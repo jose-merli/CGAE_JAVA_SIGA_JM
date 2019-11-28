@@ -898,6 +898,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String ROL_CONTRARIO_ASISTENCIA = "CA";
 	public static final String ROL_REPRESENTANTE = "RE";
 	
+	public static final Short ID_INSTITUCION_0 = 0;
+	
 	
 	
 }

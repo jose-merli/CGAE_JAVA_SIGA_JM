@@ -22,23 +22,23 @@ public class JusticiableItem {
 	private String apellido2;
 	private String direccion;
 	private String codigoPostal;
-	private String idProfesion;
+	private Short idProfesion;
 	private String regimen_conyugal;
 	private String idProvincia;
 	private String idPoblacion;
-	private String idEstadoCivil;
+	private Short idEstadoCivil;
 	private String tipoPersonajg;
-	private String idTipoIdentificacion;
+	private Short idTipoIdentificacion;
 	private String observaciones;
-	private String idRepresentantejg;
-	private String idTipoencalidad;
+	private Long idRepresentantejg;
+	private Short idTipoencalidad;
 	private String sexo;
 	private String idLenguaje;
-	private String numeroHijos;
+	private Short numeroHijos;
 	private String fax;
 	private String correoElectronico;
-	private String edad;
-	private String idMinusvalia;
+	private Short edad;
+	private Short idMinusvalia;
 	private String existeDomicilio;
 	private String idProvincia2;
 	private String idPoblacion2;
@@ -330,17 +330,17 @@ public class JusticiableItem {
 
 	/**
 	 **/
-	public JusticiableItem idProfesion(String idProfesion) {
+	public JusticiableItem idProfesion(Short idProfesion) {
 		this.idProfesion = idProfesion;
 		return this;
 	}
 
 	@JsonProperty("idprofesion")
-	public String getIdProfesion() {
+	public Short getIdProfesion() {
 		return idProfesion;
 	}
 
-	public void setIdProfesion(String idProfesion) {
+	public void setIdProfesion(Short idProfesion) {
 		this.idProfesion = idProfesion;
 	}
 
@@ -362,17 +362,17 @@ public class JusticiableItem {
 
 	/**
 	 **/
-	public JusticiableItem idEstadoCivil(String idEstadoCivil) {
+	public JusticiableItem idEstadoCivil(Short idEstadoCivil) {
 		this.idEstadoCivil = idEstadoCivil;
 		return this;
 	}
 
 	@JsonProperty("idestadocivil")
-	public String getIdEstadoCivil() {
+	public Short getIdEstadoCivil() {
 		return idEstadoCivil;
 	}
 
-	public void setIdEstadoCivil(String idEstadoCivil) {
+	public void setIdEstadoCivil(Short idEstadoCivil) {
 		this.idEstadoCivil = idEstadoCivil;
 	}
 
@@ -394,17 +394,17 @@ public class JusticiableItem {
 
 	/**
 	 **/
-	public JusticiableItem idTipoIdentificacion(String idTipoIdentificacion) {
+	public JusticiableItem idTipoIdentificacion(Short idTipoIdentificacion) {
 		this.idTipoIdentificacion = idTipoIdentificacion;
 		return this;
 	}
 
 	@JsonProperty("idtipoidentificacion")
-	public String getIdTipoIdentificacion() {
+	public Short getIdTipoIdentificacion() {
 		return idTipoIdentificacion;
 	}
 
-	public void setIdTipoIdentificacion(String idTipoIdentificacion) {
+	public void setIdTipoIdentificacion(Short idTipoIdentificacion) {
 		this.idTipoIdentificacion = idTipoIdentificacion;
 	}
 
@@ -426,33 +426,33 @@ public class JusticiableItem {
 
 	/**
 	 **/
-	public JusticiableItem idRepresentantejg(String idRepresentantejg) {
+	public JusticiableItem idRepresentantejg(Long idRepresentantejg) {
 		this.idRepresentantejg = idRepresentantejg;
 		return this;
 	}
 
 	@JsonProperty("idrepresentantejg")
-	public String getIdRepresentantejg() {
+	public Long getIdRepresentantejg() {
 		return idRepresentantejg;
 	}
 
-	public void setIdRepresentantejg(String idRepresentantejg) {
+	public void setIdRepresentantejg(Long idRepresentantejg) {
 		this.idRepresentantejg = idRepresentantejg;
 	}
 
 	/**
 	 **/
-	public JusticiableItem idTipoencalidad(String idTipoencalidad) {
+	public JusticiableItem idTipoencalidad(Short idTipoencalidad) {
 		this.idTipoencalidad = idTipoencalidad;
 		return this;
 	}
 
 	@JsonProperty("idtipoencalidad")
-	public String getIdTipoencalidad() {
+	public Short getIdTipoencalidad() {
 		return idTipoencalidad;
 	}
 
-	public void setIdTipoencalidad(String idTipoencalidad) {
+	public void setIdTipoencalidad(Short idTipoencalidad) {
 		this.idTipoencalidad = idTipoencalidad;
 	}
 
@@ -490,17 +490,17 @@ public class JusticiableItem {
 
 	/**
 	 **/
-	public JusticiableItem numeroHijos(String numeroHijos) {
+	public JusticiableItem numeroHijos(Short numeroHijos) {
 		this.numeroHijos = numeroHijos;
 		return this;
 	}
 
 	@JsonProperty("numerohijos")
-	public String getNumeroHijos() {
+	public Short getNumeroHijos() {
 		return numeroHijos;
 	}
 
-	public void setNumeroHijos(String numeroHijos) {
+	public void setNumeroHijos(Short numeroHijos) {
 		this.numeroHijos = numeroHijos;
 	}
 
@@ -538,33 +538,33 @@ public class JusticiableItem {
 
 	/**
 	 **/
-	public JusticiableItem edad(String edad) {
+	public JusticiableItem edad(Short edad) {
 		this.edad = edad;
 		return this;
 	}
 
 	@JsonProperty("edad")
-	public String getEdad() {
+	public Short getEdad() {
 		return edad;
 	}
 
-	public void setEdad(String edad) {
+	public void setEdad(Short edad) {
 		this.edad = edad;
 	}
 
 	/**
 	 **/
-	public JusticiableItem idMinusvalia(String idMinusvalia) {
+	public JusticiableItem idMinusvalia(Short idMinusvalia) {
 		this.idMinusvalia = idMinusvalia;
 		return this;
 	}
 
 	@JsonProperty("idminusvalia")
-	public String getIdMinusvalia() {
+	public Short getIdMinusvalia() {
 		return idMinusvalia;
 	}
 
-	public void setIdMinusvalia(String idMinusvalia) {
+	public void setIdMinusvalia(Short idMinusvalia) {
 		this.idMinusvalia = idMinusvalia;
 	}
 

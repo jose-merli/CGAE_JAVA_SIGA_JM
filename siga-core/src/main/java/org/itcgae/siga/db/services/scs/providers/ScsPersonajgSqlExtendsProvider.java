@@ -14,7 +14,8 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 	private Logger LOGGER = Logger.getLogger(ScsPersonajgSqlExtendsProvider.class);
 
-	public String searchIdPersonaJusticiables(JusticiableBusquedaItem justiciableBusquedaItem, Short idInstitucion, String tamMax){
+	public String searchIdPersonaJusticiables(JusticiableBusquedaItem justiciableBusquedaItem, Short idInstitucion,
+			Integer tamMax) {
 
 		LOGGER.info("INICIO MONTAJE SQL IDPERSONAS");
 
@@ -189,12 +190,14 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 			sql.WHERE("exists (" + sqlUnidadFamiliar + " union all " + sqlContrarioEjg + " union all "
 					+ sqlContrariosDesigna + " union all " + sqlDefendidosDesigna + " union all " + sqlSoj
 					+ " union all " + sqlContrariosAsistencia + " union all " + sqlAsistencia + ")");
-			
-		
+
 		}
 
-		sql.WHERE("rownum < " + tamMax);
-	
+		if (tamMax != null) {
+			Integer tamMaxNumber = tamMax + 1;
+			sql.WHERE("rownum <= " + tamMaxNumber);
+		}
+
 		LOGGER.info("MONTADA SQL IDPERSONAS");
 
 		return sql.toString();
@@ -215,7 +218,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 			if (count < 100) {
 
-				if (count == 99 || count == justiciableBusquedaItems.size()) {
+				if (count == 99 || count == justiciableBusquedaItems.size() || i + 1 == justiciableBusquedaItems.size()) {
 					idPersonas += justiciableBusquedaItems.get(i).getValor();
 					arrayPersonas.add(idPersonas);
 
@@ -240,7 +243,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("consulta.idinstitucion");
 		sql.SELECT("consulta.fechamodificacion");
 		sql.SELECT("consulta.nif");
-		sql.SELECT("concat(concat(consulta.apellido1 || ' ', consulta.apellido2) || ', ', consulta.nombre ) as nombre");
+		sql.SELECT("concat(concat(apellido1 || ' ', apellido2) ||  decode(apellido1, null, '',', '), nombre ) as nombre");
 		sql.SELECT("concat(consulta.apellido1 || ' ', consulta.apellido2) as apellidos");
 		sql.SELECT("consulta.nombre as nombresolo");
 		sql.SELECT(
@@ -376,7 +379,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlDefendidosDesigna.WHERE("(" + idPersonasIn + ")");
 
 		SQL sqlSoj = new SQL();
-		sqlSoj.SELECT("SOJ.idpersona");
+		sqlSoj.SELECT("SOJ.idpersonajg");
 		sqlSoj.SELECT("per.idinstitucion");
 		sqlSoj.SELECT("per.fechamodificacion");
 		sqlSoj.SELECT("per.nif");
@@ -386,17 +389,17 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlSoj.SELECT("SOJ.fechamodificacion as fechamodificacionasunto");
 		sqlSoj.SELECT("concat('S' || SOJ.anio || '/',lpad(SOJ.numSOJ,5,'0') ) as asunto");
 		sqlSoj.FROM("SCS_PERSONAJG per");
-		sqlSoj.INNER_JOIN("SCS_SOJ SOJ  on SOJ.idpersona = per.idpersona and SOJ.idinstitucion = per.idinstitucion");
+		sqlSoj.INNER_JOIN("SCS_SOJ SOJ  on SOJ.idpersonajg = per.idpersona and SOJ.idinstitucion = per.idinstitucion");
 		sqlSoj.WHERE("SOJ.idinstitucion = '" + idInstitucion + "'");
 
 		idPersonasIn = "";
 		for (int j = 0; j < arrayPersonas.size(); j++) {
 
 			if (j != (arrayPersonas.size() - 1)) {
-				idPersonasIn += "SOJ.idpersona in(" + arrayPersonas.get(j) + ") OR ";
+				idPersonasIn += "SOJ.idpersonajg in(" + arrayPersonas.get(j) + ") OR ";
 
 			} else {
-				idPersonasIn += "SOJ.idpersona in(" + arrayPersonas.get(j) + ")";
+				idPersonasIn += "SOJ.idpersonajg in(" + arrayPersonas.get(j) + ")";
 			}
 
 		}
@@ -412,7 +415,8 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrariosAsistencia.SELECT("per.apellido1");
 		sqlContrariosAsistencia.SELECT("per.apellido2");
 		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.fechamodificacion as fechamodificacionasunto");
-		sqlContrariosAsistencia.SELECT("concat('A' || CONTRARIOSASISTENCIA.anio || '/',lpad(a.numero,5,'0') ) as asunto");
+		sqlContrariosAsistencia
+				.SELECT("concat('A' || CONTRARIOSASISTENCIA.anio || '/',lpad(a.numero,5,'0') ) as asunto");
 		sqlContrariosAsistencia.FROM("SCS_PERSONAJG per");
 		sqlContrariosAsistencia.INNER_JOIN(
 				"SCS_CONTRARIOSASISTENCIA CONTRARIOSASISTENCIA on CONTRARIOSASISTENCIA.idpersona = per.idpersona and CONTRARIOSASISTENCIA.idinstitucion = per.idinstitucion");
@@ -607,7 +611,6 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.FROM("(" + sqlUnidadFamiliar + " union " + sqlContrarioEjg + " union all " + sqlContrariosDesigna
 				+ " union all " + sqlDefendidosDesigna + " union all " + sqlSoj + " union all "
 				+ sqlContrariosAsistencia + "union all " + sqlAsistencia + ") consulta");
-
 
 		return sql.toString();
 	}

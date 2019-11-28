@@ -101,6 +101,7 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 		List<JusticiableBusquedaItem> justiciablesItems = new ArrayList<JusticiableBusquedaItem>();
 		Error error = new Error();
 		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
 
 		if (idInstitucion != null) {
 
@@ -133,7 +134,7 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 
 						genParametrosExample.createCriteria().andModuloEqualTo("SCS")
 								.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-								.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_2000, idInstitucion));
+								.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
 						genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
@@ -149,8 +150,14 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
 
+						if(tamMax != null) {
+							tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+						}else {
+							tamMaximo = null;
+						}
+						
 						idPersonaJusticiables = scsPersonajgExtendsMapper
-								.searchIdPersonaJusticiables(justiciableBusquedaItem, idInstitucion, tamMax.get(0).getValor());
+								.searchIdPersonaJusticiables(justiciableBusquedaItem, idInstitucion, tamMaximo);
 
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener las personas justiciables");
@@ -168,6 +175,13 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
 
+						if(justiciablesItems != null && justiciablesItems.size() > tamMaximo) {
+							error.setCode(200);
+							error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+							justiciableBusquedaDTO.setError(error);
+							justiciablesItems.remove(justiciablesItems.size()-1);
+						}
+						
 						justiciableBusquedaDTO.setJusticiableBusquedaItem(justiciablesItems);
 					}
 

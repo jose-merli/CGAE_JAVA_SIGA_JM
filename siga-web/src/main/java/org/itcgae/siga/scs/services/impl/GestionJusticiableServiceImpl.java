@@ -42,6 +42,7 @@ import org.itcgae.siga.db.entities.ScsPersonajgExample;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsTelefonospersona;
 import org.itcgae.siga.db.entities.ScsTelefonospersonaExample;
+import org.itcgae.siga.db.entities.ScsTelefonospersonaKey;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -328,9 +329,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		justiciableItem.setDireccion(personajg.getDireccion());
 		justiciableItem.setDireccion2(personajg.getDireccion2());
 
-		if (personajg.getEdad() != null) {
-			justiciableItem.setEdad(String.valueOf(personajg.getEdad()));
-		}
+		justiciableItem.setEdad(personajg.getEdad());
+
 		justiciableItem.setEscaleraDir(personajg.getEscaleradir());
 		justiciableItem.setEscaleraDir2(personajg.getEscaleradir2());
 		justiciableItem.setExisteDomicilio(personajg.getExistedomicilio());
@@ -338,9 +338,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		justiciableItem.setFechaModificacion(new Date());
 		justiciableItem.setFechaNacimiento(personajg.getFechanacimiento());
 
-		if (personajg.getIdestadocivil() != null) {
-			justiciableItem.setIdEstadoCivil(String.valueOf(personajg.getIdestadocivil()));
-		}
+		justiciableItem.setIdEstadoCivil(personajg.getIdestadocivil());
 
 		if (personajg.getIdinstitucion() != null) {
 			justiciableItem.setIdInstitucion(String.valueOf(personajg.getIdinstitucion()));
@@ -348,14 +346,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		justiciableItem.setIdLenguaje(personajg.getIdlenguaje());
 
-		if (personajg.getIdminusvalia() != null) {
-			justiciableItem.setIdMinusvalia(String.valueOf(personajg.getIdminusvalia()));
-		}
+		justiciableItem.setIdMinusvalia(personajg.getIdminusvalia());
 
 		justiciableItem.setIdPais(personajg.getIdpais());
 
-		justiciableItem.setIdpaisDir1(personajg.getIdpaisdir1());
-		justiciableItem.setIdpaisDir2(personajg.getIdpaisdir2());
+		// justiciableItem.setIdpaisDir1(personajg.getIdpaisdir1());
+		// justiciableItem.setIdpaisDir2(personajg.getIdpaisdir2());
 
 		if (personajg.getIdpersona() != null) {
 			justiciableItem.setIdPersona(String.valueOf(personajg.getIdpersona()));
@@ -364,27 +360,19 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		justiciableItem.setIdPoblacion(personajg.getIdpoblacion());
 		justiciableItem.setIdPoblacion2(personajg.getIdpoblacion2());
 
-		if (personajg.getIdprofesion() != null) {
-			justiciableItem.setIdProfesion(String.valueOf(personajg.getIdprofesion()));
-		}
+		justiciableItem.setIdProfesion(personajg.getIdprofesion());
 
 		justiciableItem.setIdProvincia(personajg.getIdprovincia());
 		justiciableItem.setIdProvincia2(personajg.getIdprovincia2());
 
-		if (personajg.getIdrepresentantejg() != null) {
-			justiciableItem.setIdRepresentantejg(String.valueOf(personajg.getIdrepresentantejg()));
-		}
+		justiciableItem.setIdRepresentantejg(personajg.getIdrepresentantejg());
 
 		justiciableItem.setIdTipodir(personajg.getIdtipodir());
 		justiciableItem.setIdTipodir2(personajg.getIdtipodir2());
 
-		if (personajg.getIdtipoencalidad() != null) {
-			justiciableItem.setIdTipoencalidad(String.valueOf(personajg.getIdtipoencalidad()));
-		}
+		justiciableItem.setIdTipoencalidad(personajg.getIdtipoencalidad());
 
-		if (personajg.getIdtipoidentificacion() != null) {
-			justiciableItem.setIdTipoIdentificacion(String.valueOf(personajg.getIdtipoidentificacion()));
-		}
+		justiciableItem.setIdTipoIdentificacion(personajg.getIdtipoidentificacion());
 
 		justiciableItem.setIdTipoIdentificacionotros(personajg.getIdtipoidentificacionotros());
 		justiciableItem.setIdTipoVia(personajg.getIdtipovia());
@@ -394,9 +382,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		justiciableItem.setNumeroDir(personajg.getNumerodir());
 		justiciableItem.setNumeroDir2(personajg.getNumerodir2());
 
-		if (personajg.getNumerohijos() != null) {
-			justiciableItem.setNumeroHijos(String.valueOf(personajg.getNumerohijos()));
-		}
+		justiciableItem.setNumeroHijos(personajg.getNumerohijos());
 
 		justiciableItem.setObservaciones(personajg.getObservaciones());
 		justiciableItem.setPisoDir(personajg.getPisodir());
@@ -482,7 +468,6 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		String idPersona = null;
-		String validacion = null;
 
 		if (null != idInstitucion) {
 
@@ -610,18 +595,15 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			scsPersonajg.setDireccion(justiciableItem.getDireccion());
 			scsPersonajg.setDireccion2(justiciableItem.getDireccion2());
 
-			if (justiciableItem.getEdad() != null && justiciableItem.getEdad() != "") {
-				scsPersonajg.setEdad(Short.valueOf(justiciableItem.getEdad()));
-			}
+			scsPersonajg.setEdad(justiciableItem.getEdad());
+
 			scsPersonajg.setEscaleradir(justiciableItem.getEscaleraDir());
 			scsPersonajg.setEscaleradir2(justiciableItem.getEscaleraDir2());
 			scsPersonajg.setExistedomicilio(justiciableItem.getExisteDomicilio());
 			scsPersonajg.setFax(justiciableItem.getFax());
 			scsPersonajg.setFechanacimiento(justiciableItem.getFechaNacimiento());
 
-			if (justiciableItem.getIdEstadoCivil() != null && justiciableItem.getIdEstadoCivil() != "") {
-				scsPersonajg.setIdestadocivil(Short.valueOf(justiciableItem.getIdEstadoCivil()));
-			}
+			scsPersonajg.setIdestadocivil(justiciableItem.getIdEstadoCivil());
 
 			if (justiciableItem.getIdInstitucion() != null && justiciableItem.getIdInstitucion() != "") {
 				scsPersonajg.setIdinstitucion(Short.valueOf(justiciableItem.getIdInstitucion()));
@@ -629,14 +611,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 			scsPersonajg.setIdlenguaje(justiciableItem.getIdLenguaje());
 
-			if (justiciableItem.getIdMinusvalia() != null && justiciableItem.getIdMinusvalia() != "") {
-				scsPersonajg.setIdminusvalia(Short.valueOf(justiciableItem.getIdMinusvalia()));
-			}
+			scsPersonajg.setIdminusvalia(justiciableItem.getIdMinusvalia());
 
 			scsPersonajg.setIdpais(justiciableItem.getIdPais());
 
-			scsPersonajg.setIdpaisdir1(justiciableItem.getIdpaisDir1());
-			scsPersonajg.setIdpaisdir2(justiciableItem.getIdpaisDir2());
+			// scsPersonajg.setIdpaisdir1(justiciableItem.getIdpaisDir1());
+			// scsPersonajg.setIdpaisdir2(justiciableItem.getIdpaisDir2());
 
 			if (justiciableItem.getIdPersona() != null && justiciableItem.getIdPersona() != "") {
 				scsPersonajg.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
@@ -645,39 +625,29 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			scsPersonajg.setIdpoblacion(justiciableItem.getIdPoblacion());
 			scsPersonajg.setIdpoblacion2(justiciableItem.getIdPoblacion2());
 
-			if (justiciableItem.getIdProfesion() != null && justiciableItem.getIdProfesion() != "") {
-				scsPersonajg.setIdprofesion(Short.valueOf(justiciableItem.getIdProfesion()));
-			}
+			scsPersonajg.setIdprofesion(justiciableItem.getIdProfesion());
 
 			scsPersonajg.setIdprovincia(justiciableItem.getIdProvincia());
 			scsPersonajg.setIdprovincia2(justiciableItem.getIdProvincia2());
 
-			if (justiciableItem.getIdRepresentantejg() != null && justiciableItem.getIdRepresentantejg() != "") {
-				scsPersonajg.setIdrepresentantejg(Long.decode(justiciableItem.getIdRepresentantejg()));
-			}
+			scsPersonajg.setIdrepresentantejg(justiciableItem.getIdRepresentantejg());
 
 			scsPersonajg.setIdtipodir(justiciableItem.getIdTipodir());
 			scsPersonajg.setIdtipodir2(justiciableItem.getIdTipodir2());
 
-			if (justiciableItem.getIdTipoencalidad() != null && justiciableItem.getIdTipoencalidad() != "") {
-				scsPersonajg.setIdtipoencalidad(Short.valueOf(justiciableItem.getIdTipoencalidad()));
-			}
+			scsPersonajg.setIdtipoencalidad(justiciableItem.getIdTipoencalidad());
 
-			if (justiciableItem.getIdTipoIdentificacion() != null && justiciableItem.getIdTipoIdentificacion() != "") {
-				scsPersonajg.setIdtipoidentificacion(Short.valueOf(justiciableItem.getIdTipoIdentificacion()));
-			}
+			scsPersonajg.setIdtipoidentificacion(justiciableItem.getIdTipoIdentificacion());
 
 			scsPersonajg.setIdtipoidentificacionotros(justiciableItem.getIdTipoIdentificacionotros());
 			scsPersonajg.setIdtipovia(justiciableItem.getIdTipoVia());
 			scsPersonajg.setIdtipovia2(justiciableItem.getIdTipoVia2());
-			scsPersonajg.setNif(justiciableItem.getNif());
+			scsPersonajg.setNif(justiciableItem.getNif().toUpperCase());
 			scsPersonajg.setNombre(justiciableItem.getNombre());
 			scsPersonajg.setNumerodir(justiciableItem.getNumeroDir());
 			scsPersonajg.setNumerodir2(justiciableItem.getNumeroDir2());
 
-			if (justiciableItem.getNumeroHijos() != null && justiciableItem.getNumeroHijos() != "") {
-				scsPersonajg.setNumerohijos(Short.valueOf(justiciableItem.getNumeroHijos()));
-			}
+			scsPersonajg.setNumerohijos(justiciableItem.getNumeroHijos());
 
 			scsPersonajg.setObservaciones(justiciableItem.getObservaciones());
 			scsPersonajg.setPisodir(justiciableItem.getPisoDir());
@@ -797,94 +767,88 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						LOGGER.info(
 								"updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida de scsPersonajgExtendsMapper para modificar al justiciable");
 
-						if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0
-								&& datosGenerales) {
+						ScsTelefonospersonaExample example = new ScsTelefonospersonaExample();
+						example.createCriteria().andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()))
+						.andIdinstitucionEqualTo(idInstitucion);
 
-							for (JusticiableTelefonoItem telefono : justiciableItem.getTelefonos()) {
+						LOGGER.info(
+								"updateJusticiable() / scsTelefonosPersonaExtendsMapper.selectByExample() -> Entrada a scsTelefonosPersonaExtendsMapper para buscar telefonos al justiciable");
 
-								if (telefono.getIdTelefono() != null) {
+						List<ScsTelefonospersona> telefonosList = scsTelefonosPersonaExtendsMapper
+								.selectByExample(example);
 
-									ScsTelefonospersonaExample scsTelefonospersonaExamples = new ScsTelefonospersonaExample();
-									scsTelefonospersonaExamples.createCriteria()
-											.andIdpersonaEqualTo(Long.valueOf(telefono.getIdPersona()))
-											.andIdtelefonoEqualTo(Long.valueOf(telefono.getIdTelefono()))
-											.andIdinstitucionEqualTo(Short.valueOf(telefono.getIdInstitucion()));
+						LOGGER.info(
+								"updateJusticiable() / scsTelefonosPersonaExtendsMapper.selectByExample() -> Entrada a scsTelefonosPersonaExtendsMapper para buscar telefonos al justiciable");
 
-									List<ScsTelefonospersona> telefonosList = scsTelefonosPersonaExtendsMapper
-											.selectByExample(scsTelefonospersonaExamples);
+						// Eliminamos todos los telefonos guardado en bbdd
+						if (telefonosList != null && telefonosList.size() > 0) {
 
-									if (telefonosList != null && telefonosList.size() > 0) {
+							for (ScsTelefonospersona telefono : telefonosList) {
 
-										ScsTelefonospersona scsTelefonospersona = telefonosList.get(0);
+								ScsTelefonospersonaKey keyTel = new ScsTelefonospersonaKey();
+								keyTel.setIdinstitucion(idInstitucion);
+								keyTel.setIdpersona(telefono.getIdpersona());
+								keyTel.setIdtelefono(telefono.getIdtelefono());
 
-										scsTelefonospersona.setNombretelefono(telefono.getNombreTelefono());
-										scsTelefonospersona.setNumerotelefono(telefono.getNumeroTelefono());
+								LOGGER.info(
+										"updateJusticiable() / scsTelefonosPersonaExtendsMapper.deleteByExample() -> Entrada a scsTelefonosPersonaExtendsMapper para eliminar telefonos al justiciable");
 
-										if (telefono.getPreferenteSms() != null && telefono.getPreferenteSms() != "") {
-											scsTelefonospersona
-													.setPreferentesms(Short.valueOf(telefono.getPreferenteSms()));
-										}
+								response = scsTelefonosPersonaExtendsMapper.deleteByPrimaryKey(keyTel);
 
-										scsTelefonospersona.setFechamodificacion(new Date());
-										scsTelefonospersona.setUsumodificacion(usuario.getIdusuario());
-
-										LOGGER.info(
-												"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Entrada a scsTelefonospersonaMapper para modificar los telefonos del justiciable");
-
-										response = scsTelefonosPersonaExtendsMapper
-												.updateByPrimaryKey(scsTelefonospersona);
-
-										LOGGER.info(
-												"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Salida de scsTelefonospersonaMapper para modificar los telefonos del justiciable");
-
-									}
-								} else {
-
-									ScsTelefonospersona scsTelefonospersona = new ScsTelefonospersona();
-
-									LOGGER.info(
-											"updateJusticiable() / scsTelefonospersonaMapper.getIdTelefono() -> Entrada a scsTelefonospersonaMapper para obtener idTelefono a crear");
-
-									NewIdDTO idT = scsTelefonosPersonaExtendsMapper.getIdTelefono(justiciableItem,
-											idInstitucion);
-
-									if (idT == null) {
-										scsTelefonospersona.setIdtelefono((long) 1);
-									} else {
-										long idTelefono = (long) (Integer.parseInt(idT.getNewId()) + 1);
-										scsTelefonospersona.setIdtelefono(idTelefono);
-									}
-
-									LOGGER.info(
-											"updateJusticiable() / scsTelefonospersonaMapper.getIdTelefono() -> Salida de scsTelefonospersonaMapper para obtener idTelefono a crear");
-
-									scsTelefonospersona.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
-									scsTelefonospersona.setIdinstitucion(idInstitucion);
-									scsTelefonospersona.setNombretelefono(telefono.getNombreTelefono());
-									scsTelefonospersona.setNumerotelefono(telefono.getNumeroTelefono());
-
-									if (telefono.getPreferenteSms() != null && telefono.getPreferenteSms() != "") {
-										scsTelefonospersona
-												.setPreferentesms(Short.valueOf(telefono.getPreferenteSms()));
-									}
-
-									scsTelefonospersona.setFechamodificacion(new Date());
-									scsTelefonospersona.setUsumodificacion(usuario.getIdusuario());
-
-									LOGGER.info(
-											"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Entrada a scsTelefonospersonaMapper para modificar los telefonos del justiciable");
-
-									response = scsTelefonosPersonaExtendsMapper.insert(scsTelefonospersona);
-
-									LOGGER.info(
-											"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Salida de scsTelefonospersonaMapper para modificar los telefonos del justiciable");
-
-								}
+								LOGGER.info(
+										"updateJusticiable() / scsTelefonosPersonaExtendsMapper.deleteByExample() -> Entrada a scsTelefonosPersonaExtendsMapper para eliminar telefonos al justiciable");
 
 							}
 
 						}
 
+						if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0
+								&& datosGenerales) {
+
+							// Añadimos los telefonos nuevos
+							for (JusticiableTelefonoItem telefono : justiciableItem.getTelefonos()) {
+
+								ScsTelefonospersona scsTelefonospersona = new ScsTelefonospersona();
+
+								LOGGER.info(
+										"updateJusticiable() / scsTelefonospersonaMapper.getIdTelefono() -> Entrada a scsTelefonospersonaMapper para obtener idTelefono a crear");
+
+								NewIdDTO idT = scsTelefonosPersonaExtendsMapper.getIdTelefono(justiciableItem,
+										idInstitucion);
+
+								if (idT == null) {
+									scsTelefonospersona.setIdtelefono((long) 1);
+								} else {
+									long idTelefono = (long) (Integer.parseInt(idT.getNewId()) + 1);
+									scsTelefonospersona.setIdtelefono(idTelefono);
+								}
+
+								LOGGER.info(
+										"updateJusticiable() / scsTelefonospersonaMapper.getIdTelefono() -> Salida de scsTelefonospersonaMapper para obtener idTelefono a crear");
+
+								scsTelefonospersona.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
+								scsTelefonospersona.setIdinstitucion(idInstitucion);
+								scsTelefonospersona.setNombretelefono(telefono.getNombreTelefono());
+								scsTelefonospersona.setNumerotelefono(telefono.getNumeroTelefono());
+
+								if (telefono.getPreferenteSms() != null && telefono.getPreferenteSms() != "") {
+									scsTelefonospersona.setPreferentesms(Short.valueOf(telefono.getPreferenteSms()));
+								}
+
+								scsTelefonospersona.setFechamodificacion(new Date());
+								scsTelefonospersona.setUsumodificacion(usuario.getIdusuario());
+
+								LOGGER.info(
+										"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Entrada a scsTelefonospersonaMapper para modificar los telefonos del justiciable");
+
+								response = scsTelefonosPersonaExtendsMapper.insert(scsTelefonospersona);
+
+								LOGGER.info(
+										"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Salida de scsTelefonospersonaMapper para modificar los telefonos del justiciable");
+
+							}
+
+						}
 					}
 
 				} catch (Exception e) {
@@ -1257,12 +1221,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		String datosInteres = "";
 
 		if (estadoEjg.getDescripcion() != null) {
-			datosInteres += "Estado: " + estadoEjg.getDescripcion();
+			datosInteres += "<b>Estado</b>: " + estadoEjg.getDescripcion();
 			datosInteres += "<br/>";
 		}
 
 		if (asuntoEjg.getExpedienteInsostenibilidad() != null) {
-			datosInteres += "Expediente de insostenibilidad: " + asuntoEjg.getExpedienteInsostenibilidad();
+			datosInteres += "<b>Expediente de insostenibilidad</b>: " + asuntoEjg.getExpedienteInsostenibilidad();
 			datosInteres += "<br/>";
 		}
 
@@ -1270,57 +1234,57 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				&& estadoEjg.getIdEstadoejg().equals(SigaConstants.TIPO_ESTADO_EJG_DICTAMINADO)) {
 
 			if (asuntoEjg.getDictamen() != null) {
-				datosInteres += "Tipo Dictamen: " + asuntoEjg.getDictamen();
+				datosInteres += "<b>Tipo Dictamen</b>: " + asuntoEjg.getDictamen();
 				datosInteres += "<br/>";
 			}
 
 			if (asuntoEjg.getFundamentoCalificacion() != null) {
-				datosInteres += "Fundamento Calificación: " + asuntoEjg.getFundamentoCalificacion();
+				datosInteres += "Fundamento Calificación</b>: " + asuntoEjg.getFundamentoCalificacion();
 				datosInteres += "<br/>";
 			}
 
 			if (asuntoEjg.getFecha() != null) {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String fecha = dateFormat.format(asuntoEjg.getFecha());
-				datosInteres += "Fecha: " + fecha;
+				datosInteres += "<b>Fecha</b>: " + fecha;
 			}
 
 		} else if (estadoEjg.getIdEstadoejg() != null
 				&& estadoEjg.getIdEstadoejg().equals(SigaConstants.TIPO_ESTADO_EJG_RESUELTO_COMISION)) {
 
 			if (asuntoEjg.getTipoResolucion() != null) {
-				datosInteres += "Resolución: " + asuntoEjg.getTipoResolucion();
+				datosInteres += "<b>Resolución</b>: " + asuntoEjg.getTipoResolucion();
 				datosInteres += "<br/>";
 			}
 
 			if (asuntoEjg.getTipoFundamento() != null) {
-				datosInteres += "Fundamento Jurídico: " + asuntoEjg.getTipoFundamento();
+				datosInteres += "<b>Fundamento Jurídico</b>: " + asuntoEjg.getTipoFundamento();
 				datosInteres += "<br/>";
 			}
 
 			if (asuntoEjg.getFecha() != null) {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String fecha = dateFormat.format(asuntoEjg.getFecha());
-				datosInteres += "Fecha: " + fecha;
+				datosInteres += "<b>Fecha</b>: " + fecha;
 			}
 
 		} else if (estadoEjg.getIdEstadoejg() != null
 				&& estadoEjg.getIdEstadoejg().equals(SigaConstants.TIPO_ESTADO_EJG_RESUELTA_IMPUGNACION)) {
 
 			if (asuntoEjg.getTipoResolucionAuto() != null) {
-				datosInteres += "Auto Resolutorio: " + asuntoEjg.getTipoResolucionAuto();
-				datosInteres += "<br>";
+				datosInteres += "<b>Auto Resolutorio</b>: " + asuntoEjg.getTipoResolucionAuto();
+				datosInteres += "<br/>";
 			}
 
 			if (asuntoEjg.getTipoSentidoAuto() != null) {
-				datosInteres += "Sentido Auto: " + asuntoEjg.getTipoSentidoAuto();
-				datosInteres += "<br>";
+				datosInteres += "<b>Sentido Auto</b>: " + asuntoEjg.getTipoSentidoAuto();
+				datosInteres += "<br/>";
 			}
 
 			if (asuntoEjg.getFecha() != null) {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String fecha = dateFormat.format(asuntoEjg.getFecha());
-				datosInteres += "Fecha: " + fecha;
+				datosInteres += "<b>Fecha</b>: " + fecha;
 			}
 
 		}
@@ -1960,31 +1924,18 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_DESIGNACION)) {
 
-			if (justiciableItem.isCheckNoInformadaDireccion()) {
-				if (justiciableItem.getSexo() != null && justiciableItem.getSexo() != ""
-						&& justiciableItem.getIdEstadoCivil() != null && justiciableItem.getIdEstadoCivil() != ""
-						&& justiciableItem.getRegimen_conyugal() != null
-						&& justiciableItem.getRegimen_conyugal() != "") {
+			if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
+					&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
+					&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
+					&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
+					&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
+					&& justiciableItem.getSexo() != null && justiciableItem.getSexo() != ""
+					&& justiciableItem.getIdEstadoCivil() != null && justiciableItem.getRegimen_conyugal() != null
+					&& justiciableItem.getRegimen_conyugal() != "") {
 
-					error = null;
-				} else {
-					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.sex.estcivil.regconyugal";
-				}
+				error = null;
 			} else {
-				if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
-						&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
-						&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
-						&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
-						&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
-						&& justiciableItem.getSexo() != null && justiciableItem.getSexo() != ""
-						&& justiciableItem.getIdEstadoCivil() != null && justiciableItem.getIdEstadoCivil() != ""
-						&& justiciableItem.getRegimen_conyugal() != null
-						&& justiciableItem.getRegimen_conyugal() != "") {
-
-					error = null;
-				} else {
-					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.sex.estcivil.regconyugal";
-				}
+				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.sex.estcivil.regconyugal";
 			}
 
 		}
@@ -2022,27 +1973,17 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
-			if (justiciableItem.isCheckNoInformadaDireccion()) {
-				if (justiciableItem.getIdPais() != null && justiciableItem.getIdPais() != ""
-						&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != "") {
+			if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
+					&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
+					&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
+					&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
+					&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
+					&& justiciableItem.getIdPais() != null && justiciableItem.getIdPais() != ""
+					&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != "") {
 
-					error = null;
-				} else {
-					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.nacionalidad.parentesco";
-				}
+				error = null;
 			} else {
-				if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
-						&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
-						&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
-						&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
-						&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
-						&& justiciableItem.getIdPais() != null && justiciableItem.getIdPais() != ""
-						&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != "") {
-
-					error = null;
-				} else {
-					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.nacionalidad.parentesco";
-				}
+				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.nacionalidad.parentesco";
 			}
 
 		}
@@ -2060,27 +2001,17 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
-			if (justiciableItem.isCheckNoInformadaDireccion()) {
-				if (justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
-						&& justiciableItem.getFechaNacimiento() != null) {
+			if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
+					&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
+					&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
+					&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
+					&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
+					&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
+					&& justiciableItem.getFechaNacimiento() != null) {
 
-					error = null;
-				} else {
-					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.fechaNac.parentesco";
-				}
+				error = null;
 			} else {
-				if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
-						&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
-						&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
-						&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
-						&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
-						&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
-						&& justiciableItem.getFechaNacimiento() != null) {
-
-					error = null;
-				} else {
-					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.fechaNac.parentesco";
-				}
+				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.fechaNac.parentesco";
 			}
 
 		}

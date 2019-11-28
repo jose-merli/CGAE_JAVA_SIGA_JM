@@ -23,7 +23,7 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 	@Results({ 
 		@Result(column = "IDPERSONA", property = "valor", jdbcType = JdbcType.VARCHAR),
 	})
-	List<StringDTO> searchIdPersonaJusticiables(JusticiableBusquedaItem justiciableBusquedaItem, Short idInstitucion, String tamMax);
+	List<StringDTO> searchIdPersonaJusticiables(JusticiableBusquedaItem justiciableBusquedaItem, Short idInstitucion, Integer tamMax);
 	
 	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "searchJusticiables")
 	@Results({ 
