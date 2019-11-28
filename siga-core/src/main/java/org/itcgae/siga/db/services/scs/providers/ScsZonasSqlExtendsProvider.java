@@ -66,7 +66,7 @@ public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
 		sql1.FROM("(" + sql.toString() + ") consulta");
 		
 		if(zonasItem.getDescripcionsubzona() != null && zonasItem.getDescripcionsubzona() != "") {
-			sql1.WHERE("UPPER(consulta.nombre) like UPPER('%"+ zonasItem.getDescripcionsubzona() + "%')");
+			sql1.WHERE("UPPER(consulta.nombresubzonas) like UPPER('%"+ zonasItem.getDescripcionsubzona() + "%')");
 		}
 		
 		if(zonasItem.getDescripcionpartido() != null && zonasItem.getDescripcionpartido() != "") {

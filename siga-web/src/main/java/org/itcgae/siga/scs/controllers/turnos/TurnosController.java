@@ -2,38 +2,14 @@ package org.itcgae.siga.scs.controllers.turnos;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.AreasDTO;
- 
-import org.itcgae.siga.DTO.scs.AreasItem;
-import org.itcgae.siga.DTO.scs.ComboColaOrdenadaDTO;
-import org.itcgae.siga.DTO.scs.ComisariaDTO;
-import org.itcgae.siga.DTO.scs.ComisariaItem;
-import org.itcgae.siga.DTO.scs.MateriasDTO;
-import org.itcgae.siga.DTO.scs.ModulosItem;
-import org.itcgae.siga.DTO.scs.PartidasDTO;
-import org.itcgae.siga.DTO.scs.PartidasItem;
-import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
-import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
-import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
-import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
-import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
-import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTO.scs.CosteFijoDTO;
-import org.itcgae.siga.DTO.scs.FundamentoResolucionItem;
-import org.itcgae.siga.DTO.scs.TiposActuacionDTO;
-import org.itcgae.siga.DTO.scs.TiposActuacionItem;
-import org.itcgae.siga.DTO.scs.TiposAsistenciaItem;
-import org.itcgae.siga.DTO.scs.TiposAsistenciasDTO;
 import org.itcgae.siga.DTO.scs.TurnosDTO;
 import org.itcgae.siga.DTO.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.scs.service.IGestionTurnosService;
-
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -197,23 +173,6 @@ public class TurnosController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-
-	@RequestMapping(value = "/combossjcs/ordenColaEnvios", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> ordenCola(String idordenacioncolas, HttpServletRequest request) { 
-		ComboDTO response = turnosService.ordenColaEnvios(request, idordenacioncolas);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-	}
-	
-	
-	@RequestMapping(value = "/combossjcs/ordenCola",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboColaOrdenadaDTO> ordenCola(HttpServletRequest request, @RequestBody TurnosItem turnosItem) {
-		
-		ComboColaOrdenadaDTO response = turnosService.ordenCola(request, turnosItem);
-		if(response.getError() == null)
-			return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/turnos/tarjetaGuardarPesos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

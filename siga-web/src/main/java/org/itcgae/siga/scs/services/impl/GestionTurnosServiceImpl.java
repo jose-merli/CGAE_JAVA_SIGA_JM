@@ -1,16 +1,20 @@
 package org.itcgae.siga.scs.services.impl;
 
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+
 import org.itcgae.siga.DTO.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTO.scs.ComboColaOrdenadaItem;
+
 import org.itcgae.siga.DTO.scs.TurnosDTO;
 import org.itcgae.siga.DTO.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -23,6 +27,7 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
@@ -33,6 +38,9 @@ import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
 import org.itcgae.siga.db.entities.ScsProcurador;
 import org.itcgae.siga.db.entities.ScsProcuradorExample;
+
+import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
+
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
@@ -96,7 +104,6 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
 
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
@@ -138,8 +145,6 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-
-				AdmUsuarios usuario = usuarios.get(0);
 
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
@@ -509,8 +514,11 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-				try {
+
 					ScsOrdenacioncolas ordenacion = new ScsOrdenacioncolas();
+
+				try{
+
 					NewIdDTO idOrdenacion = scsTurnosExtendsMapper.getIdOrdenacion(idInstitucion);
 
 					idOrdenacionNuevo = (Integer.parseInt(idOrdenacion.getNewId()) + 1);
@@ -723,6 +731,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		return insertResponseDTO;
 	}
 
+
 	public ComboColaOrdenadaDTO ordenCola(HttpServletRequest request, TurnosItem turnosItem) {
 		LOGGER.info("getPerfiles() -> Entrada al servicio para obtener los perfiles disponibles");
 
@@ -742,7 +751,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 				AdmUsuarios usuario = usuarios.get(0);
-				comboItems = scsOrdenacioncolasExtendsMapper.ordenColas(turnosItem);
+				comboItems = scsOrdenacioncolasExtendsMapper.ordenColas(turnosItem.getIdordenacioncolas());
 				comboDTO.setColaOrden(comboItems);
 
 			}
@@ -759,41 +768,6 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		return comboDTO;
 	}
 
-	@Override
-	public ComboDTO ordenColaEnvios(HttpServletRequest request, String idordenacioncolas) {
-		LOGGER.info("getPerfiles() -> Entrada al servicio para obtener los perfiles disponibles");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-
-		if (null != idInstitucion) {
-			ScsOrdenacioncolasExample example = new ScsOrdenacioncolasExample();
-			example.createCriteria().andIdordenacioncolasEqualTo(Integer.parseInt(idordenacioncolas));
-
-			List<ScsOrdenacioncolas> listaordenacion = scsOrdenacioncolasMapper.selectByExample(example);
-			if (null != listaordenacion && listaordenacion.size() > 0) {
-				comboItems = scsOrdenacioncolasExtendsMapper.ordenColasEnvios(idordenacioncolas);
-
-				// Se debe de incluir el placeholder de "Seleccionar" en el combo de perfiles
-				// if(null != comboItems && comboItems.size() > 0) {
-				// ComboItem element = new ComboItem();
-				// element.setLabel("");
-				// element.setValue("");
-				// comboItems.add(0, element);
-				// }
-
-				comboDTO.setCombooItems(comboItems);
-			}
-		}
-
-		LOGGER.info("getPerfiles() -> Salida del servicio para obtener los perfiles disponibles");
-		return comboDTO;
-	}
 
 	@Override
 	public TurnosDTO busquedaColaOficio(TurnosItem turnosItem, HttpServletRequest request) {
