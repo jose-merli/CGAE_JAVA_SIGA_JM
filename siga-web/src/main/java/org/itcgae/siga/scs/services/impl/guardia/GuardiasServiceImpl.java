@@ -115,13 +115,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 								.andIdturnoEqualTo(Integer.valueOf(guardiaItem.getIdTurno()));
 
 						LOGGER.info(
-								"deleteGuardias() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prision");
+								"deleteGuardias() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a scsGuardiasturnoExtendsMapper para buscar la guardia");
 
 						List<ScsGuardiasturno> guardiasList = scsGuardiasturnoExtendsMapper
 								.selectByExample(scsGuardiasExample);
 
 						LOGGER.info(
-								"deleteGuardias() / scsPrisionExtendsMapper.selectByExample() -> Salida de scsPrisionExtendsMapper para buscar la prision");
+								"deleteGuardias() / scsGuardiasturnoExtendsMapper.selectByExample() -> Salida de scsGuardiasturnoExtendsMapper para buscar la guardia");
 
 						if (null != guardiasList && guardiasList.size() > 0) {
 
@@ -132,16 +132,17 @@ public class GuardiasServiceImpl implements GuardiasService {
 							guardia.setUsumodificacion(usuario.getIdusuario());
 
 							LOGGER.info(
-									"deleteGuardias() / scsPrisionExtendsMapper.updateByPrimaryKey() -> Entrada a scsPrisionExtendsMapper para dar de baja a una prision");
+									"deleteGuardias() / scsGuardiasturnoExtendsMapper.updateByPrimaryKey() -> Entrada a scsGuardiasturnoExtendsMapper para dar de baja a una guardia");
 
 							response = scsGuardiasturnoExtendsMapper.updateByPrimaryKey(guardia);
 
 							LOGGER.info(
-									"deleteGuardias() / scsPrisionExtendsMapper.updateByPrimaryKey() -> Salida de scsPrisionExtendsMapper para dar de baja a una prision");
+									"deleteGuardias() / scsGuardiasturnoExtendsMapper.updateByPrimaryKey() -> Salida de scsGuardiasturnoExtendsMapper para dar de baja a una guardia");
 						}
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -207,13 +208,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 								.andIdturnoEqualTo(Integer.valueOf(guardiaItem.getIdTurno()));
 
 						LOGGER.info(
-								"activateGuardias() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prision");
+								"activateGuardias() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a scsGuardiasturnoExtendsMapper para buscar la guardia");
 
 						List<ScsGuardiasturno> guardiasList = scsGuardiasturnoExtendsMapper
 								.selectByExample(scsGuardiasExample);
 
 						LOGGER.info(
-								"activateGuardias() / scsPrisionExtendsMapper.selectByExample() -> Salida de scsPrisionExtendsMapper para buscar la prision");
+								"activateGuardias() / scsGuardiasturnoExtendsMapper.selectByExample() -> Salida de scsGuardiasturnoExtendsMapper para buscar la guardia");
 
 						if (null != guardiasList && guardiasList.size() > 0) {
 
@@ -224,17 +225,18 @@ public class GuardiasServiceImpl implements GuardiasService {
 							guardia.setUsumodificacion(usuario.getIdusuario());
 
 							LOGGER.info(
-									"activateGuardias() / scsPrisionExtendsMapper.updateByPrimaryKey() -> Entrada a scsPrisionExtendsMapper para dar de baja a una prision");
+									"activateGuardias() / scsGuardiasturnoExtendsMapper.updateByPrimaryKey() -> Entrada a scsGuardiasturnoExtendsMapper para dar de baja a una prision");
 
 							response = scsGuardiasturnoExtendsMapper.updateByPrimaryKey(guardia);
 
 							LOGGER.info(
-									"activateGuardias() / scsPrisionExtendsMapper.updateByPrimaryKey() -> Salida de scsPrisionExtendsMapper para dar de baja a una prision");
+									"activateGuardias() / scsGuardiasturnoExtendsMapper.updateByPrimaryKey() -> Salida de scsGuardiasturnoExtendsMapper para dar de baja a una prision");
 						}
 
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -254,7 +256,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("activateGuardias() -> Salida del servicio para dar de alta a las prisiones");
+		LOGGER.info("activateGuardias() -> Salida del servicio para dar de alta las guardias");
 
 		return updateResponseDTO;
 
