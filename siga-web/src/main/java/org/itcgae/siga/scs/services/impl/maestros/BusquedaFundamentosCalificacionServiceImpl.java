@@ -499,8 +499,8 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 					// Obtenemos el fundamento de resolucion que queremos modificar
 					ScsTipofundamentocalifExample example = new ScsTipofundamentocalifExample();
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).
-							andIdfundamentocalifEqualTo(Short.valueOf(fundamentosCalificacionItem.getIdFundamento()))
-							.andFechabajaIsNull();
+							andIdfundamentocalifEqualTo(Short.valueOf(fundamentosCalificacionItem.getIdFundamento()));
+//							.andFechabajaIsNull();
 
 					LOGGER.info(
 							"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
@@ -558,11 +558,17 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 						GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
 						genRecursosCatalogos.setIdrecurso(fundamento.getDescripcion());
 						genRecursosCatalogos.setIdinstitucion(idInstitucion);
-						genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
+						genRecursosCatalogos.setIdlenguaje(usuarios.get(0).getIdlenguaje());
+						genRecursosCatalogos = genRecursosCatalogosExtendsMapper
+								.selectByPrimaryKey(genRecursosCatalogos);
+						genRecursosCatalogos.setFechamodificacion(new Date());
+						genRecursosCatalogos.setUsumodificacion(usuario.getIdusuario().intValue());
+						genRecursosCatalogos.setDescripcion(fundamentosCalificacionItem.getDescripcionFundamento());
 						response = scsFundamentoscalificacionExtendsMapper.updateByPrimaryKey(fundamento);
+
+						genRecursosCatalogosExtendsMapper.updateByPrimaryKey(genRecursosCatalogos);
+
 						
-						genRecursosCatalogos = genRecursosCatalogosExtendsMapper.selectByPrimaryKey(genRecursosCatalogos);
-						genRecursosCatalogosExtendsMapper.updateByPrimaryKey(genRecursosCatalogos);	
 						updateRestoIdiomas(genRecursosCatalogos);
 							
 						updateResponseDTO.setId(fundamento.getIdfundamentocalif().toString());

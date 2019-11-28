@@ -44,6 +44,21 @@ public interface ScsDestinatariosRetencionesExtendsMapper extends FcsDestinatari
 	})
 	List<DestinatariosItem> searchDestinatario(DestinatariosItem destinatariosItems);
 	
+	@SelectProvider(type=ScsDestinatariosRetencionesSqlExtendsProvider.class, method="updateRetenciones")
+    @Results({
+    	@Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="IDDESTINATARIO", property="iddestinatario", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="NOMBRE", property="nombre", jdbcType=JdbcType.VARCHAR),
+        @Result(column="FECHAMODIFICACION", property="fechamodificacion", jdbcType=JdbcType.TIMESTAMP),
+        @Result(column="USUMODIFICACION", property="usumodificacion", jdbcType=JdbcType.DECIMAL),
+        @Result(column="CODIGOEXT", property="codigoext", jdbcType=JdbcType.VARCHAR),
+        @Result(column="BLOQUEADO", property="bloqueado", jdbcType=JdbcType.CHAR),
+        @Result(column="CUENTACONTABLE", property="cuentacontable", jdbcType=JdbcType.VARCHAR),
+        @Result(column="ORDEN", property="orden", jdbcType=JdbcType.DECIMAL),
+        @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP)
+	})
+	List<DestinatariosItem> updateRetenciones(Short idInstitucion,DestinatariosItem destinatariosItem);
+	
 	@SelectProvider(type = ScsDestinatariosRetencionesSqlExtendsProvider.class, method = "getIdDestinatariosRetenc")
 	@Results({ @Result(column = "IDDESTINATARIORETENCIONES", property = "newId", jdbcType = JdbcType.DECIMAL, id=true)
 	})

@@ -29,4 +29,6 @@ public interface IFichaAreasService {
 
 	public InsertResponseDTO createMaterias(AreasItem areasItem, HttpServletRequest request);
 
+	public UpdateResponseDTO activateAreas(AreasDTO areasDTO, HttpServletRequest request);
+
 }

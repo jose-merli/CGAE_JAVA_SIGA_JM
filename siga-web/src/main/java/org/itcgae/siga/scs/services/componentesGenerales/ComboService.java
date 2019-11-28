@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.services.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface ComboService {
@@ -25,5 +26,11 @@ public interface ComboService {
 	public ComboDTO getComboGrupoFacturacion(HttpServletRequest request);
 
 	public ComboDTO getComboPartidasPresupuestarias(HttpServletRequest request);
+
+	public ComboDTO comboRequisitosGuardias(HttpServletRequest request);
 	
+	public ComboDTO comboGuardias(HttpServletRequest request, String idTurno);
+	
+	public ComboColaOrdenadaDTO ordenCola(HttpServletRequest request, String idordenacioncolas);
+
 }

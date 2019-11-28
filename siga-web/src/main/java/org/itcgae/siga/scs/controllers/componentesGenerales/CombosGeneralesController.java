@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.controllers.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +75,25 @@ public class CombosGeneralesController {
 	}
 	
 	@GetMapping("/jurisdicciones")
-	public ResponseEntity<ComboDTO> combo(HttpServletRequest request) {
+	public ResponseEntity<ComboDTO> comboJurisdicciones(HttpServletRequest request) {
 		ComboDTO response = comboService.getJurisdicciones(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/guardias")
+	public ResponseEntity<ComboDTO> comboGuardias(HttpServletRequest request, String idTurno) {
+		ComboDTO response = comboService.comboGuardias(request, idTurno);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/ordenCola")
+	ResponseEntity<ComboColaOrdenadaDTO> ordenCola(HttpServletRequest request, String idordenacioncolas) {
+		
+		ComboColaOrdenadaDTO response = comboService.ordenCola(request, idordenacioncolas);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 

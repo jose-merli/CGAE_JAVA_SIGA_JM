@@ -18,12 +18,12 @@ public interface ScsRetencionirpfExtendsMapper extends ScsMaestroretencionesMapp
 	@Results({
 		@Result(column = "IDRETENCION", property = "idRetencion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "RETENCION", property = "retencion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "LETRANIFSOCIEDAD", property = "descripcionSociedad", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "LETRANIFSOCIEDAD", property = "tipoSociedad", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CLAVEM190", property = "claveModelo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDRECURSO", property = "idDescripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCIONsoc", property = "tipoSociedad", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCIONsoc", property = "descripcionSociedad", jdbcType = JdbcType.VARCHAR),
 	})
 	public List<RetencionIRPFItem> searchRetenciones(String idLenguaje, RetencionIRPFItem retencionItem);
 
