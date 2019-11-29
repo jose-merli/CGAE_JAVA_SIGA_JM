@@ -175,7 +175,7 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
 
-						if(justiciablesItems != null && justiciablesItems.size() > tamMaximo) {
+						if(justiciablesItems != null && tamMaximo != null  && justiciablesItems.size() > tamMaximo) {
 							error.setCode(200);
 							error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
 							justiciableBusquedaDTO.setError(error);

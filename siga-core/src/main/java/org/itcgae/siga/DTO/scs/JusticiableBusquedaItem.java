@@ -51,7 +51,7 @@ public class JusticiableBusquedaItem {
 		return this;
 	}
 
-	@JsonProperty("idInstitucion")
+	@JsonProperty("idinstitucion")
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}
