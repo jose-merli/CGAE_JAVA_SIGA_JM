@@ -21,7 +21,7 @@ public class ScsDesignaSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.FROM("SCS_DESIGNA DESIGNA");
 
-		sql.LEFT_OUTER_JOIN("SCS_TURNO TURNO ON designa.idturno = turno.idturno");
+		sql.LEFT_OUTER_JOIN("SCS_TURNO TURNO ON designa.idturno = turno.idturno and designa.idinstitucion = turno.idinstitucion");
 		sql.LEFT_OUTER_JOIN("SCS_Juzgado juzgado ON juzgado.idjuzgado = DESIGNA.IDJUZGADO and DESIGNA.IDINSTITUCION = juzgado.IDINSTITUCION");
 		
 		sql.WHERE("DESIGNA.IDINSTITUCION = '" + asuntoClave.getIdInstitucion() + "'");

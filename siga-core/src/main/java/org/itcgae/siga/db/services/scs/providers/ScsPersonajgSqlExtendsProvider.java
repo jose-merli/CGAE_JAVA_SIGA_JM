@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsPersonajgSqlProvider;
 
 public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
@@ -26,12 +27,19 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 
 		if (justiciableBusquedaItem.getNombre() != null && justiciableBusquedaItem.getNombre() != "") {
-			sql.WHERE("upper(nombre) like upper('%" + justiciableBusquedaItem.getNombre() + "%')");
+			String columna = "nombre";
+			String cadena = justiciableBusquedaItem.getNombre();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+		
 		}
 
 		if (justiciableBusquedaItem.getApellidos() != null && justiciableBusquedaItem.getApellidos() != "") {
-			sql.WHERE("upper(concat(apellido1 || ' ', apellido2)) like upper('%"
-					+ justiciableBusquedaItem.getApellidos() + "%')");
+			
+			
+			String columna = "REPLACE(CONCAT(apellido1,apellido2), ' ', '')";
+			String cadena = justiciableBusquedaItem.getApellidos().replaceAll("\\s+","");
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}
 
 		if (justiciableBusquedaItem.getNif() != null && justiciableBusquedaItem.getNif() != "") {
@@ -102,6 +110,40 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlAsistencia.FROM("SCS_ASISTENCIA ASISTENCIA");
 		sqlAsistencia.WHERE("ASISTENCIA.idinstitucion = '" + idInstitucion + "'");
 		sqlAsistencia.WHERE("ASISTENCIA.idpersonaJG = persona.idpersona");
+		
+		if ((UtilidadesString.esCadenaVacia(justiciableBusquedaItem.getIdRol())) && (!UtilidadesString.esCadenaVacia(justiciableBusquedaItem.getAnioDesde()) || 
+				!UtilidadesString.esCadenaVacia(justiciableBusquedaItem.getAnioHasta()))){
+			
+			if (justiciableBusquedaItem.getAnioDesde() != null && justiciableBusquedaItem.getAnioDesde() != "") {
+				sqlUnidadFamiliar.WHERE("unidadFamiliar.anio >= " + justiciableBusquedaItem.getAnioDesde());
+				sqlContrarioEjg.WHERE("CONTRARIOEJG.anio >= " + justiciableBusquedaItem.getAnioDesde());
+				sqlContrariosDesigna.WHERE("CONTRARIOSDESIGNA.anio >= " + justiciableBusquedaItem.getAnioDesde());
+				sqlDefendidosDesigna.WHERE("DEFENDIDOSDESIGNA.anio >= " + justiciableBusquedaItem.getAnioDesde());
+				sqlSoj.WHERE("SOJ.anio >= " + justiciableBusquedaItem.getAnioDesde());
+				sqlContrariosAsistencia.WHERE("CONTRARIOSASISTENCIA.anio >= " + justiciableBusquedaItem.getAnioDesde());
+				sqlAsistencia.WHERE("ASISTENCIA.anio >= " + justiciableBusquedaItem.getAnioDesde());
+
+			}
+
+			if (justiciableBusquedaItem.getAnioHasta() != null && justiciableBusquedaItem.getAnioHasta() != "") {
+				sqlUnidadFamiliar.WHERE("unidadFamiliar.anio <= " + justiciableBusquedaItem.getAnioHasta());
+				sqlContrarioEjg.WHERE("CONTRARIOEJG.anio <= " + justiciableBusquedaItem.getAnioHasta());
+				sqlContrariosDesigna.WHERE("CONTRARIOSDESIGNA.anio <= " + justiciableBusquedaItem.getAnioHasta());
+				sqlDefendidosDesigna.WHERE("DEFENDIDOSDESIGNA.anio <= " + justiciableBusquedaItem.getAnioHasta());
+				sqlSoj.WHERE("SOJ.anio <= " + justiciableBusquedaItem.getAnioHasta());
+				sqlContrariosAsistencia.WHERE("CONTRARIOSASISTENCIA.anio <= " + justiciableBusquedaItem.getAnioHasta());
+				sqlAsistencia.WHERE("ASISTENCIA.anio <= " + justiciableBusquedaItem.getAnioHasta());
+			}
+
+
+			sql.WHERE("exists (" + sqlUnidadFamiliar + " union all " + sqlContrarioEjg + " union all "
+					+ sqlContrariosDesigna + " union all " + sqlDefendidosDesigna + " union all " + sqlSoj
+					+ " union all " + sqlContrariosAsistencia + " union all " + sqlAsistencia + ")");
+		}
+		
+		
+		
+		
 
 		if (justiciableBusquedaItem.getIdRol() != null && justiciableBusquedaItem.getIdRol() != ""
 				&& justiciableBusquedaItem.getIdRol().equals(SigaConstants.JUSTICIABLE_ROL_SOLICITANTE)) {
