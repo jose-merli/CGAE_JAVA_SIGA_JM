@@ -1239,7 +1239,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			}
 
 			if (asuntoEjg.getFundamentoCalificacion() != null) {
-				datosInteres += "Fundamento Calificación</b>: " + asuntoEjg.getFundamentoCalificacion();
+				datosInteres += "<b>Fundamento Calificación</b>: " + asuntoEjg.getFundamentoCalificacion();
 				datosInteres += "<br/>";
 			}
 
@@ -1904,11 +1904,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		if (tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
-			if (justiciableItem.getParentesco() != "" && justiciableItem.getParentesco() != null) {
-				error = null;
-			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.parentesco";
-			}
+//			if (justiciableItem.getParentesco() != "" && justiciableItem.getParentesco() != null) {
+//				error = null;
+//			} else {
+//				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.parentesco";
+//			}
 		}
 
 		LOGGER.info("validateDatosTipoPcajg2y3() -> Salida del servicio para validar los datos segun tipo Pcajg 2y3");
@@ -1942,11 +1942,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		if (tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
-			if (justiciableItem.getParentesco() != "" && justiciableItem.getParentesco() != null) {
-				error = null;
-			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.parentesco";
-			}
+//			if (justiciableItem.getParentesco() != "" && justiciableItem.getParentesco() != null) {
+//				error = null;
+//			} else {
+//				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.parentesco";
+//			}
 		}
 
 		if (tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_ASISTENCIA)
@@ -1979,11 +1979,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
 					&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
 					&& justiciableItem.getIdPais() != null && justiciableItem.getIdPais() != ""
-					&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != "") {
+//					&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
+					) {
 
 				error = null;
 			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.nacionalidad.parentesco";
+				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.nacionalidad";
 			}
 
 		}
@@ -2006,12 +2007,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
 					&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
 					&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
-					&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
+//					&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
 					&& justiciableItem.getFechaNacimiento() != null) {
 
 				error = null;
 			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.fechaNac.parentesco";
+				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.fechaNac";
 			}
 
 		}
@@ -2026,11 +2027,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("validateDatosTipoPcajg8() -> Entrada al servicio para validar los datos segun tipo Pcajg 8");
 		String error = null;
 
-		if (justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != "") {
-			error = null;
-		} else {
-			error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.parentesco";
-		}
+//		if (justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != "") {
+//			error = null;
+//		} else {
+//			error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.parentesco";
+//		}
 
 		LOGGER.info("validateDatosTipoPcajg8() -> Salida del servicio para validar los datos segun tipo Pcajg 8");
 

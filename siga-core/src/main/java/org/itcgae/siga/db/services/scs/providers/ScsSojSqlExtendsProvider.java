@@ -16,7 +16,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 		sql.SELECT("SOJ.ANIO");
 		sql.SELECT("SOJ.NUMERO");
 		sql.SELECT("' ' AS turnoguardia");
-		sql.SELECT("('Tipo Consulta: ' || SOJ.DESCRIPCIONCONSULTA || ' Tipo Respuesta: ' || SOJ.RESPUESTALETRADO) as DatosInteres");
+		sql.SELECT("('<b>Tipo Consulta</b>: ' || SOJ.DESCRIPCIONCONSULTA || '<br/> <b>Tipo Respuesta</b>: ' || SOJ.RESPUESTALETRADO) as datosInteres");
 		sql.SELECT("SOJ.idpersonajg IDPERSONASOJ");
 		sql.SELECT("SOJ.IDPERSONA IDPERSONACOLEGIADO");
 

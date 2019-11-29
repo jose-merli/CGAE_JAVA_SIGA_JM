@@ -17,7 +17,7 @@ public class ScsDesignaSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("DESIGNA.NUMERO");
 		sql.SELECT("DESIGNA.codigo");
 		sql.SELECT("turno.nombre as turnoguardia");
-		sql.SELECT("'Juzgado: ' || juzgado.nombre as datosinteres");
+		sql.SELECT("'<b>Juzgado</b>: ' || juzgado.nombre as datosinteres");
 
 		sql.FROM("SCS_DESIGNA DESIGNA");
 

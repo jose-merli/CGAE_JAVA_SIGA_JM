@@ -17,7 +17,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.SELECT("ASISTENCIA.NUMERO");
 		sql.SELECT("ASISTENCIA.codigo");
 		sql.SELECT("GUARDIA.nombre as turnoguardia");
-		sql.SELECT("('Centro de Detención: ' || COMISARIA.NOMBRE || ' Comisaría: ' || COMISARIA.NOMBRE) as datosinteres");
+		sql.SELECT("('<b>Centro de Detención</b>: ' || COMISARIA.NOMBRE || '<br/> <b>Comisaría</b>: ' || COMISARIA.NOMBRE) as datosinteres");
 		sql.SELECT("ASISTENCIA.IDTURNO");
 		sql.SELECT("ASISTENCIA.idpersonajg idpersonaasistido");
 		sql.SELECT("ASISTENCIA.IDPERSONACOLEGIADO");
