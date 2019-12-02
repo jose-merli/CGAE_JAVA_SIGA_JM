@@ -75,5 +75,15 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 		
 		return sql.toString();
 	}
+	public String comboJuzgados(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("IDJUZGADO");
+		sql.SELECT("DECODE(CODIGOEXT2,NULL,NOMBRE, CODIGOEXT2 || '-' || NOMBRE) AS DESCRIPCION");
+		sql.FROM("SCS_JUZGADO");
+		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
+		
+		return sql.toString();
+	}
 	
 }

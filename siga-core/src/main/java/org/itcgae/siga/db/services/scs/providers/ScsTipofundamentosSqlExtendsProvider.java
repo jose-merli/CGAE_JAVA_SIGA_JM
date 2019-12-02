@@ -63,9 +63,10 @@ public class ScsTipofundamentosSqlExtendsProvider extends ScsTipofundamentos{
 		
 		sql.SELECT("fundamento.idfundamento");
 		sql.SELECT("catalogoFundamento.descripcion");
+//		sql.SELECT("fundamento.IDTIPORESOLUCION");
 		sql.FROM("SCS_TIPOFUNDAMENTOS fundamento");
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoFundamento on catalogoFundamento.idrecurso = fundamento.DESCRIPCION and catalogoFundamento.idlenguaje ="+idLenguaje);
-		sql.WHERE("fundamento.fecha_baja is null AND fundamento.IDINSTITUCION =" + idInstitucion + " AND fundamento.IDITPORESOLUCION =" +resolucion);
+		sql.WHERE("fundamento.fecha_baja is null AND fundamento.IDINSTITUCION =" + idInstitucion + " AND fundamento.IDTIPORESOLUCION =" +resolucion);
 		return sql.toString();
 	}
 	

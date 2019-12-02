@@ -1,6 +1,10 @@
 package org.itcgae.siga.scs.controllers.ejg;
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.scs.DocumentacionEjgDTO;
+import org.itcgae.siga.DTO.scs.DocumentacionEjgItem;
+import org.itcgae.siga.DTO.scs.EjgDTO;
+import org.itcgae.siga.DTO.scs.EjgItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
@@ -9,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,4 +71,27 @@ public class EjgController {
 		ComboDTO response = busquedaEJG.ComboFundamentoJurid(request, resolucion);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	@RequestMapping(value = "/filtros-ejg/comboEstadoEJG",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboEstadoEJG(HttpServletRequest request, String resolucion) {
+		ComboDTO response = busquedaEJG.comboEstadoEJG(request, resolucion);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/filtros-ejg/comboImpugnacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboImpugnacion(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboImpugnacion(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/filtros-ejg/comboJuzgados",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboJuzgados(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboJuzgados(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	//busqueda
+	@RequestMapping(value = "/filtros-ejg/busquedaEJG",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EjgDTO> busquedaEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		EjgDTO response = busquedaEJG.busquedaEJG(ejgItem, request);
+		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
+	}
+		
 }

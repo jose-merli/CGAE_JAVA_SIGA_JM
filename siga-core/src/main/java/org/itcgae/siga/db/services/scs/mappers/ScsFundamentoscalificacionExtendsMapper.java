@@ -11,7 +11,6 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ScsTipofundamentocalifMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsFundamentoscalificacionSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsTipoejgcolegioSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
