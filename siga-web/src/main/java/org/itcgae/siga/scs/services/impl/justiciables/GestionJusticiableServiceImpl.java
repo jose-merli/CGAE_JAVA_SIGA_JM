@@ -1,4 +1,4 @@
-package org.itcgae.siga.scs.services.impl;
+package org.itcgae.siga.scs.services.impl.justiciables;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProfesionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTelefonosPersonaExtendsMapper;
-import org.itcgae.siga.scs.service.IGestionJusticiableService;
+import org.itcgae.siga.scs.services.justiciables.IGestionJusticiableService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
