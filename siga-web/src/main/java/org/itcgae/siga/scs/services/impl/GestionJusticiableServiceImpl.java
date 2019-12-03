@@ -31,6 +31,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenPoblaciones;
@@ -118,6 +119,20 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
+	
+	private boolean validacionDireccion = false;
+	private boolean validacionTipoVia = false;
+	private boolean validacionCodigoPostal = false;
+	private boolean validacionProvincia = false;
+	private boolean validacionPoblacion = false;
+	private boolean validacionSexo = false;
+	private boolean validacionRegimenConyugal = false;
+	private boolean validacionParentesco = false;
+	private boolean validacionPais = false;
+	private boolean validacionFechaNacimiento = false;
+	private boolean validacionEstadoCivil = false;
+	
+	
 	@Override
 	public ComboDTO getMinusvalias(HttpServletRequest request) {
 		LOGGER.info("getMinusvalia() -> Entrada al servicio para obtener combo minusvalias");
@@ -687,7 +702,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		String idPersona = null;
 		String validacion = null;
 		List<String> roles = new ArrayList<String>();
+		
+		inicializarValidaciones();
 
+		
 		if (null != idInstitucion) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -725,13 +743,28 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 						validacion = validacionDatosSegunTipoPcajg(rolJusticiable, idInstitucion, justiciableItem);
 
-						if (validacion != null) {
-							break;
-						}
 					}
 
-					if (validacion != null) {
-						error.setCode(400);
+					if (validacionCodigoPostal || validacionDireccion || validacionEstadoCivil || validacionFechaNacimiento || validacionPais || validacionParentesco
+					    || validacionPoblacion ||  validacionProvincia || validacionRegimenConyugal || validacionSexo || validacionTipoVia) {
+						error.setCode(600);
+						
+						String camposErroneos = "";
+
+						if(validacionEstadoCivil) camposErroneos += ", Estado Civil ";
+						if(validacionDireccion) camposErroneos += ", Direccion";
+						if(validacionTipoVia) camposErroneos += ", Tipo de Vía";
+						if(validacionCodigoPostal) camposErroneos += ", Código Postal ";
+						if(validacionProvincia) camposErroneos += ", Provincia";
+						if(validacionPoblacion) camposErroneos += ", Poblacion";
+						if(validacionFechaNacimiento) camposErroneos += ", Fecha de Nacimiento";
+						if(validacionPais) camposErroneos += ", Nacionalidad";
+						if(validacionParentesco) camposErroneos += ", Parentesco";
+						if(validacionRegimenConyugal) camposErroneos += ", Régimen Conyugal";
+						if(validacionSexo) camposErroneos += ", Sexo";
+						
+						camposErroneos = camposErroneos.substring(1,camposErroneos.length());
+						validacion = "Debe informar los siguientes campos para poder guardar el justiciable: " + camposErroneos;
 						error.setDescription(validacion);
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						updateResponseDTO.setError(error);
@@ -875,6 +908,21 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("updateJusticiable() -> Salida del servicio para modificar un justiciable");
 
 		return updateResponseDTO;
+	}
+
+	private void inicializarValidaciones() {
+		validacionCodigoPostal  = false;
+		validacionDireccion = false;
+		validacionEstadoCivil = false;
+		validacionFechaNacimiento = false;
+		validacionPais = false;
+		validacionParentesco= false;
+	    validacionPoblacion = false;
+	    validacionProvincia = false;
+	    validacionRegimenConyugal = false;
+	    validacionSexo = false;
+	    validacionTipoVia= false;
+		
 	}
 
 	@Override
@@ -1924,40 +1972,66 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_DESIGNACION)) {
 
-			if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
-					&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
-					&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
-					&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
-					&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
-					&& justiciableItem.getSexo() != null && justiciableItem.getSexo() != ""
-					&& justiciableItem.getIdEstadoCivil() != null && justiciableItem.getRegimen_conyugal() != null
-					&& justiciableItem.getRegimen_conyugal() != "") {
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
+					validacionDireccion = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
+				validacionTipoVia = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
+				validacionCodigoPostal = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdProvincia()))
+				validacionProvincia = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPoblacion()))
+				validacionPoblacion = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo()))
+				validacionSexo = true;
+			if (justiciableItem.getIdEstadoCivil() == null)
+				validacionEstadoCivil = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getRegimen_conyugal())) 
+				validacionRegimenConyugal = true;
 
-				error = null;
-			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.sex.estcivil.regconyugal";
-			}
-
+		
 		}
 
 		if (tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
-
-//			if (justiciableItem.getParentesco() != "" && justiciableItem.getParentesco() != null) {
-//				error = null;
-//			} else {
-//				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.parentesco";
-//			}
+		if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
+				validacionDireccion = true;
+		if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
+			validacionTipoVia = true;
+		if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
+			validacionCodigoPostal = true;
+		if (UtilidadesString.esCadenaVacia(justiciableItem.getIdProvincia()))
+			validacionProvincia = true;
+		if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPoblacion()))
+			validacionPoblacion = true;
+//			if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco())) {
+//				validacionParentesco = true;
+//			} 
 		}
 
-		if (tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_ASISTENCIA)
-				|| tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_EJG)
-				|| tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_DESIGNACION)) {
+		if (tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_DESIGNACION)
+				|| tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_EJG)){
+				
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
+					validacionDireccion = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
+				validacionTipoVia = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
+				validacionCodigoPostal = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdProvincia()))
+				validacionProvincia = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPoblacion()))
+				validacionPoblacion = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPais())) {
+				validacionPais = true;
+			} 	
+				
+		}		
+				
+		if( tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_ASISTENCIA)) {
 
-			if (justiciableItem.getIdPais() != "" && justiciableItem.getIdPais() != null) {
-				error = null;
-			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.nacionalidad";
-			}
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPais())) {
+				validacionPais = true;
+			} 
 		}
 
 		LOGGER.info("validateDatosTipoPcajg4() -> Salida del servicio para validar los datos segun tipo Pcajg 4");
@@ -1973,19 +2047,21 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
-			if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
-					&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
-					&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
-					&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
-					&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
-					&& justiciableItem.getIdPais() != null && justiciableItem.getIdPais() != ""
-//					&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
-					) {
-
-				error = null;
-			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.nacionalidad";
-			}
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
+					validacionDireccion = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
+				validacionTipoVia = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
+				validacionCodigoPostal = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdProvincia()))
+				validacionProvincia = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPoblacion()))
+				validacionPoblacion = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPais()))
+				validacionPais = true;
+//			if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco))
+//				validacionParentesco = true;
+				
 
 		}
 
@@ -2001,19 +2077,21 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
-
-			if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
-					&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
-					&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
-					&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
-					&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
-//					&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
-					&& justiciableItem.getFechaNacimiento() != null) {
-
-				error = null;
-			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.fechaNac";
-			}
+				
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
+					validacionDireccion = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
+				validacionTipoVia = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
+				validacionCodigoPostal = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdProvincia()))
+				validacionProvincia = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPoblacion()))
+				validacionPoblacion = true;
+			if (justiciableItem.getFechaNacimiento() == null)
+				validacionFechaNacimiento = true;
+//			if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco))
+//				validacionParentesco = true;
 
 		}
 
@@ -2027,11 +2105,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("validateDatosTipoPcajg8() -> Entrada al servicio para validar los datos segun tipo Pcajg 8");
 		String error = null;
 
-//		if (justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != "") {
-//			error = null;
-//		} else {
-//			error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.parentesco";
-//		}
+
+//		if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco())) {
+//			validacionParentesco = true;
+//		} 
 
 		LOGGER.info("validateDatosTipoPcajg8() -> Salida del servicio para validar los datos segun tipo Pcajg 8");
 
@@ -2045,13 +2122,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_DESIGNACION)
-				|| tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_ASISTENCIA)) {
+				|| tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_ASISTENCIA)
+				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
-			if (justiciableItem.getSexo() != null && justiciableItem.getSexo() != "") {
-				error = null;
-			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.sexo";
-			}
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo())) {
+				validacionSexo = true;
+			} 
 		}
 
 		LOGGER.info("validateDatosTipoPcajg9() -> Salida del servicio para validar los datos segun tipo Pcajg 9");

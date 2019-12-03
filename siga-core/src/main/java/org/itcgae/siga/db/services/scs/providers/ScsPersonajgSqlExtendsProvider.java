@@ -21,7 +21,9 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		LOGGER.info("INICIO MONTAJE SQL IDPERSONAS");
 
 		SQL sql = new SQL();
+		SQL sqlOrder = new SQL(); 
 
+		sqlOrder.SELECT("*");
 		sql.SELECT("idpersona");
 		sql.FROM("SCS_PERSONAJG persona");
 		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
@@ -235,14 +237,16 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 		}
 
+		sql.ORDER_BY("fechamodificacion desc");
+		sqlOrder.FROM("(" + sql + " )");
 		if (tamMax != null) {
 			Integer tamMaxNumber = tamMax + 1;
-			sql.WHERE("rownum <= " + tamMaxNumber);
+			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
 		}
 
 		LOGGER.info("MONTADA SQL IDPERSONAS");
 
-		return sql.toString();
+		return sqlOrder.toString();
 	}
 
 	public String searchJusticiables(List<StringDTO> justiciableBusquedaItems, Short idInstitucion) {
@@ -542,7 +546,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 		sql.GROUP_BY(
 				"idpersona , consulta.fechamodificacion, consulta.nif, consulta.nombre, consulta.apellido1, consulta.apellido2, consulta.idinstitucion");
-		sql.ORDER_BY("apellidos");
+		sql.ORDER_BY("consulta.fechamodificacion desc");
 
 		LOGGER.info("MONTADA SQL JUSTICIABLES");
 
