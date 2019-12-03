@@ -11,7 +11,7 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		
-		sql2.SELECT("E.IDESTADOPOREJG");
+		sql2.SELECT("E.IDESTADOEJG");
 		sql2.SELECT("REC.DESCRIPCION");
 		sql2.SELECT("E.FECHAINICIO");
 

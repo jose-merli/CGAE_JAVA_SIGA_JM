@@ -17,7 +17,7 @@ public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
 
 	@SelectProvider(type = ScsEstadoejgSqlExtendsProvider.class, method = "getEstadoEjg")
 	@Results({ 
-		@Result(column = "IDESTADOPOREJG", property = "idEstadoejg", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDESTADOEJG", property = "idEstadoejg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
