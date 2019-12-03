@@ -71,6 +71,9 @@ public class JusticiableItem {
 	private boolean checkNoInformadaDireccion;
 
 	private AsuntosJusticiableItem [] datosAsuntos;
+	private boolean validacionRepeticion;
+	private Boolean asociarRepresentante;
+
 	
 	/**
 	 **/
@@ -1063,6 +1066,38 @@ public class JusticiableItem {
 	public void setDatosAsuntos(AsuntosJusticiableItem[] datosAsuntos) {
 		this.datosAsuntos = datosAsuntos;
 	}
+	
+	/**
+	 **/
+	public JusticiableItem validacionRepeticion(boolean validacionRepeticion) {
+		this.validacionRepeticion = validacionRepeticion;
+		return this;
+	}
+
+	@JsonProperty("validacionRepeticion")
+	public boolean isValidacionRepeticion() {
+		return validacionRepeticion;
+	}
+
+	public void setValidacionRepeticion(boolean validacionRepeticion) {
+		this.validacionRepeticion = validacionRepeticion;
+	}
+
+	/**
+	 **/
+	public JusticiableItem asociarRepresentante(Boolean asociarRepresentante) {
+		this.asociarRepresentante = asociarRepresentante;
+		return this;
+	}
+
+	@JsonProperty("asociarRepresentante")
+	public Boolean getAsociarRepresentante() {
+		return asociarRepresentante;
+	}
+
+	public void setAsociarRepresentante(Boolean asociarRepresentante) {
+		this.asociarRepresentante = asociarRepresentante;
+	}
 
 	@Override
 	public int hashCode() {
@@ -1073,6 +1108,7 @@ public class JusticiableItem {
 		result = prime * result + ((apellidos == null) ? 0 : apellidos.hashCode());
 		result = prime * result + ((asistidoAutorizaeejg == null) ? 0 : asistidoAutorizaeejg.hashCode());
 		result = prime * result + ((asistidoSolicitajg == null) ? 0 : asistidoSolicitajg.hashCode());
+		result = prime * result + ((asociarRepresentante == null) ? 0 : asociarRepresentante.hashCode());
 		result = prime * result + ((asuntos == null) ? 0 : asuntos.hashCode());
 		result = prime * result + ((autorizaAvisoTelematico == null) ? 0 : autorizaAvisoTelematico.hashCode());
 		result = prime * result + (checkNoInformadaDireccion ? 1231 : 1237);
@@ -1130,6 +1166,7 @@ public class JusticiableItem {
 		result = prime * result + ((telefonos == null) ? 0 : telefonos.hashCode());
 		result = prime * result + ((tipoJusticiable == null) ? 0 : tipoJusticiable.hashCode());
 		result = prime * result + ((tipoPersonajg == null) ? 0 : tipoPersonajg.hashCode());
+		result = prime * result + (validacionRepeticion ? 1231 : 1237);
 		return result;
 	}
 
@@ -1166,6 +1203,11 @@ public class JusticiableItem {
 			if (other.asistidoSolicitajg != null)
 				return false;
 		} else if (!asistidoSolicitajg.equals(other.asistidoSolicitajg))
+			return false;
+		if (asociarRepresentante == null) {
+			if (other.asociarRepresentante != null)
+				return false;
+		} else if (!asociarRepresentante.equals(other.asociarRepresentante))
 			return false;
 		if (asuntos == null) {
 			if (other.asuntos != null)
@@ -1446,6 +1488,8 @@ public class JusticiableItem {
 				return false;
 		} else if (!tipoPersonajg.equals(other.tipoPersonajg))
 			return false;
+		if (validacionRepeticion != other.validacionRepeticion)
+			return false;
 		return true;
 	}
 
@@ -1473,8 +1517,11 @@ public class JusticiableItem {
 				+ asistidoAutorizaeejg + ", autorizaAvisoTelematico=" + autorizaAvisoTelematico + ", telefonos="
 				+ telefonos + ", parentesco=" + parentesco + ", tipoJusticiable=" + tipoJusticiable
 				+ ", checkNoInformadaDireccion=" + checkNoInformadaDireccion + ", datosAsuntos="
-				+ Arrays.toString(datosAsuntos) + "]";
+				+ Arrays.toString(datosAsuntos) + ", validacionRepeticion=" + validacionRepeticion
+				+ ", asociarRepresentante=" + asociarRepresentante + "]";
 	}
+
+
 
 	
 
