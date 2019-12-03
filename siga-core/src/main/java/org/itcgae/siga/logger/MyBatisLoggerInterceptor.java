@@ -24,7 +24,7 @@ public class MyBatisLoggerInterceptor implements Interceptor {
 		
 		StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
 		String query = statementHandler.getBoundSql().getSql();
-		query = query.replaceAll("\\n|\\r|\\t", "");
+		query.replaceAll("\\n|\\r|\\t", " ");
 		LOGGER.info("SQL: {}", query);
 
 		return invocation.proceed();

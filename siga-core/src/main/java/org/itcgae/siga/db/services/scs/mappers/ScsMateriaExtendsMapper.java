@@ -7,10 +7,10 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.scs.MateriasItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ScsMateriaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsMateriaSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsSubzonaSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +33,13 @@ public interface ScsMateriaExtendsMapper extends ScsMateriaMapper{
 	@Results({ @Result(column = "IDMATERIA", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})
 	NewIdDTO getIdMateria(Short idInstitucion);
-	}
+	
+	@SelectProvider(type = ScsMateriaSqlExtendsProvider.class, method = "comboMaterias")
+	@Results({ @Result(column = "IDMATERIA", property = "value", jdbcType = JdbcType.VARCHAR, id = true),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+			 })
+	List<ComboItem> comboMaterias(Short idInstitucion,String idArea, String filtro);
+	
+}
 	
 

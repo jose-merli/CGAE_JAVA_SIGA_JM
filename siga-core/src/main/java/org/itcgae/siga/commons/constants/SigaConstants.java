@@ -860,11 +860,13 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static String EXPRESION_REGULAR_MAIL = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,10}$";
 	public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";
 	
+
 	public static String EVENTO_TIPO_FIESTA_NACIONAL = "Fiesta Nacional";
 	public static String EVENTO_TIPO_FIESTA_LOCAL = "Fiesta Local";
 	public static String EVENTO_TIPO_FIESTA_AUTONOMICA = "Fiesta Autonómica";
 	
 	public static String EVENTO_TIPO_FESTIVO = "9";
+
 	
 	public static final String JUSTICIABLE_ROL_SOLICITANTE = "1";
 	public static final String JUSTICIABLE_ROL_CONTRARIO = "2";
@@ -901,5 +903,59 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final Short ID_INSTITUCION_0 = 0;
 	
 	
+
+
+
+	public static enum ECOM_ESTADOSCOLA {
+		INICIAL ((short)1),
+		EJECUTANDOSE ((short)2),
+		REINTENTANDO ((short)3),
+		ERROR ((short)4),
+		FINAL ((short)5),
+		ERROR_VALIDACION ((short)6);
+		
+		private short id = -1;
+		
+		ECOM_ESTADOSCOLA(short id) {
+			this.id = id;
+		}
+		public short getId() {
+			return this.id;
+		}
+		
+	}
+	
+	public static enum ECOM_OPERACION {
+		ECOM2_INIT_PARAMETROS_GENERALES(206)
+		;
+
+		public static ECOM_OPERACION getEnum(Integer codigo){
+			for(ECOM_OPERACION sc : values()){
+				if (sc.getId()==codigo){
+					return sc;
+				}
+			}
+			return null;
+		}
+		
+		
+		private int id = -1;
+		
+		private ECOM_OPERACION(int id) {			
+			this.id = id;
+		}
+		public int getId() {
+			return this.id;
+		}
+	}
+	public static enum GEN_PROPERTIES_FICHERO {
+		eCOM2_LOG4J
+	}
+
+	
+	public static Integer USUMODIFICACION_0 = 0;
+	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
+
+
 	
 }

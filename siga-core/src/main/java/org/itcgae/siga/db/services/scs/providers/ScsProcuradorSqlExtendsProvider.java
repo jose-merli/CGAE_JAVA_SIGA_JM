@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.scs.ProcuradorItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsProcuradorSqlProvider;
 
 public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
@@ -21,7 +22,8 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 		sql.SELECT("procurador.idprovincia");
 		sql.SELECT("procurador.telefono1");
 		sql.SELECT("procurador.fax1");
-		sql.SELECT_DISTINCT("concat(concat(procurador.apellidos1 || ' ', concat(procurador.apellidos2 , ', ')), procurador.nombre || ' ') AS nombreape");
+		sql.SELECT_DISTINCT(
+				"concat(concat(procurador.apellidos1 || ' ', concat(procurador.apellidos2 , ', ')), procurador.nombre || ' ') AS nombreape");
 		sql.SELECT("procurador.telefono2");
 		sql.SELECT("procurador.fechabaja");
 		sql.SELECT("procurador.ncolegiado");
@@ -38,24 +40,36 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 		}
 
+
 		if (procuradorItem.getNombre() != null && procuradorItem.getNombre() != "") {
-			sql.AND();
-			sql.WHERE("(TRANSLATE(LOWER( PROCURADOR.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
-					+ procuradorItem.getNombre().trim() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+			String columna = "PROCURADOR.NOMBRE";
+			String cadena = procuradorItem.getNombre();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 			
 		}
 
 		if (procuradorItem.getApellido1() != null && procuradorItem.getApellido1() != "") {
-			sql.AND();
-			sql.WHERE("((TRANSLATE(LOWER( PROCURADOR.APELLIDOS1),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
-					+ procuradorItem.getApellido1().trim() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+			
+
+			String columna = "REPLACE(CONCAT(PROCURADOR.APELLIDOS1,PROCURADOR.APELLIDOS2), ' ', '')";
+			String cadena = procuradorItem.getApellido1().replaceAll("\\s+","");
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
+			
+			/*sql.AND();
+			sql.WHERE(
+					"((TRANSLATE(LOWER( PROCURADOR.APELLIDOS1),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
+							+ procuradorItem.getApellido1().trim() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 			sql.OR();
-			sql.WHERE("(TRANSLATE(LOWER( PROCURADOR.APELLIDOS2),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
-					+ procuradorItem.getApellido1().trim() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')))");
+			sql.WHERE(
+					"(TRANSLATE(LOWER( PROCURADOR.APELLIDOS2),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
+							+ procuradorItem.getApellido1().trim() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')))");*/
 		}
 		if (procuradorItem.getCodigoExt() != null && procuradorItem.getCodigoExt() != "") {
 			sql.AND();
-			sql.WHERE("UPPER(procurador.codigo) = UPPER('" + procuradorItem.getCodigoExt() + "')");
+			sql.WHERE("UPPER(procurador.codigo) like UPPER('%" + procuradorItem.getCodigoExt() + "%')");
 		}
 
 		if (!procuradorItem.getHistorico()) {
@@ -66,6 +80,71 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 
 		sql.ORDER_BY("procurador.nombre");
 
+		return sql.toString();
+	}
+
+	public String buscadorProcurador(String idInstitucion, ProcuradorItem procuradorItem) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("TRIM(apellidos1) as apellidos1");
+		sql.SELECT("TRIM(apellidos2) as apellidos2");
+		sql.SELECT("codigo");
+		sql.SELECT("codigopostal");
+		sql.SELECT("domicilio");
+		sql.SELECT("email");
+		sql.SELECT("fax1");
+		sql.SELECT("fechabaja");
+		sql.SELECT("pro.fechamodificacion");
+		sql.SELECT("idcolprocurador");
+		sql.SELECT("idpoblacion");
+		sql.SELECT("idprovincia");
+		sql.SELECT_DISTINCT("TRIM(concat(concat(apellidos1 || '', ' '), apellidos2 || '')) AS nombreape");
+		sql.SELECT("ncolegiado");
+		sql.SELECT("TRIM(pro.nombre) as nombre");
+		sql.SELECT("telefono1");
+		sql.SELECT("telefono2");
+		sql.SELECT("abreviatura");
+		sql.SELECT("idprocurador");
+
+		sql.FROM("scs_procurador PRO");
+
+		sql.LEFT_OUTER_JOIN("CEN_INSTITUCION INST ON PRO.IDINSTITUCION = INST.IDINSTITUCION");
+
+		if (procuradorItem.getIdInstitucion() != null && !procuradorItem.getIdInstitucion().trim().equals(""))
+			sql.WHERE("pro.idinstitucion in (" + procuradorItem.getIdInstitucion() + ")");
+		else if (idInstitucion.equals("2000") && procuradorItem.getIdInstitucion() == null || procuradorItem.getIdInstitucion().equals("")) {
+		} else
+			sql.WHERE("pro.idinstitucion = '" + idInstitucion + "'");
+
+		if (procuradorItem.getnColegiado() != null && !procuradorItem.getnColegiado().trim().equals(""))
+			sql.WHERE("ncolegiado = '" + procuradorItem.getnColegiado() + "'");
+
+		if (procuradorItem.getApellido1() != null && !procuradorItem.getApellido1().trim().equals("")){
+			
+
+			String columna = "apellidos1";
+			String cadena = procuradorItem.getApellido1();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+		}
+			
+		if (procuradorItem.getApellido2() != null && !procuradorItem.getApellido2().trim().equals("")){
+			String columna = "apellidos2";
+			String cadena = procuradorItem.getApellido2();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+		}
+
+		if (procuradorItem.getNombre() != null && !procuradorItem.getNombre().trim().equals("")){
+			String columna = "pro.NOMBRE";
+			String cadena = procuradorItem.getNombre();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+		}
+
+		if (!procuradorItem.getHistorico())
+			sql.WHERE("pro.fechabaja is null");
 		return sql.toString();
 	}
 

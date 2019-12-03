@@ -295,6 +295,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 						} catch (Exception e) {
 							error.setCode(400);
+							LOGGER.error(e);
 							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 						}
 
@@ -326,6 +327,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 						} catch (Exception e) {
 							error.setCode(400);
+							LOGGER.error(e);
+
 							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 						}
 						// SI ES TIPO FESTIVO AUTONOMICO
@@ -352,6 +355,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 						} catch (Exception e) {
 							error.setCode(400);
+							LOGGER.error(e);
+
 							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 						}
 
@@ -556,6 +561,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 			} catch (Exception e) {
 				response = 0;
 				error.setCode(400);
+				LOGGER.error(e);
 				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 			}
 		}
@@ -2624,11 +2630,20 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				// Comprobamos que en el dia seleccionado no exista un evento ya creado
 				AgeEventoExample exampleEvent = new AgeEventoExample();
 
-				exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-						.andFechainicioLessThan(fechaPosterior)
-						.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-						.andTituloEqualTo(eventoItem.getTitulo())
-						.andDescripcionNotEqualTo(eventoItem.getDescripcionOld());
+				if (eventoItem.getIdEvento() != null) {
+					exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
+					.andFechainicioLessThan(fechaPosterior)
+					.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
+					.andTituloEqualTo(eventoItem.getTitulo())
+					.andIdeventoNotEqualTo(Long.valueOf(eventoItem.getIdEvento()));
+				}else{
+					exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
+					.andFechainicioLessThan(fechaPosterior)
+					.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
+					.andTituloEqualTo(eventoItem.getTitulo())
+					.andDescripcionNotEqualTo(eventoItem.getDescripcionOld());
+				}
+				
 
 				LOGGER.info(
 						"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar el evento del colegio perteneciente al consejo");

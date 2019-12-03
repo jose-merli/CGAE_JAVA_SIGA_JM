@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.scs.ComisariaItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsComisariaSqlProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 
@@ -34,12 +35,16 @@ public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 		}
 		if (comisariaItem.getNombre() != null && comisariaItem.getNombre() != "") {
-			sql.WHERE("(TRANSLATE(LOWER( COMISARIA.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
-					+ comisariaItem.getNombre() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+			String columna = "COMISARIA.NOMBRE";
+			String cadena = comisariaItem.getNombre();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
+
 		}
 
 		if (comisariaItem.getCodigoExt() != null && comisariaItem.getCodigoExt() != "") {
-			sql.WHERE("UPPER(comisaria.codigoext) = UPPER('" + comisariaItem.getCodigoExt() + "')");
+			sql.WHERE("UPPER(comisaria.codigoext) LIKE UPPER('%" + comisariaItem.getCodigoExt() + "%')");
 		}
 
 		if (comisariaItem.getIdPoblacion() != null && comisariaItem.getIdPoblacion() != "") {

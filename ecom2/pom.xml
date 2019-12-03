@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>ecom2</artifactId>
+	<name>ecom2</name>
+	<description>ecom2</description>
+	<packaging>war</packaging>
+
+	<parent>
+		<groupId>org.redabogacia</groupId>
+		<artifactId>siga-parent</artifactId>
+		<version>${siga.version}</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.redabogacia</groupId>
+			<artifactId>siga-core</artifactId>
+			<version>${siga.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.3</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.redabogacia</groupId>
+			<artifactId>InfoColegiadosService</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-transport-local</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-transport-http</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+		
+		
+	</dependencies>
+
+</project>
