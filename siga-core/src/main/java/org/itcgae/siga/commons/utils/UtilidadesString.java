@@ -135,9 +135,12 @@ public class UtilidadesString {
 	public static String filtroTextoBusquedas(String columna, String cadena) {
 		StringBuilder cadenaWhere = new StringBuilder();
 		cadena = cadena.replaceAll("'","''");
-		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN') ");
+//		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN') ");
+//		cadenaWhere.append(" LIKE");
+//		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')) ");
+		cadenaWhere.append(" ( " + columna + ") ");
 		cadenaWhere.append(" LIKE");
-		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')) ");
+		cadenaWhere.append(" ('%" + cadena + "%') ");
 		return cadenaWhere.toString();
 		
 	}

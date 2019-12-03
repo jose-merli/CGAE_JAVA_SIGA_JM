@@ -23,7 +23,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 			sql.WHERE("IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
 		}
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("") ){
-			sql.WHERE(filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
 		}	
 		
 		return sql.toString();
@@ -80,15 +80,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		return sql.toString();
 	}
 	
-	public static String filtroTextoBusquedas(String columna, String cadena) {
 
-		StringBuilder cadenaWhere = new StringBuilder();
-		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') ");
-		cadenaWhere.append(" LIKE");
-		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz')) ");
-		return cadenaWhere.toString();
-		
-	} 
 	
 	public String selectTipoEnvioPlantilla(Short idInstitucion, String idLenguaje, String idPlantilla){
 		
@@ -119,7 +111,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 			sql.WHERE("IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
 		}
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("") ){
-			sql.WHERE(filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
 		}
 		if(!UtilidadesString.esCadenaVacia(idPlantilla)){
 			sql.WHERE("idPlantillaEnvios = '" + idPlantilla +"'");
