@@ -1063,7 +1063,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	@Override
 	public AsuntosJusticiableDTO searchAsuntosJusticiable(String idPersona, HttpServletRequest request) {
 
-		LOGGER.info("searchAsuntos() -> Entrada al servicio para obtener los asuntos de un justiciable");
+		LOGGER.info("searchAsuntosJusticiable() -> Entrada al servicio para obtener los asuntos de un justiciable");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1079,25 +1079,25 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchAsuntos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchAsuntosJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchAsuntos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchAsuntosJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				try {
 
 					LOGGER.info(
-							"searchAsuntos() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Entrada a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
+							"searchAsuntosJusticiable() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Entrada a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
 
 					asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable(idPersona,
 							idInstitucion);
 
 					LOGGER.info(
-							"searchAsuntos() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Salida a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
+							"searchAsuntosJusticiable() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Salida a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
 
 					if (asuntosClaveJusticiableItem != null && asuntosClaveJusticiableItem.size() > 0) {
 
@@ -1113,7 +1113,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			}
 
 		}
-		LOGGER.info("searchJusticiable() -> Salida del servicio para obtener los asuntos de un justiciable");
+		LOGGER.info("searchAsuntosJusticiable() -> Salida del servicio para obtener los asuntos de un justiciable");
 		return asuntosJusticiableDTO;
 	}
 
@@ -1138,12 +1138,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchAsuntos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchAsuntosConClave() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchAsuntos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchAsuntosConClave() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
@@ -1648,7 +1648,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	public JusticiableDTO getJusticiableByNif(JusticiableBusquedaItem justiciableBusquedaItem,
 			HttpServletRequest request) {
 
-		LOGGER.info("searchRepresentanteByNif() -> Entrada al servicio para obtener el representante del justiciable");
+		LOGGER.info("getJusticiableByNif() -> Entrada al servicio para obtener el representante del justiciable");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1664,19 +1664,19 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
 			LOGGER.info(
-					"searchRepresentanteByNif() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"getJusticiableByNif() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchRepresentanteByNif() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"getJusticiableByNif() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				try {
 
 					LOGGER.info(
-							"searchRepresentanteByNif() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener representante");
+							"getJusticiableByNif() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener representante");
 
 					ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
 					scsPersonajgExample.createCriteria().andNifEqualTo(justiciableBusquedaItem.getNif().toUpperCase())
@@ -1687,7 +1687,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					personajgList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
 
 					LOGGER.info(
-							"searchRepresentanteByNif() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener representante");
+							"getJusticiableByNif() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener representante");
 
 					if (personajgList != null && personajgList.size() > 0) {
 
@@ -1716,7 +1716,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			}
 
 		}
-		LOGGER.info("searchRepresentanteByNif() -> Salida del servicio para obtener el representante del justiciable");
+		LOGGER.info("getJusticiableByNif() -> Salida del servicio para obtener el representante del justiciable");
 		return justiciableDTO;
 	}
 
@@ -1943,6 +1943,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 	private String obtenerTipoRolJusticiable(String rol) {
 
+		LOGGER.info("obtenerTipoRolJusticiable() -> Entrada al servicio para obtener tipo rol de justiciable");
+		
 		String rolJusticiable = null;
 
 		switch (rol) {
@@ -1972,6 +1974,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			break;
 		}
 
+		LOGGER.info("obtenerTipoRolJusticiable() -> Salida al servicio para obtener tipo rol de justiciable");
+		
 		return rolJusticiable;
 	}
 

@@ -23,6 +23,7 @@ prompt .
 (IDPROCESO,IDMODULO,TRAZA,TARGET,FECHAMODIFICACION,USUMODIFICACION,DESCRIPCION,TRANSACCION,IDPARENT,NIVEL) values 
 ('89E','JGR','1','Y',SYSDATE,'0','Tarjeta Asuntos','JGR_JusticiablesTarjeta','89A','10');
 
+
 commit;
 prompt .
 select to_char(sysdate, 'hh24:mi:ss') as "Fin" from dual;

@@ -3,7 +3,6 @@ prompt CREACION TABLA ROLES JUSTICIABLES.log
 select to_char(sysdate, 'hh24:mi:ss') as "Inicio" from dual;
 prompt .
 
-
 CREATE TABLE scs_rolesjusticiables  (
     idrol               NUMBER(10) NOT NULL,
     descripcion         VARCHAR2(200),

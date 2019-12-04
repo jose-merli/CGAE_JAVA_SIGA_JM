@@ -2,8 +2,7 @@ spool PUNTO MENU JUSTICIABLES.log
 prompt PUNTO MENU JUSTICIABLES.log
 select to_char(sysdate, 'hh24:mi:ss') as "Inicio" from dual;
 prompt .
- 
- 
+
 Insert into GEN_PROCESOS 
 (IDPROCESO,IDMODULO,TRAZA,TARGET,FECHAMODIFICACION,USUMODIFICACION,DESCRIPCION,TRANSACCION,IDPARENT,NIVEL) values 
 ('89','JGR','1','Y',SYSDATE,'0','Justiciables','JGR_Justiciables','014','10');

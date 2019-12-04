@@ -5,6 +5,7 @@ prompt .
 
 ALTER TABLE SCS_PERSONAJG ADD FECHAALTA DATE NULL;
 
+
 commit;
 prompt .
 select to_char(sysdate, 'hh24:mi:ss') as "Fin" from dual;

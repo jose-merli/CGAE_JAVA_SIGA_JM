@@ -15,6 +15,7 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 
 Insert into GEN_PARAMETROS (MODULO,PARAMETRO,VALOR,FECHAMODIFICACION,USUMODIFICACION,IDINSTITUCION, IDRECURSO, FECHA_BAJA) values ('SCS','TAM_MAX_CONSULTA_JG','500',sysdate,'0','0','tamaño.maximo.consulta.justicia.gratuita', null);
 
+
 commit;
 prompt .
 select to_char(sysdate, 'hh24:mi:ss') as "Fin" from dual;

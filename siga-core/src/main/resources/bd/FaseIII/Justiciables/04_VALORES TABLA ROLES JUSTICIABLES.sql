@@ -3,7 +3,6 @@ prompt VALORES TABLA ROLES JUSTICIABLES.log
 select to_char(sysdate, 'hh24:mi:ss') as "Inicio" from dual;
 prompt .
 
-
 ---------
 ---- ROLES JUSTICIABLES (COMBOS)
 ---------
