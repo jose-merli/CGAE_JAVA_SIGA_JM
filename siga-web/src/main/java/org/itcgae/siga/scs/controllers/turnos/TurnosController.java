@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.controllers.turnos;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTO.scs.GuardiasDTO;
 import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTO.scs.TurnosDTO;
@@ -93,8 +94,14 @@ public class TurnosController {
 	
 	@RequestMapping(value = "/combossjcs/comboidGuardias",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboidGuardias(String idTurno ,HttpServletRequest request) {
-		ComboDTO response = comboService.comboGuardias(request, idTurno);
+		ComboDTO response = comboService.comboGuardiasUpdate(request, idTurno);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/combossjcs/ordenCola",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboColaOrdenadaDTO> ordenCola(@RequestBody String idordenacioncolas ,HttpServletRequest request) {
+		ComboColaOrdenadaDTO response = comboService.ordenCola(request, idordenacioncolas);
+		return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/turnos/busquedaTurnos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -139,6 +146,15 @@ public class TurnosController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/turnos/eliminateGuardia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> eliminateGuardia(@RequestBody GuardiasDTO guardiasDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = turnosService.eliminateGuardia(guardiasDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@RequestMapping(value = "/turnos/eliminateColaGuardia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> eliminateColaGuardia(@RequestBody TurnosDTO turnosDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = turnosService.eliminateColaGuardia(turnosDTO, request);
@@ -161,7 +177,15 @@ public class TurnosController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-
+	}
+	
+	@RequestMapping(value = "/turnos/updateUltimo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateUltimo(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
+		UpdateResponseDTO response = turnosService.updateUltimo(turnosItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/turnos/updateConfiguracion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -32,8 +32,8 @@ public class GuardiasItem {
 	private String tipoDiasPeriodo;
 	private String letradosGuardia;
 	private String letradosIns;
-	private String seleccionLab;
-	private String seleccionFes;
+	private String seleccionLaborables;
+	private String seleccionFestivos;
 	private String diasPeriodo;
 	private String diasGuardia;
 	private String diasSeparacionGuardias;
@@ -75,9 +75,7 @@ public class GuardiasItem {
 	public void setDiasSeparacionGuardias(String diasSeparacionGuardias) {
 		this.diasSeparacionGuardias = diasSeparacionGuardias;
 	}
-	public void setSeleccionLab(String seleccionLab) {
-		this.seleccionLab = seleccionLab;
-	}
+
 	public String getDiasPeriodo() {
 		return diasPeriodo;
 	}
@@ -132,18 +130,6 @@ public class GuardiasItem {
 	}
 	public void setHistorico(boolean historico) {
 		this.historico = historico;
-	}
-	public String getSeleccionLab() {
-		return seleccionLab;
-	}
-	public void setSeleccionsLab(String seleccionLab) {
-		this.seleccionLab = seleccionLab;
-	}
-	public String getSeleccionFes() {
-		return seleccionFes;
-	}
-	public void setSeleccionFes(String seleccionFes) {
-		this.seleccionFes = seleccionFes;
 	}
 	public String getIdGuardia() {
 		return idGuardia;
@@ -412,6 +398,18 @@ public class GuardiasItem {
 				+ grupoFacturacion + ", partidaPresupuestaria=" + partidaPresupuestaria + ", tipoTurno=" + tipoTurno
 				+ ", tipoGuardia=" + tipoGuardia + ", tipoDia=" + tipoDia + ", letradosGuardia=" + letradosGuardia
 				+ ", letradosIns=" + letradosIns + ", fechabaja=" + fechabaja + "]";
+	}
+	public String getSeleccionLaborables() {
+		return seleccionLaborables;
+	}
+	public void setSeleccionLaborables(String seleccionLaborables) {
+		this.seleccionLaborables = seleccionLaborables;
+	}
+	public String getSeleccionFestivos() {
+		return seleccionFestivos;
+	}
+	public void setSeleccionFestivos(String seleccionFestivos) {
+		this.seleccionFestivos = seleccionFestivos;
 	} 
 
 	

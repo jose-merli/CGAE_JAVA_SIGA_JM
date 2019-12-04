@@ -33,4 +33,6 @@ public interface ComboService {
 	
 	public ComboColaOrdenadaDTO ordenCola(HttpServletRequest request, String idordenacioncolas);
 
+	public ComboDTO comboGuardiasUpdate(HttpServletRequest request, String idTurno);
+
 }

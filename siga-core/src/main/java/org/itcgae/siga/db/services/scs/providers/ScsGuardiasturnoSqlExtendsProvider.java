@@ -61,7 +61,9 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 						+ idLenguaje + "'");
 		sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("SCS_TURNO.IDTURNO= '"+turnosItem.getIdturno()+"'");
-
+		if(!turnosItem.isHistorico()) {
+			sql.WHERE("SCS_GUARDIASTURNO.FECHABAJA is null");
+		}
 		
 		sql.ORDER_BY("SCS_TURNO.NOMBRE, SCS_GUARDIASTURNO.NOMBRE");
 
@@ -78,6 +80,22 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		
 		sql.WHERE("IDTURNO = '"+idTurno+"'");
 		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+		sql.ORDER_BY("nombre");
+		
+		return sql.toString();
+	}
+	
+	public String comboGuardiasUpdate(String idTurno, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("NOMBRE");
+		sql.SELECT("IDGUARDIA");
+		
+		sql.FROM("SCS_GUARDIASTURNO");
+		
+		sql.WHERE("IDTURNO = '"+idTurno+"'");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+		sql.WHERE("fechabaja is null");
 		sql.ORDER_BY("nombre");
 		
 		return sql.toString();
