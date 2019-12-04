@@ -36,7 +36,9 @@ public interface IGestionJusticiableService {
 	
 	public AsuntosJusticiableDTO searchAsuntosConClave(List<AsuntosClaveJusticiableItem> asuntosClaveList, boolean fromJusticiable, HttpServletRequest request);
 
-	public JusticiableDTO getJusticiableByNif (JusticiableBusquedaItem justiciableBusquedaItem, HttpServletRequest request);
+	public JusticiableDTO getJusticiableByNif(JusticiableBusquedaItem justiciableBusquedaItem, HttpServletRequest request);
+
+	public JusticiableDTO getJusticiableByIdPersona(JusticiableBusquedaItem justiciableBusquedaItem, HttpServletRequest request);
 
 	public UpdateResponseDTO associateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request);
 

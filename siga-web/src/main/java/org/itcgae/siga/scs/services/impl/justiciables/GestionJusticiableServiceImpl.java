@@ -119,7 +119,6 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
-	
 	private boolean validacionDireccion = false;
 	private boolean validacionTipoVia = false;
 	private boolean validacionCodigoPostal = false;
@@ -131,8 +130,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	private boolean validacionPais = false;
 	private boolean validacionFechaNacimiento = false;
 	private boolean validacionEstadoCivil = false;
-	
-	
+
 	@Override
 	public ComboDTO getMinusvalias(HttpServletRequest request) {
 		LOGGER.info("getMinusvalia() -> Entrada al servicio para obtener combo minusvalias");
@@ -619,8 +617,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		return insertResponseDTO;
 	}
 
-	private ScsPersonajg fillScsPersonasjsOfJusticiableItem(ScsPersonajg scsPersonajg, Boolean datosGenerales, Short idInstitucion,
-			JusticiableItem justiciableItem) {
+	private ScsPersonajg fillScsPersonasjsOfJusticiableItem(ScsPersonajg scsPersonajg, Boolean datosGenerales,
+			Short idInstitucion, JusticiableItem justiciableItem) {
 
 		if (datosGenerales == null || datosGenerales) {
 
@@ -646,7 +644,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			scsPersonajg.setIdestadocivil(justiciableItem.getIdEstadoCivil());
 
 			scsPersonajg.setIdinstitucion(idInstitucion);
-			
+
 			scsPersonajg.setIdlenguaje(justiciableItem.getIdLenguaje());
 
 			scsPersonajg.setIdminusvalia(justiciableItem.getIdMinusvalia());
@@ -656,9 +654,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			// scsPersonajg.setIdpaisdir1(justiciableItem.getIdpaisDir1());
 			// scsPersonajg.setIdpaisdir2(justiciableItem.getIdpaisDir2());
 
-//			if (justiciableItem.getIdPersona() != null && justiciableItem.getIdPersona() != "") {
-//				scsPersonajg.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
-//			}
+			// if (justiciableItem.getIdPersona() != null && justiciableItem.getIdPersona()
+			// != "") {
+			// scsPersonajg.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
+			// }
 
 			scsPersonajg.setIdpoblacion(justiciableItem.getIdPoblacion());
 			scsPersonajg.setIdpoblacion2(justiciableItem.getIdPoblacion2());
@@ -668,7 +667,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			scsPersonajg.setIdprovincia(justiciableItem.getIdProvincia());
 			scsPersonajg.setIdprovincia2(justiciableItem.getIdProvincia2());
 
-			if(justiciableItem.getAsociarRepresentante() != null && justiciableItem.getAsociarRepresentante()) {
+			if (justiciableItem.getAsociarRepresentante() != null && justiciableItem.getAsociarRepresentante()) {
 				scsPersonajg.setIdrepresentantejg(justiciableItem.getIdRepresentantejg());
 			}
 
@@ -729,10 +728,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		String idPersona = null;
 		String validacion = null;
 		List<String> roles = new ArrayList<String>();
-		
+
 		inicializarValidaciones();
 
-		
 		if (null != idInstitucion) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -771,29 +769,42 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 							validacion = validacionDatosSegunTipoPcajg(rolJusticiable, idInstitucion, justiciableItem);
 
-
-					 }
-				    }
-					if (validacionCodigoPostal || validacionDireccion || validacionEstadoCivil || validacionFechaNacimiento || validacionPais || validacionParentesco
-					    || validacionPoblacion ||  validacionProvincia || validacionRegimenConyugal || validacionSexo || validacionTipoVia) {
+						}
+					}
+					if (validacionCodigoPostal || validacionDireccion || validacionEstadoCivil
+							|| validacionFechaNacimiento || validacionPais || validacionParentesco
+							|| validacionPoblacion || validacionProvincia || validacionRegimenConyugal || validacionSexo
+							|| validacionTipoVia) {
 						error.setCode(600);
-						
+
 						String camposErroneos = "";
 
-						if(validacionEstadoCivil) camposErroneos += ", Estado Civil ";
-						if(validacionDireccion) camposErroneos += ", Direccion";
-						if(validacionTipoVia) camposErroneos += ", Tipo de Vía";
-						if(validacionCodigoPostal) camposErroneos += ", Código Postal ";
-						if(validacionProvincia) camposErroneos += ", Provincia";
-						if(validacionPoblacion) camposErroneos += ", Poblacion";
-						if(validacionFechaNacimiento) camposErroneos += ", Fecha de Nacimiento";
-						if(validacionPais) camposErroneos += ", Nacionalidad";
-						if(validacionParentesco) camposErroneos += ", Parentesco";
-						if(validacionRegimenConyugal) camposErroneos += ", Régimen Conyugal";
-						if(validacionSexo) camposErroneos += ", Sexo";
-						
-						camposErroneos = camposErroneos.substring(1,camposErroneos.length());
-						validacion = "Debe informar los siguientes campos para poder guardar el justiciable: " + camposErroneos;
+						if (validacionEstadoCivil)
+							camposErroneos += ", Estado Civil ";
+						if (validacionDireccion)
+							camposErroneos += ", Direccion";
+						if (validacionTipoVia)
+							camposErroneos += ", Tipo de Vía";
+						if (validacionCodigoPostal)
+							camposErroneos += ", Código Postal ";
+						if (validacionProvincia)
+							camposErroneos += ", Provincia";
+						if (validacionPoblacion)
+							camposErroneos += ", Poblacion";
+						if (validacionFechaNacimiento)
+							camposErroneos += ", Fecha de Nacimiento";
+						if (validacionPais)
+							camposErroneos += ", Nacionalidad";
+						if (validacionParentesco)
+							camposErroneos += ", Parentesco";
+						if (validacionRegimenConyugal)
+							camposErroneos += ", Régimen Conyugal";
+						if (validacionSexo)
+							camposErroneos += ", Sexo";
+
+						camposErroneos = camposErroneos.substring(1, camposErroneos.length());
+						validacion = "Debe informar los siguientes campos para poder guardar el justiciable: "
+								+ camposErroneos;
 
 						error.setDescription(validacion);
 						updateResponseDTO.setStatus(SigaConstants.KO);
@@ -817,8 +828,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 						ScsPersonajg scsPersonajg = personaList.get(0);
 
-						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, datosGenerales, idInstitucion,
-								justiciableItem);
+						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, datosGenerales,
+								idInstitucion, justiciableItem);
 
 						justiciable.setUsumodificacion(usuario.getIdusuario());
 
@@ -941,18 +952,18 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	}
 
 	private void inicializarValidaciones() {
-		validacionCodigoPostal  = false;
+		validacionCodigoPostal = false;
 		validacionDireccion = false;
 		validacionEstadoCivil = false;
 		validacionFechaNacimiento = false;
 		validacionPais = false;
-		validacionParentesco= false;
-	    validacionPoblacion = false;
-	    validacionProvincia = false;
-	    validacionRegimenConyugal = false;
-	    validacionSexo = false;
-	    validacionTipoVia= false;
-		
+		validacionParentesco = false;
+		validacionPoblacion = false;
+		validacionProvincia = false;
+		validacionRegimenConyugal = false;
+		validacionSexo = false;
+		validacionTipoVia = false;
+
 	}
 
 	@Override
@@ -1648,7 +1659,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	public JusticiableDTO getJusticiableByNif(JusticiableBusquedaItem justiciableBusquedaItem,
 			HttpServletRequest request) {
 
-		LOGGER.info("getJusticiableByNif() -> Entrada al servicio para obtener el representante del justiciable");
+		LOGGER.info("getJusticiableByNif() -> Entrada al servicio para obtener el representante del justiciable by nif");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1677,8 +1688,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 					LOGGER.info(
 							"getJusticiableByNif() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener representante");
-
 					ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
+
 					scsPersonajgExample.createCriteria().andNifEqualTo(justiciableBusquedaItem.getNif().toUpperCase())
 							.andIdinstitucionEqualTo(idInstitucion);
 
@@ -1716,7 +1727,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			}
 
 		}
-		LOGGER.info("getJusticiableByNif() -> Salida del servicio para obtener el representante del justiciable");
+		LOGGER.info("getJusticiableByNif() -> Salida del servicio para obtener el representante del justiciable by nif");
 		return justiciableDTO;
 	}
 
@@ -1944,7 +1955,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	private String obtenerTipoRolJusticiable(String rol) {
 
 		LOGGER.info("obtenerTipoRolJusticiable() -> Entrada al servicio para obtener tipo rol de justiciable");
-		
+
 		String rolJusticiable = null;
 
 		switch (rol) {
@@ -1975,7 +1986,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		}
 
 		LOGGER.info("obtenerTipoRolJusticiable() -> Salida al servicio para obtener tipo rol de justiciable");
-		
+
 		return rolJusticiable;
 	}
 
@@ -2009,7 +2020,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				|| tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_DESIGNACION)) {
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
-					validacionDireccion = true;
+				validacionDireccion = true;
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
 				validacionTipoVia = true;
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
@@ -2022,35 +2033,34 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				validacionSexo = true;
 			if (justiciableItem.getIdEstadoCivil() == null)
 				validacionEstadoCivil = true;
-			if (UtilidadesString.esCadenaVacia(justiciableItem.getRegimen_conyugal())) 
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getRegimen_conyugal()))
 				validacionRegimenConyugal = true;
 
-		
 		}
 
 		if (tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
-		if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
 				validacionDireccion = true;
-		if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
-			validacionTipoVia = true;
-		if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
-			validacionCodigoPostal = true;
-		if (UtilidadesString.esCadenaVacia(justiciableItem.getIdProvincia()))
-			validacionProvincia = true;
-		if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPoblacion()))
-			validacionPoblacion = true;
-//			if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco())) {
-//				validacionParentesco = true;
-//			} 
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
+				validacionTipoVia = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
+				validacionCodigoPostal = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdProvincia()))
+				validacionProvincia = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPoblacion()))
+				validacionPoblacion = true;
+			// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco())) {
+			// validacionParentesco = true;
+			// }
 
 		}
 
 		if (tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_DESIGNACION)
-				|| tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_EJG)){
-				
+				|| tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_EJG)) {
+
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
-					validacionDireccion = true;
+				validacionDireccion = true;
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
 				validacionTipoVia = true;
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
@@ -2061,15 +2071,15 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				validacionPoblacion = true;
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPais())) {
 				validacionPais = true;
-			} 	
-				
-		}		
-				
-		if( tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_ASISTENCIA)) {
+			}
+
+		}
+
+		if (tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_ASISTENCIA)) {
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPais())) {
 				validacionPais = true;
-			} 
+			}
 		}
 
 		LOGGER.info("validateDatosTipoPcajg4() -> Salida del servicio para validar los datos segun tipo Pcajg 4");
@@ -2086,7 +2096,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
-					validacionDireccion = true;
+				validacionDireccion = true;
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
 				validacionTipoVia = true;
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
@@ -2097,10 +2107,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				validacionPoblacion = true;
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPais()))
 				validacionPais = true;
-//			if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco))
-//				validacionParentesco = true;
-				
-
+			// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco))
+			// validacionParentesco = true;
 
 		}
 
@@ -2117,9 +2125,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
-				
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
-					validacionDireccion = true;
+				validacionDireccion = true;
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdTipoVia()))
 				validacionTipoVia = true;
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getCodigoPostal()))
@@ -2130,9 +2137,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				validacionPoblacion = true;
 			if (justiciableItem.getFechaNacimiento() == null)
 				validacionFechaNacimiento = true;
-//			if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco))
-//				validacionParentesco = true;
-
+			// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco))
+			// validacionParentesco = true;
 
 		}
 
@@ -2146,10 +2152,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("validateDatosTipoPcajg8() -> Entrada al servicio para validar los datos segun tipo Pcajg 8");
 		String error = null;
 
-
-//		if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco())) {
-//			validacionParentesco = true;
-//		} 
+		// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco())) {
+		// validacionParentesco = true;
+		// }
 
 		LOGGER.info("validateDatosTipoPcajg8() -> Salida del servicio para validar los datos segun tipo Pcajg 8");
 
@@ -2168,12 +2173,87 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo())) {
 				validacionSexo = true;
-			} 
+			}
 		}
 
 		LOGGER.info("validateDatosTipoPcajg9() -> Salida del servicio para validar los datos segun tipo Pcajg 9");
 
 		return error;
+	}
+
+	@Override
+	public JusticiableDTO getJusticiableByIdPersona(JusticiableBusquedaItem justiciableBusquedaItem,
+			HttpServletRequest request) {
+
+		LOGGER.info("getJusticiableByIdPersona() -> Entrada al servicio para obtener el representante del justiciable por idpersona");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		JusticiableDTO justiciableDTO = new JusticiableDTO();
+		List<ScsPersonajg> personajgList = new ArrayList<ScsPersonajg>();
+		Error error = new Error();
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"getJusticiableByIdPersona() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getJusticiableByIdPersona() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				try {
+
+					LOGGER.info(
+							"getJusticiableByIdPersona() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener representante");
+					ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
+					scsPersonajgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.valueOf(justiciableBusquedaItem.getIdPersona()));
+
+					scsPersonajgExample.setOrderByClause("FECHAMODIFICACION DESC");
+
+					personajgList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
+
+					LOGGER.info(
+							"getJusticiableByNif() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener representante");
+
+					if (personajgList != null && personajgList.size() > 0) {
+
+						ScsPersonajg personajg = personajgList.get(0);
+
+						JusticiableItem justiciable = fillJusticiableItemOfScsPersonasjg(personajg);
+
+						justiciableDTO.setJusticiable(justiciable);
+
+					} else {
+
+						JusticiableItem justiciable = new JusticiableItem();
+
+						justiciable.setNif(justiciableBusquedaItem.getNif());
+
+						justiciableDTO.setJusticiable(justiciable);
+
+					}
+
+				} catch (Exception e) {
+					LOGGER.error(e);
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+				}
+
+			}
+
+		}
+		LOGGER.info("getJusticiableByIdPersona() -> Salida del servicio para obtener el representante del justiciable por idpersona");
+		return justiciableDTO;
 	}
 
 }

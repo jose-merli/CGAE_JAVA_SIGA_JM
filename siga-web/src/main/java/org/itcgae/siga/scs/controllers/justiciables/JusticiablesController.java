@@ -132,6 +132,12 @@ public class JusticiablesController {
 		return new ResponseEntity<JusticiableDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/gestionJusticiables/getJusticiableByIdPersona", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<JusticiableDTO> getJusticiableByIdPersona(@RequestBody JusticiableBusquedaItem justiciableBusquedaItem, HttpServletRequest request) {
+		JusticiableDTO response = gestionJusticiableService.getJusticiableByIdPersona(justiciableBusquedaItem, request);
+		return new ResponseEntity<JusticiableDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/gestionJusticiables/associateRepresentante", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> associateRepresentante(@RequestBody JusticiableItem justiciableItem, HttpServletRequest request) {
 
