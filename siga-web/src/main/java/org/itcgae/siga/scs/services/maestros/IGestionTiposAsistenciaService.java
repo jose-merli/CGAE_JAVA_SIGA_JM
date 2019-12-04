@@ -2,18 +2,18 @@ package org.itcgae.siga.scs.services.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.AcreditacionDTO;
-import org.itcgae.siga.DTO.scs.CosteFijoDTO;
-import org.itcgae.siga.DTO.scs.CosteFijoItem;
-import org.itcgae.siga.DTO.scs.FundamentoResolucionItem;
-import org.itcgae.siga.DTO.scs.TiposAsistenciaItem;
-import org.itcgae.siga.DTO.scs.TiposAsistenciasDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoUpdateDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.PartidasJudicialesDTO;
 import org.itcgae.siga.DTOs.cen.PartidasJudicialesItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.AcreditacionDTO;
+import org.itcgae.siga.DTOs.scs.CosteFijoDTO;
+import org.itcgae.siga.DTOs.scs.CosteFijoItem;
+import org.itcgae.siga.DTOs.scs.FundamentoResolucionItem;
+import org.itcgae.siga.DTOs.scs.TiposAsistenciaItem;
+import org.itcgae.siga.DTOs.scs.TiposAsistenciasDTO;
 
 public interface IGestionTiposAsistenciaService {
 	public TiposAsistenciasDTO searchTiposAsistencia(boolean historico, HttpServletRequest request);

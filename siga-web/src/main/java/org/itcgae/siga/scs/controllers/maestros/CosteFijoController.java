@@ -2,11 +2,11 @@ package org.itcgae.siga.scs.controllers.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.CosteFijoDTO;
-import org.itcgae.siga.DTO.scs.CosteFijoItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.CosteFijoDTO;
+import org.itcgae.siga.DTOs.scs.CosteFijoItem;
 import org.itcgae.siga.scs.services.maestros.IGestionCosteFijoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

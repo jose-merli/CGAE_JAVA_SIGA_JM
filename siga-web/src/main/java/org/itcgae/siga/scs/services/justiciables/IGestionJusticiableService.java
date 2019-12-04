@@ -4,15 +4,15 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.AsuntosClaveJusticiableItem;
-import org.itcgae.siga.DTO.scs.AsuntosJusticiableDTO;
-import org.itcgae.siga.DTO.scs.JusticiableBusquedaItem;
-import org.itcgae.siga.DTO.scs.JusticiableDTO;
-import org.itcgae.siga.DTO.scs.JusticiableItem;
-import org.itcgae.siga.DTO.scs.JusticiableTelefonoDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
+import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
+import org.itcgae.siga.DTOs.scs.JusticiableDTO;
+import org.itcgae.siga.DTOs.scs.JusticiableItem;
+import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
 
 public interface IGestionJusticiableService {
 	

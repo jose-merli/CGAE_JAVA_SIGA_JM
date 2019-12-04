@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.ZonasItem;
+import org.itcgae.siga.DTOs.scs.ZonasItem;
 import org.itcgae.siga.db.mappers.ScsZonaSqlProvider;
 
 public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
