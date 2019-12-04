@@ -106,6 +106,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 						juzgado.setCodigoext(juzgadoItem.getCodigoExt());
 						juzgado.setCodigoprocurador(juzgadoItem.getCodigoProcurador());
 						juzgado.setMovil(juzgadoItem.getMovil());
+						juzgado.setCodigoejis(juzgadoItem.getCodigoEjis());
 
 						if (juzgadoItem.getEsDecano() != null && juzgadoItem.getEsDecano() != "") {
 							juzgado.setEsdecano(Short.valueOf(juzgadoItem.getEsDecano()));
