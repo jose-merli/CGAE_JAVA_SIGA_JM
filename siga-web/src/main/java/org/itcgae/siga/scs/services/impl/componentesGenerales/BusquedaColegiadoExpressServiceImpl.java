@@ -5,8 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.ColegiadoJGDTO;
-import org.itcgae.siga.DTO.scs.ColegiadoJGItem;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;

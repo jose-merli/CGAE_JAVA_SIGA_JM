@@ -2,9 +2,9 @@ package org.itcgae.siga.scs.controllers.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.FundamentosCalificacionDTO;
-import org.itcgae.siga.DTO.scs.FundamentosCalificacionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.FundamentosCalificacionDTO;
+import org.itcgae.siga.DTOs.scs.FundamentosCalificacionItem;
 import org.itcgae.siga.scs.services.maestros.IBusquedaFundamentosCalificacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

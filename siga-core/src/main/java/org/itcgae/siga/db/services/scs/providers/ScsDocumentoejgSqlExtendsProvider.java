@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.DocumentacionEjgItem;
+import org.itcgae.siga.DTOs.scs.DocumentacionEjgItem;
 import org.itcgae.siga.db.mappers.ScsDocumentoejgSqlProvider;
 
 public class ScsDocumentoejgSqlExtendsProvider extends ScsDocumentoejgSqlProvider {

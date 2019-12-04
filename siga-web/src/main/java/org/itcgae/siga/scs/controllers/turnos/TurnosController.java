@@ -2,15 +2,15 @@ package org.itcgae.siga.scs.controllers.turnos;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.TurnosDTO;
-import org.itcgae.siga.DTO.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.scs.service.IGestionTurnosService;
+import org.itcgae.siga.DTOs.scs.TurnosDTO;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
+import org.itcgae.siga.scs.services.oficio.IGestionTurnosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsPersonajgSqlProvider;
