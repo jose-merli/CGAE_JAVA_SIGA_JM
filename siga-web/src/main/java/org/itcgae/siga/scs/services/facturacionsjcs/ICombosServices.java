@@ -7,5 +7,6 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 public interface ICombosServices {
 	
 	public ComboDTO comboFactEstados(HttpServletRequest request);
+	public ComboDTO comboFactConceptos(HttpServletRequest request);
 	
 }
