@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.MateriasItem;
+import org.itcgae.siga.DTOs.scs.MateriasItem;
 import org.itcgae.siga.db.mappers.ScsMateriaSqlProvider;
 
 public class ScsMateriaSqlExtendsProvider extends ScsMateriaSqlProvider {

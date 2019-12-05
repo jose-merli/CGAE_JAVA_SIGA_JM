@@ -2,8 +2,8 @@ package org.itcgae.siga.scs.controllers.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.ColegiadosSJCSDTO;
-import org.itcgae.siga.DTO.scs.ColegiadosSJCSItem;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.scs.services.componentesGenerales.BusquedaGeneralSJCSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -6,10 +6,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.FundamentoResolucionDTO;
-import org.itcgae.siga.DTO.scs.FundamentoResolucionItem;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.FundamentoResolucionDTO;
+import org.itcgae.siga.DTOs.scs.FundamentoResolucionItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;

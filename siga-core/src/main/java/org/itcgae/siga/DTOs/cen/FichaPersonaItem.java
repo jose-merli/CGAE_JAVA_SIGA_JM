@@ -20,6 +20,7 @@ public class FichaPersonaItem {
 	private String tipoIdentificacion;
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaAlta;
+	private String colegiado;
 	
 	
 	/**
@@ -213,7 +214,24 @@ public class FichaPersonaItem {
 		this.tipoIdentificacion = tipoIdentificacion;
 	}
 	
+	/**
+	 */
+	public FichaPersonaItem colegiado(String colegiado){
+		this.colegiado = colegiado;
+		return this;
+	}
 	
+	@JsonProperty("colegiado")	
+	public String getColegiado() {
+		return colegiado;
+	}
+
+
+	public void setColegiado(String colegiado) {
+		this.colegiado = colegiado;
+	}
+
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -233,14 +251,15 @@ public class FichaPersonaItem {
 	    		Objects.equals(this.residente, fichaPersonaItem.residente) &&
 	    		Objects.equals(this.situacion, fichaPersonaItem.situacion) &&
 	    		Objects.equals(this.tipoIdentificacion, fichaPersonaItem.tipoIdentificacion) &&
-	    		Objects.equals(this.fechaAlta, fichaPersonaItem.fechaAlta);
+	    		Objects.equals(this.fechaAlta, fichaPersonaItem.fechaAlta) &&
+	    		Objects.equals(this.colegiado, fichaPersonaItem.colegiado);
 	}
 	
 	
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(colegio, idPersona, nif, nombre, apellido1, apellido2, numeroColegiado, residente, situacion, tipoIdentificacion, fechaAlta);
+		return Objects.hash(colegio, idPersona, nif, nombre, apellido1, apellido2, numeroColegiado, residente, situacion, tipoIdentificacion, fechaAlta, colegiado);
 	}
 	
 	
@@ -260,6 +279,8 @@ public class FichaPersonaItem {
 	    sb.append("    situacion: ").append(toIndentedString(situacion)).append("\n");
 	    sb.append("    tipoIdentificacion: ").append(toIndentedString(tipoIdentificacion)).append("\n");
 	    sb.append("    fechaAlta: ").append(toIndentedString(fechaAlta)).append("\n");
+	    sb.append("    colegiado: ").append(toIndentedString(colegiado)).append("\n");
+
 	    sb.append("}");
 	    return sb.toString();
 	}

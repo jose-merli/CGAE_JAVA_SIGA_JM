@@ -3,7 +3,7 @@ package org.itcgae.siga.db.services.scs.providers;
 import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.ModulosItem;
+import org.itcgae.siga.DTOs.scs.ModulosItem;
 import org.itcgae.siga.db.mappers.ScsProcedimientosSqlProvider;
 
 public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlProvider{
@@ -119,7 +119,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 	public String getIdProcedimiento(Short idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("MAX(IDPROCEDIMIENTO) AS IDPROCEDIMIENTO");
+		sql.SELECT("MAX(to_number(IDPROCEDIMIENTO)) AS IDPROCEDIMIENTO");
 		sql.FROM("SCS_PROCEDIMIENTOS");
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
 

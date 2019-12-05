@@ -2,10 +2,10 @@ package org.itcgae.siga.scs.controllers.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.PartidasDTO;
-import org.itcgae.siga.DTO.scs.PartidasItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.scs.PartidasDTO;
+import org.itcgae.siga.DTOs.scs.PartidasItem;
 import org.itcgae.siga.scs.services.maestros.IPartidasPresupuestariasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
