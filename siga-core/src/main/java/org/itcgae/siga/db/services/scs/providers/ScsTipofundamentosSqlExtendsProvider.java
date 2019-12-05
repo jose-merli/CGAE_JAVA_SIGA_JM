@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.FundamentoResolucionItem;
+import org.itcgae.siga.DTOs.scs.FundamentoResolucionItem;
 import org.itcgae.siga.db.entities.ScsTipofundamentos;
 
 public class ScsTipofundamentosSqlExtendsProvider extends ScsTipofundamentos{

@@ -2,12 +2,12 @@ package org.itcgae.siga.scs.controllers.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.JuzgadoDTO;
-import org.itcgae.siga.DTO.scs.JuzgadoItem;
-import org.itcgae.siga.DTO.scs.ProcedimientoDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.JuzgadoDTO;
+import org.itcgae.siga.DTOs.scs.JuzgadoItem;
+import org.itcgae.siga.DTOs.scs.ProcedimientoDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
 import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
 import org.itcgae.siga.scs.services.maestros.IBusquedaJuzgadosService;

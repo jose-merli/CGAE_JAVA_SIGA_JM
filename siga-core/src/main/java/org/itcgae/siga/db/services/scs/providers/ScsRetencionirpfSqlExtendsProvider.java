@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.RetencionIRPFItem;
+import org.itcgae.siga.DTOs.scs.RetencionIRPFItem;
 import org.itcgae.siga.db.mappers.ScsMaestroretencionesSqlProvider;
 
 public class ScsRetencionirpfSqlExtendsProvider extends ScsMaestroretencionesSqlProvider{

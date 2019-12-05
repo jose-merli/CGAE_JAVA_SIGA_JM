@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.PretensionItem;
+import org.itcgae.siga.DTOs.scs.PretensionItem;
 import org.itcgae.siga.db.mappers.ScsPretensionSqlProvider;
 
 public class ScsPretensionSqlExtendsProvider extends ScsPretensionSqlProvider{

@@ -2,9 +2,9 @@ package org.itcgae.siga.scs.services.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.ZonasDTO;
-import org.itcgae.siga.DTO.scs.ZonasItem;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.scs.ZonasDTO;
+import org.itcgae.siga.DTOs.scs.ZonasItem;
 
 public interface IGestionZonasService {
 	
