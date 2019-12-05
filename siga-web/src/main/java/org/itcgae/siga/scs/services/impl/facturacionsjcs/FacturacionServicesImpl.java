@@ -5,9 +5,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.FacturacionDTO;
-import org.itcgae.siga.DTO.scs.FacturacionDeleteDTO;
-import org.itcgae.siga.DTO.scs.FacturacionItem;
+import org.itcgae.siga.DTOs.scs.FacturacionDTO;
+import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
+import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;

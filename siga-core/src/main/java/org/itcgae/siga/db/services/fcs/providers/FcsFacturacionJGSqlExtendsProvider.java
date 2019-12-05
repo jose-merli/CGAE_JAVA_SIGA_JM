@@ -3,7 +3,7 @@ package org.itcgae.siga.db.services.fcs.providers;
 import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.FacturacionItem;
+import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgSqlProvider;
 

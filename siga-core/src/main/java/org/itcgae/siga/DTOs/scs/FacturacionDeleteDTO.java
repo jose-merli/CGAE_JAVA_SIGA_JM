@@ -1,4 +1,4 @@
-package org.itcgae.siga.DTO.scs;
+package org.itcgae.siga.DTOs.scs;
 
 import org.itcgae.siga.DTOs.gen.Error;
 

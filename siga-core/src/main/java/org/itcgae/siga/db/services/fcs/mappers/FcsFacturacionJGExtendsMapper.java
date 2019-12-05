@@ -7,11 +7,11 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.scs.FacturacionItem;
 import org.itcgae.siga.db.services.adm.providers.AdmUsuariosSqlExtendsProvider;
 import org.itcgae.siga.db.services.fcs.providers.FcsFacturacionJGSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgMapper;
 
 @Service
