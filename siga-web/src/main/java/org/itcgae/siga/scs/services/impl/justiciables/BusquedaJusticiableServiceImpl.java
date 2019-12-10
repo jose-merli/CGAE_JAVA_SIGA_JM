@@ -37,6 +37,10 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 
 	@Autowired
 	private ScsRolesJusticiablesExtendsMapper scsRolesJusticiablesExtendsMapper;
+	
+	@Autowired
+	private ScsTelefonospersonaMapper scsTelefonospersonaMapper;
+	
 
 	@Autowired
 	private ScsPersonajgExtendsMapper scsPersonajgExtendsMapper;
@@ -85,6 +89,52 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 		LOGGER.info("getComboRoles() -> Salida del servicio para obtener combo roles justiciables");
 		return combo;
 	}
+
+	@Override
+	public JusticiableTelefonoDTO getTelefonos(HttpServletRequest request) {
+
+		LOGGER.info("getTelefonos() -> Entrada al servicio para obtener telefonos personas");
+
+		JusticiableTelefonoDTO justiciableTelefonoDTO = new JusticiableTelefonoDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getTelefonos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getTelefonos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				ScsTelefonospersonaExample scsTelefonospersonaExample = new ScsTelefonospersonaExample();
+				scsTelefonospersonaExample.createCriteria()
+				.andIdinstitucionEqualTo(idInstitucion);
+				
+				scsTelefonospersonaExample.setOrderByClause("NOMBRETELEFONO asc");
+				
+				List<ScsTelefonospersona> telefonospersonaList = scsTelefonospersonaMapper.selectByExample(scsTelefonospersonaExample);
+				
+				if (telefonospersonaList != null && telefonospersonaList.size() > 0) {
+					justiciableTelefonoDTO.setTelefonospersona(telefonospersonaList);
+				}
+			}
+		}
+		
+		LOGGER.info("getTelefonos() -> Salida del servicio para obtener telefonos personas");
+
+		return justiciableTelefonoDTO;
+	}
+
 
 	@Override
 	public JusticiableBusquedaDTO searchJusticiables(JusticiableBusquedaItem justiciableBusquedaItem,

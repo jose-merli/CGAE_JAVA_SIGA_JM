@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.scs.ProcedimientoItem;
+import org.itcgae.siga.DTO.scs.ProcedimientoItem;
 import org.itcgae.siga.db.mappers.ScsJuzgadoprocedimientoMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsJuzgadoprocedimientoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;

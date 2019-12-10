@@ -10,7 +10,6 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 	public String searchClaveAsistencia(AsuntosJusticiableItem asuntosJusticiableItem) {
 		SQL sql = new SQL();
 
-
 		sql.SELECT("ASISTENCIA.idinstitucion, ASISTENCIA.anio,ASISTENCIA.numero,'' as clave, '' as rol, 'A' as tipo");
 		sql.FROM("SCS_ASISTENCIA ASISTENCIA");
 //		El Join con la tabla de scs_personaJG, solo realizará si nos viene informado alguno de los datos del solicitante(Nif, nombre o apellidos).
@@ -63,7 +62,6 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		if(asuntosJusticiableItem.getJuzgado() != null) {
 			sql.WHERE("ASISTENCIA.JUZGADO  = "+asuntosJusticiableItem.getJuzgado());
 		}
-		
 		return sql.toString();
 	}
 	
@@ -98,4 +96,5 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		
 		return sql.toString();
 	}
+	
 }
