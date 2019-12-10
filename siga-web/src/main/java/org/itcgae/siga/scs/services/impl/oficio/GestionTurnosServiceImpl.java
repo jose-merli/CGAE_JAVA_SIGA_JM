@@ -902,13 +902,21 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						busquedaOrden += comboDTO.getCombooItems().get(i).getValue() + ",";
 					}
 				}
+				if(busquedaOrden != null && busquedaOrden.length() > 0) {
+					busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
+				}			
 				
-				busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
 				Date prueba = turnosItem.getFechaActual();
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String strDate = dateFormat.format(prueba);
-				turnosItems = scsTurnosExtendsMapper.busquedaColaOficio(turnosItem, strDate, busquedaOrden,
-						idInstitucion);
+				if(turnosItem.getIdpersonaUltimo() != null) {
+					turnosItems = scsTurnosExtendsMapper.busquedaColaOficio(turnosItem, strDate, busquedaOrden,
+							idInstitucion);
+				}else {
+					turnosItems = scsTurnosExtendsMapper.busquedaColaOficio2(turnosItem, strDate, busquedaOrden,
+							idInstitucion);
+				}
+				
 
 				LOGGER.info(
 						"busquedaColaOficio()  -> Salida a scsOrdenacioncolasExtendsMapper para obtener orden colas");
@@ -931,6 +939,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		TurnosDTO turnosDTO = new TurnosDTO();
 		List<TurnosItem> turnosItems = null;
+		List<ScsGuardiasturno> scsGuardiaLista = null;
 		String busquedaOrden = "";
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -950,9 +959,16 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 				LOGGER.info(
 						"busquedaColaOficio() -> Entrada a scsOrdenacioncolasExtendsMapper para obtener orden colas");
+				ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
+				example.createCriteria().andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno())).andIdguardiaEqualTo(Integer.parseInt(turnosItem.getIdcomboguardias())).andIdinstitucionEqualTo(idInstitucion);
+				scsGuardiaLista = scsGuardiasturnoExtendsMapper.selectByExample(example);
+				
+				
+				ScsGuardiasturno guardiasItems = scsGuardiaLista.get(0);
+				
 				ComboDTO comboDTO = new ComboDTO();
 				List<ComboItem> comboItems = new ArrayList<ComboItem>();
-				comboItems = scsOrdenacioncolasExtendsMapper.ordenColasEnvios(turnosItem.getIdordenacioncolas());
+				comboItems = scsOrdenacioncolasExtendsMapper.ordenColasEnvios(guardiasItems.getIdordenacioncolas().toString());
 				comboDTO.setCombooItems(comboItems);
 
 				for (int i = 0; i < comboDTO.getCombooItems().size(); i++) {
@@ -960,7 +976,9 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						busquedaOrden += comboDTO.getCombooItems().get(i).getValue() + ",";
 					}
 				}
-				busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
+				if(busquedaOrden != null && busquedaOrden.length() > 0) {
+					busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
+				}				
 				Date prueba = turnosItem.getFechaActual();
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String strDate = dateFormat.format(prueba);

@@ -138,7 +138,9 @@ public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String bus
 		SQL sqls4 = new SQL();
 		SQL sqls5 = new SQL();
 		
-
+		if(busquedaOrden == null || busquedaOrden.length() == 0) {
+			busquedaOrden = "ANTIGUEDADCOLA";
+		}
 		
 		sql4.SELECT("(CASE\r\n" + 
 				"				WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
@@ -285,6 +287,72 @@ public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String bus
 		
 	}
 
+public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String busquedaOrden, Short idInstitucion) {
+	SQL sql = new SQL();
+	
+	if(busquedaOrden == null || busquedaOrden.length() == 0) {
+		busquedaOrden = "ANTIGUEDADCOLA";
+	}
+	sql.SELECT("ROWNUM AS  orden_cola,consulta_total.* from(WITH tabla_nueva AS (SELECT consulta2.*\r\n" + 
+			"FROM (SELECT ROWNUM AS orden,consulta.* \r\n" + 
+			"FROM (SELECT (CASE\r\n" + 
+			"				WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
+			"				AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
+			"				AND (Ins.Fechabaja IS NULL\r\n" + 
+			"				OR TRUNC(Ins.Fechabaja) > NVL('"+strDate+"', '01/01/1900')) THEN '1'\r\n" + 
+			"				ELSE '0'\r\n" + 
+			"				END) Activo,\r\n" + 
+			"				Ins.Idinstitucion,\r\n" + 
+			"				Ins.Idturno,\r\n" + 
+			"				Per.Idpersona,\r\n" + 
+			"				TRUNC(Ins.fechavalidacion) AS Fechavalidacion,\r\n" + 
+			"				TRUNC(Ins.fechabaja) AS fechabajapersona,\r\n" + 
+			"				ins.fechasolicitud AS fechasolicitud,\r\n" + 
+			"				Per.Nifcif,\r\n" + 
+			"				Per.Nombre as nombrepersona,\r\n" + 
+			"				Per.Apellidos1,\r\n" + 
+			"				DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) apellidos2,\r\n" + 
+			"				Per.Apellidos1 || DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,\r\n" + 
+			"				DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
+			"				Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
+			"				Ins.Fechavalidacion AS ANTIGUEDADCOLA,(\r\n" + 
+			"					SELECT\r\n" + 
+			"						COUNT(1) numero\r\n" + 
+			"						FROM scs_saltoscompensaciones salto\r\n" + 
+			"						WHERE salto.idinstitucion = tur.idinstitucion\r\n" + 
+			"							AND   salto.idturno = tur.IDTURNO\r\n" + 
+			"							AND   salto.idguardia IS NULL\r\n" + 
+			"							AND   salto.saltoocompensacion = 'S'\r\n" + 
+			"							AND   salto.fechacumplimiento IS NULL\r\n" + 
+			"							and   salto.idpersona = ins.IDPERSONA\r\n" + 
+			"					)  as saltos,(\r\n" + 
+			"						SELECT\r\n" + 
+			"							COUNT(1) numero FROM scs_saltoscompensaciones salto\r\n" + 
+			"						WHERE\r\n" + 
+			"							salto.idinstitucion = tur.idinstitucion\r\n" + 
+			"							AND   salto.idturno = tur.IDTURNO\r\n" + 
+			"							AND   salto.idguardia IS NULL\r\n" + 
+			"							AND   salto.saltoocompensacion = 'C'\r\n" + 
+			"							AND   salto.fechacumplimiento IS NULL\r\n" + 
+			"							and   salto.idpersona = ins.IDPERSONA\r\n" + 
+			"					)  as compensaciones");
+	sql.FROM(" scs_inscripcionturno ins");
+	sql.INNER_JOIN("cen_persona per ON per.IDPERSONA = ins.IDPERSONA");
+	sql.INNER_JOIN("cen_colegiado col ON col.idpersona = per.IDPERSONA and col.IDINSTITUCION = ins.IDINSTITUCION and col.IDPERSONA = ins.IDPERSONA");
+	sql.INNER_JOIN("scs_turno tur ON tur.IDTURNO = ins.IDTURNO and tur.IDINSTITUCION = col.IDINSTITUCION");
+	sql.WHERE("(ins.fechabaja is null AND Ins.Fechavalidacion IS NOT NULL AND tur.Idinstitucion = '"+idInstitucion+"'AND tur.Idturno = '"+turnosItem.getIdturno()+"')");
+	sql.ORDER_BY("/*aqui debemos de consultar primero el orden que vamos a ordenar.*/\r\n" +busquedaOrden+
+			"          ) consulta ) consulta2)\r\n" + 
+			"SELECT * from(\r\n" + 
+			"SELECT  tabla_nueva.* FROM tabla_nueva)\r\n" + 
+			"\r\n" + 
+			") consulta_total       \r\n" + 
+			"");
+	
+	return sql.toString();
+	
+}
+
 	public String updateUltimo(TurnosItem turnosItem,Short idInstitucion) {
 		SQL sql = new SQL();
 		
@@ -369,10 +437,18 @@ public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String bus
 				"AND Gua.Idinstitucion = '"+idInstitucion+"'" + 
 				"AND Gua.Idturno = '"+turnosItem.getIdturno()+"'"+
 				"AND Gua.idguardia = '"+turnosItem.getIdcomboguardias()+"'");
-		sql4.ORDER_BY(""+busquedaOrden+",numeroGrupo,\r\n" + 
-				"	ordengrupo, \r\n" + 
-				"	Ins.FECHASUSCRIPCION,\r\n" + 
-				"	Ins.Idpersona");
+		if(busquedaOrden != null && busquedaOrden.length() > 0) {
+			sql4.ORDER_BY(""+busquedaOrden+",numeroGrupo,\r\n" + 
+					"	ordengrupo, \r\n" + 
+					"	Ins.FECHASUSCRIPCION,\r\n" + 
+					"	Ins.Idpersona");
+		}else {
+			sql4.ORDER_BY("numeroGrupo,\r\n" + 
+					"	ordengrupo, \r\n" + 
+					"	Ins.FECHASUSCRIPCION,\r\n" + 
+					"	Ins.Idpersona");
+		}
+		
 		
 
 		sqls5.SELECT("consulta4.* from(SELECT ROWNUM AS orden,consulta3.* FROM (SELECT \r\n" + 
@@ -450,21 +526,41 @@ public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String bus
 		
 		
 		if(turnosItem.getIdpersonaUltimo() != null) {
-			sqls5.ORDER_BY(""+busquedaOrden+",numeroGrupo,\r\n" + 
-					"	ordengrupo, \r\n" + 
-					"	Ins.FECHASUSCRIPCION,\r\n" + 
-					"	Ins.Idpersona )consulta3 WHERE activo = 1)consulta4 WHERE idpersona = \r\n" + 
-					"( SELECT IDPERSONA_ULTIMO FROM SCS_GUARDIASTURNO\r\n" + 
-					"        where Idinstitucion = '"+idInstitucion+"'"+ 
-					"		AND Idturno = '"+turnosItem.getIdturno()+"'"
-							+ "and idguardia ='"+turnosItem.getIdcomboguardias()+"'" + 
-					"	) )"+sqls3.toString());
-
+			if(busquedaOrden != null && busquedaOrden.length() > 0 ) {
+				sqls5.ORDER_BY(""+busquedaOrden+",numeroGrupo,\r\n" + 
+						"	ordengrupo, \r\n" + 
+						"	Ins.FECHASUSCRIPCION,\r\n" + 
+						"	Ins.Idpersona )consulta3 WHERE activo = 1)consulta4 WHERE idpersona = \r\n" + 
+						"( SELECT IDPERSONA_ULTIMO FROM SCS_GUARDIASTURNO\r\n" + 
+						"        where Idinstitucion = '"+idInstitucion+"'"+ 
+						"		AND Idturno = '"+turnosItem.getIdturno()+"'"
+								+ "and idguardia ='"+turnosItem.getIdcomboguardias()+"'" + 
+						"	) )"+sqls3.toString());
+			}else {
+				sqls5.ORDER_BY("numeroGrupo,\r\n" + 
+						"	ordengrupo, \r\n" + 
+						"	Ins.FECHASUSCRIPCION,\r\n" + 
+						"	Ins.Idpersona )consulta3 WHERE activo = 1)consulta4 WHERE idpersona = \r\n" + 
+						"( SELECT IDPERSONA_ULTIMO FROM SCS_GUARDIASTURNO\r\n" + 
+						"        where Idinstitucion = '"+idInstitucion+"'"+ 
+						"		AND Idturno = '"+turnosItem.getIdturno()+"'"
+								+ "and idguardia ='"+turnosItem.getIdcomboguardias()+"'" + 
+						"	) )"+sqls3.toString());
+			}
+			
 		}else {
-			sqls5.ORDER_BY(""+busquedaOrden+",numeroGrupo,\r\n" + 
-					"	ordengrupo, \r\n" + 
-					"	Ins.FECHASUSCRIPCION,\r\n" + 
-					"	Ins.Idpersona )consulta3 WHERE activo = 1)consulta4)"+sqls3.toString());
+			if(busquedaOrden != null && busquedaOrden.length() > 0 ) {
+				sqls5.ORDER_BY(""+busquedaOrden+",numeroGrupo,\r\n" + 
+						"	ordengrupo, \r\n" + 
+						"	Ins.FECHASUSCRIPCION,\r\n" + 
+						"	Ins.Idpersona )consulta3 WHERE activo = 1)consulta4)"+sqls3.toString());
+			}else {
+				sqls5.ORDER_BY("numeroGrupo,\r\n" + 
+						"	ordengrupo, \r\n" + 
+						"	Ins.FECHASUSCRIPCION,\r\n" + 
+						"	Ins.Idpersona )consulta3 WHERE activo = 1)consulta4)"+sqls3.toString());
+			}
+			
 		}
 
 		sql3.SELECT("ROWNUM AS orden,consulta.* ");
