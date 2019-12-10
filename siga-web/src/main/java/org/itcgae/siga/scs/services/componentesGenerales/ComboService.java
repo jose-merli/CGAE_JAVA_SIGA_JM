@@ -33,4 +33,17 @@ public interface ComboService {
 	
 	public ComboColaOrdenadaDTO ordenCola(HttpServletRequest request, String idordenacioncolas);
 
+	public ComboDTO comboEstadoEjg(HttpServletRequest request);
+
+	public ComboDTO comboTipoEjg(HttpServletRequest request);
+	
+	public ComboDTO comboTipoEjgColegio(HttpServletRequest request);
+
+	public ComboDTO comboTipoDesignacion(HttpServletRequest request);
+
+	public ComboDTO comboTipoSOJ(HttpServletRequest request);
+
+	public ComboDTO comboComisaria(HttpServletRequest request);
+
+	public ComboDTO comboJuzgado(HttpServletRequest request);
 }
