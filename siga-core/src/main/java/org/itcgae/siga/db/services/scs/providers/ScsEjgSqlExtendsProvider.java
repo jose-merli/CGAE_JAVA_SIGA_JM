@@ -2,15 +2,18 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.scs.EjgItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	
 	
 	public String busquedaEJG(EjgItem ejgItem, String idInstitucion) {
+		String dictamenCad = "";
+		boolean indiferente = false;
 		SQL sql = new SQL();
 		
-		String condicionAnnioNumActas = " EXISTS (SELECT 1 FROM scs_ejg_acta ejgacta, scs_actacomision ac"
+		String condicionAnnioNumActas = " (EXISTS (SELECT 1 FROM scs_ejg_acta ejgacta, scs_actacomision ac"
 				+ " WHERE ejgacta.idinstitucionacta = ac.idinstitucion"
 				+ " AND ejgacta.idacta = ac.idacta"
 				+ " AND   ejgacta.anioacta = ac.anioacta"
@@ -26,9 +29,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.anioacta = " + ejgItem.getAnnioActa();
 		if(ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")
 			condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.numeroacta = " + ejgItem.getNumActa();
-		condicionAnnioNumActas = condicionAnnioNumActas + ")";
+		condicionAnnioNumActas = condicionAnnioNumActas + "))";
 		
-		String condicionNumRegRemesa = " EXISTS (SELECT 1 FROM cajg_ejgremesa ejgremesa, cajg_remesa remesa"
+		String condicionNumRegRemesa = " (EXISTS (SELECT 1 FROM cajg_ejgremesa ejgremesa, cajg_remesa remesa"
 				+ " WHERE ejgremesa.idinstitucionremesa = remesa.idinstitucion"
 				+ " AND ejgremesa.idinstitucion = ejg.idinstitucion"
 				+ " AND   ejgremesa.anio = ejg.anio"
@@ -39,12 +42,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 //				+ " AND   remesa.numero = " + ejgItem.getNumRegRemesa2()
 //				+ " AND   remesa.sufijo = " + ejgItem.getNumRegRemesa3() + ")";
 		if(ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != "")
-			condicionAnnioNumActas = condicionAnnioNumActas + " AND   remesa.prefijo = " + ejgItem.getNumRegRemesa1();
+			condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.prefijo = '" + ejgItem.getNumRegRemesa1() + "'";
 		if(ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != "")
-			condicionAnnioNumActas = condicionAnnioNumActas + " AND   remesa.numero = " + ejgItem.getNumRegRemesa2();
+			condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.numero = '" + ejgItem.getNumRegRemesa2() + "'"; 
 		if(ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
-			condicionAnnioNumActas = condicionAnnioNumActas + " AND   remesa.numero = " + ejgItem.getNumRegRemesa3();
-		condicionNumRegRemesa = condicionNumRegRemesa + ")";
+			condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.sufijo = '" + ejgItem.getNumRegRemesa3() + "'";
+		condicionNumRegRemesa = condicionNumRegRemesa + "))";
 		
 		//select
 		sql.SELECT("ejg.anio");
@@ -61,6 +64,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
 		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre as NOMBRESOLICITANTE");
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
+//		sql.SELECT("perjg.NIF");
+//		sql.SELECT("perjg.correoelectronico");
+//		sql.SELECT("perjg.fechanacimiento");
+
+
 		
 		//from
 		sql.FROM("scs_ejg ejg");
@@ -99,122 +107,171 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		if(ejgItem.getTipoEJGColegio() != null && ejgItem.getTipoEJGColegio() != "")
                  sql.WHERE ("ejg.idtipoejgcolegio = " + ejgItem.getTipoEJGColegio());
 		if(ejgItem.getCreadoDesde() != null && ejgItem.getCreadoDesde() != "")
-                 sql.WHERE ("ejg.origenapertura =" + ejgItem.getCreadoDesde());
+                 sql.WHERE ("ejg.origenapertura = '" + ejgItem.getCreadoDesde() +"'");
 		if(ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != "")
-			     sql.WHERE ("regexp_like(EJG.NUMEROPROCEDIMIENTO," +  ejgItem.getProcedimiento() +")");
+			     sql.WHERE ("regexp_like(EJG.NUMEROPROCEDIMIENTO,'" +  ejgItem.getProcedimiento()+"')");
         if(ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "")
                  sql.WHERE ("estado.idestadoejg =" + ejgItem.getEstadoEJG());
         if(ejgItem.getFechaAperturaDesd() != null)      	
-                 sql.WHERE ("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') >= TO_DATE( " + ejgItem.getFechaAperturaDesd() + ",'DD/MM/RRRR')");
+                 sql.WHERE ("EJG.FECHAAPERTURA >= TO_DATE( '" + ejgItem.getFechaAperturaDesd() + "','DD/MM/RRRR')");
         if(ejgItem.getFechaAperturaHast() != null)   
-        		 sql.WHERE ("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') <= TO_DATE( " + ejgItem.getFechaAperturaHast() +",'DD/MM/RRRR')");
+        		 sql.WHERE ("EJG.FECHAAPERTURA <= TO_DATE( '" + ejgItem.getFechaAperturaHast() +"','DD/MM/RRRR')");
         if(ejgItem.getFechaEstadoDesd() != null)   
-        		 sql.WHERE ("TO_CHAR(ESTADO.FECHAINICIO,'DD/MM/RRRR') >= TO_DATE( " + ejgItem.getFechaEstadoDesd() + ",'DD/MM/RRRR')");
+        		 sql.WHERE ("TO_CHAR(ESTADO.FECHAINICIO,'DD/MM/RRRR') >= TO_DATE( '" + ejgItem.getFechaEstadoDesd() + "','DD/MM/RRRR')");
         if(ejgItem.getFechaEstadoHast() != null)     
-        		 sql.WHERE  ("TO_CHAR(ESTADO.FECHAINICIO,'DD/MM/RRRR') <= TO_DATE( " + ejgItem.getFechaEstadoHast() + ",'DD/MM/RRRR')");
+        		 sql.WHERE  ("TO_CHAR(ESTADO.FECHAINICIO,'DD/MM/RRRR') <= TO_DATE( '" + ejgItem.getFechaEstadoHast() + "','DD/MM/RRRR')");
         if(ejgItem.getFechaLimiteDesd() != null)   
-        		 sql.WHERE  ("TO_CHAR(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') >= TO_DATE( " + ejgItem.getFechaLimiteDesd() + ",'DD/MM/RRRR')");
+        		 sql.WHERE  ("TO_CHAR(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') >= TO_DATE( '" + ejgItem.getFechaLimiteDesd() + "','DD/MM/RRRR')");
         if(ejgItem.getFechaLimiteHast() != null)   
-        		 sql.WHERE  ("TO_CHAR(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') <= TO_DATE( " + ejgItem.getFechaLimiteHast() + ",'DD/MM/RRRR')");
-        if(ejgItem.getDictamen() != null && ejgItem.getDictamen() != "")
-                 sql.WHERE ("EJG.IDTIPODICTAMENEJG = " + ejgItem.getDictamen());
+        		 sql.WHERE  ("TO_CHAR(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') <= TO_DATE( '" + ejgItem.getFechaLimiteHast() + "','DD/MM/RRRR')");
+        if(ejgItem.getDictamen() != null) {
+        	for (String dictamen : ejgItem.getDictamen()) {
+        		if(!dictamen.equals("-1")) {
+            		dictamenCad += dictamen+",";
+        		}else {indiferente = true;}
+    		}
+        	if(!indiferente) {
+        		dictamenCad = dictamenCad.substring(0, (dictamenCad.length() -1));
+                sql.WHERE ("EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ")");
+        	}
+
+        }
         if(ejgItem.getFundamentoCalif() != null && ejgItem.getFundamentoCalif() != "")
                  sql.WHERE ("EJG.IDFUNDAMENTOCALIF = " + ejgItem.getFundamentoCalif());
         if(ejgItem.getFechaDictamenDesd() != null)   
-                 sql.WHERE  ("TO_CHAR(EJG.FECHADICTAMEN,'DD/MM/RRRR') >= TO_DATE( "+ ejgItem.getFechaDictamenDesd() + ",'DD/MM/RRRR')");
+                 sql.WHERE  ("TO_CHAR(EJG.FECHADICTAMEN,'DD/MM/RRRR') >= TO_DATE( '"+ ejgItem.getFechaDictamenDesd() + "','DD/MM/RRRR')");
         if(ejgItem.getFechaDictamenHast() != null)   
-        		 sql.WHERE  ("TO_CHAR(EJG.FECHADICTAMEN,'DD/MM/RRRR') <= TO_DATE( "+ ejgItem.getFechaDictamenHast() + ",'DD/MM/RRRR')");
+        		 sql.WHERE  ("TO_CHAR(EJG.FECHADICTAMEN,'DD/MM/RRRR') <= TO_DATE( '"+ ejgItem.getFechaDictamenHast() + "','DD/MM/RRRR')");
         if(ejgItem.getResolucion() != null)   
                  sql.WHERE ("EJG.IDTIPORATIFICACIONEJG = " + ejgItem.getResolucion());
         if(ejgItem.getFundamentoJuridico() != null && ejgItem.getFundamentoJuridico() != "")
                  sql.WHERE ("EJG.IDFUNDAMENTOJURIDICO = " + ejgItem.getFundamentoJuridico());
         if(ejgItem.getFechaResolucionDesd() != null)   
-                 sql.WHERE  ("TO_CHAR(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') >= TO_DATE( "+ ejgItem.getFechaResolucionDesd() + ",'DD/MM/RRRR')");
+                 sql.WHERE  ("TO_CHAR(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') >= TO_DATE( '"+ ejgItem.getFechaResolucionDesd() + "','DD/MM/RRRR')");
         if(ejgItem.getFechaResolucionHast() != null)       
-        	 	 sql.WHERE  ("TO_CHAR(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') <= TO_DATE( "+ ejgItem.getFechaResolucionHast() + ",'DD/MM/RRRR')");
+        	 	 sql.WHERE  ("TO_CHAR(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') <= TO_DATE( '"+ ejgItem.getFechaResolucionHast() + "','DD/MM/RRRR')");
         if(ejgItem.getImpugnacion() != null && ejgItem.getImpugnacion() != "")
                  sql.WHERE ("EJG.IDTIPORESOLAUTO = " + ejgItem.getImpugnacion());
         if(ejgItem.getImpugnacion() != null && ejgItem.getImpugnacion() != "")
                  sql.WHERE ("EJG.IDTIPOSENTIDOAUTO = " + ejgItem.getFundamentoImpuganacion());
         if(ejgItem.getFechaImpugnacionDesd() != null)       
-                 sql.WHERE  ("TO_CHAR(EJG.FECHAAUTO,'DD/MM/RRRR') >= TO_DATE( "+ ejgItem.getFechaImpugnacionDesd() + ",'DD/MM/RRRR')");
+                 sql.WHERE  ("TO_CHAR(EJG.FECHAAUTO,'DD/MM/RRRR') >= TO_DATE( '"+ ejgItem.getFechaImpugnacionDesd() + "','DD/MM/RRRR')");
         if(ejgItem.getFechaImpugnacionHast() != null)         
-        	 	 sql.WHERE  ("TO_CHAR(EJG.FECHAAUTO,'DD/MM/RRRR') <= TO_DATE( "+ ejgItem.getFechaImpugnacionHast() + ",'DD/MM/RRRR')");
+        	 	 sql.WHERE  ("TO_CHAR(EJG.FECHAAUTO,'DD/MM/RRRR') <= TO_DATE( '"+ ejgItem.getFechaImpugnacionHast() + "','DD/MM/RRRR')");
         if(ejgItem.getJuzgado() != null && ejgItem.getJuzgado() != "")
                  sql.WHERE ("EJG.JUZGADO = " + ejgItem.getJuzgado());
         if(ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != "")
-                 sql.WHERE ("regexp_like(EJG.NUMEROPROCEDIMIENTO || EJG.ANIOPROCEDIMIENTO,'" + ejgItem.getProcedimiento() +"')");
+                 sql.WHERE ("regexp_like(EJG.NUMEROPROCEDIMIENTO || EJG.ANIOPROCEDIMIENTO, '" + ejgItem.getProcedimiento() +"')");
         if(ejgItem.getAsunto() != null && ejgItem.getAsunto() != "")
         	 	 sql.WHERE ("regexp_like(EJG.OBSERVACIONES,'" + ejgItem.getAsunto() +"')");
         if(ejgItem.getNig() != null && ejgItem.getNig() != "")
-                 sql.WHERE ("regexp_like(EJG.NIG,'" + ejgItem.getNig() +"')");
+                 sql.WHERE ("regexp_like(EJG.NIG,'" + ejgItem.getNig() +"'))");
         if(ejgItem.getPerceptivo() != null && ejgItem.getPerceptivo() != "")
                  sql.WHERE ("EJG.IDPRECEPTIVO = " + ejgItem.getPerceptivo());
         if(ejgItem.getCalidad() != null && ejgItem.getCalidad() != "")
-                 sql.WHERE ("EJG.CALIDAD = " + ejgItem.getCalidad());
+                 sql.WHERE ("EJG.CALIDAD = '" + ejgItem.getCalidad() + "'");
         if(ejgItem.getRenuncia() != null && ejgItem.getRenuncia() != "")
                  sql.WHERE ("EJG.IDRENUNCIA = " + ejgItem.getRenuncia());
         if(ejgItem.getRenuncia() != null && ejgItem.getRenuncia() != "")
                  sql.WHERE ("EJG.IDPONENTE = " + ejgItem.getRenuncia());
         if(ejgItem.getFechaPonenteDesd() != null)   
-                 sql.WHERE  ("TO_CHAR(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') >= TO_DATE( "+ ejgItem.getFechaPonenteDesd() + ",'DD/MM/RRRR')");
+                 sql.WHERE  ("TO_CHAR(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') >= TO_DATE( '"+ ejgItem.getFechaPonenteDesd() + "','DD/MM/RRRR')");
         if(ejgItem.getFechaPonenteHast() != null)     
-        		 sql.WHERE  ("TO_CHAR(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( "+ ejgItem.getFechaPonenteHast() + ",'DD/MM/RRRR')");
+        		 sql.WHERE  ("TO_CHAR(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( '"+ ejgItem.getFechaPonenteHast() + "','DD/MM/RRRR')");
         if(ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
         		 sql.WHERE ("regexp_like(EJG.NUMERO_CAJG || EJG.ANIOCAJG,'" + ejgItem.getNumCAJG() +"')");
-		
 		sql.WHERE(condicionAnnioNumActas); 
 		sql.WHERE(condicionNumRegRemesa); 
 		//logica rol
 		if(ejgItem.getRol() != null && ejgItem.getRol() != "") {
-			if(ejgItem.getRol().equals("Solicitante")) {
+			if(ejgItem.getRol().equals("1")) {
 				if(ejgItem.getNif() != null && ejgItem.getNif() != "")
-					sql.WHERE("PERSONA.NIF = " + ejgItem.getNif());
-				if(ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
-					sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(apellido1,apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
-				if(ejgItem.getNombre() != null && ejgItem.getNombre() != "")
-					sql.WHERE("TRANSLATE(LOWER( NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
-			}
-			else if(ejgItem.getRol().equals("Unidad Familiar")) {
+					sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+				if(ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+					String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
+					String cadena = ejgItem.getApellidos().replaceAll("\\s+","");
+					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+				}
+//					sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(apellido1,apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
+				if(ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+					String columna = "perjg.NOMBRE";
+					String cadena = ejgItem.getNombre();
+					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+//					sql.WHERE("TRANSLATE(LOWER(perjg.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
+				}
+				}
+			else if(ejgItem.getRol().equals("4")) {
                 sql.INNER_JOIN("scs_unidadfamiliarejg unidadFamiliar on unidadFamiliar.idinstitucion = ejg.idinstitucion and unidadFamiliar.idtipoejg = ejg.idtipoejg"); 
                 sql.WHERE("unidadFamiliar.anio = ejg.anio and unidadFamiliar.numero = ejg.numero");
                 sql.INNER_JOIN("scs_personajg perjgunidadfamiliar on perjgunidadfamiliar.idpersona = unidadFamiliar.idpersona AND perjgunidadfamiliar.IDINSTITUCION = unidadFamiliar.IDINSTITUCION");
                 if(ejgItem.getNif() != null && ejgItem.getNif() != "")
                 	sql.WHERE("perjgunidadfamiliar.NIF = " + ejgItem.getNif());
-				if(ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
-					sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
-				if(ejgItem.getNombre() != null && ejgItem.getNombre() != "")
-					sql.WHERE("TRANSLATE(LOWER( perjgunidadfamiliar.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+				if(ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+					String columna = "REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')";
+					String cadena = ejgItem.getApellidos().replaceAll("\\s+","");
+					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+				}
+//					sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+				if(ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+					String columna = "perjgunidadfamiliar.NOMBRE";
+					String cadena = ejgItem.getNombre();
+					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+				}
+//					sql.WHERE("TRANSLATE(LOWER(perjgunidadfamiliar.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 			}
-			else if(ejgItem.getRol().equals("Contrario")) {
+			else if(ejgItem.getRol().equals("2")) {
 				sql.INNER_JOIN("scs_contrariosejg contrario on contrario.idinstitucion = ejg.idinstitucion and contrario.idtipoejg = ejg.idtipoejg"); 
 				sql.WHERE("contrario.anio = ejg.anio and contrario.numero = ejg.numero");
 				sql.INNER_JOIN("scs_personajg perjgcontrario on perjgcontrario.idpersona = contrario.idpersona AND perjgcontrario.IDINSTITUCION = contrario.IDINSTITUCION");
 				if(ejgItem.getNif() != null && ejgItem.getNif() != "")
-					sql.WHERE("PERJCONTRARIO.NIF = " + ejgItem.getNif());
-				if(ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
-					sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(perjgcontrario.apellido1,perjgcontrario.apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
-				if(ejgItem.getNombre() != null && ejgItem.getNombre() != "")
-					sql.WHERE("TRANSLATE(LOWER( perjgcontrario.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+					sql.WHERE("PERJCONTRARIO.NIF = '" + ejgItem.getNif() + "'");
+				if(ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+					String columna = "REPLACE(CONCAT(perjgcontrario.apellido1,perjgcontrario.apellido2), ' ', '')";
+					String cadena = ejgItem.getApellidos().replaceAll("\\s+","");
+					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+				}
+//					sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(perjgcontrario.apellido1,perjgcontrario.apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+				if(ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+					String columna = "perjgcontrario.NOMBRE";
+					String cadena = ejgItem.getNombre();
+					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+				}
+//					sql.WHERE("TRANSLATE(LOWER(perjgcontrario.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 			}
-			else if(ejgItem.getRol().equals("Representante del solicitante")) {
+			else if(ejgItem.getRol().equals("3")) {
 				sql.INNER_JOIN("scs_unidadfamiliarejg solicitante on solicitante.idinstitucion = ejg.idinstitucion and solicitante.idtipoejg = ejg.idtipoejg"); 
 				sql.WHERE("solicitante.anio = ejg.anio and solicitante.numero = ejg.numero AND solicitante.solicitante = 1");
 				sql.INNER_JOIN("scs_personajg perjgsolicitante on perjgsolicitante.idrepresentanteejg = solicitante.idpersona AND perjgsolicitante.IDINSTITUCION = unidadFamiliar.IDINSTITUCION");
 				if(ejgItem.getNif() != null && ejgItem.getNif() != "")
-					sql.WHERE("PERJUNIDADFAMILIAR.NIF = " + ejgItem.getNif());
-				if(ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
-					sql.WHERE("(TRANSLATE(LOWER( REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
-				if(ejgItem.getNombre() != null && ejgItem.getNombre() != "")
-					sql.WHERE("(TRANSLATE(LOWER( perjgunidadfamiliar.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+					sql.WHERE("PERJUNIDADFAMILIAR.NIF = '" + ejgItem.getNif() + "'");
+				if(ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+					String columna = "REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')";
+					String cadena = ejgItem.getApellidos().replaceAll("\\s+","");
+					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+				}
+//					sql.WHERE("(TRANSLATE(LOWER( REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+				if(ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+					String columna = "perjgunidadfamiliar.NOMBRE";
+					String cadena = ejgItem.getNombre();
+					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+				}
+//					sql.WHERE("(TRANSLATE(LOWER(perjgunidadfamiliar.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 			}	    
 		}else {
 			if(ejgItem.getNif() != null && ejgItem.getNif() != "")
-				sql.WHERE("PERSONA.NIF = " + ejgItem.getNif());
-			if(ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
-				sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(apellido1,apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
-			if(ejgItem.getNombre() != null && ejgItem.getNombre() != "")
-				sql.WHERE("TRANSLATE(LOWER( NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
+				sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+			if(ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+				String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
+				String cadena = ejgItem.getApellidos().replaceAll("\\s+","");
+				sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			}
+//				sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(apellido1,apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
+			if(ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+				String columna = "perjg.NOMBRE";
+				String cadena = ejgItem.getNombre();
+				sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			}
+//				sql.WHERE("TRANSLATE(LOWER(perjg.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
 		}
 		if(ejgItem.getTipoLetrado() != null && ejgItem.getTipoLetrado() != "") {
 			if(ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "") {
@@ -237,7 +294,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						sql.WHERE("DESIGNA.IDTURNO = " + ejgItem.getTurno());
 				}else if(ejgItem.getTipoLetrado().equals("A")){
 					//letrado asistencias
-					sql.INNER_JOIN("SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.numeroejg = ejg.EJGNUMERO");
+					sql.INNER_JOIN("SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
 					if(ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
 						sql.WHERE("ASISTENCIA.IDPERSONACOLEGIADO = " + ejgItem.getIdPersona());
 					if(ejgItem.getTurno() != null && ejgItem.getTurno() != "")
@@ -259,7 +316,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						sql.WHERE("EJGDESIGNA.IDTURNO = " + ejgItem.getTurno());           
 				}else if(ejgItem.getTipoLetrado().equals("A")){
 					//letrado asistencias
-					sql.INNER_JOIN("SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.numeroejg = ejg.EJGNUMERO");
+					sql.INNER_JOIN("SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
 					if(ejgItem.getTurno() != null && ejgItem.getTurno() != "")
 						sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getTurno());
 					if(ejgItem.getGuardia() != null && ejgItem.getGuardia() != "")

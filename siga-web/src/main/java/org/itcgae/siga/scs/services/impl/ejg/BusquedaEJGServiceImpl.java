@@ -24,12 +24,14 @@ import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsFundamentoscalificacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsImpugnacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsJuzgadoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsPonenteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPreceptivoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRenunciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoejgcolegioExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipofundamentosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTiporesolucionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsTipofundamentosSqlExtendsProvider;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
@@ -65,10 +67,12 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 	private ScsImpugnacionExtendsMapper scsImpugnacionextendsMapper;
 	@Autowired
 	private ScsJuzgadoExtendsMapper scsJuzgadoextendsMapper;
+	@Autowired
+	private ScsPonenteExtendsMapper scsPonenteextendsMapper;
+	@Autowired
+	private ScsTurnosExtendsMapper scsTurnosextendsMapper;
 
-	
 
-	
 	@Override
 	public ComboDTO comboTipoEJG(HttpServletRequest request) {
 		// TODO Auto-generated method stub
@@ -154,7 +158,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 
 
 	@Override
-	public ComboDTO comboFundamentoCalificacion(HttpServletRequest request) {
+	public ComboDTO comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen) {
 		// TODO Auto-generated method stub
 				// Conseguimos información del usuario logeado
 				String token = request.getHeader("Authorization");
@@ -179,7 +183,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 						LOGGER.info(
 								"comboTipoEJG() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-						comboItems = scsFundamentoscalificacionExtendsMapper.comboFundamentoCalificacion(usuarios.get(0).getIdlenguaje(), idInstitucion.toString());
+						comboItems = scsFundamentoscalificacionExtendsMapper.comboFundamentoCalificacion(usuarios.get(0).getIdlenguaje(), idInstitucion.toString(), list_dictamen);
 
 						LOGGER.info(
 								"comboTipoEJG() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
@@ -623,6 +627,86 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 		}
 		LOGGER.info("comboJuzgados() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
+	}
+	@Override
+	public ComboDTO comboPonente(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"comboPonente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"comboPonente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboPonente() / scsPonenteextendsMapper.getResoluciones() -> Entrada a scsImpugnacionEjgextendsMapper para obtener los combo");
+
+				comboItems = scsPonenteextendsMapper.comboPonente(usuarios.get(0).getIdlenguaje(), idInstitucion.toString());
+
+				LOGGER.info(
+						"comboPonente() / scsPonenteextendsMapper.getResoluciones() -> Salida a scsImpugnacionEjgextendsMapper para obtener los combo");
+
+				if (comboItems != null) {
+					comboDTO.setCombooItems(comboItems);
+				}
+			}
+		}
+		LOGGER.info("comboPonente() -> Salida del servicio para obtener los tipos ejg");
+		return comboDTO;
+	}
+
+
+	@Override
+	public ComboDTO comboTurnosTipo(HttpServletRequest request, String idtipoturno) {
+		// TODO Auto-generated method stub
+				// Conseguimos información del usuario logeado
+				String token = request.getHeader("Authorization");
+				String dni = UserTokenUtils.getDniFromJWTToken(token);
+				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+				ComboDTO comboDTO = new ComboDTO();
+				List<ComboItem> comboItems = null;
+
+				if (idInstitucion != null) {
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					LOGGER.info(
+							"comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+					LOGGER.info(
+							"comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					if (usuarios != null && usuarios.size() > 0) {
+
+						LOGGER.info(
+								"comboTurnosTipo() / scsTurnosextendsMapper.getResoluciones() -> Entrada a scsImpugnacionEjgextendsMapper para obtener los combo");
+
+						comboItems = scsTurnosextendsMapper.comboTurnosTipo(idInstitucion, idtipoturno);
+
+						LOGGER.info(
+								"comboTurnosTipo() / scsTurnosextendsMapper.getResoluciones() -> Salida a scsImpugnacionEjgextendsMapper para obtener los combo");
+
+						if (comboItems != null) {
+							comboDTO.setCombooItems(comboItems);
+						}
+					}
+				}
+				LOGGER.info("comboTurnosTipo() -> Salida del servicio para obtener los tipos ejg");
+				return comboDTO;
 	}
 	
 }

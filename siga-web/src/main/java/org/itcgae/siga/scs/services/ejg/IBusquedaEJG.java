@@ -14,7 +14,7 @@ public interface IBusquedaEJG {
 
 	ComboDTO comboTipoColegioEjg(HttpServletRequest request);
 
-	ComboDTO comboFundamentoCalificacion(HttpServletRequest request);
+	ComboDTO comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen);
 
 	ComboDTO comboResolucion(HttpServletRequest request);
 
@@ -35,5 +35,9 @@ public interface IBusquedaEJG {
 	ComboDTO comboImpugnacion(HttpServletRequest request);
 
 	ComboDTO comboJuzgados(HttpServletRequest request);
+
+	ComboDTO comboPonente(HttpServletRequest request);
+
+	ComboDTO comboTurnosTipo(HttpServletRequest request, String idtipoturno);
 
 }

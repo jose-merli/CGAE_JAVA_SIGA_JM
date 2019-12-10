@@ -43,9 +43,9 @@ public interface ScsFundamentoscalificacionExtendsMapper extends ScsTipofundamen
 	
 	@SelectProvider(type = ScsFundamentoscalificacionSqlExtendsProvider.class, method = "comboFundamentoCalificacion")
 	@Results({ 
-		@Result(column = "IDTIPOEJG", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDFUNDAMENTOCALIF", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> comboFundamentoCalificacion(String idlenguaje, String idInstitucion);
+	List<ComboItem> comboFundamentoCalificacion(String idlenguaje, String idInstitucion, String[] list_dictamen);
 		
 }

@@ -27,21 +27,23 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "busquedaEJG")
 	@Results({ 
 
-		@Result(column = "ejg.anio", property = "anio", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "ejg.idtipoejg", property = "tipoEJG", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "ejg.idinstitucion", property = "idInstitucion", jdbcType = JdbcType.DECIMAL),
-		@Result(column = "ejg.numero", property = "numero", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "ejg.numejg", property = "numEJG", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "anio", property = "annio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idtipoejg", property = "tipoEJG", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "idinstitucion", property = "idInstitucion", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numejg", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMANIO", property = "numAnnioProcedimiento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNODES", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "ejg.fechaapertura", property = "fechaApertura", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "ejg.fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaapertura", property = "fechaApertura", jdbcType = JdbcType.DATE),
+		@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRESOLICITANTE", property = "nombreApeSolicitante", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRESOLICITANTE", property = "nombreApeSolicitante", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
-
+//		@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "correoelectronico", property = "correoelectronico", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "fechanacimiento", property = "fechanacimiento", jdbcType = JdbcType.VARCHAR),
 	})
 	List<EjgItem> busquedaEJG(EjgItem ejgItem, String string);
 
