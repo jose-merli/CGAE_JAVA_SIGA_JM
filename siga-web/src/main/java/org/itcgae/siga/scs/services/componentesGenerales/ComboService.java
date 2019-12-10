@@ -2,8 +2,8 @@ package org.itcgae.siga.scs.services.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 
 public interface ComboService {
 	

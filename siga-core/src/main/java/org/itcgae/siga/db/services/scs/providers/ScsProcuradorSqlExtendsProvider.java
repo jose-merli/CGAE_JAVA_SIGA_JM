@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.ProcuradorItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsProcuradorSqlProvider;
 

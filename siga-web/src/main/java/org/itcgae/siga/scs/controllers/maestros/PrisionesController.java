@@ -2,11 +2,11 @@ package org.itcgae.siga.scs.controllers.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.PrisionDTO;
-import org.itcgae.siga.DTO.scs.PrisionItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.PrisionDTO;
+import org.itcgae.siga.DTOs.scs.PrisionItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
 import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
 import org.itcgae.siga.scs.services.maestros.IBusquedaPrisionesService;

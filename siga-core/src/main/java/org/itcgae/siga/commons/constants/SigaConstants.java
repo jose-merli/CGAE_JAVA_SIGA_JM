@@ -867,6 +867,44 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static String EVENTO_TIPO_FESTIVO = "9";
 
+	
+	public static final String JUSTICIABLE_ROL_SOLICITANTE = "1";
+	public static final String JUSTICIABLE_ROL_CONTRARIO = "2";
+	public static final String JUSTICIABLE_ROL_REPRESENTANTE = "3";
+	public static final String JUSTICIABLE_ROL_UNIDADFAMILIAR = "4";
+	
+	public static final String TIPO_ASUNTO_EJG = "E";
+	public static final String TIPO_ASUNTO_DESIGNA = "D";
+	public static final String TIPO_ASUNTO_ASISTENCIA = "A";
+	public static final String TIPO_ASUNTO_SOJ = "S";
+
+	public static final String TIPO_ESTADO_EJG_DICTAMINADO = "6";
+	public static final String TIPO_ESTADO_EJG_RESUELTO_COMISION = "10";
+	public static final String TIPO_ESTADO_EJG_RESUELTA_IMPUGNACION = "13";
+	
+	public static final String SCS_JUSTICIABLE = "0";
+	public static final String SCS_SOLICITANTE_EJG = "1";
+	public static final String SCS_UNIDAD_FAMILIAR_EJG = "2";
+	public static final String SCS_CONTRARIO_EJG = "3";
+	public static final String SCS_CONTRARIO_DESIGNACION = "4";
+	public static final String SCS_CONTRARIO_ASISTENCIA = "5";
+	public static final String SCS_SOLICITANTE_DESIGNACION = "6";
+	public static final String SCS_SOLICITANTE_ASISTENCIA = "7";
+
+	public static final String ROL_SOLICITANTE_EJG = "SE";
+	public static final String ROL_SOLICITANTE_ASISTENCIA = "SA";
+	public static final String ROL_SOLICITANTE_DESIGNACION = "SD";
+	public static final String ROL_UNIDAD_FAMILIAR_EJG = "UE";
+	public static final String ROL_CONTRARIO_EJG = "CE";
+	public static final String ROL_CONTRADIO_DESIGNACION = "CD";
+	public static final String ROL_CONTRARIO_ASISTENCIA = "CA";
+	public static final String ROL_REPRESENTANTE = "RE";
+	
+	public static final Short ID_INSTITUCION_0 = 0;
+	
+	
+
+
 
 	public static enum ECOM_ESTADOSCOLA {
 		INICIAL ((short)1),
@@ -917,6 +955,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static Integer USUMODIFICACION_0 = 0;
 	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
+
 
 	
 }
