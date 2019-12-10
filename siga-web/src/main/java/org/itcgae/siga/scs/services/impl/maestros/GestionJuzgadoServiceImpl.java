@@ -7,13 +7,13 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.JuzgadoItem;
-import org.itcgae.siga.DTO.scs.ProcedimientoDTO;
-import org.itcgae.siga.DTO.scs.ProcedimientoItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.JuzgadoItem;
+import org.itcgae.siga.DTOs.scs.ProcedimientoDTO;
+import org.itcgae.siga.DTOs.scs.ProcedimientoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -106,6 +106,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 						juzgado.setCodigoext(juzgadoItem.getCodigoExt());
 						juzgado.setCodigoprocurador(juzgadoItem.getCodigoProcurador());
 						juzgado.setMovil(juzgadoItem.getMovil());
+						juzgado.setCodigoejis(juzgadoItem.getCodigoEjis());
 
 						if (juzgadoItem.getEsDecano() != null && juzgadoItem.getEsDecano() != "") {
 							juzgado.setEsdecano(Short.valueOf(juzgadoItem.getEsDecano()));

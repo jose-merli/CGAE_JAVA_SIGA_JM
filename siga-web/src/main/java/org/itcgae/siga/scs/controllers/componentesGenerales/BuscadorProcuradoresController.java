@@ -2,8 +2,8 @@ package org.itcgae.siga.scs.controllers.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.ProcuradorDTO;
-import org.itcgae.siga.DTO.scs.ProcuradorItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.scs.services.componentesGenerales.BuscadorProcuradoresService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

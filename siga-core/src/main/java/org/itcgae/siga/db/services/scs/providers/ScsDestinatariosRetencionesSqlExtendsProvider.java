@@ -3,9 +3,9 @@ package org.itcgae.siga.db.services.scs.providers;
 import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.DestinatariosItem;
-import org.itcgae.siga.DTO.scs.ModulosItem;
-import org.itcgae.siga.DTO.scs.PartidasItem;
+import org.itcgae.siga.DTOs.scs.DestinatariosItem;
+import org.itcgae.siga.DTOs.scs.ModulosItem;
+import org.itcgae.siga.DTOs.scs.PartidasItem;
 import org.itcgae.siga.db.mappers.FcsDestinatariosRetencionesSqlProvider;
 import org.itcgae.siga.db.mappers.ScsPartidapresupuestariaSqlProvider;
 import org.itcgae.siga.db.mappers.ScsProcedimientosSqlProvider;

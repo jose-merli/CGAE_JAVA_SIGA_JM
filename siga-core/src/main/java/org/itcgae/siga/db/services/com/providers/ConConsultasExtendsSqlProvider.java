@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 
 public class ConConsultasExtendsSqlProvider {
 	
@@ -60,10 +61,10 @@ public class ConConsultasExtendsSqlProvider {
 		sql.WHERE("CONSULTA.FECHABAJA IS NULL");
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
-			sql.WHERE(filtroTextoBusquedas("CONSULTA.DESCRIPCION",filtros.getNombre()));
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONSULTA.DESCRIPCION",filtros.getNombre()));
 		}
 		if(filtros.getDescripcion() != null && !filtros.getDescripcion().trim().equals("")){
-			sql.WHERE(filtroTextoBusquedas("CONSULTA.OBSERVACIONES", filtros.getDescripcion()));
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONSULTA.OBSERVACIONES", filtros.getDescripcion()));
 		}
 		
 		if(filtros.getIdModulo() != null && !filtros.getIdModulo().trim().equals("")){
@@ -149,7 +150,7 @@ public class ConConsultasExtendsSqlProvider {
 			sql.WHERE("IDOBJETIVO = " + idObjetivo);
 		}
 		
-		sql.WHERE(filtroTextoBusquedas("DESCRIPCION", filtro));
+		sql.WHERE(UtilidadesString.filtroTextoBusquedas("DESCRIPCION", filtro));
 		
 		sql.ORDER_BY("DESCRIPCION");
 		
