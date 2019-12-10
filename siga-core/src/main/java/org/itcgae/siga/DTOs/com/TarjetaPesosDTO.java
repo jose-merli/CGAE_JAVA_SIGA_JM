@@ -2,7 +2,7 @@ package org.itcgae.siga.DTOs.com;
 
 import java.util.ArrayList;
 
-import org.itcgae.siga.DTO.scs.ComboColaOrdenadaItem;
+import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
 
 public class TarjetaPesosDTO {
 	private String idturno;

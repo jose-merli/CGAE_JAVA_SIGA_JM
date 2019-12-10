@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 
 public class EnvEnviosExtendsSqlProvider {
 	
@@ -43,7 +44,7 @@ public class EnvEnviosExtendsSqlProvider {
 		sql.WHERE("ENVIO.ENVIO = 'M'");
 		
 		if(filtros.getDescripcion() != null && !filtros.getDescripcion().trim().equals("")){
-			sql.WHERE(filtroTextoBusquedas("ENVIO.DESCRIPCION",filtros.getDescripcion()));
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("ENVIO.DESCRIPCION",filtros.getDescripcion()));
 		}
 		if(filtros.getIdEstado() != null && !filtros.getIdEstado().trim().equals("")){
 			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getIdEstado() +"'");
@@ -128,7 +129,7 @@ public class EnvEnviosExtendsSqlProvider {
 		sql.WHERE("ENVIO.ENVIO = 'A'");
 		
 		if(filtros.getDescripcion() != null && !filtros.getDescripcion().trim().equals("")){
-			sql.WHERE(filtroTextoBusquedas("ENVIO.DESCRIPCION",filtros.getDescripcion()));
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("ENVIO.DESCRIPCION",filtros.getDescripcion()));
 		}
 		if(filtros.getIdEstado() != null && !filtros.getIdEstado().trim().equals("")){
 			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getIdEstado() +"'");
@@ -154,7 +155,7 @@ public class EnvEnviosExtendsSqlProvider {
 			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
 		}
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
-			sql.WHERE(filtroTextoBusquedas("DEST.NOMBRE",filtros.getNombre()));
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("DEST.NOMBRE",filtros.getNombre()));
 		}
 		
 		if(filtros.getApellidos() != null && !filtros.getApellidos().trim().equals("")){
@@ -176,7 +177,7 @@ public class EnvEnviosExtendsSqlProvider {
 		}		
 		
 		if(filtros.getNif() != null && !filtros.getNif().trim().equals("")){
-			sql.WHERE(filtroTextoBusquedas("DEST.NIFCIF", filtros.getNif()));
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("DEST.NIFCIF", filtros.getNif()));
 		}
 		
 		if(filtros.getNumColegiado() != null && !filtros.getNumColegiado().trim().equals("")){
@@ -209,15 +210,7 @@ public class EnvEnviosExtendsSqlProvider {
 	
 	
 	
-	public static String filtroTextoBusquedas(String columna, String cadena) {
 
-		StringBuilder cadenaWhere = new StringBuilder();
-		cadenaWhere.append(" TRANSLATE(LOWER( " + columna + "),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') ");
-		cadenaWhere.append(" LIKE");
-		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') ");
-		return cadenaWhere.toString();
-		
-	} 
 	
 	public String selectEnvioById(Short idInstitucion, String idLenguaje, String idEnvio){
 		

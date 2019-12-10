@@ -2,8 +2,8 @@ package org.itcgae.siga.scs.services.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.ProcuradorDTO;
-import org.itcgae.siga.DTO.scs.ProcuradorItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 
 public interface BuscadorProcuradoresService {
 	

@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.FundamentosCalificacionItem;
+import org.itcgae.siga.DTOs.scs.FundamentosCalificacionItem;
 import org.itcgae.siga.db.mappers.ScsTipofundamentocalifSqlProvider;
 
 public class ScsFundamentoscalificacionSqlExtendsProvider extends ScsTipofundamentocalifSqlProvider{
