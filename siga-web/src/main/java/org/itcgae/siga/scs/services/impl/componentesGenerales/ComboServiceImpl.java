@@ -22,7 +22,7 @@ import org.itcgae.siga.db.entities.ScsZonaExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAreasMateriasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsEstadoEJGExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupofacturacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsJurisdiccionExtendsMapper;
@@ -99,7 +99,7 @@ public class ComboServiceImpl implements ComboService {
 	private ScsTipoEJGColegioExtendsMapper scsTipoEJGColegioExtendsMapper;
 
 	@Autowired
-	private ScsEstadoEJGExtendsMapper scsEstadoEJGExtendsMapper;
+	private ScsEstadoejgExtendsMapper scsEstadoEJGExtendsMapper;
 
 	@Autowired
 	private ScsTipoDesignaColegioExtendsMapper scsTipoDesignaColegioExtendsMapper;

@@ -6,13 +6,9 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.scs.AsuntosJusticiableItem;
-import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
-import org.itcgae.siga.db.mappers.ScsEjgMapper;
-import org.itcgae.siga.db.services.scs.providers.ScsAsistenciaSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsEJGSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 

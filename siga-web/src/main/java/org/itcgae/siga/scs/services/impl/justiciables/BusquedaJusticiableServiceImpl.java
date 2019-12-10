@@ -13,15 +13,19 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.JusticiableBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
+import org.itcgae.siga.DTOs.scs.PersonaTelefonoDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.ScsTelefonospersona;
+import org.itcgae.siga.db.entities.ScsTelefonospersonaExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRolesJusticiablesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTelefonosPersonaExtendsMapper;
 import org.itcgae.siga.scs.services.justiciables.IBusquedaJusticiablesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +43,7 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 	private ScsRolesJusticiablesExtendsMapper scsRolesJusticiablesExtendsMapper;
 	
 	@Autowired
-	private ScsTelefonospersonaMapper scsTelefonospersonaMapper;
+	private ScsTelefonosPersonaExtendsMapper scsTelefonospersonaMapper;
 	
 
 	@Autowired
@@ -91,11 +95,11 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 	}
 
 	@Override
-	public JusticiableTelefonoDTO getTelefonos(HttpServletRequest request) {
+	public PersonaTelefonoDTO getTelefonos(HttpServletRequest request) {
 
 		LOGGER.info("getTelefonos() -> Entrada al servicio para obtener telefonos personas");
 
-		JusticiableTelefonoDTO justiciableTelefonoDTO = new JusticiableTelefonoDTO();
+		PersonaTelefonoDTO justiciableTelefonoDTO = new PersonaTelefonoDTO();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");

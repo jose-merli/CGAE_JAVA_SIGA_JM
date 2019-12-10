@@ -2,8 +2,8 @@ package org.itcgae.siga.scs.services.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.AsuntosJusticiableDTO;
-import org.itcgae.siga.DTO.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 
 public interface BusquedaAsuntosService {
 

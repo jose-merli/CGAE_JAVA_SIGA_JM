@@ -2,8 +2,8 @@ package org.itcgae.siga.scs.controllers.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.AsuntosJusticiableDTO;
-import org.itcgae.siga.DTO.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.scs.services.componentesGenerales.BusquedaAsuntosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

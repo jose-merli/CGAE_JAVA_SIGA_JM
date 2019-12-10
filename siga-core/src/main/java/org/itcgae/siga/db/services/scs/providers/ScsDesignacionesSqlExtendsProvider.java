@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
 
 public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
@@ -20,7 +20,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.INNER_JOIN("scs_defendidosdesigna DEFENDIDOSDESIGNA ON DEFENDIDOSDESIGNA.idinstitucion = DESIGNA.idinstitucion  and DEFENDIDOSDESIGNA.idturno = DESIGNA.idturno\r\n" + 
 				"                            and DEFENDIDOSDESIGNA.anio = DESIGNA.anio and DEFENDIDOSDESIGNA.numero = DESIGNA.numero");
 		sql.LEFT_OUTER_JOIN("SCS_PERSONAJG PERSONA ON  DEFENDIDOSDESIGNA.IDPERSONA = PERSONA.IDPERSONA  AND DEFENDIDOSDESIGNA.IDINSTITUCION = PERSONA.IDINSTITUCION");
-		sql.WHERE("DESIGNA.idinstitucion =" + asuntosJusticiableItem.getidInstitucion());
+		sql.WHERE("DESIGNA.idinstitucion =" + asuntosJusticiableItem.getIdInstitucion());
 		
 		if(asuntosJusticiableItem.getAnio() != null) {
 			sql.WHERE("DESIGNA.ANIO = "+asuntosJusticiableItem.getAnio());

@@ -6,8 +6,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.TurnosDTO;
-import org.itcgae.siga.DTO.scs.TurnosItem;
+import org.itcgae.siga.DTOs.scs.TurnosDTO;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;

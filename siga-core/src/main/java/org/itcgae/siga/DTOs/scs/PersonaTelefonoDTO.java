@@ -1,4 +1,4 @@
-package org.itcgae.siga.DTO.scs;
+package org.itcgae.siga.DTOs.scs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.itcgae.siga.db.entities.ScsTelefonospersona;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class JusticiableTelefonoDTO {
+public class PersonaTelefonoDTO {
 
 	 private List<ScsTelefonospersona> telefonospersonas = new ArrayList<ScsTelefonospersona>();
 	  private Error error = null;
@@ -18,7 +18,7 @@ public class JusticiableTelefonoDTO {
 	  /**
 	   * 
 	   **/
-	  public JusticiableTelefonoDTO telefonospersonas(List<ScsTelefonospersona> telefonospersonas) {
+	  public PersonaTelefonoDTO telefonospersonas(List<ScsTelefonospersona> telefonospersonas) {
 	    this.telefonospersonas = telefonospersonas;
 	    return this;
 	  }
@@ -36,7 +36,7 @@ public class JusticiableTelefonoDTO {
 	  /**
 	   * 
 	   **/
-	  public JusticiableTelefonoDTO error(Error error) {
+	  public PersonaTelefonoDTO error(Error error) {
 	    this.error = error;
 	    return this;
 	  }
@@ -59,7 +59,7 @@ public class JusticiableTelefonoDTO {
 	    if (o == null || getClass() != o.getClass()) {
 	      return false;
 	    }
-	    JusticiableTelefonoDTO justiciableTelefonoDTO = (JusticiableTelefonoDTO) o;
+	    PersonaTelefonoDTO justiciableTelefonoDTO = (PersonaTelefonoDTO) o;
 	    return Objects.equals(this.telefonospersonas, justiciableTelefonoDTO.telefonospersonas) &&
 	        Objects.equals(this.error, justiciableTelefonoDTO.error);
 	  }

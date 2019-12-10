@@ -2,8 +2,8 @@ package org.itcgae.siga.scs.service;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.TurnosDTO;
-import org.itcgae.siga.DTO.scs.TurnosItem;
+import org.itcgae.siga.DTOs.scs.TurnosDTO;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;

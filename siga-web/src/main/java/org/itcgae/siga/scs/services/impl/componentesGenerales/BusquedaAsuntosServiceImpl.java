@@ -5,14 +5,14 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.AsuntosJusticiableDTO;
-import org.itcgae.siga.DTO.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsEJGExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.scs.services.componentesGenerales.BusquedaAsuntosService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -27,7 +27,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 	@Autowired
-	private ScsEJGExtendsMapper scsEjgExtendsMapper;
+	private ScsEjgExtendsMapper scsEjgExtendsMapper;
 	
 	@Autowired
 	private ScsAsistenciaExtendsMapper scsAsistenciaExtendsMapper;
@@ -70,7 +70,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						"searchClaveAsuntosEJG() / scsEjgExtendsMapper.searchClaveAsuntosEJG() -> Salida a scsEjgExtendsMapper para obtener los AsuntosEJG");
 
 				if (asuntosJusticiableItems != null) {
-					asuntosJusticiableDTO.setAsuntosJusticiableItem(asuntosJusticiableItems);
+					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 				}
 			}
 
@@ -112,7 +112,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						"searchClaveAsuntosAsistencias() / scsAsistenciaExtendsMapper.searchClaveAsuntosAsistencias() -> Salida a cenTiposolicitudSqlExtendsMapper para obtener los Asistencias");
 
 				if (asuntosJusticiableItems != null) {
-					asuntosJusticiableDTO.setAsuntosJusticiableItem(asuntosJusticiableItems);
+					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 				}
 			}
 
@@ -155,7 +155,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						"searchClaveAsuntosDesignaciones() / scsEjgExtendsMapper.searchClaveAsuntosDesignaciones() -> Salida a cenTiposolicitudSqlExtendsMapper para obtener los AsuntosEJG");
 
 				if (asuntosJusticiableItems != null) {
-					asuntosJusticiableDTO.setAsuntosJusticiableItem(asuntosJusticiableItems);
+					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 				}
 			}
 
@@ -198,7 +198,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						"searchClaveAsuntosSOJ() / scsEjgExtendsMapper.searchClaveAsuntosSOJ() -> Salida a cenTiposolicitudSqlExtendsMapper para obtener los AsuntosEJG");
 
 				if (asuntosJusticiableItems != null) {
-					asuntosJusticiableDTO.setAsuntosJusticiableItem(asuntosJusticiableItems);
+					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 				}
 			}
 
