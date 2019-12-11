@@ -1,0 +1,88 @@
+package org.itcgae.siga.db.services.scs.providers;
+
+import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
+
+public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
+
+	public String searchClaveDesignaciones(AsuntosJusticiableItem asuntosJusticiableItem) {
+		SQL sql = new SQL();
+
+
+		sql.SELECT("DESIGNA.idinstitucion, DESIGNA.anio,DESIGNA.numero,to_char(DESIGNA.idturno)  as clave, '' as rol, 'D' as tipo");
+		sql.FROM("SCS_DESIGNA DESIGNA");
+//		El Join con la tabla de scs_personaJG, solo realizará si nos viene informado alguno de los datos del solicitante(Nif, nombre o apellidos).
+		if(asuntosJusticiableItem.getIdPersonaColegiado()!= null) {
+			sql.INNER_JOIN("SCS_DESIGNASLETRADO DESIGNALETRADO ON DESIGNALETRADO.idinstitucion = DESIGNA.idinstitucion  and DESIGNALETRADO.idturno = DESIGNA.idturno\r\n" + 
+					"  and DESIGNALETRADO.anio = DESIGNA.anio and DESIGNALETRADO.numero = DESIGNA.numero");
+		}
+		sql.INNER_JOIN("scs_defendidosdesigna DEFENDIDOSDESIGNA ON DEFENDIDOSDESIGNA.idinstitucion = DESIGNA.idinstitucion  and DEFENDIDOSDESIGNA.idturno = DESIGNA.idturno\r\n" + 
+				"                            and DEFENDIDOSDESIGNA.anio = DESIGNA.anio and DEFENDIDOSDESIGNA.numero = DESIGNA.numero");
+		sql.LEFT_OUTER_JOIN("SCS_PERSONAJG PERSONA ON  DEFENDIDOSDESIGNA.IDPERSONA = PERSONA.IDPERSONA  AND DEFENDIDOSDESIGNA.IDINSTITUCION = PERSONA.IDINSTITUCION");
+		sql.WHERE("DESIGNA.idinstitucion =" + asuntosJusticiableItem.getIdInstitucion());
+		
+		if(asuntosJusticiableItem.getAnio() != null) {
+			sql.WHERE("DESIGNA.ANIO = "+asuntosJusticiableItem.getAnio());
+		}		
+		if(asuntosJusticiableItem.getNumero() != null) {
+			sql.WHERE("DESIGNA.NUMERO = "+asuntosJusticiableItem.getNumero());
+		}
+		if(asuntosJusticiableItem.getIdTurno()!= null) {
+			sql.WHERE("DESIGNA.IDTURNO = "+asuntosJusticiableItem.getIdTurno());
+		}
+		if(asuntosJusticiableItem.getIdGuardia() != null) {
+			sql.WHERE("DESIGNA.IDGUARDIA = "+asuntosJusticiableItem.getIdGuardia());
+		}
+		if(asuntosJusticiableItem.getIdPersonaColegiado() != null) {
+			sql.WHERE("DESIGNALETRADO.IDPERSONA = "+asuntosJusticiableItem.getIdPersonaColegiado());
+		}
+		if(asuntosJusticiableItem.getFechaAperturaDesde() != null) {
+			sql.WHERE("TO_CHAR(DESIGNA.FECHAALTA,'DD/MM/RRRR') >= TO_DATE("+asuntosJusticiableItem.getFechaAperturaDesde()+")");
+		}
+		if(asuntosJusticiableItem.getFechaAperturaHasta() != null) {
+			sql.WHERE("TO_CHAR(DESIGNA.FECHAALTA,'DD/MM/RRRR') <= TO_DATE("+asuntosJusticiableItem.getFechaAperturaHasta()+")");
+		}
+		
+		sql.WHERE("(TRANSLATE(LOWER( REPLACE(CONCAT(apellido1,apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+asuntosJusticiableItem.getApellidos()+"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+		sql.WHERE("(TRANSLATE(LOWER( NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('" + asuntosJusticiableItem.getNombre()+ "'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+	
+		
+			sql.WHERE("( DESIGNALETRADO.fecharenuncia is null or\r\n" + 
+					"           DESIGNALETRADO.Fechadesigna =\r\n" + 
+					"           (SELECT MAX(LET2.Fechadesigna)\r\n" + 
+					"               FROM SCS_DESIGNASLETRADO LET2\r\n" + 
+					"              WHERE DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION\r\n" + 
+					"                AND DESIGNALETRADO.IDTURNO = LET2.IDTURNO\r\n" + 
+					"                AND DESIGNALETRADO.ANIO = LET2.ANIO\r\n" + 
+					"                AND DESIGNALETRADO.NUMERO = LET2.NUMERO\r\n" + 
+					"                AND TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)))\r\n" + 
+					"");
+		
+			
+		if(asuntosJusticiableItem.getNif() != null) {
+			sql.WHERE("PERSONA.NIF = "+asuntosJusticiableItem.getNif());
+		}
+		if(asuntosJusticiableItem.getIdTipoDesigna() != null) {
+			sql.WHERE("DESIGNA.IDTIPODESIGNACOLEGIO = "+asuntosJusticiableItem.getIdTipoDesigna());
+		}
+		if(asuntosJusticiableItem.getIdEstadoDesigna() != null) {
+			sql.WHERE("DESIGNA.ESTADO = "+asuntosJusticiableItem.getIdEstadoDesigna());
+		}
+		if(asuntosJusticiableItem.getNumeroProcedimiento() != null) {
+			sql.WHERE("DESIGNA.NUMPROCEDIMIENTO   = "+asuntosJusticiableItem.getNumeroProcedimiento());
+		}
+//		if(asuntosJusticiableItem.getNumeroDiligencia() != null) {
+//			sql.WHERE("ASISTENCIA.NUMERODILIGENCIA   = "+asuntosJusticiableItem.getNumeroDiligencia());
+//		}
+		if(asuntosJusticiableItem.getNig() != null) {
+			sql.WHERE("DESIGNA.NIG   = "+asuntosJusticiableItem.getNig());
+		}
+		if(asuntosJusticiableItem.getJuzgado() != null) {
+			sql.WHERE("DESIGNA.IDJUZGADO  = "+asuntosJusticiableItem.getJuzgado());
+		}
+		
+		return sql.toString();
+	}
+	
+}

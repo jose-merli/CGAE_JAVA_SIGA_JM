@@ -1,9 +1,12 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosEjgItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
@@ -34,4 +37,15 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper{
 		@Result(column = "TIPOSENTIDOAUTO", property = "tipoSentidoAuto", jdbcType = JdbcType.VARCHAR),
 	})
 	AsuntosEjgItem getAsuntoTipoEjg(AsuntosClaveJusticiableItem asuntoClave, String idLenguaje);
+	
+    @SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "searchClaveAsuntosEJG")
+    @Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.DATE),
+            @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+            @Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR), 
+            @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR) 
+    })
+    List<AsuntosJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem);
+
 }
