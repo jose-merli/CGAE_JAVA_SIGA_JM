@@ -11,7 +11,6 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.AreasItem;
 import org.itcgae.siga.DTOs.scs.DocumentacionEjgDTO;
 import org.itcgae.siga.DTOs.scs.DocumentacionEjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -21,12 +20,8 @@ import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
 import org.itcgae.siga.db.entities.ScsDocumentoejg;
 import org.itcgae.siga.db.entities.ScsDocumentoejgExample;
-import org.itcgae.siga.db.entities.ScsMateria;
-import org.itcgae.siga.db.entities.ScsMateriajurisdiccion;
-import org.itcgae.siga.db.entities.ScsMateriajurisdiccionExample;
 import org.itcgae.siga.db.entities.ScsTipodocumentoejg;
 import org.itcgae.siga.db.entities.ScsTipodocumentoejgExample;
-import org.itcgae.siga.db.mappers.ScsTipodocumentoejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionEjgExtendsMapper;
@@ -48,14 +43,11 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 	@Autowired
 	private ScsDocumentacionEjgExtendsMapper scsDocumentacionEjgExtendsMapper;
 
-	@Autowired
-	private ScsTipodocumentoejgMapper scsTipodocumentoejgMapper;
 
 	@Autowired
 	private ScsDocumentoejgExtendsMapper scsDocumentoEjgExtendsMapper;
 	@Autowired
 	private GenRecursosCatalogosExtendsMapper genRecursosCatalogosExtendsMapper;
-
 
 	@Override
 	public DocumentacionEjgDTO searchDocumento(DocumentacionEjgItem documentacionEjgItem, HttpServletRequest request) {
@@ -66,7 +58,6 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		boolean exists = false;
 		Error error = new Error();
-		int response = 0;
 		DocumentacionEjgDTO documentacionEjgDTO = new DocumentacionEjgDTO();
 		List<DocumentacionEjgItem> documentacionEjgItems = null;
 		List<DocumentacionEjgItem> documentacionEjgItemsFinal = new ArrayList<DocumentacionEjgItem>();
@@ -179,7 +170,6 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 					}
 
 				} catch (Exception e) {
-					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
 				}
@@ -353,69 +343,53 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 
 				try {
 
-					ScsTipodocumentoejgExample ejemplo = new ScsTipodocumentoejgExample();
-					ejemplo.createCriteria().andAbreviaturaEqualTo(documentacionejgItem.getabreviaturaTipoDoc())
-							.andIdinstitucionEqualTo(idInstitucion)
-							.andIdtipodocumentoejgNotEqualTo(Short.valueOf(documentacionejgItem.getIdTipoDocumento()));
+					LOGGER.info(
+							"insertFundamentos() / scsTipodocumentoejgMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para insertar el nuevo documento");
 
-					List<ScsTipodocumentoejg> tipoDocDuplicados = scsTipodocumentoejgMapper.selectByExample(ejemplo);
+					genRecursosCatalogos = new GenRecursosCatalogos();
+					genRecursosCatalogos.setIdrecurso(documentacionejgItem.getCodigodescripcion());
+					genRecursosCatalogos.setDescripcion(documentacionejgItem.getdescripcionTipoDoc());
+					genRecursosCatalogos.setFechamodificacion(new Date());
+					genRecursosCatalogos.setUsumodificacion(usuario.getIdusuario());
+					genRecursosCatalogos.setIdinstitucion(idInstitucion);
+					genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
+					genRecursosCatalogos.setIdrecursoalias("scs_tipodocumentoejg.descripcion." + idInstitucion + "."
+							+ genRecursosCatalogos.getIdrecurso());
+					genRecursosCatalogos.setNombretabla("SCS_SCS_TIPODOCUMENTOEJG");
+					genRecursosCatalogos.setCampotabla("DESCRIPCION");
+
+					ScsTipodocumentoejgExample example = new ScsTipodocumentoejgExample();
+
+					example.createCriteria()
+							.andIdtipodocumentoejgEqualTo(Short.valueOf(documentacionejgItem.getIdTipoDocumento()))
+							.andIdinstitucionEqualTo(idInstitucion);
+
+					ScsTipodocumentoejg tipoDoc = scsDocumentacionEjgExtendsMapper.selectByExample(example).get(0);
+					updateResponseDTO.setId(tipoDoc.getIdtipodocumentoejg().toString());
 
 					LOGGER.info(
-							"updateGroupZone() / scsTipodocumentoejgMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
+							"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Salida de scsFundamentoscalificacionExtendsMapper para updatear el nuevo fundamento");
 
-					if (tipoDocDuplicados != null && tipoDocDuplicados.size() > 0) {
+					LOGGER.info(
+							"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para updatear el nuevo fundamento");
 
-						error.setCode(400);
-						error.setDescription("messages.censo.nombreExiste");
+					genRecursosCatalogosExtendsMapper.updateByPrimaryKey(genRecursosCatalogos);
+					updateRestoIdiomas(genRecursosCatalogos);
 
-					} else {
+					LOGGER.info(
+							"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Salida de scsFundamentoscalificacionExtendsMapper para updatear el nuevo fundamento");
 
-						LOGGER.info(
-								"insertFundamentos() / scsTipodocumentoejgMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para insertar el nuevo documento");
-						
-						genRecursosCatalogos = new GenRecursosCatalogos();
-						genRecursosCatalogos.setIdrecurso(documentacionejgItem.getCodigodescripcion());
-						genRecursosCatalogos.setDescripcion(documentacionejgItem.getdescripcionTipoDoc());
-						genRecursosCatalogos.setFechamodificacion(new Date());
-						genRecursosCatalogos.setUsumodificacion(usuario.getIdusuario());
-						genRecursosCatalogos.setIdinstitucion(idInstitucion);
-						genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
-						genRecursosCatalogos.setIdrecursoalias("scs_tipodocumentoejg.descripcion." + idInstitucion + "."
-								+ genRecursosCatalogos.getIdrecurso());
-						genRecursosCatalogos.setNombretabla("SCS_SCS_TIPODOCUMENTOEJG");
-						genRecursosCatalogos.setCampotabla("DESCRIPCION");
-						
-						ScsTipodocumentoejgExample example = new ScsTipodocumentoejgExample();
-						
-						example.createCriteria().andIdtipodocumentoejgEqualTo(Short.valueOf(documentacionejgItem.getIdTipoDocumento())).andIdinstitucionEqualTo(idInstitucion);
-						
-						ScsTipodocumentoejg tipoDoc =  scsDocumentacionEjgExtendsMapper.selectByExample(example).get(0);
-						updateResponseDTO.setId(tipoDoc.getIdtipodocumentoejg().toString());
+					tipoDoc.setAbreviatura(documentacionejgItem.getabreviaturaTipoDoc());
+					tipoDoc.setCodigoext(documentacionejgItem.getCodigoExt());
+					tipoDoc.setIdinstitucion(idInstitucion);
 
-						LOGGER.info(
-								"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Salida de scsFundamentoscalificacionExtendsMapper para updatear el nuevo fundamento");
+					LOGGER.info(
+							"updateTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Entrada a scsDocumentacionEjgExtendsMapper para updatear un nuevo documento");
 
-						LOGGER.info(
-								"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para updatear el nuevo fundamento");
+					response = scsDocumentacionEjgExtendsMapper.updateByPrimaryKey(tipoDoc);
 
-						genRecursosCatalogosExtendsMapper.updateByPrimaryKey(genRecursosCatalogos);
-						updateRestoIdiomas(genRecursosCatalogos);
-
-						LOGGER.info(
-								"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Salida de scsFundamentoscalificacionExtendsMapper para updatear el nuevo fundamento");
-
-						tipoDoc.setAbreviatura(documentacionejgItem.getabreviaturaTipoDoc());
-						tipoDoc.setCodigoext(documentacionejgItem.getCodigoExt());
-						tipoDoc.setIdinstitucion(idInstitucion);
-
-						LOGGER.info(
-								"updateTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Entrada a scsDocumentacionEjgExtendsMapper para updatear un nuevo documento");
-
-						response = scsDocumentacionEjgExtendsMapper.updateByPrimaryKey(tipoDoc);
-
-						LOGGER.info(
-								"updateTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Salida de scsDocumentacionEjgExtendsMapper para updatear un nuevo documento");
-					}
+					LOGGER.info(
+							"updateTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Salida de scsDocumentacionEjgExtendsMapper para updatear un nuevo documento");
 
 				} catch (Exception e) {
 					response = 0;
@@ -429,7 +403,7 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 
 		if (response == 0) {
 			error.setCode(400);
-//			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			// error.setDescription("areasmaterias.materias.ficha.eliminarError");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
@@ -476,99 +450,73 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 
 				try {
 
-					ScsTipodocumentoejgExample ejemplo = new ScsTipodocumentoejgExample();
-					ejemplo.createCriteria().andAbreviaturaEqualTo(documentacionejgItem.getabreviaturaTipoDoc())
-							.andIdinstitucionEqualTo(idInstitucion);
-
-					List<ScsTipodocumentoejg> tipoDocDuplicados = scsTipodocumentoejgMapper.selectByExample(ejemplo);
-
 					LOGGER.info(
-							"updateGroupZone() / scsTipodocumentoejgMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
+							"createTipoDoc() / scsTipodocumentoejgMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para insertar el nuevo documento");
+					GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
+					genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
+							.andDescripcionEqualTo(documentacionejgItem.getdescripcionTipoDoc());
 
-					if (tipoDocDuplicados != null && tipoDocDuplicados.size() > 0) {
+					NewIdDTO idTipoDoc = scsDocumentacionEjgExtendsMapper
+							.getIdTipoDocumentoEjg(usuario.getIdinstitucion());
+					if (idTipoDoc == null) {
+						tipoDoc.setIdtipodocumentoejg((short) 1);
+					} else {
+						idTipoDocNuevo = (short) (Integer.parseInt(idTipoDoc.getNewId()) + 1);
+						tipoDoc.setIdtipodocumentoejg(idTipoDocNuevo);
+					}
 
-						error.setCode(400);
-						error.setDescription("messages.censo.nombreExiste");
+					/*
+					 * if (l != null && l.size() > 0) { //hacer lo mismo q en else, lo dice jesu
+					 * 
+					 * } else {
+					 */
+					genRecursosCatalogos = new GenRecursosCatalogos();
+					genRecursosCatalogos.setDescripcion(documentacionejgItem.getdescripcionTipoDoc());
+					genRecursosCatalogos.setFechamodificacion(new Date());
+					genRecursosCatalogos.setUsumodificacion(usuario.getIdusuario());
+					genRecursosCatalogos.setIdinstitucion(idInstitucion);
+					genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
+					genRecursosCatalogos.setIdrecursoalias("scs_tipodocumentoejg.descripcion." + idInstitucion + "."
+							+ genRecursosCatalogos.getIdrecurso());
+					genRecursosCatalogos.setNombretabla("SCS_SCS_TIPODOCUMENTOEJG");
+					genRecursosCatalogos.setCampotabla("DESCRIPCION");
+					NewIdDTO idJD = genRecursosCatalogosExtendsMapper.getMaxIdRecursoCatalogo(idInstitucion.toString(),
+							usuario.getIdlenguaje());
+					if (idJD == null) {
+						genRecursosCatalogos.setIdrecurso("1");
 
 					} else {
-
-						LOGGER.info(
-								"insertFundamentos() / scsTipodocumentoejgMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para insertar el nuevo documento");
-						GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
-						genRecursosCatalogosExample.createCriteria()
-								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
-								.andDescripcionEqualTo(documentacionejgItem.getdescripcionTipoDoc());
-						List<GenRecursosCatalogos> l = genRecursosCatalogosExtendsMapper
-								.selectByExample(genRecursosCatalogosExample);
-
-						NewIdDTO idTipoDoc = scsDocumentacionEjgExtendsMapper
-								.getIdTipoDocumentoEjg(usuario.getIdinstitucion());
-						if (idTipoDoc == null) {
-							tipoDoc.setIdtipodocumentoejg((short) 1);
-						} else {
-							idTipoDocNuevo = (short) (Integer.parseInt(idTipoDoc.getNewId()) + 1);
-							tipoDoc.setIdtipodocumentoejg(idTipoDocNuevo);
-						}
-
-						/*
-						 * if (l != null && l.size() > 0) { //hacer lo mismo q en else, lo dice jesu
-						 * 
-						 * } else {
-						 */
-						genRecursosCatalogos = new GenRecursosCatalogos();
-						genRecursosCatalogos.setDescripcion(documentacionejgItem.getdescripcionTipoDoc());
-						genRecursosCatalogos.setFechamodificacion(new Date());
-						genRecursosCatalogos.setUsumodificacion(usuario.getIdusuario());
-						genRecursosCatalogos.setIdinstitucion(idInstitucion);
-						genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
-						genRecursosCatalogos.setIdrecursoalias("scs_tipodocumentoejg.descripcion." + idInstitucion + "."
-								+ genRecursosCatalogos.getIdrecurso());
-						genRecursosCatalogos.setNombretabla("SCS_SCS_TIPODOCUMENTOEJG");
-						genRecursosCatalogos.setCampotabla("DESCRIPCION");
-						NewIdDTO idJD = genRecursosCatalogosExtendsMapper
-								.getMaxIdRecursoCatalogo(idInstitucion.toString(), usuario.getIdlenguaje());
-						if (idJD == null) {
-							genRecursosCatalogos.setIdrecurso("1");
-
-						} else {
-							genRecursosCatalogos.setIdrecurso((Long.parseLong(idJD.getNewId()) + 1) + "");
-							tipoDoc.setDescripcion(genRecursosCatalogos.getIdrecurso());
-						}
-						insertResponseDTO.setId(tipoDoc.getIdtipodocumentoejg().toString());
-
-						LOGGER.info(
-								"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Salida de scsFundamentoscalificacionExtendsMapper para insertar el nuevo fundamento");
-
-						LOGGER.info(
-								"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para insertar el nuevo fundamento");
-
-						genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogos);
-						insertarRestoIdiomas(genRecursosCatalogos);
-
-						LOGGER.info(
-								"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Salida de scsFundamentoscalificacionExtendsMapper para insertar el nuevo fundamento");
-						// }
-
-						tipoDoc.setAbreviatura(documentacionejgItem.getabreviaturaTipoDoc());
-						tipoDoc.setCodigoext(documentacionejgItem.getCodigoExt());
-						tipoDoc.setIdinstitucion(idInstitucion);
-
-						LOGGER.info(
-								"createTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Entrada a scsDocumentacionEjgExtendsMapper para insertar un nuevo documento");
-
-						response = scsDocumentacionEjgExtendsMapper.insert(tipoDoc);
-
-						LOGGER.info(
-								"createTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Salida de scsDocumentacionEjgExtendsMapper para insertar un nuevo documento");
+						genRecursosCatalogos.setIdrecurso((Long.parseLong(idJD.getNewId()) + 1) + "");
+						tipoDoc.setDescripcion(genRecursosCatalogos.getIdrecurso());
 					}
-				}
-					catch (Exception e) {
+					insertResponseDTO.setId(tipoDoc.getIdtipodocumentoejg().toString());
+
+					genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogos);
+					insertarRestoIdiomas(genRecursosCatalogos);
+
+					LOGGER.info(
+							"createTipoDoc() / genRecursosCatalogosExtendsMapper.insert() -> Salida de scsFundamentoscalificacionExtendsMapper para insertar el nuevo documento");
+					// }
+
+					tipoDoc.setAbreviatura(documentacionejgItem.getabreviaturaTipoDoc());
+					tipoDoc.setCodigoext(documentacionejgItem.getCodigoExt());
+					tipoDoc.setIdinstitucion(idInstitucion);
+
+					LOGGER.info(
+							"createTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Entrada a scsDocumentacionEjgExtendsMapper para insertar un nuevo documento");
+
+					response = scsDocumentacionEjgExtendsMapper.insert(tipoDoc);
+
+					LOGGER.info(
+							"createTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Salida de scsDocumentacionEjgExtendsMapper para insertar un nuevo documento");
+
+				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
-				}
+			}
 
 		}
 
@@ -584,7 +532,7 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 		insertResponseDTO.setError(error);
 
 		LOGGER.info("createZone() -> Salida del servicio para crear un nuvo tipo documento");
-		
+
 		return insertResponseDTO;
 	}
 
@@ -763,21 +711,20 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 
 						ScsDocumentoejg documentoejg = new ScsDocumentoejg();
 						documentoejg.setIddocumentoejg(Short.valueOf(documentacionejgItem.getIdDocumento()));
-										
+
 						ScsDocumentoejgExample example = new ScsDocumentoejgExample();
-						example.createCriteria().andIddocumentoejgEqualTo(Short.valueOf(documentacionejgItem.getIdDocumento()))
-							.andIdtipodocumentoejgEqualTo(Short.valueOf(documentacionejgItem.getIdTipoDocumento())).andIdinstitucionEqualTo(idInstitucion);
+						example.createCriteria()
+								.andIddocumentoejgEqualTo(Short.valueOf(documentacionejgItem.getIdDocumento()))
+								.andIdtipodocumentoejgEqualTo(Short.valueOf(documentacionejgItem.getIdTipoDocumento()))
+								.andIdinstitucionEqualTo(idInstitucion);
 						documentoejg = scsDocumentoEjgExtendsMapper.selectByExample(example).get(0);
-						
-						
+
 						if (documentacionejgItem.getFechabaja() == null) {
 							documentoejg.setFechabaja(new Date());
 						} else {
 							documentoejg.setFechabaja(null);
 
 						}
-						
-
 
 						LOGGER.info(
 								"deleteAreas() / scsDocumentoEjgExtendsMapper.deleteByExample() -> Entrada a scsDocumentoEjgExtendsMapper para eliminar los  Documentos seleccionados");
@@ -819,77 +766,76 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 	public UpdateResponseDTO updateDoc(DocumentacionEjgDTO documentacionejgDTO, HttpServletRequest request) {
 		LOGGER.info("deleteZones() ->  Entrada al servicio para actualizar Materias");
 		// PENDIENTE DE ACABAR
-				UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-				Error error = new Error();
-				int response = 0;
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
 
-				String token = request.getHeader("Authorization");
-				String dni = UserTokenUtils.getDniFromJWTToken(token);
-				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-				if (null != idInstitucion) {
+		if (null != idInstitucion) {
 
-					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-					LOGGER.info(
-							"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-					LOGGER.info(
-							"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-					if (null != usuarios && usuarios.size() > 0) {
+			if (null != usuarios && usuarios.size() > 0) {
 
-						try {
-							
-							for (DocumentacionEjgItem documentoItem : documentacionejgDTO.getDocumentacionEjgItems()) {
-							
-								ScsDocumentoejg documento = new ScsDocumentoejg();
-								documento.setIddocumentoejg(Short.valueOf(documentoItem.getIdDocumento()));
-								documento.setCodigoext(documentoItem.getCodigoExt());
-								documento.setIdtipodocumentoejg(Short.valueOf(documentoItem.getIdTipoDocumento()));
-								documento.setIdinstitucion(idInstitucion);
-								documento.setAbreviatura(documentoItem.getAbreviatura());
-								
-								GenRecursosCatalogosExample example = new GenRecursosCatalogosExample();
-								example.createCriteria().andIdinstitucionEqualTo(idInstitucion).
-									andIdrecursoEqualTo(documentoItem.getCodigodescripcion());
-								GenRecursosCatalogos gen = genRecursosCatalogosExtendsMapper.selectByExample(example).get(0);
-								gen.setDescripcion(documentoItem.getdescripcionDoc());
-								
-								genRecursosCatalogosExtendsMapper.updateByPrimaryKey(gen);
-								response = scsDocumentoEjgExtendsMapper.updateByPrimaryKeySelective(documento);
-								
-							}
-								
+				try {
 
-						} catch (Exception e) {
-							response = 0;
-							error.setCode(400);
-							error.setDescription("general.mensaje.error.bbdd");
-							updateResponseDTO.setStatus(SigaConstants.KO);
-						}
+					for (DocumentacionEjgItem documentoItem : documentacionejgDTO.getDocumentacionEjgItems()) {
+
+						ScsDocumentoejg documento = new ScsDocumentoejg();
+						documento.setIddocumentoejg(Short.valueOf(documentoItem.getIdDocumento()));
+						documento.setCodigoext(documentoItem.getCodigoExt());
+						documento.setIdtipodocumentoejg(Short.valueOf(documentoItem.getIdTipoDocumento()));
+						documento.setIdinstitucion(idInstitucion);
+						documento.setAbreviatura(documentoItem.getAbreviatura());
+
+						GenRecursosCatalogosExample example = new GenRecursosCatalogosExample();
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdrecursoEqualTo(documentoItem.getCodigodescripcion());
+						GenRecursosCatalogos gen = genRecursosCatalogosExtendsMapper.selectByExample(example).get(0);
+						gen.setDescripcion(documentoItem.getdescripcionDoc());
+
+						genRecursosCatalogosExtendsMapper.updateByPrimaryKey(gen);
+						response = scsDocumentoEjgExtendsMapper.updateByPrimaryKeySelective(documento);
+
 					}
 
-				}
-
-				if (response == 0) {
+				} catch (Exception e) {
+					response = 0;
 					error.setCode(400);
-					error.setDescription("areasmaterias.materias.ficha.actualizarerror");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
-				} else {
-					error.setCode(200);
-					error.setDescription("general.message.registro.actualizado");
 				}
-
-				updateResponseDTO.setError(error);
-
-				LOGGER.info("deleteZones() -> Salida del servicio para eliminar areas de un grupo zona");
-
-				return updateResponseDTO;
 			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.actualizarerror");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("deleteZones() -> Salida del servicio para eliminar areas de un grupo zona");
+
+		return updateResponseDTO;
+	}
 
 	@Override
 	public InsertResponseDTO createDoc(DocumentacionEjgItem documentacionejgItem, HttpServletRequest request) {
@@ -943,8 +889,7 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 						LOGGER.info(
 								"insertFundamentos() / scsTipodocumentoejgMapper.insert() -> Entrada a scsTipodocumentoejgMapper para insertar el nuevo documento");
 
-						NewIdDTO idTipoDoc = scsDocumentoEjgExtendsMapper
-								.getIdDocumentoEjg(usuario.getIdinstitucion());
+						NewIdDTO idTipoDoc = scsDocumentoEjgExtendsMapper.getIdDocumentoEjg(usuario.getIdinstitucion());
 						if (idTipoDoc == null) {
 							nuevoDoc.setIddocumentoejg((short) 1);
 						} else {
