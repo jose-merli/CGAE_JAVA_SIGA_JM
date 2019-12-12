@@ -8,6 +8,7 @@ import org.itcgae.siga.DTO.scs.EjgItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
+import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class EjgController {
 	@Autowired
 	private IBusquedaEJG busquedaEJG;
+	@Autowired
+	private IGestionEJG gestionEJG;
 	
 	@RequestMapping(value = "/filtros-ejg/comboTipoEJG",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboTipoEJG(HttpServletRequest request) {
@@ -103,5 +106,11 @@ public class EjgController {
 		EjgDTO response = busquedaEJG.busquedaEJG(ejgItem, request);
 		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
 	}
+	//datosEJG
+		@RequestMapping(value = "/gestion-ejg/datosEJG",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<EjgDTO> datosEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+			EjgDTO response = gestionEJG.datosEJG(ejgItem, request);
+			return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
+		}
 		
 }

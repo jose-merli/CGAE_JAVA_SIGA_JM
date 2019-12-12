@@ -24,6 +24,7 @@ public class EjgItem {
     private String fechaLimiteHast;
 
     private String[] dictamen;
+    private String dictamenSing;
     private String fundamentoCalif;
     private String fechaDictamenDesd;
     private String fechaDictamenHast;
@@ -963,6 +964,21 @@ public class EjgItem {
 
 	public void setNombreApeSolicitante(String nombreApeSolicitante) {
 		this.nombreApeSolicitante = nombreApeSolicitante;
+	}
+	/**
+	 **/
+	public EjgItem dictamenSing(String dictamenSing) {
+		this.dictamenSing = dictamenSing;
+		return this;
+	}
+
+	@JsonProperty("dictamenSing")
+	public String getDictamenSing() {
+		return dictamenSing;
+	}
+
+	public void setDictamenSing(String dictamenSing) {
+		this.dictamenSing = dictamenSing;
 	}
 
 //	/**

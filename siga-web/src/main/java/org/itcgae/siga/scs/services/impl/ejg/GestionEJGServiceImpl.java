@@ -1,0 +1,58 @@
+package org.itcgae.siga.scs.services.impl.ejg;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.scs.EjgDTO;
+import org.itcgae.siga.DTO.scs.EjgItem;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
+import org.itcgae.siga.scs.services.ejg.IGestionEJG;
+import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
+import org.itcgae.siga.security.UserTokenUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+@Service
+public class GestionEJGServiceImpl implements IGestionEJG {
+	private Logger LOGGER = Logger.getLogger(BusquedaDocumentacionEjgServiceImpl.class);
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	@Autowired
+	private ScsEjgExtendsMapper scsEjgExtendsMapper;
+	@Override
+	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
+		LOGGER.info("datosEJG() -> Entrada al servicio para obtener el colegiado");
+		EjgDTO ejgDTO = new EjgDTO();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"datosEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"datosEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if(null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
+				LOGGER.info("datosEJG() / scsEjgExtendsMapper.datosEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
+				ejgDTO.setEjgItems(scsEjgExtendsMapper.datosEJG(ejgItem, idInstitucion.toString()));
+				LOGGER.info("datosEJG() / scsEjgExtendsMapper.datosEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
+			}else {
+				LOGGER.warn("datosEJG() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		}else {
+			LOGGER.warn("datosEJG() -> idInstitucion del token nula");
+		}
+		
+		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
+		return ejgDTO;
+	}
+}

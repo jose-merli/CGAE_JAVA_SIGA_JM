@@ -152,7 +152,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         	 	 sql.WHERE  ("TO_CHAR(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') <= TO_DATE( '"+ ejgItem.getFechaResolucionHast() + "','DD/MM/RRRR')");
         if(ejgItem.getImpugnacion() != null && ejgItem.getImpugnacion() != "")
                  sql.WHERE ("EJG.IDTIPORESOLAUTO = " + ejgItem.getImpugnacion());
-        if(ejgItem.getImpugnacion() != null && ejgItem.getImpugnacion() != "")
+        if(ejgItem.getFundamentoImpuganacion() != null && ejgItem.getFundamentoImpuganacion() != "")
                  sql.WHERE ("EJG.IDTIPOSENTIDOAUTO = " + ejgItem.getFundamentoImpuganacion());
         if(ejgItem.getFechaImpugnacionDesd() != null)       
                  sql.WHERE  ("TO_CHAR(EJG.FECHAAUTO,'DD/MM/RRRR') >= TO_DATE( '"+ ejgItem.getFechaImpugnacionDesd() + "','DD/MM/RRRR')");
@@ -160,8 +160,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         	 	 sql.WHERE  ("TO_CHAR(EJG.FECHAAUTO,'DD/MM/RRRR') <= TO_DATE( '"+ ejgItem.getFechaImpugnacionHast() + "','DD/MM/RRRR')");
         if(ejgItem.getJuzgado() != null && ejgItem.getJuzgado() != "")
                  sql.WHERE ("EJG.JUZGADO = " + ejgItem.getJuzgado());
-        if(ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != "")
-                 sql.WHERE ("regexp_like(EJG.NUMEROPROCEDIMIENTO || EJG.ANIOPROCEDIMIENTO, '" + ejgItem.getProcedimiento() +"')");
+        if(ejgItem.getNumAnnioProcedimiento() != null && ejgItem.getNumAnnioProcedimiento() != "")
+                 sql.WHERE ("regexp_like(EJG.NUMEROPROCEDIMIENTO || EJG.ANIOPROCEDIMIENTO, '" + ejgItem.getNumAnnioProcedimiento() +"')");
         if(ejgItem.getAsunto() != null && ejgItem.getAsunto() != "")
         	 	 sql.WHERE ("regexp_like(EJG.OBSERVACIONES,'" + ejgItem.getAsunto() +"')");
         if(ejgItem.getNig() != null && ejgItem.getNig() != "")
@@ -172,8 +172,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                  sql.WHERE ("EJG.CALIDAD = '" + ejgItem.getCalidad() + "'");
         if(ejgItem.getRenuncia() != null && ejgItem.getRenuncia() != "")
                  sql.WHERE ("EJG.IDRENUNCIA = " + ejgItem.getRenuncia());
-        if(ejgItem.getRenuncia() != null && ejgItem.getRenuncia() != "")
-                 sql.WHERE ("EJG.IDPONENTE = " + ejgItem.getRenuncia());
+        if(ejgItem.getPonente() != null && ejgItem.getPonente() != "")
+                 sql.WHERE ("EJG.IDPONENTE = " + ejgItem.getPonente());
         if(ejgItem.getFechaPonenteDesd() != null)   
                  sql.WHERE  ("TO_CHAR(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') >= TO_DATE( '"+ ejgItem.getFechaPonenteDesd() + "','DD/MM/RRRR')");
         if(ejgItem.getFechaPonenteHast() != null)     
@@ -181,7 +181,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         if(ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
         		 sql.WHERE ("regexp_like(EJG.NUMERO_CAJG || EJG.ANIOCAJG,'" + ejgItem.getNumCAJG() +"')");
 		sql.WHERE(condicionAnnioNumActas); 
-		sql.WHERE(condicionNumRegRemesa); 
+		sql.WHERE(condicionNumRegRemesa);
+        if(ejgItem.getAnnioCAJG() != null && ejgItem.getAnnioCAJG() != "")
+   		 sql.WHERE ("EJG.aniocajg = " + ejgItem.getAnnioCAJG());
 		//logica rol
 		if(ejgItem.getRol() != null && ejgItem.getRol() != "") {
 			if(ejgItem.getRol().equals("1")) {
@@ -337,7 +339,91 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
 		return sql.toString();	
 	}
-	
+	public String datosEJG(EjgItem ejgItem, String idInstitucion) {
+		SQL sql = new SQL();
+		String joinDesignaLetrado = "(select * from SCS_DESIGNASLETRADO designaletrado where designaletrado.fecharenuncia is null or"
+				+ " designaletrado.Fechadesigna = (SELECT MAX(LET2.Fechadesigna)"
+				+ " FROM SCS_DESIGNASLETRADO LET2"
+				+ " WHERE designaletrado.IDINSTITUCION = LET2.IDINSTITUCION"
+				+ " AND designaletrado.IDTURNO = LET2.IDTURNO"
+				+ " AND designaletrado.ANIO = LET2.ANIO"
+				+ " AND designaletrado.NUMERO = LET2.NUMERO"
+				+ " AND TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE))"
+				+ ") designaletrado2 on (designaletrado2.idinstitucion = ejgd.idinstitucion and designaletrado2.idturno = ejgd.idturno  and designaletrado2.anio = ejgd.anioejg and designaletrado2.numero = EJGD.NUMERODESIGNA)";
+
+		//select
+		sql.SELECT("ejg.anio");
+		sql.SELECT("ejg.idinstitucion");
+		sql.SELECT("ejg.idtipoejg");
+		sql.SELECT("ejg.numero");
+		sql.SELECT("ejg.numejg numejg"); 
+		sql.SELECT("'E' || EJG.ANIO || '/' || EJG.NUMEJG AS NUMANIO");
+		sql.SELECT("TURNO.NOMBRE || '/' || GUARDIA.NOMBRE AS TURNO");
+		sql.SELECT("TURNO.ABREVIATURA AS TURNODES");
+		sql.SELECT("ejg.fechaapertura");
+		sql.SELECT("ejg.fechapresentacion");
+		sql.SELECT("ejg.idtipoejgcolegio");
+		sql.SELECT("ejg.fechalimitepresentacion");
+		sql.SELECT("ejg.fechamodificacion");
+		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as nombreletrado");
+		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
+		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre as NOMBRESOLICITANTE");
+		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
+		sql.SELECT("rectipodictamen.descripcion AS dictamen");
+		sql.SELECT("rectiporesolucion.descripcion AS resolucion");
+		sql.SELECT("rectiporesolauto.descripcion AS resolauto");
+		sql.SELECT("personadesigna.apellidos1 || ' ' || personadesigna.apellidos2 || ', ' || personadesigna.nombre AS nombreletradodesigna");
+		sql.SELECT("EXPEDIENTE.anioexpediente");
+		sql.SELECT("EXPEDIENTE.numeroexpediente");
+		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE");
+		//from
+		sql.FROM("scs_ejg ejg");
+		//joins
+		sql.LEFT_OUTER_JOIN("cen_persona per on per.idpersona = ejg.idpersona");
+		sql.LEFT_OUTER_JOIN("EXP_EXPEDIENTE EXPEDIENTE ON EJG.IDINSTITUCION = EXPEDIENTE.IDINSTITUCION AND EJG.ANIO = EXPEDIENTE.ANIOEJG  \r\n" + 
+				"			            AND EJG.NUMERO = EXPEDIENTE.NUMEROEJG AND EJG.IDTIPOEJG = EXPEDIENTE.IDTIPOEJG");
+		sql.LEFT_OUTER_JOIN("scs_personajg perjg on perjg.idpersona = ejg.idpersonajg AND perjg.IDINSTITUCION = EJG.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN("SCS_TURNO  TURNO ON TURNO.IDINSTITUCION =EJG.IDINSTITUCION AND TURNO.IDTURNO =EJG.GUARDIATURNO_IDTURNO");
+		sql.LEFT_OUTER_JOIN("SCS_GUARDIASTURNO GUARDIA  ON GUARDIA.IDINSTITUCION =EJG.IDINSTITUCION AND GUARDIA.IDTURNO =EJG.GUARDIATURNO_IDTURNO  AND GUARDIA.IDGUARDIA =EJG.GUARDIATURNO_IDGUARDIA");
+		sql.INNER_JOIN("SCS_ESTADOEJG ESTADO ON (ESTADO.IDINSTITUCION = EJG.IDINSTITUCION "
+				+ "AND ESTADO.IDTIPOEJG = EJG.IDTIPOEJG AND ESTADO.IDTIPOEJG = EJG.IDTIPOEJG "
+				+ "AND ESTADO.ANIO = EJG.ANIO "
+				+ "AND ESTADO.NUMERO = EJG.NUMERO "
+				+ "AND ESTADO.FECHABAJA IS NULL "
+				+ "AND ESTADO.idestadoporejg = (SELECT MAX(idestadoporejg) FROM SCS_ESTADOEJG ESTADO2 WHERE (ESTADO.IDINSTITUCION = ESTADO2.IDINSTITUCION "
+				+ "AND ESTADO.IDTIPOEJG = ESTADO2.IDTIPOEJG "
+				+ "AND ESTADO.ANIO = ESTADO2.ANIO "
+				+ "AND ESTADO.NUMERO = ESTADO2.NUMERO "
+				+ "AND ESTADO2.FECHABAJA IS NULL) "
+				+ "AND ESTADO2.FECHAINICIO = (SELECT MAX(FECHAINICIO) FROM SCS_ESTADOEJG ESTADO3 WHERE (ESTADO3.IDINSTITUCION = ESTADO2.IDINSTITUCION "
+				+ "AND ESTADO.IDTIPOEJG = ESTADO3.IDTIPOEJG "
+				+ "AND ESTADO.ANIO = ESTADO3.ANIO "
+				+ "AND ESTADO.NUMERO = ESTADO3.NUMERO "
+				+ "AND ESTADO3.FECHABAJA IS NULL))))");
+				sql.INNER_JOIN("SCS_MAESTROESTADOSEJG MAESTROESTADO ON ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG");
+				sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = 1");
+				sql.LEFT_OUTER_JOIN("scs_tipodictamenejg tipodictamen ON tipodictamen.idtipodictamenejg = ejg.idtipodictamenejg AND ejg.idinstitucion = tipodictamen.idinstitucion");
+				sql.LEFT_OUTER_JOIN("gen_recursos_catalogos rectipodictamen ON rectipodictamen.idrecurso = tipodictamen.descripcion AND rectipodictamen.idlenguaje = 1");
+				sql.LEFT_OUTER_JOIN("scs_tiporesolucion tiporesolucion ON tiporesolucion.idtiporesolucion = ejg.idtiporatificacionejg");
+				sql.LEFT_OUTER_JOIN("gen_recursos_catalogos rectiporesolucion ON rectiporesolucion.idrecurso = tiporesolucion.descripcion AND rectiporesolucion.idlenguaje = 1");
+				sql.LEFT_OUTER_JOIN("scs_tiporesolauto tiporesolauto ON tiporesolauto.idtiporesolauto = ejg.idtiporesolauto");
+				sql.LEFT_OUTER_JOIN("gen_recursos_catalogos rectiporesolauto ON rectiporesolauto.idrecurso = tiporesolauto.descripcion AND rectiporesolauto.idlenguaje = 1");
+				sql.LEFT_OUTER_JOIN("SCS_EJGDESIGNA EJGD ON   ejgd.anioejg = ejg.anio   AND   ejgd.numeroejg = ejg.numero AND   ejgd.idtipoejg = ejg.idtipoejg  AND   ejgd.idinstitucion = ejg.idinstitucion");
+				sql.LEFT_OUTER_JOIN(joinDesignaLetrado);
+				sql.LEFT_OUTER_JOIN("CEN_CLIENTE clientedesigna on clientedesigna.idpersona = designaletrado2.idpersona  and clientedesigna.idinstitucion = designaletrado2.idinstitucion");
+				sql.LEFT_OUTER_JOIN("cen_persona personadesigna on clientedesigna.idpersona = personadesigna.idpersona");
+				//where
+				sql.WHERE("ejg.idinstitucion = " + idInstitucion);
+				if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
+		                 sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
+				if(ejgItem.getNumero() != null && ejgItem.getNumero() != "")
+		                 sql.WHERE ("EJG.NUMEJG ="+ ejgItem.getNumero());
+				if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
+		                 sql.WHERE ("ejg.IDTIPOEJG = " + ejgItem.getTipoEJG());
+				
+				sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
+				return sql.toString();
+	}
 	public String comboCreadoDesde(String idLenguaje, String idInstitucion) {
 		SQL sql = new SQL();
 		

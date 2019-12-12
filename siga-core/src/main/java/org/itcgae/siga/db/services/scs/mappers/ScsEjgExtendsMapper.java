@@ -29,7 +29,6 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 
 		@Result(column = "anio", property = "annio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipoejg", property = "tipoEJG", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "idinstitucion", property = "idInstitucion", jdbcType = JdbcType.DECIMAL),
 		@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numejg", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMANIO", property = "numAnnioProcedimiento", jdbcType = JdbcType.VARCHAR),
@@ -41,10 +40,42 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 		@Result(column = "NOMBREletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "correoelectronico", property = "correoelectronico", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "fechanacimiento", property = "fechanacimiento", jdbcType = JdbcType.VARCHAR),
 	})
 	List<EjgItem> busquedaEJG(EjgItem ejgItem, String string);
+
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "datosEJG")
+	@Results({ 
+
+
+//		sql.SELECT("ejg.fechapresentacion");
+//		sql.SELECT("ejg.idtipocolegio");
+//		sql.SELECT("ejg.fechalimitepresentacion");		
+//		sql.SELECT("rectipodictamen.descripcion AS dictamen");
+//		sql.SELECT("rectiporesolucion.descripcion AS resolucion");
+//		sql.SELECT("rectiporesolauto.descripcion AS resolauto");
+//		sql.SELECT("personadesigna.apellidos1 || ' ' || personadesigna.apellidos2 || ', ' || personadesigna.nombre AS nombreletradodesigna");
+//		sql.SELECT("EXPEDIENTE.anioexpediente");
+//		sql.SELECT("EXPEDIENTE.numeroexpediente");
+//		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE");
+		@Result(column = "anio", property = "annio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idtipoejg", property = "tipoEJG", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numejg", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMANIO", property = "numAnnioProcedimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TURNODES", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaapertura", property = "fechaApertura", jdbcType = JdbcType.DATE),
+		@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRESOLICITANTE", property = "nombreApeSolicitante", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombreletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "dictamen", property = "dictamenSing", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "resolucion", property = "resolucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "resolauto", property = "impugnacion", jdbcType = JdbcType.VARCHAR),
+
+
+	})
+	List<EjgItem> datosEJG(EjgItem ejgItem, String string);
 
 }
