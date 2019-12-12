@@ -24,8 +24,6 @@ public interface IGestionTurnosService {
 
 	public InsertResponseDTO createTurnos(TurnosItem turnosItem, HttpServletRequest request);
 
-	public Error guardartarjetaPesos(HttpServletRequest request,TarjetaPesosDTO tarjetaPesos);
-
 	public UpdateResponseDTO updateConfiguracion(TurnosItem turnosItem, HttpServletRequest request);
 	
 	public TurnosDTO busquedaColaOficio(TurnosItem turnosItem, HttpServletRequest request);
@@ -40,5 +38,7 @@ public interface IGestionTurnosService {
 
 	public UpdateResponseDTO eliminateGuardia(GuardiasDTO guardiasDTO, HttpServletRequest request);
 
-	public UpdateResponseDTO updateUltimo(TurnosItem turnosItem, HttpServletRequest request); 
+	public UpdateResponseDTO updateUltimo(TurnosItem turnosItem, HttpServletRequest request);
+
+	public Error guardartarjetaPesos2(HttpServletRequest request, TarjetaPesosDTO tarjetaPesos); 
 }

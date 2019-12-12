@@ -207,10 +207,10 @@ public class TurnosController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/turnos/tarjetaGuardarPesos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardartarjetaPesos(HttpServletRequest request, @RequestBody TarjetaPesosDTO tarjetaPesos) {
+	@RequestMapping(value = "/turnos/tarjetaGuardarPesos2",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardartarjetaPesos2(HttpServletRequest request, @RequestBody TarjetaPesosDTO tarjetaPesos) {
 
-		Error response = turnosService.guardartarjetaPesos(request,tarjetaPesos);
+		Error response = turnosService.guardartarjetaPesos2(request,tarjetaPesos);
 		if(response.getCode() == 200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else

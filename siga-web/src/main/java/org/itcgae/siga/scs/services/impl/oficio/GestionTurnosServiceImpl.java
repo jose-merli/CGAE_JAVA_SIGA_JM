@@ -592,7 +592,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 	}
 
 	@Override
-	public Error guardartarjetaPesos(HttpServletRequest request, TarjetaPesosDTO tarjetaPesos) {
+	public Error guardartarjetaPesos2(HttpServletRequest request, TarjetaPesosDTO tarjetaPesos) {
 
 		LOGGER.info("guardarPerfilesModelo() -> Entrada al servicio para guardar datos perfiles");
 		Integer idOrdenacionNuevo = 0;
@@ -610,17 +610,14 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-
-					ScsOrdenacioncolas ordenacion = new ScsOrdenacioncolas();
-
+										
 				try{
 
 					NewIdDTO idOrdenacion = scsTurnosExtendsMapper.getIdOrdenacion(idInstitucion);
-
+					ScsOrdenacioncolas ordenacion = new ScsOrdenacioncolas();
 					idOrdenacionNuevo = (Integer.parseInt(idOrdenacion.getNewId()) + 1);
 					// añadimos las etiquetas seleccionadas
 					ScsOrdenacioncolas key = new ScsOrdenacioncolas();
-					key.setIdordenacioncolas(idOrdenacionNuevo);
 					key.setFechamodificacion(new Date());
 					key.setUsumodificacion(usuario.getUsumodificacion());
 					key.setAlfabeticoapellidos(Short.parseShort("0"));
@@ -671,15 +668,33 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 						default:
 							break;
-						}
+						}						
 
 					}
-
-					scsOrdenacioncolasExtendsMapper.insert(key);
+					ScsOrdenacioncolasExample example = new ScsOrdenacioncolasExample();
+					example.createCriteria().andAlfabeticoapellidosEqualTo(key.getAlfabeticoapellidos()).andNumerocolegiadoEqualTo(key.getNumerocolegiado()).andAntiguedadcolaEqualTo(key.getAntiguedadcola())
+					.andFechanacimientoEqualTo(key.getFechanacimiento());
+					
+					List<ScsOrdenacioncolas> scsordenacion = scsOrdenacioncolasExtendsMapper.selectByExample(example);
+					
+					
+					
+					if(scsordenacion != null && scsordenacion.size() > 0) {
+						ordenacion = scsordenacion.get(0);
+					}else {
+						key.setIdordenacioncolas(idOrdenacionNuevo);
+						scsOrdenacioncolasExtendsMapper.insertSelective(key);
+					}
+					
+					
 					ScsTurno turno = new ScsTurno();
 					turno.setIdturno(Integer.parseInt(tarjetaPesos.getIdturno()));
 					turno.setIdinstitucion(idInstitucion);
-					turno.setIdordenacioncolas(idOrdenacionNuevo);
+					if(scsordenacion != null && scsordenacion.size() > 0) {
+						turno.setIdordenacioncolas(ordenacion.getIdordenacioncolas());
+					}else {
+						turno.setIdordenacioncolas(idOrdenacionNuevo);
+					}
 					response = scsTurnosExtendsMapper.updateByPrimaryKeySelective(turno);
 
 					respuesta.setCode(200);
@@ -735,7 +750,10 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 					if ((turnosExistentes != null && turnosExistentes.size() > 0)) {
 						response = 0;
 						error.setCode(400);
-						error.setDescription("menu.justiciaGratuita.maestros.nombreCodigoExistente");
+						error.setDescription("justiciaGratuita.oficio.turnos.yaexisteabreviatura");
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						insertResponseDTO.setError(error);
+						return insertResponseDTO;
 					} else {
 						ScsTurno turno = new ScsTurno();
 						ScsOrdenacioncolas ordenacion = new ScsOrdenacioncolas();
