@@ -21,6 +21,26 @@ public class FacturacionItem {
 	private String importePagado;
 	private String idPartidaPresupuestaria;
 	private String importePendiente;
+	private String prevision;
+	private String visible;
+	
+	@JsonProperty("visible")
+	public String getVisible() {
+		return visible;
+	}
+
+	public void setVisible(String visible) {
+		this.visible = visible;
+	}
+
+	@JsonProperty("prevision")
+	public String getPrevision() {
+		return prevision;
+	}
+
+	public void setprevision(String prevision) {
+		this.prevision = prevision;
+	}
 	
 	@JsonProperty("importePendiente")
 	public String getImportePendiente() {

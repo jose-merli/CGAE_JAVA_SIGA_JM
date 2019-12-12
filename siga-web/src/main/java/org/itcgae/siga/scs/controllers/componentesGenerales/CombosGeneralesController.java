@@ -57,8 +57,8 @@ public class CombosGeneralesController {
 	}
 	
 	@GetMapping("/partidasPresupuestarias")
-	public ResponseEntity<ComboDTO> comboPartidasPresupuestarias(HttpServletRequest request) {
-		ComboDTO response = comboService.getComboPartidasPresupuestarias(request);
+	public ResponseEntity<ComboDTO> comboPartidasPresupuestarias(String importe, HttpServletRequest request) {
+		ComboDTO response = comboService.getComboPartidasPresupuestarias(request, importe);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	

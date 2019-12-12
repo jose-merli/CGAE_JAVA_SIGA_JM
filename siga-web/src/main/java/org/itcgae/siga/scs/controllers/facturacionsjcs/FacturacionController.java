@@ -2,6 +2,8 @@ package org.itcgae.siga.scs.controllers.facturacionsjcs;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.cen.AsociarPersonaDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,6 +37,28 @@ public class FacturacionController {
 			return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.OK);
 		}else {
 			return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value="/facturacionsjcs/datosfacturacion", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FacturacionDTO> datosfacturacion(@RequestParam("idFacturacion") String idFacturacion, HttpServletRequest request){
+		FacturacionDTO response = facturacionServices.datosFacturacion(idFacturacion, request);
+		return new ResponseEntity<FacturacionDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/facturacionsjcs/historicofacturacion", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FacturacionDTO> historicoFacturacion(@RequestParam("idFacturacion") String idFacturacion, HttpServletRequest request){
+		FacturacionDTO response = facturacionServices.historicoFacturacion(idFacturacion, request);
+		return new ResponseEntity<FacturacionDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/facturacionsjcs/saveFacturacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> saveFacturacion(@RequestBody FacturacionItem facturacionItem, HttpServletRequest request) { 
+		InsertResponseDTO response = facturacionServices.saveFacturacion(facturacionItem, request);
+		if (response.getError().getCode() == 200) {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 		}
 	}
 }

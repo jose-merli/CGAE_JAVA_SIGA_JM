@@ -106,5 +106,56 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		
 		return sql.toString();
 	}
+	
+	public String datosFacturacion(String idFacturacion, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("fac.idinstitucion");
+		sql.SELECT("fac.idfacturacion");
+		sql.SELECT("fac.fechadesde");
+		sql.SELECT("fac.fechahasta");
+		sql.SELECT("fac.nombre");
+		sql.SELECT("grupo.idpartidapresupuestaria");
+		sql.SELECT("fac.regularizacion");
+		sql.SELECT("fac.importeejg");
+		sql.SELECT("fac.prevision");
+		sql.SELECT("fac.visible");
+		sql.FROM("fcs_facturacionjg fac");  
+		sql.LEFT_OUTER_JOIN("fcs_fact_grupofact_hito grupo ON (fac.idinstitucion = grupo.idinstitucion AND fac.idfacturacion = grupo.idfacturacion)");
+		sql.WHERE("fac.idinstitucion = '"+idInstitucion+"'");
+		sql.WHERE("fac.idfacturacion =  '"+idFacturacion+"'");
+		sql.ORDER_BY("fac.idinstitucion");
+		sql.ORDER_BY("fac.idfacturacion");
+	
+		return sql.toString();
+	}
+	
+	public String historicoFacturacion(String idFacturacion, String lenguaje, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("estados.idestadofacturacion");
+		sql.SELECT("rec.descripcion descripcion");
+		sql.SELECT("est.fechaestado fechaestado");
+		sql.FROM("fcs_fact_estadosfacturacion est");
+		sql.JOIN("fcs_estadosfacturacion estados on (est.idestadofacturacion = estados.idestadofacturacion)");
+		sql.JOIN("gen_recursos_catalogos rec on (estados.descripcion = rec.idrecurso)");
+		sql.WHERE("est.idinstitucion = '"+idInstitucion+"'");
+		sql.WHERE("est.idfacturacion = '"+idFacturacion+"'");
+		sql.WHERE("rec.idlenguaje = '"+lenguaje+"'");
+		sql.ORDER_BY("fechaestado DESC");
+	
+		return sql.toString();
+	}
+	
+	public String getIdFacturacion(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("NVL(MAX(IDFACTURACION),1) AS IDFACTURACION");
+		sql.FROM("FCS_FACTURACIONJG");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
 }
 
