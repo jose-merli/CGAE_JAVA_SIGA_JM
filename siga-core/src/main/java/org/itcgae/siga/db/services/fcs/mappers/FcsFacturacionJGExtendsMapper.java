@@ -10,7 +10,6 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsFacturacionJGSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsPersonajgSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -62,4 +61,9 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	@Results({ @Result(column = "IDFACTURACION", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})
 	NewIdDTO getIdFacturacion(Short idInstitucion);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getIdOrdenEstado")
+	@Results({ @Result(column = "IDORDENESTADO", property = "newId", jdbcType = JdbcType.VARCHAR)
+	})
+	NewIdDTO getIdOrdenEstado(Short idInstitucion, String idFacturacion);
 }

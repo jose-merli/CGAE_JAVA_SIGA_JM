@@ -115,13 +115,12 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("fac.fechadesde");
 		sql.SELECT("fac.fechahasta");
 		sql.SELECT("fac.nombre");
-		sql.SELECT("grupo.idpartidapresupuestaria");
+		sql.SELECT("fac.idpartidapresupuestaria");
 		sql.SELECT("fac.regularizacion");
 		sql.SELECT("fac.importeejg");
 		sql.SELECT("fac.prevision");
 		sql.SELECT("fac.visible");
 		sql.FROM("fcs_facturacionjg fac");  
-		sql.LEFT_OUTER_JOIN("fcs_fact_grupofact_hito grupo ON (fac.idinstitucion = grupo.idinstitucion AND fac.idfacturacion = grupo.idfacturacion)");
 		sql.WHERE("fac.idinstitucion = '"+idInstitucion+"'");
 		sql.WHERE("fac.idfacturacion =  '"+idFacturacion+"'");
 		sql.ORDER_BY("fac.idinstitucion");
@@ -151,9 +150,21 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		SQL sql = new SQL();
 
-		sql.SELECT("NVL(MAX(IDFACTURACION),1) AS IDFACTURACION");
+		sql.SELECT("NVL(MAX(IDFACTURACION),0) AS IDFACTURACION");
 		sql.FROM("FCS_FACTURACIONJG");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
+	
+	public String getIdOrdenEstado(Short idInstitucion, String idFacturacion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("NVL(MAX(IDORDENESTADO),1) AS IDORDENESTADO");
+		sql.FROM("FCS_FACT_ESTADOSFACTURACION");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDFACTURACION = '" + idFacturacion + "'");
 
 		return sql.toString();
 	}

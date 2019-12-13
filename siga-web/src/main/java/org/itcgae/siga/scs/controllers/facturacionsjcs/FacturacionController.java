@@ -3,7 +3,7 @@ package org.itcgae.siga.scs.controllers.facturacionsjcs;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
-import org.itcgae.siga.DTOs.cen.AsociarPersonaDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
@@ -55,6 +55,26 @@ public class FacturacionController {
 	@RequestMapping(value = "/facturacionsjcs/saveFacturacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> saveFacturacion(@RequestBody FacturacionItem facturacionItem, HttpServletRequest request) { 
 		InsertResponseDTO response = facturacionServices.saveFacturacion(facturacionItem, request);
+		if (response.getError().getCode() == 200) {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+		}
+	}
+	
+	@RequestMapping(value = "/facturacionsjcs/updateFacturacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateFacturacion(@RequestBody FacturacionItem facturacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = facturacionServices.updateFacturacion(facturacionItem, request);
+		if (response.getError().getCode() == 200) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+		}
+	}
+	
+	@RequestMapping(value = "/facturacionsjcs/ejecutarfacturacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> ejecutarFacturacion(@RequestBody String idFacturacion, HttpServletRequest request) { 
+		InsertResponseDTO response = facturacionServices.ejecutarFacturacion(idFacturacion, request);
 		if (response.getError().getCode() == 200) {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		}else {

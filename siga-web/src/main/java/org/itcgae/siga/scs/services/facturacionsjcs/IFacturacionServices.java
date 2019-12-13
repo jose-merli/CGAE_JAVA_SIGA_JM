@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.services.facturacionsjcs;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
@@ -18,4 +19,8 @@ public interface IFacturacionServices {
 	public FacturacionDTO historicoFacturacion(String idFacturacion, HttpServletRequest request);
 	
 	public InsertResponseDTO saveFacturacion(FacturacionItem facturacionItem, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateFacturacion(FacturacionItem facturacionItem, HttpServletRequest request);
+	
+	public InsertResponseDTO ejecutarFacturacion(String idFacturacion, HttpServletRequest request);
 }
