@@ -2,10 +2,10 @@ package org.itcgae.siga.scs.services.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.ProcuradorDTO;
-import org.itcgae.siga.DTO.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 
 public interface IProcuradoresService {
 	

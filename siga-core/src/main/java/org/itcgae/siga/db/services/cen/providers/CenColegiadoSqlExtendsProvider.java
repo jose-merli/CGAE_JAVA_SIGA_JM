@@ -3,8 +3,8 @@ package org.itcgae.siga.db.services.cen.providers;
 import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;

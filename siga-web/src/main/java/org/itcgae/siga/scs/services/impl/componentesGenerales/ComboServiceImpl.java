@@ -6,11 +6,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.ComboColaOrdenadaDTO;
-import org.itcgae.siga.DTO.scs.ComboColaOrdenadaItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
+import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestaria;
@@ -477,7 +477,6 @@ public class ComboServiceImpl implements ComboService {
 		LOGGER.info("comboAreas() -> Entrada al servicio para búsqueda de las areas");
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		String idLenguaje = "";
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ComboDTO comboDTO = new ComboDTO();
 		if (idInstitucion != null) {
@@ -487,8 +486,6 @@ public class ComboServiceImpl implements ComboService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
-				idLenguaje = usuario.getIdlenguaje();
 				LOGGER.info(
 						"comboAreas() / scsTipoactuacionExtendsMapper.comboAreas() -> Entrada a scsTipoactuacionExtendsMapper para obtener las actuaciones");
 

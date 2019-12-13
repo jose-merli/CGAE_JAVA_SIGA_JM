@@ -2,11 +2,11 @@ package org.itcgae.siga.scs.controllers.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.RetencionIRPFDTO;
-import org.itcgae.siga.DTO.scs.RetencionIRPFItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.RetencionIRPFDTO;
+import org.itcgae.siga.DTOs.scs.RetencionIRPFItem;
 import org.itcgae.siga.scs.services.maestros.IRetencionesIrpfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

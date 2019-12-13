@@ -2,13 +2,13 @@ package org.itcgae.siga.scs.controllers.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.AcreditacionDTO;
-import org.itcgae.siga.DTO.scs.AcreditacionItem;
-import org.itcgae.siga.DTO.scs.ModulosDTO;
-import org.itcgae.siga.DTO.scs.ModulosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.AcreditacionDTO;
+import org.itcgae.siga.DTOs.scs.AcreditacionItem;
+import org.itcgae.siga.DTOs.scs.ModulosDTO;
+import org.itcgae.siga.DTOs.scs.ModulosItem;
 import org.itcgae.siga.scs.services.maestros.IModulosYBasesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

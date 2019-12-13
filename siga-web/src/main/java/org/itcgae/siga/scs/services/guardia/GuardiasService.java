@@ -2,9 +2,12 @@ package org.itcgae.siga.scs.services.guardia;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.GuardiasDTO;
-import org.itcgae.siga.DTO.scs.GuardiasItem;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
+import org.itcgae.siga.DTOs.scs.GuardiasDTO;
+import org.itcgae.siga.DTOs.scs.GuardiasItem;
 
 public interface GuardiasService {
 
@@ -13,7 +16,21 @@ public interface GuardiasService {
 	public UpdateResponseDTO deleteGuardias(GuardiasDTO guardiasDTO, HttpServletRequest request);
 	
 	public UpdateResponseDTO activateGuardias(GuardiasDTO guardiasDTO, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
 
-	public GuardiasItem detalleGuardia(String idGuardia, HttpServletRequest request);
+	public GuardiasItem detalleGuardia(GuardiasItem guardiaTurno, HttpServletRequest request);
+
+	public InsertResponseDTO createGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
+	
+	public GuardiasItem resumenGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
+		
+	public GuardiasDTO tarjetaIncompatibilidades(String idGuardia, HttpServletRequest request);
+	
+	public ComboDTO getBaremos(String idGuardia, HttpServletRequest request);
+	
+	public DatosCalendarioItem getCalendario(String idGuardia, HttpServletRequest request);
+
+	public GuardiasItem resumenConfiguracionCola(GuardiasItem guardia, HttpServletRequest request);
 
 }

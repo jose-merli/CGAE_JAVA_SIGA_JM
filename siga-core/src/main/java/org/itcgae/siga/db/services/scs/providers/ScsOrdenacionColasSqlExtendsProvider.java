@@ -25,4 +25,13 @@ public class ScsOrdenacionColasSqlExtendsProvider extends ScsOrdenacioncolasSqlP
 		return sql.toString();
 	}
 	
+	public String getIdOrdenacion() {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDORDENACIONCOLAS) AS IDORDENACIONCOLAS");
+		sql.FROM("SCS_ORDENACIONCOLAS");
+
+		return sql.toString();
+	}
+	
 }

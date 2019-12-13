@@ -6,8 +6,9 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.scs.ComboColaOrdenadaItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsOrdenacionColasSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -29,4 +30,9 @@ public interface ScsOrdenacionColasExtendsMapper extends ScsOrdenacioncolasMappe
 		@Result(column = "POR_FILAS", property = "value", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> ordenColasEnvios(String idordenacioncolas);
+	
+	@SelectProvider(type = ScsOrdenacionColasSqlExtendsProvider.class, method = "getIdOrdenacion")
+	@Results({ @Result(column = "IDORDENACIONCOLAS", property = "newId", jdbcType = JdbcType.VARCHAR)
+	})
+	NewIdDTO getIdOrdenacion();
 }

@@ -2,10 +2,10 @@ package org.itcgae.siga.scs.controllers.justiciables;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.JusticiableBusquedaDTO;
-import org.itcgae.siga.DTO.scs.JusticiableBusquedaItem;
-import org.itcgae.siga.DTO.scs.JusticiableTelefonoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.JusticiableBusquedaDTO;
+import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
+import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
 import org.itcgae.siga.scs.services.justiciables.IBusquedaJusticiablesService;
 import org.itcgae.siga.scs.services.justiciables.IGestionJusticiableService;
 import org.springframework.beans.factory.annotation.Autowired;
