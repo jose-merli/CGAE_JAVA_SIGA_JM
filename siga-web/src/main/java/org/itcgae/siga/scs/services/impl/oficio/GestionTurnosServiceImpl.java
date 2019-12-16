@@ -1,6 +1,5 @@
 package org.itcgae.siga.scs.services.impl.oficio;
 
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,11 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-
-
 import org.itcgae.siga.DTO.scs.GuardiasDTO;
 import org.itcgae.siga.DTO.scs.GuardiasItem;
-
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -79,10 +75,10 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 	@Autowired
 	private ScsGuardiasturnoMapper scsGuardiasturnoMapper;
-	
+
 	@Autowired
 	private ScsGuardiasturnoExtendsMapper scsGuardiasturnoExtendsMapper;
-	
+
 	@Autowired
 	private ScsInscripcionguardiaMapper scsInscripcionguardiaMapper;
 
@@ -114,7 +110,6 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-
 
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
@@ -292,52 +287,65 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 					LOGGER.info(
 							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
+//					ScsTurnoExample ejemplo = new ScsTurnoExample();
+//					ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+//							.andAbreviaturaEqualTo(turnosItem.getAbreviatura()).andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()));
+//
+//					List<ScsTurno> turnosExistentes = scsTurnosExtendsMapper.selectByExample(ejemplo);
+//
+//					if ((turnosExistentes != null && turnosExistentes.size() > 0)) {
+//						response = 0;
+//						error.setCode(400);
+//						error.setDescription("justiciaGratuita.oficio.turnos.yaexisteabreviatura");
+//						updateResponseDTO.setStatus(SigaConstants.KO);
+//						updateResponseDTO.setError(error);
+//						return updateResponseDTO;
+//					} else {
 
-					ScsTurnoExample example = new ScsTurnoExample();
-					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()));
+						ScsTurnoExample example = new ScsTurnoExample();
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()));
 
-					ScsTurno scsTurno = new ScsTurno();
-					List<ScsTurno> scsTurnoLista = scsTurnosExtendsMapper.selectByExample(example);
-					scsTurno = scsTurnoLista.get(0);
+						ScsTurno scsTurno = new ScsTurno();
+						List<ScsTurno> scsTurnoLista = scsTurnosExtendsMapper.selectByExample(example);
+						scsTurno = scsTurnoLista.get(0);
 
-					scsTurno.setIdinstitucion(idInstitucion);
-					scsTurno.setAbreviatura(turnosItem.getAbreviatura());
-					scsTurno.setNombre(turnosItem.getNombre());
-					scsTurno.setCodigoext(turnosItem.getCodigoext());
-					scsTurno.setIdpartidapresupuestaria(Integer.parseInt(turnosItem.getIdpartidapresupuestaria()));
-					scsTurno.setIdgrupofacturacion(Short.parseShort(turnosItem.getIdgrupofacturacion()));
-					scsTurno.setIdarea(Short.parseShort(turnosItem.getIdarea()));
-					scsTurno.setIdmateria(Short.parseShort(turnosItem.getIdmateria()));
-					scsTurno.setIdjurisdiccion(Short.parseShort(turnosItem.getIdjurisdiccion()));
-					scsTurno.setIdzona(Short.parseShort(turnosItem.getIdzona()));
-					scsTurno.setIdsubzona(Short.parseShort(turnosItem.getIdsubzona()));
-					scsTurno.setIdtipoturno(Short.parseShort(turnosItem.getIdtipoturno()));
-					scsTurno.setFechamodificacion(new Date());
-					scsTurno.setDescripcion(turnosItem.getDescripcion());
-					scsTurno.setRequisitos(turnosItem.getRequisitos());
-					scsTurno.setUsumodificacion(usuarios.get(0).getIdusuario());
-					// scsTurno.setVisiblemovil(Short.parseShort(turnosItem.getVisiblemovil()));
-					// scsTurno.setActivarretriccionacredit(turnosItem.getActivarretriccionacredit());
-					// scsTurno.setValidarjustificaciones(turnosItem.getValidarjustificaciones());
-					// scsTurno.setValidarinscripciones(turnosItem.getValidarinscripciones());
-					// scsTurno.setLetradoactuaciones(turnosItem.getLetradoactuaciones());
-					// scsTurno.setLetradoasistencias(turnosItem.getLetradoasistencias());
-					// scsTurno.setGuardias(Short.parseShort(turnosItem.getIdguardias()));
+						scsTurno.setIdinstitucion(idInstitucion);
+						scsTurno.setAbreviatura(turnosItem.getAbreviatura());
+						scsTurno.setNombre(turnosItem.getNombre());
+						scsTurno.setCodigoext(turnosItem.getCodigoext());
+						scsTurno.setIdpartidapresupuestaria(Integer.parseInt(turnosItem.getIdpartidapresupuestaria()));
+						scsTurno.setIdgrupofacturacion(Short.parseShort(turnosItem.getIdgrupofacturacion()));
+						scsTurno.setIdarea(Short.parseShort(turnosItem.getIdarea()));
+						scsTurno.setIdmateria(Short.parseShort(turnosItem.getIdmateria()));
+						scsTurno.setIdjurisdiccion(Short.parseShort(turnosItem.getIdjurisdiccion()));
+						scsTurno.setIdzona(Short.parseShort(turnosItem.getIdzona()));
+						scsTurno.setIdsubzona(Short.parseShort(turnosItem.getIdsubzona()));
+						scsTurno.setIdtipoturno(Short.parseShort(turnosItem.getIdtipoturno()));
+						scsTurno.setFechamodificacion(new Date());
+						scsTurno.setDescripcion(turnosItem.getDescripcion());
+						scsTurno.setRequisitos(turnosItem.getRequisitos());
+						scsTurno.setUsumodificacion(usuarios.get(0).getIdusuario());
+						// scsTurno.setVisiblemovil(Short.parseShort(turnosItem.getVisiblemovil()));
+						// scsTurno.setActivarretriccionacredit(turnosItem.getActivarretriccionacredit());
+						// scsTurno.setValidarjustificaciones(turnosItem.getValidarjustificaciones());
+						// scsTurno.setValidarinscripciones(turnosItem.getValidarinscripciones());
+						// scsTurno.setLetradoactuaciones(turnosItem.getLetradoactuaciones());
+						// scsTurno.setLetradoasistencias(turnosItem.getLetradoasistencias());
+						// scsTurno.setGuardias(Short.parseShort(turnosItem.getIdguardias()));
 
-					LOGGER.info(
-							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Salida a scsTipoactuacioncostefijoMapper para buscar los costes fijos propios");
+						LOGGER.info(
+								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Salida a scsTipoactuacioncostefijoMapper para buscar los costes fijos propios");
 
-					LOGGER.info(
-							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Entrada a scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
+						LOGGER.info(
+								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Entrada a scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
 
-					response = scsTurnosExtendsMapper.updateByPrimaryKeySelective(scsTurno);
+						response = scsTurnosExtendsMapper.updateByPrimaryKeySelective(scsTurno);
 
-					LOGGER.info(
-							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
-				}
-
-				catch (Exception e) {
+						LOGGER.info(
+								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
+					
+				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
@@ -452,6 +460,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		}
 		return updateResponseDTO;
 	}
+
 	@Override
 	public UpdateResponseDTO updateConfiguracion(TurnosItem turnosItem, HttpServletRequest request) {
 		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
@@ -610,8 +619,8 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-										
-				try{
+
+				try {
 
 					NewIdDTO idOrdenacion = scsTurnosExtendsMapper.getIdOrdenacion(idInstitucion);
 					ScsOrdenacioncolas ordenacion = new ScsOrdenacioncolas();
@@ -668,31 +677,30 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 						default:
 							break;
-						}						
+						}
 
 					}
 					ScsOrdenacioncolasExample example = new ScsOrdenacioncolasExample();
-					example.createCriteria().andAlfabeticoapellidosEqualTo(key.getAlfabeticoapellidos()).andNumerocolegiadoEqualTo(key.getNumerocolegiado()).andAntiguedadcolaEqualTo(key.getAntiguedadcola())
-					.andFechanacimientoEqualTo(key.getFechanacimiento());
-					
+					example.createCriteria().andAlfabeticoapellidosEqualTo(key.getAlfabeticoapellidos())
+							.andNumerocolegiadoEqualTo(key.getNumerocolegiado())
+							.andAntiguedadcolaEqualTo(key.getAntiguedadcola())
+							.andFechanacimientoEqualTo(key.getFechanacimiento());
+
 					List<ScsOrdenacioncolas> scsordenacion = scsOrdenacioncolasExtendsMapper.selectByExample(example);
-					
-					
-					
-					if(scsordenacion != null && scsordenacion.size() > 0) {
+
+					if (scsordenacion != null && scsordenacion.size() > 0) {
 						ordenacion = scsordenacion.get(0);
-					}else {
+					} else {
 						key.setIdordenacioncolas(idOrdenacionNuevo);
 						scsOrdenacioncolasExtendsMapper.insertSelective(key);
 					}
-					
-					
+
 					ScsTurno turno = new ScsTurno();
 					turno.setIdturno(Integer.parseInt(tarjetaPesos.getIdturno()));
 					turno.setIdinstitucion(idInstitucion);
-					if(scsordenacion != null && scsordenacion.size() > 0) {
+					if (scsordenacion != null && scsordenacion.size() > 0) {
 						turno.setIdordenacioncolas(ordenacion.getIdordenacioncolas());
-					}else {
+					} else {
 						turno.setIdordenacioncolas(idOrdenacionNuevo);
 					}
 					response = scsTurnosExtendsMapper.updateByPrimaryKeySelective(turno);
@@ -727,19 +735,20 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (null != idInstitucion) {
-
+			
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"createModules() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
+			AdmUsuarios usuario = usuarios.get(0);
+			
 			LOGGER.info(
 					"createModules() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (null != usuarios && usuarios.size() > 0) {
+			if (null != usuarios && usuarios.size() >= 0) {
 				try {
 					ScsTurnoExample ejemplo = new ScsTurnoExample();
 					ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -773,6 +782,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 							ordenacion.setAntiguedadcola(Short.parseShort("0"));
 							ordenacion.setNumerocolegiado(Short.parseShort("0"));
 							ordenacion.setUsumodificacion(usuarios.get(0).getIdusuario());
+							ordenacion.setOrdenacionmanual(Short.parseShort("0"));
 							response = scsOrdenacioncolasMapper.insert(ordenacion);
 
 							turno.setIdordenacioncolas(Integer.parseInt(idOrdenacionNuevo.toString()));
@@ -845,7 +855,6 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		return insertResponseDTO;
 	}
 
-
 	public ComboColaOrdenadaDTO ordenCola(HttpServletRequest request, TurnosItem turnosItem) {
 		LOGGER.info("getPerfiles() -> Entrada al servicio para obtener los perfiles disponibles");
 
@@ -882,7 +891,6 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		return comboDTO;
 	}
 
-
 	@Override
 	public TurnosDTO busquedaColaOficio(TurnosItem turnosItem, HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
@@ -916,25 +924,24 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				comboDTO.setCombooItems(comboItems);
 
 				for (int i = 0; i < comboDTO.getCombooItems().size(); i++) {
-					if(!comboDTO.getCombooItems().get(i).getLabel().toString().equals("0")) {
+					if (!comboDTO.getCombooItems().get(i).getLabel().toString().equals("0")) {
 						busquedaOrden += comboDTO.getCombooItems().get(i).getValue() + ",";
 					}
 				}
-				if(busquedaOrden != null && busquedaOrden.length() > 0) {
+				if (busquedaOrden != null && busquedaOrden.length() > 0) {
 					busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
-				}			
-				
+				}
+
 				Date prueba = turnosItem.getFechaActual();
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String strDate = dateFormat.format(prueba);
-				if(turnosItem.getIdpersonaUltimo() != null) {
+				if (turnosItem.getIdpersonaUltimo() != null) {
 					turnosItems = scsTurnosExtendsMapper.busquedaColaOficio(turnosItem, strDate, busquedaOrden,
 							idInstitucion);
-				}else {
+				} else {
 					turnosItems = scsTurnosExtendsMapper.busquedaColaOficio2(turnosItem, strDate, busquedaOrden,
 							idInstitucion);
 				}
-				
 
 				LOGGER.info(
 						"busquedaColaOficio()  -> Salida a scsOrdenacioncolasExtendsMapper para obtener orden colas");
@@ -948,7 +955,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		LOGGER.info("busquedaColaOficio() -> Salida del servicio para obtener la busqueda Cola Oficio");
 		return turnosDTO;
 	}
-	
+
 	@Override
 	public TurnosDTO busquedaColaGuardia(TurnosItem turnosItem, HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
@@ -978,25 +985,27 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				LOGGER.info(
 						"busquedaColaOficio() -> Entrada a scsOrdenacioncolasExtendsMapper para obtener orden colas");
 				ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
-				example.createCriteria().andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno())).andIdguardiaEqualTo(Integer.parseInt(turnosItem.getIdcomboguardias())).andIdinstitucionEqualTo(idInstitucion);
+				example.createCriteria().andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()))
+						.andIdguardiaEqualTo(Integer.parseInt(turnosItem.getIdcomboguardias()))
+						.andIdinstitucionEqualTo(idInstitucion);
 				scsGuardiaLista = scsGuardiasturnoExtendsMapper.selectByExample(example);
-				
-				
+
 				ScsGuardiasturno guardiasItems = scsGuardiaLista.get(0);
-				
+
 				ComboDTO comboDTO = new ComboDTO();
 				List<ComboItem> comboItems = new ArrayList<ComboItem>();
-				comboItems = scsOrdenacioncolasExtendsMapper.ordenColasEnvios(guardiasItems.getIdordenacioncolas().toString());
+				comboItems = scsOrdenacioncolasExtendsMapper
+						.ordenColasEnvios(guardiasItems.getIdordenacioncolas().toString());
 				comboDTO.setCombooItems(comboItems);
 
 				for (int i = 0; i < comboDTO.getCombooItems().size(); i++) {
-					if(!comboDTO.getCombooItems().get(i).getLabel().toString().equals("0")) {
+					if (!comboDTO.getCombooItems().get(i).getLabel().toString().equals("0")) {
 						busquedaOrden += comboDTO.getCombooItems().get(i).getValue() + ",";
 					}
 				}
-				if(busquedaOrden != null && busquedaOrden.length() > 0) {
+				if (busquedaOrden != null && busquedaOrden.length() > 0) {
 					busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
-				}				
+				}
 				Date prueba = turnosItem.getFechaActual();
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String strDate = dateFormat.format(prueba);
@@ -1015,8 +1024,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		LOGGER.info("busquedaColaOficio() -> Salida del servicio para obtener la busqueda Cola Oficio");
 		return turnosDTO;
 	}
-	
-	
+
 	@Override
 	public UpdateResponseDTO eliminateColaOficio(TurnosDTO turnosDTO, HttpServletRequest request) {
 		LOGGER.info("deleteModules() ->  Entrada al servicio para eliminar modulos");
@@ -1047,21 +1055,22 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				try {
 
 					for (TurnosItem turnosItem : turnosDTO.getTurnosItems()) {
-						
-						ScsInscripcionturnoExample turno = new ScsInscripcionturnoExample();
-						turno.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()))
-						.andIdpersonaEqualTo(Long.parseLong(turnosItem.getIdpersona()));
 
+						ScsInscripcionturnoExample turno = new ScsInscripcionturnoExample();
+						turno.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()))
+								.andIdpersonaEqualTo(Long.parseLong(turnosItem.getIdpersona()));
 
 						LOGGER.info(
 								"deleteProcuradores() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prision");
 
-						List<ScsInscripcionturno> inscripcionturnosList = scsInscripcionturnoMapper.selectByExample(turno);
-														
+						List<ScsInscripcionturno> inscripcionturnosList = scsInscripcionturnoMapper
+								.selectByExample(turno);
+
 						if (null != inscripcionturnosList && inscripcionturnosList.size() > 0) {
-							
+
 							ScsInscripcionturno turnoupdate = inscripcionturnosList.get(0);
-									
+
 							if (turnosItem.getFechabajapersona() == null) {
 								turnoupdate.setFechabaja(new Date());
 							} else {
@@ -1075,7 +1084,6 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 							response = scsInscripcionturnoMapper.updateByPrimaryKey(turnoupdate);
 						}
-						
 
 						LOGGER.info(
 								"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Salida de scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
@@ -1107,7 +1115,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	public UpdateResponseDTO eliminateGuardia(GuardiasDTO guardiasDTO, HttpServletRequest request) {
 		LOGGER.info("deleteModules() ->  Entrada al servicio para eliminar modulos");
@@ -1138,21 +1146,22 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				try {
 
 					for (GuardiasItem guardiasItem : guardiasDTO.getGuardiaItems()) {
-						
-						ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
-						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(Integer.parseInt(guardiasItem.getIdTurno()))
-						.andIdguardiaEqualTo(Integer.parseInt(guardiasItem.getIdGuardia()));					
 
+						ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdturnoEqualTo(Integer.parseInt(guardiasItem.getIdTurno()))
+								.andIdguardiaEqualTo(Integer.parseInt(guardiasItem.getIdGuardia()));
 
 						LOGGER.info(
 								"deleteProcuradores() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prision");
 
-						List<ScsGuardiasturno> guardiasturnoList = scsGuardiasturnoExtendsMapper.selectByExample(example);
-														
+						List<ScsGuardiasturno> guardiasturnoList = scsGuardiasturnoExtendsMapper
+								.selectByExample(example);
+
 						if (null != guardiasturnoList && guardiasturnoList.size() > 0) {
-							
+
 							ScsGuardiasturno guardiasupdate = guardiasturnoList.get(0);
-									
+
 							if (guardiasItem.getFechabaja() == null) {
 								guardiasupdate.setFechabaja(new Date());
 							} else {
@@ -1166,7 +1175,6 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 							response = scsGuardiasturnoExtendsMapper.updateByPrimaryKey(guardiasupdate);
 						}
-						
 
 						LOGGER.info(
 								"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Salida de scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
@@ -1198,7 +1206,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	public UpdateResponseDTO eliminateColaGuardia(TurnosDTO turnosDTO, HttpServletRequest request) {
 		LOGGER.info("deleteModules() ->  Entrada al servicio para eliminar modulos");
@@ -1229,36 +1237,37 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				try {
 
 					for (TurnosItem turnosItem : turnosDTO.getTurnosItems()) {
-						
-						ScsInscripcionguardiaExample guardia = new ScsInscripcionguardiaExample();
-						guardia.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno())).andIdguardiaEqualTo(Integer.parseInt(turnosItem.getIdcomboguardias()))
-						.andIdpersonaEqualTo(Long.parseLong(turnosItem.getIdpersona()));
 
+						ScsInscripcionguardiaExample guardia = new ScsInscripcionguardiaExample();
+						guardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()))
+								.andIdguardiaEqualTo(Integer.parseInt(turnosItem.getIdcomboguardias()))
+								.andIdpersonaEqualTo(Long.parseLong(turnosItem.getIdpersona()));
 
 						LOGGER.info(
 								"deleteProcuradores() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prision");
 
-						List<ScsInscripcionguardia> inscripcionguardiasList = scsInscripcionguardiaMapper.selectByExample(guardia);
-														
+						List<ScsInscripcionguardia> inscripcionguardiasList = scsInscripcionguardiaMapper
+								.selectByExample(guardia);
+
 						if (null != inscripcionguardiasList && inscripcionguardiasList.size() > 0) {
-							for(int i =0;i< inscripcionguardiasList.size();i++) {						
-							ScsInscripcionguardia guardiaupdate = inscripcionguardiasList.get(i);
-									
-							if (turnosItem.getFechabajaguardia() == null) {
-								guardiaupdate.setFechabaja(new Date());
-							} else {
-								guardiaupdate.setFechabaja(null);
-							}
-							guardiaupdate.setFechamodificacion(new Date());
-							guardiaupdate.setUsumodificacion(usuarios.get(0).getIdusuario());
+							for (int i = 0; i < inscripcionguardiasList.size(); i++) {
+								ScsInscripcionguardia guardiaupdate = inscripcionguardiasList.get(i);
 
-							LOGGER.info(
-									"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Entrada a scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
+								if (turnosItem.getFechabajaguardia() == null) {
+									guardiaupdate.setFechabaja(new Date());
+								} else {
+									guardiaupdate.setFechabaja(null);
+								}
+								guardiaupdate.setFechamodificacion(new Date());
+								guardiaupdate.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-							response = scsInscripcionguardiaMapper.updateByPrimaryKey(guardiaupdate);
+								LOGGER.info(
+										"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Entrada a scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
+
+								response = scsInscripcionguardiaMapper.updateByPrimaryKey(guardiaupdate);
 							}
 						}
-						
 
 						LOGGER.info(
 								"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Salida de scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
@@ -1290,7 +1299,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	public GuardiasDTO busquedaGuardias(TurnosItem turnosItem, HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
@@ -1314,11 +1323,11 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
 
-				guardiaItems = scsGuardiasturnoExtendsMapper.searchGuardias(turnosItem, idInstitucion.toString(), usuarios.get(0).getIdlenguaje().toString());
+				guardiaItems = scsGuardiasturnoExtendsMapper.searchGuardias(turnosItem, idInstitucion.toString(),
+						usuarios.get(0).getIdlenguaje().toString());
 
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
@@ -1326,7 +1335,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 					it.setTipoDia(("Labor. " + it.getSeleccionLaborables() + ", Fest. " + it.getSeleccionFestivos())
 							.replace("null", ""));
 					return it;
-				}).collect(Collectors.toList()); 
+				}).collect(Collectors.toList());
 
 				if (guardiaItems != null) {
 					guardiasDTO.setGuardiaItems(guardiaItems);
