@@ -289,7 +289,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
 					ScsTurnoExample ejemplo = new ScsTurnoExample();
 					ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andAbreviaturaEqualTo(turnosItem.getAbreviatura());
+							.andAbreviaturaEqualTo(turnosItem.getAbreviatura()).andIdturnoNotEqualTo(Integer.parseInt(turnosItem.getIdturno()));
 
 					List<ScsTurno> turnosExistentes = scsTurnosExtendsMapper.selectByExample(ejemplo);
 
