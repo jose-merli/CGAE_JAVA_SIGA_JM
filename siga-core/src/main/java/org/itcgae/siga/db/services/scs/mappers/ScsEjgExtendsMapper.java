@@ -65,7 +65,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 		@Result(column = "TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNODES", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaapertura", property = "fechaApertura", jdbcType = JdbcType.DATE),
-		@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.DATE),
 		@Result(column = "NOMBRESOLICITANTE", property = "nombreApeSolicitante", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombreletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
@@ -73,6 +73,10 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 		@Result(column = "dictamen", property = "dictamenSing", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "resolucion", property = "resolucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "resolauto", property = "impugnacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechapresentacion", property = "fechapresentacion", jdbcType = JdbcType.DATE),
+		@Result(column = "fechalimitepresentacion", property = "fechalimitepresentacion", jdbcType = JdbcType.DATE),
+		@Result(column = "anioexpediente", property = "anioexpediente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numeroexpediente", property = "numeroexpediente", jdbcType = JdbcType.VARCHAR),
 
 
 	})

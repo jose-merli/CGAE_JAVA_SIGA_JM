@@ -7,10 +7,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.scs.EjgDTO;
 import org.itcgae.siga.DTO.scs.EjgItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsPrestacionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsPretensionExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -23,6 +27,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	@Autowired
 	private ScsEjgExtendsMapper scsEjgExtendsMapper;
+	@Autowired
+	private ScsPrestacionExtendsMapper scsPrestacionesExtendsMapper;
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
 		LOGGER.info("datosEJG() -> Entrada al servicio para obtener el colegiado");
@@ -54,5 +60,45 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
 		return ejgDTO;
+	}
+	@Override
+	public ComboDTO comboPrestaciones(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"comboPrestaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"comboPrestaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboPrestaciones() / scsTiporesolucionExtendsMapper.comboPrestaciones() -> Entrada a scsTipofundamentosExtendsMapper para obtener los combo");
+
+				comboItems = scsPrestacionesExtendsMapper.comboPrestaciones(usuarios.get(0).getIdlenguaje().toString(), idInstitucion.toString());
+
+				LOGGER.info(
+						"comboPrestaciones() / scsTiporesolucionExtendsMapper.comboPrestaciones() -> Salida a scsTipofundamentosExtendsMapper para obtener los combo");
+
+				if (comboItems != null) {
+					comboDTO.setCombooItems(comboItems);
+				}
+			}
+
+		}
+		LOGGER.info("comboTipoEJG() -> Salida del servicio para obtener los tipos ejg");
+		return comboDTO;
 	}
 }

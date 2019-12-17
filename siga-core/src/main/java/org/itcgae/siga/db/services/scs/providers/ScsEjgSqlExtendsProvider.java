@@ -1,5 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.text.SimpleDateFormat;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -11,6 +13,22 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	public String busquedaEJG(EjgItem ejgItem, String idInstitucion) {
 		String dictamenCad = "";
 		boolean indiferente = false;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); 
+		String fechaAperturaDesd; 
+		String fechaAperturaHast; 
+		String fechaEstadoDesd; 
+		String fechaEstadoHast; 
+		String fechaLimiteDesd; 
+		String fechaLimiteHast; 
+		String fechaDictamenDesd; 
+		String fechaDictamenHast;
+		String fechaImpugnacionDesd;
+		String fechaImpugnacionHast;
+		String fechaPonenteDesd;
+		String fechaPonenteHast;
+		String fechaResolucionDesd;
+		String fechaResolucionHast;
+ 
 		SQL sql = new SQL();
 		
 		String condicionAnnioNumActas = " (EXISTS (SELECT 1 FROM scs_ejg_acta ejgacta, scs_actacomision ac"
@@ -112,18 +130,31 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			     sql.WHERE ("regexp_like(EJG.NUMEROPROCEDIMIENTO,'" +  ejgItem.getProcedimiento()+"')");
         if(ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "")
                  sql.WHERE ("estado.idestadoejg =" + ejgItem.getEstadoEJG());
-        if(ejgItem.getFechaAperturaDesd() != null)      	
-                 sql.WHERE ("EJG.FECHAAPERTURA >= TO_DATE( '" + ejgItem.getFechaAperturaDesd() + "','DD/MM/RRRR')");
-        if(ejgItem.getFechaAperturaHast() != null)   
-        		 sql.WHERE ("EJG.FECHAAPERTURA <= TO_DATE( '" + ejgItem.getFechaAperturaHast() +"','DD/MM/RRRR')");
-        if(ejgItem.getFechaEstadoDesd() != null)   
-        		 sql.WHERE ("TO_CHAR(ESTADO.FECHAINICIO,'DD/MM/RRRR') >= TO_DATE( '" + ejgItem.getFechaEstadoDesd() + "','DD/MM/RRRR')");
-        if(ejgItem.getFechaEstadoHast() != null)     
-        		 sql.WHERE  ("TO_CHAR(ESTADO.FECHAINICIO,'DD/MM/RRRR') <= TO_DATE( '" + ejgItem.getFechaEstadoHast() + "','DD/MM/RRRR')");
-        if(ejgItem.getFechaLimiteDesd() != null)   
-        		 sql.WHERE  ("TO_CHAR(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') >= TO_DATE( '" + ejgItem.getFechaLimiteDesd() + "','DD/MM/RRRR')");
-        if(ejgItem.getFechaLimiteHast() != null)   
-        		 sql.WHERE  ("TO_CHAR(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') <= TO_DATE( '" + ejgItem.getFechaLimiteHast() + "','DD/MM/RRRR')");
+        if(ejgItem.getFechaAperturaDesd() != null) {
+            fechaAperturaDesd = dateFormat.format(ejgItem.getFechaAperturaDesd()); 
+            sql.WHERE ("EJG.FECHAAPERTURA >= TO_DATE( '" + fechaAperturaDesd + "','DD/MM/RRRR')");
+        }      	
+        if(ejgItem.getFechaAperturaHast() != null) {
+    		fechaAperturaHast = dateFormat.format(ejgItem.getFechaAperturaHast()); 
+   		 	sql.WHERE ("EJG.FECHAAPERTURA <= TO_DATE( '" + fechaAperturaHast +"','DD/MM/RRRR')");
+        }   
+        if(ejgItem.getFechaEstadoDesd() != null) {
+    		fechaEstadoDesd = dateFormat.format(ejgItem.getFechaEstadoDesd()); 
+    		sql.WHERE ("TO_CHAR(ESTADO.FECHAINICIO,'DD/MM/RRRR') >= TO_DATE( '" + fechaEstadoDesd + "','DD/MM/RRRR')");
+        }
+        if(ejgItem.getFechaEstadoHast() != null) {
+    		fechaEstadoHast = dateFormat.format(ejgItem.getFechaEstadoHast()); 
+   		 	sql.WHERE  ("TO_CHAR(ESTADO.FECHAINICIO,'DD/MM/RRRR') <= TO_DATE( '" + fechaEstadoHast + "','DD/MM/RRRR')");
+
+        }     
+        if(ejgItem.getFechaLimiteDesd() != null) {
+    		fechaLimiteDesd = dateFormat.format(ejgItem.getFechaLimiteDesd()); 
+   		 	sql.WHERE  ("TO_CHAR(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') >= TO_DATE( '" + fechaLimiteDesd + "','DD/MM/RRRR')");
+        }   
+        if(ejgItem.getFechaLimiteHast() != null) {
+    		fechaLimiteHast = dateFormat.format(ejgItem.getFechaLimiteHast());
+   		 	sql.WHERE  ("TO_CHAR(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') <= TO_DATE( '" + fechaLimiteHast + "','DD/MM/RRRR')");
+        }  
         if(ejgItem.getDictamen() != null) {
         	for (String dictamen : ejgItem.getDictamen()) {
         		if(!dictamen.equals("-1")) {
@@ -138,26 +169,40 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         }
         if(ejgItem.getFundamentoCalif() != null && ejgItem.getFundamentoCalif() != "")
                  sql.WHERE ("EJG.IDFUNDAMENTOCALIF = " + ejgItem.getFundamentoCalif());
-        if(ejgItem.getFechaDictamenDesd() != null)   
-                 sql.WHERE  ("TO_CHAR(EJG.FECHADICTAMEN,'DD/MM/RRRR') >= TO_DATE( '"+ ejgItem.getFechaDictamenDesd() + "','DD/MM/RRRR')");
-        if(ejgItem.getFechaDictamenHast() != null)   
-        		 sql.WHERE  ("TO_CHAR(EJG.FECHADICTAMEN,'DD/MM/RRRR') <= TO_DATE( '"+ ejgItem.getFechaDictamenHast() + "','DD/MM/RRRR')");
+        if(ejgItem.getFechaDictamenDesd() != null) {
+    		fechaDictamenDesd = dateFormat.format(ejgItem.getFechaDictamenDesd()); 
+            sql.WHERE  ("TO_CHAR(EJG.FECHADICTAMEN,'DD/MM/RRRR') >= TO_DATE( '"+ fechaDictamenDesd + "','DD/MM/RRRR')");
+        }   
+        if(ejgItem.getFechaDictamenHast() != null) {
+    		fechaDictamenHast = dateFormat.format(ejgItem.getFechaDictamenHast()); 
+   		 	sql.WHERE  ("TO_CHAR(EJG.FECHADICTAMEN,'DD/MM/RRRR') <= TO_DATE( '"+ fechaDictamenHast + "','DD/MM/RRRR')");
+        }   
         if(ejgItem.getResolucion() != null)   
                  sql.WHERE ("EJG.IDTIPORATIFICACIONEJG = " + ejgItem.getResolucion());
         if(ejgItem.getFundamentoJuridico() != null && ejgItem.getFundamentoJuridico() != "")
                  sql.WHERE ("EJG.IDFUNDAMENTOJURIDICO = " + ejgItem.getFundamentoJuridico());
-        if(ejgItem.getFechaResolucionDesd() != null)   
-                 sql.WHERE  ("TO_CHAR(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') >= TO_DATE( '"+ ejgItem.getFechaResolucionDesd() + "','DD/MM/RRRR')");
-        if(ejgItem.getFechaResolucionHast() != null)       
-        	 	 sql.WHERE  ("TO_CHAR(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') <= TO_DATE( '"+ ejgItem.getFechaResolucionHast() + "','DD/MM/RRRR')");
+        if(ejgItem.getFechaResolucionDesd() != null) {
+    		fechaResolucionDesd = dateFormat.format(ejgItem.getFechaResolucionDesd()); 
+            sql.WHERE  ("TO_CHAR(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') >= TO_DATE( '"+ fechaResolucionDesd + "','DD/MM/RRRR')");
+        }   
+        if(ejgItem.getFechaResolucionHast() != null) {
+    		fechaResolucionHast = dateFormat.format(ejgItem.getFechaResolucionHast()); 
+   	 	    sql.WHERE  ("TO_CHAR(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') <= TO_DATE( '"+ fechaResolucionHast + "','DD/MM/RRRR')");
+
+        }       
         if(ejgItem.getImpugnacion() != null && ejgItem.getImpugnacion() != "")
                  sql.WHERE ("EJG.IDTIPORESOLAUTO = " + ejgItem.getImpugnacion());
         if(ejgItem.getFundamentoImpuganacion() != null && ejgItem.getFundamentoImpuganacion() != "")
                  sql.WHERE ("EJG.IDTIPOSENTIDOAUTO = " + ejgItem.getFundamentoImpuganacion());
-        if(ejgItem.getFechaImpugnacionDesd() != null)       
-                 sql.WHERE  ("TO_CHAR(EJG.FECHAAUTO,'DD/MM/RRRR') >= TO_DATE( '"+ ejgItem.getFechaImpugnacionDesd() + "','DD/MM/RRRR')");
-        if(ejgItem.getFechaImpugnacionHast() != null)         
-        	 	 sql.WHERE  ("TO_CHAR(EJG.FECHAAUTO,'DD/MM/RRRR') <= TO_DATE( '"+ ejgItem.getFechaImpugnacionHast() + "','DD/MM/RRRR')");
+        if(ejgItem.getFechaImpugnacionDesd() != null) {
+    		fechaImpugnacionDesd = dateFormat.format(ejgItem.getFechaImpugnacionDesd()); 
+            sql.WHERE  ("TO_CHAR(EJG.FECHAAUTO,'DD/MM/RRRR') >= TO_DATE( '"+ fechaImpugnacionDesd + "','DD/MM/RRRR')");
+        }       
+        if(ejgItem.getFechaImpugnacionHast() != null) {
+    		fechaImpugnacionHast = dateFormat.format(ejgItem.getFechaImpugnacionHast()); 
+   	 	 	sql.WHERE  ("TO_CHAR(EJG.FECHAAUTO,'DD/MM/RRRR') <= TO_DATE( '"+ fechaImpugnacionHast + "','DD/MM/RRRR')");
+
+        }         
         if(ejgItem.getJuzgado() != null && ejgItem.getJuzgado() != "")
                  sql.WHERE ("EJG.JUZGADO = " + ejgItem.getJuzgado());
         if(ejgItem.getNumAnnioProcedimiento() != null && ejgItem.getNumAnnioProcedimiento() != "")
@@ -174,10 +219,14 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                  sql.WHERE ("EJG.IDRENUNCIA = " + ejgItem.getRenuncia());
         if(ejgItem.getPonente() != null && ejgItem.getPonente() != "")
                  sql.WHERE ("EJG.IDPONENTE = " + ejgItem.getPonente());
-        if(ejgItem.getFechaPonenteDesd() != null)   
-                 sql.WHERE  ("TO_CHAR(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') >= TO_DATE( '"+ ejgItem.getFechaPonenteDesd() + "','DD/MM/RRRR')");
-        if(ejgItem.getFechaPonenteHast() != null)     
-        		 sql.WHERE  ("TO_CHAR(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( '"+ ejgItem.getFechaPonenteHast() + "','DD/MM/RRRR')");
+        if(ejgItem.getFechaPonenteDesd() != null) {
+    		fechaPonenteDesd = dateFormat.format(ejgItem.getFechaPonenteDesd());
+            sql.WHERE  ("TO_CHAR(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') >= TO_DATE( '"+ fechaPonenteDesd + "','DD/MM/RRRR')");
+        }   
+        if(ejgItem.getFechaPonenteHast() != null) {
+    		fechaPonenteHast = dateFormat.format(ejgItem.getFechaPonenteHast());
+   		 	sql.WHERE  ("TO_CHAR(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( '"+ fechaPonenteHast + "','DD/MM/RRRR')");
+        }     
         if(ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
         		 sql.WHERE ("regexp_like(EJG.NUMERO_CAJG || EJG.ANIOCAJG,'" + ejgItem.getNumCAJG() +"')");
 		sql.WHERE(condicionAnnioNumActas); 
@@ -341,6 +390,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	}
 	public String datosEJG(EjgItem ejgItem, String idInstitucion) {
 		SQL sql = new SQL();
+		
 		String joinDesignaLetrado = "(select * from SCS_DESIGNASLETRADO designaletrado where designaletrado.fecharenuncia is null or"
 				+ " designaletrado.Fechadesigna = (SELECT MAX(LET2.Fechadesigna)"
 				+ " FROM SCS_DESIGNASLETRADO LET2"

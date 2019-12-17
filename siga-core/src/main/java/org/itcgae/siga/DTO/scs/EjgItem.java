@@ -2,6 +2,9 @@ package org.itcgae.siga.DTO.scs;
 
 import java.util.Date;
 
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.type.JdbcType;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EjgItem {
@@ -12,30 +15,30 @@ public class EjgItem {
     private String tipoEJG;
     private String tipoEJGColegio;
     private String creadoDesde;
-    private String fechaAperturaDesd;
-    private String fechaAperturaHast;
+    private Date fechaAperturaDesd;
+    private Date fechaAperturaHast;
     private Date fechaApertura;
 	private Date fechaModificacion;
 	private String idPersona;
     private String estadoEJG;
-    private String fechaEstadoDesd;
-    private String fechaEstadoHast;
-    private String fechaLimiteDesd;
-    private String fechaLimiteHast;
+    private Date fechaEstadoDesd;
+    private Date fechaEstadoHast;
+    private Date fechaLimiteDesd;
+    private Date fechaLimiteHast;
 
     private String[] dictamen;
     private String dictamenSing;
     private String fundamentoCalif;
-    private String fechaDictamenDesd;
-    private String fechaDictamenHast;
+    private Date fechaDictamenDesd;
+    private Date fechaDictamenHast;
     private String resolucion;
     private String fundamentoJuridico;
-    private String fechaResolucionDesd;
-    private String fechaResolucionHast;
+    private Date fechaResolucionDesd;
+    private Date fechaResolucionHast;
     private String impugnacion;
     private String fundamentoImpuganacion;
-    private String fechaImpugnacionDesd;
-    private String fechaImpugnacionHast;
+    private Date fechaImpugnacionDesd;
+    private Date fechaImpugnacionHast;
 
     private String juzgado;
     private String asunto;
@@ -51,8 +54,8 @@ public class EjgItem {
     private String annioActa;
     private String numActa;
     private String ponente;
-    private String fechaPonenteDesd;
-    private String fechaPonenteHast;
+    private Date fechaPonenteDesd;
+    private Date fechaPonenteHast;
     private String numRegRemesa;
     private String numRegRemesa1;
     private String numRegRemesa2;
@@ -71,6 +74,10 @@ public class EjgItem {
     
     private String turnoDes;
     private String nombreApeSolicitante;
+    private String anioexpediente;
+    private String numeroexpediente;
+    private Date fechapresentacion;
+    private Date fechalimitepresentacion;
 //    private String correoelectronico;
 //    private Date fechanacimiento;
 
@@ -185,32 +192,32 @@ public class EjgItem {
 	}
 	/**
 	 **/
-	public EjgItem fechaAperturaDesd(String fechaAperturaDesd) {
+	public EjgItem fechaAperturaDesd(Date fechaAperturaDesd) {
 		this.fechaAperturaDesd = fechaAperturaDesd;
 		return this;
 	}
 
 	@JsonProperty("fechaAperturaDesd")
-	public String getFechaAperturaDesd() {
+	public Date getFechaAperturaDesd() {
 		return fechaAperturaDesd;
 	}
 
-	public void setFechaAperturaDesd(String fechaAperturaDesd) {
+	public void setFechaAperturaDesd(Date fechaAperturaDesd) {
 		this.fechaAperturaDesd = fechaAperturaDesd;
 	}
 	/**
 	 **/
-	public EjgItem fechaAperturaHast(String fechaAperturaHast) {
+	public EjgItem fechaAperturaHast(Date fechaAperturaHast) {
 		this.fechaAperturaHast = fechaAperturaHast;
 		return this;
 	}
 
 	@JsonProperty("fechaAperturaHast")
-	public String getFechaAperturaHast() {
+	public Date getFechaAperturaHast() {
 		return fechaAperturaHast;
 	}
 
-	public void setFechaAperturaHast(String fechaAperturaHast) {
+	public void setFechaAperturaHast(Date fechaAperturaHast) {
 		this.fechaAperturaHast = fechaAperturaHast;
 	}
 	/**
@@ -261,62 +268,62 @@ public class EjgItem {
 	}
 	/**
 	 **/
-	public EjgItem fechaEstadoDesd(String fechaEstadoDesd) {
+	public EjgItem fechaEstadoDesd(Date fechaEstadoDesd) {
 		this.fechaEstadoDesd = fechaEstadoDesd;
 		return this;
 	}
 
 	@JsonProperty("fechaEstadoDesd")
-	public String getFechaEstadoDesd() {
+	public Date getFechaEstadoDesd() {
 		return fechaEstadoDesd;
 	}
 
-	public void setFechaEstadoDesd(String fechaEstadoDesd) {
+	public void setFechaEstadoDesd(Date fechaEstadoDesd) {
 		this.fechaEstadoDesd = fechaEstadoDesd;
 	}
 	/**
 	 **/
-	public EjgItem fechaEstadoHast(String fechaEstadoHast) {
+	public EjgItem fechaEstadoHast(Date fechaEstadoHast) {
 		this.fechaEstadoHast = fechaEstadoHast;
 		return this;
 	}
 
 	@JsonProperty("fechaEstadoHast")
-	public String getFechaEstadoHast() {
+	public Date getFechaEstadoHast() {
 		return fechaEstadoHast;
 	}
 
-	public void setFechaEstadoHast(String fechaEstadoHast) {
+	public void setFechaEstadoHast(Date fechaEstadoHast) {
 		this.fechaEstadoHast = fechaEstadoHast;
 	}
 	/**
 	 **/
-	public EjgItem fechaLimiteDesd(String fechaLimiteDesd) {
+	public EjgItem fechaLimiteDesd(Date fechaLimiteDesd) {
 		this.fechaLimiteDesd = fechaLimiteDesd;
 		return this;
 	}
 
 	@JsonProperty("fechaLimiteDesd")
-	public String getFechaLimiteDesd() {
+	public Date getFechaLimiteDesd() {
 		return fechaLimiteDesd;
 	}
 
-	public void setFechaLimiteDesd(String fechaLimiteDesd) {
+	public void setFechaLimiteDesd(Date fechaLimiteDesd) {
 		this.fechaLimiteDesd = fechaLimiteDesd;
 	}
 	/**
 	 **/
-	public EjgItem fechaLimiteHast(String fechaLimiteHast) {
+	public EjgItem fechaLimiteHast(Date fechaLimiteHast) {
 		this.fechaLimiteHast = fechaLimiteHast;
 		return this;
 	}
 
 	@JsonProperty("fechaLimiteHast")
-	public String getFechaLimiteHast() {
+	public Date getFechaLimiteHast() {
 		return fechaLimiteHast;
 	}
 
-	public void setFechaLimiteHast(String fechaLimiteHast) {
+	public void setFechaLimiteHast(Date fechaLimiteHast) {
 		this.fechaLimiteHast = fechaLimiteHast;
 	}
 	/**
@@ -351,32 +358,32 @@ public class EjgItem {
 	}
 	/**
 	 **/
-	public EjgItem fechaDictamenDesd(String fechaDictamenDesd) {
+	public EjgItem fechaDictamenDesd(Date fechaDictamenDesd) {
 		this.fechaDictamenDesd = fechaDictamenDesd;
 		return this;
 	}
 
 	@JsonProperty("fechaDictamenDesd")
-	public String getFechaDictamenDesd() {
+	public Date getFechaDictamenDesd() {
 		return fechaDictamenDesd;
 	}
 
-	public void setFechaDictamenDesd(String fechaDictamenDesd) {
+	public void setFechaDictamenDesd(Date fechaDictamenDesd) {
 		this.fechaDictamenDesd = fechaDictamenDesd;
 	}
 	/**
 	 **/
-	public EjgItem fechaDictamenHast(String fechaDictamenHast) {
+	public EjgItem fechaDictamenHast(Date fechaDictamenHast) {
 		this.fechaDictamenHast = fechaDictamenHast;
 		return this;
 	}
 
 	@JsonProperty("fechaDictamenHast")
-	public String getFechaDictamenHast() {
+	public Date getFechaDictamenHast() {
 		return fechaDictamenHast;
 	}
 
-	public void setFechaDictamenHast(String fechaDictamenHast) {
+	public void setFechaDictamenHast(Date fechaDictamenHast) {
 		this.fechaDictamenHast = fechaDictamenHast;
 	}
 	/**
@@ -411,32 +418,32 @@ public class EjgItem {
 	}
 	/**
 	 **/
-	public EjgItem fechaResolucionDesd(String fechaResolucionDesd) {
+	public EjgItem fechaResolucionDesd(Date fechaResolucionDesd) {
 		this.fechaResolucionDesd = fechaResolucionDesd;
 		return this;
 	}
 
 	@JsonProperty("fechaResolucionDesd")
-	public String getFechaResolucionDesd() {
+	public Date getFechaResolucionDesd() {
 		return fechaResolucionDesd;
 	}
 
-	public void setFechaResolucionDesd(String fechaResolucionDesd) {
+	public void setFechaResolucionDesd(Date fechaResolucionDesd) {
 		this.fechaResolucionDesd = fechaResolucionDesd;
 	}
 	/**
 	 **/
-	public EjgItem fechaResolucionHast(String fechaResolucionHast) {
+	public EjgItem fechaResolucionHast(Date fechaResolucionHast) {
 		this.fechaResolucionHast = fechaResolucionHast;
 		return this;
 	}
 
 	@JsonProperty("fechaResolucionHast")
-	public String getFechaResolucionHast() {
+	public Date getFechaResolucionHast() {
 		return fechaResolucionHast;
 	}
 
-	public void setFechaResolucionHast(String fechaResolucionHast) {
+	public void setFechaResolucionHast(Date fechaResolucionHast) {
 		this.fechaResolucionHast = fechaResolucionHast;
 	}
 	/**
@@ -471,32 +478,32 @@ public class EjgItem {
 	}
 	/**
 	 **/
-	public EjgItem fechaImpugnacionDesd(String fechaImpugnacionDesd) {
+	public EjgItem fechaImpugnacionDesd(Date fechaImpugnacionDesd) {
 		this.fechaImpugnacionDesd = fechaImpugnacionDesd;
 		return this;
 	}
 
 	@JsonProperty("fechaImpugnacionDesd")
-	public String getFechaImpugnacionDesd() {
+	public Date getFechaImpugnacionDesd() {
 		return fechaImpugnacionDesd;
 	}
 
-	public void setFechaImpugnacionDesd(String fechaImpugnacionDesd) {
+	public void setFechaImpugnacionDesd(Date fechaImpugnacionDesd) {
 		this.fechaImpugnacionDesd = fechaImpugnacionDesd;
 	}
 	/**
 	 **/
-	public EjgItem fechaImpugnacionHast(String fechaImpugnacionHast) {
+	public EjgItem fechaImpugnacionHast(Date fechaImpugnacionHast) {
 		this.fechaImpugnacionHast = fechaImpugnacionHast;
 		return this;
 	}
 
 	@JsonProperty("fechaImpugnacionHast")
-	public String getFechaImpugnacionHast() {
+	public Date getFechaImpugnacionHast() {
 		return fechaImpugnacionHast;
 	}
 
-	public void setFechaImpugnacionHast(String fechaImpugnacionHast) {
+	public void setFechaImpugnacionHast(Date fechaImpugnacionHast) {
 		this.fechaImpugnacionHast = fechaImpugnacionHast;
 	}
 	/**
@@ -696,32 +703,32 @@ public class EjgItem {
 	}
 	/**
 	 **/
-	public EjgItem fechaPonenteDesd(String fechaPonenteDesd) {
+	public EjgItem fechaPonenteDesd(Date fechaPonenteDesd) {
 		this.fechaPonenteDesd = fechaPonenteDesd;
 		return this;
 	}
 
 	@JsonProperty("fechaPonenteDesd")
-	public String getFechaPonenteDesd() {
+	public Date getFechaPonenteDesd() {
 		return fechaPonenteDesd;
 	}
 
-	public void setFechaPonenteDesd(String fechaPonenteDesd) {
+	public void setFechaPonenteDesd(Date fechaPonenteDesd) {
 		this.fechaPonenteDesd = fechaPonenteDesd;
 	}
 	/**
 	 **/
-	public EjgItem fechaPonenteHast(String fechaPonenteHast) {
+	public EjgItem fechaPonenteHast(Date fechaPonenteHast) {
 		this.fechaPonenteHast = fechaPonenteHast;
 		return this;
 	}
 
 	@JsonProperty("fechaPonenteHast")
-	public String getFechaPonenteHast() {
+	public Date getFechaPonenteHast() {
 		return fechaPonenteHast;
 	}
 
-	public void setFechaPonenteHast(String fechaPonenteHast) {
+	public void setFechaPonenteHast(Date fechaPonenteHast) {
 		this.fechaPonenteHast = fechaPonenteHast;
 	}
 	/**
@@ -979,6 +986,66 @@ public class EjgItem {
 
 	public void setDictamenSing(String dictamenSing) {
 		this.dictamenSing = dictamenSing;
+	}
+	/**
+	 **/
+	public EjgItem anioexpediente(String anioexpediente) {
+		this.anioexpediente = anioexpediente;
+		return this;
+	}
+
+	@JsonProperty("anioexpediente")
+	public String getAnioexpediente() {
+		return anioexpediente;
+	}
+
+	public void setAnioexpediente(String anioexpediente) {
+		this.anioexpediente = anioexpediente;
+	}
+	/**
+	 **/
+	public EjgItem numeroexpediente(String numeroexpediente) {
+		this.numeroexpediente = numeroexpediente;
+		return this;
+	}
+
+	@JsonProperty("numeroexpediente")
+	public String getNumeroexpediente() {
+		return numeroexpediente;
+	}
+
+	public void setNumeroexpediente(String numeroexpediente) {
+		this.numeroexpediente = numeroexpediente;
+	}
+	/**
+	 **/
+	public EjgItem fechapresentacion(Date fechapresentacion) {
+		this.fechapresentacion = fechapresentacion;
+		return this;
+	}
+
+	@JsonProperty("fechapresentacion")
+	public Date getFechapresentacion() {
+		return fechapresentacion;
+	}
+
+	public void setFechapresentacion(Date fechapresentacion) {
+		this.fechapresentacion = fechapresentacion;
+	}
+	/**
+	 **/
+	public EjgItem fechalimitepresentacion(Date fechalimitepresentacion) {
+		this.fechalimitepresentacion = fechalimitepresentacion;
+		return this;
+	}
+
+	@JsonProperty("fechalimitepresentacion")
+	public Date getFechalimitepresentacion() {
+		return fechalimitepresentacion;
+	}
+
+	public void setFechalimitepresentacion(Date fechalimitepresentacion) {
+		this.fechalimitepresentacion = fechalimitepresentacion;
 	}
 
 //	/**

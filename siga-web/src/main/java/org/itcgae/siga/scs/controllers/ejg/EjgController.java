@@ -94,6 +94,11 @@ public class EjgController {
 		ComboDTO response = busquedaEJG.comboPonente(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	@RequestMapping(value = "/filtros-ejg/comboPrestaciones",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboPrestaciones(HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboPrestaciones(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 	@RequestMapping(value = "/filtros-ejg/comboTurnosTipo",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboTurnosTipo(HttpServletRequest request, String idTurno) {
 		ComboDTO response = busquedaEJG.comboTurnosTipo(request, idTurno);
