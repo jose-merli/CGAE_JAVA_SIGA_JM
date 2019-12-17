@@ -25,7 +25,7 @@ public interface ScsSojExtendsMapper extends ScsSojMapper{
 			@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR), 
 			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR) 
 	})
-	List<AsuntosJusticiableItem> searchClaveSoj(AsuntosJusticiableItem asuntosJusticiableItem);
+	List<AsuntosClaveJusticiableItem> searchClaveSoj(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo);
 	
 	@SelectProvider(type = ScsSojSqlExtendsProvider.class, method = "getAsuntoTipoSoj")
 	@Results({ 

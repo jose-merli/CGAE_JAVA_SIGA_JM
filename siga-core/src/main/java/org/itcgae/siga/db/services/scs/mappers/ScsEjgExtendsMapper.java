@@ -39,13 +39,13 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper{
 	AsuntosEjgItem getAsuntoTipoEjg(AsuntosClaveJusticiableItem asuntoClave, String idLenguaje);
 	
     @SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "searchClaveAsuntosEJG")
-    @Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.DATE),
+    @Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
             @Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
             @Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
             @Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR), 
             @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR) 
     })
-    List<AsuntosJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem);
+    List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo);
 
 }

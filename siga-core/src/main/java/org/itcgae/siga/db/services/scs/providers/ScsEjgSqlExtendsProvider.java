@@ -1,8 +1,11 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.text.SimpleDateFormat;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
@@ -54,9 +57,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 	
-    public String searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem) {
+    public String searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax) {
         SQL sql = new SQL();
-
+        SQL sqlOrder = new SQL();
+        
+        sqlOrder.SELECT("*");
         sql.SELECT("EJG.idinstitucion, EJG.anio,EJG.numero,to_char(EJG.IDTIPOEJG) AS clave, '' as rol, 'E' as tipo");
         sql.FROM("SCS_EJG EJG");
         sql.INNER_JOIN("SCS_PERSONAJG PERSONA ON (EJG.IDPERSONAJG = PERSONA.IDPERSONA AND PERSONA.IDINSTITUCION = EJG.IDINSTITUCION)");
@@ -65,7 +70,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 " AND ESTADO.IDTIPOEJG = ESTADO2.IDTIPOEJG AND ESTADO.ANIO = ESTADO2.ANIO AND ESTADO.NUMERO = ESTADO2.NUMERO AND ESTADO2.FECHABAJA IS NULL)))");
         sql.WHERE("EJG.idinstitucion = " + asuntosJusticiableItem.getIdInstitucion());
         
-        if(asuntosJusticiableItem.getAnio() != null) {
+        if(asuntosJusticiableItem.getAnio() != null && asuntosJusticiableItem.getAnio() != "") {
             sql.WHERE("EJG.ANIO = "+asuntosJusticiableItem.getAnio());
         }        
         if(asuntosJusticiableItem.getNumero() != null) {
@@ -78,19 +83,27 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
             sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = "+asuntosJusticiableItem.getIdGuardia());
         }
         if(asuntosJusticiableItem.getFechaAperturaDesde() != null) {
-            sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') >= TO_DATE("+asuntosJusticiableItem.getFechaAperturaDesde()+")");
+        	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			String fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
+            sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') >= TO_DATE('"+fecha+"','DD/MM/RRRR')");
         }
         if(asuntosJusticiableItem.getFechaAperturaHasta() != null) {
-            sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') <= TO_DATE("+asuntosJusticiableItem.getFechaAperturaHasta()+")");
+        	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			String fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaHasta());
+            sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') <= TO_DATE('"+fecha+"','DD/MM/RRRR')");
         }
-        sql.WHERE("(TRANSLATE(LOWER( REPLACE(CONCAT(apellido1,apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+asuntosJusticiableItem.getApellidos()+"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
-        sql.WHERE("(TRANSLATE(LOWER( NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+asuntosJusticiableItem.getNombre()+"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
-    
+        
+        if(asuntosJusticiableItem.getApellidos() != null && asuntosJusticiableItem.getApellidos() != "") 
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("REPLACE(CONCAT(apellido1,apellido2), ' ', '')", asuntosJusticiableItem.getApellidos().replaceAll("\\s+","")));
+			if(asuntosJusticiableItem.getNombre() != null && asuntosJusticiableItem.getNombre() != "")
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE", asuntosJusticiableItem.getNombre()));
+			
+			
         if(asuntosJusticiableItem.getIdPersonaColegiado() != null) {
             sql.WHERE("EJG.IDPERSONA = "+asuntosJusticiableItem.getIdPersonaColegiado());
         }
-        if(asuntosJusticiableItem.getNif() != null) {
-            sql.WHERE("PERSONA.NIF = "+asuntosJusticiableItem.getNif());
+        if(asuntosJusticiableItem.getNif() != null && asuntosJusticiableItem.getNif() != "") {
+            sql.WHERE("upper(PERSONA.NIF) like upper('%"+asuntosJusticiableItem.getNif()+"%')");
         }
         if(asuntosJusticiableItem.getIdTipoEjg() != null) {
             sql.WHERE("EJG.IDTIPOEJG = "+asuntosJusticiableItem.getIdTipoEjg());
@@ -101,7 +114,14 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         if(asuntosJusticiableItem.getIdEstadoPorEjg() != null) {
             sql.WHERE("ESTADO.IDESTADOPOREJG = "+asuntosJusticiableItem.getIdEstadoPorEjg());
         }
-        return sql.toString();
+        sqlOrder.FROM("(" + sql + " )");
+		if (tamMax != null) {
+			Integer tamMaxNumber = tamMax + 1;
+			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+		}
+
+		return sqlOrder.toString();
+//        return sql.toString();
     }
 
 

@@ -80,12 +80,6 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-	@GetMapping("/guardias")
-	public ResponseEntity<ComboDTO> comboGuardias(HttpServletRequest request, String idTurno) {
-		ComboDTO response = comboService.comboGuardias(request, idTurno);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-	}
-	
 	@GetMapping("/ordenCola")
 	ResponseEntity<ComboColaOrdenadaDTO> ordenCola(HttpServletRequest request, String idordenacioncolas) {
 		
@@ -112,6 +106,12 @@ public class CombosGeneralesController {
 	@GetMapping("/comboEstadoEjg")
 	public ResponseEntity<ComboDTO> comboEstadoEjg(HttpServletRequest request) {
 		ComboDTO response = comboService.comboEstadoEjg(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/guardias")
+	public ResponseEntity<ComboDTO> comboGuardias(HttpServletRequest request, String idTurno) {
+		ComboDTO response = comboService.comboGuardias(request, idTurno);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
