@@ -274,7 +274,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 			insertResponse.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
-			insertResponse.setId(""+idFacturacion);
+			insertResponse.setId(Integer.toString(idFacturacion));
 			insertResponse.setStatus(SigaConstants.OK);
 		}
 
@@ -351,7 +351,6 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 			updateResponse.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
-			updateResponse.setId(""+idFacturacion);
 			updateResponse.setStatus(SigaConstants.OK);
 		}
 
@@ -438,7 +437,6 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 			insertResponse.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
-			insertResponse.setId(""+idFacturacion);
 			insertResponse.setStatus(SigaConstants.OK);
 		}
 
@@ -512,7 +510,6 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 			insertResponse.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
-			insertResponse.setId(""+idFacturacion);
 			insertResponse.setStatus(SigaConstants.OK);
 		}
 
@@ -598,7 +595,6 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 			insertResponse.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
-			insertResponse.setId(""+idFacturacion);
 			insertResponse.setStatus(SigaConstants.OK);
 		}
 
