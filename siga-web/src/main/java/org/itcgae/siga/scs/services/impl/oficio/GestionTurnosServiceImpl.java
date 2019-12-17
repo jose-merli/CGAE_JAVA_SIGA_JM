@@ -287,20 +287,20 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 					LOGGER.info(
 							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
-//					ScsTurnoExample ejemplo = new ScsTurnoExample();
-//					ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-//							.andAbreviaturaEqualTo(turnosItem.getAbreviatura()).andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()));
-//
-//					List<ScsTurno> turnosExistentes = scsTurnosExtendsMapper.selectByExample(ejemplo);
-//
-//					if ((turnosExistentes != null && turnosExistentes.size() > 0)) {
-//						response = 0;
-//						error.setCode(400);
-//						error.setDescription("justiciaGratuita.oficio.turnos.yaexisteabreviatura");
-//						updateResponseDTO.setStatus(SigaConstants.KO);
-//						updateResponseDTO.setError(error);
-//						return updateResponseDTO;
-//					} else {
+					ScsTurnoExample ejemplo = new ScsTurnoExample();
+					ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andAbreviaturaEqualTo(turnosItem.getAbreviatura());
+
+					List<ScsTurno> turnosExistentes = scsTurnosExtendsMapper.selectByExample(ejemplo);
+
+					if ((turnosExistentes != null && turnosExistentes.size() > 0)) {
+						response = 0;
+						error.setCode(400);
+						error.setDescription("justiciaGratuita.oficio.turnos.yaexisteabreviatura");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						updateResponseDTO.setError(error);
+						return updateResponseDTO;
+					} else {
 
 						ScsTurnoExample example = new ScsTurnoExample();
 						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -344,7 +344,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
-					
+					}
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
