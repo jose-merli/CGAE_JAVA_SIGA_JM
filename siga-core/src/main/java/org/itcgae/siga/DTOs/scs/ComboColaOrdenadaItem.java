@@ -1,5 +1,8 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ComboColaOrdenadaItem {
 
 	private String numero;

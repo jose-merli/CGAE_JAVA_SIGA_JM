@@ -1,4 +1,4 @@
-package org.itcgae.siga.scs.service;
+package org.itcgae.siga.scs.services.oficio;
 
 import javax.servlet.http.HttpServletRequest;
 

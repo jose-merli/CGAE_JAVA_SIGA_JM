@@ -119,7 +119,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 	public String getIdProcedimiento(Short idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("MAX(IDPROCEDIMIENTO) AS IDPROCEDIMIENTO");
+		sql.SELECT("MAX(to_number(IDPROCEDIMIENTO)) AS IDPROCEDIMIENTO");
 		sql.FROM("SCS_PROCEDIMIENTOS");
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
 

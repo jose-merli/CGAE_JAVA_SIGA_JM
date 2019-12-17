@@ -53,4 +53,12 @@ public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 	})
 	NewIdDTO getIdJuzgado(Short idInstitucion);
 	
+	
+	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "comboJuzgado")
+	@Results({
+		@Result(column = "IDJUZGADO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> comboJuzgado(Short idLenguaje, Short idInstitucion);
+	
 }

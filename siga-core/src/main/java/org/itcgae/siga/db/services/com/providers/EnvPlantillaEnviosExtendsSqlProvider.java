@@ -23,7 +23,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 			sql.WHERE("IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
 		}
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("") ){
-			sql.WHERE(filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
 		}	
 		
 		return sql.toString();
@@ -119,7 +119,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 			sql.WHERE("IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
 		}
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("") ){
-			sql.WHERE(filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
 		}
 		if(!UtilidadesString.esCadenaVacia(idPlantilla)){
 			sql.WHERE("idPlantillaEnvios = '" + idPlantilla +"'");

@@ -1,4 +1,4 @@
-package org.itcgae.siga.scs.services.impl;
+package org.itcgae.siga.scs.services.impl.oficio;
 
 import java.util.Date;
 import java.util.List;
@@ -23,8 +23,8 @@ import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsOrdenacionColasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
-import org.itcgae.siga.scs.service.IGestionTurnosService;
 import org.itcgae.siga.scs.services.impl.maestros.FichaPartidasJudicialesServiceImpl;
+import org.itcgae.siga.scs.services.oficio.IGestionTurnosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

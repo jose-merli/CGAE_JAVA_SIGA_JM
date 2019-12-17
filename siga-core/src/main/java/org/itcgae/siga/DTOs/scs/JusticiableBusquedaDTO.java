@@ -1,11 +1,9 @@
 package org.itcgae.siga.DTOs.scs;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
