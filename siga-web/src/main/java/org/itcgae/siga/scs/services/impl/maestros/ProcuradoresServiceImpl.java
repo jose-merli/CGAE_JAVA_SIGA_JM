@@ -326,7 +326,7 @@ public class ProcuradoresServiceImpl implements IProcuradoresService {
 
 					if (procuradorList != null && procuradorList.size() > 0) {
 						error.setCode(400);
-						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
+						error.setDescription("messages.jgr.maestros.procuradores.existeProcuradorMismoNombre");
 
 					} else {
 
