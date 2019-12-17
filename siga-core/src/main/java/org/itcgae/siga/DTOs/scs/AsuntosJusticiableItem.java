@@ -14,7 +14,7 @@ public class AsuntosJusticiableItem {
 	private Date fecha;
 	private String interesado;
 	private String datosInteres;
-	private Date anio;
+	private String anio;
 	private String numero;
 	private String clave;
 	private String rol;
@@ -26,6 +26,9 @@ public class AsuntosJusticiableItem {
 	private String idTipoSoj;
 	private String idTipoDesigna;
 	private String idEstadoDesigna;
+	private String anioProcedimiento; 
+	private String numProcedimiento;
+	private String idJuzgado;
 	private String nig;
 	private String nif;
 	private String idPersonaColegiado; 
@@ -55,15 +58,43 @@ public class AsuntosJusticiableItem {
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
+	
+	@JsonProperty("anioProcedimiento")
+	public String getAnioProcedimiento() {
+		return anioProcedimiento;
+	}
 
-	public Date getAnio() {
+	public void setAnioProcedimiento(String anioProcedimiento) {
+		this.anioProcedimiento = anioProcedimiento;
+	}
+	@JsonProperty("numProcedimiento")
+	public String getNumProcedimiento() {
+		return numProcedimiento;
+	}
+
+	public void setNumProcedimiento(String numProcedimiento) {
+		this.numProcedimiento = numProcedimiento;
+	}
+	
+	@JsonProperty("idJuzgado")
+	public String getIdJuzgado() {
+		return idJuzgado;
+	}
+
+	public void setIdJuzgado(String idJuzgado) {
+		this.idJuzgado = idJuzgado;
+	}
+
+	@JsonProperty("anio")
+	public String getAnio() {
 		return anio;
 	}
 
-	public void setAnio(Date anio) {
+	public void setAnio(String anio) {
 		this.anio = anio;
 	}
 
+	@JsonProperty("numero")
 	public String getNumero() {
 		return numero;
 	}
@@ -71,7 +102,7 @@ public class AsuntosJusticiableItem {
 	public void setNumero(String numero) {
 		this.numero = numero;
 	}
-
+	@JsonProperty("clave")
 	public String getClave() {
 		return clave;
 	}
@@ -79,7 +110,7 @@ public class AsuntosJusticiableItem {
 	public void setClave(String clave) {
 		this.clave = clave;
 	}
-
+	@JsonProperty("nombre")
 	public String getNombre() {
 		return nombre;
 	}
@@ -87,7 +118,7 @@ public class AsuntosJusticiableItem {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-
+	@JsonProperty("apellidos")
 	public String getApellidos() {
 		return apellidos;
 	}
@@ -95,7 +126,7 @@ public class AsuntosJusticiableItem {
 	public void setApellidos(String apellidos) {
 		this.apellidos = apellidos;
 	}
-
+	@JsonProperty("tipo")
 	public String getTipo() {
 		return tipo;
 	}
@@ -103,7 +134,7 @@ public class AsuntosJusticiableItem {
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
-
+	@JsonProperty("idTurno")
 	public String getIdTurno() {
 		return idTurno;
 	}
@@ -111,7 +142,7 @@ public class AsuntosJusticiableItem {
 	public void setIdTurno(String idTurno) {
 		this.idTurno = idTurno;
 	}
-
+	@JsonProperty("idGuardia")
 	public String getIdGuardia() {
 		return idGuardia;
 	}
@@ -119,7 +150,7 @@ public class AsuntosJusticiableItem {
 	public void setIdGuardia(String idGuardia) {
 		this.idGuardia = idGuardia;
 	}
-
+	@JsonProperty("idTipoSoj")
 	public String getIdTipoSoj() {
 		return idTipoSoj;
 	}
@@ -127,7 +158,7 @@ public class AsuntosJusticiableItem {
 	public void setIdTipoSoj(String idTipoSoj) {
 		this.idTipoSoj = idTipoSoj;
 	}
-
+	@JsonProperty("idTipoDesigna")
 	public String getIdTipoDesigna() {
 		return idTipoDesigna;
 	}
@@ -135,7 +166,7 @@ public class AsuntosJusticiableItem {
 	public void setIdTipoDesigna(String idTipoDesigna) {
 		this.idTipoDesigna = idTipoDesigna;
 	}
-
+	@JsonProperty("idEstadoDesigna")
 	public String getIdEstadoDesigna() {
 		return idEstadoDesigna;
 	}
@@ -143,7 +174,7 @@ public class AsuntosJusticiableItem {
 	public void setIdEstadoDesigna(String idEstadoDesigna) {
 		this.idEstadoDesigna = idEstadoDesigna;
 	}
-
+	@JsonProperty("nig")
 	public String getNig() {
 		return nig;
 	}
@@ -151,7 +182,7 @@ public class AsuntosJusticiableItem {
 	public void setNig(String nig) {
 		this.nig = nig;
 	}
-
+	@JsonProperty("nif")
 	public String getNif() {
 		return nif;
 	}
@@ -159,7 +190,7 @@ public class AsuntosJusticiableItem {
 	public void setNif(String nif) {
 		this.nif = nif;
 	}
-
+	@JsonProperty("idPersonaColegiado")
 	public String getIdPersonaColegiado() {
 		return idPersonaColegiado;
 	}
@@ -167,7 +198,7 @@ public class AsuntosJusticiableItem {
 	public void setIdPersonaColegiado(String idPersonaColegiado) {
 		this.idPersonaColegiado = idPersonaColegiado;
 	}
-
+	@JsonProperty("idTipoEjg")
 	public String getIdTipoEjg() {
 		return idTipoEjg;
 	}
@@ -175,7 +206,7 @@ public class AsuntosJusticiableItem {
 	public void setIdTipoEjg(String idTipoEjg) {
 		this.idTipoEjg = idTipoEjg;
 	}
-
+	@JsonProperty("idTipoEjColegio")
 	public String getIdTipoEjColegio() {
 		return idTipoEjColegio;
 	}
@@ -183,7 +214,7 @@ public class AsuntosJusticiableItem {
 	public void setIdTipoEjColegio(String idTipoEjColegio) {
 		this.idTipoEjColegio = idTipoEjColegio;
 	}
-
+	@JsonProperty("idEstadoPorEjg")
 	public String getIdEstadoPorEjg() {
 		return idEstadoPorEjg;
 	}
@@ -191,7 +222,7 @@ public class AsuntosJusticiableItem {
 	public void setIdEstadoPorEjg(String idEstadoPorEjg) {
 		this.idEstadoPorEjg = idEstadoPorEjg;
 	}
-
+	@JsonProperty("idTipoAsistencia")
 	public String getIdTipoAsistencia() {
 		return idTipoAsistencia;
 	}
@@ -199,7 +230,7 @@ public class AsuntosJusticiableItem {
 	public void setIdTipoAsistencia(String idTipoAsistencia) {
 		this.idTipoAsistencia = idTipoAsistencia;
 	}
-
+	@JsonProperty("numeroProcedimiento")
 	public String getNumeroProcedimiento() {
 		return numeroProcedimiento;
 	}
@@ -207,7 +238,7 @@ public class AsuntosJusticiableItem {
 	public void setNumeroProcedimiento(String numeroProcedimiento) {
 		this.numeroProcedimiento = numeroProcedimiento;
 	}
-
+	@JsonProperty("numeroDiligencia")
 	public String getNumeroDiligencia() {
 		return numeroDiligencia;
 	}
@@ -215,7 +246,7 @@ public class AsuntosJusticiableItem {
 	public void setNumeroDiligencia(String numeroDiligencia) {
 		this.numeroDiligencia = numeroDiligencia;
 	}
-
+	@JsonProperty("comisaria")
 	public String getComisaria() {
 		return comisaria;
 	}
@@ -223,7 +254,7 @@ public class AsuntosJusticiableItem {
 	public void setComisaria(String comisaria) {
 		this.comisaria = comisaria;
 	}
-
+	@JsonProperty("juzgado")
 	public String getJuzgado() {
 		return juzgado;
 	}
@@ -231,7 +262,7 @@ public class AsuntosJusticiableItem {
 	public void setJuzgado(String juzgado) {
 		this.juzgado = juzgado;
 	}
-
+	@JsonProperty("fechaAperturaDesde")
 	public Date getFechaAperturaDesde() {
 		return fechaAperturaDesde;
 	}
@@ -239,7 +270,7 @@ public class AsuntosJusticiableItem {
 	public void setFechaAperturaDesde(Date fechaAperturaDesde) {
 		this.fechaAperturaDesde = fechaAperturaDesde;
 	}
-
+	@JsonProperty("fechaAperturaHasta")
 	public Date getFechaAperturaHasta() {
 		return fechaAperturaHasta;
 	}
@@ -250,6 +281,7 @@ public class AsuntosJusticiableItem {
 
 	/**
 	 **/
+	
 	public AsuntosJusticiableItem asunto(String asunto) {
 		this.asunto = asunto;
 		return this;

@@ -26,7 +26,7 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 			@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR), 
 			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR) 
 	})
-	List<AsuntosJusticiableItem> searchClaveAsistencia(AsuntosJusticiableItem asuntosJusticiableItem);
+	List<AsuntosClaveJusticiableItem> searchClaveAsistencia(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo);
 	
 
 	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "getAsuntoTipoAsistencia")

@@ -1,7 +1,6 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTOs.cen.PartidasJudicialesItem;
 import org.itcgae.siga.db.mappers.CenPartidojudicialSqlProvider;
 
 public class CenPartidojudicialSqlExtendsProvider extends CenPartidojudicialSqlProvider {
@@ -21,7 +20,7 @@ public class CenPartidojudicialSqlExtendsProvider extends CenPartidojudicialSqlP
 		sql.INNER_JOIN("CEN_INFLUENCIA INF ON PAR.IDPARTIDO = INF.IDPARTIDO");
 
 		sql.WHERE("INF.IDINSTITUCION = '" + String.valueOf(idInstitucion) + "'");
-
+		sql.ORDER_BY("PAR.NOMBRE");
 		return sql.toString();
 	}
 

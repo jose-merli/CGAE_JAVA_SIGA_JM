@@ -4,7 +4,6 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.ComisariaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsComisariaSqlProvider;
-import org.itcgae.siga.security.UserTokenUtils;
 
 public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 
@@ -44,7 +43,11 @@ public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 		}
 
 		if (comisariaItem.getCodigoExt() != null && comisariaItem.getCodigoExt() != "") {
-			sql.WHERE("UPPER(comisaria.codigoext) LIKE UPPER('%" + comisariaItem.getCodigoExt() + "%')");
+			
+			String columna = "COMISARIA.CODIGOEXT";
+			String cadena = comisariaItem.getCodigoExt();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}
 
 		if (comisariaItem.getIdPoblacion() != null && comisariaItem.getIdPoblacion() != "") {
