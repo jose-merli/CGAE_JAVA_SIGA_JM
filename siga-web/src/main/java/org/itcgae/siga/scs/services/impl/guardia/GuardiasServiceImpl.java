@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.services.impl.guardia;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -14,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -22,10 +23,14 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
+import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ScsGrupoguardia;
+import org.itcgae.siga.db.entities.ScsGrupoguardiaExample;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
@@ -478,7 +483,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						LOGGER.info(
 								"updateGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear Configuracion de Cola de guardias");
-						guardia.setPorgrupos((Boolean.valueOf(guardiasItem.getPorGrupos()) ? "1":"0"));
+						guardia.setPorgrupos((Boolean.valueOf(guardiasItem.getPorGrupos()) ? "1" : "0"));
 						guardia.setIdordenacioncolas(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
 						// ROTAR COMPONENTES?
 						guardia.setNumeroletradosguardia(Integer.valueOf(guardiasItem.getLetradosGuardia()));
@@ -856,13 +861,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return datos.size() > 0 ? datos.get(0) : null;
 	}
 
-	public GuardiasDTO searchColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request) {
+	@Override
+	public InscripcionGuardiaDTO searchColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request) {
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		GuardiasDTO guardiaDTO = new GuardiasDTO();
 		String ordenaciones = "";
+		InscripcionGuardiaDTO inscritos = new InscripcionGuardiaDTO();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -875,72 +881,195 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			LOGGER.info(
 					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			try {
 
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
-				ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
-				example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
-						.andIdtipoguardiaEqualTo(Short.valueOf(guardiasItem.getIdGuardia()));
+				if (usuarios != null && usuarios.size() > 0) {
+					LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+					ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
+							.andIdtipoguardiaEqualTo(Short.valueOf(guardiasItem.getIdGuardia()));
 
-				List<ScsGuardiasturno> guardias = scsGuardiasturnoExtendsMapper.selectByExample(example);
-				String ultimo = "";
-				
-				if (guardias != null && !guardias.isEmpty())
-					ultimo = guardias.get(0).getIdpersonaUltimo().toString();
+					List<ScsGuardiasturno> guardias = scsGuardiasturnoExtendsMapper.selectByExample(example);
+					String ultimo = "";
 
-				ScsOrdenacioncolasExample example2 = new ScsOrdenacioncolasExample();
-				example2.createCriteria()
-						.andIdordenacioncolasEqualTo(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
+					if (guardias != null && !guardias.isEmpty())
+						ultimo = guardias.get(0).getIdpersonaUltimo().toString();
 
-				List<ScsOrdenacioncolas> cola = scsOrdenacionColasExtendsMapper.selectByExample(example2);
-				Map<Short, String> mapilla = new HashMap(); 
-				Map<Short, String> mapa = new TreeMap<Short, String>(Collections.reverseOrder());
-				if (cola != null && !cola.isEmpty()) {
-					if (cola.get(0).getAntiguedadcola() > 0) 
-						mapilla.put(cola.get(0).getAntiguedadcola(), "ANTIGUEDADCOLA,");
-					 else if (cola.get(0).getAntiguedadcola() < 0) 
-						mapilla.put(cola.get(0).getAntiguedadcola(), "ANTIGUEDADCOLA desc,");
-					
-					if (cola.get(0).getAlfabeticoapellidos() > 0) 
-						mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS,");
-					 else if (cola.get(0).getAlfabeticoapellidos() < 0) 
-						mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS desc,");
+					ScsOrdenacioncolasExample example2 = new ScsOrdenacioncolasExample();
+					example2.createCriteria()
+							.andIdordenacioncolasEqualTo(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
 
-					if (cola.get(0).getFechanacimiento() > 0) 
-						mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO,");
+					List<ScsOrdenacioncolas> cola = scsOrdenacionColasExtendsMapper.selectByExample(example2);
+					Map<Short, String> mapilla = new HashMap();
+					Map<Short, String> mapa = new TreeMap<Short, String>(Collections.reverseOrder());
+					if (cola != null && !cola.isEmpty()) {
+						if (cola.get(0).getAntiguedadcola() > 0)
+							mapilla.put(cola.get(0).getAntiguedadcola(), "ANTIGUEDADCOLA,");
+						else if (cola.get(0).getAntiguedadcola() < 0)
+							mapilla.put(cola.get(0).getAntiguedadcola(), "ANTIGUEDADCOLA desc,");
 
-					else if (cola.get(0).getFechanacimiento() < 0) 
-						mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO DESC,");
+						if (cola.get(0).getAlfabeticoapellidos() > 0)
+							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS,");
+						else if (cola.get(0).getAlfabeticoapellidos() < 0)
+							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS desc,");
 
-					
-					if (cola.get(0).getOrdenacionmanual() > 0) 
-						mapilla.put(cola.get(0).getOrdenacionmanual(), "ORDENACIONMANUAL,");
-					else if (cola.get(0).getOrdenacionmanual() < 0) 
-						mapilla.put(cola.get(0).getOrdenacionmanual(), "ORDENACIONMANUAL desc,");
-				
-					
-					if (cola.get(0).getNumerocolegiado() > 0) 
-						mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO,");
-					else if (cola.get(0).getNumerocolegiado() < 0) 
-						mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO desc,");
-					
-					mapa.putAll(mapilla);
-					
-					mapa.entrySet().stream().forEach(it -> {
-						ordenaciones.concat(it.getValue());
-					});
-					if(!ordenaciones.isEmpty()) ordenaciones.substring(0,ordenaciones.length()-1);
+						if (cola.get(0).getFechanacimiento() > 0)
+							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO,");
+
+						else if (cola.get(0).getFechanacimiento() < 0)
+							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO desc,");
+
+						if (cola.get(0).getOrdenacionmanual() > 0)
+							mapilla.put(cola.get(0).getOrdenacionmanual(), "ORDENACIONMANUAL,");
+						else if (cola.get(0).getOrdenacionmanual() < 0)
+							mapilla.put(cola.get(0).getOrdenacionmanual(), "ORDENACIONMANUAL desc,");
+
+						if (cola.get(0).getNumerocolegiado() > 0)
+							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO,");
+						else if (cola.get(0).getNumerocolegiado() < 0)
+							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO desc,");
+
+						mapa.putAll(mapilla);
+						if (mapa.size() > 0)
+							for (String orden : mapa.values()) {
+								ordenaciones += orden;
+							}
+						if (!ordenaciones.isEmpty())
+							ordenaciones.substring(0, ordenaciones.length() - 1);
+					}
+
+					if (!UtilidadesString.esCadenaVacia(ultimo))
+						ultimo = "WHERE\r\n" + "		idpersona =" + ultimo;
+
+					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
+							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo,
+							ordenaciones, idInstitucion.toString());
+					inscritos.setInscripcionesItem(colaGuardia);
+
+					LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
 				}
-
-				List<InscripcionItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
-						guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(),
-						guardiasItem.getLetradosIns().toString(), ultimo,ordenaciones, idInstitucion.toString());
-
-				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+			} catch (Exception e) {
+				LOGGER.error(e);
 			}
 		}
-		return guardiaDTO;
+		return inscritos;
 	}
 
+	@Override
+	public InsertResponseDTO insertColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request) {
+		LOGGER.info("createPrision() ->  Entrada al servicio para crear una nueva prisión");
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		long idGuardia = 0;
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+//
+//					ScsGrupoguardiaExample scsGrupoguardiaExample = new ScsGrupoguardiaExample();
+//					scsGrupoguardiaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).
+//						andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).
+//						andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia())).
+//						andNumerogrupoEqualsTo(guardiasItem.getPorGrupos());
+					
+					
+					
+				} catch (Exception e) {
+					LOGGER.error(e);
+				}
+			}
+		}
+		return insertResponseDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO updateUltimoCola(GuardiasItem guardiasItem, HttpServletRequest request) {
+		LOGGER.info("updateGuardia() ->  Entrada al servicio para editar guardia");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 2;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateUltimoCola() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateUltimoCola() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					ScsGuardiasturno guardia = new ScsGuardiasturno();
+					guardia.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
+					guardia.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
+					guardia.setIdinstitucion(idInstitucion);
+
+					LOGGER.info(
+							"updateUltimoCola() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear DatosGenerales de guardias");
+
+					guardia.setIdpersonaUltimo(Long.valueOf(guardiasItem.getIdPersonaUltimo()));
+					
+					if(!UtilidadesString.esCadenaVacia(guardiasItem.getIdGrupoUltimo()))
+						guardia.setIdgrupoguardiaUltimo(Long.valueOf(guardiasItem.getIdGrupoUltimo()));
+					
+					response = scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
+
+				} catch (Exception e) {
+					LOGGER.error(e);
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else if (response == 1) {
+			error.setCode(200);
+			updateResponseDTO.setStatus(SigaConstants.OK);
+
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("updateUltimoCola() -> Salida del servicio para editar guardia");
+
+		return updateResponseDTO;
+
+	}
 }

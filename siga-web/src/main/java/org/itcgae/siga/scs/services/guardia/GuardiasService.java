@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
+import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
 
 public interface GuardiasService {
 
@@ -32,5 +33,12 @@ public interface GuardiasService {
 	public DatosCalendarioItem getCalendario(String idGuardia, HttpServletRequest request);
 
 	public GuardiasItem resumenConfiguracionCola(GuardiasItem guardia, HttpServletRequest request);
+	
+	public InscripcionGuardiaDTO searchColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
+
+	public InsertResponseDTO insertColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateUltimoCola(GuardiasItem guardiasItem, HttpServletRequest request);
+
 
 }

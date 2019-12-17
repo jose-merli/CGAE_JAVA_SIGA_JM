@@ -9,12 +9,12 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
+import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,6 +92,18 @@ public class GuardiaController {
 	ResponseEntity<DatosCalendarioItem> getCalendario(@RequestBody String idGuardia, HttpServletRequest request){
 		DatosCalendarioItem response= guardiasService.getCalendario(idGuardia,request);
 		return new ResponseEntity<DatosCalendarioItem>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/busquedaGuardia/getColaGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InscripcionGuardiaDTO> getColaGuardia(@RequestBody GuardiasItem guardia, HttpServletRequest request){
+		InscripcionGuardiaDTO response= guardiasService.searchColaGuardia(guardia, request);
+		return new ResponseEntity<InscripcionGuardiaDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/busquedaGuardia/ultimo", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateUltimoCola(@RequestBody GuardiasItem guardia, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasService.updateUltimoCola(guardia, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 }

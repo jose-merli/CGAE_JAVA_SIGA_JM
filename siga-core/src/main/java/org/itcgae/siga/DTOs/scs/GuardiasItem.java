@@ -13,6 +13,7 @@ public class GuardiasItem {
 	private String idTurnoVinculada;
 	private String idOrdenacionColas;
 	private String idPersonaUltimo;
+	private String idGrupoUltimo;
 	private String idTipoGuardia;
 	private String turno;
 	private String nombre;
@@ -52,6 +53,13 @@ public class GuardiasItem {
 	
 	
 	
+	
+	public String getIdGrupoUltimo() {
+		return idGrupoUltimo;
+	}
+	public void setIdGrupoUltimo(String idGrupoUltimo) {
+		this.idGrupoUltimo = idGrupoUltimo;
+	}
 	public String getRotarComponentes() {
 		return rotarComponentes;
 	}

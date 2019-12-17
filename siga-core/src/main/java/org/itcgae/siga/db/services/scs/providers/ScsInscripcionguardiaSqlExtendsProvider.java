@@ -16,7 +16,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		
 		sql.SELECT("ROWNUM AS orden_cola,\r\n" + 
 				"	consulta_total.*\r\n" + 
-				"FROM (WITH tabla_nueva AS (\r\n" + 
+				"FROM (WITH tabla_nueva AS (\r\n" + // A partir de este parentesis es donde va la query sin ultimo. Y sino, se pone todo.
 				"	SELECT\r\n" + 
 				"		consulta2.*\r\n" + 
 				"	FROM\r\n" + 
@@ -29,9 +29,9 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				"			SELECT\r\n" + 
 				"				(CASE\r\n" + 
 				"					WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-				"					AND TRUNC(Ins.Fechavalidacion) <= NVL("+fecha+", Ins.Fechavalidacion)\r\n" + 
+				"					AND TRUNC(Ins.Fechavalidacion) <= NVL('"+fecha+"', Ins.Fechavalidacion)\r\n" + 
 				"					AND (Ins.Fechabaja IS NULL\r\n" + 
-				"					OR TRUNC(Ins.Fechabaja) > NVL("+fecha+", '01/01/1900')) THEN '1'\r\n" + 
+				"					OR TRUNC(Ins.Fechabaja) > NVL('"+fecha+"', '01/01/1900')) THEN '1'\r\n" + 
 				"					ELSE '0'\r\n" + 
 				"				END) Activo,\r\n" + 
 				"				Ins.Idinstitucion,\r\n" + 
@@ -103,12 +103,12 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				"				AND Gua.Idturno = "+idTurno+"\r\n" + 
 				"				AND Gua.Idguardia = "+idGuardia+"\r\n" + 
 				"			ORDER BY\r\n" + 
+								ordenaciones+
 				"				numeroGrupo,\r\n" + 
 				"				ordengrupo,\r\n" + 
-								ordenaciones+
 				"				NOMBRE,\r\n" + 
 				"				Ins.FECHASUSCRIPCION,\r\n" + 
-				"				Ins.Idpersona) consulta"
+				"				Ins.Idpersona) consulta "
 				+ "WHERE\r\n" + 
 				"			activo = 1) consulta2),\r\n" + 
 				"	tabla_nueva2 AS (\r\n" + 
@@ -124,9 +124,9 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				"			SELECT\r\n" + 
 				"				(CASE\r\n" + 
 				"					WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-				"					AND TRUNC(Ins.Fechavalidacion) <= NVL("+fecha+", Ins.Fechavalidacion)\r\n" + 
+				"					AND TRUNC(Ins.Fechavalidacion) <= NVL('"+fecha+"', Ins.Fechavalidacion)\r\n" + 
 				"					AND (Ins.Fechabaja IS NULL\r\n" + 
-				"					OR TRUNC(Ins.Fechabaja) > NVL("+fecha+", '01/01/1900')) THEN '1'\r\n" + 
+				"					OR TRUNC(Ins.Fechabaja) > NVL('"+fecha+"', '01/01/1900')) THEN '1'\r\n" + 
 				"					ELSE '0'\r\n" + 
 				"				END) Activo,\r\n" + 
 				"				Ins.Idinstitucion,\r\n" + 
@@ -198,18 +198,14 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				"				AND Gua.Idturno = "+idTurno+"\r\n" + 
 				"				AND Gua.Idguardia = "+idGuardia+"\r\n" + 
 				"			ORDER BY\r\n" + 
+				"				"+ordenaciones+"\r\n" + 
 				"				numeroGrupo,\r\n" + 
 				"				ordengrupo,\r\n" + 
-				"-------Aquí se incluirá el orden seleccionado---------------------------\r\n" + 
-				"				"+ordenaciones+",\r\n" + 
-				"------------------------------------------------------------------------\r\n" + 
 				"				NOMBRE,\r\n" + 
 				"				Ins.FECHASUSCRIPCION,\r\n" + 
 				"				Ins.Idpersona) consulta3\r\n" + 
 				"		WHERE\r\n" + 
-				"			activo = 1) consulta4\r\n" + 
-				
-				"----------Si la consulta que se especifica al principio del documento devuelve un valor, sse añadirá este filtro con dicho valor, si no se eliminará la condición--------------------------\r\n" + 
+				"			activo = 1) consulta4\r\n" + 				
 				"	"+elUltimo+")\r\n" + 
 				"	SELECT\r\n" + 
 				"		*\r\n" + 
