@@ -81,4 +81,24 @@ public class FacturacionController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 		}
 	}
+	
+	@RequestMapping(value = "/facturacionsjcs/reabrirfacturacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> reabrirFacturacion(@RequestBody String idFacturacion, HttpServletRequest request) { 
+		InsertResponseDTO response = facturacionServices.reabrirFacturacion(idFacturacion, request);
+		if (response.getError().getCode() == 200) {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+		}
+	}
+	
+	@RequestMapping(value = "/facturacionsjcs/simularfacturacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> simularFacturacion(@RequestBody String idFacturacion, HttpServletRequest request) { 
+		InsertResponseDTO response = facturacionServices.simularFacturacion(idFacturacion, request);
+		if (response.getError().getCode() == 200) {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+		}
+	}
 }

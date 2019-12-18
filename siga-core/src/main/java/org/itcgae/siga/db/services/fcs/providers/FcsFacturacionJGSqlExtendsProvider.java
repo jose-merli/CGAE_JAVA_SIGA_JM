@@ -58,9 +58,9 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 			sql2.WHERE("EST.IDESTADOFACTURACION = " + facturacionItem.getIdEstado());
 		}
 
-		// FILTRO NOMBRE
-		if (!UtilidadesString.esCadenaVacia(facturacionItem.getNombre())) {
-			sql2.WHERE("(REGEXP_LIKE(FAC.NOMBRE, '" + facturacionItem.getNombre() + "'))");
+		//FILTRO NOMBRE
+		if(!UtilidadesString.esCadenaVacia(facturacionItem.getNombre())) {
+			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("FAC.NOMBRE", facturacionItem.getNombre()));
 		}
 
 		// FILTRO POR CONCEPTOS DE FACTURACIÓN Y POR GRUPOS DE FACTURACIÓN Y PARTIDA

@@ -23,4 +23,8 @@ public interface IFacturacionServices {
 	public UpdateResponseDTO updateFacturacion(FacturacionItem facturacionItem, HttpServletRequest request);
 	
 	public InsertResponseDTO ejecutarFacturacion(String idFacturacion, HttpServletRequest request);
+	
+	public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request);
+	
+	public InsertResponseDTO simularFacturacion(String idFacturacion, HttpServletRequest request);
 }

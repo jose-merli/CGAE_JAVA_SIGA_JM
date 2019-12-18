@@ -93,16 +93,16 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	        	AdmUsuarios usuario = usuarios.get(0);
 	            usuario.setIdinstitucion(idInstitucion);
 	                
-	            LOGGER.info("buscarFacturaciones() / fcsFacturacionJGExtendsMapper.buscarFacturaciones() -> Entrada a fcsFacturacionJGExtendsMapper para obtener las facturaciones");
+	            //LOGGER.info("buscarFacturaciones() / fcsFacturacionJGExtendsMapper.buscarFacturaciones() -> Entrada a fcsFacturacionJGExtendsMapper para obtener las facturaciones");
 	            //response = fcsFacturacionJGExtendsMapper.eliminarFacturaciones(idFactura, idInstitucion.toString()); 	            
 	            
-	            if (response > 0){
-	            	facturacionesDelete.setStatus(SigaConstants.OK);
-	            }else{
-	            	facturacionesDelete.setStatus(SigaConstants.KO);
-	            }
+//	            if (response > 0){
+//	            	facturacionesDelete.setStatus(SigaConstants.OK);
+//	            }else{
+//	            	facturacionesDelete.setStatus(SigaConstants.KO);
+//	            }
 	           
-	            LOGGER.info("buscarFacturaciones() / fcsFacturacionJGExtendsMapper.buscarFacturaciones() -> Salida a fcsFacturacionJGExtendsMapper para obtener las facturaciones");
+	            //LOGGER.info("eliminarFacturaciones() / fcsFacturacionJGExtendsMapper.buscarFacturaciones() -> Salida a fcsFacturacionJGExtendsMapper para obtener las facturaciones");
 	        }else {
 	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
 	        }
@@ -110,7 +110,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
 	    }
 	        
-	    LOGGER.info("getLabel() -> Salida del servicio para obtener las facturaciones");
+	    LOGGER.info("getLabel() -> Salida del servicio para eliminar las facturaciones");
 	    
 	    return facturacionesDelete;	
 	}
@@ -167,10 +167,10 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	        	AdmUsuarios usuario = usuarios.get(0);
 	            usuario.setIdinstitucion(idInstitucion);
 	            idLenguaje=usuario.getIdlenguaje();    
-	            LOGGER.info("datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los historicos de estados de la facturacón");
+	            LOGGER.info("historicoFacturacion() / fcsFacturacionJGExtendsMapper.historicoFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los historicos de estados de la facturacón");
 	            List<FacturacionItem> facturacionItem = fcsFacturacionJGExtendsMapper.historicoFacturacion(idFacturacion, idLenguaje, idInstitucion.toString());
 	            facturaciones.setFacturacionItem(facturacionItem);
-	            LOGGER.info("datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener los historicos de estados de la facturación");
+	            LOGGER.info("historicoFacturacion() / fcsFacturacionJGExtendsMapper.historicoFacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener los historicos de estados de la facturación");
 	        }else {
 	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
 	        }
@@ -274,7 +274,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 			insertResponse.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
-			insertResponse.setId(""+idFacturacion);
+			insertResponse.setId(Integer.toString(idFacturacion));
 			insertResponse.setStatus(SigaConstants.OK);
 		}
 
@@ -311,7 +311,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	            FcsFacturacionjg record = new FcsFacturacionjg();
 	            
 	            try {
-	               	LOGGER.info("updateFacturacion() / fcsFacturacionJGExtendsMapper.updateFacturacion() -> Actualizar datos en fcsFacturacionjg");
+	               	LOGGER.info("updateFacturacion() -> Actualizar datos en fcsFacturacionjg");
 	               	idFacturacion = Integer.parseInt(facturacionItem.getIdFacturacion());
 	               	int idPartida = Integer.parseInt(facturacionItem.getIdPartidaPresupuestaria());
 	               	
@@ -329,7 +329,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		           		            
 		            response = fcsFacturacionJGExtendsMapper.updateByPrimaryKeySelective(record);
 		            
-		            LOGGER.info("updateFacturacion() / fcsFacturacionJGExtendsMapper.updateFacturacion() -> Salida actualizar datos en fcsFacturacionjg");
+		            LOGGER.info("updateFacturacion() -> Salida actualizar datos en fcsFacturacionjg");
 		            
 	            }catch(Exception e){
 	            	LOGGER.error("ERROR: FacturacionServicesImpl.updateFacturacion() > al actualizar los datos de la facturacion.", e);
@@ -351,7 +351,6 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 			updateResponse.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
-			updateResponse.setId(""+idFacturacion);
 			updateResponse.setStatus(SigaConstants.OK);
 		}
 
@@ -384,12 +383,12 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	            FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
 	            FcsFacturacionjg record2 = new FcsFacturacionjg();
 	           
-	            LOGGER.info("fcsFacturacionJGExtendsMapper.ejecutarFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para poner la facturacion como programada");
+	            LOGGER.info("ejecutarFacturacion() -> Entrada para poner la facturacion como programada");
 	            
 	            //GUARDAR DATOAS DE LA FACTURACION
 	            try {
 	            	//ACTUALIZAMOS LA PREVISION DE LA TABLA FCS_FACTURACIONJG
-	            	LOGGER.info("fcsFacturacionJGExtendsMapper.ejecutarFacturacion() -> Actualizar la prevision");
+	            	LOGGER.info("ejecutarFacturacion() -> Actualizar la prevision");
 	            	
 		            record2.setPrevision("0");
 		            record2.setIdfacturacion(Integer.parseInt(idFacturacion));
@@ -397,14 +396,89 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		           		            
 		            response = fcsFacturacionJGExtendsMapper.updateByPrimaryKeySelective(record2);
 		            
-		            LOGGER.info("fcsFacturacionJGExtendsMapper.ejecutarFacturacion() -> Salida actualizar la prevision");
+		            LOGGER.info("ejecutarFacturacion() -> Salida actualizar la prevision");
 		            
 	            	//SETEAMOS LOS DATOS Y HACEMOS INSERT DEL ESTADO
-	            	LOGGER.info("fcsFacturacionJGExtendsMapper.ejecutarFacturacion() -> Guardar datos en fcsFactEstadosfacturacion");
+	            	LOGGER.info("ejecutarFacturacion() -> Guardar datos en fcsFactEstadosfacturacion");
 	            	NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(idInstitucion, idFacturacion);	
-	            	Short idOrdenEstado = (short) Integer.parseInt(idP.getNewId()+1);
+	            	Short idOrdenEstado = (short) (Integer.parseInt(idP.getNewId())+1);
+	            	Short idEstado = 50;
 	            	
 		            record.setIdinstitucion(idInstitucion);
+		            record.setIdfacturacion(Integer.parseInt(idFacturacion));
+		            record.setIdestadofacturacion(idEstado);
+		            record.setFechaestado(new Date());
+		            record.setFechamodificacion(new Date());
+		            record.setUsumodificacion(usuario.getIdusuario());
+		            record.setIdordenestado(idOrdenEstado);
+		           		            
+		            response = fcsFactEstadosfacturacionMapper.insert(record);
+		            
+		            LOGGER.info("ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
+	            }catch(Exception e){
+	            	LOGGER.error("ERROR: FacturacionServicesImpl.ejecutarFacturacion() >  Al poner la facturacion como programada.", e);
+	            	error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					insertResponse.setStatus(SigaConstants.KO);
+	            }            
+	            
+	            LOGGER.info("ejecutarFacturacion() -> Salida poner la facturacion como programada");
+	        }else {
+	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+	        }
+	    }else {
+	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
+	    }
+	        
+	    LOGGER.info("getLabel() -> Salida del servicio para poner la facturacion como programada");
+	    
+	    if (response == 0 && error.getDescription() == null) {
+			error.setCode(400);
+			insertResponse.setStatus(SigaConstants.KO);
+		} else if (error.getCode() == null) {
+			error.setCode(200);
+			insertResponse.setStatus(SigaConstants.OK);
+		}
+
+	    insertResponse.setError(error);
+		
+		return insertResponse;
+	}
+	
+	@Override
+	public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponse = new InsertResponseDTO();
+		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+		insertResponse.setError(error);
+		int response = 0;
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	            
+	        if(null != usuarios && usuarios.size() > 0) {
+	        	AdmUsuarios usuario = usuarios.get(0);
+	            usuario.setIdinstitucion(idInstitucion);
+	            FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
+	           
+	            LOGGER.info("reabrirFacturacion() -> Entrada para reabrir la facturacion");
+	            
+	            //GUARDAR DATOAS DE LA FACTURACION
+	            try {
+	            	//SETEAMOS LOS DATOS Y HACEMOS INSERT DEL ESTADO
+	            	LOGGER.info("reabrirFacturacion() -> Guardar datos para reabrir en fcsFactEstadosfacturacion");
+	            	NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(idInstitucion, idFacturacion);	
+	            	Short idOrdenEstado = (short) (Integer.parseInt(idP.getNewId())+1);
+	            	Short idEstado = 10;
+	            	
+		            record.setIdinstitucion(idInstitucion);
+		            record.setIdestadofacturacion(idEstado);
 		            record.setIdfacturacion(Integer.parseInt(idFacturacion));
 		            record.setFechaestado(new Date());
 		            record.setFechamodificacion(new Date());
@@ -413,15 +487,15 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		           		            
 		            response = fcsFactEstadosfacturacionMapper.insert(record);
 		            
-		            LOGGER.info("fcsFacturacionJGExtendsMapper.ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
+		            LOGGER.info("reabrirFacturacion() -> Salida guardar datos para reabrir en fcsFactEstadosfacturacion");
 	            }catch(Exception e){
-	            	LOGGER.error("ERROR: FacturacionServicesImpl.ejecutarFacturacion() >  Al poner la facturacion como programada.", e);
+	            	LOGGER.error("ERROR: FacturacionServicesImpl.reabrirFacturacion() >  Al reabrir la facturacion.", e);
 	            	error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
 					insertResponse.setStatus(SigaConstants.KO);
 	            }            
 	            
-	            LOGGER.info("fcsFacturacionJGExtendsMapper.ejecutarFacturacion() -> Salida a fcsFacturacionJGExtendsMapper para poner la facturacion como programada");
+	            LOGGER.info("reabrirFacturacion() -> Salida para reabrir la facturacion");
 	        }else {
 	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
 	        }
@@ -429,14 +503,98 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
 	    }
 	        
-	    LOGGER.info("getLabel() -> Salida del servicio para guardar las facturaciones");
+	    LOGGER.info("getLabel() -> Salida del servicio para rabrir las facturaciones");
 	    
 	    if (response == 0 && error.getDescription() == null) {
 			error.setCode(400);
 			insertResponse.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
-			insertResponse.setId(""+idFacturacion);
+			insertResponse.setStatus(SigaConstants.OK);
+		}
+
+	    insertResponse.setError(error);
+		
+		return insertResponse;
+	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO simularFacturacion(String idFacturacion, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponse = new InsertResponseDTO();
+		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+		insertResponse.setError(error);
+		int response = 0;
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	            
+	        if(null != usuarios && usuarios.size() > 0) {
+	        	AdmUsuarios usuario = usuarios.get(0);
+	            usuario.setIdinstitucion(idInstitucion);
+	            FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
+	            FcsFacturacionjg record2 = new FcsFacturacionjg();
+	           
+	            LOGGER.info("simularFacturacion() -> Entrada para simular la facturacion");
+	            
+	            //GUARDAR DATOAS DE LA FACTURACION
+	            try {
+	            	//PRIMERO ACTUALIZAMOS FCS_FACTURACIONJG EL CAMPO PREVISION A 1
+	            	//SETEAMOS LOS DATOS Y HACEMOS UPDATE
+	            	LOGGER.info("simularFacturacion() -> Actualizar prevision para simular facturacion");
+	            	
+		            record2.setPrevision("1");
+		            record2.setIdfacturacion(Integer.parseInt(idFacturacion));
+		            record2.setIdinstitucion(idInstitucion);
+		           		            
+		            response = fcsFacturacionJGExtendsMapper.updateByPrimaryKeySelective(record2);
+		            
+		            LOGGER.info("simularFacturacion() -> Salida actualizar prevision para simular facturacion");
+	            	
+	            	//SETEAMOS LOS DATOS Y HACEMOS INSERT DEL ESTADO
+	            	LOGGER.info("simularFacturacion() -> Guardar datos para simular facturacion");
+	            	NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(idInstitucion, idFacturacion);	
+	            	Short idOrdenEstado = (short) (Integer.parseInt(idP.getNewId())+1);
+	            	Short idEstado = 50;
+	            	
+		            record.setIdinstitucion(idInstitucion);
+		            record.setIdestadofacturacion(idEstado);
+		            record.setIdfacturacion(Integer.parseInt(idFacturacion));
+		            record.setFechaestado(new Date());
+		            record.setFechamodificacion(new Date());
+		            record.setUsumodificacion(usuario.getIdusuario());
+		            record.setIdordenestado(idOrdenEstado);
+		           		            
+		            response = fcsFactEstadosfacturacionMapper.insert(record);
+		            
+		            LOGGER.info("simularFacturacion() -> Salida guardar datos para simular facturacion");
+	            }catch(Exception e){
+	            	LOGGER.error("ERROR: FacturacionServicesImpl.simularFacturacion() >  Al simular la facturacion.", e);
+	            	error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					insertResponse.setStatus(SigaConstants.KO);
+	            }            
+	        }else {
+	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+	        }
+	    }else {
+	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
+	    }
+	        
+	    LOGGER.info("getLabel() -> Salida del servicio para simular la facturacion");
+	    
+	    if (response == 0 && error.getDescription() == null) {
+			error.setCode(400);
+			insertResponse.setStatus(SigaConstants.KO);
+		} else if (error.getCode() == null) {
+			error.setCode(200);
 			insertResponse.setStatus(SigaConstants.OK);
 		}
 

@@ -283,7 +283,7 @@ public class ComboServiceImpl implements ComboService {
 					ComboItem item = new ComboItem();
 										
 					if(!UtilidadesString.esCadenaVacia(importe) && "1".equals(importe)) {
-						item.setLabel(partida.getNombrepartida()+" - "+partida.getImportepartida().toString());
+						item.setLabel(partida.getNombrepartida()+" - "+partida.getImportepartida().toString().replace('.', ',')+" €");
 					}else{
 						item.setLabel(partida.getNombrepartida());
 					}
