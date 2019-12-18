@@ -168,5 +168,58 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		return sql.toString();
 	}
+	
+	public String conceptosFacturacion(String idFacturacion, String idInstitucion, String idLenguaje) {
+		SQL sql = new SQL();
+		SQL sqlDescGrupo = new SQL();
+		SQL sqlDescConcepto = new SQL();
+		
+		sqlDescGrupo.SELECT("rec.descripcion");
+		sqlDescGrupo.FROM("gen_recursos_catalogos rec");
+		sqlDescGrupo.WHERE("rec.idrecurso = grupo.nombre");
+		sqlDescGrupo.WHERE("rec.idlenguaje = '"+idLenguaje+"'");
+		
+		sqlDescConcepto.SELECT("rec.descripcion");
+		sqlDescConcepto.FROM("gen_recursos_catalogos rec");
+		sqlDescConcepto.WHERE("rec.idrecurso = concept.descripcion");
+		sqlDescConcepto.WHERE("rec.idlenguaje = '"+idLenguaje+"'");
+		
+		sql.SELECT("fac.idinstitucion");
+		sql.SELECT("fac.idfacturacion");
+		sql.SELECT("("+sqlDescGrupo.toString()+") descGrupo");
+		sql.SELECT("("+sqlDescConcepto.toString()+") descConcepto");
+		sql.SELECT("grupo.idgrupofacturacion idgrupo");
+		sql.SELECT("concept.idhitogeneral idconcepto");
+		sql.SELECT("CASE concept.idhitogeneral\r\n" + 
+				"        WHEN 10   THEN\r\n" + 
+				"            fac.importeoficio\r\n" + 
+				"        WHEN 20   THEN\r\n" + 
+				"            fac.importeguardia\r\n" + 
+				"        WHEN 30   THEN\r\n" + 
+				"            fac.importesoj\r\n" + 
+				"        ELSE\r\n" + 
+				"            fac.importeejg\r\n" + 
+				"    END AS importetotal"); 
+		sql.SELECT("CASE concept.idhitogeneral\r\n" + 
+				"        WHEN 10   THEN\r\n" + 
+				"            fac.importeoficio - pago.importeoficio\r\n" + 
+				"        WHEN 20   THEN\r\n" + 
+				"            fac.importeguardia - pago.importeguardia\r\n" + 
+				"        WHEN 30   THEN\r\n" + 
+				"            fac.importesoj - pago.importesoj\r\n" + 
+				"        ELSE\r\n" + 
+				"            fac.importeejg - pago.importeejg\r\n" + 
+				"    END AS importependiente");
+		sql.FROM("fcs_fact_grupofact_hito   factgrupo");  
+		sql.LEFT_OUTER_JOIN("scs_grupofacturacion grupo ON (factgrupo.idgrupofacturacion = grupo.idgrupofacturacion AND factgrupo.idinstitucion = grupo.idinstitucion)");
+		sql.INNER_JOIN("fcs_hitogeneral concept ON (factgrupo.idhitogeneral = concept.idhitogeneral)");
+		sql.INNER_JOIN("fcs_facturacionjg fac ON (factgrupo.idfacturacion = fac.idfacturacion AND factgrupo.idinstitucion = fac.idinstitucion)");
+		sql.INNER_JOIN("fcs_pagosjg pago ON (fac.idfacturacion = pago.idfacturacion AND fac.idinstitucion = pago.idinstitucion)");
+		sql.WHERE("factgrupo.idinstitucion = '"+idInstitucion+"'");
+		sql.WHERE(" factgrupo.idfacturacion = '"+idFacturacion+"'");
+		sql.ORDER_BY("factgrupo.idhitogeneral");
+		
+		return sql.toString();
+	}
 }
 

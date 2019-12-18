@@ -27,4 +27,8 @@ public interface IFacturacionServices {
 	public InsertResponseDTO reabrirFacturacion(String idFacturacion, HttpServletRequest request);
 	
 	public InsertResponseDTO simularFacturacion(String idFacturacion, HttpServletRequest request);
+	
+	public FacturacionDTO conceptosFacturacion(String idFacturacion, HttpServletRequest request);
+	
+	public InsertResponseDTO saveConceptosFac(FacturacionItem facturacionItem, HttpServletRequest request);
 }

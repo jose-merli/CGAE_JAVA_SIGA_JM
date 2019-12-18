@@ -101,4 +101,20 @@ public class FacturacionController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 		}
 	}
+
+	@RequestMapping(value="/facturacionsjcs/tarjetaConceptosfac", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FacturacionDTO> conceptosFacturacion(@RequestParam("idFacturacion") String idFacturacion, HttpServletRequest request){
+		FacturacionDTO response = facturacionServices.conceptosFacturacion(idFacturacion, request);
+		return new ResponseEntity<FacturacionDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/facturacionsjcs/saveConceptosFac",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> saveConceptosFac(@RequestBody FacturacionItem facturacionItem, HttpServletRequest request) { 
+		InsertResponseDTO response = facturacionServices.saveConceptosFac(facturacionItem, request);
+		if (response.getError().getCode() == 200) {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+		}
+	}
 }
