@@ -1,19 +1,15 @@
 package org.itcgae.siga.scs.controllers.ejg;
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.DocumentacionEjgDTO;
-import org.itcgae.siga.DTO.scs.DocumentacionEjgItem;
-import org.itcgae.siga.DTO.scs.EjgDTO;
-import org.itcgae.siga.DTO.scs.EjgItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
+import org.itcgae.siga.DTOs.scs.EjgDTO;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

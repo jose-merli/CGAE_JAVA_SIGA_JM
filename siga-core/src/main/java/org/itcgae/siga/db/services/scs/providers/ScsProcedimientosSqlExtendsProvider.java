@@ -1,11 +1,8 @@
 package org.itcgae.siga.db.services.scs.providers;
 
-import java.util.Date;
-
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.ModulosItem;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.DTOs.scs.ModulosItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsProcedimientosSqlProvider;
 
 public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlProvider{

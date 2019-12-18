@@ -21,10 +21,10 @@ import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.scs.services.componentesGenerales.BusquedaAsuntosService;
+import org.itcgae.siga.scs.services.impl.justiciables.GestionJusticiableServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.itcgae.siga.scs.services.impl.justiciables.GestionJusticiableServiceImpl;
 
 @Service
 public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {

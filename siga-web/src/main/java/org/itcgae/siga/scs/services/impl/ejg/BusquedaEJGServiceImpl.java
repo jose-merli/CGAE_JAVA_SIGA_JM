@@ -6,13 +6,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.ColegiadoJGDTO;
-import org.itcgae.siga.DTO.scs.DocumentacionEjgDTO;
-import org.itcgae.siga.DTO.scs.DocumentacionEjgItem;
-import org.itcgae.siga.DTO.scs.EjgDTO;
-import org.itcgae.siga.DTO.scs.EjgItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.EjgDTO;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsTiposentidoauto;
@@ -27,12 +24,11 @@ import org.itcgae.siga.db.services.scs.mappers.ScsJuzgadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPonenteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPreceptivoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRenunciaExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsTipoejgExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsTipoejgcolegioExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTipoEJGColegioExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTipoEJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipofundamentosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTiporesolucionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
-import org.itcgae.siga.db.services.scs.providers.ScsTipofundamentosSqlExtendsProvider;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -44,9 +40,9 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	@Autowired
-	private ScsTipoejgExtendsMapper scsTipoEjgextendsMapper;
+	private ScsTipoEJGExtendsMapper scsTipoEjgextendsMapper;
 	@Autowired
-	ScsTipoejgcolegioExtendsMapper scsTipoejgcolegioExtendsMapper;
+	ScsTipoEJGColegioExtendsMapper scsTipoejgcolegioExtendsMapper;
 	@Autowired
 	private ScsFundamentoscalificacionExtendsMapper scsFundamentoscalificacionExtendsMapper;
 	@Autowired
@@ -99,7 +95,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 						LOGGER.info(
 								"comboTipoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
 
-						comboItems = scsTipoEjgextendsMapper.comboTipoejg(usuarios.get(0).getIdlenguaje(), idInstitucion.toString());
+						comboItems = scsTipoEjgextendsMapper.comboTipoEjg(Short.valueOf(usuarios.get(0).getIdlenguaje()));
 
 						LOGGER.info(
 								"comboTipoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
