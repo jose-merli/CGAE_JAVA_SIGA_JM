@@ -6,18 +6,17 @@ import java.security.cert.CertificateEncodingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.EntornoDTO;
-import org.itcgae.siga.DTOs.gen.FusionadorItem;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.services.IFusionadorPersonasServerService;
-import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesResponseDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -99,6 +98,12 @@ public class MenuController {
    	ResponseEntity<ComboItem> getLetrado(HttpServletRequest request) {
     	ComboItem response = menuService.getLetrado(request);
        	return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
+   	}
+    
+    @RequestMapping(value = "/isColegiado", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ColegiadoItem> isColegiado(HttpServletRequest request) {
+    	ColegiadoItem response = menuService.isColegiado(request);
+       	return new ResponseEntity<ColegiadoItem>(response, HttpStatus.OK);
    	}
 
     
