@@ -6,9 +6,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.PrisionDTO;
-import org.itcgae.siga.DTO.scs.PrisionItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.PrisionDTO;
+import org.itcgae.siga.DTOs.scs.PrisionItem;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -143,6 +143,7 @@ public class BusquedaPrisionesServiceImpl implements IBusquedaPrisionesService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -237,6 +238,8 @@ public class BusquedaPrisionesServiceImpl implements IBusquedaPrisionesService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
+
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");

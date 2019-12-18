@@ -1,7 +1,8 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.PrisionItem;
+import org.itcgae.siga.DTOs.scs.PrisionItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsPrisionSqlProvider;
 
 public class ScsPrisionSqlExtendsProvider extends ScsPrisionSqlProvider {
@@ -34,12 +35,16 @@ public class ScsPrisionSqlExtendsProvider extends ScsPrisionSqlProvider {
 			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 		}
 		if (prisionItem.getNombre() != null && prisionItem.getNombre() != "") {
-			sql.WHERE("(TRANSLATE(LOWER( PRISION.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
-					+ prisionItem.getNombre() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
+		
+			String columna = "PRISION.NOMBRE";
+			String cadena = prisionItem.getNombre();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
 		}
 
 		if (prisionItem.getCodigoExt() != null && prisionItem.getCodigoExt() != "") {
-			sql.WHERE("UPPER(prision.codigoext) = UPPER('" + prisionItem.getCodigoExt() + "')");
+			sql.WHERE("UPPER(prision.codigoext) LIKE UPPER('%" + prisionItem.getCodigoExt() + "%')");
 		}
 
 		if (prisionItem.getIdPoblacion() != null && prisionItem.getIdPoblacion() != "") {

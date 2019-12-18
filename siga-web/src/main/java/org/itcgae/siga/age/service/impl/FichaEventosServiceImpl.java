@@ -2630,11 +2630,20 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				// Comprobamos que en el dia seleccionado no exista un evento ya creado
 				AgeEventoExample exampleEvent = new AgeEventoExample();
 
-				exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-						.andFechainicioLessThan(fechaPosterior)
-						.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-						.andTituloEqualTo(eventoItem.getTitulo())
-						.andDescripcionNotEqualTo(eventoItem.getDescripcionOld());
+				if (eventoItem.getIdEvento() != null) {
+					exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
+					.andFechainicioLessThan(fechaPosterior)
+					.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
+					.andTituloEqualTo(eventoItem.getTitulo())
+					.andIdeventoNotEqualTo(Long.valueOf(eventoItem.getIdEvento()));
+				}else{
+					exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
+					.andFechainicioLessThan(fechaPosterior)
+					.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
+					.andTituloEqualTo(eventoItem.getTitulo())
+					.andDescripcionNotEqualTo(eventoItem.getDescripcionOld());
+				}
+				
 
 				LOGGER.info(
 						"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar el evento del colegio perteneciente al consejo");

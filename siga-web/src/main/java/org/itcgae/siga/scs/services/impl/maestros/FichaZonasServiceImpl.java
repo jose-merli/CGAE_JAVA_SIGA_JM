@@ -7,14 +7,14 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.ZonasDTO;
-import org.itcgae.siga.DTO.scs.ZonasItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.ZonasDTO;
+import org.itcgae.siga.DTOs.scs.ZonasItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -23,9 +23,12 @@ import org.itcgae.siga.db.entities.ScsSubzona;
 import org.itcgae.siga.db.entities.ScsSubzonaExample;
 import org.itcgae.siga.db.entities.ScsSubzonapartido;
 import org.itcgae.siga.db.entities.ScsSubzonapartidoExample;
+import org.itcgae.siga.db.entities.ScsTurno;
+import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.entities.ScsZona;
 import org.itcgae.siga.db.entities.ScsZonaExample;
 import org.itcgae.siga.db.mappers.ScsSubzonapartidoMapper;
+import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPartidojudicialExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSubzonaExtendsMapper;
@@ -37,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class FichaZonasServiceImpl implements IFichaZonasService {
 
 	private Logger LOGGER = Logger.getLogger(FichaZonasServiceImpl.class);
@@ -55,6 +59,9 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 	@Autowired
 	private ScsSubzonapartidoMapper scsSubzonapartidoMapper;
+	
+	@Autowired
+	private ScsTurnoMapper scsTurnoMapper;
 
 	@Override
 	public ComboDTO getPartidoJudicial(HttpServletRequest request) {
@@ -714,6 +721,17 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 				try {
 
+					boolean existe = false;
+					for (ZonasItem zonaItem : zonasDTO.getZonasItems()) {
+						ScsTurnoExample ejemploTurno = new ScsTurnoExample();
+						ejemploTurno.createCriteria().andIdzonaEqualTo(Short.parseShort(zonaItem.getIdzona())).andIdsubzonaEqualTo(Short.parseShort(zonaItem.getIdsubzona())).andIdinstitucionEqualTo(idInstitucion);
+						List<ScsTurno> turnos = scsTurnoMapper.selectByExample(ejemploTurno);
+
+						if(!(turnos == null || turnos.size() == 0)) {
+							existe = true; 
+						}
+					}
+					if(!existe) {
 					for (ZonasItem zonaItem : zonasDTO.getZonasItems()) {
 
 						// Eliminamos asociaciones partidos judiciales con zona
@@ -746,6 +764,9 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 								"deleteZones() / scsSubzonaExtendsMapper.deleteByExample() -> Salida de scsSubzonapartidoMapper para eliminar los partidos judiciales asociadoas a la zona");
 
 					}
+				}else {
+					response = 2;
+				}
 
 				} catch (Exception e) {
 					response = 0;
@@ -760,7 +781,11 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 		if (response == 0) {
 			error.setCode(400);
 			updateResponseDTO.setStatus(SigaConstants.KO);
-		} else {
+		} else if(response == 2) {
+			error.setCode(400);
+			error.setDescription("zonasysubzonas.zonas.ficha.subzonaEnUso");
+			updateResponseDTO.setStatus(SigaConstants.KO);	
+		}else {
 			error.setCode(200);
 			updateResponseDTO.setStatus(SigaConstants.OK);
 		}

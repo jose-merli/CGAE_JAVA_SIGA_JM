@@ -8,17 +8,18 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.AcreditacionDTO;
-import org.itcgae.siga.DTO.scs.AcreditacionItem;
-import org.itcgae.siga.DTO.scs.ModulosDTO;
-import org.itcgae.siga.DTO.scs.ModulosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.AcreditacionDTO;
+import org.itcgae.siga.DTOs.scs.AcreditacionItem;
+import org.itcgae.siga.DTOs.scs.ModulosDTO;
+import org.itcgae.siga.DTOs.scs.ModulosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsAcreditacionprocedimiento;
@@ -287,6 +288,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					}
 					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -437,6 +439,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						
 					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -502,8 +505,15 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						acreditacionProc.setIdprocedimiento(acreditacionItem.getIdprocedimiento());
 						ScsAcreditacionprocedimiento registro = scsAcreditacionProcedimientoMapper.selectByPrimaryKey(acreditacionProc);
 
-						BigDecimal porcentaje = new BigDecimal(Double.valueOf(acreditacionItem.getPorcentaje()));
-						registro.setPorcentaje(porcentaje);
+						
+						if (!UtilidadesString.esCadenaVacia(acreditacionItem.getPorcentaje()) ) {
+							BigDecimal porcentaje = new BigDecimal(Double.valueOf(acreditacionItem.getPorcentaje()));
+							registro.setPorcentaje(porcentaje);
+						}else{
+							BigDecimal porcentaje = new BigDecimal(Double.valueOf(0));
+							registro.setPorcentaje(porcentaje);
+						}
+						
 //						registro.setNigNumprocedimiento(Short.parseShort(acreditacionItem.getNig_numprocedimiento()));
 						if(acreditacionItem.isNigProcedimiento()) {
 							registro.setNigNumprocedimiento(Short.parseShort("1"));
@@ -511,7 +521,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 							registro.setNigNumprocedimiento(Short.parseShort("0"));
 						}
 						registro.setCodigoext(acreditacionItem.getCodigoext());
-						registro.setCodsubtarifa(acreditacionItem.getCodSubTarifa());
+						registro.setCodsubtarifa(acreditacionItem.getCodSubTarifa());	
 						registro.setUsumodificacion(usuarios.get(0).getIdusuario());
 						registro.setFechamodificacion(new Date());
 						LOGGER.info(
@@ -526,6 +536,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					}
 					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -613,6 +624,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					}
 					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -702,6 +714,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					}
 					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -886,6 +899,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400); 
 					error.setDescription("general.mensaje.error.bbdd");

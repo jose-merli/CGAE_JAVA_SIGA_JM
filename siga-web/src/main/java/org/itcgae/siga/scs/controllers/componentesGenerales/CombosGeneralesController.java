@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.controllers.componentesGenerales;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -79,9 +80,65 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping("/ordenCola")
+	ResponseEntity<ComboColaOrdenadaDTO> ordenCola(HttpServletRequest request, String idordenacioncolas) {
+		
+		ComboColaOrdenadaDTO response = comboService.ordenCola(request, idordenacioncolas);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+
+	@GetMapping("/comboTipoEjg")
+	public ResponseEntity<ComboDTO> comboTipoEjg(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTipoEjg(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/comboTipoEjgColegio")
+	public ResponseEntity<ComboDTO> comboTipoEjgColegio(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTipoEjgColegio(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/comboEstadoEjg")
+	public ResponseEntity<ComboDTO> comboEstadoEjg(HttpServletRequest request) {
+		ComboDTO response = comboService.comboEstadoEjg(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping("/guardias")
 	public ResponseEntity<ComboDTO> comboGuardias(HttpServletRequest request, String idTurno) {
 		ComboDTO response = comboService.comboGuardias(request, idTurno);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/comboTipoDesignacion")
+	public ResponseEntity<ComboDTO> comboTipoDesignacion(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTipoDesignacion(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("/comboTipoSOJ")
+	public ResponseEntity<ComboDTO> comboTipoSOJ(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTipoSOJ(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("/comboComisaria")
+	public ResponseEntity<ComboDTO> comboComisaria(HttpServletRequest request) {
+		ComboDTO response = comboService.comboComisaria(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}	
+	
+	
+	@GetMapping("/comboJuzgado")
+	public ResponseEntity<ComboDTO> comboJuzgado(HttpServletRequest request) {
+		ComboDTO response = comboService.comboJuzgado(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	

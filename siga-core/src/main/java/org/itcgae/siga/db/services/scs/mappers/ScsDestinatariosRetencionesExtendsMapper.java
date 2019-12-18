@@ -9,10 +9,10 @@ import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.scs.DestinatariosItem;
-import org.itcgae.siga.DTO.scs.ModulosItem;
-import org.itcgae.siga.DTO.scs.PartidasItem;
-import org.itcgae.siga.DTO.scs.ProcedimientoItem;
+import org.itcgae.siga.DTOs.scs.DestinatariosItem;
+import org.itcgae.siga.DTOs.scs.ModulosItem;
+import org.itcgae.siga.DTOs.scs.PartidasItem;
+import org.itcgae.siga.DTOs.scs.ProcedimientoItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.FcsDestinatariosRetencionesMapper;
 import org.itcgae.siga.db.mappers.ScsPartidapresupuestariaMapper;
@@ -43,6 +43,21 @@ public interface ScsDestinatariosRetencionesExtendsMapper extends FcsDestinatari
         @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP)
 	})
 	List<DestinatariosItem> searchDestinatario(DestinatariosItem destinatariosItems);
+	
+	@SelectProvider(type=ScsDestinatariosRetencionesSqlExtendsProvider.class, method="updateRetenciones")
+    @Results({
+    	@Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="IDDESTINATARIO", property="iddestinatario", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="NOMBRE", property="nombre", jdbcType=JdbcType.VARCHAR),
+        @Result(column="FECHAMODIFICACION", property="fechamodificacion", jdbcType=JdbcType.TIMESTAMP),
+        @Result(column="USUMODIFICACION", property="usumodificacion", jdbcType=JdbcType.DECIMAL),
+        @Result(column="CODIGOEXT", property="codigoext", jdbcType=JdbcType.VARCHAR),
+        @Result(column="BLOQUEADO", property="bloqueado", jdbcType=JdbcType.CHAR),
+        @Result(column="CUENTACONTABLE", property="cuentacontable", jdbcType=JdbcType.VARCHAR),
+        @Result(column="ORDEN", property="orden", jdbcType=JdbcType.DECIMAL),
+        @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP)
+	})
+	List<DestinatariosItem> updateRetenciones(Short idInstitucion,DestinatariosItem destinatariosItem);
 	
 	@SelectProvider(type = ScsDestinatariosRetencionesSqlExtendsProvider.class, method = "getIdDestinatariosRetenc")
 	@Results({ @Result(column = "IDDESTINATARIORETENCIONES", property = "newId", jdbcType = JdbcType.DECIMAL, id=true)

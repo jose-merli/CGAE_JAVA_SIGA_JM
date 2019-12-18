@@ -2,12 +2,12 @@ package org.itcgae.siga.scs.services.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.AreasDTO;
-import org.itcgae.siga.DTO.scs.AreasItem;
-import org.itcgae.siga.DTO.scs.MateriasDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.AreasDTO;
+import org.itcgae.siga.DTOs.scs.AreasItem;
+import org.itcgae.siga.DTOs.scs.MateriasDTO;
 
 public interface IFichaAreasService {
 	
@@ -28,5 +28,7 @@ public interface IFichaAreasService {
 	UpdateResponseDTO deleteMaterias(AreasDTO areasDTO, HttpServletRequest request);
 
 	public InsertResponseDTO createMaterias(AreasItem areasItem, HttpServletRequest request);
+
+	public UpdateResponseDTO activateAreas(AreasDTO areasDTO, HttpServletRequest request);
 
 }

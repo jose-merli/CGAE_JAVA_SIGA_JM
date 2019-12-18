@@ -6,8 +6,9 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.scs.ComisariaItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.ComisariaItem;
 import org.itcgae.siga.db.mappers.ScsComisariaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsComisariaSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -44,5 +45,12 @@ public interface ScsComisariaExtendsMapper extends ScsComisariaMapper{
 	
 	})
 	NewIdDTO getIdComisaria(Short idInstitucion);
+	
+	@SelectProvider(type = ScsComisariaSqlExtendsProvider.class, method = "comboComisaria")
+	@Results({
+		@Result(column = "IDCOMISARIA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> comboComisaria(Short idLenguaje, Short idInstitucion);
 	
 }

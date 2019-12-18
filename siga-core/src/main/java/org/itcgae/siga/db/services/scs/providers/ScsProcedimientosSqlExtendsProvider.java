@@ -5,6 +5,7 @@ import java.util.Date;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.scs.ModulosItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.DTOs.scs.ModulosItem;
 import org.itcgae.siga.db.mappers.ScsProcedimientosSqlProvider;
 
 public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlProvider{
@@ -44,7 +45,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		sql.WHERE("procedimiento.idinstitucion = '" + idInstitucion + "'");
 		if(UtilidadesString.esCadenaVacia(idJurisdiccion))
 		sql.WHERE("procedimiento.idjurisdiccion = '"+idJurisdiccion+"'");
-		
+		sql.WHERE("procedimiento.fechabaja is null");
 		sql.ORDER_BY("nombre");
 	
 		return sql.toString();
@@ -67,7 +68,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		sql.SELECT("procedimiento.idprocedimiento");
 		sql.SELECT("procedimiento.nombre");
 		sql.SELECT("procedimiento.codigo");
-		sql.SELECT("LISTAGG(prepro.idpretension, ',') WITHIN GROUP (ORDER BY prepro.idprocedimiento) AS procedimientos");
+		sql.SELECT("LISTAGG(pretension.idpretension, ',') WITHIN GROUP (ORDER BY procedimiento.idprocedimiento) AS procedimientos");
 		sql.SELECT("procedimiento.precio as importe");
 		sql.SELECT("procedimiento.complemento");
 		sql.SELECT("procedimiento.vigente");
@@ -85,7 +86,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		sql.WHERE("procedimiento.idinstitucion = '" + moduloItem.getidInstitucion() + "'");
 		
 		sql.LEFT_OUTER_JOIN("SCS_PRETENSIONESPROCED prepro on (prepro.idprocedimiento = procedimiento.idprocedimiento AND PREPRO.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION)");
-		
+		sql.LEFT_OUTER_JOIN("SCS_PRETENSION pretension on (prepro.idpretension = pretension.idpretension AND pretension.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION AND PRETENSION.FECHABAJA IS NULL)");
 		if(moduloItem.getPrecio() == null) {
 			if(moduloItem.getNombre() != null && moduloItem.getNombre() != "") {
 				sql.WHERE("UPPER(procedimiento.nombre) like UPPER('%" + moduloItem.getNombre() + "%')");
@@ -121,12 +122,11 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 	public String getIdProcedimiento(Short idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("MAX(IDPROCEDIMIENTO) AS IDPROCEDIMIENTO");
+		sql.SELECT("MAX(to_number(IDPROCEDIMIENTO)) AS IDPROCEDIMIENTO");
 		sql.FROM("SCS_PROCEDIMIENTOS");
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
 
 		return sql.toString();
 	}
-	
 	
 }

@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.ZonasItem;
+import org.itcgae.siga.DTOs.scs.ZonasItem;
 import org.itcgae.siga.db.mappers.ScsZonaSqlProvider;
 
 public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
@@ -66,7 +66,7 @@ public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
 		sql1.FROM("(" + sql.toString() + ") consulta");
 		
 		if(zonasItem.getDescripcionsubzona() != null && zonasItem.getDescripcionsubzona() != "") {
-			sql1.WHERE("UPPER(consulta.nombre) like UPPER('%"+ zonasItem.getDescripcionsubzona() + "%')");
+			sql1.WHERE("UPPER(consulta.nombresubzonas) like UPPER('%"+ zonasItem.getDescripcionsubzona() + "%')");
 		}
 		
 		if(zonasItem.getDescripcionpartido() != null && zonasItem.getDescripcionpartido() != "") {

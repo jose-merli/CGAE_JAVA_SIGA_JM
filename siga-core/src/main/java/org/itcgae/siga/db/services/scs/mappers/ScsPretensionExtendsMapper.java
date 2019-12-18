@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.scs.PretensionItem;
+import org.itcgae.siga.DTOs.scs.PretensionItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ScsPretensionMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsPretensionSqlExtendsProvider;

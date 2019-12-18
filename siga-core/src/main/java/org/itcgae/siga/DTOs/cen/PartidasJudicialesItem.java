@@ -1,9 +1,5 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class PartidasJudicialesItem {
 
 	private String idinstitucion;

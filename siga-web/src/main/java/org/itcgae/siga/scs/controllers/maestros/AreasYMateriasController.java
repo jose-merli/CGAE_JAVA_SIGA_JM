@@ -2,12 +2,12 @@ package org.itcgae.siga.scs.controllers.maestros;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.AreasDTO;
-import org.itcgae.siga.DTO.scs.AreasItem;
-import org.itcgae.siga.DTO.scs.MateriasDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.AreasDTO;
+import org.itcgae.siga.DTOs.scs.AreasItem;
+import org.itcgae.siga.DTOs.scs.MateriasDTO;
 import org.itcgae.siga.scs.services.maestros.IFichaAreasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -89,6 +89,17 @@ public class AreasYMateriasController {
 	ResponseEntity<UpdateResponseDTO> deleteMaterias(@RequestBody AreasDTO areasDTO, HttpServletRequest request) {
 
 		UpdateResponseDTO response = fichaAreasService.deleteMaterias(areasDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
+	@RequestMapping(value = "/areasMaterias/activateMaterias", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> activateMaterias(@RequestBody AreasDTO areasDTO, HttpServletRequest request) {
+
+		UpdateResponseDTO response = fichaAreasService.activateAreas(areasDTO, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else

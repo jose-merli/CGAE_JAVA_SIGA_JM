@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.JuzgadoItem;
+import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.db.mappers.ScsJuzgadoSqlProvider;
 
 public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
@@ -46,7 +46,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 		}
 		
 		if(juzgadoItem.getCodigoExt() != null && juzgadoItem.getCodigoExt() != "") {
-			sql.WHERE("UPPER(juzgado.codigoext) = UPPER('"+ juzgadoItem.getCodigoExt() + "')");
+			sql.WHERE("UPPER(juzgado.codigoext) like UPPER('%"+ juzgadoItem.getCodigoExt() + "%')");
 		}
 		
 		if(juzgadoItem.getIdPoblacion() != null && juzgadoItem.getIdPoblacion() != "") {
@@ -83,6 +83,20 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 		sql.FROM("SCS_JUZGADO");
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
 		
+		return sql.toString();
+	}
+	
+	public String comboJuzgado(Short idLenguaje, Short idInstitucion) {
+
+		SQL sql = new SQL();
+	
+		sql.SELECT("juzgado.IDJUZGADO");
+		sql.SELECT("juzgado.NOMBRE");
+		sql.FROM("SCS_JUZGADO juzgado");
+		sql.WHERE("juzgado.fechabaja is null");
+		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
+		sql.ORDER_BY("juzgado.NOMBRE");
+	
 		return sql.toString();
 	}
 	

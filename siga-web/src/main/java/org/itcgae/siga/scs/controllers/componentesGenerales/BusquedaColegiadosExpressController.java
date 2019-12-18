@@ -2,9 +2,9 @@ package org.itcgae.siga.scs.controllers.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.scs.ColegiadoJGDTO;
-import org.itcgae.siga.DTO.scs.ColegiadoJGItem;
-import org.itcgae.siga.scs.service.componentesGenerales.IBusquedaColegiadosExpressService;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
+import org.itcgae.siga.scs.services.componentesGenerales.IBusquedaColegiadosExpressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

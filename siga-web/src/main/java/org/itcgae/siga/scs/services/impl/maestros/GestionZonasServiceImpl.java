@@ -1,25 +1,32 @@
 package org.itcgae.siga.scs.services.impl.maestros;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.ZonasDTO;
-import org.itcgae.siga.DTO.scs.ZonasItem;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.ZonasDTO;
+import org.itcgae.siga.DTOs.scs.ZonasItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ExpExpediente;
+import org.itcgae.siga.db.entities.ExpExpedienteExample;
 import org.itcgae.siga.db.entities.ScsSubzona;
 import org.itcgae.siga.db.entities.ScsSubzonaExample;
 import org.itcgae.siga.db.entities.ScsSubzonapartido;
 import org.itcgae.siga.db.entities.ScsSubzonapartidoExample;
+import org.itcgae.siga.db.entities.ScsTurno;
+import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.entities.ScsZona;
 import org.itcgae.siga.db.entities.ScsZonaExample;
+import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
 import org.itcgae.siga.db.mappers.ScsSubzonapartidoMapper;
+import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSubzonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsZonasExtendsMapper;
@@ -45,6 +52,12 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 	
 	@Autowired
 	private ScsSubzonapartidoMapper scsSubzonapartidoMapper;
+	
+	@Autowired
+	private ScsTurnoMapper scsTurnoMapper;
+	
+	@Autowired
+	private ExpExpedienteMapper expExpedienteMapper;
 	
 	@Override
 	public ZonasDTO searchZones(ZonasItem zonasItem, HttpServletRequest request) {
@@ -120,9 +133,30 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-
+					boolean existe = false;
 					for (ZonasItem zonaItem : zonasDTO.getZonasItems()) {
+						ScsTurnoExample ejemploTurno = new ScsTurnoExample();
+						ejemploTurno.createCriteria().andIdzonaEqualTo(Short.parseShort(zonaItem.getIdzona())).andIdinstitucionEqualTo(idInstitucion);
+						List<ScsTurno> turnos = scsTurnoMapper.selectByExample(ejemploTurno);
 
+						if(!(turnos == null || turnos.size() == 0)) {
+							int totalTurnos = turnos.size();
+							int turnosBaja = 0;
+							for (Iterator iterator = turnos.iterator(); iterator.hasNext();) {
+								ScsTurno scsTurno = (ScsTurno) iterator.next();
+								if (null != scsTurno.getFechabaja() || scsTurno.getVisibilidad().equals("0") ) {
+									turnosBaja++;
+								}
+								
+							}
+							if (turnosBaja < totalTurnos ) {
+								//Todos los turnos están de baja
+								existe = true; 
+							}
+						}
+					}
+					if(!existe) {
+					for (ZonasItem zonaItem : zonasDTO.getZonasItems()) {
 						// Eliminamos asociaciones partidos judiciales con zona
 						if (zonaItem.getIdsConjuntoSubzonas() != null) {
 
@@ -230,8 +264,12 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 						}
 
 					}
+				}else {
+					response = 2;
+				}
 
 				} catch (Exception e) {
+					LOGGER.info(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -244,7 +282,11 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 		if (response == 0) {
 			error.setCode(400);
 			updateResponseDTO.setStatus(SigaConstants.KO);
-		} else {
+		} else if(response == 2) {
+			error.setCode(400);
+			error.setDescription("zonasysubzonas.zonas.ficha.zonaEnUso");
+			updateResponseDTO.setStatus(SigaConstants.KO);	
+		}else {
 			error.setCode(200);
 			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
@@ -398,6 +440,7 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.info(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");

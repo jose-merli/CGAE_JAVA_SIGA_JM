@@ -1,7 +1,8 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.ProcuradorItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsProcuradorSqlProvider;
 
 public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
@@ -41,25 +42,34 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 
 
 		if (procuradorItem.getNombre() != null && procuradorItem.getNombre() != "") {
-			sql.AND();
-			sql.WHERE("(TRANSLATE(LOWER( PROCURADOR.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
-					+ procuradorItem.getNombre().trim() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
-
+			String columna = "PROCURADOR.NOMBRE";
+			String cadena = procuradorItem.getNombre();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
 		}
 
 		if (procuradorItem.getApellido1() != null && procuradorItem.getApellido1() != "") {
-			sql.AND();
+			
+
+			String columna = "REPLACE(CONCAT(PROCURADOR.APELLIDOS1,PROCURADOR.APELLIDOS2), ' ', '')";
+			String cadena = procuradorItem.getApellido1().replaceAll("\\s+","");
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
+			
+			/*sql.AND();
 			sql.WHERE(
 					"((TRANSLATE(LOWER( PROCURADOR.APELLIDOS1),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
 							+ procuradorItem.getApellido1().trim() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 			sql.OR();
 			sql.WHERE(
 					"(TRANSLATE(LOWER( PROCURADOR.APELLIDOS2),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
-							+ procuradorItem.getApellido1().trim() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')))");
+							+ procuradorItem.getApellido1().trim() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')))");*/
 		}
 		if (procuradorItem.getCodigoExt() != null && procuradorItem.getCodigoExt() != "") {
 			sql.AND();
-			sql.WHERE("UPPER(procurador.codigo) = UPPER('" + procuradorItem.getCodigoExt() + "')");
+			sql.WHERE("UPPER(procurador.codigo) like UPPER('%" + procuradorItem.getCodigoExt() + "%')");
 		}
 
 		if (!procuradorItem.getHistorico()) {
@@ -110,16 +120,28 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 		if (procuradorItem.getnColegiado() != null && !procuradorItem.getnColegiado().trim().equals(""))
 			sql.WHERE("ncolegiado = '" + procuradorItem.getnColegiado() + "'");
 
-		if (procuradorItem.getApellido1() != null && !procuradorItem.getApellido1().trim().equals(""))
-			sql.WHERE("TRANSLATE(LOWER(apellidos1),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
-					+ procuradorItem.getApellido1() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
-		if (procuradorItem.getApellido2() != null && !procuradorItem.getApellido2().trim().equals(""))
-			sql.WHERE("TRANSLATE(LOWER(apellidos2),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
-					+ procuradorItem.getApellido2() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
+		if (procuradorItem.getApellido1() != null && !procuradorItem.getApellido1().trim().equals("")){
+			
 
-		if (procuradorItem.getNombre() != null && !procuradorItem.getNombre().trim().equals(""))
-			sql.WHERE("TRANSLATE(LOWER(pro.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
-					+ procuradorItem.getNombre() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
+			String columna = "apellidos1";
+			String cadena = procuradorItem.getApellido1();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+		}
+			
+		if (procuradorItem.getApellido2() != null && !procuradorItem.getApellido2().trim().equals("")){
+			String columna = "apellidos2";
+			String cadena = procuradorItem.getApellido2();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+		}
+
+		if (procuradorItem.getNombre() != null && !procuradorItem.getNombre().trim().equals("")){
+			String columna = "pro.NOMBRE";
+			String cadena = procuradorItem.getNombre();
+			
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+		}
 
 		if (!procuradorItem.getHistorico())
 			sql.WHERE("pro.fechabaja is null");

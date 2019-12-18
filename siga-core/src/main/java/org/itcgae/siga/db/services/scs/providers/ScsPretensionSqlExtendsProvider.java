@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.scs.PretensionItem;
+import org.itcgae.siga.DTOs.scs.PretensionItem;
 import org.itcgae.siga.db.mappers.ScsPretensionSqlProvider;
 
 public class ScsPretensionSqlExtendsProvider extends ScsPretensionSqlProvider{
@@ -35,7 +35,7 @@ public class ScsPretensionSqlExtendsProvider extends ScsPretensionSqlProvider{
 		if(pretensionItem.getIdPretension() != null && pretensionItem.getIdPretension() != "") {
 			sql.WHERE("PRETENSIONESPROC.IDPROCEDIMIENTO = '" + pretensionItem.getIdPretension() + "'");
 		}
-		if(pretensionItem.getDescripcion() != null && pretensionItem.getDescripcion() != "" && pretensionItem.getDescripcion().length() > 2) {
+		if(pretensionItem.getDescripcion() != null && pretensionItem.getDescripcion() != "") {
 			sql.WHERE("UPPER(CATPRETENSION.DESCRIPCION) LIKE UPPER('%" + pretensionItem.getDescripcion() + "%')");
 		}
 	
