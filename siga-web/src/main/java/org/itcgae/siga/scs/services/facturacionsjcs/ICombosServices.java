@@ -8,5 +8,8 @@ public interface ICombosServices {
 	
 	public ComboDTO comboFactEstados(HttpServletRequest request);
 	public ComboDTO comboFactConceptos(HttpServletRequest request);
+	public ComboDTO comboFactColegio(HttpServletRequest request);
+	public ComboDTO comboPagosColegio(HttpServletRequest request);
+
 	
 }
