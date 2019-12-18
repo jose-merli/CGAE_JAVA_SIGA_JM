@@ -9,6 +9,8 @@ import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
@@ -36,6 +38,12 @@ public class InscripcionesController {
 	ResponseEntity<ComboDTO> comboTurnos(HttpServletRequest request) {
 		ComboDTO response = inscripcionesService.comboTurnos(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/inscripciones/busquedaInscripciones",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InscripcionesDTO> busquedaTurnos(@RequestBody InscripcionesItem inscripcionesItem, HttpServletRequest request) {
+		InscripcionesDTO response = inscripcionesService.busquedaInscripciones(inscripcionesItem, request);
+		return new ResponseEntity<InscripcionesDTO>(response, HttpStatus.OK);
 	}
 	
 }

@@ -11,9 +11,13 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 
 public interface IGestionInscripcionesService {
 	public ComboDTO comboTurnos(HttpServletRequest request);
+
+	public InscripcionesDTO busquedaInscripciones(InscripcionesItem inscripcionesItem, HttpServletRequest request);
 }

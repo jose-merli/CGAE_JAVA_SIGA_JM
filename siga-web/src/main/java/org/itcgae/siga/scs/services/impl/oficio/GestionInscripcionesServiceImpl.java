@@ -28,6 +28,8 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -128,6 +130,65 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 		}
 		LOGGER.info("comboTurnos() -> Salida del servicio para obtener combo actuaciones");
 		return comboDTO;
+	}
+	@Override
+	public InscripcionesDTO busquedaInscripciones(InscripcionesItem inscripcionesItem, HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InscripcionesDTO inscripcionesDTO = new InscripcionesDTO();
+		List<InscripcionesItem> inscripcionesItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				String fechahasta = "";
+				String fechadesde = "";
+				String afechade = "";
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				LOGGER.info(
+						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
+				if(inscripcionesItem.getFechadesde() != null) {
+					Date fechad = inscripcionesItem.getFechadesde();
+					
+					 fechadesde = dateFormat.format(fechad);
+					if(inscripcionesItem.getFechahasta() != null) {
+						Date fechah = inscripcionesItem.getFechahasta();
+						fechahasta = dateFormat.format(fechah);
+
+					}
+				}
+				if(inscripcionesItem.getAfechade() != null) {
+					Date afechades = inscripcionesItem.getAfechade();
+					afechade = dateFormat.format(afechades);
+				}
+				
+				
+				
+				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaInscripciones(inscripcionesItem, idInstitucion,fechadesde,fechahasta,afechade);
+
+				LOGGER.info(
+						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
+
+				if (inscripcionesItems != null) {
+					inscripcionesDTO.setInscripcionesItems(inscripcionesItems);
+				}
+			}
+
+		}
+		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
+		return inscripcionesDTO;
 	}
 	
 }
