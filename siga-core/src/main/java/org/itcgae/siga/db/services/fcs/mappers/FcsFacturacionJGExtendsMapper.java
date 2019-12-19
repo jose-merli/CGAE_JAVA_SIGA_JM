@@ -69,6 +69,20 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	})
 	NewIdDTO getIdOrdenEstado(Short idInstitucion, String idFacturacion);
 	
+
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "conceptosFacturacion")
+	@Results({ 
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGRUPO", property = "idGrupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCONCEPTO", property = "idConcepto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCGRUPO", property = "descGrupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCCONCEPTO", property = "descConcepto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR),
+	})
+	List<FacturacionItem> conceptosFacturacion(String idFacturacion, String idInstitucion, String idLenguaje);
+
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getComboFactColegio")
 	@Results({ 
 		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
@@ -92,4 +106,5 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 
 	})
 	List<CartasFacturacionPagosItem> buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion);
+
 }

@@ -16,8 +16,10 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
+import org.itcgae.siga.db.entities.FcsFactGrupofactHito;
 import org.itcgae.siga.db.entities.FcsFacturacionjg;
 import org.itcgae.siga.db.mappers.FcsFactEstadosfacturacionMapper;
+import org.itcgae.siga.db.mappers.FcsFactGrupofactHitoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionServices;
@@ -39,6 +41,9 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	
 	@Autowired
 	private FcsFactEstadosfacturacionMapper fcsFactEstadosfacturacionMapper;
+	
+	@Autowired
+	private FcsFactGrupofactHitoMapper fcsFactGrupofactHitoMapper;
 	
 	@Override
 	public FacturacionDTO buscarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
@@ -208,7 +213,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	            FcsFacturacionjg record = new FcsFacturacionjg();
 	            FcsFactEstadosfacturacion record2 = new FcsFactEstadosfacturacion();
 	           
-	            LOGGER.info("saveFacturacion() / fcsFacturacionJGExtendsMapper.saveFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los datos de la facturacón");
+	            LOGGER.info("saveFacturacion() / fcsFacturacionJGExtendsMapper.saveFacturacion() -> Entrada a guardar los datos de la facturacón");
 	            
 	            //GUARDAR DATOAS DE LA FACTURACION
 	            try {
@@ -589,6 +594,115 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	    }
 	        
 	    LOGGER.info("getLabel() -> Salida del servicio para simular la facturacion");
+	    
+	    if (response == 0 && error.getDescription() == null) {
+			error.setCode(400);
+			insertResponse.setStatus(SigaConstants.KO);
+		} else if (error.getCode() == null) {
+			error.setCode(200);
+			insertResponse.setStatus(SigaConstants.OK);
+		}
+
+	    insertResponse.setError(error);
+		
+		return insertResponse;
+	}
+	
+	@Override
+	public FacturacionDTO conceptosFacturacion(String idFacturacion, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		FacturacionDTO facturaciones = new FacturacionDTO();
+		String idLenguaje;
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	            
+	        if(null != usuarios && usuarios.size() > 0) {
+	        	AdmUsuarios usuario = usuarios.get(0);
+	            usuario.setIdinstitucion(idInstitucion);
+	            idLenguaje=usuario.getIdlenguaje();  
+	                
+	            LOGGER.info("conceptosFacturacion() / fcsFacturacionJGExtendsMapper.conceptosFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los conceptos de facturacón");
+	            List<FacturacionItem> facturacionItem = fcsFacturacionJGExtendsMapper.conceptosFacturacion(idFacturacion, idInstitucion.toString(), idLenguaje);
+	            facturaciones.setFacturacionItem(facturacionItem);
+	            LOGGER.info("conceptosFacturacion() / fcsFacturacionJGExtendsMapper.conceptosFacturacion() -> Salida de fcsFacturacionJGExtendsMapper para obtener los conceptos de facturación");
+	        }else {
+	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+	        }
+	    }else {
+	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
+	    }
+	        
+	    LOGGER.info("getLabel() -> Salida del servicio para obtener los conceptos de facturaciones");
+	    
+	    return facturaciones;	
+	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO saveConceptosFac(FacturacionItem facturacionItem, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponse = new InsertResponseDTO();
+		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+		insertResponse.setError(error);
+		int response = 0;
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	            
+	        if(null != usuarios && usuarios.size() > 0) {
+	        	AdmUsuarios usuario = usuarios.get(0);
+	            usuario.setIdinstitucion(idInstitucion);
+	            FcsFactGrupofactHito record = new FcsFactGrupofactHito();
+	           
+	            LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveConceptosFac() -> Entrada a guardar los conceptos de la facturacón");
+	            
+	            //GUARDAR DATOAS DE LA FACTURACION
+	            try {
+	            	//OBTENEMOS EL ID DE LA FACTURA
+	            	LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveConceptosFac() -> Guardar conceptos en fcsFacturacionjg");
+	            	Short idGrupoFacturacion=(short) Integer.parseInt(facturacionItem.getIdGrupo());
+	            	Short idHitoGeneral = (short) Integer.parseInt(facturacionItem.getIdConcepto());
+	            	
+	            	//SETEAMOS LOS DATOS Y GUARDAMOS LA FACTURA	      
+		            record.setIdinstitucion(idInstitucion);
+		            record.setIdfacturacion(Integer.parseInt(facturacionItem.getIdFacturacion()));
+		            record.setIdgrupofacturacion(idGrupoFacturacion);
+		            record.setIdhitogeneral(idHitoGeneral);
+		            record.setFechamodificacion(new Date());
+		            record.setUsumodificacion(usuario.getIdusuario());
+		           		            
+		            response = fcsFactGrupofactHitoMapper.insert(record);
+		            
+		            LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveFacturacion() -> Salida guardar datos en fcsFacturacionjg");
+	            }catch(Exception e){
+	            	LOGGER.error("ERROR: FacturacionServicesImpl.saveConceptosFac() > al guardar los conceptos de la facturacion.", e);
+	            	error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					insertResponse.setStatus(SigaConstants.KO);
+	            }            
+	            
+	            LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveConceptosFac() -> Salida de guardar los conceptos de la facturación");
+	        }else {
+	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+	        }
+	    }else {
+	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
+	    }
+	        
+	    LOGGER.info("getLabel() -> Salida del servicio para guardar las facturaciones");
 	    
 	    if (response == 0 && error.getDescription() == null) {
 			error.setCode(400);
