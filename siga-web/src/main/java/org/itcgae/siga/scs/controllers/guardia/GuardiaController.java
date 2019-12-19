@@ -106,4 +106,10 @@ public class GuardiaController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/gestionGuardia/updateColaGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateColaGuardia(@RequestBody GuardiasItem guardia, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasService.updateUltimoCola(guardia, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
 }

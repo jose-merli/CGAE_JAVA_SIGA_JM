@@ -26,6 +26,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "orden_cola", property = "ordenCola", jdbcType = JdbcType.VARCHAR),
 	})
 	List<InscripcionGuardiaItem> getColaGuardias(String idGuardia, String idTurno, String fecha,String ultimo,String ordenaciones, String idInstitucion);
 
