@@ -216,7 +216,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			sql.WHERE("i.idinstitucion in (" + idInstituciones + ")");
 		}
 		sql.WHERE("col.fecha_baja IS NULL");
-		sql.WHERE("PER.IDTIPOIDENTIFICACION IN ('20','50')");
+		sql.WHERE("PER.IDTIPOIDENTIFICACION IN ('20')");
 		// if (null != busquedaPerJuridicaSearchDTO.getNumColegiado()
 		// && !busquedaPerJuridicaSearchDTO.getNumColegiado().equalsIgnoreCase("")) {
 		// sql.WHERE(" COL.NCOLEGIADO = '" +
@@ -230,7 +230,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 				&& !busquedaPerJuridicaSearchDTO.getNif().equalsIgnoreCase("")) {
 			sql.WHERE("per.nifcif = '" + busquedaPerJuridicaSearchDTO.getNif() + "'");
 			// si trae un nif no tendrá en cuenta el tipo 'V' que es otros
-			sql.WHERE("col.tipo IN ('G','B','A','Y','E','J','F','C','H','P','Q','R','S','U')");
+			//sql.WHERE("col.tipo IN ('G','B','A','Y','E','J','F','C','H','P','Q','R','S','U')");
 		}
 
 		sql.GROUP_BY("cliColegiado.idinstitucion");
