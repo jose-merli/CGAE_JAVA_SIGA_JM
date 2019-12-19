@@ -100,8 +100,6 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				AND Gua.Idguardia = "+idGuardia+"\r\n" + 
 					"			ORDER BY\r\n" + 
 									ordenaciones+
-					"				numeroGrupo,\r\n" + 
-					"				ordengrupo,\r\n" + 
 					"				NOMBRE,\r\n" + 
 					"				Ins.FECHASUSCRIPCION,\r\n" + 
 					"				Ins.Idpersona) consulta "
@@ -195,8 +193,6 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				AND Gua.Idguardia = "+idGuardia+"\r\n" + 
 					"			ORDER BY\r\n" + 
 					"				"+ordenaciones+"\r\n" + 
-					"				numeroGrupo,\r\n" + 
-					"				ordengrupo,\r\n" + 
 					"				NOMBRE,\r\n" + 
 					"				Ins.FECHASUSCRIPCION,\r\n" + 
 					"				Ins.Idpersona) consulta3\r\n" + 
@@ -307,8 +303,6 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"                          AND Gua.Idturno = "+idTurno+"\r\n" + 
 					"                          AND Gua.Idguardia = "+idGuardia+"\r\n" + 
 					"                    ORDER BY\r\n" + 
-					"                          numeroGrupo,\r\n" + 
-					"                          ordengrupo,\r\n" + 
 					"							"+ordenaciones+"\r\n" + 
 					"                          NOMBRE,\r\n" + 
 					"                          Ins.FECHASUSCRIPCION,\r\n" + 

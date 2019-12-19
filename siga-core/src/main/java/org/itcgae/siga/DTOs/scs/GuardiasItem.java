@@ -15,6 +15,7 @@ public class GuardiasItem {
 	private String idPersonaUltimo;
 	private String idGrupoUltimo;
 	private String idTipoGuardia;
+	private String ordenacionManual;
 	private String turno;
 	private String nombre;
 	private String descripcion;
@@ -54,6 +55,12 @@ public class GuardiasItem {
 	
 	
 	
+	public String getOrdenacionManual() {
+		return ordenacionManual;
+	}
+	public void setOrdenacionManual(String ordenacionManual) {
+		this.ordenacionManual = ordenacionManual;
+	}
 	public String getIdGrupoUltimo() {
 		return idGrupoUltimo;
 	}

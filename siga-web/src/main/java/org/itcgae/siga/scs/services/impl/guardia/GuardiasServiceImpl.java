@@ -921,9 +921,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO desc,");
 
 						if (cola.get(0).getOrdenacionmanual() > 0)
-							mapilla.put(cola.get(0).getOrdenacionmanual(), "ORDENACIONMANUAL,");
-						else if (cola.get(0).getOrdenacionmanual() < 0)
-							mapilla.put(cola.get(0).getOrdenacionmanual(), "ORDENACIONMANUAL desc,");
+							mapilla.put(cola.get(0).getOrdenacionmanual(), "numeroGrupo,ordengrupo,");
 
 						if (cola.get(0).getNumerocolegiado() > 0)
 							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO,");
