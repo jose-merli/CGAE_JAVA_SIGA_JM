@@ -4,7 +4,7 @@ package org.itcgae.siga.scs.services.impl.oficio;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +35,8 @@ import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
@@ -56,6 +57,7 @@ import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
 import org.itcgae.siga.db.mappers.ScsInscripcionturnoMapper;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsOrdenacionColasExtendsMapper;
@@ -73,8 +75,8 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 	private Logger LOGGER = Logger.getLogger(FichaPartidasJudicialesServiceImpl.class);
 
 	@Autowired
-	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
-
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
 	@Autowired
 	private ScsOrdenacioncolasMapper scsOrdenacioncolasMapper;
 
@@ -139,7 +141,8 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InscripcionesDTO inscripcionesDTO = new InscripcionesDTO();
 		List<InscripcionesItem> inscripcionesItems = null;
-
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -153,6 +156,25 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
+
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+						.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+				LOGGER.info(
+						"searchJusticiables() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+				
+				if(tamMax != null) {
+					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+				}else {
+					tamMaximo = null;
+				}
+				
 				String fechahasta = "";
 				String fechadesde = "";
 				String afechade = "";
@@ -176,7 +198,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 				
 				
 				
-				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaInscripciones(inscripcionesItem, idInstitucion,fechadesde,fechahasta,afechade);
+				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaInscripciones(inscripcionesItem, idInstitucion,fechadesde,fechahasta,afechade,tamMaximo);
 
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");

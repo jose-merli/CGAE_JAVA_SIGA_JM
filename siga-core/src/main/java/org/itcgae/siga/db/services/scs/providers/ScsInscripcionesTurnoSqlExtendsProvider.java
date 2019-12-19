@@ -38,7 +38,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		return sql.toString() +"consultaBaja";
 	}
 	
-	public String busquedaInscripciones(InscripcionesItem inscripcionesItem, Short idInstitucion,String fechadesde,String fechahasta, String afechade) {
+	public String busquedaInscripciones(InscripcionesItem inscripcionesItem, Short idInstitucion,String fechadesde,String fechahasta, String afechade,Integer tamMax) {
 
 		SQL sql = new SQL();
 		sql.SELECT(  
@@ -88,15 +88,13 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"    ins.observacionesvalbaja,\r\n" + 
 				"    ins.fechadenegacion,\r\n" + 
 				"    ins.observacionesdenegacion,\r\n" + 
-				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado,\r\n" + 
-				"    TO_CHAR(nvl(ins.fechadenegacion,ins.fechavalidacion),'dd/mm/yyyy') fechavalidacion,\r\n" + 
-				"    TO_CHAR(nvl(ins.fechadenegacion,ins.fechabaja),'dd/mm/yyyy') fechabaja\r\n" + 
+				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado\r\n" + 
 				"FROM\r\n" + 
 				"    scs_inscripcionturno ins\r\n" + 
-				"    INNER JOIN cen_colegiado col ON col.idpersona = ins.idpersona\r\n" + 
+				"    JOIN cen_colegiado col ON col.idpersona = ins.idpersona\r\n" + 
 				"                                    AND col.idinstitucion = ins.idinstitucion\r\n" + 
-				"    INNER JOIN cen_persona per ON per.idpersona = col.idpersona\r\n" + 
-				"    INNER JOIN scs_turno tur ON tur.idturno = ins.idturno\r\n" + 
+				"     JOIN cen_persona per ON per.idpersona = col.idpersona\r\n" + 
+				"    LEFT JOIN scs_turno tur ON tur.idturno = ins.idturno\r\n" + 
 				"                                AND tur.idinstitucion = ins.idinstitucion");
 		sql.WHERE("ins.idinstitucion ='"+idInstitucion+"'");
 		if(inscripcionesItem.getIdturno() != null) {
@@ -118,20 +116,20 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"    )");
 		if(inscripcionesItem.getEstado() != null) {
 			if(inscripcionesItem.getEstado().equals("0")) {
-				sql.WHERE("ins.fechavalidacion is null and ins.fechasolicitudbaja is null and ins.fechabaja "
-						+ "is null and ins.fechadenegacion is null OR ins.fechavalidacion is not null and ins.fechasolicitudbaja is not null and ins.fechabaja"
-						+ " is null and ins.fechadenegacion is null") ;
+				sql.WHERE("((ins.fechavalidacion is null and ins.fechasolicitudbaja is null and ins.fechabaja "
+						+ "is null and ins.fechadenegacion is null) OR (ins.fechavalidacion is not null and ins.fechasolicitudbaja is not null and ins.fechabaja"
+						+ " is null and ins.fechadenegacion is null))") ;
 			}
 			
 			if(inscripcionesItem.getEstado().equals("1")) {
-				sql.WHERE("ins.fechavalidacion is not null and ins.fechasolicitudbaja is null and ins.fechabaja "
-						+ "is null and ins.fechadenegacion is null OR ins.fechavalidacion is not null and ins.fechasolicitudbaja is null and ins.fechabaja"
-						+ " is not null and ins.fechadenegacion is null") ;
+				sql.WHERE("((ins.fechavalidacion is not null and ins.fechasolicitudbaja is null and ins.fechabaja "
+						+ "is null and ins.fechadenegacion is null) OR (ins.fechavalidacion is not null and ins.fechasolicitudbaja is not null and ins.fechabaja"
+						+ " is not null and ins.fechadenegacion is null))") ;
 			}
 			
 			if(inscripcionesItem.getEstado().equals("2")) {
-				sql.WHERE("ins.fechavalidacion is not null and ins.fechasolicitudbaja is not null and ins.fechabaja "
-						+ "is not null and ins.fechadenegacion is not null") ;
+				sql.WHERE("(ins.fechavalidacion is not null and ins.fechasolicitudbaja is not null and ins.fechabaja "
+						+ "is not null and ins.fechadenegacion is not null)") ;
 			}
 		}
 		if(inscripcionesItem.getAfechade() != null) {
@@ -145,6 +143,10 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			sql.WHERE("ins.fechasolicitud <= '"+fechahasta+"'");
 		}
 		sql.ORDER_BY("nombreturno");
+		if (tamMax != null) {
+			Integer tamMaxNumber = tamMax + 1;
+			sql.WHERE("rownum <= " + tamMaxNumber);
+		}
 			
 		return sql.toString();
 	}
