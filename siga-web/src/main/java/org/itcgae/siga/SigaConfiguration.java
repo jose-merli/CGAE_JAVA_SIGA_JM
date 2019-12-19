@@ -104,6 +104,7 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 			PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 			sqlSessionFactory.setMapperLocations(resolver.getResources("classpath:org/itcgae/siga/db/services/com/mappers/MapperConsulta.xml"));
 			config.setCallSettersOnNulls(true);
+			config.setDefaultStatementTimeout(60000);
 			configurationCustomizer.customize(config);
 			sqlSessionFactory.setConfiguration(config);
 			return sqlSessionFactory.getObject();

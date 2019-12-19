@@ -25,6 +25,7 @@ import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -988,6 +989,20 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						} else {
 							response.setStatus(SigaConstants.OK);
 						}
+						// Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se
+						// encargan de ello
+
+						// Lanzamos el proceso de revision de suscripciones del letrado
+						String resultadoPl[] = ejecutarPL_RevisionSuscripcionesLetrado("" + idInstitucion.toString(),
+								"" + listColegiadoItem.get(0).getIdPersona(), "", "" + usuario.getIdusuario().toString());
+						if ((resultadoPl == null) || (!resultadoPl[0].equals("0"))) {
+							Error error = new Error();
+							response.setStatus(SigaConstants.KO);
+							error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"
+									+ resultadoPl[1]);
+							response.setError(error);
+							return response;
+						}
 
 					} else {
 						response.setStatus(SigaConstants.KO);
@@ -1543,6 +1558,39 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 		LOGGER.info("datosColegialesSearch() -> Salida del servicio para la búsqueda por filtros de Colegiados");
 		return datosColegialesDTO;
+	}
+	/**
+	 * PL que realiza una revision de letrado
+	 * 
+	 * @param idInstitucion
+	 * @param idPersona
+	 * @param usuario
+	 * @return
+	 * @throws ClsExceptions
+	 */
+	private String[] ejecutarPL_RevisionSuscripcionesLetrado(String idInstitucion, String idPersona, String fecha,
+			String usuario) throws Exception {
+
+		Object[] paramIn = new Object[4]; // Parametros de entrada del PL
+		String resultado[] = new String[2]; // Parametros de salida del PL
+
+		try {
+			// Parametros de entrada del PL
+			paramIn[0] = idInstitucion;
+			paramIn[1] = idPersona;
+			paramIn[2] = fecha;
+			paramIn[3] = usuario;
+
+			// Ejecucion del PL
+			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO (?,?,?,?,?,?)}", 2,
+					paramIn);
+
+		} catch (Exception e) {
+			resultado[0] = "1"; // P_NUMREGISTRO
+			resultado[1] = "ERROR"; // ERROR P_DATOSERROR
+		}
+
+		return resultado;
 	}
 
 }
