@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.ejg;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,12 +11,16 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsTiposentidoauto;
 import org.itcgae.siga.db.entities.ScsTiposentidoautoExample;
 import org.itcgae.siga.db.mappers.ScsTiposentidoautoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsFundamentoscalificacionExtendsMapper;
@@ -67,8 +72,9 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 	private ScsPonenteExtendsMapper scsPonenteextendsMapper;
 	@Autowired
 	private ScsTurnosExtendsMapper scsTurnosextendsMapper;
-
-
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
 	@Override
 	public ComboDTO comboTipoEJG(HttpServletRequest request) {
 		// TODO Auto-generated method stub
@@ -512,11 +518,12 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 		LOGGER.info("busquedaEJG() -> Entrada al servicio para obtener el colegiado");
 		
 		EjgDTO ejgDTO = new EjgDTO();
-		
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+          
 		if(null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -529,8 +536,27 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 			if(null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				usuario.setIdinstitucion(idInstitucion);
+		        GenParametrosExample genParametrosExample = new GenParametrosExample();
+		        genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+		                .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+		        genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+		        LOGGER.info(
+		                "busquedaEJG() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+		        tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+		        LOGGER.info(
+		                "busquedaEJG() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+		        LOGGER.info(
+		                "busquedaEJG() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
+		        if (tamMax != null) {
+		            tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+		        } else {
+		            tamMaximo = null;
+		        }
 				LOGGER.info("busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
-				ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString()));
+				ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo));
 				LOGGER.info("busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
 			}else {
 				LOGGER.warn("busquedaEJG() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);

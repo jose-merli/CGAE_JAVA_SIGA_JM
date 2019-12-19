@@ -12,7 +12,7 @@ import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	
 	
-	public String busquedaEJG(EjgItem ejgItem, String idInstitucion) {
+	public String busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo) {
 		String dictamenCad = "";
 		boolean indiferente = false;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); 
@@ -76,8 +76,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.numero");
 		sql.SELECT("ejg.numejg numejg"); 
 		sql.SELECT("'E' || EJG.ANIO || '/' || EJG.NUMEJG AS NUMANIO");
-		sql.SELECT("TURNO.NOMBRE || '/' || GUARDIA.NOMBRE AS TURNO");
-		sql.SELECT("TURNO.ABREVIATURA AS TURNODES");
+		sql.SELECT("TURNO.NOMBRE || '/' || GUARDIA.NOMBRE AS TURNOGUARDIA");
+		sql.SELECT("TURNO.ABREVIATURA AS TURNO");
+		sql.SELECT("EJG.GUARDIATURNO_IDTURNO as IDTURNO");
 		sql.SELECT("ejg.fechaapertura");
 		sql.SELECT("ejg.fechamodificacion");
 		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as NOMBREletrado");
@@ -384,8 +385,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			if(ejgItem.getGuardia() != null && ejgItem.getGuardia() != "")
 				sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getGuardia());
 		}
+		if (tamMaximo != null) {
+			Integer tamMaxNumber = tamMaximo + 1;
+			sql.WHERE("rownum <= " + tamMaxNumber);
 
-		sql.WHERE("rownum < 1000");
+		}
 		//order
 		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
 		return sql.toString();	
@@ -404,14 +408,17 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ ") designaletrado2 on (designaletrado2.idinstitucion = ejgd.idinstitucion and designaletrado2.idturno = ejgd.idturno  and designaletrado2.anio = ejgd.anioejg and designaletrado2.numero = EJGD.NUMERODESIGNA)";
 
 		//select
+		sql.SELECT("EJG.IDPERSONA"); //IDpERSONA
 		sql.SELECT("ejg.anio");
 		sql.SELECT("ejg.idinstitucion");
 		sql.SELECT("ejg.idtipoejg");
 		sql.SELECT("ejg.numero");
 		sql.SELECT("ejg.numejg numejg"); 
 		sql.SELECT("'E' || EJG.ANIO || '/' || EJG.NUMEJG AS NUMANIO");
-		sql.SELECT("TURNO.NOMBRE || '/' || GUARDIA.NOMBRE AS TURNO");
-		sql.SELECT("TURNO.ABREVIATURA AS TURNODES");
+		sql.SELECT("TURNO.NOMBRE || '/' || GUARDIA.NOMBRE AS TURNOGUARDIA");
+		sql.SELECT("TURNO.ABREVIATURA AS TURNO");
+		sql.SELECT("EJG.GUARDIATURNO_IDTURNO as IDTURNO");
+		sql.SELECT("EJG.GUARDIATURNO_IDGUARDIA as IDGUARDIA");
 		sql.SELECT("ejg.fechaapertura");
 		sql.SELECT("ejg.fechapresentacion");
 		sql.SELECT("ejg.idtipoejgcolegio");

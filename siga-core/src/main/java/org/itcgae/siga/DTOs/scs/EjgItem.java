@@ -12,6 +12,7 @@ public class EjgItem {
     private String colegio;
     private String annio;
     private String numero;
+    private String numEjg;
     private String tipoEJG;
     private String tipoEJGColegio;
     private String creadoDesde;
@@ -67,6 +68,8 @@ public class EjgItem {
     private String rol;
 
     private String turno;
+    private String idTurno;
+
     private String guardia;
     private String numColegiado;
     private String apellidosYNombre; 
@@ -1046,6 +1049,36 @@ public class EjgItem {
 
 	public void setFechalimitepresentacion(Date fechalimitepresentacion) {
 		this.fechalimitepresentacion = fechalimitepresentacion;
+	}
+	/**
+	 **/
+	public EjgItem idTurno(String idTurno) {
+		this.idTurno = idTurno;
+		return this;
+	}
+
+	@JsonProperty("idTurno")
+	public String getIdTurno() {
+		return idTurno;
+	}
+
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
+	}
+	/**
+	 **/
+	public EjgItem numEjg(String numEjg) {
+		this.numEjg = numEjg;
+		return this;
+	}
+
+	@JsonProperty("numEjg")
+	public String getNumEjg() {
+		return numEjg;
+	}
+
+	public void setNumEjg(String numEjg) {
+		this.numEjg = numEjg;
 	}
 
 //	/**

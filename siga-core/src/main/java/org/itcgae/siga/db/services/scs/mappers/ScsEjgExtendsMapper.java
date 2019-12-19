@@ -61,10 +61,11 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "anio", property = "annio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipoejg", property = "tipoEJG", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "numejg", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numejg", property = "numEjg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMANIO", property = "numAnnioProcedimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "TURNODES", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TURNOGUARDIA", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaapertura", property = "fechaApertura", jdbcType = JdbcType.DATE),
 		@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRESOLICITANTE", property = "nombreApeSolicitante", jdbcType = JdbcType.VARCHAR),
@@ -72,7 +73,7 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
 	})
-	List<EjgItem> busquedaEJG(EjgItem ejgItem, String string);
+	List<EjgItem> busquedaEJG(EjgItem ejgItem, String string, Integer tamMaximo);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "datosEJG")
 	@Results({ 
@@ -91,10 +92,14 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "anio", property = "annio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipoejg", property = "tipoEJG", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "numejg", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numejg", property = "numEjg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMANIO", property = "numAnnioProcedimiento", jdbcType = JdbcType.VARCHAR),
+		
+		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "TURNODES", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TURNOGUARDIA", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
+
+		@Result(column = "IDGUARDIA", property = "guardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaapertura", property = "fechaApertura", jdbcType = JdbcType.DATE),
 		@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.DATE),
 		@Result(column = "NOMBRESOLICITANTE", property = "nombreApeSolicitante", jdbcType = JdbcType.VARCHAR),
