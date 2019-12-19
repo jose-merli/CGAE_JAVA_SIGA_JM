@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsFacturacionJGSqlExtendsProvider;
@@ -89,21 +90,21 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	})
 	List<ComboItem> getComboFactColegio(Short idInstitucion);	
 	
-//	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "buscarCartasfacturacion")
-//	@Results({ 
-//		@Result(column = "NOMBRECOL", property = "nombreCol", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "NOMBREFAC", property = "nombreFac", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "FECHADESDE", property = "fechaDesde", jdbcType = JdbcType.DATE),
-//		@Result(column = "FECHAHASTA", property = "fechaHasta", jdbcType = JdbcType.DATE),
-//		@Result(column = "NCOLEGIADO", property = "ncolegiado", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "IMPORTEGUARDIA", property = "importeGuardia", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "IMPORTEOFICIO", property = "importeOficio", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "IMPORTEEJG", property = "importeEjg", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "IMPORTESOJ", property = "importeSoj", jdbcType = JdbcType.VARCHAR),
-//
-//	})
-//	List<CartasFacturacionPagosItem> buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion);
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "buscarCartasfacturacion")
+	@Results({ 
+		@Result(column = "NOMBRECOL", property = "nombreCol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREFAC", property = "nombreFac", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHADESDE", property = "fechaDesde", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAHASTA", property = "fechaHasta", jdbcType = JdbcType.DATE),
+		@Result(column = "NCOLEGIADO", property = "ncolegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEGUARDIA", property = "importeGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEOFICIO", property = "importeOficio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEEJG", property = "importeEjg", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTESOJ", property = "importeSoj", jdbcType = JdbcType.VARCHAR),
+
+	})
+	List<CartasFacturacionPagosItem> buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion);
 
 }
