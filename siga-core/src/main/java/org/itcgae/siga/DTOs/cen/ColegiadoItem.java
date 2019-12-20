@@ -15,6 +15,7 @@ public class ColegiadoItem {
 	private String idPersona;
 	private String noAparecerRedAbogacia;
 	private String noAparecerRedAbogacia2;
+	private String noAparecerRedAbogaciaFilter;
 	private Boolean searchLoggedUser;
 	private String institucion;
 	private String idInstitucion;
@@ -1210,6 +1211,14 @@ public class ColegiadoItem {
 		this.noAparecerRedAbogacia2 = noAparecerRedAbogacia2;
 	}
 
+	public String getNoAparecerRedAbogaciaFilter() {
+		return noAparecerRedAbogaciaFilter;
+	}
+
+	public void setNoAparecerRedAbogaciaFilter(String noAparecerRedAbogaciaFilter) {
+		this.noAparecerRedAbogaciaFilter = noAparecerRedAbogaciaFilter;
+	}
+
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idPersona, idInstitucion, nif, nombre, numColegiado, residenteInscrito,	fechaNacimiento, correo, telefono, movil, estadoColegial,
@@ -1217,7 +1226,7 @@ public class ColegiadoItem {
 	    		idEstadoCivil, domicilio, tipoCV, subTipoCV1, subTipoCV2, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
 	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
 	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV, temas,
-	    		fechaNacimientoRango, fechaEstadoNueva, identificadords, cambioEstado);
+	    		fechaNacimientoRango, fechaEstadoNueva, identificadords, cambioEstado, noAparecerRedAbogaciaFilter);
 	}
 
 	@Override
@@ -1286,6 +1295,7 @@ public class ColegiadoItem {
 	    sb.append("    fechaEstadoNueva: ").append(toIndentedString(fechaEstadoNueva)).append("\n");
 	    sb.append("    identificadords: ").append(toIndentedString(identificadords)).append("\n");
 	    sb.append("    cambioEstado: ").append(toIndentedString(cambioEstado)).append("\n");
+	    sb.append("    noAparecerRedAbogaciaFilter: ").append(toIndentedString(noAparecerRedAbogaciaFilter)).append("\n");
 
 		
 	    sb.append("}");
