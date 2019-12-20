@@ -66,7 +66,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("nvl(decode(nvl(col.comunitario,0),0, col.ncolegiado, col.ncomunitario), col.ncolegiado) as numcolegiado");
 		sql.SELECT_DISTINCT("colest.idestado as situacion");
 		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
-		sql.SELECT_DISTINCT("colest.situacionresidente as situacionresidente");
+		sql.SELECT_DISTINCT("col.situacionresidente as situacionresidente");
 		sql.SELECT_DISTINCT("col.comunitario as comunitario");
 
 		sql.SELECT_DISTINCT(
