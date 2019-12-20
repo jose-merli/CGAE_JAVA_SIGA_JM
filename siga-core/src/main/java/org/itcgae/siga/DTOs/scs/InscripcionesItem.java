@@ -25,6 +25,7 @@ public class InscripcionesItem {
 	public String observacionesvalidacion;
 	public Date fechasolicitudbaja;
 	public String observacionesbaja;
+	public String validarinscripciones;
 	public Date fechabaja;
 	public String observacionesvalbaja;
 	public Date fechadenegacion;
@@ -32,6 +33,15 @@ public class InscripcionesItem {
 	public Date fechavaloralta;
 	public Date fechavalorbaja;
 	public String estadonombre;
+	
+	public String getValidarinscripciones() {
+		return validarinscripciones;
+	}
+
+	public void setValidarinscripciones(String validarinscripciones) {
+		this.validarinscripciones = validarinscripciones;
+	}
+
 	public String getNombreturno() {
 		return nombreturno;
 	}

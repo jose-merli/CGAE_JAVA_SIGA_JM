@@ -20,4 +20,6 @@ public interface IGestionInscripcionesService {
 	public ComboDTO comboTurnos(HttpServletRequest request);
 
 	public InscripcionesDTO busquedaInscripciones(InscripcionesItem inscripcionesItem, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateSolicitarBaja(InscripcionesItem inscripcionesItem, HttpServletRequest request);
 }

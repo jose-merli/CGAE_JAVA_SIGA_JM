@@ -78,7 +78,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
 	@Autowired
-	private ScsOrdenacioncolasMapper scsOrdenacioncolasMapper;
+	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
 
 	@Autowired
 	private ScsInscripcionesTurnoExtendsMapper scsInscripcionturnoExtendsMapper;
@@ -212,5 +212,75 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
 		return inscripcionesDTO;
 	}
+	
+	@Override
+	public UpdateResponseDTO updateSolicitarBaja(InscripcionesItem inscripcionesItem, HttpServletRequest request) {
+		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					LOGGER.info(
+							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
+				
+
+					LOGGER.info(
+							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
+				}
+
+				catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha modificado la partida presupuestaria");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else if (response == 1 && existentes != 0) {
+					error.setCode(200);
+					error.setDescription(
+							"Se han modificiado la partida presupuestaria excepto algunos que tiene las mismas características");
+
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la partida presupuestaria correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar una partida presupuestaria");
+
+			}
+		}
+		return updateResponseDTO;
+	}
+
 	
 }
