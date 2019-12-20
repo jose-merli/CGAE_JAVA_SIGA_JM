@@ -14,11 +14,18 @@ public class InscripcionGuardiaItem {
 	private String apellido2;
 	private String nombre;
 	private String ordenCola;
+	private String idPersona;
 	
 	
 	
 	
 	
+	public String getIdPersona() {
+		return idPersona;
+	}
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
 	public String getOrdenCola() {
 		return ordenCola;
 	}

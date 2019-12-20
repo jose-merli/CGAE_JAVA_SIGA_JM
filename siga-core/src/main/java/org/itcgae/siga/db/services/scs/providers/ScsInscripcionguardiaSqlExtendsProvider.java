@@ -229,9 +229,9 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		else 
 			sql.SELECT("ROWNUM AS orden_cola, consulta.* FROM (SELECT(CASE\r\n" + 
 					"                                 WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-					"                                 AND TRUNC(Ins.Fechavalidacion) <= NVL('17/12/2019', Ins.Fechavalidacion)\r\n" + 
+					"                                 AND TRUNC(Ins.Fechavalidacion) <= NVL('"+fecha+"', Ins.Fechavalidacion)\r\n" + 
 					"                                 AND (Ins.Fechabaja IS NULL\r\n" + 
-					"                                 OR TRUNC(Ins.Fechabaja) > NVL('17/12/2019', '01/01/1900')) THEN '1'\r\n" + 
+					"                                 OR TRUNC(Ins.Fechabaja) > NVL('"+fecha+"', '01/01/1900')) THEN '1'\r\n" + 
 					"                                 ELSE '0'\r\n" + 
 					"                          END) Activo,\r\n" + 
 					"                          Ins.Idinstitucion,\r\n" + 

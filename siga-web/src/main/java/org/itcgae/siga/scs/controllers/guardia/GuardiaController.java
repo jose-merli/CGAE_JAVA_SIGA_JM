@@ -100,7 +100,7 @@ public class GuardiaController {
 		return new ResponseEntity<InscripcionGuardiaDTO>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping(value = "/busquedaGuardia/ultimo", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/gestionGuardia/ultimo", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateUltimoCola(@RequestBody GuardiasItem guardia, HttpServletRequest request){
 		UpdateResponseDTO response= guardiasService.updateUltimoCola(guardia, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);

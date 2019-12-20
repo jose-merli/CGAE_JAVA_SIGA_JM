@@ -1,7 +1,5 @@
 package org.itcgae.siga.scs.services.impl.guardia;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -29,8 +27,6 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.ScsGrupoguardia;
-import org.itcgae.siga.db.entities.ScsGrupoguardiaExample;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
@@ -1035,9 +1031,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					LOGGER.info(
 							"updateUltimoCola() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear DatosGenerales de guardias");
-
-					guardia.setIdpersonaUltimo(Long.valueOf(guardiasItem.getIdPersonaUltimo()));
+					ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
+					example.createCriteria().andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
+					.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).andIdinstitucionEqualTo(idInstitucion);
+					guardia = scsGuardiasturnoExtendsMapper.selectByExample(example).get(0);
 					
+//					guardia.setIdpersonaUltimo();
 					if(!UtilidadesString.esCadenaVacia(guardiasItem.getIdGrupoUltimo()))
 						guardia.setIdgrupoguardiaUltimo(Long.valueOf(guardiasItem.getIdGrupoUltimo()));
 					
