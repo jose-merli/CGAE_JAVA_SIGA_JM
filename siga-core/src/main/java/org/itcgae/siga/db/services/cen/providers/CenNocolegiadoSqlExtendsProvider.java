@@ -98,9 +98,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (null != busquedaJuridicaSearchDTO.getTipo() && !busquedaJuridicaSearchDTO.getTipo().equalsIgnoreCase("")) {
 			sql2.WHERE("COL.TIPO = '" + busquedaJuridicaSearchDTO.getTipo() + "'");
 		} else {
-			sql2.WHERE("COL.TIPO IN('0','A','B','C','D','E','F','G','H','J','P','Q','R','S','U','V')");
+			//sql2.WHERE("COL.TIPO IN('0','A','B','C','D','E','F','G','H','J','P','Q','R','S','U','V')");
 		}
-
+		sql2.WHERE("PER.IDTIPOIDENTIFICACION IN ('20')");
+		
 		sql2.GROUP_BY("COL.IDINSTITUCION");
 		sql2.GROUP_BY("COL.IDPERSONA");
 		sql2.GROUP_BY("PER.NIFCIF");
@@ -702,7 +703,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
 		//sql.WHERE("per.idtipoidentificacion not in '20'");
 		sql.WHERE("(dir.fechamodificacion = (select max(fechamodificacion) from cen_direcciones dir2 where dir2.idpersona = dir.idpersona and dir2.idinstitucion = dir.idinstitucion and dir2.idinstitucion = dir.idinstitucion and dir2.fechabaja is null ) or dir.fechamodificacion is null)");
-		
+		sql.WHERE("per.idtipoidentificacion not in '20'");
 		if(!noColegiadoItem.isHistorico()) {
 			sql.WHERE("NOCOL.FECHA_BAJA is NULL");
 		}

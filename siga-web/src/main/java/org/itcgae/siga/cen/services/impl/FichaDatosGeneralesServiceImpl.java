@@ -5,6 +5,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
+import java.sql.Types;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,7 +20,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -37,6 +46,8 @@ import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmConfig;
+import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
@@ -62,6 +73,7 @@ import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
+import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenSolicmodifcambiarfotoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
@@ -84,10 +96,12 @@ import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
+@Transactional
 public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesService {
 
 	private Logger LOGGER = Logger.getLogger(FichaDatosGeneralesServiceImpl.class);
@@ -149,6 +163,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
 
+	@Autowired
+	private AdmConfigMapper admConfigMapper;
 	// @Override
 	// public ComboDTO getSocietyTypes(HttpServletRequest request) {
 	// // TODO Auto-generated method stub
@@ -742,9 +758,33 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 //								}
 							}
 
+							if (!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
+								
+								// Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se
+								// encargan de ello
+								LOGGER.info(
+										"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a ejecutarPL_RevisionSuscripcionesLetrado");
+								// Lanzamos el proceso de revision de suscripciones del letrado
+								String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado("" + idInstitucion.toString(),
+										"" + colegiadoItem.getIdPersona(), "", "" + usuario.getIdusuario().toString());
+								if ((resultado == null) || (!resultado[0].equals("0"))) {
+									LOGGER.info(
+											"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a error al ejecutarPL_RevisionSuscripcionesLetrado");
+									Error error = new Error();
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"
+											+ resultado[1]);
+									updateResponseDTO.setError(error);
+									return updateResponseDTO;
+								}
+								LOGGER.info(
+										"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(temaCursoBaja) -> Salida a ejecutarPL_RevisionSuscripcionesLetrado");
+							}
 							updateResponseDTO.setStatus(SigaConstants.OK);
 						}
 
+						
+						
 					} else {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.warn(
@@ -1831,5 +1871,135 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 		return comboDTO;
 	}
+	
+	/**
+	 * PL que realiza una revision de letrado
+	 * 
+	 * @param idInstitucion
+	 * @param idPersona
+	 * @param usuario
+	 * @return
+	 * @throws ClsExceptions
+	 */
+	private String[] ejecutarPL_RevisionSuscripcionesLetrado(String idInstitucion, String idPersona, String fecha,
+			String usuario) throws Exception {
 
+		Object[] paramIn = new Object[4]; // Parametros de entrada del PL
+		String resultado[] = new String[2]; // Parametros de salida del PL
+
+		try {
+			// Parametros de entrada del PL
+			paramIn[0] = idInstitucion;
+			paramIn[1] = idPersona;
+			paramIn[2] = fecha;
+			paramIn[3] = usuario;
+
+			// Ejecucion del PL
+			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO (?,?,?,?,?,?)}", 2,
+					paramIn);
+
+		} catch (Exception e) {
+			resultado[0] = "1"; // P_NUMREGISTRO
+			resultado[1] = "ERROR"; // ERROR P_DATOSERROR
+		}
+
+		return resultado;
+	}
+	
+	/**
+	 * Calls a PL Funtion
+	 * 
+	 * @author CSD
+	 * @param functionDefinition
+	 *            string that defines the function
+	 * @param inParameters
+	 *            input parameters
+	 * @param outParameters
+	 *            number of output parameters
+	 * @return error code, '0' if ok
+	 * @throws NamingException
+	 * @throws IOException
+	 * @throws SQLException
+	 * @throws ClsExceptions
+	 *             type Exception
+	 */
+	private String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters)
+			throws IOException, NamingException, SQLException {
+		String result[] = null;
+
+		if (outParameters > 0)
+			result = new String[outParameters];
+		DataSource ds = getOracleDataSource();
+		Connection con = ds.getConnection();
+		try {
+			CallableStatement cs = con.prepareCall(functionDefinition);
+			int size = inParameters.length;
+
+			// input Parameters
+			for (int i = 0; i < size; i++) {
+
+				cs.setString(i + 1, (String) inParameters[i]);
+			}
+			// output Parameters
+			for (int i = 0; i < outParameters; i++) {
+				cs.registerOutParameter(i + size + 1, Types.VARCHAR);
+			}
+
+			for (int intento = 1; intento <= 2; intento++) {
+				try {
+					cs.execute();
+					break;
+
+				} catch (SQLTimeoutException tex) {
+					throw tex;
+
+				} catch (SQLException ex) {
+					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la
+																		// segunda vez deberia funcionar)
+						throw ex;
+					}
+				}
+
+			}
+
+			for (int i = 0; i < outParameters; i++) {
+				result[i] = cs.getString(i + size + 1);
+			}
+			cs.close();
+			return result;
+
+		} catch (SQLTimeoutException ex) {
+			return null;
+		} catch (SQLException ex) {
+			return null;
+		} catch (Exception e) {
+			return null;
+		} finally {
+			con.close();
+			con = null;
+		}
+	}
+
+	/**
+	 * Recupera el datasource con los datos de conexión sacados del fichero de
+	 * configuracion
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws NamingException
+	 */
+	private DataSource getOracleDataSource() throws IOException, NamingException {
+		try {
+
+			LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)");
+
+			AdmConfigExample example = new AdmConfigExample();
+			example.createCriteria().andClaveEqualTo("spring.datasource.jndi-name");
+			List<AdmConfig> config = admConfigMapper.selectByExample(example);
+			Context ctx = new InitialContext();
+			return (DataSource) ctx.lookup(config.get(0).getValor());
+		} catch (NamingException e) {
+			throw e;
+		}
+	}
 }
