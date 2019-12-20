@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
@@ -19,6 +18,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
 import org.itcgae.siga.db.entities.FcsFactGrupofactHito;
+import org.itcgae.siga.db.entities.FcsFactGrupofactHitoExample;
 import org.itcgae.siga.db.entities.FcsFacturacionjg;
 import org.itcgae.siga.db.mappers.FcsFactEstadosfacturacionMapper;
 import org.itcgae.siga.db.mappers.FcsFactGrupofactHitoMapper;
@@ -748,8 +748,14 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	               	LOGGER.info("updateConceptosFac() -> Actualizar datos de los conceptos de facturacion");
             
 		            Short idGrupoFacturacion=(short) Integer.parseInt(facturacionItem.getIdGrupo());
+		            Short idGrupoOld=(short) Integer.parseInt(facturacionItem.getIdGrupoOld());
+		            
 	            	Short idHitoGeneral = (short) Integer.parseInt(facturacionItem.getIdConcepto());
+	            	Short idHitoOld = (short) Integer.parseInt(facturacionItem.getIdConceptoOld());
 	            	
+	            	FcsFactGrupofactHitoExample example = new FcsFactGrupofactHitoExample();
+	            	
+	            	example.createCriteria().andIdfacturacionEqualTo(Integer.parseInt(facturacionItem.getIdFacturacion())).andIdinstitucionEqualTo(idInstitucion).andIdgrupofacturacionEqualTo(idGrupoOld).andIdhitogeneralEqualTo(idHitoOld);	            	
 	            	//SETEAMOS LOS DATOS Y GUARDAMOS LA FACTURA	      
 		            record.setIdinstitucion(idInstitucion);
 		            record.setIdfacturacion(Integer.parseInt(facturacionItem.getIdFacturacion()));
@@ -758,7 +764,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		            record.setFechamodificacion(new Date());
 		            record.setUsumodificacion(usuario.getIdusuario());
 		           		            
-		            response = fcsFactGrupofactHitoMapper.updateByPrimaryKeySelective(record);
+		            response = fcsFactGrupofactHitoMapper.updateByExampleSelective(record, example);
 		            
 		            LOGGER.info("updateConceptosFac() -> Salida actualizar datos de los conceptos de facturacion");
 		            
