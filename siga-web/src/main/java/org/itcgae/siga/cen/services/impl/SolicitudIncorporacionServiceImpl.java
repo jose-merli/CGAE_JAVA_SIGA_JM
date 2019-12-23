@@ -1629,7 +1629,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 
 		Object[] paramIn = new Object[4]; //Parametros de entrada del PL
 		String resultado[] = new String[2]; //Parametros de salida del PL
-	
+		LOGGER.info("Entrada Ejecución PL Revision SuscripcionesLetrado " );
 		try {
 	 		// Parametros de entrada del PL
 	        paramIn[0] = idInstitucion;
@@ -1641,10 +1641,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO (?,?,?,?,?,?)}", 2, paramIn);
 			
 		} catch (Exception e) {
+			LOGGER.info("Error Ejecución PL Revision SuscripcionesLetrado: " + e.getMessage());
 			resultado[0] = "1"; 	// P_NUMREGISTRO
 	    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
 		}
-		
+		LOGGER.info("Salida Ejecución PL Revision SuscripcionesLetrado " );
 	    return resultado;
 	}
 

@@ -1570,7 +1570,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 	 */
 	private String[] ejecutarPL_RevisionSuscripcionesLetrado(String idInstitucion, String idPersona, String fecha,
 			String usuario) throws Exception {
-
+		LOGGER.info("Entrada Ejecución PL Revision SuscripcionesLetrado");
 		Object[] paramIn = new Object[4]; // Parametros de entrada del PL
 		String resultado[] = new String[2]; // Parametros de salida del PL
 
@@ -1586,10 +1586,11 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					paramIn);
 
 		} catch (Exception e) {
+			LOGGER.info("Error Ejecución PL Revision SuscripcionesLetrado: " + e.getMessage());
 			resultado[0] = "1"; // P_NUMREGISTRO
 			resultado[1] = "ERROR"; // ERROR P_DATOSERROR
 		}
-
+		LOGGER.info("Salida Ejecución PL Revision SuscripcionesLetrado" );
 		return resultado;
 	}
 
