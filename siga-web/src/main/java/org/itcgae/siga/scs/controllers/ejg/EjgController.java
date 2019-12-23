@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,5 +114,11 @@ public class EjgController {
 			EjgDTO response = gestionEJG.datosEJG(ejgItem, request);
 			return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
 		}
+	//unidadFamiliar
+	@RequestMapping(value = "/gestion-ejg/unidadFamiliarEJG",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UnidadFamiliarEJGDTO> unidadFamiliarEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		UnidadFamiliarEJGDTO response = gestionEJG.unidadFamiliarEJG(ejgItem, request);
+		return new ResponseEntity<UnidadFamiliarEJGDTO>(response, HttpStatus.OK);
+	}
 		
 }

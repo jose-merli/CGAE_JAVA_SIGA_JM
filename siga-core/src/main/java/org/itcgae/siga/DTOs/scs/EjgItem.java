@@ -2,9 +2,6 @@ package org.itcgae.siga.DTOs.scs;
 
 import java.util.Date;
 
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.type.JdbcType;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EjgItem {

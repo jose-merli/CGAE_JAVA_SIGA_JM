@@ -427,6 +427,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as nombreletrado");
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
 		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre as NOMBRESOLICITANTE");
+		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 as APESOLICITANTE");
+		sql.SELECT("perjg.nombre as SOLONOMBRESOLIC");
+		sql.SELECT("perjg.NIF");
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
 		sql.SELECT("rectipodictamen.descripcion AS dictamen");
 		sql.SELECT("rectiporesolucion.descripcion AS resolucion");
