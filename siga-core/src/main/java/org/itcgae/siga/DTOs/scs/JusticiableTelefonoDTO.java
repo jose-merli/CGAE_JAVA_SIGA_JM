@@ -89,4 +89,5 @@ public class JusticiableTelefonoDTO {
 	    }
 	    return o.toString().replace("\n", "\n    ");
 	  }
+
 }

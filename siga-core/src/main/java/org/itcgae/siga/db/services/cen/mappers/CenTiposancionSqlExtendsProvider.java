@@ -105,15 +105,15 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		}
 
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getNombre())) {
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("persona.NOMBRE", busquedaSancionesSearchDTO.getNombre()));
+			sql.WHERE(filtroTextoBusquedas("persona.NOMBRE", busquedaSancionesSearchDTO.getNombre()));
 		}
 
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getPrimerApellido())) {
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("persona.APELLIDOS1", busquedaSancionesSearchDTO.getPrimerApellido()));
+			sql.WHERE(filtroTextoBusquedas("persona.APELLIDOS1", busquedaSancionesSearchDTO.getPrimerApellido()));
 		}
 
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getSegundoApellido())) {
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("persona.APELLIDOS2", busquedaSancionesSearchDTO.getSegundoApellido()));
+			sql.WHERE(filtroTextoBusquedas("persona.APELLIDOS2", busquedaSancionesSearchDTO.getSegundoApellido()));
 		}
 
 		if (null != busquedaSancionesSearchDTO.getColegio() && busquedaSancionesSearchDTO.getColegio().length > 0) {
@@ -127,7 +127,7 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		}
 
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getRefColegio())) {
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("sancion.REFCOLEGIO", busquedaSancionesSearchDTO.getRefColegio()));
+			sql.WHERE(filtroTextoBusquedas("sancion.REFCOLEGIO", busquedaSancionesSearchDTO.getRefColegio()));
 		}
 
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getRefConsejo())) {
@@ -267,6 +267,15 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		return rdo;
 	}
 
+	public static String filtroTextoBusquedas(String columna, String cadena) {
+		StringBuilder cadenaWhere = new StringBuilder();
+		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna
+				+ "),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') ");
+		cadenaWhere.append(" LIKE");
+		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena
+				+ "%'),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz')) ");
+		return cadenaWhere.toString();
 
+	}
 
 }
