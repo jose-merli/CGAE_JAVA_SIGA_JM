@@ -29,6 +29,8 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
+import org.itcgae.siga.db.entities.ScsInscripcionguardia;
+import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -884,7 +886,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 							.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
-							.andIdtipoguardiaEqualTo(Short.valueOf(guardiasItem.getIdGuardia()));
+							.andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()));
 
 					List<ScsGuardiasturno> guardias = scsGuardiasturnoExtendsMapper.selectByExample(example);
 					String ultimo = "";
@@ -1031,17 +1033,20 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					LOGGER.info(
 							"updateUltimoCola() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear DatosGenerales de guardias");
-					ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
+					ScsInscripcionguardiaExample example = new ScsInscripcionguardiaExample();
 					example.createCriteria().andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
-					.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).andIdinstitucionEqualTo(idInstitucion);
-					guardia = scsGuardiasturnoExtendsMapper.selectByExample(example).get(0);
-					
-//					guardia.setIdpersonaUltimo();
-					if(!UtilidadesString.esCadenaVacia(guardiasItem.getIdGrupoUltimo()))
-						guardia.setIdgrupoguardiaUltimo(Long.valueOf(guardiasItem.getIdGrupoUltimo()));
+					.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).andIdinstitucionEqualTo(idInstitucion)
+					.andIdpersonaEqualTo(Long.valueOf(guardiasItem.getIdPersonaUltimo()));
+					List<ScsInscripcionguardia> inscripciones = scsInscripcionguardiaExtendsMapper.selectByExample(example);
+					if(!inscripciones.isEmpty()) {
+						guardia.setFechasuscripcionUltimo(inscripciones.get(0).getFechasuscripcion());						
+						guardia.setIdpersonaUltimo(Long.valueOf(guardiasItem.getIdPersonaUltimo()));
+//					if(!UtilidadesString.esCadenaVacia(guardiasItem.getIdGrupoUltimo()))
+//						guardia.setIdgrupoguardiaUltimo(null);
 					
 					response = scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
-
+					}else
+						throw new Exception("No se encontró la inscripcion a la que asignarle último");
 				} catch (Exception e) {
 					LOGGER.error(e);
 					response = 0;
@@ -1069,4 +1074,39 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return updateResponseDTO;
 
 	}
+	
+	@Override
+	public GuardiasDTO resumenIncompatibilidades(GuardiasItem guardiasItem, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<GuardiasItem> guardias = new ArrayList<GuardiasItem>();
+		GuardiasDTO guardiaDTO = new GuardiasDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+
+				guardias = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades(guardiasItem, idInstitucion.toString());
+				guardiaDTO.setGuardiaItems(guardias);
+				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+			}
+		}
+		
+		return guardiaDTO;
+	}
+	
+
+	
 }

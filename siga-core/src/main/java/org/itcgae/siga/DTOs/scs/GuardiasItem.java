@@ -48,6 +48,7 @@ public class GuardiasItem {
 	private String porGrupos;
 	private String filtros;
 	private String rotarComponentes;
+	private String incompatibilidades;
 	private Date fechabaja;
 	private boolean historico;
 	
@@ -55,6 +56,12 @@ public class GuardiasItem {
 	
 	
 	
+	public String getIncompatibilidades() {
+		return incompatibilidades;
+	}
+	public void setIncompatibilidades(String incompatibilidades) {
+		this.incompatibilidades = incompatibilidades;
+	}
 	public String getOrdenacionManual() {
 		return ordenacionManual;
 	}

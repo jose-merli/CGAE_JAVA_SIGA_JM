@@ -39,6 +39,8 @@ public interface GuardiasService {
 	public InsertResponseDTO insertColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
 	
 	public UpdateResponseDTO updateUltimoCola(GuardiasItem guardiasItem, HttpServletRequest request);
+	
+	public GuardiasDTO resumenIncompatibilidades(GuardiasItem guardiasItem, HttpServletRequest request);
 
 
 }

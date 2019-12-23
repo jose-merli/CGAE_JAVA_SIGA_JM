@@ -8,11 +8,10 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 	
 	public String getColaGuardias(String idGuardia, String idTurno, String fecha,String ultimo,String ordenaciones, String idInstitucion) {
 		SQL sql = new SQL();
-		String elUltimo = "";
 		if(!UtilidadesString.esCadenaVacia(ultimo))						
 			sql.SELECT("ROWNUM AS orden_cola,\r\n" + 
 					"	consulta_total.*\r\n" + 
-					"FROM (WITH tabla_nueva AS (\r\n" + // A partir de este parentesis es donde va la query sin ultimo. Y sino, se pone todo.
+					"FROM (WITH tabla_nueva AS (\r\n" + // ESTA ES LA QUERY QUE SE USA CUANDO LA GUARDIA TIENE UN ÚLTIMOM ASIGNADO.
 					"	SELECT\r\n" + 
 					"		consulta2.*\r\n" + 
 					"	FROM\r\n" + 
@@ -198,7 +197,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				Ins.Idpersona) consulta3\r\n" + 
 					"		WHERE\r\n" + 
 					"			activo = 1) consulta4\r\n" + 				
-					"	"+elUltimo+")\r\n" + 
+					"	"+ultimo+")\r\n" + 
 					"	SELECT\r\n" + 
 					"		*\r\n" + 
 					"	FROM\r\n" + 

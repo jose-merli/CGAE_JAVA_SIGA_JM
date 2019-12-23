@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.db.mappers.ScsIncompatibilidadguardiasSqlProvider;
 
 public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatibilidadguardiasSqlProvider{
@@ -72,6 +73,49 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		sql.JOIN("SCS_TURNO turnos ON turnos.idturno = guardi.idturno AND turnos.idinstitucion = guardi.idinstitucion");
 		
 		sql.WHERE("incomp.IDGUARDIA_INCOMPATIBLE = "+idGuardia+" AND incomp.IDINSTITUCION = "+idInstitucion + ") UNION "+sqlUnion.toString());
+		return sql.toString();
+	}
+	
+	public String resumenIncompatibilidades(GuardiasItem guardia, String idInstitucion)  {
+		SQL sql = new SQL();
+		
+		sql.SELECT("count (*) AS TOTAL_INCOMPATIBILIDADES");
+		
+		sql.FROM("(SELECT\r\n" + 
+				"	turnos.NOMBRE AS TURNO,\r\n" + 
+				"	guardi.NOMBRE AS GUARDIA,\r\n" + 
+				"	guardi.SELECCIONLABORABLES,\r\n" + 
+				"	guardi.SELECCIONFESTIVOS,\r\n" + 
+				"	incomp.MOTIVOS,\r\n" + 
+				"	incomp.DIASSEPARACIONGUARDIAS,\r\n" + 
+				"	incomp.IDINSTITUCION\r\n" + 
+				"FROM\r\n" + 
+				"	SCS_INCOMPATIBILIDADGUARDIAS incomp\r\n" + 
+				"	JOIN SCS_GUARDIASTURNO guardi ON incomp.idguardia = guardi.idguardia AND INCOMP.idturno = guardi.idturno AND INCOMP.idinstitucion = guardi.idinstitucion\r\n" + 
+				"	JOIN SCS_TURNO turnos ON turnos.idturno = guardi.idturno AND turnos.idinstitucion = guardi.idinstitucion\r\n" + 
+				"WHERE\r\n" + 
+				"	incomp.IDINSTITUCION = "+idInstitucion+"\r\n" + 
+				"	AND incomp.IDTURNO = "+guardia.getIdTurno()+"\r\n" + 
+				"	AND incomp.IDGUARDIA = "+guardia.getIdGuardia()+"\r\n" + 
+				"UNION\r\n" + 
+				"SELECT\r\n" + 
+				"	turnos.NOMBRE AS TURNO,\r\n" + 
+				"	guardi.NOMBRE AS GUARDIA,\r\n" + 
+				"	guardi.SELECCIONLABORABLES,\r\n" + 
+				"	guardi.SELECCIONFESTIVOS,\r\n" + 
+				"	incomp.MOTIVOS,\r\n" + 
+				"	incomp.DIASSEPARACIONGUARDIAS,\r\n" + 
+				"	incomp.IDINSTITUCION\r\n" + 
+				"FROM\r\n" + 
+				"	SCS_INCOMPATIBILIDADGUARDIAS incomp\r\n" + 
+				"	JOIN SCS_GUARDIASTURNO guardi ON incomp.idguardia = guardi.idguardia AND INCOMP.idturno = guardi.idturno AND INCOMP.idinstitucion = guardi.idinstitucion\r\n" + 
+				"	JOIN SCS_TURNO turnos ON turnos.idturno = guardi.idturno AND turnos.idinstitucion = guardi.idinstitucion\r\n" + 
+				"WHERE\r\n" + 
+				"	incomp.IDINSTITUCION = "+idInstitucion+"\r\n" + 
+				"	AND incomp.IDTURNO_INCOMPATIBLE = "+guardia.getIdTurno()+"\r\n" + 
+				"	AND incomp.IDGUARDIA_INCOMPATIBLE = "+guardia.getIdGuardia()+")");
+		
+		
 		return sql.toString();
 	}
 }

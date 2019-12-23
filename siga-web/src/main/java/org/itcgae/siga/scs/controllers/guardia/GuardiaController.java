@@ -112,4 +112,10 @@ public class GuardiaController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/gestionGuardia/resumenIncompatibilidades", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<GuardiasDTO> resumenIncompatibilidades(@RequestBody GuardiasItem guardia, HttpServletRequest request){
+		GuardiasDTO response= guardiasService.resumenIncompatibilidades(guardia, request);
+		return new ResponseEntity<GuardiasDTO>(response, HttpStatus.OK);
+	}
+	
 }
