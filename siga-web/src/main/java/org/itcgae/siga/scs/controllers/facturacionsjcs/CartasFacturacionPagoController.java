@@ -25,5 +25,11 @@ public class CartasFacturacionPagoController {
 		CartasFacturacionPagosDTO response = cartasFacturacionPagoServices.buscarCartasfacturacion(cartasFacturacionPagosItem, request);
 		return new ResponseEntity<CartasFacturacionPagosDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value="/facturacionsjcs/buscarCartaspago", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CartasFacturacionPagosDTO> buscarCartaspago(@RequestBody CartasFacturacionPagosItem cartasFacturacionPagosItem, HttpServletRequest request){
+		CartasFacturacionPagosDTO response = cartasFacturacionPagoServices.buscarCartaspago(cartasFacturacionPagosItem, request);
+		return new ResponseEntity<CartasFacturacionPagosDTO>(response, HttpStatus.OK);
+	}
 
 }

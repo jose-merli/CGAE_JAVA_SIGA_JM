@@ -70,6 +70,50 @@ public class CartasFacturacionPagoServicesImpl implements ICartasFacturacionPago
 	    
 	    return cartasFacturacionPagosDTO;	
 	}
+
+	@Override
+	public CartasFacturacionPagosDTO buscarCartaspago(CartasFacturacionPagosItem cartasFacturacionPagosItem,
+			HttpServletRequest request) {
+		
+	    LOGGER.info("buscarCartaspago() -> Entrada del servicio para obtener las cartas de pago");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		CartasFacturacionPagosDTO cartasFacturacionPagosDTO = new CartasFacturacionPagosDTO();
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	      
+	        LOGGER.info("buscarCartaspago() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	        
+	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	        
+	        LOGGER.info("buscarCartaspago() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	            
+	        if(null != usuarios && usuarios.size() > 0) {
+	        	AdmUsuarios usuario = usuarios.get(0);
+	            usuario.setIdinstitucion(idInstitucion);
+	                
+	            LOGGER.info("buscarCartaspago() / fcsFacturacionJGExtendsMapper.buscarCartasfacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener las cartas de facturaciones");
+	            
+	            List<CartasFacturacionPagosItem> cartasFacturacionPagosItems = fcsFacturacionJGExtendsMapper.buscarCartaspago(cartasFacturacionPagosItem, idInstitucion, usuario.getIdlenguaje());
+	            cartasFacturacionPagosDTO.setCartasFacturacionPagosItems(cartasFacturacionPagosItems);
+	            
+	            LOGGER.info("buscarCartaspago() / fcsFacturacionJGExtendsMapper.buscarCartasfacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener las cartas de facturaciones");
+	      
+	        }else {
+	        	LOGGER.warn("buscarCartaspago() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+	        }
+	    }else {
+	    	LOGGER.warn("buscarCartaspago() -> idInstitucion del token nula");
+	    }
+	        
+	    LOGGER.info("buscarCartaspago() -> Salida del servicio para obtener las cartas de pago");
+	    
+	    return cartasFacturacionPagosDTO;	
+	}
 	
 	
 }
