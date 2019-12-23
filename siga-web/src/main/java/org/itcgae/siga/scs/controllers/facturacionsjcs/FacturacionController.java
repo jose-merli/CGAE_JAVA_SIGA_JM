@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.controllers.facturacionsjcs;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
@@ -130,7 +132,7 @@ public class FacturacionController {
 	}
 	
 	@RequestMapping(value = "/facturacionsjcs/deleteConceptosFac",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> deleteConceptosFac(@RequestBody FacturacionDTO facturacionDto, HttpServletRequest request) { 
+	ResponseEntity<DeleteResponseDTO> deleteConceptosFac(@RequestBody List<FacturacionItem> facturacionDto, HttpServletRequest request) { 
 		DeleteResponseDTO response = facturacionServices.deleteConceptosFac(facturacionDto, request);
 		if (response.getError().getCode() == 200) {
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
