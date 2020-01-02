@@ -19,7 +19,7 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
 	@SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "comboPagosColegio")
 	@Results({ 
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPAGOSJG", property = "value", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> comboPagosColegio(String idLenguaje, Short idInstitucion);
 	

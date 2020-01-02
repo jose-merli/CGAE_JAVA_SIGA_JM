@@ -381,6 +381,76 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.WHERE("pjg.idfacturacion =  '" + idFacturacion + "'");
 		sql.WHERE("rec.idlenguaje = '"+idLenguaje+"'");
 
+        return sql.toString();
+    }
+
+	public String buscarCartaspago(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion, String idLenguaje) {
+
+		SQL sql = new SQL();
+			
+		sql.SELECT("idpersonasjcs");
+		sql.SELECT("idpagos");
+		sql.SELECT("nombrepago");
+		sql.SELECT("totalimportesjcs");
+		sql.SELECT("importetotalretenciones");
+		sql.SELECT("importetotalmovimientos");
+		sql.SELECT("totalimportebruto");
+		sql.SELECT("totalimporteirpf");
+		sql.SELECT("importetotal");
+		sql.SELECT("idinstitucion");
+		
+		SQL sql2 = new SQL();
+		sql2.SELECT("descripcion");
+		sql2.FROM("gen_recursos_catalogos");
+		sql2.WHERE("idrecurso = formadepago");
+		sql2.WHERE("idlenguaje = '" + idLenguaje + "'");
+
+		
+		sql.SELECT("(" + sql2 + ") as formadepago");
+		sql.SELECT("ncolegiado");
+		sql.SELECT("nombrecol");
+		sql.SELECT("nombredest");
+
+		SQL sql3 = new SQL();
+		//Ya esta montada todo solamente falta la consulta grande de la sentencia FROM, los filtros van dentro de esta consulta por eso estan comentandos 
+		
+//		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdFacturacion())) {
+//			sql.WHERE("fac.idfacturacion > " + cartasFacturacionPagosItem.getIdFacturacion());
+//		}
+//
+//		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {
+//			sql.WHERE("col.idpersona = " + cartasFacturacionPagosItem.getIdPersona());
+//		}
+//
+//		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno())) {
+//			sql.WHERE("grupo.IDGRUPOFACTURACION =" + cartasFacturacionPagosItem.getIdTurno());
+//		}
+//
+//		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdConcepto())) {
+//			sql.WHERE("grupo.IDHITOGENERAL =" + cartasFacturacionPagosItem.getIdConcepto());
+//		}
+//
+//		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPartidaPresupuestaria())) {
+//			sql.WHERE("fac.IDPARTIDAPRESUPUESTARIA =" + cartasFacturacionPagosItem.getIdPartidaPresupuestaria());
+//		}
+		
+		sql.FROM("(" + sql3 + ")");
+		sql.WHERE("totalimportesjcs > 0");
+		sql.WHERE("1 = 1");
+		
+		
+		SQL sql4 = new SQL();
+		sql4.SELECT("pers.idpersona");
+		sql4.FROM("cen_persona pers");
+		
+		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {
+			sql4.WHERE("pers.idpersona =" + cartasFacturacionPagosItem.getIdPersona());
+	
+		}
+
+		sql.WHERE("idpersonasjcs IN (" + sql4 + ")");
+		sql.ORDER_BY("nombrecol");
+
 		return sql.toString();
 	}
 }

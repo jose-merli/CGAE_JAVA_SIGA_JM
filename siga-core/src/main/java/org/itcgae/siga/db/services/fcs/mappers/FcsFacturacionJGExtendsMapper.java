@@ -107,6 +107,26 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 
 	})
 	List<CartasFacturacionPagosItem> buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "buscarCartaspago")
+	@Results({ 
+		@Result(column = "IDPERSONASJCS", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRECOL", property = "nombreCol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREPAGO", property = "nombrePago,", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPAGO", property = "idPago", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREDEST", property = "nombreDest", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TOTALIMPORTESJCS", property = "totalImportesjcs,", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTETOTALRETENCIONES", property = "importeTotalRetenciones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NCOLEGIADO", property = "ncolegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTETOTALMOVIMIENTOS", property = "importeTotalMovimientos", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TOTALIMPORTEBRUTO", property = "totalImporteBruto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TOTALIMPORTEIRPF", property = "totalImporteIrpf", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FORMADEPAGO", property = "formaDePago", jdbcType = JdbcType.VARCHAR),
+
+	})
+	List<CartasFacturacionPagosItem> buscarCartaspago(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion, String idLenguaje);
 
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "datosPagos")
 	@Results({ 

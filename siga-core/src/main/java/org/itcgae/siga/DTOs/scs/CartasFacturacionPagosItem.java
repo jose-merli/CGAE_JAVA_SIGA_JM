@@ -29,6 +29,15 @@ public class CartasFacturacionPagosItem {
 	private String prevision;
 	private String visible;
 	private String idPersona;
+	private String nombrePago;
+	private String nombreDest;
+	private String idPago;
+	private String importeTotalMovimientos;
+	private String importeTotalRetenciones;
+	private String totalImportesjcs;
+	private String totalImporteBruto;
+	private String totalImporteIrpf;
+	private String formaDePago;
 	
 	@JsonProperty("visible")
 	public String getVisible() {
@@ -237,6 +246,87 @@ public class CartasFacturacionPagosItem {
 		this.idPersona = idPersona;
 	}
 
+	@JsonProperty("nombrePago")
+	public String getNombrePago() {
+		return nombrePago;
+	}
+
+	public void setNombrePago(String nombrePago) {
+		this.nombrePago = nombrePago;
+	}
+
+	@JsonProperty("nombreDest")
+	public String getNombreDest() {
+		return nombreDest;
+	}
+
+	public void setNombreDest(String nombreDest) {
+		this.nombreDest = nombreDest;
+	}
+
+	@JsonProperty("idPago")
+	public String getIdPago() {
+		return idPago;
+	}
+
+	public void setIdPago(String idPago) {
+		this.idPago = idPago;
+	}
+
+	@JsonProperty("importeTotalMovimientos")
+	public String getImporteTotalMovimientos() {
+		return importeTotalMovimientos;
+	}
+
+	public void setImporteTotalMovimientos(String importeTotalMovimientos) {
+		this.importeTotalMovimientos = importeTotalMovimientos;
+	}
+
+	@JsonProperty("importeTotalRetenciones")
+	public String getImporteTotalRetenciones() {
+		return importeTotalRetenciones;
+	}
+
+	public void setImporteTotalRetenciones(String importeTotalRetenciones) {
+		this.importeTotalRetenciones = importeTotalRetenciones;
+	}
+
+	@JsonProperty("totalImportesjcs")
+	public String getTotalImportesjcs() {
+		return totalImportesjcs;
+	}
+
+	public void setTotalImportesjcs(String totalImportesjcs) {
+		this.totalImportesjcs = totalImportesjcs;
+	}
+
+	@JsonProperty("totalImporteBruto")
+	public String getTotalImporteBruto() {
+		return totalImporteBruto;
+	}
+
+	public void setTotalImporteBruto(String totalImporteBruto) {
+		this.totalImporteBruto = totalImporteBruto;
+	}
+
+	@JsonProperty("totalImporteIrpf")
+	public String getTotalImporteIrpf() {
+		return totalImporteIrpf;
+	}
+
+	public void setTotalImporteIrpf(String totalImporteIrpf) {
+		this.totalImporteIrpf = totalImporteIrpf;
+	}
+
+	@JsonProperty("formaDePago")
+	public String getFormaDePago() {
+		return formaDePago;
+	}
+
+	public void setFormaDePago(String formaDePago) {
+		this.formaDePago = formaDePago;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -245,10 +335,12 @@ public class CartasFacturacionPagosItem {
 		result = prime * result + ((fechaDesde == null) ? 0 : fechaDesde.hashCode());
 		result = prime * result + ((fechaEstado == null) ? 0 : fechaEstado.hashCode());
 		result = prime * result + ((fechaHasta == null) ? 0 : fechaHasta.hashCode());
+		result = prime * result + ((formaDePago == null) ? 0 : formaDePago.hashCode());
 		result = prime * result + ((idConcepto == null) ? 0 : idConcepto.hashCode());
 		result = prime * result + ((idEstado == null) ? 0 : idEstado.hashCode());
 		result = prime * result + ((idFacturacion == null) ? 0 : idFacturacion.hashCode());
 		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
+		result = prime * result + ((idPago == null) ? 0 : idPago.hashCode());
 		result = prime * result + ((idPartidaPresupuestaria == null) ? 0 : idPartidaPresupuestaria.hashCode());
 		result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
 		result = prime * result + ((idTurno == null) ? 0 : idTurno.hashCode());
@@ -258,11 +350,18 @@ public class CartasFacturacionPagosItem {
 		result = prime * result + ((importePendiente == null) ? 0 : importePendiente.hashCode());
 		result = prime * result + ((importeSoj == null) ? 0 : importeSoj.hashCode());
 		result = prime * result + ((importeTotal == null) ? 0 : importeTotal.hashCode());
+		result = prime * result + ((importeTotalMovimientos == null) ? 0 : importeTotalMovimientos.hashCode());
+		result = prime * result + ((importeTotalRetenciones == null) ? 0 : importeTotalRetenciones.hashCode());
 		result = prime * result + ((ncolegiado == null) ? 0 : ncolegiado.hashCode());
 		result = prime * result + ((nombreCol == null) ? 0 : nombreCol.hashCode());
+		result = prime * result + ((nombreDest == null) ? 0 : nombreDest.hashCode());
 		result = prime * result + ((nombreFac == null) ? 0 : nombreFac.hashCode());
+		result = prime * result + ((nombrePago == null) ? 0 : nombrePago.hashCode());
 		result = prime * result + ((prevision == null) ? 0 : prevision.hashCode());
 		result = prime * result + ((regularizacion == null) ? 0 : regularizacion.hashCode());
+		result = prime * result + ((totalImporteBruto == null) ? 0 : totalImporteBruto.hashCode());
+		result = prime * result + ((totalImporteIrpf == null) ? 0 : totalImporteIrpf.hashCode());
+		result = prime * result + ((totalImportesjcs == null) ? 0 : totalImportesjcs.hashCode());
 		result = prime * result + ((visible == null) ? 0 : visible.hashCode());
 		return result;
 	}
@@ -296,6 +395,11 @@ public class CartasFacturacionPagosItem {
 				return false;
 		} else if (!fechaHasta.equals(other.fechaHasta))
 			return false;
+		if (formaDePago == null) {
+			if (other.formaDePago != null)
+				return false;
+		} else if (!formaDePago.equals(other.formaDePago))
+			return false;
 		if (idConcepto == null) {
 			if (other.idConcepto != null)
 				return false;
@@ -315,6 +419,11 @@ public class CartasFacturacionPagosItem {
 			if (other.idInstitucion != null)
 				return false;
 		} else if (!idInstitucion.equals(other.idInstitucion))
+			return false;
+		if (idPago == null) {
+			if (other.idPago != null)
+				return false;
+		} else if (!idPago.equals(other.idPago))
 			return false;
 		if (idPartidaPresupuestaria == null) {
 			if (other.idPartidaPresupuestaria != null)
@@ -361,6 +470,16 @@ public class CartasFacturacionPagosItem {
 				return false;
 		} else if (!importeTotal.equals(other.importeTotal))
 			return false;
+		if (importeTotalMovimientos == null) {
+			if (other.importeTotalMovimientos != null)
+				return false;
+		} else if (!importeTotalMovimientos.equals(other.importeTotalMovimientos))
+			return false;
+		if (importeTotalRetenciones == null) {
+			if (other.importeTotalRetenciones != null)
+				return false;
+		} else if (!importeTotalRetenciones.equals(other.importeTotalRetenciones))
+			return false;
 		if (ncolegiado == null) {
 			if (other.ncolegiado != null)
 				return false;
@@ -371,10 +490,20 @@ public class CartasFacturacionPagosItem {
 				return false;
 		} else if (!nombreCol.equals(other.nombreCol))
 			return false;
+		if (nombreDest == null) {
+			if (other.nombreDest != null)
+				return false;
+		} else if (!nombreDest.equals(other.nombreDest))
+			return false;
 		if (nombreFac == null) {
 			if (other.nombreFac != null)
 				return false;
 		} else if (!nombreFac.equals(other.nombreFac))
+			return false;
+		if (nombrePago == null) {
+			if (other.nombrePago != null)
+				return false;
+		} else if (!nombrePago.equals(other.nombrePago))
 			return false;
 		if (prevision == null) {
 			if (other.prevision != null)
@@ -385,6 +514,21 @@ public class CartasFacturacionPagosItem {
 			if (other.regularizacion != null)
 				return false;
 		} else if (!regularizacion.equals(other.regularizacion))
+			return false;
+		if (totalImporteBruto == null) {
+			if (other.totalImporteBruto != null)
+				return false;
+		} else if (!totalImporteBruto.equals(other.totalImporteBruto))
+			return false;
+		if (totalImporteIrpf == null) {
+			if (other.totalImporteIrpf != null)
+				return false;
+		} else if (!totalImporteIrpf.equals(other.totalImporteIrpf))
+			return false;
+		if (totalImportesjcs == null) {
+			if (other.totalImportesjcs != null)
+				return false;
+		} else if (!totalImportesjcs.equals(other.totalImportesjcs))
 			return false;
 		if (visible == null) {
 			if (other.visible != null)
@@ -404,11 +548,13 @@ public class CartasFacturacionPagosItem {
 				+ ", importeGuardia=" + importeGuardia + ", importeOficio=" + importeOficio + ", importeEjg="
 				+ importeEjg + ", importeSoj=" + importeSoj + ", idPartidaPresupuestaria=" + idPartidaPresupuestaria
 				+ ", importePendiente=" + importePendiente + ", prevision=" + prevision + ", visible=" + visible
-				+ ", idPersona=" + idPersona + "]";
+				+ ", idPersona=" + idPersona + ", nombrePago=" + nombrePago + ", nombreDest=" + nombreDest + ", idPago="
+				+ idPago + ", importeTotalMovimientos=" + importeTotalMovimientos + ", importeTotalRetenciones="
+				+ importeTotalRetenciones + ", totalImportesjcs=" + totalImportesjcs + ", totalImporteBruto="
+				+ totalImporteBruto + ", totalImporteIrpf=" + totalImporteIrpf + ", formaDePago=" + formaDePago + "]";
 	}
 
 	
-
 	
 	
 	

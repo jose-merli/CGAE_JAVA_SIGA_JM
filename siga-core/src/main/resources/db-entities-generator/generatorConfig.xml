@@ -2,7 +2,7 @@
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
 	<classPathEntry
-		location="C:\Users\DTUser\Downloads\ojdbc6.jar" />
+		location="C:\Oracle\OJDBC-Full\ojdbc6.jar" />
 	<context id="DB2Tables" targetRuntime="MyBatis3">
 
 		<jdbcConnection
@@ -17,9 +17,8 @@
 			/> -->
 		<javaClientGenerator
 			targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core"
-			type="ANNOTATEDMAPPER"
-			implementationPackage="org.itcgae.siga.db.services" />
-
+			type="ANNOTATEDMAPPER"  />
+		<!-- implementationPackage="org.itcgae.siga.db.services" -->
 
 		<!-- <table schema="USCGAE" tableName="cen_reg_mercantil"> -->
 		<!-- <property name="ignoreQualifiersAtRuntime" value="true"/> -->
@@ -40,8 +39,60 @@
 		<!-- <generatedKey column="IDCURSO" -->
 		<!-- sqlStatement="SELECT SEQ_FORCURSO.NEXTVAL FROM DUAL" /> -->
 		<!-- </table> -->
-		<table schema="USCGAE" tableName="FCS_FACTURACIONJG">
+
+		<table schema="USCGAE" tableName="SCS_GUARDIASCOLEGIADO">
 			<property name="ignoreQualifiersAtRuntime" value="true" />
+			<columnOverride column="FECHAINICIO" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAFIN" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAMODIFICACION" jdbcType="TIMESTAMP"/>
+		</table>
+		<table schema="USCGAE" tableName="SCS_ACTUACIONASISTENCIA">
+			<property name="ignoreQualifiersAtRuntime" value="true" />
+			<columnOverride column="FECHA" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAJUSTIFICACION" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHACREACION" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAMODIFICACION" jdbcType="TIMESTAMP"/>
+		</table>
+		<table schema="USCGAE" tableName="FCS_MOVIMIENTOSVARIOS">
+			<property name="ignoreQualifiersAtRuntime" value="true" />
+			<columnOverride column="FECHAALTA" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAMODIFICACION" jdbcType="TIMESTAMP"/>
+		</table>
+		
+		<table schema="USCGAE" tableName="SCS_ASISTENCIA">
+			<property name="ignoreQualifiersAtRuntime" value="true" />
+			<columnOverride column="FECHAHORA" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAANULACION" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHACIERRE" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAESTADOASISTENCIA" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHASOLICITUD" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAMODIFICACION" jdbcType="TIMESTAMP"/>
+		</table>
+		<table schema="USCGAE" tableName="SCS_EJG">
+			<property name="ignoreQualifiersAtRuntime" value="true" />
+			<columnOverride column="FECHAAPERTURA" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHALIMITEPRESENTACION" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAPRESENTACION" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHADICTAMEN" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHARATIFICACION" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHARESOLUCIONCAJG" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHANOTIFICACION" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAAUTO" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHA_DES_PROC" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAPUBLICACION" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHACREACION" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAMODIFICACION" jdbcType="TIMESTAMP"/>
+		</table>
+		<table schema="USCGAE" tableName="SCS_SOJ">
+			<property name="ignoreQualifiersAtRuntime" value="true" />
+			<columnOverride column="FECHAAPERTURA" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAMODIFICACION" jdbcType="TIMESTAMP"/>
+		</table>
+		<table schema="USCGAE" tableName="FCS_PAGOSJG">
+			<property name="ignoreQualifiersAtRuntime" value="true" />
+			<columnOverride column="FECHADESDE" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAHASTA" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAMODIFICACION" jdbcType="TIMESTAMP"/>
 		</table>
 
 	</context>
