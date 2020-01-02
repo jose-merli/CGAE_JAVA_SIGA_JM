@@ -1,7 +1,10 @@
 package org.itcgae.siga.scs.services.facturacionsjcs;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
@@ -31,4 +34,8 @@ public interface IFacturacionServices {
 	public FacturacionDTO conceptosFacturacion(String idFacturacion, HttpServletRequest request);
 	
 	public InsertResponseDTO saveConceptosFac(FacturacionItem facturacionItem, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateConceptosFac(FacturacionItem facturacionItem, HttpServletRequest request);
+	
+	public DeleteResponseDTO deleteConceptosFac(List<FacturacionItem> facturacionDTO, HttpServletRequest request);
 }

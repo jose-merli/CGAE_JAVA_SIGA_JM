@@ -26,6 +26,8 @@ public class FacturacionItem {
 	private String idGrupo;
 	private String descGrupo;
 	private String descConcepto;
+	private String idGrupoOld;
+	private String idConceptoOld;
 	
 	@JsonProperty("idGrupo")
 	public String getIdGrupo() {
@@ -206,9 +208,25 @@ public class FacturacionItem {
 	public void setImportePagado(String importePagado) {
 		this.importePagado = importePagado;
 	}
-	
-	
-	
+
+	@JsonProperty("idConceptoOld")
+	public String getIdConceptoOld() {
+		return idConceptoOld;
+	}
+
+	public void setIdConceptoOld(String idConceptoOld) {
+		this.idConceptoOld = idConceptoOld;
+	}
+
+	@JsonProperty("idGrupoOld")
+	public String getIdGrupoOld() {
+		return idGrupoOld;
+	}
+
+	public void setIdGrupoOld(String idGrupoOld) {
+		this.idGrupoOld = idGrupoOld;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -221,9 +239,11 @@ public class FacturacionItem {
 		result = prime * result + ((fechaEstado == null) ? 0 : fechaEstado.hashCode());
 		result = prime * result + ((fechaHasta == null) ? 0 : fechaHasta.hashCode());
 		result = prime * result + ((idConcepto == null) ? 0 : idConcepto.hashCode());
+		result = prime * result + ((idConceptoOld == null) ? 0 : idConceptoOld.hashCode());
 		result = prime * result + ((idEstado == null) ? 0 : idEstado.hashCode());
 		result = prime * result + ((idFacturacion == null) ? 0 : idFacturacion.hashCode());
 		result = prime * result + ((idGrupo == null) ? 0 : idGrupo.hashCode());
+		result = prime * result + ((idGrupoOld == null) ? 0 : idGrupoOld.hashCode());
 		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
 		result = prime * result + ((idPartidaPresupuestaria == null) ? 0 : idPartidaPresupuestaria.hashCode());
 		result = prime * result + ((importePagado == null) ? 0 : importePagado.hashCode());
@@ -285,6 +305,11 @@ public class FacturacionItem {
 				return false;
 		} else if (!idConcepto.equals(other.idConcepto))
 			return false;
+		if (idConceptoOld == null) {
+			if (other.idConceptoOld != null)
+				return false;
+		} else if (!idConceptoOld.equals(other.idConceptoOld))
+			return false;
 		if (idEstado == null) {
 			if (other.idEstado != null)
 				return false;
@@ -299,6 +324,11 @@ public class FacturacionItem {
 			if (other.idGrupo != null)
 				return false;
 		} else if (!idGrupo.equals(other.idGrupo))
+			return false;
+		if (idGrupoOld == null) {
+			if (other.idGrupoOld != null)
+				return false;
+		} else if (!idGrupoOld.equals(other.idGrupoOld))
 			return false;
 		if (idInstitucion == null) {
 			if (other.idInstitucion != null)
@@ -356,6 +386,7 @@ public class FacturacionItem {
 				+ ", idEstado=" + idEstado + ", fechaEstado=" + fechaEstado + ", importeTotal=" + importeTotal
 				+ ", importePagado=" + importePagado + ", idPartidaPresupuestaria=" + idPartidaPresupuestaria
 				+ ", importePendiente=" + importePendiente + ", prevision=" + prevision + ", visible=" + visible
-				+ ", idGrupo=" + idGrupo + ", descGrupo=" + descGrupo + ", descConcepto=" + descConcepto + "]";
+				+ ", idGrupo=" + idGrupo + ", descGrupo=" + descGrupo + ", descConcepto=" + descConcepto
+				+ ", idGrupoOld=" + idGrupoOld + ", idConceptoOld=" + idConceptoOld + "]";
 	}	
 }

@@ -182,7 +182,15 @@ public class ConConsultasExtendsSqlProvider {
 	}
 	
 	
-
+	public static String filtroTextoBusquedas(String columna, String cadena) {
+	
+		StringBuilder cadenaWhere = new StringBuilder();
+		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') ");
+		cadenaWhere.append(" LIKE");
+		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz')) ");
+		return cadenaWhere.toString();
+		
+	} 
 	
 	public String selectConsultasById(Short idInstitucion, String idLenguaje, String idConsulta){
 		

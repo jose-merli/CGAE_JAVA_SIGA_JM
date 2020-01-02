@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
@@ -17,6 +18,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
 import org.itcgae.siga.db.entities.FcsFactGrupofactHito;
+import org.itcgae.siga.db.entities.FcsFactGrupofactHitoExample;
 import org.itcgae.siga.db.entities.FcsFacturacionjg;
 import org.itcgae.siga.db.mappers.FcsFactEstadosfacturacionMapper;
 import org.itcgae.siga.db.mappers.FcsFactGrupofactHitoMapper;
@@ -85,7 +87,6 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		FacturacionDeleteDTO facturacionesDelete = new FacturacionDeleteDTO();
-		int response = 0;
 		
 		if(null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -215,7 +216,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	           
 	            LOGGER.info("saveFacturacion() / fcsFacturacionJGExtendsMapper.saveFacturacion() -> Entrada a guardar los datos de la facturacón");
 	            
-	            //GUARDAR DATOAS DE LA FACTURACION
+	            //GUARDAR DATOS DE LA FACTURACION
 	            try {
 	            	//OBTENEMOS EL ID DE LA FACTURA
 	            	LOGGER.info("saveFacturacion() / fcsFacturacionJGExtendsMapper.saveFacturacion() -> Guardar datos en fcsFacturacionjg");
@@ -390,7 +391,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	           
 	            LOGGER.info("ejecutarFacturacion() -> Entrada para poner la facturacion como programada");
 	            
-	            //GUARDAR DATOAS DE LA FACTURACION
+	            //GUARDAR DATOS DE LA FACTURACION
 	            try {
 	            	//ACTUALIZAMOS LA PREVISION DE LA TABLA FCS_FACTURACIONJG
 	            	LOGGER.info("ejecutarFacturacion() -> Actualizar la prevision");
@@ -474,7 +475,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	           
 	            LOGGER.info("reabrirFacturacion() -> Entrada para reabrir la facturacion");
 	            
-	            //GUARDAR DATOAS DE LA FACTURACION
+	            //GUARDAR DATOS DE LA FACTURACION
 	            try {
 	            	//SETEAMOS LOS DATOS Y HACEMOS INSERT DEL ESTADO
 	            	LOGGER.info("reabrirFacturacion() -> Guardar datos para reabrir en fcsFactEstadosfacturacion");
@@ -549,9 +550,9 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	           
 	            LOGGER.info("simularFacturacion() -> Entrada para simular la facturacion");
 	            
-	            //GUARDAR DATOAS DE LA FACTURACION
+	            //GUARDAR DATOS DE LA FACTURACION
 	            try {
-	            	//PRIMERO ACTUALIZAMOS FCS_FACTURACIONJG EL CAMPO PREVISION A 1
+	            	//ACTUALIZAMOS FCS_FACTURACIONJG EL CAMPO PREVISION A 1
 	            	//SETEAMOS LOS DATOS Y HACEMOS UPDATE
 	            	LOGGER.info("simularFacturacion() -> Actualizar prevision para simular facturacion");
 	            	
@@ -669,24 +670,41 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	           
 	            LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveConceptosFac() -> Entrada a guardar los conceptos de la facturacón");
 	            
-	            //GUARDAR DATOAS DE LA FACTURACION
+	            //GUARDAR DATOS DE LA FACTURACION
 	            try {
-	            	//OBTENEMOS EL ID DE LA FACTURA
-	            	LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveConceptosFac() -> Guardar conceptos en fcsFacturacionjg");
 	            	Short idGrupoFacturacion=(short) Integer.parseInt(facturacionItem.getIdGrupo());
 	            	Short idHitoGeneral = (short) Integer.parseInt(facturacionItem.getIdConcepto());
 	            	
-	            	//SETEAMOS LOS DATOS Y GUARDAMOS LA FACTURA	      
-		            record.setIdinstitucion(idInstitucion);
-		            record.setIdfacturacion(Integer.parseInt(facturacionItem.getIdFacturacion()));
-		            record.setIdgrupofacturacion(idGrupoFacturacion);
-		            record.setIdhitogeneral(idHitoGeneral);
-		            record.setFechamodificacion(new Date());
-		            record.setUsumodificacion(usuario.getIdusuario());
-		           		            
-		            response = fcsFactGrupofactHitoMapper.insert(record);
-		            
-		            LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveFacturacion() -> Salida guardar datos en fcsFacturacionjg");
+	            	//COMPROBAMOS QUE LOS DATOS A INSERTAR NO EXISTAN EN LA TABLA
+	            	LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveConceptosFac() -> Entrada: comprobamos que los conceptos no existan previamente.");
+	            	
+	            	FcsFactGrupofactHitoExample example = new FcsFactGrupofactHitoExample();
+	            	example.createCriteria().andIdfacturacionEqualTo(Integer.parseInt(facturacionItem.getIdFacturacion())).andIdinstitucionEqualTo(idInstitucion).andIdgrupofacturacionEqualTo(idGrupoFacturacion).andIdhitogeneralEqualTo(idHitoGeneral);	            	
+	            		            	
+	            	List<FcsFactGrupofactHito> conceptos = fcsFactGrupofactHitoMapper.selectByExample(example);
+	            	
+	            	if(conceptos.size()==0) {		            	
+	            		LOGGER.info("saveConceptosFac() -> Salida: comprobamos que los conceptos no existan previamente.");
+	            		
+		            	//OBTENEMOS EL ID DE LA FACTURA
+		            	LOGGER.info("saveConceptosFac() -> Guardar conceptos");
+		            	
+		            	//SETEAMOS LOS DATOS Y GUARDAMOS LA FACTURA	      
+			            record.setIdinstitucion(idInstitucion);
+			            record.setIdfacturacion(Integer.parseInt(facturacionItem.getIdFacturacion()));
+			            record.setIdgrupofacturacion(idGrupoFacturacion);
+			            record.setIdhitogeneral(idHitoGeneral);
+			            record.setFechamodificacion(new Date());
+			            record.setUsumodificacion(usuario.getIdusuario());
+			           		            
+			            response = fcsFactGrupofactHitoMapper.insert(record);
+			            
+			            LOGGER.info("saveConceptosFac() -> Salida guardar conceptos");
+		            }else {
+		            	error.setCode(400);
+						error.setDescription("facturacionSJCS.facturacionesYPagos.mensaje.conceptoExistente");
+						LOGGER.info("saveConceptosFac() -> Salida: comprobamos que los conceptos no existan previamente.");
+		            }
 	            }catch(Exception e){
 	            	LOGGER.error("ERROR: FacturacionServicesImpl.saveConceptosFac() > al guardar los conceptos de la facturacion.", e);
 	            	error.setCode(400);
@@ -694,7 +712,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 					insertResponse.setStatus(SigaConstants.KO);
 	            }            
 	            
-	            LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveConceptosFac() -> Salida de guardar los conceptos de la facturación");
+	            LOGGER.info("saveConceptosFac() -> Salida de guardar los conceptos de la facturación");
 	        }else {
 	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
 	        }
@@ -715,5 +733,165 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	    insertResponse.setError(error);
 		
 		return insertResponse;
+	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO updateConceptosFac(FacturacionItem facturacionItem, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		UpdateResponseDTO updateResponse = new UpdateResponseDTO();
+		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+		updateResponse.setError(error);
+		
+		int response = 0;
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	        
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	            
+	        if(null != usuarios && usuarios.size() > 0) {
+	        	AdmUsuarios usuario = usuarios.get(0);
+	            usuario.setIdinstitucion(idInstitucion);
+	            FcsFactGrupofactHito record = new FcsFactGrupofactHito();
+	            
+	            try {
+	               	LOGGER.info("updateConceptosFac() -> Actualizar datos de los conceptos de facturacion");
+            
+		            Short idGrupoFacturacion=(short) Integer.parseInt(facturacionItem.getIdGrupo());
+		            Short idGrupoOld=(short) Integer.parseInt(facturacionItem.getIdGrupoOld());
+		            
+	            	Short idHitoGeneral = (short) Integer.parseInt(facturacionItem.getIdConcepto());
+	            	Short idHitoOld = (short) Integer.parseInt(facturacionItem.getIdConceptoOld());
+	            	
+	            	//COMPROBAMOS QUE LOS DATOS A INSERTAR NO EXISTAN EN LA TABLA
+	            	LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveConceptosFac() -> Entrada: comprobamos que los conceptos no existan previamente.");
+	            	
+	            	FcsFactGrupofactHitoExample example = new FcsFactGrupofactHitoExample();
+	            	example.createCriteria().andIdfacturacionEqualTo(Integer.parseInt(facturacionItem.getIdFacturacion())).andIdinstitucionEqualTo(idInstitucion).andIdgrupofacturacionEqualTo(idGrupoFacturacion).andIdhitogeneralEqualTo(idHitoGeneral);	            	
+	            		            	
+	            	List<FcsFactGrupofactHito> conceptos = fcsFactGrupofactHitoMapper.selectByExample(example);
+	            	
+		            if(conceptos.size()==0) {		            	
+		            	FcsFactGrupofactHitoExample exampleUpdate = new FcsFactGrupofactHitoExample();
+		            	
+		            	exampleUpdate.createCriteria().andIdfacturacionEqualTo(Integer.parseInt(facturacionItem.getIdFacturacion())).andIdinstitucionEqualTo(idInstitucion).andIdgrupofacturacionEqualTo(idGrupoOld).andIdhitogeneralEqualTo(idHitoOld);	            	
+		            	//SETEAMOS LOS DATOS Y GUARDAMOS LA FACTURA	      
+			            record.setIdinstitucion(idInstitucion);
+			            record.setIdfacturacion(Integer.parseInt(facturacionItem.getIdFacturacion()));
+			            record.setIdgrupofacturacion(idGrupoFacturacion);
+			            record.setIdhitogeneral(idHitoGeneral);
+			            record.setFechamodificacion(new Date());
+			            record.setUsumodificacion(usuario.getIdusuario());
+			           		            
+			            response = fcsFactGrupofactHitoMapper.updateByExampleSelective(record, exampleUpdate);
+			            
+			            LOGGER.info("updateConceptosFac() -> Salida actualizar datos de los conceptos de facturacion");
+	            	}else{
+		            	error.setCode(400);
+						error.setDescription("facturacionSJCS.facturacionesYPagos.mensaje.conceptoExistente");
+						LOGGER.info("saveConceptosFac() -> Salida: comprobamos que los conceptos no existan previamente.");
+		            }
+	            }catch(Exception e){
+	            	LOGGER.error("ERROR: FacturacionServicesImpl.updateConceptosFac() > al actualizar los conceptos de la facturacion.", e);
+	            	error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponse.setStatus(SigaConstants.KO);
+	            }            
+	        }else {
+	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+	        }
+	    }else {
+	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
+	    }
+	        
+		LOGGER.info("getLabel() -> Salida del servicio para actualizar los conceptos de las facturaciones");
+	    
+	    if (response == 0 && error.getDescription() == null) {
+			error.setCode(400);
+			updateResponse.setStatus(SigaConstants.KO);
+		} else if (error.getCode() == null) {
+			error.setCode(200);
+			updateResponse.setStatus(SigaConstants.OK);
+		}
+
+	    updateResponse.setError(error);
+	    
+	    return updateResponse;	
+	}
+	
+	public DeleteResponseDTO deleteConceptosFac(List<FacturacionItem> facturacionDTO, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		DeleteResponseDTO deleteResponse = new DeleteResponseDTO();
+		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+		deleteResponse.setError(error);
+		
+		int response = 0;
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	        
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	            
+	        if(null != usuarios && usuarios.size() > 0) {
+	        	AdmUsuarios usuario = usuarios.get(0);
+	            usuario.setIdinstitucion(idInstitucion);
+	            FcsFactGrupofactHito record = new FcsFactGrupofactHito();
+	            
+	            try {		
+	            	LOGGER.info("deleteConceptosFac() -> Eliminar conceptos de facturacion");
+	                
+	            	for (FacturacionItem factItem : facturacionDTO) {
+	            		Short idGrupoFacturacion=(short) Integer.parseInt(factItem.getIdGrupo());
+	 	            	Short idHitoGeneral = (short) Integer.parseInt(factItem.getIdConcepto());
+	 	            	
+	 	            	//SETEAMOS LOS DATOS Y GUARDAMOS LA FACTURA	      
+	 		            record.setIdinstitucion(idInstitucion);
+	 		            record.setIdfacturacion(Integer.parseInt(factItem.getIdFacturacion()));
+	 		            record.setIdgrupofacturacion(idGrupoFacturacion);
+	 		            record.setIdhitogeneral(idHitoGeneral);
+	 		            
+	 		           response = fcsFactGrupofactHitoMapper.deleteByPrimaryKey(record);
+	            	}
+		            
+		            LOGGER.info("deleteConceptosFac() SALIDA -> Eliminar conceptos de facturacion");
+	            }catch(Exception e){
+	            	LOGGER.error("ERROR: FacturacionServicesImpl.deleteConceptosFac() > al eliminar los conceptos de la facturacion.", e);
+	            	error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					deleteResponse.setStatus(SigaConstants.KO);
+	            }            
+	        }else {
+	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+	        }
+	    }else {
+	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
+	    }
+	        
+		LOGGER.info("getLabel() -> Salida del servicio para actualizar los conceptos de las facturaciones");
+	    
+	    if (response == 0 && error.getDescription() == null) {
+			error.setCode(400);
+			deleteResponse.setStatus(SigaConstants.KO);
+		} else if (error.getCode() == null) {
+			error.setCode(200);
+			deleteResponse.setStatus(SigaConstants.OK);
+		}
+
+	    deleteResponse.setError(error);
+	    
+		return deleteResponse;
 	}
 }

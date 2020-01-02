@@ -1,7 +1,10 @@
 package org.itcgae.siga.scs.controllers.facturacionsjcs;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
@@ -115,6 +118,26 @@ public class FacturacionController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		}else {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+		}
+	}
+	
+	@RequestMapping(value = "/facturacionsjcs/updateConceptosFac",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateConceptosFac(@RequestBody FacturacionItem facturacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = facturacionServices.updateConceptosFac(facturacionItem, request);
+		if (response.getError().getCode() == 200) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+		}
+	}
+	
+	@RequestMapping(value = "/facturacionsjcs/deleteConceptosFac",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> deleteConceptosFac(@RequestBody List<FacturacionItem> facturacionDto, HttpServletRequest request) { 
+		DeleteResponseDTO response = facturacionServices.deleteConceptosFac(facturacionDto, request);
+		if (response.getError().getCode() == 200) {
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
 		}
 	}
 }

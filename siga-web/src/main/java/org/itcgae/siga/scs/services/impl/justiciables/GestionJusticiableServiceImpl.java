@@ -2,6 +2,8 @@ package org.itcgae.siga.scs.services.impl.justiciables;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -1192,6 +1194,17 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 						if (asuntosJusticiableItem != null && asuntosJusticiableItem.size() > 0) {
 
+							Collections.sort(asuntosJusticiableItem, new Comparator<Object>() {
+								@Override
+								public int compare(Object item1, Object item2) {
+									// use instanceof to verify the references are indeed of the type in question
+									return ((AsuntosJusticiableItem) item1).getFecha()
+											.compareTo(((AsuntosJusticiableItem) item2).getFecha());
+								}
+							});
+							
+							 Collections.reverse(asuntosJusticiableItem);
+
 							asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItem);
 						}
 					}
@@ -1548,7 +1561,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					}
 
 					if (interesado.getApellido2() != null) {
-						nombre += " " + interesado.getApellido2() + ",";
+						nombre += " " + interesado.getApellido2() + ", ";
 					}
 
 					if (interesado.getApellido2() == null) {
@@ -1634,7 +1647,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					}
 
 					if (interesado.getApellido2() != null) {
-						nombre += " " + interesado.getApellido2() + ",";
+						nombre += " " + interesado.getApellido2() + ", ";
 					}
 
 					if (interesado.getApellido2() == null) {
@@ -1659,7 +1672,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	public JusticiableDTO getJusticiableByNif(JusticiableBusquedaItem justiciableBusquedaItem,
 			HttpServletRequest request) {
 
-		LOGGER.info("getJusticiableByNif() -> Entrada al servicio para obtener el representante del justiciable by nif");
+		LOGGER.info(
+				"getJusticiableByNif() -> Entrada al servicio para obtener el representante del justiciable by nif");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1727,7 +1741,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			}
 
 		}
-		LOGGER.info("getJusticiableByNif() -> Salida del servicio para obtener el representante del justiciable by nif");
+		LOGGER.info(
+				"getJusticiableByNif() -> Salida del servicio para obtener el representante del justiciable by nif");
 		return justiciableDTO;
 	}
 
@@ -2185,7 +2200,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	public JusticiableDTO getJusticiableByIdPersona(JusticiableBusquedaItem justiciableBusquedaItem,
 			HttpServletRequest request) {
 
-		LOGGER.info("getJusticiableByIdPersona() -> Entrada al servicio para obtener el representante del justiciable por idpersona");
+		LOGGER.info(
+				"getJusticiableByIdPersona() -> Entrada al servicio para obtener el representante del justiciable por idpersona");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -2252,7 +2268,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			}
 
 		}
-		LOGGER.info("getJusticiableByIdPersona() -> Salida del servicio para obtener el representante del justiciable por idpersona");
+		LOGGER.info(
+				"getJusticiableByIdPersona() -> Salida del servicio para obtener el representante del justiciable por idpersona");
 		return justiciableDTO;
 	}
 

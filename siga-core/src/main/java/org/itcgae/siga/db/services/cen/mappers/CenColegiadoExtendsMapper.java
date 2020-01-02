@@ -256,6 +256,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "busquedaColegiadosSJCS")
 	@Results({ 
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),

@@ -13,7 +13,6 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsProcuradorExtendsMapper;
 import org.itcgae.siga.scs.services.componentesGenerales.BusquedaGeneralSJCSService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
