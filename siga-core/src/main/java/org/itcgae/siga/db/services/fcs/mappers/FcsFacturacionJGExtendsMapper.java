@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
+import org.itcgae.siga.DTOs.scs.PagosjgItem;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsFacturacionJGSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -107,4 +108,21 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	})
 	List<CartasFacturacionPagosItem> buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion);
 
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "datosPagos")
+	@Results({ 
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPAGOSJG", property = "idPagosJG", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEEJG", property = "importeEJG", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEGUARDIA", property = "importeGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEOFICIO", property = "importeOficio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTESOJ", property = "importesOJ", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEREPARTIR", property = "importeRepartir", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEPAGADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
+		@Result(column = "DESESTADO", property = "desEstado", jdbcType = JdbcType.VARCHAR),
+		
+	})
+	List<PagosjgItem> datosPagos(String idFacturacion, String idInstitucion, String idLenguaje);
 }

@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
+import org.itcgae.siga.DTOs.scs.PagosjgDTO;
 
 public interface IFacturacionServices {
 
@@ -38,4 +39,6 @@ public interface IFacturacionServices {
 	public UpdateResponseDTO updateConceptosFac(FacturacionItem facturacionItem, HttpServletRequest request);
 	
 	public DeleteResponseDTO deleteConceptosFac(List<FacturacionItem> facturacionDTO, HttpServletRequest request);
+	
+	public PagosjgDTO datosPagos(String idFacturacion, HttpServletRequest request);
 }

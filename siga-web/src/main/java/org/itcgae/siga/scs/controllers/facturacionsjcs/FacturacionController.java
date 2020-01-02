@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
+import org.itcgae.siga.DTOs.scs.PagosjgDTO;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -139,5 +140,11 @@ public class FacturacionController {
 		}else {
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
 		}
+	}
+	
+	@RequestMapping(value="/facturacionsjcs/datospagos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PagosjgDTO> datosPagos(@RequestParam("idFacturacion") String idFacturacion, HttpServletRequest request){
+		PagosjgDTO response = facturacionServices.datosPagos(idFacturacion, request);
+		return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
 	}
 }

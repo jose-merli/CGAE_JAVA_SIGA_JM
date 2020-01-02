@@ -350,4 +350,37 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		return sql.toString();
 	}
+	
+	public String datosPagos(String idFacturacion, String idInstitucion, String idLenguaje) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT("MAX(est2.fechaestado)");
+		sql2.FROM("fcs_pagos_estadospagos est2");
+		sql2.WHERE("est2.idinstitucion = est.idinstitucion");
+		sql2.WHERE("est2.idpagosjg = est.idpagosjg");
+		
+		sql.SELECT("pjg.idinstitucion");
+		sql.SELECT("pjg.idpagosjg");
+		sql.SELECT("pjg.idfacturacion");
+		sql.SELECT("pjg.nombre");
+		sql.SELECT("pjg.importeejg");
+		sql.SELECT("pjg.importeguardia");
+		sql.SELECT("pjg.importeoficio");
+		sql.SELECT("pjg.importesoj");
+		sql.SELECT("pjg.importerepartir");
+		sql.SELECT("pjg.importepagado");
+		sql.SELECT("est.fechaestado");
+		sql.SELECT("rec.descripcion desestado");
+		sql.FROM("fcs_pagosjg pjg");
+		sql.INNER_JOIN("fcs_pagos_estadospagos est ON (pjg.idinstitucion = est.idinstitucion AND pjg.idpagosjg = est.idpagosjg)");
+		sql.INNER_JOIN("fcs_estadospagos estpagos ON (est.idestadopagosjg = estpagos.idestadopagosjg)");
+		sql.INNER_JOIN("gen_recursos_catalogos rec ON (estpagos.descripcion = rec.idrecurso)");
+		sql.WHERE("est.fechaestado = ("+sql2.toString()+")");		
+		sql.WHERE("pjg.idinstitucion = '" + idInstitucion + "'");
+		sql.WHERE("pjg.idfacturacion =  '" + idFacturacion + "'");
+		sql.WHERE("rec.idlenguaje = '"+idLenguaje+"'");
+
+		return sql.toString();
+	}
 }
