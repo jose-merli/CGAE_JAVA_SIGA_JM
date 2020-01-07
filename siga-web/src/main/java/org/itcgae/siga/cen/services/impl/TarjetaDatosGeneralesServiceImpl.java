@@ -66,6 +66,7 @@ import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -375,6 +376,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 	}
 
 	@Override
+	@Transactional
 	public InsertResponseDTO createLegalPerson(SociedadCreateDTO sociedadCreateDTO, HttpServletRequest request)
 			throws ParseException {
 
@@ -414,6 +416,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					AdmUsuarios usuario = usuarios.get(0);
 
 					if (null != personas && personas.size() > 0) {
+						idPersona = String.valueOf(personas.get(0).getIdpersona());
 						CenClienteExample cenClienteExample = new CenClienteExample();
 						cenClienteExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(personas.get(0).getIdpersona()))
 								.andIdinstitucionEqualTo(idInstitucion);
@@ -432,10 +435,22 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 								// 1.2 crear registro en tabla cen_nocolegiado
 								LOGGER.info(
 										"createLegalPerson() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateNewSociety() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
-
+								
+								CenNocolegiado recordNoColegiado = new CenNocolegiado();
+								recordNoColegiado.setIdpersona(record.getIdpersona());
+								recordNoColegiado.setIdinstitucion(idInstitucion);
+								recordNoColegiado.setFechamodificacion(new Date ());
+								recordNoColegiado.setUsumodificacion(usuario.getIdusuario());
+								recordNoColegiado.setSociedadsj("0");
+								recordNoColegiado.setTipo(sociedadCreateDTO.getTipo());
+								if (null != sociedadCreateDTO.getAnotaciones() && !sociedadCreateDTO.getAnotaciones().equals("")) {
+									recordNoColegiado.setAnotaciones(sociedadCreateDTO.getAnotaciones());
+								}
+								recordNoColegiado.setSociedadprofesional("0");
+								recordNoColegiado.setFechaBaja(null);
+								
 								int responseInsertNoColegiado = cenNocolegiadoExtendsMapper
-										.insertSelectiveForCreateNewSociety(String.valueOf(idInstitucion), usuario,
-												sociedadCreateDTO);
+										.insertSelective(recordNoColegiado );
 								LOGGER.info(
 										"createLegalPerson() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
 
