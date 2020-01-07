@@ -131,7 +131,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "datosPagos")
 	@Results({ 
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPAGOSJG", property = "idPagosJG", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IMPORTEEJG", property = "importeEJG", jdbcType = JdbcType.VARCHAR),
@@ -142,6 +142,8 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "IMPORTEPAGADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
 		@Result(column = "DESESTADO", property = "desEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCONCEPTO", property = "desConcepto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PORCENTAJE", property = "porcentaje", jdbcType = JdbcType.VARCHAR),
 		
 	})
 	List<PagosjgItem> datosPagos(String idFacturacion, String idInstitucion, String idLenguaje);

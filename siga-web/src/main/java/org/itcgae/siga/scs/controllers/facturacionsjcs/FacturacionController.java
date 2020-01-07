@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.DTOs.scs.PagosjgDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class FacturacionController {
 	@RequestMapping(value="/facturacionsjcs/eliminarFacturacion", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<FacturacionDeleteDTO> eliminarFacturaciones(@RequestBody int idFactura, HttpServletRequest request){
 		FacturacionDeleteDTO response = facturacionServices.eliminarFacturaciones(idFactura, request);
-		if (response.getError().getCode() == 200) {
+		if (response.getStatus() == SigaConstants.OK) {
 			return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.OK);
 		}else {
 			return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);

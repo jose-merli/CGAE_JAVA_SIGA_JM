@@ -354,7 +354,13 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 	public String datosPagos(String idFacturacion, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
-
+		SQL sql3 = new SQL();
+		
+		sql3.SELECT("rec.descripcion");
+		sql3.FROM("gen_recursos_catalogos rec");
+		sql3.WHERE("rec.idrecurso = concept.descripcion");
+		sql3.WHERE("rec.idlenguaje = '"+idLenguaje+"'"); 
+		
 		sql2.SELECT("MAX(est2.fechaestado)");
 		sql2.FROM("fcs_pagos_estadospagos est2");
 		sql2.WHERE("est2.idinstitucion = est.idinstitucion");
@@ -364,17 +370,21 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("pjg.idpagosjg");
 		sql.SELECT("pjg.idfacturacion");
 		sql.SELECT("pjg.nombre");
+		sql.SELECT("("+sql3.toString()+") desconcepto");
 		sql.SELECT("pjg.importeejg");
 		sql.SELECT("pjg.importeguardia");
 		sql.SELECT("pjg.importeoficio");
 		sql.SELECT("pjg.importesoj");
 		sql.SELECT("pjg.importerepartir");
 		sql.SELECT("pjg.importepagado");
+		sql.SELECT("( pjg.importepagado * 100 ) / pjg.importerepartir AS porcentaje");
 		sql.SELECT("est.fechaestado");
 		sql.SELECT("rec.descripcion desestado");
 		sql.FROM("fcs_pagosjg pjg");
 		sql.INNER_JOIN("fcs_pagos_estadospagos est ON (pjg.idinstitucion = est.idinstitucion AND pjg.idpagosjg = est.idpagosjg)");
 		sql.INNER_JOIN("fcs_estadospagos estpagos ON (est.idestadopagosjg = estpagos.idestadopagosjg)");
+		sql.INNER_JOIN("fcs_fact_grupofact_hito factgrupo ON (pjg.idfacturacion = factgrupo.idfacturacion AND pjg.idinstitucion = factgrupo.idinstitucion)");
+		sql.INNER_JOIN("fcs_hitogeneral concept ON (factgrupo.idhitogeneral = concept.idhitogeneral)");
 		sql.INNER_JOIN("gen_recursos_catalogos rec ON (estpagos.descripcion = rec.idrecurso)");
 		sql.WHERE("est.fechaestado = ("+sql2.toString()+")");		
 		sql.WHERE("pjg.idinstitucion = '" + idInstitucion + "'");
