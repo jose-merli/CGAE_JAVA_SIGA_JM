@@ -892,7 +892,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 					String ultimo = "";
 
 					if (guardias != null && !guardias.isEmpty())
-						ultimo = guardias.get(0).getIdpersonaUltimo().toString();
+						ultimo = guardias.get(0).getIdpersonaUltimo() == null ? ""
+								: guardias.get(0).getIdpersonaUltimo().toString();
 
 					ScsOrdenacioncolasExample example2 = new ScsOrdenacioncolasExample();
 					example2.createCriteria()
@@ -904,28 +905,32 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if (cola != null && !cola.isEmpty()) {
 						if (cola.get(0).getAntiguedadcola() > 0)
 							mapilla.put(cola.get(0).getAntiguedadcola(), "ANTIGUEDADCOLA,");
-						else if (cola.get(0).getAntiguedadcola() < 0)
+						else if (cola.get(0).getAntiguedadcola() < 0) {
+							cola.get(0).setAntiguedadcola((short) -cola.get(0).getAntiguedadcola());
 							mapilla.put(cola.get(0).getAntiguedadcola(), "ANTIGUEDADCOLA desc,");
-
+						}
 						if (cola.get(0).getAlfabeticoapellidos() > 0)
 							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS,");
-						else if (cola.get(0).getAlfabeticoapellidos() < 0)
+						else if (cola.get(0).getAlfabeticoapellidos() < 0) {
+							cola.get(0).setAlfabeticoapellidos((short) -cola.get(0).getAlfabeticoapellidos());
 							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS desc,");
-
+						}
 						if (cola.get(0).getFechanacimiento() > 0)
 							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO,");
-
-						else if (cola.get(0).getFechanacimiento() < 0)
+						else if (cola.get(0).getFechanacimiento() < 0) {
+							cola.get(0).setFechanacimiento((short) -cola.get(0).getFechanacimiento());
 							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO desc,");
 
+						}
 						if (cola.get(0).getOrdenacionmanual() > 0)
-							mapilla.put(cola.get(0).getOrdenacionmanual(), "numeroGrupo,ordengrupo,");
+							mapilla.put(cola.get(0).getOrdenacionmanual(), "NUMEROGRUPO, ORDENGRUPO,");
 
 						if (cola.get(0).getNumerocolegiado() > 0)
 							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO,");
-						else if (cola.get(0).getNumerocolegiado() < 0)
+						else if (cola.get(0).getNumerocolegiado() < 0) {
+							cola.get(0).setNumerocolegiado((short) -cola.get(0).getNumerocolegiado());
 							mapilla.put(cola.get(0).getNumerocolegiado(), "NUMEROCOLEGIADO desc,");
-
+						}
 						mapa.putAll(mapilla);
 						if (mapa.size() > 0)
 							for (String orden : mapa.values()) {
@@ -939,8 +944,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						ultimo = "WHERE\r\n" + "		idpersona =" + ultimo;
 
 					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
-							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo,
-							ordenaciones, idInstitucion.toString());
+							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(),
+							ultimo, ordenaciones, idInstitucion.toString());
 					inscritos.setInscripcionesItem(colaGuardia);
 
 					LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
@@ -981,15 +986,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-//
-//					ScsGrupoguardiaExample scsGrupoguardiaExample = new ScsGrupoguardiaExample();
-//					scsGrupoguardiaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).
-//						andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).
-//						andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia())).
-//						andNumerogrupoEqualsTo(guardiasItem.getPorGrupos());
-					
-					
-					
+					//
+					// ScsGrupoguardiaExample scsGrupoguardiaExample = new ScsGrupoguardiaExample();
+					// scsGrupoguardiaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).
+					// andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).
+					// andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia())).
+					// andNumerogrupoEqualsTo(guardiasItem.getPorGrupos());
+
 				} catch (Exception e) {
 					LOGGER.error(e);
 				}
@@ -997,7 +1000,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 		return insertResponseDTO;
 	}
-	
+
 	@Override
 	public UpdateResponseDTO updateUltimoCola(GuardiasItem guardiasItem, HttpServletRequest request) {
 		LOGGER.info("updateGuardia() ->  Entrada al servicio para editar guardia");
@@ -1035,17 +1038,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 							"updateUltimoCola() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear DatosGenerales de guardias");
 					ScsInscripcionguardiaExample example = new ScsInscripcionguardiaExample();
 					example.createCriteria().andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
-					.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).andIdinstitucionEqualTo(idInstitucion)
-					.andIdpersonaEqualTo(Long.valueOf(guardiasItem.getIdPersonaUltimo()));
-					List<ScsInscripcionguardia> inscripciones = scsInscripcionguardiaExtendsMapper.selectByExample(example);
-					if(!inscripciones.isEmpty()) {
-						guardia.setFechasuscripcionUltimo(inscripciones.get(0).getFechasuscripcion());						
+							.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
+							.andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.valueOf(guardiasItem.getIdPersonaUltimo()));
+					List<ScsInscripcionguardia> inscripciones = scsInscripcionguardiaExtendsMapper
+							.selectByExample(example);
+					if (!inscripciones.isEmpty()) {
+						guardia.setFechasuscripcionUltimo(inscripciones.get(0).getFechasuscripcion());
 						guardia.setIdpersonaUltimo(Long.valueOf(guardiasItem.getIdPersonaUltimo()));
-//					if(!UtilidadesString.esCadenaVacia(guardiasItem.getIdGrupoUltimo()))
-//						guardia.setIdgrupoguardiaUltimo(null);
-					
-					response = scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
-					}else
+						// if(!UtilidadesString.esCadenaVacia(guardiasItem.getIdGrupoUltimo()))
+						// guardia.setIdgrupoguardiaUltimo(null);
+
+						response = scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
+					} else
 						throw new Exception("No se encontró la inscripcion a la que asignarle último");
 				} catch (Exception e) {
 					LOGGER.error(e);
@@ -1074,7 +1079,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return updateResponseDTO;
 
 	}
-	
+
 	@Override
 	public GuardiasDTO resumenIncompatibilidades(GuardiasItem guardiasItem, HttpServletRequest request) {
 
@@ -1098,15 +1103,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
 
-				guardias = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades(guardiasItem, idInstitucion.toString());
+				guardias = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades(guardiasItem,
+						idInstitucion.toString());
 				guardiaDTO.setGuardiaItems(guardias);
 				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
 			}
 		}
-		
+
 		return guardiaDTO;
 	}
-	
 
-	
 }
