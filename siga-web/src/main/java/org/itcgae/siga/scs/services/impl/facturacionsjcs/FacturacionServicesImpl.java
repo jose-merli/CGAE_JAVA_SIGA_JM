@@ -492,6 +492,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	            	LOGGER.info("saveFacturacion() / fcsFacturacionJGExtendsMapper.saveFacturacion() -> Guardar datos en fcsFacturacionjg");
 	            	NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdFacturacion(idInstitucion);	
 	            	idFacturacion = Integer.parseInt(idP.getNewId()) + 1;
+	            	
 	            	int idPartida = Integer.parseInt(facturacionItem.getIdPartidaPresupuestaria());
 	            	Short idEstado = 10;
 	            	

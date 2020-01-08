@@ -28,6 +28,7 @@ public class FacturacionItem {
 	private String descConcepto;
 	private String idGrupoOld;
 	private String idConceptoOld;
+	private String observaciones;
 	
 	@JsonProperty("idGrupo")
 	public String getIdGrupo() {
@@ -226,6 +227,15 @@ public class FacturacionItem {
 	public void setIdGrupoOld(String idGrupoOld) {
 		this.idGrupoOld = idGrupoOld;
 	}
+	
+	@JsonProperty("observaciones")
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
 
 	@Override
 	public int hashCode() {
@@ -250,6 +260,7 @@ public class FacturacionItem {
 		result = prime * result + ((importePendiente == null) ? 0 : importePendiente.hashCode());
 		result = prime * result + ((importeTotal == null) ? 0 : importeTotal.hashCode());
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
+		result = prime * result + ((observaciones == null) ? 0 : observaciones.hashCode());
 		result = prime * result + ((prevision == null) ? 0 : prevision.hashCode());
 		result = prime * result + ((regularizacion == null) ? 0 : regularizacion.hashCode());
 		result = prime * result + ((visible == null) ? 0 : visible.hashCode());
@@ -360,6 +371,11 @@ public class FacturacionItem {
 				return false;
 		} else if (!nombre.equals(other.nombre))
 			return false;
+		if (observaciones == null) {
+			if (other.observaciones != null)
+				return false;
+		} else if (!observaciones.equals(other.observaciones))
+			return false;
 		if (prevision == null) {
 			if (other.prevision != null)
 				return false;
@@ -387,6 +403,7 @@ public class FacturacionItem {
 				+ ", importePagado=" + importePagado + ", idPartidaPresupuestaria=" + idPartidaPresupuestaria
 				+ ", importePendiente=" + importePendiente + ", prevision=" + prevision + ", visible=" + visible
 				+ ", idGrupo=" + idGrupo + ", descGrupo=" + descGrupo + ", descConcepto=" + descConcepto
-				+ ", idGrupoOld=" + idGrupoOld + ", idConceptoOld=" + idConceptoOld + "]";
-	}	
+				+ ", idGrupoOld=" + idGrupoOld + ", idConceptoOld=" + idConceptoOld + ", observaciones=" + observaciones
+				+ "]";
+	}
 }

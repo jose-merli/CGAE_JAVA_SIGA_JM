@@ -56,6 +56,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	@Results({ 
 		@Result(column = "idestadofacturacion", property = "idEstado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "descripcion", property = "desEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaestado", property = "fechaEstado", jdbcType = JdbcType.DATE),
 	})
 	List<FacturacionItem> historicoFacturacion(String idFacturacion, String idLenguaje, String idInstitucion);
