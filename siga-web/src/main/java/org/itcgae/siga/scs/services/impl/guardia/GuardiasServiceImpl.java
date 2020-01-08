@@ -394,7 +394,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 							guardiaItem.setDiasPeriodo(guardia.getDiasperiodo() + "");
 						guardiaItem.setTipoDiasGuardia(guardia.getTipodiasguardia());
 						guardiaItem.setTipoDiasPeriodo(guardia.getTipodiasperiodo());
-
+						guardiaItem.setDiasSeparacionGuardias(guardia.getDiasseparacionguardias() != null ? 
+								guardia.getDiasseparacionguardias().toString() : "0");
 						// String diasSeparacion =
 						// scsGuardiasturnoExtendsMapper.separarGuardias(idGuardia,
 						// guardia.getIdturno().toString(), idInstitucion.toString()).get(0);
