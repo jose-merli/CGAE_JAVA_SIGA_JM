@@ -48,7 +48,6 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql2.INNER_JOIN("CEN_INSTITUCION INS ON (FAC.IDINSTITUCION = INS.IDINSTITUCION)");
 		sql2.INNER_JOIN(
 				"FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION)");
-		sql2.WHERE("FAC.PREVISION = '0'");
 		sql2.WHERE("FAC.IDINSTITUCION = '" + idInstitucion + "'");
 
 		// FILTRO ESTADOS FACTURACIÓN
@@ -135,9 +134,10 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 	public String historicoFacturacion(String idFacturacion, String lenguaje, String idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("estados.idestadofacturacion");
+		sql.SELECT("est.idestadofacturacion");
 		sql.SELECT("rec.descripcion descripcion");
 		sql.SELECT("est.fechaestado fechaestado");
+		sql.SELECT("est.observaciones");
 		sql.FROM("fcs_fact_estadosfacturacion est");
 		sql.JOIN("fcs_estadosfacturacion estados on (est.idestadofacturacion = estados.idestadofacturacion)");
 		sql.JOIN("gen_recursos_catalogos rec on (estados.descripcion = rec.idrecurso)");
