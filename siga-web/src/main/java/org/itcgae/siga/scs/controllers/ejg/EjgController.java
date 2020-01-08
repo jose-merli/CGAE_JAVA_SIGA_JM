@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
+import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
@@ -120,5 +122,17 @@ public class EjgController {
 		UnidadFamiliarEJGDTO response = gestionEJG.unidadFamiliarEJG(ejgItem, request);
 		return new ResponseEntity<UnidadFamiliarEJGDTO>(response, HttpStatus.OK);
 	}
-		
+	//Expedientes Económicos
+	@RequestMapping(value = "/gestion-ejg/getExpedientesEconomicos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ExpedienteEconomicoDTO> getExpedientesEconomicos(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		ExpedienteEconomicoDTO response = gestionEJG.getExpedientesEconomicos(ejgItem, request);
+		return new ResponseEntity<ExpedienteEconomicoDTO>(response, HttpStatus.OK);
+	}
+	//Estados
+	@RequestMapping(value = "/gestion-ejg/gestionejg_getEstados",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EstadoEjgDTO> getEstados(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		EstadoEjgDTO response = gestionEJG.getEstados(ejgItem, request);
+		return new ResponseEntity<EstadoEjgDTO>(response, HttpStatus.OK);
+	}
+	
 }

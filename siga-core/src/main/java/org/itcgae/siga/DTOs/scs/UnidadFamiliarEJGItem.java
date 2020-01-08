@@ -16,9 +16,9 @@ public class UnidadFamiliarEJGItem {
     private String pjg_ape1;
     private String pjg_ape2;
     private String pjg_direccion;
-    private String nombrePrincipal;
-    private String apellido1Principal;
-    private String apellido2Principal;
+//    private String nombrePrincipal;
+//    private String apellido1Principal;
+//    private String apellido2Principal;
     private String pd_descripcion;
     private String estado;
     private Date fechaSolicitud;
@@ -178,48 +178,7 @@ public class UnidadFamiliarEJGItem {
 	public void setPjg_direccion(String pjg_direccion) {
 		this.pjg_direccion = pjg_direccion;
 	}
-	/**
-	 **/
-	public UnidadFamiliarEJGItem nombrePrincipal(String nombrePrincipal) {
-		this.nombrePrincipal = nombrePrincipal;
-		return this;
-	}
 
-	@JsonProperty("nombrePrincipal")
-	public String getNombrePrincipal() {
-		return nombrePrincipal;
-	}
-	public void setNombrePrincipal(String nombrePrincipal) {
-		this.nombrePrincipal = nombrePrincipal;
-	}
-	/**
-	 **/
-	public UnidadFamiliarEJGItem apellido1Principal(String apellido1Principal) {
-		this.apellido1Principal = apellido1Principal;
-		return this;
-	}
-
-	@JsonProperty("apellido1Principal")
-	public String getApellido1Principal() {
-		return apellido1Principal;
-	}
-	public void setApellido1Principal(String apellido1Principal) {
-		this.apellido1Principal = apellido1Principal;
-	}
-	/**
-	 **/
-	public UnidadFamiliarEJGItem apellido2Principal(String apellido2Principal) {
-		this.apellido2Principal = apellido2Principal;
-		return this;
-	}
-
-	@JsonProperty("apellido2Principal")
-	public String getApellido2Principal() {
-		return apellido2Principal;
-	}
-	public void setApellido2Principal(String apellido2Principal) {
-		this.apellido2Principal = apellido2Principal;
-	}
 	/**
 	 **/
 	public UnidadFamiliarEJGItem pd_descripcion(String pd_descripcion) {

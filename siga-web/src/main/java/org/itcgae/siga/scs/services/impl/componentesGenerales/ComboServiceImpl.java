@@ -162,7 +162,7 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboEstadoEjg() / scsEstadoEJGExtendsMapper.comboEstadoEjg() -> Entrada a scsTipoEJGExtendsMapper para obtener combo EstadoEjg");
 
-				List<ComboItem> comboItems = scsEstadoEJGExtendsMapper.comboEstadoEJG(usuarios.get(0).getIdlenguaje(), idInstitucion.toString());
+				List<ComboItem> comboItems = scsEstadoEJGExtendsMapper.comboEstadoEjg(Short.valueOf(usuarios.get(0).getIdlenguaje()));
 
 				LOGGER.info(
 						"comboEstadoEjg() / scsEstadoEJGExtendsMapper.comboEstadoEjg() -> Salida e scsTipoEJGExtendsMapper para obtener combo EstadoEjg");

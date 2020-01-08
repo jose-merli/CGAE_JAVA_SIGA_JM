@@ -10,6 +10,10 @@ public class EstadoEjgItem {
 	private Date fechaModificacion;
 	private Date fechaInicio;
 	private String descripcion;
+	private String observaciones;
+	private String automatico;
+	private String propietario;
+	private String user;
 
 	
 	/**
@@ -80,6 +84,66 @@ public class EstadoEjgItem {
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
+	/**
+	 **/
+	public EstadoEjgItem observaciones(String observaciones) {
+		this.observaciones = observaciones;
+		return this;
+	}
+
+	@JsonProperty("observaciones")
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
+	/**
+	 **/
+	public EstadoEjgItem automatico(String automatico) {
+		this.automatico = automatico;
+		return this;
+	}
+
+	@JsonProperty("automatico")
+	public String getAutomatico() {
+		return automatico;
+	}
+
+	public void setAutomatico(String automatico) {
+		this.automatico = automatico;
+	}
+	/**
+	 **/
+	public EstadoEjgItem propietario(String propietario) {
+		this.propietario = propietario;
+		return this;
+	}
+
+	@JsonProperty("propietario")
+	public String getPropietario() {
+		return propietario;
+	}
+
+	public void setPropietario(String propietario) {
+		this.propietario = propietario;
+	}
+	/**
+	 **/
+	public EstadoEjgItem user(String user) {
+		this.user = user;
+		return this;
+	}
+
+	@JsonProperty("user")
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
 
 	@Override
 	public int hashCode() {
@@ -129,11 +193,4 @@ public class EstadoEjgItem {
 		return "EstadoEjgItem [idEstadoejg=" + idEstadoejg + ", fechaModificacion=" + fechaModificacion
 				+ ", fechaInicio=" + fechaInicio + ", descripcion=" + descripcion + "]";
 	}
-
-	
-	
-	
-	
-	
-
 }

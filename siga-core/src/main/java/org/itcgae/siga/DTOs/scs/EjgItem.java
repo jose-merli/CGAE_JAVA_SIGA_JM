@@ -68,6 +68,8 @@ public class EjgItem {
     private String idTurno;
 
     private String guardia;
+    private String idGuardia;
+
     private String numColegiado;
     private String apellidosYNombre; 
     private String tipoLetrado;
@@ -78,6 +80,7 @@ public class EjgItem {
     private String numeroexpediente;
     private Date fechapresentacion;
     private Date fechalimitepresentacion;
+    private boolean historico;
 //    private String correoelectronico;
 //    private Date fechanacimiento;
 
@@ -1077,37 +1080,36 @@ public class EjgItem {
 	public void setNumEjg(String numEjg) {
 		this.numEjg = numEjg;
 	}
+	/**
+	 **/
+	public EjgItem idGuardia(String idGuardia) {
+		this.idGuardia = idGuardia;
+		return this;
+	}
 
-//	/**
-//	 **/
-//	public EjgItem correoelectronico(String correoelectronico) {
-//		this.correoelectronico = correoelectronico;
-//		return this;
-//	}
-//
-//	@JsonProperty("correoelectronico")
-//	public String getCorreoelectronico() {
-//		return correoelectronico;
-//	}
-//
-//	public void setCorreoelectronico(String correoelectronico) {
-//		this.correoelectronico = correoelectronico;
-//	}
-//	/**
-//	 **/
-//	public EjgItem fechanacimiento(Date fechanacimiento) {
-//		this.fechanacimiento = fechanacimiento;
-//		return this;
-//	}
-//
-//	@JsonProperty("fechanacimiento")
-//	public Date getFechanacimiento() {
-//		return fechanacimiento;
-//	}
-//
-//	public void setFechanacimiento(Date fechanacimiento) {
-//		this.fechanacimiento = fechanacimiento;
-//	}
+	@JsonProperty("idGuardia")
+	public String getIdGuardia() {
+		return idGuardia;
+	}
+
+	public void setIdGuardia(String idGuardia) {
+		this.idGuardia = idGuardia;
+	}
+	/**
+	 **/
+	public EjgItem historico(boolean historico) {
+		this.historico = historico;
+		return this;
+	}
+
+	@JsonProperty("historico")
+	public boolean isHistorico() {
+		return historico;
+	}
+
+	public void setHistorico(boolean historico) {
+		this.historico = historico;
+	}
 
 
 }

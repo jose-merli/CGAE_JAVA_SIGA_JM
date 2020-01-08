@@ -497,7 +497,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 				LOGGER.info(
 						"comboEstadoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
 
-				comboItems = scsEstadoEjgextendsMapper.comboEstadoEJG(usuarios.get(0).getIdlenguaje(), idInstitucion.toString());
+				comboItems = scsEstadoEjgextendsMapper.comboEstadoEjg(Short.valueOf(usuarios.get(0).getIdlenguaje()));
 
 				LOGGER.info(
 						"comboEstadoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
@@ -556,7 +556,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 		            tamMaximo = null;
 		        }
 				LOGGER.info("busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
-				ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo));
+				ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
 				LOGGER.info("busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
 			}else {
 				LOGGER.warn("busquedaEJG() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);

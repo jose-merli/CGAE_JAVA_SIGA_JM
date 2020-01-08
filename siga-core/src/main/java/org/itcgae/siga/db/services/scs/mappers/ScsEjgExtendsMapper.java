@@ -73,7 +73,7 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
 	})
-	List<EjgItem> busquedaEJG(EjgItem ejgItem, String string, Integer tamMaximo);
+	List<EjgItem> busquedaEJG(EjgItem ejgItem, String string, Integer tamMaximo, String idLenguaje);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "datosEJG")
 	@Results({ 
@@ -98,8 +98,8 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNOGUARDIA", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
-
-		@Result(column = "IDGUARDIA", property = "guardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "GUARDIA", property = "guardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaapertura", property = "fechaApertura", jdbcType = JdbcType.DATE),
 		@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.DATE),
 		@Result(column = "NOMBRESOLICITANTE", property = "nombreApeSolicitante", jdbcType = JdbcType.VARCHAR),
@@ -119,6 +119,6 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 
 	})
-	List<EjgItem> datosEJG(EjgItem ejgItem, String string);
+	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
 
 }

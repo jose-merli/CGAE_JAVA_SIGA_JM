@@ -661,10 +661,9 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 		return sql.toString();
 	}
-	public String unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion) {
+	public String unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 
 		SQL sql = new SQL();
-		
 		sql.SELECT("uf.idinstitucion," + 
 					" uf.idtipoejg," + 
 					" uf.anio," + 
@@ -677,9 +676,6 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 					" pjg.apellido2," + 
 					" pjg.direccion," + 
 					" uf.encalidadde," + 
-					" pjgP.nombre as nombrePrincipal," + 
-					" pjgP.apellido1 as apellido1Principal," + 
-					" pjgP.apellido2 as apellido2Principal," + 
 					" pd.descripcion," + 
 					" eejg_p.estado," + 
 					" eejg_p.fechasolicitud");
@@ -687,8 +683,8 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.FROM("scs_unidadfamiliarejg uf");
 		
 		sql.INNER_JOIN("scs_personajg pjg on (uf.idpersona=pjg.idpersona and uf.idinstitucion=pjg.idinstitucion)");
-		sql.LEFT_OUTER_JOIN("(select grc.descripcion, p.idparentesco, p.idinstitucion, grc.idlenguaje from scs_parentesco p inner join gen_recursos_catalogos grc on (grc.idrecurso=p.descripcion) where grc.idlenguaje= '" + ejgItem.getAnnio() + "'" + " ) pd on (pd.idparentesco=uf.idparentesco and pd.idinstitucion=uf.idinstitucion)");
-		sql.LEFT_OUTER_JOIN("scs_eejg_peticiones eejg_p on (eejg_p.numero = uf.numero and eejg_p.anio=uf.anio and eejg_p.idtipoejg = uf.idtipoejg and eejg_p.idinstitucion = uf.idinstitucion and eejg_p.idpersona=uf.idpersona), scs_personajg pjgP");
+		sql.LEFT_OUTER_JOIN("(select grc.descripcion, p.idparentesco, p.idinstitucion, grc.idlenguaje from scs_parentesco p inner join gen_recursos_catalogos grc on (grc.idrecurso=p.descripcion) where grc.idlenguaje= '" + idLenguaje + "'" + " ) pd on (pd.idparentesco=uf.idparentesco and pd.idinstitucion=uf.idinstitucion)");
+		sql.LEFT_OUTER_JOIN("scs_eejg_peticiones eejg_p on (eejg_p.numero = uf.numero and eejg_p.anio=uf.anio and eejg_p.idtipoejg = uf.idtipoejg and eejg_p.idinstitucion = uf.idinstitucion and eejg_p.idpersona=uf.idpersona)");
 
 		if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 			sql.WHERE("uf.anio = '" + ejgItem.getAnnio() + "'");
@@ -698,10 +694,15 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 			sql.WHERE("uf.idtipoejg = '" + ejgItem.getTipoEJG() + "'");
 		if(idInstitucion != null && idInstitucion != "")
 			sql.WHERE("uf.idinstitucion = '" + idInstitucion + "'");
-		if(ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
-			sql.WHERE("pjgP.idpersona = '" + ejgItem.getIdPersona() + "'");
-		sql.WHERE("pjgP.idinstitucion = uf.idinstitucion ");
+//		if(ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
+//			sql.WHERE("pjgP.idpersona = '" + ejgItem.getIdPersona() + "'");
+//		sql.WHERE("pjgP.idinstitucion = uf.idinstitucion ");
 
+		if (tamMaximo != null) {
+			Integer tamMaxNumber = tamMaximo + 1;
+			sql.WHERE("rownum <= " + tamMaxNumber);
+
+		}
 		
 		return sql.toString();
 

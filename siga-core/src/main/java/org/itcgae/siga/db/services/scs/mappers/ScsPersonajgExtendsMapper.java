@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
@@ -74,13 +73,13 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 		@Result(column = "apellido1", property = "pjg_ape1", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "apellido2", property = "pjg_ape2", jdbcType = JdbcType.VARCHAR),	
 		@Result(column = "direccion", property = "pjg_direccion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "nombrePrincipal", property = "nombrePrincipal", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "apellido1Principal", property = "apellido1Principal", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "apellido2Principal", property = "apellido2Principal", jdbcType = JdbcType.VARCHAR),	
+//		@Result(column = "nombrePrincipal", property = "nombrePrincipal", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "apellido1Principal", property = "apellido1Principal", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "apellido2Principal", property = "apellido2Principal", jdbcType = JdbcType.VARCHAR),	
 		@Result(column = "descripcion", property = "pd_descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechasolicitud", property = "fechaSolicitud", jdbcType = JdbcType.DATE)
 	})
-	List<UnidadFamiliarEJGItem> unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion);
+	List<UnidadFamiliarEJGItem> unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
 
 }

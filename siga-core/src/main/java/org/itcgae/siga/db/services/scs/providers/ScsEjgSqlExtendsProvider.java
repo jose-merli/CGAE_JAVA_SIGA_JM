@@ -12,7 +12,7 @@ import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	
 	
-	public String busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo) {
+	public String busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		String dictamenCad = "";
 		boolean indiferente = false;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); 
@@ -89,8 +89,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 //		sql.SELECT("perjg.correoelectronico");
 //		sql.SELECT("perjg.fechanacimiento");
 
-
-		
+	
 		//from
 		sql.FROM("scs_ejg ejg");
 		
@@ -115,7 +114,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ "AND ESTADO.NUMERO = ESTADO3.NUMERO "
 				+ "AND ESTADO3.FECHABAJA IS NULL))))");
 		sql.INNER_JOIN("SCS_MAESTROESTADOSEJG MAESTROESTADO ON ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = 1");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = '" + idLenguaje +"'");
 		
 		//where
 		sql.WHERE("ejg.idinstitucion = " + idInstitucion);
@@ -394,7 +393,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
 		return sql.toString();	
 	}
-	public String datosEJG(EjgItem ejgItem, String idInstitucion) {
+	public String datosEJG(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 		
 		String joinDesignaLetrado = "(select * from SCS_DESIGNASLETRADO designaletrado where designaletrado.fecharenuncia is null or"
@@ -417,6 +416,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("'E' || EJG.ANIO || '/' || EJG.NUMEJG AS NUMANIO");
 		sql.SELECT("TURNO.NOMBRE || '/' || GUARDIA.NOMBRE AS TURNOGUARDIA");
 		sql.SELECT("TURNO.ABREVIATURA AS TURNO");
+		sql.SELECT("GUARDIA.NOMBRE AS GUARDIA");
 		sql.SELECT("EJG.GUARDIATURNO_IDTURNO as IDTURNO");
 		sql.SELECT("EJG.GUARDIATURNO_IDGUARDIA as IDGUARDIA");
 		sql.SELECT("ejg.fechaapertura");
@@ -463,13 +463,13 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ "AND ESTADO.NUMERO = ESTADO3.NUMERO "
 				+ "AND ESTADO3.FECHABAJA IS NULL))))");
 				sql.INNER_JOIN("SCS_MAESTROESTADOSEJG MAESTROESTADO ON ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG");
-				sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = 1");
+				sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = '" + idLenguaje +"'");
 				sql.LEFT_OUTER_JOIN("scs_tipodictamenejg tipodictamen ON tipodictamen.idtipodictamenejg = ejg.idtipodictamenejg AND ejg.idinstitucion = tipodictamen.idinstitucion");
-				sql.LEFT_OUTER_JOIN("gen_recursos_catalogos rectipodictamen ON rectipodictamen.idrecurso = tipodictamen.descripcion AND rectipodictamen.idlenguaje = 1");
+				sql.LEFT_OUTER_JOIN("gen_recursos_catalogos rectipodictamen ON rectipodictamen.idrecurso = tipodictamen.descripcion AND rectipodictamen.idlenguaje = '" + idLenguaje +"'");
 				sql.LEFT_OUTER_JOIN("scs_tiporesolucion tiporesolucion ON tiporesolucion.idtiporesolucion = ejg.idtiporatificacionejg");
-				sql.LEFT_OUTER_JOIN("gen_recursos_catalogos rectiporesolucion ON rectiporesolucion.idrecurso = tiporesolucion.descripcion AND rectiporesolucion.idlenguaje = 1");
+				sql.LEFT_OUTER_JOIN("gen_recursos_catalogos rectiporesolucion ON rectiporesolucion.idrecurso = tiporesolucion.descripcion AND rectiporesolucion.idlenguaje = '" + idLenguaje +"'");
 				sql.LEFT_OUTER_JOIN("scs_tiporesolauto tiporesolauto ON tiporesolauto.idtiporesolauto = ejg.idtiporesolauto");
-				sql.LEFT_OUTER_JOIN("gen_recursos_catalogos rectiporesolauto ON rectiporesolauto.idrecurso = tiporesolauto.descripcion AND rectiporesolauto.idlenguaje = 1");
+				sql.LEFT_OUTER_JOIN("gen_recursos_catalogos rectiporesolauto ON rectiporesolauto.idrecurso = tiporesolauto.descripcion AND rectiporesolauto.idlenguaje = '" + idLenguaje +"'");
 				sql.LEFT_OUTER_JOIN("SCS_EJGDESIGNA EJGD ON   ejgd.anioejg = ejg.anio   AND   ejgd.numeroejg = ejg.numero AND   ejgd.idtipoejg = ejg.idtipoejg  AND   ejgd.idinstitucion = ejg.idinstitucion");
 				sql.LEFT_OUTER_JOIN(joinDesignaLetrado);
 				sql.LEFT_OUTER_JOIN("CEN_CLIENTE clientedesigna on clientedesigna.idpersona = designaletrado2.idpersona  and clientedesigna.idinstitucion = designaletrado2.idinstitucion");
@@ -478,8 +478,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				sql.WHERE("ejg.idinstitucion = " + idInstitucion);
 				if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 		                 sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
-				if(ejgItem.getNumero() != null && ejgItem.getNumero() != "")
-		                 sql.WHERE ("EJG.NUMEJG ="+ ejgItem.getNumero());
+				if(ejgItem.getNumEjg() != null && ejgItem.getNumEjg() != "")
+		                 sql.WHERE ("EJG.NUMEJG ="+ ejgItem.getNumEjg());
 				if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
 		                 sql.WHERE ("ejg.IDTIPOEJG = " + ejgItem.getTipoEJG());
 				
