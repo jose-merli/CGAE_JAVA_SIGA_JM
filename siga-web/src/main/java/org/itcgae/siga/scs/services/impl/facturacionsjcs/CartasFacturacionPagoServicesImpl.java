@@ -1,15 +1,21 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosDTO;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.ICartasFacturacionPagoServices;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -26,6 +32,9 @@ public class CartasFacturacionPagoServicesImpl implements ICartasFacturacionPago
 
 	@Autowired
 	private FcsFacturacionJGExtendsMapper fcsFacturacionJGExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
 	@Override
 	public CartasFacturacionPagosDTO buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem,
@@ -37,6 +46,9 @@ public class CartasFacturacionPagoServicesImpl implements ICartasFacturacionPago
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		CartasFacturacionPagosDTO cartasFacturacionPagosDTO = new CartasFacturacionPagosDTO();
+		Error error = new Error();
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
 		
 		if(null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -51,10 +63,40 @@ public class CartasFacturacionPagoServicesImpl implements ICartasFacturacionPago
 	        if(null != usuarios && usuarios.size() > 0) {
 	        	AdmUsuarios usuario = usuarios.get(0);
 	            usuario.setIdinstitucion(idInstitucion);
+	            
+	            GenParametrosExample genParametrosExample = new GenParametrosExample();
+
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+						.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+				LOGGER.info(
+						"buscarCartasfacturacion() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+				LOGGER.info(
+						"buscarCartasfacturacion() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				if(tamMax != null) {
+					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+				}else {
+					tamMaximo = null;
+				}
 	                
 	            LOGGER.info("buscarCartasfacturacion() / fcsFacturacionJGExtendsMapper.buscarCartasfacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener las cartas de facturaciones");
 	            
-	            List<CartasFacturacionPagosItem> cartasFacturacionPagosItems = fcsFacturacionJGExtendsMapper.buscarCartasfacturacion(cartasFacturacionPagosItem, idInstitucion);
+	            List<CartasFacturacionPagosItem> cartasFacturacionPagosItems = fcsFacturacionJGExtendsMapper.buscarCartasfacturacion(cartasFacturacionPagosItem, idInstitucion, tamMaximo);
+	          
+	        	if(cartasFacturacionPagosItems != null && tamMaximo != null  && cartasFacturacionPagosItems.size() > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					cartasFacturacionPagosDTO.setError(error);
+					cartasFacturacionPagosItems.remove(cartasFacturacionPagosItems.size()-1);
+				}
+	            
 	            cartasFacturacionPagosDTO.setCartasFacturacionPagosItems(cartasFacturacionPagosItems);
 	            
 	            LOGGER.info("buscarCartasfacturacion() / fcsFacturacionJGExtendsMapper.buscarCartasfacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener las cartas de facturaciones");
@@ -81,6 +123,9 @@ public class CartasFacturacionPagoServicesImpl implements ICartasFacturacionPago
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		CartasFacturacionPagosDTO cartasFacturacionPagosDTO = new CartasFacturacionPagosDTO();
+		Error error = new Error();
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
 		
 		if(null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -95,10 +140,40 @@ public class CartasFacturacionPagoServicesImpl implements ICartasFacturacionPago
 	        if(null != usuarios && usuarios.size() > 0) {
 	        	AdmUsuarios usuario = usuarios.get(0);
 	            usuario.setIdinstitucion(idInstitucion);
+	            
+	            GenParametrosExample genParametrosExample = new GenParametrosExample();
+
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+						.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+				LOGGER.info(
+						"buscarCartaspago() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+				LOGGER.info(
+						"buscarCartaspago() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				if(tamMax != null) {
+					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+				}else {
+					tamMaximo = null;
+				}
 	                
 	            LOGGER.info("buscarCartaspago() / fcsFacturacionJGExtendsMapper.buscarCartasfacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener las cartas de facturaciones");
 	            
-	            List<CartasFacturacionPagosItem> cartasFacturacionPagosItems = fcsFacturacionJGExtendsMapper.buscarCartaspago(cartasFacturacionPagosItem, idInstitucion, usuario.getIdlenguaje());
+	            List<CartasFacturacionPagosItem> cartasFacturacionPagosItems = fcsFacturacionJGExtendsMapper.buscarCartaspago(cartasFacturacionPagosItem, idInstitucion, usuario.getIdlenguaje(), tamMaximo);
+	       
+	            if(cartasFacturacionPagosItems != null && tamMaximo != null  && cartasFacturacionPagosItems.size() > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					cartasFacturacionPagosDTO.setError(error);
+					cartasFacturacionPagosItems.remove(cartasFacturacionPagosItems.size()-1);
+				}
+	            	            
 	            cartasFacturacionPagosDTO.setCartasFacturacionPagosItems(cartasFacturacionPagosItems);
 	            
 	            LOGGER.info("buscarCartaspago() / fcsFacturacionJGExtendsMapper.buscarCartasfacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener las cartas de facturaciones");

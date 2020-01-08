@@ -58,8 +58,8 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 			sql2.WHERE("EST.IDESTADOFACTURACION = " + facturacionItem.getIdEstado());
 		}
 
-		//FILTRO NOMBRE
-		if(!UtilidadesString.esCadenaVacia(facturacionItem.getNombre())) {
+		// FILTRO NOMBRE
+		if (!UtilidadesString.esCadenaVacia(facturacionItem.getNombre())) {
 			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("FAC.NOMBRE", facturacionItem.getNombre()));
 		}
 
@@ -171,57 +171,52 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		return sql.toString();
 	}
-	
+
 	public String conceptosFacturacion(String idFacturacion, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 		SQL sqlDescGrupo = new SQL();
 		SQL sqlDescConcepto = new SQL();
-		
+
 		sqlDescGrupo.SELECT("rec.descripcion");
 		sqlDescGrupo.FROM("gen_recursos_catalogos rec");
 		sqlDescGrupo.WHERE("rec.idrecurso = grupo.nombre");
-		sqlDescGrupo.WHERE("rec.idlenguaje = '"+idLenguaje+"'");
-		
+		sqlDescGrupo.WHERE("rec.idlenguaje = '" + idLenguaje + "'");
+
 		sqlDescConcepto.SELECT("rec.descripcion");
 		sqlDescConcepto.FROM("gen_recursos_catalogos rec");
 		sqlDescConcepto.WHERE("rec.idrecurso = concept.descripcion");
-		sqlDescConcepto.WHERE("rec.idlenguaje = '"+idLenguaje+"'");
-		
+		sqlDescConcepto.WHERE("rec.idlenguaje = '" + idLenguaje + "'");
+
 		sql.SELECT("fac.idinstitucion");
 		sql.SELECT("fac.idfacturacion");
-		sql.SELECT("("+sqlDescGrupo.toString()+") descGrupo");
-		sql.SELECT("("+sqlDescConcepto.toString()+") descConcepto");
+		sql.SELECT("(" + sqlDescGrupo.toString() + ") descGrupo");
+		sql.SELECT("(" + sqlDescConcepto.toString() + ") descConcepto");
 		sql.SELECT("grupo.idgrupofacturacion idgrupo");
 		sql.SELECT("concept.idhitogeneral idconcepto");
-		sql.SELECT("CASE concept.idhitogeneral\r\n" + 
-				"        WHEN 10   THEN\r\n" + 
-				"            NVL(fac.importeoficio,0)\r\n" + 
-				"        WHEN 20   THEN\r\n" + 
-				"             NVL(fac.importeguardia,0)\r\n" + 
-				"        WHEN 30   THEN\r\n" + 
-				"             NVL(fac.importesoj,0)\r\n" + 
-				"        ELSE\r\n" + 
-				"             NVL(fac.importeejg,0)\r\n" + 
-				"    END AS importetotal"); 
-		sql.SELECT("CASE concept.idhitogeneral\r\n" + 
-				"        WHEN 10   THEN\r\n" + 
-				"             NVL(fac.importeoficio,0) -  NVL(pago.importeoficio,0)\r\n" + 
-				"        WHEN 20   THEN\r\n" + 
-				"             NVL(fac.importeguardia,0) -  NVL(pago.importeguardia,0)\r\n" + 
-				"        WHEN 30   THEN\r\n" + 
-				"             NVL(fac.importesoj,0) -  NVL(pago.importesoj,0)\r\n" + 
-				"        ELSE\r\n" + 
-				"             NVL(fac.importeejg,0) -  NVL(pago.importeejg,0)\r\n" + 
-				"    END AS importependiente");
-		sql.FROM("fcs_fact_grupofact_hito   factgrupo");  
-		sql.LEFT_OUTER_JOIN("scs_grupofacturacion grupo ON (factgrupo.idgrupofacturacion = grupo.idgrupofacturacion AND factgrupo.idinstitucion = grupo.idinstitucion)");
+		sql.SELECT("CASE concept.idhitogeneral\r\n" + "        WHEN 10   THEN\r\n"
+				+ "            NVL(fac.importeoficio,0)\r\n" + "        WHEN 20   THEN\r\n"
+				+ "             NVL(fac.importeguardia,0)\r\n" + "        WHEN 30   THEN\r\n"
+				+ "             NVL(fac.importesoj,0)\r\n" + "        ELSE\r\n"
+				+ "             NVL(fac.importeejg,0)\r\n" + "    END AS importetotal");
+		sql.SELECT("CASE concept.idhitogeneral\r\n" + "        WHEN 10   THEN\r\n"
+				+ "             NVL(fac.importeoficio,0) -  NVL(pago.importeoficio,0)\r\n"
+				+ "        WHEN 20   THEN\r\n"
+				+ "             NVL(fac.importeguardia,0) -  NVL(pago.importeguardia,0)\r\n"
+				+ "        WHEN 30   THEN\r\n" + "             NVL(fac.importesoj,0) -  NVL(pago.importesoj,0)\r\n"
+				+ "        ELSE\r\n" + "             NVL(fac.importeejg,0) -  NVL(pago.importeejg,0)\r\n"
+				+ "    END AS importependiente");
+		sql.FROM("fcs_fact_grupofact_hito   factgrupo");
+		sql.LEFT_OUTER_JOIN(
+				"scs_grupofacturacion grupo ON (factgrupo.idgrupofacturacion = grupo.idgrupofacturacion AND factgrupo.idinstitucion = grupo.idinstitucion)");
 		sql.INNER_JOIN("fcs_hitogeneral concept ON (factgrupo.idhitogeneral = concept.idhitogeneral)");
-		sql.INNER_JOIN("fcs_facturacionjg fac ON (factgrupo.idfacturacion = fac.idfacturacion AND factgrupo.idinstitucion = fac.idinstitucion)");
-		sql.LEFT_OUTER_JOIN("fcs_pagosjg pago ON (fac.idfacturacion = pago.idfacturacion AND fac.idinstitucion = pago.idinstitucion)");
-		sql.WHERE("factgrupo.idinstitucion = '"+idInstitucion+"'");
-		sql.WHERE(" factgrupo.idfacturacion = '"+idFacturacion+"'");
+		sql.INNER_JOIN(
+				"fcs_facturacionjg fac ON (factgrupo.idfacturacion = fac.idfacturacion AND factgrupo.idinstitucion = fac.idinstitucion)");
+		sql.LEFT_OUTER_JOIN(
+				"fcs_pagosjg pago ON (fac.idfacturacion = pago.idfacturacion AND fac.idinstitucion = pago.idinstitucion)");
+		sql.WHERE("factgrupo.idinstitucion = '" + idInstitucion + "'");
+		sql.WHERE(" factgrupo.idfacturacion = '" + idFacturacion + "'");
 		sql.ORDER_BY("factgrupo.idhitogeneral");
-		
+
 		return sql.toString();
 	}
 
@@ -249,9 +244,12 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		return sql.toString();
 	}
 
-	public String buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion) {
+	public String buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion, Integer tamMax) {
 
 		SQL sql = new SQL();
+		SQL sqlOrder = new SQL();
+
+		sqlOrder.SELECT("*");
 
 		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre nombrecol");
 		sql.SELECT("fac.nombre nombrefac");
@@ -309,7 +307,8 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		sql5.FROM("fcs_fact_soj");
 
-		sql.FROM("((" + sql2 + ") UNION ALL (" + sql3 + ") UNION ALL (" + sql4 + ") UNION ALL (" + sql5 + ")) importes");
+		sql.FROM(
+				"((" + sql2 + ") UNION ALL (" + sql3 + ") UNION ALL (" + sql4 + ") UNION ALL (" + sql5 + ")) importes");
 		sql.FROM("cen_persona per");
 		sql.FROM("cen_colegiado col");
 		sql.FROM("fcs_facturacionjg fac");
@@ -348,29 +347,35 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 				"importes.idpersona, col.ncolegiado,col.comunitario,col.ncomunitario, fac.nombre, fac.fechadesde, fac.fechahasta,fac.idfacturacion,per.nombre,per.apellidos1,per.apellidos2");
 		sql.ORDER_BY("fac.fechadesde desc,per.apellidos1,per.apellidos2,per.nombre");
 
-		return sql.toString();
+		sqlOrder.FROM("(" + sql + " )");
+		if (tamMax != null) {
+			Integer tamMaxNumber = tamMax + 1;
+			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+		}
+
+		return sqlOrder.toString();
 	}
-	
+
 	public String datosPagos(String idFacturacion, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		SQL sql3 = new SQL();
-		
+
 		sql3.SELECT("rec.descripcion");
 		sql3.FROM("gen_recursos_catalogos rec");
 		sql3.WHERE("rec.idrecurso = concept.descripcion");
-		sql3.WHERE("rec.idlenguaje = '"+idLenguaje+"'"); 
-		
+		sql3.WHERE("rec.idlenguaje = '" + idLenguaje + "'");
+
 		sql2.SELECT("MAX(est2.fechaestado)");
 		sql2.FROM("fcs_pagos_estadospagos est2");
 		sql2.WHERE("est2.idinstitucion = est.idinstitucion");
 		sql2.WHERE("est2.idpagosjg = est.idpagosjg");
-		
+
 		sql.SELECT("pjg.idinstitucion");
 		sql.SELECT("pjg.idpagosjg");
 		sql.SELECT("pjg.idfacturacion");
 		sql.SELECT("pjg.nombre");
-		sql.SELECT("("+sql3.toString()+") desconcepto");
+		sql.SELECT("(" + sql3.toString() + ") desconcepto");
 		sql.SELECT("pjg.importeejg");
 		sql.SELECT("pjg.importeguardia");
 		sql.SELECT("pjg.importeoficio");
@@ -381,23 +386,29 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("est.fechaestado");
 		sql.SELECT("rec.descripcion desestado");
 		sql.FROM("fcs_pagosjg pjg");
-		sql.INNER_JOIN("fcs_pagos_estadospagos est ON (pjg.idinstitucion = est.idinstitucion AND pjg.idpagosjg = est.idpagosjg)");
+		sql.INNER_JOIN(
+				"fcs_pagos_estadospagos est ON (pjg.idinstitucion = est.idinstitucion AND pjg.idpagosjg = est.idpagosjg)");
 		sql.INNER_JOIN("fcs_estadospagos estpagos ON (est.idestadopagosjg = estpagos.idestadopagosjg)");
-		sql.INNER_JOIN("fcs_fact_grupofact_hito factgrupo ON (pjg.idfacturacion = factgrupo.idfacturacion AND pjg.idinstitucion = factgrupo.idinstitucion)");
+		sql.INNER_JOIN(
+				"fcs_fact_grupofact_hito factgrupo ON (pjg.idfacturacion = factgrupo.idfacturacion AND pjg.idinstitucion = factgrupo.idinstitucion)");
 		sql.INNER_JOIN("fcs_hitogeneral concept ON (factgrupo.idhitogeneral = concept.idhitogeneral)");
 		sql.INNER_JOIN("gen_recursos_catalogos rec ON (estpagos.descripcion = rec.idrecurso)");
-		sql.WHERE("est.fechaestado = ("+sql2.toString()+")");		
+		sql.WHERE("est.fechaestado = (" + sql2.toString() + ")");
 		sql.WHERE("pjg.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("pjg.idfacturacion =  '" + idFacturacion + "'");
-		sql.WHERE("rec.idlenguaje = '"+idLenguaje+"'");
+		sql.WHERE("rec.idlenguaje = '" + idLenguaje + "'");
 
-        return sql.toString();
-    }
+		return sql.toString();
+	}
 
-	public String buscarCartaspago(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion, String idLenguaje) {
+	public String buscarCartaspago(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion,
+			String idLenguaje, Integer tamMax) {
 
 		SQL sql = new SQL();
-			
+		SQL sqlOrder = new SQL();
+
+		sqlOrder.SELECT("*");
+
 		sql.SELECT("idpersonasjcs");
 		sql.SELECT("idpagos");
 		sql.SELECT("nombrepago");
@@ -408,59 +419,141 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("totalimporteirpf");
 		sql.SELECT("importetotal");
 		sql.SELECT("idinstitucion");
-		
-		SQL sql2 = new SQL();
-		sql2.SELECT("descripcion");
-		sql2.FROM("gen_recursos_catalogos");
-		sql2.WHERE("idrecurso = formadepago");
-		sql2.WHERE("idlenguaje = '" + idLenguaje + "'");
 
-		
-		sql.SELECT("(" + sql2 + ") as formadepago");
+		SQL sqlFormadepago = new SQL();
+		sqlFormadepago.SELECT("descripcion");
+		sqlFormadepago.FROM("gen_recursos_catalogos");
+		sqlFormadepago.WHERE("idrecurso = formadepago");
+		sqlFormadepago.WHERE("idlenguaje = '" + idLenguaje + "'");
+
+		sql.SELECT("(" + sqlFormadepago + ") as formadepago");
 		sql.SELECT("ncolegiado");
 		sql.SELECT("nombrecol");
 		sql.SELECT("nombredest");
 
-		SQL sql3 = new SQL();
-		//Ya esta montada todo solamente falta la consulta grande de la sentencia FROM, los filtros van dentro de esta consulta por eso estan comentandos 
-		
-//		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdFacturacion())) {
-//			sql.WHERE("fac.idfacturacion > " + cartasFacturacionPagosItem.getIdFacturacion());
-//		}
-//
-//		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {
-//			sql.WHERE("col.idpersona = " + cartasFacturacionPagosItem.getIdPersona());
-//		}
-//
-//		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno())) {
-//			sql.WHERE("grupo.IDGRUPOFACTURACION =" + cartasFacturacionPagosItem.getIdTurno());
-//		}
-//
-//		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdConcepto())) {
-//			sql.WHERE("grupo.IDHITOGENERAL =" + cartasFacturacionPagosItem.getIdConcepto());
-//		}
-//
-//		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPartidaPresupuestaria())) {
-//			sql.WHERE("fac.IDPARTIDAPRESUPUESTARIA =" + cartasFacturacionPagosItem.getIdPartidaPresupuestaria());
-//		}
-		
-		sql.FROM("(" + sql3 + ")");
-		sql.WHERE("totalimportesjcs > 0");
-		sql.WHERE("1 = 1");
-		
-		
-		SQL sql4 = new SQL();
-		sql4.SELECT("pers.idpersona");
-		sql4.FROM("cen_persona pers");
-		
-		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {
-			sql4.WHERE("pers.idpersona =" + cartasFacturacionPagosItem.getIdPersona());
-	
+		SQL sql2 = new SQL();
+		sql2.SELECT("pagoacolegiados.*");
+		sql2.SELECT("decode(col.comunitario, 1, col.ncomunitario, col.ncolegiado) ncolegiado");
+
+		SQL sqlNombreCol = new SQL();
+		sqlNombreCol.SELECT("p.apellidos1 || p.apellidos2 || ', ' || p.nombre");
+		sqlNombreCol.FROM("cen_persona p");
+		sqlNombreCol.FROM("cen_cliente c");
+		sqlNombreCol.WHERE("p.idpersona = c.idpersona");
+		sqlNombreCol.WHERE("c.idinstitucion = pagoacolegiados.idinstitucion");
+		sqlNombreCol.WHERE("c.idpersona = pagoacolegiados.idpersonasjcs");
+
+		sql2.SELECT("(" + sqlNombreCol + ") AS nombrecol");
+
+		SQL sqlNombreDest = new SQL();
+		sqlNombreDest.SELECT("p.apellidos1 || p.apellidos2 || ', ' || p.nombre");
+		sqlNombreDest.FROM("cen_persona p");
+		sqlNombreDest.FROM("cen_cliente c");
+		sqlNombreDest.WHERE("p.idpersona = c.idpersona");
+		sqlNombreDest.WHERE("c.idinstitucion = pagoacolegiados.idinstitucion");
+		sqlNombreDest.WHERE("c.idpersona = pagoacolegiados.idpersonasjcs");
+
+		sql2.SELECT("(" + sqlNombreDest + ")  AS nombredest ");
+
+		SQL sqlPagoacolegiados = new SQL();
+
+		sqlPagoacolegiados.SELECT("pc.idperorigen AS idpersonasjcs");
+		sqlPagoacolegiados.SELECT("pc.idperdestino AS idpersonadest");
+		sqlPagoacolegiados.SELECT("pc.idpagosjg AS idpagos");
+		sqlPagoacolegiados.SELECT("pj.nombre AS nombrepago");
+		sqlPagoacolegiados.SELECT("SUM(pc.impoficio + pc.impasistencia + pc.impejg + pc.impsoj) AS totalimportesjcs");
+		sqlPagoacolegiados.SELECT("SUM(pc.impret) AS importetotalretenciones");
+		sqlPagoacolegiados.SELECT("SUM(pc.impmovvar) AS importetotalmovimientos");
+		sqlPagoacolegiados.SELECT(
+				"SUM(pc.impoficio + pc.impasistencia + pc.impejg + pc.impsoj + pc.impmovvar) AS totalimportebruto");
+		sqlPagoacolegiados.SELECT("SUM(pc.impirpf) AS totalimporteirpf");
+		sqlPagoacolegiados.SELECT(
+				"( SUM(pc.impoficio + pc.impasistencia + pc.impejg + pc.impsoj + pc.impmovvar) + ( SUM(pc.impirpf) ) + ( SUM(pc.impret) ) ) AS importetotal");
+		sqlPagoacolegiados.SELECT("pc.idinstitucion");
+
+		SQL sqlFormadepagoDecode = new SQL();
+		sqlFormadepagoDecode.SELECT("a.idcuenta");
+		sqlFormadepagoDecode.FROM("fac_abono a");
+		sqlFormadepagoDecode.WHERE("idperdestino = a.idpersona");
+		sqlFormadepagoDecode.WHERE("pc.idinstitucion = a.idinstitucion");
+		sqlFormadepagoDecode.WHERE("pc.idpagosjg = a.idpagosjg");
+		sqlFormadepagoDecode.WHERE("ROWNUM = 1");
+
+		sqlPagoacolegiados.SELECT("decode(( " + sqlFormadepagoDecode
+				+ " ), NULL, 'gratuita.pagos.porCaja', 'gratuita.pagos.porBanco') AS formadepago");
+		sqlPagoacolegiados.FROM("fcs_pago_colegiado pc");
+		sqlPagoacolegiados.FROM("cen_persona cen");
+		sqlPagoacolegiados.FROM("fcs_pagosjg pj");
+		sqlPagoacolegiados.FROM("fcs_facturacionjg fac");
+		sqlPagoacolegiados.FROM("fcs_fact_grupofact_hito grupo");
+
+		sqlPagoacolegiados.WHERE("pc.idinstitucion = " + idInstitucion);
+
+		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPago())) {
+			sqlPagoacolegiados.WHERE("pc.idpagosjg > " + cartasFacturacionPagosItem.getIdPago());
 		}
 
-		sql.WHERE("idpersonasjcs IN (" + sql4 + ")");
+		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno())) {
+			sqlPagoacolegiados.WHERE("grupo.IDGRUPOFACTURACION = " + cartasFacturacionPagosItem.getIdTurno());
+		}
+
+		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdConcepto())) {
+			sqlPagoacolegiados.WHERE("grupo.IDHITOGENERAL =" + cartasFacturacionPagosItem.getIdConcepto());
+		}
+
+		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPartidaPresupuestaria())) {
+			sqlPagoacolegiados
+					.WHERE("fac.IDPARTIDAPRESUPUESTARIA =" + cartasFacturacionPagosItem.getIdPartidaPresupuestaria());
+		}
+
+		sqlPagoacolegiados.WHERE("pc.idperorigen = nvl(NULL, pc.idperorigen)");
+		sqlPagoacolegiados.WHERE("cen.idpersona = nvl(NULL, pc.idperorigen)");
+		sqlPagoacolegiados.WHERE("pj.idinstitucion = pc.idinstitucion");
+		sqlPagoacolegiados.WHERE("pj.idpagosjg = pc.idpagosjg");
+		sqlPagoacolegiados.WHERE("pj.idinstitucion = fac.idinstitucion");
+		sqlPagoacolegiados.WHERE("pj.idfacturacion = fac.idfacturacion");
+		sqlPagoacolegiados.WHERE("fac.idinstitucion = grupo.idinstitucion");
+		sqlPagoacolegiados.WHERE("fac.idfacturacion = grupo.idfacturacion");
+
+		sqlPagoacolegiados.GROUP_BY("cen.apellidos1");
+		sqlPagoacolegiados.GROUP_BY("cen.apellidos2");
+		sqlPagoacolegiados.GROUP_BY("pc.idperorigen");
+		sqlPagoacolegiados.GROUP_BY("pc.idperdestino");
+		sqlPagoacolegiados.GROUP_BY("pc.idpagosjg");
+		sqlPagoacolegiados.GROUP_BY("pc.idinstitucion");
+		sqlPagoacolegiados.GROUP_BY("pj.nombre");
+		sqlPagoacolegiados.GROUP_BY("pj.fechadesde");
+
+		sqlPagoacolegiados.ORDER_BY("cen.apellidos1");
+		sqlPagoacolegiados.ORDER_BY("cen.apellidos2");
+		sqlPagoacolegiados.ORDER_BY("pj.fechadesde");
+
+		sql2.FROM("(" + sqlPagoacolegiados + ") pagoacolegiados");
+		sql2.FROM("cen_colegiado col");
+		sql2.WHERE("pagoacolegiados.idinstitucion = col.idinstitucion");
+		sql2.WHERE("pagoacolegiados.idpersonasjcs = col.idpersona");
+
+		sql.FROM("(" + sql2 + ")");
+		sql.WHERE("totalimportesjcs > 0");
+		sql.WHERE("1 = 1");
+
+		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {
+
+			SQL sqlIdpersonasjcs = new SQL();
+			sqlIdpersonasjcs.SELECT("pers.idpersona");
+			sqlIdpersonasjcs.FROM("cen_persona pers");
+			sqlIdpersonasjcs.WHERE("pers.idpersona =" + cartasFacturacionPagosItem.getIdPersona());
+			sql.WHERE("idpersonasjcs IN (" + sqlIdpersonasjcs + ")");
+		}
+
 		sql.ORDER_BY("nombrecol");
 
-		return sql.toString();
+		sqlOrder.FROM("(" + sql + " )");
+		if (tamMax != null) {
+			Integer tamMaxNumber = tamMax + 1;
+			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+		}
+
+		return sqlOrder.toString();
 	}
 }
