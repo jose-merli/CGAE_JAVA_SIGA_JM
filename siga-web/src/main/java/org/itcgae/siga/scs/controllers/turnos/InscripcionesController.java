@@ -45,15 +45,29 @@ public class InscripcionesController {
 		InscripcionesDTO response = inscripcionesService.busquedaInscripciones(inscripcionesItem, request);
 		return new ResponseEntity<InscripcionesDTO>(response, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/inscripciones/updateSolicitarBaja", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateSolicitarBaja(@RequestBody InscripcionesItem inscripcionesItem, HttpServletRequest request) {
-		UpdateResponseDTO response = inscripcionesService.updateSolicitarBaja(inscripcionesItem, request);
+	ResponseEntity<UpdateResponseDTO> updateSolicitarBaja(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = inscripcionesService.updateSolicitarBaja(inscripcionesDTO, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-
+	}
+	
+	@RequestMapping(value = "/inscripciones/busquedaTarjetaInscripciones",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InscripcionesDTO> busquedaTarjetaInscripciones(@RequestBody InscripcionesItem inscripcionesItem, HttpServletRequest request) {
+		InscripcionesDTO response = inscripcionesService.busquedaTarjetaInscripciones(inscripcionesItem, request);
+		return new ResponseEntity<InscripcionesDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/inscripciones/updateValidar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateValidar(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = inscripcionesService.updateValidar(inscripcionesDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 }

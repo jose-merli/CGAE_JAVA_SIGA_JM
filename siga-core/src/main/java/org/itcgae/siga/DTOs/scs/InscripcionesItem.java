@@ -17,8 +17,10 @@ public class InscripcionesItem {
 	public String idinstitucion;
 	public String idpersona;
 	public Date fechadesde;
+	public String idzona;
 	public Date afechade;
 	public Date fechahasta;
+	public Date fechaActual;
 	private Date fechasolicitud;
 	private String observacionessolicitud;
 	public Date fechavalidacion;
@@ -33,7 +35,134 @@ public class InscripcionesItem {
 	public Date fechavaloralta;
 	public Date fechavalorbaja;
 	public String estadonombre;
+	public String observaciones;
+	public String nombre_turno;
+	public String nombre_zona;
+	public String idsubzona;
+	public String nombre_subzona;
+	public String idarea;
+	public String nombre_area;
+	public String idmateria;
+	public String nombre_materia;
+	public String idguardia;
+	public String nombre_guardia;
+	public String descripcion_tipo_guardia;
+	public String obligatoriedad_inscripcion;
+	public String tipoguardias;
 	
+
+	public String getNombre_turno() {
+		return nombre_turno;
+	}
+
+	public void setNombre_turno(String nombre_turno) {
+		this.nombre_turno = nombre_turno;
+	}
+
+	public String getNombre_zona() {
+		return nombre_zona;
+	}
+
+	public void setNombre_zona(String nombre_zona) {
+		this.nombre_zona = nombre_zona;
+	}
+
+	public String getIdsubzona() {
+		return idsubzona;
+	}
+
+	public void setIdsubzona(String idsubzona) {
+		this.idsubzona = idsubzona;
+	}
+
+	public String getNombre_subzona() {
+		return nombre_subzona;
+	}
+
+	public void setNombre_subzona(String nombre_subzona) {
+		this.nombre_subzona = nombre_subzona;
+	}
+
+	public String getIdarea() {
+		return idarea;
+	}
+
+	public void setIdarea(String idarea) {
+		this.idarea = idarea;
+	}
+
+	public String getNombre_area() {
+		return nombre_area;
+	}
+
+	public void setNombre_area(String nombre_area) {
+		this.nombre_area = nombre_area;
+	}
+
+	public String getIdmateria() {
+		return idmateria;
+	}
+
+	public void setIdmateria(String idmateria) {
+		this.idmateria = idmateria;
+	}
+
+	public String getNombre_materia() {
+		return nombre_materia;
+	}
+
+	public void setNombre_materia(String nombre_materia) {
+		this.nombre_materia = nombre_materia;
+	}
+
+	public String getIdguardia() {
+		return idguardia;
+	}
+
+	public void setIdguardia(String idguardia) {
+		this.idguardia = idguardia;
+	}
+
+	public String getNombre_guardia() {
+		return nombre_guardia;
+	}
+
+	public void setNombre_guardia(String nombre_guardia) {
+		this.nombre_guardia = nombre_guardia;
+	}
+
+	public String getDescripcion_tipo_guardia() {
+		return descripcion_tipo_guardia;
+	}
+
+	public void setDescripcion_tipo_guardia(String descripcion_tipo_guardia) {
+		this.descripcion_tipo_guardia = descripcion_tipo_guardia;
+	}
+
+	public String getObligatoriedad_inscripcion() {
+		return obligatoriedad_inscripcion;
+	}
+
+	public void setObligatoriedad_inscripcion(String obligatoriedad_inscripcion) {
+		this.obligatoriedad_inscripcion = obligatoriedad_inscripcion;
+	}
+
+	public String getTipoguardias() {
+		return tipoguardias;
+	}
+
+	public void setTipoguardias(String tipoguardias) {
+		this.tipoguardias = tipoguardias;
+	}
+
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
+
 	public String getValidarinscripciones() {
 		return validarinscripciones;
 	}
@@ -46,6 +175,14 @@ public class InscripcionesItem {
 		return nombreturno;
 	}
 	
+	public String getIdzona() {
+		return idzona;
+	}
+
+	public void setIdzona(String idzona) {
+		this.idzona = idzona;
+	}
+
 	public Date getAfechade() {
 		return afechade;
 	}
@@ -218,6 +355,14 @@ public class InscripcionesItem {
 	}
 	public void setIdturno(String idturno) {
 		this.idturno = idturno;
+	}
+
+	public Date getFechaActual() {
+		return fechaActual;
+	}
+
+	public void setFechaActual(Date fechaActual) {
+		this.fechaActual = fechaActual;
 	}
 	
 	
