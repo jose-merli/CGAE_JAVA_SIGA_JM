@@ -383,7 +383,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 							guardiaItem.setIdOrdenacionColas(guardia.getIdordenacioncolas() + "");
 						if (guardia.getDiasperiodo() != null)
 							guardiaItem.setDiasPeriodo(guardia.getDiasperiodo() + "");
-						guardiaItem.setNombre(guardia.getNombre());
 						guardiaItem.setRotarComponentes(guardia.getRotarcomponentes());
 						guardiaItem.setLetradosGuardia(guardia.getNumeroletradosguardia().toString());
 
@@ -394,8 +393,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 							guardiaItem.setDiasPeriodo(guardia.getDiasperiodo() + "");
 						guardiaItem.setTipoDiasGuardia(guardia.getTipodiasguardia());
 						guardiaItem.setTipoDiasPeriodo(guardia.getTipodiasperiodo());
-						guardiaItem.setDiasSeparacionGuardias(guardia.getDiasseparacionguardias() != null ? 
-								guardia.getDiasseparacionguardias().toString() : "0");
+						guardiaItem.setDiasSeparacionGuardias(guardia.getDiasseparacionguardias() != null
+								? guardia.getDiasseparacionguardias().toString()
+								: "0");
+						guardiaItem.setRequeridaValidacion(guardia.getRequeridavalidacion().equals("S") ? true : false);
 						// String diasSeparacion =
 						// scsGuardiasturnoExtendsMapper.separarGuardias(idGuardia,
 						// guardia.getIdturno().toString(), idInstitucion.toString()).get(0);
@@ -520,7 +521,20 @@ public class GuardiasServiceImpl implements GuardiasService {
 						} else {
 							guardia.setIdordenacioncolas(colas.get(0).getIdordenacioncolas());
 							scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
+						
 						}
+						
+						// ------------ Hasta aqui actualizamos los datos de la tarjeta. -------------
+						
+						// A partir de aqui comprobamos si es por grupos y si hay ordenacion manual para
+						// actualizar los grupos segun sea el caso
+						ScsInscripcionguardiaExample inscripcionesExample = new ScsInscripcionguardiaExample();
+						inscripcionesExample.createCriteria().andIdguardiaEqualTo(guardia.getIdguardia())
+							.andIdturnoEqualTo(guardia.getIdturno()).andIdinstitucionEqualTo(idInstitucion);
+						List<ScsInscripcionguardia> inscr = scsInscripcionguardiaExtendsMapper.selectByExample(inscripcionesExample);
+						for(int i = 0; i<inscr.size();i++)
+							inscr.get(i).set
+						
 					} else if (guardiasItem.getDiasGuardia() != null) {
 
 						LOGGER.info(
@@ -532,6 +546,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						guardia.setTipodiasperiodo(guardiasItem.getTipoDiasPeriodo());
 						guardia.setSeleccionfestivos(guardiasItem.getSeleccionFestivos());
 						guardia.setSeleccionlaborables(guardiasItem.getSeleccionLaborables());
+						guardia.setRequeridavalidacion(guardiasItem.isRequeridaValidacion() ? "S" : "N");
 
 					}
 

@@ -49,6 +49,7 @@ public class GuardiasItem {
 	private String filtros;
 	private String rotarComponentes;
 	private String incompatibilidades;
+	private boolean requeridaValidacion;
 	private Date fechabaja;
 	private boolean historico;
 	
@@ -56,6 +57,13 @@ public class GuardiasItem {
 	
 	
 	
+	
+	public boolean isRequeridaValidacion() {
+		return requeridaValidacion;
+	}
+	public void setRequeridaValidacion(boolean requeridaValidacion) {
+		this.requeridaValidacion = requeridaValidacion;
+	}
 	public String getIncompatibilidades() {
 		return incompatibilidades;
 	}
