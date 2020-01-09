@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
@@ -21,6 +22,8 @@ public interface IFacturacionServices {
 	public FacturacionDTO datosFacturacion(String idFacturacion, HttpServletRequest request);
 	
 	public FacturacionDTO historicoFacturacion(String idFacturacion, HttpServletRequest request);
+	
+	public StringDTO numApuntes(String idFacturacion, HttpServletRequest request);
 	
 	public InsertResponseDTO saveFacturacion(FacturacionItem facturacionItem, HttpServletRequest request);
 	

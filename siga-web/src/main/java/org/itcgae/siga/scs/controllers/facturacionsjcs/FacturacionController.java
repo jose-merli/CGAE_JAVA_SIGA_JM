@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
@@ -55,6 +56,12 @@ public class FacturacionController {
 	ResponseEntity<FacturacionDTO> historicoFacturacion(@RequestParam("idFacturacion") String idFacturacion, HttpServletRequest request){
 		FacturacionDTO response = facturacionServices.historicoFacturacion(idFacturacion, request);
 		return new ResponseEntity<FacturacionDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/facturacionsjcs/numApuntes", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> numApuntes(@RequestParam("idFacturacion") String idFacturacion, HttpServletRequest request){
+		StringDTO response = facturacionServices.numApuntes(idFacturacion, request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/facturacionsjcs/saveFacturacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

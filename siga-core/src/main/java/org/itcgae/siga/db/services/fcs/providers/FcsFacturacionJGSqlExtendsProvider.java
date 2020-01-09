@@ -148,6 +148,100 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		return sql.toString();
 	}
+	
+	public String numApuntes(String idFacturacion, String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre nombrecol");
+		sql.SELECT("fac.nombre nombrefac");
+		sql.SELECT("fac.idfacturacion");
+		sql.SELECT("fac.fechadesde");
+		sql.SELECT("fac.fechahasta");
+		sql.SELECT("decode(col.comunitario, 1, col.ncomunitario, col.ncolegiado) ncolegiado");
+		sql.SELECT(" SUM(impguardia) + SUM(impoficio) + SUM(impejg) + SUM(impsoj) importetotal");
+		sql.SELECT("SUM(impguardia) importeguardia");
+		sql.SELECT("SUM(impoficio) importeoficio");
+		sql.SELECT("SUM(impejg) importeejg");
+		sql.SELECT("SUM(impsoj) importesoj");
+
+		SQL sql2 = new SQL();
+		sql2.SELECT("idpersona");
+		sql2.SELECT("idinstitucion");
+		sql2.SELECT("idfacturacion");
+		sql2.SELECT("precioaplicado + preciocostesfijos impguardia");
+		sql2.SELECT("0 impoficio");
+		sql2.SELECT("0 impejg");
+		sql2.SELECT("0 impsoj");
+
+		sql2.FROM("fcs_fact_apunte");
+
+		SQL sql3 = new SQL();
+		sql3.SELECT("idpersona");
+		sql3.SELECT("idinstitucion");
+		sql3.SELECT("idfacturacion");
+		sql3.SELECT("0");
+		sql3.SELECT("importefacturado impoficio");
+		sql3.SELECT("0");
+		sql3.SELECT("0");
+
+		sql3.FROM("fcs_fact_actuaciondesigna");
+
+		SQL sql4 = new SQL();
+		sql4.SELECT("idpersona");
+		sql4.SELECT("idinstitucion");
+		sql4.SELECT("idfacturacion");
+		sql4.SELECT("0");
+		sql4.SELECT("0 impoficio");
+		sql4.SELECT("precioaplicado impejg");
+		sql4.SELECT("0 impsoj");
+
+		sql4.FROM("fcs_fact_ejg");
+
+		SQL sql5 = new SQL();
+		sql5.SELECT("idpersona");
+		sql5.SELECT("idinstitucion");
+		sql5.SELECT("idfacturacion");
+		sql5.SELECT("0");
+		sql5.SELECT("0 impoficio");
+		sql5.SELECT("0");
+		sql5.SELECT("precioaplicado impsoj");
+
+		sql5.FROM("fcs_fact_soj");
+
+		sql.FROM("((" + sql2 + ") UNION ALL (" + sql3 + ") UNION ALL (" + sql4 + ") UNION ALL (" + sql5 + ")) importes");
+		sql.FROM("cen_persona per");
+		sql.FROM("cen_colegiado col");
+		sql.FROM("fcs_facturacionjg fac");
+		sql.FROM("fcs_fact_grupofact_hito grupo");
+
+		sql.WHERE("col.idpersona = importes.idpersona");
+		sql.WHERE("col.idinstitucion = importes.idinstitucion");
+		sql.WHERE("col.idpersona = per.idpersona");
+		sql.WHERE("fac.idfacturacion = importes.idfacturacion");
+		sql.WHERE("fac.idinstitucion = importes.idinstitucion");
+		sql.WHERE("fac.idinstitucion = grupo.idinstitucion");
+		sql.WHERE("fac.idfacturacion = grupo.idfacturacion");
+		sql.WHERE("fac.idinstitucion = " + idInstitucion);
+		sql.WHERE("fac.idfacturacion >= " + idFacturacion);
+		
+		sql.GROUP_BY("col.idpersona");
+		sql.GROUP_BY("col.ncolegiado");
+		sql.GROUP_BY("col.comunitario");
+		sql.GROUP_BY("col.ncomunitario");
+		sql.GROUP_BY("fac.nombre");
+		sql.GROUP_BY("fac.fechadesde");
+		sql.GROUP_BY("fac.fechahasta");
+		sql.GROUP_BY("fac.idfacturacion");
+		sql.GROUP_BY("per.nombre");
+		sql.GROUP_BY("per.apellidos1");
+		sql.GROUP_BY("per.apellidos2");        
+
+		SQL sql6 = new SQL();
+		sql6.SELECT("COUNT(1) AS NUMAPUNTES");
+		sql6.FROM("("+sql+") cartas");
+		
+		return sql6.toString();
+	}
 
 	public String getIdFacturacion(Short idInstitucion) {
 
@@ -325,7 +419,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.WHERE("fac.idinstitucion = " + idInstitucion);
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdFacturacion())) {
-			sql.WHERE("fac.idfacturacion > " + cartasFacturacionPagosItem.getIdFacturacion());
+			sql.WHERE("fac.idfacturacion >= " + cartasFacturacionPagosItem.getIdFacturacion());
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {

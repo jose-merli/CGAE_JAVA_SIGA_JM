@@ -61,6 +61,12 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	})
 	List<FacturacionItem> historicoFacturacion(String idFacturacion, String idLenguaje, String idInstitucion);
 	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "numApuntes")
+	@Results({ 
+		@Result(column = "NUMAPUNTES", property = "valor", jdbcType = JdbcType.VARCHAR),
+	})
+	String numApuntes(String idFacturacion, String idInstitucion);
+	
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getIdFacturacion")
 	@Results({ @Result(column = "IDFACTURACION", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})
