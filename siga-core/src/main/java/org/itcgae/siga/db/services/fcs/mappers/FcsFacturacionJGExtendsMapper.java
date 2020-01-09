@@ -113,17 +113,17 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "IMPORTESOJ", property = "importeSoj", jdbcType = JdbcType.VARCHAR),
 
 	})
-	List<CartasFacturacionPagosItem> buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion);
+	List<CartasFacturacionPagosItem> buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion, Integer tamMax);
 	
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "buscarCartaspago")
 	@Results({ 
 		@Result(column = "IDPERSONASJCS", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRECOL", property = "nombreCol", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBREPAGO", property = "nombrePago,", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPAGO", property = "idPago", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREPAGO", property = "nombrePago", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPAGOS", property = "idPago", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREDEST", property = "nombreDest", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "TOTALIMPORTESJCS", property = "totalImportesjcs,", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TOTALIMPORTESJCS", property = "totalImportesjcs", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IMPORTETOTALRETENCIONES", property = "importeTotalRetenciones", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NCOLEGIADO", property = "ncolegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
@@ -133,7 +133,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "FORMADEPAGO", property = "formaDePago", jdbcType = JdbcType.VARCHAR),
 
 	})
-	List<CartasFacturacionPagosItem> buscarCartaspago(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion, String idLenguaje);
+	List<CartasFacturacionPagosItem> buscarCartaspago(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion, String idLenguaje, Integer tamMax);
 
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "datosPagos")
 	@Results({ 
