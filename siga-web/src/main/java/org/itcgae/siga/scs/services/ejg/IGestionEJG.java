@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
+import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
@@ -20,4 +21,6 @@ public interface IGestionEJG {
 	ExpedienteEconomicoDTO getExpedientesEconomicos(EjgItem ejgItem, HttpServletRequest request);
 
 	EstadoEjgDTO getEstados(EjgItem ejgItem, HttpServletRequest request);
+
+	EjgDocumentacionDTO getDocumentos(EjgItem ejgItem, HttpServletRequest request);
 }

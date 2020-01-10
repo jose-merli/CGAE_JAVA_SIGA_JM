@@ -12,9 +12,10 @@ public class UnidadFamiliarEJGItem {
     private String uf_solicitante;
     private String uf_enCalidad;
     private String pjg_nif;
-    private String pjg_nombre;
-    private String pjg_ape1;
-    private String pjg_ape2;
+    private String pjg_nombrecompleto;
+//    private String pjg_nombre;
+//    private String pjg_ape1;
+//    private String pjg_ape2;
     private String pjg_direccion;
 //    private String nombrePrincipal;
 //    private String apellido1Principal;
@@ -22,6 +23,7 @@ public class UnidadFamiliarEJGItem {
     private String pd_descripcion;
     private String estado;
     private Date fechaSolicitud;
+    private String fechaBaja;
     
 
 	/**
@@ -122,48 +124,48 @@ public class UnidadFamiliarEJGItem {
 	public void setPjg_nif(String pjg_nif) {
 		this.pjg_nif = pjg_nif;
 	}
-	/**
-	 **/
-	public UnidadFamiliarEJGItem pjg_nombre(String pjg_nombre) {
-		this.pjg_nombre = pjg_nombre;
-		return this;
-	}
-
-	@JsonProperty("pjg_nombre")
-	public String getPjg_nombre() {
-		return pjg_nombre;
-	}
-	public void setPjg_nombre(String pjg_nombre) {
-		this.pjg_nombre = pjg_nombre;
-	}
-	/**
-	 **/
-	public UnidadFamiliarEJGItem pjg_ape1(String pjg_ape1) {
-		this.pjg_ape1 = pjg_ape1;
-		return this;
-	}
-
-	@JsonProperty("pjg_ape1")
-	public String getPjg_ape1() {
-		return pjg_ape1;
-	}
-	public void setPjg_ape1(String pjg_ape1) {
-		this.pjg_ape1 = pjg_ape1;
-	}
-	/**
-	 **/
-	public UnidadFamiliarEJGItem pjg_ape2(String pjg_ape2) {
-		this.pjg_ape2 = pjg_ape2;
-		return this;
-	}
-
-	@JsonProperty("pjg_ape2")
-	public String getPjg_ape2() {
-		return pjg_ape2;
-	}
-	public void setPjg_ape2(String pjg_ape2) {
-		this.pjg_ape2 = pjg_ape2;
-	}
+//	/**
+//	 **/
+//	public UnidadFamiliarEJGItem pjg_nombre(String pjg_nombre) {
+//		this.pjg_nombre = pjg_nombre;
+//		return this;
+//	}
+//
+//	@JsonProperty("pjg_nombre")
+//	public String getPjg_nombre() {
+//		return pjg_nombre;
+//	}
+//	public void setPjg_nombre(String pjg_nombre) {
+//		this.pjg_nombre = pjg_nombre;
+//	}
+//	/**
+//	 **/
+//	public UnidadFamiliarEJGItem pjg_ape1(String pjg_ape1) {
+//		this.pjg_ape1 = pjg_ape1;
+//		return this;
+//	}
+//
+//	@JsonProperty("pjg_ape1")
+//	public String getPjg_ape1() {
+//		return pjg_ape1;
+//	}
+//	public void setPjg_ape1(String pjg_ape1) {
+//		this.pjg_ape1 = pjg_ape1;
+//	}
+//	/**
+//	 **/
+//	public UnidadFamiliarEJGItem pjg_ape2(String pjg_ape2) {
+//		this.pjg_ape2 = pjg_ape2;
+//		return this;
+//	}
+//
+//	@JsonProperty("pjg_ape2")
+//	public String getPjg_ape2() {
+//		return pjg_ape2;
+//	}
+//	public void setPjg_ape2(String pjg_ape2) {
+//		this.pjg_ape2 = pjg_ape2;
+//	}
 	/**
 	 **/
 	public UnidadFamiliarEJGItem pjg_direccion(String pjg_direccion) {
@@ -220,6 +222,36 @@ public class UnidadFamiliarEJGItem {
 	}
 	public void setFechaSolicitud(Date fechaSolicitud) {
 		this.fechaSolicitud = fechaSolicitud;
+	}
+	/**
+	 **/
+	public UnidadFamiliarEJGItem pjg_nombrecompleto(String pjg_nombrecompleto) {
+		this.pjg_nombrecompleto = pjg_nombrecompleto;
+		return this;
+	}
+
+	@JsonProperty("pjg_nombrecompleto")
+	public String getPjg_nombrecompleto() {
+		return pjg_nombrecompleto;
+	}
+
+	public void setPjg_nombrecompleto(String pjg_nombrecompleto) {
+		this.pjg_nombrecompleto = pjg_nombrecompleto;
+	}
+	/**
+	 **/
+	public UnidadFamiliarEJGItem fechaBaja(String fechaBaja) {
+		this.fechaBaja = fechaBaja;
+		return this;
+	}
+
+	@JsonProperty("fechaBaja")
+	public String getFechaBaja() {
+		return fechaBaja;
+	}
+
+	public void setFechaBaja(String fechaBaja) {
+		this.fechaBaja = fechaBaja;
 	}
     
     

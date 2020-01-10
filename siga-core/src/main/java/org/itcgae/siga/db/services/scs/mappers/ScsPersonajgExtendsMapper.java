@@ -69,16 +69,19 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 		@Result(column = "solicitante", property = "uf_solicitante", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "encalidadde", property = "uf_enCalidad", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nif", property = "pjg_nif", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "nombre", property = "pjg_nombre", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "apellido1", property = "pjg_ape1", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "apellido2", property = "pjg_ape2", jdbcType = JdbcType.VARCHAR),	
+		@Result(column = "nombrecompletopjg", property = "pjg_nombrecompleto", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "nombre", property = "pjg_nombre", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "apellido1", property = "pjg_ape1", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "apellido2", property = "pjg_ape2", jdbcType = JdbcType.VARCHAR),	
 		@Result(column = "direccion", property = "pjg_direccion", jdbcType = JdbcType.VARCHAR),
 //		@Result(column = "nombrePrincipal", property = "nombrePrincipal", jdbcType = JdbcType.VARCHAR),
 //		@Result(column = "apellido1Principal", property = "apellido1Principal", jdbcType = JdbcType.VARCHAR),
 //		@Result(column = "apellido2Principal", property = "apellido2Principal", jdbcType = JdbcType.VARCHAR),	
 		@Result(column = "descripcion", property = "pd_descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "fechasolicitud", property = "fechaSolicitud", jdbcType = JdbcType.DATE)
+		@Result(column = "fechasolicitud", property = "fechaSolicitud", jdbcType = JdbcType.DATE),
+		@Result(column = "fechabaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR)
+
 	})
 	List<UnidadFamiliarEJGItem> unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
 

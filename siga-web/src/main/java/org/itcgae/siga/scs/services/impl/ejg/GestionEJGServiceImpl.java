@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
+import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
@@ -259,5 +260,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			LOGGER.warn("getEstados() -> idInstitucion del token nula");
 		}
 	return estadoEjgDTO;
+	}
+	@Override
+	public EjgDocumentacionDTO getDocumentos(EjgItem ejgItem, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

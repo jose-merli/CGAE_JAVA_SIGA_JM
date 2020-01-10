@@ -73,8 +73,8 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 
         if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
             sql.WHERE("estado.anio = '" + ejgItem.getAnnio() + "'");
-        if(ejgItem.getNumEjg() != null && ejgItem.getNumEjg() != "")
-            sql.WHERE ("estado.numero = '"+ ejgItem.getNumEjg() + "'");
+        if(ejgItem.getNumero() != null && ejgItem.getNumero() != "")
+            sql.WHERE ("estado.numero = '"+ ejgItem.getNumero() + "'");
         if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
             sql.WHERE ("estado.idtipoejg = '" + ejgItem.getTipoEJG() + "'");
         sql.WHERE ("recursos.idlenguaje = '" + idLenguaje + "'");
@@ -82,7 +82,7 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
         if(!ejgItem.isHistorico())
         	sql.WHERE("estado.fechabaja is null");
         
-        sql.ORDER_BY("estado.fechainicio");
+        sql.ORDER_BY("estado.fechainicio desc");
         return sql.toString();
     }
 

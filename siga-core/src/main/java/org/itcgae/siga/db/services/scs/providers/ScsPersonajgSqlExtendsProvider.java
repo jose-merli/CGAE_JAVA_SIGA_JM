@@ -662,18 +662,19 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		return sql.toString();
 	}
 	public String unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
-
 		SQL sql = new SQL();
 		sql.SELECT("uf.idinstitucion," + 
 					" uf.idtipoejg," + 
 					" uf.anio," + 
 					" uf.numero," + 
 					" uf.idpersona," + 
+					" uf.fechabaja," + 
 					" uf.solicitante," + 
 					" pjg.nif," + 
-					" pjg.nombre," + 
-					" pjg.apellido1," + 
-					" pjg.apellido2," + 
+					"pjg.apellido1 || ' ' || pjg.apellido2 || ', ' || pjg.nombre as nombrecompletopjg," +
+					//" pjg.nombre," + 
+					//" pjg.apellido1," + 
+					//" pjg.apellido2," + 
 					" pjg.direccion," + 
 					" uf.encalidadde," + 
 					" pd.descripcion," + 

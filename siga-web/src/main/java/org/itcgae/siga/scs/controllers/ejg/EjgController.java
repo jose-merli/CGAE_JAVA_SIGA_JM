@@ -3,6 +3,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
+import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
@@ -129,10 +130,16 @@ public class EjgController {
 		return new ResponseEntity<ExpedienteEconomicoDTO>(response, HttpStatus.OK);
 	}
 	//Estados
-	@RequestMapping(value = "/gestion-ejg/gestionejg_getEstados",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/gestion-ejg/getEstados",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EstadoEjgDTO> getEstados(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
 		EstadoEjgDTO response = gestionEJG.getEstados(ejgItem, request);
 		return new ResponseEntity<EstadoEjgDTO>(response, HttpStatus.OK);
 	}
+	//Documentos
+		@RequestMapping(value = "/gestion-ejg/getDocumentos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<EjgDocumentacionDTO> getDocumentos(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+			EjgDocumentacionDTO response = gestionEJG.getDocumentos(ejgItem, request);
+			return new ResponseEntity<EjgDocumentacionDTO>(response, HttpStatus.OK);
+		}
 	
 }

@@ -24,7 +24,7 @@ import org.itcgae.siga.db.entities.ScsTipodocumentoejg;
 import org.itcgae.siga.db.entities.ScsTipodocumentoejgExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionEjgExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTipodocumentoEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentoejgExtendsMapper;
 import org.itcgae.siga.scs.services.maestros.IBusquedaDocumentacionEjgService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -41,7 +41,7 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
 	@Autowired
-	private ScsDocumentacionEjgExtendsMapper scsDocumentacionEjgExtendsMapper;
+	private ScsTipodocumentoEjgExtendsMapper scsDocumentacionEjgExtendsMapper;
 
 
 	@Autowired

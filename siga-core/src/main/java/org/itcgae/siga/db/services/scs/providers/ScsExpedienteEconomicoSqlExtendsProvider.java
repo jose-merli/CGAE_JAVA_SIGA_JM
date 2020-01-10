@@ -8,7 +8,6 @@ public class ScsExpedienteEconomicoSqlExtendsProvider extends ScsEejgPeticionesS
 
 	public String getExpedientesEconomicos(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		SQL sql = new SQL();
-//		String idLenguaje = "1";
 		sql.SELECT("eejg.idpeticion," + 
 					" eejg.fechasolicitud," + 
 					" eejg.fechapeticion," + 
@@ -24,8 +23,8 @@ public class ScsExpedienteEconomicoSqlExtendsProvider extends ScsEejgPeticionesS
 		
 		if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 			sql.WHERE("eejg.anio = '" + ejgItem.getAnnio() + "'");
-		if(ejgItem.getNumero() != null && ejgItem.getNumero() != "")
-			sql.WHERE("eejg.numero = '" + ejgItem.getNumero() + "'");
+		if(ejgItem.getNumEjg() != null && ejgItem.getNumEjg() != "")
+			sql.WHERE("eejg.numero = '" + ejgItem.getNumEjg() + "'");
 		if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
 			sql.WHERE("eejg.idtipoejg = '" + ejgItem.getTipoEJG() + "'");
 		if(idInstitucion != null && idInstitucion != "")

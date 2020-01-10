@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface ScsDocumentacionEjgExtendsMapper extends ScsTipodocumentoejgMapper{
+public interface ScsTipodocumentoEjgExtendsMapper extends ScsTipodocumentoejgMapper{
 
 	@SelectProvider(type = ScsTipodocumentoejgSqlExtendsProvider.class, method = "searchDocumento")
 	@Results({ 
