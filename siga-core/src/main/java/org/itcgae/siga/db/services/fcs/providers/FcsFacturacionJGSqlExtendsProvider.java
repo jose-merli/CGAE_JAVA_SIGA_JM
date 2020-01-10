@@ -49,11 +49,10 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql2.INNER_JOIN(
 				"FCS_FACT_ESTADOSFACTURACION EST ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION)");
 		sql2.WHERE("FAC.IDINSTITUCION = '" + idInstitucion + "'");
-
+		sql2.WHERE("EST.IDORDENESTADO =(SELECT MAX(EST2.IDORDENESTADO) FROM FCS_FACT_ESTADOSFACTURACION EST2 "
+				+ "WHERE EST2.IDINSTITUCION = EST.IDINSTITUCION AND EST2.IDFACTURACION = EST.IDFACTURACION)");
 		// FILTRO ESTADOS FACTURACIÓN
-		if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdEstado())) {
-			sql2.WHERE("EST.IDORDENESTADO =(SELECT MAX(EST2.IDORDENESTADO) " + "FROM FCS_FACT_ESTADOSFACTURACION EST2 "
-					+ "WHERE EST2.IDINSTITUCION = EST.IDINSTITUCION AND EST2.IDFACTURACION = EST.IDFACTURACION)");
+		if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdEstado())) {			
 			sql2.WHERE("EST.IDESTADOFACTURACION = " + facturacionItem.getIdEstado());
 		}
 
@@ -222,7 +221,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.WHERE("fac.idinstitucion = grupo.idinstitucion");
 		sql.WHERE("fac.idfacturacion = grupo.idfacturacion");
 		sql.WHERE("fac.idinstitucion = " + idInstitucion);
-		sql.WHERE("fac.idfacturacion >= " + idFacturacion);
+		sql.WHERE("fac.idfacturacion = " + idFacturacion);
 		
 		sql.GROUP_BY("col.idpersona");
 		sql.GROUP_BY("col.ncolegiado");
@@ -418,7 +417,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.WHERE("fac.idinstitucion = " + idInstitucion);
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdFacturacion())) {
-			sql.WHERE("fac.idfacturacion >= " + cartasFacturacionPagosItem.getIdFacturacion());
+			sql.WHERE("fac.idfacturacion = " + cartasFacturacionPagosItem.getIdFacturacion());
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {
@@ -584,7 +583,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sqlPagoacolegiados.WHERE("pc.idinstitucion = " + idInstitucion);
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPago())) {
-			sqlPagoacolegiados.WHERE("pc.idpagosjg > " + cartasFacturacionPagosItem.getIdPago());
+			sqlPagoacolegiados.WHERE("pc.idpagosjg = " + cartasFacturacionPagosItem.getIdPago());
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno())) {
