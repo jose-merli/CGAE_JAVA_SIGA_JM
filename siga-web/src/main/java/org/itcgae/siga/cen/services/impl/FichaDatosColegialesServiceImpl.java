@@ -554,7 +554,11 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						datosColegiales.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));
 						datosColegiales.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 						datosColegiales.setUsumodificacion(usuario.getIdusuario());
-						datosColegiales.setObservaciones(colegiadoItem.getObservaciones());
+						if(colegiadoItem.getObservaciones() != null) {
+							datosColegiales.setObservaciones(colegiadoItem.getObservaciones());
+						}else {
+							datosColegiales.setObservaciones("");
+						}
 						datosColegiales.setSituacionresidente(colegiadoItem.getSituacionResidente());
 						int resultado = cenDatoscolegialesestadoExtendsMapper.insert(datosColegiales);
 
@@ -877,6 +881,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							if (colegiadoItem.getSituacionResidente() != null) {
 								datosColegiales.setSituacionresidente(
 										colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
+							}
+							if(datosColegiales.getObservaciones() == null) {
+								datosColegiales.setObservaciones("");
 							}
 							LOGGER.info(
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para actualizar el estado colegial");

@@ -455,9 +455,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				cenColegiadoExample.createCriteria()
 						.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
 						.andIdinstitucionEqualTo(Short.valueOf(datosDireccionesItem.getIdInstitucion()));
-				LOGGER.warn("IncidenciaRendimiento 1");
+				LOGGER.warn("updateDirection() / Entrada Consulta en Cen_Colegiado para comprobar si es o no colegiado");
 				List<CenColegiado> cenColegiadoList = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
-				LOGGER.warn("IncidenciaRendimiento 2");
+				LOGGER.warn("updateDirection() / Salida Consulta en Cen_Colegiado para comprobar si es o no colegiado");
 
 				// Comprobamos si contiene algún tipo de dirección único
 				List<String> rdo = new ArrayList<String>();
@@ -466,7 +466,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 				// Guardamos los tipos de direcciones para separar de los preferentes y no
 				// preferentes
-				LOGGER.warn("IncidenciaRendimiento 3");
+				LOGGER.warn("updateDirection() / Entrada a Bucle para guardar los tipos de direcciones");
 				for (int i = 0; i < datosDireccionesItem.getIdTipoDireccion().length; i++) {
 					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_CENSOWEB)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_GUARDIA)
@@ -498,7 +498,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
 				}
-				LOGGER.warn("IncidenciaRendimiento 4");
+				LOGGER.warn("updateDirection() / Salida de Bucle para guardar los tipos de direcciones");
 				String[] array = new String[rdo.size()];
 				array = rdo.toArray(array);
 				String[] allArray = new String[allRdo.size()];
@@ -512,13 +512,15 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					// Eliminamos de la dirección guardada el tipo de direccion de la nueva
 					// dirección
 					if (!rdo.isEmpty())
-						LOGGER.warn("IncidenciaRendimiento 5");
+						LOGGER.warn("updateDirection() / Entrada a Consulta en Cen_direcciontipodireccion para obtener dirección actual");
 						cenDireccionTipodireccionList = cenDireccionTipodireccionMapper.select(
 								datosDireccionesItem.getIdPersona(), String.valueOf(usuario.getIdinstitucion()), array,
 								datosDireccionesItem.getIdDireccion());
-						LOGGER.warn("IncidenciaRendimiento 6");
+						LOGGER.warn("updateDirection() / Salida de Consulta en Cen_direcciontipodireccion para obtener dirección actual");
+
 					{
-						LOGGER.warn("IncidenciaRendimiento 7");
+						LOGGER.warn("updateDirection() / Entrada a Bucle para eliminar los tipos de dirección");
+
 						for (CenDireccionTipodireccion tipoDir : cenDireccionTipodireccionList) {
 
 							CenDireccionTipodireccionExample cenDireccionTipodireccionExample = new CenDireccionTipodireccionExample();
@@ -530,11 +532,11 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 							cenDireccionTipodireccionMapper.deleteByExample(cenDireccionTipodireccionExample);
 						}
-						LOGGER.warn("IncidenciaRendimiento 8");
+						LOGGER.warn("updateDirection() / Salida de Bucle para eliminar los tipos de dirección");
 					}
 
 					// Eliminamos la direcciones prefente
-					LOGGER.warn("IncidenciaRendimiento 9");
+					LOGGER.warn("updateDirection() / Entrada a Bucle para eliminar las direcciones preferentes");
 					for (String p : tipoPrefentes) {
 
 						if (p != SigaConstants.DIR_PREFERENTE_FAX) {
@@ -558,7 +560,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							}
 						}
 					}
-					LOGGER.warn("IncidenciaRendimiento 10");
+					LOGGER.warn("updateDirection() / Salida de Bucle para eliminar los tipos de dirección");
 				}
 
 				// Consultamos la dirección a actualizar
@@ -604,10 +606,8 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
 						.andIdinstitucionEqualTo(idInstitucion);
 				// Consultamos los tipos de direccion de la direccion a actualizar
-				LOGGER.warn("IncidenciaRendimiento 12");
 				List<CenDireccionTipodireccion> tiposDireccion = cenDireccionTipodireccionMapper
 						.selectByExample(tipoDireccionexample);
-				LOGGER.warn("IncidenciaRendimiento 13");
 
 				if (null != datosDireccionesItem.getIdTipoDireccion()
 						&& datosDireccionesItem.getIdTipoDireccion().length > 0) {
@@ -635,7 +635,6 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							TipoDireccionkey.setIdinstitucion(Short.valueOf(idInstitucion));
 							TipoDireccionkey.setIdtipodireccion(Short.valueOf(idTipoDireccionBorrar));
 							// Eliminamos las ya existentes y que se han eliminado en el update
-							LOGGER.warn("IncidenciaRendimiento 14");
 							LOGGER.info(
 									"updateDirection() / cenDireccionTipodireccionMapper.deleteByExample() -> Entrada a cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
 
@@ -643,11 +642,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 							LOGGER.info(
 									"updateDirection() / cenNocolegiadoExtendsMapper.deleteByExample() -> Salida de cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
-							LOGGER.warn("IncidenciaRendimiento 15");
 						}
 					}
 					if (null != idTiposDireccionFront && idTiposDireccionFront.size() > 0) {
-						LOGGER.warn("IncidenciaRendimiento 16");
+						LOGGER.warn("updateDirection() / Entrada a Bucle para insertar los tipos de dirección");
 						for (String idTipoDireccionInsertar : idTiposDireccionFront) {
 							CenDireccionTipodireccion TipoDireccionrecord = new CenDireccionTipodireccion();
 							TipoDireccionrecord.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
@@ -663,7 +661,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							LOGGER.info(
 									"updateDirection() / cenNocolegiadoExtendsMapper.insert() -> Salida de cenDireccionTipodireccionMapper para insertar tiposdedirecciones");
 						}
-						LOGGER.warn("IncidenciaRendimiento 17");
+						LOGGER.warn("updateDirection() / Salida de Bucle para eliminar los tipos de dirección");
 					}
 
 					// datos para auditoria
@@ -672,9 +670,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							.andIddireccionEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion()))
 							.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
 							.andIdinstitucionEqualTo(idInstitucion);
-					LOGGER.warn("IncidenciaRendimiento 18");
 					listCenDireccionesAnterior = cenDireccionesExtendsMapper.selectByExample(cenDireccionesExample);
-					LOGGER.warn("IncidenciaRendimiento 19");
 					cenDireccionesAnterior = listCenDireccionesAnterior.get(0);
 
 					// } else {
@@ -682,13 +678,11 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					// }
 
 					// Actualizamos la direccion
-					LOGGER.warn("IncidenciaRendimiento 20");
 					LOGGER.info(
 							"updateDirection() / cenDireccionesExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenDireccionesExtendsMapper para actualizar direcciones");
 					response = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(direcciones);
 					LOGGER.info(
 							"updateDirection() / cenDireccionesExtendsMapper.updateByExampleSelective() -> Salida de cenDireccionesExtendsMapper para actualizar direcciones ");
-					LOGGER.warn("IncidenciaRendimiento 21");
 					// comprobacion actualización
 					if (response >= 1) {
 
@@ -708,13 +702,11 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 								
 								colegiado.setFechamodificacion(new Date());
 								colegiado.setUsumodificacion(usuario.getIdusuario());
-								LOGGER.warn("IncidenciaRendimiento 24");
 								LOGGER.info(
 										"updateDirection() / cenColegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenColegiadoExtendsMapper para actualizar el Colegiado");
 								cenColegiadoExtendsMapper.updateByPrimaryKey(colegiado);
 								LOGGER.info(
 										"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
-								LOGGER.warn("IncidenciaRendimiento 25");
 								LOGGER.info(
 										"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
 								// Llamamos al PL para mantener los colegiados
@@ -726,15 +718,15 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 								paramMandatos[4] = usuario.getIdusuario().toString();
 								String resultado[] = new String[2];
 								try {
-									LOGGER.warn("IncidenciaRendimiento 26");
+									LOGGER.warn("updateDirection() / Llamada a PL Pkg_Siga_Censo.Actualizardatosletrado");	
 									resultado = callPLProcedure(
 											"{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
 											paramMandatos);
-									LOGGER.warn("IncidenciaRendimiento 27");
 								} catch (IOException | NamingException | SQLException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
+								LOGGER.warn("updateDirection() / Fin Llamada a PL Pkg_Siga_Censo.Actualizardatosletrado");	
 
 							}
 							
@@ -751,7 +743,6 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							noColegiado.setFechamodificacion(new Date());
 							noColegiado.setUsumodificacion(usuario.getIdusuario());
 
-							LOGGER.warn("IncidenciaRendimiento 28");
 							LOGGER.info(
 									"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
 							cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
@@ -773,10 +764,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							cenDireccionesPosterior = cenDireccionesExtendsMapper
 									.selectByPrimaryKey(keyDireccionesPosterior);
 							
-							LOGGER.warn("IncidenciaRendimiento 30");
+							LOGGER.warn("updateDirection() / Entrada a auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones() ");	
 							auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(cenDireccionesAnterior,
 									cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
-							LOGGER.warn("IncidenciaRendimiento 31");
+							LOGGER.warn("updateDirection() / Salida de auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones() ");	
 						}
 					} else {
 						LOGGER.info(
