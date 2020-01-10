@@ -23,6 +23,8 @@ import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
+import org.itcgae.siga.DTOs.scs.TurnosDTO;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -39,6 +41,8 @@ import org.itcgae.siga.db.services.scs.mappers.ScsHitofacturableguardiaExtendsMa
 import org.itcgae.siga.db.services.scs.mappers.ScsIncompatibilidadguardiasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionguardiaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsOrdenacionColasExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsSubzonapartidoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +71,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private ScsInscripcionguardiaExtendsMapper scsInscripcionguardiaExtendsMapper;
+
+	@Autowired
+	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
+
+	@Autowired
+	private ScsSubzonapartidoExtendsMapper scsSubzonapartidoExtendsMapper;
 
 	@Override
 	public GuardiasDTO searchGuardias(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -525,15 +535,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 						
 						// ------------ Hasta aqui actualizamos los datos de la tarjeta. -------------
-						
-						// A partir de aqui comprobamos si es por grupos y si hay ordenacion manual para
-						// actualizar los grupos segun sea el caso
-						ScsInscripcionguardiaExample inscripcionesExample = new ScsInscripcionguardiaExample();
-						inscripcionesExample.createCriteria().andIdguardiaEqualTo(guardia.getIdguardia())
-							.andIdturnoEqualTo(guardia.getIdturno()).andIdinstitucionEqualTo(idInstitucion);
-						List<ScsInscripcionguardia> inscr = scsInscripcionguardiaExtendsMapper.selectByExample(inscripcionesExample);
-						for(int i = 0; i<inscr.size();i++)
-							inscr.get(i).set
+
 						
 					} else if (guardiasItem.getDiasGuardia() != null) {
 
@@ -1127,6 +1129,41 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 
 		return guardiaDTO;
+	}
+
+	@Override
+	public TurnosDTO resumenTurno(String idTurno, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<TurnosItem> turnos = new ArrayList<TurnosItem>();
+		TurnosDTO turnoDTO = new TurnosDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+
+				turnos = scsTurnosExtendsMapper.resumenTurnoColaGuardia(idTurno, idInstitucion.toString());
+				List<TurnosItem> partidoJudicial = scsSubzonapartidoExtendsMapper.getPartidoJudicialTurno(turnos.get(0).getIdzona(),
+						turnos.get(0).getIdzubzona(), idInstitucion.toString());
+				turnos.get(0).setPartidoJudicial(partidoJudicial.get(0).getPartidoJudicial());
+				turnoDTO.setTurnosItems(turnos);
+				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+			}
+		}
+
+		return turnoDTO;
 	}
 
 }

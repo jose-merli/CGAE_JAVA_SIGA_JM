@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
+import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -116,6 +117,12 @@ public class GuardiaController {
 	ResponseEntity<GuardiasDTO> resumenIncompatibilidades(@RequestBody GuardiasItem guardia, HttpServletRequest request){
 		GuardiasDTO response= guardiasService.resumenIncompatibilidades(guardia, request);
 		return new ResponseEntity<GuardiasDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/gestionGuardia/resumenTurno", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<TurnosDTO> resumenTurno(@RequestBody String idTurno, HttpServletRequest request){
+		TurnosDTO response= guardiasService.resumenTurno(idTurno, request);
+		return new ResponseEntity<TurnosDTO>(response, HttpStatus.OK);
 	}
 	
 }

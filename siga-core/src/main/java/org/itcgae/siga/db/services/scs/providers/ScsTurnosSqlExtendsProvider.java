@@ -122,4 +122,41 @@ public String busquedaFichaTurnos(TurnosItem turnosItem, Short idInstitucion) {
 		sql.FROM("scs_ordenacioncolas");
 		return sql.toString();
 		}
+	
+	public String resumenTurnoColaGuardia(String idTurno, String idInstitucion) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("SCS_TURNO.nombre");
+		sql.SELECT("SCS_ZONA.IDZONA");
+		sql.SELECT("SCS_TURNO.IDSUBZONA");
+		sql.SELECT("SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA");
+		sql.SELECT("SCS_ZONA.NOMBRE AS NOMBRE_ZONA");
+		sql.SELECT("(\r\n" + 
+				"		SELECT\r\n" + 
+				"			COUNT(*)\r\n" + 
+				"		FROM\r\n" + 
+				"			SCS_INSCRIPCIONTURNO\r\n" + 
+				"		WHERE\r\n" + 
+				"			(SCS_INSCRIPCIONTURNO.FECHABAJA IS NULL\r\n" + 
+				"			OR TRUNC(SCS_INSCRIPCIONTURNO.FECHABAJA)>TRUNC(SYSDATE))\r\n" + 
+				"			AND (SCS_INSCRIPCIONTURNO.FECHAVALIDACION IS NOT NULL\r\n" + 
+				"			AND TRUNC(SCS_INSCRIPCIONTURNO.FECHAVALIDACION)<= TRUNC(SYSDATE))\r\n" + 
+				"			AND SCS_INSCRIPCIONTURNO.IDINSTITUCION = SCS_TURNO.IDINSTITUCION\r\n" + 
+				"			AND SCS_INSCRIPCIONTURNO.IDTURNO = SCS_TURNO.IDTURNO ) AS NUMEROINSCRITOSTURNO");
+		sql.FROM("SCS_TURNO");
+		sql.JOIN("SCS_MATERIA ON\r\n" + 
+				"		SCS_TURNO.IDINSTITUCION = SCS_MATERIA.IDINSTITUCION\r\n" + 
+				"		AND SCS_TURNO.IDAREA = SCS_MATERIA.IDAREA\r\n" + 
+				"		AND SCS_TURNO.IDMATERIA = SCS_MATERIA.IDMATERIA");
+		sql.JOIN("SCS_ZONA ON\r\n" + 
+				"		SCS_TURNO.IDINSTITUCION = SCS_ZONA.IDINSTITUCION\r\n" + 
+				"		AND SCS_TURNO.IDZONA = SCS_ZONA.IDZONA");
+		sql.WHERE("IDTURNO="+idTurno);
+		sql.WHERE("SCS_TURNO.IDINSTITUCION="+idInstitucion);
+
+		return sql.toString();
+	}
+	
+	
 }

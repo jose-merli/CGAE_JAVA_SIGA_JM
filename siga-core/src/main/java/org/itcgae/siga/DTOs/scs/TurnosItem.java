@@ -1,9 +1,6 @@
 package org.itcgae.siga.DTOs.scs;
 
 import java.util.Date;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TurnosItem {
 
@@ -49,8 +46,23 @@ public class TurnosItem {
 	private String idordenacioncolas;
 	private String orden;
 	private String nombrepartidosjudiciales;
+	private String numeroInscritos;
+	private String partidoJudicial;
 	
 	
+		
+	public String getPartidoJudicial() {
+		return partidoJudicial;
+	}
+	public void setPartidoJudicial(String partidoJudicial) {
+		this.partidoJudicial = partidoJudicial;
+	}
+	public String getNumeroInscritos() {
+		return numeroInscritos;
+	}
+	public void setNumeroInscritos(String numeroInscritos) {
+		this.numeroInscritos = numeroInscritos;
+	}
 	public String getVisiblemovil() {
 		return visiblemovil;
 	}

@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
+import org.itcgae.siga.DTOs.scs.TurnosDTO;
 
 public interface GuardiasService {
 
@@ -41,6 +42,8 @@ public interface GuardiasService {
 	public UpdateResponseDTO updateUltimoCola(GuardiasItem guardiasItem, HttpServletRequest request);
 	
 	public GuardiasDTO resumenIncompatibilidades(GuardiasItem guardiasItem, HttpServletRequest request);
+
+	public TurnosDTO resumenTurno(String idTurno, HttpServletRequest request);
 
 
 }
