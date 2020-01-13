@@ -31,6 +31,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
+import org.itcgae.siga.db.entities.ScsHitofacturableguardiaExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
@@ -412,7 +413,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 						// guardia.getIdturno().toString(), idInstitucion.toString()).get(0);
 						// guardiaItem.setDiasSeparacionGuardias(UtilidadesString.esCadenaVacia(diasSeparacion)?
 						// diasSeparacion : "0");
-
+						
+						// Check de separarGuardiasCalendario
+						List<GuardiasItem> checkeado = scsHitofacturableguardiaExtendsMapper.getCheckSeparacionGuardias(guardia.getIdturno().toString(), guardia.getIdguardia().toString(), idInstitucion.toString());
+						if(checkeado.size() > 0)
+							guardiaItem.setSepararGuardia(checkeado.get(0).getSepararGuardia());
+						
+						
 						guardiaItem.setSeleccionLaborables(guardia.getSeleccionlaborables());
 						guardiaItem.setSeleccionFestivos(guardia.getSeleccionfestivos());
 
@@ -534,8 +541,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 						
 						}
 						
-						// ------------ Hasta aqui actualizamos los datos de la tarjeta. -------------
-
 						
 					} else if (guardiasItem.getDiasGuardia() != null) {
 

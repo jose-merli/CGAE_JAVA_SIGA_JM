@@ -20,5 +20,22 @@ public class ScsHitofacturableguardiaSqlExtendsProvider extends ScsHitofacturabl
 		
 		return sql.toString();
 	}
+	
+	public String getCheckSeparacionGuardias(String idGuardia, String idTurno, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("DIASAPLICABLES");
+		
+		sql.FROM("SCS_HITOFACTURABLEGUARDIA");
+
+		sql.WHERE("IDINSTITUCION ='"+idInstitucion+"'");
+		sql.WHERE("IDTURNO = '"+idTurno+"'");
+		sql.WHERE("IDGUARDIA  = '"+idGuardia+"'");
+		sql.WHERE("NVL(AGRUPAR , 0) = 0");
+		sql.WHERE("DIASAPLICABLES IS NOT NULL");
+		
+		sql.GROUP_BY("DIASAPLICABLES");
+		return sql.toString();
+	}
 
 }

@@ -52,12 +52,19 @@ public class GuardiasItem {
 	private boolean requeridaValidacion;
 	private Date fechabaja;
 	private boolean historico;
+	private String separarGuardia;
 	
 	
 	
 	
 	
 	
+	public String getSepararGuardia() {
+		return separarGuardia;
+	}
+	public void setSepararGuardia(String separarGuardia) {
+		this.separarGuardia = separarGuardia;
+	}
 	public boolean isRequeridaValidacion() {
 		return requeridaValidacion;
 	}
