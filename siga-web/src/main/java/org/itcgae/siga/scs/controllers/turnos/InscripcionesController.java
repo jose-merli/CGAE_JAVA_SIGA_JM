@@ -70,5 +70,23 @@ public class InscripcionesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/inscripciones/updateDenegar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateDenegar(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = inscripcionesService.updateDenegar(inscripcionesDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/inscripciones/updateCambiarFecha", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateCambiarFecha(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = inscripcionesService.updateCambiarFecha(inscripcionesDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 }
  

@@ -43,10 +43,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		SQL sql = new SQL();
 		sql.SELECT(  
 				"       ( CASE\r\n" + 
-				"            WHEN ins.fechadenegacion IS NOT NULL\r\n" + 
-				"                 AND ins.fechabaja IS NOT NULL\r\n" + 
-				"                 AND ins.fechasolicitudbaja IS NOT NULL\r\n" + 
-				"                 AND ins.fechavalidacion IS NOT NULL THEN '4' /*Denegada*/\r\n" + 
+				"            WHEN ins.fechadenegacion IS NOT NULL THEN '4'\r\n" + 
 				"            WHEN ins.fechadenegacion IS NULL\r\n" + 
 				"                 AND ins.fechabaja IS NOT NULL\r\n" + 
 				"                 AND ins.fechasolicitudbaja IS NOT NULL\r\n" + 

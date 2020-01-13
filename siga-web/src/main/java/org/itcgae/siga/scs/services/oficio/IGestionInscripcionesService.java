@@ -26,4 +26,9 @@ public interface IGestionInscripcionesService {
 	public InscripcionesDTO busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem, HttpServletRequest request);
 	
 	public UpdateResponseDTO updateValidar(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateDenegar(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateCambiarFecha(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
+
 }
