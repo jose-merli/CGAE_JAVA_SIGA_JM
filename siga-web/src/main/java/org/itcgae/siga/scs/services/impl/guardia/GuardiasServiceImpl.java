@@ -29,14 +29,17 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ScsGrupoguardia;
+import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiado;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
-import org.itcgae.siga.db.entities.ScsHitofacturableguardiaExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsGrupoguardiaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsGrupoguardiacolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsHitofacturableguardiaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsIncompatibilidadguardiasExtendsMapper;
@@ -54,7 +57,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class GuardiasServiceImpl implements GuardiasService {
 
 	private Logger LOGGER = Logger.getLogger(GuardiasServiceImpl.class);
-
+	private boolean resetGrupos = false;
+	
+	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
@@ -78,6 +83,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private ScsSubzonapartidoExtendsMapper scsSubzonapartidoExtendsMapper;
+
+	@Autowired
+	private ScsGrupoguardiaExtendsMapper scsGrupoguardiaExtendsMapper;
+	
+	@Autowired
+	private ScsGrupoguardiacolegiadoExtendsMapper scsGrupoguardiacolegiadoExtendsMapper;
 
 	@Override
 	public GuardiasDTO searchGuardias(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -500,6 +511,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						LOGGER.info(
 								"updateGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear Configuracion de Cola de guardias");
+						
+						if(guardia.getPorgrupos().equals("1") && Boolean.valueOf(guardiasItem.getPorGrupos())) {
+							resetGrupos = true;
+						}
+						
 						guardia.setPorgrupos((Boolean.valueOf(guardiasItem.getPorGrupos()) ? "1" : "0"));
 						guardia.setIdordenacioncolas(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
 						// ROTAR COMPONENTES?
@@ -971,6 +987,50 @@ public class GuardiasServiceImpl implements GuardiasService {
 							ultimo, ordenaciones, idInstitucion.toString());
 					inscritos.setInscripcionesItem(colaGuardia);
 
+					// Si se ha pasado de por grupos a sin grupos hay que updatear todos los grupos
+					// y generarlos con el mismo valor de la posicion que tienen en la lista.
+					if(colaGuardia != null && colaGuardia.size() > 0 && resetGrupos) {
+						ScsGrupoguardia grupo = null;
+						ScsGrupoguardiacolegiado grupoColegiado = null;
+						//Obtenemos el ultimo id generado en los grupos
+						Integer idGrupo = Integer.valueOf(scsGrupoguardiaExtendsMapper.getLastId(idInstitucion.toString()).getNewId())+1;
+						Integer idGrupocolegiado = Integer.valueOf(scsGrupoguardiacolegiadoExtendsMapper.getLastId(idInstitucion.toString()).getNewId())+1;
+						
+						for(InscripcionGuardiaItem it: colaGuardia) {
+							grupo = new ScsGrupoguardia();
+							grupoColegiado = new ScsGrupoguardiacolegiado();
+							idGrupo +=1;
+							idGrupocolegiado +=1;
+							
+							//Setteando el nuevo grupo
+							grupo.setIdgrupoguardia((long)idGrupo);
+							grupo.setIdturno(Integer.valueOf(guardiasItem.getIdGuardia()));
+							grupo.setIdguardia(Integer.valueOf(guardiasItem.getIdTurno()));
+							grupo.setFechamodificacion(new Date());
+							grupo.setFechacreacion(new Date());
+							grupo.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
+							grupo.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
+							grupo.setNumerogrupo(idGrupo); // ESTO ESTA MAL
+							grupo.setIdinstitucion(idInstitucion);
+							
+							//Setteando el nuevo grupo colegiado
+							grupoColegiado.setIdgrupoguardia((long)idGrupo);
+							grupoColegiado.setIdturno(Integer.valueOf(guardiasItem.getIdGuardia()));
+							grupoColegiado.setIdguardia(Integer.valueOf(guardiasItem.getIdTurno()));
+							grupoColegiado.setFechamodificacion(new Date());
+							grupoColegiado.setFechacreacion(new Date());
+							grupoColegiado.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
+							grupoColegiado.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
+							grupoColegiado.setOrden(1);
+							grupoColegiado.setIdinstitucion(idInstitucion);
+							
+							
+							
+							
+							scsGrupoguardiaExtendsMapper.insert(grupo);
+						}
+					}
+					
 					LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
 				}
 			} catch (Exception e) {
