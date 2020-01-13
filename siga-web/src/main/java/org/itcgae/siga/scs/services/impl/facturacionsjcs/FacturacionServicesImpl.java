@@ -536,7 +536,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		            record.setIdinstitucion(idInstitucion);
 		            record.setFechadesde(facturacionItem.getFechaDesde());
 		            record.setFechahasta(facturacionItem.getFechaHasta());
-		            record.setNombre(facturacionItem.getNombre());
+		            record.setNombre(facturacionItem.getNombre().trim());
 		            record.setRegularizacion(facturacionItem.getRegularizacion());
 		            record.setPrevision(facturacionItem.getPrevision());
 		            record.setVisible(facturacionItem.getVisible());
@@ -632,7 +632,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		            record.setIdinstitucion(idInstitucion);
 		            record.setFechadesde(facturacionItem.getFechaDesde());
 		            record.setFechahasta(facturacionItem.getFechaHasta());
-		            record.setNombre(facturacionItem.getNombre());
+		            record.setNombre(facturacionItem.getNombre().trim());
 		            record.setRegularizacion(facturacionItem.getRegularizacion());
 		            record.setVisible(facturacionItem.getVisible());
 		            record.setFechamodificacion(new Date());
