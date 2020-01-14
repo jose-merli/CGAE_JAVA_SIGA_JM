@@ -120,5 +120,16 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 
 	})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getDictamen")
+	@Results({ @Result(column = "fechadictamen", property = "fechaDictamen", jdbcType = JdbcType.DATE),
+	      @Result(column = "observaciones", property = "observacionesDictamen", jdbcType = JdbcType.VARCHAR),
+	      @Result(column = "dictamen", property = "dictamenSing", jdbcType = JdbcType.VARCHAR),
+	      @Result(column = "iddictamen", property = "iddictamen", jdbcType = JdbcType.VARCHAR),
+	      @Result(column = "fundamento", property = "fundamentoCalifDes", jdbcType = JdbcType.VARCHAR), 
+	      @Result(column = "idfundamento", property = "fundamentoCalif", jdbcType = JdbcType.VARCHAR) 
+	})
+	EjgItem getDictamen(EjgItem ejgItem, String idInstitucion, String idLenguaje);
 
 }
+

@@ -28,6 +28,7 @@ public class EjgItem {
     private String dictamenSing;
     private String fundamentoCalif;
     private Date fechaDictamenDesd;
+    private Date fechaDictamen;
     private Date fechaDictamenHast;
     private String resolucion;
     private String fundamentoJuridico;
@@ -81,6 +82,10 @@ public class EjgItem {
     private Date fechapresentacion;
     private Date fechalimitepresentacion;
     private boolean historico;
+    private String observacionesDictamen;
+    private String fundamentoCalifDes;
+    private String iddictamen;
+
 //    private String correoelectronico;
 //    private Date fechanacimiento;
 
@@ -1109,6 +1114,66 @@ public class EjgItem {
 
 	public void setHistorico(boolean historico) {
 		this.historico = historico;
+	}
+	/**
+	 **/
+	public EjgItem fechaDictamen(Date fechaDictamen) {
+		this.fechaDictamen = fechaDictamen;
+		return this;
+	}
+
+	@JsonProperty("fechaDictamen")
+	public Date getFechaDictamen() {
+		return fechaDictamen;
+	}
+
+	public void setFechaDictamen(Date fechaDictamen) {
+		this.fechaDictamen = fechaDictamen;
+	}
+	/**
+	 **/
+	public EjgItem observacionesDictamen(String observacionesDictamen) {
+		this.observacionesDictamen = observacionesDictamen;
+		return this;
+	}
+
+	@JsonProperty("observacionesDictamen")
+	public String getObservacionesDictamen() {
+		return observacionesDictamen;
+	}
+
+	public void setObservacionesDictamen(String observacionesDictamen) {
+		this.observacionesDictamen = observacionesDictamen;
+	}
+	/**
+	 **/
+	public EjgItem fundamentoCalifDes(String fundamentoCalifDes) {
+		this.fundamentoCalifDes = fundamentoCalifDes;
+		return this;
+	}
+
+	@JsonProperty("fundamentoCalifDes")
+	public String getFundamentoCalifDes() {
+		return fundamentoCalifDes;
+	}
+
+	public void setFundamentoCalifDes(String fundamentoCalifDes) {
+		this.fundamentoCalifDes = fundamentoCalifDes;
+	}
+	/**
+	 **/
+	public EjgItem iddictamen(String iddictamen) {
+		this.iddictamen = iddictamen;
+		return this;
+	}
+
+	@JsonProperty("iddictamen")
+	public String getIddictamen() {
+		return iddictamen;
+	}
+
+	public void setIddictamen(String iddictamen) {
+		this.iddictamen = iddictamen;
 	}
 
 

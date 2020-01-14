@@ -23,4 +23,6 @@ public interface IGestionEJG {
 	EstadoEjgDTO getEstados(EjgItem ejgItem, HttpServletRequest request);
 
 	EjgDocumentacionDTO getDocumentos(EjgItem ejgItem, HttpServletRequest request);
+
+	EjgItem getDictamen(EjgItem ejgItem, HttpServletRequest request);
 }

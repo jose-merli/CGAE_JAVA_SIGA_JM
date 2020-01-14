@@ -141,5 +141,10 @@ public class EjgController {
 			EjgDocumentacionDTO response = gestionEJG.getDocumentos(ejgItem, request);
 			return new ResponseEntity<EjgDocumentacionDTO>(response, HttpStatus.OK);
 		}
-	
+	//Informe Calficacion
+	@RequestMapping(value = "/gestion-ejg/getDictamen",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EjgItem> getDictamen(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		EjgItem response = gestionEJG.getDictamen(ejgItem, request);
+		return new ResponseEntity<EjgItem>(response, HttpStatus.OK);
+	}	
 }

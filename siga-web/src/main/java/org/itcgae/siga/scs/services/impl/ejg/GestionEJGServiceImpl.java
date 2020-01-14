@@ -21,6 +21,7 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsExpedienteEconomicoExtendsMapper;
@@ -48,6 +49,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	private ScsExpedienteEconomicoExtendsMapper scsExpedienteEconomicoExtendsMapper;
 	@Autowired
 	private ScsEstadoejgExtendsMapper scsEstadoejgExtendsMapper;
+	@Autowired
+	private ScsDocumentacionejgExtendsMapper scsDocumentacionejgExtendsMapper;
 	
 	
 	@Override
@@ -263,7 +266,87 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	}
 	@Override
 	public EjgDocumentacionDTO getDocumentos(EjgItem ejgItem, HttpServletRequest request) {
+		LOGGER.info("getExpedientesEconomicos() -> Entrada al servicio para obtener expedientes económicos");
+		EjgDocumentacionDTO ejgDocumentacionDTO = new EjgDocumentacionDTO();
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getDocumentos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getDocumentos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if(null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
+				 GenParametrosExample genParametrosExample = new GenParametrosExample();
+			        genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+			                .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+			        genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			        LOGGER.info(
+			                "getDocumentos() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+			        tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+			        LOGGER.info(
+			                "getDocumentos() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+			        LOGGER.info(
+			                "getDocumentos() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
+			        if (tamMax != null) {
+			            tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			        } else {
+			            tamMaximo = null;
+			        }
+		
+				LOGGER.info("getDocumentos() / setUnidadFamiliarEJGItems.getExpedientesEconomicos() -> Entrada a scsEjgExtendsMapper para obtener la documentación de EJG");
+				ejgDocumentacionDTO.setEjgDocItems(scsDocumentacionejgExtendsMapper.getDocumentacion(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
+				LOGGER.info("getDocumentos() / setUnidadFamiliarEJGItems.getExpedientesEconomicos() -> Salida de scsEjgExtendsMapper para obtener la documentación de EJG");
+			}else {
+				LOGGER.warn("getDocumentos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		}else {
+			LOGGER.warn("getDocumentos() -> idInstitucion del token nula");
+		}
+		
+		LOGGER.info("getDocumentos() -> Salida del servicio para obtener la documentación de EJG");
+		return ejgDocumentacionDTO;
+	}
+	@Override
+	public EjgItem getDictamen(EjgItem ejgItem, HttpServletRequest request) {
 		// TODO Auto-generated method stub
-		return null;
+				LOGGER.info("getDictamen() -> Entrada al servicio para obtener el colegiado");
+				EjgItem dictamen = new EjgItem();
+				String token = request.getHeader("Authorization");
+				String dni = UserTokenUtils.getDniFromJWTToken(token);
+				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+				if(null != idInstitucion) {
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					LOGGER.info(
+							"getDictamen() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+					LOGGER.info(
+							"getDictamen() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					if(null != usuarios && usuarios.size() > 0) {
+						AdmUsuarios usuario = usuarios.get(0);
+						usuario.setIdinstitucion(idInstitucion);
+						LOGGER.info("getDictamen() / scsEjgExtendsMapper.getEstados() -> Entrada a scsEjgExtendsMapper para obtener información del Informe de Calificación");
+						dictamen = scsEjgExtendsMapper.getDictamen(ejgItem, idInstitucion.toString(), usuarios.get(0).getIdlenguaje().toString());
+						LOGGER.info("getDictamen() / scsEjgExtendsMapper.getEstados() -> Salida de scsEjgExtendsMapper para obtener información del Informe de Calificación");
+					}else {
+						LOGGER.warn("getDictamen() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+					}
+				}else {
+					LOGGER.warn("getDictamen() -> idInstitucion del token nula");
+				}
+			return dictamen;
 	}
 }
