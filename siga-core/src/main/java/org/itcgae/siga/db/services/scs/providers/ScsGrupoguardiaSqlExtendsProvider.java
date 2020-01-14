@@ -5,12 +5,11 @@ import org.itcgae.siga.db.mappers.ScsGrupoguardiaSqlProvider;
 
 public class ScsGrupoguardiaSqlExtendsProvider extends ScsGrupoguardiaSqlProvider{
 	
-	public String getLastId(String idInstitucion) {
+	public String getLastId() {
 		SQL sql = new SQL();
 		
 		sql.SELECT("MAX(IDGRUPOGUARDIA) AS IDGRUPOGUARDIA");
 		sql.FROM("SCS_GRUPOGUARDIA");
-		sql.WHERE("idinstitucion = '"+ idInstitucion +"'");
 		
 		return sql.toString();
 	}

@@ -13,6 +13,6 @@ public interface ScsGrupoguardiaExtendsMapper extends ScsGrupoguardiaMapper{
 	@Results({
 		@Result(column="IDGRUPOGUARDIA", property="newId")
 	})
-	public NewIdDTO getLastId(String idInstitucion);
+	NewIdDTO getLastId();
 
 }

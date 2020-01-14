@@ -1,9 +1,12 @@
 package org.itcgae.siga.scs.services.guardia;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
@@ -44,6 +47,8 @@ public interface GuardiasService {
 	public GuardiasDTO resumenIncompatibilidades(GuardiasItem guardiasItem, HttpServletRequest request);
 
 	public TurnosDTO resumenTurno(String idTurno, HttpServletRequest request);
+
+	public UpdateResponseDTO guardarColaGuardias(List<InscripcionItem> inscripciones, HttpServletRequest request);
 
 
 }
