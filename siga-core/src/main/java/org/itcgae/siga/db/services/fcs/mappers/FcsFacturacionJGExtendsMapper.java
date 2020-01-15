@@ -11,6 +11,8 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.DTOs.scs.PagosjgItem;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionKey;
+import org.itcgae.siga.db.entities.FcsFacturacionjg;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsFacturacionJGSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -35,7 +37,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IMPORTEPAGADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturacionItem> buscarFacturaciones(FacturacionItem facturacionItem, String idInstitucion);
 	
@@ -48,7 +50,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "REGULARIZACION", property = "regularizacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PREVISION", property = "prevision", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturacionItem> datosFacturacion(String idFacturacion, String idInstitucion);
 	
@@ -57,7 +59,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "idestadofacturacion", property = "idEstado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "descripcion", property = "desEstado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "fechaestado", property = "fechaEstado", jdbcType = JdbcType.DATE),
+		@Result(column = "fechaestado", property = "fechaEstado", jdbcType = JdbcType.DATE)
 	})
 	List<FacturacionItem> historicoFacturacion(String idFacturacion, String idLenguaje, String idInstitucion);
 	
@@ -87,7 +89,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "DESCGRUPO", property = "descGrupo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCCONCEPTO", property = "descConcepto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FacturacionItem> conceptosFacturacion(String idFacturacion, String idInstitucion, String idLenguaje);
 
@@ -110,7 +112,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "IMPORTEGUARDIA", property = "importeGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IMPORTEOFICIO", property = "importeOficio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IMPORTEEJG", property = "importeEjg", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IMPORTESOJ", property = "importeSoj", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTESOJ", property = "importeSoj", jdbcType = JdbcType.VARCHAR)
 
 	})
 	List<CartasFacturacionPagosItem> buscarCartasfacturacion(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion, Integer tamMax);
@@ -130,7 +132,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "IMPORTETOTALMOVIMIENTOS", property = "importeTotalMovimientos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TOTALIMPORTEBRUTO", property = "totalImporteBruto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TOTALIMPORTEIRPF", property = "totalImporteIrpf", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FORMADEPAGO", property = "formaDePago", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FORMADEPAGO", property = "formaDePago", jdbcType = JdbcType.VARCHAR)
 
 	})
 	List<CartasFacturacionPagosItem> buscarCartaspago(CartasFacturacionPagosItem cartasFacturacionPagosItem, Short idInstitucion, String idLenguaje, Integer tamMax);
@@ -150,8 +152,66 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
 		@Result(column = "DESESTADO", property = "desEstado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCONCEPTO", property = "desConcepto", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "PORCENTAJE", property = "porcentaje", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PORCENTAJE", property = "porcentaje", jdbcType = JdbcType.VARCHAR)
 		
 	})
 	List<PagosjgItem> datosPagos(String idFacturacion, String idInstitucion, String idLenguaje);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "facturacionesPorEstadoEjecucion")
+	@Results({ 
+		@Result(column = "IDFACTURACION", property = "idfacturacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHADESDE", property = "fechadesde", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAHASTA", property = "fechahasta", jdbcType = JdbcType.DATE),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTETOTAL", property = "importetotal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEOFICIO", property = "importeoficio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEGUARDIA", property = "importeguardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTESOJ", property = "importesoj", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEEJG", property = "importeejg", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PREVISION", property = "prevision", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "REGULARIZACION", property = "regularizacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.DATE),
+		@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDFACTURACION_REGULARIZA", property = "idfacturacionRegulariza", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREFISICO", property = "nombrefisico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDECOMCOLA", property = "idecomcola", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idpartidapresupuestaria", jdbcType = JdbcType.VARCHAR)
+	})
+	List<FcsFacturacionjg> facturacionesPorEstadoEjecucion(String idInstitucion);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "facturacionesPorEstadoProgramadas")
+	@Results({ 
+		@Result(column = "IDFACTURACION", property = "idfacturacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHADESDE", property = "fechadesde", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAHASTA", property = "fechahasta", jdbcType = JdbcType.DATE),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTETOTAL", property = "importetotal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEOFICIO", property = "importeoficio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEGUARDIA", property = "importeguardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTESOJ", property = "importesoj", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTEEJG", property = "importeejg", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PREVISION", property = "prevision", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "REGULARIZACION", property = "regularizacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.DATE),
+		@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDFACTURACION_REGULARIZA", property = "idfacturacionRegulariza", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREFISICO", property = "nombrefisico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDECOMCOLA", property = "idecomcola", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idpartidapresupuestaria", jdbcType = JdbcType.VARCHAR)
+	})
+	List<FcsFacturacionjg> facturacionesPorEstadoProgramadas(String idInstitucion);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "ultimoEstadoFacturacion")
+	@Results({ 
+		@Result(column = "idestadofacturacion", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "descripcion", property = "desEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaestado", property = "fechaEstado", jdbcType = JdbcType.DATE)
+	})
+	FcsFactEstadosfacturacionKey ultimoEstadoFacturacion(String idFacturacion, String idInstitucion);
+	
 }

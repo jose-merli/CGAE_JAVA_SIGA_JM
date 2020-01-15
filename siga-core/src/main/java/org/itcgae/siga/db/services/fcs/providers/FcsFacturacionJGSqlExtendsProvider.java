@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
+import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgSqlProvider;
 
@@ -648,5 +649,101 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		}
 
 		return sqlOrder.toString();
+	}
+	
+	
+	public String facturacionesPorEstadoEjecucion(String idInstitucion) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql.SELECT("FAC.IDFACTURACION");
+		sql.SELECT("FAC.IDINSTITUCION");
+		sql.SELECT("FAC.FECHADESDE");
+		sql.SELECT("FAC.FECHAHASTA");
+		sql.SELECT("FAC.NOMBRE");
+		sql.SELECT("FAC.IMPORTETOTAL");
+		sql.SELECT("FAC.IMPORTEOFICIO");
+		sql.SELECT("FAC.IMPORTEGUARDIA");
+		sql.SELECT("FAC.IMPORTESOJ");
+		sql.SELECT("FAC.IMPORTEEJG");
+		sql.SELECT("FAC.PREVISION");
+		sql.SELECT("FAC.REGULARIZACION");
+		sql.SELECT("FAC.FECHAMODIFICACION");
+		sql.SELECT("FAC.USUMODIFICACION");
+		sql.SELECT("FAC.IDFACTURACION_REGULARIZA");
+		sql.SELECT("FAC.NOMBREFISICO");
+		sql.SELECT("FAC.IDECOMCOLA");
+		sql.SELECT("FAC.VISIBLE");
+		sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
+		sql.FROM("FCS_FACTURACIONJG FAC");
+		sql.JOIN("FCS_FACT_ESTADOSFACTURACION E ON (F.IDINSTITUCION = E.IDINSTITUCION AND F.IDFACTURACION = E.IDFACTURACION)");
+		sql.WHERE("E.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("E.IDESTADOFACTURACION = "+ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo());
+		sql2.SELECT("MAX(EST2.IDORDENESTADO)");
+		sql2.FROM("FCS_FACT_ESTADOSFACTURACION EST2 ");
+		sql2.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+		sql2.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+		sql.WHERE("EST.IDORDENESTADO = (" + sql2.toString() +")");
+				
+		return sql.toString();
+	}
+	
+	public String facturacionesPorEstadoProgramadas(String idInstitucion) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql.SELECT("FAC.IDFACTURACION");
+		sql.SELECT("FAC.IDINSTITUCION");
+		sql.SELECT("FAC.FECHADESDE");
+		sql.SELECT("FAC.FECHAHASTA");
+		sql.SELECT("FAC.NOMBRE");
+		sql.SELECT("FAC.IMPORTETOTAL");
+		sql.SELECT("FAC.IMPORTEOFICIO");
+		sql.SELECT("FAC.IMPORTEGUARDIA");
+		sql.SELECT("FAC.IMPORTESOJ");
+		sql.SELECT("FAC.IMPORTEEJG");
+		sql.SELECT("FAC.PREVISION");
+		sql.SELECT("FAC.REGULARIZACION");
+		sql.SELECT("FAC.FECHAMODIFICACION");
+		sql.SELECT("FAC.USUMODIFICACION");
+		sql.SELECT("FAC.IDFACTURACION_REGULARIZA");
+		sql.SELECT("FAC.NOMBREFISICO");
+		sql.SELECT("FAC.IDECOMCOLA");
+		sql.SELECT("FAC.VISIBLE");
+		sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
+		sql.FROM("FCS_FACTURACIONJG FAC");
+		sql.JOIN("FCS_FACT_ESTADOSFACTURACION E ON (F.IDINSTITUCION = E.IDINSTITUCION AND F.IDFACTURACION = E.IDFACTURACION)");
+		sql.WHERE("E.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("E.IDESTADOFACTURACION = "+ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo());
+		sql2.SELECT("MAX(EST2.IDORDENESTADO)");
+		sql2.FROM("FCS_FACT_ESTADOSFACTURACION EST2 ");
+		sql2.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+		sql2.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+		sql.WHERE("EST.IDORDENESTADO = (" + sql2.toString() +")");
+				
+		return sql.toString();
+	}
+	
+	public String ultimoEstadoFacturacion(String idFacturacion, String idInstitucion) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql.SELECT("est.idestadofacturacion idestadofacturacion");
+		sql.SELECT("est.idinstitucion idinstitucion");
+		sql.SELECT("est.idfacturacion idfacturacion");
+		sql.SELECT("est.fechaestado fechaestado");
+		sql.FROM("fcs_fact_estadosfacturacion est");
+		sql.JOIN("fcs_estadosfacturacion estados on (est.idestadofacturacion = estados.idestadofacturacion)");
+		sql.JOIN("gen_recursos_catalogos rec on (estados.descripcion = rec.idrecurso)");
+		sql.WHERE("est.idinstitucion = '" + idInstitucion + "'");
+		sql.WHERE("est.idfacturacion = '" + idFacturacion + "'");
+		sql2.SELECT("MAX(EST2.IDORDENESTADO)");
+		sql2.FROM("FCS_FACT_ESTADOSFACTURACION EST2 ");
+		sql2.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+		sql2.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+		sql.WHERE("EST.IDORDENESTADO = (" + sql2.toString() +")");
+		sql.ORDER_BY("fechaestado DESC");
+
+		return sql.toString();
 	}
 }

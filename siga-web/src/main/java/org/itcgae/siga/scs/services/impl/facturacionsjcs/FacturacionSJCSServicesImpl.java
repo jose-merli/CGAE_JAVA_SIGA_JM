@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -17,13 +16,17 @@ import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.DTOs.scs.PagosjgDTO;
 import org.itcgae.siga.DTOs.scs.PagosjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.FcsFactActuaciondesignaExample;
 import org.itcgae.siga.db.entities.FcsFactApunteExample;
 import org.itcgae.siga.db.entities.FcsFactEjgExample;
 import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
 import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionExample;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionKey;
 import org.itcgae.siga.db.entities.FcsFactGrupofactHito;
 import org.itcgae.siga.db.entities.FcsFactGrupofactHitoExample;
 import org.itcgae.siga.db.entities.FcsFactGuardiascolegiadoExample;
@@ -74,18 +77,21 @@ import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoMapper;
 import org.itcgae.siga.db.mappers.ScsSojMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
-import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionServices;
+import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class FacturacionServicesImpl implements IFacturacionServices {
+public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
-	private Logger LOGGER = Logger.getLogger(FacturacionServicesImpl.class);
+	private Logger LOGGER = Logger.getLogger(FacturacionSJCSServicesImpl.class);
 	
+	private static Boolean alguienEjecutando=Boolean.FALSE;
+		
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
@@ -160,6 +166,9 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	
 	@Autowired
 	FcsFacturacionjgMapper fcsFacturacionjgMapper;
+	
+	@Autowired
+	private CenInstitucionExtendsMapper institucionMapper;
 
 	
 	@Override
@@ -536,7 +545,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		            record.setIdinstitucion(idInstitucion);
 		            record.setFechadesde(facturacionItem.getFechaDesde());
 		            record.setFechahasta(facturacionItem.getFechaHasta());
-		            record.setNombre(facturacionItem.getNombre().trim());
+		            record.setNombre(facturacionItem.getNombre());
 		            record.setRegularizacion(facturacionItem.getRegularizacion());
 		            record.setPrevision(facturacionItem.getPrevision());
 		            record.setVisible(facturacionItem.getVisible());
@@ -632,7 +641,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		            record.setIdinstitucion(idInstitucion);
 		            record.setFechadesde(facturacionItem.getFechaDesde());
 		            record.setFechahasta(facturacionItem.getFechaHasta());
-		            record.setNombre(facturacionItem.getNombre().trim());
+		            record.setNombre(facturacionItem.getNombre());
 		            record.setRegularizacion(facturacionItem.getRegularizacion());
 		            record.setVisible(facturacionItem.getVisible());
 		            record.setFechamodificacion(new Date());
@@ -692,7 +701,6 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	        if(null != usuarios && usuarios.size() > 0) {
 	        	AdmUsuarios usuario = usuarios.get(0);
 	            usuario.setIdinstitucion(idInstitucion);
-	            FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
 	            FcsFacturacionjg record2 = new FcsFacturacionjg();
 	           
 	            LOGGER.info("ejecutarFacturacion() -> Entrada para poner la facturacion como programada");
@@ -710,9 +718,11 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		            
 		            LOGGER.info("ejecutarFacturacion() -> Salida actualizar la prevision");
 		            
-	            	//SETEAMOS LOS DATOS Y HACEMOS INSERT DEL ESTADO
-	            	LOGGER.info("ejecutarFacturacion() -> Guardar datos en fcsFactEstadosfacturacion");
-	            	NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(idInstitucion, idFacturacion);	
+	            	//HACEMOS INSERT DEL ESTADO PROGRAMADA
+		            LOGGER.info("ejecutarFacturacion() -> Guardar datos en fcsFactEstadosfacturacion");
+		            response = insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(),idInstitucion, Integer.valueOf(idFacturacion), usuario.getIdusuario());
+		            /*
+		            NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(idInstitucion, idFacturacion);	
 	            	Short idOrdenEstado = (short) (Integer.parseInt(idP.getNewId())+1);
 	            	Short idEstado = 50;
 	            	
@@ -723,8 +733,8 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		            record.setFechamodificacion(new Date());
 		            record.setUsumodificacion(usuario.getIdusuario());
 		            record.setIdordenestado(idOrdenEstado);
-		           		            
-		            response = fcsFactEstadosfacturacionMapper.insert(record);
+					
+		            response = fcsFactEstadosfacturacionMapper.insert(record);*/
 		            
 		            LOGGER.info("ejecutarFacturacion() -> Salida guardar datos en fcsFactEstadosfacturacion");
 	            }catch(Exception e){
@@ -777,15 +787,17 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	        if(null != usuarios && usuarios.size() > 0) {
 	        	AdmUsuarios usuario = usuarios.get(0);
 	            usuario.setIdinstitucion(idInstitucion);
-	            FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
-	           
+	            
 	            LOGGER.info("reabrirFacturacion() -> Entrada para reabrir la facturacion");
 	            
 	            //GUARDAR DATOAS DE LA FACTURACION
 	            try {
-	            	//SETEAMOS LOS DATOS Y HACEMOS INSERT DEL ESTADO
+	            	//HACEMOS INSERT DEL ESTADO ABIERTA
 	            	LOGGER.info("reabrirFacturacion() -> Guardar datos para reabrir en fcsFactEstadosfacturacion");
+	            	response = insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(),idInstitucion, Integer.valueOf(idFacturacion), usuario.getIdusuario());
+	            	/*
 	            	NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(idInstitucion, idFacturacion);	
+	            	
 	            	Short idOrdenEstado = (short) (Integer.parseInt(idP.getNewId())+1);
 	            	Short idEstado = 10;
 	            	
@@ -798,7 +810,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		            record.setIdordenestado(idOrdenEstado);
 		           		            
 		            response = fcsFactEstadosfacturacionMapper.insert(record);
-		            
+		            */
 		            LOGGER.info("reabrirFacturacion() -> Salida guardar datos para reabrir en fcsFactEstadosfacturacion");
 	            }catch(Exception e){
 	            	LOGGER.error("ERROR: FacturacionServicesImpl.reabrirFacturacion() >  Al reabrir la facturacion.", e);
@@ -851,7 +863,6 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	        if(null != usuarios && usuarios.size() > 0) {
 	        	AdmUsuarios usuario = usuarios.get(0);
 	            usuario.setIdinstitucion(idInstitucion);
-	            FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
 	            FcsFacturacionjg record2 = new FcsFacturacionjg();
 	           
 	            LOGGER.info("simularFacturacion() -> Entrada para simular la facturacion");
@@ -870,11 +881,13 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		            
 		            LOGGER.info("simularFacturacion() -> Salida actualizar prevision para simular facturacion");
 	            	
-	            	//SETEAMOS LOS DATOS Y HACEMOS INSERT DEL ESTADO
+	            	//HACEMOS INSERT DEL ESTADO PROGRAMADA
 	            	LOGGER.info("simularFacturacion() -> Guardar datos para simular facturacion");
+	            	response = insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(),idInstitucion, Integer.valueOf(idFacturacion), usuario.getIdusuario());
+	            	/*
 	            	NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(idInstitucion, idFacturacion);	
 	            	Short idOrdenEstado = (short) (Integer.parseInt(idP.getNewId())+1);
-	            	Short idEstado = 50;
+	            	Short idEstado = ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo().shortValue();
 	            	
 		            record.setIdinstitucion(idInstitucion);
 		            record.setIdestadofacturacion(idEstado);
@@ -885,7 +898,7 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 		            record.setIdordenestado(idOrdenEstado);
 		           		            
 		            response = fcsFactEstadosfacturacionMapper.insert(record);
-		            
+		            */
 		            LOGGER.info("simularFacturacion() -> Salida guardar datos para simular facturacion");
 	            }catch(Exception e){
 	            	LOGGER.error("ERROR: FacturacionServicesImpl.simularFacturacion() >  Al simular la facturacion.", e);
@@ -983,28 +996,17 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	            	Short idGrupoFacturacion=(short) Integer.parseInt(facturacionItem.getIdGrupo());
 	            	Short idHitoGeneral = (short) Integer.parseInt(facturacionItem.getIdConcepto());
 	            	
-	            	//COMPROBAMOS QUE LOS DATOS A INSERTAR NO EXISTAN EN LA TABLA	            	
-	            	FcsFactGrupofactHitoExample example = new FcsFactGrupofactHitoExample();
-	            	example.createCriteria().andIdfacturacionEqualTo(Integer.parseInt(facturacionItem.getIdFacturacion())).andIdinstitucionEqualTo(idInstitucion).andIdgrupofacturacionEqualTo(idGrupoFacturacion).andIdhitogeneralEqualTo(idHitoGeneral);	            	
-	            		            	
-	            	List<FcsFactGrupofactHito> conceptos = fcsFactGrupofactHitoMapper.selectByExample(example);
-	            	
-		            if(conceptos.size()==0) {		            	
-		            	//SETEAMOS LOS DATOS Y GUARDAMOS LA FACTURA	      
-			            record.setIdinstitucion(idInstitucion);
-			            record.setIdfacturacion(Integer.parseInt(facturacionItem.getIdFacturacion()));
-			            record.setIdgrupofacturacion(idGrupoFacturacion);
-			            record.setIdhitogeneral(idHitoGeneral);
-			            record.setFechamodificacion(new Date());
-			            record.setUsumodificacion(usuario.getIdusuario());
-			           		            
-			            response = fcsFactGrupofactHitoMapper.insert(record);
-			            
-			            LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveFacturacion() -> Salida guardar datos en fcsFacturacionjg");
-		            }else {
-		            	error.setCode(400);
-						error.setDescription("facturacionSJCS.facturacionesYPagos.mensaje.conceptoExistente");
-		            }
+	            	//SETEAMOS LOS DATOS Y GUARDAMOS LA FACTURA	      
+		            record.setIdinstitucion(idInstitucion);
+		            record.setIdfacturacion(Integer.parseInt(facturacionItem.getIdFacturacion()));
+		            record.setIdgrupofacturacion(idGrupoFacturacion);
+		            record.setIdhitogeneral(idHitoGeneral);
+		            record.setFechamodificacion(new Date());
+		            record.setUsumodificacion(usuario.getIdusuario());
+		           		            
+		            response = fcsFactGrupofactHitoMapper.insert(record);
+		            
+		            LOGGER.info("saveConceptosFac() / fcsFacturacionJGExtendsMapper.saveFacturacion() -> Salida guardar datos en fcsFacturacionjg");
 	            }catch(Exception e){
 	            	LOGGER.error("ERROR: FacturacionServicesImpl.saveConceptosFac() > al guardar los conceptos de la facturacion.", e);
 	            	error.setCode(400);
@@ -1230,4 +1232,149 @@ public class FacturacionServicesImpl implements IFacturacionServices {
 	    
 	    return pagos;	
 	}
+
+	@Override
+	@Transactional
+	public void ejecutaFacturacionSJCS() {
+		if (isAlguienEjecutando()){
+			LOGGER.debug("YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO.");
+			return;
+		}
+		try {
+			procesarFacturacionSJCS();
+
+		} catch(Exception e){
+			throw e;
+		}
+		finally {
+			setNadieEjecutando();
+		}
+	}
+	
+	private void procesarFacturacionSJCS() {
+
+		CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+		exampleInstitucion.setDistinct(true);
+		exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull();;
+
+		List<CenInstitucion> listaInstituciones = institucionMapper.selectByExample(exampleInstitucion);
+		
+		for(CenInstitucion institucion: listaInstituciones) {
+			facturacionesBloqueadas(institucion);
+			
+			facturacionesProgramadas(institucion);
+		}
+		
+	}
+
+	private void facturacionesProgramadas(CenInstitucion institucion) {
+		List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper.facturacionesPorEstadoProgramadas(institucion.getIdinstitucion().toString());
+		
+		for(FcsFacturacionjg item : listaFacturaciones) {
+			
+			//Insertamos el estado En ejecucion para las facturaciones en ejecucion
+			insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+			
+			// Ejecutamos la facturación y genero los multiples ficheros pendientes
+			try {
+				UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
+				if (item.getRegularizacion().equals("1")) {
+					insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+					utils.ejecutarRegularizacionJG(item, institucion);
+					insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+				}
+				else {
+					insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+					utils.ejecutarFacturacionJG(item, institucion);
+					insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+				}
+			}catch(Exception e){
+				LOGGER.error(e);
+				actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
+				insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+			}
+		}	
+	}
+	
+	private void facturacionesBloqueadas(CenInstitucion institucion) {
+		List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper.facturacionesPorEstadoEjecucion(institucion.getIdinstitucion().toString());
+				
+			for(FcsFacturacionjg item : listaFacturaciones) {
+				
+				//Insertamos el estado programada para las facturaciones en ejecucion
+				insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+				
+				//Insertamos el estado En ejecucion para las facturaciones en ejecucion
+				insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+				
+				// Ejecutamos la facturación y genero los multiples ficheros pendientes
+				try {
+					UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
+					if (item.getRegularizacion().equals("1")) {
+						utils.ejecutarRegularizacionJG(item, institucion);
+					} else {
+						utils.ejecutarFacturacionJG(item, institucion);
+					}
+					//Insertamos el estado En ejecucion para las facturaciones ejecutada
+					insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+				}catch(Exception e){
+					LOGGER.error(e);
+					actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
+					insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+				}
+			}	
+	}
+	
+	
+
+	private int insertarEstado(Integer codigoEstado, Short idInstitucion, Integer idFacturacion, Integer usuario) {
+		NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(Short.valueOf(idInstitucion), String.valueOf(idFacturacion));	
+    	Short idOrdenEstado = (short) (Integer.parseInt(idP.getNewId())+1);
+    	Short idEstado = codigoEstado.shortValue();
+    	
+    	FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
+        record.setIdinstitucion(Short.valueOf(idInstitucion));
+        record.setIdestadofacturacion(idEstado);
+        record.setIdfacturacion(Integer.valueOf(idFacturacion));
+        record.setFechaestado(new Date());
+        record.setFechamodificacion(new Date());
+        record.setUsumodificacion(usuario);
+        record.setIdordenestado(idOrdenEstado);
+       		            
+        return fcsFactEstadosfacturacionMapper.insert(record);
+		
+	}
+	
+	private void actualizaObservacionesEstado(Integer codigo, Short idInstitucion, Integer idFacturacion, String observaciones) {
+		
+		FcsFactEstadosfacturacionKey estadoFactPK = fcsFacturacionJGExtendsMapper.ultimoEstadoFacturacion(String.valueOf(idFacturacion), String.valueOf(idInstitucion));
+		
+		FcsFactEstadosfacturacion estado = new FcsFactEstadosfacturacion();
+		estado.setIdestadofacturacion(estadoFactPK.getIdestadofacturacion());
+		estado.setIdfacturacion(estadoFactPK.getIdfacturacion());
+		estado.setIdinstitucion(estadoFactPK.getIdinstitucion());
+		estado.setFechaestado(estadoFactPK.getFechaestado());
+		estado.setObservaciones(observaciones);
+		fcsFactEstadosfacturacionMapper.updateByPrimaryKeySelective(estado);
+		
+	}
+
+	private void setNadieEjecutando(){
+		synchronized(FacturacionSJCSServicesImpl.alguienEjecutando){
+			FacturacionSJCSServicesImpl.alguienEjecutando=Boolean.FALSE;
+		}
+	}
+	
+	public boolean isAlguienEjecutando(){
+		synchronized(FacturacionSJCSServicesImpl.alguienEjecutando){
+			if (!FacturacionSJCSServicesImpl.alguienEjecutando){
+				FacturacionSJCSServicesImpl.alguienEjecutando=Boolean.TRUE;
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
+	
+	
 }
