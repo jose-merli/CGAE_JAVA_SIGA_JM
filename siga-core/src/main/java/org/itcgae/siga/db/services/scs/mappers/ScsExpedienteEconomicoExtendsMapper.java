@@ -20,10 +20,12 @@ public interface ScsExpedienteEconomicoExtendsMapper extends ScsEejgPeticionesMa
 	@SelectProvider(type = ScsExpedienteEconomicoSqlExtendsProvider.class, method = "getExpedientesEconomicos")
 	@Results({ 
 //		@Result(column = "IDPERSONA", property = "justiciable", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "IDPERSONA", property = "solicitadoPor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "solicitadopor", property = "solicitadoPor", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechasolicitud", property = "f_solicitud", jdbcType = JdbcType.DATE),
 		@Result(column = "fechapeticion", property = "f_recepcion", jdbcType = JdbcType.DATE),
 		@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "csv", property = "csv", jdbcType = JdbcType.VARCHAR),
+
 
 	})
 	List<ExpedienteEconomicoItem> getExpedientesEconomicos(EjgItem ejgItem, String idInstitucion, Integer tamMax, String idLenguaje);

@@ -10,6 +10,8 @@ public class ExpedienteEconomicoItem {
     private Date f_solicitud;
     private Date f_recepcion;
     private String estado;
+    private String csv;
+
     
 	/**
 	 **/
@@ -80,5 +82,20 @@ public class ExpedienteEconomicoItem {
 	}
 	public void setF_recepcion(Date f_recepcion) {
 		this.f_recepcion = f_recepcion;
+	}
+	/**
+	 **/
+	public ExpedienteEconomicoItem csv(String csv) {
+		this.csv = csv;
+		return this;
+	}
+
+	@JsonProperty("csv")
+	public String getCsv() {
+		return csv;
+	}
+
+	public void setCsv(String csv) {
+		this.csv = csv;
 	}
 }
