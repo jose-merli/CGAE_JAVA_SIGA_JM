@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
@@ -207,11 +208,17 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "ultimoEstadoFacturacion")
 	@Results({ 
-		@Result(column = "idestadofacturacion", property = "idEstado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "descripcion", property = "desEstado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "fechaestado", property = "fechaEstado", jdbcType = JdbcType.DATE)
+		@Result(column = "idestadofacturacion", property = "idestadofacturacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idinstitucion", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idfacturacion", property = "idfacturacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaestado", property = "fechaestado", jdbcType = JdbcType.DATE)
 	})
 	FcsFactEstadosfacturacionKey ultimoEstadoFacturacion(String idFacturacion, String idInstitucion);
 	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getParametroInstitucion")
+	@Results({ 
+		@Result(column = "valor", property = "valor", jdbcType = JdbcType.VARCHAR),
+	})
+	StringDTO getParametroInstitucion(String idInstitucion, String parametro);
+
 }

@@ -676,14 +676,14 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("FAC.VISIBLE");
 		sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
 		sql.FROM("FCS_FACTURACIONJG FAC");
-		sql.JOIN("FCS_FACT_ESTADOSFACTURACION E ON (F.IDINSTITUCION = E.IDINSTITUCION AND F.IDFACTURACION = E.IDFACTURACION)");
+		sql.JOIN("FCS_FACT_ESTADOSFACTURACION E ON (FAC.IDINSTITUCION = E.IDINSTITUCION AND FAC.IDFACTURACION = E.IDFACTURACION)");
 		sql.WHERE("E.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("E.IDESTADOFACTURACION = "+ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo());
 		sql2.SELECT("MAX(EST2.IDORDENESTADO)");
 		sql2.FROM("FCS_FACT_ESTADOSFACTURACION EST2 ");
-		sql2.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
-		sql2.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
-		sql.WHERE("EST.IDORDENESTADO = (" + sql2.toString() +")");
+		sql2.WHERE("EST2.IDINSTITUCION = E.IDINSTITUCION");
+		sql2.WHERE("EST2.IDFACTURACION = E.IDFACTURACION");
+		sql.WHERE("E.IDORDENESTADO = (" + sql2.toString() +")");
 				
 		return sql.toString();
 	}
@@ -712,14 +712,14 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("FAC.VISIBLE");
 		sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
 		sql.FROM("FCS_FACTURACIONJG FAC");
-		sql.JOIN("FCS_FACT_ESTADOSFACTURACION E ON (F.IDINSTITUCION = E.IDINSTITUCION AND F.IDFACTURACION = E.IDFACTURACION)");
+		sql.JOIN("FCS_FACT_ESTADOSFACTURACION E ON (FAC.IDINSTITUCION = E.IDINSTITUCION AND FAC.IDFACTURACION = E.IDFACTURACION)");
 		sql.WHERE("E.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("E.IDESTADOFACTURACION = "+ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo());
 		sql2.SELECT("MAX(EST2.IDORDENESTADO)");
 		sql2.FROM("FCS_FACT_ESTADOSFACTURACION EST2 ");
-		sql2.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
-		sql2.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
-		sql.WHERE("EST.IDORDENESTADO = (" + sql2.toString() +")");
+		sql2.WHERE("EST2.IDINSTITUCION = E.IDINSTITUCION");
+		sql2.WHERE("EST2.IDFACTURACION = E.IDFACTURACION");
+		sql.WHERE("E.IDORDENESTADO = (" + sql2.toString() +")");
 				
 		return sql.toString();
 	}
@@ -734,7 +734,6 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("est.fechaestado fechaestado");
 		sql.FROM("fcs_fact_estadosfacturacion est");
 		sql.JOIN("fcs_estadosfacturacion estados on (est.idestadofacturacion = estados.idestadofacturacion)");
-		sql.JOIN("gen_recursos_catalogos rec on (estados.descripcion = rec.idrecurso)");
 		sql.WHERE("est.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("est.idfacturacion = '" + idFacturacion + "'");
 		sql2.SELECT("MAX(EST2.IDORDENESTADO)");
@@ -744,6 +743,16 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.WHERE("EST.IDORDENESTADO = (" + sql2.toString() +")");
 		sql.ORDER_BY("fechaestado DESC");
 
+		return sql.toString();
+	}
+	
+	public String getParametroInstitucion(String idInstitucion, String parametro) {
+		SQL sql = new SQL();
+
+		sql.SELECT("VALOR");
+		sql.FROM("gen_parametros");
+		sql.WHERE("PARAMETRO = " + parametro);
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"'");
 		return sql.toString();
 	}
 }

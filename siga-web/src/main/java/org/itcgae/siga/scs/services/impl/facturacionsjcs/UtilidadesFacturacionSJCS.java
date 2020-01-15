@@ -8,33 +8,30 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
-import org.itcgae.siga.db.entities.AdmTipoinforme;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.FcsFacturacionjg;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+@Service
 public class UtilidadesFacturacionSJCS 
 {
 	private Logger LOGGER = Logger.getLogger(UtilidadesFacturacionSJCS.class);
@@ -44,6 +41,9 @@ public class UtilidadesFacturacionSJCS
 	
 	@Autowired
 	private FcsFacturacionjgMapper fcsFacturacionjgMapper;
+	
+	@Autowired
+	private FcsFacturacionJGExtendsMapper fcsFacturacionJGExtendsMapper;
 	
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
@@ -159,12 +159,12 @@ public class UtilidadesFacturacionSJCS
 			
 			//String tipoP=SigaConstants.FACTURACION_SJCS;
 			
-			GenParametrosExample example = new GenParametrosExample();
-			example.createCriteria().andModuloEqualTo("FCS").andParametroEqualTo("PATH_PREVISIONES_BD").andIdinstitucionEqualTo(itemFac.getIdinstitucion());
+			//GenParametrosExample example = new GenParametrosExample();
+			//example.createCriteria().andModuloEqualTo("FCS").andParametroEqualTo("PATH_PREVISIONES_BD").andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_0);
 			
-			List<GenParametros> config = genParametrosMapper.selectByExample(example);
+			StringDTO config = genParametrosMapper.selectParametroPorInstitucion("PATH_PREVISIONES_BD", SigaConstants.IDINSTITUCION_0);//.selectByExample(example);
 			 
-			String pathFicheros = config.get(0).getValor();
+			String pathFicheros = config.getValor();
 			
 			Hashtable nombreFicheros = null;
 			if (idPago == null) { 
@@ -382,12 +382,17 @@ public class UtilidadesFacturacionSJCS
 	void ejecutarFacturacionJG(FcsFacturacionjg itemFac, CenInstitucion institucion) throws Exception {
 		
 		// Fichero de log
-		GenParametrosExample example = new GenParametrosExample();
-		example.createCriteria().andModuloEqualTo("FCS").andParametroEqualTo("PATH_PREVISIONES_BD").andIdinstitucionEqualTo(itemFac.getIdinstitucion());
+		/*GenParametrosExample example = new GenParametrosExample();
+		example.createCriteria().andModuloEqualTo("FCS").andParametroEqualTo("PATH_PREVISIONES_BD").andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_0);
 		
 		List<GenParametros> config = genParametrosMapper.selectByExample(example);
 		 
 		String pathFicheros = config.get(0).getValor();
+		*/
+		//StringDTO config = genParametrosMapper.selectParametroPorInstitucion("PATH_PREVISIONES_BD", SigaConstants.IDINSTITUCION_0);//.selectByExample(example);
+		StringDTO config = fcsFacturacionJGExtendsMapper.getParametroInstitucion(SigaConstants.IDINSTITUCION_0, "PATH_PREVISIONES_BD");
+		 
+		String pathFicheros = config.getValor();
 		
 		String sNombreFichero = pathFicheros + File.separator + "LOG_ERROR_" + itemFac.getIdinstitucion() + "_" + itemFac.getIdfacturacion() + ".log";
 		File ficheroLog = new File(sNombreFichero);
