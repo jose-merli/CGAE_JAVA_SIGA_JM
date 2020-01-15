@@ -6,12 +6,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 
 public interface GuardiasService {
@@ -48,7 +48,7 @@ public interface GuardiasService {
 
 	public TurnosDTO resumenTurno(String idTurno, HttpServletRequest request);
 
-	public UpdateResponseDTO guardarColaGuardias(List<InscripcionItem> inscripciones, HttpServletRequest request);
+	public UpdateResponseDTO guardarColaGuardias(List<InscripcionGuardiaItem> inscripciones, HttpServletRequest request);
 
 
 }

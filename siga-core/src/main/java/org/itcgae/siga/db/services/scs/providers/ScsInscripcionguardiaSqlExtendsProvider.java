@@ -44,10 +44,10 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
 					"				Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
 					"				Ins.Fechavalidacion AS ANTIGUEDADCOLA,\r\n" + 
-					"				DECODE(Gua.Porgrupos, '1', Gru.IDGRUPOGUARDIACOLEGIADO, NULL) AS Idgrupoguardiacolegiado,\r\n" + 
-					"				DECODE(Gua.Porgrupos, '1', Gru.IDGRUPOGUARDIA, NULL) AS Grupo,\r\n" + 
-					"				DECODE(Gua.Porgrupos, '1', Grg.NUMEROGRUPO, NULL) AS numeroGrupo,\r\n" + 
-					"				DECODE(Gua.Porgrupos, '1', Gru.ORDEN, NULL) AS Ordengrupo,\r\n" + 
+					"				Gru.IDGRUPOGUARDIACOLEGIADO AS Idgrupoguardiacolegiado,\r\n" + 
+					"				Gru.IDGRUPOGUARDIA AS Grupo,\r\n" + 
+					"				Grg.NUMEROGRUPO AS numeroGrupo,\r\n" + 
+					"				Gru.ORDEN AS Ordengrupo,\r\n" + 
 					"				(\r\n" + 
 					"				SELECT\r\n" + 
 					"					COUNT(1) numero\r\n" + 
@@ -137,10 +137,10 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
 					"				Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
 					"				Ins.Fechavalidacion AS ANTIGUEDADCOLA,\r\n" + 
-					"				DECODE(Gua.Porgrupos, '1', Gru.IDGRUPOGUARDIACOLEGIADO, NULL) AS Idgrupoguardiacolegiado,\r\n" + 
-					"				DECODE(Gua.Porgrupos, '1', Gru.IDGRUPOGUARDIA, NULL) AS Grupo,\r\n" + 
-					"				DECODE(Gua.Porgrupos, '1', Grg.NUMEROGRUPO, NULL) AS numeroGrupo,\r\n" + 
-					"				DECODE(Gua.Porgrupos, '1', Gru.ORDEN, NULL) AS Ordengrupo,\r\n" + 
+					"				Gru.IDGRUPOGUARDIACOLEGIADO AS Idgrupoguardiacolegiado,\r\n" + 
+					"				Gru.IDGRUPOGUARDIA AS Grupo,\r\n" + 
+					"				Grg.NUMEROGRUPO AS numeroGrupo,\r\n" + 
+					"				Gru.ORDEN AS Ordengrupo,\r\n" + 
 					"				(\r\n" + 
 					"				SELECT\r\n" + 
 					"					COUNT(1) numero\r\n" + 
@@ -248,10 +248,10 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"                          DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
 					"                          Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
 					"                          Ins.Fechavalidacion AS ANTIGUEDADCOLA,\r\n" + 
-					"                          DECODE(Gua.Porgrupos, '1', Gru.IDGRUPOGUARDIACOLEGIADO, NULL) AS Idgrupoguardiacolegiado,\r\n" + 
-					"                          DECODE(Gua.Porgrupos, '1', Gru.IDGRUPOGUARDIA, NULL) AS Grupo,\r\n" + 
-					"                          DECODE(Gua.Porgrupos, '1', Grg.NUMEROGRUPO, NULL) AS numeroGrupo,\r\n" + 
-					"                          DECODE(Gua.Porgrupos, '1', Gru.ORDEN, NULL) AS Ordengrupo,\r\n" + 
+					"                          Gru.IDGRUPOGUARDIACOLEGIADO AS Idgrupoguardiacolegiado,\r\n" + 
+					"                          Gru.IDGRUPOGUARDIA AS Grupo,\r\n" + 
+					"                          Grg.NUMEROGRUPO AS numeroGrupo,\r\n" + 
+					"                          Gru.ORDEN AS Ordengrupo,\r\n" + 
 					"                          (\r\n" + 
 					"                          SELECT\r\n" + 
 					"                                 COUNT(1) numero\r\n" + 

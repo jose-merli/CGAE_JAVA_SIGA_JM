@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.Date;
+
 public class InscripcionGuardiaItem {
 	
 	private String numeroGrupo;
@@ -13,13 +15,33 @@ public class InscripcionGuardiaItem {
 	private String apellido1;
 	private String apellido2;
 	private String nombre;
-	private String ordenCola;
 	private String idPersona;
+	private String ordenCola;
+	private String idTurno;
+	private String idGuardia;
+	private Date fechaSuscripcion;
 	
 	
 	
 	
-	
+	public Date getFechaSuscripcion() {
+		return fechaSuscripcion;
+	}
+	public void setFechaSuscripcion(Date fechaSuscripcion) {
+		this.fechaSuscripcion = fechaSuscripcion;
+	}
+	public String getIdTurno() {
+		return idTurno;
+	}
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
+	}
+	public String getIdGuardia() {
+		return idGuardia;
+	}
+	public void setIdGuardia(String idGuardia) {
+		this.idGuardia = idGuardia;
+	}
 	public String getIdPersona() {
 		return idPersona;
 	}

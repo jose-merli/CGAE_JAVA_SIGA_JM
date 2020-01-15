@@ -1,6 +1,8 @@
 
 package org.itcgae.siga.scs.controllers.guardia;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -10,6 +12,7 @@ import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +126,12 @@ public class GuardiaController {
 	ResponseEntity<TurnosDTO> resumenTurno(@RequestBody String idTurno, HttpServletRequest request){
 		TurnosDTO response= guardiasService.resumenTurno(idTurno, request);
 		return new ResponseEntity<TurnosDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/gestionGuardia/guardarCola", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> guardarCola(@RequestBody List<InscripcionGuardiaItem> inscripciones, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasService.guardarColaGuardias(inscripciones, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 }
