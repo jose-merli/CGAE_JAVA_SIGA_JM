@@ -196,7 +196,7 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 						"cen_tiposcvsubtipo1.descripcion." + idInstitucion + "." + genRecursosCatalogo.getIdrecurso());
 
 				genRecursosCatalogo.setNombretabla("CEN_TIPOSCVSUBTIPO1");
-				genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
+				genRecursosCatalogo.setUsumodificacion(usuario.getIdusuario());
 
 				if (genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo) == 1) {
 					record.setDescripcion(genRecursosCatalogo.getIdrecurso());
@@ -217,7 +217,7 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 					record.setIdtipocvsubtipo1((short) newIdTipoCvSubtipo1);
 				}
 
-				record.setUsumodificacion(usuario.getUsumodificacion());
+				record.setUsumodificacion(usuario.getIdusuario());
 
 				if (cenTiposCVSubtipo1ExtendsMapper.insert(record) == 1) {
 					insertResponseDTO.setStatus(SigaConstants.OK);
@@ -447,7 +447,7 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 								+ genRecursosCatalogo.getIdrecurso());
 
 						genRecursosCatalogo.setNombretabla("CEN_TIPOSCVSUBTIPO1");
-						genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
+						genRecursosCatalogo.setUsumodificacion(usuario.getIdusuario());
 
 						if (genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo) == 1) {
 							record.setDescripcion(genRecursosCatalogo.getIdrecurso());
@@ -464,7 +464,7 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 						record.setIdinstitucion(idInstitucion);
 						record.setIdtipocv(Short.valueOf(tipoCurricularItem.getIdTipoCV()));
 						record.setIdtipocvsubtipo1(Short.valueOf(tipoCurricularItem.getIdTipoCvSubtipo1()));
-						record.setUsumodificacion(usuario.getUsumodificacion());
+						record.setUsumodificacion(usuario.getIdusuario());
 
 						// Actualizamos el tipo curricular
 						if (cenTiposCVSubtipo1ExtendsMapper.updateByPrimaryKey(record) == 1) {

@@ -150,7 +150,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 						"cen_tiposcvsubtipo2.descripcion." + idInstitucion + "." + genRecursosCatalogo.getIdrecurso());
 
 				genRecursosCatalogo.setNombretabla("CEN_TIPOSCVSUBTIPO2");
-				genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
+				genRecursosCatalogo.setUsumodificacion(usuario.getIdusuario());
 
 				if (genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo) == 1) {
 					record.setDescripcion(genRecursosCatalogo.getIdrecurso());
@@ -171,7 +171,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 					record.setIdtipocvsubtipo2((short) newIdTipoCvSubtipo1);
 				}
 
-				record.setUsumodificacion(usuario.getUsumodificacion());
+				record.setUsumodificacion(usuario.getIdusuario());
 
 				if (cenTiposCVSubtipo2ExtendsMapper.insert(record) == 1) {
 					insertResponseDTO.setStatus(SigaConstants.OK);
@@ -402,7 +402,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 								+ genRecursosCatalogo.getIdrecurso());
 
 						genRecursosCatalogo.setNombretabla("CEN_TIPOSCVSUBTIPO2");
-						genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
+						genRecursosCatalogo.setUsumodificacion(usuario.getIdusuario());
 
 						if (genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo) == 1) {
 							record.setDescripcion(genRecursosCatalogo.getIdrecurso());
@@ -417,7 +417,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 						record.setIdinstitucion(idInstitucion);
 						record.setIdtipocv(Short.valueOf(subtipoCurricularItem.getIdTipoCV()));
 						record.setIdtipocvsubtipo2(Short.valueOf(subtipoCurricularItem.getIdTipoCvSubtipo2()));
-						record.setUsumodificacion(usuario.getUsumodificacion());
+						record.setUsumodificacion(usuario.getIdusuario());
 
 						if (cenTiposCVSubtipo2ExtendsMapper.updateByPrimaryKey(record) == 1) {
 							updateResponseDTO.setStatus(SigaConstants.OK);
