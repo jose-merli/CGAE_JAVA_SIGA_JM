@@ -1438,7 +1438,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							grupo.setFechacreacion(new Date());
 							grupo.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
 							grupo.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
-							grupo.setNumerogrupo(ultimoGrupo);
+							grupo.setNumerogrupo(Integer.valueOf(inscripcionesGrupoNuevo.get(i).getNumeroGrupo()));
 							grupo.setIdinstitucion(idInstitucion);
 
 							scsGrupoguardiaExtendsMapper.insert(grupo);
