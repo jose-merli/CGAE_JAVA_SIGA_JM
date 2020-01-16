@@ -387,7 +387,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 								envioProgramado = new EnvEnvioprogramado();
 								envioProgramado.setIdenvio(enviosProgramadosDto[i].getIdEnvio());
 								envioProgramado.setIdinstitucion(idInstitucion);
-								envioProgramado.setEstado("0");
+								envioProgramado.setEstado("4");
 								if (enviosProgramadosDto[i].getIdPlantilla() != null) {
 									envioProgramado
 											.setIdplantilla(Short.valueOf(enviosProgramadosDto[i].getIdPlantilla()));
@@ -605,25 +605,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setEnvio("M");
 						int insert = _envEnviosMapper.insert(envio);
 						
-//						EnvEnvioprogramado envioProgramado = new EnvEnvioprogramado();
-//						envioProgramado.setIdinstitucion(idInstitucion);
-//						envioProgramado.setIdenvio(envio.getIdenvio());
-//						envioProgramado.setIdinstitucion(idInstitucion);
-//						envioProgramado.setEstado("0");
-//							envioProgramado.setIdplantilla(envio.getIdplantilla());
-//						envioProgramado.setIdplantillaenvios(envio.getIdplantillaenvios());
-//						envioProgramado.setIdtipoenvios(envio.getIdtipoenvios());
-//						envioProgramado.setNombre(envio.getDescripcion());
-//						envioProgramado.setFechaprogramada(envio.getFechaprogramada());
-//						envioProgramado.setFechamodificacion(new Date());
-//						envioProgramado.setUsumodificacion(usuario.getIdusuario());
-//						
-//						//O cambiamos la fecha programada en bbdd para que no sea obligatoria o tenemos que indicar en envios masivos 
-//						//la fecha programada al principio porque sino peta
-//						envioProgramado.setFechaprogramada(new Date());
-//						int insertProgramado = _envEnvioprogramadoMapper.insert(envioProgramado);
-//						
-						
 						/*if (insert > 0) {
 							EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
 							historico.setIdenvio(envio.getIdenvio());
@@ -694,22 +675,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setDescripcion(datosTarjeta.getDescripcion());
 						envio.setFechamodificacion(new Date());
 						envio.setUsumodificacion(usuario.getIdusuario());
-						_envEnviosMapper.updateByPrimaryKey(envio);
-						
-						EnvEnvioprogramadoKey keyP = new EnvEnvioprogramadoKey();
-						keyP.setIdenvio(Long.valueOf(datosTarjeta.getIdEnvio()));
-						keyP.setIdinstitucion(idInstitucion);
-						EnvEnvioprogramado envioProgramado = _envEnvioprogramadoMapper.selectByPrimaryKey(keyP);
-						
-						if(envioProgramado != null) {
-							envioProgramado.setIdenvio(envio.getIdenvio());
-							envioProgramado.setIdinstitucion(idInstitucion);
-							envioProgramado.setNombre(envio.getDescripcion());
-							envioProgramado.setFechamodificacion(new Date());
-							envioProgramado.setUsumodificacion(usuario.getIdusuario());
-							_envEnvioprogramadoMapper.updateByPrimaryKey(envioProgramado);
-						}
-					
+						_envEnviosMapper.updateByPrimaryKey(envio);				
 
 						if (SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
 								|| SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO
