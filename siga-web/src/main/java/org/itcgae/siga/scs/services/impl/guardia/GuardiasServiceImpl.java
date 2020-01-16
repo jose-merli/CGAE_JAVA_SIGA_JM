@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -941,6 +942,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 						ultimo = guardias.get(0).getIdpersonaUltimo() == null ? ""
 								: guardias.get(0).getIdpersonaUltimo().toString();
 
+					String fecha = "";
+					
+					
 					ScsOrdenacioncolasExample example2 = new ScsOrdenacioncolasExample();
 					example2.createCriteria()
 							.andIdordenacioncolasEqualTo(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
@@ -1038,7 +1042,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 								grupoColegiado.setIdpersona(Long.valueOf(todaColaGuardia.get(i).getIdPersona()));
 								grupoColegiado.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
 								grupoColegiado.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
-								grupoColegiado.setIdgrupoguardiacolegiado(Long.valueOf(scsGrupoguardiacolegiadoExtendsMapper.getLastId().getNewId())+1);
+								grupoColegiado.setIdgrupoguardiacolegiado(
+										Long.valueOf(scsGrupoguardiacolegiadoExtendsMapper.getLastId().getNewId()) + 1);
 								if (grupoColegiado.getIdgrupoguardia() != null)
 									scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
 								else {
@@ -1105,6 +1110,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(guardiasItem.getIdGuardia(),
 								guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo, ordenaciones,
 								idInstitucion.toString());
+
+						inscritos.setInscripcionesItem(colaGuardia);
 					}
 
 				}
@@ -1308,7 +1315,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return turnoDTO;
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	@Transactional
 	@Override
 	public UpdateResponseDTO guardarColaGuardias(List<InscripcionGuardiaItem> inscripciones,
@@ -1344,7 +1350,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 						guardiasItem.setIdGuardia(inscripciones.get(0).getIdGuardia());
 					}
 					List<InscripcionGuardiaItem> inscripcionesGrupoNuevo = new ArrayList<InscripcionGuardiaItem>();
-					List<InscripcionGuardiaItem> inscripcionesGrupoUpdate = new ArrayList<InscripcionGuardiaItem>();
 					// Obtenemos el ultimo id generado en los grupos
 					NewIdDTO idGrupoDTO = scsGrupoguardiaExtendsMapper.getLastId();
 					Integer idGrupo = 0;
@@ -1356,6 +1361,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if (idGrupoDTO != null)
 						idGrupo = Integer.valueOf(idGrupoDTO.getNewId());
 
+					
+					//ESTO ES EN CASO DE QUE HAYA QUE COMPROBAR DENTRO
+//					List<InscripcionGuardiaItem> todaColaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
+//							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), "",
+//							"", "",idInstitucion.toString());
+//					
+//					int repe = 0;
+//					for(InscripcionGuardiaItem ins: inscripciones) {
+//						if(repe<=1) 
+//							repe = todaColaGuardia.stream().filter(it -> it.getNumeroGrupo().equals(ins.getNumeroGrupo()) && it.getOrden().equals(ins.getOrden())).collect(Collectors.toList()).size();
+//						if(repe<=1) 
+//							repe = todaColaGuardia.stream().filter(it -> it.getNumeroGrupo().equals(ins.getNumeroGrupo()) && it.getIdPersona().equals(ins.getIdPersona())).collect(Collectors.toList()).size();
+//					}
 					// Primero comprobamos si hay algun grupo nuevo
 					ScsGrupoguardiaExample grupoGuardiaExample = new ScsGrupoguardiaExample();
 					grupoGuardiaExample.createCriteria()
