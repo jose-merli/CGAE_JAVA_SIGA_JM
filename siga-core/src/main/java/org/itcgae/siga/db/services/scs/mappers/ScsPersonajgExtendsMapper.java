@@ -61,7 +61,7 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 
 	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "unidadFamiliarEJG")
 	@Results({ 
-	    
+		@Result(column = "idinstitucion", property = "uf_idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipoejg", property = "uf_idTipoejg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "anio", property = "uf_anio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numero", property = "uf_numero", jdbcType = JdbcType.VARCHAR),	
@@ -70,9 +70,9 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 		@Result(column = "encalidadde", property = "uf_enCalidad", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nif", property = "pjg_nif", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombrecompletopjg", property = "pjg_nombrecompleto", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "nombre", property = "pjg_nombre", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "apellido1", property = "pjg_ape1", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "apellido2", property = "pjg_ape2", jdbcType = JdbcType.VARCHAR),	
+		@Result(column = "nombre", property = "pjg_nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellido1", property = "pjg_ape1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellido2", property = "", jdbcType = JdbcType.VARCHAR),	
 		@Result(column = "direccion", property = "pjg_direccion", jdbcType = JdbcType.VARCHAR),
 //		@Result(column = "nombrePrincipal", property = "nombrePrincipal", jdbcType = JdbcType.VARCHAR),
 //		@Result(column = "apellido1Principal", property = "apellido1Principal", jdbcType = JdbcType.VARCHAR),

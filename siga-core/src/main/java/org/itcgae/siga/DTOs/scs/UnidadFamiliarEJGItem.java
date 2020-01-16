@@ -13,10 +13,11 @@ public class UnidadFamiliarEJGItem {
     private String uf_enCalidad;
     private String pjg_nif;
     private String pjg_nombrecompleto;
-//    private String pjg_nombre;
-//    private String pjg_ape1;
-//    private String pjg_ape2;
+    private String pjg_nombre;
+    private String pjg_ape1;
+    private String pjg_ape2;
     private String pjg_direccion;
+    private String uf_idInstitucion;
 //    private String nombrePrincipal;
 //    private String apellido1Principal;
 //    private String apellido2Principal;
@@ -124,48 +125,48 @@ public class UnidadFamiliarEJGItem {
 	public void setPjg_nif(String pjg_nif) {
 		this.pjg_nif = pjg_nif;
 	}
-//	/**
-//	 **/
-//	public UnidadFamiliarEJGItem pjg_nombre(String pjg_nombre) {
-//		this.pjg_nombre = pjg_nombre;
-//		return this;
-//	}
-//
-//	@JsonProperty("pjg_nombre")
-//	public String getPjg_nombre() {
-//		return pjg_nombre;
-//	}
-//	public void setPjg_nombre(String pjg_nombre) {
-//		this.pjg_nombre = pjg_nombre;
-//	}
-//	/**
-//	 **/
-//	public UnidadFamiliarEJGItem pjg_ape1(String pjg_ape1) {
-//		this.pjg_ape1 = pjg_ape1;
-//		return this;
-//	}
-//
-//	@JsonProperty("pjg_ape1")
-//	public String getPjg_ape1() {
-//		return pjg_ape1;
-//	}
-//	public void setPjg_ape1(String pjg_ape1) {
-//		this.pjg_ape1 = pjg_ape1;
-//	}
-//	/**
-//	 **/
-//	public UnidadFamiliarEJGItem pjg_ape2(String pjg_ape2) {
-//		this.pjg_ape2 = pjg_ape2;
-//		return this;
-//	}
-//
-//	@JsonProperty("pjg_ape2")
-//	public String getPjg_ape2() {
-//		return pjg_ape2;
-//	}
-//	public void setPjg_ape2(String pjg_ape2) {
-//		this.pjg_ape2 = pjg_ape2;
-//	}
+	/**
+	 **/
+	public UnidadFamiliarEJGItem pjg_nombre(String pjg_nombre) {
+		this.pjg_nombre = pjg_nombre;
+		return this;
+	}
+
+	@JsonProperty("pjg_nombre")
+	public String getPjg_nombre() {
+		return pjg_nombre;
+	}
+	public void setPjg_nombre(String pjg_nombre) {
+		this.pjg_nombre = pjg_nombre;
+	}
+	/**
+	 **/
+	public UnidadFamiliarEJGItem pjg_ape1(String pjg_ape1) {
+		this.pjg_ape1 = pjg_ape1;
+		return this;
+	}
+
+	@JsonProperty("pjg_ape1")
+	public String getPjg_ape1() {
+		return pjg_ape1;
+	}
+	public void setPjg_ape1(String pjg_ape1) {
+		this.pjg_ape1 = pjg_ape1;
+	}
+	/**
+	 **/
+	public UnidadFamiliarEJGItem pjg_ape2(String pjg_ape2) {
+		this.pjg_ape2 = pjg_ape2;
+		return this;
+	}
+
+	@JsonProperty("pjg_ape2")
+	public String getPjg_ape2() {
+		return pjg_ape2;
+	}
+	public void setPjg_ape2(String pjg_ape2) {
+		this.pjg_ape2 = pjg_ape2;
+	}
 	/**
 	 **/
 	public UnidadFamiliarEJGItem pjg_direccion(String pjg_direccion) {
@@ -253,6 +254,156 @@ public class UnidadFamiliarEJGItem {
 	public void setFechaBaja(String fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
+	/**
+	 **/
+	public UnidadFamiliarEJGItem uf_idInstitucion(String uf_idInstitucion) {
+		this.uf_idInstitucion = uf_idInstitucion;
+		return this;
+	}
+
+	@JsonProperty("uf_idInstitucion")
+	public String getUf_idInstitucion() {
+		return uf_idInstitucion;
+	}
+
+	public void setUf_idInstitucion(String uf_idInstitucion) {
+		this.uf_idInstitucion = uf_idInstitucion;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
+		result = prime * result + ((fechaBaja == null) ? 0 : fechaBaja.hashCode());
+		result = prime * result + ((fechaSolicitud == null) ? 0 : fechaSolicitud.hashCode());
+		result = prime * result + ((pd_descripcion == null) ? 0 : pd_descripcion.hashCode());
+		result = prime * result + ((pjg_ape1 == null) ? 0 : pjg_ape1.hashCode());
+		result = prime * result + ((pjg_ape2 == null) ? 0 : pjg_ape2.hashCode());
+		result = prime * result + ((pjg_direccion == null) ? 0 : pjg_direccion.hashCode());
+		result = prime * result + ((pjg_nif == null) ? 0 : pjg_nif.hashCode());
+		result = prime * result + ((pjg_nombre == null) ? 0 : pjg_nombre.hashCode());
+		result = prime * result + ((pjg_nombrecompleto == null) ? 0 : pjg_nombrecompleto.hashCode());
+		result = prime * result + ((uf_anio == null) ? 0 : uf_anio.hashCode());
+		result = prime * result + ((uf_enCalidad == null) ? 0 : uf_enCalidad.hashCode());
+		result = prime * result + ((uf_idPersona == null) ? 0 : uf_idPersona.hashCode());
+		result = prime * result + ((uf_idTipoejg == null) ? 0 : uf_idTipoejg.hashCode());
+		result = prime * result + ((uf_idInstitucion == null) ? 0 : uf_idInstitucion.hashCode());
+		result = prime * result + ((uf_numero == null) ? 0 : uf_numero.hashCode());
+		result = prime * result + ((uf_solicitante == null) ? 0 : uf_solicitante.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UnidadFamiliarEJGItem other = (UnidadFamiliarEJGItem) obj;
+		if (estado == null) {
+			if (other.estado != null)
+				return false;
+		} else if (!estado.equals(other.estado))
+			return false;
+		if (fechaBaja == null) {
+			if (other.fechaBaja != null)
+				return false;
+		} else if (!fechaBaja.equals(other.fechaBaja))
+			return false;
+		if (fechaSolicitud == null) {
+			if (other.fechaSolicitud != null)
+				return false;
+		} else if (!fechaSolicitud.equals(other.fechaSolicitud))
+			return false;
+		if (pd_descripcion == null) {
+			if (other.pd_descripcion != null)
+				return false;
+		} else if (!pd_descripcion.equals(other.pd_descripcion))
+			return false;
+		if (pjg_ape1 == null) {
+			if (other.pjg_ape1 != null)
+				return false;
+		} else if (!pjg_ape1.equals(other.pjg_ape1))
+			return false;
+		if (pjg_ape2 == null) {
+			if (other.pjg_ape2 != null)
+				return false;
+		} else if (!pjg_ape2.equals(other.pjg_ape2))
+			return false;
+		if (pjg_direccion == null) {
+			if (other.pjg_direccion != null)
+				return false;
+		} else if (!pjg_direccion.equals(other.pjg_direccion))
+			return false;
+		if (pjg_nif == null) {
+			if (other.pjg_nif != null)
+				return false;
+		} else if (!pjg_nif.equals(other.pjg_nif))
+			return false;
+		if (pjg_nombre == null) {
+			if (other.pjg_nombre != null)
+				return false;
+		} else if (!pjg_nombre.equals(other.pjg_nombre))
+			return false;
+		if (pjg_nombrecompleto == null) {
+			if (other.pjg_nombrecompleto != null)
+				return false;
+		} else if (!pjg_nombrecompleto.equals(other.pjg_nombrecompleto))
+			return false;
+		if (uf_anio == null) {
+			if (other.uf_anio != null)
+				return false;
+		} else if (!uf_anio.equals(other.uf_anio))
+			return false;
+		if (uf_enCalidad == null) {
+			if (other.uf_enCalidad != null)
+				return false;
+		} else if (!uf_enCalidad.equals(other.uf_enCalidad))
+			return false;
+		if (uf_idPersona == null) {
+			if (other.uf_idPersona != null)
+				return false;
+		} else if (!uf_idPersona.equals(other.uf_idPersona))
+			return false;
+		if (uf_idTipoejg == null) {
+			if (other.uf_idTipoejg != null)
+				return false;
+		} else if (!uf_idTipoejg.equals(other.uf_idTipoejg))
+			return false;
+		if (uf_idInstitucion == null) {
+			if (other.uf_idInstitucion != null)
+				return false;
+		} else if (!uf_idInstitucion.equals(other.uf_idInstitucion))
+			return false;
+		if (uf_numero == null) {
+			if (other.uf_numero != null)
+				return false;
+		} else if (!uf_numero.equals(other.uf_numero))
+			return false;
+		if (uf_solicitante == null) {
+			if (other.uf_solicitante != null)
+				return false;
+		} else if (!uf_solicitante.equals(other.uf_solicitante))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "UnidadFamiliarEJGItem [uf_idTipoejg=" + uf_idTipoejg + ", uf_anio=" + uf_anio + ", uf_numero="
+				+ uf_numero + ", uf_idPersona=" + uf_idPersona + ", uf_solicitante=" + uf_solicitante
+				+ ", uf_enCalidad=" + uf_enCalidad + ", pjg_nif=" + pjg_nif + ", pjg_nombrecompleto="
+				+ pjg_nombrecompleto + ", pjg_nombre=" + pjg_nombre + ", pjg_ape1=" + pjg_ape1 + ", pjg_ape2="
+				+ pjg_ape2 + ", pjg_direccion=" + pjg_direccion + ", uf_idinstitucion=" + uf_idInstitucion
+				+ ", pd_descripcion=" + pd_descripcion + ", estado=" + estado + ", fechaSolicitud=" + fechaSolicitud
+				+ ", fechaBaja=" + fechaBaja + "]";
+	}
+
+	
     
+	
     
 }

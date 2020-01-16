@@ -672,9 +672,9 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 					" uf.solicitante," + 
 					" pjg.nif," + 
 					"pjg.apellido1 || ' ' || pjg.apellido2 || ', ' || pjg.nombre as nombrecompletopjg," +
-					//" pjg.nombre," + 
-					//" pjg.apellido1," + 
-					//" pjg.apellido2," + 
+					" pjg.nombre," + 
+					" pjg.apellido1," + 
+					" pjg.apellido2," + 
 					" pjg.direccion," + 
 					" uf.encalidadde," + 
 					" pd.descripcion," + 
