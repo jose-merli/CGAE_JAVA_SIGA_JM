@@ -499,14 +499,13 @@ public class EnviosServiceImpl implements IEnviosService{
         return destinatariosCopia;
     }
 
-    private String adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException, IOException {
+    private String adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException, IOException, BusinessException {
     	String listaDocumentos = null;
         if (documentosEnvio != null) {
         	listaDocumentos = "";
             //Adjuntamos los informes adjuntos.
             for (DatosDocumentoItem informe : documentosEnvio) {
                 File file = informe.getDocumentoFile();
-                
                 if (file == null) {
                     String error = "El fichero del envío " + idEnvio + " para el colegio " + idInstitucion + " es nulo";
                     LOGGER.error(error);
