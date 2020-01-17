@@ -1259,7 +1259,6 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	}
 
 	@Override
-	@Transactional
 	public void ejecutaFacturacionSJCS() {
 		if (isAlguienEjecutando()){
 			LOGGER.debug("YA SE ESTA EJECUTANDO LA FACTURACIÓN SJCS EN BACKGROUND. CUANDO TERMINE SE INICIARA OTRA VEZ EL PROCESO.");
@@ -1297,21 +1296,18 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		
 		for(FcsFacturacionjg item : listaFacturaciones) {
 			
-			//Insertamos el estado En ejecucion para las facturaciones en ejecucion
-			insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
-			
-			// Ejecutamos la facturación y genero los multiples ficheros pendientes
 			try {
+				//Insertamos el estado En ejecucion para las facturaciones en ejecucion
+				insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+				
+				// Ejecutamos la facturación y genero los multiples ficheros pendientes
+				
 				//UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
 				if (item.getRegularizacion().equals("1")) {
-			//		insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
 					ejecutarRegularizacionJG(item, institucion);
-			//		insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
 				}
 				else {
-				//	insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
 					ejecutarFacturacionJG(item, institucion);
-				//	insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
 				}
 				
 				insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
@@ -1326,8 +1322,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	private void facturacionesBloqueadas(CenInstitucion institucion) {
 		List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper.facturacionesPorEstadoEjecucion(institucion.getIdinstitucion().toString());
 				
-			for(FcsFacturacionjg item : listaFacturaciones) {
-				
+		for(FcsFacturacionjg item : listaFacturaciones) {
+			
+			try {
 				//Insertamos el estado programada para las facturaciones en ejecucion
 				insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
 				
@@ -1335,25 +1332,23 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 				insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
 				
 				// Ejecutamos la facturación y genero los multiples ficheros pendientes
-				try {
-					//UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
-					if (item.getRegularizacion().equals("1")) {
-						ejecutarRegularizacionJG(item, institucion);
-					} else {
-						ejecutarFacturacionJG(item, institucion);
-					}
-					//Insertamos el estado En ejecucion para las facturaciones ejecutada
-					insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
-				}catch(Exception e){
-					LOGGER.error(e);
-					actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
-					insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+				//UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
+				if (item.getRegularizacion().equals("1")) {
+					ejecutarRegularizacionJG(item, institucion);
+				} else {
+					ejecutarFacturacionJG(item, institucion);
 				}
-			}	
-	}
+				//Insertamos el estado En ejecucion para las facturaciones ejecutada
+				insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+			}catch(Exception e){
+				LOGGER.error(e);
+				actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(), e.getMessage());
+				insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_ABIERTA.getCodigo(),item.getIdinstitucion(), item.getIdfacturacion(),SigaConstants.USUMODIFICACION_0);
+			}
+		}	
+	}	
 	
-	
-
+	@Transactional
 	private int insertarEstado(Integer codigoEstado, Short idInstitucion, Integer idFacturacion, Integer usuario) {
 		NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(Short.valueOf(idInstitucion), String.valueOf(idFacturacion));	
     	Short idOrdenEstado = (short) (Integer.parseInt(idP.getNewId())+1);
@@ -1368,12 +1363,11 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         record.setUsumodificacion(usuario);
         record.setIdordenestado(idOrdenEstado);
        		            
-        return fcsFactEstadosfacturacionMapper.insert(record);
-		
+        return fcsFactEstadosfacturacionMapper.insert(record);		
 	}
 	
-	private void actualizaObservacionesEstado(Integer codigo, Short idInstitucion, Integer idFacturacion, String observaciones) {
-		
+	@Transactional
+	private void actualizaObservacionesEstado(Integer codigo, Short idInstitucion, Integer idFacturacion, String observaciones) {		
 		if(observaciones != null) {
 			FcsFactEstadosfacturacionKey estadoFactPK = fcsFacturacionJGExtendsMapper.ultimoEstadoFacturacion(String.valueOf(idFacturacion), String.valueOf(idInstitucion));
 			
@@ -1514,9 +1508,6 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		try {
 			
 			//String tipoP=SigaConstants.FACTURACION_SJCS;
-			
-			//GenParametrosExample example = new GenParametrosExample();
-			//example.createCriteria().andModuloEqualTo("FCS").andParametroEqualTo("PATH_PREVISIONES_BD").andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_0);
 			
 			StringDTO config = genParametrosMapper.selectParametroPorInstitucion("PATH_PREVISIONES_BD", SigaConstants.IDINSTITUCION_0);//.selectByExample(example);
 			 
@@ -1710,43 +1701,22 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 			importeEJG = new Double(((String)resultado[0]).replaceAll(",","."));
 			importeTotal += importeEJG.doubleValue();
 			
-			//////////////////////////////////
-			// ACTUALIZO LOS TOTALES
-			item.setImporteejg(new BigDecimal(importeEJG));
-			item.setImporteguardia(new BigDecimal(importeGuardia));
-			item.setImporteoficio(new BigDecimal(importeOficio));
-			item.setImportesoj(new BigDecimal(importeSOJ));
-			item.setImportetotal(new BigDecimal(importeTotal));
-			try{
-				fcsFacturacionjgMapper.updateByPrimaryKey(item);
-			}catch(Exception ex) {
-				LOGGER.error("Ha ocurrido un error al almacenar los importes resultado de la facturacion");
-				throw new Exception("Ha ocurrido un error al almacenar los importes resultado de la facturacion",ex);
-			}
+			actualizarTotales(item,importeEJG,importeGuardia, importeOficio, importeSOJ, importeTotal);
 			
 			// Exportacion de datos a EXCEL
 			//UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
 			exportarDatosFacturacion(item, SigaConstants.USUMODIFICACION_0, institucion);
 		}catch(Exception ex) {
+			LOGGER.error("Error en la ejecución de la Facturación SJCS. idinstitucion="+ item.getIdinstitucion()+" idfacturacion="+ item.getIdfacturacion());
 			throw new Exception("Error en la ejecución de la Facturación SJCS. idinstitucion="+ item.getIdinstitucion()+" idfacturacion="+ item.getIdfacturacion(), ex);
-		}
-	
-				
+		}			
 	}
 
 	@Transactional 
 	void ejecutarFacturacionJG(FcsFacturacionjg itemFac, CenInstitucion institucion) throws Exception {
 		
 		// Fichero de log
-		/*GenParametrosExample example = new GenParametrosExample();
-		example.createCriteria().andModuloEqualTo("FCS").andParametroEqualTo("PATH_PREVISIONES_BD").andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_0);
-		
-		List<GenParametros> config = genParametrosMapper.selectByExample(example);
-		 
-		String pathFicheros = config.get(0).getValor();
-		*/
 		StringDTO config = genParametrosMapper.selectParametroPorInstitucion("PATH_PREVISIONES_BD", SigaConstants.IDINSTITUCION_0);//.selectByExample(example);
-		//StringDTO config = fcsFacturacionJGExtendsMapper.getParametroInstitucion(SigaConstants.IDINSTITUCION_0, "PATH_PREVISIONES_BD");
 		 
 		String pathFicheros = config.getValor();
 		
@@ -1850,35 +1820,34 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 				}
 
-
-				//////////////////////////////////
-				// ACTUALIZO LOS TOTALES
-				itemFac.setImporteejg(new BigDecimal(importeEJG));
-				itemFac.setImporteguardia(new BigDecimal(importeGuardia));
-				itemFac.setImporteoficio(new BigDecimal(importeOficio));
-				itemFac.setImportesoj(new BigDecimal(importeSOJ));
-				itemFac.setImportetotal(new BigDecimal(importeTotal));
-				try{
-					fcsFacturacionjgMapper.updateByPrimaryKey(itemFac);
-				}catch(Exception ex) {
-					LOGGER.error("Ha ocurrido un error al almacenar los importes resultado de la facturacion");
-					throw new Exception("Ha ocurrido un error al almacenar los importes resultado de la facturacion",ex);
-				}	
+				actualizarTotales(itemFac,importeEJG,importeGuardia, importeOficio, importeSOJ, importeTotal);
 
 			// Exportacion de datos a EXCEL: Se ha comentado este metodo por que no se quiere utilizar
 			//UtilidadesFacturacionSJCS.exportarDatosFacturacion(new Integer(idInstitucion), new Integer(idFacturacion), this.usrbean);			
 	
 		} catch (Exception e) {
-			try {
-
-			    LOGGER.error("Error al ejecutar facturacion SJCS.",e);
-			    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
-			} catch (Exception ee) {
-			    LOGGER.error("Error al cambiar de estado facturacion SJCS por error.",ee);
-			}
+		    LOGGER.error("Error al ejecutar facturacion SJCS.",e);
 		    throw e;
 		} 		
+	}
+	
+	@Transactional
+	private void actualizarTotales(FcsFacturacionjg item, Double importeEJG, Double importeGuardia,
+			Double importeOficio, Double importeSOJ, double importeTotal) throws Exception {
+		//////////////////////////////////
+		// ACTUALIZO LOS TOTALES
+		item.setImporteejg(new BigDecimal(importeEJG));
+		item.setImporteguardia(new BigDecimal(importeGuardia));
+		item.setImporteoficio(new BigDecimal(importeOficio));
+		item.setImportesoj(new BigDecimal(importeSOJ));
+		item.setImportetotal(new BigDecimal(importeTotal));
+		try{
+			fcsFacturacionjgMapper.updateByPrimaryKey(item);
+		}catch(Exception ex) {
+			LOGGER.error("Ha ocurrido un error al almacenar los importes resultado de la facturacion");
+			throw new Exception("Ha ocurrido un error al almacenar los importes resultado de la facturacion",ex);
+		}
+		
 	}
 	
 	/**
