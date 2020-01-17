@@ -387,7 +387,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 								envioProgramado = new EnvEnvioprogramado();
 								envioProgramado.setIdenvio(enviosProgramadosDto[i].getIdEnvio());
 								envioProgramado.setIdinstitucion(idInstitucion);
-								envioProgramado.setEstado("0");
+								envioProgramado.setEstado("4");
 								if (enviosProgramadosDto[i].getIdPlantilla() != null) {
 									envioProgramado
 											.setIdplantilla(Short.valueOf(enviosProgramadosDto[i].getIdPlantilla()));
@@ -604,6 +604,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setUsumodificacion(usuario.getIdusuario());
 						envio.setEnvio("M");
 						int insert = _envEnviosMapper.insert(envio);
+						
 						/*if (insert > 0) {
 							EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
 							historico.setIdenvio(envio.getIdenvio());
@@ -674,7 +675,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setDescripcion(datosTarjeta.getDescripcion());
 						envio.setFechamodificacion(new Date());
 						envio.setUsumodificacion(usuario.getIdusuario());
-						_envEnviosMapper.updateByPrimaryKey(envio);
+						_envEnviosMapper.updateByPrimaryKey(envio);				
 
 						if (SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
 								|| SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO

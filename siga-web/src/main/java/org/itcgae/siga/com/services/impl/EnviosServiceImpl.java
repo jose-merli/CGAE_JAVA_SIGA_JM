@@ -241,6 +241,8 @@ public class EnviosServiceImpl implements IEnviosService{
 								{
 									    new javax.mail.internet.InternetAddress(from)
 									});
+						mensaje.setSender(new InternetAddress(from,descFrom));
+						
                         InternetAddress toInternetAddress = new InternetAddress(sTo);
                         mensaje.addRecipient(MimeMessage.RecipientType.TO,toInternetAddress);
                         

@@ -1237,7 +1237,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							
 							//Obtenemos las consultas de la plantilla de envio seleccionada
 							
-							if(modelo.getIdPlantillaEnvio() != null && modelo.getIdTipoEnvio() != null){
+							if(modelo.getIdPlantillaEnvio() != "" && modelo.getIdPlantillaEnvio() != null && modelo.getIdTipoEnvio() != null){
 								//Obtenemos las consultas asociadas a la plantilla
 								List<ConsultaItem> listaEnvioConsultas = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(idInstitucion, Integer.parseInt(modelo.getIdPlantillaEnvio()), Short.parseShort(modelo.getIdTipoEnvio()));
 								if(listaEnvioConsultas != null && listaEnvioConsultas.size() > 0){
