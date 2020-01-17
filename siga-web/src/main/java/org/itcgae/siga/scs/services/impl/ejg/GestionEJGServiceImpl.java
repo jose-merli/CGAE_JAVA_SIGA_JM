@@ -25,6 +25,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsExpedienteEconomicoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsOrigencajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrestacionExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
@@ -51,6 +52,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	private ScsEstadoejgExtendsMapper scsEstadoejgExtendsMapper;
 	@Autowired
 	private ScsDocumentacionejgExtendsMapper scsDocumentacionejgExtendsMapper;
+	@Autowired
+	private ScsOrigencajgExtendsMapper scsOrigencajgExtendsMapper;
 	
 	
 	@Override
@@ -348,5 +351,37 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					LOGGER.warn("getDictamen() -> idInstitucion del token nula");
 				}
 			return dictamen;
+	}
+	@Override
+	public ComboDTO comboOrigen(HttpServletRequest request) {
+			// TODO Auto-generated method stub
+			// Conseguimos información del usuario logeado
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+			ComboDTO comboDTO = new ComboDTO();
+			List<ComboItem> comboItems = null;
+
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"comboOrigen() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"comboOrigen() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				if (usuarios != null && usuarios.size() > 0) {
+					LOGGER.info(
+							"comboOrigen() / scsOrigencajgExtendsMapper.comboOrigen() -> Entrada a scsOrigencajgExtendsMapper para rellenar el combo");
+					comboItems = scsOrigencajgExtendsMapper.comboOrigen(usuarios.get(0).getIdlenguaje().toString(), idInstitucion.toString());
+					LOGGER.info(
+							"comboOrigen() / scsOrigencajgExtendsMapper.comboOrigen() -> Salida a scsOrigencajgExtendsMapper para rellenar el combo");
+					if (comboItems != null) {
+						comboDTO.setCombooItems(comboItems);
+					}
+				}
+			}
+			LOGGER.info("comboTipoEJG() -> Salida del servicio para obtener los tipos ejg");
+			return comboDTO;
 	}
 }

@@ -25,4 +25,6 @@ public interface IGestionEJG {
 	EjgDocumentacionDTO getDocumentos(EjgItem ejgItem, HttpServletRequest request);
 
 	EjgItem getDictamen(EjgItem ejgItem, HttpServletRequest request);
+
+	ComboDTO comboOrigen(HttpServletRequest request);
 }

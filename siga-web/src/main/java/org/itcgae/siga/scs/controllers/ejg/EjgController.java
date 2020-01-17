@@ -146,5 +146,10 @@ public class EjgController {
 	ResponseEntity<EjgItem> getDictamen(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
 		EjgItem response = gestionEJG.getDictamen(ejgItem, request);
 		return new ResponseEntity<EjgItem>(response, HttpStatus.OK);
-	}	
+	}
+	@RequestMapping(value = "/gestion-ejg/comboOrigen",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboOrigen(HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboOrigen(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 }
