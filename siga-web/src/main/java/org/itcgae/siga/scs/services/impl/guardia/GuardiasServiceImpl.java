@@ -690,7 +690,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						guardia.setSeleccionfestivos("LMXJVSD");
 						guardia.setSeleccionlaborables("LMXJVSD");
 						guardia.setValidarjustificaciones("N");
-						guardia.setIdordenacioncolas(1); // Esta creo que esta especialmente mal
+						guardia.setIdordenacioncolas(18033); // Esta puesto este id porque es el que tiene la conf por
+																// defecto.
 					}
 					NewIdDTO idP = scsGuardiasturnoExtendsMapper.getIdGuardia();
 
@@ -1206,8 +1207,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
 							.andIdinstitucionEqualTo(idInstitucion)
 							.andIdpersonaEqualTo(Long.valueOf(guardiasItem.getIdPersonaUltimo()))
-							.andFechasuscripcionIsNotNull()
-							.andFechabajaIsNull().andFechavalidacionIsNotNull()
+							.andFechasuscripcionIsNotNull().andFechabajaIsNull().andFechavalidacionIsNotNull()
 							.andFechadenegacionIsNull();
 					List<ScsInscripcionguardia> inscripciones = scsInscripcionguardiaExtendsMapper
 							.selectByExample(example);
@@ -1307,7 +1307,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 				turnos = scsTurnosExtendsMapper.resumenTurnoColaGuardia(idTurno, idInstitucion.toString());
 				List<TurnosItem> partidoJudicial = scsSubzonapartidoExtendsMapper.getPartidoJudicialTurno(
 						turnos.get(0).getIdzona(), turnos.get(0).getIdzubzona(), idInstitucion.toString());
-				turnos.get(0).setPartidoJudicial(partidoJudicial.get(0).getPartidoJudicial());
+				if (partidoJudicial.size() > 0)
+					turnos.get(0).setPartidoJudicial(partidoJudicial.get(0).getPartidoJudicial());
 				turnoDTO.setTurnosItems(turnos);
 				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
 			}
@@ -1488,7 +1489,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								scsGrupoguardiaExtendsMapper.insert(grupo);
 
 								grupoColegiado = new ScsGrupoguardiacolegiado();
-
+								// Aqui se crea un nuevo grupo colegiado en caso de que el recibido no tenga idgrupoguardiacolegiado
 								if (inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado().equals("")) {
 									grupoColegiado.setFechamodificacion(new Date());
 									grupoColegiado.setFechacreacion(new Date());
