@@ -2,10 +2,7 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.mappers.ScsInscripcionturnoSqlProvider;
-import org.itcgae.siga.db.mappers.ScsTipoactuacionSqlProvider;
-import org.itcgae.siga.db.mappers.ScsTurnoSqlProvider;
 
 public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturnoSqlProvider {
 
@@ -36,6 +33,54 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"ORDER BY nom");
 		
 		return sql.toString() +"consultaBaja";
+	}
+	
+	public String busquedaTrabajosGuardias(InscripcionesItem inscripcionesItem,Short idInstitucion,String fechaActual) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT("TO_CHAR(gc.fechainicio,'dd/mm/yyyy')\r\n" + 
+				"    || ' - '\r\n" + 
+				"    || TO_CHAR(gc.fecha_fin,'dd/mm/yyyy') fecha,\r\n" + 
+				"    gt.nombre incidencia,\r\n" + 
+				"    'Guardia' descripcion");
+		sql.FROM("scs_cabeceraguardias gc,\r\n" + 
+				"    scs_guardiasturno gt");
+		sql.WHERE("gc.idinstitucion = gt.idinstitucion\r\n" + 
+				"    AND   gc.idturno = gt.idturno\r\n" + 
+				"    AND   gc.idguardia = gt.idguardia\r\n" + 
+				"    AND   gc.idinstitucion = '"+idInstitucion+"'" + 
+				"    AND   gc.idpersona = '"+inscripcionesItem.getIdpersona()+"'"+ 
+				"    AND   trunc(gc.fecha_fin) > '"+fechaActual+"'" + 
+				"    AND   gc.idturno = '"+inscripcionesItem.getIdturno()+"'");
+		sql.ORDER_BY("gc.fechainicio DESC");
+		
+		
+		return sql.toString();
+	}
+	
+	public String busquedaTrabajosPendientes(InscripcionesItem inscripcionesItem,Short idInstitucion,String fechaActual) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT("des.anio\r\n" + 
+				"    || '/'\r\n" + 
+				"    || des.codigo incidencia,\r\n" + 
+				"    TO_CHAR(des.fechaentrada,'dd/mm/yyyy') fecha,\r\n" + 
+				"    'Designación' descripcion");
+		sql.FROM("scs_designa des,\r\n" + 
+				"    scs_designasletrado deslet");
+		sql.WHERE("des.idinstitucion = '"+idInstitucion+"'" + 
+				"    AND   des.estado <> ' f '    AND   deslet.idpersona = '"+inscripcionesItem.getIdpersona() +"'" + 
+				"    AND   deslet.fecharenuncia IS NULL\r\n" + 
+				"    AND   deslet.idturno = '"+inscripcionesItem.getIdturno() +"'" + 
+				"    AND   des.idinstitucion = deslet.idinstitucion" + 
+				"    AND   des.idturno = deslet.idturno" + 
+				"    AND   des.anio = deslet.anio" + 
+				"    AND   des.numero = deslet.numero" + 
+				"    AND   trunc(des.fechaentrada) > '"+fechaActual+"'");		
+		
+		return sql.toString();
 	}
 	
 	public String busquedaInscripciones(InscripcionesItem inscripcionesItem, Short idInstitucion,String fechadesde,String fechahasta, String afechade,Integer tamMax) {
@@ -232,5 +277,82 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			
 		return sql.toString();
 	}
+	
+	public String busquedaColaOficio(InscripcionesItem inscripcionesItem,String strDate,String busquedaOrden, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		if(busquedaOrden == null || busquedaOrden.length() == 0) {
+			busquedaOrden = "ANTIGUEDADCOLA";
+		}
+		sql.SELECT("ROWNUM AS  orden_cola,consulta_total.* from(WITH tabla_nueva AS (SELECT consulta2.*\r\n" + 
+				"FROM (SELECT ROWNUM AS orden,consulta.* \r\n" + 
+				"FROM (SELECT (CASE\r\n" + 
+				"				WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
+				"				AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
+				"				AND (Ins.Fechabaja IS NULL\r\n" + 
+				"				OR TRUNC(Ins.Fechabaja) > NVL('"+strDate+"', '01/01/1900')) THEN '1'\r\n" + 
+				"				ELSE '0'\r\n" + 
+				"				END) Activo,\r\n" + 
+				"				Ins.Idinstitucion,\r\n" + 
+				"				Ins.Idturno,\r\n" + 
+				"				Per.Idpersona,\r\n" + 
+				"				TRUNC(Ins.fechavalidacion) AS Fechavalidacion,\r\n" + 
+				"				TRUNC(Ins.fechabaja) AS fechabajapersona,\r\n" + 
+				"				ins.fechasolicitud AS fechasolicitud,\r\n" + 
+				"				Per.Nifcif,\r\n" + 
+				"				Per.Nombre as nombrepersona,\r\n" + 
+				"				Per.Apellidos1,\r\n" + 
+				"				DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) apellidos2,\r\n" + 
+				"				Per.Apellidos1 || DECODE(Per.Apellidos2, NULL, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,\r\n" + 
+				"				DECODE(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO,\r\n" + 
+				"				Per.Fechanacimiento FECHANACIMIENTO,\r\n" + 
+				"				Ins.Fechavalidacion AS ANTIGUEDADCOLA,(\r\n" + 
+				"					SELECT\r\n" + 
+				"						COUNT(1) numero\r\n" + 
+				"						FROM scs_saltoscompensaciones salto\r\n" + 
+				"						WHERE salto.idinstitucion = tur.idinstitucion\r\n" + 
+				"							AND   salto.idturno = tur.IDTURNO\r\n" + 
+				"							AND   salto.idguardia IS NULL\r\n" + 
+				"							AND   salto.saltoocompensacion = 'S'\r\n" + 
+				"							AND   salto.fechacumplimiento IS NULL\r\n" + 
+				"							and   salto.idpersona = ins.IDPERSONA\r\n" + 
+				"					)  as saltos,(\r\n" + 
+				"						SELECT\r\n" + 
+				"							COUNT(1) numero FROM scs_saltoscompensaciones salto\r\n" + 
+				"						WHERE\r\n" + 
+				"							salto.idinstitucion = tur.idinstitucion\r\n" + 
+				"							AND   salto.idturno = tur.IDTURNO\r\n" + 
+				"							AND   salto.idguardia IS NULL\r\n" + 
+				"							AND   salto.saltoocompensacion = 'C'\r\n" + 
+				"							AND   salto.fechacumplimiento IS NULL\r\n" + 
+				"							and   salto.idpersona = ins.IDPERSONA\r\n" + 
+				"					)  as compensaciones");
+		sql.FROM(" scs_inscripcionturno ins");
+		sql.INNER_JOIN("cen_persona per ON per.IDPERSONA = ins.IDPERSONA");
+		sql.INNER_JOIN("cen_colegiado col ON col.idpersona = per.IDPERSONA and col.IDINSTITUCION = ins.IDINSTITUCION and col.IDPERSONA = ins.IDPERSONA");
+		sql.INNER_JOIN("scs_turno tur ON tur.IDTURNO = ins.IDTURNO and tur.IDINSTITUCION = col.IDINSTITUCION");
+		sql.WHERE("(ins.fechabaja is null AND Ins.Fechavalidacion IS NOT NULL AND tur.Idinstitucion = '"+idInstitucion+"'AND tur.Idturno = '"+inscripcionesItem.getIdturno()+"')");
+		sql.ORDER_BY("/*aqui debemos de consultar primero el orden que vamos a ordenar.*/\r\n" +busquedaOrden+
+				"          ) consulta ) consulta2)\r\n" + 
+				"SELECT * from(\r\n" + 
+				"SELECT  tabla_nueva.* FROM tabla_nueva)\r\n" + 
+				"\r\n" + 
+				") consulta_total       \r\n" + 
+				"");
+		
+		return sql.toString();
+		
+	}
 
+	public String busquedaTarjeta(InscripcionesItem inscripcionesItem, Short idInstitucion) {
+
+		SQL sql = new SQL();
+		sql.SELECT("*");
+		sql.FROM("SCS_INSCRIPCIONTURNO");
+		sql.WHERE("idturno ='"+inscripcionesItem.getIdturno()+"'");
+		sql.WHERE("idinstitucion ='"+idInstitucion+"'");
+		sql.WHERE("idpersona ='"+inscripcionesItem.getIdpersona()+"'");
+			
+		return sql.toString();
+	}
 }

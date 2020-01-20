@@ -4,6 +4,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +28,8 @@ import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesTarjetaOficioDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionesTarjetaOficioItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -207,7 +211,168 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
 		return inscripcionesDTO;
 	}
+	
+	@Override
+	public InscripcionesTarjetaOficioDTO busquedaTarjeta(InscripcionesItem inscripcionesItem, HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InscripcionesTarjetaOficioDTO inscripcionesDTO = new InscripcionesTarjetaOficioDTO();
+		List<InscripcionesItem> inscripcionesItems = null;
+		List<InscripcionesTarjetaOficioItem> inscripcionesHistoricoItems = new ArrayList<InscripcionesTarjetaOficioItem>();
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
+			LOGGER.info(
+					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+
+				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaTarjeta(inscripcionesItem,idInstitucion);
+				
+
+				if (inscripcionesItems != null) {
+					InscripcionesTarjetaOficioItem solicitud = new InscripcionesTarjetaOficioItem();
+					InscripcionesTarjetaOficioItem solicitud1 = new InscripcionesTarjetaOficioItem();
+					InscripcionesTarjetaOficioItem solicitud2 = new InscripcionesTarjetaOficioItem();
+					InscripcionesTarjetaOficioItem solicitud3 = new InscripcionesTarjetaOficioItem();
+					InscripcionesTarjetaOficioItem solicitud4 = new InscripcionesTarjetaOficioItem();
+
+					
+						if(inscripcionesItems.get(0).getFechasolicitud() != null) {
+							
+							solicitud.setAccion("Solicitud");
+							solicitud.setObservaciones(inscripcionesItems.get(0).getObservacionessolicitud());
+							solicitud.setFecha(inscripcionesItems.get(0).getFechasolicitud());
+							inscripcionesHistoricoItems.add(solicitud);
+						}
+						if(inscripcionesItems.get(0).getFechasolicitudbaja() != null) {
+							solicitud1.setAccion("Solicitud de Baja");
+							solicitud1.setObservaciones(inscripcionesItems.get(0).getObservacionesbaja());
+							solicitud1.setFecha(inscripcionesItems.get(0).getFechasolicitudbaja());
+							inscripcionesHistoricoItems.add(solicitud1);
+
+						}
+						
+						if(inscripcionesItems.get(0).getFechavalidacion() != null) {
+							solicitud2.setAccion("Validación de Alta");
+							solicitud2.setObservaciones(inscripcionesItems.get(0).getObservacionesvalidacion());
+							solicitud2.setFecha(inscripcionesItems.get(0).getFechavalidacion());
+							inscripcionesHistoricoItems.add(solicitud2);
+
+						}
+						
+						if(inscripcionesItems.get(0).getFechadenegacion() != null) {
+							solicitud3.setAccion("Denegación");
+							solicitud3.setObservaciones(inscripcionesItems.get(0).getObservacionesdenegacion());
+							solicitud3.setFecha(inscripcionesItems.get(0).getFechadenegacion());
+							inscripcionesHistoricoItems.add(solicitud3);
+
+						}
+						
+						if(inscripcionesItems.get(0).getFechabaja() != null) {
+							solicitud4.setAccion("Validación Baja");
+							solicitud4.setObservaciones(inscripcionesItems.get(0).getObservacionesvalbaja());
+							solicitud4.setFecha(inscripcionesItems.get(0).getFechabaja());
+							inscripcionesHistoricoItems.add(solicitud4);
+
+						}
+						Collections.sort(inscripcionesHistoricoItems, new Comparator<InscripcionesTarjetaOficioItem>() {
+						    public int compare(InscripcionesTarjetaOficioItem m1, InscripcionesTarjetaOficioItem m2) {
+						        return m2.getFecha().compareTo(m1.getFecha());
+						    }
+						});
+					inscripcionesDTO.setInscripcionesTarjetaItems(inscripcionesHistoricoItems);
+				}
+			
+			}
+		}
+		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
+		return inscripcionesDTO;
+	}
+	
+	@Override
+	public InscripcionesDTO TarjetaColaOficio(InscripcionesItem inscripcionesItem, HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InscripcionesDTO inscripcionesDTO = new InscripcionesDTO();
+		List<InscripcionesItem> inscripcionesItems = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		String busquedaOrden = "";
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				
+				List<ScsTurno> listaTurno = null;
+				
+				
+				ScsTurnoExample exampleturno = new ScsTurnoExample();
+				exampleturno.createCriteria()
+						.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
+						.andIdinstitucionEqualTo(idInstitucion);
+				
+				listaTurno = scsTurnosExtendsMapper.selectByExample(exampleturno);
+				
+				ScsTurno turno = listaTurno.get(0);
+				
+				ComboDTO comboDTO = new ComboDTO();
+				List<ComboItem> comboItems = new ArrayList<ComboItem>();
+				comboItems = scsOrdenacioncolasExtendsMapper.ordenColasEnvios(turno.getIdordenacioncolas().toString());
+				comboDTO.setCombooItems(comboItems);
+
+				for (int i = 0; i < comboDTO.getCombooItems().size(); i++) {
+					if (!comboDTO.getCombooItems().get(i).getLabel().toString().equals("0")) {
+						busquedaOrden += comboDTO.getCombooItems().get(i).getValue() + ",";
+					}
+				}
+				if (busquedaOrden != null && busquedaOrden.length() > 0) {
+					busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
+				}
+				
+				Date prueba = inscripcionesItem.getFechasolicitud();
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				String strDate = dateFormat.format(prueba);
+				
+				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaColaOficio(inscripcionesItem, strDate, busquedaOrden,
+						idInstitucion);
+
+				LOGGER.info(
+						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
+
+				if (inscripcionesItems != null) {
+					inscripcionesDTO.setInscripcionesItems(inscripcionesItems);
+				}
+			}
+
+		}
+		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
+		return inscripcionesDTO;
+	}
+	
 	@Override
 	public UpdateResponseDTO updateValidar(InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
 		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
@@ -215,6 +380,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 0;
+		List<InscripcionesItem> trabajosSJCS = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -268,7 +434,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 								response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);
 							}
 
-						}
+						}						
 						if(inscripcionesItem.getEstadonombre().equals("Pendiente de Alta")) {
 							if (inscripcionesItem.getTipoguardias().equals("Obligatorias")
 									|| inscripcionesItem.getTipoguardias().equals("Todas o ninguna")) {
@@ -312,7 +478,22 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							}
 						}
 						
+						if(inscripcionesItem.getEstadonombre().equals("Pendiente de Baja")) {
+							DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+							String fechaActual;
+							Date fecha = new Date();
+							fechaActual = dateFormat.format(fecha);
+							List<InscripcionesItem> trabajosPendientes = null;
+							trabajosSJCS = scsInscripcionturnoExtendsMapper.busquedaTrabajosGuardias(inscripcionesItem, idInstitucion,fechaActual);
+							trabajosPendientes = scsInscripcionturnoExtendsMapper.busquedaTrabajosPendientes(inscripcionesItem, idInstitucion, fechaActual);
+							if(trabajosSJCS.size()>0 || trabajosPendientes.size() >0) {								
+								error.setCode(400);								
+								error.setDescription("justiciaGratuita.oficio.inscripciones.mensajeSJCS");
+								updateResponseDTO.setError(error);
+								return updateResponseDTO;
+							}
 
+						}
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
 					}
@@ -657,6 +838,23 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						}
 						response = scsInscripcionturnoExtendsMapper.updateByExampleSelective(inscripcionturno,
 								exampleinscripcion);
+
+							DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+							String fechaActual;
+							Date fecha = new Date();
+							fechaActual = dateFormat.format(fecha);
+							List<InscripcionesItem> trabajosSJCS = null;
+							List<InscripcionesItem> trabajosPendientes = null;
+							trabajosSJCS = scsInscripcionturnoExtendsMapper.busquedaTrabajosGuardias(inscripcionesItem, idInstitucion,fechaActual);
+							trabajosPendientes = scsInscripcionturnoExtendsMapper.busquedaTrabajosPendientes(inscripcionesItem, idInstitucion, fechaActual);
+							if(trabajosSJCS.size()>0 || trabajosPendientes.size() >0) {								
+								error.setCode(400);								
+								error.setDescription("justiciaGratuita.oficio.inscripciones.mensajeSJCS");
+								updateResponseDTO.setError(error);
+								return updateResponseDTO;
+							}
+
+						
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
 					}

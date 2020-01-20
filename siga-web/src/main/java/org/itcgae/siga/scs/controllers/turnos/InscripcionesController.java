@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesTarjetaOficioDTO;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
@@ -88,5 +89,16 @@ public class InscripcionesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/inscripciones/TarjetaColaOficio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InscripcionesDTO> TarjetaColaOficio(@RequestBody InscripcionesItem inscripcionesItem, HttpServletRequest request) {
+		InscripcionesDTO response = inscripcionesService.TarjetaColaOficio(inscripcionesItem, request);
+		return new ResponseEntity<InscripcionesDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/inscripciones/busquedaTarjeta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InscripcionesTarjetaOficioDTO> busquedaTarjeta(@RequestBody InscripcionesItem inscripcionesItem, HttpServletRequest request) {
+		InscripcionesTarjetaOficioDTO response = inscripcionesService.busquedaTarjeta(inscripcionesItem, request);
+		return new ResponseEntity<InscripcionesTarjetaOficioDTO>(response, HttpStatus.OK);
+	}
 }
  

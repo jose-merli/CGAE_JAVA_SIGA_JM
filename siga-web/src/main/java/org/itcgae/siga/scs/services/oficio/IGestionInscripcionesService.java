@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesTarjetaOficioDTO;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 
@@ -31,4 +32,7 @@ public interface IGestionInscripcionesService {
 	
 	public UpdateResponseDTO updateCambiarFecha(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
 
+	public InscripcionesDTO TarjetaColaOficio(InscripcionesItem inscripcionesItem, HttpServletRequest request);
+	
+	public InscripcionesTarjetaOficioDTO busquedaTarjeta(InscripcionesItem inscripcionesItem, HttpServletRequest request);
 }

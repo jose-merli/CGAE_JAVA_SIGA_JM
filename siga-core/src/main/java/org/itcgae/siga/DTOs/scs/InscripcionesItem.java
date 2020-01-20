@@ -11,6 +11,7 @@ public class InscripcionesItem {
 	public String idturno;
 	public String apellidosnombre;
 	public String ncolegiado;
+	public Date fechamodificacion;
 	public String nombre;
 	public String apellidos;
 	public String apellidos2;
@@ -49,7 +50,74 @@ public class InscripcionesItem {
 	public String descripcion_tipo_guardia;
 	public String obligatoriedad_inscripcion;
 	public String tipoguardias;
+	public String orden;
+	public String numerocolegiado;
+	public String accion;
+	public String observacionestabla;
+	public Date fechatabla;
+	public String usumodificacion;
 	
+	
+	
+	
+	
+
+
+	public String getUsumodificacion() {
+		return usumodificacion;
+	}
+
+	public void setUsumodificacion(String usumodificacion) {
+		this.usumodificacion = usumodificacion;
+	}
+
+	public Date getFechamodificacion() {
+		return fechamodificacion;
+	}
+
+	public void setFechamodificacion(Date fechamodificacion) {
+		this.fechamodificacion = fechamodificacion;
+	}
+
+	public Date getFechatabla() {
+		return fechatabla;
+	}
+
+	public void setFechatabla(Date fechatabla) {
+		this.fechatabla = fechatabla;
+	}
+
+	public String getObservacionestabla() {
+		return observacionestabla;
+	}
+
+	public void setObservacionestabla(String observacionestabla) {
+		this.observacionestabla = observacionestabla;
+	}
+
+	public String getAccion() {
+		return accion;
+	}
+
+	public void setAccion(String accion) {
+		this.accion = accion;
+	}
+
+	public String getNumerocolegiado() {
+		return numerocolegiado;
+	}
+
+	public void setNumerocolegiado(String numerocolegiado) {
+		this.numerocolegiado = numerocolegiado;
+	}
+
+	public String getOrden() {
+		return orden;
+	}
+
+	public void setOrden(String orden) {
+		this.orden = orden;
+	}
 
 	public String getNombre_turno() {
 		return nombre_turno;
