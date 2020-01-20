@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestaria;
@@ -493,7 +494,7 @@ public class ComboServiceImpl implements ComboService {
 
 	}
 
-	public ComboDTO getComboPartidasPresupuestarias(HttpServletRequest request) {
+	public ComboDTO getComboPartidasPresupuestarias(HttpServletRequest request, String importe) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -525,9 +526,14 @@ public class ComboServiceImpl implements ComboService {
 
 				for (ScsPartidapresupuestaria partida : partidas) {
 					ComboItem item = new ComboItem();
-					item.setLabel(partida.getNombrepartida());
-					item.setValue(partida.getIdpartidapresupuestaria().toString());
+										
+					if(!UtilidadesString.esCadenaVacia(importe) && "1".equals(importe)) {
+						item.setLabel(partida.getNombrepartida()+" - "+partida.getImportepartida().toString().replace('.', ',')+" €");
+					}else{
+						item.setLabel(partida.getNombrepartida());
+					}
 
+					item.setValue(partida.getIdpartidapresupuestaria().toString());
 					comboItems.add(item);
 
 				}
