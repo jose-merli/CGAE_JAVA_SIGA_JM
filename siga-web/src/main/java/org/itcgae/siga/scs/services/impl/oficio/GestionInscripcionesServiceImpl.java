@@ -254,12 +254,14 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							solicitud.setAccion("Solicitud");
 							solicitud.setObservaciones(inscripcionesItems.get(0).getObservacionessolicitud());
 							solicitud.setFecha(inscripcionesItems.get(0).getFechasolicitud());
+							solicitud.setId("0");
 							inscripcionesHistoricoItems.add(solicitud);
 						}
 						if(inscripcionesItems.get(0).getFechasolicitudbaja() != null) {
 							solicitud1.setAccion("Solicitud de Baja");
 							solicitud1.setObservaciones(inscripcionesItems.get(0).getObservacionesbaja());
 							solicitud1.setFecha(inscripcionesItems.get(0).getFechasolicitudbaja());
+							solicitud1.setId("2");
 							inscripcionesHistoricoItems.add(solicitud1);
 
 						}
@@ -268,6 +270,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							solicitud2.setAccion("Validación de Alta");
 							solicitud2.setObservaciones(inscripcionesItems.get(0).getObservacionesvalidacion());
 							solicitud2.setFecha(inscripcionesItems.get(0).getFechavalidacion());
+							solicitud2.setId("1");
 							inscripcionesHistoricoItems.add(solicitud2);
 
 						}
@@ -276,6 +279,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							solicitud3.setAccion("Denegación");
 							solicitud3.setObservaciones(inscripcionesItems.get(0).getObservacionesdenegacion());
 							solicitud3.setFecha(inscripcionesItems.get(0).getFechadenegacion());
+							solicitud3.setId("4");
 							inscripcionesHistoricoItems.add(solicitud3);
 
 						}
@@ -284,12 +288,13 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							solicitud4.setAccion("Validación Baja");
 							solicitud4.setObservaciones(inscripcionesItems.get(0).getObservacionesvalbaja());
 							solicitud4.setFecha(inscripcionesItems.get(0).getFechabaja());
+							solicitud4.setId("3");
 							inscripcionesHistoricoItems.add(solicitud4);
 
 						}
 						Collections.sort(inscripcionesHistoricoItems, new Comparator<InscripcionesTarjetaOficioItem>() {
 						    public int compare(InscripcionesTarjetaOficioItem m1, InscripcionesTarjetaOficioItem m2) {
-						        return m2.getFecha().compareTo(m1.getFecha());
+						        return m1.getId().compareTo(m2.getId());
 						    }
 						});
 					inscripcionesDTO.setInscripcionesTarjetaItems(inscripcionesHistoricoItems);

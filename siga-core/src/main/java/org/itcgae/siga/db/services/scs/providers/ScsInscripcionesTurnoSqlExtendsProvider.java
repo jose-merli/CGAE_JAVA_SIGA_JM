@@ -173,7 +173,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			
 			if(inscripcionesItem.getEstado().equals("2")) {
 				sql.WHERE("(ins.fechavalidacion is not null and ins.fechasolicitudbaja is not null and ins.fechabaja "
-						+ "is not null and ins.fechadenegacion is not null)") ;
+						+ "is null and ins.fechadenegacion is not null)") ;
 			}
 		}
 		if(inscripcionesItem.getAfechade() != null) {
