@@ -15,7 +15,9 @@ public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSql
 		sql.SELECT("PLANTILLA.idDireccion, PLANTILLA.idPersona, PLANTILLA.DESCRIPCION");
 		sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = ENV_TIPOENVIOS.NOMBRE WHERE ENV_TIPOENVIOS.IDTIPOENVIOS = "
 				+ "PLANTILLA.IDTIPOENVIOS AND CAT.IDLENGUAJE = '" + idLenguaje + "') AS TIPOENVIO");
+		sql.SELECT("clase.nombre as clasecomunicacion");
 		sql.FROM("ENV_PLANTILLASENVIOS PLANTILLA");
+		sql.LEFT_OUTER_JOIN("mod_clasecomunicaciones clase on plantilla.idclasecomunicacion = clase.idclasecomunicacion");
 		sql.WHERE("PLANTILLA.FECHABAJA is null");
 		sql.WHERE("PLANTILLA.IDINSTITUCION = '"+ idInstitucion +"' AND ANTIGUA = 'N'");
 		
@@ -55,7 +57,11 @@ public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSql
 		sql.SELECT("INITCAP(NOMBRE) AS LABEL");		
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N' AND FECHABAJA is NULL");
-		sql.WHERE("(IDCLASECOMUNICACION = '" + idClaseComunicacion  + "' or IDCLASECOMUNICACION is null)" );
+		
+		if(!UtilidadesString.esCadenaVacia(idClaseComunicacion)) {
+			sql.WHERE("(IDCLASECOMUNICACION = '" + idClaseComunicacion  + "' or IDCLASECOMUNICACION is null)");
+		}
+		
 		sql.ORDER_BY("LABEL");
 		
 		return sql.toString();

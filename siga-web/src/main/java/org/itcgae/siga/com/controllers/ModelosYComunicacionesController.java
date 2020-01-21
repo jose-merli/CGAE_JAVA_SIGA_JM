@@ -211,10 +211,20 @@ public class ModelosYComunicacionesController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/detalle/plantillasComunicacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboPlantillasComunicacion(@RequestParam("idClase") String idClaseComunicacion, HttpServletRequest request) {
+	@RequestMapping(value = "/detalle/plantillasComunicacionByIdClase",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> plantillasComunicacionByIdClase(@RequestParam("idClase") String idClaseComunicacion, HttpServletRequest request) {
 
 		ComboDTO response = _modelosYcomunicacionesService.obtenerPlantillasComunicacion(idClaseComunicacion, request);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}	
+	
+	@RequestMapping(value = "/detalle/plantillasComunicacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboPlantillasComunicacion(HttpServletRequest request) {
+
+		ComboDTO response = _modelosYcomunicacionesService.obtenerPlantillasComunicacion(null, request);
 		if(response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
