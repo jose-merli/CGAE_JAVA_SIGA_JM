@@ -61,6 +61,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		if (!UtilidadesString.esCadenaVacia(facturacionItem.getNombre())) {
 			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("FAC.NOMBRE", facturacionItem.getNombre().trim()));
 		}
+		
+		// FILTRO POR PARTIDA PRESUPUESTARIA
+		if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdPartidaPresupuestaria())) {
+			sql2.WHERE("FAC.IDPARTIDAPRESUPUESTARIA = " + facturacionItem.getIdPartidaPresupuestaria());
+		}
 
 		// FILTRO POR CONCEPTOS DE FACTURACIÓN Y POR GRUPOS DE FACTURACIÓN Y PARTIDA
 		// PRESUPUESTARIA
@@ -79,11 +84,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdFacturacion())) {
 				queryAux.append(" AND HIT.IDGRUPOFACTURACION = " + facturacionItem.getIdFacturacion());
 			}
-			// FILTRO POR PARTIDA PRESUPUESTARIA
-			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdPartidaPresupuestaria())) {
-				queryAux.append(" AND FAC.IDPARTIDAPRESUPUESTARIA = " + facturacionItem.getIdPartidaPresupuestaria());
-			}
-
+			
 			queryAux.append(")");
 			sql2.WHERE(queryAux.toString());
 		}
@@ -103,8 +104,9 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		}
 
 		sql.FROM("(" + sql2.toString() + ") busqueda");
-		sql.ORDER_BY("busqueda.NOMBRE");
-		sql.ORDER_BY("busqueda.FECHADESDE DESC");
+		sql.ORDER_BY("busqueda.FECHADESDE ASC");
+		sql.ORDER_BY("busqueda.FECHAHASTA");
+		sql.ORDER_BY("busqueda.FECHAESTADO DESC");
 
 		return sql.toString();
 	}
