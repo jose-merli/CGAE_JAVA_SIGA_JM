@@ -246,6 +246,41 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 		return colegiadosDTO;
 	}
-	
+	@Override
+	public ColegiadoDTO searchColegiadoFicha(ColegiadoItem colegiadoItem, HttpServletRequest request) {
+
+		LOGGER.info("searchColegiado() -> Entrada al servicio para obtener colegiados");
+
+		ColegiadoDTO colegiadosDTO = new ColegiadoDTO();
+		
+		
+		List<ColegiadoItem> colegiadoItemList = new ArrayList<ColegiadoItem>();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			if(null !=colegiadoItem.getSearchLoggedUser() && colegiadoItem.getSearchLoggedUser()) {
+				colegiadoItem.setNif(dni);
+
+
+			}
+			colegiadoItemList = cenColegiadoExtendsMapper.selectColegiado(idInstitucion, colegiadoItem);
+			colegiadosDTO.setColegiadoItem(colegiadoItemList);
+
+			if (colegiadoItemList == null || colegiadoItemList.size() == 0) {
+
+				LOGGER.warn(
+						"searchColegiado() / cenColegiadoExtendsMapper.searchColegiado() -> No existen colegiados con las condiciones recibidas en la Institucion = "
+								+ idInstitucion);
+			}
+
+		} else {
+			LOGGER.warn("searchColegiado() -> idInstitucion del token nula");
+		}
+
+		return colegiadosDTO;
+	}
 
 }

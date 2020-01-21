@@ -38,56 +38,56 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql.SELECT_DISTINCT("col.idpersona");
 		sql.SELECT_DISTINCT("col.idinstitucion");
-		sql.SELECT_DISTINCT("col.identificadords");
+//		sql.SELECT_DISTINCT("col.identificadords");
 		sql.SELECT_DISTINCT("per.nifcif");
 		sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
-		sql.SELECT_DISTINCT("per.nombre as solonombre");
-		sql.SELECT_DISTINCT("per.apellidos1");
-		sql.SELECT_DISTINCT("per.apellidos2");
-		sql.SELECT_DISTINCT("per.sexo");
-		sql.SELECT_DISTINCT("per.idestadocivil");
-		sql.SELECT_DISTINCT("cli.noaparecerredabogacia");
+//		sql.SELECT_DISTINCT("per.nombre as solonombre");
+//		sql.SELECT_DISTINCT("per.apellidos1");
+//		sql.SELECT_DISTINCT("per.apellidos2");
+//		sql.SELECT_DISTINCT("per.sexo");
+//		sql.SELECT_DISTINCT("per.idestadocivil");
+//		sql.SELECT_DISTINCT("cli.noaparecerredabogacia");
 		sql.SELECT_DISTINCT("cli2.noaparecerredabogacia as noaparecerredabogacia2");
-		sql.SELECT_DISTINCT("decode(cli2.noaparecerredabogacia, 0, 'NONono' , 1, 'SISisiSísíSÍ') as noAparecerRedAbogaciaFilter");
-		sql.SELECT_DISTINCT("per.idtipoidentificacion");
-		sql.SELECT_DISTINCT("per.naturalde");
-		sql.SELECT("TO_CHAR(cli.fechaalta,'DD/MM/YYYY') AS fechaalta");
-		sql.SELECT_DISTINCT("cli.idlenguaje");
-		sql.SELECT_DISTINCT("cli.asientocontable");
-		sql.SELECT_DISTINCT("col.nmutualista");
-		sql.SELECT("TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
-		sql.SELECT("TO_CHAR(col.fechajura,'DD/MM/YYYY') AS fechajura");
-		sql.SELECT("TO_CHAR(col.fechatitulacion,'DD/MM/YYYY') AS fechatitulacion");
-		sql.SELECT("TO_CHAR(col.fechapresentacion,'DD/MM/YYYY') AS fechapresentacion");
-		sql.SELECT_DISTINCT("TO_CHAR(col.idtiposseguro) AS idTiposSeguro");
-
-		sql.SELECT_DISTINCT("cli.comisiones");
-		sql.SELECT_DISTINCT("cli.idtratamiento");
+//		sql.SELECT_DISTINCT("decode(cli2.noaparecerredabogacia, 0, 'NONono' , 1, 'SISisiSísíSÍ') as noAparecerRedAbogaciaFilter");
+//		sql.SELECT_DISTINCT("per.idtipoidentificacion");
+//		sql.SELECT_DISTINCT("per.naturalde");
+//		sql.SELECT("TO_CHAR(cli.fechaalta,'DD/MM/YYYY') AS fechaalta");
+//		sql.SELECT_DISTINCT("cli.idlenguaje");
+//		sql.SELECT_DISTINCT("cli.asientocontable");
+//		sql.SELECT_DISTINCT("col.nmutualista");
+//		sql.SELECT("TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
+//		sql.SELECT("TO_CHAR(col.fechajura,'DD/MM/YYYY') AS fechajura");
+//		sql.SELECT("TO_CHAR(col.fechatitulacion,'DD/MM/YYYY') AS fechatitulacion");
+//		sql.SELECT("TO_CHAR(col.fechapresentacion,'DD/MM/YYYY') AS fechapresentacion");
+//		sql.SELECT_DISTINCT("TO_CHAR(col.idtiposseguro) AS idTiposSeguro");
+//
+//		sql.SELECT_DISTINCT("cli.comisiones");
+//		sql.SELECT_DISTINCT("cli.idtratamiento");
 		sql.SELECT_DISTINCT("nvl(decode(nvl(col.comunitario,0),0, col.ncolegiado, col.ncomunitario), col.ncolegiado) as numcolegiado");
 		sql.SELECT_DISTINCT("colest.idestado as situacion");
 		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
 		sql.SELECT_DISTINCT("col.situacionresidente as situacionresidente");
-		sql.SELECT_DISTINCT("col.comunitario as comunitario");
+//		sql.SELECT_DISTINCT("col.comunitario as comunitario");
 
 		sql.SELECT_DISTINCT(
 				"concat( decode(col.situacionresidente,0,'No', 'Sí')  || ' / ',decode(col.comunitario,0,'No', 'Sí')) as residenteInscrito");
 		sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechanacimiento");
 		sql.SELECT("inst.abreviatura as colegioResultado");
 		
-		sql1.SELECT("partidojudicial.nombre");		
-		sql1.FROM("cen_partidojudicial partidojudicial");
-		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
-		sql1.INNER_JOIN("cen_direcciones direcciones on pob.idpoblacion = direcciones.idpoblacion");
-		sql1.INNER_JOIN(
-				"CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
-						+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
-
-		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
-		sql1.WHERE("direcciones.idpersona = dir.idpersona");
-		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");
-		sql1.WHERE("direcciones.iddireccion = dir.iddireccion");
-
-		sql.SELECT_DISTINCT("(" + sql1 + ") as partidoJudicial");
+//		sql1.SELECT("partidojudicial.nombre");		
+//		sql1.FROM("cen_partidojudicial partidojudicial");
+//		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
+//		sql1.INNER_JOIN("cen_direcciones direcciones on pob.idpoblacion = direcciones.idpoblacion");
+//		sql1.INNER_JOIN(
+//				"CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
+//						+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
+//
+//		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
+//		sql1.WHERE("direcciones.idpersona = dir.idpersona");
+//		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");
+//		sql1.WHERE("direcciones.iddireccion = dir.iddireccion");
+//
+//		sql.SELECT_DISTINCT("(" + sql1 + ") as partidoJudicial");
 
 		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,3,dir.correoelectronico,'') AS correo");
 		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,3,dir.telefono1,'') AS telefono");
@@ -333,6 +333,174 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 						+ "','DD/MM/YYYY'))");
 			}
 		}
+
+		sql.ORDER_BY("NOMBRE,CORREO,TELEFONO");
+
+		sql2.SELECT("CONSULTA.*, ROW_NUMBER() OVER(PARTITION BY concat(CONSULTA.idpersona,CONSULTA.idinstitucion) ORDER BY CONSULTA.idpersona) AS RN");
+		sql2.FROM("(" + sql + ") CONSULTA");
+//		sql2.WHERE("rownum < 5000");
+		
+		sql3.SELECT("*");
+		sql3.FROM("(" + sql2 + ") WHERE RN = '1'");
+//		sql3.WHERE("RN = '1'");
+
+		return sql3.toString();
+		
+	}
+	
+	public String selectColegiado(Short idInstitucion, ColegiadoItem colegiadoItem) {
+
+		SQL sql = new SQL();
+		SQL sql1 = new SQL();
+		SQL sql2 = new SQL();
+		SQL sql3 = new SQL();
+
+		// En el caso de que venga de la pantalla de busqueda colegiados/no colegiados, tendremos que preparar el filtro de instituciones
+		String instituciones = "";
+		if(colegiadoItem.getColegio() != null) {
+			if (colegiadoItem.getColegio().length > 1) {
+				for (String string : colegiadoItem.getColegio()) {
+					instituciones += "'" + string + "'";
+					instituciones += ",";
+				}
+				instituciones = instituciones.substring(0, instituciones.length() - 1);
+			} else if (colegiadoItem.getColegio().length == 1) {
+				instituciones = "'" + colegiadoItem.getColegio()[0] + "'";
+			}
+		}else if(colegiadoItem.getIdInstitucion() != null){
+			instituciones = colegiadoItem.getIdInstitucion();
+		}
+		
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+		sql.SELECT_DISTINCT("col.idpersona");
+		sql.SELECT_DISTINCT("col.idinstitucion");
+		sql.SELECT_DISTINCT("col.identificadords");
+		sql.SELECT_DISTINCT("per.nifcif");
+		sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
+		sql.SELECT_DISTINCT("per.nombre as solonombre");
+		sql.SELECT_DISTINCT("per.apellidos1");
+		sql.SELECT_DISTINCT("per.apellidos2");
+		sql.SELECT_DISTINCT("per.sexo");
+		sql.SELECT_DISTINCT("per.idestadocivil");
+		sql.SELECT_DISTINCT("cli.noaparecerredabogacia");
+		sql.SELECT_DISTINCT("cli2.noaparecerredabogacia as noaparecerredabogacia2");
+		sql.SELECT_DISTINCT("decode(cli2.noaparecerredabogacia, 0, 'NONono' , 1, 'SISisiSísíSÍ') as noAparecerRedAbogaciaFilter");
+		sql.SELECT_DISTINCT("per.idtipoidentificacion");
+		sql.SELECT_DISTINCT("per.naturalde");
+		sql.SELECT("TO_CHAR(cli.fechaalta,'DD/MM/YYYY') AS fechaalta");
+		sql.SELECT_DISTINCT("cli.idlenguaje");
+		sql.SELECT_DISTINCT("cli.asientocontable");
+		sql.SELECT_DISTINCT("col.nmutualista");
+		sql.SELECT("TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
+		sql.SELECT("TO_CHAR(col.fechajura,'DD/MM/YYYY') AS fechajura");
+		sql.SELECT("TO_CHAR(col.fechatitulacion,'DD/MM/YYYY') AS fechatitulacion");
+		sql.SELECT("TO_CHAR(col.fechapresentacion,'DD/MM/YYYY') AS fechapresentacion");
+		sql.SELECT_DISTINCT("TO_CHAR(col.idtiposseguro) AS idTiposSeguro");
+
+		sql.SELECT_DISTINCT("cli.comisiones");
+		sql.SELECT_DISTINCT("cli.idtratamiento");
+		sql.SELECT_DISTINCT("nvl(decode(nvl(col.comunitario,0),0, col.ncolegiado, col.ncomunitario), col.ncolegiado) as numcolegiado");
+		sql.SELECT_DISTINCT("colest.idestado as situacion");
+		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
+		sql.SELECT_DISTINCT("col.situacionresidente as situacionresidente");
+		sql.SELECT_DISTINCT("col.comunitario as comunitario");
+
+		sql.SELECT_DISTINCT(
+				"concat( decode(col.situacionresidente,0,'No', 'Sí')  || ' / ',decode(col.comunitario,0,'No', 'Sí')) as residenteInscrito");
+		sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechanacimiento");
+		sql.SELECT("inst.abreviatura as colegioResultado");
+		
+		sql1.SELECT("partidojudicial.nombre");		
+		sql1.FROM("cen_partidojudicial partidojudicial");
+		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
+		sql1.INNER_JOIN("cen_direcciones direcciones on pob.idpoblacion = direcciones.idpoblacion");
+		sql1.INNER_JOIN(
+				"CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
+						+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
+
+		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
+		sql1.WHERE("direcciones.idpersona = dir.idpersona");
+		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");
+		sql1.WHERE("direcciones.iddireccion = dir.iddireccion");
+
+		sql.SELECT_DISTINCT("(" + sql1 + ") as partidoJudicial");
+
+		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,3,dir.correoelectronico,'') AS correo");
+		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,3,dir.telefono1,'') AS telefono");
+		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,3,dir.movil,'') as movil");
+		//sql.SELECT_DISTINCT("ROW_NUMBER() OVER(PARTITION BY concat(col.idpersona,col.idinstitucion) ORDER BY col.idpersona) AS RN");
+		sql.FROM("cen_colegiado col");
+
+		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
+		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
+
+			
+		if (idInstitucion != Short.parseShort("2000") && idInstitucion != Short.parseShort("3500")) {
+			if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100") ) {
+				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
+				sql.INNER_JOIN("cen_cliente cli2 on (col.idpersona = cli2.idpersona and col.idinstitucion = cli2.idinstitucion)");
+			}
+			else{
+				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and inst.cen_inst_IDINSTITUCION  =  cli.idinstitucion)");
+				sql.INNER_JOIN("cen_cliente cli2 on (col.idpersona = cli2.idpersona and inst.cen_inst_IDINSTITUCION  =  cli2.idinstitucion)");
+			}
+			
+		}else {
+            sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion =  '"+ idInstitucion + "')");
+			sql.INNER_JOIN("cen_cliente cli2 on (col.idpersona = cli2.idpersona and col.idinstitucion = cli2.idinstitucion)");
+		}
+
+		
+		if (colegiadoItem.getIdgrupo() != null && colegiadoItem.getIdgrupo().length > 0) {
+		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
+				+ "    ((grucli.idinstitucion = inst.idinstitucion or grucli.idinstitucion = '2000') and col.idpersona = grucli.idpersona and ((grucli.fecha_inicio <= SYSDATE OR grucli.fecha_inicio IS NULL ) and \r\n"
+				+ "        ( grucli.fecha_baja > SYSDATE OR grucli.fecha_baja IS NULL)))");
+		}
+		sql.INNER_JOIN(
+				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
+						+ " and datcol.fechaestado < sysdate))");
+		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
+		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '1')");
+		sql.LEFT_OUTER_JOIN(
+				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
+
+		sql.LEFT_OUTER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIR ON (CLI.IDPERSONA = TIPODIR.IDPERSONA AND"  
+	                + " DIR.IDDIRECCION = TIPODIR.IDDIRECCION AND CLI.IDINSTITUCION = TIPODIR.IDINSTITUCION AND "
+	                + " INST.IDINSTITUCION = DIR.IDINSTITUCION)"); 
+		
+		
+		if ((colegiadoItem.getTipoCV() != null && colegiadoItem.getTipoCV() != "") || (colegiadoItem.getSubTipoCV1() != null && colegiadoItem.getSubTipoCV1() != "") || (colegiadoItem.getSubTipoCV2() != null && colegiadoItem.getSubTipoCV2() != "")) {
+			sql.LEFT_OUTER_JOIN(
+					"cen_datosCV datosCV ON ( datosCV.idInstitucion = col.idInstitucion and datosCV.idPersona = per.idPersona )");
+			
+			sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
+			sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = col.idInstitucion )");
+			sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = col.idInstitucion )");
+		}
+		if(!instituciones.equals("")) {
+			sql.WHERE("COL.IDINSTITUCION IN (" + instituciones + ")");
+		} else {
+			if (idInstitucion != Short.parseShort("2000") && idInstitucion != Short.parseShort("3500")) {
+				if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100") ) {
+					sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+				}
+				else{
+                    sql.WHERE("inst.cen_inst_IDINSTITUCION = '" + idInstitucion + "'");
+
+				}
+				
+			}
+		}
+		sql.WHERE("per.idtipoidentificacion not in '20'");
+
+		
+		if (colegiadoItem.getIdPersona() != null && colegiadoItem.getIdPersona() != "") {
+			sql.WHERE("col.idpersona = " + colegiadoItem.getIdPersona());
+		}
+		
 
 		sql.ORDER_BY("NOMBRE,CORREO,TELEFONO");
 

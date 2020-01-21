@@ -7,7 +7,9 @@ import java.util.Objects;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ColegiadoItem {
 
 	private Boolean colegiado;

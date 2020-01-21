@@ -19,5 +19,7 @@ public interface IBusquedaColegiadosService {
 	
 	public ComboInstitucionDTO getLabel(HttpServletRequest request);
 
+	public ColegiadoDTO searchColegiadoFicha(ColegiadoItem colegiadoItem, HttpServletRequest request);
+
 	
 }
