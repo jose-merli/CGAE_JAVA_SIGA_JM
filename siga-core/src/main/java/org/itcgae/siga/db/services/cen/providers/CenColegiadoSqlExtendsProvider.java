@@ -74,20 +74,20 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechanacimiento");
 		sql.SELECT("inst.abreviatura as colegioResultado");
 		
-//		sql1.SELECT("partidojudicial.nombre");		
-//		sql1.FROM("cen_partidojudicial partidojudicial");
-//		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
-//		sql1.INNER_JOIN("cen_direcciones direcciones on pob.idpoblacion = direcciones.idpoblacion");
-//		sql1.INNER_JOIN(
-//				"CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
-//						+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
-//
-//		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
-//		sql1.WHERE("direcciones.idpersona = dir.idpersona");
-//		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");
-//		sql1.WHERE("direcciones.iddireccion = dir.iddireccion");
-//
-//		sql.SELECT_DISTINCT("(" + sql1 + ") as partidoJudicial");
+		sql1.SELECT("partidojudicial.nombre");		
+		sql1.FROM("cen_partidojudicial partidojudicial");
+		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
+		sql1.INNER_JOIN("cen_direcciones direcciones on pob.idpoblacion = direcciones.idpoblacion");
+		sql1.INNER_JOIN(
+				"CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
+						+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
+
+		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
+		sql1.WHERE("direcciones.idpersona = dir.idpersona");
+		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");
+		sql1.WHERE("direcciones.iddireccion = dir.iddireccion");
+
+		sql.SELECT_DISTINCT("(" + sql1 + ") as partidoJudicial");
 
 		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,3,dir.correoelectronico,'') AS correo");
 		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,3,dir.telefono1,'') AS telefono");
@@ -341,8 +341,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 //		sql2.WHERE("rownum < 5000");
 		
 		sql3.SELECT("*");
-		sql3.FROM("(" + sql2 + ") WHERE RN = '1'");
-//		sql3.WHERE("RN = '1'");
+		sql3.FROM("(" + sql2 + ")");
+		sql3.WHERE("RN = 1");
 
 		return sql3.toString();
 		
