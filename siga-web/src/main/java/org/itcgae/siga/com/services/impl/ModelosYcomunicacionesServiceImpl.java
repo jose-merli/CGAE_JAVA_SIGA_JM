@@ -34,6 +34,8 @@ import org.itcgae.siga.com.services.IModelosYcomunicacionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.EnvPlantillasenvios;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModClasecomunicaciones;
@@ -736,6 +738,40 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						
 					}
 					
+					//A la plantilla de envio guardada en el modelo se le asigna la clase de comunicacion del modelo asignado 
+					if(modeloCom.getIdplantillaenvios() != null) {
+						
+						EnvPlantillasenviosExample envPlantillasenviosExample = new EnvPlantillasenviosExample(); 
+						envPlantillasenviosExample.createCriteria().andIdplantillaenviosEqualTo(modeloCom.getIdplantillaenvios().intValue());
+						
+						LOGGER.info(
+								"guardarDatosGenerales() / envPlantillaEnviosExtendsMapper.selectByExample() -> Entrada a envPlantillaEnviosExtendsMapper para obtener la plantilla de envio asociada al modelo de comunicacion");
+						
+						List<EnvPlantillasenvios> plantillas = envPlantillaEnviosExtendsMapper.selectByExample(envPlantillasenviosExample);
+						
+						LOGGER.info(
+								"guardarDatosGenerales() / envPlantillaEnviosExtendsMapper.selectByExample() -> Salida de envPlantillaEnviosExtendsMapper para obtener la plantilla de envio asociada al modelo de comunicacion");
+
+						
+						if(null != plantillas && plantillas.size() > 0) {
+							EnvPlantillasenvios plantilla = plantillas.get(0);
+							
+							plantilla.setFechamodificacion(new Date());
+							plantilla.setUsumodificacion(usuario.getIdusuario());
+							plantilla.setIdclasecomunicacion((long) modeloCom.getIdclasecomunicacion());
+							
+							LOGGER.info(
+									"guardarDatosGenerales() / envPlantillaEnviosExtendsMapper.updateByPrimaryKey() -> Entrada a envPlantillaEnviosExtendsMapper para modificar la plantilla de envio asociada al modelo de comunicacion");
+							
+							envPlantillaEnviosExtendsMapper.updateByPrimaryKey(plantilla);
+							
+							LOGGER.info(
+									"guardarDatosGenerales() / envPlantillaEnviosExtendsMapper.updateByPrimaryKey() -> Salida de envPlantillaEnviosExtendsMapper para modificar la plantilla de envio asociada al modelo de comunicacion");
+
+						}
+						
+					}
+					
 					respuesta.setData(String.valueOf(modeloCom.getIdmodelocomunicacion()));
 
 				}
@@ -1117,7 +1153,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 
 	@Override
-	public ComboDTO obtenerPlantillasComunicacion(HttpServletRequest request) {
+	public ComboDTO obtenerPlantillasComunicacion(String idClaseComunicacion, HttpServletRequest request) {
 		
 		LOGGER.info("obtenerPlantillasComunicacion() -> Entrada al servicio para obtener las plantillas para añadir a la comunicación");
 		
@@ -1136,7 +1172,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					comboItems = envPlantillaEnviosExtendsMapper.getPlantillasComunicacion(idInstitucionUser);
+					comboItems = envPlantillaEnviosExtendsMapper.getPlantillasComunicacion(idInstitucionUser, idClaseComunicacion);
 					comboDTO.setCombooItems(comboItems);
 				}catch(Exception e){
 					Error error = new Error();
@@ -1198,7 +1234,6 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
-		PlantillaEnvioItem plantilla = new PlantillaEnvioItem();
 		ModelosComunicacionItem modeloComunicacionItem = null;
 		
 		if (null != idInstitucionUser) {
@@ -1237,7 +1272,6 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
 			
 			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
 				
 				ModModelocomunicacionExample example = new ModModelocomunicacionExample();
 				example.createCriteria().andNombreEqualTo(datosTarjeta.getNombre());

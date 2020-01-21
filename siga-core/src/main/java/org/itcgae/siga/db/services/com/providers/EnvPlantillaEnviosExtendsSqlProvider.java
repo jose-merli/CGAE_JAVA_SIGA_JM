@@ -3,8 +3,9 @@ package org.itcgae.siga.db.services.com.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.mappers.EnvPlantillasenviosSqlProvider;
 
-public class EnvPlantillaEnviosExtendsSqlProvider {
+public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSqlProvider {
 	
 	
 	public String selectPlantillas(Short idInstitucion, String idLenguaje, PlantillaEnvioSearchItem filtros){
@@ -31,7 +32,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 	
 	
 	
-	public String getPlantillas(Short idInstitucion, String idTipoEnvio){
+	public String getPlantillasByIdTipoEnvio(Short idInstitucion, String idTipoEnvio){
 		
 		SQL sql = new SQL();
 		
@@ -42,17 +43,19 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N' AND FECHABAJA is NULL");
 		sql.WHERE("IDTIPOENVIOS = '" + idTipoEnvio + "'");
+		sql.WHERE("IDCLASECOMUNICACION is null");
 		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
 	}
 	
-	public String getPlantillasComunicacion(Short idInstitucion){
+	public String getPlantillasComunicacion(Short idInstitucion, String idClaseComunicacion){
 		
 		SQL sql = new SQL();
 		sql.SELECT("IDPLANTILLAENVIOS AS VALUE");
 		sql.SELECT("INITCAP(NOMBRE) AS LABEL");		
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N' AND FECHABAJA is NULL");
+		sql.WHERE("(IDCLASECOMUNICACION = '" + idClaseComunicacion  + "' or IDCLASECOMUNICACION is null)" );
 		sql.ORDER_BY("LABEL");
 		
 		return sql.toString();
@@ -128,4 +131,31 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		return sql.toString();
 	}
 
+	public String getTemplates(String idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("IDPLANTILLAENVIOS");
+		sql.SELECT("INITCAP(NOMBRE) AS NOMBRE");
+		sql.SELECT("IDTIPOENVIOS");
+		sql.FROM("ENV_PLANTILLASENVIOS");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("NOMBRE");
+		
+		return sql.toString();
+	}
+	
+	public String getPlantillasByIdInstitucion(String idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("IDPLANTILLAENVIOS");
+		sql.SELECT("NOMBRE");
+		sql.SELECT("IDTIPOENVIOS");
+		sql.FROM("ENV_PLANTILLASENVIOS");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("NOMBRE");
+		
+		return sql.toString();
+	}
 }

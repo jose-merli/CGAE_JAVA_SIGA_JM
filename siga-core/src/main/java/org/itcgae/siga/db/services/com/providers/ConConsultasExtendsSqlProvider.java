@@ -117,7 +117,7 @@ public class ConConsultasExtendsSqlProvider {
 	public String selectConsultasDisponibles(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION");
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION, IDCLASECOMUNICACION");
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
@@ -137,7 +137,7 @@ public class ConConsultasExtendsSqlProvider {
 	public String selectConsultasDisponiblesFiltro(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION");
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION, IDCLASECOMUNICACION");
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
