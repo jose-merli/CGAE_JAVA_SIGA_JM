@@ -19,11 +19,18 @@ public class InscripcionGuardiaItem {
 	private String ordenCola;
 	private String idTurno;
 	private String idGuardia;
+	private String idGrupoGuardia;
 	private Date fechaSuscripcion;
 	
 	
 	
 	
+	public String getIdGrupoGuardia() {
+		return idGrupoGuardia;
+	}
+	public void setIdGrupoGuardia(String idGrupoguardia) {
+		this.idGrupoGuardia = idGrupoguardia;
+	}
 	public Date getFechaSuscripcion() {
 		return fechaSuscripcion;
 	}

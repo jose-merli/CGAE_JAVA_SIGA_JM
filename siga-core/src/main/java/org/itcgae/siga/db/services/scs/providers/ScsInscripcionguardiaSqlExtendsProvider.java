@@ -6,7 +6,7 @@ import org.itcgae.siga.db.mappers.ScsInscripcionguardiaSqlProvider;
 
 public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguardiaSqlProvider{
 	
-	public String getColaGuardias(String idGuardia, String idTurno, String fecha,String ultimo,String ordenaciones, String idInstitucion) {
+	public String getColaGuardias(String idGuardia, String idTurno, String fecha,String ultimo,String ordenaciones, String idInstitucion, String idgrupoguardia) {
 		SQL sql = new SQL();
 		
 		String fechaAnd = fecha != null && !fecha.equals("") ? "AND TRUNC(Ins.Fechavalidacion) <= NVL('"+fecha+"', Ins.Fechavalidacion)\r\n":"";
@@ -146,6 +146,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				Gru.IDGRUPOGUARDIA AS Grupo,\r\n" + 
 					"				Grg.NUMEROGRUPO AS numeroGrupo,\r\n" + 
 					"				Gru.ORDEN AS Ordengrupo,\r\n" + 
+					"				Gru.IDGRUPOGUARDIA AS IDGRUPOGUARDIA,\r\n" + 
 					"				(\r\n" + 
 					"				SELECT\r\n" + 
 					"					COUNT(1) numero\r\n" + 
@@ -202,7 +203,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"				Ins.Idpersona) consulta3\r\n" + 
 					"		WHERE\r\n" + 
 					"			activo = 1) consulta4\r\n" + 				
-					"	"+ultimo+")\r\n" + 
+					"	"+ultimo+" "+idgrupoguardia+")\r\n" + 
 					"	SELECT\r\n" + 
 					"		*\r\n" + 
 					"	FROM\r\n" + 
