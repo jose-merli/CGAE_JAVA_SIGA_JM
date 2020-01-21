@@ -251,6 +251,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 		//Obtenemos los destinatarios dependendiendo del tipo de envio.
 		boolean envioMasivo = envio.getEnvio().contains("M") ? true : false;
 		
+		Short idEstadoEnvio = SigaConstants.ENVIO_PROCESADO;
+
 		if(envioMasivo){
 			
 			List<DestinatarioItem> destinatarios = new ArrayList<DestinatarioItem>();
@@ -272,7 +274,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 			List<DatosDocumentoItem> documentosEnvio = new ArrayList<DatosDocumentoItem>();
 			addDocumentosAdjuntos(envio, documentosEnvio);			
 
-			Short idEstadoEnvio = SigaConstants.ENVIO_PROCESADO;
 			
 			if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
 				idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
@@ -339,11 +340,12 @@ public class ColaEnviosImpl implements IColaEnvios {
 				
 				LOGGER.debug("Procedemos al envio del email: tipo " + envio.getIdtipoenvios() + "--" + envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL));
 				
+				
 				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
-					_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
+					idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 				}else{
 					if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){
-						_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
+						idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
 					}
 					//Añadimos los informes al envio para que puedan ser descargados.
 //					for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
@@ -364,14 +366,16 @@ public class ColaEnviosImpl implements IColaEnvios {
 //						destinatario.getDomicilio();
 //					}
 				}
+				
 			}else{
 				LOGGER.error("No se han encontrado consultas de destinatarios asociadas a la plantilla de envío");
 				envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
 				envio.setFechamodificacion(new Date());
 				_envEnviosMapper.updateByPrimaryKey(envio);
 			}
+			
 		}
-		envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+		envio.setIdestado(idEstadoEnvio);
 		envio.setFechamodificacion(new Date());
 		_envEnviosMapper.updateByPrimaryKey(envio);
 	}

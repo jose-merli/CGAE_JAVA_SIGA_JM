@@ -159,7 +159,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	private EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
 
 	@Autowired
-	private EnvPlantillasenviosMapper _envPlantillasenviosMapper;
+	private EnvPlantillaEnviosExtendsMapper _envPlantillasenviosMapper;
 
 	@Autowired
 	private EnvDocumentosExtendsMapper _envDocumentosExtendsMapper;
@@ -758,7 +758,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = _envPlantillaEnviosExtendsMapper.getPlantillas(idInstitucion, idtipoEnvio);
+				comboItems = _envPlantillaEnviosExtendsMapper.getPlantillasByIdTipoEnvio(idInstitucion, idtipoEnvio);
 				if (null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");

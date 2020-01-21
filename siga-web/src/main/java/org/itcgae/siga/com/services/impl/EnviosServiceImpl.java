@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.Address;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -65,10 +64,10 @@ import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvImagenplantillaMapper;
-import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.ws.client.ClientECOS;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +86,7 @@ public class EnviosServiceImpl implements IEnviosService{
     Logger LOGGER = Logger.getLogger(EnviosServiceImpl.class);    
     
     @Autowired    
-    EnvPlantillasenviosMapper _envPlantillasenviosMapper;
+    EnvPlantillaEnviosExtendsMapper _envPlantillasenviosMapper;
     
     @Autowired    
     CenDireccionesMapper _cenDireccionesMapper;
@@ -501,14 +500,13 @@ public class EnviosServiceImpl implements IEnviosService{
         return destinatariosCopia;
     }
 
-    private String adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException, IOException {
+    private String adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException, IOException, BusinessException {
     	String listaDocumentos = null;
         if (documentosEnvio != null) {
         	listaDocumentos = "";
             //Adjuntamos los informes adjuntos.
             for (DatosDocumentoItem informe : documentosEnvio) {
                 File file = informe.getDocumentoFile();
-                
                 if (file == null) {
                     String error = "El fichero del envío " + idEnvio + " para el colegio " + idInstitucion + " es nulo";
                     LOGGER.error(error);

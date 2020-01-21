@@ -1,10 +1,7 @@
 package org.itcgae.siga.com.services.impl;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -18,10 +15,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.DTOs.com.ByteResponseDto;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionItem;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
@@ -407,7 +402,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				file = WSCommons.zipBytes(listaFicheros, file);
 			}
 		}
-		
+		LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se ha generado Documentos.zip con todos los documentos");
+
 		return file;
 	}
 
@@ -465,7 +461,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			}
 			
 			generarComunicacion.setFechaProgramada(dialogo.getFechaProgramada());
-			LOGGER.debug("Fecha programada = " + generarComunicacion.getFechaProgramada());
+			LOGGER.debug("SIGARNV-1232 generarComunicacion() -> Fecha programada = " + generarComunicacion.getFechaProgramada());
 			
 			for(ModelosComunicacionItem modelosComunicacionItem :dialogo.getModelos()){
 				ModelosEnvioItem modeloEnvioItem = new ModelosEnvioItem();		
@@ -480,6 +476,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								
 				
 				// Obtenemos la plantilla de envio seleccionada en el modelo
+				LOGGER.info("SIGARNV-1232 generarComunicacion() -> Se obtiene la plantilla seleccionada en el modelo");
 				List<ConsultaItem> listaConsultasPlantillaEnvio = null;
 				if(modelosComunicacionItem.getIdPlantillaEnvio() != null && modelosComunicacionItem.getIdTipoEnvio()!=null){
 					listaConsultasPlantillaEnvio = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(Short.valueOf(dialogo.getIdInstitucion()), Integer.parseInt(modelosComunicacionItem.getIdPlantillaEnvio()), Short.parseShort(modelosComunicacionItem.getIdTipoEnvio()));
@@ -500,12 +497,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 				if((listaKeyFiltros != null && listaKeyFiltros.size() > 0) || ejecutarConsulta){
 					for(int i=0; i< listaKeyFiltros.size(); i ++){	
-						List<String> listaStringKey = listaKeyFiltros.get(i);							
+						List<String> listaStringKey = listaKeyFiltros.get(i);	
 						HashMap<String, String> mapaClave = new HashMap<String, String>();
 						if(!ejecutarConsulta) {
 							for(int j = 0; j < listaKey.size(); j++){
 								KeyItem key = listaKey.get(j);
 								mapaClave.put(key.getNombre(), listaStringKey.get(j));
+								LOGGER.info("SIGARNV-1232 generarComunicacion() -> " + key.getNombre() +": "+listaStringKey.get(j));
 							}
 							if (dialogo.isComunicar() && modelosComunicacionItem.getIdTipoEnvio() != null) {
 								mapaClave.put(SigaConstants.ETIQUETATIPOENVIO.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, ""), modelosComunicacionItem.getIdTipoEnvio());
@@ -513,8 +511,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						}
 						
 						
-						// Nuevo envio = nueva lista de consultas
-						
+
 						List<ConsultaEnvioItem> listaConsultasEnvio = new ArrayList<ConsultaEnvioItem>();
 						destinatario = new DestinatarioItem();	
 
@@ -587,7 +584,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		List<Document> listaDocumentos = new ArrayList<Document>();	
 		
-		LOGGER.debug("Obtenemos las plantillas de documento asociadas al modelo " + modelosComunicacionItem.getIdModeloComunicacion());
+		LOGGER.info("SIGARNV-1232 Obtenemos las plantillas de documento asociadas al modelo: " + modelosComunicacionItem.getNombre());
 		List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectInformesGenerar(Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), usuario.getIdlenguaje());
 		
 		
@@ -653,7 +650,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					
 					List<Map<String, Object>> result;
 					try {
+						LOGGER.info("SIGARNV-1232 generarComunicacion() -> Ejecutamos la consulta "+consultaEjecutarCondicional);
 						result = _consultasService.ejecutarConsultaConClaves(consultaEjecutarCondicional);
+						LOGGER.info("SIGARNV-1232 generarComunicacion() -> Ha sido ejecutada la consulta "+consultaEjecutarCondicional);
 					} catch (BusinessSQLException e) {
 						LOGGER.error(e);
 						throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(), e);
@@ -809,6 +808,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						List<Map<String, Object>> result;
 						try {
 							result = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDestinatarios);
+							LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se ejecuta la consulta de destinatarios: " + consultaEjecutarDestinatarios);
+							LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se envía a la dirección: " + result);
+
 						} catch (BusinessSQLException e) {
 							LOGGER.error(e);
 							throw new BusinessException(
@@ -1002,7 +1004,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		if(consulta != null){
 			// Reemplazamos los datos insertados desde pantalla		
 			try {
+				LOGGER.info("SIGARNV-1232 generarComunicacion() -> Procesamos la consulta "+consulta.getSentencia());
 				sentencia = _consultasService.procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
+
 			} catch (ParseException e) {
 				LOGGER.error("Error al ejecutar la consulta con id " + consulta.getIdConsulta(), e);
 				throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
@@ -1055,7 +1059,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Override
 	public String obtenerNombreFicheroSalida(String idModeloComunicacion, PlantillaModeloDocumentoDTO plantilla, HashMap<String,Object> hDatosGenerales, String idLenguaje, int numFichero, String pathFicheroSalida, String campoSufijo){
-		LOGGER.info("Obteniendo nombre del fichero con idPlantillaDocumento: " + plantilla.getIdPlantillaDocumento());
+		LOGGER.info("Obteniendo el nombre del fichero: " + plantilla.getNombreFicheroSalida());
 		String nombreFichero = null;
 		try {
 			HashMap<String,Object> hashMapRow = null;
@@ -1425,7 +1429,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	@Transactional
 	private void insertarConsultasEnvio(AdmUsuarios usuario, Short idInstitucion, GenerarComunicacionItem generarComunicacion){
 		// Hay que generar un envio por cada modelo y cada destinatario
-		
+		LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se genera un envío poro cada modelo y cada destinatario");
+
 		try {
 			if(generarComunicacion != null && generarComunicacion.getListaModelosEnvio() != null && generarComunicacion.getListaModelosEnvio().size() > 0){
 				// Por cada modelo y por cada destinatario se genera un envio
@@ -1451,12 +1456,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							envio.setFechaprogramada(generarComunicacion.getFechaProgramada());
 							envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
 							int insert = _envEnviosMapper.insert(envio);
-							
+
 							// Actualizamos el envio para ponerle la descripcion
 							CenInstitucion institucion = _cenInstitucion.selectByPrimaryKey(idInstitucion);
 							ModModelocomunicacion modelo =  _modModeloComunicacionMapper.selectByPrimaryKey(modeloEnvio.getIdModeloComunicacion());
 							String descripcion = envio.getIdenvio() + "--" + modelo.getNombre();
-							envio.setDescripcion(descripcion);
+							envio.setDescripcion(descripcion);	
+							LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se actualiza el envío "+descripcion);
+
 							_envEnviosMapper.updateByPrimaryKey(envio);					
 							
 							if(insert >0){						
@@ -1525,6 +1532,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									destinatario.setUsumodificacion(usuario.getIdusuario());
 									destinatario.setTipodestinatario(SigaConstants.TIPO_CEN_PERSONA);
 									_envDestinatariosMapper.insert(destinatario);
+									LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se añade el destinatario" + destinatario);
+
 								}
 							}
 							
@@ -1594,7 +1603,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				List<ClaseComunicacionItem> modClaseItem = _modClasecomunicacionesExtendsMapper.selectClaseComunicacionModulo(String.valueOf(idModeloComunicacionEnvio));
 				if(modClaseItem != null && modClaseItem.size() > 0) {
 					ClaseComunicacionItem claseItem = modClaseItem.get(0);
-					directorioPlantillaClase = claseItem.getRutaPlantilla();					
+					directorioPlantillaClase = claseItem.getRutaPlantilla();
+					LOGGER.info("SIGARNV-1232 generarComunicacion() -> Se selecciona la plantilla "+claseItem.getRutaPlantilla());
 				}
 			}
 		}else {
@@ -1621,6 +1631,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					idValues.add(Long.parseLong(idPlantilla));
 					
 					example.createCriteria().andIdplantilladocumentoIn(idValues);
+					
 					List<ModPlantilladocumento> listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
 					
 					if(listaPlantilla != null && listaPlantilla.size() == 1){
@@ -1681,7 +1692,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					
 					String campoSufijo = null;
 					
-					LOGGER.debug("Obtenemos la consulta de destinatario para el envio " + idEnvio + " y plantilla: " + idPlantilla);
+					LOGGER.debug("SIGARNV-1232 generarDocumentosEnvio() -> Obtenemos la consulta de destinatario para el envio " + idEnvio + " y plantilla: " + idPlantilla);
 					example = new EnvConsultasenvioExample();
 					example.createCriteria().andIdenvioEqualTo(Long.parseLong(idEnvio)).andIdplantilladocumentoEqualTo(Long.parseLong(idPlantilla)).andIdobjetivoEqualTo(SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
 					List<EnvConsultasenvio> listaConsultasDest = _envConsultasenvioMapper.selectByExampleWithBLOBs(example);
@@ -1755,7 +1766,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									
 									// Por cada registro generamos un documento
 									numFicheros++;
-									
 									List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectPlantillaGenerar(consultaMulti.getIdmodelocomunicacion(), consultaMulti.getIdplantilladocumento());
 									PlantillaModeloDocumentoDTO plantilla = plantillas.get(0);
 									
@@ -1849,7 +1859,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									}
 									
 									docGenerado.setPathDocumento(rutaTmp + nombreFicheroSalida);
-									
+									LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se ha generado el documento " + rutaTmp + nombreFicheroSalida);
 									listaFicheros.add(docGenerado);
 																															
 								}
@@ -1953,7 +1963,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						}
 						
 						docGenerado.setPathDocumento(rutaTmp + nombreFicheroSalida);
-						
+						LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se ha generado el documento " + rutaTmp + nombreFicheroSalida );
+
 						listaFicheros.add(docGenerado);
 					}					
 				}				
@@ -2184,6 +2195,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					}
 					
 					docGenerado = _generacionDocService.grabaDocumento(doc, rutaTmp, nombreFicheroSalida, firmado);
+					LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se ha generado el documento " + rutaTmp + nombreFicheroSalida);
+
 				} catch (Exception e) {
 					LOGGER.error(e);
 					throw new BusinessException("Error al generar el fichero", e);
