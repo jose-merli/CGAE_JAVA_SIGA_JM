@@ -521,8 +521,16 @@ public class GuardiasServiceImpl implements GuardiasService {
 						example.createCriteria().andIdturnoEqualTo(guardia.getIdturno())
 								.andIdguardiaEqualTo(guardia.getIdguardia()).andIdinstitucionEqualTo(idInstitucion);
 						List<ScsGuardiasturno> item = scsGuardiasturnoExtendsMapper.selectByExample(example);
+						
+						ScsOrdenacioncolasExample ordExample = new ScsOrdenacioncolasExample();
+						ordExample.createCriteria()
+								.andIdordenacioncolasEqualTo(item.get(0).getIdordenacioncolas());
+						
+						List<ScsOrdenacioncolas> colas = scsOrdenacionColasExtendsMapper.selectByExample(ordExample);
+						
+						
 						resetGrupos = false;
-						if (item.get(0).getPorgrupos().equals("1") && !Boolean.valueOf(guardiasItem.getPorGrupos())
+						if ((item.get(0).getPorgrupos().equals("1") || colas.get(0).getOrdenacionmanual() == 0) && !Boolean.valueOf(guardiasItem.getPorGrupos())
 								&& Short.valueOf(guardiasItem.getFiltros().split(",")[4]) != 0) {
 							resetGrupos = true;
 						}
@@ -531,7 +539,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						// ROTAR COMPONENTES?
 						guardia.setNumeroletradosguardia(Integer.valueOf(guardiasItem.getLetradosGuardia()));
 
-						ScsOrdenacioncolasExample ordExample = new ScsOrdenacioncolasExample();
+						ordExample = new ScsOrdenacioncolasExample();
 						ordExample.createCriteria()
 								.andAlfabeticoapellidosEqualTo(Short.valueOf(guardiasItem.getFiltros().split(",")[0]))
 								.andFechanacimientoEqualTo(Short.valueOf(guardiasItem.getFiltros().split(",")[1]))
@@ -539,7 +547,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								.andAntiguedadcolaEqualTo(Short.valueOf(guardiasItem.getFiltros().split(",")[3]))
 								.andOrdenacionmanualEqualTo(Short.valueOf(guardiasItem.getFiltros().split(",")[4]));
 
-						List<ScsOrdenacioncolas> colas = scsOrdenacionColasExtendsMapper.selectByExample(ordExample);
+						colas = scsOrdenacionColasExtendsMapper.selectByExample(ordExample);
 
 						if (colas.isEmpty()) {
 							ScsOrdenacioncolas ordenacion = new ScsOrdenacioncolas();
@@ -998,8 +1006,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						ultimo = "WHERE\r\n" + "		idpersona =" + ultimo;
 					String grupoUltimo = "";
 
-					if (!UtilidadesString.esCadenaVacia(guardiasItem.getIdGrupoUltimo()))
-						grupoUltimo = "and idgrupoguardia = " + guardiasItem.getIdGrupoUltimo();
+					if (guardias.get(0).getIdgrupoguardiaUltimo() != null)
+						grupoUltimo = "and idgrupoguardia = " + guardias.get(0).getIdgrupoguardiaUltimo();
 
 					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
 							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(),
@@ -1330,7 +1338,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	@Override
 	public UpdateResponseDTO guardarColaGuardias(List<InscripcionGuardiaItem> inscripciones,
 			HttpServletRequest request) {
-		LOGGER.info("updateGuardia() ->  Entrada al servicio para editar guardia");
+		LOGGER.info("guardarColaGuardias() ->  Entrada al servicio para editar guardia");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -1345,12 +1353,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"updateGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"guardarColaGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"updateGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"guardarColaGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
@@ -1403,17 +1411,17 @@ public class GuardiasServiceImpl implements GuardiasService {
 					for (int i = 0; i < inscripciones.size(); i++) {
 						InscripcionGuardiaItem element = inscripciones.get(i);
 
-						if (!element.getNumeroGrupo().equals(""))
+						if (element.getNumeroGrupo() != null && !"".equals(element.getNumeroGrupo()))
 							grupoPerteneciente = gruposExistentes.stream()
 									.filter(it -> Integer.valueOf(element.getNumeroGrupo()).equals(it.getNumerogrupo()))
 									.collect(Collectors.toList());
 						if (grupoPerteneciente == null || grupoPerteneciente.size() == 0) {
 							inscripcionesGrupoNuevo.add(element); // Aqui vemos si hay alguno nuevo y si lo hay
-							inscripciones.remove(element); // lo metemos en otra lista.
 						} else {
 							grupoColegiado = new ScsGrupoguardiacolegiado();
 
-							if (element.getIdGrupoGuardiaColegiado().equals("")) {
+							if (element.getIdGrupoGuardiaColegiado() == null
+									|| element.getIdGrupoGuardiaColegiado().equals("")) {
 								grupoColegiado.setFechamodificacion(new Date());
 								grupoColegiado.setFechacreacion(new Date());
 								grupoColegiado.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
@@ -1500,7 +1508,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								grupoColegiado = new ScsGrupoguardiacolegiado();
 								// Aqui se crea un nuevo grupo colegiado en caso de que el recibido no tenga
 								// idgrupoguardiacolegiado
-								if (inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado().equals("")) {
+								if (inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado() == null) {
 									grupoColegiado.setFechamodificacion(new Date());
 									grupoColegiado.setFechacreacion(new Date());
 									grupoColegiado.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
