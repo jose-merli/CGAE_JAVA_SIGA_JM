@@ -9,7 +9,16 @@ public class ComboItemConsulta {
 	private String value = null;
 	private String idInstitucion = null;
 	private String idClaseComunicacion = null;
+	private String claseComunicacion = null;
 
+	/**
+	   **/
+	public ComboItemConsulta idInstitucion(String idInstitucion) {
+		this.label = idInstitucion;
+		return this;
+	}
+
+	@JsonProperty("idInstitucion")
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}
@@ -66,10 +75,27 @@ public class ComboItemConsulta {
 		this.idClaseComunicacion = idClaseComunicacion;
 	}
 
+	/**
+	 **/
+	public ComboItemConsulta claseComunicacion(String claseComunicacion) {
+		this.claseComunicacion = claseComunicacion;
+		return this;
+	}
+
+	@JsonProperty("claseComunicacion")
+	public String getClaseComunicacion() {
+		return claseComunicacion;
+	}
+
+	public void setClaseComunicacion(String claseComunicacion) {
+		this.claseComunicacion = claseComunicacion;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((claseComunicacion == null) ? 0 : claseComunicacion.hashCode());
 		result = prime * result + ((idClaseComunicacion == null) ? 0 : idClaseComunicacion.hashCode());
 		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
@@ -86,6 +112,11 @@ public class ComboItemConsulta {
 		if (getClass() != obj.getClass())
 			return false;
 		ComboItemConsulta other = (ComboItemConsulta) obj;
+		if (claseComunicacion == null) {
+			if (other.claseComunicacion != null)
+				return false;
+		} else if (!claseComunicacion.equals(other.claseComunicacion))
+			return false;
 		if (idClaseComunicacion == null) {
 			if (other.idClaseComunicacion != null)
 				return false;
@@ -111,25 +142,9 @@ public class ComboItemConsulta {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class ComboItem {\n");
-		sb.append("    label: ").append(toIndentedString(label)).append("\n");
-		sb.append("    value: ").append(toIndentedString(value)).append("\n");
-		sb.append("    idClaseComunicacion: ").append(toIndentedString(idClaseComunicacion)).append("\n");
-		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
-
-		sb.append("}");
-		return sb.toString();
+		return "ComboItemConsulta [label=" + label + ", value=" + value + ", idInstitucion=" + idInstitucion
+				+ ", idClaseComunicacion=" + idClaseComunicacion + ", claseComunicacion=" + claseComunicacion + "]";
 	}
 
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
-	private String toIndentedString(java.lang.Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return o.toString().replace("\n", "\n    ");
-	}
+	
 }

@@ -137,21 +137,22 @@ public class ConConsultasExtendsSqlProvider {
 	public String selectConsultasDisponiblesFiltro(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION, IDCLASECOMUNICACION");
-		sql.FROM("CON_CONSULTA");
-		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
+		sql.SELECT_DISTINCT("consulta.IDCONSULTA, consulta.DESCRIPCION, consulta.IDINSTITUCION, consulta.IDCLASECOMUNICACION, clase.nombre as clasecomunicacion");
+		sql.FROM("CON_CONSULTA consulta");
+		sql.LEFT_OUTER_JOIN("mod_clasecomunicaciones clase on consulta.idclasecomunicacion = clase.idclasecomunicacion");
+		sql.WHERE("(consulta.IDINSTITUCION = "+ idInstitucion + " OR (consulta.IDINSTITUCION = '2000' AND (UPPER(consulta.GENERAL) = 'S' OR consulta.GENERAL = '1'))) AND consulta.FECHABAJA IS NULL");
 		
 		if(idClaseComunicacion != null){
-			sql.WHERE("IDCLASECOMUNICACION = "+ idClaseComunicacion);
+			sql.WHERE("consulta.IDCLASECOMUNICACION = "+ idClaseComunicacion);
 		}
 		
 		if(idObjetivo != null){
-			sql.WHERE("IDOBJETIVO = " + idObjetivo);
+			sql.WHERE("consulta.IDOBJETIVO = " + idObjetivo);
 		}
 		
-		sql.WHERE(filtroTextoBusquedas("DESCRIPCION", filtro));
+		sql.WHERE(filtroTextoBusquedas("consulta.DESCRIPCION", filtro));
 		
-		sql.ORDER_BY("DESCRIPCION");
+		sql.ORDER_BY("consulta.DESCRIPCION");
 		
 		return sql.toString();
 	}

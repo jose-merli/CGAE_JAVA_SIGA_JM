@@ -34,7 +34,8 @@ public interface EnvPlantillaEnviosExtendsMapper extends EnvPlantillasenviosMapp
 		@Result(column = "IDDIRECCION", property = "idDireccion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CLASECOMUNICACION", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR)
 		})
 	List<PlantillaEnvioItem> selectPlantillasEnvios(Short idInstitucion, String idLenguaje, PlantillaEnvioSearchItem filtros);
 	

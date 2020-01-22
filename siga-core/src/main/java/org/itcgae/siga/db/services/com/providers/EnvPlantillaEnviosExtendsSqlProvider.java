@@ -19,14 +19,14 @@ public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSql
 		sql.FROM("ENV_PLANTILLASENVIOS PLANTILLA");
 		sql.LEFT_OUTER_JOIN("mod_clasecomunicaciones clase on plantilla.idclasecomunicacion = clase.idclasecomunicacion");
 		sql.WHERE("PLANTILLA.FECHABAJA is null");
-		sql.WHERE("PLANTILLA.IDINSTITUCION = '"+ idInstitucion +"' AND ANTIGUA = 'N'");
+		sql.WHERE("PLANTILLA.IDINSTITUCION = '"+ idInstitucion +"' AND PLANTILLA.ANTIGUA = 'N'");
 		
 
 		if(filtros.getIdTipoEnvios() != null && !filtros.getIdTipoEnvios().trim().equals("")){
-			sql.WHERE("IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
+			sql.WHERE("PLANTILLA.IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
 		}
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("") ){
-			sql.WHERE(filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
+			sql.WHERE(filtroTextoBusquedas("PLANTILLA.NOMBRE", filtros.getNombre()));
 		}	
 		
 		return sql.toString();

@@ -24,7 +24,6 @@ import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
@@ -40,6 +39,8 @@ import org.itcgae.siga.db.entities.EnvPlantillasenvios;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
+import org.itcgae.siga.db.entities.ModModelocomunicacion;
+import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaKey;
@@ -52,6 +53,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenDireccionTipodireccionExtendsM
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -89,6 +91,10 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 
 	@Autowired
 	private CenDireccionTipodireccionExtendsMapper _cenDireccionTipodireccionExtendsMapper;
+	
+	@Autowired
+	private ModModeloComunicacionExtendsMapper _modModeloComunicacionExtendsMapper;
+
 
 	@Override
 	public ComboConsultaInstitucionDTO getComboConsultas(HttpServletRequest request, String filtro) {
@@ -572,46 +578,68 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 							.andIdplantillaenviosEqualTo(Integer.parseInt(idPlantillaEnvios)).andFechabajaIsNull();
 
 					LOGGER.info(
-							"asociarConsulta() / _modPlantillaenvioConsultaMapper.selectByExample() -> Entrada a _modPlantillaenvioConsultaMapper para obtener las consultas asociadas a la plantilla envio a editar");
+							"desAsociarConsulta() / _modPlantillaenvioConsultaMapper.selectByExample() -> Entrada a _modPlantillaenvioConsultaMapper para obtener las consultas asociadas a la plantilla envio a editar");
 
 					List<ModPlantillaenvioConsulta> modPlantillaenvioConsultas = _modPlantillaenvioConsultaMapper
 							.selectByExample(modPlantillaenvioConsultaExample);
 
 					LOGGER.info(
-							"asociarConsulta() / _modPlantillaenvioConsultaMapper.selectByExample() -> Salida de _modPlantillaenvioConsultaMapper para obtener las consultas asociadas a la plantilla envio a editar");
+							"desAsociarConsulta() / _modPlantillaenvioConsultaMapper.selectByExample() -> Salida de _modPlantillaenvioConsultaMapper para obtener las consultas asociadas a la plantilla envio a editar");
 
 					//Plantilla de envio ya no tiene consultas y se convierte en plantilla de envio sin clase comunicacion
 					if (modPlantillaenvioConsultas == null || modPlantillaenvioConsultas.size() == 0) {
 						
-						EnvPlantillasenviosKey envPlantillasenviosKey = new EnvPlantillasenviosKey();
-						envPlantillasenviosKey.setIdinstitucion(idInstitucion);
-						envPlantillasenviosKey.setIdplantillaenvios(Integer.valueOf(idPlantillaEnvios));
-						envPlantillasenviosKey.setIdtipoenvios(Short.valueOf(idTipoEnvios));
+						//Se comprueba si la plantilla de envio esta asociada a un modelo de comunicacion y
+						//si esta asociado sigue siendo una plantilla con clase
+						
+						ModModelocomunicacionExample example = new ModModelocomunicacionExample();
+						example.createCriteria().andIdplantillaenviosEqualTo(Long.valueOf(idPlantillaEnvios));
+						
+						LOGGER.info(
+								"desAsociarConsulta() / _modModeloComunicacionExtendsMapper.selectByExample() -> Entrada a _modModeloComunicacionExtendsMapper para obtener modelos de comunicacion que tenga asociada la plantilla envio a editar");
+
+						List<ModModelocomunicacion> modelosComunicacion = _modModeloComunicacionExtendsMapper.selectByExample(example);
 
 						LOGGER.info(
-								"asociarConsulta() / _envPlantillaEnviosExtendsMapper.selectByExample() -> Entrada a _modPlantillaenvioConsultaMapper para obtener plantilla envio a editar");
+								"desAsociarConsulta() / _modModeloComunicacionExtendsMapper.selectByExample() -> Salida de _modModeloComunicacionExtendsMapper para obtener modelos de comunicacion que tenga asociada la plantilla envio a editar");
 
-						EnvPlantillasenvios plantillaEnvio = _envPlantillaEnviosExtendsMapper
-								.selectByPrimaryKey(envPlantillasenviosKey);
+						//Si la plantilla no tiene asociada ningun modelo de comunicacion se le quita la clase de comunicacion asignada
+						//Si esta asociada a alguna comunicacion no se eliminia la clase de comunicación 
+						if (null != modelosComunicacion && modelosComunicacion.size() > 0) {
+							
+							respuesta.setDescription("conClase");
 
-						LOGGER.info(
-								"asociarConsulta() / _envPlantillaEnviosExtendsMapper.selectByExample() -> Salida de _modPlantillaenvioConsultaMapper para obtener plantilla envio a editar");
-
-						if (plantillaEnvio != null) {
-							plantillaEnvio.setFechamodificacion(new Date());
-							plantillaEnvio.setUsumodificacion(usuario.getIdusuario());
-							plantillaEnvio.setIdclasecomunicacion(null);
-
-							LOGGER.info(
-									"asociarConsulta() / _envPlantillaEnviosExtendsMapper.updateByPrimaryKey() -> Entrada a _modPlantillaenvioConsultaMapper para modificar idClaseComunicacion de la plantilla envio a editar");
-
-							_envPlantillaEnviosExtendsMapper.updateByPrimaryKey(plantillaEnvio);
+						}else {
+						
+							EnvPlantillasenviosKey envPlantillasenviosKey = new EnvPlantillasenviosKey();
+							envPlantillasenviosKey.setIdinstitucion(idInstitucion);
+							envPlantillasenviosKey.setIdplantillaenvios(Integer.valueOf(idPlantillaEnvios));
+							envPlantillasenviosKey.setIdtipoenvios(Short.valueOf(idTipoEnvios));
 
 							LOGGER.info(
-									"asociarConsulta() / _envPlantillaEnviosExtendsMapper.updateByPrimaryKey() -> Salida de _modPlantillaenvioConsultaMapper para modificar idClaseComunicacion de la plantilla envio a editar");
+									"desAsociarConsulta() / _envPlantillaEnviosExtendsMapper.selectByExample() -> Entrada a _modPlantillaenvioConsultaMapper para obtener plantilla envio a editar");
 
+							EnvPlantillasenvios plantillaEnvio = _envPlantillaEnviosExtendsMapper
+									.selectByPrimaryKey(envPlantillasenviosKey);
+
+							LOGGER.info(
+									"desAsociarConsulta() / _envPlantillaEnviosExtendsMapper.selectByExample() -> Salida de _modPlantillaenvioConsultaMapper para obtener plantilla envio a editar");
+
+							if (plantillaEnvio != null) {
+								plantillaEnvio.setFechamodificacion(new Date());
+								plantillaEnvio.setUsumodificacion(usuario.getIdusuario());
+								plantillaEnvio.setIdclasecomunicacion(null);
+
+								LOGGER.info(
+										"desAsociarConsulta() / _envPlantillaEnviosExtendsMapper.updateByPrimaryKey() -> Entrada a _modPlantillaenvioConsultaMapper para modificar idClaseComunicacion de la plantilla envio a editar");
+
+								_envPlantillaEnviosExtendsMapper.updateByPrimaryKey(plantillaEnvio);
+
+								LOGGER.info(
+										"desAsociarConsulta() / _envPlantillaEnviosExtendsMapper.updateByPrimaryKey() -> Salida de _modPlantillaenvioConsultaMapper para modificar idClaseComunicacion de la plantilla envio a editar");
+
+							}
 						}
-
 					}
 					
 					respuesta.setCode(200);
