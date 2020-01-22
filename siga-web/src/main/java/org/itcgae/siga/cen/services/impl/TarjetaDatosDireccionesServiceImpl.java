@@ -495,6 +495,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_DESPACHO)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PUBLICA)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_FORMACION)) {
+						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
 				}
