@@ -7,6 +7,7 @@ import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
+import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
@@ -152,4 +153,16 @@ public class EjgController {
 		ComboDTO response = gestionEJG.comboOrigen(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	//Resolucion
+		@RequestMapping(value = "/gestion-ejg/getResolucion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<ResolucionEJGItem> getResolucion(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+			ResolucionEJGItem response = gestionEJG.getResolucion(ejgItem, request);
+			return new ResponseEntity<ResolucionEJGItem>(response, HttpStatus.OK);
+		}
+	//comboActaAnnio
+			@RequestMapping(value = "/gestion-ejg/comboActaAnnio",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+			ResponseEntity<ComboDTO> comboActaAnnio(HttpServletRequest request) {
+				ComboDTO response = gestionEJG.comboActaAnnio(request);
+				return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+			}
 }

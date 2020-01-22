@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
+import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 
 public interface IGestionEJG {
@@ -27,4 +28,8 @@ public interface IGestionEJG {
 	EjgItem getDictamen(EjgItem ejgItem, HttpServletRequest request);
 
 	ComboDTO comboOrigen(HttpServletRequest request);
+
+	ComboDTO comboActaAnnio(HttpServletRequest request);
+
+	ResolucionEJGItem getResolucion(EjgItem ejgItem, HttpServletRequest request);
 }

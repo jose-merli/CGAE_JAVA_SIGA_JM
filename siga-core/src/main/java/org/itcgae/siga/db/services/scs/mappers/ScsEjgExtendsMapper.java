@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosEjgItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsEjgSqlExtendsProvider;
 
@@ -117,7 +118,14 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "anioexpediente", property = "anioexpediente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numeroexpediente", property = "numeroexpediente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
-
+		@Result(column = "fechaauto", property = "fechaAuto", jdbcType = JdbcType.DATE),
+		@Result(column = "idtiporesolauto", property = "autoResolutorio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idtiposentidoauto", property = "sentidoAuto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "observacionimpugnacion", property = "observacionesImpugnacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numeroresolucion", property = "nImpugnacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechapublicacion", property = "fechaPublicacion", jdbcType = JdbcType.DATE),
+		@Result(column = "bisresolucion", property = "bis", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "turnadoratificacion", property = "requiereTurn", jdbcType = JdbcType.VARCHAR),
 	})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
 	
@@ -130,6 +138,30 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 	      @Result(column = "idfundamento", property = "fundamentoCalif", jdbcType = JdbcType.VARCHAR) 
 	})
 	EjgItem getDictamen(EjgItem ejgItem, String idInstitucion, String idLenguaje);
+	
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getResolucion")
+	@Results({ 
+		 @Result(column = "anioacta", property = "annioActa", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "idacta", property = "idActa", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "idtiporatificacionejg", property = "idTiporatificacionEJG", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "idfundamentojuridico", property = "idFundamentoJuridico", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "ratificaciondictamen", property = "ratificacionDictamen", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "idorigencajg", property = "idOrigencajg", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "aniocajg", property = "anioCAJG", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "numero_cajg", property = "numeroCAJG", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "idponente", property = "idPonente", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "fechapresentacionponente", property = "fechaPresentacionPonente", jdbcType = JdbcType.DATE),
+	     @Result(column = "fecharesolucioncajg", property = "fechaResolucionCAJG", jdbcType = JdbcType.DATE),
+	     @Result(column = "fecharatificacion", property = "fechaRatificacion", jdbcType = JdbcType.DATE),
+	     @Result(column = "fechanotificacion", property = "fechaNotificacion", jdbcType = JdbcType.DATE),
+	     @Result(column = "refauto", property = "refAuto", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "idannioacta", property = "idAnnioActa", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "turnadoratificacion", property = "turnadoRatificacion", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "requierenotificarproc", property = "requiereNotificarProc", jdbcType = JdbcType.VARCHAR),
+	     @Result(column = "notascajg", property = "notasCAJG", jdbcType = JdbcType.VARCHAR),
+	})
+	ResolucionEJGItem getResolucion(EjgItem ejgItem, String idInstitucion, String idLenguaje);
 
 }
 

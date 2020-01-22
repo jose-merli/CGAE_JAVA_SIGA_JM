@@ -424,6 +424,14 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.idtipoejgcolegio");
 		sql.SELECT("ejg.fechalimitepresentacion");
 		sql.SELECT("ejg.fechamodificacion");
+		sql.SELECT("ejg.fechaauto");
+		sql.SELECT("ejg.idtiporesolauto");
+		sql.SELECT("ejg.idtiposentidoauto");
+		sql.SELECT("ejg.observacionimpugnacion");
+		sql.SELECT("ejg.numeroresolucion");
+		sql.SELECT("ejg.fechapublicacion");
+		sql.SELECT("ejg.bisresolucion");
+		sql.SELECT("ejg.turnadoratificacion");
 		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as nombreletrado");
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
 		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre as NOMBRESOLICITANTE");
@@ -480,6 +488,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		                 sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
 				if(ejgItem.getNumEjg() != null && ejgItem.getNumEjg() != "")
 		                 sql.WHERE ("EJG.NUMEJG ="+ ejgItem.getNumEjg());
+//				sql.WHERE ("EJG.NUMEJG ='09039'");
+
 				if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
 		                 sql.WHERE ("ejg.IDTIPOEJG = " + ejgItem.getTipoEJG());
 				
@@ -637,6 +647,41 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sql.WHERE("ejg.idinstitucion = '" + idInstitucion + "'");
 		
 		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
+		return sql.toString();
+	}
+	public String getResolucion(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("ejg.idtiporatificacionejg," + 
+				" ejg.idfundamentojuridico," + 
+				" ejg.ratificaciondictamen," + 
+				" ejg.idorigencajg," + 
+				" ejg.aniocajg," + 
+				" ejg.numero_cajg," + 
+				" ejg.idponente," + 
+				" ejg.fechapresentacionponente," + 
+				" ejg.fecharesolucioncajg," + 
+				" ejg.fecharatificacion," + 
+				" ejg.fechanotificacion," + 
+				" ejg.refauto," + 
+				" ejg.turnadoratificacion," + 
+				" ejg.requierenotificarproc," + 
+				" ejg.anioacta," + 
+				" ejg.idacta," +
+				" ejg.idinstitucion||','||ejg.anioacta||','||ejg.idacta as idannioacta," +
+				" resolucion.notascajg AS notascajg");
+		
+		sql.FROM("scs_ejg ejg");
+		sql.LEFT_OUTER_JOIN("scs_ejg_resolucion resolucion on (resolucion.idinstitucion = ejg.idinstitucion AND resolucion.idtipoejg = ejg.idtipoejg AND resolucion.anio = ejg.anio AND resolucion.numero = ejg.numero)");
+		
+		sql.WHERE("ejg.idinstitucion = " + idInstitucion);
+		if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
+                 sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
+		if(ejgItem.getNumEjg() != null && ejgItem.getNumEjg() != "")
+                 sql.WHERE ("ejg.numejg ="+ ejgItem.getNumEjg());
+		if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
+                 sql.WHERE ("ejg.idtipoejg = " + ejgItem.getTipoEJG());
+		
 		return sql.toString();
 	}
 }

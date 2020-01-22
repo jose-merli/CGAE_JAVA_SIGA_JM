@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -516,7 +517,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 	@Override
 	public EjgDTO busquedaEJG(EjgItem ejgItem, HttpServletRequest request) {
 		LOGGER.info("busquedaEJG() -> Entrada al servicio para obtener el colegiado");
-		
+		Error error = new Error();
 		EjgDTO ejgDTO = new EjgDTO();
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
@@ -558,6 +559,12 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG{
 				LOGGER.info("busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
 				ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
 				LOGGER.info("busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
+				if((scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString())) != null && tamMaximo != null  && (scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString())).size() > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					ejgDTO.setError(error);
+					//justiciablesItems.remove(justiciablesItems.size()-1);
+				}
 			}else {
 				LOGGER.warn("busquedaEJG() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
 			}

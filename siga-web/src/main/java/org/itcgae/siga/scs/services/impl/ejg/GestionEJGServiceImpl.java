@@ -8,11 +8,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
+import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -21,6 +23,7 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsActacomisionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
@@ -54,6 +57,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	private ScsDocumentacionejgExtendsMapper scsDocumentacionejgExtendsMapper;
 	@Autowired
 	private ScsOrigencajgExtendsMapper scsOrigencajgExtendsMapper;
+	@Autowired
+	private ScsActacomisionExtendsMapper scsActacomisionExtendsMapper;
 	
 	
 	@Override
@@ -203,6 +208,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			if(null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				usuario.setIdinstitucion(idInstitucion);
+				Error error = new Error();
+
 				 GenParametrosExample genParametrosExample = new GenParametrosExample();
 			        genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
 			                .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
@@ -226,6 +233,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.info("getExpedientesEconomicos() / setUnidadFamiliarEJGItems.getExpedientesEconomicos() -> Entrada a scsEjgExtendsMapper para obtener Expedienets Económicos");
 				expedienteEconomicoDTO.setExpEconItems(scsExpedienteEconomicoExtendsMapper.getExpedientesEconomicos(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
 				LOGGER.info("getExpedientesEconomicos() / setUnidadFamiliarEJGItems.getExpedientesEconomicos() -> Salida de scsEjgExtendsMapper para obtener Expedienets Económicos");
+				if((scsExpedienteEconomicoExtendsMapper.getExpedientesEconomicos(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString())) != null && tamMaximo != null  && (scsExpedienteEconomicoExtendsMapper.getExpedientesEconomicos(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString())).size() > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					expedienteEconomicoDTO.setError(error);
+					//justiciablesItems.remove(justiciablesItems.size()-1);
+				}
+				
 			}else {
 				LOGGER.warn("getExpedientesEconomicos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
 			}
@@ -383,5 +397,65 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			}
 			LOGGER.info("comboTipoEJG() -> Salida del servicio para obtener los tipos ejg");
 			return comboDTO;
+	}
+	@Override
+	public ComboDTO comboActaAnnio(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"comboActaAnnio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+					LOGGER.info("comboActaAnnio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					if (usuarios != null && usuarios.size() > 0) {
+						LOGGER.info("comboActaAnnio() / scsActacomisionExtendsMapper.comboPrestaciones() -> Entrada a scsActacomisionExtendsMapper para obtener los combo");
+						comboItems = scsActacomisionExtendsMapper.getActaAnnio(idInstitucion.toString());
+						LOGGER.info("comboActaAnnio() / scsActacomisionExtendsMapper.comboPrestaciones() -> Salida a scsActacomisionExtendsMapper para obtener los combo");
+						if (comboItems != null) {
+							comboDTO.setCombooItems(comboItems);
+						}
+					}
+				}
+				LOGGER.info("comboActaAnnio() -> Salida del servicio");
+				return comboDTO;
+	}
+	@Override
+	public ResolucionEJGItem getResolucion(EjgItem ejgItem, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		LOGGER.info("getResolucion() -> Entrada al servicio para obtener el colegiado");
+		ResolucionEJGItem resolucion = new ResolucionEJGItem();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getResolucion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getResolucion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if(null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
+				LOGGER.info("getResolucion() / scsEjgExtendsMapper.getResolucion() -> Entrada a scsEjgExtendsMapper para obtener información de la Resolución");
+				resolucion = scsEjgExtendsMapper.getResolucion(ejgItem, idInstitucion.toString(), usuarios.get(0).getIdlenguaje().toString());
+				LOGGER.info("getResolucion() / scsEjgExtendsMapper.getResolucion() -> Salida de scsEjgExtendsMapper para obtener información de la Resolución");
+			}else {
+				LOGGER.warn("getResolucion() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		}else {
+			LOGGER.warn("getResolucion() -> idInstitucion del token nula");
+		}
+	return resolucion;		
 	}
 }

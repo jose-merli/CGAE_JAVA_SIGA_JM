@@ -86,11 +86,14 @@ public class EjgItem {
     private String fundamentoCalifDes;
     private String iddictamen;
 
-//    private String correoelectronico;
-//    private Date fechanacimiento;
-
-//    private String idInstitucion;
-
+    private boolean requiereTurn;
+    private boolean bis;
+    private Date fechaPublicacion;
+    private String nImpugnacion;
+    private String observacionesImpugnacion;
+    private String sentidoAuto;
+    private String autoResolutorio;
+    private Date fechaAuto;
 
 	
 	/**
@@ -1176,5 +1179,124 @@ public class EjgItem {
 		this.iddictamen = iddictamen;
 	}
 
+//impugnacion
+	/**
+	 **/
+	public EjgItem requiereTurn(boolean requiereTurn) {
+		this.requiereTurn = requiereTurn;
+		return this;
+	}
 
+	@JsonProperty("requiereTurn")	
+	public boolean isRequiereTurn() {
+		return requiereTurn;
+	}
+
+	public void setRequiereTurn(boolean requiereTurn) {
+		this.requiereTurn = requiereTurn;
+	}
+	/**
+	 **/
+	public EjgItem bis(boolean bis) {
+		this.bis = bis;
+		return this;
+	}
+
+	@JsonProperty("bis")	
+	public boolean getBis() {
+		return bis;
+	}
+
+	public void setBis(boolean bis) {
+		this.bis = bis;
+	}
+	/**
+	 **/
+	public EjgItem fechaPublicacion(Date fechaPublicacion) {
+		this.fechaPublicacion = fechaPublicacion;
+		return this;
+	}
+
+	@JsonProperty("fechaPublicacion")	
+	public Date getFechaPublicacion() {
+		return fechaPublicacion;
+	}
+
+	public void setFechaPublicacion(Date fechaPublicacion) {
+		this.fechaPublicacion = fechaPublicacion;
+	}
+	/**
+	 **/
+	public EjgItem nImpugnacion(String nImpugnacion) {
+		this.nImpugnacion = nImpugnacion;
+		return this;
+	}
+
+	@JsonProperty("nImpugnacion")
+	public String getnImpugnacion() {
+		return nImpugnacion;
+	}
+
+	public void setnImpugnacion(String nImpugnacion) {
+		this.nImpugnacion = nImpugnacion;
+	}
+	/**
+	 **/
+	public EjgItem observacionesImpugnacion(String observacionesImpugnacion) {
+		this.observacionesImpugnacion = observacionesImpugnacion;
+		return this;
+	}
+
+	@JsonProperty("observacionesImpugnacion")
+	public String getObservacionesImpugnacion() {
+		return observacionesImpugnacion;
+	}
+
+	public void setObservacionesImpugnacion(String observacionesImpugnacion) {
+		this.observacionesImpugnacion = observacionesImpugnacion;
+	}
+	/**
+	 **/
+	public EjgItem sentidoAuto(String sentidoAuto) {
+		this.sentidoAuto = sentidoAuto;
+		return this;
+	}
+
+	@JsonProperty("sentidoAuto")
+	public String getSentidoAuto() {
+		return sentidoAuto;
+	}
+
+	public void setSentidoAuto(String sentidoAuto) {
+		this.sentidoAuto = sentidoAuto;
+	}
+	/**
+	 **/
+	public EjgItem autoResolutorio(String autoResolutorio) {
+		this.autoResolutorio = autoResolutorio;
+		return this;
+	}
+
+	@JsonProperty("autoResolutorio")
+	public String getAutoResolutorio() {
+		return autoResolutorio;
+	}
+
+	public void setAutoResolutorio(String autoResolutorio) {
+		this.autoResolutorio = autoResolutorio;
+	}
+	/**
+	 **/
+	public EjgItem fechaAuto(Date fechaAuto) {
+		this.fechaAuto = fechaAuto;
+		return this;
+	}
+
+	@JsonProperty("fechaAuto")	
+	public Date getFechaAuto() {
+		return fechaAuto;
+	}
+	public void setFechaAuto(Date fechaAuto) {
+		this.fechaAuto = fechaAuto;
+	}	
 }
