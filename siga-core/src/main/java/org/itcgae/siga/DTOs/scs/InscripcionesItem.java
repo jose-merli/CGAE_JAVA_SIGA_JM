@@ -56,12 +56,39 @@ public class InscripcionesItem {
 	public String observacionestabla;
 	public Date fechatabla;
 	public String usumodificacion;
+	public String nifcif;
+	public String telefono;
+	public String movil;
 	
 	
 	
 	
 	
 
+
+	public String getTelefono() {
+		return telefono;
+	}
+
+	public void setTelefono(String telefono) {
+		this.telefono = telefono;
+	}
+
+	public String getMovil() {
+		return movil;
+	}
+
+	public void setMovil(String movil) {
+		this.movil = movil;
+	}
+
+	public String getNifcif() {
+		return nifcif;
+	}
+
+	public void setNifcif(String nifcif) {
+		this.nifcif = nifcif;
+	}
 
 	public String getUsumodificacion() {
 		return usumodificacion;
