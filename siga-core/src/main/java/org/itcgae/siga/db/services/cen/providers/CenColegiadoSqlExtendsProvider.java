@@ -500,7 +500,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		if (colegiadoItem.getIdPersona() != null && colegiadoItem.getIdPersona() != "") {
 			sql.WHERE("col.idpersona = " + colegiadoItem.getIdPersona());
 		}
-		
+		if (colegiadoItem.getNif() != null && colegiadoItem.getNif() != "") {
+			sql.WHERE("upper(per.nifcif) like upper('%" + colegiadoItem.getNif() + "%')");
+		}
 
 		sql.ORDER_BY("NOMBRE,CORREO,TELEFONO");
 
