@@ -495,7 +495,6 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_DESPACHO)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PUBLICA)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_FORMACION)) {
-						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
 				}
@@ -512,14 +511,14 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 					// Eliminamos de la dirección guardada el tipo de direccion de la nueva
 					// dirección
-					if (!rdo.isEmpty())
+					if (!rdo.isEmpty()) {
 						LOGGER.warn("updateDirection() / Entrada a Consulta en Cen_direcciontipodireccion para obtener dirección actual");
 						cenDireccionTipodireccionList = cenDireccionTipodireccionMapper.select(
 								datosDireccionesItem.getIdPersona(), String.valueOf(usuario.getIdinstitucion()), array,
 								datosDireccionesItem.getIdDireccion());
 						LOGGER.warn("updateDirection() / Salida de Consulta en Cen_direcciontipodireccion para obtener dirección actual");
 
-					{
+					
 						LOGGER.warn("updateDirection() / Entrada a Bucle para eliminar los tipos de dirección");
 
 						for (CenDireccionTipodireccion tipoDir : cenDireccionTipodireccionList) {
