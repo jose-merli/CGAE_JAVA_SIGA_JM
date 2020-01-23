@@ -497,6 +497,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 					LOGGER.info(
 							"updateGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear DatosGenerales de guardias");
 
+					// Se entrara en cada if dependiendo de que tarjeta se haya editado.
+					// Se define donde entrara segun los datos que lleguen.
 					if (guardiasItem.getDescripcion() != null) {
 
 						LOGGER.info(
@@ -510,8 +512,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 									Short.valueOf((short) (guardiasItem.getEnvioCentralita() ? 1 : 0)));
 						guardia.setDescripcionfacturacion(guardiasItem.getDescripcionFacturacion());
 						guardia.setDescripcionpago(guardiasItem.getDescripcionPago());
-						guardia.setIdturnoprincipal(Integer.valueOf(guardiasItem.getIdTurnoPrincipal()));
-						guardia.setIdguardiaprincipal(Integer.valueOf(guardiasItem.getIdGuardiaPrincipal()));
+						// guardia.setIdturnoprincipal(Integer.valueOf(guardiasItem.getIdTurnoPrincipal()));
+						// guardia.setIdguardiaprincipal(Integer.valueOf(guardiasItem.getIdGuardiaPrincipal()));
 
 					} else if (guardiasItem.getLetradosGuardia() != null) {
 
@@ -521,16 +523,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 						example.createCriteria().andIdturnoEqualTo(guardia.getIdturno())
 								.andIdguardiaEqualTo(guardia.getIdguardia()).andIdinstitucionEqualTo(idInstitucion);
 						List<ScsGuardiasturno> item = scsGuardiasturnoExtendsMapper.selectByExample(example);
-						
+
 						ScsOrdenacioncolasExample ordExample = new ScsOrdenacioncolasExample();
-						ordExample.createCriteria()
-								.andIdordenacioncolasEqualTo(item.get(0).getIdordenacioncolas());
-						
+						ordExample.createCriteria().andIdordenacioncolasEqualTo(item.get(0).getIdordenacioncolas());
+
 						List<ScsOrdenacioncolas> colas = scsOrdenacionColasExtendsMapper.selectByExample(ordExample);
-						
-						
+
 						resetGrupos = false;
-						if ((item.get(0).getPorgrupos().equals("1") || colas.get(0).getOrdenacionmanual() == 0) && !Boolean.valueOf(guardiasItem.getPorGrupos())
+						if ((item.get(0).getPorgrupos().equals("1") || colas.get(0).getOrdenacionmanual() == 0)
+								&& !Boolean.valueOf(guardiasItem.getPorGrupos())
 								&& Short.valueOf(guardiasItem.getFiltros().split(",")[4]) != 0) {
 							resetGrupos = true;
 						}
@@ -1137,50 +1138,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 			}
 		}
 		return inscritos;
-	}
-
-	@Override
-	public InsertResponseDTO insertColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request) {
-		LOGGER.info("createPrision() ->  Entrada al servicio para crear una nueva prisión");
-
-		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		long idGuardia = 0;
-		if (null != idInstitucion) {
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-
-				try {
-					//
-					// ScsGrupoguardiaExample scsGrupoguardiaExample = new ScsGrupoguardiaExample();
-					// scsGrupoguardiaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).
-					// andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno())).
-					// andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia())).
-					// andNumerogrupoEqualsTo(guardiasItem.getPorGrupos());
-
-				} catch (Exception e) {
-					LOGGER.error(e);
-				}
-			}
-		}
-		return insertResponseDTO;
 	}
 
 	@Override

@@ -39,8 +39,6 @@ public interface GuardiasService {
 	public GuardiasItem resumenConfiguracionCola(GuardiasItem guardia, HttpServletRequest request);
 	
 	public InscripcionGuardiaDTO searchColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
-
-	public InsertResponseDTO insertColaGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
 	
 	public UpdateResponseDTO updateUltimoCola(GuardiasItem guardiasItem, HttpServletRequest request);
 	
