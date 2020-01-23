@@ -1257,6 +1257,42 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	    
 	    return pagos;	
 	}
+	
+	@Override
+	public PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		PagosjgDTO pagos = new PagosjgDTO();
+		String idLenguaje = "";
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	            
+	        if(null != usuarios && usuarios.size() > 0) {
+	        	AdmUsuarios usuario = usuarios.get(0);
+	            usuario.setIdinstitucion(idInstitucion);
+	            idLenguaje=usuario.getIdlenguaje();    
+	                
+	            LOGGER.info("buscarPagos() / fcsFacturacionJGExtendsMapper.buscarPagos() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los pagos");
+	            List<PagosjgItem> pagosItems = fcsFacturacionJGExtendsMapper.buscarPagos(pagosItem, idInstitucion.toString(), idLenguaje);
+	            pagos.setPagosjgItem(pagosItems);
+	            LOGGER.info("buscarPagos() / fcsFacturacionJGExtendsMapper.buscarPagos() -> Salida a fcsFacturacionJGExtendsMapper para obtener los pagos");
+	        }else {
+	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+	        }
+	    }else {
+	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
+	    }
+	        
+	    LOGGER.info("getLabel() -> Salida del servicio para obtener las facturaciones");
+	    
+	    return pagos;	
+	}
 
 	@Override
 	public void ejecutaFacturacionSJCS() {

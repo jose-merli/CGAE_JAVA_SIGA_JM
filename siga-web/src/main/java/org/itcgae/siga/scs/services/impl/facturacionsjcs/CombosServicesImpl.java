@@ -215,5 +215,46 @@ public class CombosServicesImpl implements ICombosServices {
 		return comboEstadosFact;
 	}
 
+	public ComboDTO comboPagoEstados(HttpServletRequest request) {
 
+		LOGGER.info("comboPagoEstados() -> Entrada del servicio para obtener los estados de los pagos");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String idLenguaje;
+		ComboDTO comboEstadosFact = new ComboDTO();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			
+			LOGGER.info("comboPagoEstados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			LOGGER.info("comboPagoEstados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
+				idLenguaje = usuario.getIdlenguaje();
+
+				LOGGER.info("comboPagoEstados() / FcsEstadosFacturacionExtendsMapper.estadosPagos() -> Entrada a FcsEstadosFacturacionExtendsMapper para obtener los estados de los pagos");
+				
+				List<ComboItem> comboItems = fcsEstadosFacturacionExtendsMapper.estadosPagos(idLenguaje);
+				comboEstadosFact.setCombooItems(comboItems);
+				
+				LOGGER.info("comboPagoEstados() / FcsEstadosFacturacionExtendsMapper.estadosPagos() -> Salida a FcsEstadosFacturacionExtendsMapper para obtener los estados de los pagos");
+			} else {
+				LOGGER.warn("comboPagoEstados() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("comboPagoEstados() -> idInstitucion del token nula");
+		}
+		
+		LOGGER.info("comboPagoEstados() -> Salida del servicio para obtener los estados de los pagos");
+		
+		return comboEstadosFact;
+	}
 }

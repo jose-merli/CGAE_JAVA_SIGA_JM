@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.DTOs.scs.PagosjgDTO;
+import org.itcgae.siga.DTOs.scs.PagosjgItem;
 
 public interface IFacturacionSJCSServices {
 
@@ -46,4 +47,6 @@ public interface IFacturacionSJCSServices {
 	public PagosjgDTO datosPagos(String idFacturacion, HttpServletRequest request);
 
 	public void ejecutaFacturacionSJCS();
+	
+	public PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request);
 }

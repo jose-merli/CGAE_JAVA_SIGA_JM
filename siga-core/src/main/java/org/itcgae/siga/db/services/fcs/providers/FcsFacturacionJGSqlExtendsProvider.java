@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
+import org.itcgae.siga.DTOs.scs.PagosjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgSqlProvider;
@@ -753,6 +754,116 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.FROM("gen_parametros");
 		sql.WHERE("PARAMETRO = " + parametro);
 		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"'");
+		return sql.toString();
+	}
+	
+	public String buscarPagos(PagosjgItem pagosItem, String idInstitucion, String idLenguaje) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("ABREVIATURA");
+		sql.SELECT("IDFACTURACION");
+		sql.SELECT("IDPAGOSJG");
+		sql.SELECT("FECHADESDE");
+		sql.SELECT("FECHAHASTA");
+		sql.SELECT("NOMBRE");
+		sql.SELECT("DESESTADO");
+		sql.SELECT("IDESTADO");
+		sql.SELECT("FECHAESTADO");
+		sql.SELECT("CANTIDAD");
+		sql.SELECT("PORCENTAJE");
+
+		SQL sql2 = new SQL();
+		
+		sql2.SELECT("PAGO.IDINSTITUCION");
+		sql2.SELECT("PAGO.ABREVIATURA");
+		sql2.SELECT("PAGO.IDFACTURACION");
+		sql2.SELECT("PAGO.IDPAGOSJG");
+		sql2.SELECT("PAGO.FECHADESDE");
+		sql2.SELECT("PAGO.FECHAHASTA");
+		sql2.SELECT("PAGO.NOMBRE");
+		
+		SQL sql3 = new SQL();
+		
+		sql3.SELECT("REC.DESCRIPCION DESCRIPCION");
+		sql3.FROM("FCS_ESTADOSPAGOS ESTADOS");
+		sql3.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON ESTADOS.DESCRIPCION = REC.IDRECURSO");
+		sql3.WHERE("EST.IDESTADOPAGOSJG = ESTADOS.IDESTADOPAGOSJG");
+		sql3.WHERE("REC.IDLENGUAJE = "+idLenguaje);
+		
+		sql2.SELECT("("+sql3.toString()+") AS DESESTADO");
+		sql2.SELECT("EST.IDESTADOPAGOSJG AS IDESTADO");
+		sql2.SELECT("EST.FECHAESTADO AS FECHAESTADO");
+		sql2.SELECT("NVL(PAGO.IMPORTEPAGADO, 0) CANTIDAD");
+		sql2.SELECT("(PAGO.IMPORTEPAGADO * 100) / PAGO.IMPORTEREPARTIR PORCENTAJE");
+		sql2.FROM("FCS_PAGOSJG PAGO");
+		sql2.INNER_JOIN("CEN_INSTITUCION INS ON PAGO.IDINSTITUCION = INS.IDINSTITUCION");
+		sql2.INNER_JOIN("FCS_PAGOS_ESTADOSPAGOS EST ON PAGO.IDINSTITUCION = EST.IDINSTITUCION AND PAGO.IDPAGOSJG = EST.IDPAGOSJG");
+		sql2.WHERE("PAGO.IDINSTITUCION = '" + idInstitucion + "'");
+		
+		SQL sql4 = new SQL();
+		sql4.SELECT("MAX(EST2.FECHAESTADO)");
+		sql4.FROM("FCS_PAGOS_ESTADOSPAGOS EST2");
+		sql4.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+		sql4.WHERE("EST2.IDPAGOSJG = EST.IDPAGOSJG");
+		
+		sql2.WHERE("EST.FECHAESTADO = ("+sql4.toString()+")");
+		
+		// FILTRO ESTADOS FACTURACIÓN
+		if (!UtilidadesString.esCadenaVacia(pagosItem.getIdEstado())) {			
+			sql2.WHERE("EST.IDESTADOPAGOSJG = " + pagosItem.getIdEstado());
+		}
+
+		// FILTRO NOMBRE
+		if (!UtilidadesString.esCadenaVacia(pagosItem.getNombre())) {
+			sql2.WHERE("(REGEXP_LIKE(PAGO.NOMBRE, '"+pagosItem.getNombre().trim()+"')");
+		}
+		
+		// FILTRO PARTIDA PRESUPUESTARIA
+		if (!UtilidadesString.esCadenaVacia(pagosItem.getIdPartidaPresupuestaria())) {
+			sql2.WHERE("PAGO.IDPARTIDAPRESUPUESTARIA = "+pagosItem.getIdPartidaPresupuestaria());
+		}
+
+		// FILTRO POR CONCEPTOS DE FACTURACIÓN Y POR GRUPOS DE FACTURACIÓN 
+		if (!UtilidadesString.esCadenaVacia(pagosItem.getIdConcepto()) || !UtilidadesString.esCadenaVacia(pagosItem.getIdFacturacion())) {
+			SQL sql5 = new SQL();
+			
+			sql5.SELECT("1");
+			sql5.FROM("FCS_FACT_GRUPOFACT_HITO HIT");
+			sql5.WHERE("HIT.IDPAGOSJG = PAGO.IDPAGOSJG");
+			sql5.WHERE("HIT.IDINSTITUCION = PAGO.IDINSTITUCION");			
+
+			// FILTRO POR CONCEPTOS DE FACTURACION
+			if (!UtilidadesString.esCadenaVacia(pagosItem.getIdConcepto())) {
+				sql5.WHERE("HIT.IDHITOGENERAL = "+pagosItem.getIdConcepto());
+			}
+			// FILTRO POR GRUPO FACTURACION
+			if (!UtilidadesString.esCadenaVacia(pagosItem.getIdFacturacion())) {
+				sql5.WHERE("HIT.IDGRUPOFACTURACION = "+pagosItem.getIdGrupo());
+			}
+			
+			sql2.WHERE("EXISTS ("+sql5.toString()+")");
+		}
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+		// FILTRO FECHADESDE
+		if (null != pagosItem.getFechaDesde()) {
+			String fechaF = dateFormat.format(pagosItem.getFechaDesde());
+			sql2.WHERE("PAGO.FECHADESDE >=TO_DATE('" + fechaF + "', 'DD/MM/YYYY hh24:mi:ss')");
+		}
+
+		// FILTRO FECHAHASTA
+		if (null != pagosItem.getFechaHasta()) {
+			String fechaF = dateFormat.format(pagosItem.getFechaHasta());
+			sql2.WHERE("PAGO.FECHAHASTA <=TO_DATE('" + fechaF + "', 'DD/MM/YYYY hh24:mi:ss')");
+		}
+
+		sql.FROM("(" + sql2.toString() + ") busqueda");
+		sql.ORDER_BY("busqueda.FECHADESDE");
+		sql.ORDER_BY("busqueda.FECHAHASTA");
+		sql.ORDER_BY("busqueda.FECHAESTADO DESC");
+
 		return sql.toString();
 	}
 }

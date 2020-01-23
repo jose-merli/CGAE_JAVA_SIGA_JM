@@ -220,5 +220,21 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "valor", property = "valor", jdbcType = JdbcType.VARCHAR),
 	})
 	StringDTO getParametroInstitucion(String idInstitucion, String parametro);
-
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "buscarPagos")
+	@Results({ 
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHADESDE", property = "fechaDesde", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAHASTA", property = "fechaHasta", jdbcType = JdbcType.DATE),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESESTADO", property = "desEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
+		@Result(column = "CANTIDAD", property = "cantidad", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PORCENTAJE", property = "porcentaje", jdbcType = JdbcType.VARCHAR)
+	})
+	List<PagosjgItem> buscarPagos(PagosjgItem pagosItem, String idInstitucion, String idLenguaje);
 }

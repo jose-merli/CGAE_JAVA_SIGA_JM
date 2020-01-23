@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.DTOs.scs.PagosjgDTO;
+import org.itcgae.siga.DTOs.scs.PagosjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,6 +154,12 @@ public class FacturacionController {
 	@RequestMapping(value="/facturacionsjcs/datospagos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<PagosjgDTO> datosPagos(@RequestParam("idFacturacion") String idFacturacion, HttpServletRequest request){
 		PagosjgDTO response = facturacionServices.datosPagos(idFacturacion, request);
+		return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/facturacionsjcs/buscarPagos", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PagosjgDTO> buscarPagos(@RequestBody PagosjgItem pagosItem, HttpServletRequest request){
+		PagosjgDTO response = facturacionServices.buscarPagos(pagosItem, request);
 		return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
 	}
 }

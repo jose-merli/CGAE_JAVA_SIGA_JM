@@ -11,5 +11,5 @@ public interface ICombosServices {
 	public ComboDTO comboFactColegio(HttpServletRequest request);
 	public ComboDTO comboPagosColegio(HttpServletRequest request);
 
-	
+	public ComboDTO comboPagoEstados(HttpServletRequest request);	
 }

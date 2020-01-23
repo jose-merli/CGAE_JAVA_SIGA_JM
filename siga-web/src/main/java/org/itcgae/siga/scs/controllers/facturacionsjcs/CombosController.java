@@ -26,6 +26,12 @@ public class CombosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
     
+    @RequestMapping(value="/combo/comboPagoEstados", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboPagoEstados(HttpServletRequest request) {
+		ComboDTO response = combosServices.comboPagoEstados(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+    
     @RequestMapping(value="/combo/comboFactConceptos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboFactConceptos(HttpServletRequest request) {
 		ComboDTO response = combosServices.comboFactConceptos(request);
