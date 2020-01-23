@@ -73,21 +73,23 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdConcepto())
 				|| !UtilidadesString.esCadenaVacia(facturacionItem.getIdFacturacion())
 				|| !UtilidadesString.esCadenaVacia(facturacionItem.getIdPartidaPresupuestaria())) {
-			StringBuilder queryAux = new StringBuilder();
-			queryAux.append(
-					"EXISTS (SELECT 1 FROM FCS_FACT_GRUPOFACT_HITO HIT WHERE HIT.IDFACTURACION = FAC.IDFACTURACION AND HIT.IDINSTITUCION = FAC.IDINSTITUCION");
+			SQL sql3 = new SQL();
+			
+			sql3.SELECT("1");
+			sql3.FROM("FCS_FACT_GRUPOFACT_HITO HIT");
+			sql3.WHERE("HIT.IDFACTURACION = FAC.IDFACTURACION");
+			sql3.WHERE("HIT.IDINSTITUCION = FAC.IDINSTITUCION");
 
 			// FILTRO POR CONCEPTOS DE FACTURACION
 			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdConcepto())) {
-				queryAux.append(" AND HIT.IDHITOGENERAL = " + facturacionItem.getIdConcepto());
+				sql3.WHERE("HIT.IDHITOGENERAL = " + facturacionItem.getIdConcepto());
 			}
 			// FILTRO POR GRUPO FACTURACION
 			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdFacturacion())) {
-				queryAux.append(" AND HIT.IDGRUPOFACTURACION = " + facturacionItem.getIdFacturacion());
+				sql3.WHERE("HIT.IDGRUPOFACTURACION = " + facturacionItem.getIdFacturacion());
 			}
 			
-			queryAux.append(")");
-			sql2.WHERE(queryAux.toString());
+			sql2.WHERE("EXISTS ("+sql3.toString()+")");
 		}
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
