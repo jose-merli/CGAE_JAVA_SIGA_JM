@@ -139,6 +139,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		UnidadFamiliarEJGDTO unidadFamiliarEJGDTO = new UnidadFamiliarEJGDTO();
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		Error error = new Error();
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -230,9 +231,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			            tamMaximo = null;
 			        }
 		
-				LOGGER.info("getExpedientesEconomicos() / setUnidadFamiliarEJGItems.getExpedientesEconomicos() -> Entrada a scsEjgExtendsMapper para obtener Expedienets Económicos");
+				LOGGER.info("getExpedientesEconomicos() / getExpedientesEconomicos.getExpedientesEconomicos() -> Entrada a scsEjgExtendsMapper para obtener Expedienets Económicos");
 				expedienteEconomicoDTO.setExpEconItems(scsExpedienteEconomicoExtendsMapper.getExpedientesEconomicos(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
-				LOGGER.info("getExpedientesEconomicos() / setUnidadFamiliarEJGItems.getExpedientesEconomicos() -> Salida de scsEjgExtendsMapper para obtener Expedienets Económicos");
+				LOGGER.info("getExpedientesEconomicos() / getExpedientesEconomicos.getExpedientesEconomicos() -> Salida de scsEjgExtendsMapper para obtener Expedienets Económicos");
 				if((scsExpedienteEconomicoExtendsMapper.getExpedientesEconomicos(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString())) != null && tamMaximo != null  && (scsExpedienteEconomicoExtendsMapper.getExpedientesEconomicos(ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString())).size() > tamMaximo) {
 					error.setCode(200);
 					error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");

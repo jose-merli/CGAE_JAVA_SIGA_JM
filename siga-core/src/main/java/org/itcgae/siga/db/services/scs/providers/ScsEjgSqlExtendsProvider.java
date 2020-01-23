@@ -390,7 +390,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		}
 		//order
-		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
+//		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
+		sql.ORDER_BY("TURNO ASC, GUARDIA.NOMBRE ASC");
+
 		return sql.toString();	
 	}
 	public String datosEJG(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
