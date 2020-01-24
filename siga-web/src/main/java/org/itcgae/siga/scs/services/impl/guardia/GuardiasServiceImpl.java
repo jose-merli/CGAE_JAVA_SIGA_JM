@@ -494,9 +494,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 					guardia.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
 					guardia.setIdinstitucion(idInstitucion);
 
-					LOGGER.info(
-							"updateGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear DatosGenerales de guardias");
-
 					// Se entrara en cada if dependiendo de que tarjeta se haya editado.
 					// Se define donde entrara segun los datos que lleguen.
 					if (guardiasItem.getDescripcion() != null) {
