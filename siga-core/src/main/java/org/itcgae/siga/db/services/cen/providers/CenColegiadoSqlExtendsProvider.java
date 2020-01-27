@@ -12,7 +12,7 @@ import org.itcgae.siga.db.mappers.CenColegiadoSqlProvider;
 
 public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
-	public String selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem) {
+	public String selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem, Integer tamMaximo) {
 
 		SQL sql = new SQL();
 		SQL sql1 = new SQL();
@@ -343,7 +343,11 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql3.SELECT("*");
 		sql3.FROM("(" + sql2 + ")");
 		sql3.WHERE("RN = 1");
+		if (tamMaximo != null) {
+			Integer tamMaxNumber = tamMaximo + 1;
+			sql3.WHERE("rownum <= " + tamMaxNumber);
 
+		}
 		return sql3.toString();
 		
 	}

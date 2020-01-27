@@ -43,7 +43,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ColegiadoItem> selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem);
+	List<ColegiadoItem> selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem, Integer tamMaximo);
 	
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiado")
 	@Results({@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),

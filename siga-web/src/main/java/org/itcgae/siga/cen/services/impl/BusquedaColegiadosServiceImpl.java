@@ -1,6 +1,7 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,9 +14,13 @@ import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
@@ -24,6 +29,8 @@ import org.itcgae.siga.db.services.cen.mappers.CenTiposcvExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.itcgae.siga.DTOs.gen.Error;
+
 
 @Service
 public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService{
@@ -47,6 +54,9 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 	
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
 	@Override
 	public ComboDTO getCivilStatus(HttpServletRequest request) {
@@ -214,9 +224,10 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 	public ColegiadoDTO searchColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) {
 
 		LOGGER.info("searchColegiado() -> Entrada al servicio para obtener colegiados");
-
+		Error error = new Error();
 		ColegiadoDTO colegiadosDTO = new ColegiadoDTO();
-		
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
 		
 		List<ColegiadoItem> colegiadoItemList = new ArrayList<ColegiadoItem>();
 
@@ -227,12 +238,26 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		if (null != idInstitucion) {
 			if(null !=colegiadoItem.getSearchLoggedUser() && colegiadoItem.getSearchLoggedUser()) {
 				colegiadoItem.setNif(dni);
-
-
 			}
-			colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem);
-			colegiadosDTO.setColegiadoItem(colegiadoItemList);
-
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+	    genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG").andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	    tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+        if (tamMax != null) {
+            tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+        } else {
+            tamMaximo = null;
+        }
+	    
+		colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem, tamMaximo);
+		colegiadosDTO.setColegiadoItem(colegiadoItemList);
+		if((colegiadoItemList != null) && tamMaximo != null && (colegiadoItemList.size()) > tamMaximo) {
+			error.setCode(200);
+			error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+			colegiadosDTO.setError(error);
+			}
 			if (colegiadoItemList == null || colegiadoItemList.size() == 0) {
 
 				LOGGER.warn(
