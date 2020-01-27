@@ -113,7 +113,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+				LOGGER.info("searchGuardias() -> Entrada para obtener las guardias");
 
 				List<GuardiasItem> guardias = scsGuardiasturnoExtendsMapper.searchGuardias(guardiasItem,
 						idInstitucion.toString(), usuarios.get(0).getIdlenguaje());
@@ -323,7 +323,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	@Override
 	public GuardiasItem detalleGuardia(GuardiasItem guardiaTurno, HttpServletRequest request) {
 
-		LOGGER.info("getGuardia() ->  Entrada al servicio para obtener una guardia");
+		LOGGER.info("detalleGuardia() ->  Entrada al servicio para obtener una guardia");
 
 		GuardiasItem guardiaItem = new GuardiasItem();
 
@@ -337,19 +337,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"activagetGuardiateGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"detalleGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"getGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"detalleGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
 
 					LOGGER.info(
-							"getGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a la busqueda de la guardia");
+							"detalleGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a la busqueda de la guardia");
 
 					ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
 					example.createCriteria().andIdguardiaEqualTo(Integer.valueOf(guardiaTurno.getIdGuardia()))
@@ -360,7 +360,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if (guardiasList != null && guardiasList.size() > 0) {
 
 						LOGGER.info(
-								"getGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Mapeamos lo recogido");
+								"detalleGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Mapeamos lo recogido");
 						// Mapeo para Datos Generales
 						ScsGuardiasturno guardia = guardiasList.get(0);
 						guardiaItem.setNombre(guardia.getNombre());
@@ -422,13 +422,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								? guardia.getDiasseparacionguardias().toString()
 								: "0");
 						guardiaItem.setRequeridaValidacion("S".equals(guardia.getRequeridavalidacion()) ? true : false);
-						// String diasSeparacion =
-						// scsGuardiasturnoExtendsMapper.separarGuardias(idGuardia,
-						// guardia.getIdturno().toString(), idInstitucion.toString()).get(0);
-						// guardiaItem.setDiasSeparacionGuardias(UtilidadesString.esCadenaVacia(diasSeparacion)?
-						// diasSeparacion : "0");
 
-						// Check de separarGuardiasCalendario
 						List<GuardiasItem> checkeado = scsHitofacturableguardiaExtendsMapper.getCheckSeparacionGuardias(
 								guardia.getIdturno().toString(), guardia.getIdguardia().toString(),
 								idInstitucion.toString());
@@ -443,10 +437,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 						// Cola de guardia
 						if (guardia.getIdpersonaUltimo() != null)
 							guardiaItem.setIdPersonaUltimo(guardia.getIdpersonaUltimo() + "");
+						LOGGER.info(
+								"detalleGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Acabamos de mapear");
 
 					}
 					LOGGER.info(
-							"getGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Salida de la busqueda de guardia");
+							"detalleGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Salida de la busqueda de guardia");
 
 				} catch (Exception e) {
 					LOGGER.error(e);
@@ -455,7 +451,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		}
 
-		LOGGER.info("getGuardia() -> Salida del servicio para recoger una guardia");
+		LOGGER.info("detalleGuardia() -> Salida del servicio para recoger una guardia");
 
 		return guardiaItem;
 
@@ -526,9 +522,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						List<ScsOrdenacioncolas> colas = scsOrdenacionColasExtendsMapper.selectByExample(ordExample);
 
+						// Esto sirve para ver si habrá que generar grupos automaticamente despues de updatear
 						resetGrupos = false;
 						if ((item.get(0).getPorgrupos().equals("1") || colas.get(0).getOrdenacionmanual() == 0)
-								&& !Boolean.valueOf(guardiasItem.getPorGrupos())
+								&& !Boolean.valueOf(guardiasItem.getPorGrupos()) 
 								&& Short.valueOf(guardiasItem.getFiltros().split(",")[4]) != 0) {
 							resetGrupos = true;
 						}
@@ -547,7 +544,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						colas = scsOrdenacionColasExtendsMapper.selectByExample(ordExample);
 
-						if (colas.isEmpty()) {
+						if (colas.isEmpty()) { // Setteo de cola
 							ScsOrdenacioncolas ordenacion = new ScsOrdenacioncolas();
 							ordenacion.setAlfabeticoapellidos(Short.valueOf(guardiasItem.getFiltros().split(",")[0]));
 							ordenacion.setFechanacimiento(Short.valueOf(guardiasItem.getFiltros().split(",")[1]));
@@ -651,6 +648,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 				try {
 
 					ScsGuardiasturnoExample scsGuardiasturnoExample = null;
+					LOGGER.info(
+				"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Setteo de los campos que se han introducido y el resto de datos heredados de la guardia vinculada");
 
 					ScsGuardiasturno guardia = new ScsGuardiasturno();
 					if (!UtilidadesString.esCadenaVacia(guardiasItem.getIdGuardiaPrincipal())
@@ -679,6 +678,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						guardia.setIdpersonaUltimo(null);
 
 					} else {
+						LOGGER.info(
+								"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Setteo de los campos que se han introducido y el resto de datos por defecto");
 
 						guardia.setFechabaja(null);
 						guardia.setEnviocentralita((short) (guardiasItem.getEnvioCentralita() ? 1 : 0));
@@ -764,20 +765,20 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"resumenGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"resumenGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+				LOGGER.info("resumenGuardia() -> Entrada para obtener datos resumen");
 
 				guardias = scsGuardiasturnoExtendsMapper.getResumen(guardiasItem.getIdGuardia(),
 						guardiasItem.getIdTurno(), idInstitucion.toString(), usuarios.get(0).getIdlenguaje());
 
-				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+				LOGGER.info("resumenGuardia() -> Salida ya con los datos recogidos");
 			}
 		}
 		return guardias.get(0);
@@ -795,18 +796,18 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"resumenConfiguracionCola() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"resumenConfiguracionCola() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+				LOGGER.info("resumenConfiguracionCola() -> Entrada para obtener los resumen Conf. Cola");
 				guardias = scsGuardiasturnoExtendsMapper.resumenConfCola(guardia.getIdGuardia(), guardia.getIdTurno(),
 						idInstitucion.toString());
-				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+				LOGGER.info("resumenConfiguracionCola() -> Salida ya con los datos recogidos");
 			}
 		}
 		return guardias.get(0);
@@ -826,15 +827,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+				LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
 
 				guardias = scsIncompatibilidadguardiasExtendsMapper.tarjetaIncompatibilidades(idGuardia,
 						idInstitucion.toString());
@@ -844,7 +845,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					return it;
 				}).collect(Collectors.toList());
 
-				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+				LOGGER.info("tarjetaIncompatibilidades() -> Salida ya con los datos recogidos");
 			}
 		}
 		guardia.setGuardiaItems(guardias);
@@ -865,19 +866,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"getBaremos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"getBaremos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+				LOGGER.info("getBaremos() -> Entrada para obtener los datos de baremos");
 
 				datos = scsHitofacturableguardiaExtendsMapper.getBaremos(idGuardia, usuarios.get(0).getIdlenguaje());
 
-				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+				LOGGER.info("getBaremos() -> Salida ya con los datos recogidos");
 			}
 		}
 		baremos.setCombooItems(datos);
@@ -897,19 +898,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"getCalendario() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"getCalendario() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+				LOGGER.info("getCalendario() -> Entrada para obtener los datos del calendario");
 
 				datos = scsGuardiasturnoExtendsMapper.getCalendario(idGuardia);
 
-				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+				LOGGER.info("getCalendario() -> Salida ya con los datos recogidos");
 			}
 		}
 
@@ -931,16 +932,16 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchColaGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchColaGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try {
 
 				if (usuarios != null && usuarios.size() > 0) {
-					LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+					LOGGER.info("searchGuardias() -> Entrada para obtener las colas de guardia");
 					ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 							.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
@@ -958,7 +959,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					ScsOrdenacioncolasExample example2 = new ScsOrdenacioncolasExample();
 					example2.createCriteria()
 							.andIdordenacioncolasEqualTo(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
-
+					// Segun lo que nos llega del front preparamos el ORDER BY que habra en la query.
 					List<ScsOrdenacioncolas> cola = scsOrdenacionColasExtendsMapper.selectByExample(example2);
 					Map<Short, String> mapilla = new HashMap();
 					Map<Short, String> mapa = new TreeMap<Short, String>(Collections.reverseOrder());
@@ -999,7 +1000,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						if (!ordenaciones.isEmpty())
 							ordenaciones.substring(0, ordenaciones.length() - 1);
 					}
-
+					// Si hay ultimo se prepara su WHERE correspondiente
 					if (!UtilidadesString.esCadenaVacia(ultimo))
 						ultimo = "WHERE\r\n" + "		idpersona =" + ultimo;
 					String grupoUltimo = "";
@@ -1012,7 +1013,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo);
 					inscritos.setInscripcionesItem(colaGuardia);
 
-					// Si se ha pasado de por grupos a sin grupos hay que updatear todos los grupos
+					// Si se ha pasado de por grupos a sin grupos o que estuviese sin grupos y se añada la ord. manual
+					// hay que updatear todos los grupos
 					// y generarlos con el mismo valor de la posicion que tienen en la lista.
 					if (colaGuardia != null && colaGuardia.size() > 0 && resetGrupos) {
 						resetGrupos = false;
@@ -1036,14 +1038,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 								.selectByExample(grupoGuardiaExample);
 
 						ScsGrupoguardiacolegiadoExample scsGrupoguardiacolegiadoExample = null;
-
+						
 						for (int i = 0; i < todaColaGuardia.size(); i++) {
 							grupoColegiado = new ScsGrupoguardiacolegiado();
-
+							//Aqui se buscan de los grupos existentes uno cuyo numero sea adecuado para el 
+							//orden cola. Si encuentra uno le settea el campo FK.
 							for (ScsGrupoguardia g : gruposGuardia)
 								if ((i + 1) == g.getNumerogrupo())
 									grupoColegiado.setIdgrupoguardia(g.getIdgrupoguardia());
-
+							// Aqui creamos un Grupoguardiacolegiado en caso de que no tenga uno asignado.
 							if (todaColaGuardia.get(i).getIdGrupoGuardiaColegiado() == null) {
 								grupoColegiado.setFechamodificacion(new Date());
 								grupoColegiado.setFechacreacion(new Date());
@@ -1055,8 +1058,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 								grupoColegiado.setIdpersona(Long.valueOf(todaColaGuardia.get(i).getIdPersona()));
 								grupoColegiado.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
 								grupoColegiado.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
-								grupoColegiado.setIdgrupoguardiacolegiado(
-										Long.valueOf(scsGrupoguardiacolegiadoExtendsMapper.getLastId().getNewId()) + 1);
+								
+								NewIdDTO idP = scsGrupoguardiacolegiadoExtendsMapper.getLastId();
+
+								if (idP == null) 
+									grupoColegiado.setIdgrupoguardiacolegiado((long) 1);
+								else 
+									grupoColegiado.setIdgrupoguardiacolegiado(Long.parseLong(idP.getNewId()) + 1);
+								
+								// Si se encontro un grupo se inserta sino se crea uno nuevo y se asigna.
 								if (grupoColegiado.getIdgrupoguardia() != null)
 									scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
 								else {
@@ -1081,7 +1091,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 								}
 
 							} else {
-								// Setteando el nuevo grupo colegiado
+								// En este caso el Grupoguardiacolegiado existe y solo setteamos
+								// lo necesario. 
 								grupoColegiado.setFechamodificacion(new Date());
 								grupoColegiado.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
 								grupoColegiado.setOrden(1);
@@ -1094,9 +1105,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 												Long.valueOf(todaColaGuardia.get(i).getIdGrupoGuardiaColegiado()))
 										.andIdinstitucionEqualTo(idInstitucion);
 
+								// Si previamente se le encontro grupo se inserta directamente
 								if (grupoColegiado.getIdgrupoguardia() != null)
 									scsGrupoguardiacolegiadoExtendsMapper.updateByExampleSelective(grupoColegiado,
 											scsGrupoguardiacolegiadoExample);
+								// Sino se crea uno, se asigna y entonces insertamos
 								else {
 									grupo = new ScsGrupoguardia();
 
@@ -1129,7 +1142,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				}
 
-				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+				LOGGER.info("searchColaGuardia() -> Salida ya con los datos recogidos");
 			} catch (Exception e) {
 				LOGGER.error(e);
 			}
@@ -1139,7 +1152,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Override
 	public UpdateResponseDTO updateUltimoCola(GuardiasItem guardiasItem, HttpServletRequest request) {
-		LOGGER.info("updateGuardia() ->  Entrada al servicio para editar guardia");
+		LOGGER.info("updateUltimoCola() ->  Entrada al servicio para editar guardia");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -1172,6 +1185,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					LOGGER.info(
 							"updateUltimoCola() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear DatosGenerales de guardias");
+					// Se obtiene de la tabla de inscripciones la fecha de suscripcion y se asigna el idpersona.
+					// Hacen falta ambos para definir el ultimo de la cola.
 					ScsInscripcionguardiaExample example = new ScsInscripcionguardiaExample();
 					example.createCriteria().andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
 							.andIdturnoEqualTo(Integer.valueOf(guardiasItem.getIdTurno()))
@@ -1240,12 +1255,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+				LOGGER.info("resumenIncompatibilidades() -> Entrada para obtener las incompatibilidades");
 
 				guardias = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades(guardiasItem,
 						idInstitucion.toString());
 				guardiaDTO.setGuardiaItems(guardias);
-				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+				LOGGER.info("resumenIncompatibilidades() -> Salida ya con los datos recogidos");
 			}
 		}
 
@@ -1265,15 +1280,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"resumenTurno() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"resumenTurno() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("searchGuardias() -> Entrada para obtener los guardias");
+				LOGGER.info("resumenTurno() -> Entrada para obtener los resumen turno");
 
 				turnos = scsTurnosExtendsMapper.resumenTurnoColaGuardia(idTurno, idInstitucion.toString());
 				List<TurnosItem> partidoJudicial = scsSubzonapartidoExtendsMapper.getPartidoJudicialTurno(
@@ -1281,7 +1296,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				if (partidoJudicial.size() > 0)
 					turnos.get(0).setPartidoJudicial(partidoJudicial.get(0).getPartidoJudicial());
 				turnoDTO.setTurnosItems(turnos);
-				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
+				LOGGER.info("resumenTurno() -> Salida ya con los datos recogidos");
 			}
 		}
 
@@ -1296,7 +1311,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
-		int response = 2;
+		int response = 1;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -1334,23 +1349,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if (idGrupoDTO != null)
 						idGrupo = Integer.valueOf(idGrupoDTO.getNewId());
 
-					// ESTO ES EN CASO DE QUE HAYA QUE COMPROBAR DENTRO
-					// List<InscripcionGuardiaItem> todaColaGuardia =
-					// scsInscripcionguardiaExtendsMapper.getColaGuardias(
-					// guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), "",
-					// "", "",idInstitucion.toString());
-					//
-					// int repe = 0;
-					// for(InscripcionGuardiaItem ins: inscripciones) {
-					// if(repe<=1)
-					// repe = todaColaGuardia.stream().filter(it ->
-					// it.getNumeroGrupo().equals(ins.getNumeroGrupo()) &&
-					// it.getOrden().equals(ins.getOrden())).collect(Collectors.toList()).size();
-					// if(repe<=1)
-					// repe = todaColaGuardia.stream().filter(it ->
-					// it.getNumeroGrupo().equals(ins.getNumeroGrupo()) &&
-					// it.getIdPersona().equals(ins.getIdPersona())).collect(Collectors.toList()).size();
-					// }
 
 					// Comprobamos si hay algun grupo nuevo
 					ScsGrupoguardiaExample grupoGuardiaExample = new ScsGrupoguardiaExample();
@@ -1364,16 +1362,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 					List<ScsGrupoguardia> grupoPerteneciente = null;
 					for (int i = 0; i < inscripciones.size(); i++) {
 						InscripcionGuardiaItem element = inscripciones.get(i);
-
+						// Vemos si la inscripcion tiene grupo y si existe
 						if (element.getNumeroGrupo() != null && !"".equals(element.getNumeroGrupo()))
 							grupoPerteneciente = gruposExistentes.stream()
 									.filter(it -> Integer.valueOf(element.getNumeroGrupo()).equals(it.getNumerogrupo()))
 									.collect(Collectors.toList());
+						// Si no pertenece a ninguno se añade a la lista encargada de los nuevos grupos.
 						if (grupoPerteneciente == null || grupoPerteneciente.size() == 0) {
 							inscripcionesGrupoNuevo.add(element); // Aqui vemos si hay alguno nuevo y si lo hay
 						} else {
 							grupoColegiado = new ScsGrupoguardiacolegiado();
-
+							// Si tenia Grupoguardiacolegiado, es decir, no tenia ni grupo ni orden
+							// creamos uno. Para crear es importante la Fechasuscripcion que se obtiene 
+							// con mybatis
 							if (element.getIdGrupoGuardiaColegiado() == null
 									|| element.getIdGrupoGuardiaColegiado().equals("")) {
 								grupoColegiado.setFechamodificacion(new Date());
@@ -1517,9 +1518,26 @@ public class GuardiasServiceImpl implements GuardiasService {
 					}
 				} catch (Exception e) {
 					LOGGER.error(e);
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
 		}
+
+		if (response == 0) {
+			error.setCode(400);
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else if (response == 1) {
+			error.setCode(200);
+			updateResponseDTO.setStatus(SigaConstants.OK);
+
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("guardarColaGuardia() -> Salida del servicio para guardar la cola de guardia");
 
 		return updateResponseDTO;
 	}
