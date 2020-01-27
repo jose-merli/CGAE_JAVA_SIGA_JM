@@ -165,4 +165,10 @@ public class EjgController {
 				ComboDTO response = gestionEJG.comboActaAnnio(request);
 				return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 			}
+	//Combo TipoExpediente
+			@RequestMapping(value = "/gestion-ejg/comboTipoExpediente",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+			ResponseEntity<ComboDTO> comboTipoExpediente(HttpServletRequest request) {
+				ComboDTO response = gestionEJG.comboTipoExpediente(request);
+				return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+			}
 }

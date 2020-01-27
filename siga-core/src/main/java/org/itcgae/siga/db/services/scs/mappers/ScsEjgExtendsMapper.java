@@ -73,23 +73,13 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "NOMBREletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
+
 	})
 	List<EjgItem> busquedaEJG(EjgItem ejgItem, String string, Integer tamMaximo, String idLenguaje);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "datosEJG")
 	@Results({ 
 
-
-//		sql.SELECT("ejg.fechapresentacion");
-//		sql.SELECT("ejg.idtipocolegio");
-//		sql.SELECT("ejg.fechalimitepresentacion");		
-//		sql.SELECT("rectipodictamen.descripcion AS dictamen");
-//		sql.SELECT("rectiporesolucion.descripcion AS resolucion");
-//		sql.SELECT("rectiporesolauto.descripcion AS resolauto");
-//		sql.SELECT("personadesigna.apellidos1 || ' ' || personadesigna.apellidos2 || ', ' || personadesigna.nombre AS nombreletradodesigna");
-//		sql.SELECT("EXPEDIENTE.anioexpediente");
-//		sql.SELECT("EXPEDIENTE.numeroexpediente");
-//		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE");
 		@Result(column = "anio", property = "annio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipoejg", property = "tipoEJG", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
@@ -117,6 +107,7 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "fechalimitepresentacion", property = "fechalimitepresentacion", jdbcType = JdbcType.DATE),
 		@Result(column = "anioexpediente", property = "anioexpediente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numeroexpediente", property = "numeroexpediente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idtipoexpediente", property = "idTipoExpediente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaauto", property = "fechaAuto", jdbcType = JdbcType.DATE),
 		@Result(column = "idtiporesolauto", property = "autoResolutorio", jdbcType = JdbcType.VARCHAR),

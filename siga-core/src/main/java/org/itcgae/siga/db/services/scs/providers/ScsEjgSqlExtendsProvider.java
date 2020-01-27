@@ -61,7 +61,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 //				+ " AND   remesa.prefijo = " + ejgItem.getNumRegRemesa1()
 //				+ " AND   remesa.numero = " + ejgItem.getNumRegRemesa2()
 //				+ " AND   remesa.sufijo = " + ejgItem.getNumRegRemesa3() + ")";
-		if(ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != "")
+			if(ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != "")
 			condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.prefijo = '" + ejgItem.getNumRegRemesa1() + "'";
 		if(ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != "")
 			condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.numero = '" + ejgItem.getNumRegRemesa2() + "'"; 
@@ -85,6 +85,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
 		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre as NOMBRESOLICITANTE");
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
+
 //		sql.SELECT("perjg.NIF");
 //		sql.SELECT("perjg.correoelectronico");
 //		sql.SELECT("perjg.fechanacimiento");
@@ -230,9 +231,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
    		 	sql.WHERE  ("TO_CHAR(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( '"+ fechaPonenteHast + "','DD/MM/RRRR')");
         }     
         if(ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
-        		 sql.WHERE ("regexp_like(EJG.NUMERO_CAJG || EJG.ANIOCAJG,'" + ejgItem.getNumCAJG() +"')");
-		sql.WHERE(condicionAnnioNumActas); 
-		sql.WHERE(condicionNumRegRemesa);
+        	sql.WHERE ("regexp_like(EJG.NUMERO_CAJG || EJG.ANIOCAJG,'" + ejgItem.getNumCAJG() +"')");
+		if(ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
+			sql.WHERE(condicionAnnioNumActas); 
+		if(ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != ""  || ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != "" || ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
+			sql.WHERE(condicionNumRegRemesa);
+		
         if(ejgItem.getAnnioCAJG() != null && ejgItem.getAnnioCAJG() != "")
    		 sql.WHERE ("EJG.aniocajg = " + ejgItem.getAnnioCAJG());
 		//logica rol

@@ -32,4 +32,6 @@ public interface IGestionEJG {
 	ComboDTO comboActaAnnio(HttpServletRequest request);
 
 	ResolucionEJGItem getResolucion(EjgItem ejgItem, HttpServletRequest request);
+
+	ComboDTO comboTipoExpediente(HttpServletRequest request);
 }

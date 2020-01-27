@@ -79,6 +79,7 @@ public class EjgItem {
     private String nombreApeSolicitante;
     private String anioexpediente;
     private String numeroexpediente;
+    private String idTipoExpediente;
     private Date fechapresentacion;
     private Date fechalimitepresentacion;
     private boolean historico;
@@ -1298,5 +1299,20 @@ public class EjgItem {
 	}
 	public void setFechaAuto(Date fechaAuto) {
 		this.fechaAuto = fechaAuto;
+	}
+	/**
+	 **/
+	public EjgItem idTipoExpediente(String idTipoExpediente) {
+		this.idTipoExpediente = idTipoExpediente;
+		return this;
+	}
+
+	@JsonProperty("idTipoExpediente")
+	public String getIdTipoExpediente() {
+		return idTipoExpediente;
+	}
+
+	public void setIdTipoExpediente(String idTipoExpediente) {
+		this.idTipoExpediente = idTipoExpediente;
 	}	
 }
