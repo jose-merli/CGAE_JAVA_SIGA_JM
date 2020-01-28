@@ -38,6 +38,7 @@ public class ColegiadoItem {
 	private Date [] fechaIncorporacion;
 	private Date [] fechaNacimientoRango;
 	private String situacion;
+	private String[] situaciones;
 	private String residencia;
 	private String inscrito;	
 	private String  idProvincia;
@@ -1385,6 +1386,14 @@ public class ColegiadoItem {
 
 	public void setCambioEstado(Boolean cambioEstado) {
 		this.cambioEstado = cambioEstado;
+	}
+
+	public String[] getSituaciones() {
+		return situaciones;
+	}
+
+	public void setSituaciones(String[] situaciones) {
+		this.situaciones = situaciones;
 	}
 	
 }
