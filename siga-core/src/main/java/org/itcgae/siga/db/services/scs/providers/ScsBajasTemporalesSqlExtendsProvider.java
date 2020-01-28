@@ -9,7 +9,7 @@ import org.itcgae.siga.db.mappers.ScsInscripcionturnoSqlProvider;
 public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlProvider {
 
 
-	public String busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Short idInstitucion,String fechadesde,String fechahasta, String afechade) {
+	public String busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Short idInstitucion,String fechadesde,String fechahasta) {
 
 		SQL sql = new SQL();
 		sql.SELECT("DISTINCT\r\n" + 
@@ -27,7 +27,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 				"    per.apellidos1,\r\n" + 
 				"    per.apellidos2");
 		sql.FROM("cen_bajastemporales bt");
-		sql.INNER_JOIN("INNER JOIN cen_colegiado col ON col.idpersona = bt.idpersona and col.idinstitucion = bt.idinstitucion\r\n" + 
+		sql.INNER_JOIN("cen_colegiado col ON col.idpersona = bt.idpersona and col.idinstitucion = bt.idinstitucion\r\n" + 
 				"    INNER JOIN cen_persona per ON per.idpersona = col.idpersona");
 		sql.WHERE("TO_CHAR(bt.fechabt,'YYYY') >= TO_CHAR(bt.fechabt,'YYYY') - 2");
 		sql.WHERE("bt.idinstitucion = '"+idInstitucion+"'");
