@@ -49,4 +49,8 @@ public interface IFacturacionSJCSServices {
 	public void ejecutaFacturacionSJCS();
 	
 	public PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request);
+	
+	public PagosjgItem datosGeneralesPagos(String idPago, HttpServletRequest request); 
+	
+	//public PagosjgDTO historicoPagos(String idPago, HttpServletRequest request);
 }

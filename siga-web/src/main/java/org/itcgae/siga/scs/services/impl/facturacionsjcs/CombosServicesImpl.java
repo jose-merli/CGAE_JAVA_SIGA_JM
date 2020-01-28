@@ -257,4 +257,46 @@ public class CombosServicesImpl implements ICombosServices {
 		
 		return comboEstadosFact;
 	}
+	
+	public ComboDTO comboFacturaciones(HttpServletRequest request) {
+
+		LOGGER.info("comboFacturaciones() -> Entrada del servicio para obtener las facturaciones");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ComboDTO comboFact = new ComboDTO();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			
+			LOGGER.info("comboFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			LOGGER.info("comboFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
+
+				LOGGER.info("comboFacturaciones() / FcsEstadosFacturacionExtendsMapper.estadosPagos() -> Entrada a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
+				
+				List<ComboItem> comboItems = fcsFacturacionJGExtendsMapper.comboFacturaciones(idInstitucion.toString());
+				comboFact.setCombooItems(comboItems);
+				
+				LOGGER.info("comboFacturaciones() / FcsEstadosFacturacionExtendsMapper.comboFacturaciones() -> Salida a FcsEstadosFacturacionExtendsMapper para obtener las facturaciones");
+			} else {
+				LOGGER.warn("comboFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("comboPagoEstados() -> idInstitucion del token nula");
+		}
+		
+		LOGGER.info("comboPagoEstados() -> Salida del servicio para obtener los estados de los pagos");
+		
+		return comboFact;
+	}
 }

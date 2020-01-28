@@ -237,4 +237,21 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "PORCENTAJE", property = "porcentaje", jdbcType = JdbcType.VARCHAR)
 	})
 	List<PagosjgItem> buscarPagos(PagosjgItem pagosItem, String idInstitucion, String idLenguaje);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "comboFacturaciones")
+	@Results({ 
+		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> comboFacturaciones(String idInstitucion);		
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "datosGeneralesPagos")
+	@Results({
+		@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BANCOS_CODIGO", property = "codBanco", jdbcType = JdbcType.VARCHAR)
+	})
+	PagosjgItem datosGeneralesPagos(String idPago, String idInstitucion);
 }

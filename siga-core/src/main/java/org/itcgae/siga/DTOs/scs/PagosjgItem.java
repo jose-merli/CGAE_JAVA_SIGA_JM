@@ -28,6 +28,7 @@ public class PagosjgItem {
 	private Date fechaDesde;
 	private Date fechaHasta;
 	private String cantidad;
+	private String codBanco;
 	
 	@JsonProperty("idInstitucion")
 	public String getIdInstitucion() {
@@ -234,5 +235,14 @@ public class PagosjgItem {
 
 	public void setCantidad(String cantidad) {
 		this.cantidad = cantidad;
+	}
+	
+	@JsonProperty("codBanco")
+	public String getCodBanco() {
+		return codBanco;
+	}
+
+	public void setCodBanco(String codBanco) {
+		this.codBanco = codBanco;
 	}
 }

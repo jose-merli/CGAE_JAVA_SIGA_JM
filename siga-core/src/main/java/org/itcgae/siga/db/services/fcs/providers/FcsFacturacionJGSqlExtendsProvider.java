@@ -872,4 +872,33 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		return sql.toString();
 	}
+	
+	public String comboFacturaciones(String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDFACTURACION");
+		sql.SELECT("NOMBRE");
+		sql.FROM("FCS_FACTURACIONJG");
+		sql.WHERE("IDINSTITUCION="+idInstitucion);
+		sql.ORDER_BY("IDFACTURACION");
+		
+		return sql.toString();
+	}
+	
+	public String datosGeneralesPagos(String idPago, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("PAG.IDINSTITUCION");
+		sql.SELECT("PAG.IDFACTURACION");
+		sql.SELECT("PAG.NOMBRE");
+		sql.SELECT("PAG.IDPAGOSJG");
+		sql.SELECT("PAG.BANCOS_CODIGO");
+		sql.FROM("FCS_PAGOSJG PAG");
+		sql.WHERE("PAG.IDINSTITUCION = "+idInstitucion);
+		sql.WHERE("PAG.IDPAGOSJG="+idPago);
+		sql.ORDER_BY("PAG.IDINSTITUCION");
+		sql.ORDER_BY("PAG.IDPAGOSJG");
+		
+		return sql.toString();
+	}
 }
