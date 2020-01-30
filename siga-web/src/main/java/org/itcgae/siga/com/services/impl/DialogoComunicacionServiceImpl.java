@@ -4,6 +4,7 @@ package org.itcgae.siga.com.services.impl;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -56,6 +57,7 @@ import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.ConEjecucion;
 import org.itcgae.siga.db.entities.EnvCamposenvios;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
@@ -74,6 +76,7 @@ import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.mappers.ConEjecucionMapper;
 import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
@@ -207,6 +210,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 	@Autowired
 	private ModClasecomunicacionesExtendsMapper _modClasecomunicacionesExtendsMapper;
+	
+	@Autowired
+	private ConEjecucionMapper _conEjecucionMapper;
 	
 	
 	static int numeroFicheros = 1; 
@@ -651,7 +657,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					List<Map<String, Object>> result;
 					try {
 						LOGGER.info("SIGARNV-1232 generarComunicacion() -> Ejecutamos la consulta "+consultaEjecutarCondicional);
-						result = _consultasService.ejecutarConsultaConClaves(consultaEjecutarCondicional);
+						result = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarCondicional,usuario,modelosComunicacionItem,consulta);
 						LOGGER.info("SIGARNV-1232 generarComunicacion() -> Ha sido ejecutada la consulta "+consultaEjecutarCondicional);
 					} catch (BusinessSQLException e) {
 						LOGGER.error(e);
@@ -799,15 +805,15 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 				if (consultasItemDest != null && consultasItemDest.size() > 0) {
 
-					LOGGER.debug("Número de consultas de destintarios " + consultasItemCondicional.size());
+					LOGGER.debug("Número de consultas de destintarios " + consultasItemDest.size());
 					for (ConsultaItem consulta : consultasItemDest) {
-
 						String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta,
 								mapaClave, esEnvio);
 
 						List<Map<String, Object>> result;
 						try {
-							result = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDestinatarios);
+							result = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDestinatarios, usuario, modelosComunicacionItem, consulta);	
+							
 							LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se ejecuta la consulta de destinatarios: " + consultaEjecutarDestinatarios);
 							LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se envía a la dirección: " + result);
 
@@ -914,7 +920,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 						List<Map<String, Object>> resultMulti;
 						try {
-							resultMulti = _consultasService.ejecutarConsultaConClaves(consultaEjecutarMulti);
+							resultMulti = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarMulti,usuario,modelosComunicacionItem,consultaMulti);
 							
 							if(resultMulti != null && resultMulti.size() > 0){
 								for(int k = 0;k<resultMulti.size();k++){
@@ -2115,9 +2121,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			
 			List<Map<String, Object>> resultDatos;
 			try {
-				resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+								
+				resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos, usuario, modelosComunicacionItem, consultaDatos);		
+				
 			} catch (BusinessSQLException e) {
 				LOGGER.error(e);
+				
 				throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getDescripcion() + " " + e.getMessage(), e);
 			} catch (Exception e) {
 				LOGGER.error(e);
