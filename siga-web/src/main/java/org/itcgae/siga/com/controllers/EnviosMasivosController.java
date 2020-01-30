@@ -85,6 +85,16 @@ public class EnviosMasivosController {
 			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/searchBusqueda",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EnviosMasivosDTO> busquedaEnvioMasivoSearch(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody EnviosMasivosSearch filtros) {
+		
+		EnviosMasivosDTO response = _enviosMasivosService.busquedaEnvioMasivoSearch(request, filtros); 
+		if(response.getError() == null)
+			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@RequestMapping(value = "/programarEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Error> programarEnvio(HttpServletRequest request, @RequestBody EnviosMasivosItem[] enviosProgramadosDto) {
 		
