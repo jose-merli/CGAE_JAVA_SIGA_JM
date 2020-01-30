@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-	<classPathEntry location="home/johndoe/ojdbc6.jar"/>
+	<classPathEntry location="C:\Users\acorral\Downloads\ojdbc6.jar" />
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
-			connectionURL="jdbc:oracle:thin:@//vmcgaeap004.cloud.es.deloitte.com:1521/cgae" 
+			connectionURL="jdbc:oracle:thin:@//10.75.29.133:1521/cgae" 
 			driverClass="oracle.jdbc.OracleDriver"
 			userId="uscgae"
 			password="uscgae" />
@@ -13,148 +13,76 @@
 			
 		<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
 		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
-		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER" implementationPackage="org.itcgae.siga.db.services" />
+		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER" />
 		
 
-		
-<!-- 		<table schema="USCGAE_INT" tableName="ENV_TIPOENVIOS" > -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_BOTONACCION" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
-		
-<!-- 		<table schema="USCGAE_INT" tableName="ENV_ESTADOENVIO" > -->
+<!-- 		</table>  -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_CERTIFICADOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
-		
-  			<!--<table schema="USCGAE" tableName="ENV_ENVIOS" > 
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_CONSULTAINFORME" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table>  -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_CONFIG" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_CONTADOR" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table>   -->
+			<table schema="USCGAE" tableName="ADM_ENVIOINFORME" >
 				<property name="ignoreQualifiersAtRuntime" value="true"/>
-				<generatedKey column="IDENVIO" sqlStatement="SELECT TO_NUMBER(TO_CHAR(SYSDATE, 'YYYY') || SEQ_ENV_ENVIOS.NEXTVAL) FROM DUAL"/>
-			</table--> 
-
-<!-- 			<table schema="USCGAE" tableName="CON_CONSULTA" > -->
-<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			</table> -->
-
-<!-- 		<table schema="USCGAE_INT" tableName="ENV_ENTRADA_ENVIOS" > -->
+			</table> 
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_GESTORINTERFAZ" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
-		
-<!-- 		<table schema="USCGAE" tableName="ENV_HISTORICOESTADOENVIO" > -->
+<!-- 		</table>  -->
+			<table schema="USCGAE_DESA" tableName="ADM_INFORME" >
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+			</table> 
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_LENGUAJES" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDHISTORICO" sqlStatement="SELECT SEQ_ENV_HISTORICOESTADOENVIO.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table> -->
-		
-<!-- 		<table schema="USCGAE" tableName="ENV_CAMPOSPLANTILLA" > -->
+<!-- 		</table>  -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_MODO_CONTADOR" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDCAMPO" sqlStatement="SELECT SEQ_ENV_CAMPOSPLANTILLA.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table> -->
-		
-		 
-<!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" > -->
-<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			</table> -->
-
-			
-<!-- 				<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" > -->
-<!-- 					<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 				</table> -->
-
-
-<!-- 	 		<table schema="USCGAE" tableName="MOD_CLASECOMUNICACION_RUTA" >  -->
-<!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
-<!-- 	 		</table> -->
-
-<!-- 			<table schema="USCGAE" tableName="MOD_KEYCLASECOMUNICACION" >  -->
-<!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
-<!-- 	 		</table> -->
-	 		
-<!-- 			<table schema="USCGAE" tableName="MOD_CAMPOSKEY" >  -->
-<!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
-<!-- 	 		</table> -->
-
-<!-- 		<table schema="USCGAE" tableName="MOD_MODELOCOMUNICACION" > -->
+<!-- 		</table>  -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_PERFIL" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDMODELOCOMUNICACION" sqlStatement="SELECT SEQ_MOD_MODELOCOMUNICACION.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table> -->
-
-<!-- 		<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" > -->
+<!-- 		</table>  -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_PERFIL_ROL" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDCONSULTAENVIO" sqlStatement="SELECT SEQ_ENV_CONSULTASENVIO.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table> -->
-
-
-<!-- 		<table schema="USCGAE" tableName="MOD_MODELO_PERFILES" > -->
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_ROL" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
-		
-
-<!-- 		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLADOCUMENTO" > -->
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_TIPOFILTROINFORME" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
-
-<!-- 		<table schema="USCGAE" tableName="MOD_REL_PLANTILLA_SUFIJO" > -->
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_TIPOINFORME" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDPLANTILLASUFIJO" sqlStatement="SELECT SEQ_MOD_REL_PLANTILLA_SUFIJO.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table> -->
-
-<!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOCUMENTO" > -->
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_TIPOSACCESO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDPLANTILLADOCUMENTO" sqlStatement="SELECT SEQ_MOD_PLANTILLADOCUMENTO.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table> -->
-		
-<!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOC_FORMATO" > -->
+<!-- 		</table>    -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_TIPOSACCESO_HISTORICO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
-<!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOC_SUFIJO" > -->
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_USUARIO_EFECTIVO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>		 -->
-
-<!-- 			<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLAENVIO" > -->
-<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			</table> -->
-		
-<!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLAREMITENTES" > -->
-<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			</table> -->
-		
-<!-- 				<table schema="USCGAE" tableName="ENV_ENVIOPROGRAMADO" > -->
-<!-- 					<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 				</table> -->
-
-				<!--<table schema="USCGAE" tableName="ENV_CAMPOSENVIOS" > 
-					<property name="ignoreQualifiersAtRuntime" value="true"/>
- 				</table> -->
-
-
-<!-- 			<table schema="USCGAE" tableName="ENV_DESTINATARIOS" > -->
-<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			</table> -->
-		
-		 
-<!-- 			<table schema="USCGAE" tableName="ENV_ENVIOSGRUPOCLIENTE" > -->
-<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			</table> -->
-			
-<!-- 			<table schema="USCGAE" tableName="MOD_CLASECOMUNICACIONES" > -->
-<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			</table> -->
-
-<!-- 		<table schema="USCGAE_INT" tableName="ENV_DOCUMENTOS" > -->
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_USUARIOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDDOCUMENTO" sqlStatement="SELECT SEQ_ENV_DOCUMENTOS.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table> -->
-		
-<!-- 		<table schema="USCGAE_INT" tableName="ENV_DESTINATARIOS" > -->
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_USUARIOS_EFECTIVOS_HIST" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>		 -->
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_USUARIOS_EFECTIVOS_PERFIL" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table>   -->
+<!-- 		<table schema="USCGAE_DESA" tableName="ADM_VALORPREFERENTE" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table>   -->
 
-<!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOC_CONSULTA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDPLANTILLACONSULTA" sqlStatement="SELECT SEQ_MOD_PLANTILLADOCCONSULTA.NEXTVAL FROM DUAL"/>			 -->
-<!-- 		</table> -->
-
-<!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLAENVIO_CONSULTA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
 		
 
 	</context>

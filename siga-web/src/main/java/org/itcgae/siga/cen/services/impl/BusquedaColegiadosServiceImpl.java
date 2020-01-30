@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -29,7 +30,6 @@ import org.itcgae.siga.db.services.cen.mappers.CenTiposcvExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.itcgae.siga.DTOs.gen.Error;
 
 
 @Service
@@ -240,7 +240,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 				colegiadoItem.setNif(dni);
 			}
 		GenParametrosExample genParametrosExample = new GenParametrosExample();
-	    genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG").andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+	    genParametrosExample.createCriteria().andModuloEqualTo("CEN").andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO").andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
 	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 	    tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
