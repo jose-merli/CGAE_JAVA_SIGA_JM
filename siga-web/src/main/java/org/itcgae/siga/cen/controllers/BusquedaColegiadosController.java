@@ -1,5 +1,9 @@
 package org.itcgae.siga.cen.controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
@@ -7,13 +11,17 @@ import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.cen.ComboSubtiposCVDTO;
 import org.itcgae.siga.DTOs.cen.ComboTiposCVDTO;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
 import org.itcgae.siga.cen.services.ISubtipoCurricularService;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
 import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
 import org.itcgae.siga.cen.services.ITipoCurricularService;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -105,6 +113,43 @@ public class BusquedaColegiadosController {
 	ResponseEntity<ComboSubtiposCVDTO> getCurricularSubtypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) { 
 		ComboSubtiposCVDTO response = subtipoCurricularService.getCurricularSubtypeCombo(idTipoCV, false, request);
 		return new ResponseEntity<ComboSubtiposCVDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "busquedaColegiados/generarExcel", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	ResponseEntity<InputStreamResource> generateExcel(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) throws SigaExceptions {
+	
+		ResponseFileDTO response = busquedaColegiadosService.generateExcel(colegiadoItem, request);
+
+		File file = response.getFile();		
+		HttpHeaders headers = null;
+		InputStreamResource resource = null;
+		
+		headers = new HttpHeaders();
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+		
+		if(response.isResultados()){
+			try {
+				resource = new InputStreamResource(new FileInputStream(file));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"");
+			headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
+			System.out.println("The length of the file is : "+file.length());
+			return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.OK);
+		}else{
+			if(response.getError() != null && response.getError().getCode() == 400) {
+				headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"SinArchivo\"");
+				System.out.println("Consulta no permitida");
+				return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.BAD_REQUEST);
+			}else{
+				headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"SinArchivo\"");
+				System.out.println("No se ha generado el fichero");
+				return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.NO_CONTENT);
+			}			
+		}
 	}
 		
 }

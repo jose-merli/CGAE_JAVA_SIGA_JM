@@ -82,7 +82,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 	private Document sustituyeRegionDocumento(Document doc, String region, List dato) throws Exception {
 		DataMailMergeDataSource dataMerge = new DataMailMergeDataSource(region, dato);
-		
+
 		try {
 			if (doc != null && doc.getMailMerge() != null) {
 				doc.getMailMerge().executeWithRegions(dataMerge);
@@ -100,7 +100,6 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 			Set<String> claves = dato.keySet();
 
-			
 			DocumentBuilder builder = new DocumentBuilder(doc);
 
 			if (claves.size() != 0) {
@@ -124,11 +123,11 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			} else {
 				doc = null;
 			}
-			
+
 			doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS
 					| MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS
 					| MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
-			
+
 		} catch (Exception e) {
 			LOGGER.error(e);
 		}
@@ -272,7 +271,10 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 									row.createCell(cell).setCellValue("");
 								} else {
 									Cell celda = row.createCell(cell);
-									if (campo instanceof Number) {
+									// Si desde bbdd se obtiene el formato no numerico y queremos que una columna
+									// especifica sea númerico
+									// obligamos a que el formato de la columna que queremos que sea númerica lo sea
+									if (campo instanceof Number || isNumeric(campo.toString())) {
 										celda.setCellType(Cell.CELL_TYPE_NUMERIC);
 										celda.setCellValue(Double.parseDouble(campo.toString()));
 										cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
@@ -358,6 +360,34 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 		return nombreHoja;
 
+	}
+
+	public boolean isNumeric(String cadena) {
+
+		boolean resultado;
+
+		try {
+			Integer.parseInt(cadena);
+			resultado = true;
+		} catch (NumberFormatException excepcionInteger) {
+
+			try {
+				Double.parseDouble(cadena);
+				resultado = true;
+			} catch (NumberFormatException excepcionDouble) {
+
+				try {
+					Long.parseLong(cadena);
+					resultado = true;
+				} catch (NumberFormatException excepcionLong) {
+
+					resultado = false;
+				}
+
+			}
+		}
+
+		return resultado;
 	}
 
 }

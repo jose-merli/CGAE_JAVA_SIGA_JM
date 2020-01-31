@@ -44,6 +44,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistralesService{
@@ -200,6 +201,7 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO updateRegistryDataLegalPerson(
 			PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, HttpServletRequest request) {
 		LOGGER.info(
@@ -346,31 +348,35 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 						
 						responseCenRegMercantil = cenRegMercantilMapper.insert(datosRegistro);
 						perJuridicaDatosRegistralesUpdateDTO.setIdDatosRegistro(datosRegistro.getIdDatosReg());
-						// 4. Actualizamos el registro en el contador en caso de que el modo sea correcto.
-						AdmContador contadorDTO = new AdmContador();
-						List<AdmContadorDTO> contadorItem = new ArrayList<AdmContadorDTO>();
-						AdmContadorKey exampleContador = new AdmContadorKey();
-						exampleContador.setIdinstitucion(idInstitucion);
-						exampleContador.setIdcontador("SSPP");
-						contadorDTO = admContadorMapper.selectByPrimaryKey(exampleContador);
-						LOGGER.info(
-								"getDatosContador() / admContadorMapper.getContadoresSearch() -> Entrada a AdmContador para buscar el contador a aplicar");
-						if (null != contadorDTO) {
-							if (contadorDTO.getModo().equals(Short.valueOf("0"))) {
-								if (null != perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()) {
-									contadorDTO.setContador(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()));
-									contadorDTO.setFechamodificacion(new Date());
-									contadorDTO.setUsumodificacion(usuario.getIdusuario());
-									admContadorMapper.updateByPrimaryKey(contadorDTO);
-								}
-							}
-						}
+					
 					}
 				}
 			//}
 				responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, String.valueOf(idInstitucion), usuario);
 				LOGGER.info(
 						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson() -> Salida de cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
+				
+				if(perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional().equals("1") && !UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp())) {
+					// 4. Actualizamos el registro en el contador en caso de que el modo sea correcto.
+					AdmContador contadorDTO = new AdmContador();
+					List<AdmContadorDTO> contadorItem = new ArrayList<AdmContadorDTO>();
+					AdmContadorKey exampleContador = new AdmContadorKey();
+					exampleContador.setIdinstitucion(idInstitucion);
+					exampleContador.setIdcontador("SSPP");
+					contadorDTO = admContadorMapper.selectByPrimaryKey(exampleContador);
+					LOGGER.info(
+							"getDatosContador() / admContadorMapper.getContadoresSearch() -> Entrada a AdmContador para buscar el contador a aplicar");
+					if (null != contadorDTO) {
+						if (contadorDTO.getModo().equals(Short.valueOf("0"))) {
+							if (null != perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()) {
+								contadorDTO.setContador(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()));
+								contadorDTO.setFechamodificacion(new Date());
+								contadorDTO.setUsumodificacion(usuario.getIdusuario());
+								admContadorMapper.updateByPrimaryKey(contadorDTO);
+							}
+						}
+					}
+				}
 				
 			}
 			else {

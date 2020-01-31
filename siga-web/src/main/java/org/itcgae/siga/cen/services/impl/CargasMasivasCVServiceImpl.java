@@ -740,7 +740,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 								//nos quedamos con el subtipo propio
 								if(tiposcvsubtipo1s.size() > 1) {
 									for (CenTiposcvsubtipo2 subCV2 : tiposcvsubtipo2s) {
-										if(subCV2.getIdinstitucion() == idInstitucion) {
+										if(subCV2.getIdinstitucion().equals(idInstitucion)) {
 											subCV2Select = subCV2;
 										}
 									}
