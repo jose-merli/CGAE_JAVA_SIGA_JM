@@ -300,7 +300,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	@Override
 	public EnviosMasivosDTO enviosMasivosSearch(HttpServletRequest request, EnviosMasivosSearch filtros) {
-		LOGGER.info("estadoEnvios() -> Entrada al servicio para obtener combo estado envios");
+		LOGGER.info("enviosMasivosSearch() -> Entrada al servicio para obtener envios");
 
 		EnviosMasivosDTO enviosMasivos = new EnviosMasivosDTO();
 		List<EnviosMasivosItem> enviosItemList = new ArrayList<EnviosMasivosItem>();
@@ -344,7 +344,48 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			}
 		}
 
-		LOGGER.info("estadoEnvios() -> Salida del servicio para obtener combo estado envios");
+		LOGGER.info("enviosMasivosSearch() -> Salida del servicio para obtener envios");
+		return enviosMasivos;
+	}
+
+	@Override
+	public EnviosMasivosDTO busquedaEnvioMasivoSearch(HttpServletRequest request, EnviosMasivosSearch filtros) {
+		LOGGER.info("busquedaEnvioMasivoSearch() -> Entrada al servicio para obtener envios");
+
+		EnviosMasivosDTO enviosMasivos = new EnviosMasivosDTO();
+		List<EnviosMasivosItem> enviosItemList = new ArrayList<EnviosMasivosItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					enviosItemList = _envEnviosExtendsMapper.busquedaSelectEnviosMasivosSearch(usuario.getIdinstitucion(),
+							usuario.getIdlenguaje(), filtros);
+					if (enviosItemList.size() > 0) {
+						enviosMasivos.setEnviosMasivosItem(enviosItemList);
+					}
+				} catch (Exception e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage(e.getMessage());
+					enviosMasivos.setError(error);
+				}
+
+			}
+		}
+
+		LOGGER.info("busquedaEnvioMasivoSearch() -> Salida del servicio para obtener envios");
 		return enviosMasivos;
 	}
 

@@ -61,5 +61,6 @@ public interface IEnviosMasivosService {
 	public String getPathFicheroEnvioMasivo(Short idInstitucion, Long idEnvio);
 	public File[] getFicherosLOGEnvioMasivo(Short idInstitucion, Long idEnvio);
 	public File getPathFicheroLOGEnvioMasivo(Short idInstitucion, Long idEnvio);
+	public EnviosMasivosDTO busquedaEnvioMasivoSearch(HttpServletRequest request, EnviosMasivosSearch filtros);
 }
 
