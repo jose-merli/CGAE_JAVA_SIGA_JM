@@ -902,6 +902,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
 								Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
 								plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
+				boolean consultasDestinatarioEjecutadas = consultasItemDest.size() > 0;
 				if (consultasItemMulti != null && consultasItemMulti.size() > 0) {
 
 					for (ConsultaItem consultaMulti : consultasItemMulti) {
@@ -921,7 +922,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						List<Map<String, Object>> resultMulti;
 						try {
 							resultMulti = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarMulti,usuario,modelosComunicacionItem,consultaMulti);
-							
+							LOGGER.info("Se ejecuta la consulta MULTI");
 							if(resultMulti != null && resultMulti.size() > 0){
 								for(int k = 0;k<resultMulti.size();k++){
 									// Por cada registro generamos un documento
@@ -929,7 +930,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 											listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 											hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-											nombrePlantilla, esEnvio, esExcel, esDestinatario);
+											nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
 								}														
 							}
 								
@@ -947,7 +948,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-							nombrePlantilla, esEnvio, esExcel, esDestinatario);
+							nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
 				}
 			
 //				if (ejecutarConsulta) {
@@ -2067,7 +2068,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 	}
 	
-	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario) {
+	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario, boolean consultasDestinatarioEjecutadas) {
 		
 		LOGGER.debug("Obtenemos la ruta temporal del fichero de salida");
 		String rutaTmp = getRutaFicheroSalida(dialogo.getIdInstitucion());
@@ -2097,10 +2098,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<ConsultaItem> consultasItemFinal = new ArrayList<ConsultaItem>();
 		List<ConsultaItem> consultasItemDatos = new ArrayList<ConsultaItem>();
 		List<ConsultaItem> consultasItemDestinatario = new ArrayList<ConsultaItem>();	
-		
-		consultasItemDestinatario = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
-		for(ConsultaItem consultaDatosDestinatario:consultasItemDestinatario){
-			consultasItemFinal.add(consultaDatosDestinatario);
+		if(!consultasDestinatarioEjecutadas) {
+			consultasItemDestinatario = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
+			for(ConsultaItem consultaDatosDestinatario:consultasItemDestinatario){
+				consultasItemFinal.add(consultaDatosDestinatario);
+			}
 		}
 
 		consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
@@ -2123,6 +2125,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			try {
 								
 				resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos, usuario, modelosComunicacionItem, consultaDatos);		
+				LOGGER.info("Se ejecuta la consulta de DATOS");
 				
 			} catch (BusinessSQLException e) {
 				LOGGER.error(e);
