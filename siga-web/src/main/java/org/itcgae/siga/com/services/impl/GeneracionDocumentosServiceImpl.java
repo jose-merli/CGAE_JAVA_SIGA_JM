@@ -274,7 +274,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 									// Si desde bbdd se obtiene el formato no numerico y queremos que una columna
 									// especifica sea númerico
 									// obligamos a que el formato de la columna que queremos que sea númerica lo sea
-									if (campo instanceof Number || isNumeric(campo.toString())) {
+									if (campo instanceof Number) {
 										celda.setCellType(Cell.CELL_TYPE_NUMERIC);
 										celda.setCellValue(Double.parseDouble(campo.toString()));
 										cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
@@ -362,32 +362,32 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 	}
 
-	public boolean isNumeric(String cadena) {
-
-		boolean resultado;
-
-		try {
-			Integer.parseInt(cadena);
-			resultado = true;
-		} catch (NumberFormatException excepcionInteger) {
-
-			try {
-				Double.parseDouble(cadena);
-				resultado = true;
-			} catch (NumberFormatException excepcionDouble) {
-
-				try {
-					Long.parseLong(cadena);
-					resultado = true;
-				} catch (NumberFormatException excepcionLong) {
-
-					resultado = false;
-				}
-
-			}
-		}
-
-		return resultado;
-	}
+//	public boolean isNumeric(String cadena) {
+//
+//		boolean resultado;
+//
+//		try {
+//			Integer.parseInt(cadena);
+//			resultado = true;
+//		} catch (NumberFormatException excepcionInteger) {
+//
+//			try {
+//				Double.parseDouble(cadena);
+//				resultado = true;
+//			} catch (NumberFormatException excepcionDouble) {
+//
+//				try {
+//					Long.parseLong(cadena);
+//					resultado = true;
+//				} catch (NumberFormatException excepcionLong) {
+//
+//					resultado = false;
+//				}
+//
+//			}
+//		}
+//
+//		return resultado;
+//	}
 
 }
