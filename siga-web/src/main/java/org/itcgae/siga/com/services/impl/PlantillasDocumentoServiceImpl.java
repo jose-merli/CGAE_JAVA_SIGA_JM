@@ -223,13 +223,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion,
 							SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
 
-//					if (null != comboItems && comboItems.size() > 0) {
-//						ComboItemConsulta element = new ComboItemConsulta();
-//						element.setLabel("");
-//						element.setValue("");
-//						comboItems.add(0, element);
-//					}
-
 					comboConsultasDTO.setConsultasCondicional(comboItems);
 
 					LOGGER.debug("Obtenemos las consultas DATOS");
@@ -237,13 +230,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(
 							Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion,
 							SigaConstants.OBJETIVO.DATOS.getCodigo());
-
-					if (null != comboItems && comboItems.size() > 0) {
-						ComboItemConsulta element = new ComboItemConsulta();
-						element.setLabel("");
-						element.setValue("");
-						comboItems.add(0, element);
-					}
 
 					comboConsultasDTO.setConsultasDatos(comboItems);
 
@@ -253,13 +239,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion,
 							SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
 
-					if (null != comboItems && comboItems.size() > 0) {
-						ComboItemConsulta element = new ComboItemConsulta();
-						element.setLabel("");
-						element.setValue("");
-						comboItems.add(0, element);
-					}
-
 					comboConsultasDTO.setConsultasMultidoc(comboItems);
 
 					LOGGER.debug("Obtenemos las consultas DESTINATARIOS");
@@ -267,13 +246,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(
 							Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion,
 							SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
-
-					if (null != comboItems && comboItems.size() > 0) {
-						ComboItemConsulta element = new ComboItemConsulta();
-						element.setLabel("");
-						element.setValue("");
-						comboItems.add(0, element);
-					}
 
 					comboConsultasDTO.setConsultasDestinatarios(comboItems);
 

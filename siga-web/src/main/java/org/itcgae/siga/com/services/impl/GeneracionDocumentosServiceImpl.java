@@ -264,7 +264,6 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 							Row row = sheet.createRow(rowNum++);
 							int cell = 0;
 
-							CellStyle cellStyle = workbook.createCellStyle();
 							for (int j = 0; j < columnsKey.size(); j++) {
 								Object campo = map.get(columnsKey.get(j).trim());
 								if (campo == null || campo.toString().trim() == "") {
@@ -277,10 +276,12 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 									if (campo instanceof Number) {
 										celda.setCellType(Cell.CELL_TYPE_NUMERIC);
 										celda.setCellValue(Double.parseDouble(campo.toString()));
+										CellStyle cellStyle = workbook.createCellStyle();
 										cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
 										celda.setCellStyle(cellStyle);
 									} else if (campo instanceof Date) {
 										celda.setCellType(Cell.CELL_TYPE_STRING);
+										CellStyle cellStyle = workbook.createCellStyle();
 										cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
 										XSSFRichTextString textCell = new XSSFRichTextString(
 												SigaConstants.DATE_FORMAT_MIN.format(campo));
@@ -288,6 +289,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 										celda.setCellStyle(cellStyle);
 									} else {
 										celda.setCellType(Cell.CELL_TYPE_STRING);
+										CellStyle cellStyle = workbook.createCellStyle();
 										cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
 										XSSFRichTextString textCell = new XSSFRichTextString(campo.toString());
 										celda.setCellValue(textCell);
