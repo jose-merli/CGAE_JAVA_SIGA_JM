@@ -427,20 +427,23 @@ public class EnviosServiceImpl implements IEnviosService{
     }
 
     private void rellenaCelda(Workbook workbook, Cell celda, Object campo) {
-        CellStyle cellStyle = workbook.createCellStyle();
+        
         if (campo instanceof Number) {
             celda.setCellType(Cell.CELL_TYPE_NUMERIC);
             celda.setCellValue(Double.parseDouble(campo.toString()));
+            CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);                                
             celda.setCellStyle(cellStyle);
         } else if (campo instanceof Date) {
             celda.setCellType(Cell.CELL_TYPE_STRING);
+            CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
             XSSFRichTextString textCell = new XSSFRichTextString(SigaConstants.DATE_FORMAT_MIN.format(campo));
             celda.setCellValue(textCell);
             celda.setCellStyle(cellStyle);
         } else {
             celda.setCellType(Cell.CELL_TYPE_STRING);
+            CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
             XSSFRichTextString textCell = new XSSFRichTextString(campo.toString());
             celda.setCellValue(textCell);
