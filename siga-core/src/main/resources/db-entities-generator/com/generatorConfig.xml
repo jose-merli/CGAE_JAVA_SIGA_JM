@@ -1,344 +1,160 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-	<classPathEntry location="C:\Users\DTUser\Downloads\ojdbc6.jar" />
+	<classPathEntry location="C:\repositorio_weblogic\ojdbc6.jar"/>
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
-			connectionURL="jdbc:oracle:thin:@//192.168.18.6:1546/SIGADES" 
+			connectionURL="jdbc:oracle:thin:@//vmcgaeap004.cloud.es.deloitte.com:1521/cgae" 
 			driverClass="oracle.jdbc.OracleDriver"
 			userId="uscgae"
 			password="uscgae" />
 			
 			
 		<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
-		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
-		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER"/>
-		
+		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> 
+		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER" implementationPackage="org.itcgae.siga.db.services" />
+		-->
 
 		
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLICMODIFCAMBIARFOTO" > -->
+<!-- 		<table schema="USCGAE_INT" tableName="ENV_TIPOENVIOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
+<!-- 		</table> -->
 		
-		<table schema="USCGAE" tableName="CEN_SOLICMODIFCAMBIARFOTO">
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDSOLICITUD" 
- 				sqlStatement="SELECT SEQ_CENSOLICMODIFCAMBIARFOTO.NEXTVAL FROM DUAL" />
-		</table>
+<!-- 		<table schema="USCGAE_INT" tableName="ENV_ESTADOENVIO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table> -->
 		
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_AC_IPS" > -->
+  			<!--<table schema="USCGAE" tableName="ENV_ENVIOS" > 
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+				<generatedKey column="IDENVIO" sqlStatement="SELECT TO_NUMBER(TO_CHAR(SYSDATE, 'YYYY') || SEQ_ENV_ENVIOS.NEXTVAL) FROM DUAL"/>
+			</table--> 
+
+<!-- 			<table schema="USCGAE" tableName="CON_CONSULTA" > -->
+<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			</table> -->
+
+<!-- 		<table schema="USCGAE_INT" tableName="ENV_ENTRADA_ENVIOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_AC_LISTA_NEGRA_BLANCA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_AC_MAESTRO_IDIOMA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_AC_MENSAJE" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_AC_PETICION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_AC_RESPUESTA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_AC_SERVICIO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_AC_XML" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ACCESODATOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ACCESODATOS_CAMPOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ACTIVIDADPROFESIONAL" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ANEXOS_CUENTASBANCARIAS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_BAJASTEMPORALES" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_BANCOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_CAMPOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_CARGAMASIVA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDCARGAMASIVA" sqlStatement="SELECT SEQ_CEN_CARGAMASIVA.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_CARGO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_CGAE" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_CLIENTE" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_COLACAMBIOLETRADO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_COLEGIADO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_COLEGIO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_COLEGIOPROCURADOR" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_COMPONENTES" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_COMUNIDADESAUTONOMAS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_CONSEJO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_CONTACTO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_CUENTASBANCARIAS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_DATOSCOLEGIALESESTADO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_DATOSCV" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_DIRECCION_TIPODIRECCION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_DIRECCIONES" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_DOCUMENTACIONMODALIDAD" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_DOCUMENTACIONPRESENTADA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_DOCUMENTACIONSOLICITUD" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_DOCUMENTSOLICITUDINSTITU" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ESTADOACTIVIDAD" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ESTADOACTIVIDADPERSONA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ESTADOCIVIL" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ESTADOCOLEGIAL" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ESTADOSOLICITUD" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ESTADOSOLICITUDMODIF" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_FAL2_LOG" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDCENFAL2LOG" sqlStatement="SELECT SEQ_CEN_FAL2_LOG.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table>     -->
+<!-- 		</table> -->
 		
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_GRUPOS_FICHEROS" > -->
+<!-- 		<table schema="USCGAE" tableName="ENV_HISTORICOESTADOENVIO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_GRUPOSCLIENTE" > -->
+<!-- 			<generatedKey column="IDHISTORICO" sqlStatement="SELECT SEQ_ENV_HISTORICOESTADOENVIO.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
+		
+<!-- 		<table schema="USCGAE" tableName="ENV_CAMPOSPLANTILLA" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_GRUPOSCLIENTE_CLIENTE" > -->
+<!-- 			<generatedKey column="IDCAMPO" sqlStatement="SELECT SEQ_ENV_CAMPOSPLANTILLA.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
+		
+		 
+<!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" > -->
+<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			</table> -->
+
+			
+<!-- 				<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" > -->
+<!-- 					<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 				</table> -->
+
+
+<!-- 	 		<table schema="USCGAE" tableName="MOD_CLASECOMUNICACION_RUTA" >  -->
+<!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
+<!-- 	 		</table> -->
+
+<!-- 			<table schema="USCGAE" tableName="MOD_KEYCLASECOMUNICACION" >  -->
+<!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
+<!-- 	 		</table> -->
+	 		
+<!-- 			<table schema="USCGAE" tableName="MOD_CAMPOSKEY" >  -->
+<!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
+<!-- 	 		</table> -->
+
+<!-- 		<table schema="USCGAE" tableName="MOD_MODELOCOMUNICACION" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_GRUPOSCRITERIOS" > -->
+<!-- 			<generatedKey column="IDMODELOCOMUNICACION" sqlStatement="SELECT SEQ_MOD_MODELOCOMUNICACION.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
+
+<!-- 		<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_HISTORICO" > -->
+<!-- 			<generatedKey column="IDCONSULTAENVIO" sqlStatement="SELECT SEQ_ENV_CONSULTASENVIO.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
+
+
+<!-- 		<table schema="USCGAE" tableName="MOD_MODELO_PERFILES" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_INFLUENCIA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_INSTITUCION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_INSTITUCION_LENGUAJES" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_INSTITUCION_POBLACION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_MANDATOS_CUENTASBANCARIAS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_MED_TIPODOCUMENTO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_MED_TIPOMOVIM" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_MEDIADOR_CSV" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDMEDIADORCSV" sqlStatement="SELECT SEQ_CEN_MEDIADOR_CSV.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_MEDIADOR_EXPORTFICHERO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDMEDIADOREXPORTFICHERO" sqlStatement="SELECT SEQ_CEN_MED_EXPORTFICH.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_MEDIADOR_FICHEROCSV" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDMEDIADORFICHEROCSV" sqlStatement="SELECT SEQ_CEN_MEDIAD_FICHEROCSV.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_MEDIADOR_TIPOEXPORT" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_MEDIADOR_XML" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDMEDIADORXML" sqlStatement="SELECT SEQ_CEN_MED_XML.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_NOCOLEGIADO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_NOCOLEGIADO_ACTIVIDAD" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_ORGANISMOS_INT" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_PAIS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_PAISES_ORGINT" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_PARTIDOJUDICIAL" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_PERSONA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_PLAZAS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_POBLACIONES" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_PROVINCIAS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SANCION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLICITMODIFDATOSBASICOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLICITUDALTER" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLICITUDESMODIFICACION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLICITUDINCORPORACION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLICITUDMODIFICACIONCV" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLICITUDMUTUALIDAD" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLICMODICUENTAS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLICMODIFEXPORTARFOTO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLIMODIDIRECCIONES" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SOLMODIFACTURACIONSERVICIO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_SUCURSALES" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOCAMBIO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOCAMBIOCOLA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOCLIENTE" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOCLIENTE_ACCESODATOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOCOLEGIACION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOCOLEGIO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPODIRECCION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOIDENTIFICACION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOSANCION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOSCV" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOSCVSUBTIPO1" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOSCVSUBTIPO2" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOSMODIFICACIONES" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOSOCIEDAD" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOSOLICITUD" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOSSEGURO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TIPOVIA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_TRATAMIENTO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="CEN_UNSOLOCOL_EJER_NORESID"> -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>  -->
+<!-- 		</table> -->
 		
 
+<!-- 		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLADOCUMENTO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table> -->
+
+<!-- 		<table schema="USCGAE" tableName="MOD_REL_PLANTILLA_SUFIJO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			<generatedKey column="IDPLANTILLASUFIJO" sqlStatement="SELECT SEQ_MOD_REL_PLANTILLA_SUFIJO.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
+
+<!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOCUMENTO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			<generatedKey column="IDPLANTILLADOCUMENTO" sqlStatement="SELECT SEQ_MOD_PLANTILLADOCUMENTO.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
+		
+<!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOC_FORMATO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table> -->
+<!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOC_SUFIJO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table>		 -->
+
+<!-- 			<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLAENVIO" > -->
+<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			</table> -->
+		
+<!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLAREMITENTES" > -->
+<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			</table> -->
+		
+<!-- 				<table schema="USCGAE" tableName="ENV_ENVIOPROGRAMADO" > -->
+<!-- 					<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 				</table> -->
+
+				<!--<table schema="USCGAE" tableName="ENV_CAMPOSENVIOS" > 
+					<property name="ignoreQualifiersAtRuntime" value="true"/>
+ 				</table> -->
+
+
+<!-- 			<table schema="USCGAE" tableName="ENV_DESTINATARIOS" > -->
+<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			</table> -->
+		
+		 
+<!-- 			<table schema="USCGAE" tableName="ENV_ENVIOSGRUPOCLIENTE" > -->
+<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			</table> -->
+			
+<!-- 			<table schema="USCGAE" tableName="MOD_CLASECOMUNICACIONES" > -->
+<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			</table> -->
+
+<!-- 		<table schema="USCGAE_INT" tableName="ENV_DOCUMENTOS" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			<generatedKey column="IDDOCUMENTO" sqlStatement="SELECT SEQ_ENV_DOCUMENTOS.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
+		
+<!-- 		<table schema="USCGAE_INT" tableName="ENV_DESTINATARIOS" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table>		 -->
+
+<!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOC_CONSULTA" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			<generatedKey column="IDPLANTILLACONSULTA" sqlStatement="SELECT SEQ_MOD_PLANTILLADOCCONSULTA.NEXTVAL FROM DUAL"/>			 -->
+<!-- 		</table> -->
+
+ 		<table schema="USCGAE" tableName="MOD_PLANTILLAENVIO_CONSULTA" >
+ 			<property name="ignoreQualifiersAtRuntime" value="true"/>
+ 		</table>
 		
 
 	</context>
