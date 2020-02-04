@@ -110,6 +110,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSql
 		sql.INNER_JOIN("ENV_TIPOENVIOS TIPO ON PLANTILLA.Idtipoenvios = TIPO.Idtipoenvios");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = TIPO.NOMBRE AND CAT.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.WHERE("PLANTILLA.ANTIGUA = 'N' AND PLANTILLA.Idplantillaenvios = " + idPlantilla +" AND PLANTILLA.idinstitucion = "+ idInstitucion);
+		sql.WHERE("PLANTILLA.fechabaja is null");
 		
 		return sql.toString();
 	}
