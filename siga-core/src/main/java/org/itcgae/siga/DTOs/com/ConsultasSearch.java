@@ -16,7 +16,7 @@ public class ConsultasSearch {
 	private String idObjetivo;
 	private String idClaseComunicacion;
 	private String idInstitucion;
-	
+	private Boolean historico;
 	
 	@JsonProperty("idModulo")
 	public String getIdModulo() {
@@ -96,6 +96,12 @@ public class ConsultasSearch {
 	}
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
+	}
+	public Boolean getHistorico() {
+		return historico;
+	}
+	public void setHistorico(Boolean historico) {
+		this.historico = historico;
 	}
 	
 	

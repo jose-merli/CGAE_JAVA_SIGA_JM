@@ -24,6 +24,7 @@ import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
@@ -686,7 +687,9 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 
 					EnvPlantillasenvios plantilla = _envPlantillaEnviosExtendsMapper.selectByPrimaryKey(key);
 					plantilla.setIddireccion(Long.valueOf(remitente.getIdDireccion()));
-					plantilla.setIdpersona(Long.valueOf(remitente.getIdPersona()));
+					if(!UtilidadesString.esCadenaVacia(remitente.getIdPersona())) {
+						plantilla.setIdpersona(Long.valueOf(remitente.getIdPersona()));
+					}
 					plantilla.setDescripcionRemitente(remitente.getDescripcion());
 					plantilla.setFechamodificacion(new Date());
 					plantilla.setUsumodificacion(usuario.getIdusuario());

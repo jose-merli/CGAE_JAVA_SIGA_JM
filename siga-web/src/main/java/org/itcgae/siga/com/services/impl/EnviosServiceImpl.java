@@ -482,11 +482,12 @@ public class EnviosServiceImpl implements IEnviosService{
 
     private List<DestinatarioItem> limpiaCorreosDuplicados(List<DestinatarioItem> destinatarios) {
         List<DestinatarioItem> destinatariosCopia = new ArrayList<DestinatarioItem>();
-        Map<String, Boolean> mapaCorreos = new HashMap<String, Boolean>();
+        Map<Map<String, String>, Boolean> mapaCorreos = new HashMap<Map<String, String>, Boolean>();
         if (destinatarios != null) {
             for (DestinatarioItem destinatarioItem : destinatarios) {
                 if (destinatarioItem != null && destinatarioItem.getCorreoElectronico() != null && !destinatarioItem.getCorreoElectronico().trim().equals("")) {
-                    String correo = destinatarioItem.getCorreoElectronico().trim().toUpperCase();
+                	Map<String, String> correo = new HashMap<String, String>();
+                	correo.put(destinatarioItem.getIdPersona(), destinatarioItem.getCorreoElectronico());        
                     if (!mapaCorreos.containsKey(correo)) {
                         destinatariosCopia.add(destinatarioItem);
                         mapaCorreos.put(correo, true);

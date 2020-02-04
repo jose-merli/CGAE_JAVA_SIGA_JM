@@ -57,7 +57,9 @@ public class ConConsultasExtendsSqlProvider {
 		if(filtros.getIdObjetivo() != null && !filtros.getIdObjetivo().trim().equals("")){
 			sql.WHERE("CONSULTA.IDOBJETIVO = '" + filtros.getIdObjetivo() +"'");
 		}
-		sql.WHERE("CONSULTA.FECHABAJA IS NULL");
+		if(!filtros.getHistorico()) {
+			sql.WHERE("CONSULTA.FECHABAJA IS NULL");
+		}
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
 			sql.WHERE(filtroTextoBusquedas("CONSULTA.DESCRIPCION",filtros.getNombre()));

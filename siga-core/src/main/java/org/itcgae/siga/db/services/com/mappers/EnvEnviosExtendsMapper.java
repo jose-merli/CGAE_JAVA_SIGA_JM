@@ -39,6 +39,20 @@ public interface EnvEnviosExtendsMapper {
       })
       List<EnviosMasivosItem> selectEnviosMasivosSearch(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros);
       
+      @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "busquedaSelectEnvios")
+      @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+                @Result(column = "FECHACREACION", property = "fechaCreacion", jdbcType = JdbcType.DATE),
+//                @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
+//                @Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "FECHAPROGRAMADA", property = "fechaProgramada", jdbcType = JdbcType.DATE),
+                @Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+                @Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+                @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR),
+      })
+      List<EnviosMasivosItem> busquedaSelectEnviosMasivosSearch(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros);
+      
       @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectMaxIDEnvio")
       @Results({
                 @Result(column = "IDMAX", property = "newId", jdbcType = JdbcType.VARCHAR)

@@ -534,7 +534,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 		EnvDestinatariosExample ejemplo = new EnvDestinatariosExample();
 		ejemplo.createCriteria().andIdinstitucionEqualTo(cenPersona.getIdinstitucion())
 				.andIdenvioEqualTo(etiquetasDTO.getIdenvio())
-				.andIdpersonaEqualTo(cenPersona.getIdpersona());
+				.andIdpersonaEqualTo(cenPersona.getIdpersona())
+				.andCorreoelectronicoEqualTo(direccion.getCorreoelectronico());
 		List<EnvDestinatarios> destinatariosExistentes = _envDestinatariosMapper
 				.selectByExample(ejemplo);
 
