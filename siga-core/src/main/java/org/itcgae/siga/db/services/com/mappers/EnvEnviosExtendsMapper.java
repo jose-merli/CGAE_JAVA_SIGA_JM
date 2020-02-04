@@ -51,6 +51,7 @@ public interface EnvEnviosExtendsMapper {
                 @Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
                 @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR),
                 @Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR),
+                @Result(column = "NUMDEST", property = "numDestinatarios", jdbcType = JdbcType.NUMERIC)
                 
       })
       List<EnviosMasivosItem> busquedaSelectEnviosMasivosSearch(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros);
