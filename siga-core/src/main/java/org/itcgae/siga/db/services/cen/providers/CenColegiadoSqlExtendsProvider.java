@@ -55,7 +55,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 //		sql.SELECT_DISTINCT("cli.idlenguaje");
 //		sql.SELECT_DISTINCT("cli.asientocontable");
 //		sql.SELECT_DISTINCT("col.nmutualista");
-//		sql.SELECT("TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
+		sql.SELECT("TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
 //		sql.SELECT("TO_CHAR(col.fechajura,'DD/MM/YYYY') AS fechajura");
 //		sql.SELECT("TO_CHAR(col.fechatitulacion,'DD/MM/YYYY') AS fechatitulacion");
 //		sql.SELECT("TO_CHAR(col.fechapresentacion,'DD/MM/YYYY') AS fechapresentacion");
