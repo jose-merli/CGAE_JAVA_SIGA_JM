@@ -35,10 +35,10 @@
 <!-- 			<generatedKey column="IDCURSO"  -->
 <!--  				sqlStatement="SELECT SEQ_FORCURSO.NEXTVAL FROM DUAL" /> -->
 <!-- 		</table>   -->
-				<table schema="USCGAE" tableName="CEN_SOLICMODIFCAMBIARFOTO">
+				<table schema="USCGAE" tableName="CON_EJECUCION">
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDSOLICITUD" 
- 				sqlStatement="SELECT SEQ_CENSOLICMODIFCAMBIARFOTO.NEXTVAL FROM DUAL" />
+			<generatedKey column="IDEJECUCION" 
+ 				sqlStatement="SELECT SEQ_CON_EJECUCION_PK.NEXTVAL FROM DUAL" />
 		</table>
 
 	</context>

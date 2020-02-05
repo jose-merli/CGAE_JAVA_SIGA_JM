@@ -57,6 +57,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.ConEjecucion;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
@@ -69,6 +70,7 @@ import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.mappers.ConEjecucionMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
@@ -88,6 +90,7 @@ import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,6 +164,9 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 	@Autowired
 	private ModModeloComunicacionExtendsMapper _modModeloComunicacionExtendsMapper;
+	
+	@Autowired
+	private ConEjecucionMapper _conEjecucionMapper;
 
 	@Override
 	public ComboDTO modulo(HttpServletRequest request) {
@@ -2392,11 +2398,11 @@ public class ConsultasServiceImpl implements IConsultasService {
 		return select;
 	}
 
-	@Override
-	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws ParseException, SigaExceptions {
 
-		List<Map<String, Object>> result = null;
-
+	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws Exception{
+		
+		List<Map<String,Object>> result = null;
+		Date inicial = new Date();
 		try {
 
 			sentencia = quitarEtiquetas(sentencia.toUpperCase());
@@ -2438,7 +2444,32 @@ public class ConsultasServiceImpl implements IConsultasService {
 		}
 		return result;
 	}
+ 
+	
+	@Override
+	public List<Map<String, Object>> ejecutarConsultaConClavesLog(String sentencia, AdmUsuarios usuario,ModelosComunicacionItem modelosComunicacionItem, ConsultaItem consulta) throws ParseException, SigaExceptions {
+		List<Map<String, Object>> resultDatos = null;
+		Date inicialDate = new Date();
+		try {
+			resultDatos = ejecutarConsultaConClaves(sentencia);
+			insertarLogEjecucion(inicialDate, Short.valueOf(usuario.getIdinstitucion()),Integer.valueOf(usuario.getIdusuario()), Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()), "");
+			
 
+			} catch (BusinessSQLException e) {
+				LOGGER.error(e);
+				insertarLogEjecucion(inicialDate, Short.valueOf(usuario.getIdinstitucion()),Integer.valueOf(usuario.getIdusuario()), Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()), e.getMessage());
+				throw new BusinessException(
+						"Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(),
+						e);
+			} catch (Exception e) {
+				LOGGER.warn("Error al ejejcutar la consulta" + e);
+				insertarLogEjecucion(inicialDate, Short.valueOf(usuario.getIdinstitucion()),Integer.valueOf(usuario.getIdusuario()), Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()), e.getMessage());
+				throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(),
+						e);
+			}
+		return resultDatos;
+	}
+	
 	public static void main(String[] args) {
 		String query = "select nombbre as \"nombre\", codigo	as \"C.P.\" as cod, 'FECHA\"' || SYSDATE     AS  \"FECHA..HOY\","
 				+ "'otro campo'\nas \"otro.y\", '= \" as \"t..al\", \"pepe\" as juan from tal where pascual";
@@ -2474,5 +2505,30 @@ public class ConsultasServiceImpl implements IConsultasService {
 		return query;
 
 	}
-
+ 
+	
+	public void insertarLogEjecucion(Date inicial,Short idInstitucion,Integer idUsuario, Long idModelo,Long idConsulta,Short idInstitucionConsulta, String mensaje) {
+		
+		//tiempo final
+		Date finalDate = new Date();
+		//Tiempo de ejecución de la consulta en ms
+		Long diff = finalDate.getTime() - inicial.getTime();
+		//Fecha de ejecución
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		format.format(inicial);
+		
+		ConEjecucion conEjecucionInsert = new ConEjecucion();
+		//Setteo de valores
+		conEjecucionInsert.setIdinstitucion(idInstitucion);
+		conEjecucionInsert.setIdusuario(idUsuario);
+		conEjecucionInsert.setIdmodelo(idModelo);
+		conEjecucionInsert.setIdconsulta(idConsulta);
+		conEjecucionInsert.setFechaejecucion(inicial);
+		conEjecucionInsert.setTiempoejecucion(Long.valueOf(diff));
+		conEjecucionInsert.setIdinstitucionConsulta(idInstitucionConsulta);
+		conEjecucionInsert.setMensaje(mensaje);
+		_conEjecucionMapper.insert(conEjecucionInsert);
+	
+	}
+ 
 }
