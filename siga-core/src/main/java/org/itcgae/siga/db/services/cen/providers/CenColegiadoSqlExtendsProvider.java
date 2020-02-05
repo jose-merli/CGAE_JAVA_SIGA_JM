@@ -343,8 +343,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql.ORDER_BY("NOMBRE");
 
-//		sql2.SELECT("CONSULTA.*, ROW_NUMBER() OVER(PARTITION BY concat(CONSULTA.idpersona,CONSULTA.idinstitucion) ORDER BY CONSULTA.idpersona) AS RN");
-//		sql2.FROM("(" + sql + ") CONSULTA");
+		sql2.SELECT("CONSULTA.*, ROW_NUMBER() OVER(PARTITION BY concat(CONSULTA.idpersona,CONSULTA.idinstitucion) ORDER BY CONSULTA.idpersona) AS RN");
+		sql2.FROM("(" + sql + ") CONSULTA");
 //		sql2.WHERE("rownum < 5000");
 	 
 		sql3.SELECT("*");
