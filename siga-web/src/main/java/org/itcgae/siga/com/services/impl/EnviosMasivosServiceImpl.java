@@ -800,12 +800,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				comboItems = _envPlantillaEnviosExtendsMapper.getPlantillasByIdTipoEnvio(idInstitucion, idtipoEnvio);
-				if (null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}
 
 				comboDTO.setCombooItems(comboItems);
 
