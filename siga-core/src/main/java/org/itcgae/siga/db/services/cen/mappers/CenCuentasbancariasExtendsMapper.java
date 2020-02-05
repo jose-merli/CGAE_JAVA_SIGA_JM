@@ -42,7 +42,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHAFIRMAPRODUCTOS", property = "fechaFirmaProductos", jdbcType = JdbcType.DATE)
 	})
-	List<DatosBancariosItem> selectCuentasBancarias(DatosBancariosSearchDTO datosBancarios, String idInstitucion);
+	List<DatosBancariosItem> selectCuentasBancarias(DatosBancariosSearchDTO datosBancarios, Short idInstitucion);
 	
 	
 	
