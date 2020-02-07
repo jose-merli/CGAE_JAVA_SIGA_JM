@@ -41,6 +41,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 //		sql.SELECT_DISTINCT("col.identificadords");
 		sql.SELECT_DISTINCT("per.nifcif");
 		sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
+		sql.SELECT_DISTINCT("dir.domicilio");
 //		sql.SELECT_DISTINCT("per.nombre as solonombre");
 //		sql.SELECT_DISTINCT("per.apellidos1");
 //		sql.SELECT_DISTINCT("per.apellidos2");
@@ -219,7 +220,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 
 		if (colegiadoItem.getDomicilio() != null && colegiadoItem.getDomicilio() != "") {
-			sql.WHERE("(dir.domicilio) like upper('" + colegiadoItem.getDomicilio() + "')");
+			sql.WHERE("(dir.domicilio) like upper('%" + colegiadoItem.getDomicilio() + "%')");
 		}
 
 		if (colegiadoItem.getCorreo() != null && colegiadoItem.getCorreo() != "") {
