@@ -47,6 +47,7 @@ public class SigaEndPointsProcess {
 			put("alertas","44");
 			put("nuevoExpediente","46");
 			put("busquedaSanciones","566");
+			put("detalleSancion","566");
 			put("fichaColegial","12");
 			put("modificacionDatos","13");
 			put("cargasPeriodicas","161");
