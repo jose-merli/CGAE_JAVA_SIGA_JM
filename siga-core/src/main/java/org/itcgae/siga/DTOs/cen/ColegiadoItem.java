@@ -25,7 +25,7 @@ public class ColegiadoItem {
 	private String nif;
 	private String nombre;
 	private String numColegiado;
-	private Integer numberColegiado;
+	private String numberColegiado;
 	private String residenteInscrito;
 	private String situacionResidente;
 	private String comunitario;
@@ -1339,13 +1339,6 @@ public class ColegiadoItem {
 		this.institucion = institucion;
 	}
 
-	public Integer getNumberColegiado() {
-		return numberColegiado;
-	}
-
-	public void setNumberColegiado(Integer numberColegiado) {
-		this.numberColegiado = numberColegiado;
-	}
 
 	public String[] getTemas() {
 		return temas;
@@ -1385,6 +1378,14 @@ public class ColegiadoItem {
 
 	public void setCambioEstado(Boolean cambioEstado) {
 		this.cambioEstado = cambioEstado;
+	}
+
+	public String getNumberColegiado() {
+		return numberColegiado;
+	}
+
+	public void setNumberColegiado(String numberColegiado) {
+		this.numberColegiado = numberColegiado;
 	}
 	
 }
