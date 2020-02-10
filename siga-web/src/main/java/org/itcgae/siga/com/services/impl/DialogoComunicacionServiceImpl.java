@@ -1534,7 +1534,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								consultaEnvioEntity.setIdenvio(envio.getIdenvio());
 								consultaEnvioEntity.setIdinstitucion(consultaEnvio.getIdInstitucion());
 								consultaEnvioEntity.setIdobjetivo(consultaEnvio.getIdObjetivo());
-								consultaEnvioEntity.setUsumodificacion(consultaEnvio.getUsuModificacion());
+								if (null != consultaEnvio.getUsuModificacion()) {
+									consultaEnvioEntity.setUsumodificacion(Integer.getInteger(consultaEnvio.getUsuModificacion().toString()));
+								}
 								consultaEnvioEntity.setIdplantilladocumento(consultaEnvio.getIdPlantillaDoc());
 								consultaEnvioEntity.setIdinforme(consultaEnvio.getIdInforme());
 								consultaEnvioEntity.setIdmodelocomunicacion(consultaEnvio.getIdModeloComunicacion());
