@@ -22,8 +22,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
@@ -38,11 +36,14 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocolegialExtendsMapper;
@@ -81,6 +82,9 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 	@Autowired
 	private GenDiccionarioMapper genDiccionarioMapper;
 
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
 	@Override
 	public ComboDTO getCivilStatus(HttpServletRequest request) {
 
@@ -697,6 +701,8 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 			if (colegiadoItem.getMovil() != null && colegiadoItem.getMovil() != "") {
 				sql.WHERE("dir.movil like '%" + colegiadoItem.getMovil() + "%'");
 			}
+			
+			
 		}
 
 		sql.FROM(from);
@@ -814,6 +820,29 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 				sql.WHERE("( TO_CHAR(per.fechanacimiento, 'DD-MM-YYYY') <= TO_DATE('" + getFechaNacimientoHasta
 						+ "','DD/MM/YYYY'))");
+			}
+		}
+		
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+		
+		List<Short> idInstituciones = new ArrayList<>();
+		idInstituciones.add(idInstitucion);
+		idInstituciones.add(SigaConstants.IDINSTITUCION_0_SHORT);
+		
+		genParametrosExample.createCriteria().andIdinstitucionIn(idInstituciones)
+		.andParametroEqualTo("EXPORTAR_COLEGIADOS_ACOGIDOS_A_LOPD");
+		
+		genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+		
+		
+		List<GenParametros> genParametros = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+		
+		if(genParametros != null && genParametros.size() > 0) {
+			
+			GenParametros parametro = genParametros.get(0);
+			
+			if(parametro.getValor().equals("N")) {
+				sql.WHERE("(decode(cli.noaparecerredabogacia,null,0,cli.noaparecerredabogacia) <> 1)");
 			}
 		}
 
