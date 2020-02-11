@@ -539,6 +539,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
         sql.SELECT("per.apellidos1 AS Apellido1");
         sql.SELECT("per.apellidos2 AS Apellido2");
         sql.SELECT("f_siga_getrecurso(tip.descripcion,1) AS TipoIdentificacion");
+        sql.SELECT("per.nifcif AS NifCif");
         sql.SELECT("To_Char(Per.Fechanacimiento, 'dd-mm-yyyy') AS FechadeNacimiento");
         sql.SELECT("f_siga_getrecurso(est.descripcion,1) AS EstadoCivil");
         sql.SELECT("per.naturalde AS Naturalde");
