@@ -2239,13 +2239,24 @@ public class ConsultasServiceImpl implements IConsultasService {
 									// listaCampos.get(j).setValor("'" + nuevoValor + "'");
 
 									// String aux = listaCampos.get(j).getValor();
-									codigosBind.put(new Integer(iParametroBind), "'" + nuevoValor + "'");
+									if(operador.equals("LIKE")) {
+										codigosBind.put(new Integer(iParametroBind), "" + nuevoValor + "");
+									}else {
+										codigosBind.put(new Integer(iParametroBind), "'" + nuevoValor + "'");
+									}
 								} else {
 									iParametroBind++;
 									criteriosDinamicos = ":@" + iParametroBind + "@:";
-									codigosBind.put(new Integer(iParametroBind),
-											"'" + listaCampos.get(j).getValor() + "'");
-									if (operador.equals(SigaConstants.LIKE)) {
+									
+									if(operador.equals("LIKE")) {
+										codigosBind.put(new Integer(iParametroBind),
+												"" + listaCampos.get(j).getValor() + "");
+									}else {
+										codigosBind.put(new Integer(iParametroBind),
+												"'" + listaCampos.get(j).getValor() + "'");
+									}
+									
+									if (operador.equals(SigaConstants.LIKE.toUpperCase())) {
 										codigosLike.put(new Integer(iParametroBind), listaCampos.get(j).getValor());
 									}
 								}
