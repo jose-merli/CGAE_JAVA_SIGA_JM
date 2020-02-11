@@ -188,7 +188,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		
 		if (colegiadoItem.getNumColegiado() != null && colegiadoItem.getNumColegiado() != "") {
-			sql.WHERE("(col.ncolegiado = '" + colegiadoItem.getNumColegiado() + "' OR COL.NCOMUNITARIO = '" + colegiadoItem.getNumColegiado() + "')");
+			sql.WHERE("(decode(col.comunitario,1,col.ncomunitario,col.ncolegiado) = '" + colegiadoItem.getNumColegiado() + "')");
 		}
 
 		if (colegiadoItem.getSexo() != null && colegiadoItem.getSexo() != "") {
@@ -1022,7 +1022,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		
 		if (colegiadoItem.getNumColegiado() != null && colegiadoItem.getNumColegiado() != "") {
-			sql.WHERE("(col.ncolegiado = '" + colegiadoItem.getNumColegiado() + "' OR COL.NCOMUNITARIO = '" + colegiadoItem.getNumColegiado() + "')");
+			sql.WHERE("(decode(col.comunitario,1,col.ncomunitario,col.ncolegiado) = '" + colegiadoItem.getNumColegiado() + "')");
 		}
 
 		if (colegiadoItem.getSexo() != null && colegiadoItem.getSexo() != "") {

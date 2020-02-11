@@ -762,10 +762,17 @@ public class MenuServiceImpl implements IMenuService {
 			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
 
 
-			if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-				RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
-				organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-			}else{
+			boolean certificadoNuevo =  Boolean.FALSE;
+			
+			for (int i = 0; i < x500name.getAttributeTypes().length; i++) {
+				if (x500name.getAttributeTypes()[i].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+					RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[i])[0];
+					organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+					certificadoNuevo =  Boolean.TRUE;
+				}
+			}
+			
+			if (!certificadoNuevo) {
 				RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
 				organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
 			}
@@ -923,14 +930,20 @@ public class MenuServiceImpl implements IMenuService {
 			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
 
 
-			if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-				RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
-				organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-			}else{
+			boolean certificadoNuevo =  Boolean.FALSE;
+			
+			for (int i = 0; i < x500name.getAttributeTypes().length; i++) {
+				if (x500name.getAttributeTypes()[i].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+					RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[i])[0];
+					organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+					certificadoNuevo =  Boolean.TRUE;
+				}
+			}
+			
+			if (!certificadoNuevo) {
 				RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
 				organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
 			}
-			
 		} catch (CertificateEncodingException e) {
 			throw new InvalidClientCerticateException(e);
 		}
@@ -973,10 +986,17 @@ public class MenuServiceImpl implements IMenuService {
 			RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
 			commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
 			
-			if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-				RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
-				organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-			}else{
+			boolean certificadoNuevo =  Boolean.FALSE;
+			
+			for (int i = 0; i < x500name.getAttributeTypes().length; i++) {
+				if (x500name.getAttributeTypes()[i].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+					RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[i])[0];
+					organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+					certificadoNuevo =  Boolean.TRUE;
+				}
+			}
+			
+			if (!certificadoNuevo) {
 				RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
 				organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
 			}
