@@ -742,7 +742,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion.setFechamodificacion(new Date());
 					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
 					solIncorporacion.setFechaalta(new Date());
-					solIncorporacion.setFechaestadosolicitud(new Date());
+//					solIncorporacion.setFechaestadosolicitud(new Date());
 					//solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
@@ -1411,7 +1411,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setUsumodificacion(usuario.getIdusuario());
 		colegiado.setNumsolicitudcolegiacion(solicitud.getIdsolicitud().toString());
 		
-		colegiado.setFechapresentacion(new Date());
+		colegiado.setFechapresentacion(solicitud.getFechaestado());
 		if (solicitud.getIdtipocolegiacion() == 20) {
 			colegiado.setComunitario("1");
 			colegiado.setNcomunitario(solicitud.getNcolegiado());

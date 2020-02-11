@@ -2110,7 +2110,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 				hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
 			}else{
-				
+				//COMENTARIO IVÁN
+				// AQUÍ SE ESTÁ COGIEDNO SOLO EL PRIMER RESULTADO TIENE QUE COGER TODOS LOS RESULTADOS DE LA CONSULTA
 				if(resultDatos != null && resultDatos.size() > 0) {
 					hDatosGenerales.putAll(resultDatos.get(0));
 				}
