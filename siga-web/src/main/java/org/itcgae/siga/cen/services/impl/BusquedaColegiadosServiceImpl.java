@@ -284,12 +284,14 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
         }
 	    
 		colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem, tamMaximo);
-		colegiadosDTO.setColegiadoItem(colegiadoItemList);
+		//colegiadosDTO.setColegiadoItem(colegiadoItemList);
 		if((colegiadoItemList != null) && tamMaximo != null && (colegiadoItemList.size()) > tamMaximo) {
 			error.setCode(200);
 			error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
 			colegiadosDTO.setError(error);
+			colegiadoItemList.remove(colegiadoItemList.size()-1);
 			}
+		colegiadosDTO.setColegiadoItem(colegiadoItemList);
 			if (colegiadoItemList == null || colegiadoItemList.size() == 0) {
 
 				LOGGER.warn(
