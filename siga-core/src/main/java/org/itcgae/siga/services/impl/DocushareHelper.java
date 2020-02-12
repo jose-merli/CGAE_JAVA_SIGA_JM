@@ -429,6 +429,10 @@ public class DocushareHelper {
 
 					list.addAll(listDir);
 					list.addAll(listArch);
+				
+			        list.sort((x,y) -> y.getFechaModificacion().compareTo(x.getFechaModificacion()));
+
+				
 				}
 			}
 
