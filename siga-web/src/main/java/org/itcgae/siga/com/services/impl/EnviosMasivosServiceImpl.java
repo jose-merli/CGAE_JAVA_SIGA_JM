@@ -934,6 +934,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							for (EnvConsultasenvio consultaEnvio : listaConsultasEnvio) {
 								// Duplicamos las consultas del envio
 								consultaEnvio.setIdenvio(envio.getIdenvio());
+								consultaEnvio.setIdconsultaenvio(null);
 								_envConsultasenvioMapper.insert(consultaEnvio);
 							}
 						}
