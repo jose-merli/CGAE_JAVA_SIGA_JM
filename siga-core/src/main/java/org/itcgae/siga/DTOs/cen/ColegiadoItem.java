@@ -7,7 +7,9 @@ import java.util.Objects;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ColegiadoItem {
 
 	private Boolean colegiado;
@@ -15,6 +17,7 @@ public class ColegiadoItem {
 	private String idPersona;
 	private String noAparecerRedAbogacia;
 	private String noAparecerRedAbogacia2;
+	private String noAparecerRedAbogaciaFilter;
 	private Boolean searchLoggedUser;
 	private String institucion;
 	private String idInstitucion;
@@ -22,7 +25,7 @@ public class ColegiadoItem {
 	private String nif;
 	private String nombre;
 	private String numColegiado;
-	private Integer numberColegiado;
+	private String numberColegiado;
 	private String residenteInscrito;
 	private String situacionResidente;
 	private String comunitario;
@@ -1210,6 +1213,14 @@ public class ColegiadoItem {
 		this.noAparecerRedAbogacia2 = noAparecerRedAbogacia2;
 	}
 
+	public String getNoAparecerRedAbogaciaFilter() {
+		return noAparecerRedAbogaciaFilter;
+	}
+
+	public void setNoAparecerRedAbogaciaFilter(String noAparecerRedAbogaciaFilter) {
+		this.noAparecerRedAbogaciaFilter = noAparecerRedAbogaciaFilter;
+	}
+
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idPersona, idInstitucion, nif, nombre, numColegiado, residenteInscrito,	fechaNacimiento, correo, telefono, movil, estadoColegial,
@@ -1217,7 +1228,7 @@ public class ColegiadoItem {
 	    		idEstadoCivil, domicilio, tipoCV, subTipoCV1, subTipoCV2, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
 	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
 	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV, temas,
-	    		fechaNacimientoRango, fechaEstadoNueva, identificadords, cambioEstado);
+	    		fechaNacimientoRango, fechaEstadoNueva, identificadords, cambioEstado, noAparecerRedAbogaciaFilter);
 	}
 
 	@Override
@@ -1286,6 +1297,7 @@ public class ColegiadoItem {
 	    sb.append("    fechaEstadoNueva: ").append(toIndentedString(fechaEstadoNueva)).append("\n");
 	    sb.append("    identificadords: ").append(toIndentedString(identificadords)).append("\n");
 	    sb.append("    cambioEstado: ").append(toIndentedString(cambioEstado)).append("\n");
+	    sb.append("    noAparecerRedAbogaciaFilter: ").append(toIndentedString(noAparecerRedAbogaciaFilter)).append("\n");
 
 		
 	    sb.append("}");
@@ -1327,13 +1339,6 @@ public class ColegiadoItem {
 		this.institucion = institucion;
 	}
 
-	public Integer getNumberColegiado() {
-		return numberColegiado;
-	}
-
-	public void setNumberColegiado(Integer numberColegiado) {
-		this.numberColegiado = numberColegiado;
-	}
 
 	public String[] getTemas() {
 		return temas;
@@ -1373,6 +1378,14 @@ public class ColegiadoItem {
 
 	public void setCambioEstado(Boolean cambioEstado) {
 		this.cambioEstado = cambioEstado;
+	}
+
+	public String getNumberColegiado() {
+		return numberColegiado;
+	}
+
+	public void setNumberColegiado(String numberColegiado) {
+		this.numberColegiado = numberColegiado;
 	}
 	
 }

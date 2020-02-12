@@ -762,10 +762,17 @@ public class MenuServiceImpl implements IMenuService {
 			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
 
 
-			if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-				RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
-				organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-			}else{
+			boolean certificadoNuevo =  Boolean.FALSE;
+			
+			for (int i = 0; i < x500name.getAttributeTypes().length; i++) {
+				if (x500name.getAttributeTypes()[i].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+					RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[i])[0];
+					organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+					certificadoNuevo =  Boolean.TRUE;
+				}
+			}
+			
+			if (!certificadoNuevo) {
 				RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
 				organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
 			}
@@ -923,14 +930,20 @@ public class MenuServiceImpl implements IMenuService {
 			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
 
 
-			if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-				RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
-				organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-			}else{
+			boolean certificadoNuevo =  Boolean.FALSE;
+			
+			for (int i = 0; i < x500name.getAttributeTypes().length; i++) {
+				if (x500name.getAttributeTypes()[i].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+					RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[i])[0];
+					organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+					certificadoNuevo =  Boolean.TRUE;
+				}
+			}
+			
+			if (!certificadoNuevo) {
 				RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
 				organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
 			}
-			
 		} catch (CertificateEncodingException e) {
 			throw new InvalidClientCerticateException(e);
 		}
@@ -950,6 +963,81 @@ public class MenuServiceImpl implements IMenuService {
 		}
 
 		return idInstitucion;
+	}
+	
+	@Override
+	public UpdateResponseDTO validaUsuario(HttpServletRequest request)  {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		try{
+		X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+		String commonName = null;
+		String organizationName = null;
+		String organizationNameNuevo = null;
+		X509Certificate cert = null;
+
+		try{
+		if (certs == null) {
+			LOGGER.error("No se está recibiendo el certificado desde el apache. Revisa que tengas el apache activo y el check de la consola de weblogic para recibir el certificado");
+		}
+		
+			cert = certs[0];
+			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
+
+			RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
+			commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
+			
+			boolean certificadoNuevo =  Boolean.FALSE;
+			
+			for (int i = 0; i < x500name.getAttributeTypes().length; i++) {
+				if (x500name.getAttributeTypes()[i].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+					RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[i])[0];
+					organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+					certificadoNuevo =  Boolean.TRUE;
+				}
+			}
+			
+			if (!certificadoNuevo) {
+				RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
+				organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+			}
+			
+			String idInstitucion = null;
+			if (null != organizationNameNuevo) {
+				idInstitucion = organizationNameNuevo.substring(0,
+							4);
+			}else{
+				idInstitucion = organizationName.substring(organizationName.length() - 4,
+					organizationName.length());
+			}
+			if (UtilidadesString.esCadenaVacia(idInstitucion)) {
+				throw new BadCredentialsException("Institucion No válida");
+			}
+			String dni = commonName.substring(commonName.length() - 9, commonName.length());
+			AdmUsuariosExample  usuarioExampple = new AdmUsuariosExample();
+			usuarioExampple.createCriteria().andActivoEqualTo("N").andIdinstitucionEqualTo(new Short(idInstitucion)).andNifEqualTo(dni);
+			List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExampple);
+			if (null != usuarios && usuarios.size()>0) {
+				throw new BadCredentialsException("Usuario no válido");
+			}
+			
+			usuarioExampple = new AdmUsuariosExample();
+			usuarioExampple.createCriteria().andFechaBajaIsNotNull().andIdinstitucionEqualTo(new Short(idInstitucion)).andNifEqualTo(dni);
+			usuarios = usuarioMapper.selectByExample(usuarioExampple);
+			
+			if (null != usuarios && usuarios.size()>0) {
+				throw new BadCredentialsException("Usuario no válido");
+			}
+			
+				
+		} catch (CertificateEncodingException e) {
+			throw new InvalidClientCerticateException(e);
+		}
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
+		response.setStatus(SigaConstants.OK);
+		return response;
+	
 	}
 
 }

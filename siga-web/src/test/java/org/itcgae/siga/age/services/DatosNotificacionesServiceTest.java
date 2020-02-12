@@ -27,8 +27,8 @@ import org.itcgae.siga.db.services.age.mappers.AgeNotificacioneseventoExtendsMap
 import org.itcgae.siga.db.services.age.mappers.AgeTipocuandoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeTiponotificacioneventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeUnidadmedidaExtendsMapper;
-import org.itcgae.siga.db.services.age.mappers.EnvPlantillasenviosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.EnvTipoenviosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -56,7 +56,7 @@ public class DatosNotificacionesServiceTest {
 	private AgeTipocuandoExtendsMapper ageTipocuandoExtendsMapper;
 
 	@Mock
-	private EnvPlantillasenviosExtendsMapper envPlantillasenviosExtendsMapper;
+	private EnvPlantillaEnviosExtendsMapper envPlantillasenviosExtendsMapper;
 
 	@Mock
 	private EnvTipoenviosExtendsMapper envTipoenviosExtendsMapper;

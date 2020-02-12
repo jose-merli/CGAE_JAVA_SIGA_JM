@@ -58,4 +58,7 @@ public interface IMenuService {
 
 	public ComboItem getLetrado(HttpServletRequest request);
 
+
+	public UpdateResponseDTO validaUsuario(HttpServletRequest request);
+
 }
