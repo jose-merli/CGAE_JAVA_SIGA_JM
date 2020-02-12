@@ -214,6 +214,7 @@ public class SigaEndPointsProcess {
 			put("gruposUsuarios", "82");
 			put("seleccionarIdioma", "79");
 			put("fichaCurso", "20A");
+			put("fichaEventos", "20A");
 			put("fichaInscripcion", "20B");
 			put("devolucion", "02C");
 			put("justificacion", "0");
