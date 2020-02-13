@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -52,6 +54,7 @@ import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService {
@@ -253,9 +256,11 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 	public ColegiadoDTO searchColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) {
 
 		LOGGER.info("searchColegiado() -> Entrada al servicio para obtener colegiados");
-
+		Error error = new Error();
 		ColegiadoDTO colegiadosDTO = new ColegiadoDTO();
-
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		
 		List<ColegiadoItem> colegiadoItemList = new ArrayList<ColegiadoItem>();
 
 		String token = request.getHeader("Authorization");
@@ -265,11 +270,28 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		if (null != idInstitucion) {
 			if (null != colegiadoItem.getSearchLoggedUser() && colegiadoItem.getSearchLoggedUser()) {
 				colegiadoItem.setNif(dni);
-
 			}
-			colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem);
-			colegiadosDTO.setColegiadoItem(colegiadoItemList);
-
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+	    genParametrosExample.createCriteria().andModuloEqualTo("CEN").andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO").andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	    tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+        if (tamMax != null) {
+            tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+        } else {
+            tamMaximo = null;
+        }
+	    
+		colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem, tamMaximo);
+		//colegiadosDTO.setColegiadoItem(colegiadoItemList);
+		if((colegiadoItemList != null) && tamMaximo != null && (colegiadoItemList.size()) > tamMaximo) {
+			error.setCode(200);
+			error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+			colegiadosDTO.setError(error);
+			colegiadoItemList.remove(colegiadoItemList.size()-1);
+			}
+		colegiadosDTO.setColegiadoItem(colegiadoItemList);
 			if (colegiadoItemList == null || colegiadoItemList.size() == 0) {
 
 				LOGGER.warn(
@@ -519,6 +541,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
         sql.SELECT("per.apellidos1 AS Apellido1");
         sql.SELECT("per.apellidos2 AS Apellido2");
         sql.SELECT("f_siga_getrecurso(tip.descripcion,1) AS TipoIdentificacion");
+        sql.SELECT("per.nifcif AS NifCif");
         sql.SELECT("To_Char(Per.Fechanacimiento, 'dd-mm-yyyy') AS FechadeNacimiento");
         sql.SELECT("f_siga_getrecurso(est.descripcion,1) AS EstadoCivil");
         sql.SELECT("per.naturalde AS Naturalde");
@@ -555,7 +578,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
         sql.SELECT("To_Char(Col.Fechamovimiento, 'dd-mm-yyyy') AS FechaMovimiento");
         sql.SELECT("f_siga_getrecurso(ts.nombre,1) AS TipoSeguro");
         sql.SELECT("col.cuentacontablesjcs AS CuentaContableSJCS");
-        sql.SELECT("decode (f_siga_gettipocliente(col.idpersona,col.idinstitucion,sysdate),'10','No Ejerciente','20','Ejerciente','30','Baja Colegial','40','Inhabilitacion','50','Suspension Ejercicio','60','Baja por Deceso') AS EstadoColegial");
+        sql.SELECT("decode (f_siga_gettipocliente(col.idpersona,col.idinstitucion,sysdate),'10','No Ejerciente','20','Ejerciente','30','Baja Colegial','40','Inhabilitacion','50','Suspension Ejercicio','60','Baja por Deceso','Baja por Deceso') AS EstadoColegial");
         sql.SELECT("To_Char(f_siga_getfechaestadocolegial(col.idpersona,col.idinstitucion,sysdate), 'dd-mm-yyyy')   AS FechaEstado");
         sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,1) AS Domicilio");
         sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,2) AS CodigoPostal");
@@ -615,7 +638,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 			sql.WHERE("col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  ");
 			sql.WHERE(
 					"colest.fechaestado = (select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion and datcol.fechaestado < sysdate)");
-			sql.WHERE("colest.idestado = 20");
+		
 			sql.WHERE("colest.idestado ='" + colegiadoItem.getSituacion() + "'");
 		}
 

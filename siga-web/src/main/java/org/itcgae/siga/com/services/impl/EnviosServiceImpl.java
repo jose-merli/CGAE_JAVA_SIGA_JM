@@ -426,30 +426,6 @@ public class EnviosServiceImpl implements IEnviosService{
         
     }
 
-    private void rellenaCelda(Workbook workbook, Cell celda, Object campo) {
-        
-        if (campo instanceof Number) {
-            celda.setCellType(Cell.CELL_TYPE_NUMERIC);
-            celda.setCellValue(Double.parseDouble(campo.toString()));
-            CellStyle cellStyle = workbook.createCellStyle();
-            cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);                                
-            celda.setCellStyle(cellStyle);
-        } else if (campo instanceof Date) {
-            celda.setCellType(Cell.CELL_TYPE_STRING);
-            CellStyle cellStyle = workbook.createCellStyle();
-            cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
-            XSSFRichTextString textCell = new XSSFRichTextString(SigaConstants.DATE_FORMAT_MIN.format(campo));
-            celda.setCellValue(textCell);
-            celda.setCellStyle(cellStyle);
-        } else {
-            celda.setCellType(Cell.CELL_TYPE_STRING);
-            CellStyle cellStyle = workbook.createCellStyle();
-            cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
-            XSSFRichTextString textCell = new XSSFRichTextString(campo.toString());
-            celda.setCellValue(textCell);
-            celda.setCellStyle(cellStyle);
-        }
-    }
 
     private Sheet creaLogExcel(EnvEnvios envEnvio) throws IOException, InvalidFormatException {
         Sheet sheet = null;
@@ -612,20 +588,7 @@ public class EnviosServiceImpl implements IEnviosService{
         
     }
     
-    private String getExtension(String texto) {
-        String ret = ";";
-        try {
-            texto = texto.split( "," )[0];
-            texto = texto.substring(texto.indexOf("/")+1);
-            texto = texto.substring(0, texto.indexOf(";"));
-            ret = "." + texto;
-        } catch (Exception e) {
-            LOGGER.warn(e);
-            ret = "";
-        }
-        return ret;
-    }
-
+  
     @Override
     public String envioSMS(CenDirecciones remitente, List<DestinatarioItem> listEnvDestinatarios, EnvEnvios envEnvio, String texto, boolean esBuroSMS) {
         
@@ -688,7 +651,7 @@ public class EnviosServiceImpl implements IEnviosService{
             from = request.getEmail();
             descFrom = request.getEmail();
             
-            int num = 0;
+         
             listCorrectos = new ArrayList<DestinatarioItem>();
             //Si no viene el prefijo se lo añadimos
             for(int i = listEnvDestinatarios.size()-1; i >= 0; i--) {

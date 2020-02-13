@@ -111,6 +111,13 @@ public class SigaConstants {
 	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
 	public static final long ID_OBJETIVO_DESTINATARIOS = 1;
 	
+	// Tipos de Cambio ColaCambioLetrado
+	public static final int COLA_CAMBIO_LETRADO_APROBACION_COLEGIACION = 10;
+	public static final int COLA_CAMBIO_LETRADO_ACTIVACION_RESIDENCIA  = 20;
+	public static final int COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION = 30;
+	public static final int COLA_CAMBIO_LETRADO_BORRADO_DIRECCION = 40;
+	public static final int COLA_CAMBIO_LETRADO_LOPD = 50;
+	
 	//estados envio
 	public static final Short ENVIO_PENDIENTE_MANUAL = 1;
 	public static final Short ENVIO_PROCESADO = 2;

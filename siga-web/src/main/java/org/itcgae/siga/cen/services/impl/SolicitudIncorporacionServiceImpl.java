@@ -8,7 +8,6 @@ import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,9 +19,6 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
-import org.itcgae.siga.DTOs.cen.BancoBicItem;
-import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
-import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
@@ -45,6 +41,7 @@ import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenBancosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
+import org.itcgae.siga.db.entities.CenColacambioletrado;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
@@ -71,6 +68,7 @@ import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColacambioletradoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
@@ -158,9 +156,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	private CenPaisExtendsMapper cenPaisExtendsMapper;
 
 	@Autowired
-	private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
-
-	@Autowired
 	private CenDatoscolegialesestadoMapper cenDatoscolegialesestadoMapper;
 	
 	@Autowired
@@ -168,6 +163,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	@Autowired
+	private CenColacambioletradoExtendsMapper cenColacambioletradoMapper;
 	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
@@ -197,7 +195,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -411,7 +409,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenTratamientoExtendsMapper.selectTratamiento(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -452,7 +450,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenEstadocivilExtendsMapper.distinctCivilStatus(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -494,7 +492,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenTipoidentificacionExtendsMapper.getIdentificationTypes(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -536,7 +534,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenTipocolegiacionExtendsMapper.selectTipoColegiacion(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -578,7 +576,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenDocumentacionmodalidadExtendsMapper.selectModalidadDocumentacion(usuario);
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -692,7 +690,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		LOGGER.info("aprobarSolicitud() -> Entrada al servicio para aprobar una solicitud");
 		
 		Long idDireccion;
-		Long idDireccion2;
 		Long idPersona;
 		Short idBancario = 0;
 		int insertColegiado;
@@ -746,13 +743,26 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					//solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
-					if(idPersona != null && idDireccion!= null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
+					if(idPersona != null && idDireccion != null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
 						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
 						response.setStatus(SigaConstants.OK);
 						response.setError(null);
 						LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> " + solIncorporacion.getIdsolicitud()
 										+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
-//						
+						// Llamamos al PL para mantener los colegiados
+						//Insertamos en cen_colacambioletrado						
+						int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_APROBACION_COLEGIACION,usuario.getIdinstitucion().intValue(),
+								idPersona, idDireccion, usuario.getIdusuario());
+						if(res <=0) {
+							LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
+									usuario.getIdinstitucion() + ", idpersona: " +
+									idPersona + ", usumodificacion: " +
+									usuario.getIdusuario());
+						}else {
+							LOGGER.info(
+									"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
+						}
+						/*
 						Object[] paramMandatos = new Object[5];
 						paramMandatos[0] = idPersona.toString();
 						paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -761,6 +771,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						paramMandatos[4] = usuario.getIdusuario().toString();
 						String resultado[] = new String[2];
 						resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+						*/
+						
 					}else{
 						LOGGER.error("aprobarSolicitud() --> Borramos los registros al no poder aprobar la solicitud");
 						if(insertColegiado == 0) {
@@ -1649,5 +1661,36 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	    return resultado;
 	}
 
+	public int insertarCambioEnCola (int idTipoCambio,
+			 Integer idInstitucion,
+			 Long idPersona,
+			 Long idDireccion,
+			 Integer usumodificacion) 
+	{
+		try
+		{
+			CenColacambioletrado bean = new CenColacambioletrado ();
+			bean.setFechacambio(new Date());
+			bean.setIdcambio(getNuevoId (idInstitucion, idPersona));
+			if (idDireccion != null) 
+				bean.setIddireccion (idDireccion);
+			bean.setIdinstitucion (idInstitucion.shortValue());
+			bean.setIdpersona (idPersona);
+			bean.setIdtipocambio ((new Integer (idTipoCambio).shortValue()));
+			bean.setUsumodificacion(usumodificacion);
+			bean.setFechamodificacion(new Date());
+			return cenColacambioletradoMapper.insert(bean);
+		}
+		catch (Exception e) {
+			LOGGER.info("Error Ejecución PL Revision SuscripcionesLetrado: " + e.getMessage());
+		return 0;
+		}
+	} //insertarCambioEnCola()
+
+	private Long getNuevoId(Integer idInstitucion, Long idPersona) {
+		
+		MaxIdDto id = cenColacambioletradoMapper.selectNuevoId(idInstitucion, idPersona);
+		return id.idMax;
+	}
 
 }

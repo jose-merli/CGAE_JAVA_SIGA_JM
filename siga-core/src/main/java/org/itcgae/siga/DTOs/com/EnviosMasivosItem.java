@@ -1,7 +1,9 @@
 package org.itcgae.siga.DTOs.com;
 
 import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL) 
 public class EnviosMasivosItem {
           
           private Short idInstitucion;

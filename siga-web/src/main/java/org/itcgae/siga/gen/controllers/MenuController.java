@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.gen.services.IMenuService;
+import org.itcgae.siga.gen.services.IProcesoService;
 import org.itcgae.siga.services.IFusionadorPersonasServerService;
 import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesResponseDocument;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class MenuController {
     
 	@Autowired
 	private IFusionadorPersonasServerService fusionadorService;
+	
+	@Autowired
+	private IProcesoService procesoService;
 	
     @RequestMapping(value = "/getEntorno", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EntornoDTO> getEntorno(HttpServletRequest request) {
@@ -93,6 +97,16 @@ public class MenuController {
     	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
 
 	}
+    
+    @RequestMapping(value = "/accesControlUrl", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  	ResponseEntity<PermisoDTO> getAccesUrl(@RequestBody String url,HttpServletRequest request) {
+      	ControlRequestItem permisoRequestItem = new ControlRequestItem();
+      	PermisoDTO response = new PermisoDTO();
+      	permisoRequestItem.setIdProceso(procesoService.getIdProceso(url));      	
+      	response = menuService.getAccessControl(permisoRequestItem,request);     	
+      	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
+
+  	}
     
     
     @RequestMapping(value = "/getInstitucionActual", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

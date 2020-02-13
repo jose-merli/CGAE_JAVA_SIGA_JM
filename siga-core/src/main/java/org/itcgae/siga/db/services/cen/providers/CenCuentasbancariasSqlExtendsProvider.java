@@ -10,7 +10,7 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 
 
 	
-	public String selectCuentasBancarias(DatosBancariosSearchDTO datosBancariosSearchDTO, String idInstitucion) {
+	public String selectCuentasBancarias(DatosBancariosSearchDTO datosBancariosSearchDTO, Short idInstitucion) {
 		SQL sql = new SQL();
 		sql.SELECT("CUENTA.TITULAR");
 		sql.SELECT("CUENTA.IDCUENTA");

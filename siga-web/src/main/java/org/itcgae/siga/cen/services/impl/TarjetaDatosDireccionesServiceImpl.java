@@ -27,6 +27,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -40,6 +41,7 @@ import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColacambioletrado;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
@@ -59,6 +61,7 @@ import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColacambioletradoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionTipodireccionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
@@ -116,6 +119,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosMapper;
+	
+	@Autowired
+	private CenColacambioletradoExtendsMapper cenColacambioletradoMapper;
 
 	@Override
 	public DatosDireccionesDTO datosDireccionesSearch(int numPagina,
@@ -269,7 +275,24 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				LOGGER.info(
 						"getCargos() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para actualizar datos de un direcciones");
 
+				int res = 0;
+				
 				// Llamamos al PL para mantener los colegiados
+				if(recordUpdate.getIddireccion() != null) {
+					res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+							Long.valueOf(tarjetaDireccionesUpdateDTO[i].getIdPersona()), recordUpdate.getIddireccion(), usuario.getIdusuario());
+				}else {
+					res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+							Long.valueOf(tarjetaDireccionesUpdateDTO[i].getIdPersona()), null, usuario.getIdusuario());
+				}
+				
+				if(res <=0) {
+					LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
+							usuario.getIdinstitucion() + ", idpersona: " +
+							tarjetaDireccionesUpdateDTO[i].getIdPersona() + ", usumodificacion: " +
+							usuario.getIdusuario());
+				}
+				/*
 				Object[] paramMandatos = new Object[5];
 				paramMandatos[0] = tarjetaDireccionesUpdateDTO[i].getIdPersona().toString();
 				paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -283,7 +306,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				} catch (IOException | NamingException | SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
+				}*/
 
 				updateResponseDTO.setStatus(SigaConstants.OK);
 				if (response == 0) {
@@ -710,6 +733,27 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 								LOGGER.info(
 										"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
 								// Llamamos al PL para mantener los colegiados
+								
+								int res = 0;
+								
+								if(!UtilidadesString.esCadenaVacia(datosDireccionesItem.getIdDireccion())) {
+									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+											Long.valueOf(datosDireccionesItem.getIdPersona()), Long.valueOf(datosDireccionesItem.getIdDireccion()), usuario.getIdusuario());
+								}else {
+									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+											Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
+								}
+								
+								if(res <=0) {
+									LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
+											usuario.getIdinstitucion() + ", idpersona: " +
+											datosDireccionesItem.getIdPersona() + ", usumodificacion: " +
+											usuario.getIdusuario());
+								}else {
+									LOGGER.info(
+											"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
+								}
+								/*
 								Object[] paramMandatos = new Object[5];
 								paramMandatos[0] = datosDireccionesItem.getIdPersona().toString();
 								paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -727,6 +771,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 									e.printStackTrace();
 								}
 								LOGGER.warn("updateDirection() / Fin Llamada a PL Pkg_Siga_Censo.Actualizardatosletrado");	
+								*/
 
 							}
 							
@@ -1116,7 +1161,27 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						LOGGER.info(
 								"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
 
+						int res = 0;
+						
 						// Llamamos al PL para mantener los colegiados
+						if(direcciones.getIddireccion() != null) {
+							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+									Long.valueOf(datosDireccionesItem.getIdPersona()), direcciones.getIddireccion(), usuario.getIdusuario());
+						}else {
+							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+									Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
+						}
+				
+						if(res <=0) {
+							LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
+									usuario.getIdinstitucion() + ", idpersona: " +
+									datosDireccionesItem.getIdPersona() + ", usumodificacion: " +
+									usuario.getIdusuario());
+						}else {
+							LOGGER.info(
+									"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
+						}
+						/*
 						Object[] paramMandatos = new Object[5];
 						paramMandatos[0] = datosDireccionesItem.getIdPersona().toString();
 						paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -1131,6 +1196,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						*/
 
 						LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
 						insertResponseDTO.setId(idDireccion.toString());
@@ -1696,6 +1762,27 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					return insertResponseDTO;
 				} else {
 					// Llamamos al PL para mantener los colegiados
+					int res = 0;
+					
+					if(direcciones.getIddireccion() != null) {
+						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+								Long.valueOf(datosDireccionesItem.getIdPersona()), direcciones.getIddireccion(), usuario.getIdusuario());
+					}else {
+						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+								Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
+					}
+					
+			
+					if(res <=0) {
+						LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
+								usuario.getIdinstitucion() + ", idpersona: " +
+								datosDireccionesItem.getIdPersona() + ", usumodificacion: " +
+								usuario.getIdusuario());
+					}else {
+						LOGGER.info(
+								"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
+					}
+					/*
 					Object[] paramMandatos = new Object[5];
 					paramMandatos[0] = datosDireccionesItem.getIdPersona().toString();
 					paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -1710,6 +1797,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					*/
 
 					insertResponseDTO.setStatus(SigaConstants.OK);
 					insertResponseDTO.setId(idDireccion.toString());
@@ -1826,4 +1914,35 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		}
 	}
 
+	public int insertarCambioEnCola (int idTipoCambio,
+			 Integer idInstitucion,
+			 Long idPersona,
+			 Long idDireccion,
+			 Integer usumodificacion) 
+	{
+		try
+		{
+			CenColacambioletrado bean = new CenColacambioletrado ();
+			bean.setFechacambio(new Date());
+			bean.setIdcambio(getNuevoId (idInstitucion, idPersona));
+			if (idDireccion != null) 
+				bean.setIddireccion (idDireccion);
+			bean.setIdinstitucion (idInstitucion.shortValue());
+			bean.setIdpersona (idPersona);
+			bean.setIdtipocambio ((new Integer (idTipoCambio).shortValue()));
+			bean.setUsumodificacion(usumodificacion);
+			bean.setFechamodificacion(new Date());
+			return cenColacambioletradoMapper.insert(bean);
+		}
+		catch (Exception e) {
+			LOGGER.info("Error Ejecución PL Revision SuscripcionesLetrado: " + e.getMessage());
+		return 0;
+		}
+	} //insertarCambioEnCola()
+
+	private Long getNuevoId(Integer idInstitucion, Long idPersona) {
+		
+		MaxIdDto id = cenColacambioletradoMapper.selectNuevoId(idInstitucion, idPersona);
+		return id.idMax;
+	}
 }
