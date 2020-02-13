@@ -10,6 +10,7 @@ public class SigaEndPointsProcess {
 
 	public static final Map<String, String> PROCESS = new HashMap<String, String>() {
 		{
+			put("gestionAuditoria","110");
 			put("busquedaLetrados", "11");
 			put("busquedaColegiados", "1");
 			put("busquedaNoColegiados", "2");
@@ -173,6 +174,7 @@ public class SigaEndPointsProcess {
 			put("solicitudesEspecificas", "5");
 			put("alterMutua", "226");
 			put("alterMutuaReta", "22A");
+			put("alterMutuaOfertas", "22O");
 			put("nuevaIncorporacion", "47");
 			put("detalleIntegrante", "22");
 			put("nuevaSolicitudesModificacion", "1");
