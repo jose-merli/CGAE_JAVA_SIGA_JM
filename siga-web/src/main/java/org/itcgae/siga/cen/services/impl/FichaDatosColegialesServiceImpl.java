@@ -398,6 +398,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					CenDatoscolegialesestado datosColegiales = new CenDatoscolegialesestado();
 					List<Short> addTipoDirecciones = null;
 					List<String> addTipoDireccionesPreferentes = null;
+					CenDirecciones direccionCensoWeb = null;
 
 					// Comprobamos que sea cambio de ejerciente a no ejerciente
 					CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
@@ -507,7 +508,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								}
 							}
 							if (null != tipoCensoWeb) {
-								CenDirecciones direccionCensoWeb = null;
+							
 								for (CenDirecciones cenDireccion : cenDireccionesList) {
 									if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
 										direccionCensoWeb = cenDireccion;
@@ -570,9 +571,17 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						int resultado = cenDatoscolegialesestadoExtendsMapper.insert(datosColegiales);
 
 						// Llamamos al PL para mantener los colegiados
+						int res = 0;
+					
+						if(direccionCensoWeb.getIddireccion() != null) {
+							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+									datosColegiales.getIdpersona(), direccionCensoWeb.getIddireccion(), usuario.getIdusuario());
+						}else {
+							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+									datosColegiales.getIdpersona(), null, usuario.getIdusuario());
+						}
 						
-						int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
-								datosColegiales.getIdpersona(), null, usuario.getIdusuario());
+						
 						if(res <=0) {
 							LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 									usuario.getIdinstitucion() + ", idpersona: " +
@@ -730,6 +739,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							CenDatoscolegialesestado datosColegiales = new CenDatoscolegialesestado();
 							List<Short> addTipoDirecciones = null;
 							List<String> addTipoDireccionesPreferentes = null;
+							CenDirecciones direccionCensoWeb = null;
 
 							// Si solamente es modificar
 							if (!existeDummy && colegiadoItem.getIdPersona() != null && i == 0) {
@@ -803,7 +813,6 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 									if (null != tipoCensoWeb) {
 
-										CenDirecciones direccionCensoWeb = null;
 										for (CenDirecciones cenDireccion : cenDireccionesList) {
 											if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
 												direccionCensoWeb = cenDireccion;
@@ -912,8 +921,16 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para para actualizar el estado colegial");
 
 							if (ejecutarPL) {
-								int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
-										Long.valueOf(listColegiadoItem.get(0).getIdPersona()), null, usuario.getIdusuario());
+								int res = 0;
+								
+								if(direccionCensoWeb.getIddireccion() != null) {
+									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+											datosColegiales.getIdpersona(), direccionCensoWeb.getIddireccion(), usuario.getIdusuario());
+								}else {
+									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+											datosColegiales.getIdpersona(), null, usuario.getIdusuario());
+								}
+								
 								if(res <=0) {
 									LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 											usuario.getIdinstitucion() + ", idpersona: " +
@@ -1165,6 +1182,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 					List<Short> addTipoDirecciones = null;
 					List<String> addTipoDireccionesPreferentes = null;
+					CenDirecciones direccionCensoWeb = null;
 
 					// Comprobamos que sea cambio de ejerciente a no ejerciente
 					CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
@@ -1278,7 +1296,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							}
 						}
 						if (null != tipoCensoWeb) {
-							CenDirecciones direccionCensoWeb = null;
+						
 							for (CenDirecciones cenDireccion : cenDireccionesList) {
 								if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
 									direccionCensoWeb = cenDireccion;
@@ -1328,8 +1346,16 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					LOGGER.info(
 							"datosColegialesDeleteEstado() / cenDatoscolegialesestadoMapper.deleteByPrimaryKey() -> Entrada a cenDatoscolegialesestadoMapper para eliminar el estado colegial");
 					// Llamamos al PL para mantener los colegiados
-					int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
-							estadoColegial.getIdpersona(), null, usuario.getIdusuario());
+					int res = 0;
+					
+					if(direccionCensoWeb.getIddireccion() != null) {
+						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+								estadoColegial.getIdpersona(), direccionCensoWeb.getIddireccion(), usuario.getIdusuario());
+					}else {
+						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+								estadoColegial.getIdpersona(), null, usuario.getIdusuario());
+					}
+					
 					if(res <=0) {
 						LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 								usuario.getIdinstitucion() + ", idpersona: " +
