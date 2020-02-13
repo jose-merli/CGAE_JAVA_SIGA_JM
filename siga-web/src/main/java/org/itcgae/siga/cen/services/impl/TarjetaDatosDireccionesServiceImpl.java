@@ -275,10 +275,17 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				LOGGER.info(
 						"getCargos() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para actualizar datos de un direcciones");
 
-				// Llamamos al PL para mantener los colegiados
+				int res = 0;
 				
-				int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
-						Long.valueOf(tarjetaDireccionesUpdateDTO[i].getIdPersona()), null, usuario.getIdusuario());
+				// Llamamos al PL para mantener los colegiados
+				if(recordUpdate.getIddireccion() != null) {
+					res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+							Long.valueOf(tarjetaDireccionesUpdateDTO[i].getIdPersona()), recordUpdate.getIddireccion(), usuario.getIdusuario());
+				}else {
+					res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+							Long.valueOf(tarjetaDireccionesUpdateDTO[i].getIdPersona()), null, usuario.getIdusuario());
+				}
+				
 				if(res <=0) {
 					LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 							usuario.getIdinstitucion() + ", idpersona: " +
@@ -726,8 +733,17 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 								LOGGER.info(
 										"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
 								// Llamamos al PL para mantener los colegiados
-								int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
-										Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
+								
+								int res = 0;
+								
+								if(!UtilidadesString.esCadenaVacia(datosDireccionesItem.getIdDireccion())) {
+									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+											Long.valueOf(datosDireccionesItem.getIdPersona()), Long.valueOf(datosDireccionesItem.getIdDireccion()), usuario.getIdusuario());
+								}else {
+									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+											Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
+								}
+								
 								if(res <=0) {
 									LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 											usuario.getIdinstitucion() + ", idpersona: " +
@@ -1145,9 +1161,17 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						LOGGER.info(
 								"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
 
+						int res = 0;
+						
 						// Llamamos al PL para mantener los colegiados
-						int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
-								Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
+						if(direcciones.getIddireccion() != null) {
+							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+									Long.valueOf(datosDireccionesItem.getIdPersona()), direcciones.getIddireccion(), usuario.getIdusuario());
+						}else {
+							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+									Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
+						}
+				
 						if(res <=0) {
 							LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 									usuario.getIdinstitucion() + ", idpersona: " +
@@ -1738,8 +1762,17 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					return insertResponseDTO;
 				} else {
 					// Llamamos al PL para mantener los colegiados
-					int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
-							Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
+					int res = 0;
+					
+					if(direcciones.getIddireccion() != null) {
+						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+								Long.valueOf(datosDireccionesItem.getIdPersona()), direcciones.getIddireccion(), usuario.getIdusuario());
+					}else {
+						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+								Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
+					}
+					
+			
 					if(res <=0) {
 						LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 								usuario.getIdinstitucion() + ", idpersona: " +
