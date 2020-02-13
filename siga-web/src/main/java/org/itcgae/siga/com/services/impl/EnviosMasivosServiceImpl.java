@@ -716,7 +716,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setDescripcion(datosTarjeta.getDescripcion());
 						envio.setFechamodificacion(new Date());
 						envio.setUsumodificacion(usuario.getIdusuario());
-						_envEnviosMapper.updateByPrimaryKey(envio);				
+						_envEnviosMapper.updateByPrimaryKeySelective(envio);				
 
 						if (SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
 								|| SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO
@@ -934,6 +934,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							for (EnvConsultasenvio consultaEnvio : listaConsultasEnvio) {
 								// Duplicamos las consultas del envio
 								consultaEnvio.setIdenvio(envio.getIdenvio());
+								consultaEnvio.setIdconsultaenvio(null);
 								_envConsultasenvioMapper.insert(consultaEnvio);
 							}
 						}

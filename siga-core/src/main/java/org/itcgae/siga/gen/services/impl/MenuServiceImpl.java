@@ -600,7 +600,7 @@ public class MenuServiceImpl implements IMenuService {
 		HashMap<String,String> permisos = UserTokenUtils.getPermisosFromJWTToken(token);
 		PermisoItem permisoItem = new PermisoItem();
 		permisoItem.setDerechoacceso(permisos.get(controlItem.getIdProceso()));
-		
+		permisoItem.setData(controlItem.getIdProceso());
 		List<PermisoItem> permisosItem = new ArrayList<PermisoItem>();
 		permisosItem.add(permisoItem);
 		response.setPermisoItems(permisosItem);

@@ -257,7 +257,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 						}
 					}
 
-					for (Map<String, Object> map : registrosHoja) {
+				/*	for (Map<String, Object> map : registrosHoja) {
 
 						if (map != null) {
 
@@ -299,10 +299,68 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 								cell++;
 							}
 						}
-					}
+					}*/
+					Map<Integer, CellStyle> mapaEstilos = new HashMap<Integer, CellStyle>();
 
+					CellStyle cellStyleNum = workbook.createCellStyle();
+					cellStyleNum.setAlignment(CellStyle.ALIGN_RIGHT);
+					
+					CellStyle cellStyleString = workbook.createCellStyle();
+					cellStyleString.setAlignment(CellStyle.ALIGN_LEFT);
+					
+					for (Map<String, Object> map : registrosHoja) {
+			
+						if (map != null) {
+			
+							Row row = sheet.createRow(rowNum++);
+							int cell = 0;
+			
+							CellStyle cellStyle = workbook.createCellStyle();
+							sheet.setDefaultColumnStyle(1, cellStyle);
+							
+							for (int j = 0; j < columnsKey.size(); j++) {
+								Object campo = map.get(columnsKey.get(j).trim());
+								
+								if (campo == null || campo.toString().trim() == "") {
+									row.createCell(cell).setCellValue("");
+								} else {
+									Cell celda = row.createCell(cell);
+									if (campo instanceof Number) {
+										if (!mapaEstilos.containsKey(cell)) {
+											mapaEstilos.put(cell, cellStyleNum);
+										}
+										celda.setCellType(Cell.CELL_TYPE_NUMERIC);
+										celda.setCellValue(Double.parseDouble(campo.toString()));
+										
+									} else if (campo instanceof Date) {
+										if (!mapaEstilos.containsKey(cell)) {
+											mapaEstilos.put(cell, cellStyleString);
+										}
+										celda.setCellType(Cell.CELL_TYPE_STRING);
+										XSSFRichTextString textCell = new XSSFRichTextString(
+												SigaConstants.DATE_FORMAT_MIN.format(campo));
+										celda.setCellValue(textCell);
+									} else {
+										if (!mapaEstilos.containsKey(cell)) {
+											mapaEstilos.put(cell, cellStyleString);
+										}
+										
+										celda.setCellType(Cell.CELL_TYPE_STRING);
+										XSSFRichTextString textCell = new XSSFRichTextString(campo.toString());
+										celda.setCellValue(textCell);
+									}
+								}
+								cell++;
+								
+							}
+						}
+					}
+					
 					for (int j = 0; j < index; j++) {
-						sheet.autoSizeColumn(j);
+						//sheet.autoSizeColumn(j);
+						if (mapaEstilos.containsKey(j)) {
+							sheet.setDefaultColumnStyle(j, mapaEstilos.get(j));
+						}
 					}
 				}
 
