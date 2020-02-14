@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
@@ -87,6 +89,8 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	private static final int EXCEL_ROW_FLUSH = 1000;
 	
 	@Override
 	public ComboDTO getCivilStatus(HttpServletRequest request) {
@@ -384,7 +388,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 					try {
 						Workbook workBook = crearExcel(result);
-
+						
 						// Obtenemos la ruta temporal
 						GenPropertiesKey key = new GenPropertiesKey();
 						key.setFichero(SigaConstants.FICHERO_SIGA);
@@ -456,7 +460,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		LOGGER.info("crearExcel() -> Entrada del servicio para crear el excel con los datos de los colegiados");
 
 		// Creamos el libro de excel
-		Workbook workbook = new SXSSFWorkbook(100000);
+		Workbook workbook = new SXSSFWorkbook(EXCEL_ROW_FLUSH);
 		Sheet sheet = workbook.createSheet("Query");
 
 		// Le aplicamos estilos a las cabeceras
@@ -474,7 +478,19 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		List<String> columnsKey = new ArrayList<String>();
 		int rowNum = 1;
 		int index = 0;
+		Row row = null;
 
+		Map<Integer, CellStyle> mapaEstilos = new HashMap<Integer, CellStyle>();
+
+		CellStyle cellStyleNum = workbook.createCellStyle();
+		cellStyleNum.setAlignment(CellStyle.ALIGN_RIGHT);
+		
+		CellStyle cellStyleString = workbook.createCellStyle();
+		cellStyleString.setAlignment(CellStyle.ALIGN_LEFT);
+		
+		Object campo = null;
+		XSSFRichTextString textCell = null;
+		
 		if (result.size() > 0) {
 			for (String value : result.get(0).keySet()) {
 				Cell cell = headerRow.createCell(index);
@@ -485,23 +501,56 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 			}
 
 			for (Map<String, Object> map : result) {
-
-				Row row = sheet.createRow(rowNum++);
-				int cell = 0;
-
-				for (int i = 0; i < columnsKey.size(); i++) {
-					Object campo = map.get(columnsKey.get(i).trim());
-					if (campo == null || campo.toString().trim() == "") {
-						row.createCell(cell).setCellValue("");
-					} else {
-						row.createCell(cell).setCellValue(campo.toString());
+				
+				if (map != null) {
+	
+					row = sheet.createRow(rowNum++);
+					int cell = 0;
+	
+					
+					for (int j = 0; j < columnsKey.size(); j++) {
+						campo = map.get(columnsKey.get(j).trim());
+						
+						if (campo == null || campo.toString().trim() == "") {
+							row.createCell(cell).setCellValue("");
+						} else {
+							Cell celda = row.createCell(cell);
+							if (campo instanceof Number) {
+								if (!mapaEstilos.containsKey(cell)) {
+									mapaEstilos.put(cell, cellStyleNum);
+								}
+								celda.setCellType(Cell.CELL_TYPE_NUMERIC);
+								celda.setCellValue(Double.parseDouble(campo.toString()));
+								
+							} else if (campo instanceof Date) {
+								if (!mapaEstilos.containsKey(cell)) {
+									mapaEstilos.put(cell, cellStyleString);
+								}
+								celda.setCellType(Cell.CELL_TYPE_STRING);
+								textCell = new XSSFRichTextString(
+										SigaConstants.DATE_FORMAT_MIN.format(campo));
+								celda.setCellValue(textCell);
+							} else {
+								if (!mapaEstilos.containsKey(cell)) {
+									mapaEstilos.put(cell, cellStyleString);
+								}
+								
+								celda.setCellType(Cell.CELL_TYPE_STRING);
+								textCell = new XSSFRichTextString(campo.toString());
+								celda.setCellValue(textCell);
+							}
+						}
+						cell++;
+						
 					}
-					cell++;
 				}
 			}
 
 			for (int i = 0; i < index; i++) {
-				sheet.autoSizeColumn(i);
+				//sheet.autoSizeColumn(j);
+				if (mapaEstilos.containsKey(i)) {
+					sheet.setDefaultColumnStyle(i, mapaEstilos.get(i));
+				}
 			}
 		}
 
@@ -542,12 +591,12 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
         sql.SELECT("per.apellidos2 AS Apellido2");
         sql.SELECT("f_siga_getrecurso(tip.descripcion,1) AS TipoIdentificacion");
         sql.SELECT("per.nifcif AS NifCif");
-        sql.SELECT("To_Char(Per.Fechanacimiento, 'dd-mm-yyyy') AS FechadeNacimiento");
+        sql.SELECT("Per.Fechanacimiento AS FechadeNacimiento");
         sql.SELECT("f_siga_getrecurso(est.descripcion,1) AS EstadoCivil");
         sql.SELECT("per.naturalde AS Naturalde");
         sql.SELECT("decode (per.fallecido,'1','SI','NO') AS Fallecido");
         sql.SELECT("decode (per.sexo,'M','MUEJR','HOMBRE') AS Sexo");
-        sql.SELECT("To_Char(Cli.Fechaalta, 'dd-mm-yyyy') AS Fechaalta");
+        sql.SELECT("Cli.Fechaalta AS Fechaalta");
         sql.SELECT("f_siga_getrecurso(tra.descripcion,1) AS Tratamiento");
         sql.SELECT("cli.caracter AS Caracter");
         sql.SELECT("cli.publicidad AS Publicidad");
@@ -558,28 +607,28 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
         sql.SELECT("decode (cli.idlenguaje,'1','Castellano','2','Catalá','3','Euskera','4','Galego') AS Lenguaje");
         sql.SELECT("cli.fotografia AS Fotografia");
         sql.SELECT("cli.asientocontable AS AsientoContable");
-        sql.SELECT("To_Char(Cli.Fechacarga, 'dd-mm-yyyy') AS FechaCarga");
+        sql.SELECT("Cli.Fechacarga AS FechaCarga");
         sql.SELECT("cli.letrado AS Letrado");
-        sql.SELECT("To_Char(Cli.Fechaactualizacion, 'dd-mm-yyyy') AS FechaActualizacion");
-        sql.SELECT("To_Char(Cli.Fechaexportcenso, 'dd-mm-yyyy') AS FechaExportCenso");
+        sql.SELECT("Cli.Fechaactualizacion AS FechaActualizacion");
+        sql.SELECT("Cli.Fechaexportcenso AS FechaExportCenso");
         sql.SELECT("cli.noenviarrevista AS NoenviaRevista");
         sql.SELECT("cli.noaparecerredabogacia AS NoapareceRedAbogacia");
-        sql.SELECT("To_Char(Col.Fechapresentacion, 'dd-mm-yyyy') AS FechaPresentacion");
-        sql.SELECT("To_Char(Col.Fechaincorporacion, 'dd-mm-yyyy') AS FechaIncorporacion");
+        sql.SELECT("Col.Fechapresentacion AS FechaPresentacion");
+        sql.SELECT("Col.Fechaincorporacion AS FechaIncorporacion");
         sql.SELECT("col.indtitulacion AS IndTitulacion");
         sql.SELECT("col.jubilacioncuota AS JubilacionCuota");
         sql.SELECT("decode (col.situacionejercicio,'1','Alta','0','Baja') AS SituacionEjercicio");
         sql.SELECT("decode (col.situacionresidente,'1','SI','0','NO') AS SituacionResidente");
         sql.SELECT("col.situacionempresa AS SituacionEmpresa");
-        sql.SELECT("To_Char(Col.Fechajura, 'dd-mm-yyyy') AS FechaJura");
-        sql.SELECT("To_Char(Col.Fechatitulacion, 'dd-mm-yyyy') AS FechaTitulacion");
+        sql.SELECT("Col.Fechajura AS FechaJura");
+        sql.SELECT("Col.Fechatitulacion AS FechaTitulacion");
         sql.SELECT("decode (col.otroscolegios,'1','SI','0','NO') as OtrosColegios");
-        sql.SELECT("To_Char(Col.Fechadeontologia, 'dd-mm-yyyy') AS FechaDeontologia");
-        sql.SELECT("To_Char(Col.Fechamovimiento, 'dd-mm-yyyy') AS FechaMovimiento");
+        sql.SELECT("Col.Fechadeontologia AS FechaDeontologia");
+        sql.SELECT("Col.Fechamovimiento AS FechaMovimiento");
         sql.SELECT("f_siga_getrecurso(ts.nombre,1) AS TipoSeguro");
         sql.SELECT("col.cuentacontablesjcs AS CuentaContableSJCS");
         sql.SELECT("decode (f_siga_gettipocliente(col.idpersona,col.idinstitucion,sysdate),'10','No Ejerciente','20','Ejerciente','30','Baja Colegial','40','Inhabilitacion','50','Suspension Ejercicio','60','Baja por Deceso','Baja por Deceso') AS EstadoColegial");
-        sql.SELECT("To_Char(f_siga_getfechaestadocolegial(col.idpersona,col.idinstitucion,sysdate), 'dd-mm-yyyy')   AS FechaEstado");
+        sql.SELECT("f_siga_getfechaestadocolegial(col.idpersona,col.idinstitucion,sysdate)   AS FechaEstado");
         sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,1) AS Domicilio");
         sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,2) AS CodigoPostal");
         sql.SELECT("f_siga_getdireccioncliente(col.idinstitucion,col.idpersona,3,11) AS Telefono1");
