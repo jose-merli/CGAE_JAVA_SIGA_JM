@@ -743,7 +743,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					//solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
-					if(idPersona != null && idDireccion!= null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
+					if(idPersona != null && idDireccion != null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
 						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
 						response.setStatus(SigaConstants.OK);
 						response.setError(null);
@@ -752,7 +752,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						// Llamamos al PL para mantener los colegiados
 						//Insertamos en cen_colacambioletrado						
 						int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_APROBACION_COLEGIACION,usuario.getIdinstitucion().intValue(),
-								idPersona, null, usuario.getIdusuario());
+								idPersona, idDireccion, usuario.getIdusuario());
 						if(res <=0) {
 							LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 									usuario.getIdinstitucion() + ", idpersona: " +

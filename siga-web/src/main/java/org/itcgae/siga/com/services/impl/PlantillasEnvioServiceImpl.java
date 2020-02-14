@@ -526,7 +526,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 			} catch (Exception e) {
 				respuesta.setCode(500);
 				respuesta.setDescription("Error al asociar consulta a la plantilla");
-				respuesta.setMessage(e.getMessage());
+				respuesta.setMessage("informesycomunicaciones.plantillasenvio.ficha.errorAsociar");
 				e.printStackTrace();
 			}
 		}
