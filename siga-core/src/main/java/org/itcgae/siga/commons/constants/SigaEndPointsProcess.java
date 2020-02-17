@@ -173,7 +173,7 @@ public class SigaEndPointsProcess {
 			put("MutualidadAbogaciaPlanUniversal", "224");
 			put("solicitudesEspecificas", "5");
 			put("alterMutua", "226");
-			put("alterMutuaReta", "22A");
+			put("alterMutuaReta", "299");
 			put("alterMutuaOfertas", "22O");
 			put("nuevaIncorporacion", "47");
 			put("detalleIntegrante", "22");
