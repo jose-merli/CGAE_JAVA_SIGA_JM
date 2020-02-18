@@ -15,7 +15,6 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 	public String selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem, Integer tamMaximo) {
 
 		SQL sql = new SQL();
-		SQL sql1 = new SQL();
 		SQL sql2 = new SQL();
 		SQL sql3 = new SQL();
 
@@ -56,6 +55,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 					"concat( decode(col.situacionresidente,0,'No', 'Sí')  || ' / ',decode(col.comunitario,0,'No', 'Sí')) as residenteInscrito");
 			sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechanacimiento");
 			sql.SELECT("inst.abreviatura as colegioResultado");
+
 				
 		sql.FROM("cen_colegiado col");
 
@@ -357,9 +357,6 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			instituciones = colegiadoItem.getIdInstitucion();
 		}
 		
-		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
 		sql.SELECT_DISTINCT("col.idpersona");
 		sql.SELECT_DISTINCT("col.idinstitucion");
 		sql.SELECT_DISTINCT("col.identificadords");
@@ -373,6 +370,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("cli.noaparecerredabogacia");
 		sql.SELECT_DISTINCT("cli2.noaparecerredabogacia as noaparecerredabogacia2");
 		sql.SELECT_DISTINCT("decode(cli2.noaparecerredabogacia, 0, 'NONono' , 1, 'SISisiSísíSÍ') as noAparecerRedAbogaciaFilter");
+		sql.SELECT_DISTINCT("decode(col.situacionresidente, 0, 'NONono' , 1, 'SISisiSísíSÍ') as situacionresidenteFilter");
 		sql.SELECT_DISTINCT("per.idtipoidentificacion");
 		sql.SELECT_DISTINCT("per.naturalde");
 		sql.SELECT("TO_CHAR(cli.fechaalta,'DD/MM/YYYY') AS fechaalta");
