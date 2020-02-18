@@ -49,6 +49,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiado")
 	@Results({@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "COUNT", property = "count", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SOLONOMBRE", property = "soloNombre", jdbcType = JdbcType.VARCHAR),

@@ -92,7 +92,8 @@ public class ColegiadoItem {
 	private List<ComboItem> temasCombo;
 	private String identificadords;
 	private Boolean cambioEstado;
-
+	private Boolean searchCount;
+	private String count;
 	
 	// Nombre del colegio que se mostrará como resultado en la tabla de busqueda
 	private String colegioResultado;
@@ -1387,6 +1388,23 @@ public class ColegiadoItem {
 	public void setNumberColegiado(String numberColegiado) {
 		this.numberColegiado = numberColegiado;
 	}
+
+	public Boolean getSearchCount() {
+		return searchCount;
+	}
+
+	public void setSearchCount(Boolean searchCount) {
+		this.searchCount = searchCount;
+	}
+
+	public String getCount() {
+		return count;
+	}
+
+	public void setCount(String count) {
+		this.count = count;
+	}
+
 	
 }
 
