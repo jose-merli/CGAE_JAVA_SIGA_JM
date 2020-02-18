@@ -526,7 +526,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 			} catch (Exception e) {
 				respuesta.setCode(500);
 				respuesta.setDescription("Error al asociar consulta a la plantilla");
-				respuesta.setMessage(e.getMessage());
+				respuesta.setMessage("informesycomunicaciones.plantillasenvio.ficha.errorAsociar");
 				e.printStackTrace();
 			}
 		}
@@ -1013,11 +1013,16 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 			consulta = _conConsultaMapper.selectByPrimaryKey(key);
 		}
 
-		int inicioSelect = consulta.getSentencia().indexOf("<SELECT>") + 8;
-		int finSelect = consulta.getSentencia().indexOf("</SELECT>");
-		String finalidad = consulta.getSentencia().substring(inicioSelect, finSelect);
-		finalidad = finalidad.replace("select", "");
-		finalidad = finalidad.replace("distinct", "");
+		String finalidad = "";
+		if(null != consulta.getSentencia() && !consulta.getSentencia().equals("")) {
+			int inicioSelect = consulta.getSentencia().indexOf("<SELECT>") + 8;
+			int finSelect = consulta.getSentencia().indexOf("</SELECT>");
+			if(finSelect != -1 && inicioSelect != -1) {
+				finalidad = consulta.getSentencia().substring(inicioSelect, finSelect);
+			finalidad = finalidad.replace("select", "");
+			finalidad = finalidad.replace("distinct", "");
+			}			
+		}
 		return finalidad;
 	}
 

@@ -385,7 +385,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			LOGGER.error(e);
 			throw new BusinessException("Error interno de la aplicación", e);
 		}
-		
+		LOGGER.info("descargarComunicacion() -> Salida al servicio para descargar la documentación de la comunicación");
 		return file;
 		
 	}
