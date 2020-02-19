@@ -82,6 +82,8 @@ public class ConConsultasExtendsSqlProvider {
 			sql.WHERE("((CONSULTA.IDINSTITUCION = '2000' AND (UPPER(CONSULTA.GENERAL) = 'S'  OR  CONSULTA.GENERAL = '1')) OR (CONSULTA.IDINSTITUCION = '" + idInstitucion +"' AND (UPPER(CONSULTA.GENERAL) = 'N'  OR  CONSULTA.GENERAL = '0')))");
 		}
 		
+		sql.ORDER_BY("DESCRIPCION");
+		
 		return sql.toString();
 	}
 

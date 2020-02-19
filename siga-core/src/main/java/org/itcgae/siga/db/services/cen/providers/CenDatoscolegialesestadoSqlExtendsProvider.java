@@ -66,8 +66,8 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 					+ "', 'dd/MM/RRRR')");
 		} else {
 			sql.SET("FECHAESTADO = TO_DATE('" + dateFormatWhere.format(record.getFechaestado()) + "', 'dd/MM/RRRR')");
-			sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('" + dateFormatWhere.format(record.getFechaestado())
-					+ "', 'dd/MM/RRRR')");
+			sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE(" + "TO_DATE('"+dateFormatWhere.format(record.getFechaestado())+"', 'dd/MM/RRRR')"
+					+ ", 'dd/MM/RRRR')");
 		}
 
 		sql.WHERE("IDINSTITUCION = " + record.getIdinstitucion() + "");

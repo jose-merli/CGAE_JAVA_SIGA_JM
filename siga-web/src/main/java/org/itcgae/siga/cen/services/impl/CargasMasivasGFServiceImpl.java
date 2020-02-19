@@ -41,6 +41,7 @@ import org.itcgae.siga.db.entities.CenCargamasiva;
 import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteKey;
+import org.itcgae.siga.db.entities.CenGruposclienteExample;
 import org.itcgae.siga.db.entities.CenHistorico;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.GenProperties;
@@ -535,16 +536,23 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 						if (idGrupo > 9999)
 							throw new NumberFormatException();
 						String key = idInst + "||" + idGrupo;
-						if (!idGruposHashTable.containsKey(key)) {
-							cenGruposCliente = new CenGruposcliente();
+//						if (!idGruposHashTable.containsKey(key)) {
+							CenGruposclienteExample cen = new CenGruposclienteExample();
+							List<Short> instituciones = new ArrayList<>();
+							instituciones.add(idInstitucion);
+							instituciones.add(SigaConstants.IDINSTITUCION_2000);
 							// Llamada a metodo para obtener idgrupo
-							cenGruposCliente.setIdgrupo(idGrupo);
-							cenGruposCliente.setIdinstitucion(idInst);
-
-							CenGruposcliente gruposCliente = cenGruposclienteMapper
-									.selectByPrimaryKey(cenGruposCliente);
-							if (gruposCliente != null) {
-								genRecursosCatalogosKey.setIdrecurso(gruposCliente.getNombre());
+							cen.createCriteria().andIdgrupoEqualTo(idGrupo)
+							.andIdinstitucionIn(instituciones);
+							
+							cen.setOrderByClause("IDINSTITUCION DESC");
+							
+							List<CenGruposcliente> gruposCliente = cenGruposclienteMapper
+									.selectByExample(cen);
+							
+							if (gruposCliente != null && gruposCliente.size() > 0) {
+								cenGruposCliente = gruposCliente.get(0);
+								genRecursosCatalogosKey.setIdrecurso(cenGruposCliente.getNombre());
 								recursosCatalogos = genRecursosCatalogosMapper
 										.selectByPrimaryKey(genRecursosCatalogosKey);
 								cenGruposCliente.setNombre(recursosCatalogos.getDescripcion());
@@ -567,13 +575,13 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 							}
 
-						} else {
-							cenGruposCliente = idGruposHashTable.get(key);
-						}
+//						} else {
+//							cenGruposCliente = idGruposHashTable.get(key);
+//						}
 						idGruposHashTable.put(key, cenGruposCliente);
 
-						cargaMasivaDatosGFVo.setIdGrupo(idGrupo);
-						cargaMasivaDatosGFVo.setIdInstitucionGrupo(idInstitucion);
+						cargaMasivaDatosGFVo.setIdGrupo(cenGruposCliente.getIdgrupo());
+						cargaMasivaDatosGFVo.setIdInstitucionGrupo(cenGruposCliente.getIdinstitucion());
 					} catch (NumberFormatException e) {
 						cargaMasivaDatosGFVo.setNombreGrupo("Error");
 						errorLinea.append("El identificador de Grupo Fijo debe ser numerico de valor menor que 9999.");

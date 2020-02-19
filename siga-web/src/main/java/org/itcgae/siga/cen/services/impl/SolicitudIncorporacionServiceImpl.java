@@ -52,6 +52,8 @@ import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
+import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenPais;
 import org.itcgae.siga.db.entities.CenPaisExample;
 import org.itcgae.siga.db.entities.CenPersona;
@@ -75,6 +77,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionmodalidadExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadoSolicitudExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
@@ -144,6 +147,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private CenColegiadoExtendsMapper _cenColegiadoMapper;
+	
+	@Autowired
+	private CenNocolegiadoExtendsMapper _cenNoColegiadoMapper;
 	
 	@Autowired
 	private CenClienteMapper _cenClienteMapper;
@@ -739,11 +745,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion.setFechamodificacion(new Date());
 					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
 					solIncorporacion.setFechaalta(new Date());
-					solIncorporacion.setFechaestadosolicitud(new Date());
+//					solIncorporacion.setFechaestadosolicitud(new Date());
 					//solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
-					if(idPersona != null && idDireccion!= null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
+					if(idPersona != null && idDireccion != null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
 						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
 						response.setStatus(SigaConstants.OK);
 						response.setError(null);
@@ -752,7 +758,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						// Llamamos al PL para mantener los colegiados
 						//Insertamos en cen_colacambioletrado						
 						int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_APROBACION_COLEGIACION,usuario.getIdinstitucion().intValue(),
-								idPersona, null, usuario.getIdusuario());
+								idPersona, idDireccion, usuario.getIdusuario());
 						if(res <=0) {
 							LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 									usuario.getIdinstitucion() + ", idpersona: " +
@@ -1423,7 +1429,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setUsumodificacion(usuario.getIdusuario());
 		colegiado.setNumsolicitudcolegiacion(solicitud.getIdsolicitud().toString());
 		
-		colegiado.setFechapresentacion(new Date());
+		colegiado.setFechapresentacion(solicitud.getFechaestado());
 		if (solicitud.getIdtipocolegiacion() == 20) {
 			colegiado.setComunitario("1");
 			colegiado.setNcomunitario(solicitud.getNcolegiado());
@@ -1448,6 +1454,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			int resultado = _cenColegiadoMapper.insert(colegiado);
 			
 			if (resultado == 1) {
+				CenNocolegiadoExample ejemploNoColegiado = new CenNocolegiadoExample();
+				ejemploNoColegiado.createCriteria().andIdpersonaEqualTo(idPersona).andIdinstitucionEqualTo(solicitud.getIdinstitucion());
+				List <CenNocolegiado> listaNoColegiados = _cenNoColegiadoMapper.selectByExample(ejemploNoColegiado);
+				if(!listaNoColegiados.isEmpty()) {
+					CenNocolegiado updateNoCol = new CenNocolegiado();
+					updateNoCol.setFechaBaja(new Date());
+					_cenNoColegiadoMapper.updateByExampleSelective(updateNoCol, ejemploNoColegiado);
+				}
 				CenDatoscolegialesestado datosColegiales = new CenDatoscolegialesestado();
 				datosColegiales.setFechaestado(solicitud.getFechaestado());
 				datosColegiales.setFechamodificacion(new Date());

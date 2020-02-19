@@ -385,7 +385,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			LOGGER.error(e);
 			throw new BusinessException("Error interno de la aplicación", e);
 		}
-		
+		LOGGER.info("descargarComunicacion() -> Salida al servicio para descargar la documentación de la comunicación");
 		return file;
 		
 	}
@@ -1548,7 +1548,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								consultaEnvioEntity.setIdenvio(envio.getIdenvio());
 								consultaEnvioEntity.setIdinstitucion(consultaEnvio.getIdInstitucion());
 								consultaEnvioEntity.setIdobjetivo(consultaEnvio.getIdObjetivo());
-								consultaEnvioEntity.setUsumodificacion(consultaEnvio.getUsuModificacion());
+								if (null != consultaEnvio.getUsuModificacion()) {
+									consultaEnvioEntity.setUsumodificacion(Integer.valueOf((consultaEnvio.getUsuModificacion().toString())));
+								}
 								consultaEnvioEntity.setIdplantilladocumento(consultaEnvio.getIdPlantillaDoc());
 								consultaEnvioEntity.setIdinforme(consultaEnvio.getIdInforme());
 								consultaEnvioEntity.setIdmodelocomunicacion(consultaEnvio.getIdModeloComunicacion());
@@ -1799,7 +1801,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										
 										String consultaEjecutarDatos = consultaDatos.getConsulta();
 										List<Map<String,Object>> resultDatos = null;
-										
+																	
 										try {
 											resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
 										}catch (BusinessSQLException e) {
@@ -1904,7 +1906,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							List<Map<String,Object>> resultDatos = null;	
 							
 							try {
-								resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);	
+								
+								resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+
 							}catch (BusinessSQLException e) {
 								LOGGER.error(e);
 								throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " " + e.getMessage(), e);
@@ -2129,7 +2133,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 				hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
 			}else{
-				
+				//COMENTARIO IVÁN
+				// AQUÍ SE ESTÁ COGIEDNO SOLO EL PRIMER RESULTADO TIENE QUE COGER TODOS LOS RESULTADOS DE LA CONSULTA
 				if(resultDatos != null && resultDatos.size() > 0) {
 					hDatosGenerales.putAll(resultDatos.get(0));
 				}
