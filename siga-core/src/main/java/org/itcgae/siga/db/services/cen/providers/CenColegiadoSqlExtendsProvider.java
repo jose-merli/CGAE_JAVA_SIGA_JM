@@ -17,6 +17,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		SQL sql3 = new SQL();
+		String situacCad = "";
 
 		// En el caso de que venga de la pantalla de busqueda colegiados/no colegiados, tendremos que preparar el filtro de instituciones
 		String instituciones = "";
@@ -216,10 +217,18 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.WHERE("datoscv.idtipocvsubtipo2 = '" + colegiadoItem.getSubTipoCV2() + "'");
 		}
 
-		if (colegiadoItem.getSituacion() != null && colegiadoItem.getSituacion() != "") {
-			sql.WHERE("colest.idestado ='" + colegiadoItem.getSituacion() + "'");
-		}
-
+//		if (colegiadoItem.getSituacion() != null && colegiadoItem.getSituacion() != "") {
+//			sql.WHERE("colest.idestado ='" + colegiadoItem.getSituacion() + "'");
+//		}
+		
+		 if(colegiadoItem.getSituaciones() != null) {
+	        	for (String situac : colegiadoItem.getSituaciones()) {
+	        			situacCad += situac+",";
+	    		}
+	        	situacCad = situacCad.substring(0, (situacCad.length() -1));
+	                sql.WHERE ("colest.idestado IN (" + situacCad + ")");
+	     }
+		 
 		if (colegiadoItem.getResidencia() != null && colegiadoItem.getResidencia() != "") {
 			sql.WHERE("col.situacionresidente ='" + colegiadoItem.getResidencia() + "'");
 		}

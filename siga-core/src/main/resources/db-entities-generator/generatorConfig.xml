@@ -1,44 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-	<classPathEntry location="C:\Users\DTUser\Downloads\ojdbc6.jar" />
-	  <context id="DB2Tables" targetRuntime="MyBatis3">
-	
-		<jdbcConnection 
-			connectionURL="jdbc:oracle:thin:@//vmcgaeap004.cloud.es.deloitte.com:1521/cgae" 
-			driverClass="oracle.jdbc.OracleDriver"
-			userId="uscgae"
-			password="uscgae" />
-			
-			
-		<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
-		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
-		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER"/>
-		
+	<classPathEntry
+		location="C:\Users\acorral\Downloads\ojdbc6.jar" />
+	<context id="DB2Tables" targetRuntime="MyBatis3">
 
-<!-- 		<table schema="USCGAE" tableName="cen_reg_mercantil"> -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="id_datos_reg" sqlStatement="SELECT seq_id_datos_reg.NEXTVAL FROM DUAL" /> -->
-<!--  		</table> -->
- 		
-<!--  		<table schema="USCGAE" tableName="CEN_NOCOLEGIADO"> -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="idpersona" sqlStatement="SELECT seq_idpersona.NEXTVAL FROM DUAL" /> -->
-<!--  		</table> -->
-		<!--  <table schema="USCGAE" tableName="cfg_param_colegios">
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="id_param_colegio" 
- 				sqlStatement="SELECT seq_cfg_param_colegios.NEXTVAL FROM DUAL" />
-		</table>-->
-<!-- 		<table schema="USCGAE" tableName="FOR_CURSO"> -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDCURSO"  -->
-<!--  				sqlStatement="SELECT SEQ_FORCURSO.NEXTVAL FROM DUAL" /> -->
-<!-- 		</table>   -->
-				<table schema="USCGAE" tableName="ENV_CONSULTASENVIO">
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDCONSULTAENVIO" 
- 				sqlStatement="SELECT SEQ_ENV_CONSULTASENVIO.NEXTVAL FROM DUAL" />
+		<jdbcConnection
+			connectionURL="jdbc:oracle:thin:@//vmcgaeap004.cloud.es.deloitte.com:1521/cgae"
+			driverClass="oracle.jdbc.OracleDriver" userId="uscgae"
+			password="uscgae" />
+
+
+		<javaModelGenerator
+			targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
+		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" 
+			/> -->
+		<javaClientGenerator
+			targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core"
+			type="ANNOTATEDMAPPER"
+			/>
+
+
+		<!-- <table schema="USCGAE" tableName="cen_reg_mercantil"> -->
+		<!-- <property name="ignoreQualifiersAtRuntime" value="true"/> -->
+		<!-- <generatedKey column="id_datos_reg" sqlStatement="SELECT seq_id_datos_reg.NEXTVAL 
+			FROM DUAL" /> -->
+		<!-- </table> -->
+
+		<!-- <table schema="USCGAE" tableName="CEN_NOCOLEGIADO"> -->
+		<!-- <property name="ignoreQualifiersAtRuntime" value="true"/> -->
+		<!-- <generatedKey column="idpersona" sqlStatement="SELECT seq_idpersona.NEXTVAL 
+			FROM DUAL" /> -->
+		<!-- </table> -->
+		<!-- <table schema="USCGAE" tableName="cfg_param_colegios"> <property name="ignoreQualifiersAtRuntime" 
+			value="true"/> <generatedKey column="id_param_colegio" sqlStatement="SELECT 
+			seq_cfg_param_colegios.NEXTVAL FROM DUAL" /> </table> -->
+		<!-- <table schema="USCGAE" tableName="FOR_CURSO"> -->
+		<!-- <property name="ignoreQualifiersAtRuntime" value="true"/> -->
+		<!-- <generatedKey column="IDCURSO" -->
+		<!-- sqlStatement="SELECT SEQ_FORCURSO.NEXTVAL FROM DUAL" /> -->
+		<!-- </table> -->
+		<table schema="USCGAE" tableName="SCS_ORIGENCAJG">
+			<property name="ignoreQualifiersAtRuntime" value="true" />
 		</table>
 
 	</context>
