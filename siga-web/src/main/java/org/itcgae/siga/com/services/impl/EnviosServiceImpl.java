@@ -500,7 +500,7 @@ public class EnviosServiceImpl implements IEnviosService{
                 BodyPart messageBodyPart = new MimeBodyPart();
                 
                 messageBodyPart.setDataHandler(new DataHandler(ds));
-                String fileName = truncarFileName(MimeUtility.encodeText(informe.getFileName()));
+                String fileName = truncarFileName(informe.getFileName());
                 messageBodyPart.setFileName(fileName);
                 messageBodyPart.setDisposition(MimePart.ATTACHMENT);
 //                mimeBodyPart.attachFile(file);
