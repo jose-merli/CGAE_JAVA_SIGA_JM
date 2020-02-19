@@ -1801,7 +1801,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										
 										String consultaEjecutarDatos = consultaDatos.getConsulta();
 										List<Map<String,Object>> resultDatos = null;
-										
+																	
 										try {
 											resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
 										}catch (BusinessSQLException e) {
@@ -1906,7 +1906,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							List<Map<String,Object>> resultDatos = null;	
 							
 							try {
-								resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);	
+								
+								resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+
 							}catch (BusinessSQLException e) {
 								LOGGER.error(e);
 								throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " " + e.getMessage(), e);
