@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
+
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -14,15 +15,15 @@ import org.springframework.stereotype.Service;
 @Primary
 public interface ScsGuardiascolegiadoExtendsMapper extends ScsGuardiascolegiadoMapper {
 
-	
+    
 
-	
-	@SelectProvider(type = ScsGuardiascolegiadoSqlExtendsProvider.class, method = "getTurnosGuardias")
-	@Results({ 
-		@Result(column = "COUNT", property = "valor", jdbcType = JdbcType.VARCHAR),
-	})
-	StringDTO getTurnosGuardias(String idPersona);
-	
-	
-	
+    
+    @SelectProvider(type = ScsGuardiascolegiadoSqlExtendsProvider.class, method = "getTurnosGuardias")
+    @Results({ 
+        @Result(column = "COUNT", property = "valor", jdbcType = JdbcType.VARCHAR),
+    })
+    StringDTO getTurnosGuardias(String idPersona);
+    
+    
+    
 }

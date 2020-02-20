@@ -44,6 +44,7 @@ public interface IFichaDatosColegialesService {
 	StringDTO getTurnosGuardias(ColegiadoItem colegiadoItem,
 			HttpServletRequest request);
 	
-//	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request);
-	
+	public StringDTO getTurnosGuardias(ColegiadoItem colegiadoItem,
+            HttpServletRequest request);
+
 }

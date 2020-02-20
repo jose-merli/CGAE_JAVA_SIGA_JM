@@ -48,7 +48,6 @@ import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsGuardiascolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColacambioletradoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
@@ -58,6 +57,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposseguroExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsGuardiascolegiadoExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,11 +104,11 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 	@Autowired
 	private GenDiccionarioMapper genDiccionarioMapper;
 	
-	@Autowired
-	private CenColacambioletradoExtendsMapper cenColacambioletradoMapper;
+    @Autowired
+    private ScsGuardiascolegiadoExtendsMapper _scsGuardiascolegiadoMapper;
 	
 	@Autowired
-	private ScsGuardiascolegiadoExtendsMapper _scsGuardiascolegiadoMapper;
+	private CenColacambioletradoExtendsMapper cenColacambioletradoMapper;
 
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -1491,40 +1491,6 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 		return nColegiado;
 	}
-	
-	@Override
-	public StringDTO getTurnosGuardias(ColegiadoItem colegiadoItem, HttpServletRequest request) {
-
-		LOGGER.info("getTurnosGuardias() -> Entrada al servicio para obtener los turnos o guardias asociados al colegiado");
-		StringDTO resultado = new StringDTO();
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (null != usuarios && usuarios.size() > 0) {
-				resultado = _scsGuardiascolegiadoMapper.getTurnosGuardias(colegiadoItem.getIdPersona());
-
-			}
-
-		}
-		LOGGER.info("getTurnosGuardias() -> Salida del servicio para obtener los turnos o guardias asociados al colegiado");
-
-		return resultado;
-	}
 
 	/**
 	 * Calls a PL Funtion
@@ -1735,4 +1701,41 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		MaxIdDto id = cenColacambioletradoMapper.selectNuevoId(idInstitucion, idPersona);
 		return id.idMax;
 	}
+	
+    
+    @Override
+    public StringDTO getTurnosGuardias(ColegiadoItem colegiadoItem, HttpServletRequest request) {
+
+        LOGGER.info("getTurnosGuardias() -> Entrada al servicio para obtener los turnos o guardias asociados al colegiado");
+        StringDTO resultado = new StringDTO();
+
+        // Conseguimos información del usuario logeado
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+            LOGGER.info(
+                    "getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+            LOGGER.info(
+                    "getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+            if (null != usuarios && usuarios.size() > 0) {
+                resultado = _scsGuardiascolegiadoMapper.getTurnosGuardias(colegiadoItem.getIdPersona());
+
+            }
+
+        }
+        LOGGER.info("getTurnosGuardias() -> Salida del servicio para obtener los turnos o guardias asociados al colegiado");
+
+        return resultado;
+    }
+
+	
 }
