@@ -1046,8 +1046,6 @@ public class MenuServiceImpl implements IMenuService {
 		List<GenProperties> prop = new ArrayList<GenProperties>();
 		// Obtenemos atributos del usuario logeado
 		LOGGER.debug("Obtenemos atributos del usuario logeado");
-		String token = request.getHeader("Authorization");
-		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		GenPropertiesExample propertiesExample = new GenPropertiesExample();
 		propertiesExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.entorno");
