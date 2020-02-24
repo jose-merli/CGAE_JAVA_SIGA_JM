@@ -6,5 +6,5 @@ public interface IColaEnvios {
 	
 	public void execute();
 	public void preparaCorreo(EnvEnvios envio) throws Exception;
-	public void preparaEnvioSMS(EnvEnvios envio, boolean isBuroSMS) throws Exception;
+	public void preparaEnvioSMS(EnvEnvios envio, boolean isBuroSMS);
 }

@@ -103,9 +103,6 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-	
-	@Autowired
-	private ConConsultaMapper _conConsultaMapper;
 
 	@Autowired
 	private AdmPerfilExtendsMapper admPerfilExtendsMapper;
@@ -128,7 +125,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 	@Autowired
 	private ConListadoPlantillasExtendsMapper _conListadoPlantillasExtendsMapper;
 
-
+	@Autowired
+	private ConConsultaMapper _conConsultaMapper;
 
 	@Autowired
 	private ModPlantilladocConsultaMapper _modPlantilladocConsultaMapper;
@@ -1026,25 +1024,22 @@ public class ConsultasServiceImpl implements IConsultasService {
 					// Map<String,String> mapa = new HashMap<String,String>();
 					// mapa = obtenerMapaConsulta(sentencia);
 
-//					sentencia = quitarEtiquetas(sentencia.toUpperCase());
-//
-//					if (sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER)
-//							|| sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-//							|| sentencia.contains(SigaConstants.SENTENCIA_DELETE)
-//							|| sentencia.contains(SigaConstants.SENTENCIA_DROP)
-//							|| sentencia.contains(SigaConstants.SENTENCIA_INSERT)
-//							|| sentencia.contains(SigaConstants.SENTENCIA_UPDATE))) {
-//
-//						LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
-//						error.setCode(400);
-//						error.setDescription("Consulta no permitida");
-//						error.setMessage("Consulta no permitida");
-//						response.setError(error);
-//					} else {
-//						List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+					sentencia = quitarEtiquetas(sentencia.toUpperCase());
 
-					
-					List<Map<String, Object>>  result = this.ejecutarConsultaConClavesLog(sentencia, null, Long.valueOf(consulta.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()),consulta.getDescripcion());
+					if (sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER)
+							|| sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+							|| sentencia.contains(SigaConstants.SENTENCIA_DELETE)
+							|| sentencia.contains(SigaConstants.SENTENCIA_DROP)
+							|| sentencia.contains(SigaConstants.SENTENCIA_INSERT)
+							|| sentencia.contains(SigaConstants.SENTENCIA_UPDATE))) {
+
+						LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+						error.setCode(400);
+						error.setDescription("Consulta no permitida");
+						error.setMessage("Consulta no permitida");
+						response.setError(error);
+					} else {
+						List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
 
 						if (result != null && result.size() > 0) {
 							Workbook workBook = crearExcel(result);
@@ -1074,7 +1069,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 						} else {
 							response.setResultados(false);
 						}
-					
+					}
 				} catch (Exception e) {
 					LOGGER.error("ejecutarConsulta() -> Error al ejecutar la consulta: " + e.getMessage());
 					e.printStackTrace();

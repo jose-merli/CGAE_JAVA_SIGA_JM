@@ -27,8 +27,6 @@ import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.ConConsulta;
-import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.EnvCamposenvios;
 import org.itcgae.siga.db.entities.EnvCamposenviosKey;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
@@ -46,7 +44,6 @@ import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenGruposclienteClienteMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
-import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDestinatariosBurosmsMapper;
@@ -68,8 +65,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 	
 	private Logger LOGGER = Logger.getLogger(ColaEnviosImpl.class);
 
-	@Autowired
-	private ConConsultaMapper _conConsultaMapper;
 
 	@Autowired
 	private EnvEnviosMapper _envEnviosMapper;
@@ -130,7 +125,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 	
 	
 	//@Transactional
-	//@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
+	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
 	@Override
 	public void execute() {
 		
@@ -433,7 +428,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 		}
 	}
 
-	private void addResultadoConsultaDatosPlantillaEnvio(EnvEnvios envio, List<Map<String, Object>> resultadosConsultas) throws Exception {
+	private void addResultadoConsultaDatosPlantillaEnvio(EnvEnvios envio, List<Map<String, Object>> resultadosConsultas) {
 		
 		// Obtenemos las consultas asociadas de datos a la plantilla de envio.
 		EnvConsultasenvioExample exampleConsulta = new EnvConsultasenvioExample();
@@ -445,27 +440,19 @@ public class ColaEnviosImpl implements IColaEnvios {
 		// Las ejecutamos y obtenemos los resultados
 		
 		for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {
-			
 			String sentencia = consultaDatos.getConsulta();
 			
-			ConConsultaKey key = new ConConsultaKey();
-			key.setIdconsulta(consultaDatos.getIdconsulta());
-			key.setIdinstitucion(consultaDatos.getIdinstitucion());
-			ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key );
-			List<Map<String, Object>>  result = _consultasService.ejecutarConsultaConClavesLog(sentencia, null, Long.valueOf(envio.getIdmodelocomunicacion()), Long.valueOf(consultaDatos.getIdconsulta()),Short.valueOf(consultaDatos.getIdinstitucion()),consulta.getDescripcion());
+			sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
 			
-//			
-//			sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
-//			
-//			if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-//					|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
-//					|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
-//				
-//				LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
-//			}else {
-//				List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+			if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+					|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+					|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+				
+				LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+			}else {
+				List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
 				resultadosConsultas.addAll(result);
-			//}
+			}
 		}
 		
 	}
@@ -635,18 +622,13 @@ public class ColaEnviosImpl implements IColaEnvios {
 		}
 	}
 
-	private void addDestinatariosConsultas(EnvEnvios envio, List<DestinatarioItem> destinatarios, boolean isBuroSMS, List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms) throws NumberFormatException, Exception {
+	private void addDestinatariosConsultas(EnvEnvios envio, List<DestinatarioItem> destinatarios, boolean isBuroSMS, List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms) {
 				
 		List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(envio.getIdinstitucion(), envio.getIdenvio().toString());
 		if (consultaItem != null) {
 			for (ConsultaItem consulta : consultaItem) {
-				
 				String sentenciaFinal = prepararConsulta(consulta.getSentencia(), envio.getIdtipoenvios(), envio.getIdinstitucion());
-				
-				List<Map<String, Object>>  result = _consultasService.ejecutarConsultaConClavesLog(sentenciaFinal, null, Long.valueOf(consulta.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()),consulta.getDescripcion());
-		
-				
-				//List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentenciaFinal);
+				List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentenciaFinal);
 				if(result != null && result.size() > 0){
 					
 					for (Map<String, Object> map : result) {
@@ -749,7 +731,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 
 	
 
-	public void preparaEnvioSMS(EnvEnvios envio, boolean isBuroSMS) throws Exception {
+	public void preparaEnvioSMS(EnvEnvios envio, boolean isBuroSMS) {
 
 		String idSolicitudEcos ="";
 		// Obtenemos la plantilla de envio
@@ -823,26 +805,17 @@ public class ColaEnviosImpl implements IColaEnvios {
 		List<Map<String, Object>> resultadosConsultas = new ArrayList<Map<String, Object>>();
 		for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {				
 			String sentencia = consultaDatos.getConsulta();				
-//			sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
-//			
-//			if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-//					|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
-//					|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
-//				
-//				LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
-//			}else {
-//				List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
-//				resultadosConsultas.addAll(result);
-//			}				
+			sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
 			
-			ConConsultaKey key = new ConConsultaKey();
-			key.setIdconsulta(consultaDatos.getIdconsulta());
-			key.setIdinstitucion(consultaDatos.getIdinstitucion());
-			ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key );
-			List<Map<String, Object>>  result = _consultasService.ejecutarConsultaConClavesLog(sentencia, null, Long.valueOf(envio.getIdmodelocomunicacion()), Long.valueOf(consultaDatos.getIdconsulta()),Short.valueOf(consultaDatos.getIdinstitucion()),consulta.getDescripcion());
-			
-			resultadosConsultas.addAll(result);
-			
+			if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+					|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+					|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+				
+				LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+			}else {
+				List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+				resultadosConsultas.addAll(result);
+			}				
 		}
 //		String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo(), resultadosConsultas);
 

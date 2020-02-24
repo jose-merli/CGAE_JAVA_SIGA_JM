@@ -1663,28 +1663,21 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						List<Map<String, Object>> result = null;
 						String sentencia = consulta.getConsulta();
 						
-//						sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
-//						
-//						if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-//								|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
-//								|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
-//							
-//							LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
-//						}else {
-//							try {
-//								result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
-//							}catch(Exception e) {
-//								LOGGER.error("Error al ejecutar la consulta: " + sentencia);
-//								throw e;
-//							}							
-//						}
+						sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
 						
-						ConConsultaKey key = new ConConsultaKey();
-						key.setIdconsulta(consulta.getIdconsulta());
-						key.setIdinstitucion(consulta.getIdinstitucion());
-						ConConsulta consultaDatos = _conConsultaMapper.selectByPrimaryKey(key );
-						result = _consultasService.ejecutarConsultaConClavesLog(sentencia, null, Long.valueOf(consulta.getIdmodelocomunicacion()), Long.valueOf(consultaDatos.getIdconsulta()),Short.valueOf(consultaDatos.getIdinstitucion()),consultaDatos.getDescripcion());
-						
+						if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+								|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+								|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+							
+							LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+						}else {
+							try {
+								result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+							}catch(Exception e) {
+								LOGGER.error("Error al ejecutar la consulta: " + sentencia);
+								throw e;
+							}							
+						}
 						
 						if(result != null && result.size() > 0){
 							continua = true;
@@ -1711,36 +1704,28 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						// Ejecutamos la consulta
 						
 						String sentencia = consultaDest.getConsulta();
-						List<Map<String, Object>> result = null;
 						
-//						sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
-//						
-//						if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-//								|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
-//								|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
-//							
-//							LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
-//						}else {
-//							List<Map<String, Object>> result = null;
-//							try {
-//								result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
-//							}catch(Exception e) {
-//								LOGGER.error("Error al ejecutar la consulta: " + sentencia);
-//								throw e;
-//							}
+						sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
 						
-						
-						ConConsultaKey key = new ConConsultaKey();
-						key.setIdconsulta(consultaDest.getIdconsulta());
-						key.setIdinstitucion(consultaDest.getIdinstitucion());
-						ConConsulta consultaDatos = _conConsultaMapper.selectByPrimaryKey(key );
-						result = _consultasService.ejecutarConsultaConClavesLog(sentencia, null, Long.valueOf(consultaDest.getIdmodelocomunicacion()), Long.valueOf(consultaDatos.getIdconsulta()),Short.valueOf(consultaDatos.getIdinstitucion()),consultaDatos.getDescripcion());
+						if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+								|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+								|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+							
+							LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+						}else {
+							List<Map<String, Object>> result = null;
+							try {
+								result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+							}catch(Exception e) {
+								LOGGER.error("Error al ejecutar la consulta: " + sentencia);
+								throw e;
+							}
 							if(result != null && result.size() > 0){
 								for(Map<String,Object> dest : result){
 									hDatosGenerales.putAll(dest);
 								}							
 							}
-						
+						}
 						
 					}
 					
@@ -1760,7 +1745,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							
 							String sentencia = consultaMulti.getConsulta();
 							
-						/*	sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+							sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
 							
 							if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
 									|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
@@ -1775,17 +1760,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									throw e;
 								}								
 							}
-									
-							
-							*/
-							
-							ConConsultaKey key = new ConConsultaKey();
-							key.setIdconsulta(consultaMulti.getIdconsulta());
-							key.setIdinstitucion(consultaMulti.getIdinstitucion());
-							ConConsulta consultaDato = _conConsultaMapper.selectByPrimaryKey(key );
-							resultMulti = _consultasService.ejecutarConsultaConClavesLog(sentencia, null, Long.valueOf(consultaMulti.getIdmodelocomunicacion()), Long.valueOf(consultaDato.getIdconsulta()),Short.valueOf(consultaDato.getIdinstitucion()),consultaDato.getDescripcion());
-							
-							
+														
 							int numFicheros = 0;
 							if(resultMulti != null && resultMulti.size() > 0){
 								for(int k = 0;k<resultMulti.size();k++){
@@ -1831,10 +1806,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										List<Map<String,Object>> resultDatos = null;
 																	
 										try {
-											ConConsultaKey keyConsulta = new ConConsultaKey();
-											keyConsulta.setIdconsulta(consultaDatos.getIdconsulta());
-											keyConsulta.setIdinstitucion(consultaDatos.getIdinstitucion());
-											ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(keyConsulta );
+											ConConsultaKey key = new ConConsultaKey();
+											key.setIdconsulta(consultaDatos.getIdconsulta());
+											key.setIdinstitucion(consultaDatos.getIdinstitucion());
+											ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key );
 											resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos,null, consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(),consultaDatos.getIdinstitucion(),consulta.getDescripcion());
 										}catch (BusinessSQLException e) {
 											LOGGER.error(e);
