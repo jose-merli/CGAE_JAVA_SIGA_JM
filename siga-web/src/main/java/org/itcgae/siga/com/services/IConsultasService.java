@@ -64,5 +64,5 @@ public interface IConsultasService {
 
 	public String quitarEtiquetas(String sentencia);
 
-	public List<Map<String, Object>> ejecutarConsultaConClavesLog(String sentencia, AdmUsuarios usuario,ModelosComunicacionItem modelosComunicacionItem, ConsultaItem consulta) throws Exception;
+	public List<Map<String, Object>> ejecutarConsultaConClavesLog(String sentencia, AdmUsuarios usuario,Long modelosComunicacionItem, Long consulta, Short idInstitucion,String descripcion) throws Exception;
 }
