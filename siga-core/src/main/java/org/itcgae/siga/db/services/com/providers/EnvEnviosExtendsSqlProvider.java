@@ -110,9 +110,9 @@ public class EnvEnviosExtendsSqlProvider {
 				"(SELECT CAT.DESCRIPCION FROM ENV_ESTADOENVIO ESTADO LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = ESTADO.NOMBRE WHERE ESTADO.IDESTADO = ENVIO.IDESTADO AND CAT.IDLENGUAJE = '"
 						+ idLenguaje + "') AS ESTADOENVIO");
 		
-		sql.SELECT("(SELECT count(*) FROM env_dest_consulta_envio dest where dest.idenvio=ENVIO.IDENVIO AND dest.IDINSTITUCION = ENVIO.IDINSTITUCION) + " +
-				"(SELECT count(*) FROM env_destinatarios dest where dest.idenvio=ENVIO.IDENVIO AND dest.IDINSTITUCION = ENVIO.IDINSTITUCION)  + " +
-				"(SELECT count(*) FROM env_enviosgrupocliente dest where dest.idenvio=ENVIO.IDENVIO) AS NUMDEST");
+//		sql.SELECT("(SELECT count(*) FROM env_dest_consulta_envio dest where dest.idenvio=ENVIO.IDENVIO AND dest.IDINSTITUCION = ENVIO.IDINSTITUCION) + " +
+//				"(SELECT count(*) FROM env_destinatarios dest where dest.idenvio=ENVIO.IDENVIO AND dest.IDINSTITUCION = ENVIO.IDINSTITUCION)  + " +
+//				"(SELECT count(*) FROM env_enviosgrupocliente dest where dest.idenvio=ENVIO.IDENVIO) AS NUMDEST");
 
 		sql.FROM("ENV_ENVIOS ENVIO");
 		sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion + "'");
@@ -353,6 +353,24 @@ public class EnvEnviosExtendsSqlProvider {
 		sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion + "' AND ENVIO.IDPLANTILLAENVIOS = " + idPlantillaEnvio);
 
 		return sql.toString();
+	}
+	
+	public String obtenerDestinatarios(Short idInstitucion, String idEnvios) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT("ENVIO.IDINSTITUCION");
+		sql.SELECT("ENVIO.IDENVIO");
+		sql.SELECT("(SELECT count(*) FROM env_dest_consulta_envio dest where dest.idenvio=ENVIO.IDENVIO AND dest.IDINSTITUCION = ENVIO.IDINSTITUCION) + " +
+				"(SELECT count(*) FROM env_destinatarios dest where dest.idenvio=ENVIO.IDENVIO AND dest.IDINSTITUCION = ENVIO.IDINSTITUCION)  + " +
+				"(SELECT count(*) FROM env_enviosgrupocliente dest where dest.idenvio=ENVIO.IDENVIO) AS NUMDEST");
+
+		sql.FROM("ENV_ENVIOS ENVIO");
+		sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("ENVIO.IDENVIO in (" + idEnvios + ")");
+
+		return sql.toString();
+	
 	}
 
 }
