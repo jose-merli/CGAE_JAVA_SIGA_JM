@@ -70,7 +70,7 @@ public class FichaDatosCertificadosServiceImpl implements IFichaDatosCertificado
 					AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"datosCertificadosSearch() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
-				certificadoListItem = cenDatosCertificadosExtendsMapper.datosCertificadosSearch(idPersona);
+				certificadoListItem = cenDatosCertificadosExtendsMapper.datosCertificadosSearch(idPersona,idInstitucion);
 				LOGGER.info(
 						"datosCertificadosSearch() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para busqueda de Colegiados");
 
