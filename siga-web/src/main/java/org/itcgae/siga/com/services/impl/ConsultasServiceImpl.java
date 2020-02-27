@@ -2455,21 +2455,25 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 	@Override
 	public List<Map<String, Object>> ejecutarConsultaConClavesLog(String sentencia, AdmUsuarios usuario,
-			ModelosComunicacionItem modelosComunicacionItem, ConsultaItem consulta)
+			Long modelosComunicacionItem, Long consulta,Short idInstitucion,String descripcion)
 			throws ParseException, SigaExceptions {
 		List<Map<String, Object>> resultDatos = null;
 		String sentenciaCompleta = null;
 		BigDecimal idEjecucion = null;
 		
 		Date inicialDate = new Date();
+		if (null == usuario) {
+			usuario = new AdmUsuarios();
+			usuario.setIdusuario(0);
+		}
 		try {
 
 			sentenciaCompleta = obtenerSentencia(sentencia);
 			
-			idEjecucion = insertarLogEjecucion(inicialDate, Short.valueOf(usuario.getIdinstitucion()),
+			idEjecucion = insertarLogEjecucion(inicialDate, idInstitucion,
 					Integer.valueOf(usuario.getIdusuario()),
-					Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()),
-					Long.valueOf(consulta.getIdConsulta()), Short.valueOf(consulta.getIdInstitucion()), "",
+					Long.valueOf(modelosComunicacionItem),
+					Long.valueOf(consulta), Short.valueOf(idInstitucion), "",
 					sentenciaCompleta);
 		
 			resultDatos = ejecutarConsultaConClaves(sentenciaCompleta);
@@ -2486,7 +2490,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 //					Long.valueOf(consulta.getIdConsulta()), Short.valueOf(consulta.getIdInstitucion()), e.getMessage(),
 //					sentenciaCompleta);
 			throw new BusinessException(
-					"Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(), e.getCause());
+					"Error al ejecutar la consulta " + descripcion + " " + e.getMessage(), e.getCause());
 		} catch (Exception e) {
 			LOGGER.warn("Error al ejejcutar la consulta" + e);
 			updateLogEjecucion(inicialDate, Integer.valueOf(usuario.getIdusuario()), idEjecucion, e.getMessage());
@@ -2496,7 +2500,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 //					Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()),
 //					Long.valueOf(consulta.getIdConsulta()), Short.valueOf(consulta.getIdInstitucion()), e.getMessage(),
 //					sentenciaCompleta);
-			throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
+			throw new BusinessException("Error al ejecutar la consulta " +descripcion, e);
 		}
 
 		return resultDatos;
