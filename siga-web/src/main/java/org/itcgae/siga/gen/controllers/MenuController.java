@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.EntornoDTO;
 import org.itcgae.siga.DTOs.gen.FusionadorItem;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
+import org.itcgae.siga.DTOs.gen.ParamsItem;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
@@ -123,6 +124,13 @@ public class MenuController {
     	ComboItem response = menuService.getInstitucionActual(request);
        	return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
    	}
+    
+    @RequestMapping(value = "/getEnvParams", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ParamsItem> getEnvParams(HttpServletRequest request) {
+    	ParamsItem response = menuService.getEnvParams(request);
+       	return new ResponseEntity<ParamsItem>(response, HttpStatus.OK);
+   	}
+    
     
     @RequestMapping(value = "/getLetrado", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
    	ResponseEntity<ComboItem> getLetrado(HttpServletRequest request) {

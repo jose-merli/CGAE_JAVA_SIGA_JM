@@ -186,7 +186,10 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 
 		if (colegiadoItem.getDomicilio() != null && colegiadoItem.getDomicilio() != "") {
-			sql.WHERE("(dir.domicilio) like upper('" + colegiadoItem.getDomicilio() + "')");
+			String columna = "dir.domicilio";
+			String cadena = colegiadoItem.getDomicilio();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+//			sql.WHERE("(dir.domicilio) like upper('%" + colegiadoItem.getDomicilio() + "%')");
 		}
 
 		if (colegiadoItem.getCorreo() != null && colegiadoItem.getCorreo() != "") {
@@ -467,11 +470,11 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		
 		if ((colegiadoItem.getTipoCV() != null && colegiadoItem.getTipoCV() != "") || (colegiadoItem.getSubTipoCV1() != null && colegiadoItem.getSubTipoCV1() != "") || (colegiadoItem.getSubTipoCV2() != null && colegiadoItem.getSubTipoCV2() != "")) {
 			sql.LEFT_OUTER_JOIN(
-					"cen_datosCV datosCV ON ( datosCV.idInstitucion = col.idInstitucion and datosCV.idPersona = per.idPersona )");
+					"cen_datosCV datosCV ON ( datosCV.idInstitucion = col.idInstitucion and datosCV.idPersona = per.idPersona and datosCV.fechabaja is null)");
 			
-			sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
-			sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = col.idInstitucion )");
-			sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = col.idInstitucion )");
+			sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV and cenTipoCV.fecha_baja is null)");
+			sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = col.idInstitucion and subt2.fecha_baja is null)");
+			sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = col.idInstitucion and subt1.fecha_baja is null)");
 		}
 		if(!instituciones.equals("")) {
 			sql.WHERE("COL.IDINSTITUCION IN (" + instituciones + ")");

@@ -2328,4 +2328,62 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		return inputStreamResource;
 	}
 
+	@Override
+	public EnviosMasivosDTO obtenerDestinatarios(HttpServletRequest request, EnviosMasivosDTO enviosMasivosDTO) {
+		LOGGER.info("obtenerDestinatarios() -> Entrada al servicio para obtener destinatarios de envios");
+
+		EnviosMasivosDTO enviosMasivos = new EnviosMasivosDTO();
+		List<EnviosMasivosItem> enviosItemList = new ArrayList<EnviosMasivosItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					
+					List<EnviosMasivosItem> envios = enviosMasivosDTO.getEnviosMasivosItem();
+					
+					String idEnvios = "";
+					
+					for (int i = 0; i < envios.size(); i++) {
+						
+						if(i == envios.size()-1) {
+							idEnvios += envios.get(i).getIdEnvio(); 
+						}else {
+							idEnvios += envios.get(i).getIdEnvio() + ","; 
+						}
+					}
+					
+					
+					enviosItemList = _envEnviosExtendsMapper.obtenerDestinatarios(usuario.getIdinstitucion(),
+							idEnvios);
+				
+					if (enviosItemList.size() > 0) {
+						enviosMasivos.setEnviosMasivosItem(enviosItemList);
+					}
+					
+				} catch (Exception e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage(e.getMessage());
+					enviosMasivos.setError(error);
+				}
+
+			}
+		}
+
+		LOGGER.info("obtenerDestinatarios() -> Salida del servicio para obtener destinatarios de envios");
+		return enviosMasivos;
+	}
+
 }

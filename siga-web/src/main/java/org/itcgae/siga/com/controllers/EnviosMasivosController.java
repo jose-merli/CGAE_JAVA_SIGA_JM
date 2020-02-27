@@ -450,4 +450,20 @@ public class EnviosMasivosController {
 			
 	}
 	
+	@RequestMapping(value = "/obtenerDestinatarios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EnviosMasivosDTO> obtenerDestinatarios(HttpServletRequest request, @RequestBody EnviosMasivosDTO enviosDTO) {
+		
+		EnviosMasivosDTO response = _enviosMasivosService.obtenerDestinatarios(request, enviosDTO);
+		if(response.getError() == null)
+			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
+		else{
+			if(response.getError().getCode() == 400)
+				return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.BAD_REQUEST);
+			else
+				return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+			
+	}
+	
+	
 }

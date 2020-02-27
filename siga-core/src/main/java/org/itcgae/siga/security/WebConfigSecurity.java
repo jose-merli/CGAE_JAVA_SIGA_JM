@@ -75,6 +75,7 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 				"/perfilespost", 
 				"/perfiles",
 				"/getEntorno",
+				"/getEnvParams",
 				"/ws/**"
 		};
 		/*
