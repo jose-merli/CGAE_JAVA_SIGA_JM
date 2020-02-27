@@ -37,6 +37,7 @@ import org.itcgae.siga.DTOs.gen.EntornoDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.MenuItem;
+import org.itcgae.siga.DTOs.gen.ParamsItem;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
 import org.itcgae.siga.DTOs.gen.PermisoItem;
@@ -1029,6 +1030,33 @@ public class MenuServiceImpl implements IMenuService {
 		response.setPermisoItems(permisosItem);
 
 		return response;
+	}
+	
+	@Override
+	public ParamsItem getEnvParams(HttpServletRequest request) {
+		ParamsItem paramsItem = new ParamsItem();
+		List<GenProperties> prop = new ArrayList<GenProperties>();
+		// Obtenemos atributos del usuario logeado
+		LOGGER.debug("Obtenemos atributos del usuario logeado");
+		
+		GenPropertiesExample propertiesExample = new GenPropertiesExample();
+		propertiesExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.entorno");
+		prop = genPropertiesMapper.selectByExample(propertiesExample);
+		paramsItem.setEnvironment(prop.get(0).getValor());
+
+		GenPropertiesExample propertiesfrontExample = new GenPropertiesExample();
+		propertiesfrontExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.frontsigaversion");
+		prop = genPropertiesMapper.selectByExample(propertiesfrontExample);
+		paramsItem.setSigaFrontVersion(prop.get(0).getValor());
+
+		GenPropertiesExample propertiesWebExample = new GenPropertiesExample();
+		propertiesWebExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.webversion");
+		prop = genPropertiesMapper.selectByExample(propertiesWebExample);
+		paramsItem.setSigaWebVersion(prop.get(0).getValor());
+		
+//		comboItem.setLabel(cenInstitucion.getAbreviatura());
+//		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
+		return paramsItem;
 	}
 
 }
