@@ -114,7 +114,8 @@ public class ConConsultasExtendsSqlProvider {
 		sql.LEFT_OUTER_JOIN("con_modulo cm on cc.idmodulo = cm.idmodulo");
 		sql.INNER_JOIN("mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta and mpc.idinstitucion_consulta = cc.idInstitucion");
 
-		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio + "' AND cc.FECHABAJA is null and mpc.IDINSTITUCION = '" + idInstitucion + "'");
+		
+		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio + "' AND cc.FECHABAJA is null AND mpc.FECHABAJA is null and mpc.IDINSTITUCION = '" + idInstitucion + "'");
 		return sql.toString();
 	}
 	
