@@ -1032,7 +1032,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				}
 				return busqueda.get(0).getIdpersona();
 			}else{
-				if (clienteExistente.get(0).getIdinstitucion().equals(usuario.getIdinstitucion())) {
+				if (clienteExistente.size() == 1 && clienteExistente.get(0).getIdinstitucion().equals(usuario.getIdinstitucion())) {
 					CenPersona personaUpdate = busqueda.get(0);
 					personaUpdate.setNombre(solicitud.getNombre());
 					personaUpdate.setApellidos1(solicitud.getApellido1());
@@ -1515,7 +1515,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setUsumodificacion(usuario.getIdusuario());
 		colegiado.setNumsolicitudcolegiacion(solicitud.getIdsolicitud().toString());
 		
-		colegiado.setFechapresentacion(new Date());
+		colegiado.setFechapresentacion(solicitud.getFechasolicitud());
 		if (solicitud.getIdtipocolegiacion() == 20) {
 			colegiado.setComunitario("1");
 			colegiado.setNcomunitario(solicitud.getNcolegiado());
