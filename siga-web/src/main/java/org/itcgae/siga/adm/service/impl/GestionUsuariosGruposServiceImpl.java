@@ -103,9 +103,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 		if (roles != null && roles.size() > 0) {
 			ComboItem comboItem = new ComboItem();
-			comboItem.setValue("");
-			comboItem.setLabel("");
-			comboItems.add(comboItem);
+//			comboItem.setValue("");
+//			comboItem.setLabel("");
+//			comboItems.add(comboItem);
 			for (AdmRol admRol : roles) {
 				comboItem = new ComboItem();
 				comboItem.setValue(admRol.getIdrol());
