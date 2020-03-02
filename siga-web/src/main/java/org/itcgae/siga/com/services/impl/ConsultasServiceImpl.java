@@ -1,11 +1,8 @@
 package org.itcgae.siga.com.services.impl;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,7 +28,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.aspectj.weaver.ast.And;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
@@ -58,12 +54,12 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.ConEjecucion;
+import org.itcgae.siga.db.entities.ConEjecucionExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
-import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
@@ -164,7 +160,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 	@Autowired
 	private ModModeloComunicacionExtendsMapper _modModeloComunicacionExtendsMapper;
-	
+
 	@Autowired
 	private ConEjecucionMapper _conEjecucionMapper;
 
@@ -2398,15 +2394,14 @@ public class ConsultasServiceImpl implements IConsultasService {
 		return select;
 	}
 
+	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws Exception {
 
-	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws Exception{
-		
-		List<Map<String,Object>> result = null;
+		List<Map<String, Object>> result = null;
 		Date inicial = new Date();
 		try {
 
-			sentencia = quitarEtiquetas(sentencia.toUpperCase());
-			sentencia = quitaPuntosAlias(sentencia);
+//			sentencia = quitarEtiquetas(sentencia.toUpperCase());
+//			sentencia = quitaPuntosAlias(sentencia);
 
 			boolean contienePuntosAlias = sentencia.indexOf(CARACTER_REEMPLAZO_PUNTOS) > -1;
 
@@ -2432,44 +2427,84 @@ public class ConsultasServiceImpl implements IConsultasService {
 					}
 					resultCopia.add(mapaResultCopia);
 				}
+
 				return resultCopia;
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error al ejecutar la consulta", e);
 			if ((e instanceof DataAccessException) && e.getCause() != null) {
-				throw new BusinessSQLException(e.getCause().getMessage(), e);
+				throw new BusinessSQLException(e.getMessage(), e);
 			} else {
 				throw e;
 			}
 		}
+
 		return result;
 	}
- 
-	
-	@Override
-	public List<Map<String, Object>> ejecutarConsultaConClavesLog(String sentencia, AdmUsuarios usuario,ModelosComunicacionItem modelosComunicacionItem, ConsultaItem consulta) throws ParseException, SigaExceptions {
-		List<Map<String, Object>> resultDatos = null;
-		Date inicialDate = new Date();
-		try {
-			resultDatos = ejecutarConsultaConClaves(sentencia);
-			insertarLogEjecucion(inicialDate, Short.valueOf(usuario.getIdinstitucion()),Integer.valueOf(usuario.getIdusuario()), Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()), "");
-			
 
-			} catch (BusinessSQLException e) {
-				LOGGER.error(e);
-				insertarLogEjecucion(inicialDate, Short.valueOf(usuario.getIdinstitucion()),Integer.valueOf(usuario.getIdusuario()), Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()), e.getMessage());
-				throw new BusinessException(
-						"Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(),
-						e);
-			} catch (Exception e) {
-				LOGGER.warn("Error al ejejcutar la consulta" + e);
-				insertarLogEjecucion(inicialDate, Short.valueOf(usuario.getIdinstitucion()),Integer.valueOf(usuario.getIdusuario()), Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()), e.getMessage());
-				throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(),
-						e);
-			}
+	@Override
+	public List<Map<String, Object>> ejecutarConsultaConClavesLog(String sentencia, AdmUsuarios usuario,
+			Long modelosComunicacionItem, Long consulta,Short idInstitucion,String descripcion)
+			throws ParseException, SigaExceptions {
+		List<Map<String, Object>> resultDatos = null;
+		String sentenciaCompleta = null;
+		BigDecimal idEjecucion = null;
+		
+		Date inicialDate = new Date();
+		if (null == usuario) {
+			usuario = new AdmUsuarios();
+			usuario.setIdusuario(0);
+		}
+		try {
+
+			sentenciaCompleta = obtenerSentencia(sentencia);
+			
+			idEjecucion = insertarLogEjecucion(inicialDate, idInstitucion,
+					Integer.valueOf(usuario.getIdusuario()),
+					Long.valueOf(modelosComunicacionItem),
+					Long.valueOf(consulta), Short.valueOf(idInstitucion), "",
+					sentenciaCompleta);
+		
+			resultDatos = ejecutarConsultaConClaves(sentenciaCompleta);
+
+			updateLogEjecucion(inicialDate, Integer.valueOf(usuario.getIdusuario()), idEjecucion, "");
+
+		} catch (BusinessSQLException e) {
+			LOGGER.error(e);
+			updateLogEjecucion(inicialDate, Integer.valueOf(usuario.getIdusuario()), idEjecucion, e.getCause().getCause().toString());
+
+//			insertarLogEjecucion(inicialDate, Short.valueOf(usuario.getIdinstitucion()),
+//					Integer.valueOf(usuario.getIdusuario()),
+//					Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()),
+//					Long.valueOf(consulta.getIdConsulta()), Short.valueOf(consulta.getIdInstitucion()), e.getMessage(),
+//					sentenciaCompleta);
+			throw new BusinessException(
+					"Error al ejecutar la consulta " + descripcion + " " + e.getMessage(), e.getCause());
+		} catch (Exception e) {
+			LOGGER.warn("Error al ejejcutar la consulta" + e);
+			updateLogEjecucion(inicialDate, Integer.valueOf(usuario.getIdusuario()), idEjecucion, e.getMessage());
+
+//			insertarLogEjecucion(inicialDate, Short.valueOf(usuario.getIdinstitucion()),
+//					Integer.valueOf(usuario.getIdusuario()),
+//					Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()),
+//					Long.valueOf(consulta.getIdConsulta()), Short.valueOf(consulta.getIdInstitucion()), e.getMessage(),
+//					sentenciaCompleta);
+			throw new BusinessException("Error al ejecutar la consulta " +descripcion, e);
+		}
+
 		return resultDatos;
 	}
-	
+
+	private String obtenerSentencia(String sentencia) {
+
+		String sentenciaCompleta = null;
+
+		sentencia = quitarEtiquetas(sentencia.toUpperCase());
+		sentenciaCompleta = quitaPuntosAlias(sentencia);
+
+		return sentenciaCompleta;
+	}
+
 	public static void main(String[] args) {
 		String query = "select nombbre as \"nombre\", codigo	as \"C.P.\" as cod, 'FECHA\"' || SYSDATE     AS  \"FECHA..HOY\","
 				+ "'otro campo'\nas \"otro.y\", '= \" as \"t..al\", \"pepe\" as juan from tal where pascual";
@@ -2505,30 +2540,67 @@ public class ConsultasServiceImpl implements IConsultasService {
 		return query;
 
 	}
- 
-	
-	public void insertarLogEjecucion(Date inicial,Short idInstitucion,Integer idUsuario, Long idModelo,Long idConsulta,Short idInstitucionConsulta, String mensaje) {
-		
-		//tiempo final
+
+	public BigDecimal insertarLogEjecucion(Date inicial, Short idInstitucion, Integer idUsuario, Long idModelo,
+			Long idConsulta, Short idInstitucionConsulta, String mensaje, String sentencia) {
+
+		BigDecimal idEjecucion = null;
+
+		// tiempo final
 		Date finalDate = new Date();
-		//Tiempo de ejecución de la consulta en ms
+		// Tiempo de ejecución de la consulta en ms
 		Long diff = finalDate.getTime() - inicial.getTime();
-		//Fecha de ejecución
+		// Fecha de ejecución
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 		format.format(inicial);
-		
+
 		ConEjecucion conEjecucionInsert = new ConEjecucion();
-		//Setteo de valores
+		// Setteo de valores
 		conEjecucionInsert.setIdinstitucion(idInstitucion);
 		conEjecucionInsert.setIdusuario(idUsuario);
 		conEjecucionInsert.setIdmodelo(idModelo);
 		conEjecucionInsert.setIdconsulta(idConsulta);
 		conEjecucionInsert.setFechaejecucion(inicial);
-		conEjecucionInsert.setTiempoejecucion(Long.valueOf(diff));
 		conEjecucionInsert.setIdinstitucionConsulta(idInstitucionConsulta);
-		conEjecucionInsert.setMensaje(mensaje);
+		conEjecucionInsert.setSentencia(sentencia);
 		_conEjecucionMapper.insert(conEjecucionInsert);
-	
+
+		idEjecucion = conEjecucionInsert.getIdejecucion();
+		return idEjecucion;
 	}
- 
+
+	public void updateLogEjecucion(Date inicial, Integer idUsuario, BigDecimal idEjecucion, String mensaje) {
+
+		// tiempo final
+		Date finalDate = new Date();
+		// Tiempo de ejecución de la consulta en ms
+		Long diff = finalDate.getTime() - inicial.getTime();
+		// Fecha de ejecución
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		format.format(inicial);
+
+		
+		ConEjecucionExample conEjecucionExample = new ConEjecucionExample();
+		conEjecucionExample.createCriteria()
+		.andIdejecucionEqualTo(idEjecucion);
+		
+		
+		List<ConEjecucion> conEjecuciones = _conEjecucionMapper.selectByExample(conEjecucionExample);
+		
+		if (null != conEjecuciones && conEjecuciones.size() > 0) {
+			
+			ConEjecucion conEjecucion = conEjecuciones.get(0);
+			
+			// Setteo de valores
+			conEjecucion.setIdusuario(idUsuario);
+			conEjecucion.setFechaejecucion(inicial);
+			conEjecucion.setTiempoejecucion(Long.valueOf(diff));
+			conEjecucion.setMensaje(mensaje);
+			
+			_conEjecucionMapper.updateByPrimaryKey(conEjecucion);
+
+		}
+		
+	}
+
 }

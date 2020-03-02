@@ -385,7 +385,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			LOGGER.error(e);
 			throw new BusinessException("Error interno de la aplicación", e);
 		}
-		
+		LOGGER.info("descargarComunicacion() -> Salida al servicio para descargar la documentación de la comunicación");
 		return file;
 		
 	}
@@ -652,7 +652,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					try {
  
 						LOGGER.info("SIGARNV-1232 generarComunicacion() -> Ejecutamos la consulta "+consultaEjecutarCondicional);
-						result = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarCondicional,usuario,modelosComunicacionItem,consulta);
+						result = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarCondicional, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()),consulta.getDescripcion());
 						LOGGER.info("SIGARNV-1232 generarComunicacion() -> Ha sido ejecutada la consulta "+consultaEjecutarCondicional);
  
 					} catch (BusinessSQLException e) {
@@ -809,7 +809,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						List<Map<String, Object>> result;
 						try {
  
-							result = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDestinatarios, usuario, modelosComunicacionItem, consulta);	
+							result = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDestinatarios, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consulta.getIdConsulta()),Short.valueOf(consulta.getIdInstitucion()),consulta.getDescripcion());	
 							
 							LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se ejecuta la consulta de destinatarios: " + consultaEjecutarDestinatarios);
 							LOGGER.info("SIGARNV-1232 GenerarDocumentosEnvio() -> Se envía a la dirección: " + result);
@@ -918,7 +918,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 						List<Map<String, Object>> resultMulti;
 						try {
-							resultMulti = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarMulti,usuario,modelosComunicacionItem,consultaMulti);
+							resultMulti = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarMulti, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consultaMulti.getIdConsulta()),Short.valueOf(consultaMulti.getIdInstitucionConsulta()),consultaMulti.getDescripcion());
 							LOGGER.info("Se ejecuta la consulta MULTI");
 							if(resultMulti != null && resultMulti.size() > 0){
 								for(int k = 0;k<resultMulti.size();k++){
@@ -1585,6 +1585,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Override
 	public List<DatosDocumentoItem> generarDocumentosEnvio(String idInstitucion, String idEnvio) throws Exception{	
+		
+	
+		
 		List<String> listaIdPlantilla = _envConsultasEnvioExtendsMapper.selectPlantillasByEnvio(idInstitucion, idEnvio);
 		List<DatosDocumentoItem> listaFicheros = new ArrayList<DatosDocumentoItem>();
 		Long idModeloComunicacion = null;
@@ -1801,9 +1804,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										
 										String consultaEjecutarDatos = consultaDatos.getConsulta();
 										List<Map<String,Object>> resultDatos = null;
-										
+																	
 										try {
-											resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+											ConConsultaKey key = new ConConsultaKey();
+											key.setIdconsulta(consultaDatos.getIdconsulta());
+											key.setIdinstitucion(consultaDatos.getIdinstitucion());
+											ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key );
+											resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos,null, consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(),consultaDatos.getIdinstitucion(),consulta.getDescripcion());
 										}catch (BusinessSQLException e) {
 											LOGGER.error(e);
 											throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " " + e.getMessage(), e);
@@ -1906,7 +1913,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							List<Map<String,Object>> resultDatos = null;	
 							
 							try {
-								resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);	
+								ConConsultaKey key = new ConConsultaKey();
+								key.setIdconsulta(consultaDatos.getIdconsulta());
+								key.setIdinstitucion(consultaDatos.getIdinstitucion());
+								ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key );
+								resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos,null, consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(),consultaDatos.getIdinstitucion(),consulta.getDescripcion());
+
 							}catch (BusinessSQLException e) {
 								LOGGER.error(e);
 								throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " " + e.getMessage(), e);
@@ -2115,7 +2127,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			List<Map<String, Object>> resultDatos;
 			try {
 								
-				resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos, usuario, modelosComunicacionItem, consultaDatos);		
+				resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consultaDatos.getIdConsulta()),Short.valueOf(consultaDatos.getIdInstitucion()),consultaDatos.getDescripcion());		
 				LOGGER.info("Se ejecuta la consulta de DATOS");
 				
 			} catch (BusinessSQLException e) {

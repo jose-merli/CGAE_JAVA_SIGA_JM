@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.EntornoDTO;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
+import org.itcgae.siga.DTOs.gen.ParamsItem;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
@@ -51,5 +52,8 @@ public interface IMenuService {
 	public UpdateResponseDTO validaUsuario(HttpServletRequest request);
 	
 	public PermisoDTO getVariosPermisos(List<ControlRequestItem> controlItem, HttpServletRequest request);
+
+
+	public ParamsItem getEnvParams(HttpServletRequest request);
 
 }

@@ -42,13 +42,16 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		@Result(column = "COLEGIORESULTADO", property = "colegioResultado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CORREO", property = "correo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOAPARECERREDABOGACIAFILTER", property = "noAparecerRedAbogaciaFilter", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SITUACIONRESIDENTEFILTER", property = "situacionResidenteFilter", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ColegiadoItem> selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem, Integer tamMaximo);
 	
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiado")
 	@Results({@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "COUNT", property = "count", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SOLONOMBRE", property = "soloNombre", jdbcType = JdbcType.VARCHAR),
@@ -83,6 +86,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOAPARECERREDABOGACIA2", property = "noAparecerRedAbogacia2", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOAPARECERREDABOGACIAFILTER", property = "noAparecerRedAbogaciaFilter", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SITUACIONRESIDENTEFILTER", property = "situacionResidenteFilter", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SITUACIONRESIDENTE", property = "situacionResidente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "COMUNITARIO", property = "comunitario", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "COLEGIORESULTADO", property = "colegioResultado", jdbcType = JdbcType.VARCHAR),
