@@ -198,11 +198,13 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		return sql.toString();
 	}
 	
-	public String selectMaxId(){
+	public String selectMaxId(Long idPersona, Short institucion){
 		SQL sql = new SQL();
 		
-		sql.SELECT("MAX(IDCUENTA) +1 AS IDCUENTA");
+		sql.SELECT("NVL(MAX(IDCUENTA) + 1,1) AS IDCUENTA");
 		sql.FROM("CEN_CUENTASBANCARIAS");
+		sql.WHERE("IDPERSONA = '"+idPersona+"'");
+		sql.WHERE("IDINSTITUCION = '"+institucion+"'");
 		
 		return sql.toString();
 	}
