@@ -1034,20 +1034,44 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				}
 				return busqueda.get(0).getIdpersona();
 			}else{
-				if (clienteExistente.size() == 1 && clienteExistente.get(0).getIdinstitucion().equals(usuario.getIdinstitucion())) {
-					CenPersona personaUpdate = busqueda.get(0);
-					personaUpdate.setNombre(solicitud.getNombre());
-					personaUpdate.setApellidos1(solicitud.getApellido1());
-					personaUpdate.setApellidos2(solicitud.getApellido2());
-					personaUpdate.setFechamodificacion(new Date());
-					personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
-					personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
-					personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
-					personaUpdate.setNaturalde(solicitud.getNaturalde());
-					personaUpdate.setNifcif(solicitud.getNumeroidentificador());
-					personaUpdate.setSexo(solicitud.getSexo());
-					personaUpdate.setUsumodificacion(usuario.getIdusuario());
-					_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+				if (clienteExistente.size() == 1) {
+					if (clienteExistente.get(0).getIdinstitucion().equals(usuario.getIdinstitucion())) {
+						CenPersona personaUpdate = busqueda.get(0);
+						personaUpdate.setNombre(solicitud.getNombre());
+						personaUpdate.setApellidos1(solicitud.getApellido1());
+						personaUpdate.setApellidos2(solicitud.getApellido2());
+						personaUpdate.setFechamodificacion(new Date());
+						personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
+						personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
+						personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+						personaUpdate.setNaturalde(solicitud.getNaturalde());
+						personaUpdate.setNifcif(solicitud.getNumeroidentificador());
+						personaUpdate.setSexo(solicitud.getSexo());
+						personaUpdate.setUsumodificacion(usuario.getIdusuario());
+						_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+					}else{
+						
+						CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+						exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull().andIdinstitucionEqualTo(clienteExistente.get(0).getIdinstitucion());
+						//Colegios de SIGA
+						List<CenInstitucion> instituciones =_cenInstitucionMapper.selectByExample(exampleInstitucion);
+						if (instituciones.isEmpty()) {
+							CenPersona personaUpdate = busqueda.get(0);
+							personaUpdate.setNombre(solicitud.getNombre());
+							personaUpdate.setApellidos1(solicitud.getApellido1());
+							personaUpdate.setApellidos2(solicitud.getApellido2());
+							personaUpdate.setFechamodificacion(new Date());
+							personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
+							personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
+							personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+							personaUpdate.setNaturalde(solicitud.getNaturalde());
+							personaUpdate.setNifcif(solicitud.getNumeroidentificador());
+							personaUpdate.setSexo(solicitud.getSexo());
+							personaUpdate.setUsumodificacion(usuario.getIdusuario());
+							_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+						}
+					}
+					
 				}else{
 					ejemploCliente = new CenClienteExample();
 					ejemploCliente.createCriteria().andIdpersonaEqualTo(busqueda.get(0).getIdpersona()).andIdinstitucionEqualTo(Short.valueOf("2000"));
