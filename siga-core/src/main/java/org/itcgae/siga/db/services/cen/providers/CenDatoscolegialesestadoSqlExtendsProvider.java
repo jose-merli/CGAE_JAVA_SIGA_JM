@@ -50,8 +50,13 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 		// !record.getSituacionresidente().equals("")) {
 		sql.SET("SITUACIONRESIDENTE = " + record.getSituacionresidente());
 		// }
+		
+		if (record.getObservaciones() != null) {
+			sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
 
-		sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
+		}else {
+			sql.SET("OBSERVACIONES = ''");
+		}
 
 		if (record.getFechamodificacion() != null) {
 			String fechaF = dateFormat.format(record.getFechamodificacion());
