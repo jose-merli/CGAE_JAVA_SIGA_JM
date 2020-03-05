@@ -435,9 +435,15 @@ public class MenuServiceImpl implements IMenuService {
 		// Obtener idInstitucion del certificado y idUsuario del certificado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String idInstitucionCert = validaInstitucionCertificado(request);
+		//String idInstitucionCert = validaInstitucionCertificado(request);
+		List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
+		
+		if(institucionList == null || institucionList.isEmpty()) {
+			throw new BadCredentialsException("Institucion No válida");
+		}
+		String idInstitucionRequest = institucionList.get(0).getIdinstitucion().toString();
 		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
-		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem,idInstitucionCert);
+		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem,idInstitucionRequest);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
 			List<PermisoItem> items = new ArrayList<PermisoItem>();
@@ -750,52 +756,16 @@ public class MenuServiceImpl implements IMenuService {
 	public UpdateResponseDTO validaInstitucion(HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		try{
-		X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-		String organizationName = null;
-		String organizationNameNuevo = null;
-		X509Certificate cert = null;
-		
-		if (certs == null) {
-			LOGGER.error("No se está recibiendo el certificado desde el apache. Revisa que tengas el apache activo y el check de la consola de weblogic para recibir el certificado");
-		}
-		try {
-			cert = certs[0];
-			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
-
-
-			boolean certificadoNuevo =  Boolean.FALSE;
-			
-			for (int i = 0; i < x500name.getAttributeTypes().length; i++) {
-				if (x500name.getAttributeTypes()[i].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-					RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[i])[0];
-					organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-					certificadoNuevo =  Boolean.TRUE;
+			String idInstitucion = getInstitucionRequest(request);
+	
+			if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
+				List<CenInstitucion> instituciones = getidInstitucionByCodExterno(idInstitucion);
+				if(instituciones != null && !instituciones.isEmpty()) {
+					if (!instituciones.get(0).getIdinstitucion().toString().equals(SigaConstants.InstitucionGeneral)) {
+						throw new BadCredentialsException("El usuario no tiene rol en la institucion CGAE");
+					}
 				}
 			}
-			
-			if (!certificadoNuevo) {
-				RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
-				organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
-			}
-			
-		} catch (CertificateEncodingException e) {
-			throw new InvalidClientCerticateException(e);
-		}
-
-
-		String idInstitucion = null;
-		if (null != organizationNameNuevo) {
-			idInstitucion = organizationNameNuevo.substring(0,
-						4);
-		}else{
-			idInstitucion = organizationName.substring(organizationName.length() - 4,
-				organizationName.length());
-		}
-		if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
-			if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
-				throw new BadCredentialsException("Certificado no validado para CGAE");
-			}
-		}
 
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage());
@@ -915,7 +885,29 @@ public class MenuServiceImpl implements IMenuService {
 		return response;
 	}	
 	
+	private String getInstitucionRequest(HttpServletRequest request) {
+		String idInstitucion = null;
+		
+		try {
+			String roles = (String) request.getHeader("CAS-roles");
+			String defaultRole = null;
+			String [] roleAttributes;
+			String [] rolesList = roles.split("::");
+			if(rolesList.length > 1) {
+				defaultRole = (String) request.getHeader("CAS-defaultRole");
+				roleAttributes = defaultRole.split(" ");
+			}else {
+				roleAttributes = roles.split(" ");
+			}
+				
+			idInstitucion = roleAttributes[0];
+			
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
 
+		return idInstitucion;
+	}
 
 	private String validaInstitucionCertificado(HttpServletRequest request) {
 		String idInstitucion = null;
@@ -969,59 +961,22 @@ public class MenuServiceImpl implements IMenuService {
 	public UpdateResponseDTO validaUsuario(HttpServletRequest request)  {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		try{
-		X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-		String commonName = null;
-		String organizationName = null;
-		String organizationNameNuevo = null;
-		X509Certificate cert = null;
-
-		try{
-		if (certs == null) {
-			LOGGER.error("No se está recibiendo el certificado desde el apache. Revisa que tengas el apache activo y el check de la consola de weblogic para recibir el certificado");
-		}
-		
-			cert = certs[0];
-			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
-
-			RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
-			commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
+			List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
 			
-			boolean certificadoNuevo =  Boolean.FALSE;
-			
-			for (int i = 0; i < x500name.getAttributeTypes().length; i++) {
-				if (x500name.getAttributeTypes()[i].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-					RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[i])[0];
-					organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-					certificadoNuevo =  Boolean.TRUE;
-				}
-			}
-			
-			if (!certificadoNuevo) {
-				RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
-				organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
-			}
-			
-			String idInstitucion = null;
-			if (null != organizationNameNuevo) {
-				idInstitucion = organizationNameNuevo.substring(0,
-							4);
-			}else{
-				idInstitucion = organizationName.substring(organizationName.length() - 4,
-					organizationName.length());
-			}
-			if (UtilidadesString.esCadenaVacia(idInstitucion)) {
+			if(institucionList == null || institucionList.isEmpty()) {
 				throw new BadCredentialsException("Institucion No válida");
 			}
-			String dni = commonName.substring(commonName.length() - 9, commonName.length());
+			Short idInstitucion = institucionList.get(0).getIdinstitucion();
+			String dni = (String) request.getHeader("CAS-username");
 			AdmUsuariosExample  usuarioExampple = new AdmUsuariosExample();
-			usuarioExampple.createCriteria().andActivoEqualTo("N").andIdinstitucionEqualTo(new Short(idInstitucion)).andNifEqualTo(dni);
+			usuarioExampple.createCriteria().andActivoEqualTo("N").andIdinstitucionEqualTo(idInstitucion).andNifEqualTo(dni);
 			List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExampple);
 			if (null != usuarios && usuarios.size()>0) {
 				throw new BadCredentialsException("Usuario no válido");
 			}
 			
 			usuarioExampple = new AdmUsuariosExample();
-			usuarioExampple.createCriteria().andFechaBajaIsNotNull().andIdinstitucionEqualTo(new Short(idInstitucion)).andNifEqualTo(dni);
+			usuarioExampple.createCriteria().andFechaBajaIsNotNull().andIdinstitucionEqualTo(idInstitucion).andNifEqualTo(dni);
 			usuarios = usuarioMapper.selectByExample(usuarioExampple);
 			
 			if (null != usuarios && usuarios.size()>0) {
@@ -1029,9 +984,6 @@ public class MenuServiceImpl implements IMenuService {
 			}
 			
 				
-		} catch (CertificateEncodingException e) {
-			throw new InvalidClientCerticateException(e);
-		}
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage());
 		}
@@ -1065,6 +1017,35 @@ public class MenuServiceImpl implements IMenuService {
 //		comboItem.setLabel(cenInstitucion.getAbreviatura());
 //		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
 		return paramsItem;
+	}
+	
+	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
+		if(codExterno != null && !codExterno.isEmpty()) {
+			CenInstitucionExample example = new CenInstitucionExample();
+			example.createCriteria().andCodigoextEqualTo(codExterno);
+			
+			return institucionMapper.selectByExample(example);
+		}else {
+			return null;
+		}
+	}
+
+	@Override
+	public ComboDTO getInstitucionesUsuario(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ComboDTO getRolesUsuario(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ComboDTO getPerfilesColegioRol(String idInstitucion) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -51,13 +51,13 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 
                     LOGGER.info("Intento de validar certificado " + username);
                     // TODO: Añadir llamada a OCSPs con el certificado y comprobar
-                    if (System.getProperty("CERT_CHECK_CONF") == null) {
+                    /*if (System.getProperty("CERT_CHECK_CONF") == null) {
                               System.setProperty("CERT_CHECK_CONF", certConfPath);
                     }
                     Validacion result = validaCertificado(cgaeAuthenticaton.getCertificate());
                     if (result == null || !result.equals(Validacion.OK)) {
                               throw new BadCredentialsException("Imposible validar el certificado");
-                    }
+                    }*/
 
                     UserCgae user = (UserCgae) this.userDetailsService.loadUserByUsername(cgaeAuthenticaton.getUser());
 

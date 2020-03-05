@@ -14,6 +14,8 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
@@ -167,6 +169,17 @@ public class SigaUserDetailsService implements UserDetailsService {
 		return null;
 			
 		
+	}
+	
+	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
+		if(codExterno != null && !codExterno.isEmpty()) {
+			CenInstitucionExample example = new CenInstitucionExample();
+			example.createCriteria().andCodigoextEqualTo(codExterno);
+			
+			return institucionMapper.selectByExample(example);
+		}else {
+			return null;
+		}
 	}
 
 }

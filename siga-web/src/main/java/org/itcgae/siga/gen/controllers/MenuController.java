@@ -78,7 +78,24 @@ public class MenuController {
     	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
     
+    @RequestMapping(value = "/institucionesUsuario", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getInstitucionesUsuario(HttpServletRequest request) {
+    	ComboDTO response = menuService.getInstitucionesUsuario(request);
+    	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
     
+    @RequestMapping(value = "/rolesColegioUsuario", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getRolesUsuario(HttpServletRequest request, @RequestParam("institucion") String idInstitucion) {
+    	ComboDTO response = menuService.getRolesUsuario(request);
+    	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+    
+    @RequestMapping(value = "/perfilesColegioRol", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getPerfilesColegioRol(HttpServletRequest request, @RequestParam("institucion") String idInstitucion) {
+    	ComboDTO response = menuService.getPerfilesColegioRol(idInstitucion);
+    	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+        
     @RequestMapping(value = "/permisos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<PermisoDTO> getPermisos(@RequestBody PermisoRequestItem permisoRequestItem,HttpServletRequest request) throws CertificateEncodingException {
     	PermisoDTO response = menuService.getPermisos(permisoRequestItem,request);

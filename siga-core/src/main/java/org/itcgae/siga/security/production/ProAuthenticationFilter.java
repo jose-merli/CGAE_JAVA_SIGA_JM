@@ -1,25 +1,22 @@
 package org.itcgae.siga.security.production;
 
 import java.io.IOException;
-import java.security.cert.X509Certificate;
-import java.util.NoSuchElementException;
-
+import java.util.List;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.itcgae.siga.commons.utils.InvalidClientCerticateException;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -34,6 +31,9 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	private AuthenticationManager authenticationManager;
 
 	private static String tokenHeaderAuthKey;
+	
+	@Autowired
+	private CenInstitucionExtendsMapper institucionMapper;
 
 
 	public ProAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
@@ -47,66 +47,41 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 		try {
-			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-			String commonName = null;
-			String organizationName = null;
-			String organizationNameNuevo = null;
 			String grupo = null;
-			X509Certificate cert = null;
-
-			if (null != certs && certs.length > 0) {
-				cert = certs[0];
-				try {
-					X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
-
-					RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
-					commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
-
-					boolean certificadoNuevo =  Boolean.FALSE;
-					
-					for (int i = 0; i < x500name.getAttributeTypes().length; i++) {
-						if (x500name.getAttributeTypes()[i].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-							RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[i])[0];
-							organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-							certificadoNuevo =  Boolean.TRUE;
-						}
-					}
-					
-					if (!certificadoNuevo) {
-						RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
-						organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
-					}
-					RDN grupoRdn = x500name.getRDNs(BCStyle.T)[0];
-					grupo = IETFUtils.valueToString(grupoRdn.getFirst().getValue());
-
-					LOGGER.debug("Common Name: " + commonName);
-					LOGGER.debug("Organization Name: " + organizationName);
-				} catch (NoSuchElementException e) {
-					throw new InvalidClientCerticateException(e);
-				}
-
-				String dni = commonName.substring(commonName.length() - 9, commonName.length());
-				String institucion = null;
-				if (null != organizationNameNuevo) {
-					institucion = organizationNameNuevo.substring(0,
-								4);
-				}else{
-					institucion = organizationName.substring(organizationName.length() - 4,
-						organizationName.length());
-				}
-
-				LOGGER.debug("DNI: " + dni);
-				LOGGER.debug("INSTITUCION: " + institucion);
-				LOGGER.debug("GRUPO: " + grupo);
-
-				UserCgae user = new UserCgae(dni, grupo, institucion, null,null,null);
-				LOGGER.info("Intento de autenticación en siga {}", user);
-				return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
+			
+			String dni = (String) request.getHeader("CAS-username");
+			String roles = (String) request.getHeader("CAS-roles");
+			String defaultRole = null;
+			String [] roleAttributes;
+			String [] rolesList = roles.split("::");
+			if(rolesList.length > 1) {
+				defaultRole = (String) request.getHeader("CAS-defaultRole");
+				roleAttributes = defaultRole.split(" ");
+			}else {
+				roleAttributes = roles.split(" ");
 			}
+				
+			String institucion = null;
+			institucion = getidInstitucionByCodExterno(roleAttributes[0]).get(0).getIdinstitucion().toString();
+			
+			if(roleAttributes.length == 2) {
+				grupo = SigaConstants.getTipoUsuario(roleAttributes[1]);
+			}else {
+				grupo = SigaConstants.getTipoUsuario(roleAttributes[2]);
+			}
+	
+
+			LOGGER.debug("DNI: " + dni);
+			LOGGER.debug("INSTITUCION: " + institucion);
+			LOGGER.debug("GRUPO: " + grupo);
+
+			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,null);
+			LOGGER.info("Intento de autenticación en siga {}", user);
+			//return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
+			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, null));
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage());
 		}
-		return null;
 	}
 
 	@Override
@@ -123,6 +98,16 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
+		if(codExterno != null && !codExterno.isEmpty()) {
+			CenInstitucionExample example = new CenInstitucionExample();
+			example.createCriteria().andCodigoextEqualTo(codExterno);
+			
+			return institucionMapper.selectByExample(example);
+		}else {
+			return null;
 		}
 	}
 

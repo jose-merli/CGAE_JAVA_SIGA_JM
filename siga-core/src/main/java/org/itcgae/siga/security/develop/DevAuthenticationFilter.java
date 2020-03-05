@@ -1,8 +1,6 @@
 package org.itcgae.siga.security.develop;
 
 import java.io.IOException;
-import java.security.cert.X509Certificate;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -41,11 +39,11 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 		try{
-			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+			//X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
 			
-			// Confirmado con CGAE que debe accederse con el usuario con id -1 siempre que se acceda por los combos
+			// OLD Confirmado con CGAE que debe accederse con el usuario con id -1 siempre que se acceda por los combos
 			LOGGER.info("Se accede por los combos");
-			String dni = "44149718E";
+			String dni = (String) request.getHeader("CAS-username");
 			String grupo = request.getParameter("profile");
 			String institucion = request.getParameter("location");
 			String letrado = request.getParameter("letrado");

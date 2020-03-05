@@ -65,4 +65,13 @@ public interface IMenuService {
 
 	public ParamsItem getEnvParams(HttpServletRequest request);
 
+
+	public ComboDTO getInstitucionesUsuario(HttpServletRequest request);
+
+
+	public ComboDTO getRolesUsuario(HttpServletRequest request);
+
+
+	public ComboDTO getPerfilesColegioRol(String idInstitucion);
+
 }
