@@ -587,7 +587,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.SET("IDENTIFICADORDS = " + record.getIdentificadords() + "");
 		}
 		if (record.getNmutualista() != null) {
-			sql.SET("NMUTUALISTA = " + record.getNmutualista() + "");
+			sql.SET("NMUTUALISTA = '" + record.getNmutualista() + "'");
 		}
 		if (record.getNumsolicitudcolegiacion() != null) {
 			sql.SET("NUMSOLICITUDCOLEGIACION = " + record.getNumsolicitudcolegiacion() + "");
