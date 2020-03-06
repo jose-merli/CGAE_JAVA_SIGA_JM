@@ -14,6 +14,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +33,14 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
 	private static String tokenHeaderAuthKey;
 	
-	@Autowired
-	private CenInstitucionExtendsMapper institucionMapper;
+	private SigaUserDetailsService userDetailsService;
 
 
 	public ProAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
-			String tokenHeaderAuthKey) {
+			String tokenHeaderAuthKey, SigaUserDetailsService userDetailsService2) {
 		super(new AntPathRequestMatcher(loginUrl, loginMethod));
 		this.authenticationManager = authenticationManager;
+		this.userDetailsService = userDetailsService2;
 		ProAuthenticationFilter.tokenHeaderAuthKey = tokenHeaderAuthKey;
 	}
 
@@ -62,7 +63,7 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			}
 				
 			String institucion = null;
-			institucion = getidInstitucionByCodExterno(roleAttributes[0]).get(0).getIdinstitucion().toString();
+			institucion = this.userDetailsService.getidInstitucionByCodExterno(roleAttributes[0]).get(0).getIdinstitucion().toString();
 			
 			if(roleAttributes.length == 2) {
 				grupo = SigaConstants.getTipoUsuario(roleAttributes[1]);
@@ -98,16 +99,6 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		}
-	}
-	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
-		if(codExterno != null && !codExterno.isEmpty()) {
-			CenInstitucionExample example = new CenInstitucionExample();
-			example.createCriteria().andCodigoextEqualTo(codExterno);
-			
-			return institucionMapper.selectByExample(example);
-		}else {
-			return null;
 		}
 	}
 
