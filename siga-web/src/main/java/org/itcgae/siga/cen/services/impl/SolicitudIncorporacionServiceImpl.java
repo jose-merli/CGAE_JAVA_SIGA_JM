@@ -756,6 +756,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
 					solIncorporacion.setFechaalta(new Date());
 					solIncorporacion.setFechaestadosolicitud(new Date());
+					solIncorporacion.setIdpersona(idPersona);
 					//solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
