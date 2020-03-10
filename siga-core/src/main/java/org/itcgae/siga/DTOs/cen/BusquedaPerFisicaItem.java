@@ -21,6 +21,8 @@ public class BusquedaPerFisicaItem {
 	private String situacion;
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaNacimiento;
+	private String fechaNacimientoString;
+	
 	private String numeroInstitucion;
 	private String idProvincia;
 	private String idActividadProfesional;
@@ -250,6 +252,28 @@ public class BusquedaPerFisicaItem {
 
 	public void setFechaNacimiento(Date fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;
+	}
+	
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem fechaNacimientoString(String fechaNacimientoString){
+		this.fechaNacimientoString = fechaNacimientoString;
+		return this;
+	}
+	
+	
+	
+	@JsonProperty("fechaNacimientoString")
+	public String getFechaNacimientoString() {
+		return fechaNacimientoString;
+	}
+
+
+
+
+	public void setFechaNacimiento(String fechaNacimientoString) {
+		this.fechaNacimientoString = fechaNacimientoString;
 	}
 	
 	
