@@ -61,6 +61,7 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		sql.SELECT("TITULAR");
 		sql.SELECT("IBAN");
 		sql.SELECT("BIC");
+		sql.SELECT("IDPERSONA");
 		sql.SELECT("NOMBREBANCO");
 		sql.SELECT("ABONOCARGO");
 		sql.SELECT("ABONOSJCS");
