@@ -56,7 +56,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
                     }
                     Validacion result = validaCertificado(cgaeAuthenticaton.getCertificate());
                     if (result == null || !result.equals(Validacion.OK)) {
-                              throw new BadCredentialsException("Imposible validar el certificado");
+                              throw new BadCredentialsException("Imposible validar el usuario en SIGA");
                     }*/
 
                     UserCgae user = (UserCgae) this.userDetailsService.loadUserByUsername(cgaeAuthenticaton.getUser());
@@ -65,7 +65,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
                               return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null, user,
                                                  cgaeAuthenticaton.getCertificate(), cgaeAuthenticaton.getAuthorities());
                     } else {
-                              throw new BadCredentialsException("Imposible validar el certificado");
+                              throw new BadCredentialsException("Imposible validar el usuario en SIGA");
                     }
           }
 
@@ -94,7 +94,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
                                        LOGGER.debug("Certificado Valido");
                                        valCertificadoRespuesta = Validacion.OK;
                               } else {
-                                       LOGGER.error("Imposible validar el certificado");
+                                       LOGGER.error("Imposible validar el usuario en SIGA");
                                        valCertificadoRespuesta = Validacion.ERROR_CERT_IS_NOT_VALID;
                               }
                     } catch (CertificateNotYetValidException e) {
