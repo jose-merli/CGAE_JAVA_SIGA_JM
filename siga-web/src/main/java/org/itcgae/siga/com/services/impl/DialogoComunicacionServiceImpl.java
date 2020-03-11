@@ -918,7 +918,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 						List<Map<String, Object>> resultMulti;
 						try {
-							resultMulti = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarMulti, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consultaMulti.getIdConsulta()),Short.valueOf(consultaMulti.getIdInstitucionConsulta()),consultaMulti.getDescripcion());
+							resultMulti = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarMulti, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()),
+									Long.valueOf(consultaMulti.getIdConsulta()),Short.valueOf(consultaMulti.getIdInstitucion()),consultaMulti.getDescripcion());
 							LOGGER.info("Se ejecuta la consulta MULTI");
 							if(resultMulti != null && resultMulti.size() > 0){
 								for(int k = 0;k<resultMulti.size();k++){

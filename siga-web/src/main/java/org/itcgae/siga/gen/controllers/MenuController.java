@@ -2,6 +2,7 @@ package org.itcgae.siga.gen.controllers;
 
 
 import java.security.cert.CertificateEncodingException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -107,6 +108,14 @@ public class MenuController {
 	ResponseEntity<PermisoDTO> getAcces(@RequestBody ControlRequestItem permisoRequestItem,HttpServletRequest request) {
     	PermisoDTO response = new PermisoDTO(); 
     	response = menuService.getAccessControl(permisoRequestItem,request);
+    	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
+
+	}
+    
+    @RequestMapping(value = "/accesControls", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PermisoDTO> getAccesControls(@RequestBody List<ControlRequestItem> permisoRequestItem,HttpServletRequest request) {
+    	PermisoDTO response = new PermisoDTO(); 
+    	response = menuService.getVariosPermisos(permisoRequestItem,request);
     	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
 
 	}

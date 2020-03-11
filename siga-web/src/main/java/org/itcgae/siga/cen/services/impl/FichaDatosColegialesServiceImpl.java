@@ -573,7 +573,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						// Llamamos al PL para mantener los colegiados
 						int res = 0;
 					
-						if(direccionCensoWeb.getIddireccion() != null) {
+						if(direccionCensoWeb != null && direccionCensoWeb.getIddireccion() != null) {
 							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 									datosColegiales.getIdpersona(), direccionCensoWeb.getIddireccion(), usuario.getIdusuario());
 						}else {
@@ -923,7 +923,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							if (ejecutarPL) {
 								int res = 0;
 								
-								if(direccionCensoWeb.getIddireccion() != null) {
+								if(direccionCensoWeb != null && direccionCensoWeb.getIddireccion() != null) {
 									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 											datosColegiales.getIdpersona(), direccionCensoWeb.getIddireccion(), usuario.getIdusuario());
 								}else {
@@ -1348,7 +1348,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					// Llamamos al PL para mantener los colegiados
 					int res = 0;
 					
-					if(direccionCensoWeb.getIddireccion() != null) {
+					if(direccionCensoWeb != null && direccionCensoWeb.getIddireccion() != null) {
 						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 								estadoColegial.getIdpersona(), direccionCensoWeb.getIddireccion(), usuario.getIdusuario());
 					}else {
