@@ -761,7 +761,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
 					if(idPersona != null && idDireccion != null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
-						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
+						response.setId(Long.toString(solIncorporacion.getIdsolicitud())+","+idPersona);
 						response.setStatus(SigaConstants.OK);
 						response.setError(null);
 						LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> " + solIncorporacion.getIdsolicitud()
