@@ -94,6 +94,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 
@@ -698,6 +699,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	}
 	
 	@Override
+	@Transactional
 	public InsertResponseDTO aprobarSolicitud(Long idSolicitud, HttpServletRequest request) {
 		
 		
@@ -754,6 +756,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
 					solIncorporacion.setFechaalta(new Date());
 					solIncorporacion.setFechaestadosolicitud(new Date());
+					solIncorporacion.setIdpersona(idPersona);
 					//solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
@@ -1032,20 +1035,65 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				}
 				return busqueda.get(0).getIdpersona();
 			}else{
-				if (clienteExistente.get(0).getIdinstitucion().equals(usuario.getIdinstitucion())) {
-					CenPersona personaUpdate = busqueda.get(0);
-					personaUpdate.setNombre(solicitud.getNombre());
-					personaUpdate.setApellidos1(solicitud.getApellido1());
-					personaUpdate.setApellidos2(solicitud.getApellido2());
-					personaUpdate.setFechamodificacion(new Date());
-					personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
-					personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
-					personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
-					personaUpdate.setNaturalde(solicitud.getNaturalde());
-					personaUpdate.setNifcif(solicitud.getNumeroidentificador());
-					personaUpdate.setSexo(solicitud.getSexo());
-					personaUpdate.setUsumodificacion(usuario.getIdusuario());
-					_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+				if (clienteExistente.size() == 1) {
+					if (clienteExistente.get(0).getIdinstitucion().equals(usuario.getIdinstitucion())) {
+						CenPersona personaUpdate = busqueda.get(0);
+						personaUpdate.setNombre(solicitud.getNombre());
+						personaUpdate.setApellidos1(solicitud.getApellido1());
+						personaUpdate.setApellidos2(solicitud.getApellido2());
+						personaUpdate.setFechamodificacion(new Date());
+						personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
+						personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
+						personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+						personaUpdate.setNaturalde(solicitud.getNaturalde());
+						personaUpdate.setNifcif(solicitud.getNumeroidentificador());
+						personaUpdate.setSexo(solicitud.getSexo());
+						personaUpdate.setUsumodificacion(usuario.getIdusuario());
+						_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+					}else{
+						
+						CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+						exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull().andIdinstitucionEqualTo(clienteExistente.get(0).getIdinstitucion());
+						//Colegios de SIGA
+						List<CenInstitucion> instituciones =_cenInstitucionMapper.selectByExample(exampleInstitucion);
+						if (instituciones.isEmpty()) {
+							CenPersona personaUpdate = busqueda.get(0);
+							personaUpdate.setNombre(solicitud.getNombre());
+							personaUpdate.setApellidos1(solicitud.getApellido1());
+							personaUpdate.setApellidos2(solicitud.getApellido2());
+							personaUpdate.setFechamodificacion(new Date());
+							personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
+							personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
+							personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+							personaUpdate.setNaturalde(solicitud.getNaturalde());
+							personaUpdate.setNifcif(solicitud.getNumeroidentificador());
+							personaUpdate.setSexo(solicitud.getSexo());
+							personaUpdate.setUsumodificacion(usuario.getIdusuario());
+							_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+						}
+					}
+					
+				}else{
+					ejemploCliente = new CenClienteExample();
+					ejemploCliente.createCriteria().andIdpersonaEqualTo(busqueda.get(0).getIdpersona()).andIdinstitucionEqualTo(Short.valueOf("2000"));
+					List<CenCliente> clienteExistente2 = _cenClienteMapper.selectByExample(ejemploCliente);
+					if (!clienteExistente2.isEmpty()){
+						CenPersona personaUpdate = busqueda.get(0);
+						personaUpdate.setNombre(solicitud.getNombre());
+						personaUpdate.setApellidos1(solicitud.getApellido1());
+						personaUpdate.setApellidos2(solicitud.getApellido2());
+						personaUpdate.setFechamodificacion(new Date());
+						personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
+						personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
+						personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+						personaUpdate.setNaturalde(solicitud.getNaturalde());
+						personaUpdate.setNifcif(solicitud.getNumeroidentificador());
+						personaUpdate.setSexo(solicitud.getSexo());
+						personaUpdate.setUsumodificacion(usuario.getIdusuario());
+						_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+						
+					}
+					
 				}
 			}
 			return busqueda.get(0).getIdpersona();
@@ -1214,14 +1262,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		CenCuentasbancarias cuenta = new CenCuentasbancarias();
 
-		MaxIdDto personaID = _cenCuentasbancariasExtendsMapper.selectMaxID();
+		MaxIdDto personaID = _cenCuentasbancariasExtendsMapper.selectMaxID(idPersona,usuario.getIdinstitucion());
 		boolean tieneCargo = false;
 		boolean tieneSCSJ = false;
 		boolean tieneAbono = false;
 		if (null == solicitud.getAbonocargo() || (solicitud.getAbonocargo().equals("T") || solicitud.getAbonocargo().equals("C"))) {
 			tieneCargo =  true;
 		}
-		cuenta.setIdcuenta((short)(personaID.getIdMax()+0));
+		cuenta.setIdcuenta(Short.valueOf(personaID.getIdMax().toString()));
 		cuenta.setAbonocargo(solicitud.getAbonocargo());
 		cuenta.setAbonosjcs(solicitud.getAbonosjcs());
 		cuenta.setFechamodificacion(new Date());
@@ -1515,7 +1563,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setUsumodificacion(usuario.getIdusuario());
 		colegiado.setNumsolicitudcolegiacion(solicitud.getIdsolicitud().toString());
 		
-		colegiado.setFechapresentacion(new Date());
+		colegiado.setFechapresentacion(solicitud.getFechasolicitud());
 		if (solicitud.getIdtipocolegiacion() == 20) {
 			colegiado.setComunitario("1");
 			colegiado.setNcomunitario(solicitud.getNcolegiado());

@@ -736,7 +736,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 								
 								int res = 0;
 								
-								if(!UtilidadesString.esCadenaVacia(datosDireccionesItem.getIdDireccion())) {
+								if(datosDireccionesItem != null && !UtilidadesString.esCadenaVacia(datosDireccionesItem.getIdDireccion())) {
 									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 											Long.valueOf(datosDireccionesItem.getIdPersona()), Long.valueOf(datosDireccionesItem.getIdDireccion()), usuario.getIdusuario());
 								}else {
@@ -1164,7 +1164,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						int res = 0;
 						
 						// Llamamos al PL para mantener los colegiados
-						if(direcciones.getIddireccion() != null) {
+						if(direcciones != null && direcciones.getIddireccion() != null) {
 							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 									Long.valueOf(datosDireccionesItem.getIdPersona()), direcciones.getIddireccion(), usuario.getIdusuario());
 						}else {
@@ -1764,7 +1764,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					// Llamamos al PL para mantener los colegiados
 					int res = 0;
 					
-					if(direcciones.getIddireccion() != null) {
+					if(direcciones != null && direcciones.getIddireccion() != null) {
 						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 								Long.valueOf(datosDireccionesItem.getIdPersona()), direcciones.getIddireccion(), usuario.getIdusuario());
 					}else {
