@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
+/*import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;*/
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,11 +22,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.assertj.core.util.Strings;
-import org.bouncycastle.asn1.x500.RDN;
+/*import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;*/
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
@@ -36,6 +35,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.EntornoDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.LoginMultipleItem;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.MenuItem;
 import org.itcgae.siga.DTOs.gen.ParamsItem;
@@ -46,7 +46,7 @@ import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
-import org.itcgae.siga.commons.utils.InvalidClientCerticateException;
+//import org.itcgae.siga.commons.utils.InvalidClientCerticateException;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
@@ -55,6 +55,10 @@ import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmPerfilKey;
+import org.itcgae.siga.db.entities.AdmPerfilRol;
+import org.itcgae.siga.db.entities.AdmPerfilRolExample;
+import org.itcgae.siga.db.entities.AdmRol;
+import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmTiposacceso;
 import org.itcgae.siga.db.entities.AdmTiposaccesoKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -78,6 +82,8 @@ import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.AdmGestorinterfazMapper;
 import org.itcgae.siga.db.mappers.AdmPerfilMapper;
+import org.itcgae.siga.db.mappers.AdmPerfilRolMapper;
+import org.itcgae.siga.db.mappers.AdmRolMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
@@ -119,7 +125,13 @@ public class MenuServiceImpl implements IMenuService {
 	private CenInstitucionExtendsMapper institucionMapper;
 	
 	@Autowired
+	private AdmRolMapper admRolMapper;
+	
+	@Autowired
 	private AdmPerfilExtendsMapper perfilMapper;
+	
+	@Autowired
+	private AdmPerfilRolMapper perfilRolMapper;
 	
 	@Autowired
 	private AdmUsuariosMapper usuarioMapper;
@@ -905,11 +917,57 @@ public class MenuServiceImpl implements IMenuService {
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage());
 		}
+		if (idInstitucion == null){
+			idInstitucion = "";
+		}
 
 		return idInstitucion;
 	}
+	
+	private List<String> getInstitucionesUsuarioRequest(HttpServletRequest request) {
+		List<String> respuesta = new ArrayList<String>();
+		try {
+			String roles = (String) request.getHeader("CAS-roles");
+			String [] rolesList = roles.split("::");
+			
+			for(String rol: rolesList) {
+				String[] attributes = rol.split(" ");
+				respuesta.add(attributes[0]);
+			}
+			
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
+		
+	
+		return respuesta;
+	}
+	
+	private List<String> getRolesUsuarioRequest(HttpServletRequest request, String idInstitucion) {
+		List<String> respuesta = new ArrayList<String>();
+		try {
+			String roles = (String) request.getHeader("CAS-roles");
+			String [] rolesList = roles.split("::");
+			
+			for(String rol: rolesList) {
+				String[] attributes = rol.split(" ");
+				String institucionRol = getidInstitucionByCodExterno(attributes[0]).get(0).getIdinstitucion().toString();
+				if(attributes.length == 2 && institucionRol.equals(idInstitucion)) {
+					respuesta.add(SigaConstants.getTipoUsuario(attributes[1]));
+				}else if(institucionRol.equals(idInstitucion)) {
+					respuesta.add(SigaConstants.getTipoUsuario(attributes[2]));
+				}
+			}
+			
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
+		
+	
+		return respuesta;
+	}
 
-	private String validaInstitucionCertificado(HttpServletRequest request) {
+	/*private String validaInstitucionCertificado(HttpServletRequest request) {
 		String idInstitucion = null;
 		try{
 		X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
@@ -955,7 +1013,7 @@ public class MenuServiceImpl implements IMenuService {
 		}
 
 		return idInstitucion;
-	}
+	}*/
 	
 	@Override
 	public UpdateResponseDTO validaUsuario(HttpServletRequest request)  {
@@ -1032,20 +1090,112 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Override
 	public ComboDTO getInstitucionesUsuario(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
+		// Cargamos el combo de Instituciones
+				ComboDTO response = new ComboDTO();
+				
+				List<String> institucionesList = getInstitucionesUsuarioRequest(request);
+
+				CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+				exampleInstitucion.setDistinct(true);
+				exampleInstitucion.createCriteria().andCodigoextIn(institucionesList);
+				exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
+
+				List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
+				List<ComboItem> combos = new ArrayList<ComboItem>();
+				ComboItem comboBlanco = new ComboItem();
+				comboBlanco.setValue("");
+				comboBlanco.setLabel("");
+				combos.add(comboBlanco);
+				if (null != instituciones && instituciones.size() > 0) {
+					for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
+						CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
+						ComboItem combo = new ComboItem();
+						combo.setValue(cenInstitucion.getIdinstitucion().toString());
+						if (null != cenInstitucion.getFechaenproduccion()) {
+
+							combo.setLabel(cenInstitucion.getAbreviatura() + " (En producción: "
+									+ Converter.dateToString(cenInstitucion.getFechaenproduccion()) + ")");
+						} else {
+							combo.setLabel(cenInstitucion.getAbreviatura());
+						}
+
+						combos.add(combo);
+					}
+
+				}
+
+				response.setCombooItems(combos);
+				return response;
+
 	}
 
 	@Override
-	public ComboDTO getRolesUsuario(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public ComboDTO getRolesUsuario(HttpServletRequest request, String idInstitucion) {
+		// Cargamos el combo de roles
+		ComboDTO response = new ComboDTO();
+		
+		List<String> rolesList = getRolesUsuarioRequest(request, idInstitucion);
+
+		AdmRolExample exampleRol = new AdmRolExample();
+		exampleRol.setDistinct(true);
+		exampleRol.createCriteria().andDescripcionIn(rolesList);
+		exampleRol.setOrderByClause("DESCRIPCION ASC");
+
+		List<AdmRol> roles = admRolMapper.selectByExample(exampleRol);
+		List<ComboItem> combos = new ArrayList<ComboItem>();
+		ComboItem comboBlanco = new ComboItem();
+		comboBlanco.setValue("");
+		comboBlanco.setLabel("");
+		combos.add(comboBlanco);
+		if (null != roles && roles.size() > 0) {
+			for (Iterator<AdmRol> iterator = roles.iterator(); iterator.hasNext();) {
+				AdmRol rol = (AdmRol) iterator.next();
+				ComboItem combo = new ComboItem();
+				combo.setValue(rol.getIdrol().toString());
+				combo.setLabel(rol.getDescripcion());
+				
+				combos.add(combo);
+			}
+
+		}
+
+		response.setCombooItems(combos);
+		return response;	}
 
 	@Override
-	public ComboDTO getPerfilesColegioRol(String idInstitucion) {
-		// TODO Auto-generated method stub
-		return null;
+	public ComboDTO getPerfilesColegioRol(LoginMultipleItem loginMultipleItem) {
+		// Cargamos el combo de Perfil
+		ComboDTO response = new ComboDTO();
+		
+		AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
+		examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(loginMultipleItem.getIdInstitucion())).
+			andIdrolEqualTo(loginMultipleItem.getRol());
+		List<AdmPerfilRol> perfilesRol = perfilRolMapper.selectByExample(examplePerfilRol);
+
+		List<String> listaPerfilesRol = new ArrayList<String>();
+		for(AdmPerfilRol perfil : perfilesRol) {
+			listaPerfilesRol.add(perfil.getIdperfil());
+		}
+		
+		AdmPerfilExample examplePerfil = new AdmPerfilExample();
+		examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(loginMultipleItem.getIdInstitucion())).
+			andIdperfilIn(listaPerfilesRol).andFechaBajaIsNull();
+		examplePerfil.setOrderByClause(" DESCRIPCION ASC ");
+		List<AdmPerfil> perfiles = perfilMapper.selectComboPerfilByExample(examplePerfil);
+		List<ComboItem> combos = new ArrayList<ComboItem>();
+		if (null != perfiles && perfiles.size() > 0) {
+			for (Iterator<AdmPerfil> iterator = perfiles.iterator(); iterator.hasNext();) {
+				AdmPerfil admPerfil = (AdmPerfil) iterator.next();
+				ComboItem combo = new ComboItem();
+				combo.setValue(admPerfil.getIdperfil().toString());
+				combo.setLabel(admPerfil.getDescripcion());
+				combos.add(combo);
+			}
+
+		}
+
+		response.setCombooItems(combos);
+		return response;
 	}
 
 }

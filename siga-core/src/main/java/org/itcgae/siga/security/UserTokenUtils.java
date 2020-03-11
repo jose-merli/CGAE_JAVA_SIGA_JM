@@ -97,7 +97,7 @@ public class UserTokenUtils {
 		String letrado = (String) Jwts.parser().setSigningKey(secretSignKey)
 				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("grupo");
 
-		return new UserCgae(dni, grupo, institucion, permisos,perfiles,letrado);
+		return new UserCgae(dni, grupo, institucion, permisos,perfiles,letrado, null, null);
 	}
 
 	public static String getDniFromJWTToken(String token) {

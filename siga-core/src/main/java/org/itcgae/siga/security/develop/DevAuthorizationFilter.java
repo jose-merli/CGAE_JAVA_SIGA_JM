@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.TokenGenerationException;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
@@ -63,53 +62,31 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 			List<String> perfiles = new ArrayList<String>(); 
 			//perfiles.add("ADG");
 			String dni = (String) request.getHeader("CAS-username");
-			String roles = (String) request.getHeader("CAS-roles");
 			String grupo = "";
-			String defaultRole = null;
-			String [] roleAttributes;
-			String [] rolesList = roles.split("::");
-			if(rolesList.length > 1) {
-				defaultRole = (String) request.getHeader("CAS-defaultRole");
-				roleAttributes = defaultRole.split(" ");
-				for(String rol : rolesList) {
-					String [] aux = rol.split(" ");
-					String perfil = "";
-					if(aux.length == 2) {
-						perfil = SigaConstants.getTipoUsuario(aux[1]);
-					}else {
-						perfil = SigaConstants.getTipoUsuario(aux[2]);
-					}
-					if (!perfiles.contains(perfil)) {
-						perfiles.add(perfil);
-					}
-				}
-			}else {
-				roleAttributes = roles.split(" ");
-			}
-				
-			String institucion = roleAttributes[0];
-			institucion = userDetailsService.getidInstitucionByCodExterno(institucion).get(0).getIdinstitucion().toString();
+			String nombre = (String) request.getHeader("CAS-displayName");
+			String institucion = "";	
 			
-			if(roleAttributes.length == 2) {
-				grupo = SigaConstants.getTipoUsuario(roleAttributes[1]);
-			}else {
-				grupo = SigaConstants.getTipoUsuario(roleAttributes[2]);
-			}
+			grupo = this.userDetailsService.getGrupoCAS(request);
+			institucion = this.userDetailsService.getInstitucionCAS(request);
 			
 			if (!perfiles.contains(grupo)) {
 				perfiles.add(grupo);
 			}
-			UserCgae userDesarrollo = (UserCgae) userDetailsService
-					.loadUserByUsername(new UserCgae(dni, grupo, institucion, null,perfiles, "N"));
-			authentication = new UserAuthenticationToken(userDesarrollo.getDni(), null, userDesarrollo, null,
-					new ArrayList<>());
-			String header = null;
 			try {
-				header = UserTokenUtils.generateToken(userDesarrollo);
-			} catch (TokenGenerationException e) {
+				UserCgae userDesarrollo = (UserCgae) userDetailsService
+						.loadUserByUsername(new UserCgae(dni, grupo, institucion, null,perfiles, "N", null, nombre));
+				authentication = new UserAuthenticationToken(userDesarrollo.getDni(), null, userDesarrollo, null,
+						new ArrayList<>());
+				String header = null;
+				try {
+					header = UserTokenUtils.generateToken(userDesarrollo);
+				} catch (TokenGenerationException e) {
+					e.printStackTrace();
+				}
+				mutableRequest.addHeader("Authorization", header);
+			}catch(Exception e) {
 				e.printStackTrace();
 			}
-			mutableRequest.addHeader("Authorization", header);
 		}
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);

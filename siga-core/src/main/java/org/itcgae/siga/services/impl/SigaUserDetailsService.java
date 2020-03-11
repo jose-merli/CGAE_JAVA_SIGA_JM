@@ -1,15 +1,20 @@
 package org.itcgae.siga.services.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmRol;
+import org.itcgae.siga.db.entities.AdmUsuarioEfectivo;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
@@ -69,13 +74,15 @@ public class SigaUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String dni) throws UsernameNotFoundException {
 
-		return new UserCgae(dni, null, null, null,null,null);
+		return new UserCgae(dni, null, null, null,null,null, null, null);
 	}
 
 	public UserDetails loadUserByUsername(UserCgae user) throws UsernameNotFoundException {
 
 		String dni = user.getDni();
+		String nombre = user.getNombre();
 		String grupo = user.getGrupo();
+		AdmRol rol = user.getRol();
 		String institucion = user.getInstitucion();
 		String letrado = user.getLetrado();
 		ControlRequestItem controlItem = new ControlRequestItem();
@@ -92,8 +99,11 @@ public class SigaUserDetailsService implements UserDetailsService {
 		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
 
 		
-		if (null != usuarios && usuarios.size() >0) {
-			
+		if (null == usuarios || usuarios.size() ==0) {
+			insertaUsuBd(user);
+			usuarios = usuarioMapper.selectByExample(usuarioExample);
+		}
+		if (null != usuarios && usuarios.size() > 0) {
 			List<String> idperfiles = new ArrayList<String>();
 			if (!(null != user.getDni())) {
 				user.setDni(usuarios.get(0).getNif());
@@ -116,9 +126,10 @@ public class SigaUserDetailsService implements UserDetailsService {
 					for (AdmPerfil perfil : perfilesPuertaAtras) {
 						idperfiles.add("'" + perfil.getIdperfil() + "'");
 					}
+	
 				}else {
 					List<AdmRol> roles = admRol.selectRolAccesoByExample(grupo );
-					if (null!= roles && roles.size()>0) {
+					if (null != roles && roles.size()>0) {
 						AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
 						exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
 									.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andIdrolEqualTo(roles.get(0).getIdrol()).andFechaBajaIsNull();
@@ -135,6 +146,28 @@ public class SigaUserDetailsService implements UserDetailsService {
 							 */
 							for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
 								idperfiles.add("'" + perfil.getIdperfil() + "'");
+							}
+						}
+					}else {
+						if(rol != null) {
+							AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
+						
+							exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
+										.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andIdrolEqualTo(rol.getIdrol()).andFechaBajaIsNull();
+							List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+							letrado = rol.getLetrado().toString();
+							if (letrado.equals("0")) {
+								letrado = "N";
+							}else{
+								letrado = "S";
+							}
+							if(null != perfiles && perfiles.size()>0) {
+								/*
+								 * Tratamos todos los grupos del Rol
+								 */
+								for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
+									idperfiles.add("'" + perfil.getIdperfil() + "'");
+								}
 							}
 						}
 					}
@@ -157,18 +190,52 @@ public class SigaUserDetailsService implements UserDetailsService {
 					for (PermisoEntity permisoEntity : permisos) {
 						response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
 					}
-					return new UserCgae(dni, grupo, institucion, response,idperfiles,letrado);
+					return new UserCgae(dni, grupo, institucion, response,idperfiles,letrado, rol, nombre);
 				}else {
 					 throw new BadCredentialsException("El usuario no tiene permisos");
 				}	
-		}
-			
+			}
 		}else {
-			 throw new AuthenticationCredentialsNotFoundException("Usuario no encontrado en la aplicación");
+			throw new BadCredentialsException("Ha ocurrido un problema al crear el usuario en base de datos");
 		}
+
 		return null;
 			
 		
+	}
+	
+	public String getGrupoCAS(HttpServletRequest request) {
+		String roles = (String) request.getHeader("CAS-roles");
+		String defaultRole = null;
+		String [] roleAttributes;
+		String [] rolesList = roles.split("::");
+		if(rolesList.length > 1) {
+			defaultRole = (String) request.getHeader("CAS-defaultRole");
+			roleAttributes = defaultRole.split(" ");
+		}else {
+			roleAttributes = roles.split(" ");
+		}
+			
+		if(roleAttributes.length == 2) {
+			return SigaConstants.getTipoUsuario(roleAttributes[1]);
+		}else {
+			return SigaConstants.getTipoUsuario(roleAttributes[2]);
+		}
+	}
+	
+	public String getInstitucionCAS(HttpServletRequest request) {
+		String roles = (String) request.getHeader("CAS-roles");
+		String defaultRole = null;
+		String [] roleAttributes;
+		String [] rolesList = roles.split("::");
+		if(rolesList.length > 1) {
+			defaultRole = (String) request.getHeader("CAS-defaultRole");
+			roleAttributes = defaultRole.split(" ");
+		}else {
+			roleAttributes = roles.split(" ");
+		}
+			
+		return getidInstitucionByCodExterno(roleAttributes[0]).get(0).getIdinstitucion().toString();
 	}
 	
 	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
@@ -182,4 +249,30 @@ public class SigaUserDetailsService implements UserDetailsService {
 		}
 	}
 
+	public AdmRol getRolLoginMultiple(String grupo) {
+		AdmRol rol = admRol.selectByPrimaryKey(grupo);
+		return rol;
+	}
+
+	private void insertaUsuBd(UserCgae user) {
+		AdmUsuarios usu = new AdmUsuarios();
+		UsuarioCreateDTO usuDTO = new UsuarioCreateDTO();
+		CenInstitucion institucion = institucionMapper.selectByPrimaryKey(Short.valueOf(user.getInstitucion()));
+		usuDTO.setActivo("S");
+		usuDTO.setFechaAlta(new Date());
+		usuDTO.setIdInstitucion(user.getInstitucion());
+		usuDTO.setIdLenguaje(institucion.getIdlenguaje());
+		usuDTO.setGrupo(user.getGrupo());
+		usuDTO.setRol(user.getRol().getIdrol());
+		usuDTO.setNombreApellidos(user.getNombre());
+		usuDTO.setNif(user.getDni());
+		// Obtenemos el nuevo idusuario
+		try {
+			admUsuariosExtendsMapper.createUserAdmUsuariosTable(usuDTO,new Integer("-1"));	
+			admUsuariosExtendsMapper.createUserAdmUsuarioEfectivoTable(usuDTO, new Integer("-1"));
+			admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable(usuDTO, new Integer("-1"));
+		}catch(Exception e) {
+			 e.printStackTrace();
+		}
+	}
 }

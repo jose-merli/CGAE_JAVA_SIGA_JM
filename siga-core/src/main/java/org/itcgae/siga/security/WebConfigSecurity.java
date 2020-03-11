@@ -96,7 +96,7 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 						tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
 				.addFilter(new ProAuthorizationFilter(authenticationManager()))
 				.addFilterBefore(new DevAuthenticationFilter(authenticationManager(), "GET", "/loginDevelop",
-						tokenHeaderAuthKey), BasicAuthenticationFilter.class)
+						tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 		
 		if (!security){

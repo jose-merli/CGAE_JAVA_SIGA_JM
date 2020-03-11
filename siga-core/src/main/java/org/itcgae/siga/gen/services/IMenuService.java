@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.EntornoDTO;
+import org.itcgae.siga.DTOs.gen.LoginMultipleItem;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.ParamsItem;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
@@ -69,9 +70,9 @@ public interface IMenuService {
 	public ComboDTO getInstitucionesUsuario(HttpServletRequest request);
 
 
-	public ComboDTO getRolesUsuario(HttpServletRequest request);
+	public ComboDTO getRolesUsuario(HttpServletRequest request, String idInstitucion);
 
 
-	public ComboDTO getPerfilesColegioRol(String idInstitucion);
+	public ComboDTO getPerfilesColegioRol(LoginMultipleItem loginMultipleItem);
 
 }

@@ -10,7 +10,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.EntornoDTO;
-import org.itcgae.siga.DTOs.gen.FusionadorItem;
+import org.itcgae.siga.DTOs.gen.LoginMultipleItem;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.ParamsItem;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
@@ -18,8 +18,6 @@ import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.gen.services.IProcesoService;
-import org.itcgae.siga.services.IFusionadorPersonasServerService;
-import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesResponseDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,10 +33,7 @@ public class MenuController {
 	
 	@Autowired
 	private IMenuService menuService;
-    
-	@Autowired
-	private IFusionadorPersonasServerService fusionadorService;
-	
+    	
 	@Autowired
 	private IProcesoService procesoService;
 	
@@ -86,13 +81,13 @@ public class MenuController {
     
     @RequestMapping(value = "/rolesColegioUsuario", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getRolesUsuario(HttpServletRequest request, @RequestParam("institucion") String idInstitucion) {
-    	ComboDTO response = menuService.getRolesUsuario(request);
+    	ComboDTO response = menuService.getRolesUsuario(request, idInstitucion);
     	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
     
-    @RequestMapping(value = "/perfilesColegioRol", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getPerfilesColegioRol(HttpServletRequest request, @RequestParam("institucion") String idInstitucion) {
-    	ComboDTO response = menuService.getPerfilesColegioRol(idInstitucion);
+    @RequestMapping(value = "/perfilesColegioRol", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getPerfilesColegioRol(@RequestBody LoginMultipleItem loginMultipleItem, HttpServletRequest request) {
+    	ComboDTO response = menuService.getPerfilesColegioRol(loginMultipleItem);
     	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
         

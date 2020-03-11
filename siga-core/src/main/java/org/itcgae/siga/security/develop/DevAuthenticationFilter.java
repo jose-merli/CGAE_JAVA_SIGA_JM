@@ -6,9 +6,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,13 +27,16 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	Logger LOGGER = LoggerFactory.getLogger(DevAuthenticationFilter.class);
 
 	private AuthenticationManager authenticationManager;
+	
+	private SigaUserDetailsService userDetailsService;
 
 	private static String tokenHeaderAuthKey;
 
 	public DevAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
-			String tokenHeaderAuthKey) {
+			String tokenHeaderAuthKey, SigaUserDetailsService userDetailsService2) {
 		super(new AntPathRequestMatcher(loginUrl, loginMethod));
 		this.authenticationManager = authenticationManager;
+		this.userDetailsService = userDetailsService2;
 		DevAuthenticationFilter.tokenHeaderAuthKey = tokenHeaderAuthKey;
 	}
 
@@ -44,10 +49,25 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			// OLD Confirmado con CGAE que debe accederse con el usuario con id -1 siempre que se acceda por los combos
 			LOGGER.info("Se accede por los combos");
 			String dni = (String) request.getHeader("CAS-username");
-			String grupo = request.getParameter("profile");
+			String nombre = (String) request.getHeader("CAS-displayName");
+			String grupo = "";
 			String institucion = request.getParameter("location");
-			String letrado = request.getParameter("letrado");
-			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,letrado);
+			String letrado = "";
+			AdmRol rol = null;
+			grupo = request.getParameter("profile");
+			if(request.getParameter("letrado")!=null) {
+				letrado = request.getParameter("letrado");
+			}else {
+				//Hemos accedido por loginMultiple
+				rol = this.userDetailsService.getRolLoginMultiple(request.getParameter("rol"));
+				letrado = rol.getLetrado().toString();
+				if (letrado.equals("0")) {
+					letrado = "N";
+				}else{
+					letrado = "S";
+				}
+			}
+			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,letrado, rol, nombre);
 //			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,certs[0]));
 			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,null));
 		} catch (Exception e) {

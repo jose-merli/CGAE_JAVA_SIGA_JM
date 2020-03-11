@@ -1,12 +1,12 @@
 package org.itcgae.siga.security;
 
-import java.security.cert.CertificateExpiredException;
+/*import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.X509Certificate;
+import java.security.cert.X509Certificate;*/
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
-import org.redabogacia.accesscontrol.crl.exception.CrlCommunicationException;
+/*import org.redabogacia.accesscontrol.crl.exception.CrlCommunicationException;
 import org.redabogacia.accesscontrol.crl.exception.CrlOutOfDateException;
 import org.redabogacia.accesscontrol.crl.exception.CrlRevokedException;
 import org.redabogacia.accesscontrol.ocsp.exception.OcspRevokedException;
@@ -15,7 +15,7 @@ import org.redabogacia.accesscontrol.security.CertificateAuthValidatorDefault;
 import org.redabogacia.accesscontrol.security.exception.AuthenticationFailedException;
 import org.redabogacia.accesscontrol.security.exception.ConfigException;
 import org.redabogacia.accesscontrol.security.exception.DamagedOrModifiedCertificateException;
-import org.redabogacia.accesscontrol.security.exception.UnrecognizedCAException;
+import org.redabogacia.accesscontrol.security.exception.UnrecognizedCAException;*/
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -74,7 +74,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
                     return authentication.equals(UserAuthenticationToken.class);
           }
 
-          private Validacion validaCertificado(X509Certificate x509Certificate) {
+          /*private Validacion validaCertificado(X509Certificate x509Certificate) {
 
                     Validacion valCertificadoRespuesta = null;
                     valCertificadoRespuesta = Validacion.OK;
@@ -147,6 +147,6 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 
                     , ERROR_CERT_ROL_NOT_ALLOWED, ERROR_BAR_PROVIDER
 
-          }
+          }*/
 
 }
