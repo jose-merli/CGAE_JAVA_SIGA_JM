@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
@@ -30,6 +31,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
+import org.itcgae.siga.gen.services.impl.MenuServiceImpl;
 import org.itcgae.siga.security.UserCgae;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,6 +45,8 @@ import org.springframework.stereotype.Service;
 @Service
 @Qualifier("AdmUsuariosMapper")
 public class SigaUserDetailsService implements UserDetailsService {
+	
+	Logger LOGGER = Logger.getLogger(SigaUserDetailsService.class);
 
 	@Autowired
 	GenMenuExtendsMapper menuExtend;
@@ -255,7 +259,6 @@ public class SigaUserDetailsService implements UserDetailsService {
 	}
 
 	private void insertaUsuBd(UserCgae user) {
-		AdmUsuarios usu = new AdmUsuarios();
 		UsuarioCreateDTO usuDTO = new UsuarioCreateDTO();
 		CenInstitucion institucion = institucionMapper.selectByPrimaryKey(Short.valueOf(user.getInstitucion()));
 		usuDTO.setActivo("S");
@@ -268,11 +271,12 @@ public class SigaUserDetailsService implements UserDetailsService {
 		usuDTO.setNif(user.getDni());
 		// Obtenemos el nuevo idusuario
 		try {
+			LOGGER.debug("Se intenta crear el usuario " + user.getDni() + " en base de datos.");
 			admUsuariosExtendsMapper.createUserAdmUsuariosTable(usuDTO,new Integer("-1"));	
 			admUsuariosExtendsMapper.createUserAdmUsuarioEfectivoTable(usuDTO, new Integer("-1"));
 			admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable(usuDTO, new Integer("-1"));
 		}catch(Exception e) {
-			 e.printStackTrace();
+			LOGGER.error("Se ha producido un error al crear el usuario en base de datos", e);
 		}
 	}
 }
