@@ -1006,13 +1006,26 @@ public class MenuServiceImpl implements IMenuService {
 	public UpdateResponseDTO validaUsuario(HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		try{
-			List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
+			//List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
+			
+			LOGGER.debug("Validamos el usuario");
+			LOGGER.debug("Obtenemos de la request las instituciones del usuario en CAS");
+			List<String> institucionesList = getInstitucionesUsuarioRequest(request);
+			LOGGER.debug("Obtenemos de la lista de instituciones de base de datos");
+			List<CenInstitucion> institucionList = getlistIdInstitucionByListCodExterno(institucionesList);
 			
 			if(institucionList == null || institucionList.isEmpty()) {
-				throw new BadCredentialsException("Institucion No válida");
+				throw new BadCredentialsException("Usuario no válido");
 			}
-			Short idInstitucion = institucionList.get(0).getIdinstitucion();
+			Short idInstitucion = null;
+			LOGGER.debug("Comprobamos si la institución 2000 entá en las cabeceras CAS");
+			for(CenInstitucion inst : institucionList) {
+				if (inst.getIdinstitucion().toString().equals(SigaConstants.InstitucionGeneral)) {
+					idInstitucion = inst.getIdinstitucion();
+				}
+			}
 			String dni = (String) request.getHeader("CAS-username");
+			LOGGER.debug("Comprobamos si la el usuario tiene rol en la institución 2000");
 			AdmUsuariosExample  usuarioExampple = new AdmUsuariosExample();
 			usuarioExampple.createCriteria().andActivoEqualTo("N").andIdinstitucionEqualTo(idInstitucion).andNifEqualTo(dni);
 			List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExampple);
