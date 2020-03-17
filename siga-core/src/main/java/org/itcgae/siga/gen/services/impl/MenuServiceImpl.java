@@ -751,16 +751,25 @@ public class MenuServiceImpl implements IMenuService {
 	@Override
 	public UpdateResponseDTO validaInstitucion(HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
+		Boolean encontrado = false;
 		try{
-			String idInstitucion = getInstitucionRequest(request);
+			LOGGER.debug("Validamos la institucion");
+			LOGGER.debug("Obtenemos de la request las instituciones del usuario en CAS");
+			List<String> institucionesList = getInstitucionesUsuarioRequest(request);
+			LOGGER.debug("Obtenemos de la lista de instituciones de base de datos");
+			List<CenInstitucion> lista = getlistIdInstitucionByListCodExterno(institucionesList);
+
+			LOGGER.debug("Recorremos la lista de instituciones: "+lista.size() + " instituciones encontradas");
+			for(CenInstitucion institucion : lista) {
 	
-			if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
-				List<CenInstitucion> instituciones = getidInstitucionByCodExterno(idInstitucion);
-				if(instituciones != null && !instituciones.isEmpty()) {
-					if (!instituciones.get(0).getIdinstitucion().toString().equals(SigaConstants.InstitucionGeneral)) {
-						throw new BadCredentialsException("El usuario no tiene rol en la institucion CGAE");
-					}
+				if (institucion.getIdinstitucion().toString().equals(SigaConstants.InstitucionGeneral)) {
+					LOGGER.debug("El usuario tiene rol en la institucion 2000 en CAS");
+					encontrado = true;
 				}
+			}
+			if(!encontrado) {
+				LOGGER.debug("ERROR: El usuario NO tiene rol en la institucion 2000 en CAS");
+				throw new BadCredentialsException("El usuario no tiene rol en la institucion CGAE");
 			}
 
 		} catch (Exception e) {
@@ -1078,6 +1087,17 @@ public class MenuServiceImpl implements IMenuService {
 		if(codExterno != null && !codExterno.isEmpty()) {
 			CenInstitucionExample example = new CenInstitucionExample();
 			example.createCriteria().andCodigoextEqualTo(codExterno);
+			
+			return institucionMapper.selectByExample(example);
+		}else {
+			return null;
+		}
+	}
+	
+	public List<CenInstitucion> getlistIdInstitucionByListCodExterno(List<String> listCodExterno) {
+		if(listCodExterno != null && !listCodExterno.isEmpty()) {
+			CenInstitucionExample example = new CenInstitucionExample();
+			example.createCriteria().andCodigoextIn(listCodExterno);
 			
 			return institucionMapper.selectByExample(example);
 		}else {
