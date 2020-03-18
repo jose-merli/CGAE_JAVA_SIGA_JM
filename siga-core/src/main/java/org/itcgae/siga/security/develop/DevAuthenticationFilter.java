@@ -71,7 +71,7 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 //			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,certs[0]));
 			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,null));
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 	}
 

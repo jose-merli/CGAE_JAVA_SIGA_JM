@@ -259,55 +259,55 @@ public class SigaConstants {
 	public static String getTipoUsuario(String rol) {
 		if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.PERSONAL.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.PERSONAL.getRecurso())) {
-			return ECOM_CEN_ROLES.PERSONAL.getDescripcion();
+			return ECOM_CEN_ROLES.PERSONAL.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.ABOGADO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.ABOGADO.getRecurso())) {
-			return ECOM_CEN_ROLES.ABOGADO.getDescripcion();
+			return ECOM_CEN_ROLES.ABOGADO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.NOEJERCIENTE.getDescripcion()) || 
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.NOEJERCIENTE.getRecurso())) {
-			return ECOM_CEN_ROLES.NOEJERCIENTE.getDescripcion();
+			return ECOM_CEN_ROLES.NOEJERCIENTE.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.CONSEJERO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.CONSEJERO.getRecurso())) {
-			return ECOM_CEN_ROLES.CONSEJERO.getDescripcion();
+			return ECOM_CEN_ROLES.CONSEJERO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.DECANO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.DECANO.getRecurso())) {
-			return ECOM_CEN_ROLES.DECANO.getDescripcion();
+			return ECOM_CEN_ROLES.DECANO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.DIRECTIVO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.DIRECTIVO.getRecurso())) {
-			return ECOM_CEN_ROLES.DIRECTIVO.getDescripcion();
+			return ECOM_CEN_ROLES.DIRECTIVO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.MIEMBROJUNTA.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.MIEMBROJUNTA.getRecurso())) {
-			return ECOM_CEN_ROLES.MIEMBROJUNTA.getDescripcion();
+			return ECOM_CEN_ROLES.MIEMBROJUNTA.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.SECRETARIO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.SECRETARIO.getRecurso())) {
-			return ECOM_CEN_ROLES.SECRETARIO.getDescripcion();
+			return ECOM_CEN_ROLES.SECRETARIO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.VICEDECANO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.VICEDECANO.getRecurso())) {
-			return ECOM_CEN_ROLES.VICEDECANO.getDescripcion();
+			return ECOM_CEN_ROLES.VICEDECANO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.ABOGADOEUROPEO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.ABOGADOEUROPEO.getRecurso())) {
-			return ECOM_CEN_ROLES.ABOGADOEUROPEO.getDescripcion();
+			return ECOM_CEN_ROLES.ABOGADOEUROPEO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.INSCRITO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.INSCRITO.getRecurso())) {
-			return ECOM_CEN_ROLES.INSCRITO.getDescripcion();
+			return ECOM_CEN_ROLES.INSCRITO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADOR.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADOR.getRecurso())) {
-			return ECOM_CEN_ROLES.ADMINISTRADOR.getDescripcion();
+			return ECOM_CEN_ROLES.ADMINISTRADOR.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADORSOLIDARIO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADORSOLIDARIO.getRecurso())) {
-			return ECOM_CEN_ROLES.ADMINISTRADORSOLIDARIO.getDescripcion();
+			return ECOM_CEN_ROLES.ADMINISTRADORSOLIDARIO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADORUNICO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADORUNICO.getRecurso())) {
-			return ECOM_CEN_ROLES.ADMINISTRADORUNICO.getDescripcion();
+			return ECOM_CEN_ROLES.ADMINISTRADORUNICO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.AUTORIZADO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.AUTORIZADO.getRecurso())) {
-			return ECOM_CEN_ROLES.AUTORIZADO.getDescripcion();
+			return ECOM_CEN_ROLES.AUTORIZADO.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.REPRESENTANTELEGAL.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.REPRESENTANTELEGAL.getRecurso())) {
-			return ECOM_CEN_ROLES.REPRESENTANTELEGAL.getDescripcion();
+			return ECOM_CEN_ROLES.REPRESENTANTELEGAL.getCodigo();
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.REPRESENTANTEVOLUNTARIO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.REPRESENTANTEVOLUNTARIO.getRecurso())) {
-			return ECOM_CEN_ROLES.REPRESENTANTEVOLUNTARIO.getDescripcion();
+			return ECOM_CEN_ROLES.REPRESENTANTEVOLUNTARIO.getCodigo();
 		}
 		return null;
 	}

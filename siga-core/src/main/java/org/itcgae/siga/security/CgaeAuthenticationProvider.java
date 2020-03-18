@@ -59,14 +59,20 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
                               throw new BadCredentialsException("Imposible validar el usuario en SIGA");
                     }*/
 
-                    UserCgae user = (UserCgae) this.userDetailsService.loadUserByUsername(cgaeAuthenticaton.getUser());
-
-                    if (user != null) {
-                              return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null, user,
-                                                 cgaeAuthenticaton.getCertificate(), cgaeAuthenticaton.getAuthorities());
-                    } else {
-                              throw new BadCredentialsException("Imposible validar el usuario en SIGA");
-                    }
+                    UserCgae user;
+					try {
+						user = (UserCgae) this.userDetailsService.loadUserByUsername(cgaeAuthenticaton.getUser());
+	
+	                    if (user != null) {
+	                              return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null, user,
+	                                                 cgaeAuthenticaton.getCertificate(), cgaeAuthenticaton.getAuthorities());
+	                    } else {
+	                              throw new BadCredentialsException("Imposible validar el usuario en SIGA");
+	                    }
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						throw new BadCredentialsException("Se ha producido un error al cargar el usuario",e);
+					}
           }
 
           @Override

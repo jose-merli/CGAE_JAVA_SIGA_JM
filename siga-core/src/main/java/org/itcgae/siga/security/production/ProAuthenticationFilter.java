@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -45,21 +46,24 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			String dni = (String) request.getHeader("CAS-username");
 			String nombre = (String) request.getHeader("CAS-displayName");
 			String grupo = null;
+			AdmRol rol = null;
 			grupo = this.userDetailsService.getGrupoCAS(request);
 				
 			String institucion = null;
 			institucion = this.userDetailsService.getInstitucionCAS(request);
 			
+			rol = this.userDetailsService.getRolLogin(request);
+			
 			LOGGER.debug("DNI: " + dni);
 			LOGGER.debug("INSTITUCION: " + institucion);
 			LOGGER.debug("GRUPO: " + grupo);
 
-			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,null, null, nombre);
+			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,null, rol, nombre);
 			LOGGER.info("Intento de autenticación en siga {}", user);
 			//return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
 			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, null));
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 	}
 

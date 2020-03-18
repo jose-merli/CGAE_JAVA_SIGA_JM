@@ -8,21 +8,25 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
+import org.itcgae.siga.db.entities.AdmPerfilRol;
+import org.itcgae.siga.db.entities.AdmPerfilRolExample;
 import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.db.entities.AdmUsuarioEfectivo;
+import org.itcgae.siga.db.entities.AdmUsuarioEfectivoKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.mappers.AdmPerfilRolMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
+import org.itcgae.siga.db.mappers.AdmUsuarioEfectivoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
@@ -31,11 +35,9 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
-import org.itcgae.siga.gen.services.impl.MenuServiceImpl;
 import org.itcgae.siga.security.UserCgae;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -67,10 +69,16 @@ public class SigaUserDetailsService implements UserDetailsService {
 	AdmTiposaccesoMapper tiposAccesoMapper;
 
 	@Autowired
+	AdmPerfilRolMapper admPerfilRolMapper;
+	
+	@Autowired
 	AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
 	@Autowired
-	AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
+	AdmUsuarioEfectivoMapper admUsuarioEfectivoMapper;
+	
+	@Autowired
+	AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoPerfilMapper;
 	
 	@Autowired
 	AdmRolExtendsMapper admRol;
@@ -81,7 +89,7 @@ public class SigaUserDetailsService implements UserDetailsService {
 		return new UserCgae(dni, null, null, null,null,null, null, null);
 	}
 
-	public UserDetails loadUserByUsername(UserCgae user) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(UserCgae user) throws UsernameNotFoundException, Exception {
 
 		String dni = user.getDni();
 		String nombre = user.getNombre();
@@ -137,41 +145,46 @@ public class SigaUserDetailsService implements UserDetailsService {
 						AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
 						exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
 									.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andIdrolEqualTo(roles.get(0).getIdrol()).andFechaBajaIsNull();
-						List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+						List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoPerfilMapper.selectByExample(exampleUsuarioPerfil);
 						letrado = roles.get(0).getLetrado().toString();
 						if (letrado.equals("0")) {
 							letrado = "N";
 						}else{
 							letrado = "S";
 						}
-						if(null != perfiles && perfiles.size()>0) {
-							/*
-							 * Tratamos todos los grupos del Rol
-							 */
-							for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
-								idperfiles.add("'" + perfil.getIdperfil() + "'");
-							}
+						if(null == perfiles || perfiles.size()==0) {
+							insertaUsuEfectivoBd(usuarios.get(0),roles.get(0));
+							perfiles = admUsuariosEfectivoPerfilMapper.selectByExample(exampleUsuarioPerfil);
 						}
+						/*
+						 * Tratamos todos los grupos del Rol
+						 */
+						for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
+							idperfiles.add("'" + perfil.getIdperfil() + "'");
+						}
+						
 					}else {
 						if(rol != null) {
 							AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
 						
 							exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
 										.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andIdrolEqualTo(rol.getIdrol()).andFechaBajaIsNull();
-							List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+							List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoPerfilMapper.selectByExample(exampleUsuarioPerfil);
 							letrado = rol.getLetrado().toString();
 							if (letrado.equals("0")) {
 								letrado = "N";
 							}else{
 								letrado = "S";
 							}
-							if(null != perfiles && perfiles.size()>0) {
-								/*
-								 * Tratamos todos los grupos del Rol
-								 */
-								for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
-									idperfiles.add("'" + perfil.getIdperfil() + "'");
-								}
+							if(null == perfiles || perfiles.size()==0) {
+								insertaUsuEfectivoBd(usuarios.get(0),rol);
+								perfiles = admUsuariosEfectivoPerfilMapper.selectByExample(exampleUsuarioPerfil);
+							}
+							/*
+							 * Tratamos todos los grupos del Rol
+							 */
+							for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
+								idperfiles.add("'" + perfil.getIdperfil() + "'");
 							}
 						}
 					}
@@ -198,33 +211,40 @@ public class SigaUserDetailsService implements UserDetailsService {
 				}else {
 					 throw new BadCredentialsException("El usuario no tiene permisos");
 				}	
+			}else {
+				throw new BadCredentialsException("Perfil del usuario erróneo");
 			}
 		}else {
 			throw new BadCredentialsException("Ha ocurrido un problema al crear el usuario en base de datos");
 		}
-
-		return null;
-			
 		
 	}
 	
 	public String getGrupoCAS(HttpServletRequest request) {
-		String roles = (String) request.getHeader("CAS-roles");
 		String defaultRole = null;
 		String [] roleAttributes;
-		String [] rolesList = roles.split("::");
-		if(rolesList.length > 1) {
-			defaultRole = (String) request.getHeader("CAS-defaultRole");
-			roleAttributes = defaultRole.split(" ");
-		}else {
-			roleAttributes = roles.split(" ");
-		}
+		String codigoRol = "";
+		defaultRole = (String) request.getHeader("CAS-defaultRole");
+		roleAttributes = defaultRole.split(" ");
+	
 			
 		if(roleAttributes.length == 2) {
-			return SigaConstants.getTipoUsuario(roleAttributes[1]);
+			codigoRol = SigaConstants.getTipoUsuario(roleAttributes[1]);
 		}else {
-			return SigaConstants.getTipoUsuario(roleAttributes[2]);
+			codigoRol = SigaConstants.getTipoUsuario(roleAttributes[2]);
 		}
+		
+		return codigoRol;
+		
+		/*AdmPerfilRolExample example = new AdmPerfilRolExample();
+		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(roleAttributes[0])).andIdrolEqualTo(codigoRol);		
+		List<AdmPerfilRol> admPerfilRol = admPerfilRolMapper.selectByExample(example);
+		
+		if(admPerfilRol != null && !admPerfilRol.isEmpty()) {
+			return admPerfilRol.get(0).getIdperfil();
+		}else {
+			return "";
+		}*/
 	}
 	
 	public String getInstitucionCAS(HttpServletRequest request) {
@@ -232,13 +252,9 @@ public class SigaUserDetailsService implements UserDetailsService {
 		String defaultRole = null;
 		String [] roleAttributes;
 		String [] rolesList = roles.split("::");
-		if(rolesList.length > 1) {
-			defaultRole = (String) request.getHeader("CAS-defaultRole");
-			roleAttributes = defaultRole.split(" ");
-		}else {
-			roleAttributes = roles.split(" ");
-		}
-			
+		defaultRole = (String) request.getHeader("CAS-defaultRole");
+		roleAttributes = defaultRole.split(" ");
+					
 		return getidInstitucionByCodExterno(roleAttributes[0]).get(0).getIdinstitucion().toString();
 	}
 	
@@ -257,26 +273,99 @@ public class SigaUserDetailsService implements UserDetailsService {
 		AdmRol rol = admRol.selectByPrimaryKey(grupo);
 		return rol;
 	}
+	
+	public AdmRol getRolLogin(HttpServletRequest request) {
+		String defaultRole = null;
+		String [] roleAttributes;
+		String codigoRol = "";
+		defaultRole = (String) request.getHeader("CAS-defaultRole");
+		roleAttributes = defaultRole.split(" ");
+	
+			
+		if(roleAttributes.length == 2) {
+			codigoRol = roleAttributes[1];
+		}else {
+			codigoRol = roleAttributes[2];
+		}
+		
+		List<AdmRol> roles = admRol.selectRolAccesoByExample(codigoRol);
+		
+		if(roles != null && !roles.isEmpty())
+			return roles.get(0);
+		else
+			return null;
+	}
 
-	private void insertaUsuBd(UserCgae user) {
-		UsuarioCreateDTO usuDTO = new UsuarioCreateDTO();
-		CenInstitucion institucion = institucionMapper.selectByPrimaryKey(Short.valueOf(user.getInstitucion()));
-		usuDTO.setActivo("S");
-		usuDTO.setFechaAlta(new Date());
-		usuDTO.setIdInstitucion(user.getInstitucion());
-		usuDTO.setIdLenguaje(institucion.getIdlenguaje());
-		usuDTO.setGrupo(user.getGrupo());
-		usuDTO.setRol(user.getRol().getIdrol());
-		usuDTO.setNombreApellidos(user.getNombre());
-		usuDTO.setNif(user.getDni());
-		// Obtenemos el nuevo idusuario
+	private void insertaUsuBd(UserCgae user) throws Exception {
+		
 		try {
-			LOGGER.debug("Se intenta crear el usuario " + user.getDni() + " en base de datos.");
-			admUsuariosExtendsMapper.createUserAdmUsuariosTable(usuDTO,new Integer("-1"));	
-			admUsuariosExtendsMapper.createUserAdmUsuarioEfectivoTable(usuDTO, new Integer("-1"));
-			admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable(usuDTO, new Integer("-1"));
+			AdmUsuarios usuario = new AdmUsuarios();
+			CenInstitucion institucion = institucionMapper.selectByPrimaryKey(Short.valueOf(user.getInstitucion()));
+			usuario.setActivo("S");
+			usuario.setDescripcion(user.getNombre());
+			usuario.setFechaalta(new Date());
+			usuario.setFechamodificacion(new Date());
+			usuario.setIdinstitucion(institucion.getIdinstitucion());
+			usuario.setIdlenguaje(institucion.getIdlenguaje());
+			usuario.setNif(user.getDni());
+			
+			admUsuariosExtendsMapper.insert(usuario);
+			
+			LOGGER.debug("Insertamos en bd el usuario efectivo y sus perfiles");
+			insertaUsuEfectivoBd(usuario, user.getRol());
+			
 		}catch(Exception e) {
-			LOGGER.error("Se ha producido un error al crear el usuario en base de datos", e);
+			LOGGER.error("Se ha producido un error al crear el usuario efectivo en base de datos", e);
+			throw new Exception("Se ha producido un error al crear el usuario efectivo en base de datos", e);
+		}
+		
+	}
+	
+	private void insertaUsuEfectivoBd(AdmUsuarios usuario, AdmRol rol) {
+		
+		try {
+			LOGGER.debug("Buscamos el usuario efectivo " + usuario.getNif() + " en base de datos.");
+			AdmUsuarioEfectivoKey key = new AdmUsuarioEfectivoKey();
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setIdusuario(usuario.getIdusuario());
+			key.setIdrol(rol.getIdrol());
+			AdmUsuarioEfectivo admUsuarioEfectivo = admUsuarioEfectivoMapper.selectByPrimaryKey(key);
+			
+			if(admUsuarioEfectivo == null) {
+				LOGGER.debug("No se ha encontrado usuario efectivo: "+usuario.getNif());
+				admUsuarioEfectivo = new AdmUsuarioEfectivo();
+				admUsuarioEfectivo.setIdinstitucion(usuario.getIdinstitucion());
+				admUsuarioEfectivo.setIdrol(rol.getIdrol());
+				admUsuarioEfectivo.setIdusuario(usuario.getIdusuario());
+				admUsuarioEfectivo.setUsumodificacion(new Integer("-1"));
+				admUsuarioEfectivo.setFechamodificacion(new Date());
+				LOGGER.debug("Se intenta crear el usuario efectivo " + usuario.getNif() + " en base de datos.");
+				admUsuarioEfectivoMapper.insert(admUsuarioEfectivo);
+			}
+			
+			LOGGER.debug("Buscamos el perfil "+rol.getDescripcion()+ " del usuario efectivo " + usuario.getNif() + " en base de datos.");
+			AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
+			exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuario.getIdinstitucion()))
+						.andIdusuarioEqualTo(usuario.getIdusuario()).andIdrolEqualTo(rol.getIdrol()).andFechaBajaIsNull();
+			List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoPerfilMapper.selectByExample(exampleUsuarioPerfil);
+			
+			if(perfiles == null || perfiles.size() == 0) {
+				AdmPerfilRolExample example = new AdmPerfilRolExample();
+				example.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion()).andIdrolEqualTo(rol.getIdrol());		
+				List<AdmPerfilRol> admPerfilRol = admPerfilRolMapper.selectByExample(example);
+				
+				AdmUsuariosEfectivosPerfil admUsuariosEfectivosPerfil = new AdmUsuariosEfectivosPerfil();
+				admUsuariosEfectivosPerfil.setIdinstitucion(usuario.getIdinstitucion());
+				admUsuariosEfectivosPerfil.setIdperfil(admPerfilRol.get(0).getIdperfil());
+				admUsuariosEfectivosPerfil.setIdrol(rol.getIdrol());
+				admUsuariosEfectivosPerfil.setIdusuario(usuario.getIdusuario());
+				admUsuariosEfectivosPerfil.setUsumodificacion(new Integer("-1"));
+				admUsuariosEfectivosPerfil.setFechamodificacion(new Date());
+				
+				admUsuariosEfectivoPerfilMapper.insert(admUsuariosEfectivosPerfil);
+			}
+		}catch(Exception e) {
+			LOGGER.error("Se ha producido un error al crear el usuario efectivo en base de datos", e);
 		}
 	}
 }
