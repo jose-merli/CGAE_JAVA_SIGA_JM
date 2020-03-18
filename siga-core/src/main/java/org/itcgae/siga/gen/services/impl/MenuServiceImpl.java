@@ -1170,7 +1170,7 @@ public class MenuServiceImpl implements IMenuService {
 
 		AdmRolExample exampleRol = new AdmRolExample();
 		exampleRol.setDistinct(true);
-		exampleRol.createCriteria().andDescripcionIn(rolesList);
+		exampleRol.createCriteria().andCodigoextIn(rolesList);
 		exampleRol.setOrderByClause("DESCRIPCION ASC");
 
 		List<AdmRol> roles = admRolMapper.selectByExample(exampleRol);
