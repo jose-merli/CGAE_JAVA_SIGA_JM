@@ -1175,10 +1175,7 @@ public class MenuServiceImpl implements IMenuService {
 
 		List<AdmRol> roles = admRolMapper.selectByExample(exampleRol);
 		List<ComboItem> combos = new ArrayList<ComboItem>();
-		ComboItem comboBlanco = new ComboItem();
-		comboBlanco.setValue("");
-		comboBlanco.setLabel("");
-		combos.add(comboBlanco);
+		
 		if (null != roles && roles.size() > 0) {
 			for (Iterator<AdmRol> iterator = roles.iterator(); iterator.hasNext();) {
 				AdmRol rol = (AdmRol) iterator.next();
@@ -1189,6 +1186,11 @@ public class MenuServiceImpl implements IMenuService {
 				combos.add(combo);
 			}
 
+		}else {
+			ComboItem comboBlanco = new ComboItem();
+			comboBlanco.setValue("");
+			comboBlanco.setLabel("");
+			combos.add(comboBlanco);
 		}
 
 		response.setCombooItems(combos);

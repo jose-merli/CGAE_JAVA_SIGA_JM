@@ -305,6 +305,7 @@ public class SigaUserDetailsService implements UserDetailsService {
 			usuario.setDescripcion(user.getNombre());
 			usuario.setFechaalta(new Date());
 			usuario.setFechamodificacion(new Date());
+			usuario.setUsumodificacion(new Integer("-1"));
 			usuario.setIdinstitucion(institucion.getIdinstitucion());
 			usuario.setIdlenguaje(institucion.getIdlenguaje());
 			usuario.setNif(user.getDni());
