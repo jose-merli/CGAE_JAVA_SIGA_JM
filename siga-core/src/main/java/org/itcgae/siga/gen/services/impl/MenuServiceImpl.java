@@ -765,6 +765,7 @@ public class MenuServiceImpl implements IMenuService {
 				if (institucion.getIdinstitucion().toString().equals(SigaConstants.InstitucionGeneral)) {
 					LOGGER.debug("El usuario tiene rol en la institucion 2000 en CAS");
 					encontrado = true;
+					break;
 				}
 			}
 			if(!encontrado) {
@@ -1022,6 +1023,7 @@ public class MenuServiceImpl implements IMenuService {
 			for(CenInstitucion inst : institucionList) {
 				if (inst.getIdinstitucion().toString().equals(SigaConstants.InstitucionGeneral)) {
 					idInstitucion = inst.getIdinstitucion();
+					break;
 				}
 			}
 			String dni = (String) request.getHeader("CAS-username");
