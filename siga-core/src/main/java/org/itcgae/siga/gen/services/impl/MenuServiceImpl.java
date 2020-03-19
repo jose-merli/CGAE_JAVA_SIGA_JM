@@ -46,8 +46,6 @@ import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
-//import org.itcgae.siga.commons.utils.InvalidClientCerticateException;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmGestorinterfaz;
@@ -774,7 +772,7 @@ public class MenuServiceImpl implements IMenuService {
 			}
 
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 		response.setStatus(SigaConstants.OK);
 		return response;
@@ -908,7 +906,7 @@ public class MenuServiceImpl implements IMenuService {
 			idInstitucion = roleAttributes[0];
 			
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 		if (idInstitucion == null){
 			idInstitucion = "";
@@ -929,7 +927,7 @@ public class MenuServiceImpl implements IMenuService {
 			}
 			
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 		
 	
@@ -953,7 +951,7 @@ public class MenuServiceImpl implements IMenuService {
 			}
 			
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 		
 	
@@ -997,7 +995,7 @@ public class MenuServiceImpl implements IMenuService {
 			}
 
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 
 		return idInstitucion;
@@ -1045,7 +1043,7 @@ public class MenuServiceImpl implements IMenuService {
 			
 				
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 		response.setStatus(SigaConstants.OK);
 		return response;

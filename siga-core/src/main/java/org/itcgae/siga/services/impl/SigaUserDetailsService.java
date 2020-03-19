@@ -199,7 +199,8 @@ public class SigaUserDetailsService implements UserDetailsService {
 						permisos.addAll(permisosPorGrupo);
 						if (null != permisosPorGrupo && permisosPorGrupo.size() > 0) {
 						}else {
-							 throw new BadCredentialsException("El usuario no tiene permisos");
+							LOGGER.error("El perfil "+str + " de la institución " + institucion + " no tiene permisos asociados");
+							throw new BadCredentialsException("El perfil seleccionado no tiene permisos");
 						}
 		
 				}
