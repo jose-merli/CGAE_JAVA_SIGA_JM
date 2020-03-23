@@ -1017,24 +1017,37 @@ public class MenuServiceImpl implements IMenuService {
 				throw new BadCredentialsException("Usuario no válido");
 			}
 			Short idInstitucion = null;
+			List<Short> lista = new ArrayList<Short>();
 			LOGGER.debug("Comprobamos si la institución 2000 entá en las cabeceras CAS");
 			for(CenInstitucion inst : institucionList) {
 				if (inst.getIdinstitucion().toString().equals(SigaConstants.InstitucionGeneral)) {
 					idInstitucion = inst.getIdinstitucion();
 					break;
 				}
+				lista.add(inst.getIdinstitucion());
 			}
+			
 			String dni = (String) request.getHeader("CAS-username");
 			LOGGER.debug("Comprobamos si la el usuario tiene rol en la institución 2000");
 			AdmUsuariosExample  usuarioExampple = new AdmUsuariosExample();
-			usuarioExampple.createCriteria().andActivoEqualTo("N").andIdinstitucionEqualTo(idInstitucion).andNifEqualTo(dni);
+			if(idInstitucion != null) {
+				usuarioExampple.createCriteria().andActivoEqualTo("N").andIdinstitucionEqualTo(idInstitucion).andNifEqualTo(dni);
+			}
+			else {
+				usuarioExampple.createCriteria().andActivoEqualTo("N").andIdinstitucionIn(lista).andNifEqualTo(dni);
+			}
 			List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExampple);
 			if (null != usuarios && usuarios.size()>0) {
 				throw new BadCredentialsException("Usuario no válido");
 			}
 			
 			usuarioExampple = new AdmUsuariosExample();
-			usuarioExampple.createCriteria().andFechaBajaIsNotNull().andIdinstitucionEqualTo(idInstitucion).andNifEqualTo(dni);
+			if(idInstitucion != null) {
+				usuarioExampple.createCriteria().andFechaBajaIsNotNull().andIdinstitucionEqualTo(idInstitucion).andNifEqualTo(dni);
+			}
+			else {
+				usuarioExampple.createCriteria().andFechaBajaIsNotNull().andIdinstitucionIn(lista).andNifEqualTo(dni);
+			}
 			usuarios = usuarioMapper.selectByExample(usuarioExampple);
 			
 			if (null != usuarios && usuarios.size()>0) {
