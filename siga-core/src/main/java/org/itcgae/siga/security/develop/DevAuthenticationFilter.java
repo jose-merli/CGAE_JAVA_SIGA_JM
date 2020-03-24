@@ -55,18 +55,8 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			String letrado = "";
 			AdmRol rol = null;
 			grupo = request.getParameter("profile");
-			if(request.getParameter("letrado")!=null) {
-				letrado = request.getParameter("letrado");
-			}else {
-				//Hemos accedido por loginMultiple
-				rol = this.userDetailsService.getRolLoginMultiple(request.getParameter("rol"));
-				letrado = rol.getLetrado().toString();
-				if (letrado.equals("0")) {
-					letrado = "N";
-				}else{
-					letrado = "S";
-				}
-			}
+			letrado = request.getParameter("letrado");
+			
 			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,letrado, rol, nombre);
 //			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,certs[0]));
 			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,null));

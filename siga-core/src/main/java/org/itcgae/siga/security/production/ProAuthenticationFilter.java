@@ -50,9 +50,18 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			grupo = this.userDetailsService.getGrupoCAS(request);
 				
 			String institucion = null;
-			institucion = this.userDetailsService.getInstitucionCAS(request);
-			
-			rol = this.userDetailsService.getRolLogin(request);
+			if(request.getParameter("location")==null) {
+				institucion = this.userDetailsService.getInstitucionCAS(request);
+			}else {
+				//Hemos accedido por loginMultiple
+				institucion = request.getParameter("location");
+			}
+			if(request.getParameter("rol") == null) {
+				rol = this.userDetailsService.getRolLogin(request);
+			}else {
+				//Hemos accedido por loginMultiple
+				rol = this.userDetailsService.getRolLoginMultiple(request.getParameter("rol"));
+			}
 			
 			LOGGER.debug("DNI: " + dni);
 			LOGGER.debug("INSTITUCION: " + institucion);
