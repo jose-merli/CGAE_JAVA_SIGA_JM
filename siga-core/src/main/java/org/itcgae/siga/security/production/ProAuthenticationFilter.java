@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
@@ -47,7 +48,6 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			String nombre = (String) request.getHeader("CAS-displayName");
 			String grupo = null;
 			AdmRol rol = null;
-			grupo = this.userDetailsService.getGrupoCAS(request);
 				
 			String institucion = null;
 			if(request.getParameter("location")==null) {
@@ -58,9 +58,11 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			}
 			if(request.getParameter("rol") == null) {
 				rol = this.userDetailsService.getRolLogin(request);
+				grupo = this.userDetailsService.getGrupoCAS(request);
 			}else {
 				//Hemos accedido por loginMultiple
 				rol = this.userDetailsService.getRolLoginMultiple(request.getParameter("rol"));
+				grupo = SigaConstants.getTipoUsuario(request.getParameter("rol"));
 			}
 			
 			LOGGER.debug("DNI: " + dni);

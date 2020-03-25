@@ -226,8 +226,18 @@ public class SigaUserDetailsService implements UserDetailsService {
 		String [] roleAttributes;
 		String codigoRol = "";
 		defaultRole = (String) request.getHeader("CAS-defaultRole");
-		roleAttributes = defaultRole.split(" ");
-	
+		if(defaultRole != null) {
+			roleAttributes = defaultRole.split(" ");
+		}else {
+			String roles = (String) request.getHeader("CAS-roles");
+			String [] rolesList = roles.split("::");
+			if(rolesList.length > 1) {
+				defaultRole = rolesList[0];
+				roleAttributes = defaultRole.split(" ");
+			}else {
+				roleAttributes = roles.split(" ");
+			}
+		}
 			
 		if(roleAttributes.length == 2) {
 			codigoRol = SigaConstants.getTipoUsuario(roleAttributes[1]);
@@ -236,26 +246,25 @@ public class SigaUserDetailsService implements UserDetailsService {
 		}
 		
 		return codigoRol;
-		
-		/*AdmPerfilRolExample example = new AdmPerfilRolExample();
-		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(roleAttributes[0])).andIdrolEqualTo(codigoRol);		
-		List<AdmPerfilRol> admPerfilRol = admPerfilRolMapper.selectByExample(example);
-		
-		if(admPerfilRol != null && !admPerfilRol.isEmpty()) {
-			return admPerfilRol.get(0).getIdperfil();
-		}else {
-			return "";
-		}*/
 	}
 	
 	public String getInstitucionCAS(HttpServletRequest request) {
-		String roles = (String) request.getHeader("CAS-roles");
 		String defaultRole = null;
 		String [] roleAttributes;
-		String [] rolesList = roles.split("::");
 		defaultRole = (String) request.getHeader("CAS-defaultRole");
-		roleAttributes = defaultRole.split(" ");
-					
+		if(defaultRole != null) {
+			roleAttributes = defaultRole.split(" ");
+		}else {
+			String roles = (String) request.getHeader("CAS-roles");
+			String [] rolesList = roles.split("::");
+			if(rolesList.length > 1) {
+				defaultRole = rolesList[0];
+				roleAttributes = defaultRole.split(" ");
+			}else {
+				roleAttributes = roles.split(" ");
+			}
+		}
+		
 		return getidInstitucionByCodExterno(roleAttributes[0]).get(0).getIdinstitucion().toString();
 	}
 	
@@ -280,8 +289,18 @@ public class SigaUserDetailsService implements UserDetailsService {
 		String [] roleAttributes;
 		String codigoRol = "";
 		defaultRole = (String) request.getHeader("CAS-defaultRole");
-		roleAttributes = defaultRole.split(" ");
-	
+		if(defaultRole != null) {
+			roleAttributes = defaultRole.split(" ");
+		}else {
+			String roles = (String) request.getHeader("CAS-roles");
+			String [] rolesList = roles.split("::");
+			if(rolesList.length > 1) {
+				defaultRole = rolesList[0];
+				roleAttributes = defaultRole.split(" ");
+			}else {
+				roleAttributes = roles.split(" ");
+			}
+		}
 			
 		if(roleAttributes.length == 2) {
 			codigoRol = roleAttributes[1];
