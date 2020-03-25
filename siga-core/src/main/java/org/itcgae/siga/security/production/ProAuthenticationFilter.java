@@ -62,7 +62,7 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			}else {
 				//Hemos accedido por loginMultiple
 				rol = this.userDetailsService.getRolLoginMultiple(request.getParameter("rol"));
-				grupo = SigaConstants.getTipoUsuario(request.getParameter("rol"));
+				grupo = SigaConstants.getTipoUsuario(rol.getDescripcion());
 			}
 			
 			LOGGER.debug("DNI: " + dni);
