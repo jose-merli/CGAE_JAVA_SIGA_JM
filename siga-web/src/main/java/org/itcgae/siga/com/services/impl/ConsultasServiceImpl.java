@@ -2479,7 +2479,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 //					Long.valueOf(consulta.getIdConsulta()), Short.valueOf(consulta.getIdInstitucion()), e.getMessage(),
 //					sentenciaCompleta);
 			throw new BusinessException(
-					"Error al ejecutar la consulta " + descripcion + " " + e.getMessage(), e.getCause());
+					"Error al ejecutar la consulta " + consulta + " " + e.getMessage(), e.getCause());
 		} catch (Exception e) {
 			LOGGER.warn("Error al ejejcutar la consulta" + e);
 			updateLogEjecucion(inicialDate, Integer.valueOf(usuario.getIdusuario()), idEjecucion, e.getMessage());
@@ -2489,7 +2489,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 //					Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()),
 //					Long.valueOf(consulta.getIdConsulta()), Short.valueOf(consulta.getIdInstitucion()), e.getMessage(),
 //					sentenciaCompleta);
-			throw new BusinessException("Error al ejecutar la consulta " +descripcion, e);
+			throw new BusinessException("Error al ejecutar la consulta " +consulta, e);
 		}
 
 		return resultDatos;

@@ -372,10 +372,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 				
 				if (null != usuarios && usuarios.size() > 0) {
+					LOGGER.info("Rendimiento Inicio método generar comunicacion");
 					AdmUsuarios usuario = usuarios.get(0);
 					generarComunicacion = generarComunicacion(request, dialogo,usuario, false);
 					listaFicheros = generarComunicacion.getListaDocumentos();
+					LOGGER.info("Rendimiento Inicio obtener fichero o zip descarga");
 					file = getFicheroDescarga(dialogo.getIdInstitucion(), listaFicheros);
+					LOGGER.info("Rendimiento fin obtener fichero o zip descarga");
+					LOGGER.info("Rendimiento Fin método generar comunicacion");
 				}
 			}
 		} catch (BusinessException e) {
@@ -465,8 +469,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			}
 			
 			generarComunicacion.setFechaProgramada(dialogo.getFechaProgramada());
-			
+			int r = 1;
 			for(ModelosComunicacionItem modelosComunicacionItem :dialogo.getModelos()){
+				LOGGER.info("Rendimiento inicio tratamiento modelo de comunicacion: " + r);
 				ModelosEnvioItem modeloEnvioItem = new ModelosEnvioItem();		
 				
 				LOGGER.debug("Generación de documentación del modelo " + modelosComunicacionItem.getIdModeloComunicacion());
@@ -540,6 +545,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				modeloEnvioItem.setIdModeloComunicacion(Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
 				
 				listaModelosEnvio.add(modeloEnvioItem);
+				LOGGER.info("Rendimiento fin tratamiento modelo de comunicacion: " + r);
+				r++;
+				
 			}	
 			
 			generarComunicacion.setListaModelosEnvio(listaModelosEnvio);
@@ -593,8 +601,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			LOGGER.warn(mensaje);
 			throw new BusinessException(mensaje);
 		}
-		
+		int r =1;
 		for(PlantillaModeloDocumentoDTO plantilla:plantillas){
+			LOGGER.info("Rendimiento inicio tratamiento modelo de comunicacion: " + r);
 			List<List<Map<String,Object>>> listaDatosExcel = new ArrayList<List<Map<String,Object>>>();
 			String nombrePlantilla = "";
 			Long idPlantillaGenerar = null;
@@ -634,7 +643,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					throw new BusinessException("No hay plantilla asociada para el informe en el idioma del usuario");
 				}
 			}
+			LOGGER.info("Rendimiento inicio ejecucion consultas " );
 			
+			LOGGER.info("Rendimiento inicio ejecucion consultas condicionales" );
 			LOGGER.debug("Obtenemos las consultas condicional: " + plantilla.getIdPlantillas());
 			List<ConsultaItem> consultasItemCondicional = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
 
@@ -675,7 +686,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				LOGGER.debug("No hay consulta condicional para el informe: " + plantilla.getIdInforme());
 				continua = true;
 			}
-			
+			LOGGER.info("Rendimiento fin ejecucion consultas condicionales" );
 //			Lo que había antes
 //			if(continua){									
 //				LOGGER.debug("Obtenemos la consulta de destinatario: " + plantilla.getIdInforme());
@@ -791,7 +802,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 //			}else{
 //				LOGGER.debug("No se ejecuta la generación del informe: " + plantilla.getIdInforme());
 //			}						
-			
+			LOGGER.info("Rendimiento inicio ejecucion consultas destinatarios" );
 			if (continua) {
 				LOGGER.debug("Obtenemos la consulta de destinatario: " + plantilla.getIdInforme());
 				List<ConsultaItem> consultasItemDest = _modPlantillaDocumentoConsultaExtendsMapper
@@ -893,7 +904,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}else {
 					LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
 				}
-
+				LOGGER.info("Rendimiento fin ejecucion consultas destinatarios" );
+				
+				
+				
 				LOGGER.debug("Obtenemos la consulta de multidocumento para la plantilla: " + plantilla.getIdInforme());
 				List<ConsultaItem> consultasItemMulti = _modPlantillaDocumentoConsultaExtendsMapper
 						.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
@@ -901,7 +915,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
 				boolean consultasDestinatarioEjecutadas = consultasItemDest.size() > 0;
 				if (consultasItemMulti != null && consultasItemMulti.size() > 0) {
-
+					LOGGER.info("Rendimiento inicio ejecucion consultas multidocumento" );
 					for (ConsultaItem consultaMulti : consultasItemMulti) {
 						String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo, consultaMulti,
 								mapaClave, esEnvio);
@@ -941,7 +955,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							throw new BusinessException(
 									"Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
 						}
+						
 					}
+					LOGGER.info("Rendimiento fin ejecucion consultas multidocumento" );
 				}else {
 					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
@@ -957,6 +973,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 //							nombrePlantilla, esEnvio, esExcel, esDestinatario);
 //				} 
 			}
+			
+			LOGGER.info("Rendimiento fin tratamiento modelo de comunicacion: " + r);
+			r++;
 		}						
 	}
 
@@ -1806,18 +1825,37 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										String consultaEjecutarDatos = consultaDatos.getConsulta();
 										List<Map<String,Object>> resultDatos = null;
 																	
-										try {
-											ConConsultaKey key = new ConConsultaKey();
-											key.setIdconsulta(consultaDatos.getIdconsulta());
-											key.setIdinstitucion(consultaDatos.getIdinstitucion());
-											ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key );
-											resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos,null, consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(),consultaDatos.getIdinstitucion(),consulta.getDescripcion());
-										}catch (BusinessSQLException e) {
-											LOGGER.error(e);
-											throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " " + e.getMessage(), e);
-										}catch (Exception e) {
-											LOGGER.error(e);
-											throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " para el envío: " + idEnvio, e);
+										//try {
+//											ConConsultaKey key = new ConConsultaKey();
+//											key.setIdconsulta(consultaDatos.getIdconsulta());
+//											key.setIdinstitucion(consultaDatos.getIdinstitucion());
+//											ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key );
+											//resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos,null, consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(),consultaDatos.getIdinstitucion(),"");
+											
+											
+											
+//											
+//											resultDatos = _conConsultasExtendsMapper.ejecutarConsultaString(consultaEjecutarDatos);
+//										}catch (BusinessSQLException e) {
+//											LOGGER.error(e);
+//											throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " " + e.getMessage(), e);
+//										}catch (Exception e) {
+//											LOGGER.error(e);
+//											throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " para el envío: " + idEnvio, e);
+//										}
+										consultaEjecutarDatos = _consultasService.quitarEtiquetas(consultaEjecutarDatos.toUpperCase());
+										if(consultaEjecutarDatos != null && (consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_ALTER) || consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_CREATE)
+												|| consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_DELETE) || consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_DROP)
+												|| consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_INSERT) || consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_UPDATE))){
+											
+											LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + consultaEjecutarDatos);
+										}else {								
+											try {
+												resultDatos = _conConsultasExtendsMapper.ejecutarConsultaString(consultaEjecutarDatos);
+											}catch(Exception e) {
+												LOGGER.error("Error al ejecutar la consulta: " + consultaEjecutarDatos);
+												throw e;
+											}								
 										}
 										//Miramos si la consulta tiene region
 										List<ConsultaItem> listaPlantillaDocConsulta = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.valueOf(idInstitucion), consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdinforme(), consultaDatos.getIdconsulta(), consultaDatos.getIdplantilladocumento());
@@ -1913,22 +1951,35 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							
 							List<Map<String,Object>> resultDatos = null;	
 							
-							try {
-								ConConsultaKey key = new ConConsultaKey();
-								key.setIdconsulta(consultaDatos.getIdconsulta());
-								key.setIdinstitucion(consultaDatos.getIdinstitucion());
-								ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key );
-								resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos,null, consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(),consultaDatos.getIdinstitucion(),consulta.getDescripcion());
-
-							}catch (BusinessSQLException e) {
-								LOGGER.error(e);
-								throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " " + e.getMessage(), e);
-							}catch(Exception e) {
-								String mensaje = "Error al ejecutar la consulta: " + consultaDatos.getIdconsulta() + " para el envío: " + idEnvio;
-								LOGGER.error(mensaje);
-								throw new BusinessException(mensaje,e);
+//							try {
+//								ConConsultaKey key = new ConConsultaKey();
+////								key.setIdconsulta(consultaDatos.getIdconsulta());
+////								key.setIdinstitucion(consultaDatos.getIdinstitucion());
+////								ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key );
+//								//resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos,null, consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(),consultaDatos.getIdinstitucion(),"");
+//								resultDatos = _conConsultasExtendsMapper.ejecutarConsultaString(consultaEjecutarDatos);
+//							}catch (BusinessSQLException e) {
+//								LOGGER.error(e);
+//								throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " " + e.getMessage(), e);
+//							}catch(Exception e) {
+//								String mensaje = "Error al ejecutar la consulta: " + consultaDatos.getIdconsulta() + " para el envío: " + idEnvio;
+//								LOGGER.error(mensaje);
+//								throw new BusinessException(mensaje,e);
+//							}
+							consultaEjecutarDatos = _consultasService.quitarEtiquetas(consultaEjecutarDatos.toUpperCase());
+							if(consultaEjecutarDatos != null && (consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_ALTER) || consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_CREATE)
+									|| consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_DELETE) || consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_DROP)
+									|| consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_INSERT) || consultaEjecutarDatos.contains(SigaConstants.SENTENCIA_UPDATE))){
+								
+								LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + consultaEjecutarDatos);
+							}else {								
+								try {
+									resultDatos = _conConsultasExtendsMapper.ejecutarConsultaString(consultaEjecutarDatos);
+								}catch(Exception e) {
+									LOGGER.error("Error al ejecutar la consulta: " + consultaEjecutarDatos);
+									throw e;
+								}								
 							}
-							
 							//Miramos si la consulta tiene region
 							List<ConsultaItem> listaPlantillaDocConsulta = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.valueOf(idInstitucion), consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdinforme(), consultaDatos.getIdconsulta(), consultaDatos.getIdplantilladocumento());
 							
@@ -2096,7 +2147,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			hDatosGenerales.putAll(resultMulti);
 		}
 		
-		
+		LOGGER.info("Rendimiento inicio ejecucion consultas datos" );
 		// Por cada resultado ejecutamos las consultas de datos
 		LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
 		List<ConsultaItem> consultasItemFinal = new ArrayList<ConsultaItem>();
@@ -2167,7 +2218,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 //				hDatosFinal.put("region", resultDatos);
 //			}
 		}
-		
+		LOGGER.info("Rendimiento fin ejecucion consultas datos" );
 //		hDatosFinal.put("row", hDatosGenerales);
 		
 		//Obtenemos el sufijo del fichero para el caso de que se haya seleccionado el sufijo de entidad
@@ -2182,6 +2233,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 		
 		if(!esEnvio){
+			LOGGER.info("Rendimiento inicio generacion del documento con datos" );
 			LOGGER.debug("Generamos el documento");																
 			DatosDocumentoItem docGenerado = null;
 			
@@ -2224,6 +2276,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if (doc != null) {
 				listaDocumentos.add(doc);
 			}
+			
+			LOGGER.info("Rendimiento fin generacion del documento con datos" );
 		}else{
 			//Cogemos todas las consultas y le metemos el nombre del fichero
 			if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
