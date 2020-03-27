@@ -941,12 +941,19 @@ public class MenuServiceImpl implements IMenuService {
 			String [] rolesList = roles.split("::");
 			
 			for(String rol: rolesList) {
+				String rolObtenido = "";
 				String[] attributes = rol.split(" ");
 				String institucionRol = getidInstitucionByCodExterno(attributes[0]).get(0).getIdinstitucion().toString();
-				if(attributes.length == 2 && institucionRol.equals(idInstitucion)) {
-					respuesta.add(SigaConstants.getTipoUsuario(attributes[1]));
-				}else if(institucionRol.equals(idInstitucion)) {
-					respuesta.add(SigaConstants.getTipoUsuario(attributes[2]));
+				if(institucionRol.equals(idInstitucion)) {
+					if(attributes.length == 2) {
+						rolObtenido = SigaConstants.getTipoUsuario(attributes[1]);	
+					}else  {
+						rolObtenido = SigaConstants.getTipoUsuario(attributes[2]);
+					}
+					
+					if(!respuesta.contains(rolObtenido)) {
+						respuesta.add(rolObtenido);
+					}
 				}
 			}
 			

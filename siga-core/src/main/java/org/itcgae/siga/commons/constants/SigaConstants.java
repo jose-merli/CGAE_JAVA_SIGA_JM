@@ -233,7 +233,8 @@ public class SigaConstants {
 		,REPRESENTANTELEGAL("REP","RESPRESENTANTE_LEGAL","Representante Legal")
 		,REPRESENTANTEVOLUNTARIO("REPVOL","RESPRESENTANTE_VOLUNTARIO","Representante Voluntario")
 		,SECRETARIO("SEC","SECRETARIO","Secretario")
-		,VICEDECANO("VICDEC","VICEDECANO","Vicedecano");
+		,VICEDECANO("VICDEC","VICEDECANO","Vicedecano")
+		,SIGAADMIN("SAD","SIGA-Admin","SIGA-Admin");
 		
 		private String codigo = null;
 		private String recurso = null;
@@ -308,8 +309,10 @@ public class SigaConstants {
 		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.REPRESENTANTEVOLUNTARIO.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.REPRESENTANTEVOLUNTARIO.getRecurso())) {
 			return ECOM_CEN_ROLES.REPRESENTANTEVOLUNTARIO.getCodigo();
-		}
-		return null;
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.SIGAADMIN.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.SIGAADMIN.getRecurso())) {
+			return ECOM_CEN_ROLES.SIGAADMIN.getCodigo();
+		}return "";
 	}
 	
     // Tipo direcciones que tienen logica asociada
