@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.gen.ParamsItem;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 
 public interface IMenuService {
 
@@ -65,5 +66,7 @@ public interface IMenuService {
 
 
 	public ComboDTO getPerfilesColegioRol(LoginMultipleItem loginMultipleItem);
+
+	public StringDTO getTokenOldSiga(HttpServletRequest request);
 
 }

@@ -30,6 +30,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;*/
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
@@ -46,6 +47,7 @@ import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
+import org.itcgae.siga.commons.utils.TokenGenerationException;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmGestorinterfaz;
@@ -97,6 +99,8 @@ import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
+import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -1248,6 +1252,23 @@ public class MenuServiceImpl implements IMenuService {
 
 		response.setCombooItems(combos);
 		return response;
+	}
+
+	@Override
+	public StringDTO getTokenOldSiga(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		UserCgae userDesarrollo = UserTokenUtils.gerUserFromJWTToken(token);
+		
+		String header = "";
+		try {
+			header = UserTokenUtils.generateTokenOldSiga(userDesarrollo);
+		} catch (TokenGenerationException e) {
+			// TODO Auto-generated catch block
+			LOGGER.error("Se ha producido un error al generar el token de SIGA Classique");
+		}
+		StringDTO respuesta = new StringDTO();
+		respuesta.setValor(header);
+		return respuesta;
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
@@ -149,6 +150,13 @@ public class MenuController {
     	ComboItem response = menuService.getLetrado(request);
        	return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
    	}
+    
+    @RequestMapping(value = "/getTokenOldSiga", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<StringDTO> getTokenOldSiga(HttpServletRequest request) {
+    	StringDTO response = menuService.getTokenOldSiga(request);
+       	return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+   	}
+    
 
     
 }
