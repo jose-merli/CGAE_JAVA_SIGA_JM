@@ -68,5 +68,7 @@ public interface IMenuService {
 	public ComboDTO getPerfilesColegioRol(LoginMultipleItem loginMultipleItem);
 
 	public StringDTO getTokenOldSiga(HttpServletRequest request);
+	
+	public UpdateResponseDTO eliminaCookie(HttpServletRequest request);
 
 }

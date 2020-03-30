@@ -4,7 +4,9 @@ package org.itcgae.siga.gen.controllers;
 import java.security.cert.CertificateEncodingException;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -157,6 +159,20 @@ public class MenuController {
        	return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
    	}
     
-
+    /*@RequestMapping(value = "/eliminaCookie", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> eliminaCookie( HttpServletRequest request) {
+    	UpdateResponseDTO response = menuService.eliminaCookie(request);
+    	ResponseEntity<UpdateResponseDTO> response2 = new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}*/
+    @RequestMapping(value = "/eliminaCookie", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    private void eliminaCookie( HttpServletRequest request, HttpServletResponse response ) {
+    	Cookie[] cookies = request.getCookies();
+        for (Cookie cookie: cookies) {
+          cookie.setMaxAge(0);
+          cookie.setValue(null);
+          cookie.setPath("/");          
+          response.addCookie(cookie);
+         }
+    }
     
 }

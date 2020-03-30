@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -99,7 +100,6 @@ import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
-import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -565,6 +565,7 @@ public class MenuServiceImpl implements IMenuService {
 		UsuarioLogeadoDTO response = new UsuarioLogeadoDTO();
 		usuario.get(0).setPerfiles(getDescripcion(perfiles, idInstitucion));
 		usuario.get(0).setRutaLogout(getUserRoutLogout(idInstitucion));
+		usuario.get(0).setRutaLogoutCAS(getUserRoutLogoutCAS());
 		usuario.get(0).setIdPerfiles(perfiles.toString());
 		response.setUsuarioLogeadoItem(usuario);
 
@@ -815,6 +816,20 @@ public class MenuServiceImpl implements IMenuService {
 			return response;
 		}
 
+	}
+	
+	private String getUserRoutLogoutCAS() {
+
+		GenParametrosExample example = new GenParametrosExample();
+		example.createCriteria().andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_0_SHORT).andParametroEqualTo("PATH_INICIO_SESION");
+		List<GenParametros> parametros = genParametrosMapper.selectByExample(example);
+		if (null != parametros && parametros.size() > 0) {
+			String response = parametros.get(0).getValor();
+			return response;
+		}else {
+			return "";
+		}
+		
 	}
 
 	@Override
@@ -1269,6 +1284,23 @@ public class MenuServiceImpl implements IMenuService {
 		StringDTO respuesta = new StringDTO();
 		respuesta.setValor(header);
 		return respuesta;
+	}
+	
+	@Override
+	public UpdateResponseDTO eliminaCookie(HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		
+		LOGGER.debug("Eliminando cookies");
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie: cookies) {
+         LOGGER.debug("Cookie: " + cookie.getName() );
+         cookie.setMaxAge(0);
+         cookie.setValue(null);
+         cookie.setPath("/"); 
+        }
+
+		response.setStatus(SigaConstants.OK);
+		return response;
 	}
 
 }
