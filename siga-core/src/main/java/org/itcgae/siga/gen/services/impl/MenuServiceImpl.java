@@ -963,6 +963,7 @@ public class MenuServiceImpl implements IMenuService {
 			String tipoUsuario = "";
 			
 			for(String rol: rolesList) {
+				tipoUsuario = "";
 				String rolObtenido = "";
 				String[] attributes = rol.split(" ");
 				String institucionRol = getidInstitucionByCodExterno(attributes[0]).get(0).getIdinstitucion().toString();
