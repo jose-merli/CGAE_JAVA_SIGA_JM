@@ -102,6 +102,7 @@ import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -958,17 +959,41 @@ public class MenuServiceImpl implements IMenuService {
 		try {
 			String roles = (String) request.getHeader("CAS-roles");
 			String [] rolesList = roles.split("::");
+			int primero, ultimo = 0;
+			String tipoUsuario = "";
 			
 			for(String rol: rolesList) {
 				String rolObtenido = "";
 				String[] attributes = rol.split(" ");
 				String institucionRol = getidInstitucionByCodExterno(attributes[0]).get(0).getIdinstitucion().toString();
 				if(institucionRol.equals(idInstitucion)) {
-					if(attributes.length == 2) {
-						rolObtenido = SigaConstants.getTipoUsuario(attributes[1]);	
-					}else  {
-						rolObtenido = SigaConstants.getTipoUsuario(attributes[2]);
+					if(SigaUserDetailsService.isNumeric(attributes[1])) { //Si es númerico el segundo atributo
+						primero = 2; //el rol empieza en el tercero
+						if(attributes[attributes.length-1].equalsIgnoreCase("Residente")) { //Si el último atributo es Residente
+							ultimo = attributes.length -2; //la ultima palabra del rol es la penultima
+						}else {
+							ultimo = attributes.length -1; //Si no, la ultima palabra del rol es la ultima
+						}
+					}else {
+						primero = 1; //Si no es numerico, el rol empieza en el segundo atributo
+						ultimo = attributes.length -1; //Acaba en el ultimo atributo
 					}
+					
+					for(int i=primero;i<=ultimo ; i++) {
+						String constructRol = "";
+						if (i != ultimo) {
+							constructRol += attributes[i];
+
+							constructRol += " ";
+
+						} else {
+							constructRol += attributes[i];
+
+						}
+						tipoUsuario += constructRol;
+					}
+					
+					rolObtenido = SigaConstants.getTipoUsuario(tipoUsuario);	
 					
 					if(!respuesta.contains(rolObtenido)) {
 						respuesta.add(rolObtenido);

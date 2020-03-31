@@ -49,7 +49,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
                     UserAuthenticationToken cgaeAuthenticaton = (UserAuthenticationToken) authentication;
                     String username = authentication.getPrincipal() + "";
 
-                    LOGGER.info("Intento de validar certificado " + username);
+                    //LOGGER.info("Intento de validar certificado " + username);
                     // TODO: Añadir llamada a OCSPs con el certificado y comprobar
                     /*if (System.getProperty("CERT_CHECK_CONF") == null) {
                               System.setProperty("CERT_CHECK_CONF", certConfPath);

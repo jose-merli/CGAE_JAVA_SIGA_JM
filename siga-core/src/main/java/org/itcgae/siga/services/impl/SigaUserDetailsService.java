@@ -131,7 +131,7 @@ public class SigaUserDetailsService implements UserDetailsService {
 				examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(grupos[j]);
 				List<AdmPerfil> perfilesPuertaAtras = perfilMapper.selectByExample(examplePerfil );
 				
-				if(null != perfilesPuertaAtras && perfilesPuertaAtras.size()>0) {
+				if(null != perfilesPuertaAtras && perfilesPuertaAtras.size()>0 && letrado != null) {
 					/*
 					 * Tratamos solo el grupo seleccionado en el combo
 					 */
@@ -225,6 +225,8 @@ public class SigaUserDetailsService implements UserDetailsService {
 		String defaultRole = null;
 		String [] roleAttributes;
 		String codigoRol = "";
+		String tipoUsuario = "";
+		int primero, ultimo =0;
 		defaultRole = (String) request.getHeader("CAS-defaultRole");
 		if(defaultRole != null) {
 			roleAttributes = defaultRole.split(" ");
@@ -239,11 +241,33 @@ public class SigaUserDetailsService implements UserDetailsService {
 			}
 		}
 			
-		if(roleAttributes.length == 2) {
-			codigoRol = SigaConstants.getTipoUsuario(roleAttributes[1]);
+		if(isNumeric(roleAttributes[1])) { //Si es númerico el segundo atributo
+			primero = 2; //el rol empieza en el tercero
+			if(roleAttributes[roleAttributes.length-1].equalsIgnoreCase("Residente")) { //Si el último atributo es Residente
+				ultimo = roleAttributes.length -2; //la ultima palabra del rol es la penultima
+			}else {
+				ultimo = roleAttributes.length -1; //Si no, la ultima palabra del rol es la ultima
+			}
 		}else {
-			codigoRol = SigaConstants.getTipoUsuario(roleAttributes[2]);
+			primero = 1; //Si no es numerico, el rol empieza en el segundo atributo
+			ultimo = roleAttributes.length -1; //Acaba en el ultimo atributo
 		}
+		
+		for(int i=primero;i<=ultimo ; i++) {
+			String constructRol = "";
+			if (i != ultimo) {
+				constructRol += roleAttributes[i];
+
+				constructRol += " ";
+
+			} else {
+				constructRol += roleAttributes[i];
+
+			}
+			tipoUsuario += constructRol;
+		}
+
+		codigoRol = SigaConstants.getTipoUsuario(tipoUsuario);
 		
 		return codigoRol;
 	}
@@ -287,7 +311,8 @@ public class SigaUserDetailsService implements UserDetailsService {
 	public AdmRol getRolLogin(HttpServletRequest request) {
 		String defaultRole = null;
 		String [] roleAttributes;
-		String codigoRol = "";
+		String tipoUsuario = "";
+		int primero, ultimo=0;
 		defaultRole = (String) request.getHeader("CAS-defaultRole");
 		if(defaultRole != null) {
 			roleAttributes = defaultRole.split(" ");
@@ -301,14 +326,34 @@ public class SigaUserDetailsService implements UserDetailsService {
 				roleAttributes = roles.split(" ");
 			}
 		}
-			
-		if(roleAttributes.length == 2) {
-			codigoRol = roleAttributes[1];
+		
+		if(isNumeric(roleAttributes[1])) { //Si es númerico el segundo atributo
+			primero = 2; //el rol empieza en el tercero
+			if(roleAttributes[roleAttributes.length-1].equalsIgnoreCase("Residente")) { //Si el último atributo es Residente
+				ultimo = roleAttributes.length -2; //la ultima palabra del rol es la penultima
+			}else {
+				ultimo = roleAttributes.length -1; //Si no, la ultima palabra del rol es la ultima
+			}
 		}else {
-			codigoRol = roleAttributes[2];
+			primero = 1; //Si no es numerico, el rol empieza en el segundo atributo
+			ultimo = roleAttributes.length -1; //Acaba en el ultimo atributo
 		}
 		
-		List<AdmRol> roles = admRol.selectRolAccesoByExample(codigoRol);
+		for(int i=primero;i<=ultimo ; i++) {
+			String constructRol = "";
+			if (i != ultimo) {
+				constructRol += roleAttributes[i];
+
+				constructRol += " ";
+
+			} else {
+				constructRol += roleAttributes[i];
+
+			}
+			tipoUsuario += constructRol;
+		}
+		
+		List<AdmRol> roles = admRol.selectRolAccesoByExample(tipoUsuario);
 		
 		if(roles != null && !roles.isEmpty())
 			return roles.get(0);
@@ -389,4 +434,21 @@ public class SigaUserDetailsService implements UserDetailsService {
 			LOGGER.error("Se ha producido un error al crear el usuario efectivo en base de datos", e);
 		}
 	}
+	
+	public static boolean isNumeric(final String str) {
+
+        // null or empty
+        if (str == null || str.length() == 0) {
+            return false;
+        }
+
+        for (char c : str.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
 }

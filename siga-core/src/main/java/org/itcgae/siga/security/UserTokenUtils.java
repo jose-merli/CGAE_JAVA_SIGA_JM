@@ -124,7 +124,7 @@ public class UserTokenUtils {
 				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("perfiles");
 
 		String letrado = (String) Jwts.parser().setSigningKey(secretSignKey)
-				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("grupo");
+				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("letrado");
 
 		return new UserCgae(dni, grupo, institucion, permisos,perfiles,letrado, null, null);
 	}
