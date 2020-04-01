@@ -44,10 +44,8 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 		try{
-			//X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-			
-			// OLD Confirmado con CGAE que debe accederse con el usuario con id -1 siempre que se acceda por los combos
 			LOGGER.info("Se accede por los combos");
+			//String dni = "44149718E"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
 			String dni = (String) request.getHeader("CAS-username");
 			String nombre = (String) request.getHeader("CAS-displayName");
 			String grupo = "";
@@ -58,7 +56,6 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			letrado = request.getParameter("letrado");
 			
 			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,letrado, rol, nombre);
-//			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,certs[0]));
 			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,null));
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage(),e);
