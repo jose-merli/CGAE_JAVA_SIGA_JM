@@ -215,6 +215,106 @@ public class SigaConstants {
 			return mensajeError;
 		}
 	}
+	
+	public static enum ECOM_CEN_ROLES {
+		ABOGADO("ABO","ABOGADO","Abogado")
+		,NOEJERCIENTE("CNE","COLEGIADO_NO_EJERCIENTE","Colegiado No Ejerciente")
+		,PERSONAL("PER","PERSONAL","Personal")
+		,DECANO("DEC","DECANO","Decano")
+		,MIEMBROJUNTA("MJU","MIEMBRO_JUNTA","Miembro de Junta")
+		,CONSEJERO("CON","CONSEJERO","Consejero")
+		,DIRECTIVO("DIR","DIRECTIVO","Directivo")
+		,INSCRITO("INS","ABOGADO_INSCRITO","Abogado inscrito")
+		,ABOGADOEUROPEO("CCB","ABOGADO_ADVOCAT_AVOGADO_ABOKATU","Abogado Advocat Avogado Abokatu")
+		,ADMINISTRADOR("ADM","ADMINISTRADOR", "Administrador")
+		,ADMINISTRADORUNICO("ADMUNI","ADMINISTRADOR_UNICO", "Administrador Único")
+		,ADMINISTRADORSOLIDARIO("ADMSOL","ADMINISTRADOR_SOLIDARIO","Administrador Solidario")
+		,AUTORIZADO("AUT","AUTORIZADO","Autorizado")
+		,REPRESENTANTELEGAL("REP","RESPRESENTANTE_LEGAL","Representante Legal")
+		,REPRESENTANTEVOLUNTARIO("REPVOL","RESPRESENTANTE_VOLUNTARIO","Representante Voluntario")
+		,SECRETARIO("SEC","SECRETARIO","Secretario")
+		,VICEDECANO("VICDEC","VICEDECANO","Vicedecano")
+		,SIGAADMIN("SAD","SIGA-Admin","SIGA-Admin");
+		
+		private String codigo = null;
+		private String recurso = null;
+		private String descripcion = null;
+		
+		private ECOM_CEN_ROLES(String codigo, String recurso, String descripcion) {
+			this.codigo = codigo;
+			this.recurso = recurso;
+			this.descripcion = descripcion;
+		}
+		public String getCodigo() {
+			return codigo;
+		}
+		public String getRecurso() {
+			return recurso;
+		}
+		public String getDescripcion() {
+			return descripcion;
+		}
+		
+	}
+	
+	public static String getTipoUsuario(String rol) {
+		if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.PERSONAL.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.PERSONAL.getRecurso())) {
+			return ECOM_CEN_ROLES.PERSONAL.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.ABOGADO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.ABOGADO.getRecurso())) {
+			return ECOM_CEN_ROLES.ABOGADO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.NOEJERCIENTE.getDescripcion()) || 
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.NOEJERCIENTE.getRecurso())) {
+			return ECOM_CEN_ROLES.NOEJERCIENTE.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.CONSEJERO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.CONSEJERO.getRecurso())) {
+			return ECOM_CEN_ROLES.CONSEJERO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.DECANO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.DECANO.getRecurso())) {
+			return ECOM_CEN_ROLES.DECANO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.DIRECTIVO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.DIRECTIVO.getRecurso())) {
+			return ECOM_CEN_ROLES.DIRECTIVO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.MIEMBROJUNTA.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.MIEMBROJUNTA.getRecurso())) {
+			return ECOM_CEN_ROLES.MIEMBROJUNTA.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.SECRETARIO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.SECRETARIO.getRecurso())) {
+			return ECOM_CEN_ROLES.SECRETARIO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.VICEDECANO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.VICEDECANO.getRecurso())) {
+			return ECOM_CEN_ROLES.VICEDECANO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.ABOGADOEUROPEO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.ABOGADOEUROPEO.getRecurso())) {
+			return ECOM_CEN_ROLES.ABOGADOEUROPEO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.INSCRITO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.INSCRITO.getRecurso())) {
+			return ECOM_CEN_ROLES.INSCRITO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADOR.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADOR.getRecurso())) {
+			return ECOM_CEN_ROLES.ADMINISTRADOR.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADORSOLIDARIO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADORSOLIDARIO.getRecurso())) {
+			return ECOM_CEN_ROLES.ADMINISTRADORSOLIDARIO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADORUNICO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.ADMINISTRADORUNICO.getRecurso())) {
+			return ECOM_CEN_ROLES.ADMINISTRADORUNICO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.AUTORIZADO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.AUTORIZADO.getRecurso())) {
+			return ECOM_CEN_ROLES.AUTORIZADO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.REPRESENTANTELEGAL.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.REPRESENTANTELEGAL.getRecurso())) {
+			return ECOM_CEN_ROLES.REPRESENTANTELEGAL.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.REPRESENTANTEVOLUNTARIO.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.REPRESENTANTEVOLUNTARIO.getRecurso())) {
+			return ECOM_CEN_ROLES.REPRESENTANTEVOLUNTARIO.getCodigo();
+		}else if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.SIGAADMIN.getDescripcion()) ||
+				rol.equalsIgnoreCase(ECOM_CEN_ROLES.SIGAADMIN.getRecurso())) {
+			return ECOM_CEN_ROLES.SIGAADMIN.getCodigo();
+		}return "";
+	}
+	
     // Tipo direcciones que tienen logica asociada
 	public static final int TIPO_DIRECCION_CENSOWEB		= 3;
 	public static final int TIPO_DIRECCION_DESPACHO		= 2;

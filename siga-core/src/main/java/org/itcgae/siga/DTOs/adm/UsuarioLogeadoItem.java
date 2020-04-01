@@ -15,6 +15,7 @@ public class UsuarioLogeadoItem {
 	private String idioma  = null;
 	private String perfiles  = null;
 	private String rutaLogout  = null;
+	private String rutaLogoutCAS = null;
 	private String idPerfiles = null;
 
 	public String getRutaLogout() {
@@ -24,6 +25,15 @@ public class UsuarioLogeadoItem {
 
 	public void setRutaLogout(String rutaLogout) {
 		this.rutaLogout = rutaLogout;
+	}
+	
+	public String getRutaLogoutCAS() {
+		return rutaLogoutCAS;
+	}
+
+
+	public void setRutaLogoutCAS(String rutaLogoutCAS) {
+		this.rutaLogoutCAS = rutaLogoutCAS;
 	}
 
 

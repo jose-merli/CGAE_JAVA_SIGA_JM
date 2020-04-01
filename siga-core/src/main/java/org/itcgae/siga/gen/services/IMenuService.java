@@ -13,11 +13,13 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.EntornoDTO;
+import org.itcgae.siga.DTOs.gen.LoginMultipleItem;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.ParamsItem;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 
 public interface IMenuService {
 
@@ -55,5 +57,18 @@ public interface IMenuService {
 
 
 	public ParamsItem getEnvParams(HttpServletRequest request);
+
+
+	public ComboDTO getInstitucionesUsuario(HttpServletRequest request);
+
+
+	public ComboDTO getRolesUsuario(HttpServletRequest request, String idInstitucion);
+
+
+	public ComboDTO getPerfilesColegioRol(LoginMultipleItem loginMultipleItem);
+
+	public StringDTO getTokenOldSiga(HttpServletRequest request);
+	
+	public UpdateResponseDTO eliminaCookie(HttpServletRequest request);
 
 }

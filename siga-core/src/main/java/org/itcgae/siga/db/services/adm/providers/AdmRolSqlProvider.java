@@ -1,14 +1,6 @@
 package org.itcgae.siga.db.services.adm.providers;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.db.entities.AdmPerfil;
-import org.itcgae.siga.db.entities.AdmPerfilExample;
-import org.itcgae.siga.db.entities.AdmPerfilExample.Criteria;
-import org.itcgae.siga.db.entities.AdmPerfilExample.Criterion;
-import org.itcgae.siga.db.entities.AdmRolExample;
 
 public class AdmRolSqlProvider {
 
