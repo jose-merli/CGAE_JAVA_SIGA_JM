@@ -857,7 +857,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 				try {
 					modeloList = _conListadoModelosExtendsMapper
-							.selectListadoModelos(Short.valueOf(consulta.getIdInstitucion()), consulta.getIdConsulta());
+							.selectListadoModelos(Short.valueOf(consulta.getIdInstitucion()), consulta.getIdConsulta(),idInstitucion);
 					if (modeloList.size() > 0) {
 						conListadoModelosDTO.setListadoModelos(modeloList);
 					}
@@ -2245,10 +2245,13 @@ public class ConsultasServiceImpl implements IConsultasService {
 								} else {
 									iParametroBind++;
 									criteriosDinamicos = ":@" + iParametroBind + "@:";
-									codigosBind.put(new Integer(iParametroBind),
-											"'" + listaCampos.get(j).getValor() + "'");
 									if (operador.equals(SigaConstants.LIKE)) {
+										codigosBind.put(new Integer(iParametroBind),
+												 listaCampos.get(j).getValor() );
 										codigosLike.put(new Integer(iParametroBind), listaCampos.get(j).getValor());
+									}else{
+										codigosBind.put(new Integer(iParametroBind),
+												"'" + listaCampos.get(j).getValor() + "'");
 									}
 								}
 							} else {
@@ -2354,7 +2357,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 		while (indice != -1) {
 			String numero = sentenciaAux3.substring(indice + 2, sentenciaAux3.indexOf("@:", indice));
 			if (codigosLike.containsKey(new Integer(numero))) {
-				sentencia = sentencia.replaceFirst(":@" + numero + "@:",
+				sentencia = sentencia.replaceFirst(":@" + numero + "@:", 
 						"'%" + (String) codigosBind.get(new Integer(numero)) + "%'");
 			} else {
 				contadorOrdenados++;

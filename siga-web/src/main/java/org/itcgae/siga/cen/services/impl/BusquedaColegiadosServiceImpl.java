@@ -18,6 +18,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -526,10 +527,16 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 								if (!mapaEstilos.containsKey(cell)) {
 									mapaEstilos.put(cell, cellStyleString);
 								}
-								celda.setCellType(Cell.CELL_TYPE_STRING);
-								textCell = new XSSFRichTextString(
-										SigaConstants.DATE_FORMAT_MIN.format(campo));
-								celda.setCellValue(textCell);
+								
+								CreationHelper creationHelper = workbook.getCreationHelper();
+								
+								celda.setCellValue((Date) campo);
+								
+								CellStyle style1 = workbook.createCellStyle();
+								style1.setDataFormat(creationHelper.createDataFormat().getFormat(
+										"dd/mm/yyyy hh:mm"));
+								celda.setCellStyle(style1);
+								
 							} else {
 								if (!mapaEstilos.containsKey(cell)) {
 									mapaEstilos.put(cell, cellStyleString);

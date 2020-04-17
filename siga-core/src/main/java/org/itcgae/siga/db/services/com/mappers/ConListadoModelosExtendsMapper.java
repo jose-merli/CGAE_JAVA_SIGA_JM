@@ -32,5 +32,5 @@ public interface ConListadoModelosExtendsMapper {
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 				})
 	
-	List<ModelosComunicacionItem> selectListadoModelos(Short idInstitucion,String idConsulta);
+	List<ModelosComunicacionItem> selectListadoModelos(Short idInstitucion,String idConsulta, Short idInstitucionModelo);
 }

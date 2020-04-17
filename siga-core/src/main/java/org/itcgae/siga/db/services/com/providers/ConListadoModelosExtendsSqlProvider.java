@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 
 public class ConListadoModelosExtendsSqlProvider {
-	public String selectListadoModelos(Short idInstitucion, String idConsulta) {
+	public String selectListadoModelos(Short idInstitucion, String idConsulta, Short idInstitucionModelo) {
 
 		SQL sql = new SQL();
 		// Formateo de fecha para sentencia sql
@@ -44,7 +44,7 @@ public class ConListadoModelosExtendsSqlProvider {
 		
 		
 		sql.WHERE("MODELO.IDMODELOCOMUNICACION IN (SELECT IDMODELOCOMUNICACION FROM MOD_PLANTILLADOC_CONSULTA WHERE IDINSTITUCION_CONSULTA='"+idInstitucion+"' AND IDCONSULTA='"+idConsulta+"' AND FECHABAJA IS NULL)");
-//		sql.WHERE("MODELO.IDINSTITUCION='"+idInstitucion+"'");
+		sql.WHERE("MODELO.IDINSTITUCION='"+idInstitucionModelo+"'");
 		sql.WHERE("MODELO.FECHABAJA IS NULL");
 		return sql.toString();
 	}

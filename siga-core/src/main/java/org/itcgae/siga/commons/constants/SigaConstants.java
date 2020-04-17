@@ -98,8 +98,8 @@ public class SigaConstants {
 	public static final String ETIQUETAOPERADOR   	= "%%OPERADOR%%";
 	
 	public static final String NOMBRETIPOENVIO		= "TIPO ENVIO";
-	public static final String IS_NULL		= "is null";
-	public static final String LIKE		= "like";
+	public static final String IS_NULL		= "IS NULL";
+	public static final String LIKE		= "LIKE";
 	public static final String NOMBRETABLA_CEN_CLIENTE = "CEN_CLIENTE";
 	public static final String NOMBRETABLA_CEN_COLEGIADO = "CEN_COLEGIADO";
 	
@@ -965,6 +965,12 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	}
 	
 	public static String EXPRESION_REGULAR_MAIL = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,10}$";
+	public static String EXPRESION_REGULAR_MAIL2 = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                        + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+	
+	
+	
+	
 	public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";
 	
 	public static enum ECOM_ESTADOSCOLA {

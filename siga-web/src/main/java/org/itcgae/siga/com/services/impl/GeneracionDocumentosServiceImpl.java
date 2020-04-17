@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,6 +21,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -306,10 +308,16 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 										if (!mapaEstilos.containsKey(cell)) {
 											mapaEstilos.put(cell, cellStyleString);
 										}
-										celda.setCellType(Cell.CELL_TYPE_STRING);
-										textCell = new XSSFRichTextString(
-												SigaConstants.DATE_FORMAT_MIN.format(campo));
-										celda.setCellValue(textCell);
+										
+
+										CreationHelper creationHelper = workbook.getCreationHelper();
+										
+										celda.setCellValue((Date) campo);
+										
+										CellStyle style1 = workbook.createCellStyle();
+										style1.setDataFormat(creationHelper.createDataFormat().getFormat(
+												"dd/mm/yyyy hh:mm"));
+										celda.setCellStyle(style1);
 									} else {
 										if (!mapaEstilos.containsKey(cell)) {
 											mapaEstilos.put(cell, cellStyleString);

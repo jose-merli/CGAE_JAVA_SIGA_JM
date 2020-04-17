@@ -225,7 +225,7 @@ public class EnviosServiceImpl implements IEnviosService{
                       //TODO
                         
                         //public static final 
-                       Pattern EXPRESION_REGULAR_PATTERN_MAIL = Pattern.compile(SigaConstants.EXPRESION_REGULAR_MAIL, Pattern.CASE_INSENSITIVE);
+                       Pattern EXPRESION_REGULAR_PATTERN_MAIL = Pattern.compile(SigaConstants.EXPRESION_REGULAR_MAIL2, Pattern.CASE_INSENSITIVE);
                        if (!EXPRESION_REGULAR_PATTERN_MAIL.matcher(sTo).matches()) {
                     	   throw new BusinessException("ERROR: El destinatario no tiene dirección de correo electrónico válida");
                        }
