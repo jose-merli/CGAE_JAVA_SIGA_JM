@@ -1427,7 +1427,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				Iterator<String> itr = request.getFileNames();
 				MultipartFile file = request.getFile(itr.next());
 
-				String fileName = file.getOriginalFilename();
+				String fileNameOriginal = file.getOriginalFilename();
+				String fName = Long.toString(System.currentTimeMillis());
 
 				try {
 
@@ -1436,16 +1437,17 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 					SIGAHelper.addPerm777(serverFile);
 
-					serverFile = new File(serverFile, fileName);
+					serverFile = new File(serverFile, fName);
+					LOGGER.info("uploadFile() -> Ruta del fichero subido: " + serverFile.getAbsolutePath());
 					if (serverFile.exists()) {
-						LOGGER.error("Ya existe el fichero: " + pathFichero + fileName);
+						LOGGER.error("Ya existe el fichero: " + serverFile.getAbsolutePath());
 						throw new FileAlreadyExistsException("El fichero ya existe");
 					}
 					// stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 					// stream.write(file.getBytes());
 					FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
-					response.setNombreDocumento(fileName);
-					response.setRutaDocumento(fileName);
+					response.setNombreDocumento(fileNameOriginal);
+					response.setRutaDocumento(fName);
 				} catch (FileNotFoundException e) {
 					Error error = new Error();
 					error.setCode(500);
