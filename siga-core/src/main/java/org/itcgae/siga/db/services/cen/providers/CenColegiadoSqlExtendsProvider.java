@@ -146,7 +146,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		if (colegiadoItem.getApellidos() != null && colegiadoItem.getApellidos() != "") {
 			
 			String columna = "REPLACE(CONCAT(per.apellidos1,per.apellidos2), ' ', '')";
-			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+","");
+			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+","%"); 
 			
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 			
@@ -988,7 +988,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		if (colegiadoItem.getApellidos() != null && colegiadoItem.getApellidos() != "") {
 			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
-			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+","");
+			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+","%"); 
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 			
 //			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" +colegiadoItem.getApellidos().replaceAll("\\s+","")

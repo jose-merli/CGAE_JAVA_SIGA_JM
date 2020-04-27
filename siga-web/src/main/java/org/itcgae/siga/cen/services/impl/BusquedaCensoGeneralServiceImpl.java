@@ -224,6 +224,12 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 									busquedaPerFisica.setNif(
 											colegiadoName[i].getDatosPersonales().getIdentificacion().getPasaporte());
 								}
+								
+								if (colegiadoName[i].getDatosPersonales().getSexo() != null) {
+									busquedaPerFisica
+											.setSexo(colegiadoName[i].getDatosPersonales().getSexo().toString());
+
+								}
 
 								if (busquedaPerFisica.getNif() != null) {
 									// Extraemos el idPersona
@@ -310,6 +316,7 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 									busquedaPerFisica.setDomicilio(colegiadoName[i].getLocalizacion().getDomicilio());
 
 								}
+
 								busquedaPerFisicaItems.add(busquedaPerFisica);
 							}
 						}
@@ -626,6 +633,11 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 									}
 									if (null != colegiado.getLocalizacion()) {
 										busquedaPerFisica.setDomicilio(colegiado.getLocalizacion().getDomicilio());
+
+									}
+									if (colegiado.getDatosPersonales().getSexo() != null) {
+										busquedaPerFisica
+												.setSexo(colegiado.getDatosPersonales().getSexo().toString());
 
 									}
 
