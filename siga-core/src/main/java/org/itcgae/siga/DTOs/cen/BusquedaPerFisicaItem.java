@@ -32,8 +32,18 @@ public class BusquedaPerFisicaItem {
 	private String idEstadoCivil;
 	private String idTratamiento;
 	private String naturalDe;
+	private String idInstitucion;
 	
-	
+	@JsonProperty("idInstitucion")
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+
+
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+
 
 	/**
 	 *
@@ -448,6 +458,7 @@ public class BusquedaPerFisicaItem {
 	    		Objects.equals(this.sexo, busquedaFisicaItem.sexo) &&
 	    		Objects.equals(this.idEstadoCivil, busquedaFisicaItem.idEstadoCivil) &&
 	    		Objects.equals(this.idTratamiento, busquedaFisicaItem.idTratamiento) &&
+	    		Objects.equals(this.idInstitucion, busquedaFisicaItem.idInstitucion) &&
 	    	    Objects.equals(this.naturalDe, busquedaFisicaItem.naturalDe);
 	}
  
@@ -456,7 +467,7 @@ public class BusquedaPerFisicaItem {
 	public int hashCode() {
 	    return Objects.hash(colegio, idPersona, nif, nombre, apellidos, primerApellido, segundoApellido, numeroColegiado, residente, 
 	    		situacion, fechaNacimiento, numeroInstitucion, idProvincia, idActividadProfesional, sexo, 
-	    		idEstadoCivil,idTratamiento, naturalDe);
+	    		idEstadoCivil,idTratamiento,idInstitucion, naturalDe);
 	}
 
 	
@@ -482,6 +493,7 @@ public class BusquedaPerFisicaItem {
 	    sb.append("    sexo: ").append(toIndentedString(sexo)).append("\n");
 	    sb.append("    idEstadoCivil: ").append(toIndentedString(idEstadoCivil)).append("\n");
 	    sb.append("    idTratamiento: ").append(toIndentedString(idTratamiento)).append("\n");
+	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 	    sb.append("    naturalDe: ").append(toIndentedString(naturalDe)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
