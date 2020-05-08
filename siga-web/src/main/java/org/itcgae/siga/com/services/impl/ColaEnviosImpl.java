@@ -167,6 +167,17 @@ public class ColaEnviosImpl implements IColaEnvios {
 				}
 
 			}
+			List<EnvEnvios> enviosBasura = _envEnviosExtendsMapper.obtenerEnviosMalCreados();
+			if (enviosBasura != null && enviosBasura.size() > 0) {
+				for (EnvEnvios envioBasura : enviosBasura) {
+					envio = envioBasura;
+					LOGGER.info("Listener envios => Se ha encontrado envio mal creado y se procederá a su cambio de estado a Error con ID: " + envio.getIdenvio());
+					envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
+					envio.setFechamodificacion(new Date());
+					_envEnviosMapper.updateByPrimaryKey(envio);
+				}
+			}
+			
 		}catch(Exception e){
 			LOGGER.error("Error al procesar el envío", e);
 			envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
@@ -851,7 +862,9 @@ public class ColaEnviosImpl implements IColaEnvios {
 				listDestinatarioItems.add(destinatarioItem);
 				idSolicitudEcos = _enviosService.envioSMS(remitente, listDestinatarioItems, envio, cuerpoFinal, isBuroSMS);
 				LOGGER.debug("El idSolicitudEcos para el número " + envDestinatariosBurosms.getMovil() + " es " + idSolicitudEcos);
-				if (isBuroSMS && idSolicitudEcos != null && !idSolicitudEcos.trim().equals("")) {
+				if (idSolicitudEcos != null && !idSolicitudEcos.trim().equals("")) {
+					if (isBuroSMS) {
+						
 					
 					//añadimos un documento vacío para que al descargar desde la web vayamos a buscar el pdf a la pfd
 					EnvDocumentos envDocumentos = addEnvDocument(envio.getIdenvio(), envio.getIdinstitucion(), envDestinatariosBurosms.getMovil());
@@ -862,7 +875,12 @@ public class ColaEnviosImpl implements IColaEnvios {
 					envDestinatariosBurosms.setIdsolicitudecos(idSolicitudEcos);
 					envDestinatariosBurosms.setIddocumento(envDocumentos.getIddocumento());
 					
-					buroSMSenviados += envDestinatariosBurosmsMapper.insert(envDestinatariosBurosms);						
+					buroSMSenviados += envDestinatariosBurosmsMapper.insert(envDestinatariosBurosms);	
+					}
+				}else{
+					hayError = true;
+					LOGGER.error("Error al enviar el sms al destinatario: " + envDestinatariosBurosms.getMovil());
+					
 				}
 			}catch(Exception e) {
 				hayError = true;

@@ -388,7 +388,13 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				pysServiciossolicitados.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
 				pysServiciossolicitados.setIdpersona(inscripcion.getIdPersona());
 				pysServiciossolicitados.setCantidad(1);
-				pysServiciossolicitados.setIdformapago(Short.valueOf("10"));
+				if (null != inscripcion.getFormaPago() ) {
+					pysServiciossolicitados.setIdformapago(Short.valueOf(inscripcion.getFormaPago().toString()));
+				}else{
+					pysServiciossolicitados.setIdformapago(Short.valueOf("10"));
+				}
+			
+				
 
 				LOGGER.info(
 						"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para insertar el servicio solicitado");
@@ -408,7 +414,11 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				pysSuscripcion.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
 				pysSuscripcion.setIdpersona(inscripcion.getIdPersona());
 				pysSuscripcion.setCantidad(1);
-				pysSuscripcion.setIdformapago(Short.valueOf("10"));
+				if (null != inscripcion.getFormaPago() ) {
+					pysSuscripcion.setIdformapago(Short.valueOf(inscripcion.getFormaPago().toString()));
+				}else{
+					pysSuscripcion.setIdformapago(Short.valueOf("10"));
+				}
 				pysSuscripcion.setFechasuscripcion(new Date());
 
 				CursoItem curso = forCursoExtendsMapper.searchCourseByIdcurso(inscripcion.getIdCurso(), idInstitucion,

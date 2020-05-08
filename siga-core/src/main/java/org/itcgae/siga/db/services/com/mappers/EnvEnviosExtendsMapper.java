@@ -110,7 +110,7 @@ public interface EnvEnviosExtendsMapper {
                 @Result(column = "csv", property = "csv", jdbcType = JdbcType.VARCHAR),
                 @Result(column = "idsolicitudecos", property = "idsolicitudecos", jdbcType = JdbcType.VARCHAR),
                 @Result(column = "envio", property = "envio", jdbcType = JdbcType.VARCHAR),
-                @Result(column = "idmodelocomunicacion", property = "idmodelocomunicacion", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "idmodelocomunicacion", property = "idmodelocomunicacion", jdbcType = JdbcType.NUMERIC)
                 
       })
       List<EnvEnvios> obtenerEnviosProgramados();
@@ -145,5 +145,15 @@ public interface EnvEnviosExtendsMapper {
                 @Result(column = "NUMDEST", property = "numDestinatarios", jdbcType = JdbcType.NUMERIC)
       })
       List<EnviosMasivosItem> obtenerDestinatarios(Short idInstitucion, String idEnvios);
+
+      
+      @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "obtenerEnviosMalCreados")
+      @Results({@Result(column = "idinstitucion", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "idenvio", property = "idenvio", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "fecha", property = "fecha", jdbcType = JdbcType.DATE)
+                
+      })
+      List<EnvEnvios> obtenerEnviosMalCreados();
+	
 
 }

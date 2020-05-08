@@ -684,12 +684,7 @@ public class EnviosServiceImpl implements IEnviosService{
             
             
             
-            EnviarSMSResponseDocument responseDoc = EnviarSMSResponseDocument.Factory.newInstance();            
-            EnviarSMS sms = EnviarSMS.Factory.newInstance();
-            sms.setEnviarSMSRequest(request);
-            
-            EnviarSMSDocument requestDoc = EnviarSMSDocument.Factory.newInstance();
-            requestDoc.setEnviarSMS(sms);
+
             
             if (listCorrectos != null && listCorrectos.size() > 0) {
             	
@@ -698,7 +693,12 @@ public class EnviosServiceImpl implements IEnviosService{
             		listaTOs[i] = listEnvDestinatarios.get(i).getMovil();
             	}
             	request.setListaTOsArray(listaTOs);
-            	
+                EnviarSMSResponseDocument responseDoc = EnviarSMSResponseDocument.Factory.newInstance();            
+                EnviarSMS sms = EnviarSMS.Factory.newInstance();
+                sms.setEnviarSMSRequest(request);
+                
+                EnviarSMSDocument requestDoc = EnviarSMSDocument.Factory.newInstance();
+                requestDoc.setEnviarSMS(sms);
 	            try {
 	                responseDoc = _clientECOS.enviarSMS(uriService, requestDoc);    
 	                response = responseDoc.getEnviarSMSResponse();

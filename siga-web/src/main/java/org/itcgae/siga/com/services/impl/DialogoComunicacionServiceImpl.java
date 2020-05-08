@@ -1409,6 +1409,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 
 	@Override
+	@Transactional
 	public Error generarEnvios(HttpServletRequest request, DialogoComunicacionItem dialogo) {
 		LOGGER.info("generarEnvios() -> Entrada al servicio para generar los envíos");
 		

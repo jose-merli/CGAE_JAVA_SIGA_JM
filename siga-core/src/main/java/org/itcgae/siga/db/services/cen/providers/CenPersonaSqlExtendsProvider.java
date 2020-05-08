@@ -55,12 +55,32 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 				"NVL(CA.DESCRIPCION, DECODE(PER.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) AS ESTADOCOLEGIAL");
 		// sql.SELECT("CA.DESCRIPCION AS ESTADOCOLEGIAL");
 		sql.SELECT("DECODE(COL.SITUACIONRESIDENTE,'0','NO','1','SI') AS RESIDENTE");
-		sql.SELECT("MAX(DIR.IDPROVINCIA)  AS IDPROVINCIA");
+		
 		sql.SELECT("ACT.IDACTIVIDADPROFESIONAL");
 		sql.SELECT("PER.SEXO");
 		sql.SELECT("PER.IDESTADOCIVIL");
 		sql.SELECT("CLI.IDTRATAMIENTO");
 		sql.SELECT("PER.NATURALDE");
+        sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,1) AS Domicilio");
+        sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,2) AS CodigoPostal");
+        sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,11) AS Telefono1");
+        sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,12) AS Telefono2");
+        sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,13) AS Movil");
+        sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,14) AS Fax1");
+        sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,15) AS Fax2");
+        sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,3) AS nombrePoblacion");
+        sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,16) AS CorreoElectronico");
+
+        sql.SELECT("(select idprovincia   from CEN_DIRECCIONES DIR  where dir.fechabaja is null  and dir.idinstitucion = cli.idinstitucion    and dir.idpersona = per.idpersona     "
+        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = dir.idinstitucion  and dir.idpersona = dir.idpersona  "
+        		+ "and dir.iddireccion = DIR.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as provincia");
+        sql.SELECT("(select idpoblacion   from CEN_DIRECCIONES DIR  where dir.fechabaja is null  and dir.idinstitucion = cli.idinstitucion    and dir.idpersona = per.idpersona     "
+        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = dir.idinstitucion  and dir.idpersona = dir.idpersona  "
+        		+ "and dir.iddireccion = DIR.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as poblacion");
+        sql.SELECT("(select idpais   from CEN_DIRECCIONES DIR  where dir.fechabaja is null  and dir.idinstitucion = cli.idinstitucion    and dir.idpersona = per.idpersona     "
+        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = dir.idinstitucion  and dir.idpersona = dir.idpersona  "
+        		+ "and dir.iddireccion = DIR.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as pais");        
+        
 
 		sql.FROM("CEN_PERSONA PER");
 		// Mybatis cambia el orden de inner join y left_outer_join con sus funciones
@@ -96,15 +116,9 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 				"GEN_RECURSOS_CATALOGOS CA ON (ESTADOCOLEGIAL.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '"
 						+ idLenguaje + "')");
 		sql.LEFT_OUTER_JOIN(
-				"CEN_DIRECCIONES DIR ON (PER.IDPERSONA = DIR.IDPERSONA AND CLI.IDINSTITUCION = DIR.IDINSTITUCION)");
-		sql.LEFT_OUTER_JOIN(
 				"CEN_NOCOLEGIADO_ACTIVIDAD ACT ON (PER.IDPERSONA = ACT.IDPERSONA AND CLI.IDINSTITUCION = ACT.IDINSTITUCION)");
 		sql.WHERE("PER.IDTIPOIDENTIFICACION NOT IN ('20')");
-		sql.GROUP_BY(
-				"PER.IDPERSONA, PER.NOMBRE , CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2) , PER.APELLIDOS1 , PER.APELLIDOS2 , PER.NIFCIF , PER.FECHANACIMIENTO, I.ABREVIATURA , "
-						+ "I.IDINSTITUCION, NVL(DECODE(NVL(COL.COMUNITARIO,0),0, COL.NCOLEGIADO, COL.NCOMUNITARIO), COL.NCOLEGIADO) ,NVL(CA.DESCRIPCION, DECODE(PER.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) ,"
-						+ " DECODE(COL.SITUACIONRESIDENTE,'0','NO','1','SI') , ACT.IDACTIVIDADPROFESIONAL, PER.SEXO, PER.IDESTADOCIVIL, PER.NATURALDE, CLI.IDTRATAMIENTO");
-
+	
 		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
 			sql.WHERE("PER.NIFCIF = '" + busquedaPerFisicaSearchDTO.getNif() + "'");
 		}

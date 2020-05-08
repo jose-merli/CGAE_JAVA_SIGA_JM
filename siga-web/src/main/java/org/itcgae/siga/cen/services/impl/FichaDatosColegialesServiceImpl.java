@@ -22,6 +22,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -707,6 +708,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		boolean existeDummy = false;
 		Date fechaEstadoNueva = null;
 		Date colegiadoSiguienteFechaEstado = null;
+		boolean updateEstado = false;
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -886,15 +888,16 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 												|| !colegiadoItem.getIdEstado().equals(String.valueOf(cenDatoscolegialesestadosBBDD.getIdestado()))
 												|| (colegiadoItem.getFechaEstadoNueva() != null && colegiadoItem.getFechaEstadoNueva().compareTo(cenDatoscolegialesestadosBBDD.getFechaestado()) != 0)) {
 									updateDate = true;
+									updateEstado = true;
 								}
 							}
 
-							if (colegiadoSiguienteFechaEstado != null) {
-								if (colegiadoSiguienteFechaEstado.before(colegiadoItem.getFechaEstado())
-										&& colegiadoItem.getFechaEstado().before(new Date())) {
-									updateDate = true;
-								}
-							}
+//							if (colegiadoSiguienteFechaEstado != null) {
+//								if (colegiadoSiguienteFechaEstado.before(colegiadoItem.getFechaEstado())
+//										&& colegiadoItem.getFechaEstado().before(new Date())) {
+//									updateDate = true;
+//								}
+//							}
 
 							if (updateDate) {
 								datosColegiales.setFechamodificacion(new Date());
@@ -913,13 +916,14 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							if(datosColegiales.getObservaciones() == null) {
 								datosColegiales.setObservaciones("");
 							}
-							LOGGER.info(
-									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para actualizar el estado colegial");
-							resultado += cenDatoscolegialesestadoExtendsMapper.updateEstadoColegial(datosColegiales,
-									fechaEstadoNueva);
-							LOGGER.info(
-									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para para actualizar el estado colegial");
-
+							if(updateDate) {
+								LOGGER.info(
+										"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para actualizar el estado colegial");
+								resultado += cenDatoscolegialesestadoExtendsMapper.updateEstadoColegial(datosColegiales,
+										fechaEstadoNueva);
+								LOGGER.info(
+										"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para para actualizar el estado colegial");
+							}
 							if (ejecutarPL) {
 								int res = 0;
 								
@@ -1059,7 +1063,11 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						}
 
 					} else {
+						if(updateEstado){
 						response.setStatus(SigaConstants.KO);
+						}else{
+							response.setStatus(SigaConstants.OK);
+						}
 					}
 				} catch (Exception e) {
 					LOGGER.error("Error Datos Colegiales", e);
@@ -1699,5 +1707,160 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		
 		MaxIdDto id = cenColacambioletradoMapper.selectNuevoId(idInstitucion, idPersona);
 		return id.idMax;
+	}
+
+	@Override
+	public UpdateResponseDTO datosColegialesUpdateMasivo(ColegiadoItemDTO listColegiadoItem,
+			HttpServletRequest request) {
+
+		LOGGER.info("datosColegialesUpdateMasivo() -> Entrada al servicio para la actualizacion de estados colegiales");
+		ColegiadoItem colegiadoItem = listColegiadoItem.getColegiadoItem();
+		InsertResponseDTO responseinsert = new InsertResponseDTO();
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		response.setStatus(SigaConstants.OK);
+		responseinsert.setStatus(SigaConstants.OK);
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"datosColegialesUpdateMasivo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"datosColegialesUpdateMasivo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				// if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"datosColegialesUpdateMasivo() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
+				//1. Actualizamos el colegiado
+				CenColegiadoKey colegiadoKey = new CenColegiadoKey();
+				colegiadoKey.setIdinstitucion(idInstitucion);
+				colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+				CenColegiado cenColegiadoAnterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey);
+				CenColegiado colegiado = new CenColegiado();
+				colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+				colegiado.setIdinstitucion(idInstitucion);
+				colegiado.setUsumodificacion(usuario.getIdusuario());
+				/*if (colegiadoItem.getNumColegiado() != null) {
+					colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+				}*/
+				if (colegiadoItem.getIdTiposSeguro() != null && colegiadoItem.getIdTiposSeguro() != "") {
+					colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
+				} else {
+					colegiado.setIdtiposseguro(null);
+				}
+				if (colegiadoItem.getSituacionResidente() != null) {
+					colegiado.setSituacionresidente(
+							colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
+				} else {
+					colegiado.setSituacionresidente("0");
+				}
+
+				if (colegiadoItem.getComunitario() != null) {
+					colegiado.setComunitario(colegiadoItem.getComunitario());
+					if (colegiadoItem.getNumColegiado() != null) {
+						if (colegiadoItem.getComunitario().equals("1")) {
+							colegiado.setNcomunitario(colegiadoItem.getNumColegiado());
+						}else{
+							
+							colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+						}
+					}
+				}else{
+					if (colegiadoItem.getNumColegiado() != null) {
+						colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+					}
+				}
+				if (colegiadoItem.getnMutualista() != null && colegiadoItem.getnMutualista() != "") {
+					colegiado.setNmutualista(colegiadoItem.getnMutualista());
+				} else {
+					colegiado.setNmutualista(null);
+				}
+
+				
+				colegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
+				colegiado.setFechatitulacion(colegiadoItem.getFechaTitulacionDate());
+				colegiado.setFechapresentacion(colegiadoItem.getFechapresentacionDate());
+				colegiado.setFechajura(colegiadoItem.getFechaJuraDate());
+
+				colegiado.setFechamodificacion(new Date());
+
+				int responseUpdateColegiado = cenColegiadoExtendsMapper.updateColegiado(colegiado);
+				LOGGER.info(
+						"datosColegialesUpdateMasivo() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para actualización de Colegiados");
+
+				LOGGER.info(
+						"datosColegialesUpdateMasivo() / Entrada Actualizamos los estados de la tabla");
+
+				//2 actualizamos los estados
+				response = this.datosColegialesUpdateEstados(listColegiadoItem.getColegiadoItemEstados(), request);
+				
+
+				LOGGER.info(
+						"datosColegialesUpdateMasivo() / Salida Actualizamos los estados de la tabla");
+				if (response.getStatus().equals(SigaConstants.OK)) {
+					
+				
+					//3 Insertamos el estado si así precisa
+					if (null != listColegiadoItem.getNuevocolegiadoItem() && null != listColegiadoItem.getNuevocolegiadoItem().getIdPersona()) {
+
+						LOGGER.info(
+								"datosColegialesUpdateMasivo() / Entrada a insertar primer estado de la tabla");
+						responseinsert = this.datosColegialesInsertEstado(listColegiadoItem.getNuevocolegiadoItem(), request);
+
+						LOGGER.info(
+								"datosColegialesUpdateMasivo() / Salida a insertar primer estado de la tabla");
+					}
+					
+				}
+				
+				
+				
+				
+				
+				//4 Añadimos auditoria
+				if (responseUpdateColegiado >= 1 && response.getStatus().equals(SigaConstants.OK) && responseinsert.getStatus().equals(SigaConstants.OK)) {
+
+					// Añadimos auditoria
+					if (!UtilidadesString.esCadenaVacia(colegiadoItem.getMotivo())) {
+
+						LOGGER.info(
+								"datosColegialesUpdateMasivo() / Entrada a insertar auditoria");
+						colegiadoKey.setIdinstitucion(idInstitucion);
+						colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+						CenColegiado cenColegiadoPosterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey);
+						// AUDITORIA => actualizamos cen_historico si todo es correcto
+						auditoriaCenHistoricoService.manageAuditoriaDatosColegiales(cenColegiadoAnterior,
+								cenColegiadoPosterior, "UPDATE", request, colegiadoItem.getMotivo());
+						LOGGER.info(
+								"datosColegialesUpdateMasivo() / Salida a insertar auditoria");
+					}
+
+					response.setStatus(SigaConstants.OK);
+
+				} else {
+					response.setStatus(SigaConstants.KO);
+				}
+
+			} else {
+				LOGGER.warn(
+						"datosColegialesUpdate() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+				response.setStatus(SigaConstants.KO);
+			}
+
+		} else {
+			LOGGER.warn("datosColegialesUpdate() -> idInstitucion del token nula");
+			response.setStatus(SigaConstants.KO);
+		}
+
+		LOGGER.info("datosColegialesUpdate() -> Salida del servicio para la búsqueda por filtros de Colegiados");
+		return response;
 	}
 }

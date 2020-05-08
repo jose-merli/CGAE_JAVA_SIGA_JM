@@ -1850,6 +1850,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							inscripcionInsert.setIdpersona(inscripcion.getIdPersona());
 							inscripcionInsert.setUsumodificacion(usuario.getIdusuario().longValue());
 							inscripcionInsert.setIdcargainscripcion(forInscripcionesmasivas.getIdcargainscripcion());
+							if (null != inscripcion.getFormaPago()) {
+								inscripcionInsert.setIdformapago(Long.parseLong(inscripcion.getFormaPago()));
+							}
 
 							LOGGER.info(
 									"uploadFileExcel() / forInscripcionExtendsMapper.insert(inscripcionInsert) -> Entrada a forInscripcionExtendsMapper para insertar una inscripcion");
@@ -2684,7 +2687,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 												Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
 										pysServiciossolicitados.setIdpersona(inscription.getIdpersona());
 										pysServiciossolicitados.setCantidad(1);
-										pysServiciossolicitados.setIdformapago(Short.valueOf("10"));
+										pysServiciossolicitados.setIdformapago(Short.valueOf(inscription.getIdformapago().toString()));
 
 										LOGGER.info(
 												"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para insertar el servicio solicitado");
@@ -2706,7 +2709,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 												Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
 										pysSuscripcion.setIdpersona(inscription.getIdpersona());
 										pysSuscripcion.setCantidad(1);
-										pysSuscripcion.setIdformapago(Short.valueOf("10"));
+										pysSuscripcion.setIdformapago(Short.valueOf(inscription.getIdformapago().toString()));
 										pysSuscripcion.setFechasuscripcion(new Date());
 
 										CursoItem curso = forCursoExtendsMapper.searchCourseByIdcurso(

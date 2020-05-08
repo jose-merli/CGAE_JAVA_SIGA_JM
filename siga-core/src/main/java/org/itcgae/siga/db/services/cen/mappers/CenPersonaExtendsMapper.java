@@ -61,6 +61,18 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "IDESTADOCIVIL", property = "idEstadoCivil", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTRATAMIENTO", property = "idTratamiento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NATURALDE", property = "naturalDe", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Poblacion", property = "idPoblacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "correoelectronico", property = "correoelectronico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Movil", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fax2", property = "fax1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fax2", property = "fax2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Telefono2", property = "telefono2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Telefono1", property = "telefono1", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "CodigoPostal", property = "codigoPostal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Domicilio", property = "direccion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "provincia", property = "idProvincia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombrePoblacion", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "pais", property = "idPais", jdbcType = JdbcType.VARCHAR)
 	})
 	List<BusquedaPerFisicaItem> searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje, String idInstitucion);
 	

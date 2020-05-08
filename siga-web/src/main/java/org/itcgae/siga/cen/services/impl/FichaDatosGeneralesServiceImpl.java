@@ -55,6 +55,8 @@ import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
+import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
+import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
@@ -74,6 +76,7 @@ import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
+import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenSolicmodifcambiarfotoMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -112,6 +115,13 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
+	
+	@Autowired
+	private CenDireccionTipodireccionMapper cenDireccionTipoDireccionMapper;
+	
+	
+	@Autowired
+	private CenDireccionesExtendsMapper _cenDireccionesMapper;
 
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoMapper;
@@ -1720,6 +1730,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 									// Comprobamos si existe algun tema para el curso y les damos de baja
 								}
 
+								//Creamos la dirección si ya la tuviera.
+								if (null != noColegiadoItem.getIdPoblacion() || null != noColegiadoItem.getIdProvincia()) {
+									Long idDireccion = insertarDatosDireccion(noColegiadoItem, usuario, idPersona);
+								} 
 							} else {
 								insertResponseDTO.setStatus(SigaConstants.KO);
 								LOGGER.warn(
@@ -1752,6 +1766,74 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		}
 
 		return insertResponseDTO;
+	}
+
+	private Long insertarDatosDireccion(NoColegiadoItem noColegiadoItem, AdmUsuarios usuario, Long idPersona) {
+		
+		CenDirecciones direccion = new CenDirecciones();
+		
+		//Creamos la direccion con los tipos de direccion oblogatorios
+		 List<DatosDireccionesItem> direccionID = _cenDireccionesMapper.selectNewIdDireccion(idPersona.toString(),usuario.getIdinstitucion().toString());
+		
+		direccion.setIddireccion(Long.valueOf(direccionID.get(0).getIdDireccion()));
+		direccion.setCodigopostal(noColegiadoItem.getCodigoPostal());
+		direccion.setCorreoelectronico(noColegiadoItem.getCorreoelectronico());
+		direccion.setDomicilio(noColegiadoItem.getDomicilio());
+		if(noColegiadoItem.getFax1() != null)direccion.setFax1(noColegiadoItem.getFax1());
+		if(noColegiadoItem.getFax2() != null)direccion.setFax1(noColegiadoItem.getFax2());
+		direccion.setFechamodificacion(new Date());
+		direccion.setIdinstitucion(usuario.getIdinstitucion());
+		direccion.setIdpersona(idPersona);
+		if(noColegiadoItem.getIdPoblacion()!= null)direccion.setIdpoblacion(noColegiadoItem.getIdPoblacion());
+		if(noColegiadoItem.getIdProvincia()!= null)direccion.setIdprovincia(noColegiadoItem.getIdProvincia());
+		if(noColegiadoItem.getTelefono1()!= null)direccion.setTelefono1(noColegiadoItem.getTelefono1());
+		if(noColegiadoItem.getTelefono2()!= null)direccion.setTelefono1(noColegiadoItem.getTelefono2());
+		direccion.setMovil(noColegiadoItem.getMovil());
+		direccion.setUsumodificacion(usuario.getIdusuario());
+		
+		if(noColegiadoItem.getIdPais()!= null){
+			direccion.setIdpais(noColegiadoItem.getIdPais());
+		}else{
+			//Ponemos por defecto España
+			direccion.setIdpais("191");
+		}
+			
+			
+		//Añadimos las preferencias de direccion obligatorias
+		direccion.setPreferente("ECS");
+		
+		_cenDireccionesMapper.insert(direccion);
+		
+		CenDireccionTipodireccion tipoDireccion =  new CenDireccionTipodireccion();
+		tipoDireccion.setFechamodificacion(new Date());
+		tipoDireccion.setIddireccion(direccion.getIddireccion());
+		tipoDireccion.setIdinstitucion(usuario.getIdinstitucion());
+		tipoDireccion.setIdpersona(idPersona);
+		tipoDireccion.setUsumodificacion(usuario.getIdusuario());
+		
+		//Añadimos los tipo de direcciones obligatorios
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_TRASPASO));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_FACTURACION));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_CENSOWEB));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUIAJUDICIAL));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUARDIA));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_CORREO));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_SMS));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		
+		return direccion.getIddireccion();
+		
 	}
 
 	@Override

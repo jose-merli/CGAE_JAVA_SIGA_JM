@@ -1,15 +1,28 @@
 package org.itcgae.siga.form.services.impl;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.AsociarPersonaDTO;
+import org.itcgae.siga.DTOs.cen.FicheroDTO;
+import org.itcgae.siga.DTOs.cen.MandatosDownloadDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -20,10 +33,14 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenAnexosCuentasbancarias;
+import org.itcgae.siga.db.entities.CenAnexosCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
+import org.itcgae.siga.db.entities.CenMandatosCuentasbancarias;
+import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.ForCertificadoscurso;
@@ -31,19 +48,28 @@ import org.itcgae.siga.db.entities.ForCertificadoscursoExample;
 import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForInscripcion;
 import org.itcgae.siga.db.entities.ForInscripcionExample;
+import org.itcgae.siga.db.entities.GenFichero;
+import org.itcgae.siga.db.entities.GenFicheroKey;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosExample;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
 import org.itcgae.siga.db.entities.PysProductossolicitados;
 import org.itcgae.siga.db.entities.PysServiciossolicitados;
 import org.itcgae.siga.db.entities.PysSuscripcion;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.mappers.PysServiciossolicitadosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCertificadoscursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
-import org.itcgae.siga.db.services.form.mappers.ForModopagoExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysPeticioncomprasuscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysProductossolicitadosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosExtendsMapper;
@@ -54,6 +80,8 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
@@ -64,8 +92,18 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 	private ForInscripcionExtendsMapper forInscripcionExtendsMapper;
 	
 	@Autowired
+	private PysFormapagoExtendsMapper pysFormapagoExtendsMapper;
+
+
+	@Autowired
 	private ForCursoExtendsMapper forCursoExtendsMapper;
 
+	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;
+	
+	@Autowired
+	private GenFicheroExtendsMapper genFicheroExtendsMapper;
+	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
@@ -100,9 +138,9 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 	@Autowired
 	private PysServiciossolicitadosMapper pysServiciossolicitadosMapper;
 	
-	@Autowired
-	private ForModopagoExtendsMapper forModopagoExtendsMapper;
 
+	@Autowired
+	private GenRecursosMapper genRecursosMapper;
 	
 	@Override
 	public CursoItem searchCourse(String idCurso, HttpServletRequest request) {
@@ -279,6 +317,10 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 					forInscripcionInsert.setIdcurso(Long.parseLong(inscripcionItem.getIdCurso()));
 					forInscripcionInsert.setIdpersona(inscripcionItem.getIdPersona());
 					forInscripcionInsert.setIdestadoinscripcion(Long.parseLong(inscripcionItem.getIdEstadoInscripcion()));	
+					if (null != inscripcionItem.getFormaPago()) {
+						forInscripcionInsert.setIdformapago(Long.parseLong(inscripcionItem.getFormaPago()));
+					}
+					
 					
 					LOGGER.info(
 							"saveInscripcion() / forInscripcionExtendsMapper.insertSelective(forInscripcionInsert) -> Entrada a forInscripcionExtendsMapper para insertar una inscripcion");
@@ -875,7 +917,10 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"getPaymentMode() / forModopagoExtendsMapper.getPaymentMode() -> Entrada a forModopagoExtendsMapper para obtener los modos de pago");
-				comboItems = forModopagoExtendsMapper.getPaymentMode(usuario.getIdlenguaje());
+
+				comboItems= pysFormapagoExtendsMapper
+						.getWayToPayWithIdFormapago(usuario.getIdlenguaje());
+				
 				LOGGER.info(
 						"getPaymentMode() / forModopagoExtendsMapper.getPaymentMode() -> Salida de forModopagoExtendsMapper para obtener los modos de pago");
 
@@ -887,6 +932,287 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 		LOGGER.info("getPaymentMode() -> Salida del servicio para obtener los modos de pago");
 
 		return comboDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException {
+
+		LOGGER.info("uploadFile() -> Entrada al servicio para guardar una fotografía de una persona jurídica");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<GenRecursos> genRecursos = new ArrayList<GenRecursos>();
+		AdmUsuarios usuario = new AdmUsuarios();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+
+		String idPersona = request.getParameter("idPersona");
+		String idInscripcion = request.getParameter("idInscripcion");
+
+
+		int responseGenFichero = 0;
+		int responseMandatoOAnexo = 0;
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		int newIdFichero = 0;
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("for.comprobantesPago.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String pathGF = genPropertiesPath.get(0).getValor();
+
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+		if (null != usuarios && usuarios.size() > 0) {
+			// 3. Obtener el idFichero a almacenar
+			usuario = usuarios.get(0);
+			comboItems = genFicheroExtendsMapper.selectMaxIdFichero();
+			
+			if (comboItems.isEmpty()) {
+				newIdFichero = 1;
+			} else {
+				newIdFichero = Integer.valueOf(comboItems.get(0).getValue()) + 1;
+			}
+			Date date = new Date(); // your date
+			
+			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
+			cal.setTime(date);
+			int year = cal.get(Calendar.YEAR);
+			
+			// crear path para almacenar el fichero
+			String pathFichero = pathGF + String.valueOf(idInstitucion) + "/" + String.valueOf(year) ;
+			String fileNewName = idInstitucion + "_" + newIdFichero;
+
+			// No hay que indicar que tipo de mandato es el fichero, solo la institucion y
+			// el idfichero
+			// if (null == idAnexo || idAnexo.equals("") || idAnexo.equals("null")) {
+			// if (tipoMandato.equals("SERVICIO"))
+			// fileNewName += "0";
+			// else if (tipoMandato.equals("PRODUCTO"))
+			// fileNewName += "1";
+			// } else {
+			// fileNewName += idAnexo;
+			// }
+
+			// 1. Coger archivo del request
+			LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
+			Iterator<String> itr = request.getFileNames();
+			MultipartFile file = request.getFile(itr.next());
+			String fileName = file.getOriginalFilename();
+			String extension = fileName.substring(fileName.lastIndexOf(".")+1, fileName.length());
+
+			String fileNewNameNoExtension = fileNewName;
+			fileNewName += "." + extension;
+			BufferedOutputStream stream = null;
+			// 2. Guardar el archivo
+			LOGGER.debug("uploadFile() -> Guardar el documento de cuenta bancaria");
+			try {
+				File aux = new File(pathFichero);
+				// creo directorio si no existe
+				aux.mkdirs();
+				File serverFile = new File(pathFichero, fileNewName);
+				stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+				stream.write(file.getBytes());
+			} catch (FileNotFoundException e) {
+				LOGGER.error(
+						"uploadFile() -> Error al buscar el documento de cuenta bancaria en el directorio indicado", e);
+			} catch (IOException ioe) {
+				LOGGER.error(
+						"uploadFile() -> Error al guardar el documento de cuenta bancaria en el directorio indicado",
+						ioe);
+			} finally {
+				// close the stream
+				LOGGER.debug("uploadFile() -> Cierre del stream de la fotografía de la persona jurídica");
+				stream.close();
+			}
+
+			//Registamos el almacenamiento en bbdd
+			GenFichero genFichero = new GenFichero();
+			genFichero.setIdfichero(Long.valueOf(newIdFichero));
+			genFichero.setIdinstitucion(idInstitucion);
+			genFichero.setExtension(extension);
+			genFichero.setFechamodificacion(new Date());
+			genFichero.setUsumodificacion(usuario.getIdusuario());
+
+			// obtenemos descripcion de gen_recursos
+			GenRecursosExample genRecursosExample = new GenRecursosExample();
+			genRecursosExample.createCriteria().andIdrecursoEqualTo("fichero.comprobante.pago.descripcion")
+					.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+			genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
+
+			genFichero.setDescripcion(genRecursos.get(0).getDescripcion());
+			// unimos el path + nombre del fichero (sin extension)
+			String directorio = pathFichero;
+			genFichero.setDirectorio(directorio);
+			responseGenFichero = genFicheroExtendsMapper.insertSelective(genFichero);
+			if (responseGenFichero == 1) {
+
+				// 4. actualizar FOR_INSCRIPCIONES
+
+
+					// actualiza CEN_ANEXOS_CUENTASBANCARIAS
+
+					
+					ForInscripcion inscripcion = new ForInscripcion();
+					inscripcion.setIdficherocomprobante(Long.valueOf(newIdFichero));
+					ForInscripcionExample inscripcionExample = new ForInscripcionExample();
+					inscripcionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdinscripcionEqualTo((Long.valueOf(idInscripcion)));
+
+					responseMandatoOAnexo = forInscripcionExtendsMapper
+							.updateByExampleSelective(inscripcion, inscripcionExample);
+					if (responseMandatoOAnexo == 1) {
+						Error error = new Error();
+						error.setCode(SigaConstants.CODE_200);
+						updateResponseDTO.setError(error );
+						updateResponseDTO.setStatus(SigaConstants.OK);
+						updateResponseDTO.setId(String.valueOf(newIdFichero));
+					} else {
+						Error error = new Error();
+						updateResponseDTO.setError(error );
+						updateResponseDTO.setStatus(SigaConstants.KO);
+					}
+
+			} else {
+				Error error = new Error();
+				updateResponseDTO.setError(error );
+				updateResponseDTO.setStatus(SigaConstants.KO);
+			}
+
+		}
+		return updateResponseDTO;
+	
+	}
+
+	@Override
+	public FicheroDTO downloadFile(InscripcionItem inscripcionItem, HttpServletRequest request,
+			HttpServletResponse response) {
+
+	
+		ForInscripcion forInscripcion = new ForInscripcion();
+		GenFichero genFichero = new GenFichero();
+		Long idFichero = null;
+		FicheroDTO ficheroDTO = new FicheroDTO();
+		byte[] documento = null; 
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != inscripcionItem.getIdInscripcion()) {
+		forInscripcion =  forInscripcionExtendsMapper.selectByPrimaryKey(Long.valueOf(inscripcionItem.getIdInscripcion()));
+		} else {
+			return ficheroDTO;
+		}
+		
+		if (null != forInscripcion.getIdficherocomprobante()) {
+	
+			idFichero = forInscripcion.getIdficherocomprobante();
+			GenFicheroKey genFicheroKey = new GenFicheroKey();
+			genFicheroKey.setIdfichero(idFichero);
+			genFicheroKey.setIdinstitucion(idInstitucion);
+			genFichero = genFicheroExtendsMapper.selectByPrimaryKey(genFicheroKey);
+			String filename = "";
+	
+			if (null != genFichero) {
+				String pathAbsolute = genFichero.getDirectorio();
+	
+				// File file = new File("C://IISIGA/anexos/2006002472110.pdf");
+				
+	//			String [] path = pathAbsolute.split("/");
+				filename = idInstitucion + "_" + idFichero + "." + genFichero.getExtension() ;
+				pathAbsolute += "/" + filename;
+	
+				File file = new File(pathAbsolute);
+				FileInputStream fis = null;
+	
+				try {
+					fis = new FileInputStream(file);
+					documento = IOUtils.toByteArray(fis);
+					//documento = doc;
+				} catch (FileNotFoundException e) {
+					LOGGER.error("No se ha encontrado el fichero", e);
+	
+				} catch (IOException e1) {
+					LOGGER.error(
+							"No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse",
+							e1);
+				} finally {
+					if (null != fis)
+						try {
+							fis.close();
+						} catch (IOException e) {
+							LOGGER.error("No se ha cerrado el archivo correctamente", e);
+						}
+				}
+				ficheroDTO.setFile(documento);
+				ficheroDTO.setFileName(filename);
+				return ficheroDTO;
+	
+			} else {
+				return ficheroDTO;
+			}
+		}else {
+			return ficheroDTO;
+		}
+
+	}
+
+	@Override
+	public ComboItem fileDownloadInformation(InscripcionItem inscripcionItem, HttpServletRequest request) {
+
+		ForInscripcion forInscripcion = new ForInscripcion();
+		GenFichero genFichero = new GenFichero();
+		Long idFichero = null;
+		ComboItem comboItem = new ComboItem();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != inscripcionItem.getIdInscripcion()) {
+			forInscripcion =  forInscripcionExtendsMapper.selectByPrimaryKey(Long.valueOf(inscripcionItem.getIdInscripcion()));
+		}else{
+			return comboItem;
+		}
+		
+		
+		if (null != forInscripcion.getIdficherocomprobante()) {
+				idFichero = forInscripcion.getIdficherocomprobante();
+		}
+
+	
+
+		GenFicheroKey genFicheroKey = new GenFicheroKey();
+		genFicheroKey.setIdfichero(idFichero);
+		genFicheroKey.setIdinstitucion(idInstitucion);
+		genFichero = genFicheroExtendsMapper.selectByPrimaryKey(genFicheroKey);
+
+		if (null != genFichero) {
+			comboItem.setLabel(genFichero.getExtension());
+			String ruta = genFichero.getDirectorio();
+			String[] division = ruta.split("/");
+			String nombreArchivo;
+			if(genFichero.getIdfichero() != null) {
+				nombreArchivo = genFichero.getIdinstitucion() + "_" + genFichero.getIdfichero();
+			}else {
+				nombreArchivo = division[division.length - 1];
+			}
+			if (nombreArchivo.contains("/")) {
+				nombreArchivo = nombreArchivo.replace("/", "");
+			}
+			comboItem.setValue(nombreArchivo);
+		}
+
+		return comboItem;
 	}
 	
 	

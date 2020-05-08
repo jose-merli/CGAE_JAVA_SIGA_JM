@@ -1204,6 +1204,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
 		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUARDIA));
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_CORREO));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_SMS));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		
 		
 		if(solicitud.getIdtiposolicitud() == SigaConstants.INCORPORACION_EJERCIENTE ||
 				solicitud.getIdtiposolicitud() == SigaConstants.REINCORPORACION_EJERCIENTE) {
@@ -1246,6 +1254,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_RESIDENCIA));
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
 		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_REVISTA));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
+		
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_FAX));
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
 		
 		if(solicitud.getIdtiposolicitud() != SigaConstants.INCORPORACION_EJERCIENTE &&
