@@ -938,6 +938,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					boolean objetivoIncorrecto = false;
 					boolean noContieneInstitucion = false;
 
+
 					ConConsultaKey key = new ConConsultaKey();
 					key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
 					key.setIdinstitucion(idInstitucion);
@@ -952,6 +953,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 					objetivoIncorrecto = comprobarObjetivo(consultaDTO.getSentencia(), consultaDTO.getIdObjetivo());
 
 					noContieneInstitucion = comprobarInstitucion(consultaDTO.getSentencia());
+					
+
 
 					if (etiquetasIncorrectas) {
 						respuesta.setCode(400);
@@ -995,6 +998,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 		}
 		return incorrecta;
 	}
+	
+
 
 	@Override
 	public ResponseFileDTO ejecutarConsulta(HttpServletRequest request, ConsultaItem consulta) {
@@ -1133,6 +1138,9 @@ public class ConsultasServiceImpl implements IConsultasService {
 					camposIncorrectos = true;
 				}
 				if (!select.contains("IDPOBLACION")) {
+					camposIncorrectos = true;
+				}
+				if (!select.contains("IDIOMA")) {
 					camposIncorrectos = true;
 				}
 
