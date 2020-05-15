@@ -221,9 +221,7 @@ public class EnviosServiceImpl implements IEnviosService{
                         if (sTo == null || sTo.trim().equals("")) {
                         	throw new BusinessException("ERROR: El destinatario no tiene dirección de correo electrónico");
                         }
-                        
-                      //TODO
-                        
+                       
                         //public static final 
                        Pattern EXPRESION_REGULAR_PATTERN_MAIL = Pattern.compile(SigaConstants.EXPRESION_REGULAR_MAIL2, Pattern.CASE_INSENSITIVE);
                        if (!EXPRESION_REGULAR_PATTERN_MAIL.matcher(sTo).matches()) {

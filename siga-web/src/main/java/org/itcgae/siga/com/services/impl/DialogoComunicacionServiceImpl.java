@@ -651,7 +651,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							idioma = usuario.getIdlenguaje();
 						}
 						List<Document> listaDocumentos = new ArrayList<Document>();	
-						
+						LOGGER.info("el idioma del destinatario es: " + idioma);
 						if (idioma.equals(consulta.getIdioma())) {
 						
 						existenConsultas = Boolean.TRUE;

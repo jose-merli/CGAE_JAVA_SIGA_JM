@@ -1845,6 +1845,14 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					response.setStatus(SigaConstants.OK);
 
 				} else {
+					if (null != responseinsert.getStatus()) {
+						if (responseinsert.getStatus().equals(SigaConstants.KO)) {
+							if (null != responseinsert.getError()) {
+								response.setError(responseinsert.getError());
+							}
+						}
+						
+					}
 					response.setStatus(SigaConstants.KO);
 				}
 

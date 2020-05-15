@@ -965,10 +965,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	}
 	
 	public static String EXPRESION_REGULAR_MAIL = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,10}$";
-	public static String EXPRESION_REGULAR_MAIL2 = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-                        + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-	
-	
+	public static String EXPRESION_REGULAR_MAIL2 =  "^([_A-Za-z0-9-\\+]{3,})+(\\.[_A-Za-z0-9-]+)*@([A-Za-z0-9-]{3,})+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
 	
 	
 	public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";

@@ -597,7 +597,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 	
 						// Llamada a método para obtener idtipocv
 						CenTiposcvExample cenTiposCVExample = new CenTiposcvExample();
-						cenTiposCVExample.createCriteria().andCodigoextEqualTo(tipocvCod);
+						cenTiposCVExample.createCriteria().andCodigoextEqualTo(tipocvCod).andFechaBajaIsNull();
 						List<CenTiposcv> tiposCV = cenTiposcvMapper.selectByExample(cenTiposCVExample);
 	
 						if (tiposCV != null && tiposCV.size() > 0) {
@@ -639,7 +639,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 				CenTiposcvsubtipo1Example cenTiposcvsubtipo1Example = new CenTiposcvsubtipo1Example();
 				cenTiposcvsubtipo1Example.createCriteria().andIdinstitucionIn(idInstituciones)
-						.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
+						.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV()).andFechaBajaIsNull();
 				List<CenTiposcvsubtipo1> tiposcvsubtipo1s = cenTiposcvsubtipo1Mapper
 						.selectByExample(cenTiposcvsubtipo1Example);
 
@@ -660,6 +660,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 						cenTiposcvsubtipo1Example1.createCriteria()
 								.andCodigoextEqualTo(subtipocv1Cod)
 								.andIdinstitucionIn(idInstituciones)
+								.andFechaBajaIsNull()
 								.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 						
 						//ORDERNAR
@@ -725,6 +726,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 							cenTiposcvsubtipo2Example.createCriteria()
 									.andCodigoextEqualTo(subtipocv2Cod)
 									.andIdinstitucionIn(idInstituciones)
+									.andFechaBajaIsNull()
 									.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 							
 							//ORDERNAR

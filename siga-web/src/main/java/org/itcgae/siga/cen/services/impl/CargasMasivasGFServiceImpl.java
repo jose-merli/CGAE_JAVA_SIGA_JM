@@ -578,10 +578,10 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 //						} else {
 //							cenGruposCliente = idGruposHashTable.get(key);
 //						}
-						idGruposHashTable.put(key, cenGruposCliente);
+						//idGruposHashTable.put(key, cenGruposCliente);
 
-						cargaMasivaDatosGFVo.setIdGrupo(cenGruposCliente.getIdgrupo());
-						cargaMasivaDatosGFVo.setIdInstitucionGrupo(cenGruposCliente.getIdinstitucion());
+//						cargaMasivaDatosGFVo.setIdGrupo(cenGruposCliente.getIdgrupo());
+//						cargaMasivaDatosGFVo.setIdInstitucionGrupo(cenGruposCliente.getIdinstitucion());
 					} catch (NumberFormatException e) {
 						cargaMasivaDatosGFVo.setNombreGrupo("Error");
 						errorLinea.append("El identificador de Grupo Fijo debe ser numerico de valor menor que 9999.");
