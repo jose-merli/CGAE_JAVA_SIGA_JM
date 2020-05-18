@@ -89,7 +89,7 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		}
 		if(solIncorporacionSearchDTO.getApellidos()!=null && !solIncorporacionSearchDTO.getApellidos().equals("")){
 			String columna = "CONCAT(APELLIDO1,APELLIDO2)";
-			String cadena = solIncorporacionSearchDTO.getApellidos().replaceAll("\\s+","");
+			String cadena = solIncorporacionSearchDTO.getApellidos().replaceAll("\\s+","%");
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 //			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONCAT(APELLIDO1,APELLIDO2)", solIncorporacionSearchDTO.getApellidos()));
 		}

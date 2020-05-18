@@ -757,7 +757,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		if (colegiadoItem.getApellidos() != null && colegiadoItem.getApellidos() != "") {
 			
 			String columna = "REPLACE(CONCAT(per.apellidos1,per.apellidos2), ' ', '')";
-			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+","");
+			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+","%"); 
 			
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 			

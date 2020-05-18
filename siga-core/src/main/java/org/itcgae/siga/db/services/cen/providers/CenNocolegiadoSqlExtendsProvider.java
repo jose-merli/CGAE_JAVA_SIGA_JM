@@ -726,7 +726,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		}
 		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
 			String columna = "REPLACE(CONCAT(per.apellidos1,per.apellidos2), ' ', '')";
-			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","");
+			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","%"); 
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}			
 		if (noColegiadoItem.getSexo() != null && noColegiadoItem.getSexo() != "") {
@@ -923,7 +923,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		}
 		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
 			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
-			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","");
+			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","%");
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}			
 		if (noColegiadoItem.getSexo() != null && noColegiadoItem.getSexo() != "") {
@@ -1185,7 +1185,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		}
 		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
 			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
-			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","");
+			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","%");
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}			
 		if (noColegiadoItem.getSexo() != null && noColegiadoItem.getSexo() != "") {
