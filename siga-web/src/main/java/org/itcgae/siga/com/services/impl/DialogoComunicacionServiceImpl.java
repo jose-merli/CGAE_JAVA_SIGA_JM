@@ -605,7 +605,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						 SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
 		
 		
-		if (consultasItemDest != null && consultasItemDest.size() > 0) {
+		if (consultasItemDest != null && consultasItemDest.size() > 0 && !(null != modelosComunicacionItem.getIdClaseComunicacion() &&  modelosComunicacionItem.getIdClaseComunicacion().equals("5"))) {
 
 			LOGGER.debug("Número de consultas de destintarios " + consultasItemDest.size());
 			for (ConsultaItem consulta : consultasItemDest) {
@@ -1181,7 +1181,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
 								Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
 								plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
-				boolean consultasDestinatarioEjecutadas = consultasItemDest.size() > 0;
+				boolean consultasDestinatarioEjecutadas = Boolean.FALSE;
+				if (!(null != modelosComunicacionItem.getIdClaseComunicacion() &&  modelosComunicacionItem.getIdClaseComunicacion().equals("5"))) {
+					 consultasDestinatarioEjecutadas = consultasItemDest.size() > 0;
+				}
+				
 				if (consultasItemMulti != null && consultasItemMulti.size() > 0) {
 					LOGGER.info("Rendimiento inicio ejecucion consultas multidocumento" );
 					for (ConsultaItem consultaMulti : consultasItemMulti) {
