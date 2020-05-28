@@ -61,7 +61,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(timeout=2400)
 public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 
 	private Logger LOGGER = Logger.getLogger(PlantillasEnvioServiceImpl.class);
@@ -315,7 +315,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error asociarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta) {
 		LOGGER.info("asociarConsulta() -> Entrada al servicio para asociar una consulta a la plantilla de envio");
 

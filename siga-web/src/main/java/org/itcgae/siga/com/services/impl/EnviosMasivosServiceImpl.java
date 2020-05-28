@@ -129,7 +129,7 @@ import service.serviciosecos.ConsultarEstadoMensajeResponseDocument;
 import service.serviciosecos.SolicitudConsultaEstadoMensaje;
 
 @Service
-@Transactional
+@Transactional(timeout=2400)
 public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	private Logger LOGGER = Logger.getLogger(EnviosMasivosServiceImpl.class);
@@ -812,7 +812,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public EnviosMasivosDTO duplicarEnvio(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
 
 		LOGGER.info("duplicarEnvio() -> Entrada al servicio para duplicar envío");

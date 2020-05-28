@@ -165,7 +165,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public ComboDTO saveInscripcion(InscripcionItem inscripcionItem, HttpServletRequest request) {
 
 		LOGGER.info("saveInscripcion() -> Entrada al servicio para insertar una inscripcion");
@@ -376,7 +376,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO updateInscripcion(InscripcionItem inscripcionItem, HttpServletRequest request) {
 		LOGGER.info("updateInscripcion() -> Entrada al servicio para modificar la inscripcion");
 
@@ -632,7 +632,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public InsertResponseDTO generarSolicitudCertificados(InscripcionItem inscripcionItem, HttpServletRequest request) {
 
 		LOGGER.info("generarSolicitudCertificados() -> Entrada al servicio para generar una solicitud de certificado");

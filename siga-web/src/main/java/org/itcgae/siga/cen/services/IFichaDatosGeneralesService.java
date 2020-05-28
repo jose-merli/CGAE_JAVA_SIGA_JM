@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -46,5 +47,7 @@ public interface IFichaDatosGeneralesService {
 //	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request);
 	
 	public ComboDTO getTopicsSpecificPerson(HttpServletRequest request, String idPersona);
+
+	public StringDTO getTipoIdentificacion(StringDTO nifcif,HttpServletRequest request);
 	
 }

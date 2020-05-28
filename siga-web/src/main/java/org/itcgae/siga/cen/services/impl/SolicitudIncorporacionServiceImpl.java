@@ -699,7 +699,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public InsertResponseDTO aprobarSolicitud(Long idSolicitud, HttpServletRequest request) {
 		
 		

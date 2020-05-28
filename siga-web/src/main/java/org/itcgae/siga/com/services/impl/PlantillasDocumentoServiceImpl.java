@@ -73,7 +73,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
-@Transactional
+@Transactional(timeout=2400)
 public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoService {
 
 	private Logger LOGGER = Logger.getLogger(PlantillasDocumentoServiceImpl.class);
@@ -1254,7 +1254,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public ResponseDataDTO guardarDatosSalida(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		LOGGER.info(
 				"guardarDatosSalida() -> Entrada al servicio para guardar los datos de salida de la plantilla de documento");

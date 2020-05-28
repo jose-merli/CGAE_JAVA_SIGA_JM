@@ -1682,7 +1682,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error generarEnvios(HttpServletRequest request, DialogoComunicacionItem dialogo) {
 		LOGGER.info("generarEnvios() -> Entrada al servicio para generar los envíos");
 		
@@ -1723,7 +1723,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return error;
 	}
 	
-	@Transactional
+	@Transactional(timeout=2400)
 	private void insertarConsultasEnvio(AdmUsuarios usuario, Short idInstitucion, GenerarComunicacionItem generarComunicacion){
 		// Hay que generar un envio por cada modelo y cada destinatario
 
@@ -1731,7 +1731,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if(generarComunicacion != null && generarComunicacion.getListaModelosEnvio() != null && generarComunicacion.getListaModelosEnvio().size() > 0){
 				// Por cada modelo y por cada destinatario se genera un envio
 				for(ModelosEnvioItem modeloEnvio : generarComunicacion.getListaModelosEnvio()){
-					if(modeloEnvio != null && modeloEnvio.getListaDatosEnvio() != null){
+			  		if(modeloEnvio != null && modeloEnvio.getListaDatosEnvio() != null){
 						for(DatosEnvioDTO listaConsultasEnvio : modeloEnvio.getListaDatosEnvio()){
 							
 							// Insertamos nuevo envio

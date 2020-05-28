@@ -114,12 +114,12 @@ public class NoColegiadoItem {
 		this.fax2 = fax2;
 	}
 
-	public String getCorreoelectronico() {
-		return correoelectronico;
+	public String getCorreoElectronico() {
+		return correoElectronico;
 	}
 
-	public void setCorreoelectronico(String correoelectronico) {
-		this.correoelectronico = correoelectronico;
+	public void setCorreoElectronico(String correoElectronico) {
+		this.correoElectronico = correoElectronico;
 	}
 
 	public String getNombrePoblacion() {
@@ -134,7 +134,7 @@ public class NoColegiadoItem {
 	private String telefono2;
 	private String fax1;
 	private String fax2;
-	private String correoelectronico;
+	private String correoElectronico;
 	private String nombrePoblacion;
 
 

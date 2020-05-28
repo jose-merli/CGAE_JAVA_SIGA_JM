@@ -69,7 +69,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Service
-@Transactional
+@Transactional(timeout=2400)
 public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesService {
 
 	private Logger LOGGER = Logger.getLogger(FichaDatosColegialesServiceImpl.class);
@@ -692,7 +692,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO datosColegialesUpdateEstados(List<ColegiadoItem> listColegiadoItem,
 			HttpServletRequest request) {
 

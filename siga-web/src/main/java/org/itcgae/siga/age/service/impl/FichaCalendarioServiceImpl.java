@@ -92,7 +92,7 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO updatePermissions(PermisosCalendarioDTO permisosCalendarioDTO,
 			HttpServletRequest request) {
 		int response = 0;

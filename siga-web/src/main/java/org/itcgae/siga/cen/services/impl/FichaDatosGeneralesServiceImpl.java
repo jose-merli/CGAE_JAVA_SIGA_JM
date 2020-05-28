@@ -102,7 +102,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
-@Transactional
+@Transactional(timeout=2400)
 public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesService {
 
 	private Logger LOGGER = Logger.getLogger(FichaDatosGeneralesServiceImpl.class);
@@ -1777,7 +1777,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		
 		direccion.setIddireccion(Long.valueOf(direccionID.get(0).getIdDireccion()));
 		direccion.setCodigopostal(noColegiadoItem.getCodigoPostal());
-		direccion.setCorreoelectronico(noColegiadoItem.getCorreoelectronico());
+		direccion.setCorreoelectronico(noColegiadoItem.getCorreoElectronico());
 		direccion.setDomicilio(noColegiadoItem.getDomicilio());
 		if(noColegiadoItem.getFax1() != null)direccion.setFax1(noColegiadoItem.getFax1());
 		if(noColegiadoItem.getFax2() != null)direccion.setFax1(noColegiadoItem.getFax2());
@@ -1800,7 +1800,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 			
 			
 		//Añadimos las preferencias de direccion obligatorias
-		direccion.setPreferente("ECS");
+		//direccion.setPreferente("ECS");
 		
 		_cenDireccionesMapper.insert(direccion);
 		
@@ -1812,25 +1812,25 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		tipoDireccion.setUsumodificacion(usuario.getIdusuario());
 		
 		//Añadimos los tipo de direcciones obligatorios
-		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_TRASPASO));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
-		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_FACTURACION));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_TRASPASO));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_FACTURACION));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
 		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_CENSOWEB));
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
-		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUIAJUDICIAL));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
-		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUARDIA));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
-		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
-		
-		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
-		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_CORREO));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
-		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_SMS));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUIAJUDICIAL));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUARDIA));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_CORREO));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_SMS));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
 		
 		return direccion.getIddireccion();
 		
@@ -2082,5 +2082,43 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		} catch (NamingException e) {
 			throw e;
 		}
+	}
+
+	@Override
+	public StringDTO getTipoIdentificacion(StringDTO nifcif,HttpServletRequest request) {
+		LOGGER.info(
+				"verifyPerson() -> Entrada al servicio para verificar si la persona logueada está en la tabla cen_colegiado");
+
+		StringDTO stringDTO = new StringDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		
+		String dni = "";
+		
+		if(nifcif.getValor() == "") {
+			dni = UserTokenUtils.getDniFromJWTToken(token);
+		}else {
+			dni = nifcif.getValor();
+		}
+		
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			CenPersonaExample cenPersonaExample = new CenPersonaExample();
+			cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
+			List<CenPersona> cenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+
+			if (!cenPersona.isEmpty()) {
+					if (null != cenPersona.get(0).getIdtipoidentificacion()) {
+						stringDTO.setValor(cenPersona.get(0).getIdtipoidentificacion().toString());
+					}
+			}
+		}
+
+		LOGGER.info(
+				"verifyPerson() -> Salida al servicio para verificar si la persona logueada está en la tabla cen_colegiado");
+		return stringDTO;
 	}
 }

@@ -376,7 +376,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public InsertResponseDTO createLegalPerson(SociedadCreateDTO sociedadCreateDTO, HttpServletRequest request)
 			throws ParseException {
 

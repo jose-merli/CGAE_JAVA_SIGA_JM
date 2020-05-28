@@ -199,7 +199,7 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO updateRegistryDataLegalPerson(
 			PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, HttpServletRequest request) {
 		LOGGER.info(

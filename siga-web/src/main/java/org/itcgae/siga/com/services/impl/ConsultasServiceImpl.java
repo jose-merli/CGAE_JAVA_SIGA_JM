@@ -332,7 +332,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public ConsultaDTO duplicarConsulta(HttpServletRequest request, ConsultaItem consulta) {
 		LOGGER.info("duplicarConsulta() -> Entrada al servicio de duplicar consultas");
 
@@ -434,7 +434,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error borrarConsulta(HttpServletRequest request, ConsultaItem[] consultas) {
 		LOGGER.info("borrarConsulta() -> Entrada al servicio de borrar consulta");
 
@@ -539,7 +539,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error guardarDatosGenerales(HttpServletRequest request, ConsultaItem consultaDTO) {
 		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar tarjeta general");
 		// Conseguimos información del usuario logeado
@@ -916,7 +916,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consultaDTO) {
 		LOGGER.info("guardarConsulta() -> Entrada al servicio para guardar la sentencia de la consulta");
 		// Conseguimos información del usuario logeado
