@@ -1723,7 +1723,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return error;
 	}
 	
-	@Transactional(timeout=2400)
+
 	private void insertarConsultasEnvio(AdmUsuarios usuario, Short idInstitucion, GenerarComunicacionItem generarComunicacion){
 		// Hay que generar un envio por cada modelo y cada destinatario
 
