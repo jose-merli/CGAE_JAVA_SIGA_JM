@@ -287,7 +287,7 @@ public class EnvEnviosExtendsSqlProvider {
 		sql.FROM("ENV_ENVIOS ENVIO");
 
 		sql.WHERE(
-				"ENVIO.IDESTADO = 4 AND (ENVIO.ENVIO = 'A' OR ENVIO.ENVIO = 'M') AND ENVIO.FECHAPROGRAMADA <= SYSDATE - 1");
+				"ENVIO.IDESTADO = 4 AND (ENVIO.ENVIO = 'A' OR ENVIO.ENVIO = 'M') and nvl(ENVIO.fechaprogramada, SYSDATE -2) <= SYSDATE - 1");
 		sql.ORDER_BY("ENVIO.FECHA DESC");
 		return sql.toString();
 	}
