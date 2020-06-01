@@ -72,14 +72,14 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
         sql.SELECT("f_siga_getdireccioncliente(CLI.idinstitucion,CLI.idpersona,3,16) AS CorreoElectronico");
 
         sql.SELECT("(select idprovincia   from CEN_DIRECCIONES DIR  where dir.fechabaja is null  and dir.idinstitucion = cli.idinstitucion    and dir.idpersona = per.idpersona     "
-        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = dir.idinstitucion  and dir.idpersona = dir.idpersona  "
-        		+ "and dir.iddireccion = DIR.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as provincia");
+        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = tip.idinstitucion  and dir.idpersona = tip.idpersona  "
+        		+ "and dir.iddireccion = tip.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as provincia");
         sql.SELECT("(select idpoblacion   from CEN_DIRECCIONES DIR  where dir.fechabaja is null  and dir.idinstitucion = cli.idinstitucion    and dir.idpersona = per.idpersona     "
-        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = dir.idinstitucion  and dir.idpersona = dir.idpersona  "
-        		+ "and dir.iddireccion = DIR.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as poblacion");
+        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = tip.idinstitucion  and dir.idpersona = tip.idpersona  "
+        		+ "and dir.iddireccion = tip.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as poblacion");
         sql.SELECT("(select idpais   from CEN_DIRECCIONES DIR  where dir.fechabaja is null  and dir.idinstitucion = cli.idinstitucion    and dir.idpersona = per.idpersona     "
-        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = dir.idinstitucion  and dir.idpersona = dir.idpersona  "
-        		+ "and dir.iddireccion = DIR.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as pais");        
+        		+ "and exists (select 1   from CEN_DIRECCION_TIPODIRECCION TIP  where dir.idinstitucion = tip.idinstitucion  and dir.idpersona = tip.idpersona  "
+        		+ "and dir.iddireccion = tip.iddireccion and tip.idtipodireccion = 3) and rownum = 1) as pais");        
         
 
 		sql.FROM("CEN_PERSONA PER");
