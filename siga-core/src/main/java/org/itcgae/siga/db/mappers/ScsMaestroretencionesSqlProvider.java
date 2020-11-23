@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ScsMaestroretenciones;
+import org.itcgae.siga.db.entities.ScsMaestroretencionesExample;
 import org.itcgae.siga.db.entities.ScsMaestroretencionesExample.Criteria;
 import org.itcgae.siga.db.entities.ScsMaestroretencionesExample.Criterion;
-import org.itcgae.siga.db.entities.ScsMaestroretencionesExample;
 
 public class ScsMaestroretencionesSqlProvider {
 

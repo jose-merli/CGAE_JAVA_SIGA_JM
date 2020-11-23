@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample.Criteria;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample.Criterion;
-import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
 
 public class CenDatoscolegialesestadoSqlProvider {
 

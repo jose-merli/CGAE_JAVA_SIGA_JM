@@ -6,7 +6,6 @@ import java.util.List;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 
-
 import org.apache.log4j.Logger;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
@@ -19,7 +18,6 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.soap.SoapHeader;
 import org.springframework.ws.soap.SoapMessage;
 import org.springframework.xml.transform.StringSource;
-
 
 import com.altermutua.www.wssiga.GetEstadoColegiadoDocument;
 import com.altermutua.www.wssiga.GetEstadoSolicitudDocument;

@@ -32,7 +32,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
-import javax.mail.internet.MimeUtility;
 import javax.mail.internet.PreencodedMimeBodyPart;
 import javax.mail.util.ByteArrayDataSource;
 
@@ -45,7 +44,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
@@ -221,11 +219,9 @@ public class EnviosServiceImpl implements IEnviosService{
                         if (sTo == null || sTo.trim().equals("")) {
                         	throw new BusinessException("ERROR: El destinatario no tiene dirección de correo electrónico");
                         }
-                        
-                      //TODO
-                        
+                       
                         //public static final 
-                       Pattern EXPRESION_REGULAR_PATTERN_MAIL = Pattern.compile(SigaConstants.EXPRESION_REGULAR_MAIL, Pattern.CASE_INSENSITIVE);
+                       Pattern EXPRESION_REGULAR_PATTERN_MAIL = Pattern.compile(SigaConstants.EXPRESION_REGULAR_MAIL2, Pattern.CASE_INSENSITIVE);
                        if (!EXPRESION_REGULAR_PATTERN_MAIL.matcher(sTo).matches()) {
                     	   throw new BusinessException("ERROR: El destinatario no tiene dirección de correo electrónico válida");
                        }
@@ -500,7 +496,7 @@ public class EnviosServiceImpl implements IEnviosService{
                 BodyPart messageBodyPart = new MimeBodyPart();
                 
                 messageBodyPart.setDataHandler(new DataHandler(ds));
-                String fileName = truncarFileName(MimeUtility.encodeText(informe.getFileName()));
+                String fileName = truncarFileName((informe.getFileName()));
                 messageBodyPart.setFileName(fileName);
                 messageBodyPart.setDisposition(MimePart.ATTACHMENT);
 //                mimeBodyPart.attachFile(file);
@@ -684,12 +680,7 @@ public class EnviosServiceImpl implements IEnviosService{
             
             
             
-            EnviarSMSResponseDocument responseDoc = EnviarSMSResponseDocument.Factory.newInstance();            
-            EnviarSMS sms = EnviarSMS.Factory.newInstance();
-            sms.setEnviarSMSRequest(request);
-            
-            EnviarSMSDocument requestDoc = EnviarSMSDocument.Factory.newInstance();
-            requestDoc.setEnviarSMS(sms);
+
             
             if (listCorrectos != null && listCorrectos.size() > 0) {
             	
@@ -698,7 +689,12 @@ public class EnviosServiceImpl implements IEnviosService{
             		listaTOs[i] = listEnvDestinatarios.get(i).getMovil();
             	}
             	request.setListaTOsArray(listaTOs);
-            	
+                EnviarSMSResponseDocument responseDoc = EnviarSMSResponseDocument.Factory.newInstance();            
+                EnviarSMS sms = EnviarSMS.Factory.newInstance();
+                sms.setEnviarSMSRequest(request);
+                
+                EnviarSMSDocument requestDoc = EnviarSMSDocument.Factory.newInstance();
+                requestDoc.setEnviarSMS(sms);
 	            try {
 	                responseDoc = _clientECOS.enviarSMS(uriService, requestDoc);    
 	                response = responseDoc.getEnviarSMSResponse();

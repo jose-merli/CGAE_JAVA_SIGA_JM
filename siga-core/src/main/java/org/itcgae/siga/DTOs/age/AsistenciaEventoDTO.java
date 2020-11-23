@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.db.entities.AgeCalendario;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

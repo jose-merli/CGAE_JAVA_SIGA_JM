@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ModCamposkey;
+import org.itcgae.siga.db.entities.ModCamposkeyExample;
 import org.itcgae.siga.db.entities.ModCamposkeyExample.Criteria;
 import org.itcgae.siga.db.entities.ModCamposkeyExample.Criterion;
-import org.itcgae.siga.db.entities.ModCamposkeyExample;
 
 public class ModCamposkeySqlProvider {
 

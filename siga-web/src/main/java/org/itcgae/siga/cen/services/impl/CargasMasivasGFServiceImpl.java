@@ -8,9 +8,6 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -578,10 +575,10 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 //						} else {
 //							cenGruposCliente = idGruposHashTable.get(key);
 //						}
-						idGruposHashTable.put(key, cenGruposCliente);
+						//idGruposHashTable.put(key, cenGruposCliente);
 
-						cargaMasivaDatosGFVo.setIdGrupo(cenGruposCliente.getIdgrupo());
-						cargaMasivaDatosGFVo.setIdInstitucionGrupo(cenGruposCliente.getIdinstitucion());
+//						cargaMasivaDatosGFVo.setIdGrupo(cenGruposCliente.getIdgrupo());
+//						cargaMasivaDatosGFVo.setIdInstitucionGrupo(cenGruposCliente.getIdinstitucion());
 					} catch (NumberFormatException e) {
 						cargaMasivaDatosGFVo.setNombreGrupo("Error");
 						errorLinea.append("El identificador de Grupo Fijo debe ser numerico de valor menor que 9999.");

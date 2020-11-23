@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EnvImagenplantilla;
+import org.itcgae.siga.db.entities.EnvImagenplantillaExample;
 import org.itcgae.siga.db.entities.EnvImagenplantillaExample.Criteria;
 import org.itcgae.siga.db.entities.EnvImagenplantillaExample.Criterion;
-import org.itcgae.siga.db.entities.EnvImagenplantillaExample;
 
 public class EnvImagenplantillaSqlProvider {
 

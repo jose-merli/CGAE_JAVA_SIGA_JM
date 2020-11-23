@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmTiposacceso;
+import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample.Criteria;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample.Criterion;
-import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
 
 public class AdmTiposaccesoSqlProvider {
 

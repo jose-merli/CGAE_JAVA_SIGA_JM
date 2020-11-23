@@ -488,7 +488,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 		return comboDTO;
 	}
 
-	@Transactional
+	@Transactional(timeout=2400)
 	@Override
 	public UpdateResponseDTO updateNotification(NotificacionEventoDTO notificacionEventoDTO,
 			HttpServletRequest request) {

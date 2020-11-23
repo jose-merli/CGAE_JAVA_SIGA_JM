@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.itcgae.siga.db.entities.AdmRol;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,7 +16,9 @@ public class UserCgae implements UserDetails {
 	private static final long serialVersionUID = 1L;
 	
 	private String dni;
+	private String nombre;
 	private String grupo;
+	private AdmRol rol;
 	private String institucion;
 	private String letrado;
     public String getLetrado() {
@@ -44,13 +47,15 @@ public class UserCgae implements UserDetails {
 		this.dni = dni;
 	}
 	
-	public UserCgae(String dni, String grupo, String institucion, HashMap<String,String> permisos,List<String> perfiles,String letrado) {
+	public UserCgae(String dni, String grupo, String institucion, HashMap<String,String> permisos,List<String> perfiles,String letrado, AdmRol rol2, String nombre2) {
 		this.dni = dni;
 		this.grupo = grupo;
+		this.rol = rol2;
 		this.institucion = institucion;
 		this.permisos = permisos;
 		this.perfiles = perfiles;
 		this.letrado = letrado;
+		this.nombre = nombre2;
 	}
 	
 	public String getDni() {
@@ -67,6 +72,22 @@ public class UserCgae implements UserDetails {
 
 	public void setGrupo(String grupo) {
 		this.grupo = grupo;
+	}
+	
+	public AdmRol getRol() {
+		return rol;
+	}
+
+	public void setRol(AdmRol rol) {
+		this.rol = rol;
+	}
+	
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 	public String getInstitucion() {
@@ -123,7 +144,7 @@ public class UserCgae implements UserDetails {
 
 	@Override
 	public String toString() {
-		return "UserCgae [dni=" + dni + ", grupo=" + grupo + ", institucion=" + institucion + ", permisos=" + permisos + ", perfiles=" + perfiles
+		return "UserCgae [dni=" + dni + ", nombre=" + nombre + ", grupo=" + grupo + ", rol=" + rol.getCodigoext() + ", institucion=" + institucion + ", permisos=" + permisos + ", perfiles=" + perfiles
 				+ ", letrado=" + letrado + "]";
 	}
 	

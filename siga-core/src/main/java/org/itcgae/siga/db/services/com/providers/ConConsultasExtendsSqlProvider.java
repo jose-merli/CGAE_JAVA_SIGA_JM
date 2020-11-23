@@ -82,7 +82,7 @@ public class ConConsultasExtendsSqlProvider {
 			sql.WHERE("((CONSULTA.IDINSTITUCION = '2000' AND (UPPER(CONSULTA.GENERAL) = 'S'  OR  CONSULTA.GENERAL = '1')) OR (CONSULTA.IDINSTITUCION = '" + idInstitucion +"' AND (UPPER(CONSULTA.GENERAL) = 'N'  OR  CONSULTA.GENERAL = '0')))");
 		}
 		
-		sql.ORDER_BY("DESCRIPCION");
+		sql.ORDER_BY("CONSULTA.DESCRIPCION");
 		
 		return sql.toString();
 	}
@@ -114,7 +114,6 @@ public class ConConsultasExtendsSqlProvider {
 		sql.LEFT_OUTER_JOIN("con_modulo cm on cc.idmodulo = cm.idmodulo");
 		sql.INNER_JOIN("mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta and mpc.idinstitucion_consulta = cc.idInstitucion");
 
-		
 		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio + "' AND cc.FECHABAJA is null AND mpc.FECHABAJA is null and mpc.IDINSTITUCION = '" + idInstitucion + "'");
 		return sql.toString();
 	}

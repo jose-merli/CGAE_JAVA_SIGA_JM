@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenDocumentacionmodalidad;
+import org.itcgae.siga.db.entities.CenDocumentacionmodalidadExample;
 import org.itcgae.siga.db.entities.CenDocumentacionmodalidadExample.Criteria;
 import org.itcgae.siga.db.entities.CenDocumentacionmodalidadExample.Criterion;
-import org.itcgae.siga.db.entities.CenDocumentacionmodalidadExample;
 
 public class CenDocumentacionmodalidadSqlProvider {
 

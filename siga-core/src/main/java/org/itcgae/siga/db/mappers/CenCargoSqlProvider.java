@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenCargo;
+import org.itcgae.siga.db.entities.CenCargoExample;
 import org.itcgae.siga.db.entities.CenCargoExample.Criteria;
 import org.itcgae.siga.db.entities.CenCargoExample.Criterion;
-import org.itcgae.siga.db.entities.CenCargoExample;
 
 public class CenCargoSqlProvider {
 

@@ -22,7 +22,6 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
-import org.itcgae.siga.db.services.cen.providers.CenClienteSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenPersonaSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -51,7 +50,8 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "NUMEROCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESTADOCOLEGIAL", property = "situacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHANACIMIENTOSTRING", property = "fechaNacimientoString", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DENOMINACION", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCION", property = "numeroInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR),
@@ -60,6 +60,18 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "IDESTADOCIVIL", property = "idEstadoCivil", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTRATAMIENTO", property = "idTratamiento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NATURALDE", property = "naturalDe", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Poblacion", property = "idPoblacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "correoelectronico", property = "correoelectronico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Movil", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fax2", property = "fax1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fax2", property = "fax2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Telefono2", property = "telefono2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Telefono1", property = "telefono1", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "CodigoPostal", property = "codigoPostal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Domicilio", property = "direccion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "provincia", property = "idProvincia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombrePoblacion", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "pais", property = "idPais", jdbcType = JdbcType.VARCHAR)
 	})
 	List<BusquedaPerFisicaItem> searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje, String idInstitucion);
 	

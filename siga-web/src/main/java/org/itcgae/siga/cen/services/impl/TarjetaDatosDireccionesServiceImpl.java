@@ -58,7 +58,6 @@ import org.itcgae.siga.db.entities.CenSolimodidirecciones;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
-import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColacambioletradoExtendsMapper;
@@ -162,25 +161,25 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							tiposDireccionesList = new ArrayList<String>(Arrays.asList(tiposDirecciones));
 							String tipoDireccionDesc = datosDireccionItem.getTipoDireccion();
 							// indicar en el combo los tipos de direcciones preferentes
-							if (datosDireccionItem.getPreferente() != ""
-									&& datosDireccionItem.getPreferente() != null) {
-								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_EMAIL)) {
-									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL);
-									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Email");
-								}
-								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_CORREO)) {
-									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_CORREO);
-									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Correo");
-								}
-								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_SMS)) {
-									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_SMS);
-									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente SMS/BuroSMS");
-								}
-								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_FAX)) {
-									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_FAX);
-									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Fax");
-								}
-							}
+//							if (datosDireccionItem.getPreferente() != ""
+//									&& datosDireccionItem.getPreferente() != null) {
+//								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_EMAIL)) {
+//									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL);
+//									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Email");
+//								}
+//								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_CORREO)) {
+//									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_CORREO);
+//									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Correo");
+//								}
+//								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_SMS)) {
+//									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_SMS);
+//									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente SMS/BuroSMS");
+//								}
+//								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_FAX)) {
+//									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_FAX);
+//									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Fax");
+//								}
+//							}
 							datosDireccionItem.setTipoDireccion(tipoDireccionDesc);
 							tiposDirecciones = new String[tiposDireccionesList.size()];
 							tiposDireccionesList.toArray(tiposDirecciones);
@@ -191,26 +190,26 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							String tipoDireccionDesc = new String("");
 							tiposDireccionesList = new ArrayList<String>();
 							// indicar en el combo los tipos de direcciones preferentes
-							if (datosDireccionItem.getPreferente() != ""
-									&& datosDireccionItem.getPreferente() != null) {
-								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_EMAIL)) {
-									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL);
-									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Email");
-								}
-								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_CORREO)) {
-									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_CORREO);
-									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Correo");
-								}
-								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_SMS)) {
-									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_SMS);
-									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente SMS/BuroSMS");
-								}
-								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_FAX)) {
-									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_FAX);
-									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Fax");
-								}
-								tipoDireccionDesc = tipoDireccionDesc.substring(1);
-							}
+//							if (datosDireccionItem.getPreferente() != ""
+//									&& datosDireccionItem.getPreferente() != null) {
+//								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_EMAIL)) {
+//									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL);
+//									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Email");
+//								}
+//								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_CORREO)) {
+//									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_CORREO);
+//									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Correo");
+//								}
+//								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_SMS)) {
+//									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_SMS);
+//									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente SMS/BuroSMS");
+//								}
+//								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_FAX)) {
+//									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_FAX);
+//									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Fax");
+//								}
+//								tipoDireccionDesc = tipoDireccionDesc.substring(1);
+//							}
 							datosDireccionItem.setTipoDireccion(tipoDireccionDesc);
 							tiposDirecciones = new String[tiposDireccionesList.size()];
 							tiposDireccionesList.toArray(tiposDirecciones);
@@ -502,15 +501,23 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL)) {
 						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_EMAIL);
+						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
 							.equals(SigaConstants.TIPO_DIR_PREFERENTE_CORREO)) {
 						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_CORREO);
+						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
 							.equals(SigaConstants.TIPO_DIR_PREFERENTE_SMS)) {
 						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_SMS);
+						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
 							.equals(SigaConstants.TIPO_DIR_PREFERENTE_FAX)) {
 						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_FAX);
+						
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
 
 					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_REVISTA)
@@ -736,7 +743,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 								
 								int res = 0;
 								
-								if(!UtilidadesString.esCadenaVacia(datosDireccionesItem.getIdDireccion())) {
+								if(datosDireccionesItem != null && !UtilidadesString.esCadenaVacia(datosDireccionesItem.getIdDireccion())) {
 									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 											Long.valueOf(datosDireccionesItem.getIdPersona()), Long.valueOf(datosDireccionesItem.getIdDireccion()), usuario.getIdusuario());
 								}else {
@@ -993,15 +1000,23 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL)) {
 						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_EMAIL);
+						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
 							.equals(SigaConstants.TIPO_DIR_PREFERENTE_CORREO)) {
 						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_CORREO);
+						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
 							.equals(SigaConstants.TIPO_DIR_PREFERENTE_SMS)) {
 						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_SMS);
+						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
 							.equals(SigaConstants.TIPO_DIR_PREFERENTE_FAX)) {
 						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_FAX);
+						
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
 
 					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_REVISTA)
@@ -1164,7 +1179,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						int res = 0;
 						
 						// Llamamos al PL para mantener los colegiados
-						if(direcciones.getIddireccion() != null) {
+						if(direcciones != null && direcciones.getIddireccion() != null) {
 							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 									Long.valueOf(datosDireccionesItem.getIdPersona()), direcciones.getIddireccion(), usuario.getIdusuario());
 						}else {
@@ -1764,7 +1779,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					// Llamamos al PL para mantener los colegiados
 					int res = 0;
 					
-					if(direcciones.getIddireccion() != null) {
+					if(direcciones != null && direcciones.getIddireccion() != null) {
 						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 								Long.valueOf(datosDireccionesItem.getIdPersona()), direcciones.getIddireccion(), usuario.getIdusuario());
 					}else {

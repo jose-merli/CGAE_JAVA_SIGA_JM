@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample;
 import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample.Criteria;
 import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample.Criterion;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample;
 
 public class ScsGuardiascolegiadoSqlProvider {
     /**

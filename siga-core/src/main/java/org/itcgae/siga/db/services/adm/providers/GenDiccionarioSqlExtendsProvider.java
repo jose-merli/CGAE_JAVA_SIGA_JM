@@ -3,7 +3,6 @@ package org.itcgae.siga.db.services.adm.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.EtiquetaSearchDTO;
 import org.itcgae.siga.db.mappers.GenDiccionarioSqlProvider;
-import org.itcgae.siga.db.mappers.GenRecursosSqlProvider;
 
 public class GenDiccionarioSqlExtendsProvider extends GenDiccionarioSqlProvider{
 

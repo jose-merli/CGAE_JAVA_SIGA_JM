@@ -179,7 +179,7 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 		
 		
 		if(null != colegiado.getIdpersonanotario()) {
-			if(colegiado.getIdpersonanotario().equals(asociarPersona.getIdPersonaAsociar())) {
+			if(null != asociarPersona.getIdPersonaAsociar() && colegiado.getIdpersonanotario().equals(Long.valueOf(asociarPersona.getIdPersonaAsociar()))) {
 				updateResponse.getError().setDescription("La persona seleccionada ya es el notario de la sociedad.");
 			}else {
 				usuario = usuarios.get(0);
@@ -232,6 +232,9 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 				CenCliente recordCliente = new CenCliente();
 				recordCliente = rellenarInsertCenCliente(usuario,asociarPersona.getIdPersonaAsociar(),idInstitucion);
 				int responseCenCliente = cenClienteMapper.insertSelective(recordCliente);
+				if(responseCenCliente>0) {
+					LOGGER.debug("Se ha insertado en CenCliente correctamente");
+				}
 			}
 			
 			CenNocolegiadoExample cenNoColegiadoExample = new CenNocolegiadoExample();
@@ -341,7 +344,7 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 
 			comboItems = cenTipoidentificacionExtendsMapper.getIdentificationTypes(usuario.getIdlenguaje());
 
-			ComboItem comboItem = new ComboItem();
+//			ComboItem comboItem = new ComboItem();
 //			comboItem.setLabel("");
 //			comboItem.setValue("");
 //

@@ -6,8 +6,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -17,11 +15,8 @@ import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.itcgae.siga.bootstrap.config.CgaeConfigServicePropertySourceLocator;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.AdmConfig;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.logger.LoggingConfig;
 import org.itcgae.siga.logger.MyBatisLoggerInterceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -41,8 +36,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 
 import com.aspose.words.License;
 

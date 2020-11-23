@@ -332,7 +332,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public ConsultaDTO duplicarConsulta(HttpServletRequest request, ConsultaItem consulta) {
 		LOGGER.info("duplicarConsulta() -> Entrada al servicio de duplicar consultas");
 
@@ -434,7 +434,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error borrarConsulta(HttpServletRequest request, ConsultaItem[] consultas) {
 		LOGGER.info("borrarConsulta() -> Entrada al servicio de borrar consulta");
 
@@ -539,7 +539,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error guardarDatosGenerales(HttpServletRequest request, ConsultaItem consultaDTO) {
 		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar tarjeta general");
 		// Conseguimos información del usuario logeado
@@ -857,7 +857,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 				try {
 					modeloList = _conListadoModelosExtendsMapper
-							.selectListadoModelos(Short.valueOf(consulta.getIdInstitucion()), consulta.getIdConsulta());
+							.selectListadoModelos(Short.valueOf(consulta.getIdInstitucion()), consulta.getIdConsulta(),idInstitucion);
 					if (modeloList.size() > 0) {
 						conListadoModelosDTO.setListadoModelos(modeloList);
 					}
@@ -916,7 +916,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consultaDTO) {
 		LOGGER.info("guardarConsulta() -> Entrada al servicio para guardar la sentencia de la consulta");
 		// Conseguimos información del usuario logeado
@@ -938,6 +938,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					boolean objetivoIncorrecto = false;
 					boolean noContieneInstitucion = false;
 
+
 					ConConsultaKey key = new ConConsultaKey();
 					key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
 					key.setIdinstitucion(idInstitucion);
@@ -952,6 +953,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 					objetivoIncorrecto = comprobarObjetivo(consultaDTO.getSentencia(), consultaDTO.getIdObjetivo());
 
 					noContieneInstitucion = comprobarInstitucion(consultaDTO.getSentencia());
+					
+
 
 					if (etiquetasIncorrectas) {
 						respuesta.setCode(400);
@@ -995,6 +998,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 		}
 		return incorrecta;
 	}
+	
+
 
 	@Override
 	public ResponseFileDTO ejecutarConsulta(HttpServletRequest request, ConsultaItem consulta) {
@@ -1133,6 +1138,9 @@ public class ConsultasServiceImpl implements IConsultasService {
 					camposIncorrectos = true;
 				}
 				if (!select.contains("IDPOBLACION")) {
+					camposIncorrectos = true;
+				}
+				if (!select.contains("IDIOMA")) {
 					camposIncorrectos = true;
 				}
 
@@ -2241,25 +2249,17 @@ public class ConsultasServiceImpl implements IConsultasService {
 									// listaCampos.get(j).setValor("'" + nuevoValor + "'");
 
 									// String aux = listaCampos.get(j).getValor();
-									if(operador.equals("LIKE")) {
-										codigosBind.put(new Integer(iParametroBind), "" + nuevoValor + "");
-									}else {
-										codigosBind.put(new Integer(iParametroBind), "'" + nuevoValor + "'");
-									}
+									codigosBind.put(new Integer(iParametroBind), "'" + nuevoValor + "'");
 								} else {
 									iParametroBind++;
 									criteriosDinamicos = ":@" + iParametroBind + "@:";
-									
-									if(operador.equals("LIKE")) {
+									if (operador.equals(SigaConstants.LIKE)) {
 										codigosBind.put(new Integer(iParametroBind),
-												"" + listaCampos.get(j).getValor() + "");
-									}else {
+												 listaCampos.get(j).getValor() );
+										codigosLike.put(new Integer(iParametroBind), listaCampos.get(j).getValor());
+									}else{
 										codigosBind.put(new Integer(iParametroBind),
 												"'" + listaCampos.get(j).getValor() + "'");
-									}
-									
-									if (operador.equals(SigaConstants.LIKE.toUpperCase())) {
-										codigosLike.put(new Integer(iParametroBind), listaCampos.get(j).getValor());
 									}
 								}
 							} else {
@@ -2365,7 +2365,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 		while (indice != -1) {
 			String numero = sentenciaAux3.substring(indice + 2, sentenciaAux3.indexOf("@:", indice));
 			if (codigosLike.containsKey(new Integer(numero))) {
-				sentencia = sentencia.replaceFirst(":@" + numero + "@:",
+				sentencia = sentencia.replaceFirst(":@" + numero + "@:", 
 						"'%" + (String) codigosBind.get(new Integer(numero)) + "%'");
 			} else {
 				contadorOrdenados++;
@@ -2490,7 +2490,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 //					Long.valueOf(consulta.getIdConsulta()), Short.valueOf(consulta.getIdInstitucion()), e.getMessage(),
 //					sentenciaCompleta);
 			throw new BusinessException(
-					"Error al ejecutar la consulta " + descripcion + " " + e.getMessage(), e.getCause());
+					"Error al ejecutar la consulta " + consulta + " " + e.getMessage(), e.getCause());
 		} catch (Exception e) {
 			LOGGER.warn("Error al ejejcutar la consulta" + e);
 			updateLogEjecucion(inicialDate, Integer.valueOf(usuario.getIdusuario()), idEjecucion, e.getMessage());
@@ -2500,7 +2500,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 //					Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()),
 //					Long.valueOf(consulta.getIdConsulta()), Short.valueOf(consulta.getIdInstitucion()), e.getMessage(),
 //					sentenciaCompleta);
-			throw new BusinessException("Error al ejecutar la consulta " +descripcion, e);
+			throw new BusinessException("Error al ejecutar la consulta " +consulta, e);
 		}
 
 		return resultDatos;

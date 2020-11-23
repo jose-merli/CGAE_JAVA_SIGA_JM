@@ -1,7 +1,6 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.db.mappers.CenDatoscvSqlProvider;
 import org.itcgae.siga.db.mappers.CerSolicitudcertificadosSqlProvider;
 
 public class CenDatosCertificadosSqlExtendsProvider extends CerSolicitudcertificadosSqlProvider{

@@ -230,7 +230,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	private CenPersonaMapper cenPersonaMapper;
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public InsertResponseDTO saveEventCalendar(EventoItem eventoItem, HttpServletRequest request) {
 		int response = 0;
 		int responseNotificacion = 0;
@@ -1771,7 +1771,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO deleteEventCalendar(EventoDTO eventoDTO, HttpServletRequest request) {
 		LOGGER.info("deleteEventCalendar() -> Entrada al servicio para dar de baja a un evento especifico");
 
@@ -2130,7 +2130,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public InsertResponseDTO saveAssistancesCourse(AsistenciaEventoDTO asistenciaEventoDTO,
 			HttpServletRequest request) {
 		LOGGER.info(
@@ -2222,7 +2222,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public InsertResponseDTO saveFormadorEvent(AgePersonaEventoDTO agePersonaEventoDTO, HttpServletRequest request) {
 		LOGGER.info("saveFormadorEvent() ->  Entrada al servicio para asignar uno o varios formadores a una sesión");
 
@@ -2303,7 +2303,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO updateFormadorEvent(AgePersonaEventoDTO agePersonaEventoDTO, HttpServletRequest request) {
 		LOGGER.info(
 				"updateFormadorEvent() ->  Entrada al servicio para modificar uno o varios formadores en una sesión");
@@ -3038,7 +3038,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		return updateResponseDTO;
 	}
 
-	@Transactional
+	@Transactional(timeout=2400)
 	public List<AsistenciaEventoItem> parseExcelFile(Vector<Hashtable<String, Object>> datos, AdmUsuarios usuario,
 			int idEvento) throws BusinessException {
 

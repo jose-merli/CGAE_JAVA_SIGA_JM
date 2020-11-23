@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AgeAsistenciaEvento;
+import org.itcgae.siga.db.entities.AgeAsistenciaEventoExample;
 import org.itcgae.siga.db.entities.AgeAsistenciaEventoExample.Criteria;
 import org.itcgae.siga.db.entities.AgeAsistenciaEventoExample.Criterion;
-import org.itcgae.siga.db.entities.AgeAsistenciaEventoExample;
 
 public class AgeAsistenciaEventoSqlProvider {
 

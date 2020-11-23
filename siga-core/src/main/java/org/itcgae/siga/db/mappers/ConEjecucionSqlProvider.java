@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ConEjecucion;
+import org.itcgae.siga.db.entities.ConEjecucionExample;
 import org.itcgae.siga.db.entities.ConEjecucionExample.Criteria;
 import org.itcgae.siga.db.entities.ConEjecucionExample.Criterion;
-import org.itcgae.siga.db.entities.ConEjecucionExample;
 
 public class ConEjecucionSqlProvider {
 

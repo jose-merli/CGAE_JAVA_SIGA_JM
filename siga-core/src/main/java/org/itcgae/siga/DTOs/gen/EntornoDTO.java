@@ -1,13 +1,8 @@
 package org.itcgae.siga.DTOs.gen;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-
-import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.gen.MenuItem;
-import java.util.ArrayList;
-import java.util.List;
 
 
 

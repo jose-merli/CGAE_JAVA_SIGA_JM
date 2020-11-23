@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CerSolicitudcertificados;
+import org.itcgae.siga.db.entities.CerSolicitudcertificadosExample;
 import org.itcgae.siga.db.entities.CerSolicitudcertificadosExample.Criteria;
 import org.itcgae.siga.db.entities.CerSolicitudcertificadosExample.Criterion;
-import org.itcgae.siga.db.entities.CerSolicitudcertificadosExample;
 
 public class CerSolicitudcertificadosSqlProvider {
 

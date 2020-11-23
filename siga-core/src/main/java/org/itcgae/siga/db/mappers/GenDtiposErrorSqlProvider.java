@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenDtiposError;
+import org.itcgae.siga.db.entities.GenDtiposErrorExample;
 import org.itcgae.siga.db.entities.GenDtiposErrorExample.Criteria;
 import org.itcgae.siga.db.entities.GenDtiposErrorExample.Criterion;
-import org.itcgae.siga.db.entities.GenDtiposErrorExample;
 
 public class GenDtiposErrorSqlProvider {
 

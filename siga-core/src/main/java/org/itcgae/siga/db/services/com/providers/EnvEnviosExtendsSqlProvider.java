@@ -276,6 +276,22 @@ public class EnvEnviosExtendsSqlProvider {
 		return sql.toString();
 	}
 
+	
+	public String obtenerEnviosMalCreados() {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		String fechaHoy = dateFormat.format(new Date());
+		SQL sql = new SQL();
+
+		sql.SELECT("ENVIO.*");
+		
+		sql.FROM("ENV_ENVIOS ENVIO");
+
+		sql.WHERE(
+				"ENVIO.IDESTADO = 4 AND (ENVIO.ENVIO = 'A' OR ENVIO.ENVIO = 'M') and nvl(ENVIO.fechaprogramada, SYSDATE -2) <= SYSDATE - 1");
+		sql.ORDER_BY("ENVIO.FECHA DESC");
+		return sql.toString();
+	}
+	
 	public String selectEnviosProgramados() {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		String fechaHoy = dateFormat.format(new Date());

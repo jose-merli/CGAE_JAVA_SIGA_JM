@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForCertificadoscurso;
+import org.itcgae.siga.db.entities.ForCertificadoscursoExample;
 import org.itcgae.siga.db.entities.ForCertificadoscursoExample.Criteria;
 import org.itcgae.siga.db.entities.ForCertificadoscursoExample.Criterion;
-import org.itcgae.siga.db.entities.ForCertificadoscursoExample;
 
 public class ForCertificadoscursoSqlProvider {
 

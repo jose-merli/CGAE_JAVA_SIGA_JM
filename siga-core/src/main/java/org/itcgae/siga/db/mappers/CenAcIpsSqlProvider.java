@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenAcIps;
+import org.itcgae.siga.db.entities.CenAcIpsExample;
 import org.itcgae.siga.db.entities.CenAcIpsExample.Criteria;
 import org.itcgae.siga.db.entities.CenAcIpsExample.Criterion;
-import org.itcgae.siga.db.entities.CenAcIpsExample;
 
 public class CenAcIpsSqlProvider {
 

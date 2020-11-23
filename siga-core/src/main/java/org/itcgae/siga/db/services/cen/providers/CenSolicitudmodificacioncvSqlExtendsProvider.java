@@ -7,9 +7,7 @@ import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.commons.utils.SolModifSQLUtils;
 import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
-import org.itcgae.siga.db.mappers.CenDatoscvSqlProvider;
 import org.itcgae.siga.db.mappers.CenSolicitudmodificacioncvSqlProvider;
 
 public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmodificacioncvSqlProvider{

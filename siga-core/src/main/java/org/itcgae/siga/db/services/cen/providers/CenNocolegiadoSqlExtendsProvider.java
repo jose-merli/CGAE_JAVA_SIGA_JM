@@ -25,7 +25,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		SQL sql2 = new SQL();
 		// Formateo de fecha para sentencia sql
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String grupos = "";
+		//String grupos = "";
 
 		sql2.SELECT(" DISTINCT COL.IDPERSONA AS IDPERSONA");
 		sql2.SELECT("PER.NIFCIF AS NIF");
@@ -85,8 +85,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 		}
 
-		if (null != busquedaJuridicaSearchDTO.getFechaConstitucion()
-				&& !busquedaJuridicaSearchDTO.getFechaConstitucion().equals("")) {
+		if (null != busquedaJuridicaSearchDTO.getFechaConstitucion()) {
 			String fechaC = dateFormat.format(busquedaJuridicaSearchDTO.getFechaConstitucion());
 			sql2.WHERE("PER.FECHANACIMIENTO = TO_DATE('" + fechaC + "', 'DD/MM/YYYY')");
 		}
@@ -146,7 +145,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String grupos = "";
+		//String grupos = "";
 		
 		
 //		if(busquedaJuridicaSearchDTO.getGrupos().length > 1) {
@@ -223,7 +222,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 		}
 		
-		if(null != busquedaJuridicaSearchDTO.getFechaConstitucion() && !busquedaJuridicaSearchDTO.getFechaConstitucion().equals("")) {
+		if(null != busquedaJuridicaSearchDTO.getFechaConstitucion()) {
 			String fechaC = dateFormat.format(busquedaJuridicaSearchDTO.getFechaConstitucion());
 			sql2.WHERE("PER.FECHANACIMIENTO = TO_DATE('" + fechaC + "', 'DD/MM/YYYY')");
 		}
@@ -458,11 +457,11 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			sql.SET("SOCIEDADPROFESIONAL = '" + perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional() + "'");
 		}
 		
-		if(null != usuario.getIdusuario() && !usuario.getIdusuario().equals("")) {
+		if(null != usuario.getIdusuario()) {
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		}
 		
-		if(null != perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro() && !perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro().equals("")) {
+		if(null != perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro()) {
 			sql.SET("ID_DATOS_REG = '" + perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro() + "'");
 		}
 		if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp())) {
@@ -581,7 +580,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.WHERE("SOCIEDAD.IDINSTITUCION = '" +idInstitucion+ "'");
 		String fechadesde = dateFormat.format(fechaDesde);
 		sql.WHERE("SOCIEDAD.FECHAMODIFICACION >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY')");
-		String fechahasta = dateFormat.format(fechaHasta);
+		//TODO revisar este fechahasta
+		//String fechahasta = dateFormat.format(fechaHasta);
 		sql.WHERE("SOCIEDAD.FECHAMODIFICACION < SYSDATE +1");
 		sql.WHERE("SOCIEDAD.FECHA_BAJA IS NULL");
 		sql.WHERE("SOCIEDAD.SOCIEDADPROFESIONAL = 1");
@@ -632,7 +632,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 	public String selectNoColegiados(Short idInstitucion, NoColegiadoItem noColegiadoItem) {
 
 		SQL sql = new SQL();
-		SQL sql1 = new SQL();
+		//SQL sql1 = new SQL();
 		SQL sql2 = new SQL();
 		SQL sql3 = new SQL();
 
@@ -726,7 +726,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		}
 		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
 			String columna = "REPLACE(CONCAT(per.apellidos1,per.apellidos2), ' ', '')";
-			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","");
+			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","%"); 
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}			
 		if (noColegiadoItem.getSexo() != null && noColegiadoItem.getSexo() != "") {
@@ -834,7 +834,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			String idInstitucion) {
 
 		SQL sql = new SQL();
-		SQL sql1 = new SQL();
+		//SQL sql1 = new SQL();
 		SQL sql2 = new SQL();
 		SQL sql3 = new SQL();
 
@@ -923,7 +923,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		}
 		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
 			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
-			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","");
+			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","%");
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}			
 		if (noColegiadoItem.getSexo() != null && noColegiadoItem.getSexo() != "") {
@@ -1185,7 +1185,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		}
 		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
 			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
-			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","");
+			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","%");
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}			
 		if (noColegiadoItem.getSexo() != null && noColegiadoItem.getSexo() != "") {

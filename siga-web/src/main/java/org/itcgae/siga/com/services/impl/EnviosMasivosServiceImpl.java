@@ -56,8 +56,6 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
-import org.itcgae.siga.db.entities.CenGruposclienteCliente;
-import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.EnvCamposenvios;
@@ -99,7 +97,6 @@ import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosgrupoclienteMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
-import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -129,7 +126,7 @@ import service.serviciosecos.ConsultarEstadoMensajeResponseDocument;
 import service.serviciosecos.SolicitudConsultaEstadoMensaje;
 
 @Service
-@Transactional
+@Transactional(timeout=2400)
 public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	private Logger LOGGER = Logger.getLogger(EnviosMasivosServiceImpl.class);
@@ -812,7 +809,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public EnviosMasivosDTO duplicarEnvio(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
 
 		LOGGER.info("duplicarEnvio() -> Entrada al servicio para duplicar envío");
@@ -1427,7 +1424,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				Iterator<String> itr = request.getFileNames();
 				MultipartFile file = request.getFile(itr.next());
 
-				String fileName = file.getOriginalFilename();
+				String fileNameOriginal = file.getOriginalFilename();
+				String fName = Long.toString(System.currentTimeMillis());
 
 				try {
 
@@ -1436,16 +1434,17 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 					SIGAHelper.addPerm777(serverFile);
 
-					serverFile = new File(serverFile, fileName);
+					serverFile = new File(serverFile, fName);
+					LOGGER.info("uploadFile() -> Ruta del fichero subido: " + serverFile.getAbsolutePath());
 					if (serverFile.exists()) {
-						LOGGER.error("Ya existe el fichero: " + pathFichero + fileName);
+						LOGGER.error("Ya existe el fichero: " + serverFile.getAbsolutePath());
 						throw new FileAlreadyExistsException("El fichero ya existe");
 					}
 					// stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 					// stream.write(file.getBytes());
 					FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
-					response.setNombreDocumento(fileName);
-					response.setRutaDocumento(fileName);
+					response.setNombreDocumento(fileNameOriginal);
+					response.setRutaDocumento(fName);
 				} catch (FileNotFoundException e) {
 					Error error = new Error();
 					error.setCode(500);
@@ -2327,7 +2326,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		}
 		return inputStreamResource;
 	}
-
+	
 	@Override
 	public EnviosMasivosDTO obtenerDestinatarios(HttpServletRequest request, EnviosMasivosDTO enviosMasivosDTO) {
 		LOGGER.info("obtenerDestinatarios() -> Entrada al servicio para obtener destinatarios de envios");

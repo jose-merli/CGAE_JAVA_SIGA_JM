@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmConsultainforme;
+import org.itcgae.siga.db.entities.AdmConsultainformeExample;
 import org.itcgae.siga.db.entities.AdmConsultainformeExample.Criteria;
 import org.itcgae.siga.db.entities.AdmConsultainformeExample.Criterion;
-import org.itcgae.siga.db.entities.AdmConsultainformeExample;
 
 public class AdmConsultainformeSqlProvider {
 

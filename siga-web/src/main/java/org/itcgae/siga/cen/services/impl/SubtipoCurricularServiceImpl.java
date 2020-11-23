@@ -1,7 +1,6 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -20,8 +19,6 @@ import org.itcgae.siga.cen.services.ISubtipoCurricularService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo1Example;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo2;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Example;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;

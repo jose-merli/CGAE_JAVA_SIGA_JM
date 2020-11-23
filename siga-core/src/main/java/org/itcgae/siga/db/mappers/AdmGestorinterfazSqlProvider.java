@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmGestorinterfaz;
+import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
 import org.itcgae.siga.db.entities.AdmGestorinterfazExample.Criteria;
 import org.itcgae.siga.db.entities.AdmGestorinterfazExample.Criterion;
-import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
 
 public class AdmGestorinterfazSqlProvider {
 
