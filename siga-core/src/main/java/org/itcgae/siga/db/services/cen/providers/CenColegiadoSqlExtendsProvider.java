@@ -49,6 +49,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.SELECT("TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
 			sql.SELECT_DISTINCT("nvl(decode(nvl(col.comunitario,0),0, col.ncolegiado, col.ncomunitario), col.ncolegiado) as numcolegiado");
 			sql.SELECT_DISTINCT("colest.idestado as situacion");
+			sql.SELECT_DISTINCT("colest.fechaestado as fechaestado");
 			sql.SELECT("decode (f_siga_gettipocliente(col.idpersona,col.idinstitucion,sysdate),'10','No Ejerciente','20','Ejerciente','30','Baja Colegial','40','Inhabilitación','50','Suspensión Ejercicio','60','Baja por Deceso','Baja por Deceso') AS estadoColegial");
 			sql.SELECT_DISTINCT("col.situacionresidente as situacionresidente");
 
