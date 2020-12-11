@@ -22,7 +22,7 @@ public interface ScsGuardiascolegiadoExtendsMapper extends ScsGuardiascolegiadoM
     @Results({ 
         @Result(column = "COUNT", property = "valor", jdbcType = JdbcType.VARCHAR),
     })
-    StringDTO getTurnosGuardias(String idPersona);
+    StringDTO getTurnosGuardias(String idPersona, Short idInstitucion);
     
     
     

@@ -1896,8 +1896,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
                     "getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
             if (null != usuarios && usuarios.size() > 0) {
-                resultado = _scsGuardiascolegiadoMapper.getTurnosGuardias(colegiadoItem.getIdPersona());
-
+                resultado = _scsGuardiascolegiadoMapper.getTurnosGuardias(colegiadoItem.getIdPersona(), idInstitucion);
+                if(resultado == null)
+                	resultado = new StringDTO().valor("0");
             }
 
         }
