@@ -78,14 +78,12 @@ import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
 import org.itcgae.siga.db.entities.EnvEnviosgrupoclienteExample;
-import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
-import org.itcgae.siga.db.mappers.CenGruposclienteClienteMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
@@ -96,9 +94,7 @@ import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosgrupoclienteMapper;
-import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
-import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
@@ -150,9 +146,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	private EnvEnvioprogramadoMapper _envEnvioprogramadoMapper;
 
 	@Autowired
-	private EnvHistoricoestadoenvioMapper _envHistoricoestadoenvioMapper;
-
-	@Autowired
 	private EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
 
 	@Autowired
@@ -186,9 +179,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	private EnvDestConsultaEnvioExtendsMapper _envDestConsultaEnvioExtendsMapper;
 
 	@Autowired
-	private GenPropertiesMapper _genPropertiesMapper;
-
-	@Autowired
 	private EnvDestConsultaEnvioMapper _envDestConsultaEnvioMapper;
 
 	@Autowired
@@ -217,9 +207,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	@Autowired
 	private IPFDService pfdService;
-
-	@Autowired
-	private CenGruposclienteClienteMapper _cenGruposclienteClienteMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -496,6 +483,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					for (int i = 0; i < envios.length; i++) {
 						// Solo cancelamos los envios si tiene estado 1(nuevo) o 4(programado)
 						if (envios[i].getIdEstado().equals("1") || envios[i].getIdEstado().equals("4")) {
+							@SuppressWarnings("unused")
 							int update = 0;
 							EnvEnviosKey keyEnvio = new EnvEnviosKey();
 							keyEnvio.setIdenvio(Long.parseLong(envios[i].getIdEnvio()));
@@ -641,6 +629,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setFechamodificacion(new Date());
 						envio.setUsumodificacion(usuario.getIdusuario());
 						envio.setEnvio("M");
+						@SuppressWarnings("unused")
 						int insert = _envEnviosMapper.insert(envio);
 						
 						/*if (insert > 0) {
@@ -816,8 +805,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 		Error error = new Error();
 		EnviosMasivosDTO respuesta = new EnviosMasivosDTO();
-		EnviosMasivosItem envioMasivoItem = new EnviosMasivosItem();
+        //EnviosMasivosItem envioMasivoItem = new EnviosMasivosItem();
 
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -998,9 +988,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					// tabla env_historicoestadoenvio
 					EnvHistoricoestadoenvioExample histExample = new EnvHistoricoestadoenvioExample();
 					histExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
-					List<EnvHistoricoestadoenvio> historicosEstados = _envHistoricoestadoenvioMapper
+					/*List<EnvHistoricoestadoenvio> historicosEstados = _envHistoricoestadoenvioMapper
 							.selectByExample(histExample);
-					/*for (EnvHistoricoestadoenvio envHistorico : historicosEstados) {
+					for (EnvHistoricoestadoenvio envHistorico : historicosEstados) {
 						// el id historico se debería de calcular con secuencia en bdd
 						envHistorico.setIdenvio(idEnvioNuevo);
 						envHistorico.setFechamodificacion(new Date());
@@ -1673,7 +1663,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
+				//AdmUsuarios usuario = usuarios.get(0);
 
 				EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 				key.setIdinstitucion(idInstitucion);
@@ -2232,7 +2222,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Short idDocumento) {
+	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Integer idDocumento) {
 
 		LOGGER.debug("Comprobando si es un envío burosms para recuperar el pdf para iddocumento " + idDocumento);
 		Resource inputStreamResource = null;
@@ -2250,7 +2240,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					if (envDestinatariosBurosms != null) {
 						if (envDestinatariosBurosms.getIdsolicitudecos() != null) {
 							LOGGER.debug("Comprobamos si ya tenemos el csv para el iddocumento = " + idDocumento);
-							String csv = null;
+							//String csv = null;
 							if (envDestinatariosBurosms.getCsv() == null) {
 								GenParametrosKey keyParam = new GenParametrosKey();
 
