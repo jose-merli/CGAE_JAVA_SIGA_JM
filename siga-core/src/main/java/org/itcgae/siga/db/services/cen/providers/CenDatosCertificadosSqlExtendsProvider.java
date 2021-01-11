@@ -21,7 +21,7 @@ public class CenDatosCertificadosSqlExtendsProvider extends CerSolicitudcertific
 		sql.WHERE("PROD.IDINSTITUCION = '"+idInstitucion+"'");
 		sql.WHERE("PROD.TIPOCERTIFICADO = 'C'");
 		sql.WHERE("IDPERSONA_DES = '"+idPersona+"'");
-		sql.ORDER_BY("IDPERSONA_DES DESC");
+		sql.ORDER_BY("FECHAEMISION DESC");
 		return sql.toString();
 	}
 
