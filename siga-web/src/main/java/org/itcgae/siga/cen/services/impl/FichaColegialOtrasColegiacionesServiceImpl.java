@@ -2,6 +2,7 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -73,6 +74,10 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 	
 	@Autowired
 	private GenRecursosMapper genRecursosMapper;
+	
+	private static final String ESTADO_EJERCIENTE = "Ejerciente";
+	
+	private static final String ESTADO_NOEJERCIENTE = "No Ejerciente";
 	
 	@Override
 	public ColegiadoDTO searchOtherCollegues(int numPagina, String nif,
@@ -184,7 +189,8 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 									
 //									colegiadoItem.setResidencia(colegiadoColegiacion.getResidente().toString());
 									SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
-									String fechaEstado = format1.format(colegiadoColegiacion.getSituacion().getFechaSituacion().getTime());     
+									String fechaEstado = format1.format(colegiadoColegiacion.getSituacion().getFechaSituacion().getTime());  
+									colegiadoItem.setFechaEstado(colegiadoColegiacion.getSituacion().getFechaSituacion().getTime());
 									colegiadoItem.setFechaEstadoStr(fechaEstado);
 									if (null != colegiado.getColegiacionArray()[0].getColegio()) {
 										List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiadoColegiacion.getColegio().getCodigoColegio());
@@ -213,6 +219,32 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 									if(!(inst.get(0).getIdinstitucion().equals(idInstitucion))) {
 										colegiadoItems.add(colegiadoItem);
 									}
+							}
+							//Establecemos el orden de las otras colegiaciones
+							List<ColegiadoItem> otrasColegiacionesEjercientes = new ArrayList<>();
+							List<ColegiadoItem> otrasColegiacionesNoEjercientes = new ArrayList<>();
+							List<ColegiadoItem> restoColegiaciones = new ArrayList<>();
+							for(ColegiadoItem otraColegiacion: colegiadoItems) {
+								if(ESTADO_EJERCIENTE.equals(otraColegiacion.getEstadoColegial())) {
+									otrasColegiacionesEjercientes.add(otraColegiacion);
+								}else if(ESTADO_NOEJERCIENTE.equals(otraColegiacion.getEstadoColegial())) {
+									otrasColegiacionesNoEjercientes.add(otraColegiacion);
+								}else {
+									restoColegiaciones.add(otraColegiacion);
+								}
+							}
+							colegiadoItems.clear();
+							Collections.sort(otrasColegiacionesEjercientes);
+							for(ColegiadoItem e: otrasColegiacionesEjercientes) {
+								colegiadoItems.add(e);
+							}
+							Collections.sort(otrasColegiacionesNoEjercientes);
+							for(ColegiadoItem e: otrasColegiacionesNoEjercientes) {
+								colegiadoItems.add(e);
+							}
+							Collections.sort(restoColegiaciones);
+							for(ColegiadoItem e: restoColegiaciones) {
+								colegiadoItems.add(e);
 							}
 							
 							colegiadoDTO.setColegiadoItem(colegiadoItems);
