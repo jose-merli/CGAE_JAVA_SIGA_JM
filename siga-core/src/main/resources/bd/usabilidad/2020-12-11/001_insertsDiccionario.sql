@@ -1,3 +1,8 @@
+spool  001_insertsDiccionario.log
+prompt 001_insertsDiccionario
+select to_char(sysdate, 'hh24:mi:ss') as "Inicio" from dual;
+prompt .
+
 insert into GEN_DICCIONARIO (IDRECURSO, DESCRIPCION, ERROR, IDLENGUAJE, FECHAMODIFICACION, USUMODIFICACION, IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.fechaSituacion', 'F. Incorporación', 0, '1', sysdate, 0, '19');
 insert into GEN_DICCIONARIO (IDRECURSO, DESCRIPCION, ERROR, IDLENGUAJE, FECHAMODIFICACION, USUMODIFICACION, IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.fechaSituacion', 'F. Incorporación#CA', 0, '2', sysdate, 0, '19');
 insert into GEN_DICCIONARIO (IDRECURSO, DESCRIPCION, ERROR, IDLENGUAJE, FECHAMODIFICACION, USUMODIFICACION, IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.fechaSituacion', 'F. Incorporación#EU', 0, '3', sysdate, 0, '19');
@@ -16,3 +21,6 @@ update GEN_DICCIONARIO set fechamodificacion=sysdate, DESCRIPCION='Este colegiad
 
 
 commit;
+prompt .
+select to_char(sysdate, 'hh24:mi:ss') as "Fin" from dual;
+spool off
