@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
@@ -277,7 +278,19 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 //	sql.SELECT("DIRECCION.TELEFONO1 AS TELEFONO");
 //	sql.SELECT("Select count(*)      From Scs_Cabeceraguardias Cab Where Cab.Idinstitucion = COLEGIADO.idinstitucion and cab.idpersona = COLEGIADO.idpersona and Cab.Fecha_Fin >= Sysdate) as guardiasPendientes");
 
-	
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "busquedaColegiadosSJCS")
+	@Results({ 
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INSCRITOTURNO", property = "inscritoturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INSCRITOGUARDIA", property = "inscritoguardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "GUARDIASPENDIENTES", property = "guardiasPendientes", jdbcType = JdbcType.VARCHAR)
 
-	
+	})
+	List<ColegiadosSJCSItem> busquedaColegiadosSJCS(String idInstitucion, ColegiadosSJCSItem colegiadosSJCSItem);
 }

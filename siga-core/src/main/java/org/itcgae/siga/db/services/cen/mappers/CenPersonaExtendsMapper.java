@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
@@ -160,8 +161,22 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	})
 	FichaPersonaItem getPersonaisColegiadoWithIdPersona(String idPersona, String idInstitucion);
 	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getColegiadoByIdPersona")
+	@Results({
+		@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COLEGIADO", property = "colegiado", jdbcType = JdbcType.VARCHAR),
 
-
-
-
+	})
+	FichaPersonaItem getColegiadoByIdPersona(String idPersona, Short idInstitucion);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "busquedaColegiadoExpress")//falta hacer query
+	@Results({
+		@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ColegiadoJGItem> busquedaColegiadoExpress(String colegiadoJGItem, String idInstitucion);
 }

@@ -123,12 +123,14 @@ public class PlantillasDocumentoController {
 	
 	@RequestMapping(value = "/guardar/datosSalida",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ResponseDataDTO> guardarDatosSalida(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		
 		ResponseDataDTO response = _plantillasDocumentoService.guardarDatosSalida(request, plantillaDoc);
 		if(response.getError() == null)
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
+	
 	@RequestMapping(value = "/subirPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	ResponseEntity<ResponseDocumentoDTO> uploadFile(MultipartHttpServletRequest request, @QueryParam("idClaseComunicacion") String idClaseComunicacion) throws Exception{
 		

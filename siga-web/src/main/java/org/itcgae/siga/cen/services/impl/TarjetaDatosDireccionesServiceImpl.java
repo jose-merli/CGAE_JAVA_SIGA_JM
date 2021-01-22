@@ -118,6 +118,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosMapper;
+	
 	@Autowired
 	private CenColacambioletradoExtendsMapper cenColacambioletradoMapper;
 
@@ -274,6 +275,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						"getCargos() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para actualizar datos de un direcciones");
 
 				int res = 0;
+				
 				// Llamamos al PL para mantener los colegiados
 				if(recordUpdate.getIddireccion() != null) {
 					res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
@@ -282,12 +284,14 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 							Long.valueOf(tarjetaDireccionesUpdateDTO[i].getIdPersona()), null, usuario.getIdusuario());
 				}
+				
 				if(res <=0) {
 					LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 							usuario.getIdinstitucion() + ", idpersona: " +
 							tarjetaDireccionesUpdateDTO[i].getIdPersona() + ", usumodificacion: " +
 							usuario.getIdusuario());
 				}
+				/*
 				Object[] paramMandatos = new Object[5];
 				paramMandatos[0] = tarjetaDireccionesUpdateDTO[i].getIdPersona().toString();
 				paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -512,6 +516,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
 							.equals(SigaConstants.TIPO_DIR_PREFERENTE_FAX)) {
 						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_FAX);
+						
 						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
 
@@ -543,7 +548,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 								datosDireccionesItem.getIdDireccion());
 						LOGGER.warn("updateDirection() / Salida de Consulta en Cen_direcciontipodireccion para obtener dirección actual");
 
+					
 						LOGGER.warn("updateDirection() / Entrada a Bucle para eliminar los tipos de dirección");
+
 						for (CenDireccionTipodireccion tipoDir : cenDireccionTipodireccionList) {
 
 							CenDireccionTipodireccionExample cenDireccionTipodireccionExample = new CenDireccionTipodireccionExample();
@@ -677,6 +684,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
 							TipoDireccionrecord.setFechamodificacion(new Date());
 							TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
+							
 							LOGGER.info(
 									"updateDirection() / cenDireccionTipodireccionMapper.insert() -> Entrada a cenDireccionTipodireccionMapper para insertar tiposdedirecciones");
 							cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
@@ -705,7 +713,6 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					response = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(direcciones);
 					LOGGER.info(
 							"updateDirection() / cenDireccionesExtendsMapper.updateByExampleSelective() -> Salida de cenDireccionesExtendsMapper para actualizar direcciones ");
-
 					// comprobacion actualización
 					if (response >= 1) {
 
@@ -725,17 +732,17 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 								
 								colegiado.setFechamodificacion(new Date());
 								colegiado.setUsumodificacion(usuario.getIdusuario());
-
 								LOGGER.info(
 										"updateDirection() / cenColegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenColegiadoExtendsMapper para actualizar el Colegiado");
 								cenColegiadoExtendsMapper.updateByPrimaryKey(colegiado);
 								LOGGER.info(
 										"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
-
 								LOGGER.info(
 										"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
 								// Llamamos al PL para mantener los colegiados
+								
 								int res = 0;
+								
 								if(datosDireccionesItem != null && !UtilidadesString.esCadenaVacia(datosDireccionesItem.getIdDireccion())) {
 									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 											Long.valueOf(datosDireccionesItem.getIdPersona()), Long.valueOf(datosDireccionesItem.getIdDireccion()), usuario.getIdusuario());
@@ -743,6 +750,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 											Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
 								}
+								
 								if(res <=0) {
 									LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 											usuario.getIdinstitucion() + ", idpersona: " +
@@ -752,6 +760,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 									LOGGER.info(
 											"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
 								}
+								/*
 								Object[] paramMandatos = new Object[5];
 								paramMandatos[0] = datosDireccionesItem.getIdPersona().toString();
 								paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -760,6 +769,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 								paramMandatos[4] = usuario.getIdusuario().toString();
 								String resultado[] = new String[2];
 								try {
+									LOGGER.warn("updateDirection() / Llamada a PL Pkg_Siga_Censo.Actualizardatosletrado");	
 									resultado = callPLProcedure(
 											"{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
 											paramMandatos);
@@ -767,6 +777,8 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
+								LOGGER.warn("updateDirection() / Fin Llamada a PL Pkg_Siga_Censo.Actualizardatosletrado");	
+								*/
 
 							}
 							
@@ -803,7 +815,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							keyDireccionesPosterior.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
 							cenDireccionesPosterior = cenDireccionesExtendsMapper
 									.selectByPrimaryKey(keyDireccionesPosterior);
-	
+							
 							LOGGER.warn("updateDirection() / Entrada a auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones() ");	
 							auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(cenDireccionesAnterior,
 									cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
@@ -1003,6 +1015,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
 							.equals(SigaConstants.TIPO_DIR_PREFERENTE_FAX)) {
 						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_FAX);
+						
 						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
 
@@ -1164,6 +1177,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 								"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
 
 						int res = 0;
+						
 						// Llamamos al PL para mantener los colegiados
 						if(direcciones != null && direcciones.getIddireccion() != null) {
 							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
@@ -1172,6 +1186,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 									Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
 						}
+				
 						if(res <=0) {
 							LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 									usuario.getIdinstitucion() + ", idpersona: " +
@@ -1181,6 +1196,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							LOGGER.info(
 									"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
 						}
+						/*
 						Object[] paramMandatos = new Object[5];
 						paramMandatos[0] = datosDireccionesItem.getIdPersona().toString();
 						paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -1195,6 +1211,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						*/
 
 						LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
 						insertResponseDTO.setId(idDireccion.toString());
@@ -1761,6 +1778,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				} else {
 					// Llamamos al PL para mantener los colegiados
 					int res = 0;
+					
 					if(direcciones != null && direcciones.getIddireccion() != null) {
 						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 								Long.valueOf(datosDireccionesItem.getIdPersona()), direcciones.getIddireccion(), usuario.getIdusuario());
@@ -1768,6 +1786,8 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
 								Long.valueOf(datosDireccionesItem.getIdPersona()), null, usuario.getIdusuario());
 					}
+					
+			
 					if(res <=0) {
 						LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
 								usuario.getIdinstitucion() + ", idpersona: " +
@@ -1777,6 +1797,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						LOGGER.info(
 								"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
 					}
+					/*
 					Object[] paramMandatos = new Object[5];
 					paramMandatos[0] = datosDireccionesItem.getIdPersona().toString();
 					paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -1791,6 +1812,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					*/
 
 					insertResponseDTO.setStatus(SigaConstants.OK);
 					insertResponseDTO.setId(idDireccion.toString());
@@ -1932,7 +1954,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		return 0;
 		}
 	} //insertarCambioEnCola()
+
 	private Long getNuevoId(Integer idInstitucion, Long idPersona) {
+		
 		MaxIdDto id = cenColacambioletradoMapper.selectNuevoId(idInstitucion, idPersona);
 		return id.idMax;
 	}

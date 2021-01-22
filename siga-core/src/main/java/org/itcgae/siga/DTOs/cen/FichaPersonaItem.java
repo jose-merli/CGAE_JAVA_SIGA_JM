@@ -20,6 +20,7 @@ public class FichaPersonaItem {
 	private String tipoIdentificacion;
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaAlta;
+	private String colegiado;
 	
 	
 	/**
@@ -216,8 +217,10 @@ public class FichaPersonaItem {
 	/**
 	 */
 	
-
-
+	@JsonProperty("colegiado")	
+	public String getColegiado() {
+		return colegiado;
+	}
 
 
 	@Override

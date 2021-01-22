@@ -222,10 +222,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion,
 							SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
 
-//						element.setLabel("");
-//						element.setValue("");
-//						comboItems.add(0, element);
-
 					comboConsultasDTO.setConsultasCondicional(comboItems);
 
 					LOGGER.debug("Obtenemos las consultas DATOS");
@@ -233,7 +229,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(
 							Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion,
 							SigaConstants.OBJETIVO.DATOS.getCodigo());
-
 
 					comboConsultasDTO.setConsultasDatos(comboItems);
 
@@ -243,7 +238,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion,
 							SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
 
-
 					comboConsultasDTO.setConsultasMultidoc(comboItems);
 
 					LOGGER.debug("Obtenemos las consultas DESTINATARIOS");
@@ -251,7 +245,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(
 							Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion,
 							SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
-
 
 					comboConsultasDTO.setConsultasDestinatarios(comboItems);
 
@@ -735,7 +728,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 					AdmUsuarios usuario = usuarios.get(0);
 					comboItems = modPlantillaDocFormatoExtendsMapper.selectFormatos(usuario.getIdlenguaje());
-
 					comboDTO.setCombooItems(comboItems);
 
 				}
@@ -788,7 +780,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 								LOGGER.debug("El informe ya está asociado");
 								idInforme = Long.parseLong(plantillaDoc.getIdInforme());
 
-								// Recuperamos las plantillas asociadas al informe
 							} else {
 								idInforme = modModeloPlantillaDocumentoExtendsMapper.selectMaxInforme(
 										Short.parseShort(plantillaDoc.getIdInstitucion()),
@@ -799,17 +790,17 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 								idInforme = idInforme + (long) 1;
 							}
 
-							// Comprobamos los sufijos guardadados al informe
+//							// Comprobamos los sufijos guardadados al informe
 //							ModRelPlantillaSufijoExample relSufijoPlantillaExample = new ModRelPlantillaSufijoExample();
 //							relSufijoPlantillaExample.createCriteria()
 //									.andIdmodelocomunicacionEqualTo(
 //											Long.parseLong(plantillaDoc.getIdModeloComunicacion()))
 //									.andIdinformeEqualTo(idInforme);
-
+//
 //							List<ModRelPlantillaSufijo> sufijosGuardados = modRelPlantillaSufijoMapper
 //									.selectByExample(relSufijoPlantillaExample);
-
-							// Borramos los sufijos guardados
+//
+//							// Borramos los sufijos guardados
 //							for (ModRelPlantillaSufijo modSufijo : sufijosGuardados) {
 //								modRelPlantillaSufijoMapper.deleteByPrimaryKey(modSufijo.getIdplantillasufijo());
 //							}
@@ -817,7 +808,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							for (DocumentoPlantillaItem idPlantillaDoc : plantillaDoc.getPlantillas()) {
 
 								ModPlantilladocumentoKey modeloPlantillaKey = new ModPlantilladocumentoKey();
-								
+
 								modeloPlantillaKey.setIdioma(idPlantillaDoc.getIdIdioma());
 								modeloPlantillaKey.setIdplantilladocumento(
 										Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
@@ -890,7 +881,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 									}
 								}
 
-								// Guardamos los sufijos recibidos
+//								// Guardamos los sufijos recibidos
 //								if (plantillaDoc.getSufijos() != null) {
 //									for (SufijoItem sufijo : plantillaDoc.getSufijos()) {
 //										ModRelPlantillaSufijo relSufijoPlantilla = new ModRelPlantillaSufijo();
@@ -1087,20 +1078,19 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					String idPlantillaDoc = plantillaDoc.getIdPlantillaDocumento();
 					ModPlantilladocumentoExample modeloPlantillaKey = new ModPlantilladocumentoExample();
 					modeloPlantillaKey.createCriteria().andIdplantilladocumentoEqualTo(Long.parseLong(idPlantillaDoc))
-					.andIdiomaEqualTo(plantillaDoc.getIdIdioma());
+							.andIdiomaEqualTo(plantillaDoc.getIdIdioma());
 //					modeloPlantillaKey.setIdioma(plantillaDoc.getIdIdioma());
 //					modeloPlantillaKey.setIdplantilladocumento(Long.parseLong(idPlantillaDoc));
 //					ModPlantilladocumento modPlantillaDoc = modPlantillaDocumentoExtendsMapper
 //							.selectByPrimaryKey(modeloPlantillaKey);
-					
-					
+
 					List<ModPlantilladocumento> plantillaDocumentoList = modPlantilladocumentoMapper
 							.selectByExample(modeloPlantillaKey);
-					
-					if (plantillaDocumentoList != null  && plantillaDocumentoList.size() > 0 ) {
+
+					if (plantillaDocumentoList != null && plantillaDocumentoList.size() > 0) {
 
 						ModPlantilladocumento plantillaDocumento = plantillaDocumentoList.get(0);
-						
+
 						// OBtenemos la ruta de las plantillas
 						if (plantillaDoc.getIdClaseComunicacion() != null) {
 							modClase = _modClasecomunicacionesMapper
@@ -1211,7 +1201,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 	@Override
 	public ComboDTO obtenerSizeFichero(HttpServletRequest request) {
-		
+
 		LOGGER.info(
 				"obtenerSizeFichero() -> Entrada al servicio para obtener el tamaño máximo de los ficheros de entrada");
 
@@ -1232,7 +1222,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 				if (null != usuarios && usuarios.size() > 0) {
 
-					
 					// crear path para almacenar el fichero
 					GenPropertiesKey key = new GenPropertiesKey();
 					key.setFichero(SigaConstants.FICHERO_SIGA);
@@ -1268,98 +1257,143 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	public ResponseDataDTO guardarDatosSalida(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		LOGGER.info(
 				"guardarDatosSalida() -> Entrada al servicio para guardar los datos de salida de la plantilla de documento");
+
+		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
 		ResponseDataDTO respuesta = new ResponseDataDTO();
 		List<DocumentoPlantillaItem> plantillas = new ArrayList<DocumentoPlantillaItem>();
 		Error error = new Error();
 		Long idInforme = (long) 0;
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
 			LOGGER.info(
 					"guardarDatosSalida() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener usuario logueado");
+
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
 			LOGGER.info(
 					"guardarDatosSalida() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener usuario logueado");
+
 			try {
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
+
 					if (plantillaDoc.getIdModeloComunicacion() != null) {
+
+						// Si no hay hay plantillas se generan las plantillas por defecto
 						if (!(plantillaDoc.getPlantillas() != null && plantillaDoc.getPlantillas().size() > 0)) {
 							plantillas = addModPlantillasDocumentos(plantillaDoc, usuario, idInstitucion);
+
 							if (plantillas != null && plantillas.size() > 0) {
 								plantillaDoc.setPlantillas(plantillas);
 							}
 						}
+
 						if (plantillaDoc.getIdInforme() != null && !"".equals(plantillaDoc.getIdInforme())) {
 							LOGGER.debug("El informe ya está asociado");
 							idInforme = Long.parseLong(plantillaDoc.getIdInforme());
+
 						} else {
+
 							LOGGER.info(
 									"guardarDatosSalida() / modModeloPlantillaDocumentoExtendsMapper.selectByExample() -> Entrada a modModeloPlantillaDocumentoExtendsMapper para obtener idInforme modelo de la plantilla");
+
 							idInforme = modModeloPlantillaDocumentoExtendsMapper.selectMaxInforme(
 									Short.parseShort(plantillaDoc.getIdInstitucion()),
 									Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+
 							LOGGER.info(
 									"guardarDatosSalida() / modModeloPlantillaDocumentoExtendsMapper.selectByExample() -> Salida de modModeloPlantillaDocumentoExtendsMapper para obtener idInforme modelo de la plantilla");
+
 							if (idInforme == null) {
 								idInforme = (long) 0;
 							}
 							idInforme = idInforme + (long) 1;
 						}
+
+						// Comprobamos los sufijos guardadados al informe
 						ModRelPlantillaSufijoExample relSufijoPlantillaExample = new ModRelPlantillaSufijoExample();
 						relSufijoPlantillaExample.createCriteria()
 								.andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion()))
 								.andIdinformeEqualTo(idInforme);
+
 						LOGGER.info(
 								"guardarDatosSalida() / modRelPlantillaSufijoMapper.selectByExample() -> Entrada a modRelPlantillaSufijoMapper para obtener los sufijos relacionados con la plantilla");
+
 						List<ModRelPlantillaSufijo> sufijosGuardados = modRelPlantillaSufijoMapper
 								.selectByExample(relSufijoPlantillaExample);
+
 						LOGGER.info(
 								"guardarDatosSalida() / modRelPlantillaSufijoMapper.selectByExample() -> Salida de modRelPlantillaSufijoMapper para obtener los sufijos relacionados con la plantilla");
+
+						// Borramos los sufijos guardados
 						for (ModRelPlantillaSufijo modSufijo : sufijosGuardados) {
+
 							LOGGER.info(
 									"guardarDatosSalida() / modRelPlantillaSufijoMapper.selectByExample() -> Entrada a modRelPlantillaSufijoMapper para eliminar los sufijos relacionados con la plantilla");
+
 							modRelPlantillaSufijoMapper.deleteByPrimaryKey(modSufijo.getIdplantillasufijo());
+
 							LOGGER.info(
 									"guardarDatosSalida() / modRelPlantillaSufijoMapper.selectByExample() -> Salida de modRelPlantillaSufijoMapper para eliminar los sufijos relacionados con la plantilla");
 						}
+
 						for (DocumentoPlantillaItem idPlantillaDoc : plantillaDoc.getPlantillas()) {
+
 							ModPlantilladocumentoKey modeloPlantillaKey = new ModPlantilladocumentoKey();
+
 							modeloPlantillaKey.setIdioma(idPlantillaDoc.getIdIdioma());
 							modeloPlantillaKey
 									.setIdplantilladocumento(Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
+
 							LOGGER.info(
 									"guardarDatosSalida() / modPlantillaDocumentoExtendsMapper.selectByExample() -> Entrada a modPlantillaDocumentoExtendsMapper para obtener la plantilla documento");
+
 							ModPlantilladocumento modPlantillaDoc = modPlantillaDocumentoExtendsMapper
 									.selectByPrimaryKey(modeloPlantillaKey);
+
 							LOGGER.info(
 									"guardarDatosSalida() / modPlantillaDocumentoExtendsMapper.selectByExample() -> Salida de modPlantillaDocumentoExtendsMapper para obtener la plantilla documento");
+
 							if (modPlantillaDoc != null) {
+
 								ModModeloPlantilladocumentoKey modModeloPlantillaDocKey = new ModModeloPlantilladocumentoKey();
 								modModeloPlantillaDocKey.setIdmodelocomunicacion(
 										Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
 								modModeloPlantillaDocKey
 										.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
+
 								LOGGER.info(
 										"guardarDatosSalida() / modModeloPlantilladocumentoMapper.selectByExample() -> Entrada a modPlantillaDocumentoExtendsMapper para obtener el modelo de la plantilla documento");
+
 								ModModeloPlantilladocumento modModeloPlantillaDoc = modModeloPlantilladocumentoMapper
 										.selectByPrimaryKey(modModeloPlantillaDocKey);
+
 								LOGGER.info(
 										"guardarDatosSalida() / modModeloPlantilladocumentoMapper.selectByExample() -> Salida de modPlantillaDocumentoExtendsMapper para obtener el modelo de la plantilla documento");
+
 								if (modModeloPlantillaDoc != null) {
 									modModeloPlantillaDoc.setFechamodificacion(new Date());
 									modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getIdFormatoSalida());
 									modModeloPlantillaDoc.setNombreficherosalida(plantillaDoc.getNombreFicheroSalida());
 									modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
+
 									LOGGER.info(
 											"guardarDatosSalida() / modModeloPlantilladocumentoMapper.selectByExample() -> Entrada a modPlantillaDocumentoExtendsMapper para modificar el modelo de la plantilla documento");
+
 									modModeloPlantilladocumentoMapper.updateByPrimaryKey(modModeloPlantillaDoc);
+
 									LOGGER.info(
 											"guardarDatosSalida() / modModeloPlantilladocumentoMapper.selectByExample() -> Salida de modPlantillaDocumentoExtendsMapper para modificar el modelo de la plantilla documento");
+
 								}else {
+
 									modModeloPlantillaDoc = new ModModeloPlantilladocumento();
 									modModeloPlantillaDoc.setFechamodificacion(new Date());
 									modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getIdFormatoSalida());
@@ -1372,7 +1406,11 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 											Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
 									modModeloPlantillaDoc.setFechaasociacion(new Date());
 									modModeloPlantillaDoc.setIdinforme(idInforme);
+
 									modModeloPlantilladocumentoMapper.insert(modModeloPlantillaDoc);
+
+									// Si el informe ya tiene asociadas consultas se las asociamos para esta
+									// plantilla
 									List<ConsultaItem> listaConsultas = modPlantillaDocumentoConsultaExtendsMapper
 											.selectConsultasByInforme(
 													Short.parseShort(plantillaDoc.getIdInstitucion()),
@@ -1380,13 +1418,16 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 													idInforme, usuario.getIdlenguaje(), false);
 									if (listaConsultas != null && listaConsultas.size() > 0) {
 										for (ConsultaItem consulta : listaConsultas) {
+											// Obtenemos la sentencia
 											ConConsultaKey key = new ConConsultaKey();
 											key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
 											key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
 											ConConsulta consultaEntity = _conConsultaMapper.selectByPrimaryKey(key);
+
 											if (consultaEntity != null) {
 												consulta.setSentencia(consultaEntity.getSentencia());
 											}
+
 											ModPlantilladocConsulta plantillaConsulta = new ModPlantilladocConsulta();
 											plantillaConsulta.setIdplantilladocumento(
 													modModeloPlantillaDoc.getIdplantilladocumento());
@@ -1404,7 +1445,10 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 											modPlantilladocConsultaMapper.insert(plantillaConsulta);
 										}
 									}
+								
 								}
+
+								// Guardamos los sufijos recibidos
 								if (plantillaDoc.getSufijos() != null) {
 									for (SufijoItem sufijo : plantillaDoc.getSufijos()) {
 										ModRelPlantillaSufijo relSufijoPlantilla = new ModRelPlantillaSufijo();
@@ -1417,22 +1461,30 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										relSufijoPlantilla.setIdinforme(idInforme);
 										relSufijoPlantilla.setFechamodificacion(new Date());
 										relSufijoPlantilla.setUsumodificacion(usuario.getIdusuario());
+
 										LOGGER.info(
 												"guardarDatosSalida() / modRelPlantillaSufijoMapper.selectByExample() -> Entrada a modRelPlantillaSufijoMapper para guardar los sufijos del modelo de la plantilla documento");
+
 										modRelPlantillaSufijoMapper.insertSelective(relSufijoPlantilla);
+
 										LOGGER.info(
 												"guardarDatosSalida() / modRelPlantillaSufijoMapper.selectByExample() -> Salida de modRelPlantillaSufijoMapper para guardar los sufijos del modelo de la plantilla documento");
+
 									}
 								}
 							}
+
 						}
+						
 						respuesta.setData(String.valueOf(idInforme));
+
 					} else {
 						error.setCode(500);
 						error.setDescription("Error al guardar los datos de salida de la plantilla de documento");
 						error.setMessage("Error al guardar los datos de salida de la plantilla de documento");
 						respuesta.setError(error);
 					}
+
 				}
 			} catch (Exception e) {
 				error.setCode(500);
@@ -1441,43 +1493,62 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				e.printStackTrace();
 				respuesta.setError(error);
 			}
+
 		}
 		LOGGER.info(
 				"guardarDatosSalida() -> Salida del servicio para guardar los datos de salida de la plantilla de documento");
 		return respuesta;
 	}
+
 	private List<DocumentoPlantillaItem> addModPlantillasDocumentos(TarjetaPlantillaDocumentoDTO modeloCom,
 			AdmUsuarios usuario, Short idInstitucion) {
 		LOGGER.info("addModPlantillasDocumentos() -> Entrada al servicio para generar las plantillas por defecto");
+
 		List<DocumentoPlantillaItem> plantillas = new ArrayList<DocumentoPlantillaItem>();
 		List<ModPlantilladocumento> modPlantillas = new ArrayList<ModPlantilladocumento>();
+
 		Integer i = 0;
+
 		do {
+
 			try {
+
 				ModPlantilladocumento plantilla = new ModPlantilladocumento();
 				plantilla.setFechamodificacion(new Date());
 				plantilla.setPlantilla(SigaConstants.nombreExcelConsulta);
 				plantilla.setUsumodificacion(usuario.getIdusuario());
 				Integer idioma = i + 1;
 				plantilla.setIdioma(idioma.toString());
+
 				LOGGER.info(
 						"addModPlantillasDocumentos() / modPlantilladocumentoMapper.insert() -> Entrada a modPlantilladocumentoMapper para insertar plantilla por defecto");
+
 				modPlantilladocumentoMapper.insert(plantilla);
+
 				LOGGER.info(
 						"addModPlantillasDocumentos() / modPlantilladocumentoMapper.insert() -> Salida de modPlantilladocumentoMapper para insertar plantilla por defecto");
+
 				modPlantillas.add(plantilla);
 				i++;
+
 			} catch (Exception e) {
 				LOGGER.info("Error" + e.getMessage());
 			}
+
 		} while (i < 4);
+
 		for (ModPlantilladocumento modPlantilladocumento : modPlantillas) {
+
 			DocumentoPlantillaItem documentoPlantillaItem = new DocumentoPlantillaItem();
 			documentoPlantillaItem.setIdIdioma(modPlantilladocumento.getIdioma());
 			documentoPlantillaItem.setIdPlantillaDocumento(modPlantilladocumento.getIdplantilladocumento().toString());
+
 			plantillas.add(documentoPlantillaItem);
+
 		}
+
 		LOGGER.info("addModPlantillasDocumentos() -> Salida del servicio para generar las plantillas por defecto");
 		return plantillas;
 	}
+
 }

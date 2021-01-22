@@ -57,12 +57,12 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
                     Validacion result = validaCertificado(cgaeAuthenticaton.getCertificate());
                     if (result == null || !result.equals(Validacion.OK)) {
                               throw new BadCredentialsException("Imposible validar el usuario en SIGA");
-                    }
-                    UserCgae user;
+                    }*/
+
                     UserCgae user;
 					try {
 						user = (UserCgae) this.userDetailsService.loadUserByUsername(cgaeAuthenticaton.getUser());
-
+	
 	                    if (user != null) {
 	                              return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null, user,
 	                                                 cgaeAuthenticaton.getCertificate(), cgaeAuthenticaton.getAuthorities());
@@ -70,6 +70,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 	                              throw new BadCredentialsException("Imposible validar el usuario en SIGA");
 	                    }
 					} catch (Exception e) {
+						// TODO Auto-generated catch block
 						throw new BadCredentialsException("Se ha producido un error al cargar el usuario",e);
 					}
           }
@@ -79,7 +80,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
                     return authentication.equals(UserAuthenticationToken.class);
           }
 
-          private Validacion validaCertificado(X509Certificate x509Certificate) {
+          /*private Validacion validaCertificado(X509Certificate x509Certificate) {
 
                     Validacion valCertificadoRespuesta = null;
                     valCertificadoRespuesta = Validacion.OK;
@@ -99,7 +100,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
                                        LOGGER.debug("Certificado Valido");
                                        valCertificadoRespuesta = Validacion.OK;
                               } else {
-                                       LOGGER.error("Imposible validar el certificado");
+                                       LOGGER.error("Imposible validar el usuario en SIGA");
                                        valCertificadoRespuesta = Validacion.ERROR_CERT_IS_NOT_VALID;
                               }
                     } catch (CertificateNotYetValidException e) {
@@ -152,6 +153,6 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 
                     , ERROR_CERT_ROL_NOT_ALLOWED, ERROR_BAR_PROVIDER
 
-          }
+          }*/
 
 }

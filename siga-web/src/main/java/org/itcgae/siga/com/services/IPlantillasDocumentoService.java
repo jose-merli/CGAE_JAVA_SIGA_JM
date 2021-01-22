@@ -91,6 +91,14 @@ public interface IPlantillasDocumentoService {
 	 * @param plantillaDoc
 	 * @return
 	 */
+	ResponseDataDTO guardarDatosSalida(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
+	
+	/**
+	 * Obtiene los combos de las consultas posibles seperadas por objetivo
+	 * @param request
+	 * @param plantillaDoc
+	 * @return
+	 */
 	ComboConsultasDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 
 	/**

@@ -17,6 +17,7 @@ public interface ITarjetaDatosIntegrantesService {
 	
 	public ComboDTO getProvinces(HttpServletRequest request);
 	
+	public ComboDTO getColegios(HttpServletRequest request);
 	
 	public ComboDTO getCargos(HttpServletRequest request);
 	
