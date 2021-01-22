@@ -28,6 +28,7 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	Logger LOGGER = LoggerFactory.getLogger(DevAuthenticationFilter.class);
 
 	private AuthenticationManager authenticationManager;
+	
 	@SuppressWarnings("unused")
 	private SigaUserDetailsService userDetailsService;
 
@@ -45,20 +46,20 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 		try{
-			
-			// Confirmado con CGAE que debe accederse con el usuario con id -1 siempre que se acceda por los combos
 			LOGGER.info("Se accede por los combos");
-//			String dni = "44149718E"; // Habilitar este para trabajar en local y comentar las dos l�neas de CAS
+//			String dni = "44149718E"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
+//			String nombre = "Jesus"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
 			String dni = (String) request.getHeader("CAS-username");
 			String nombre = (String) request.getHeader("CAS-displayName");
+
 			String grupo = "";
 			String institucion = request.getParameter("location");
 			String letrado = "";
 			AdmRol rol = null;
 			grupo = request.getParameter("profile");
 			letrado = request.getParameter("letrado");
+			
 			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,letrado, rol, nombre);
-//			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,certs[0]));
 			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,null));
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage(),e);
