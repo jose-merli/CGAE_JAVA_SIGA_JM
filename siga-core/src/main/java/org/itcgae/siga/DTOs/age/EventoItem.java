@@ -49,6 +49,8 @@ public class EventoItem {
 	private String tipoCalendario;
 	private String tipoEvento;
 	private String fechaInicioString;
+	private String anio;
+	private boolean historico;
 	
 	
 	
@@ -890,6 +892,34 @@ public class EventoItem {
 
 	public void setRealEnd(Date realEnd) {
 		this.realEnd = realEnd;
+	}
+	
+	public EventoItem historico(boolean historico) {
+		this.historico = historico;
+		return this;
+	}
+
+	@JsonProperty("historico")
+	public boolean isHistorico() {
+		return historico;
+	}
+
+	public void setHistorico(boolean historico) {
+		this.historico = historico;
+	}
+	
+	public EventoItem anio(String anio) {
+		this.anio = anio;
+		return this;
+	}
+
+	@JsonProperty("anio")	
+	public String getAnio() {
+		return anio;
+	}
+
+	public void setAnio(String anio) {
+		this.anio = anio;
 	}
 	
 }
