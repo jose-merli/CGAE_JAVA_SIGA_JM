@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenSolimodidirecciones;
+import org.itcgae.siga.db.entities.CenSolimodidireccionesExample;
 import org.itcgae.siga.db.entities.CenSolimodidireccionesExample.Criteria;
 import org.itcgae.siga.db.entities.CenSolimodidireccionesExample.Criterion;
-import org.itcgae.siga.db.entities.CenSolimodidireccionesExample;
 
 public class CenSolimodidireccionesSqlProvider {
 

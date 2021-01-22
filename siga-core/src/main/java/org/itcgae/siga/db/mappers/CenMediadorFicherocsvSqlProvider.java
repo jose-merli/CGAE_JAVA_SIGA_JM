@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenMediadorFicherocsv;
+import org.itcgae.siga.db.entities.CenMediadorFicherocsvExample;
 import org.itcgae.siga.db.entities.CenMediadorFicherocsvExample.Criteria;
 import org.itcgae.siga.db.entities.CenMediadorFicherocsvExample.Criterion;
-import org.itcgae.siga.db.entities.CenMediadorFicherocsvExample;
 
 public class CenMediadorFicherocsvSqlProvider {
 

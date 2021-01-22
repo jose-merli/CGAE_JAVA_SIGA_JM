@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;

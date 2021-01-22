@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmCertificados;
+import org.itcgae.siga.db.entities.AdmCertificadosExample;
 import org.itcgae.siga.db.entities.AdmCertificadosExample.Criteria;
 import org.itcgae.siga.db.entities.AdmCertificadosExample.Criterion;
-import org.itcgae.siga.db.entities.AdmCertificadosExample;
 
 public class AdmCertificadosSqlProvider {
 

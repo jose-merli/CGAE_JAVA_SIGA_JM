@@ -9,7 +9,6 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
-import org.itcgae.siga.db.services.form.providers.ForTiposervicioSqlExtendsProvider;
 import org.itcgae.siga.db.services.form.providers.PysServiciosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

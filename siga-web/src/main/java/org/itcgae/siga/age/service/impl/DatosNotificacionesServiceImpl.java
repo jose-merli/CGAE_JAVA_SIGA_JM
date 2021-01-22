@@ -16,7 +16,6 @@ import org.itcgae.siga.DTOs.age.ComboPlantillasDTO;
 import org.itcgae.siga.DTOs.age.ComboPlantillasItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
-import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -29,14 +28,9 @@ import org.itcgae.siga.db.entities.AgeGeneracionnotificaciones;
 import org.itcgae.siga.db.entities.AgeGeneracionnotificacionesExample;
 import org.itcgae.siga.db.entities.AgeNotificacionesevento;
 import org.itcgae.siga.db.entities.AgeNotificacioneseventoExample;
-import org.itcgae.siga.db.entities.CenInstitucion;
-import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
-import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
 import org.itcgae.siga.db.entities.EnvEnvios;
-import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
-import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.mappers.AgeGeneracionnotificacionesMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
@@ -47,9 +41,8 @@ import org.itcgae.siga.db.services.age.mappers.AgeNotificacioneseventoExtendsMap
 import org.itcgae.siga.db.services.age.mappers.AgeTipocuandoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeTiponotificacioneventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeUnidadmedidaExtendsMapper;
-import org.itcgae.siga.db.services.age.mappers.EnvPlantillasenviosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.EnvTipoenviosExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,7 +66,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 	private AgeTipocuandoExtendsMapper ageTipocuandoExtendsMapper;
 
 	@Autowired
-	private EnvPlantillasenviosExtendsMapper envPlantillasenviosExtendsMapper;
+	private EnvPlantillaEnviosExtendsMapper envPlantillasenviosExtendsMapper;
 
 	@Autowired
 	private EnvTipoenviosExtendsMapper envTipoenviosExtendsMapper;
@@ -495,7 +488,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 		return comboDTO;
 	}
 
-	@Transactional
+	@Transactional(timeout=2400)
 	@Override
 	public UpdateResponseDTO updateNotification(NotificacionEventoDTO notificacionEventoDTO,
 			HttpServletRequest request) {
@@ -839,12 +832,10 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
-
 				LOGGER.info(
 						"getPlantillas() / envPlantillasenviosExtendsMapper.getPlantillas() -> Entrada a envPlantillasenviosExtendsMapper para obtener las plantillas de notificaciones");
 
-				comboPlantillasItem = envPlantillasenviosExtendsMapper.getPlantillas(idInstitucion.toString());
+				comboPlantillasItem = envPlantillasenviosExtendsMapper.getPlantillasByIdInstitucion(idInstitucion.toString());
 
 				LOGGER.info(
 						"getPlantillas() / envPlantillasenviosExtendsMapper.getPlantillas() -> Salida de envPlantillasenviosExtendsMapper para obtener las plantillas de notificaciones");

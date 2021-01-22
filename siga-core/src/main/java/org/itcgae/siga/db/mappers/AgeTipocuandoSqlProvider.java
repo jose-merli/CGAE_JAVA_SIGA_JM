@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AgeTipocuando;
+import org.itcgae.siga.db.entities.AgeTipocuandoExample;
 import org.itcgae.siga.db.entities.AgeTipocuandoExample.Criteria;
 import org.itcgae.siga.db.entities.AgeTipocuandoExample.Criterion;
-import org.itcgae.siga.db.entities.AgeTipocuandoExample;
 
 public class AgeTipocuandoSqlProvider {
 

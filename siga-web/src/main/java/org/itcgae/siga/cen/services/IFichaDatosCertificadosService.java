@@ -3,7 +3,6 @@ package org.itcgae.siga.cen.services;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.CertificadoDTO;
-import org.itcgae.siga.DTOs.cen.CertificadoItem;
 
 public interface IFichaDatosCertificadosService {
 

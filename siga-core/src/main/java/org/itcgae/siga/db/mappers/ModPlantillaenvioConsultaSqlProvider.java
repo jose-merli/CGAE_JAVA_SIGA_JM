@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
+import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample.Criteria;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample.Criterion;
-import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 
 public class ModPlantillaenvioConsultaSqlProvider {
 

@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenGruposcriterios;
+import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
 import org.itcgae.siga.db.entities.CenGruposcriteriosExample.Criteria;
 import org.itcgae.siga.db.entities.CenGruposcriteriosExample.Criterion;
-import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
 
 public class CenGruposcriteriosSqlProvider {
 

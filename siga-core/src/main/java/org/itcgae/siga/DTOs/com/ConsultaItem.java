@@ -40,6 +40,7 @@ public class ConsultaItem {
 	
 	private String finalidad;
 	private String idInstitucionConsulta;
+	private String idioma;
 	
 	private ArrayList<CampoDinamicoItem> camposDinamicos = new ArrayList<CampoDinamicoItem>();
 
@@ -289,6 +290,14 @@ public class ConsultaItem {
 
 	public void setIdInstitucionConsulta(String idInstitucionConsulta) {
 		this.idInstitucionConsulta = idInstitucionConsulta;
+	}
+
+	public String getIdioma() {
+		return idioma;
+	}
+
+	public void setIdioma(String idioma) {
+		this.idioma = idioma;
 	}
 	
 

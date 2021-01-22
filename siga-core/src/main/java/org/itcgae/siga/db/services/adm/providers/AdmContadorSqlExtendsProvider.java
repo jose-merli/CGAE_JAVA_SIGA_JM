@@ -3,9 +3,7 @@ package org.itcgae.siga.db.services.adm.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.ContadorRequestDTO;
 import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
-import org.itcgae.siga.db.entities.AdmContadorExample.Criterion;
 import org.itcgae.siga.db.mappers.AdmContadorSqlProvider;
-import org.itcgae.siga.db.mappers.GenParametrosSqlProvider;
 
 public class AdmContadorSqlExtendsProvider extends AdmContadorSqlProvider{
 

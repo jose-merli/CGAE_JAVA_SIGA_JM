@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmUsuarioEfectivo;
+import org.itcgae.siga.db.entities.AdmUsuarioEfectivoExample;
 import org.itcgae.siga.db.entities.AdmUsuarioEfectivoExample.Criteria;
 import org.itcgae.siga.db.entities.AdmUsuarioEfectivoExample.Criterion;
-import org.itcgae.siga.db.entities.AdmUsuarioEfectivoExample;
 
 public class AdmUsuarioEfectivoSqlProvider {
 

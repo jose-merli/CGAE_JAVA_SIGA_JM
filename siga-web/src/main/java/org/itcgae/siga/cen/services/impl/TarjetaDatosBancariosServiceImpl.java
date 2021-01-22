@@ -178,12 +178,12 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				LOGGER.info(
 						"searchBanksData() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
 				datosBancariosItem = cenCuentasbancariasExtendsMapper.selectCuentasBancarias(datosBancariosSearchDTO,
-						idInstitucion.toString());
+						idInstitucion);
 				LOGGER.info(
 						"searchBanksData() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
 
 				datosBancariosDTO.setDatosBancariosItem(datosBancariosItem);
-				;
+				
 			} else {
 				LOGGER.warn(
 						"searchBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -2496,7 +2496,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 	 */
 	private String[] ejecutarPL_RevisionSuscripcionesLetrado(String idInstitucion, String idPersona, String fecha,
 			String usuario) throws Exception {
-
+		LOGGER.info("Entrada Ejecución PL Revision SuscripcionesLetrado: " );
 		Object[] paramIn = new Object[4]; // Parametros de entrada del PL
 		String resultado[] = new String[2]; // Parametros de salida del PL
 
@@ -2512,10 +2512,11 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					paramIn);
 
 		} catch (Exception e) {
+			LOGGER.info("Error Ejecución PL Revision SuscripcionesLetrado: " + e.getMessage());
 			resultado[0] = "1"; // P_NUMREGISTRO
 			resultado[1] = "ERROR"; // ERROR P_DATOSERROR
 		}
-
+		LOGGER.info("Salida Ejecución PL Revision SuscripcionesLetrado: " );
 		return resultado;
 	}
 

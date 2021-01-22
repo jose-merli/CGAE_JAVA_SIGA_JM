@@ -11,9 +11,9 @@ import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 //import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,5 +105,12 @@ public class FichaDatosGeneralesController {
 	ResponseEntity<ComboDTO> getTopicsSpecificCourse(@RequestParam("idPersona") String idPersona, HttpServletRequest request) {
 		ComboDTO response = fichaDatosGenerales.getTopicsSpecificPerson(request, idPersona);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	
+	@RequestMapping(value = "/fichaDatosGenerales/getTipoIdentificacion",  method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> getTipoIdentificacion(@RequestBody StringDTO nifCif, HttpServletRequest request) { 
+		StringDTO response = fichaDatosGenerales.getTipoIdentificacion(nifCif, request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 }

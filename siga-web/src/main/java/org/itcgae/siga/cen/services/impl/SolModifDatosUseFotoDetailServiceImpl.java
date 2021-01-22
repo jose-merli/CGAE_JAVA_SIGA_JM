@@ -9,7 +9,6 @@ import org.itcgae.siga.DTOs.cen.SoliModifFotoItem;
 import org.itcgae.siga.cen.services.ISolModifDatosUseFotoDetailService;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
-import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicmodifexportarfotoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;

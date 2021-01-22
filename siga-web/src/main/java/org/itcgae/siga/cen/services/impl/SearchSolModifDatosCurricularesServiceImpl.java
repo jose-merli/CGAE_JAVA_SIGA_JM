@@ -10,8 +10,6 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
-import org.itcgae.siga.DTOs.cen.SoliModiDireccionesItem;
-import org.itcgae.siga.DTOs.cen.SolicitModifDatosBasicosDTO;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ISearchSolModifDatosCurricularesService;
@@ -25,7 +23,6 @@ import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncvExample;
-import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
@@ -208,13 +205,13 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 				recordInsert.setIdpersona(solicitud.getIdpersona());
 				recordInsert.setIdtipocv(solicitud.getIdcv());
 
-				if (solicitud.getIdtipocvsubtipo1().equals("") && null != solicitud.getIdtipocvsubtipo1()) {
+				if (null != solicitud.getIdtipocvsubtipo1()) {
 					recordInsert.setIdtipocvsubtipo1(solicitud.getIdtipocvsubtipo1());
 					recordInsert.setIdinstitucionSubt1(solicitud.getIdinstitucionSubt1());
 				} else {
 					recordInsert.setIdtipocvsubtipo1(null);
 				}
-				if (solicitud.getIdtipocvsubtipo2().equals("") && null != solicitud.getIdtipocvsubtipo2()) {
+				if (null != solicitud.getIdtipocvsubtipo2()) {
 					recordInsert.setIdtipocvsubtipo2(solicitud.getIdtipocvsubtipo2());
 					recordInsert.setIdinstitucionSubt2(solicitud.getIdinstitucionSubt2());
 

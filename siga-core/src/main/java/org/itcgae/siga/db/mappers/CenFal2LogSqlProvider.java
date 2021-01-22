@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenFal2Log;
+import org.itcgae.siga.db.entities.CenFal2LogExample;
 import org.itcgae.siga.db.entities.CenFal2LogExample.Criteria;
 import org.itcgae.siga.db.entities.CenFal2LogExample.Criterion;
-import org.itcgae.siga.db.entities.CenFal2LogExample;
 
 public class CenFal2LogSqlProvider {
 

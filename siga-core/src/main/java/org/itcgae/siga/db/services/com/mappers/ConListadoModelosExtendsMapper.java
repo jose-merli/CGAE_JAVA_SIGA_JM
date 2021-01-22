@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.db.services.com.providers.ConListadoModelosExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -32,5 +31,5 @@ public interface ConListadoModelosExtendsMapper {
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 				})
 	
-	List<ModelosComunicacionItem> selectListadoModelos(Short idInstitucion,String idConsulta);
+	List<ModelosComunicacionItem> selectListadoModelos(Short idInstitucion,String idConsulta, Short idInstitucionModelo);
 }

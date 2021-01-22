@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenTipocambio;
+import org.itcgae.siga.db.entities.CenTipocambioExample;
 import org.itcgae.siga.db.entities.CenTipocambioExample.Criteria;
 import org.itcgae.siga.db.entities.CenTipocambioExample.Criterion;
-import org.itcgae.siga.db.entities.CenTipocambioExample;
 
 public class CenTipocambioSqlProvider {
 

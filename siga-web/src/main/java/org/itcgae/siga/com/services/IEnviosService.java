@@ -6,7 +6,6 @@ import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.db.entities.CenDirecciones;
-import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvEnvios;
 
 public interface IEnviosService {

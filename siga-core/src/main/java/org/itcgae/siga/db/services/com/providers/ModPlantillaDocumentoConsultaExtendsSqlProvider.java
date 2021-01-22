@@ -46,7 +46,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantilla");
 		sql.INNER_JOIN(
-				"CON_CONSULTA consulta ON consulta.IDCONSULTA = plantilla.IDCONSULTA AND consulta.IDINSTITUCION = plantilla.IDINSTITUCION_CONSULTA");
+				"CON_CONSULTA consulta ON consulta.IDCONSULTA = plantilla.IDCONSULTA AND consulta.IDINSTITUCION = plantilla.IDINSTITUCION_CONSULTA and consulta.fechabaja is null");
 		sql.INNER_JOIN(
 				"(select * from mod_modelo_plantilladocumento where rownum=1 AND mod_modelo_plantilladocumento.idmodelocomunicacion = "
 						+ idModeloComunicacion + " AND mod_modelo_plantilladocumento.idinforme = " + idInforme
@@ -83,7 +83,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantillaConsulta");
 		sql.INNER_JOIN(
-				"con_consulta ON con_consulta.idconsulta=plantillaConsulta.Idconsulta AND con_consulta.idinstitucion = plantillaConsulta.Idinstitucion_consulta");
+				"con_consulta ON con_consulta.idconsulta=plantillaConsulta.Idconsulta AND con_consulta.idinstitucion = plantillaConsulta.Idinstitucion_consulta and con_consulta.fechabaja is null");
 		sql.WHERE("plantillaConsulta.IDPLANTILLADOCUMENTO IN (" + idPlantillaDocumento
 				+ ") AND plantillaConsulta.IDMODELOCOMUNICACION = " + idModeloComunicacion);// + " AND
 																							// plantillaConsulta.IDINSTITUCION_CONSULTA
@@ -93,6 +93,32 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String selectConsultasDestinatario(Short idInstitucion, Long idModeloComunicacion, 
+			Long idObjetivo) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("con_consulta.DESCRIPCION");
+		sql.SELECT("con_consulta.IDCONSULTA");
+		sql.SELECT("con_consulta.SENTENCIA");
+		sql.SELECT("con_consulta.IDINSTITUCION");
+		sql.SELECT("plantillaConsulta.REGION");
+		sql.SELECT("plantillaDocumento.idioma");
+
+		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantillaConsulta");
+		sql.INNER_JOIN(
+				"con_consulta ON con_consulta.idconsulta=plantillaConsulta.Idconsulta AND con_consulta.idinstitucion = plantillaConsulta.Idinstitucion_consulta and con_consulta.fechabaja is null");
+		sql.INNER_JOIN("mod_plantilladocumento plantillaDocumento ON plantillaDocumento.IDPLANTILLADOCUMENTO = plantillaConsulta.IDPLANTILLADOCUMENTO");
+		sql.WHERE(" plantillaConsulta.IDMODELOCOMUNICACION = " + idModeloComunicacion);// + " AND
+																							// plantillaConsulta.IDINSTITUCION_CONSULTA
+																							// = " + idInstitucion);
+		sql.WHERE("con_consulta.idobjetivo = " + idObjetivo);
+		sql.WHERE("plantillaConsulta.FECHABAJA IS NULL");
+
+		return sql.toString();
+	}
+	
 
 	public String selectCountConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion,
 			Long idPlantillaDocumento, Long idObjetivo) {

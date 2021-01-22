@@ -42,7 +42,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHAFIRMAPRODUCTOS", property = "fechaFirmaProductos", jdbcType = JdbcType.DATE)
 	})
-	List<DatosBancariosItem> selectCuentasBancarias(DatosBancariosSearchDTO datosBancarios, String idInstitucion);
+	List<DatosBancariosItem> selectCuentasBancarias(DatosBancariosSearchDTO datosBancarios, Short idInstitucion);
 	
 	
 	
@@ -134,7 +134,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 	@Results({
 		@Result(column = "IDCUENTA", property = "idMax", jdbcType = JdbcType.VARCHAR),
 	})
-	MaxIdDto selectMaxID();
+	MaxIdDto selectMaxID(Long idPersona, Short idinstitucion);
 	
 
 }

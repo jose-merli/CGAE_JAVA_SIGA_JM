@@ -8,8 +8,6 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.form.FormadorCursoItem;
 import org.itcgae.siga.db.entities.AgePersonaEvento;
-import org.itcgae.siga.db.entities.AgePersonaEventoExample;
-import org.itcgae.siga.db.mappers.AgePersonaEventoSqlProvider;
 import org.itcgae.siga.db.mappers.ForPersonaCursoMapper;
 import org.itcgae.siga.db.services.form.providers.ForPersonacursoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;

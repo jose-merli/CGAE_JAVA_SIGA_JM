@@ -1,13 +1,9 @@
 package org.itcgae.siga.DTOs.gen;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-
-import org.itcgae.siga.DTOs.gen.DiccionarioItem;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 

@@ -155,10 +155,10 @@ public class CenTestUtils {
 		colegiado.setApellidos2("apellidos2");
 		colegiado.setColegiado(isColegiado);
 		colegiado.setNaturalDe("");
-		colegiado.setIncorporacion(new Date());
+		colegiado.setIncorporacionDate(new Date());
 		colegiado.setSituacion("1");
 		colegiado.setNif("20092000V");
-		colegiado.setIdtratamiento("1");
+		colegiado.setIdTratamiento("1");
 		colegiado.setComisiones("0");
 		colegiado.setAsientoContable("");
 		colegiado.setSexo("M");

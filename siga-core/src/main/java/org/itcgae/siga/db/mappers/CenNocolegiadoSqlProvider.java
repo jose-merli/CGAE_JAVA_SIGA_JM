@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample.Criteria;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample.Criterion;
-import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 
 public class CenNocolegiadoSqlProvider {
 

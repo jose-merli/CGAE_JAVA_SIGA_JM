@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CmnDatosXml;
+import org.itcgae.siga.db.entities.CmnDatosXmlExample;
 import org.itcgae.siga.db.entities.CmnDatosXmlExample.Criteria;
 import org.itcgae.siga.db.entities.CmnDatosXmlExample.Criterion;
-import org.itcgae.siga.db.entities.CmnDatosXmlExample;
 
 public class CmnDatosXmlSqlProvider {
 

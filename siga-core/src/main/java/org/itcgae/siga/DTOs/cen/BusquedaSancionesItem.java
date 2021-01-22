@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class BusquedaSancionesItem {
+public class BusquedaSancionesItem implements Comparable<BusquedaSancionesItem>{
 
 	private String[] idColegios;
 	private String colegio;
@@ -285,4 +285,9 @@ public class BusquedaSancionesItem {
 	public void setIsRestablecer(boolean restablecer) {
 		this.restablecer = restablecer;
 	}
+	
+	@Override
+	public int compareTo(BusquedaSancionesItem o) {
+		return o.getFechaDesdeDate().compareTo(getFechaDesdeDate());
+    }
 }

@@ -46,12 +46,18 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 			sql.SET("IDESTADO = " + record.getIdestado());
 		}
 
-		if (record.getSituacionresidente() != null && !record.getSituacionresidente().equals("")) {
-			sql.SET("SITUACIONRESIDENTE = " + record.getSituacionresidente());
+		// if (record.getSituacionresidente() != null &&
+		// !record.getSituacionresidente().equals("")) {
+		sql.SET("SITUACIONRESIDENTE = " + record.getSituacionresidente());
+		// }
+		
+		if (record.getObservaciones() != null) {
+			sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
+
+		}else {
+			sql.SET("OBSERVACIONES = ''");
 		}
 
-		sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
- 
 		if (record.getFechamodificacion() != null) {
 			String fechaF = dateFormat.format(record.getFechamodificacion());
 			sql.SET("FECHAMODIFICACION = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
@@ -61,13 +67,12 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 
 		if (fechaEstadoNueva != null) {
 			sql.SET("FECHAESTADO = TO_DATE('" + dateFormatWhere.format(fechaEstadoNueva) + "', 'dd/MM/RRRR')");
-			sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('" + dateFormatWhere.format(record.getFechaestado())
-					+ "', 'dd/MM/RRRR')");
+			sql.WHERE("TO_CHAR(FECHAESTADO, 'dd/MM/YYYY')  = TO_CHAR(TO_DATE('" + dateFormatWhere.format(record.getFechaestado())
+			+ "', 'dd/MM/RRRR'), 'dd/MM/YYYY')");
 		} else {
-			sql.SET("FECHAESTADO = TO_DATE('" + dateFormatWhere.format(record.getFechaestado())
-					+ "', 'dd/MM/RRRR')");
-			sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('" + dateFormatWhere.format(record.getFechaestado())
-					+ "', 'dd/MM/RRRR')");
+			sql.SET("FECHAESTADO = TO_DATE('" + dateFormatWhere.format(record.getFechaestado()) + "', 'dd/MM/RRRR')");
+			sql.WHERE("TO_CHAR(FECHAESTADO, 'dd/MM/YYYY')  = TO_CHAR(TO_DATE('" + dateFormatWhere.format(record.getFechaestado())
+					+ "', 'dd/MM/RRRR'), 'dd/MM/YYYY')");
 		}
 
 		sql.WHERE("IDINSTITUCION = " + record.getIdinstitucion() + "");

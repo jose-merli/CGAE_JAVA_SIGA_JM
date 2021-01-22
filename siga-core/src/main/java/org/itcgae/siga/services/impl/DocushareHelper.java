@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -420,12 +422,19 @@ public class DocushareHelper {
 						}
 					}
 
-					// Collections.sort(listDir);
-					// Collections.sort(listArch, new Comparator<DocuShareObjectVO>() {
-					// public int compare(DocuShareObjectVO o1, DocuShareObjectVO o2) {
-					// return (-1) * o1.getFechaModificacion().compareTo(o2.getFechaModificacion());
-					// }
-					// });
+					 Collections.sort(listDir);
+					 
+					 Collections.sort(listDir, new Comparator<DocuShareObjectVO>() {
+					 public int compare(DocuShareObjectVO o3, DocuShareObjectVO o4) {
+					 return (-1) * o3.getFechaModificacion().compareTo(o4.getFechaModificacion());
+					 }
+					 });
+					 
+					 Collections.sort(listArch, new Comparator<DocuShareObjectVO>() {
+					 public int compare(DocuShareObjectVO o1, DocuShareObjectVO o2) {
+					 return (-1) * o1.getFechaModificacion().compareTo(o2.getFechaModificacion());
+					 }
+					 });
 
 					list.addAll(listDir);
 					list.addAll(listArch);

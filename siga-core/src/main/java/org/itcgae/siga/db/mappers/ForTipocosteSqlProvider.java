@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForTipocoste;
+import org.itcgae.siga.db.entities.ForTipocosteExample;
 import org.itcgae.siga.db.entities.ForTipocosteExample.Criteria;
 import org.itcgae.siga.db.entities.ForTipocosteExample.Criterion;
-import org.itcgae.siga.db.entities.ForTipocosteExample;
 
 public class ForTipocosteSqlProvider {
 

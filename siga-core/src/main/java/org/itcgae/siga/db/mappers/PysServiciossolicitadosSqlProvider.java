@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.PysServiciossolicitados;
+import org.itcgae.siga.db.entities.PysServiciossolicitadosExample;
 import org.itcgae.siga.db.entities.PysServiciossolicitadosExample.Criteria;
 import org.itcgae.siga.db.entities.PysServiciossolicitadosExample.Criterion;
-import org.itcgae.siga.db.entities.PysServiciossolicitadosExample;
 
 public class PysServiciossolicitadosSqlProvider {
 
