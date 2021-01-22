@@ -2,8 +2,6 @@ package org.itcgae.siga.DTOs.com;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class EnviosMasivosSearch {
 	
 	private String descripcion;
@@ -19,6 +17,7 @@ public class EnviosMasivosSearch {
 	private String numColegiado;
 	private String idInstitucion;
 	private String nif;
+	private String idEnvio;
 	
 	public String getDescripcion() {
 		return descripcion;
@@ -97,6 +96,12 @@ public class EnviosMasivosSearch {
 	}
 	public void setApellidos(String apellidos) {
 		this.apellidos = apellidos;
+	}
+	public String getIdEnvio() {
+		return idEnvio;
+	}
+	public void setIdEnvio(String idEnvio) {
+		this.idEnvio = idEnvio;
 	}
 	
 	

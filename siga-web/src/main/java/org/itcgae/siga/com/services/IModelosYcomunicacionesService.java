@@ -36,7 +36,7 @@ public interface IModelosYcomunicacionesService {
 	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearchHist(HttpServletRequest request, String idModelo);
 	public Error borrarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO[] plantillas);
 	public Error borrarInformes(HttpServletRequest request, PlantillaDocumentoBorrarDTO[] plantillasDoc);
-	public ComboDTO obtenerPlantillasComunicacion(HttpServletRequest request);
+	public ComboDTO obtenerPlantillasComunicacion(String idClaseComunicacion, HttpServletRequest request);
 	public PlantillaEnvioItem obtenerTipoEnvioPlantilla(HttpServletRequest request, String idPlantilla);
 	
 	public Error rehabilitarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem[] modeloComunicacion);

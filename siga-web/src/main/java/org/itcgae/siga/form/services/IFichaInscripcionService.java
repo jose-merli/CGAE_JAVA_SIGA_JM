@@ -1,13 +1,19 @@
 package org.itcgae.siga.form.services;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.AsociarPersonaDTO;
+import org.itcgae.siga.DTOs.cen.FicheroDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IFichaInscripcionService {
 
@@ -24,5 +30,12 @@ public interface IFichaInscripcionService {
 	public String compruebaMinimaAsistencia(InscripcionItem inscripcionItem, HttpServletRequest request);
 	
 	public ComboDTO getPaymentMode(HttpServletRequest request);
+
+	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
+
+	public FicheroDTO downloadFile(InscripcionItem inscripcionItem, HttpServletRequest request,
+			HttpServletResponse response);
+
+	public ComboItem fileDownloadInformation(InscripcionItem inscripcionItem, HttpServletRequest request);
 	
 }

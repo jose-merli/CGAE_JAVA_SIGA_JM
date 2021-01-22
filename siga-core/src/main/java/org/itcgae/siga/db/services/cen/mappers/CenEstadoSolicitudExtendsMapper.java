@@ -9,7 +9,6 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.services.cen.providers.CenEstadoSolicitudSqlExtendsProvider;
-import org.itcgae.siga.db.services.cen.providers.CenTiposolicitudSqlExtendsProvider;
 
 public interface CenEstadoSolicitudExtendsMapper {
 

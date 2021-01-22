@@ -32,24 +32,18 @@ import org.itcgae.siga.DTOs.cen.MutualidadResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItemMutualidad;
 import org.itcgae.siga.DTOs.gen.ComboMutualidadDTO;
 import org.itcgae.siga.cen.services.IMutualidadService;
-
-import org.itcgae.siga.db.entities.CenInstitucion;
-
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenSolicitudmutualidad;
 import org.itcgae.siga.db.entities.CenSolicitudmutualidadExample;
-
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.CenSolicitudmutualidadMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
-
-import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
-
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.ws.client.ClientMutualidad;
 import org.springframework.beans.factory.annotation.Autowired;

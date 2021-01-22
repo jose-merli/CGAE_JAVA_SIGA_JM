@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmModoContador;
+import org.itcgae.siga.db.entities.AdmModoContadorExample;
 import org.itcgae.siga.db.entities.AdmModoContadorExample.Criteria;
 import org.itcgae.siga.db.entities.AdmModoContadorExample.Criterion;
-import org.itcgae.siga.db.entities.AdmModoContadorExample;
 
 public class AdmModoContadorSqlProvider {
 

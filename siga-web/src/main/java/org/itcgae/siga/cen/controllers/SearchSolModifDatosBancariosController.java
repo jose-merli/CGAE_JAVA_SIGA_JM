@@ -1,12 +1,12 @@
 package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.cen.services.ISearchSolModifDatosBancariosService;
-import org.itcgae.siga.cen.services.ISearchSolModifDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

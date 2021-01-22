@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample.Criteria;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample.Criterion;
-import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 
 public class CenCuentasbancariasSqlProvider {
 

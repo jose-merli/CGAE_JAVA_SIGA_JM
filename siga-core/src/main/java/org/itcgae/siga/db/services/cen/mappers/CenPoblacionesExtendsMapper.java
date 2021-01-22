@@ -8,9 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.CenPoblaciones;
-import org.itcgae.siga.db.entities.CenPoblacionesExample;
 import org.itcgae.siga.db.mappers.CenPoblacionesMapper;
-import org.itcgae.siga.db.mappers.CenPoblacionesSqlProvider;
 import org.itcgae.siga.db.services.cen.providers.CenPoblacionesSqlExtendsProvider;
 
 public interface CenPoblacionesExtendsMapper extends CenPoblacionesMapper{

@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.Address;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -33,7 +32,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
-import javax.mail.internet.MimeUtility;
 import javax.mail.internet.PreencodedMimeBodyPart;
 import javax.mail.util.ByteArrayDataSource;
 
@@ -46,7 +44,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
@@ -65,10 +62,10 @@ import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvImagenplantillaMapper;
-import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.ws.client.ClientECOS;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +84,7 @@ public class EnviosServiceImpl implements IEnviosService{
     Logger LOGGER = Logger.getLogger(EnviosServiceImpl.class);    
     
     @Autowired    
-    EnvPlantillasenviosMapper _envPlantillasenviosMapper;
+    EnvPlantillaEnviosExtendsMapper _envPlantillasenviosMapper;
     
     @Autowired    
     CenDireccionesMapper _cenDireccionesMapper;
@@ -222,11 +219,9 @@ public class EnviosServiceImpl implements IEnviosService{
                         if (sTo == null || sTo.trim().equals("")) {
                         	throw new BusinessException("ERROR: El destinatario no tiene dirección de correo electrónico");
                         }
-                        
-                      //TODO
-                        
+                       
                         //public static final 
-                       Pattern EXPRESION_REGULAR_PATTERN_MAIL = Pattern.compile(SigaConstants.EXPRESION_REGULAR_MAIL, Pattern.CASE_INSENSITIVE);
+                       Pattern EXPRESION_REGULAR_PATTERN_MAIL = Pattern.compile(SigaConstants.EXPRESION_REGULAR_MAIL2, Pattern.CASE_INSENSITIVE);
                        if (!EXPRESION_REGULAR_PATTERN_MAIL.matcher(sTo).matches()) {
                     	   throw new BusinessException("ERROR: El destinatario no tiene dirección de correo electrónico válida");
                        }
@@ -241,6 +236,8 @@ public class EnviosServiceImpl implements IEnviosService{
 								{
 									    new javax.mail.internet.InternetAddress(from)
 									});
+						mensaje.setSender(new InternetAddress(from,descFrom));
+						
                         InternetAddress toInternetAddress = new InternetAddress(sTo);
                         mensaje.addRecipient(MimeMessage.RecipientType.TO,toInternetAddress);
                         
@@ -425,27 +422,6 @@ public class EnviosServiceImpl implements IEnviosService{
         
     }
 
-    private void rellenaCelda(Workbook workbook, Cell celda, Object campo) {
-        CellStyle cellStyle = workbook.createCellStyle();
-        if (campo instanceof Number) {
-            celda.setCellType(Cell.CELL_TYPE_NUMERIC);
-            celda.setCellValue(Double.parseDouble(campo.toString()));
-            cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);                                
-            celda.setCellStyle(cellStyle);
-        } else if (campo instanceof Date) {
-            celda.setCellType(Cell.CELL_TYPE_STRING);
-            cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
-            XSSFRichTextString textCell = new XSSFRichTextString(SigaConstants.DATE_FORMAT_MIN.format(campo));
-            celda.setCellValue(textCell);
-            celda.setCellStyle(cellStyle);
-        } else {
-            celda.setCellType(Cell.CELL_TYPE_STRING);
-            cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
-            XSSFRichTextString textCell = new XSSFRichTextString(campo.toString());
-            celda.setCellValue(textCell);
-            celda.setCellStyle(cellStyle);
-        }
-    }
 
     private Sheet creaLogExcel(EnvEnvios envEnvio) throws IOException, InvalidFormatException {
         Sheet sheet = null;
@@ -481,11 +457,12 @@ public class EnviosServiceImpl implements IEnviosService{
 
     private List<DestinatarioItem> limpiaCorreosDuplicados(List<DestinatarioItem> destinatarios) {
         List<DestinatarioItem> destinatariosCopia = new ArrayList<DestinatarioItem>();
-        Map<String, Boolean> mapaCorreos = new HashMap<String, Boolean>();
+        Map<Map<String, String>, Boolean> mapaCorreos = new HashMap<Map<String, String>, Boolean>();
         if (destinatarios != null) {
             for (DestinatarioItem destinatarioItem : destinatarios) {
                 if (destinatarioItem != null && destinatarioItem.getCorreoElectronico() != null && !destinatarioItem.getCorreoElectronico().trim().equals("")) {
-                    String correo = destinatarioItem.getCorreoElectronico().trim().toUpperCase();
+                	Map<String, String> correo = new HashMap<String, String>();
+                	correo.put(destinatarioItem.getIdPersona(), destinatarioItem.getCorreoElectronico());        
                     if (!mapaCorreos.containsKey(correo)) {
                         destinatariosCopia.add(destinatarioItem);
                         mapaCorreos.put(correo, true);
@@ -499,14 +476,13 @@ public class EnviosServiceImpl implements IEnviosService{
         return destinatariosCopia;
     }
 
-    private String adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException, IOException {
+    private String adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException, IOException, BusinessException {
     	String listaDocumentos = null;
         if (documentosEnvio != null) {
         	listaDocumentos = "";
             //Adjuntamos los informes adjuntos.
             for (DatosDocumentoItem informe : documentosEnvio) {
                 File file = informe.getDocumentoFile();
-                
                 if (file == null) {
                     String error = "El fichero del envío " + idEnvio + " para el colegio " + idInstitucion + " es nulo";
                     LOGGER.error(error);
@@ -520,7 +496,7 @@ public class EnviosServiceImpl implements IEnviosService{
                 BodyPart messageBodyPart = new MimeBodyPart();
                 
                 messageBodyPart.setDataHandler(new DataHandler(ds));
-                String fileName = truncarFileName(MimeUtility.encodeText(informe.getFileName()));
+                String fileName = truncarFileName((informe.getFileName()));
                 messageBodyPart.setFileName(fileName);
                 messageBodyPart.setDisposition(MimePart.ATTACHMENT);
 //                mimeBodyPart.attachFile(file);
@@ -608,20 +584,7 @@ public class EnviosServiceImpl implements IEnviosService{
         
     }
     
-    private String getExtension(String texto) {
-        String ret = ";";
-        try {
-            texto = texto.split( "," )[0];
-            texto = texto.substring(texto.indexOf("/")+1);
-            texto = texto.substring(0, texto.indexOf(";"));
-            ret = "." + texto;
-        } catch (Exception e) {
-            LOGGER.warn(e);
-            ret = "";
-        }
-        return ret;
-    }
-
+  
     @Override
     public String envioSMS(CenDirecciones remitente, List<DestinatarioItem> listEnvDestinatarios, EnvEnvios envEnvio, String texto, boolean esBuroSMS) {
         
@@ -684,7 +647,7 @@ public class EnviosServiceImpl implements IEnviosService{
             from = request.getEmail();
             descFrom = request.getEmail();
             
-            int num = 0;
+         
             listCorrectos = new ArrayList<DestinatarioItem>();
             //Si no viene el prefijo se lo añadimos
             for(int i = listEnvDestinatarios.size()-1; i >= 0; i--) {
@@ -717,12 +680,7 @@ public class EnviosServiceImpl implements IEnviosService{
             
             
             
-            EnviarSMSResponseDocument responseDoc = EnviarSMSResponseDocument.Factory.newInstance();            
-            EnviarSMS sms = EnviarSMS.Factory.newInstance();
-            sms.setEnviarSMSRequest(request);
-            
-            EnviarSMSDocument requestDoc = EnviarSMSDocument.Factory.newInstance();
-            requestDoc.setEnviarSMS(sms);
+
             
             if (listCorrectos != null && listCorrectos.size() > 0) {
             	
@@ -731,7 +689,12 @@ public class EnviosServiceImpl implements IEnviosService{
             		listaTOs[i] = listEnvDestinatarios.get(i).getMovil();
             	}
             	request.setListaTOsArray(listaTOs);
-            	
+                EnviarSMSResponseDocument responseDoc = EnviarSMSResponseDocument.Factory.newInstance();            
+                EnviarSMS sms = EnviarSMS.Factory.newInstance();
+                sms.setEnviarSMSRequest(request);
+                
+                EnviarSMSDocument requestDoc = EnviarSMSDocument.Factory.newInstance();
+                requestDoc.setEnviarSMS(sms);
 	            try {
 	                responseDoc = _clientECOS.enviarSMS(uriService, requestDoc);    
 	                response = responseDoc.getEnviarSMSResponse();

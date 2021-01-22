@@ -1,6 +1,5 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public class PropuestasDTO {

@@ -1,23 +1,18 @@
 package org.itcgae.siga.security.production;
 
 import java.io.IOException;
-import java.security.cert.X509Certificate;
-import java.util.NoSuchElementException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.itcgae.siga.commons.utils.InvalidClientCerticateException;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,12 +29,15 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	private AuthenticationManager authenticationManager;
 
 	private static String tokenHeaderAuthKey;
+	
+	private SigaUserDetailsService userDetailsService;
 
 
 	public ProAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
-			String tokenHeaderAuthKey) {
+			String tokenHeaderAuthKey, SigaUserDetailsService userDetailsService2) {
 		super(new AntPathRequestMatcher(loginUrl, loginMethod));
 		this.authenticationManager = authenticationManager;
+		this.userDetailsService = userDetailsService2;
 		ProAuthenticationFilter.tokenHeaderAuthKey = tokenHeaderAuthKey;
 	}
 
@@ -47,60 +45,38 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 		try {
-			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-			String commonName = null;
-			String organizationName = null;
-			String organizationNameNuevo = null;
+			String dni = (String) request.getHeader("CAS-username");
+			String nombre = (String) request.getHeader("CAS-displayName");
 			String grupo = null;
-			X509Certificate cert = null;
-
-			if (null != certs && certs.length > 0) {
-				cert = certs[0];
-				try {
-					X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
-
-					RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
-					commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
-
-					if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-						RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
-						organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-					}else{
-						RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
-						organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
-					}
-
-					RDN grupoRdn = x500name.getRDNs(BCStyle.T)[0];
-					grupo = IETFUtils.valueToString(grupoRdn.getFirst().getValue());
-
-					LOGGER.debug("Common Name: " + commonName);
-					LOGGER.debug("Organization Name: " + organizationName);
-				} catch (NoSuchElementException e) {
-					throw new InvalidClientCerticateException(e);
-				}
-
-				String dni = commonName.substring(commonName.length() - 9, commonName.length());
-				String institucion = null;
-				if (null != organizationNameNuevo) {
-					institucion = organizationNameNuevo.substring(0,
-								4);
-				}else{
-					institucion = organizationName.substring(organizationName.length() - 4,
-						organizationName.length());
-				}
-
-				LOGGER.debug("DNI: " + dni);
-				LOGGER.debug("INSTITUCION: " + institucion);
-				LOGGER.debug("GRUPO: " + grupo);
-
-				UserCgae user = new UserCgae(dni, grupo, institucion, null,null,null);
-				LOGGER.info("Intento de autenticación en siga {}", user);
-				return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
+			AdmRol rol = null;
+				
+			String institucion = null;
+			if(request.getParameter("location")==null) {
+				institucion = this.userDetailsService.getInstitucionCAS(request);
+			}else {
+				//Hemos accedido por loginMultiple
+				institucion = request.getParameter("location");
 			}
+			if(request.getParameter("rol") == null) {
+				rol = this.userDetailsService.getRolLogin(request);
+				grupo = this.userDetailsService.getGrupoCAS(request);
+			}else {
+				//Hemos accedido por loginMultiple
+				rol = this.userDetailsService.getRolLoginMultiple(request.getParameter("rol"));
+				grupo = SigaConstants.getTipoUsuario(rol.getDescripcion());
+			}
+			
+			LOGGER.debug("DNI: " + dni);
+			LOGGER.debug("INSTITUCION: " + institucion);
+			LOGGER.debug("GRUPO: " + grupo);
+
+			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,null, rol, nombre);
+			LOGGER.info("Intento de autenticación en siga {}", user);
+			//return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
+			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, null));
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
-		return null;
 	}
 
 	@Override

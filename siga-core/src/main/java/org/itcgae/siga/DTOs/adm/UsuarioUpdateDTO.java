@@ -227,7 +227,7 @@ public class UsuarioUpdateDTO {
 	    		Objects.equals(this.nif, usuarioUpdateDTO.nif) &&
 	    		Objects.equals(this.rol, usuarioUpdateDTO.rol) &&
 	    		Objects.equals(this.grupo, usuarioUpdateDTO.grupo) &&
-	    		Objects.equals(this.grupo, usuarioUpdateDTO.idGrupo) &&
+	    		Objects.equals(this.idGrupo, usuarioUpdateDTO.idGrupo) &&
 	    		Objects.equals(this.fechaAlta, usuarioUpdateDTO.fechaAlta) &&
 	    		Objects.equals(this.codigoExterno, usuarioUpdateDTO.codigoExterno) &&
 	    		Objects.equals(this.activo, usuarioUpdateDTO.activo) &&

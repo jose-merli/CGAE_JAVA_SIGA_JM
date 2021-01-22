@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IBusquedaColegiadosService {
@@ -18,6 +19,11 @@ public interface IBusquedaColegiadosService {
 	public ColegiadoDTO searchColegiado( ColegiadoItem colegiadoItem, HttpServletRequest request);
 	
 	public ComboInstitucionDTO getLabel(HttpServletRequest request);
+
+	public ColegiadoDTO searchColegiadoFicha(ColegiadoItem colegiadoItem, HttpServletRequest request);
+	
+	public ResponseFileDTO generateExcel(ColegiadoItem colegiadoItem, HttpServletRequest request);
+
 
 	
 }

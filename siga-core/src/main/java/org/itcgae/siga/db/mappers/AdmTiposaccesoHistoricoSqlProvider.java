@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmTiposaccesoHistorico;
+import org.itcgae.siga.db.entities.AdmTiposaccesoHistoricoExample;
 import org.itcgae.siga.db.entities.AdmTiposaccesoHistoricoExample.Criteria;
 import org.itcgae.siga.db.entities.AdmTiposaccesoHistoricoExample.Criterion;
-import org.itcgae.siga.db.entities.AdmTiposaccesoHistoricoExample;
 
 public class AdmTiposaccesoHistoricoSqlProvider {
 

@@ -75,7 +75,11 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 				"/perfilespost", 
 				"/perfiles",
 				"/getEntorno",
-				"/ws/**"
+				"/getEnvParams",
+				"/ws/**",
+				"/institucionesUsuario",
+				"/rolesColegioUsuario",
+				"/perfilesColegioRol"
 		};
 		/*
 		 * 1. Se desactiva el uso de cookies 
@@ -89,10 +93,10 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 				.antMatchers(authorizedRequests).permitAll()
 				.anyRequest().authenticated().and()
 				.addFilterBefore(new ProAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
-						tokenHeaderAuthKey), BasicAuthenticationFilter.class)
+						tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
 				.addFilter(new ProAuthorizationFilter(authenticationManager()))
 				.addFilterBefore(new DevAuthenticationFilter(authenticationManager(), "GET", "/loginDevelop",
-						tokenHeaderAuthKey), BasicAuthenticationFilter.class)
+						tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 		
 		if (!security){

@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.EcomColaExample;
 import org.itcgae.siga.db.entities.EcomColaExample.Criteria;
 import org.itcgae.siga.db.entities.EcomColaExample.Criterion;
-import org.itcgae.siga.db.entities.EcomColaExample;
 
 public class EcomColaSqlProvider {
 

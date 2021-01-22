@@ -58,7 +58,9 @@ public class ConConsultasExtendsSqlProvider {
 		if(filtros.getIdObjetivo() != null && !filtros.getIdObjetivo().trim().equals("")){
 			sql.WHERE("CONSULTA.IDOBJETIVO = '" + filtros.getIdObjetivo() +"'");
 		}
-		sql.WHERE("CONSULTA.FECHABAJA IS NULL");
+		if(!filtros.getHistorico()) {
+			sql.WHERE("CONSULTA.FECHABAJA IS NULL");
+		}
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONSULTA.DESCRIPCION",filtros.getNombre()));
@@ -80,6 +82,8 @@ public class ConConsultasExtendsSqlProvider {
 		}else {
 			sql.WHERE("((CONSULTA.IDINSTITUCION = '2000' AND (UPPER(CONSULTA.GENERAL) = 'S'  OR  CONSULTA.GENERAL = '1')) OR (CONSULTA.IDINSTITUCION = '" + idInstitucion +"' AND (UPPER(CONSULTA.GENERAL) = 'N'  OR  CONSULTA.GENERAL = '0')))");
 		}
+		
+		sql.ORDER_BY("CONSULTA.DESCRIPCION");
 		
 		return sql.toString();
 	}
@@ -111,14 +115,14 @@ public class ConConsultasExtendsSqlProvider {
 		sql.LEFT_OUTER_JOIN("con_modulo cm on cc.idmodulo = cm.idmodulo");
 		sql.INNER_JOIN("mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta and mpc.idinstitucion_consulta = cc.idInstitucion");
 
-		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio + "' AND mpc.FECHABAJA is null and mpc.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio + "' AND cc.FECHABAJA is null AND mpc.FECHABAJA is null and mpc.IDINSTITUCION = '" + idInstitucion + "'");
 		return sql.toString();
 	}
 	
 	public String selectConsultasDisponibles(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION");
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION, IDCLASECOMUNICACION");
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
@@ -138,21 +142,22 @@ public class ConConsultasExtendsSqlProvider {
 	public String selectConsultasDisponiblesFiltro(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION");
-		sql.FROM("CON_CONSULTA");
-		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
+		sql.SELECT_DISTINCT("consulta.IDCONSULTA, consulta.DESCRIPCION, consulta.IDINSTITUCION, consulta.IDCLASECOMUNICACION, clase.nombre as clasecomunicacion");
+		sql.FROM("CON_CONSULTA consulta");
+		sql.LEFT_OUTER_JOIN("mod_clasecomunicaciones clase on consulta.idclasecomunicacion = clase.idclasecomunicacion");
+		sql.WHERE("(consulta.IDINSTITUCION = "+ idInstitucion + " OR (consulta.IDINSTITUCION = '2000' AND (UPPER(consulta.GENERAL) = 'S' OR consulta.GENERAL = '1'))) AND consulta.FECHABAJA IS NULL");
 		
 		if(idClaseComunicacion != null){
-			sql.WHERE("IDCLASECOMUNICACION = "+ idClaseComunicacion);
+			sql.WHERE("consulta.IDCLASECOMUNICACION = "+ idClaseComunicacion);
 		}
 		
 		if(idObjetivo != null){
-			sql.WHERE("IDOBJETIVO = " + idObjetivo);
+			sql.WHERE("consulta.IDOBJETIVO = " + idObjetivo);
 		}
 		
-		sql.WHERE(UtilidadesString.filtroTextoBusquedas("DESCRIPCION", filtro));
+		sql.WHERE(filtroTextoBusquedas("consulta.DESCRIPCION", filtro));
 		
-		sql.ORDER_BY("DESCRIPCION");
+		sql.ORDER_BY("consulta.DESCRIPCION");
 		
 		return sql.toString();
 	}

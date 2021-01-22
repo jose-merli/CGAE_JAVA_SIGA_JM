@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
@@ -21,14 +20,12 @@ import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IPlantillasDocumentoService;
-import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -118,6 +115,16 @@ public class PlantillasDocumentoController {
 	ResponseEntity<ResponseDataDTO> guardarPlantillaDocumento(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		
 		ResponseDataDTO response = _plantillasDocumentoService.guardarModPlantillaDocumento(request, plantillaDoc);
+		if(response.getError() == null)
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}	
+	
+	@RequestMapping(value = "/guardar/datosSalida",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDataDTO> guardarDatosSalida(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		
+		ResponseDataDTO response = _plantillasDocumentoService.guardarDatosSalida(request, plantillaDoc);
 		if(response.getError() == null)
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
 		else

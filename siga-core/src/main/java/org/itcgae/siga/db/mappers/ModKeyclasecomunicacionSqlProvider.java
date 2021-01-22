@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ModKeyclasecomunicacion;
+import org.itcgae.siga.db.entities.ModKeyclasecomunicacionExample;
 import org.itcgae.siga.db.entities.ModKeyclasecomunicacionExample.Criteria;
 import org.itcgae.siga.db.entities.ModKeyclasecomunicacionExample.Criterion;
-import org.itcgae.siga.db.entities.ModKeyclasecomunicacionExample;
 
 public class ModKeyclasecomunicacionSqlProvider {
 

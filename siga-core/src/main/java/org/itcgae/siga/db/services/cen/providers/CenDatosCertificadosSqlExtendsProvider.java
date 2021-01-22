@@ -1,12 +1,11 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.db.mappers.CenDatoscvSqlProvider;
 import org.itcgae.siga.db.mappers.CerSolicitudcertificadosSqlProvider;
 
 public class CenDatosCertificadosSqlExtendsProvider extends CerSolicitudcertificadosSqlProvider{
 	
-	public String datosCertificadosSearch(String idPersona) {
+	public String datosCertificadosSearch(String idPersona,Short idInstitucion) {
 		SQL sql = new SQL();
 		
 		sql.SELECT("CERT.IDSOLICITUD");
@@ -19,10 +18,10 @@ public class CenDatosCertificadosSqlExtendsProvider extends CerSolicitudcertific
 		sql.WHERE("CERT.PPN_IDPRODUCTO = PROD.IDPRODUCTO");
 		sql.WHERE("CERT.PPN_IDPRODUCTOINSTITUCION = PROD.IDPRODUCTOINSTITUCION");
 		sql.WHERE("CERT.IDINSTITUCION = PROD.IDINSTITUCION");
-		sql.WHERE("PROD.IDINSTITUCION = 2000");
+		sql.WHERE("PROD.IDINSTITUCION = '"+idInstitucion+"'");
 		sql.WHERE("PROD.TIPOCERTIFICADO = 'C'");
 		sql.WHERE("IDPERSONA_DES = '"+idPersona+"'");
-		sql.ORDER_BY("IDPERSONA_DES DESC");
+		sql.ORDER_BY("FECHAEMISION DESC");
 		return sql.toString();
 	}
 

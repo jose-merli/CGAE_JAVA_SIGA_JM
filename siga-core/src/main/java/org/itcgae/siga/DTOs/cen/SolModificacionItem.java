@@ -33,7 +33,7 @@ public class SolModificacionItem {
 		this.especifica = especifica;
 	}
 	
-	@JsonProperty("idSolicitud")
+	@JsonProperty("numIdSolicitud")
 	public String getIdSolicitud() {
 		return idSolicitud;
 	}

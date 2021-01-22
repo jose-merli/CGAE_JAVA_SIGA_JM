@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(timeout=2400)
 public class ComunicacionesServiceImpl implements IComunicacionesService {
 
 	private Logger LOGGER = Logger.getLogger(ComunicacionesServiceImpl.class);
@@ -140,7 +140,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 				
 				if (null != usuarios && usuarios.size() > 0) {
 					
-					List<DestinatarioItem> destinatarios = _envDestinatariosExtendsMapper.selectDestinatarios(idInstitucion, idEnvio);
+					List<DestinatarioItem> destinatarios = _envDestinatariosExtendsMapper.selectDestinatariosComunicaciones(idInstitucion, idEnvio);
 					if(destinatarios.size()>0){
 						respuesta.setDestinatarios(destinatarios);
 					}
