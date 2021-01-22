@@ -36,6 +36,7 @@ import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegioprocuradorExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
