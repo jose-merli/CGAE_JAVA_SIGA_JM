@@ -4,10 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
-<<<<<<< HEAD
-=======
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
->>>>>>> EJG
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;

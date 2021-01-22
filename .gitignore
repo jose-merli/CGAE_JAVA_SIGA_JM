@@ -265,3 +265,13 @@ siga-core/target/
 .metadata/.log
 .metadata/.lock
 *rebel.xml
+/.metadata/
+.sonarlint/default/.sonartmp_7838495048958420846/sonarlint-slf4j-sonar-log333444884279974939.jar
+.sonarlint/modules/siga-web/issues/index.pb
+.sonarlint/modules/siga-web/issues/f/8/f8625f2905945a10c43257e6e9310847739b2ab5
+.sonarlint/modules/siga-web/issues/7/2/721cd7dfffeb8ae9ee12a5f01396c7da2b0ce11f
+.sonarlint/modules/siga-web/issues/4/c/4c69d9f7c91954ab9becb1e6d4f056e594c6acc5
+.sonarlint/modules/siga-core/issues/index.pb
+.sonarlint/modules/siga-core/issues/3/d/3d897cec8918cb79a3b939a8c43c574255d0331c
+.sonarlint/modules/siga-core/issues/2/7/277345f460b52a816a2a0b62a3639a5ce2c1f28d
+.sonarlint/default/.sonartmp_8404124396034757435/sonarlint-slf4j-sonar-log5015092575972127445.jar
