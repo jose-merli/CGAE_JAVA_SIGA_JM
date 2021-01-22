@@ -15,6 +15,7 @@ public class DestinatarioItem {
 	private String nombreCompleto;
 	private ArrayList<ConsultaEnvioItem> listaConsultasEnvio;
 	private String tratamiento;
+	private String idioma;
 	
 	
 	public String getDomicilio() {
@@ -82,5 +83,11 @@ public class DestinatarioItem {
 	}
 	public void setTratamiento(String tratamiento) {
 		this.tratamiento = tratamiento;
+	}
+	public String getIdioma() {
+		return idioma;
+	}
+	public void setIdioma(String idioma) {
+		this.idioma = idioma;
 	}
 }

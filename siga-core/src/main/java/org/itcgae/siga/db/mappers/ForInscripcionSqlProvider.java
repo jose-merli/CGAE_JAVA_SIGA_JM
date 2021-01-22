@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForInscripcion;
+import org.itcgae.siga.db.entities.ForInscripcionExample;
 import org.itcgae.siga.db.entities.ForInscripcionExample.Criteria;
 import org.itcgae.siga.db.entities.ForInscripcionExample.Criterion;
-import org.itcgae.siga.db.entities.ForInscripcionExample;
 
 public class ForInscripcionSqlProvider {
 
@@ -85,6 +85,12 @@ public class ForInscripcionSqlProvider {
 		if (record.getIdpeticionsuscripcion() != null) {
 			sql.VALUES("IDPETICIONSUSCRIPCION", "#{idpeticionsuscripcion,jdbcType=DECIMAL}");
 		}
+		if (record.getIdformapago() != null) {
+			sql.VALUES("IDFORMAPAGO", "#{idformapago,jdbcType=DECIMAL}");
+		}
+		if (record.getIdficherocomprobante() != null) {
+			sql.VALUES("IDFICHEROCOMPROBANTE", "#{idficherocomprobante,jdbcType=DECIMAL}");
+		}
 		return sql.toString();
 	}
 
@@ -114,6 +120,8 @@ public class ForInscripcionSqlProvider {
 		sql.SELECT("EMITIRCERTIFICADO");
 		sql.SELECT("CERTIFICADOEMITIDO");
 		sql.SELECT("IDPETICIONSUSCRIPCION");
+		sql.SELECT("IDFORMAPAGO");
+		sql.SELECT("IDFICHEROCOMPROBANTE");
 		sql.FROM("FOR_INSCRIPCION");
 		applyWhere(sql, example, false);
 		if (example != null && example.getOrderByClause() != null) {
@@ -179,6 +187,12 @@ public class ForInscripcionSqlProvider {
 		if (record.getIdpeticionsuscripcion() != null) {
 			sql.SET("IDPETICIONSUSCRIPCION = #{record.idpeticionsuscripcion,jdbcType=DECIMAL}");
 		}
+		if (record.getIdformapago() != null) {
+			sql.SET("IDFORMAPAGO = #{record.idformapago,jdbcType=DECIMAL}");
+		}
+		if (record.getIdficherocomprobante() != null) {
+			sql.SET("IDFICHEROCOMPROBANTE = #{record.idficherocomprobante,jdbcType=DECIMAL}");
+		}
 		applyWhere(sql, example, true);
 		return sql.toString();
 	}
@@ -206,6 +220,8 @@ public class ForInscripcionSqlProvider {
 		sql.SET("EMITIRCERTIFICADO = #{record.emitircertificado,jdbcType=DECIMAL}");
 		sql.SET("CERTIFICADOEMITIDO = #{record.certificadoemitido,jdbcType=DECIMAL}");
 		sql.SET("IDPETICIONSUSCRIPCION = #{record.idpeticionsuscripcion,jdbcType=DECIMAL}");
+		sql.SET("IDFORMAPAGO = #{record.idformapago,jdbcType=DECIMAL}");
+		sql.SET("IDFICHEROCOMPROBANTE = #{record.idficherocomprobante,jdbcType=DECIMAL}");
 		ForInscripcionExample example = (ForInscripcionExample) parameter.get("example");
 		applyWhere(sql, example, true);
 		return sql.toString();
@@ -262,6 +278,12 @@ public class ForInscripcionSqlProvider {
 		}
 		if (record.getIdpeticionsuscripcion() != null) {
 			sql.SET("IDPETICIONSUSCRIPCION = #{idpeticionsuscripcion,jdbcType=DECIMAL}");
+		}
+		if (record.getIdformapago() != null) {
+			sql.SET("IDFORMAPAGO = #{idformapago,jdbcType=DECIMAL}");
+		}
+		if (record.getIdficherocomprobante() != null) {
+			sql.SET("IDFICHEROCOMPROBANTE = #{idficherocomprobante,jdbcType=DECIMAL}");
 		}
 		sql.WHERE("IDINSCRIPCION = #{idinscripcion,jdbcType=DECIMAL}");
 		return sql.toString();

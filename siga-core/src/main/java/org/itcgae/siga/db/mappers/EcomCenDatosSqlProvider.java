@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EcomCenDatos;
+import org.itcgae.siga.db.entities.EcomCenDatosExample;
 import org.itcgae.siga.db.entities.EcomCenDatosExample.Criteria;
 import org.itcgae.siga.db.entities.EcomCenDatosExample.Criterion;
-import org.itcgae.siga.db.entities.EcomCenDatosExample;
 
 public class EcomCenDatosSqlProvider {
 

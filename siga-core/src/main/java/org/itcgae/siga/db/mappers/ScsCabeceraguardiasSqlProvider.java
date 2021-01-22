@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ScsCabeceraguardias;
+import org.itcgae.siga.db.entities.ScsCabeceraguardiasExample;
 import org.itcgae.siga.db.entities.ScsCabeceraguardiasExample.Criteria;
 import org.itcgae.siga.db.entities.ScsCabeceraguardiasExample.Criterion;
-import org.itcgae.siga.db.entities.ScsCabeceraguardiasExample;
 
 public class ScsCabeceraguardiasSqlProvider {
 

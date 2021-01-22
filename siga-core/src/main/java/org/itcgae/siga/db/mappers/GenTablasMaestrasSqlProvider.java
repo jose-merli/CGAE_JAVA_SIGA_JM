@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenTablasMaestras;
+import org.itcgae.siga.db.entities.GenTablasMaestrasExample;
 import org.itcgae.siga.db.entities.GenTablasMaestrasExample.Criteria;
 import org.itcgae.siga.db.entities.GenTablasMaestrasExample.Criterion;
-import org.itcgae.siga.db.entities.GenTablasMaestrasExample;
 
 public class GenTablasMaestrasSqlProvider {
 

@@ -1,7 +1,7 @@
 package org.itcgae.siga.DTOs.cen;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ParametroColegioDTO {
 

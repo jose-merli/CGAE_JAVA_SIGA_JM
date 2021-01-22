@@ -27,13 +27,15 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenComponentes;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenColegioprocuradorExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
@@ -54,8 +56,6 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	@Autowired
 	private CenComponentesExtendsMapper cenComponentesExtendsMapper;
 	
-	@Autowired
-	private CenColegioprocuradorExtendsMapper cenColegioprocuradorExtendsMapper;
 
 	@Autowired
 	private CenProvinciasExtendsMapper cenProvinciasExtendsMapper;
@@ -74,6 +74,8 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 	@Override
 	public DatosIntegrantesDTO searchIntegrantesData(int numPagina, DatosIntegrantesSearchDTO datosIntegrantesSearchDTO,
@@ -138,23 +140,9 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		return comboDTO;
 	}
 
-	@Override
-	public ComboDTO getColegios(HttpServletRequest request) {
-		LOGGER.info("getProvinces() -> Entrada al servicio para búsqueda de las provincias");
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 
-		LOGGER.info(
-				"getProvinces() / cenProvinciasExtendsMapper.selectDistinctProvinces() -> Entrada a cenProvinciasExtendsMapper para obtener listado de provincias ");
-		comboItems = cenColegioprocuradorExtendsMapper.selectDistinctColegios();
-		LOGGER.info(
-				"getProvinces() / cenProvinciasExtendsMapper.selectDistinctProvinces() -> Salida de cenProvinciasExtendsMapper para obtener listado de provincias ");
 
-		comboDTO.setCombooItems(comboItems);
 
-		LOGGER.info("getProvinces() -> Salida al servicio para búsqueda de las provincias");
-		return comboDTO;
-	}
 	
 	@Override
 	public ComboDTO getCargos(HttpServletRequest request) {
@@ -242,8 +230,18 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				}
 
 				if (responseCenCliente == 1) {
+					CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+					cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.valueOf(tarjetaIntegrantesUpdateDTO.getIdPersona()));
 
 					LOGGER.info(
+							"updateMember() -> Entrada a cenColegiadoExtendsMapper para comprobar si es un colegiado");
+					List<CenColegiado> cenColegiadoList = cenColegiadoExtendsMapper
+							.selectByExample(cenColegiadoExample);
+					LOGGER.info(
+							"updateMember() -> Salida de cenColegiadoExtendsMapper para comprobar si es un colegiado");
+					if(cenColegiadoList == null || cenColegiadoList.size() == 0) {
+						LOGGER.info(
 							"updateMember() / cenNocolegiadoExtendsMapper.insertSelective() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
 
 					CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
@@ -259,7 +257,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 					LOGGER.info(
 							"createMember() / cenNocolegiadoExtendsMapper.selectByExample() -> Salida de cenNocolegiadoExtendsMapper para obtener información no colegiado");
 
-					if (null != cenNocolegiadoList && cenNocolegiadoList.size() > 0) {
+						if (null == cenNocolegiadoList || cenNocolegiadoList.size() == 0) {
 
 						CenNocolegiado cenNocolegiado = rellenarInsertCenNoColegiado(usuario,
 								Long.valueOf(tarjetaIntegrantesUpdateDTO.getIdPersonaComponente()), idInstitucion);
@@ -268,6 +266,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 						LOGGER.info(
 								"updateMember() / cenNocolegiadoExtendsMapper.insertSelective() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
 
+						}
 					}
 
 					if (responseInsertNoColegiado == 1) {

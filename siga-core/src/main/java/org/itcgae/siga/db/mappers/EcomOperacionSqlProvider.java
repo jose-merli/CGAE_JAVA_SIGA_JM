@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EcomOperacion;
+import org.itcgae.siga.db.entities.EcomOperacionExample;
 import org.itcgae.siga.db.entities.EcomOperacionExample.Criteria;
 import org.itcgae.siga.db.entities.EcomOperacionExample.Criterion;
-import org.itcgae.siga.db.entities.EcomOperacionExample;
 
 public class EcomOperacionSqlProvider {
 

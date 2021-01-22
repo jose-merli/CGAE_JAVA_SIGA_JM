@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenAnio;
+import org.itcgae.siga.db.entities.GenAnioExample;
 import org.itcgae.siga.db.entities.GenAnioExample.Criteria;
 import org.itcgae.siga.db.entities.GenAnioExample.Criterion;
-import org.itcgae.siga.db.entities.GenAnioExample;
 
 public class GenAnioSqlProvider {
 

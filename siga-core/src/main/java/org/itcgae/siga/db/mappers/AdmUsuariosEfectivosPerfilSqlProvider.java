@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
+import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample.Criteria;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample.Criterion;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 
 public class AdmUsuariosEfectivosPerfilSqlProvider {
 

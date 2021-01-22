@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
@@ -15,7 +14,6 @@ import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DestinatarioIndvEnvioMasivoItem;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
-import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
@@ -79,6 +77,14 @@ public class EnviosMasivosController {
 	ResponseEntity<EnviosMasivosDTO> cargasMasivasSearch(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody EnviosMasivosSearch filtros) {
 		
 		EnviosMasivosDTO response = _enviosMasivosService.enviosMasivosSearch(request, filtros); 
+		if(response.getError() == null)
+			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	@RequestMapping(value = "/searchBusqueda",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EnviosMasivosDTO> busquedaEnvioMasivoSearch(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody EnviosMasivosSearch filtros) {
+		EnviosMasivosDTO response = _enviosMasivosService.busquedaEnvioMasivoSearch(request, filtros); 
 		if(response.getError() == null)
 			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
 		else
@@ -287,13 +293,9 @@ public class EnviosMasivosController {
 			throw new BusinessException("El fichero de log no existe");
 		}
 		
-		if(file != null) {
 			fileInfoDTO.setFilePath(file.getAbsolutePath());
 			fileInfoDTO.setName(file.getName());
 			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
-		}else {
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
 	}
 	
 	@RequestMapping(value="/detalle/descargarLog", method=RequestMethod.POST, produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -334,7 +336,7 @@ public class EnviosMasivosController {
 		Resource inputStreamResource = null;
 		if (documentoDTO.getIdInstitucion() != null && documentoDTO.getIdEnvio() != null && !documentoDTO.getIdEnvio().trim().equals("") 
 				&& documentoDTO.getIdDocumento() != null) {
-			inputStreamResource = _enviosMasivosService.recuperaPdfBuroSMS(documentoDTO.getIdInstitucion(), Long.parseLong(documentoDTO.getIdEnvio()), documentoDTO.getIdDocumento());
+			inputStreamResource = _enviosMasivosService.recuperaPdfBuroSMS(documentoDTO.getIdInstitucion(), Long.parseLong(documentoDTO.getIdEnvio()), Integer.valueOf(documentoDTO.getIdDocumento()));
 		}
 		
 		return inputStreamResource;
@@ -440,4 +442,16 @@ public class EnviosMasivosController {
 			
 	}
 	
+	@RequestMapping(value = "/obtenerDestinatarios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EnviosMasivosDTO> obtenerDestinatarios(HttpServletRequest request, @RequestBody EnviosMasivosDTO enviosDTO) {
+		EnviosMasivosDTO response = _enviosMasivosService.obtenerDestinatarios(request, enviosDTO);
+		if(response.getError() == null)
+			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
+		else{
+			if(response.getError().getCode() == 400)
+				return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.BAD_REQUEST);
+			else
+				return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-	<classPathEntry location="C:\Users\DTUser\Downloads\ojdbc6.jar" />
+	<classPathEntry location="C:\Users\acorral\Downloads\ojdbc6.jar" />
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
-			connectionURL="jdbc:oracle:thin:@//192.168.18.6:1546/SIGADES" 
+			connectionURL="jdbc:oracle:thin:@//10.75.29.133:1521/cgae" 
 			driverClass="oracle.jdbc.OracleDriver"
 			userId="uscgae"
 			password="uscgae" />
@@ -13,17 +13,12 @@
 			
 			<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
 		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
-		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER" implementationPackage="org.itcgae.siga.db.services" />
+		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER" />
 		
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_TIPOENVIOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
 		
-			<table schema="USCGAE" tableName="CEN_SOLICMODIFCAMBIARFOTO">
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDSOLICITUD" 
- 				sqlStatement="SELECT SEQ_CENSOLICMODIFCAMBIARFOTO.NEXTVAL FROM DUAL" />
-		</table>
 		
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_ESTADOENVIO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
@@ -53,10 +48,10 @@
 <!-- 		</table> -->
 		
 		 
-<!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" > -->
-<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+			<table schema="USCGAE" tableName="ADM_ENVIOINFORME" >
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
 <!-- 			</table> -->
-
+			</table> 
 			
 <!-- 				<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" > -->
 <!-- 					<property name="ignoreQualifiersAtRuntime" value="true"/> -->
@@ -67,14 +62,14 @@
 <!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
 <!-- 	 		</table> -->
 
-<!-- 			<table schema="USCGAE" tableName="MOD_KEYCLASECOMUNICACION" >  -->
-<!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
+			<table schema="USCGAE_DESA" tableName="ADM_INFORME" >
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
 <!-- 	 		</table> -->
 	 		
 <!-- 			<table schema="USCGAE" tableName="MOD_CAMPOSKEY" >  -->
 <!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
 <!-- 	 		</table> -->
-
+			</table> 
 <!-- 		<table schema="USCGAE" tableName="MOD_MODELOCOMUNICACION" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 			<generatedKey column="IDMODELOCOMUNICACION" sqlStatement="SELECT SEQ_MOD_MODELOCOMUNICACION.NEXTVAL FROM DUAL"/> -->

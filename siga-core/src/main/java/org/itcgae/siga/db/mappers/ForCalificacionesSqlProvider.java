@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForCalificaciones;
+import org.itcgae.siga.db.entities.ForCalificacionesExample;
 import org.itcgae.siga.db.entities.ForCalificacionesExample.Criteria;
 import org.itcgae.siga.db.entities.ForCalificacionesExample.Criterion;
-import org.itcgae.siga.db.entities.ForCalificacionesExample;
 
 public class ForCalificacionesSqlProvider {
 

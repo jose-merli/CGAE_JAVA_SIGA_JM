@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AgeTiponotificacionevento;
+import org.itcgae.siga.db.entities.AgeTiponotificacioneventoExample;
 import org.itcgae.siga.db.entities.AgeTiponotificacioneventoExample.Criteria;
 import org.itcgae.siga.db.entities.AgeTiponotificacioneventoExample.Criterion;
-import org.itcgae.siga.db.entities.AgeTiponotificacioneventoExample;
 
 public class AgeTiponotificacioneventoSqlProvider {
 

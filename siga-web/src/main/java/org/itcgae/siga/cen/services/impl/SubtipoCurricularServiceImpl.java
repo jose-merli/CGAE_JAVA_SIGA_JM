@@ -1,7 +1,6 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -128,17 +127,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 				record.setCodigoext(subtipoCurricularItem.getCodigoExterno());
 
 				// Consultamos para ver si la descripción existe en genRecursosCatalogos
-				GenRecursosCatalogosExample example = new GenRecursosCatalogosExample();
-				example.createCriteria().andNombretablaEqualTo("CEN_TIPOSCVSUBTIPO2")
-						.andCampotablaEqualTo("DESCRIPCION")
-						.andDescripcionEqualTo(subtipoCurricularItem.getDescripcion())
-						.andIdinstitucionEqualTo(idInstitucion).andIdlenguajeEqualTo(idLenguaje);
-				List<GenRecursosCatalogos> genRecursosCatalogos = genRecursosCatalogosExtendsMapper
-						.selectByExample(example);
 
-				if (null != genRecursosCatalogos && genRecursosCatalogos.size() > 0) {
-					record.setDescripcion(genRecursosCatalogos.get(0).getIdrecurso());
-				} else {
 					// No está la descripción, procedemos a insertarla
 					GenRecursosCatalogos genRecursosCatalogo = new GenRecursosCatalogos();
 
@@ -157,18 +146,17 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 						genRecursosCatalogo.setIdrecurso(String.valueOf(idRecurso));
 					}
 
-					genRecursosCatalogo.setIdrecursoalias("cen_tiposcvsubtipo2.descripcion." + idInstitucion + "."
-							+ genRecursosCatalogo.getIdrecurso());
+				genRecursosCatalogo.setIdrecursoalias(
+						"cen_tiposcvsubtipo2.descripcion." + idInstitucion + "." + genRecursosCatalogo.getIdrecurso());
 
 					genRecursosCatalogo.setNombretabla("CEN_TIPOSCVSUBTIPO2");
-					genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
+				genRecursosCatalogo.setUsumodificacion(usuario.getIdusuario());
 
 					if (genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo) == 1) {
 						record.setDescripcion(genRecursosCatalogo.getIdrecurso());
 					}
 					insertarRestoIdiomas(genRecursosCatalogo);
 					
-				}
 
 				record.setFechamodificacion(new Date());
 				record.setIdinstitucion(idInstitucion);
@@ -184,7 +172,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 					record.setIdtipocvsubtipo2((short) newIdTipoCvSubtipo1);
 				}
 
-				record.setUsumodificacion(usuario.getUsumodificacion());
+				record.setUsumodificacion(usuario.getIdusuario());
 
 				if (cenTiposCVSubtipo2ExtendsMapper.insert(record) == 1) {
 					insertResponseDTO.setStatus(SigaConstants.OK);
@@ -266,11 +254,60 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 			genRecursosCatalogo.setIdlenguaje("1");
 			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
 			break;
-	
+		}
 		}
 		
+	private void actualizarRestoIdiomas(GenRecursosCatalogos genRecursosCatalogo) {
+		String idLenguaje = genRecursosCatalogo.getIdlenguaje();
+		String descripcion = genRecursosCatalogo.getDescripcion();
+		switch (idLenguaje) {
+		case "1":
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#CA"));
+			genRecursosCatalogo.setIdlenguaje("2");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
 		
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#EU"));
+			genRecursosCatalogo.setIdlenguaje("3");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
 		
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#GL"));
+			genRecursosCatalogo.setIdlenguaje("4");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
+			break;
+		case "2":
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#ES"));
+			genRecursosCatalogo.setIdlenguaje("1");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#EU"));
+			genRecursosCatalogo.setIdlenguaje("3");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#GL"));
+			genRecursosCatalogo.setIdlenguaje("4");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
+			break;
+		case "3":
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#CA"));
+			genRecursosCatalogo.setIdlenguaje("2");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#ES"));
+			genRecursosCatalogo.setIdlenguaje("1");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#GL"));
+			genRecursosCatalogo.setIdlenguaje("4");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
+			break;
+		case "4":
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#CA"));
+			genRecursosCatalogo.setIdlenguaje("2");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#EU"));
+			genRecursosCatalogo.setIdlenguaje("3");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#ES"));
+			genRecursosCatalogo.setIdlenguaje("1");
+			genRecursosCatalogosExtendsMapper.updateByPrimaryKeySelective(genRecursosCatalogo);
+			break;
+		}
 	}
 
 	@Override
@@ -301,15 +338,27 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 				for (SubtipoCurricularItem subtipoCurricularItem : subtipoCurricularDTO.getSubtipoCurricularItems()) {
 
 					// consultamos si existe la descripción
+					List<CenTiposcvsubtipo2> tipoActual = new ArrayList<CenTiposcvsubtipo2>();
+					CenTiposcvsubtipo2Example ejemplo = new CenTiposcvsubtipo2Example();
+					ejemplo.createCriteria().andIdtipocvEqualTo(Short.parseShort(subtipoCurricularItem.getIdTipoCV()))
+							.andIdinstitucionEqualTo(Short.parseShort(subtipoCurricularItem.getIdInstitucion()))
+							.andIdtipocvsubtipo2EqualTo(Short.parseShort(subtipoCurricularItem.getIdTipoCvSubtipo2()));
+					tipoActual = cenTiposCVSubtipo2ExtendsMapper.selectByExample(ejemplo);
+					if (null != tipoActual.get(0).getDescripcion()) {
 					GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
 					genRecursosCatalogosExample.createCriteria()
-							.andDescripcionEqualTo(subtipoCurricularItem.getDescripcion())
+								.andIdrecursoEqualTo(tipoActual.get(0).getDescripcion())
 							.andIdinstitucionEqualTo(idInstitucion).andIdlenguajeEqualTo(usuario.getIdlenguaje());
 					List<GenRecursosCatalogos> genRecursosCatalogos = genRecursosCatalogosExtendsMapper
 							.selectByExample(genRecursosCatalogosExample);
 
-					if (null != genRecursosCatalogos && !genRecursosCatalogos.isEmpty()) {
+						GenRecursosCatalogos recurso = new GenRecursosCatalogos();
+						recurso.setIdrecurso(tipoActual.get(0).getDescripcion());
+						recurso.setDescripcion(subtipoCurricularItem.getDescripcion());
+						genRecursosCatalogosExtendsMapper.updateByExampleSelective(recurso,
+								genRecursosCatalogosExample);
 						record.setDescripcion(genRecursosCatalogos.get(0).getIdrecurso());
+						actualizarRestoIdiomas(genRecursosCatalogos.get(0));
 					} else {
 						GenRecursosCatalogos genRecursosCatalogo = new GenRecursosCatalogos();
 
@@ -332,7 +381,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 								+ genRecursosCatalogo.getIdrecurso());
 
 						genRecursosCatalogo.setNombretabla("CEN_TIPOSCVSUBTIPO2");
-						genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
+						genRecursosCatalogo.setUsumodificacion(usuario.getIdusuario());
 
 						if (genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo) == 1) {
 							record.setDescripcion(genRecursosCatalogo.getIdrecurso());
@@ -347,7 +396,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 						record.setIdinstitucion(idInstitucion);
 						record.setIdtipocv(Short.valueOf(subtipoCurricularItem.getIdTipoCV()));
 						record.setIdtipocvsubtipo2(Short.valueOf(subtipoCurricularItem.getIdTipoCvSubtipo2()));
-						record.setUsumodificacion(usuario.getUsumodificacion());
+						record.setUsumodificacion(usuario.getIdusuario());
 
 						if (cenTiposCVSubtipo2ExtendsMapper.updateByPrimaryKey(record) == 1) {
 							updateResponseDTO.setStatus(SigaConstants.OK);
@@ -463,7 +512,8 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 				LOGGER.info(
 						"getHistory() / cenTiposCVSubtipo2ExtendsMapper.getHistory() -> Entrada a cenTiposCVSubtipo2ExtendsMapper para busqueda");
 				
-				subtipoCurricularItems = cenTiposCVSubtipo2ExtendsMapper.getHistory(subtipoCurricularItem, String.valueOf(idInstitucion), idLenguaje);
+				subtipoCurricularItems = cenTiposCVSubtipo2ExtendsMapper.getHistory(subtipoCurricularItem,
+						String.valueOf(idInstitucion), idLenguaje);
 				LOGGER.info(
 						"getHistory() / cenTiposCVSubtipo2ExtendsMapper.getHistory() -> Salida de cenTiposCVSubtipo2ExtendsMapper para busqueda");
 
@@ -482,7 +532,8 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 	}
 	
 	@Override
-	public ComboSubtiposCVDTO getCurricularSubtypeCombo (String idTipoCV, boolean historico, HttpServletRequest request) {
+	public ComboSubtiposCVDTO getCurricularSubtypeCombo(String idTipoCV, boolean historico,
+			HttpServletRequest request) {
 		
 		LOGGER.info("getCurricularSubtypeCombo() -> Entrada al servicio para obtener los tipos curriculares");
 		
@@ -512,7 +563,8 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 				LOGGER.info(
 						"getCurricularSubtypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Entrada a cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
 				
-				comboItems = cenTiposCVSubtipo2ExtendsMapper.searchCurricularSubtypeCombo(idTipoCV, historico, usuario.getIdlenguaje(), idInstitucion.toString());
+				comboItems = cenTiposCVSubtipo2ExtendsMapper.searchCurricularSubtypeCombo(idTipoCV, historico,
+						usuario.getIdlenguaje(), idInstitucion.toString());
 				
 				LOGGER.info(
 						"getCurricularSubtypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Salida de cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");

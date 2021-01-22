@@ -73,7 +73,8 @@ public interface CenSolicitudincorporacionExtendsMapper {
 			@Result(column = "DIGITOCONTROL", property = "digitoControl", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMEROCUENTA", property = "numeroCuenta", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "BANCO", property = "banco", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+	@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)
 			})
 	List<SolIncorporacionItem> getSolicitudes(SolicitudIncorporacionSearchDTO solIncorporacionSearchDTO, String idLenguage);
 	

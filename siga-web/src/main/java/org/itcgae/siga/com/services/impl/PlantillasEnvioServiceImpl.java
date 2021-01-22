@@ -21,12 +21,11 @@ import org.itcgae.siga.DTOs.com.PlantillasEnvioDTO;
 import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaRemitenteDTO;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
@@ -35,33 +34,35 @@ import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenTipodireccion;
-import org.itcgae.siga.db.entities.CenTipodireccionExample;
 import org.itcgae.siga.db.entities.ConConsulta;
+import org.itcgae.siga.db.entities.ConConsultaExample;
 import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenvios;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
+import org.itcgae.siga.db.entities.ModModelocomunicacion;
+import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
+import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaKey;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
-import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionTipodireccionExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenTipoDireccionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(timeout=2400)
 public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 
 	private Logger LOGGER = Logger.getLogger(PlantillasEnvioServiceImpl.class);
@@ -70,12 +71,10 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 	@Autowired
-	EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
+	private EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
 	
 	@Autowired
-	private EnvPlantillasenviosMapper _envPlantillasenviosMapper;
 	
-	@Autowired
 	private EnvEnviosExtendsMapper _envEnviosExtendsMapper;
 	
 	@Autowired
@@ -97,7 +96,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	private CenDireccionTipodireccionExtendsMapper _cenDireccionTipodireccionExtendsMapper;
 	
 	@Autowired
-	private CenTipoDireccionExtendsMapper _cenTipoDireccionExtendsMapper;
+	private ModModeloComunicacionExtendsMapper _modModeloComunicacionExtendsMapper;
 
 	@Override
 	public ComboConsultaInstitucionDTO getComboConsultas(HttpServletRequest request, String filtro) {
@@ -119,14 +118,15 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = _conConsultasExtendsMapper.selectConsultasDisponiblesFiltro(idInstitucion, null, null, filtro);
+				comboItems = _conConsultasExtendsMapper.selectConsultasDisponiblesFiltro(idInstitucion, null, null,
+						filtro);
 
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItemConsulta element = new ComboItemConsulta();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
+//				if(null != comboItems && comboItems.size() > 0) {
+//					ComboItemConsulta element = new ComboItemConsulta();
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
+//				}		
 				
 				comboDTO.setConsultas(comboItems);
 				
@@ -153,13 +153,16 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					plantillasItem = _envPlantillaEnviosExtendsMapper.selectPlantillasEnvios(idInstitucion, usuario.getIdlenguaje(), filtros);
+					plantillasItem = _envPlantillaEnviosExtendsMapper.selectPlantillasEnvios(idInstitucion,
+							usuario.getIdlenguaje(), filtros);
 					if(plantillasItem != null && plantillasItem.size()> 0){
 						respuesta.setPlantillasItem(plantillasItem);
 					}
@@ -191,9 +194,11 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -203,7 +208,8 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					for (int i = 0; i < plantillasEnvio.length; i++) {
 						PlantillaEnvioItem plantilla = plantillasEnvio[i];
 						if(borrar){
-							List<EnviosMasivosItem> listaEnvios = _envEnviosExtendsMapper.selectEnviosByIdPlantilla(idInstitucion, plantilla.getIdPlantillaEnvios());
+							List<EnviosMasivosItem> listaEnvios = _envEnviosExtendsMapper
+									.selectEnviosByIdPlantilla(idInstitucion, plantilla.getIdPlantillaEnvios());
 							if(listaEnvios != null && listaEnvios.size() > 0) {
 								borrar = false;
 							}
@@ -213,14 +219,16 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					if(borrar) {
 						for (int i = 0; i < plantillasEnvio.length; i++) {
 							EnvPlantillasenviosKey plantillaEnvioKey = new EnvPlantillasenviosKey();
-							plantillaEnvioKey.setIdplantillaenvios(Integer.parseInt(plantillasEnvio[i].getIdPlantillaEnvios()));
+							plantillaEnvioKey
+									.setIdplantillaenvios(Integer.parseInt(plantillasEnvio[i].getIdPlantillaEnvios()));
 							plantillaEnvioKey.setIdinstitucion(Short.valueOf(plantillasEnvio[i].getIdInstitucion()));
 							plantillaEnvioKey.setIdtipoenvios(Short.valueOf(plantillasEnvio[i].getIdTipoEnvios()));
-							EnvPlantillasenvios plantillaEnvios = _envPlantillasenviosMapper.selectByPrimaryKey(plantillaEnvioKey);
+							EnvPlantillasenvios plantillaEnvios = _envPlantillaEnviosExtendsMapper
+									.selectByPrimaryKey(plantillaEnvioKey);
 							plantillaEnvios.setFechabaja(new Date());
 							plantillaEnvios.setFechamodificacion(new Date());
 							plantillaEnvios.setUsumodificacion(usuario.getIdusuario());
-							_envPlantillasenviosMapper.updateByPrimaryKey(plantillaEnvios);
+							_envPlantillaEnviosExtendsMapper.updateByPrimaryKey(plantillaEnvios);
 						}
 						respuesta.setCode(200);
 						respuesta.setDescription("Plantillas de envío borradas");
@@ -255,9 +263,11 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("guardarDatosGenerales() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"guardarDatosGenerales() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("guardarDatosGenerales() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"guardarDatosGenerales() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
@@ -266,7 +276,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						key.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
 						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 						key.setIdinstitucion(idInstitucion);
-						EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+						EnvPlantillasenviosWithBLOBs plantilla = _envPlantillaEnviosExtendsMapper.selectByPrimaryKey(key);
 						plantilla.setAsunto(datosTarjeta.getAsunto());
 						plantilla.setCuerpo(datosTarjeta.getCuerpo());
 						plantilla.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvios()));
@@ -274,7 +284,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantilla.setDescripcion(datosTarjeta.getDescripcion());
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
-						_envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
+						_envPlantillaEnviosExtendsMapper.updateByPrimaryKeyWithBLOBs(plantilla);
 						respuesta.setMessage(plantilla.getIdplantillaenvios().toString());
 					}else{
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
@@ -289,7 +299,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
 						plantilla.setAntigua("N");
-						_envPlantillasenviosMapper.insert(plantilla);
+						_envPlantillaEnviosExtendsMapper.insert(plantilla);
 						respuesta.setMessage(plantilla.getIdplantillaenvios().toString());
 					}
 					respuesta.setCode(200);
@@ -307,6 +317,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	}
 
 	@Override
+	@Transactional(timeout=2400)
 	public Error asociarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta) {
 		LOGGER.info("asociarConsulta() -> Entrada al servicio para asociar una consulta a la plantilla de envio");
 		
@@ -314,25 +325,93 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+		boolean asociar = false;
+		boolean modificarPlantilla = false;
 		Error respuesta = new Error();
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("asociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"asociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("asociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"asociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
+					ModPlantillaenvioConsultaExample modPlantillaenvioConsultaExample = new ModPlantillaenvioConsultaExample();
+					modPlantillaenvioConsultaExample.createCriteria()
+							.andIdplantillaenviosEqualTo(Integer.parseInt(consulta.getIdPlantillaEnvios()))
+							.andFechabajaIsNull();
+					LOGGER.info(
+							"asociarConsulta() / _modPlantillaenvioConsultaMapper.selectByExample() -> Entrada a _modPlantillaenvioConsultaMapper para obtener las consultas asociadas a la plantilla envio a editar");
+					List<ModPlantillaenvioConsulta> modPlantillaenvioConsultas = _modPlantillaenvioConsultaMapper
+							.selectByExample(modPlantillaenvioConsultaExample);
+					LOGGER.info(
+							"asociarConsulta() / _modPlantillaenvioConsultaMapper.selectByExample() -> Salida de _modPlantillaenvioConsultaMapper para obtener las consultas asociadas a la plantilla envio a editar");
+					if (modPlantillaenvioConsultas != null && modPlantillaenvioConsultas.size() > 0) {
+						for (ModPlantillaenvioConsulta modPlantillaenvioConsulta : modPlantillaenvioConsultas) {
+							ConConsultaExample conConsultaExample = new ConConsultaExample();
+							conConsultaExample.createCriteria()
+									.andIdconsultaEqualTo(modPlantillaenvioConsulta.getIdconsulta());
+							LOGGER.info(
+									"asociarConsulta() / _conConsultasExtendsMapper.selectByExample() -> Entrada a _modPlantillaenvioConsultaMapper para obtener idClaseComunicacion de la consulta asociada a la plantilla envio a editar");
+							List<ConConsulta> consultas = _conConsultasExtendsMapper
+									.selectByExample(conConsultaExample);
+							LOGGER.info(
+									"asociarConsulta() / _conConsultasExtendsMapper.selectByExample() -> Salida de _modPlantillaenvioConsultaMapper para obtener idClaseComunicacion de la consulta asociada a la plantilla envio a editar");
+							if (consultas != null && consultas.size() > 0) {
+								ConConsulta conConsulta = consultas.get(0);
+								if (conConsulta.getIdclasecomunicacion().toString()
+										.equals(consulta.getIdClaseComunicacion())) {
+									asociar = true;
+								} else {
+									asociar = false;
+									respuesta.setCode(500);
+									respuesta.setMessage("informesycomunicaciones.plantillasenvio.ficha.errorAsociar.claseComunicacionDistinta");
+									return respuesta;
+								}
+							}
+						}
+					} else {
 					
+						EnvPlantillasenviosExample envPlantillasenviosExample = new EnvPlantillasenviosExample(); 
+						envPlantillasenviosExample.createCriteria().andIdplantillaenviosEqualTo(Integer.valueOf(consulta.getIdPlantillaEnvios()));
+						LOGGER.info(
+								"asociarConsulta() / envPlantillaEnviosExtendsMapper.selectByExample() -> Entrada a envPlantillaEnviosExtendsMapper para obtener la plantilla de envio asociada a la consulta");
+						List<EnvPlantillasenvios> plantillas = _envPlantillaEnviosExtendsMapper.selectByExample(envPlantillasenviosExample);
+						LOGGER.info(
+								"asociarConsulta() / envPlantillaEnviosExtendsMapper.selectByExample() -> Salida de envPlantillaEnviosExtendsMapper para obtener la plantilla de envio asociada a la consulta");
+						if (plantillas != null && plantillas.size() > 0) {
+							EnvPlantillasenvios plantilla = plantillas.get(0);
+							if(plantilla.getIdclasecomunicacion() == null) {
+								asociar = true;
+								modificarPlantilla = true;
+							}else if (plantilla.getIdclasecomunicacion() != null && plantilla.getIdclasecomunicacion().toString()
+									.equals(consulta.getIdClaseComunicacion())) {
+								asociar = true;
+							} else {
+								asociar = false;
+								respuesta.setCode(500);
+								respuesta.setMessage("informesycomunicaciones.plantillasenvio.ficha.errorAsociar.claseComunicacionDistinta");
+								return respuesta;
+							}
+						}
+					}
+					if (asociar) {
 					// Consultamos si existe la consulta en la tabla
 					ModPlantillaenvioConsultaKey modPlantillaenvioConsultaKey = new ModPlantillaenvioConsultaKey();
 					modPlantillaenvioConsultaKey.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
-					modPlantillaenvioConsultaKey.setIdplantillaenvios(Integer.parseInt(consulta.getIdPlantillaEnvios()));
-					ModPlantillaenvioConsulta modPlantillaenvioConsulta = _modPlantillaenvioConsultaMapper.selectByPrimaryKey(modPlantillaenvioConsultaKey);
+						modPlantillaenvioConsultaKey
+								.setIdplantillaenvios(Integer.parseInt(consulta.getIdPlantillaEnvios()));
+						LOGGER.info(
+								"asociarConsulta() / _modPlantillaenvioConsultaMapper.selectByExample() -> Entrada a _modPlantillaenvioConsultaMapper para comprobar si la consulta ya esta asociada a la plantilla envio a editar");
+						ModPlantillaenvioConsulta modPlantillaenvioConsulta = _modPlantillaenvioConsultaMapper
+								.selectByPrimaryKey(modPlantillaenvioConsultaKey);
 					
+						LOGGER.info(
+								"asociarConsulta() / _modPlantillaenvioConsultaMapper.selectByExample() -> Salida de _modPlantillaenvioConsultaMapper para comprobar si la consulta ya esta asociada a la plantilla envio a editar");
 					// Preparamos el objeto a actualizar o insertar
 					ModPlantillaenvioConsulta consultaAsoc = new ModPlantillaenvioConsulta();
 					
@@ -345,9 +424,41 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					consultaAsoc.setFechamodificacion(new Date());
 					 
 					if(modPlantillaenvioConsulta != null) {
+							LOGGER.info(
+									"asociarConsulta() / _modPlantillaenvioConsultaMapper.updateByPrimaryKey() -> Entrada a _modPlantillaenvioConsultaMapper para modificar la consulta ya asociada a la plantilla envio a editar");
 						_modPlantillaenvioConsultaMapper.updateByPrimaryKey(consultaAsoc);
+							LOGGER.info(
+									"asociarConsulta() / _modPlantillaenvioConsultaMapper.updateByPrimaryKey() -> Salida de _modPlantillaenvioConsultaMapper para modificar la consulta ya asociada a la plantilla envio a editar");
 					}else {
+							LOGGER.info(
+									"asociarConsulta() / _modPlantillaenvioConsultaMapper.insert() -> Entrada a _modPlantillaenvioConsultaMapper para insertar la nueva consulta a la plantilla envio a editar");
 						_modPlantillaenvioConsultaMapper.insert(consultaAsoc);
+							LOGGER.info(
+									"asociarConsulta() / _modPlantillaenvioConsultaMapper.insert() -> Salida de _modPlantillaenvioConsultaMapper para insertar la nueva consulta a la plantilla envio a editar");
+						}
+						if (modificarPlantilla) {
+							EnvPlantillasenviosKey envPlantillasenviosKey = new EnvPlantillasenviosKey();
+							envPlantillasenviosKey.setIdinstitucion(idInstitucion);
+							envPlantillasenviosKey
+									.setIdplantillaenvios(Integer.valueOf(consulta.getIdPlantillaEnvios()));
+							envPlantillasenviosKey.setIdtipoenvios(Short.valueOf(consulta.getIdTipoEnvios()));
+							LOGGER.info(
+									"asociarConsulta() / _envPlantillaEnviosExtendsMapper.selectByExample() -> Entrada a _modPlantillaenvioConsultaMapper para obtener plantilla envio a editar");
+							EnvPlantillasenvios plantillaEnvio = _envPlantillaEnviosExtendsMapper
+									.selectByPrimaryKey(envPlantillasenviosKey);
+							LOGGER.info(
+									"asociarConsulta() / _envPlantillaEnviosExtendsMapper.selectByExample() -> Salida de _modPlantillaenvioConsultaMapper para obtener plantilla envio a editar");
+							if (plantillaEnvio != null) {
+								plantillaEnvio.setFechamodificacion(new Date());
+								plantillaEnvio.setUsumodificacion(usuario.getIdusuario());
+								plantillaEnvio.setIdclasecomunicacion(Long.valueOf(consulta.getIdClaseComunicacion()));
+								LOGGER.info(
+										"asociarConsulta() / _envPlantillaEnviosExtendsMapper.updateByPrimaryKey() -> Entrada a _modPlantillaenvioConsultaMapper para modificar idClaseComunicacion de la plantilla envio a editar");
+								_envPlantillaEnviosExtendsMapper.updateByPrimaryKey(plantillaEnvio);
+								LOGGER.info(
+										"asociarConsulta() / _envPlantillaEnviosExtendsMapper.updateByPrimaryKey() -> Salida de _modPlantillaenvioConsultaMapper para modificar idClaseComunicacion de la plantilla envio a editar");
+							}
+						}
 					}
 					
 					respuesta.setCode(200);
@@ -356,7 +467,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			}catch(Exception e){
 				respuesta.setCode(500);
 				respuesta.setDescription("Error al asociar consulta a la plantilla");
-				respuesta.setMessage(e.getMessage());
+				respuesta.setMessage("informesycomunicaciones.plantillasenvio.ficha.errorAsociar");
 				e.printStackTrace();
 			}
 		}
@@ -374,15 +485,18 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+		String idPlantillaEnvios = null;
+		String idTipoEnvios = null;
 		Error respuesta = new Error();
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("desAsociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"desAsociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("desAsociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"desAsociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
@@ -390,11 +504,55 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						ModPlantillaenvioConsultaKey key = new ModPlantillaenvioConsultaKey();
 						key.setIdconsulta(Long.valueOf(consulta[i].getIdConsulta()));
 						key.setIdplantillaenvios(Integer.parseInt(consulta[i].getIdPlantillaEnvios()));
+						idPlantillaEnvios = consulta[i].getIdPlantillaEnvios();
+						idTipoEnvios = consulta[i].getIdTipoEnvios();
 						ModPlantillaenvioConsulta con = _modPlantillaenvioConsultaMapper.selectByPrimaryKey(key);
 						con.setFechabaja(new Date());
 						con.setUsumodificacion(usuario.getIdusuario());
 						con.setFechamodificacion(new Date());
 						_modPlantillaenvioConsultaMapper.updateByPrimaryKey(con);
+					}
+					ModPlantillaenvioConsultaExample modPlantillaenvioConsultaExample = new ModPlantillaenvioConsultaExample();
+					modPlantillaenvioConsultaExample.createCriteria()
+							.andIdplantillaenviosEqualTo(Integer.parseInt(idPlantillaEnvios)).andFechabajaIsNull();
+					LOGGER.info(
+							"desAsociarConsulta() / _modPlantillaenvioConsultaMapper.selectByExample() -> Entrada a _modPlantillaenvioConsultaMapper para obtener las consultas asociadas a la plantilla envio a editar");
+					List<ModPlantillaenvioConsulta> modPlantillaenvioConsultas = _modPlantillaenvioConsultaMapper
+							.selectByExample(modPlantillaenvioConsultaExample);
+					LOGGER.info(
+							"desAsociarConsulta() / _modPlantillaenvioConsultaMapper.selectByExample() -> Salida de _modPlantillaenvioConsultaMapper para obtener las consultas asociadas a la plantilla envio a editar");
+					if (modPlantillaenvioConsultas == null || modPlantillaenvioConsultas.size() == 0) {
+						ModModelocomunicacionExample example = new ModModelocomunicacionExample();
+						example.createCriteria().andIdplantillaenviosEqualTo(Long.valueOf(idPlantillaEnvios));
+						LOGGER.info(
+								"desAsociarConsulta() / _modModeloComunicacionExtendsMapper.selectByExample() -> Entrada a _modModeloComunicacionExtendsMapper para obtener modelos de comunicacion que tenga asociada la plantilla envio a editar");
+						List<ModModelocomunicacion> modelosComunicacion = _modModeloComunicacionExtendsMapper.selectByExample(example);
+						LOGGER.info(
+								"desAsociarConsulta() / _modModeloComunicacionExtendsMapper.selectByExample() -> Salida de _modModeloComunicacionExtendsMapper para obtener modelos de comunicacion que tenga asociada la plantilla envio a editar");
+						if (null != modelosComunicacion && modelosComunicacion.size() > 0) {
+							respuesta.setDescription("conClase");
+						}else {
+							EnvPlantillasenviosKey envPlantillasenviosKey = new EnvPlantillasenviosKey();
+							envPlantillasenviosKey.setIdinstitucion(idInstitucion);
+							envPlantillasenviosKey.setIdplantillaenvios(Integer.valueOf(idPlantillaEnvios));
+							envPlantillasenviosKey.setIdtipoenvios(Short.valueOf(idTipoEnvios));
+							LOGGER.info(
+									"desAsociarConsulta() / _envPlantillaEnviosExtendsMapper.selectByExample() -> Entrada a _modPlantillaenvioConsultaMapper para obtener plantilla envio a editar");
+							EnvPlantillasenvios plantillaEnvio = _envPlantillaEnviosExtendsMapper
+									.selectByPrimaryKey(envPlantillasenviosKey);
+							LOGGER.info(
+									"desAsociarConsulta() / _envPlantillaEnviosExtendsMapper.selectByExample() -> Salida de _modPlantillaenvioConsultaMapper para obtener plantilla envio a editar");
+							if (plantillaEnvio != null) {
+								plantillaEnvio.setFechamodificacion(new Date());
+								plantillaEnvio.setUsumodificacion(usuario.getIdusuario());
+								plantillaEnvio.setIdclasecomunicacion(null);
+								LOGGER.info(
+										"desAsociarConsulta() / _envPlantillaEnviosExtendsMapper.updateByPrimaryKey() -> Entrada a _modPlantillaenvioConsultaMapper para modificar idClaseComunicacion de la plantilla envio a editar");
+								_envPlantillaEnviosExtendsMapper.updateByPrimaryKey(plantillaEnvio);
+								LOGGER.info(
+										"desAsociarConsulta() / _envPlantillaEnviosExtendsMapper.updateByPrimaryKey() -> Salida de _modPlantillaenvioConsultaMapper para modificar idClaseComunicacion de la plantilla envio a editar");
+							}
+						}
 					}
 					respuesta.setCode(200);
 					respuesta.setMessage("Consulta desAsocidada correctamente");
@@ -426,9 +584,11 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
@@ -437,13 +597,15 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					key.setIdplantillaenvios(Integer.parseInt(remitente.getIdPlantillaEnvios()));
 					key.setIdtipoenvios(Short.valueOf(remitente.getIdTipoEnvios()));
 					
-					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+					EnvPlantillasenvios plantilla = _envPlantillaEnviosExtendsMapper.selectByPrimaryKey(key);
 					plantilla.setIddireccion(Long.valueOf(remitente.getIdDireccion()));
+					if(!UtilidadesString.esCadenaVacia(remitente.getIdPersona())) {
 					plantilla.setIdpersona(Long.valueOf(remitente.getIdPersona()));
+					}
 					plantilla.setDescripcionRemitente(remitente.getDescripcion());
 					plantilla.setFechamodificacion(new Date());
 					plantilla.setUsumodificacion(usuario.getIdusuario());
-					_envPlantillasenviosMapper.updateByPrimaryKey(plantilla);
+					_envPlantillaEnviosExtendsMapper.updateByPrimaryKey(plantilla);
 					respuesta.setCode(200);
 					respuesta.setMessage("Remitente guardado correctamente");
 				}
@@ -474,12 +636,16 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("detalleConsultas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"detalleConsultas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("detalleConsultas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"detalleConsultas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
-					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(Short.valueOf(consulta.getIdInstitucion()), consulta.getIdPlantillaEnvios(), consulta.getIdTipoEnvios(), usuarios.get(0).getIdlenguaje());
+					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(
+							Short.valueOf(consulta.getIdInstitucion()), consulta.getIdPlantillaEnvios(),
+							consulta.getIdTipoEnvios(), usuarios.get(0).getIdlenguaje());
 					if(consultaItems != null && consultaItems.size()>0){
 						respuesta.setConsultaItem(consultaItems);
 					}
@@ -509,9 +675,11 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("detalleRemitente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"detalleRemitente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("detalleRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"detalleRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					
@@ -519,7 +687,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
 					key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
 					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
-					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+					EnvPlantillasenvios plantilla = _envPlantillaEnviosExtendsMapper.selectByPrimaryKey(key);
 
 					if (null != plantilla && null != plantilla.getIdpersona()) {
 						CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
@@ -562,15 +730,19 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 							direccionItem.setPaginaWeb(direccion.getPaginaweb());
 						
 						CenDireccionTipodireccionExample cenDireccionTipodireccionExample = new CenDireccionTipodireccionExample();
-						cenDireccionTipodireccionExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(direccion.getIdpersona())).andIddireccionEqualTo(Long.valueOf(direccion.getIddireccion())).andIdinstitucionEqualTo(Short.valueOf(direccion.getIdinstitucion()));
-						List<CenDireccionTipodireccion> cenDireccionTipodireccion = _cenDireccionTipodireccionExtendsMapper.selectByExample(cenDireccionTipodireccionExample);
-						
+						cenDireccionTipodireccionExample.createCriteria()
+								.andIdpersonaEqualTo(Long.valueOf(direccion.getIdpersona()))
+								.andIddireccionEqualTo(Long.valueOf(direccion.getIddireccion()))
+								.andIdinstitucionEqualTo(Short.valueOf(direccion.getIdinstitucion()));
+						List<CenDireccionTipodireccion> cenDireccionTipodireccion = _cenDireccionTipodireccionExtendsMapper
+								.selectByExample(cenDireccionTipodireccionExample);
 						
 						if(!cenDireccionTipodireccion.isEmpty() && cenDireccionTipodireccion.size() > 0) {
 							String [] idTipoDireccion = new String[cenDireccionTipodireccion.size()];
 							
 							for (int i = 0; i < cenDireccionTipodireccion.size(); i++) {
-								idTipoDireccion[i] = String.valueOf(cenDireccionTipodireccion.get(i).getIdtipodireccion());
+								idTipoDireccion[i] = String
+										.valueOf(cenDireccionTipodireccion.get(i).getIdtipodireccion());
 							}
 							
 							direccionItem.setIdTipoDireccion(idTipoDireccion);
@@ -608,9 +780,11 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("obtenerFinalidad() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"obtenerFinalidad() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("obtenerFinalidad() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"obtenerFinalidad() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					String finalidad = obtenerFinalidadByIdConsulta(idInstitucion, Long.valueOf(idConsulta));
@@ -622,11 +796,13 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						Short institucionGeneral = 2000;
 						key.setIdinstitucion(institucionGeneral);
 						consulta = _conConsultaMapper.selectByPrimaryKey(key);
-						String objetivo = _conConsultasExtendsMapper.SelectObjetivo(consulta.getIdobjetivo().toString(), usuarios.get(0).getIdlenguaje());
+						String objetivo = _conConsultasExtendsMapper.SelectObjetivo(consulta.getIdobjetivo().toString(),
+								usuarios.get(0).getIdlenguaje());
 						finalidadDTO.setFinalidad(finalidad);
 						finalidadDTO.setObjetivo(objetivo);
 					}else{
-						String objetivo = _conConsultasExtendsMapper.SelectObjetivo(consulta.getIdobjetivo().toString(), usuarios.get(0).getIdlenguaje());
+						String objetivo = _conConsultasExtendsMapper.SelectObjetivo(consulta.getIdobjetivo().toString(),
+								usuarios.get(0).getIdlenguaje());
 						finalidadDTO.setFinalidad(finalidad);
 						finalidadDTO.setObjetivo(objetivo);
 					}
@@ -658,9 +834,11 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("obtenerPersonaYdireccion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"obtenerPersonaYdireccion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("obtenerPersonaYdireccion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"obtenerPersonaYdireccion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona));
@@ -670,7 +848,8 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					remitente.setApellido2(persona.getApellidos2());
 					
 					CenDireccionesExample example = new CenDireccionesExample();
-					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona)).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona))
+							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 					List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
 					if(direcciones != null && direcciones.size() > 0){
 						List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();
@@ -697,14 +876,18 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 							direccion.setPaginaWeb(item.getPaginaweb());
 							
 							CenDireccionTipodireccionExample cenDireccionTipodireccionExample = new CenDireccionTipodireccionExample();
-							cenDireccionTipodireccionExample.createCriteria().andIdpersonaEqualTo(item.getIdpersona()).andIddireccionEqualTo(item.getIddireccion()).andIdinstitucionEqualTo(item.getIdinstitucion());
-							List<CenDireccionTipodireccion> cenDireccionTipodireccion = _cenDireccionTipodireccionExtendsMapper.selectByExample(cenDireccionTipodireccionExample);
+							cenDireccionTipodireccionExample.createCriteria().andIdpersonaEqualTo(item.getIdpersona())
+									.andIddireccionEqualTo(item.getIddireccion())
+									.andIdinstitucionEqualTo(item.getIdinstitucion());
+							List<CenDireccionTipodireccion> cenDireccionTipodireccion = _cenDireccionTipodireccionExtendsMapper
+									.selectByExample(cenDireccionTipodireccionExample);
 						
 							if(!cenDireccionTipodireccion.isEmpty() && cenDireccionTipodireccion.size() > 0) {
 								String [] idTipoDireccion = new String[cenDireccionTipodireccion.size()];
 								
 								for (int i = 0; i < cenDireccionTipodireccion.size(); i++) {
-									idTipoDireccion[i] = String.valueOf(cenDireccionTipodireccion.get(i).getIdtipodireccion());
+									idTipoDireccion[i] = String
+											.valueOf(cenDireccionTipodireccion.get(i).getIdtipodireccion());
 								}
 								
 								direccion.setIdTipoDireccion(idTipoDireccion);
@@ -743,11 +926,16 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			consulta = _conConsultaMapper.selectByPrimaryKey(key);
 		}
 		
+		String finalidad = "";
+		if(null != consulta.getSentencia() && !consulta.getSentencia().equals("")) {
 		int inicioSelect = consulta.getSentencia().indexOf("<SELECT>")+8;
 		int finSelect = consulta.getSentencia().indexOf("</SELECT>");
-		String finalidad = consulta.getSentencia().substring(inicioSelect, finSelect);
+			if(finSelect != -1 && inicioSelect != -1) {
+				finalidad = consulta.getSentencia().substring(inicioSelect, finSelect);
 		finalidad = finalidad.replace("select", "");
 		finalidad = finalidad.replace("distinct", "");
+			}			
+		}
 		return finalidad;
 	}
 

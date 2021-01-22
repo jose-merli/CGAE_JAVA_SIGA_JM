@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForRoles;
+import org.itcgae.siga.db.entities.ForRolesExample;
 import org.itcgae.siga.db.entities.ForRolesExample.Criteria;
 import org.itcgae.siga.db.entities.ForRolesExample.Criterion;
-import org.itcgae.siga.db.entities.ForRolesExample;
 
 public class ForRolesSqlProvider {
 

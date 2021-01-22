@@ -3,9 +3,9 @@ package org.itcgae.siga.db.mappers;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosExample.Criteria;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosExample.Criterion;
-import org.itcgae.siga.db.entities.EnvPlantillasenviosExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 
 public class EnvPlantillasenviosSqlProvider {
@@ -78,6 +78,9 @@ public class EnvPlantillasenviosSqlProvider {
 		if (record.getDescripcionRemitente() != null) {
 			sql.VALUES("DESCRIPCION_REMITENTE", "#{descripcionRemitente,jdbcType=VARCHAR}");
 		}
+        if (record.getIdclasecomunicacion() != null) {
+            sql.VALUES("IDCLASECOMUNICACION", "#{idclasecomunicacion,jdbcType=DECIMAL}");
+        }
 		if (record.getAsunto() != null) {
 			sql.VALUES("ASUNTO", "#{asunto,jdbcType=CLOB}");
 		}
@@ -110,6 +113,7 @@ public class EnvPlantillasenviosSqlProvider {
 		sql.SELECT("DESCRIPCION");
 		sql.SELECT("ANTIGUA");
 		sql.SELECT("DESCRIPCION_REMITENTE");
+        sql.SELECT("IDCLASECOMUNICACION");
 		sql.SELECT("ASUNTO");
 		sql.SELECT("CUERPO");
 		sql.FROM("ENV_PLANTILLASENVIOS");
@@ -143,6 +147,7 @@ public class EnvPlantillasenviosSqlProvider {
 		sql.SELECT("DESCRIPCION");
 		sql.SELECT("ANTIGUA");
 		sql.SELECT("DESCRIPCION_REMITENTE");
+        sql.SELECT("IDCLASECOMUNICACION");
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		applyWhere(sql, example, false);
 		if (example != null && example.getOrderByClause() != null) {
@@ -199,6 +204,9 @@ public class EnvPlantillasenviosSqlProvider {
 		if (record.getDescripcionRemitente() != null) {
 			sql.SET("DESCRIPCION_REMITENTE = #{record.descripcionRemitente,jdbcType=VARCHAR}");
 		}
+        if (record.getIdclasecomunicacion() != null) {
+            sql.SET("IDCLASECOMUNICACION = #{record.idclasecomunicacion,jdbcType=DECIMAL}");
+        }
 		if (record.getAsunto() != null) {
 			sql.SET("ASUNTO = #{record.asunto,jdbcType=CLOB}");
 		}
@@ -229,6 +237,7 @@ public class EnvPlantillasenviosSqlProvider {
 		sql.SET("DESCRIPCION = #{record.descripcion,jdbcType=VARCHAR}");
 		sql.SET("ANTIGUA = #{record.antigua,jdbcType=VARCHAR}");
 		sql.SET("DESCRIPCION_REMITENTE = #{record.descripcionRemitente,jdbcType=VARCHAR}");
+        sql.SET("IDCLASECOMUNICACION = #{record.idclasecomunicacion,jdbcType=DECIMAL}");
 		sql.SET("ASUNTO = #{record.asunto,jdbcType=CLOB}");
 		sql.SET("CUERPO = #{record.cuerpo,jdbcType=CLOB}");
 		EnvPlantillasenviosExample example = (EnvPlantillasenviosExample) parameter.get("example");
@@ -256,6 +265,7 @@ public class EnvPlantillasenviosSqlProvider {
 		sql.SET("DESCRIPCION = #{record.descripcion,jdbcType=VARCHAR}");
 		sql.SET("ANTIGUA = #{record.antigua,jdbcType=VARCHAR}");
 		sql.SET("DESCRIPCION_REMITENTE = #{record.descripcionRemitente,jdbcType=VARCHAR}");
+        sql.SET("IDCLASECOMUNICACION = #{record.idclasecomunicacion,jdbcType=DECIMAL}");
 		EnvPlantillasenviosExample example = (EnvPlantillasenviosExample) parameter.get("example");
 		applyWhere(sql, example, true);
 		return sql.toString();
@@ -298,6 +308,9 @@ public class EnvPlantillasenviosSqlProvider {
 		if (record.getDescripcionRemitente() != null) {
 			sql.SET("DESCRIPCION_REMITENTE = #{descripcionRemitente,jdbcType=VARCHAR}");
 		}
+        if (record.getIdclasecomunicacion() != null) {
+            sql.SET("IDCLASECOMUNICACION = #{idclasecomunicacion,jdbcType=DECIMAL}");
+        }
 		if (record.getAsunto() != null) {
 			sql.SET("ASUNTO = #{asunto,jdbcType=CLOB}");
 		}
@@ -366,15 +379,13 @@ public class EnvPlantillasenviosSqlProvider {
 						if (criterion.getTypeHandler() == null) {
 							sb.append(String.format(parmPhrase1, criterion.getCondition(), i, j));
 						} else {
-							sb.append(String.format(parmPhrase1_th, criterion.getCondition(), i, j,
-									criterion.getTypeHandler()));
+                            sb.append(String.format(parmPhrase1_th, criterion.getCondition(), i, j,criterion.getTypeHandler()));
 						}
 					} else if (criterion.isBetweenValue()) {
 						if (criterion.getTypeHandler() == null) {
 							sb.append(String.format(parmPhrase2, criterion.getCondition(), i, j, i, j));
 						} else {
-							sb.append(String.format(parmPhrase2_th, criterion.getCondition(), i, j,
-									criterion.getTypeHandler(), i, j, criterion.getTypeHandler()));
+                            sb.append(String.format(parmPhrase2_th, criterion.getCondition(), i, j, criterion.getTypeHandler(), i, j, criterion.getTypeHandler()));
 						}
 					} else if (criterion.isListValue()) {
 						sb.append(criterion.getCondition());

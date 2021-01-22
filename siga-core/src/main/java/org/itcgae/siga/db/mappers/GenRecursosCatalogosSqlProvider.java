@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
+import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample.Criteria;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample.Criterion;
-import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
 
 public class GenRecursosCatalogosSqlProvider {
 

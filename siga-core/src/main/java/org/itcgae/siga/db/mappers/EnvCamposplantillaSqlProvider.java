@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EnvCamposplantilla;
+import org.itcgae.siga.db.entities.EnvCamposplantillaExample;
 import org.itcgae.siga.db.entities.EnvCamposplantillaExample.Criteria;
 import org.itcgae.siga.db.entities.EnvCamposplantillaExample.Criterion;
-import org.itcgae.siga.db.entities.EnvCamposplantillaExample;
 
 public class EnvCamposplantillaSqlProvider {
 

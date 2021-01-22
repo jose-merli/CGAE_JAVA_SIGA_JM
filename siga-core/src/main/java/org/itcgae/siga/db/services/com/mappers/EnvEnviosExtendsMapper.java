@@ -39,6 +39,20 @@ public interface EnvEnviosExtendsMapper {
       })
       List<EnviosMasivosItem> selectEnviosMasivosSearch(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros);
       
+      @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "busquedaSelectEnvios")
+      @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+                @Result(column = "FECHACREACION", property = "fechaCreacion", jdbcType = JdbcType.DATE),
+                @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "FECHAPROGRAMADA", property = "fechaProgramada", jdbcType = JdbcType.DATE),
+                @Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+                @Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+                @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR),
+                @Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR)                
+      })
+      List<EnviosMasivosItem> busquedaSelectEnviosMasivosSearch(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros);
       @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectMaxIDEnvio")
       @Results({
                 @Result(column = "IDMAX", property = "newId", jdbcType = JdbcType.VARCHAR)
@@ -95,7 +109,7 @@ public interface EnvEnviosExtendsMapper {
                 @Result(column = "csv", property = "csv", jdbcType = JdbcType.VARCHAR),
                 @Result(column = "idsolicitudecos", property = "idsolicitudecos", jdbcType = JdbcType.VARCHAR),
                 @Result(column = "envio", property = "envio", jdbcType = JdbcType.VARCHAR),
-                @Result(column = "idmodelocomunicacion", property = "idmodelocomunicacion", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "idmodelocomunicacion", property = "idmodelocomunicacion", jdbcType = JdbcType.NUMERIC)
                 
       })
       List<EnvEnvios> obtenerEnviosProgramados();
@@ -123,5 +137,17 @@ public interface EnvEnviosExtendsMapper {
       @Results({@Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC)
       })
       List<EnviosMasivosItem> selectEnviosByIdPlantilla(Short idInstitucion, String idPlantillaEnvio);
+      @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "obtenerDestinatarios")
+      @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "NUMDEST", property = "numDestinatarios", jdbcType = JdbcType.NUMERIC)
+      })
+      List<EnviosMasivosItem> obtenerDestinatarios(Short idInstitucion, String idEnvios);
 
+      @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "obtenerEnviosMalCreados")
+      @Results({@Result(column = "idinstitucion", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "idenvio", property = "idenvio", jdbcType = JdbcType.NUMERIC),
+                @Result(column = "fecha", property = "fecha", jdbcType = JdbcType.DATE)
+      })
+      List<EnvEnvios> obtenerEnviosMalCreados();
 }

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
+import org.itcgae.siga.db.entities.CenSolicitudincorporacionExample;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacionExample.Criteria;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacionExample.Criterion;
-import org.itcgae.siga.db.entities.CenSolicitudincorporacionExample;
 
 public class CenSolicitudincorporacionSqlProvider {
 

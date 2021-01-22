@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmContador;
+import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmContadorExample.Criteria;
 import org.itcgae.siga.db.entities.AdmContadorExample.Criterion;
-import org.itcgae.siga.db.entities.AdmContadorExample;
 
 public class AdmContadorSqlProvider {
 

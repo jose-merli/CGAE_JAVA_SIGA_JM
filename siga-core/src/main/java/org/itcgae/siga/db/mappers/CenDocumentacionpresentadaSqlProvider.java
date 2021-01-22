@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenDocumentacionpresentada;
+import org.itcgae.siga.db.entities.CenDocumentacionpresentadaExample;
 import org.itcgae.siga.db.entities.CenDocumentacionpresentadaExample.Criteria;
 import org.itcgae.siga.db.entities.CenDocumentacionpresentadaExample.Criterion;
-import org.itcgae.siga.db.entities.CenDocumentacionpresentadaExample;
 
 public class CenDocumentacionpresentadaSqlProvider {
 

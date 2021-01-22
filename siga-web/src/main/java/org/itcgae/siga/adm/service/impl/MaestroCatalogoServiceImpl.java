@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
-@Transactional
+@Transactional(timeout=2400)
 public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 	private Logger LOGGER = Logger.getLogger(MaestroCatalogoServiceImpl.class);

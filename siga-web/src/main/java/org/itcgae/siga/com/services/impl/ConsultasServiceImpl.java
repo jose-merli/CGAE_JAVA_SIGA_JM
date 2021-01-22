@@ -1,11 +1,9 @@
 package org.itcgae.siga.com.services.impl;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,7 +29,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.aspectj.weaver.ast.And;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
@@ -57,18 +54,20 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.ConEjecucion;
+import org.itcgae.siga.db.entities.ConEjecucionExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
-import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.mappers.ConEjecucionMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
@@ -88,6 +87,7 @@ import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,6 +163,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 	@Autowired
 	private ModModeloComunicacionExtendsMapper _modModeloComunicacionExtendsMapper;
 
+	@Autowired
+	private ConEjecucionMapper _conEjecucionMapper;
 	
 	@Override
 	public ComboDTO modulo(HttpServletRequest request) {
@@ -263,7 +265,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	@Override
 	public ComboDTO claseComunicacionByModulo(String idModulo, HttpServletRequest request) {
-		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo claseComunicacion filtrado por módulo");
+		LOGGER.info(
+				"claseComunicacion() -> Entrada al servicio para obtener combo claseComunicacion filtrado por módulo");
 		
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -334,7 +337,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public ConsultaDTO duplicarConsulta(HttpServletRequest request, ConsultaItem consulta) {
 		LOGGER.info("duplicarConsulta() -> Entrada al servicio de duplicar consultas");
 
@@ -385,11 +388,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 					respuesta.setConsultaItem(consulta);
 					
 					ModPlantilladocConsultaExample example = new ModPlantilladocConsultaExample();
-					example.createCriteria()
-					.andIdconsultaEqualTo(Long.valueOf(idConsulta))
-					.andIdinstitucionEqualTo(Short.valueOf(consulta.getIdInstitucion()))
-					.andFechabajaIsNull();
-					List<ModPlantilladocConsulta> modPlantilladocConsulta = _modPlantilladocConsultaMapper.selectByExample(example);
+					example.createCriteria().andIdconsultaEqualTo(Long.valueOf(idConsulta))
+							.andIdinstitucionEqualTo(Short.valueOf(consulta.getIdInstitucion())).andFechabajaIsNull();
+					List<ModPlantilladocConsulta> modPlantilladocConsulta = _modPlantilladocConsultaMapper
+							.selectByExample(example);
 				
 					if (null != modPlantilladocConsulta && modPlantilladocConsulta.size() > 0) {
 
@@ -437,7 +439,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error borrarConsulta(HttpServletRequest request, ConsultaItem[] consultas) {
 		LOGGER.info("borrarConsulta() -> Entrada al servicio de borrar consulta");
 
@@ -465,14 +467,18 @@ public class ConsultasServiceImpl implements IConsultasService{
 						boolean consultaAsociada = false;
 						if(consulta.getIdobjetivo() != null){
 							ModPlantilladocConsultaExample plantillaDocExample = new ModPlantilladocConsultaExample();
-							plantillaDocExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdconsultaEqualTo(consulta.getIdconsulta());
-							List<ModPlantilladocConsulta> plantillaConsulta = _modPlantilladocConsultaMapper.selectByExample(plantillaDocExample);
+							plantillaDocExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdconsultaEqualTo(consulta.getIdconsulta());
+							List<ModPlantilladocConsulta> plantillaConsulta = _modPlantilladocConsultaMapper
+									.selectByExample(plantillaDocExample);
 							if(plantillaConsulta != null && plantillaConsulta.size() > 0){
 								consultaAsociada = true;
 							}
 							ModPlantillaenvioConsultaExample envioConsultaExample = new ModPlantillaenvioConsultaExample();
-							envioConsultaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdconsultaEqualTo(consulta.getIdconsulta());
-							List<ModPlantillaenvioConsulta> plantillaEnvio = _modPlantillaenvioConsultaMapper.selectByExample(envioConsultaExample);
+							envioConsultaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdconsultaEqualTo(consulta.getIdconsulta());
+							List<ModPlantillaenvioConsulta> plantillaEnvio = _modPlantillaenvioConsultaMapper
+									.selectByExample(envioConsultaExample);
 							if(plantillaEnvio != null && plantillaEnvio.size() > 0){
 								consultaAsociada = true;
 							}
@@ -485,26 +491,32 @@ public class ConsultasServiceImpl implements IConsultasService{
 						if(general){
 							//las consultas genericas solo las puede borrar el colegio general
 							if(idInstitucion == 2000){
-								if(!consultaAsociada){
-									_conConsultaMapper.deleteByPrimaryKey(consultaKey);
+								// if(!consultaAsociada){
+								// _conConsultaMapper.deleteByPrimaryKey(consultaKey);
+								if (consulta.getFechabaja() != null) {
+									consulta.setFechabaja(null);
 								}else{
 									consulta.setFechabaja(new Date());
+								}
 									consulta.setFechamodificacion(new Date());
 									consulta.setUsumodificacion(usuario.getIdusuario());
 									_conConsultaMapper.updateByPrimaryKey(consulta);
-								}
+								// }
 							}else{
 								noBorrada = true;
 							}
 						}else if(!general && consulta.getIdinstitucion().equals(idInstitucion)){
-							if(!consultaAsociada){
-								_conConsultaMapper.deleteByPrimaryKey(consultaKey);
+							// if(!consultaAsociada){
+							// _conConsultaMapper.deleteByPrimaryKey(consultaKey);
+							if (consulta.getFechabaja() != null) {
+								consulta.setFechabaja(null);
 							}else{
 								consulta.setFechabaja(new Date());
+							}
 								consulta.setFechamodificacion(new Date());
 								consulta.setUsumodificacion(usuario.getIdusuario());
 								_conConsultaMapper.updateByPrimaryKey(consulta);
-							}
+							// }
 						}else{
 							noBorrada = true;
 						}
@@ -529,7 +541,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error guardarDatosGenerales(HttpServletRequest request, ConsultaItem consultaDTO) {
 		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar tarjeta general");
 		// Conseguimos información del usuario logeado
@@ -557,7 +569,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setDescripcion(consultaDTO.getNombre());
 						consulta.setIdobjetivo(Long.parseLong(consultaDTO.getIdObjetivo()));
 
-						if(consultaDTO.getIdClaseComunicacion() != null && !"".equalsIgnoreCase(consultaDTO.getIdClaseComunicacion())){
+						if (consultaDTO.getIdClaseComunicacion() != null
+								&& !"".equalsIgnoreCase(consultaDTO.getIdClaseComunicacion())) {
 
 							consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
 						}						
@@ -650,7 +663,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 						key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
 						key.setIdinstitucion(idInstitucion);
 						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
-						if(consultaDTO.getIdModulo() != null) consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
+						if (consultaDTO.getIdModulo() != null)
+							consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
 						consulta.setDescripcion(consultaDTO.getNombre());
 						consulta.setObservaciones(consultaDTO.getDescripcion());
 						consulta.setGeneral(consultaDTO.getGenerica());
@@ -658,7 +672,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 						objetivoAnterior = consulta.getIdobjetivo();
 						claseAnterior = consulta.getIdclasecomunicacion();
 						
-						if(consultaDTO.getIdClaseComunicacion() != null && !"".equalsIgnoreCase(consultaDTO.getIdClaseComunicacion())){
+						if (consultaDTO.getIdClaseComunicacion() != null
+								&& !"".equalsIgnoreCase(consultaDTO.getIdClaseComunicacion())) {
 							consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
 						}						
 						consulta.setIdobjetivo(Long.valueOf(consultaDTO.getIdObjetivo()));
@@ -690,8 +705,13 @@ public class ConsultasServiceImpl implements IConsultasService{
 						}
 						
 						//Si tiene clase de comunicación añadimos el where con las claves y el objetivo se ha cambiado
-						if(consultaDTO.getIdClaseComunicacion() != null && !"".equals(consultaDTO.getIdClaseComunicacion()) && (claseAnterior == null || claseAnterior.shortValue() != Short.valueOf(consultaDTO.getIdClaseComunicacion()).shortValue())){
-							sentencia = insertarClaves(Short.parseShort(consultaDTO.getIdClaseComunicacion()), sentencia);
+						// se ha cambiado
+						if (consultaDTO.getIdClaseComunicacion() != null
+								&& !"".equals(consultaDTO.getIdClaseComunicacion())
+								&& (claseAnterior == null || claseAnterior.shortValue() != Short
+										.valueOf(consultaDTO.getIdClaseComunicacion()).shortValue())) {
+							sentencia = insertarClaves(Short.parseShort(consultaDTO.getIdClaseComunicacion()),
+									sentencia);
 						}						
 						
 						consulta.setSentencia(sentencia);
@@ -771,7 +791,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 		return modeloCom;
 	}
 	
-	private void generacionDeRelaciones(ModModelocomunicacion modeloCom, ConConsulta consulta, AdmUsuarios usuario, Short idInstitucion){
+	private void generacionDeRelaciones(ModModelocomunicacion modeloCom, ConConsulta consulta, AdmUsuarios usuario,
+			Short idInstitucion) {
 		Integer i = 0;
 		do{
 			
@@ -832,8 +853,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-					modeloList = _conListadoModelosExtendsMapper.selectListadoModelos(Short.valueOf(consulta.getIdInstitucion()),
-							 consulta.getIdConsulta());
+					modeloList = _conListadoModelosExtendsMapper
+							.selectListadoModelos(Short.valueOf(consulta.getIdInstitucion()), consulta.getIdConsulta(),idInstitucion);
 					if (modeloList.size() > 0) {
 						conListadoModelosDTO.setListadoModelos(modeloList);
 					}
@@ -892,7 +913,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consultaDTO) {
 		LOGGER.info("guardarConsulta() -> Entrada al servicio para guardar la sentencia de la consulta");
 		// Conseguimos información del usuario logeado
@@ -921,7 +942,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 					etiquetasIncorrectas = comprobarEtiquetas(consultaDTO.getSentencia());
 					
 					// Comprombamos que en el where se tienen las keys asociadas a la clase
-					camposIncorrectos = comprobarClaves(consultaDTO.getSentencia(), consultaDTO.getIdClaseComunicacion());
+					camposIncorrectos = comprobarClaves(consultaDTO.getSentencia(),
+							consultaDTO.getIdClaseComunicacion());
 					
 					// Comprobamos que cumple el objetivo
 					objetivoIncorrecto = comprobarObjetivo(consultaDTO.getSentencia(), consultaDTO.getIdObjetivo());
@@ -964,7 +986,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 	private boolean comprobarInstitucion(String sentencia) {
 		boolean incorrecta = false;
 		sentencia = sentencia.toUpperCase();
-		if(sentencia.indexOf(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO) == -1){
+		if (sentencia.indexOf(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION
+				+ SigaConstants.REPLACECHAR_PREFIJO_SUFIJO) == -1) {
 			incorrecta = true;
 		}
 		return incorrecta;
@@ -992,16 +1015,20 @@ public class ConsultasServiceImpl implements IConsultasService{
 				try{
 					
 					//Reemplazamos los campos dinamicos
-					String sentencia = procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
+					String sentencia = procesarEjecutarConsulta(usuario, consulta.getSentencia(),
+							consulta.getCamposDinamicos(), true);
 					
 //					Map<String,String> mapa = new HashMap<String,String>();
 //					mapa = obtenerMapaConsulta(sentencia);
 					
 					sentencia = quitarEtiquetas(sentencia.toUpperCase());
 					
-					if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-							|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
-							|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+					if (sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER)
+							|| sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+							|| sentencia.contains(SigaConstants.SENTENCIA_DELETE)
+							|| sentencia.contains(SigaConstants.SENTENCIA_DROP)
+							|| sentencia.contains(SigaConstants.SENTENCIA_INSERT)
+							|| sentencia.contains(SigaConstants.SENTENCIA_UPDATE))) {
 						
 						LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
 						error.setCode(400);
@@ -1021,14 +1048,16 @@ public class ConsultasServiceImpl implements IConsultasService{
 							
 							GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
 							
-							String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + SigaConstants.carpetaTmp;
+							String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion
+									+ SigaConstants.pathSeparator + SigaConstants.carpetaTmp;
 							
 							File aux = new File(rutaTmp);
 							// creo directorio si no existe
 							aux.mkdirs();
 							String nombreFichero = SigaConstants.nombreExcelConsulta + new Date().getTime()+".xlsx";
 							excel = new File(rutaTmp, nombreFichero);
-							FileOutputStream fileOut = new FileOutputStream(rutaTmp + SigaConstants.pathSeparator + nombreFichero);
+							FileOutputStream fileOut = new FileOutputStream(
+									rutaTmp + SigaConstants.pathSeparator + nombreFichero);
 							workBook.write(fileOut);
 					        fileOut.close();
 					        workBook.close();
@@ -1103,6 +1132,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 				if(!select.contains("IDPOBLACION")){
 					camposIncorrectos = true;
 				}
+				if (!select.contains("IDIOMA")) {
+					camposIncorrectos = true;
+				}
 				
 			}else{
 				camposIncorrectos = true;
@@ -1140,7 +1172,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 			listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
 			for(KeyItem key : listaKeys){
 
-				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + key.getNombre().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
+				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + key.getNombre().toUpperCase()
+						+ SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
 				if(sentencia.indexOf(etiquetaKey) == -1){
 
 					incorrecta = true;
@@ -1189,11 +1222,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 		if(indexInicio > -1 && indexFinal > -1){
 			// Si ya tenía un select introducido le añadimos los daots de direccion
-			if(indexFinal + 9 <= sentencia.length() && sentencia.substring(indexInicio, indexFinal).toUpperCase().indexOf("SELECT") > -1){
+			if (indexFinal + 9 <= sentencia.length()
+					&& sentencia.substring(indexInicio, indexFinal).toUpperCase().indexOf("SELECT") > -1) {
 				String selectConsulta = sentencia.substring(indexInicio, indexFinal);
-				sentencia = sentencia.substring(0, indexInicio) + selectConsulta + ", " + select + sentencia.substring(indexFinal, sentencia.length());
+				sentencia = sentencia.substring(0, indexInicio) + selectConsulta + ", " + select
+						+ sentencia.substring(indexFinal, sentencia.length());
 			}else{
-				sentencia = sentencia.substring(0, indexInicio) + " SELECT " + select + sentencia.substring(indexFinal, sentencia.length());
+				sentencia = sentencia.substring(0, indexInicio) + " SELECT " + select
+						+ sentencia.substring(indexFinal, sentencia.length());
 			}			
 		}else{
 			sentencia = "<SELECT>" + select + "</SELECT>" + sentencia;
@@ -1245,25 +1281,31 @@ public class ConsultasServiceImpl implements IConsultasService{
 				if(i !=0){
 					where = where + " AND ";
 				}
-				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + key.getNombre() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
+				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + key.getNombre()
+						+ SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
 				where = where + key.getTabla().trim() + "." + key.getNombre() + " = " + etiquetaKey;				
 			}
 		}		
 		
 
 		if(indexInicio > -1 && indexFinal > -1){
-			if(indexFinal + 8 <= sentencia.length() && sentencia.substring(indexInicio, indexFinal).toUpperCase().indexOf("WHERE") > -1){
+			if (indexFinal + 8 <= sentencia.length()
+					&& sentencia.substring(indexInicio, indexFinal).toUpperCase().indexOf("WHERE") > -1) {
 				String whereConsulta = sentencia.substring(indexInicio, indexFinal);
 				if(!"".equalsIgnoreCase(where)) {
-					sentenciaFinal = sentencia.substring(0, indexInicio) + whereConsulta + " AND " + where + sentencia.substring(indexFinal, sentencia.length());
+					sentenciaFinal = sentencia.substring(0, indexInicio) + whereConsulta + " AND " + where
+							+ sentencia.substring(indexFinal, sentencia.length());
 				}else {
-					sentenciaFinal = sentencia.substring(0, indexInicio) + whereConsulta + sentencia.substring(indexFinal, sentencia.length());
+					sentenciaFinal = sentencia.substring(0, indexInicio) + whereConsulta
+							+ sentencia.substring(indexFinal, sentencia.length());
 				}				
 			}else{
 				if(!"".equalsIgnoreCase(where)) {
-					sentenciaFinal = sentencia.substring(0, indexInicio) + " WHERE " + where + sentencia.substring(indexFinal, sentencia.length());
+					sentenciaFinal = sentencia.substring(0, indexInicio) + " WHERE " + where
+							+ sentencia.substring(indexFinal, sentencia.length());
 				}else {
-					sentenciaFinal = sentencia.substring(0, indexInicio) + sentencia.substring(indexFinal, sentencia.length());
+					sentenciaFinal = sentencia.substring(0, indexInicio)
+							+ sentencia.substring(indexFinal, sentencia.length());
 				}				
 			}
 		}else{
@@ -1500,10 +1542,11 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 	
 	@Override
-	public CamposDinamicosDTO obtenerCamposConsulta(HttpServletRequest request, String idClaseComunicacion, String consulta){		
+	public CamposDinamicosDTO obtenerCamposConsulta(HttpServletRequest request, String idClaseComunicacion,
+			String consulta) {
 		
-		
-		LOGGER.info("obtenerCamposConsulta() -> Entrada al servicio para obtener los parámetros dinámicos de la consulta");
+		LOGGER.info(
+				"obtenerCamposConsulta() -> Entrada al servicio para obtener los parámetros dinámicos de la consulta");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1543,12 +1586,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 			}			
 			
 		}
-		LOGGER.info("obtenerCamposConsulta() -> Salida del servicio para obtener los parámetros dinámicos de la consulta");
+		LOGGER.info(
+				"obtenerCamposConsulta() -> Salida del servicio para obtener los parámetros dinámicos de la consulta");
 		return response;
 	}
 	
 	@Override
-	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, boolean comunicar, String consulta) throws Exception{
+	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, boolean comunicar, String consulta)
+			throws Exception {
 		
 		ArrayList<CampoDinamicoItem> listaCamposDinamicos = new ArrayList<CampoDinamicoItem>();
 		CampoDinamicoItem campoDinamico = null;
@@ -1584,10 +1629,16 @@ public class ConsultasServiceImpl implements IConsultasService{
 		String selectExperta = consulta.toUpperCase().replaceAll("\r\n"," ");
 		String selectOriginal = consulta.replaceAll("\r\n"," ");
 		
-		if ((selectExperta.indexOf(SigaConstants.ETIQUETATIPONUMERO))>=0 || (selectExperta.indexOf(SigaConstants.ETIQUETATIPOTEXTO))>=0 || (selectExperta.indexOf(SigaConstants.ETIQUETATIPOFECHA)>=0 ||(selectExperta.indexOf(SigaConstants.ETIQUETATIPOMULTIVALOR))>=0 ) || selectExperta.indexOf(SigaConstants.ETIQUETATIPOENVIO) > 0){
+		if ((selectExperta.indexOf(SigaConstants.ETIQUETATIPONUMERO)) >= 0
+				|| (selectExperta.indexOf(SigaConstants.ETIQUETATIPOTEXTO)) >= 0
+				|| (selectExperta.indexOf(SigaConstants.ETIQUETATIPOFECHA) >= 0
+						|| (selectExperta.indexOf(SigaConstants.ETIQUETATIPOMULTIVALOR)) >= 0)
+				|| selectExperta.indexOf(SigaConstants.ETIQUETATIPOENVIO) > 0) {
 	  		if (selectExperta.toUpperCase().indexOf("%%IDINSTITUCION%%")>=0){
-	  			selectExperta=selectExperta.toUpperCase().replaceAll("%%IDINSTITUCION%%",String.valueOf(usuario.getIdinstitucion()));
-	  			selectOriginal=selectOriginal.replaceAll("%%IDINSTITUCION%%",String.valueOf(usuario.getIdinstitucion()));	  			
+				selectExperta = selectExperta.toUpperCase().replaceAll("%%IDINSTITUCION%%",
+						String.valueOf(usuario.getIdinstitucion()));
+				selectOriginal = selectOriginal.replaceAll("%%IDINSTITUCION%%",
+						String.valueOf(usuario.getIdinstitucion()));
 			}
 		}else{
 			return null;
@@ -1670,7 +1721,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 							}
 					    }
 				 		//listaValorNulo.add(valorNulo==null?Boolean.FALSE:valorNulo.toLowerCase().equals("si")?Boolean.TRUE:Boolean.FALSE);
-				 		campoDinamico.setValorNulo(valorNulo==null?Boolean.FALSE:valorNulo.toLowerCase().equals("si")?Boolean.TRUE:Boolean.FALSE);
+						campoDinamico.setValorNulo(valorNulo == null ? Boolean.FALSE
+								: valorNulo.toLowerCase().equals("si") ? Boolean.TRUE : Boolean.FALSE);
 				 		
 		 			 if (tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPONUMERO)){	
 		 					 				
@@ -1709,8 +1761,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 		  				if(operadorEncontrado.equalsIgnoreCase("IS NULL")){
 		  					//tipoCampo.add("X");
 			 				campoDinamico.setTipoDato(SigaConstants.TIPOFECHANULA);
-		  				}
-		  				else{
+							} else {
 		  					//tipoCampo.add("D");
 			 				campoDinamico.setTipoDato(SigaConstants.TIPOFECHA);
 		  				}
@@ -1741,10 +1792,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 		 				campoDinamico.setAyuda(selectAyuda+"%%");
 		 				
 		 				if (selectAyuda!=null && !selectAyuda.equals("")){
-		 					List<Map<String, Object>>  valores = _conConsultasExtendsMapper.ejecutarConsultaString(selectAyuda);
+								List<Map<String, Object>> valores = _conConsultasExtendsMapper
 		 					/*RowsContainer rc2 = null;
 		 					rc2 = new RowsContainer();
-		 					rc2.query(selectAyuda);
+										.ejecutarConsultaString(selectAyuda);
 		 					listaValores.add(rc2.getAll());
 		 					tipoCampo.add("MV");*/
 		 					
@@ -1760,7 +1811,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 		 			}
 		 			
 		 			sentencia_aux=sentencia_aux.substring(pos_ini+tipoDatos.get(i).toString().length());
-		 			sentenciaOriginalAux=sentenciaOriginalAux.substring(pos_ini+tipoDatos.get(i).toString().length());
+					sentenciaOriginalAux = sentenciaOriginalAux
+							.substring(pos_ini + tipoDatos.get(i).toString().length());
 		 		}
 		 		
 		 		
@@ -1775,7 +1827,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 		 		campoDinamico.setAlias(SigaConstants.NOMBRETIPOENVIO);
 		 		campoDinamico.setCampo(SigaConstants.NOMBRETIPOENVIO);
 		 		
-		 		List<Map<String, Object>>  valores = _envTipoEnvioExtendsMapper.selectTipoEnviosConsultas(usuario.getIdlenguaje());
+				List<Map<String, Object>> valores = _envTipoEnvioExtendsMapper
+						.selectTipoEnviosConsultas(usuario.getIdlenguaje());
 		 		campoDinamico.setValores(valores);
 		 		listaCamposDinamicos.add(campoDinamico);
 		 	}
@@ -2092,7 +2145,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 	
 	@Override
-	public String procesarEjecutarConsulta(AdmUsuarios usuario, String sentencia, List<CampoDinamicoItem> listaCampos, boolean sustituyeInstitucion) throws ParseException{
+	public String procesarEjecutarConsulta(AdmUsuarios usuario, String sentencia, List<CampoDinamicoItem> listaCampos,
+			boolean sustituyeInstitucion) throws ParseException {
 		
 		//Variables para crear consulta parametrizada BIND
 		int iParametroBind = 0;
@@ -2107,7 +2161,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 		//cuando no se trate de una consulta experta de facturacion
 		while (sustituyeInstitucion && sentencia.toUpperCase().indexOf ("%%IDINSTITUCION%%") > -1) {
 			iParametroBind++;
-			sentencia = UtilidadesString.replaceFirstIgnoreCase(sentencia,"%%IDINSTITUCION%%", ":@"+iParametroBind+"@:");
+			sentencia = UtilidadesString.replaceFirstIgnoreCase(sentencia, "%%IDINSTITUCION%%",
+					":@" + iParametroBind + "@:");
 			codigosBind.put (new Integer(iParametroBind), usuario.getIdinstitucion());
 		}
 		
@@ -2147,10 +2202,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 		tipoDatos.add(SigaConstants.ETIQUETATIPOMULTIVALOR);
 		tipoDatos.add(SigaConstants.ETIQUETATIPOENVIO);
 		
-		for (int i=0; i<tipoDatos.size() ;i++)
-		{
-			if (listaCampos != null  && j < listaCampos.size() && listaCampos.get(j)!=null)
-			{
+		for (int i = 0; i < tipoDatos.size(); i++) {
+			if (listaCampos != null && j < listaCampos.size() && listaCampos.get(j) != null) {
 				continuar=true;
 				pos_ini=0;
 
@@ -2170,9 +2223,11 @@ public class ConsultasServiceImpl implements IConsultasService{
 					if (etiqueta.equals(SigaConstants.ETIQUETATIPOMULTIVALOR)) {
 						int iMV = sentencia.indexOf(SigaConstants.ETIQUETATIPOMULTIVALOR);
 						if (iMV > -1) {
-							etiqueta = sentencia.substring(iMV, 2+sentencia.indexOf("%%", iMV + SigaConstants.ETIQUETATIPOMULTIVALOR.length()));
+							etiqueta = sentencia.substring(iMV,
+									2 + sentencia.indexOf("%%", iMV + SigaConstants.ETIQUETATIPOMULTIVALOR.length()));
 						}
-					} else if (j < listaCampos.size() && listaCampos.get(j)!=null && listaCampos.get(j).getAyuda() != null && !listaCampos.get(j).getAyuda().equals("-1")) {
+					} else if (j < listaCampos.size() && listaCampos.get(j) != null
+							&& listaCampos.get(j).getAyuda() != null && !listaCampos.get(j).getAyuda().equals("-1")) {
 						//cuando existe select de ayuda porque estamos con la etiqueta multivalor
 						//etiqueta += cDinamicos[j].getHp().replaceAll
 						//(ClsConstants.CONSTANTESUSTITUIRCOMILLAS,"\"");
@@ -2180,11 +2235,11 @@ public class ConsultasServiceImpl implements IConsultasService{
 					pos_iniEtiqueta=sentencia.indexOf (etiqueta);	
 					sentenciaAux=sentencia.substring (0, pos_iniEtiqueta+etiqueta.length());
 
-					if (pos_iniEtiqueta>=0)
-					{
+					if (pos_iniEtiqueta >= 0) {
 						if(etiqueta.equals(SigaConstants.ETIQUETATIPOENVIO)){
 							// Si es de tipoEnvio reemplazamos el valor
-							sentencia = sentencia.replace(SigaConstants.ETIQUETATIPOENVIO, listaCampos.get(j).getValor());
+							sentencia = sentencia.replace(SigaConstants.ETIQUETATIPOENVIO,
+									listaCampos.get(j).getValor());
 							j++;
 						}else{	
 							operador = listaCampos.get(j).getOperacion();
@@ -2194,7 +2249,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 							if (!operador.equals(SigaConstants.IS_NULL) && !listaCampos.get(j).getValor().equals("") ) {
 								if (listaCampos.get(j).getTipoDato().equals (SigaConstants.TIPOFECHA)) {
 									iParametroBind++;
-									criteriosDinamicos = "TO_DATE (:@"+iParametroBind+"@:"+", 'YYYY/MM/DD HH24:MI:SS')";								
+									criteriosDinamicos = "TO_DATE (:@" + iParametroBind + "@:"
+											+ ", 'YYYY/MM/DD HH24:MI:SS')";
 									
 									String fecha = listaCampos.get(j).getValor();
 									// This could be MM/dd/yyyy, you original value is ambiguous 
@@ -2207,24 +2263,25 @@ public class ConsultasServiceImpl implements IConsultasService{
 									
 //									String aux = listaCampos.get(j).getValor();
 									codigosBind.put (new Integer(iParametroBind),"'" + nuevoValor + "'");
-								}
-								else {
+								} else {
 									iParametroBind++;
 									criteriosDinamicos = ":@"+iParametroBind+"@:";
-									codigosBind.put (new Integer(iParametroBind), "'" + listaCampos.get(j).getValor() + "'");
 									if(operador.equals(SigaConstants.LIKE)){
+										codigosBind.put(new Integer(iParametroBind),
+												 listaCampos.get(j).getValor() );
 										codigosLike.put (new Integer(iParametroBind), listaCampos.get(j).getValor());
-									}
+									}else{
+										codigosBind.put(new Integer(iParametroBind),
+												"'" + listaCampos.get(j).getValor() + "'");
 								}
 							}
-							else {
+							} else {
 								operador = "IS NULL";
 								criteriosDinamicos="";
 							}
 
-							sentenciaAux = sentenciaAux.substring (0, pos_iniEtiqueta) +
-							criteriosDinamicos +
-							sentenciaAux.substring (pos_iniEtiqueta+etiqueta.length());
+							sentenciaAux = sentenciaAux.substring(0, pos_iniEtiqueta) + criteriosDinamicos
+									+ sentenciaAux.substring(pos_iniEtiqueta + etiqueta.length());
 							String operadores[] = sentenciaAux.split("%%");
 							String operadorEncontrado = null;
 			 				for (int jta = operadores.length-1; jta >= 0 ; jta--) {
@@ -2238,11 +2295,15 @@ public class ConsultasServiceImpl implements IConsultasService{
 							}
 							if(operador.equalsIgnoreCase("IS NULL")){
 								posEtiquetaOperador=sentenciaAux.toUpperCase().lastIndexOf(operadorEncontrado);
-								sentenciaAux1 = sentenciaAux.substring (posEtiquetaOperador,posEtiquetaOperador+operadorEncontrado.length()).replaceAll (operadorEncontrado, " "+operador+" ");
+								sentenciaAux1 = sentenciaAux
+										.substring(posEtiquetaOperador,
+												posEtiquetaOperador + operadorEncontrado.length())
+										.replaceAll(operadorEncontrado, " " + operador + " ");
 
 							}else{
 								posEtiquetaOperador=sentenciaAux.toUpperCase().lastIndexOf(operadorEncontrado);
-								sentenciaAux1 = sentenciaAux.substring (posEtiquetaOperador).replaceAll (operadorEncontrado, " "+operador+" ");
+								sentenciaAux1 = sentenciaAux.substring(posEtiquetaOperador)
+										.replaceAll(operadorEncontrado, " " + operador + " ");
 
 							}
 							
@@ -2260,13 +2321,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 							int indexNulo = sentenciaAuxFin.toUpperCase().indexOf("NULO");
 							if(indiceAnd>-1){
 								if(indexDefecto>-1 && indexDefecto<indiceAnd )
-									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexDefecto)+" "+sentenciaAuxFin.substring(indiceAnd);
+									sentenciaAuxFin = sentenciaAuxFin.substring(0, indexDefecto) + " "
+											+ sentenciaAuxFin.substring(indiceAnd);
 								else if(indexNulo>-1 && indexNulo<indiceAnd)
-									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexNulo)+" "+sentenciaAuxFin.substring(indiceAnd);
+									sentenciaAuxFin = sentenciaAuxFin.substring(0, indexNulo) + " "
+											+ sentenciaAuxFin.substring(indiceAnd);
 //								else
 //									sentenciaAuxFin= " "+sentenciaAuxFin.substring(indiceAnd);
-							}
-							else{
+							} else {
 								if(indexDefecto>-1 )
 									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexDefecto);
 								else if(indexNulo>-1)
@@ -2301,8 +2363,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 							j++;
 						}					
-					}
-					else {
+					} else {
 						continuar=false;
 					}
 				} //while
@@ -2321,11 +2382,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 		while (indice!=-1) {
 			String numero=sentenciaAux3.substring(indice+2,sentenciaAux3.indexOf("@:",indice));
 			if(codigosLike.containsKey(new Integer(numero))){
-				sentencia=sentencia.replaceFirst(":@"+numero+"@:","'%"+(String)codigosBind.get(new Integer(numero))+"%'");
+				sentencia = sentencia.replaceFirst(":@" + numero + "@:", 
+						"'%" + (String) codigosBind.get(new Integer(numero)) + "%'");
 			}else{
 				contadorOrdenados++;
-				codigosOrdenados.put(new Integer(contadorOrdenados),String.valueOf(codigosBind.get(new Integer(numero))));
-				sentencia=sentencia.replaceFirst(":@"+numero+"@:", String.valueOf(codigosBind.get(new Integer(numero))));
+				codigosOrdenados.put(new Integer(contadorOrdenados),
+						String.valueOf(codigosBind.get(new Integer(numero))));
+				sentencia = sentencia.replaceFirst(":@" + numero + "@:",
+						String.valueOf(codigosBind.get(new Integer(numero))));
 			}
 			indice=sentenciaAux3.indexOf(":@",indice+2);
 		}
@@ -2343,32 +2407,38 @@ public class ConsultasServiceImpl implements IConsultasService{
 		select = select.replaceAll("@FECHA@","SYSDATE");
 		if ( select.indexOf(SigaConstants.NOMBRETABLA_CEN_CLIENTE)!=-1) {
 			// CONTIENE LA TABLA CEN_CLIENTE. 
-			select = select.replaceAll("@IDPERSONA@",SigaConstants.NOMBRETABLA_CEN_CLIENTE+"."+SigaConstants.C_IDPERSONA);
-			select = select.replaceAll("@IDINSTITUCION@",SigaConstants.NOMBRETABLA_CEN_CLIENTE+"."+SigaConstants.C_IDINSTITUCION);
+			select = select.replaceAll("@IDPERSONA@",
+					SigaConstants.NOMBRETABLA_CEN_CLIENTE + "." + SigaConstants.C_IDPERSONA);
+			select = select.replaceAll("@IDINSTITUCION@",
+					SigaConstants.NOMBRETABLA_CEN_CLIENTE + "." + SigaConstants.C_IDINSTITUCION);
 		}else if (select.indexOf(SigaConstants.NOMBRETABLA_CEN_COLEGIADO)!=-1 ) {
 			// CONTIENE LA TABLA CEN_COLEGIADO. 
-			select = select.replaceAll("@IDPERSONA@",SigaConstants.NOMBRETABLA_CEN_COLEGIADO+"."+SigaConstants.C_IDPERSONA);
-			select = select.replaceAll("@IDINSTITUCION@",SigaConstants.NOMBRETABLA_CEN_COLEGIADO+"."+SigaConstants.C_IDINSTITUCION);
+			select = select.replaceAll("@IDPERSONA@",
+					SigaConstants.NOMBRETABLA_CEN_COLEGIADO + "." + SigaConstants.C_IDPERSONA);
+			select = select.replaceAll("@IDINSTITUCION@",
+					SigaConstants.NOMBRETABLA_CEN_COLEGIADO + "." + SigaConstants.C_IDINSTITUCION);
 		}
 		
 		return select;
 	}
 	
-	@Override
-	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws ParseException, SigaExceptions{
+	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws Exception {
 		
 		List<Map<String,Object>> result = null;
-		
+		Date inicial = new Date();
 		try {
 		
-			sentencia = quitarEtiquetas(sentencia.toUpperCase());
-			sentencia = quitaPuntosAlias(sentencia);
+//			sentencia = quitarEtiquetas(sentencia.toUpperCase());
+//			sentencia = quitaPuntosAlias(sentencia);
 			
 			boolean contienePuntosAlias = sentencia.indexOf(CARACTER_REEMPLAZO_PUNTOS) > -1;
 			
-			if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-					|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
-					|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+			if (sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER)
+					|| sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+					|| sentencia.contains(SigaConstants.SENTENCIA_DELETE)
+					|| sentencia.contains(SigaConstants.SENTENCIA_DROP)
+					|| sentencia.contains(SigaConstants.SENTENCIA_INSERT)
+					|| sentencia.contains(SigaConstants.SENTENCIA_UPDATE))) {
 				
 				LOGGER.error("ejecutarConsultaConClaves() -> Consulta no permitida: " + sentencia);
 			}else {
@@ -2390,14 +2460,53 @@ public class ConsultasServiceImpl implements IConsultasService{
 		} catch (Exception e) {
 			LOGGER.error("Error al ejecutar la consulta", e);
 			if((e instanceof DataAccessException) && e.getCause() != null) {
-				throw new BusinessSQLException(e.getCause().getMessage(), e);
+				throw new BusinessSQLException(e.getMessage(), e);
 			}else {
 				throw e;
 			}		
 		}
 		return result;
 	}
+	@Override
+	public List<Map<String, Object>> ejecutarConsultaConClavesLog(String sentencia, AdmUsuarios usuario,
+			Long modelosComunicacionItem, Long consulta,Short idInstitucion,String descripcion)
+			throws ParseException, SigaExceptions {
+		List<Map<String, Object>> resultDatos = null;
+		String sentenciaCompleta = null;
+		BigDecimal idEjecucion = null;
 	
+		Date inicialDate = new Date();
+		if (null == usuario) {
+			usuario = new AdmUsuarios();
+			usuario.setIdusuario(0);
+		}
+		try {
+			sentenciaCompleta = obtenerSentencia(sentencia);
+			idEjecucion = insertarLogEjecucion(inicialDate, idInstitucion,
+					Integer.valueOf(usuario.getIdusuario()),
+					Long.valueOf(modelosComunicacionItem),
+					Long.valueOf(consulta), Short.valueOf(idInstitucion), "",
+					sentenciaCompleta);
+			resultDatos = ejecutarConsultaConClaves(sentenciaCompleta);
+			updateLogEjecucion(inicialDate, Integer.valueOf(usuario.getIdusuario()), idEjecucion, "");
+		} catch (BusinessSQLException e) {
+			LOGGER.error(e);
+			updateLogEjecucion(inicialDate, Integer.valueOf(usuario.getIdusuario()), idEjecucion, e.getCause().getCause().toString());
+			throw new BusinessException(
+					"Error al ejecutar la consulta " + consulta + " " + e.getMessage(), e.getCause());
+		} catch (Exception e) {
+			LOGGER.warn("Error al ejejcutar la consulta" + e);
+			updateLogEjecucion(inicialDate, Integer.valueOf(usuario.getIdusuario()), idEjecucion, e.getMessage());
+			throw new BusinessException("Error al ejecutar la consulta " +consulta, e);
+		}
+		return resultDatos;
+	}
+	private String obtenerSentencia(String sentencia) {
+		String sentenciaCompleta = null;
+		sentencia = quitarEtiquetas(sentencia.toUpperCase());
+		sentenciaCompleta = quitaPuntosAlias(sentencia);
+		return sentenciaCompleta;
+	}
 	public static void main(String[] args) {
 		String query = "select nombbre as \"nombre\", codigo	as \"C.P.\" as cod, 'FECHA\"' || SYSDATE     AS  \"FECHA..HOY\","
 				+ "'otro campo'\nas \"otro.y\", '= \" as \"t..al\", \"pepe\" as juan from tal where pascual";
@@ -2430,7 +2539,44 @@ public class ConsultasServiceImpl implements IConsultasService{
 		}
 		LOGGER.debug(query);
 		return query;
+	}
+	public BigDecimal insertarLogEjecucion(Date inicial, Short idInstitucion, Integer idUsuario, Long idModelo,
+			Long idConsulta, Short idInstitucionConsulta, String mensaje, String sentencia) {
+		BigDecimal idEjecucion = null;
+		Date finalDate = new Date();
+		Long diff = finalDate.getTime() - inicial.getTime();
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		format.format(inicial);
+		ConEjecucion conEjecucionInsert = new ConEjecucion();
+		conEjecucionInsert.setIdinstitucion(idInstitucion);
+		conEjecucionInsert.setIdusuario(idUsuario);
+		conEjecucionInsert.setIdmodelo(idModelo);
+		conEjecucionInsert.setIdconsulta(idConsulta);
+		conEjecucionInsert.setFechaejecucion(inicial);
+		conEjecucionInsert.setIdinstitucionConsulta(idInstitucionConsulta);
+		conEjecucionInsert.setSentencia(sentencia);
+		_conEjecucionMapper.insert(conEjecucionInsert);
+		idEjecucion = conEjecucionInsert.getIdejecucion();
+		return idEjecucion;
+	}
+	public void updateLogEjecucion(Date inicial, Integer idUsuario, BigDecimal idEjecucion, String mensaje) {
+		Date finalDate = new Date();
+		Long diff = finalDate.getTime() - inicial.getTime();
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		format.format(inicial);
 		
+		ConEjecucionExample conEjecucionExample = new ConEjecucionExample();
+		conEjecucionExample.createCriteria()
+		.andIdejecucionEqualTo(idEjecucion);
+		List<ConEjecucion> conEjecuciones = _conEjecucionMapper.selectByExample(conEjecucionExample);
+		if (null != conEjecuciones && conEjecuciones.size() > 0) {
+			ConEjecucion conEjecucion = conEjecuciones.get(0);
+			conEjecucion.setIdusuario(idUsuario);
+			conEjecucion.setFechaejecucion(inicial);
+			conEjecucion.setTiempoejecucion(Long.valueOf(diff));
+			conEjecucion.setMensaje(mensaje);
+			_conEjecucionMapper.updateByPrimaryKey(conEjecucion);
 	}
 	
+	}
 }

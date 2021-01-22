@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenEstadoactividadpersona;
+import org.itcgae.siga.db.entities.CenEstadoactividadpersonaExample;
 import org.itcgae.siga.db.entities.CenEstadoactividadpersonaExample.Criteria;
 import org.itcgae.siga.db.entities.CenEstadoactividadpersonaExample.Criterion;
-import org.itcgae.siga.db.entities.CenEstadoactividadpersonaExample;
 
 public class CenEstadoactividadpersonaSqlProvider {
 

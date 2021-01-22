@@ -26,7 +26,7 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		sql.SELECT("FECHASOLICITUD");
 		sql.SELECT("FECHAESTADO");
 		sql.SELECT("IDINSTITUCION");
-		sql.SELECT("(select f_siga_getrecurso(DESCRIPCION," + idLenguage + ") AS LABEL from CEN_ESTADOSOLICITUD e WHERE IDESTADO = SOLICITUD.IDESTADO) AS ESTADOSOLICITUD");
+		sql.SELECT("(select INITCAP(f_siga_getrecurso(DESCRIPCION," + idLenguage + ")) AS LABEL from CEN_ESTADOSOLICITUD e WHERE IDESTADO = SOLICITUD.IDESTADO) AS ESTADOSOLICITUD");
 		sql.SELECT("(select f_siga_getrecurso(DESCRIPCION," + idLenguage +") AS LABEL from CEN_TIPOSOLICITUD e WHERE IDTIPOSOLICITUD = SOLICITUD.IDTIPOSOLICITUD) AS TIPOSOLICITUD");
 		sql.SELECT("(select f_siga_getrecurso(DESCRIPCION," + idLenguage +") AS LABEL from CEN_DOCUMENTACIONMODALIDAD e WHERE IDMODALIDAD = SOLICITUD.IDMODALIDADDOCUMENTACION AND IDINSTITUCION = SOLICITUD.IDINSTITUCION) AS MODALIDAD");
 		sql.SELECT("IDMODALIDADDOCUMENTACION AS IDMODALIDADDOCUMENTACION");
@@ -61,6 +61,7 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		sql.SELECT("TITULAR");
 		sql.SELECT("IBAN");
 		sql.SELECT("BIC");
+		sql.SELECT("IDPERSONA");
 		sql.SELECT("NOMBREBANCO");
 		sql.SELECT("ABONOCARGO");
 		sql.SELECT("ABONOSJCS");
@@ -88,7 +89,7 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		}
 		if(solIncorporacionSearchDTO.getApellidos()!=null && !solIncorporacionSearchDTO.getApellidos().equals("")){
 			String columna = "CONCAT(APELLIDO1,APELLIDO2)";
-			String cadena = solIncorporacionSearchDTO.getApellidos().replaceAll("\\s+","");
+			String cadena = solIncorporacionSearchDTO.getApellidos().replaceAll("\\s+","%");
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 //			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONCAT(APELLIDO1,APELLIDO2)", solIncorporacionSearchDTO.getApellidos()));
 		}
@@ -101,12 +102,12 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		
 		
 		
-		if(solIncorporacionSearchDTO.getFechaDesde()!=null && !solIncorporacionSearchDTO.getFechaDesde().equals("")){
+		if(solIncorporacionSearchDTO.getFechaDesde()!=null){
 			String fechaDesde = dateFormat.format(solIncorporacionSearchDTO.getFechaDesde());
 			sql.WHERE("FECHASOLICITUD >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY')");
 		}
 		
-		if(solIncorporacionSearchDTO.getFechaHasta()!=null && !solIncorporacionSearchDTO.getFechaHasta().equals("")){
+		if(solIncorporacionSearchDTO.getFechaHasta()!=null){
 			String fechaHasta = dateFormat.format(solIncorporacionSearchDTO.getFechaHasta());
 			sql.WHERE("FECHASOLICITUD <= TO_DATE('" + fechaHasta + "', 'DD/MM/YYYY')");
 		}

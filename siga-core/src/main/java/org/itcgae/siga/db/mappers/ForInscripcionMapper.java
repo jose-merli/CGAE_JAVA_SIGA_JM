@@ -47,7 +47,7 @@ public interface ForInscripcionMapper {
 	@Insert({ "insert into FOR_INSCRIPCION (IDINSCRIPCION, IDINSTITUCION, ", "IDESTADOINSCRIPCION, FECHASOLICITUD, ",
 			"CALIFICACION, IDPERSONA, ", "IDCURSO, IDCALIFICACION, ", "USUMODIFICACION, FECHAMODIFICACION, ",
 			"FECHABAJA, PAGADA, ", "IDCARGAINSCRIPCION, EMITIRCERTIFICADO, ",
-			"CERTIFICADOEMITIDO, IDPETICIONSUSCRIPCION)",
+			"CERTIFICADOEMITIDO, IDPETICIONSUSCRIPCION, ", "IDFORMAPAGO, IDFICHEROCOMPROBANTE)",
 			"values (#{idinscripcion,jdbcType=DECIMAL}, #{idinstitucion,jdbcType=DECIMAL}, ",
 			"#{idestadoinscripcion,jdbcType=DECIMAL}, #{fechasolicitud,jdbcType=TIMESTAMP}, ",
 			"#{calificacion,jdbcType=DECIMAL}, #{idpersona,jdbcType=DECIMAL}, ",
@@ -55,7 +55,8 @@ public interface ForInscripcionMapper {
 			"#{usumodificacion,jdbcType=DECIMAL}, #{fechamodificacion,jdbcType=TIMESTAMP}, ",
 			"#{fechabaja,jdbcType=TIMESTAMP}, #{pagada,jdbcType=DECIMAL}, ",
 			"#{idcargainscripcion,jdbcType=DECIMAL}, #{emitircertificado,jdbcType=DECIMAL}, ",
-			"#{certificadoemitido,jdbcType=DECIMAL}, #{idpeticionsuscripcion,jdbcType=DECIMAL})" })
+			"#{certificadoemitido,jdbcType=DECIMAL}, #{idpeticionsuscripcion,jdbcType=DECIMAL}, ",
+			"#{idformapago,jdbcType=DECIMAL}, #{idficherocomprobante,jdbcType=DECIMAL})" })
 	@SelectKey(statement = "SELECT SEQ_FORINSCRIPCION.NEXTVAL FROM DUAL", keyProperty = "idinscripcion", before = true, resultType = Long.class)
 	int insert(ForInscripcion record);
 
@@ -87,7 +88,9 @@ public interface ForInscripcionMapper {
 			@Result(column = "IDCARGAINSCRIPCION", property = "idcargainscripcion", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "EMITIRCERTIFICADO", property = "emitircertificado", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "CERTIFICADOEMITIDO", property = "certificadoemitido", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "IDPETICIONSUSCRIPCION", property = "idpeticionsuscripcion", jdbcType = JdbcType.DECIMAL) })
+			@Result(column = "IDPETICIONSUSCRIPCION", property = "idpeticionsuscripcion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDFORMAPAGO", property = "idformapago", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDFICHEROCOMPROBANTE", property = "idficherocomprobante", jdbcType = JdbcType.DECIMAL) })
 	List<ForInscripcion> selectByExample(ForInscripcionExample example);
 
 	/**
@@ -96,8 +99,9 @@ public interface ForInscripcionMapper {
 	 */
 	@Select({ "select", "IDINSCRIPCION, IDINSTITUCION, IDESTADOINSCRIPCION, FECHASOLICITUD, CALIFICACION, ",
 			"IDPERSONA, IDCURSO, IDCALIFICACION, USUMODIFICACION, FECHAMODIFICACION, FECHABAJA, ",
-			"PAGADA, IDCARGAINSCRIPCION, EMITIRCERTIFICADO, CERTIFICADOEMITIDO, IDPETICIONSUSCRIPCION",
-			"from FOR_INSCRIPCION", "where IDINSCRIPCION = #{idinscripcion,jdbcType=DECIMAL}" })
+			"PAGADA, IDCARGAINSCRIPCION, EMITIRCERTIFICADO, CERTIFICADOEMITIDO, IDPETICIONSUSCRIPCION, ",
+			"IDFORMAPAGO, IDFICHEROCOMPROBANTE", "from FOR_INSCRIPCION",
+			"where IDINSCRIPCION = #{idinscripcion,jdbcType=DECIMAL}" })
 	@Results({ @Result(column = "IDINSCRIPCION", property = "idinscripcion", jdbcType = JdbcType.DECIMAL, id = true),
 			@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDESTADOINSCRIPCION", property = "idestadoinscripcion", jdbcType = JdbcType.DECIMAL),
@@ -113,7 +117,9 @@ public interface ForInscripcionMapper {
 			@Result(column = "IDCARGAINSCRIPCION", property = "idcargainscripcion", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "EMITIRCERTIFICADO", property = "emitircertificado", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "CERTIFICADOEMITIDO", property = "certificadoemitido", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "IDPETICIONSUSCRIPCION", property = "idpeticionsuscripcion", jdbcType = JdbcType.DECIMAL) })
+			@Result(column = "IDPETICIONSUSCRIPCION", property = "idpeticionsuscripcion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDFORMAPAGO", property = "idformapago", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDFICHEROCOMPROBANTE", property = "idficherocomprobante", jdbcType = JdbcType.DECIMAL) })
 	ForInscripcion selectByPrimaryKey(Long idinscripcion);
 
 	/**
@@ -153,7 +159,9 @@ public interface ForInscripcionMapper {
 			"IDCARGAINSCRIPCION = #{idcargainscripcion,jdbcType=DECIMAL},",
 			"EMITIRCERTIFICADO = #{emitircertificado,jdbcType=DECIMAL},",
 			"CERTIFICADOEMITIDO = #{certificadoemitido,jdbcType=DECIMAL},",
-			"IDPETICIONSUSCRIPCION = #{idpeticionsuscripcion,jdbcType=DECIMAL}",
+			"IDPETICIONSUSCRIPCION = #{idpeticionsuscripcion,jdbcType=DECIMAL},",
+			"IDFORMAPAGO = #{idformapago,jdbcType=DECIMAL},",
+			"IDFICHEROCOMPROBANTE = #{idficherocomprobante,jdbcType=DECIMAL}",
 			"where IDINSCRIPCION = #{idinscripcion,jdbcType=DECIMAL}" })
 	int updateByPrimaryKey(ForInscripcion record);
 }

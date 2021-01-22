@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ModPlantilladocFormato;
+import org.itcgae.siga.db.entities.ModPlantilladocFormatoExample;
 import org.itcgae.siga.db.entities.ModPlantilladocFormatoExample.Criteria;
 import org.itcgae.siga.db.entities.ModPlantilladocFormatoExample.Criterion;
-import org.itcgae.siga.db.entities.ModPlantilladocFormatoExample;
 
 public class ModPlantilladocFormatoSqlProvider {
 

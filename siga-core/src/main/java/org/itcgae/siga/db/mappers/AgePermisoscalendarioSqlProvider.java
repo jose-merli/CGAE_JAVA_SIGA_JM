@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AgePermisoscalendario;
+import org.itcgae.siga.db.entities.AgePermisoscalendarioExample;
 import org.itcgae.siga.db.entities.AgePermisoscalendarioExample.Criteria;
 import org.itcgae.siga.db.entities.AgePermisoscalendarioExample.Criterion;
-import org.itcgae.siga.db.entities.AgePermisoscalendarioExample;
 
 public class AgePermisoscalendarioSqlProvider {
 

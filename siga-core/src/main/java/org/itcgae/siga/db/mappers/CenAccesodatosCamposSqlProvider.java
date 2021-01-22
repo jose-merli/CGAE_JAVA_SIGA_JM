@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenAccesodatosCampos;
+import org.itcgae.siga.db.entities.CenAccesodatosCamposExample;
 import org.itcgae.siga.db.entities.CenAccesodatosCamposExample.Criteria;
 import org.itcgae.siga.db.entities.CenAccesodatosCamposExample.Criterion;
-import org.itcgae.siga.db.entities.CenAccesodatosCamposExample;
 
 public class CenAccesodatosCamposSqlProvider {
 

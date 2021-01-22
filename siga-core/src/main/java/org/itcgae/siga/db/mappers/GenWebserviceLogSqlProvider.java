@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenWebserviceLog;
+import org.itcgae.siga.db.entities.GenWebserviceLogExample;
 import org.itcgae.siga.db.entities.GenWebserviceLogExample.Criteria;
 import org.itcgae.siga.db.entities.GenWebserviceLogExample.Criterion;
-import org.itcgae.siga.db.entities.GenWebserviceLogExample;
 
 public class GenWebserviceLogSqlProvider {
 

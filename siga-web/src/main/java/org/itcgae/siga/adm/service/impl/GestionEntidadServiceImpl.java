@@ -93,9 +93,9 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 		LOGGER.info("getLenguages() / genDiccionarioExtendsMapper.getLabelLenguage() -> Salida de genDiccionarioExtendsMapper para obtener lista de idiomas disponibles en la aplicación");
 		// primer elemento a vacio para componente de pantalla dropdown
 		if(null != combooItems && combooItems.size() > 0) {
-			comboItem.setLabel("");
-			comboItem.setValue("");
-			combooItems.add(0,comboItem);
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//			combooItems.add(0,comboItem);
 			comboDTO.setCombooItems(combooItems);
 		}
 		else {

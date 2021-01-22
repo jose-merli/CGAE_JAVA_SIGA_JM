@@ -4,7 +4,6 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.CenSolicmodifexportarfotoDTO;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.commons.utils.SolModifSQLUtils;
-import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
 import org.itcgae.siga.db.mappers.CenSolicmodifcambiarfotoSqlProvider;
 
 public class CenSolicmodifcambiarfotoSqlExtendsProvider extends CenSolicmodifcambiarfotoSqlProvider {

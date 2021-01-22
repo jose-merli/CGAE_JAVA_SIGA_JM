@@ -173,52 +173,52 @@ public class EnvConsultasenvioExample {
 			return (Criteria) this;
 		}
 
-		public Criteria andIdconsultaenvioEqualTo(Short value) {
+        public Criteria andIdconsultaenvioEqualTo(Long value) {
 			addCriterion("IDCONSULTAENVIO =", value, "idconsultaenvio");
 			return (Criteria) this;
 		}
 
-		public Criteria andIdconsultaenvioNotEqualTo(Short value) {
+        public Criteria andIdconsultaenvioNotEqualTo(Long value) {
 			addCriterion("IDCONSULTAENVIO <>", value, "idconsultaenvio");
 			return (Criteria) this;
 		}
 
-		public Criteria andIdconsultaenvioGreaterThan(Short value) {
+        public Criteria andIdconsultaenvioGreaterThan(Long value) {
 			addCriterion("IDCONSULTAENVIO >", value, "idconsultaenvio");
 			return (Criteria) this;
 		}
 
-		public Criteria andIdconsultaenvioGreaterThanOrEqualTo(Short value) {
+        public Criteria andIdconsultaenvioGreaterThanOrEqualTo(Long value) {
 			addCriterion("IDCONSULTAENVIO >=", value, "idconsultaenvio");
 			return (Criteria) this;
 		}
 
-		public Criteria andIdconsultaenvioLessThan(Short value) {
+        public Criteria andIdconsultaenvioLessThan(Long value) {
 			addCriterion("IDCONSULTAENVIO <", value, "idconsultaenvio");
 			return (Criteria) this;
 		}
 
-		public Criteria andIdconsultaenvioLessThanOrEqualTo(Short value) {
+        public Criteria andIdconsultaenvioLessThanOrEqualTo(Long value) {
 			addCriterion("IDCONSULTAENVIO <=", value, "idconsultaenvio");
 			return (Criteria) this;
 		}
 
-		public Criteria andIdconsultaenvioIn(List<Short> values) {
+        public Criteria andIdconsultaenvioIn(List<Long> values) {
 			addCriterion("IDCONSULTAENVIO in", values, "idconsultaenvio");
 			return (Criteria) this;
 		}
 
-		public Criteria andIdconsultaenvioNotIn(List<Short> values) {
+        public Criteria andIdconsultaenvioNotIn(List<Long> values) {
 			addCriterion("IDCONSULTAENVIO not in", values, "idconsultaenvio");
 			return (Criteria) this;
 		}
 
-		public Criteria andIdconsultaenvioBetween(Short value1, Short value2) {
+        public Criteria andIdconsultaenvioBetween(Long value1, Long value2) {
 			addCriterion("IDCONSULTAENVIO between", value1, value2, "idconsultaenvio");
 			return (Criteria) this;
 		}
 
-		public Criteria andIdconsultaenvioNotBetween(Short value1, Short value2) {
+        public Criteria andIdconsultaenvioNotBetween(Long value1, Long value2) {
 			addCriterion("IDCONSULTAENVIO not between", value1, value2, "idconsultaenvio");
 			return (Criteria) this;
 		}
@@ -593,52 +593,52 @@ public class EnvConsultasenvioExample {
 			return (Criteria) this;
 		}
 
-		public Criteria andUsumodificacionEqualTo(Short value) {
+        public Criteria andUsumodificacionEqualTo(Integer value) {
 			addCriterion("USUMODIFICACION =", value, "usumodificacion");
 			return (Criteria) this;
 		}
 
-		public Criteria andUsumodificacionNotEqualTo(Short value) {
+        public Criteria andUsumodificacionNotEqualTo(Integer value) {
 			addCriterion("USUMODIFICACION <>", value, "usumodificacion");
 			return (Criteria) this;
 		}
 
-		public Criteria andUsumodificacionGreaterThan(Short value) {
+        public Criteria andUsumodificacionGreaterThan(Integer value) {
 			addCriterion("USUMODIFICACION >", value, "usumodificacion");
 			return (Criteria) this;
 		}
 
-		public Criteria andUsumodificacionGreaterThanOrEqualTo(Short value) {
+        public Criteria andUsumodificacionGreaterThanOrEqualTo(Integer value) {
 			addCriterion("USUMODIFICACION >=", value, "usumodificacion");
 			return (Criteria) this;
 		}
 
-		public Criteria andUsumodificacionLessThan(Short value) {
+        public Criteria andUsumodificacionLessThan(Integer value) {
 			addCriterion("USUMODIFICACION <", value, "usumodificacion");
 			return (Criteria) this;
 		}
 
-		public Criteria andUsumodificacionLessThanOrEqualTo(Short value) {
+        public Criteria andUsumodificacionLessThanOrEqualTo(Integer value) {
 			addCriterion("USUMODIFICACION <=", value, "usumodificacion");
 			return (Criteria) this;
 		}
 
-		public Criteria andUsumodificacionIn(List<Short> values) {
+        public Criteria andUsumodificacionIn(List<Integer> values) {
 			addCriterion("USUMODIFICACION in", values, "usumodificacion");
 			return (Criteria) this;
 		}
 
-		public Criteria andUsumodificacionNotIn(List<Short> values) {
+        public Criteria andUsumodificacionNotIn(List<Integer> values) {
 			addCriterion("USUMODIFICACION not in", values, "usumodificacion");
 			return (Criteria) this;
 		}
 
-		public Criteria andUsumodificacionBetween(Short value1, Short value2) {
+        public Criteria andUsumodificacionBetween(Integer value1, Integer value2) {
 			addCriterion("USUMODIFICACION between", value1, value2, "usumodificacion");
 			return (Criteria) this;
 		}
 
-		public Criteria andUsumodificacionNotBetween(Short value1, Short value2) {
+        public Criteria andUsumodificacionNotBetween(Integer value1, Integer value2) {
 			addCriterion("USUMODIFICACION not between", value1, value2, "usumodificacion");
 			return (Criteria) this;
 		}
@@ -896,6 +896,13 @@ public class EnvConsultasenvioExample {
 
 	/**
 	 * This class was generated by MyBatis Generator. This class corresponds to the database table USCGAE.ENV_CONSULTASENVIO
+    public static class Criteria extends GeneratedCriteria {
+        protected Criteria() {
+            super();
+        }
+    }
+        }
+    }
 	 * @mbg.generated  Sat Feb 16 17:08:49 CET 2019
 	 */
 	public static class Criterion {
@@ -983,10 +990,5 @@ public class EnvConsultasenvioExample {
      *
      * @mbg.generated do_not_delete_during_merge Fri Feb 08 09:50:35 CET 2019
      */
-    public static class Criteria extends GeneratedCriteria {
 
-        protected Criteria() {
-            super();
-        }
-    }
 }

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenAcXml;
+import org.itcgae.siga.db.entities.CenAcXmlExample;
 import org.itcgae.siga.db.entities.CenAcXmlExample.Criteria;
 import org.itcgae.siga.db.entities.CenAcXmlExample.Criterion;
-import org.itcgae.siga.db.entities.CenAcXmlExample;
 
 public class CenAcXmlSqlProvider {
 

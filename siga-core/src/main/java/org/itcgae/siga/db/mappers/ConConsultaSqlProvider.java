@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ConConsulta;
+import org.itcgae.siga.db.entities.ConConsultaExample;
 import org.itcgae.siga.db.entities.ConConsultaExample.Criteria;
 import org.itcgae.siga.db.entities.ConConsultaExample.Criterion;
-import org.itcgae.siga.db.entities.ConConsultaExample;
 
 public class ConConsultaSqlProvider {
 

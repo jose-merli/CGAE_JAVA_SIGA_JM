@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenDiasletra;
+import org.itcgae.siga.db.entities.GenDiasletraExample;
 import org.itcgae.siga.db.entities.GenDiasletraExample.Criteria;
 import org.itcgae.siga.db.entities.GenDiasletraExample.Criterion;
-import org.itcgae.siga.db.entities.GenDiasletraExample;
 
 public class GenDiasletraSqlProvider {
 

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EnvDocumentos;
+import org.itcgae.siga.db.entities.EnvDocumentosExample;
 import org.itcgae.siga.db.entities.EnvDocumentosExample.Criteria;
 import org.itcgae.siga.db.entities.EnvDocumentosExample.Criterion;
-import org.itcgae.siga.db.entities.EnvDocumentosExample;
 
 public class EnvDocumentosSqlProvider {
 
@@ -45,7 +45,9 @@ public class EnvDocumentosSqlProvider {
 		if (record.getIdenvio() != null) {
 			sql.VALUES("IDENVIO", "#{idenvio,jdbcType=DECIMAL}");
 		}
+		if (record.getIddocumento() != null) {
 		sql.VALUES("IDDOCUMENTO", "#{iddocumento,jdbcType=DECIMAL}");
+		}
 		if (record.getDescripcion() != null) {
 			sql.VALUES("DESCRIPCION", "#{descripcion,jdbcType=VARCHAR}");
 		}

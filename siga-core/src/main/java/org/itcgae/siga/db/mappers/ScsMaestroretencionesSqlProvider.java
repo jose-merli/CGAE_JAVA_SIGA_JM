@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ScsMaestroretenciones;
+import org.itcgae.siga.db.entities.ScsMaestroretencionesExample;
 import org.itcgae.siga.db.entities.ScsMaestroretencionesExample.Criteria;
 import org.itcgae.siga.db.entities.ScsMaestroretencionesExample.Criterion;
-import org.itcgae.siga.db.entities.ScsMaestroretencionesExample;
 
 public class ScsMaestroretencionesSqlProvider {
 
@@ -63,9 +63,7 @@ public class ScsMaestroretencionesSqlProvider {
 		if (record.getClavem190() != null) {
 			sql.VALUES("CLAVEM190", "#{clavem190,jdbcType=VARCHAR}");
 		}
-		if (record.getFechabaja() != null) {
-			sql.VALUES("FECHABAJA", "#{fechabaja,jdbcType=TIMESTAMP}");
-		}
+        
 		return sql.toString();
 	}
 
@@ -87,7 +85,6 @@ public class ScsMaestroretencionesSqlProvider {
 		sql.SELECT("LETRANIFSOCIEDAD");
 		sql.SELECT("PORDEFECTO");
 		sql.SELECT("CLAVEM190");
-		sql.SELECT("FECHABAJA");
 		sql.FROM("SCS_MAESTRORETENCIONES");
 		applyWhere(sql, example, false);
 		if (example != null && example.getOrderByClause() != null) {
@@ -129,9 +126,7 @@ public class ScsMaestroretencionesSqlProvider {
 		if (record.getClavem190() != null) {
 			sql.SET("CLAVEM190 = #{record.clavem190,jdbcType=VARCHAR}");
 		}
-		if (record.getFechabaja() != null) {
-			sql.SET("FECHABAJA = #{record.fechabaja,jdbcType=TIMESTAMP}");
-		}
+        
 		applyWhere(sql, example, true);
 		return sql.toString();
 	}
@@ -151,7 +146,7 @@ public class ScsMaestroretencionesSqlProvider {
 		sql.SET("LETRANIFSOCIEDAD = #{record.letranifsociedad,jdbcType=VARCHAR}");
 		sql.SET("PORDEFECTO = #{record.pordefecto,jdbcType=VARCHAR}");
 		sql.SET("CLAVEM190 = #{record.clavem190,jdbcType=VARCHAR}");
-		sql.SET("FECHABAJA = #{record.fechabaja,jdbcType=TIMESTAMP}");
+        
 		ScsMaestroretencionesExample example = (ScsMaestroretencionesExample) parameter.get("example");
 		applyWhere(sql, example, true);
 		return sql.toString();
@@ -185,9 +180,7 @@ public class ScsMaestroretencionesSqlProvider {
 		if (record.getClavem190() != null) {
 			sql.SET("CLAVEM190 = #{clavem190,jdbcType=VARCHAR}");
 		}
-		if (record.getFechabaja() != null) {
-			sql.SET("FECHABAJA = #{fechabaja,jdbcType=TIMESTAMP}");
-		}
+        
 		sql.WHERE("IDRETENCION = #{idretencion,jdbcType=DECIMAL}");
 		return sql.toString();
 	}
@@ -248,15 +241,13 @@ public class ScsMaestroretencionesSqlProvider {
 						if (criterion.getTypeHandler() == null) {
 							sb.append(String.format(parmPhrase1, criterion.getCondition(), i, j));
 						} else {
-							sb.append(String.format(parmPhrase1_th, criterion.getCondition(), i, j,
-									criterion.getTypeHandler()));
+                            sb.append(String.format(parmPhrase1_th, criterion.getCondition(), i, j,criterion.getTypeHandler()));
 						}
 					} else if (criterion.isBetweenValue()) {
 						if (criterion.getTypeHandler() == null) {
 							sb.append(String.format(parmPhrase2, criterion.getCondition(), i, j, i, j));
 						} else {
-							sb.append(String.format(parmPhrase2_th, criterion.getCondition(), i, j,
-									criterion.getTypeHandler(), i, j, criterion.getTypeHandler()));
+                            sb.append(String.format(parmPhrase2_th, criterion.getCondition(), i, j, criterion.getTypeHandler(), i, j, criterion.getTypeHandler()));
 						}
 					} else if (criterion.isListValue()) {
 						sb.append(criterion.getCondition());

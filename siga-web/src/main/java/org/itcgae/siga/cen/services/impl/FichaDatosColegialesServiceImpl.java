@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,9 +21,12 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -32,6 +34,7 @@ import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColacambioletrado;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
@@ -47,6 +50,7 @@ import org.itcgae.siga.db.entities.GenDiccionarioExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColacambioletradoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionTipodireccionExtendsMapper;
@@ -54,8 +58,8 @@ import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposseguroExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsGuardiascolegiadoExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
-import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,7 +67,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Service
-@Transactional
+@Transactional(timeout=2400)
 public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesService {
 
 	private Logger LOGGER = Logger.getLogger(FichaDatosColegialesServiceImpl.class);
@@ -100,6 +104,10 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 	@Autowired
 	private GenDiccionarioMapper genDiccionarioMapper;
+    @Autowired
+    private ScsGuardiascolegiadoExtendsMapper _scsGuardiascolegiadoMapper;
+	@Autowired
+	private CenColacambioletradoExtendsMapper cenColacambioletradoMapper;
 
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -390,6 +398,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					CenDatoscolegialesestado datosColegiales = new CenDatoscolegialesestado();
 					List<Short> addTipoDirecciones = null;
 					List<String> addTipoDireccionesPreferentes = null;
+					CenDirecciones direccionCensoWeb = null;
 
 					// Comprobamos que sea cambio de ejerciente a no ejerciente
 					CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
@@ -499,7 +508,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								}
 							}
 							if (null != tipoCensoWeb) {
-								CenDirecciones direccionCensoWeb = null;
+							
 								for (CenDirecciones cenDireccion : cenDireccionesList) {
 									if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
 										direccionCensoWeb = cenDireccion;
@@ -553,12 +562,33 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						datosColegiales.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));
 						datosColegiales.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 						datosColegiales.setUsumodificacion(usuario.getIdusuario());
+						if(colegiadoItem.getObservaciones() != null) {
 						datosColegiales.setObservaciones(colegiadoItem.getObservaciones());
+						}else {
+							datosColegiales.setObservaciones("");
+						}
 						datosColegiales.setSituacionresidente(colegiadoItem.getSituacionResidente());
 						int resultado = cenDatoscolegialesestadoExtendsMapper.insert(datosColegiales);
 
 						// Llamamos al PL para mantener los colegiados
-						Object[] paramMandatos = new Object[5];
+						int res = 0;
+						if(direccionCensoWeb != null && direccionCensoWeb.getIddireccion() != null) {
+							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+									datosColegiales.getIdpersona(), direccionCensoWeb.getIddireccion(), usuario.getIdusuario());
+						}else {
+							res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+									datosColegiales.getIdpersona(), null, usuario.getIdusuario());
+						}
+						if(res <=0) {
+							LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
+									usuario.getIdinstitucion() + ", idpersona: " +
+									datosColegiales.getIdpersona() + ", usumodificacion: " +
+									usuario.getIdusuario());
+						}else {
+							LOGGER.info(
+									"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
+						}
+						/*Object[] paramMandatos = new Object[5];
 						paramMandatos[0] = datosColegiales.getIdpersona().toString();
 						paramMandatos[1] = usuario.getIdinstitucion().toString();
 						paramMandatos[2] = new Long(30).toString();
@@ -576,7 +606,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							LOGGER.error("Error Datos Colegiales", e);
 
 							e.printStackTrace();
-						}
+						}*/
 
 						if (resultado == 1) {
 							response.setStatus(SigaConstants.OK);
@@ -658,7 +688,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO datosColegialesUpdateEstados(List<ColegiadoItem> listColegiadoItem,
 			HttpServletRequest request) {
 
@@ -674,6 +704,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		boolean existeDummy = false;
 		Date fechaEstadoNueva = null;
 		Date colegiadoSiguienteFechaEstado = null;
+		boolean updateEstado = false;
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -706,6 +737,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							CenDatoscolegialesestado datosColegiales = new CenDatoscolegialesestado();
 							List<Short> addTipoDirecciones = null;
 							List<String> addTipoDireccionesPreferentes = null;
+							CenDirecciones direccionCensoWeb = null;
 
 							// Si solamente es modificar
 							if (!existeDummy && colegiadoItem.getIdPersona() != null && i == 0) {
@@ -779,7 +811,6 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 									if (null != tipoCensoWeb) {
 
-										CenDirecciones direccionCensoWeb = null;
 										for (CenDirecciones cenDireccion : cenDireccionesList) {
 											if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
 												direccionCensoWeb = cenDireccion;
@@ -853,15 +884,16 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 												|| !colegiadoItem.getIdEstado().equals(String.valueOf(cenDatoscolegialesestadosBBDD.getIdestado()))
 												|| (colegiadoItem.getFechaEstadoNueva() != null && colegiadoItem.getFechaEstadoNueva().compareTo(cenDatoscolegialesestadosBBDD.getFechaestado()) != 0)) {
 									updateDate = true;
+									updateEstado = true;
 								}
 							}
 
-							if (colegiadoSiguienteFechaEstado != null) {
-								if (colegiadoSiguienteFechaEstado.before(colegiadoItem.getFechaEstado())
-										&& colegiadoItem.getFechaEstado().before(new Date())) {
-									updateDate = true;
-								}
-							}
+//							if (colegiadoSiguienteFechaEstado != null) {
+//								if (colegiadoSiguienteFechaEstado.before(colegiadoItem.getFechaEstado())
+//										&& colegiadoItem.getFechaEstado().before(new Date())) {
+//									updateDate = true;
+//								}
+//							}
 
 							if (updateDate) {
 								datosColegiales.setFechamodificacion(new Date());
@@ -877,15 +909,35 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								datosColegiales.setSituacionresidente(
 										colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
 							}
+							if(datosColegiales.getObservaciones() == null) {
+								datosColegiales.setObservaciones("");
+							}
+							if(updateDate) {
 							LOGGER.info(
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para actualizar el estado colegial");
 							resultado += cenDatoscolegialesestadoExtendsMapper.updateEstadoColegial(datosColegiales,
 									fechaEstadoNueva);
 							LOGGER.info(
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para para actualizar el estado colegial");
-
+							}
 							if (ejecutarPL) {
-
+								int res = 0;
+								if(direccionCensoWeb != null && direccionCensoWeb.getIddireccion() != null) {
+									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+											datosColegiales.getIdpersona(), direccionCensoWeb.getIddireccion(), usuario.getIdusuario());
+								}else {
+									res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+											datosColegiales.getIdpersona(), null, usuario.getIdusuario());
+								}
+								if(res <=0) {
+									LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
+											usuario.getIdinstitucion() + ", idpersona: " +
+											listColegiadoItem.get(0).getIdPersona() + ", usumodificacion: " +
+											usuario.getIdusuario());
+								}else {
+									LOGGER.info(
+											"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
+								}
 								// Llamamos al PL para mantener los colegiados
 								Object[] paramMandatos = new Object[5];
 								paramMandatos[0] = listColegiadoItem.get(0).getIdPersona().toString();
@@ -904,7 +956,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 									// TODO Auto-generated catch block
 									LOGGER.error("Error Datos Colegiales", e);
 									e.printStackTrace();
-								}
+								}*/
 
 							}
 
@@ -989,8 +1041,22 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							response.setStatus(SigaConstants.OK);
 						}
 
+						String resultadoPl[] = ejecutarPL_RevisionSuscripcionesLetrado("" + idInstitucion.toString(),
+								"" + listColegiadoItem.get(0).getIdPersona(), "", "" + usuario.getIdusuario().toString());
+						if ((resultadoPl == null) || (!resultadoPl[0].equals("0"))) {
+							Error error = new Error();
+							response.setStatus(SigaConstants.KO);
+							error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"
+									+ resultadoPl[1]);
+							response.setError(error);
+							return response;
+						}
 					} else {
+						if(updateEstado){
 						response.setStatus(SigaConstants.KO);
+						}else{
+							response.setStatus(SigaConstants.OK);
+						}
 					}
 				} catch (Exception e) {
 					LOGGER.error("Error Datos Colegiales", e);
@@ -1113,6 +1179,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 					List<Short> addTipoDirecciones = null;
 					List<String> addTipoDireccionesPreferentes = null;
+					CenDirecciones direccionCensoWeb = null;
 
 					// Comprobamos que sea cambio de ejerciente a no ejerciente
 					CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
@@ -1226,7 +1293,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							}
 						}
 						if (null != tipoCensoWeb) {
-							CenDirecciones direccionCensoWeb = null;
+						
 							for (CenDirecciones cenDireccion : cenDireccionesList) {
 								if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
 									direccionCensoWeb = cenDireccion;
@@ -1276,6 +1343,23 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					LOGGER.info(
 							"datosColegialesDeleteEstado() / cenDatoscolegialesestadoMapper.deleteByPrimaryKey() -> Entrada a cenDatoscolegialesestadoMapper para eliminar el estado colegial");
 					// Llamamos al PL para mantener los colegiados
+					int res = 0;
+					if(direccionCensoWeb != null && direccionCensoWeb.getIddireccion() != null) {
+						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+								estadoColegial.getIdpersona(), direccionCensoWeb.getIddireccion(), usuario.getIdusuario());
+					}else {
+						res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION,usuario.getIdinstitucion().intValue(),
+								estadoColegial.getIdpersona(), null, usuario.getIdusuario());
+					}
+					if(res <=0) {
+						LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
+								usuario.getIdinstitucion() + ", idpersona: " +
+								estadoColegial.getIdpersona() + ", usumodificacion: " +
+								usuario.getIdusuario());
+					}else {
+						LOGGER.info(
+								"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
+					}
 					Object[] paramMandatos = new Object[5];
 					paramMandatos[0] = estadoColegial.getIdpersona().toString();
 					paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -1291,7 +1375,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					} catch (IOException | NamingException | SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}
+					}*/
 
 					if (resultado == 1) {
 						response.setStatus(SigaConstants.OK);
@@ -1544,5 +1628,198 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		LOGGER.info("datosColegialesSearch() -> Salida del servicio para la búsqueda por filtros de Colegiados");
 		return datosColegialesDTO;
 	}
+	private String[] ejecutarPL_RevisionSuscripcionesLetrado(String idInstitucion, String idPersona, String fecha,
+			String usuario) throws Exception {
+		LOGGER.info("Entrada Ejecución PL Revision SuscripcionesLetrado");
+		Object[] paramIn = new Object[4]; // Parametros de entrada del PL
+		String resultado[] = new String[2]; // Parametros de salida del PL
 
+		try {
+			paramIn[0] = idInstitucion;
+			paramIn[1] = idPersona;
+			paramIn[2] = fecha;
+			paramIn[3] = usuario;
+			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO (?,?,?,?,?,?)}", 2,
+					paramIn);
+		} catch (Exception e) {
+			LOGGER.info("Error Ejecución PL Revision SuscripcionesLetrado: " + e.getMessage());
+			resultado[0] = "1"; // P_NUMREGISTRO
+			resultado[1] = "ERROR"; // ERROR P_DATOSERROR
+		}
+		LOGGER.info("Salida Ejecución PL Revision SuscripcionesLetrado" );
+		return resultado;
+	}
+	public int insertarCambioEnCola (int idTipoCambio,
+			 Integer idInstitucion,
+			 Long idPersona,
+			 Long idDireccion,
+			 Integer usumodificacion) 
+	{
+		try
+		{
+			CenColacambioletrado bean = new CenColacambioletrado ();
+			bean.setFechacambio(new Date());
+			bean.setIdcambio(getNuevoId (idInstitucion, idPersona));
+			if (idDireccion != null) 
+				bean.setIddireccion (idDireccion);
+			bean.setIdinstitucion (idInstitucion.shortValue());
+			bean.setIdpersona (idPersona);
+			bean.setIdtipocambio ((new Integer (idTipoCambio).shortValue()));
+			bean.setUsumodificacion(usumodificacion);
+			bean.setFechamodificacion(new Date());
+			return cenColacambioletradoMapper.insert(bean);
+		}
+		catch (Exception e) {
+			LOGGER.info("Error Ejecución PL Revision SuscripcionesLetrado: " + e.getMessage());
+		return 0;
+		}
+	} //insertarCambioEnCola()
+	private Long getNuevoId(Integer idInstitucion, Long idPersona) {
+		MaxIdDto id = cenColacambioletradoMapper.selectNuevoId(idInstitucion, idPersona);
+		return id.idMax;
+	}
+	@Override
+	public UpdateResponseDTO datosColegialesUpdateMasivo(ColegiadoItemDTO listColegiadoItem,
+			HttpServletRequest request) {
+		LOGGER.info("datosColegialesUpdateMasivo() -> Entrada al servicio para la actualizacion de estados colegiales");
+		ColegiadoItem colegiadoItem = listColegiadoItem.getColegiadoItem();
+		InsertResponseDTO responseinsert = new InsertResponseDTO();
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		response.setStatus(SigaConstants.OK);
+		responseinsert.setStatus(SigaConstants.OK);
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"datosColegialesUpdateMasivo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"datosColegialesUpdateMasivo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"datosColegialesUpdateMasivo() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
+				CenColegiadoKey colegiadoKey = new CenColegiadoKey();
+				colegiadoKey.setIdinstitucion(idInstitucion);
+				colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+				CenColegiado cenColegiadoAnterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey);
+				CenColegiado colegiado = new CenColegiado();
+				colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+				colegiado.setIdinstitucion(idInstitucion);
+				colegiado.setUsumodificacion(usuario.getIdusuario());
+				if (colegiadoItem.getIdTiposSeguro() != null && colegiadoItem.getIdTiposSeguro() != "") {
+					colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
+				} else {
+					colegiado.setIdtiposseguro(null);
+				}
+				if (colegiadoItem.getSituacionResidente() != null) {
+					colegiado.setSituacionresidente(
+							colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
+				} else {
+					colegiado.setSituacionresidente("0");
+				}
+				if (colegiadoItem.getComunitario() != null) {
+					colegiado.setComunitario(colegiadoItem.getComunitario());
+					if (colegiadoItem.getNumColegiado() != null) {
+						if (colegiadoItem.getComunitario().equals("1")) {
+							colegiado.setNcomunitario(colegiadoItem.getNumColegiado());
+						}else{
+							colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+						}
+					}
+				}else{
+					if (colegiadoItem.getNumColegiado() != null) {
+						colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+					}
+				}
+				if (colegiadoItem.getnMutualista() != null && colegiadoItem.getnMutualista() != "") {
+					colegiado.setNmutualista(colegiadoItem.getnMutualista());
+				} else {
+					colegiado.setNmutualista(null);
+				}
+				colegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
+				colegiado.setFechatitulacion(colegiadoItem.getFechaTitulacionDate());
+				colegiado.setFechapresentacion(colegiadoItem.getFechapresentacionDate());
+				colegiado.setFechajura(colegiadoItem.getFechaJuraDate());
+				colegiado.setFechamodificacion(new Date());
+				int responseUpdateColegiado = cenColegiadoExtendsMapper.updateColegiado(colegiado);
+				LOGGER.info(
+						"datosColegialesUpdateMasivo() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para actualización de Colegiados");
+				LOGGER.info(
+						"datosColegialesUpdateMasivo() / Entrada Actualizamos los estados de la tabla");
+				response = this.datosColegialesUpdateEstados(listColegiadoItem.getColegiadoItemEstados(), request);
+				LOGGER.info(
+						"datosColegialesUpdateMasivo() / Salida Actualizamos los estados de la tabla");
+				if (response.getStatus().equals(SigaConstants.OK)) {
+					if (null != listColegiadoItem.getNuevocolegiadoItem() && null != listColegiadoItem.getNuevocolegiadoItem().getIdPersona()) {
+						LOGGER.info(
+								"datosColegialesUpdateMasivo() / Entrada a insertar primer estado de la tabla");
+						responseinsert = this.datosColegialesInsertEstado(listColegiadoItem.getNuevocolegiadoItem(), request);
+						LOGGER.info(
+								"datosColegialesUpdateMasivo() / Salida a insertar primer estado de la tabla");
+					}
+				}
+				if (responseUpdateColegiado >= 1 && response.getStatus().equals(SigaConstants.OK) && responseinsert.getStatus().equals(SigaConstants.OK)) {
+					if (!UtilidadesString.esCadenaVacia(colegiadoItem.getMotivo())) {
+						LOGGER.info(
+								"datosColegialesUpdateMasivo() / Entrada a insertar auditoria");
+						colegiadoKey.setIdinstitucion(idInstitucion);
+						colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+						CenColegiado cenColegiadoPosterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey);
+						auditoriaCenHistoricoService.manageAuditoriaDatosColegiales(cenColegiadoAnterior,
+								cenColegiadoPosterior, "UPDATE", request, colegiadoItem.getMotivo());
+						LOGGER.info(
+								"datosColegialesUpdateMasivo() / Salida a insertar auditoria");
+					}
+					response.setStatus(SigaConstants.OK);
+				} else {
+					if (null != responseinsert.getStatus()) {
+						if (responseinsert.getStatus().equals(SigaConstants.KO)) {
+							if (null != responseinsert.getError()) {
+								response.setError(responseinsert.getError());
+							}
+						}
+					}
+					response.setStatus(SigaConstants.KO);
+				}
+			} else {
+				LOGGER.warn(
+						"datosColegialesUpdate() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+				response.setStatus(SigaConstants.KO);
+			}
+		} else {
+			LOGGER.warn("datosColegialesUpdate() -> idInstitucion del token nula");
+			response.setStatus(SigaConstants.KO);
+		}
+		LOGGER.info("datosColegialesUpdate() -> Salida del servicio para la búsqueda por filtros de Colegiados");
+		return response;
+	}
+	@Override
+    public StringDTO getTurnosGuardias(ColegiadoItem colegiadoItem, HttpServletRequest request) {
+        LOGGER.info("getTurnosGuardias() -> Entrada al servicio para obtener los turnos o guardias asociados al colegiado");
+        StringDTO resultado = new StringDTO();
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        if (null != idInstitucion) {
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+            LOGGER.info(
+                    "getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+            LOGGER.info(
+                    "getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+            if (null != usuarios && usuarios.size() > 0) {
+                resultado = _scsGuardiascolegiadoMapper.getTurnosGuardias(colegiadoItem.getIdPersona(), idInstitucion);
+                if(resultado == null)
+                	resultado = new StringDTO().valor("0");
+            }
+        }
+        LOGGER.info("getTurnosGuardias() -> Salida del servicio para obtener los turnos o guardias asociados al colegiado");
+        return resultado;
+    }
 }

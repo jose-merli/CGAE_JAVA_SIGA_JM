@@ -3,7 +3,6 @@ package org.itcgae.siga.db.services.fcs.providers;
 import java.util.ArrayList;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.db.mappers.EcomCenDatosSqlProvider;
 import org.itcgae.siga.db.mappers.FcsPagoColegiadoSqlProvider;
 
 public class FcsPagoColegiadoSqlExtendsProvider extends FcsPagoColegiadoSqlProvider{

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenMtiposError;
+import org.itcgae.siga.db.entities.GenMtiposErrorExample;
 import org.itcgae.siga.db.entities.GenMtiposErrorExample.Criteria;
 import org.itcgae.siga.db.entities.GenMtiposErrorExample.Criterion;
-import org.itcgae.siga.db.entities.GenMtiposErrorExample;
 
 public class GenMtiposErrorSqlProvider {
 

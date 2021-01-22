@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenTareaspendientes;
+import org.itcgae.siga.db.entities.GenTareaspendientesExample;
 import org.itcgae.siga.db.entities.GenTareaspendientesExample.Criteria;
 import org.itcgae.siga.db.entities.GenTareaspendientesExample.Criterion;
-import org.itcgae.siga.db.entities.GenTareaspendientesExample;
 
 public class GenTareaspendientesSqlProvider {
 

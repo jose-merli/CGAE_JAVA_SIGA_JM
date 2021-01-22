@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenAcCliente;
+import org.itcgae.siga.db.entities.CenAcClienteExample;
 import org.itcgae.siga.db.entities.CenAcClienteExample.Criteria;
 import org.itcgae.siga.db.entities.CenAcClienteExample.Criterion;
-import org.itcgae.siga.db.entities.CenAcClienteExample;
 
 public class CenAcClienteSqlProvider {
 

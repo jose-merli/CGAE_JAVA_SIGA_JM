@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo2;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Example;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Example.Criteria;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Example.Criterion;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Example;
 
 public class CenTiposcvsubtipo2SqlProvider {
 

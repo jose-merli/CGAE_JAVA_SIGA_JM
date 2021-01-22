@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenPropertiesBackup;
+import org.itcgae.siga.db.entities.GenPropertiesBackupExample;
 import org.itcgae.siga.db.entities.GenPropertiesBackupExample.Criteria;
 import org.itcgae.siga.db.entities.GenPropertiesBackupExample.Criterion;
-import org.itcgae.siga.db.entities.GenPropertiesBackupExample;
 
 public class GenPropertiesBackupSqlProvider {
 

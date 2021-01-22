@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenCodigosmaestros;
+import org.itcgae.siga.db.entities.GenCodigosmaestrosExample;
 import org.itcgae.siga.db.entities.GenCodigosmaestrosExample.Criteria;
 import org.itcgae.siga.db.entities.GenCodigosmaestrosExample.Criterion;
-import org.itcgae.siga.db.entities.GenCodigosmaestrosExample;
 
 public class GenCodigosmaestrosSqlProvider {
 

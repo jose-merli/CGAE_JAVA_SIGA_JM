@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmLenguajes;
+import org.itcgae.siga.db.entities.AdmLenguajesExample;
 import org.itcgae.siga.db.entities.AdmLenguajesExample.Criteria;
 import org.itcgae.siga.db.entities.AdmLenguajesExample.Criterion;
-import org.itcgae.siga.db.entities.AdmLenguajesExample;
 
 public class AdmLenguajesSqlProvider {
 

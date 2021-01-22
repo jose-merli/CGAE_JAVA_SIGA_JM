@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForCambioinscripcion;
+import org.itcgae.siga.db.entities.ForCambioinscripcionExample;
 import org.itcgae.siga.db.entities.ForCambioinscripcionExample.Criteria;
 import org.itcgae.siga.db.entities.ForCambioinscripcionExample.Criterion;
-import org.itcgae.siga.db.entities.ForCambioinscripcionExample;
 
 public class ForCambioinscripcionSqlProvider {
 

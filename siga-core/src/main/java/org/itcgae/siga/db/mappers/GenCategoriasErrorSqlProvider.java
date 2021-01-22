@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenCategoriasError;
+import org.itcgae.siga.db.entities.GenCategoriasErrorExample;
 import org.itcgae.siga.db.entities.GenCategoriasErrorExample.Criteria;
 import org.itcgae.siga.db.entities.GenCategoriasErrorExample.Criterion;
-import org.itcgae.siga.db.entities.GenCategoriasErrorExample;
 
 public class GenCategoriasErrorSqlProvider {
 

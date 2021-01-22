@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EnvDestConsultaEnvio;
+import org.itcgae.siga.db.entities.EnvDestConsultaEnvioExample;
 import org.itcgae.siga.db.entities.EnvDestConsultaEnvioExample.Criteria;
 import org.itcgae.siga.db.entities.EnvDestConsultaEnvioExample.Criterion;
-import org.itcgae.siga.db.entities.EnvDestConsultaEnvioExample;
 
 public class EnvDestConsultaEnvioSqlProvider {
 

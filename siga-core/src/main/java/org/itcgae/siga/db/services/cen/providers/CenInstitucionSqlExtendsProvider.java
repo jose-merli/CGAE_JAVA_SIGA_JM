@@ -6,10 +6,10 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.CenInstitucionExample.Criteria;
 import org.itcgae.siga.db.entities.CenInstitucionExample.Criterion;
 import org.itcgae.siga.db.mappers.CenInstitucionSqlProvider;
-import org.itcgae.siga.db.entities.CenInstitucionExample;
 
 public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 
@@ -438,14 +438,5 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		return sql.toString();
 	}
 	
-	public String getInstitucionesConsejos(Short idInstitucion) {
-		SQL sql = new SQL();
-		sql.SELECT("IDINSTITUCION");
-		sql.SELECT("ABREVIATURA as NOMBRE");
-		sql.FROM("CEN_INSTITUCION");
-		sql.WHERE("CEN_INST_IDINSTITUCION = '" + idInstitucion + "' or IDINSTITUCION = '" + idInstitucion + "'");
-		sql.ORDER_BY("NOMBRE");
-		return sql.toString();
-	}
     
 }

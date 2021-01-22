@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.PysSuscripcion;
+import org.itcgae.siga.db.entities.PysSuscripcionExample;
 import org.itcgae.siga.db.entities.PysSuscripcionExample.Criteria;
 import org.itcgae.siga.db.entities.PysSuscripcionExample.Criterion;
-import org.itcgae.siga.db.entities.PysSuscripcionExample;
 
 public class PysSuscripcionSqlProvider {
 

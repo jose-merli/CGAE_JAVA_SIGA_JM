@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
+import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample.Criteria;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample.Criterion;
-import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 
 public class EnvConsultasenvioSqlProvider {
 
@@ -344,15 +344,13 @@ public class EnvConsultasenvioSqlProvider {
 						if (criterion.getTypeHandler() == null) {
 							sb.append(String.format(parmPhrase1, criterion.getCondition(), i, j));
 						} else {
-							sb.append(String.format(parmPhrase1_th, criterion.getCondition(), i, j,
-									criterion.getTypeHandler()));
+                            sb.append(String.format(parmPhrase1_th, criterion.getCondition(), i, j,criterion.getTypeHandler()));
 						}
 					} else if (criterion.isBetweenValue()) {
 						if (criterion.getTypeHandler() == null) {
 							sb.append(String.format(parmPhrase2, criterion.getCondition(), i, j, i, j));
 						} else {
-							sb.append(String.format(parmPhrase2_th, criterion.getCondition(), i, j,
-									criterion.getTypeHandler(), i, j, criterion.getTypeHandler()));
+                            sb.append(String.format(parmPhrase2_th, criterion.getCondition(), i, j, criterion.getTypeHandler(), i, j, criterion.getTypeHandler()));
 						}
 					} else if (criterion.isListValue()) {
 						sb.append(criterion.getCondition());

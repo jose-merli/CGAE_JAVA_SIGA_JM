@@ -13,7 +13,6 @@ import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
@@ -29,6 +28,30 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiados")
 	@Results({ @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOAPARECERREDABOGACIA2", property = "noAparecerRedAbogacia2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMCOLEGIADO", property = "numberColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SITUACION", property = "situacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADOCOLEGIAL", property = "estadoColegial", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAESTADO", property = "fechaEstadoStr", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SITUACIONRESIDENTE", property = "situacionResidente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAINCORPORACION", property = "incorporacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COLEGIORESULTADO", property = "colegioResultado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CORREO", property = "correo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOAPARECERREDABOGACIAFILTER", property = "noAparecerRedAbogaciaFilter", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SITUACIONRESIDENTEFILTER", property = "situacionResidenteFilter", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ColegiadoItem> selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem, Integer tamMaximo);
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiado")
+	@Results({@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "COUNT", property = "count", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "SOLONOMBRE", property = "soloNombre", jdbcType = JdbcType.VARCHAR),
@@ -62,12 +85,14 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "FECHAPRESENTACION", property = "fechapresentacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOAPARECERREDABOGACIA2", property = "noAparecerRedAbogacia2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOAPARECERREDABOGACIAFILTER", property = "noAparecerRedAbogaciaFilter", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SITUACIONRESIDENTEFILTER", property = "situacionResidenteFilter", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "SITUACIONRESIDENTE", property = "situacionResidente", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "COMUNITARIO", property = "comunitario", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "COLEGIORESULTADO", property = "colegioResultado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDENTIFICADORDS", property = "identificadords", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ColegiadoItem> selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem);
+	List<ColegiadoItem> selectColegiado(Short idInstitucion, ColegiadoItem colegiadoItem);
 	
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiadosByIdPersona")
 	@Results({ @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
@@ -253,20 +278,6 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 //	sql.SELECT("Select count(*)      From Scs_Cabeceraguardias Cab Where Cab.Idinstitucion = COLEGIADO.idinstitucion and cab.idpersona = COLEGIADO.idpersona and Cab.Fecha_Fin >= Sysdate) as guardiasPendientes");
 
 	
-	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "busquedaColegiadosSJCS")
-	@Results({ 
-			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "INSCRITOTURNO", property = "inscritoturno", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "INSCRITOGUARDIA", property = "inscritoguardia", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "GUARDIASPENDIENTES", property = "guardiasPendientes", jdbcType = JdbcType.VARCHAR)
 
-	})
-	List<ColegiadosSJCSItem> busquedaColegiadosSJCS(String idInstitucion, ColegiadosSJCSItem colegiadosSJCSItem);
 	
 }

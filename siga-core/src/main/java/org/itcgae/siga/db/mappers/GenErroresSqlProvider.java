@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenErrores;
+import org.itcgae.siga.db.entities.GenErroresExample;
 import org.itcgae.siga.db.entities.GenErroresExample.Criteria;
 import org.itcgae.siga.db.entities.GenErroresExample.Criterion;
-import org.itcgae.siga.db.entities.GenErroresExample;
 
 public class GenErroresSqlProvider {
 

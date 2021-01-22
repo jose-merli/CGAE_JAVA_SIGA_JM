@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.ComboTipoCVItem;
 import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.CenTiposcvsubtipo1Mapper;
 import org.itcgae.siga.db.services.cen.providers.CenTiposCVSubtipo1SqlExtendsProvider;

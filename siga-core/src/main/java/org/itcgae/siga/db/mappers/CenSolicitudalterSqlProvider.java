@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenSolicitudalter;
+import org.itcgae.siga.db.entities.CenSolicitudalterExample;
 import org.itcgae.siga.db.entities.CenSolicitudalterExample.Criteria;
 import org.itcgae.siga.db.entities.CenSolicitudalterExample.Criterion;
-import org.itcgae.siga.db.entities.CenSolicitudalterExample;
 
 public class CenSolicitudalterSqlProvider {
 

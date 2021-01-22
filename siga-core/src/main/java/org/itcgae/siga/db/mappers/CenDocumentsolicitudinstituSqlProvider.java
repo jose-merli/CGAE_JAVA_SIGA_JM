@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenDocumentsolicitudinstitu;
+import org.itcgae.siga.db.entities.CenDocumentsolicitudinstituExample;
 import org.itcgae.siga.db.entities.CenDocumentsolicitudinstituExample.Criteria;
 import org.itcgae.siga.db.entities.CenDocumentsolicitudinstituExample.Criterion;
-import org.itcgae.siga.db.entities.CenDocumentsolicitudinstituExample;
 
 public class CenDocumentsolicitudinstituSqlProvider {
 

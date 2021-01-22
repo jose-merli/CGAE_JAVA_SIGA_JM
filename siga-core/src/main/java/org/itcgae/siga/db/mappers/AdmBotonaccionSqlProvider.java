@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmBotonaccion;
+import org.itcgae.siga.db.entities.AdmBotonaccionExample;
 import org.itcgae.siga.db.entities.AdmBotonaccionExample.Criteria;
 import org.itcgae.siga.db.entities.AdmBotonaccionExample.Criterion;
-import org.itcgae.siga.db.entities.AdmBotonaccionExample;
 
 public class AdmBotonaccionSqlProvider {
 

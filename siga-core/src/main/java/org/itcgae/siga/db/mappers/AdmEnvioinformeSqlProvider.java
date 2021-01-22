@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmEnvioinforme;
+import org.itcgae.siga.db.entities.AdmEnvioinformeExample;
 import org.itcgae.siga.db.entities.AdmEnvioinformeExample.Criteria;
 import org.itcgae.siga.db.entities.AdmEnvioinformeExample.Criterion;
-import org.itcgae.siga.db.entities.AdmEnvioinformeExample;
 
 public class AdmEnvioinformeSqlProvider {
 

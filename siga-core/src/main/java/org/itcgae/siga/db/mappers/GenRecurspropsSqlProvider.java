@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenRecursprops;
+import org.itcgae.siga.db.entities.GenRecurspropsExample;
 import org.itcgae.siga.db.entities.GenRecurspropsExample.Criteria;
 import org.itcgae.siga.db.entities.GenRecurspropsExample.Criterion;
-import org.itcgae.siga.db.entities.GenRecurspropsExample;
 
 public class GenRecurspropsSqlProvider {
 

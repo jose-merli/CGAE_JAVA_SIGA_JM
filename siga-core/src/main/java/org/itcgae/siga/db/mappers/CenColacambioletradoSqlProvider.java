@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenColacambioletrado;
+import org.itcgae.siga.db.entities.CenColacambioletradoExample;
 import org.itcgae.siga.db.entities.CenColacambioletradoExample.Criteria;
 import org.itcgae.siga.db.entities.CenColacambioletradoExample.Criterion;
-import org.itcgae.siga.db.entities.CenColacambioletradoExample;
 
 public class CenColacambioletradoSqlProvider {
 

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenTipoidentificacion;
+import org.itcgae.siga.db.entities.CenTipoidentificacionExample;
 import org.itcgae.siga.db.entities.CenTipoidentificacionExample.Criteria;
 import org.itcgae.siga.db.entities.CenTipoidentificacionExample.Criterion;
-import org.itcgae.siga.db.entities.CenTipoidentificacionExample;
 
 public class CenTipoidentificacionSqlProvider {
 

@@ -2,7 +2,7 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,20 +10,14 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaDTO;
-import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaItem;
-import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 
 import org.itcgae.siga.cen.services.IFichaColegialOtrasColegiacionesService;
 import org.itcgae.siga.cen.services.IInstitucionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -45,18 +39,13 @@ import org.itcgae.siga.ws.client.ClientCENSO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument;
-import com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument;
 import com.colegiados.info.redabogacia.ColegiacionType;
 import com.colegiados.info.redabogacia.ColegiadoRequestDocument;
-import com.colegiados.info.redabogacia.ColegiadoResponseDocument;
-import com.colegiados.info.redabogacia.ColegioType;
-import com.colegiados.info.redabogacia.IdentificacionType;
-import com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest;
-import com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse;
 import com.colegiados.info.redabogacia.ColegiadoRequestDocument.ColegiadoRequest;
+import com.colegiados.info.redabogacia.ColegiadoResponseDocument;
 import com.colegiados.info.redabogacia.ColegiadoResponseDocument.ColegiadoResponse;
 import com.colegiados.info.redabogacia.ColegiadoResponseDocument.ColegiadoResponse.Colegiado;
+import com.colegiados.info.redabogacia.IdentificacionType;
 
 @Service
 public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegialOtrasColegiacionesService {
@@ -86,6 +75,8 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 	
 	@Autowired
 	private GenRecursosMapper genRecursosMapper;
+	private static final String ESTADO_EJERCIENTE = "Ejerciente";
+	private static final String ESTADO_NOEJERCIENTE = "No Ejerciente";
 	
 	@Override
 	public ColegiadoDTO searchOtherCollegues(int numPagina, String nif,
@@ -198,6 +189,7 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 //									colegiadoItem.setResidencia(colegiadoColegiacion.getResidente().toString());
 									SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
 									String fechaEstado = format1.format(colegiadoColegiacion.getSituacion().getFechaSituacion().getTime());     
+									colegiadoItem.setFechaEstado(colegiadoColegiacion.getSituacion().getFechaSituacion().getTime());
 									colegiadoItem.setFechaEstadoStr(fechaEstado);
 									if (null != colegiado.getColegiacionArray()[0].getColegio()) {
 										List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiadoColegiacion.getColegio().getCodigoColegio());
@@ -226,6 +218,31 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 									if(!(inst.get(0).getIdinstitucion().equals(idInstitucion))) {
 										colegiadoItems.add(colegiadoItem);
 									}
+							}
+							List<ColegiadoItem> otrasColegiacionesEjercientes = new ArrayList<>();
+							List<ColegiadoItem> otrasColegiacionesNoEjercientes = new ArrayList<>();
+							List<ColegiadoItem> restoColegiaciones = new ArrayList<>();
+							for(ColegiadoItem otraColegiacion: colegiadoItems) {
+								if(ESTADO_EJERCIENTE.equals(otraColegiacion.getEstadoColegial())) {
+									otrasColegiacionesEjercientes.add(otraColegiacion);
+								}else if(ESTADO_NOEJERCIENTE.equals(otraColegiacion.getEstadoColegial())) {
+									otrasColegiacionesNoEjercientes.add(otraColegiacion);
+								}else {
+									restoColegiaciones.add(otraColegiacion);
+								}
+							}
+							colegiadoItems.clear();
+							Collections.sort(otrasColegiacionesEjercientes);
+							for(ColegiadoItem e: otrasColegiacionesEjercientes) {
+								colegiadoItems.add(e);
+							}
+							Collections.sort(otrasColegiacionesNoEjercientes);
+							for(ColegiadoItem e: otrasColegiacionesNoEjercientes) {
+								colegiadoItems.add(e);
+							}
+							Collections.sort(restoColegiaciones);
+							for(ColegiadoItem e: restoColegiaciones) {
+								colegiadoItems.add(e);
 							}
 							
 							colegiadoDTO.setColegiadoItem(colegiadoItems);

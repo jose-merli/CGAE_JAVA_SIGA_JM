@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AgeCalendario;
+import org.itcgae.siga.db.entities.AgeCalendarioExample;
 import org.itcgae.siga.db.entities.AgeCalendarioExample.Criteria;
 import org.itcgae.siga.db.entities.AgeCalendarioExample.Criterion;
-import org.itcgae.siga.db.entities.AgeCalendarioExample;
 
 public class AgeCalendarioSqlProvider {
 

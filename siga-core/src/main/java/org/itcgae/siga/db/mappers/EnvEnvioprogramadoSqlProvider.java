@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
+import org.itcgae.siga.db.entities.EnvEnvioprogramadoExample;
 import org.itcgae.siga.db.entities.EnvEnvioprogramadoExample.Criteria;
 import org.itcgae.siga.db.entities.EnvEnvioprogramadoExample.Criterion;
-import org.itcgae.siga.db.entities.EnvEnvioprogramadoExample;
 
 public class EnvEnvioprogramadoSqlProvider {
 

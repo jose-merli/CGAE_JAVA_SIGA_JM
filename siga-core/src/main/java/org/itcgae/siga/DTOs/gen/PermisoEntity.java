@@ -4,9 +4,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-import org.itcgae.siga.DTOs.gen.PermisoEntity;
-import java.util.ArrayList;
-import java.util.List;
 
 
 

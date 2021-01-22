@@ -26,7 +26,7 @@ public class EnvDocumentosExample {
 	 * @mbg.generated  Mon Nov 26 12:11:01 CET 2018
 	 */
 	public EnvDocumentosExample() {
-		oredCriteria = new ArrayList<Criteria>();
+		oredCriteria = new ArrayList<>();
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class EnvDocumentosExample {
 
 		protected GeneratedCriteria() {
 			super();
-			criteria = new ArrayList<Criterion>();
+			criteria = new ArrayList<>();
 		}
 
 		public boolean isValid() {
@@ -293,52 +293,52 @@ public class EnvDocumentosExample {
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoEqualTo(Short value) {
+		public Criteria andIddocumentoEqualTo(Integer value) {
 			addCriterion("IDDOCUMENTO =", value, "iddocumento");
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoNotEqualTo(Short value) {
+		public Criteria andIddocumentoNotEqualTo(Integer value) {
 			addCriterion("IDDOCUMENTO <>", value, "iddocumento");
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoGreaterThan(Short value) {
+		public Criteria andIddocumentoGreaterThan(Integer value) {
 			addCriterion("IDDOCUMENTO >", value, "iddocumento");
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoGreaterThanOrEqualTo(Short value) {
+		public Criteria andIddocumentoGreaterThanOrEqualTo(Integer value) {
 			addCriterion("IDDOCUMENTO >=", value, "iddocumento");
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoLessThan(Short value) {
+		public Criteria andIddocumentoLessThan(Integer value) {
 			addCriterion("IDDOCUMENTO <", value, "iddocumento");
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoLessThanOrEqualTo(Short value) {
+		public Criteria andIddocumentoLessThanOrEqualTo(Integer value) {
 			addCriterion("IDDOCUMENTO <=", value, "iddocumento");
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoIn(List<Short> values) {
+		public Criteria andIddocumentoIn(List<Integer> values) {
 			addCriterion("IDDOCUMENTO in", values, "iddocumento");
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoNotIn(List<Short> values) {
+		public Criteria andIddocumentoNotIn(List<Integer> values) {
 			addCriterion("IDDOCUMENTO not in", values, "iddocumento");
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoBetween(Short value1, Short value2) {
+		public Criteria andIddocumentoBetween(Integer value1, Integer value2) {
 			addCriterion("IDDOCUMENTO between", value1, value2, "iddocumento");
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoNotBetween(Short value1, Short value2) {
+		public Criteria andIddocumentoNotBetween(Integer value1, Integer value2) {
 			addCriterion("IDDOCUMENTO not between", value1, value2, "iddocumento");
 			return (Criteria) this;
 		}

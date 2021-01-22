@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.PysServicios;
+import org.itcgae.siga.db.entities.PysServiciosExample;
 import org.itcgae.siga.db.entities.PysServiciosExample.Criteria;
 import org.itcgae.siga.db.entities.PysServiciosExample.Criterion;
-import org.itcgae.siga.db.entities.PysServiciosExample;
 
 public class PysServiciosSqlProvider {
 

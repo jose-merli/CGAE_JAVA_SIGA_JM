@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenTipovia;
+import org.itcgae.siga.db.entities.CenTipoviaExample;
 import org.itcgae.siga.db.entities.CenTipoviaExample.Criteria;
 import org.itcgae.siga.db.entities.CenTipoviaExample.Criterion;
-import org.itcgae.siga.db.entities.CenTipoviaExample;
 
 public class CenTipoviaSqlProvider {
 

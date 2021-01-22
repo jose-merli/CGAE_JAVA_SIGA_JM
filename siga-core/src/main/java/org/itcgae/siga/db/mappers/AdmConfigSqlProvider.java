@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmConfig;
+import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmConfigExample.Criteria;
 import org.itcgae.siga.db.entities.AdmConfigExample.Criterion;
-import org.itcgae.siga.db.entities.AdmConfigExample;
 
 public class AdmConfigSqlProvider {
 

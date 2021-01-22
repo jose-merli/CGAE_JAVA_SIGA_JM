@@ -224,6 +224,10 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 									busquedaPerFisica.setNif(
 											colegiadoName[i].getDatosPersonales().getIdentificacion().getPasaporte());
 								}
+								if (colegiadoName[i].getDatosPersonales().getSexo() != null) {
+									busquedaPerFisica
+											.setSexo(colegiadoName[i].getDatosPersonales().getSexo().toString());
+								}
 
 								if (busquedaPerFisica.getNif() != null) {
 									// Extraemos el idPersona
@@ -307,8 +311,18 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 									}
 								}
 								if (null != colegiadoName[i].getLocalizacion()) {
-									busquedaPerFisica.setDomicilio(colegiadoName[i].getLocalizacion().getDomicilio());
+									busquedaPerFisica.setDireccion(colegiadoName[i].getLocalizacion().getDomicilio());
+									if (null != colegiadoName[i].getLocalizacion().getNacional()) {
+										if (null != colegiadoName[i].getLocalizacion().getNacional().getProvincia()) {
+											busquedaPerFisica.setIdProvincia(colegiadoName[i].getLocalizacion().getNacional().getProvincia().getCodigoProvincia());
+										}
+										if (null != colegiadoName[i].getLocalizacion().getNacional().getPoblacion()) {
+											busquedaPerFisica.setIdPoblacion(colegiadoName[i].getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion());
+											busquedaPerFisica.setNombrePoblacion(colegiadoName[i].getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion());
+										}
 
+										busquedaPerFisica.setCodigoPostal(colegiadoName[i].getLocalizacion().getNacional().getCodigoPostal());
+									}
 								}
 								busquedaPerFisicaItems.add(busquedaPerFisica);
 							}
@@ -628,6 +642,10 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 										busquedaPerFisica.setDomicilio(colegiado.getLocalizacion().getDomicilio());
 
 									}
+									if (colegiado.getDatosPersonales().getSexo() != null) {
+										busquedaPerFisica
+												.setSexo(colegiado.getDatosPersonales().getSexo().toString());
+									}
 
 									// Extraemos el idPersona
 									CenPersonaExample cenPersonaExample = new CenPersonaExample();
@@ -641,6 +659,19 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 												.setIdPersona(String.valueOf(cenPersona.get(0).getIdpersona()));
 									}
 
+									if (null != colegiado.getLocalizacion()) {									
+										busquedaPerFisica.setDireccion(colegiado.getLocalizacion().getDomicilio());
+										if (null != colegiado.getLocalizacion().getNacional()) {
+											if (null != colegiado.getLocalizacion().getNacional().getProvincia()) {
+												busquedaPerFisica.setIdProvincia(colegiado.getLocalizacion().getNacional().getProvincia().getCodigoProvincia());
+											}
+											if (null != colegiado.getLocalizacion().getNacional().getPoblacion()) {
+												busquedaPerFisica.setIdPoblacion(colegiado.getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion());
+												busquedaPerFisica.setNombrePoblacion(colegiado.getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion());
+											}
+											busquedaPerFisica.setCodigoPostal(colegiado.getLocalizacion().getNacional().getCodigoPostal());
+										}
+									}
 									busquedaPerFisicaItems.add(busquedaPerFisica);
 								}
 							}

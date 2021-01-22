@@ -1076,7 +1076,7 @@ public class WSCommons {
 				String[] direcciones = peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDirecciones().split(",");
 				String[] direccion;
 				if (null != direcciones && direcciones.length > 0) {
-					CenDirecciones beanDireccion = new CenDirecciones();
+					//CenDirecciones beanDireccion = new CenDirecciones();
 	
 					String idInstitucionComun, idDireccionOrigen;
 					
@@ -1265,12 +1265,10 @@ public class WSCommons {
 					//Se comprueba si se quiere insertar con historico o no
 					if (beanHis != null){					
 						// Insertamos el historico
-						CenHistorico admHis = new CenHistorico();
+						//CenHistorico admHis = new CenHistorico();
 						if (insertCompleto(beanHis, direccionEnCGAE, 2, "1")) {
 							return true;
 						}
-					}else{
-							return true;
 						
 					}
 				}
@@ -1288,7 +1286,7 @@ public class WSCommons {
 		 * Conjunto de personas que se estan fusionando en este momento. Se van metiendo y sacando segun se termina la fusion
 		 */
 		private static HashSet<String> listaPersonasFusionando = new HashSet<String>();
-		public static final String CONTROL_INFORME = "CONTROL_INFORME_FUSIONADOR";
+		//public static final String CONTROL_INFORME = "CONTROL_INFORME_FUSIONADOR";
 		
 		/**
 		 * Obtiene un control basado en dos personas a fusionar
@@ -1449,12 +1447,10 @@ public class WSCommons {
 					//Se comprueba si se quiere insertar con historico o no
 					if (beanHis != null){					
 						// Insertamos el historico
-						CenHistorico admHis = new CenHistorico();
+						//CenHistorico admHis = new CenHistorico();
 						if (insertCompleto(beanHis, beanDir, 1, idioma)) {
 							return "ok";
 						}
-					}else{
-							return "ok";
 						
 					}
 				}
@@ -1570,9 +1566,9 @@ public class WSCommons {
 		
 		beanHis.setDescripcion(descripcion);
 			
-		if ((beanHis.getFechaefectiva() == null) || (beanHis.getFechaefectiva().equals(""))) 
+		if ((beanHis.getFechaefectiva() == null)) 
 			beanHis.setFechaefectiva(new Date());
-		if ((beanHis.getFechaentrada()  == null) || (beanHis.getFechaentrada().equals(""))) 
+		if ((beanHis.getFechaentrada()  == null)) 
 			beanHis.setFechaentrada (new Date());
 		beanHis.setFechamodificacion(new Date());
 		beanHis.setUsumodificacion(-1);

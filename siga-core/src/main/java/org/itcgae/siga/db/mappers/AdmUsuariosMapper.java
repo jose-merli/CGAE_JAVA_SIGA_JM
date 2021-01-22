@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectKey;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.UpdateProvider;
@@ -53,6 +54,7 @@ public interface AdmUsuariosMapper {
 			"#{activo,jdbcType=VARCHAR}, #{fechaalta,jdbcType=TIMESTAMP}, ",
 			"#{idlenguaje,jdbcType=VARCHAR}, #{codigoext,jdbcType=VARCHAR}, ",
 			"#{fechaBaja,jdbcType=TIMESTAMP}, #{ultimaConexion,jdbcType=TIMESTAMP})" })
+	@SelectKey(statement = "SELECT MAX(IDUSUARIO)  + 1 from ADM_USUARIOS  where IDINSTITUCION = #{idinstitucion}", keyProperty = "idusuario", before = true, resultType = Integer.class)
 	int insert(AdmUsuarios record);
 
 	/**
@@ -60,6 +62,7 @@ public interface AdmUsuariosMapper {
 	 * @mbg.generated  Mon Apr 30 17:11:10 CEST 2018
 	 */
 	@InsertProvider(type = AdmUsuariosSqlProvider.class, method = "insertSelective")
+	@SelectKey(statement = "SELECT MAX(IDUSUARIO)  + 1 from ADM_USUARIOS  where IDINSTITUCION = #{idinstitucion}", keyProperty = "idusuario", before = true, resultType = Integer.class)
 	int insertSelective(AdmUsuarios record);
 
 	/**

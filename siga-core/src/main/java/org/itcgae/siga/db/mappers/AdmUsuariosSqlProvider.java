@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample.Criteria;
 import org.itcgae.siga.db.entities.AdmUsuariosExample.Criterion;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
 
 public class AdmUsuariosSqlProvider {
 
@@ -42,9 +42,7 @@ public class AdmUsuariosSqlProvider {
 		if (record.getIdinstitucion() != null) {
 			sql.VALUES("IDINSTITUCION", "#{idinstitucion,jdbcType=DECIMAL}");
 		}
-		if (record.getIdusuario() != null) {
 			sql.VALUES("IDUSUARIO", "#{idusuario,jdbcType=DECIMAL}");
-		}
 		if (record.getDescripcion() != null) {
 			sql.VALUES("DESCRIPCION", "#{descripcion,jdbcType=VARCHAR}");
 		}

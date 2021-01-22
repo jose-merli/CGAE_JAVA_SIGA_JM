@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenAcListaNegraBlanca;
+import org.itcgae.siga.db.entities.CenAcListaNegraBlancaExample;
 import org.itcgae.siga.db.entities.CenAcListaNegraBlancaExample.Criteria;
 import org.itcgae.siga.db.entities.CenAcListaNegraBlancaExample.Criterion;
-import org.itcgae.siga.db.entities.CenAcListaNegraBlancaExample;
 
 public class CenAcListaNegraBlancaSqlProvider {
 

@@ -1,7 +1,6 @@
 package org.itcgae.siga.DTOs.cen;
 
 import java.util.Date;
-import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

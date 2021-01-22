@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AgeUnidadmedida;
+import org.itcgae.siga.db.entities.AgeUnidadmedidaExample;
 import org.itcgae.siga.db.entities.AgeUnidadmedidaExample.Criteria;
 import org.itcgae.siga.db.entities.AgeUnidadmedidaExample.Criterion;
-import org.itcgae.siga.db.entities.AgeUnidadmedidaExample;
 
 public class AgeUnidadmedidaSqlProvider {
 

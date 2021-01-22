@@ -26,7 +26,7 @@ public class EnvPlantillasenviosExample {
 	 * @mbg.generated  Tue Feb 19 12:57:33 CET 2019
 	 */
 	public EnvPlantillasenviosExample() {
-		oredCriteria = new ArrayList<Criteria>();
+		oredCriteria = new ArrayList<>();
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class EnvPlantillasenviosExample {
 
 		protected GeneratedCriteria() {
 			super();
-			criteria = new ArrayList<Criterion>();
+			criteria = new ArrayList<>();
 		}
 
 		public boolean isValid() {
@@ -990,6 +990,54 @@ public class EnvPlantillasenviosExample {
 
 		public Criteria andDescripcionRemitenteNotBetween(String value1, String value2) {
 			addCriterion("DESCRIPCION_REMITENTE not between", value1, value2, "descripcionRemitente");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionIsNull() {
+			addCriterion("IDCLASECOMUNICACION is null");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionIsNotNull() {
+			addCriterion("IDCLASECOMUNICACION is not null");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionEqualTo(Long value) {
+			addCriterion("IDCLASECOMUNICACION =", value, "idclasecomunicacion");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionNotEqualTo(Long value) {
+			addCriterion("IDCLASECOMUNICACION <>", value, "idclasecomunicacion");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionGreaterThan(Long value) {
+			addCriterion("IDCLASECOMUNICACION >", value, "idclasecomunicacion");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionGreaterThanOrEqualTo(Long value) {
+			addCriterion("IDCLASECOMUNICACION >=", value, "idclasecomunicacion");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionLessThan(Long value) {
+			addCriterion("IDCLASECOMUNICACION <", value, "idclasecomunicacion");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionLessThanOrEqualTo(Long value) {
+			addCriterion("IDCLASECOMUNICACION <=", value, "idclasecomunicacion");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionIn(List<Long> values) {
+			addCriterion("IDCLASECOMUNICACION in", values, "idclasecomunicacion");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionNotIn(List<Long> values) {
+			addCriterion("IDCLASECOMUNICACION not in", values, "idclasecomunicacion");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionBetween(Long value1, Long value2) {
+			addCriterion("IDCLASECOMUNICACION between", value1, value2, "idclasecomunicacion");
+			return (Criteria) this;
+		}
+		public Criteria andIdclasecomunicacionNotBetween(Long value1, Long value2) {
+			addCriterion("IDCLASECOMUNICACION not between", value1, value2, "idclasecomunicacion");
 			return (Criteria) this;
 		}
 	}

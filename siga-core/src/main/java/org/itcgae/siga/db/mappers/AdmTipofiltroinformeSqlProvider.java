@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmTipofiltroinforme;
+import org.itcgae.siga.db.entities.AdmTipofiltroinformeExample;
 import org.itcgae.siga.db.entities.AdmTipofiltroinformeExample.Criteria;
 import org.itcgae.siga.db.entities.AdmTipofiltroinformeExample.Criterion;
-import org.itcgae.siga.db.entities.AdmTipofiltroinformeExample;
 
 public class AdmTipofiltroinformeSqlProvider {
 

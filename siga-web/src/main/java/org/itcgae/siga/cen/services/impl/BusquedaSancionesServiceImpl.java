@@ -2,6 +2,8 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,7 +17,6 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaSancionesDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaSancionesItem;
 import org.itcgae.siga.DTOs.cen.BusquedaSancionesSearchDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
@@ -25,10 +26,6 @@ import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenInstitucion;
-import org.itcgae.siga.db.entities.CenInstitucionExample;
-import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSancion;
 import org.itcgae.siga.db.entities.CenSancionExample;
 import org.itcgae.siga.db.entities.CenSancionKey;
@@ -231,6 +228,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 								}
 
+								Collections.sort(busquedaSancionesItems);
 								busquedaSancionesDTO.setBusquedaSancionesItem(busquedaSancionesItems);
 
 							}

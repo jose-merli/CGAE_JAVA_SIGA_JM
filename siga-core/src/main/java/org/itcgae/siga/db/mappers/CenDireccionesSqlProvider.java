@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesExample.Criteria;
 import org.itcgae.siga.db.entities.CenDireccionesExample.Criterion;
-import org.itcgae.siga.db.entities.CenDireccionesExample;
 
 public class CenDireccionesSqlProvider {
 

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ExpSolicitudborrado;
+import org.itcgae.siga.db.entities.ExpSolicitudborradoExample;
 import org.itcgae.siga.db.entities.ExpSolicitudborradoExample.Criteria;
 import org.itcgae.siga.db.entities.ExpSolicitudborradoExample.Criterion;
-import org.itcgae.siga.db.entities.ExpSolicitudborradoExample;
 
 public class ExpSolicitudborradoSqlProvider {
 

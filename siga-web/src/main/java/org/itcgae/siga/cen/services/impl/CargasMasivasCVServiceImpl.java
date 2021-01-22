@@ -38,9 +38,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCargamasiva;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
-import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenDatoscv;
-import org.itcgae.siga.db.entities.CenDatoscvKey;
 import org.itcgae.siga.db.entities.CenHistorico;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
@@ -597,7 +595,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 	
 						// Llamada a método para obtener idtipocv
 						CenTiposcvExample cenTiposCVExample = new CenTiposcvExample();
-						cenTiposCVExample.createCriteria().andCodigoextEqualTo(tipocvCod);
+						cenTiposCVExample.createCriteria().andCodigoextEqualTo(tipocvCod).andFechaBajaIsNull();
 						List<CenTiposcv> tiposCV = cenTiposcvMapper.selectByExample(cenTiposCVExample);
 	
 						if (tiposCV != null && tiposCV.size() > 0) {
@@ -639,7 +637,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 				CenTiposcvsubtipo1Example cenTiposcvsubtipo1Example = new CenTiposcvsubtipo1Example();
 				cenTiposcvsubtipo1Example.createCriteria().andIdinstitucionIn(idInstituciones)
-						.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
+						.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV()).andFechaBajaIsNull();
 				List<CenTiposcvsubtipo1> tiposcvsubtipo1s = cenTiposcvsubtipo1Mapper
 						.selectByExample(cenTiposcvsubtipo1Example);
 
@@ -660,6 +658,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 						cenTiposcvsubtipo1Example1.createCriteria()
 								.andCodigoextEqualTo(subtipocv1Cod)
 								.andIdinstitucionIn(idInstituciones)
+								.andFechaBajaIsNull()
 								.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 						
 						//ORDERNAR
@@ -673,7 +672,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 							//nos quedamos con el subtipo propio
 							if(tiposcvsubtipo1s.size() > 1) {
 								for (CenTiposcvsubtipo1 subCV1 : tiposcvsubtipo1s) {
-									if(subCV1.getIdinstitucion() == idInstitucion) {
+									if(subCV1.getIdinstitucion().equals(idInstitucion)) {
 										subCV1Select = subCV1;
 									}
 								}
@@ -725,6 +724,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 							cenTiposcvsubtipo2Example.createCriteria()
 									.andCodigoextEqualTo(subtipocv2Cod)
 									.andIdinstitucionIn(idInstituciones)
+									.andFechaBajaIsNull()
 									.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 							
 							//ORDERNAR
@@ -740,7 +740,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 								//nos quedamos con el subtipo propio
 								if(tiposcvsubtipo1s.size() > 1) {
 									for (CenTiposcvsubtipo2 subCV2 : tiposcvsubtipo2s) {
-										if(subCV2.getIdinstitucion() == idInstitucion) {
+										if(subCV2.getIdinstitucion().equals(idInstitucion)) {
 											subCV2Select = subCV2;
 										}
 									}

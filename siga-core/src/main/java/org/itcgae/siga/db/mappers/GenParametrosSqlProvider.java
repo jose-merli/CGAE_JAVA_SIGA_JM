@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosExample.Criteria;
 import org.itcgae.siga.db.entities.GenParametrosExample.Criterion;
-import org.itcgae.siga.db.entities.GenParametrosExample;
 
 public class GenParametrosSqlProvider {
 

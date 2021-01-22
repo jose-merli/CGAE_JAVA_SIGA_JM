@@ -724,14 +724,10 @@ public class ScsMaestroretencionesExample {
 			return (Criteria) this;
 		}
 
-		public Criteria andFechabajaIn(List<Date> values) {
-			addCriterion("FECHABAJA in", values, "fechabaja");
-			return (Criteria) this;
-		}
+    public static class Criteria extends GeneratedCriteria {
 
-		public Criteria andFechabajaNotIn(List<Date> values) {
-			addCriterion("FECHABAJA not in", values, "fechabaja");
-			return (Criteria) this;
+        protected Criteria() {
+            super();
 		}
 
 		public Criteria andFechabajaBetween(Date value1, Date value2) {

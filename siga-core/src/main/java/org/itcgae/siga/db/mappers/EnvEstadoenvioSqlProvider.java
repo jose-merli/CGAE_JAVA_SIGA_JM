@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EnvEstadoenvio;
+import org.itcgae.siga.db.entities.EnvEstadoenvioExample;
 import org.itcgae.siga.db.entities.EnvEstadoenvioExample.Criteria;
 import org.itcgae.siga.db.entities.EnvEstadoenvioExample.Criterion;
-import org.itcgae.siga.db.entities.EnvEstadoenvioExample;
 
 public class EnvEstadoenvioSqlProvider {
 

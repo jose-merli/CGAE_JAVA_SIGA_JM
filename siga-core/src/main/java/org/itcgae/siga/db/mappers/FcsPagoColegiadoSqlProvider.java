@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.FcsPagoColegiado;
+import org.itcgae.siga.db.entities.FcsPagoColegiadoExample;
 import org.itcgae.siga.db.entities.FcsPagoColegiadoExample.Criteria;
 import org.itcgae.siga.db.entities.FcsPagoColegiadoExample.Criterion;
-import org.itcgae.siga.db.entities.FcsPagoColegiadoExample;
 
 public class FcsPagoColegiadoSqlProvider {
 

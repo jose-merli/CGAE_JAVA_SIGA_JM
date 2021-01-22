@@ -60,9 +60,16 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 		if (authentication == null) {
 			// Usuario 2 -> Usuario de desarrollo del actual SIGA
 			List<String> perfiles = new ArrayList<String>(); 
+			String dni = (String) request.getHeader("CAS-username");
+			String grupo = "";
+			String nombre = (String) request.getHeader("CAS-displayName");
+			String institucion = "";	
+			grupo = "Personal";
+			institucion = "2000";
 			perfiles.add("ADG");
+			try {
 			UserCgae userDesarrollo = (UserCgae) userDetailsService
-					.loadUserByUsername(new UserCgae("44149718E", "Personal", "2000", null,perfiles, "N"));
+						.loadUserByUsername(new UserCgae(dni, grupo, institucion, null,perfiles, "N", null, nombre));
 			authentication = new UserAuthenticationToken(userDesarrollo.getDni(), null, userDesarrollo, null,
 					new ArrayList<>());
 			String header = null;
@@ -72,6 +79,9 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 				e.printStackTrace();
 			}
 			mutableRequest.addHeader("Authorization", header);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);

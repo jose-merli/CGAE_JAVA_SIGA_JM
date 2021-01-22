@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmRol;
+import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmRolExample.Criteria;
 import org.itcgae.siga.db.entities.AdmRolExample.Criterion;
-import org.itcgae.siga.db.entities.AdmRolExample;
 
 public class AdmRolSqlProvider {
 

@@ -3,7 +3,6 @@ package org.itcgae.siga.DTOs.adm;
 import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
@@ -13,6 +12,7 @@ public class HistoricoUsuarioRequestDTO {
 	private String usuarioAutomatico;
 	private String idTipoAccion;
 	private String idPersona; // campo front Persona
+	private String idPersonaReal;
 	//@JsonFormat(pattern = "dd/MM/yy")
 	//@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaDesde;
@@ -43,6 +43,12 @@ public class HistoricoUsuarioRequestDTO {
 	}
 
 	
+	public String getIdPersonaReal() {
+		return idPersonaReal;
+	}
+	public void setIdPersonaReal(String idPersonaReal) {
+		this.idPersonaReal = idPersonaReal;
+	}
 	/**
 	**/
 	public HistoricoUsuarioRequestDTO usuarioAutomatico(String usuarioAutomatico) {

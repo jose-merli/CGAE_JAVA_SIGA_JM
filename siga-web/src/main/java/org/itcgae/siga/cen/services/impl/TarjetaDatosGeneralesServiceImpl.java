@@ -28,7 +28,6 @@ import org.itcgae.siga.DTOs.cen.PersonaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
@@ -41,19 +40,16 @@ import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
-import org.itcgae.siga.db.entities.CenGruposclienteExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
-import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenGruposclienteMapper;
-import org.itcgae.siga.db.mappers.CenSolicmodifexportarfotoMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
@@ -65,6 +61,7 @@ import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -374,6 +371,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 	}
 
 	@Override
+	@Transactional(timeout=2400)
 	public InsertResponseDTO createLegalPerson(SociedadCreateDTO sociedadCreateDTO, HttpServletRequest request)
 			throws ParseException {
 
@@ -397,7 +395,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		String idPersona = "";
 		boolean cambioEtiquetas = false;
 
-		if (null != personas && !(personas.size() > 0)) {
+		
 
 			if (null != idInstitucion) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -412,8 +410,57 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
 
+					if (null != personas && personas.size() > 0) {
+						idPersona = String.valueOf(personas.get(0).getIdpersona());
+						CenClienteExample cenClienteExample = new CenClienteExample();
+						cenClienteExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(personas.get(0).getIdpersona()))
+								.andIdinstitucionEqualTo(idInstitucion);
+						List<CenCliente> listClientes = cenClienteMapper.selectByExample(cenClienteExample);
+						if(listClientes != null && !(listClientes.size()>0)) {
+							CenCliente record = new CenCliente();
+							record = rellenarInsertCenClienteNewSociety(sociedadCreateDTO, usuario, idInstitucion);
+							record.setIdpersona(Long.valueOf(personas.get(0).getIdpersona()));
+							int responseCenCliente = 0;
+							if (null != record.getIdpersona()) {
+								responseCenCliente = cenClienteMapper.insertSelective(record);
+							}
+							if (responseCenCliente == 1) {
 					// 1. crear tablas cen_persona, cen_nocolegiado y cen_cliente
-					if (!insertResponseDTO.getStatus().equals(SigaConstants.KO)) {
+								LOGGER.info(
+										"createLegalPerson() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateNewSociety() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+								CenNocolegiado recordNoColegiado = new CenNocolegiado();
+								recordNoColegiado.setIdpersona(record.getIdpersona());
+								recordNoColegiado.setIdinstitucion(idInstitucion);
+								recordNoColegiado.setFechamodificacion(new Date ());
+								recordNoColegiado.setUsumodificacion(usuario.getIdusuario());
+								recordNoColegiado.setSociedadsj("0");
+								recordNoColegiado.setTipo(sociedadCreateDTO.getTipo());
+								if (null != sociedadCreateDTO.getAnotaciones() && !sociedadCreateDTO.getAnotaciones().equals("")) {
+									recordNoColegiado.setAnotaciones(sociedadCreateDTO.getAnotaciones());
+								}
+								recordNoColegiado.setSociedadprofesional("0");
+								recordNoColegiado.setFechaBaja(null);
+								int responseInsertNoColegiado = cenNocolegiadoExtendsMapper
+										.insertSelective(recordNoColegiado );
+								LOGGER.info(
+										"createLegalPerson() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+								if (responseInsertNoColegiado == 1) {
+									insertResponseDTO.setStatus(SigaConstants.OK);
+									insertResponseDTO.setId(String.valueOf(record.getIdpersona()));
+								} else {
+									insertResponseDTO.setStatus(SigaConstants.KO);
+									LOGGER.warn(
+											"createLegalPerson() / cenClienteMapper.insertSelective() -> No se ha podido crear la persona no colegiada en tabla CEN_CLIENTE");
+								}
+							}
+						}else {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+							error.setMessage("messages.censo.nifcifExiste2");
+							insertResponseDTO.setError(error);
+						}
+					} else {
+					//if (!insertResponseDTO.getStatus().equals(SigaConstants.KO)) {
 
 						// 1.1 crear registro en tabla cen_persona
 						LOGGER.info(
@@ -542,7 +589,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 											cenGruposclienteCliente.setFechamodificacion(new Date());
 											cenGruposclienteCliente.setIdgrupo(idGrupo);
 											cenGruposclienteCliente.setIdinstitucion(usuario.getIdinstitucion());
-											cenGruposclienteCliente.setIdinstitucionGrupo(Short.valueOf(etiqueta.getIdInstitucion()));
+											cenGruposclienteCliente
+													.setIdinstitucionGrupo(Short.valueOf(etiqueta.getIdInstitucion()));
 											cenGruposclienteCliente.setIdpersona(Long.valueOf(idPersona));
 											cenGruposclienteCliente.setUsumodificacion(usuario.getIdusuario());
 
@@ -553,10 +601,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 												insertResponseDTO.setStatus(SigaConstants.OK);
 												gruposPerJuridicaNuevos.add(String.valueOf(cenGruposcli.getIdgrupo()));
 												
-												String[] a = {
-														cenGruposcli.getIdgrupo().toString(),
-														cenGruposcli.getIdinstitucion().toString()
-												};
+												String[] a = { cenGruposcli.getIdgrupo().toString(),
+														cenGruposcli.getIdinstitucion().toString() };
 												gruposPerJuridicaNuevosAudit.add(a);
 												
 												LOGGER.warn(
@@ -597,8 +643,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 										relacionGrupoPersona.createCriteria()
 												.andIdpersonaEqualTo(Long.valueOf(idPersona))
 												.andIdgrupoEqualTo(Short.valueOf(etiqueta.getIdGrupo()))
-												.andIdinstitucionEqualTo(idInstitucion)
-												.andIdinstitucionGrupoEqualTo(Short.valueOf(etiqueta.getIdInstitucion()));
+												.andIdinstitucionEqualTo(idInstitucion).andIdinstitucionGrupoEqualTo(
+														Short.valueOf(etiqueta.getIdInstitucion()));
 										
 										listarelacionGrupoPersona = cenGruposclienteClienteExtendsMapper
 												.selectByExample(relacionGrupoPersona);
@@ -741,12 +787,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				LOGGER.warn("createLegalPerson() -> idInstitucion del token nula");
 			}
 
-		} else {
-			insertResponseDTO.setStatus(SigaConstants.KO);
-			org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-			error.setMessage("messages.censo.nifcifExiste2");
-			insertResponseDTO.setError(error);
-		}
+		
 
 		// AUDITORIA => actualizamos cen_historico si todo es correcto
 		if (insertResponseDTO.getStatus().equals(SigaConstants.OK)) {
@@ -843,10 +884,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				// 2. Recorremos las etiquetas
 				for (ComboEtiquetasItem etiqueta : etiquetaUpdateDTO.getEtiquetas()) {
 					
-					String[] a = {
-							etiqueta.getIdGrupo(),
-							etiqueta.getIdInstitucion()
-					};
+					String[] a = { etiqueta.getIdGrupo(), etiqueta.getIdInstitucion() };
 					gruposPerJuridicaPosteriorAudit.add(a);
 					
 
@@ -1018,8 +1056,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				for (String[] etiquetaEliminar : gruposPerJuridicaAntiguos) {
 					 cambioEtiquetas = true;
 					CenGruposclienteClienteExample cenGruposclienteClienteExample = new CenGruposclienteClienteExample();
-					cenGruposclienteClienteExample.createCriteria()
-					.andIdinstitucionEqualTo(idInstitucion)
+					cenGruposclienteClienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 					.andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()))
 					.andIdgrupoEqualTo(Short.valueOf(etiquetaEliminar[0]))
 					.andIdinstitucionGrupoEqualTo(Short.valueOf(etiquetaEliminar[1]));

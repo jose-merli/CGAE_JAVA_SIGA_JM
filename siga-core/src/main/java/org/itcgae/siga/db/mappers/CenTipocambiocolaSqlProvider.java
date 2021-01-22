@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenTipocambiocola;
+import org.itcgae.siga.db.entities.CenTipocambiocolaExample;
 import org.itcgae.siga.db.entities.CenTipocambiocolaExample.Criteria;
 import org.itcgae.siga.db.entities.CenTipocambiocolaExample.Criterion;
-import org.itcgae.siga.db.entities.CenTipocambiocolaExample;
 
 public class CenTipocambiocolaSqlProvider {
 

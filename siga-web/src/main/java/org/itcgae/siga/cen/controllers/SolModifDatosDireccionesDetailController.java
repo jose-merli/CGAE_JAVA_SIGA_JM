@@ -2,12 +2,8 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
-import org.itcgae.siga.DTOs.cen.SoliModiDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.SoliModiDireccionesItem;
-import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
-import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.cen.services.ISolModifDatosDireccionesDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

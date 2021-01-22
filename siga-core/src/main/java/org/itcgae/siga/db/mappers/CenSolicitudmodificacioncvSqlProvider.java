@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
+import org.itcgae.siga.db.entities.CenSolicitudmodificacioncvExample;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncvExample.Criteria;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncvExample.Criterion;
-import org.itcgae.siga.db.entities.CenSolicitudmodificacioncvExample;
 
 public class CenSolicitudmodificacioncvSqlProvider {
 

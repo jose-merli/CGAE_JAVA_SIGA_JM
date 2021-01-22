@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenHistorico;
+import org.itcgae.siga.db.entities.CenHistoricoExample;
 import org.itcgae.siga.db.entities.CenHistoricoExample.Criteria;
 import org.itcgae.siga.db.entities.CenHistoricoExample.Criterion;
-import org.itcgae.siga.db.entities.CenHistoricoExample;
 
 public class CenHistoricoSqlProvider {
 

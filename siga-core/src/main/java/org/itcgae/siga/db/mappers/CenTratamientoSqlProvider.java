@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenTratamiento;
+import org.itcgae.siga.db.entities.CenTratamientoExample;
 import org.itcgae.siga.db.entities.CenTratamientoExample.Criteria;
 import org.itcgae.siga.db.entities.CenTratamientoExample.Criterion;
-import org.itcgae.siga.db.entities.CenTratamientoExample;
 
 public class CenTratamientoSqlProvider {
 

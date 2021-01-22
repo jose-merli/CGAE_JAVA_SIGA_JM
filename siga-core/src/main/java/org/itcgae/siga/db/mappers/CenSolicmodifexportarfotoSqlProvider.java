@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
+import org.itcgae.siga.db.entities.CenSolicmodifexportarfotoExample;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfotoExample.Criteria;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfotoExample.Criterion;
-import org.itcgae.siga.db.entities.CenSolicmodifexportarfotoExample;
 
 public class CenSolicmodifexportarfotoSqlProvider {
 

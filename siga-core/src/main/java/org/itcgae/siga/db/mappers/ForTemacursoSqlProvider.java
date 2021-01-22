@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForTemacurso;
+import org.itcgae.siga.db.entities.ForTemacursoExample;
 import org.itcgae.siga.db.entities.ForTemacursoExample.Criteria;
 import org.itcgae.siga.db.entities.ForTemacursoExample.Criterion;
-import org.itcgae.siga.db.entities.ForTemacursoExample;
 
 public class ForTemacursoSqlProvider {
 

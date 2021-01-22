@@ -2,10 +2,8 @@ package org.itcgae.siga.ws.config;
 
 import java.net.URISyntaxException;
 
-import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
-import com.ecos.ws.solicitarenvio.ResultadoSolicitudEnvio;
 
 import service.serviciosecos.ConsultarEstadoMensajeDocument;
 import service.serviciosecos.ConsultarEstadoMensajeResponseDocument;

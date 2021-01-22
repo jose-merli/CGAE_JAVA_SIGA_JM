@@ -125,7 +125,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 	
 	
 	//@Transactional
-//	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
+	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
 	@Override
 	public void execute() {
 		
@@ -166,6 +166,16 @@ public class ColaEnviosImpl implements IColaEnvios {
 						}
 				}
 
+			}
+			List<EnvEnvios> enviosBasura = _envEnviosExtendsMapper.obtenerEnviosMalCreados();
+			if (enviosBasura != null && enviosBasura.size() > 0) {
+				for (EnvEnvios envioBasura : enviosBasura) {
+					envio = envioBasura;
+					LOGGER.info("Listener envios => Se ha encontrado envio mal creado y se procederá a su cambio de estado a Error con ID: " + envio.getIdenvio());
+					envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
+					envio.setFechamodificacion(new Date());
+					_envEnviosMapper.updateByPrimaryKey(envio);
+				}
 			}
 		}catch(Exception e){
 			LOGGER.error("Error al procesar el envío", e);
@@ -251,6 +261,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 		//Obtenemos los destinatarios dependendiendo del tipo de envio.
 		boolean envioMasivo = envio.getEnvio().contains("M") ? true : false;
 		
+		Short idEstadoEnvio = SigaConstants.ENVIO_PROCESADO;
 		if(envioMasivo){
 			
 			List<DestinatarioItem> destinatarios = new ArrayList<DestinatarioItem>();
@@ -272,7 +283,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 			List<DatosDocumentoItem> documentosEnvio = new ArrayList<DatosDocumentoItem>();
 			addDocumentosAdjuntos(envio, documentosEnvio);			
 
-			Short idEstadoEnvio = SigaConstants.ENVIO_PROCESADO;
 			
 			if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
 				idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
@@ -340,10 +350,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 				LOGGER.debug("Procedemos al envio del email: tipo " + envio.getIdtipoenvios() + "--" + envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL));
 				
 				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
-					_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
+					idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 				}else{
 					if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){
-						_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
+						idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
 					}
 					//Añadimos los informes al envio para que puedan ser descargados.
 //					for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
@@ -371,7 +381,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				_envEnviosMapper.updateByPrimaryKey(envio);
 			}
 		}
-		envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+		envio.setIdestado(idEstadoEnvio);
 		envio.setFechamodificacion(new Date());
 		_envEnviosMapper.updateByPrimaryKey(envio);
 	}
@@ -474,7 +484,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				
 				String preferente = SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO;
 				//Obtenemos la direccion preferente de la persona
-				if (SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios())) {
+				if (SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios().toString()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios().toString())) {
 					preferente = SigaConstants.TIPO_PREFERENTE_SMS;
 				}
 				exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + preferente + "%");
@@ -491,7 +501,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 					boolean añadido = false;
 					for (CenDirecciones dir : direcciones) {
 						DestinatarioItem destinatario = null;
-						if((SigaConstants.ID_ENVIO_MAIL.equals(envio.getIdtipoenvios()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equals(envio.getIdtipoenvios())) && dir.getCorreoelectronico() != null) {
+						if((SigaConstants.ID_ENVIO_MAIL.equals(envio.getIdtipoenvios().toString()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equals(envio.getIdtipoenvios().toString())) && dir.getCorreoelectronico() != null) {
 							if(!añadido){
 								destinatario = new DestinatarioItem();
 								añadido = true;
@@ -499,7 +509,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 							}
 						}
 
-						if((SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios())) && dir.getMovil() != null) {
+						if((SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios().toString()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios().toString())) && dir.getMovil() != null) {
 							if(!añadido){
 								destinatario = new DestinatarioItem();
 								añadido = true;
@@ -530,7 +540,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 		EnvDestinatariosExample ejemplo = new EnvDestinatariosExample();
 		ejemplo.createCriteria().andIdinstitucionEqualTo(cenPersona.getIdinstitucion())
 				.andIdenvioEqualTo(etiquetasDTO.getIdenvio())
-				.andIdpersonaEqualTo(cenPersona.getIdpersona());
+				.andIdpersonaEqualTo(cenPersona.getIdpersona())
+				.andCorreoelectronicoEqualTo(direccion.getCorreoelectronico());
 		List<EnvDestinatarios> destinatariosExistentes = _envDestinatariosMapper
 				.selectByExample(ejemplo);
 
@@ -846,7 +857,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 				listDestinatarioItems.add(destinatarioItem);
 				idSolicitudEcos = _enviosService.envioSMS(remitente, listDestinatarioItems, envio, cuerpoFinal, isBuroSMS);
 				LOGGER.debug("El idSolicitudEcos para el número " + envDestinatariosBurosms.getMovil() + " es " + idSolicitudEcos);
-				if (isBuroSMS && idSolicitudEcos != null && !idSolicitudEcos.trim().equals("")) {
+				if (idSolicitudEcos != null && !idSolicitudEcos.trim().equals("")) {
+					if (isBuroSMS) {
 					
 					//añadimos un documento vacío para que al descargar desde la web vayamos a buscar el pdf a la pfd
 					EnvDocumentos envDocumentos = addEnvDocument(envio.getIdenvio(), envio.getIdinstitucion(), envDestinatariosBurosms.getMovil());
@@ -858,6 +870,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 					envDestinatariosBurosms.setIddocumento(envDocumentos.getIddocumento());
 					
 					buroSMSenviados += envDestinatariosBurosmsMapper.insert(envDestinatariosBurosms);						
+					}
+				}else{
+					hayError = true;
+					LOGGER.error("Error al enviar el sms al destinatario: " + envDestinatariosBurosms.getMovil());
 				}
 			}catch(Exception e) {
 				hayError = true;

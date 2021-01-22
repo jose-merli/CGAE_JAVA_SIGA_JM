@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenConsejo;
+import org.itcgae.siga.db.entities.CenConsejoExample;
 import org.itcgae.siga.db.entities.CenConsejoExample.Criteria;
 import org.itcgae.siga.db.entities.CenConsejoExample.Criterion;
-import org.itcgae.siga.db.entities.CenConsejoExample;
 
 public class CenConsejoSqlProvider {
 

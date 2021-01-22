@@ -1,17 +1,12 @@
 package org.itcgae.siga.cen.controllers;
 
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
-import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
 import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.cen.services.IFichaColegialRegTelService;
-import org.itcgae.siga.cen.services.IFichaColegialSociedadesService;
-import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;

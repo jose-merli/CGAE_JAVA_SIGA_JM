@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancarias;
+import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasExample.Criteria;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasExample.Criterion;
-import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasExample;
 
 public class CenMandatosCuentasbancariasSqlProvider {
 

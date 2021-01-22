@@ -24,4 +24,16 @@ public interface EnvDestinatariosExtendsMapper {
 		@Result(column = "CORREOELECTRONICO", property = "correoElectronico", jdbcType = JdbcType.VARCHAR)
 	})
 	List<DestinatarioItem> selectDestinatarios(Short idInstitucion, String idEnvio);
+	@SelectProvider(type = EnvDestinatariosExtendsSqlProvider.class, method = "selectDestinatariosComunicaciones")
+	@Results({@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFCIF", property = "NIFCIF", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DOMICILIO", property = "domicilio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRECOMPLETO", property = "nombreCompleto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CORREOELECTRONICO", property = "correoElectronico", jdbcType = JdbcType.VARCHAR)
+	})
+	List<DestinatarioItem> selectDestinatariosComunicaciones(Short idInstitucion, String idEnvio);
 }

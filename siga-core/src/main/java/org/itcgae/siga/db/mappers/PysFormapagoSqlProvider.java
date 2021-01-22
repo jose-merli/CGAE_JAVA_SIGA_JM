@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.PysFormapago;
+import org.itcgae.siga.db.entities.PysFormapagoExample;
 import org.itcgae.siga.db.entities.PysFormapagoExample.Criteria;
 import org.itcgae.siga.db.entities.PysFormapagoExample.Criterion;
-import org.itcgae.siga.db.entities.PysFormapagoExample;
 
 public class PysFormapagoSqlProvider {
 

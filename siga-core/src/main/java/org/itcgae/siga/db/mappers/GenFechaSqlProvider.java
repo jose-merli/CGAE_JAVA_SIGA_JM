@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenFecha;
+import org.itcgae.siga.db.entities.GenFechaExample;
 import org.itcgae.siga.db.entities.GenFechaExample.Criteria;
 import org.itcgae.siga.db.entities.GenFechaExample.Criterion;
-import org.itcgae.siga.db.entities.GenFechaExample;
 
 public class GenFechaSqlProvider {
 

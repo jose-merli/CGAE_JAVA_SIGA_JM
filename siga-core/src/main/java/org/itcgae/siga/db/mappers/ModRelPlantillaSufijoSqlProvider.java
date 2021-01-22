@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
+import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample.Criteria;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample.Criterion;
-import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
 
 public class ModRelPlantillaSufijoSqlProvider {
 

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenEstadocivil;
+import org.itcgae.siga.db.entities.CenEstadocivilExample;
 import org.itcgae.siga.db.entities.CenEstadocivilExample.Criteria;
 import org.itcgae.siga.db.entities.CenEstadocivilExample.Criterion;
-import org.itcgae.siga.db.entities.CenEstadocivilExample;
 
 public class CenEstadocivilSqlProvider {
 

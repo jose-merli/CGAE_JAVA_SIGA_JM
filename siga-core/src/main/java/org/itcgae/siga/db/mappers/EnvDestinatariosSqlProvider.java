@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
+import org.itcgae.siga.db.entities.EnvDestinatariosExample;
 import org.itcgae.siga.db.entities.EnvDestinatariosExample.Criteria;
 import org.itcgae.siga.db.entities.EnvDestinatariosExample.Criterion;
-import org.itcgae.siga.db.entities.EnvDestinatariosExample;
 
 public class EnvDestinatariosSqlProvider {
 

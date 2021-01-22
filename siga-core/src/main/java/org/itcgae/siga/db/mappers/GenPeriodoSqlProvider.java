@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenPeriodo;
+import org.itcgae.siga.db.entities.GenPeriodoExample;
 import org.itcgae.siga.db.entities.GenPeriodoExample.Criteria;
 import org.itcgae.siga.db.entities.GenPeriodoExample.Criterion;
-import org.itcgae.siga.db.entities.GenPeriodoExample;
 
 public class GenPeriodoSqlProvider {
 

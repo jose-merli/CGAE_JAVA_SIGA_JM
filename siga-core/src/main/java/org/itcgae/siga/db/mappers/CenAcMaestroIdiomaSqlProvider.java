@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenAcMaestroIdioma;
+import org.itcgae.siga.db.entities.CenAcMaestroIdiomaExample;
 import org.itcgae.siga.db.entities.CenAcMaestroIdiomaExample.Criteria;
 import org.itcgae.siga.db.entities.CenAcMaestroIdiomaExample.Criterion;
-import org.itcgae.siga.db.entities.CenAcMaestroIdiomaExample;
 
 public class CenAcMaestroIdiomaSqlProvider {
 

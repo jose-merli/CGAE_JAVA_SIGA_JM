@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenProcesos;
+import org.itcgae.siga.db.entities.GenProcesosExample;
 import org.itcgae.siga.db.entities.GenProcesosExample.Criteria;
 import org.itcgae.siga.db.entities.GenProcesosExample.Criterion;
-import org.itcgae.siga.db.entities.GenProcesosExample;
 
 public class GenProcesosSqlProvider {
 

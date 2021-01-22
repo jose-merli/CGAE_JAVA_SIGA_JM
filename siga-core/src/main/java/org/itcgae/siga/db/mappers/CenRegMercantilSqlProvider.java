@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenRegMercantil;
+import org.itcgae.siga.db.entities.CenRegMercantilExample;
 import org.itcgae.siga.db.entities.CenRegMercantilExample.Criteria;
 import org.itcgae.siga.db.entities.CenRegMercantilExample.Criterion;
-import org.itcgae.siga.db.entities.CenRegMercantilExample;
 
 public class CenRegMercantilSqlProvider {
 

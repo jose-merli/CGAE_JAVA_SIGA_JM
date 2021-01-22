@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenSolicitudmutualidad;
+import org.itcgae.siga.db.entities.CenSolicitudmutualidadExample;
 import org.itcgae.siga.db.entities.CenSolicitudmutualidadExample.Criteria;
 import org.itcgae.siga.db.entities.CenSolicitudmutualidadExample.Criterion;
-import org.itcgae.siga.db.entities.CenSolicitudmutualidadExample;
 
 public class CenSolicitudmutualidadSqlProvider {
 

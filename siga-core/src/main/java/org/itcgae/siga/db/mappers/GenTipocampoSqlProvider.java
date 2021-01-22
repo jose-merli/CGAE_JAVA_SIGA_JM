@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenTipocampo;
+import org.itcgae.siga.db.entities.GenTipocampoExample;
 import org.itcgae.siga.db.entities.GenTipocampoExample.Criteria;
 import org.itcgae.siga.db.entities.GenTipocampoExample.Criterion;
-import org.itcgae.siga.db.entities.GenTipocampoExample;
 
 public class GenTipocampoSqlProvider {
 

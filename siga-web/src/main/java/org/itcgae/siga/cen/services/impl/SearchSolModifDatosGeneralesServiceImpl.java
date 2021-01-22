@@ -20,11 +20,7 @@ import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
 
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicosExample;
-import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
-import org.itcgae.siga.db.entities.CenSolicitudmodificacioncvExample;
-import org.itcgae.siga.db.entities.CenSolmodifacturacionservicio;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
-import org.itcgae.siga.db.mappers.CenSolicitudesmodificacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;

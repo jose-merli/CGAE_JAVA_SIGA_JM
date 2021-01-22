@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.entities;
 
-import java.math.BigDecimal;
 
 public class AdmConfig {
 

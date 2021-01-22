@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenPropertiesExample.Criteria;
 import org.itcgae.siga.db.entities.GenPropertiesExample.Criterion;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
 
 public class GenPropertiesSqlProvider {
 

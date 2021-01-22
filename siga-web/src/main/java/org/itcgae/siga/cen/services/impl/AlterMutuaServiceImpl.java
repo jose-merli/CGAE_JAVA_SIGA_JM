@@ -22,17 +22,17 @@ import org.itcgae.siga.db.entities.CenSolicitudalterExample;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudalterMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
-import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudAlterExtendsMapper;
 import org.itcgae.siga.ws.client.ClientAlterMutua;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.altermutua.www.wssiga.GetEstadoColegiadoDocument.GetEstadoColegiado;
 import com.altermutua.www.wssiga.GetEstadoColegiadoDocument;
+import com.altermutua.www.wssiga.GetEstadoColegiadoDocument.GetEstadoColegiado;
 import com.altermutua.www.wssiga.GetEstadoSolicitudDocument;
 import com.altermutua.www.wssiga.GetEstadoSolicitudDocument.GetEstadoSolicitud;
 import com.altermutua.www.wssiga.GetPropuestasDocument;
@@ -40,11 +40,11 @@ import com.altermutua.www.wssiga.GetPropuestasDocument.GetPropuestas;
 import com.altermutua.www.wssiga.GetTarifaSolicitudDocument;
 import com.altermutua.www.wssiga.GetTarifaSolicitudDocument.GetTarifaSolicitud;
 import com.altermutua.www.wssiga.SetSolicitudAlterDocument;
+import com.altermutua.www.wssiga.SetSolicitudAlterDocument.SetSolicitudAlter;
 import com.altermutua.www.wssiga.WSAsegurado;
 import com.altermutua.www.wssiga.WSCuentaBancaria;
 import com.altermutua.www.wssiga.WSDireccion;
 import com.altermutua.www.wssiga.WSPersona;
-import com.altermutua.www.wssiga.SetSolicitudAlterDocument.SetSolicitudAlter;
 
 
 import com.altermutua.www.wssiga.WSPropuesta;

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenDatoscv;
+import org.itcgae.siga.db.entities.CenDatoscvExample;
 import org.itcgae.siga.db.entities.CenDatoscvExample.Criteria;
 import org.itcgae.siga.db.entities.CenDatoscvExample.Criterion;
-import org.itcgae.siga.db.entities.CenDatoscvExample;
 
 public class CenDatoscvSqlProvider {
 
