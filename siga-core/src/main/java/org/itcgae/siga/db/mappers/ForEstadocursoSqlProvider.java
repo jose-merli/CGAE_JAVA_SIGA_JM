@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForEstadocurso;
+import org.itcgae.siga.db.entities.ForEstadocursoExample;
 import org.itcgae.siga.db.entities.ForEstadocursoExample.Criteria;
 import org.itcgae.siga.db.entities.ForEstadocursoExample.Criterion;
-import org.itcgae.siga.db.entities.ForEstadocursoExample;
 
 public class ForEstadocursoSqlProvider {
 

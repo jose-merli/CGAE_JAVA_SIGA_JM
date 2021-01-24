@@ -3,11 +3,8 @@ package org.itcgae.siga.cen.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.SolModifDatosBancariosItem;
-import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesDTO;
-import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.cen.services.ISolModifDatosBancariosDetailService;
-import org.itcgae.siga.cen.services.ISolModifDatosCurricularesDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

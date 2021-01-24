@@ -59,9 +59,9 @@ public class MultiidiomaCatalogosServiceImpl implements IMultiidiomaCatalogosSer
 		combooItems = genDiccionarioExtendsMapper.getLabelLenguage();
 		LOGGER.info("getCatalogLenguage() / genDiccionarioExtendsMapper.getLabelLenguage() -> Salida de genDiccionarioExtendsMapper para obtener los idiomas");
 		// primer elemento a vacio para componente de pantalla dropdown
-		comboItem.setLabel("");
-		comboItem.setValue("");
-		combooItems.add(0,comboItem);
+//		comboItem.setLabel("");
+//		comboItem.setValue("");
+//		combooItems.add(0,comboItem);
 		comboDTO.setCombooItems(combooItems);
 		
 		LOGGER.info("getCatalogLenguage() -> Salida del servicio para obtener los idiomas disponibles");
@@ -85,9 +85,9 @@ public class MultiidiomaCatalogosServiceImpl implements IMultiidiomaCatalogosSer
 			combooItems = genRecursosCatalogosExtendsMapper.getCatalogEntity(idInstitucion);
 			LOGGER.info("getCatalogEntity() / genRecursosCatalogosExtendsMapper.getCatalogEntity() -> Salida de genRecursosCatalogosExtendsMapper para obtener listado de entidades por institución");
 			// primer elemento a vacio para componente de pantalla dropdown
-			comboItem.setLabel("");
-			comboItem.setValue("");
-			combooItems.add(0,comboItem);
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//			combooItems.add(0,comboItem);
 			comboDTO.setCombooItems(combooItems);
 		}
 		else {

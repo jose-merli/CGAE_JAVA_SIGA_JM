@@ -3,11 +3,12 @@ package org.itcgae.siga.db.mappers;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteExample;
 import org.itcgae.siga.db.entities.CenClienteExample.Criteria;
 import org.itcgae.siga.db.entities.CenClienteExample.Criterion;
-import org.itcgae.siga.db.entities.CenClienteExample;
 
 public class CenClienteSqlProvider {
 

@@ -60,18 +60,34 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 		if (authentication == null) {
 			// Usuario 2 -> Usuario de desarrollo del actual SIGA
 			List<String> perfiles = new ArrayList<String>(); 
+			String dni = (String) request.getHeader("CAS-username");
+			String grupo = "";
+			String nombre = (String) request.getHeader("CAS-displayName");
+			String institucion = "";	
+			
+			//grupo = this.userDetailsService.getGrupoCAS(request);
+			//institucion = this.userDetailsService.getInstitucionCAS(request);
+			grupo = "Personal";
+			institucion = "2000";
+			/*if (!perfiles.contains(grupo)) {
+				perfiles.add(grupo);
+			}*/
 			perfiles.add("ADG");
-			UserCgae userDesarrollo = (UserCgae) userDetailsService
-					.loadUserByUsername(new UserCgae("44149718E", "Personal", "2000", null,perfiles, "N"));
-			authentication = new UserAuthenticationToken(userDesarrollo.getDni(), null, userDesarrollo, null,
-					new ArrayList<>());
-			String header = null;
 			try {
-				header = UserTokenUtils.generateToken(userDesarrollo);
-			} catch (TokenGenerationException e) {
+				UserCgae userDesarrollo = (UserCgae) userDetailsService
+						.loadUserByUsername(new UserCgae(dni, grupo, institucion, null,perfiles, "N", null, nombre));
+				authentication = new UserAuthenticationToken(userDesarrollo.getDni(), null, userDesarrollo, null,
+						new ArrayList<>());
+				String header = null;
+				try {
+					header = UserTokenUtils.generateToken(userDesarrollo);
+				} catch (TokenGenerationException e) {
+					e.printStackTrace();
+				}
+				mutableRequest.addHeader("Authorization", header);
+			}catch(Exception e) {
 				e.printStackTrace();
 			}
-			mutableRequest.addHeader("Authorization", header);
 		}
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);

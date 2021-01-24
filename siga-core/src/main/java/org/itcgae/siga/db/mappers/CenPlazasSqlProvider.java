@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenPlazas;
+import org.itcgae.siga.db.entities.CenPlazasExample;
 import org.itcgae.siga.db.entities.CenPlazasExample.Criteria;
 import org.itcgae.siga.db.entities.CenPlazasExample.Criterion;
-import org.itcgae.siga.db.entities.CenPlazasExample;
 
 public class CenPlazasSqlProvider {
 

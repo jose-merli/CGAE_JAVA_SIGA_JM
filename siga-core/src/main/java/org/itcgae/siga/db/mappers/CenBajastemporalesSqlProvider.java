@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenBajastemporales;
+import org.itcgae.siga.db.entities.CenBajastemporalesExample;
 import org.itcgae.siga.db.entities.CenBajastemporalesExample.Criteria;
 import org.itcgae.siga.db.entities.CenBajastemporalesExample.Criterion;
-import org.itcgae.siga.db.entities.CenBajastemporalesExample;
 
 public class CenBajastemporalesSqlProvider {
 

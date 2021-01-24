@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenTiposseguro;
+import org.itcgae.siga.db.entities.CenTiposseguroExample;
 import org.itcgae.siga.db.entities.CenTiposseguroExample.Criteria;
 import org.itcgae.siga.db.entities.CenTiposseguroExample.Criterion;
-import org.itcgae.siga.db.entities.CenTiposseguroExample;
 
 public class CenTiposseguroSqlProvider {
 

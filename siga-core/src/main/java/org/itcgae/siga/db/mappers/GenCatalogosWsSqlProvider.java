@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenCatalogosWs;
+import org.itcgae.siga.db.entities.GenCatalogosWsExample;
 import org.itcgae.siga.db.entities.GenCatalogosWsExample.Criteria;
 import org.itcgae.siga.db.entities.GenCatalogosWsExample.Criterion;
-import org.itcgae.siga.db.entities.GenCatalogosWsExample;
 
 public class GenCatalogosWsSqlProvider {
 

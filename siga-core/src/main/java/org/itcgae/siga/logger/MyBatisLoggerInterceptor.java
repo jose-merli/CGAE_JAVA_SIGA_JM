@@ -2,6 +2,7 @@ package org.itcgae.siga.logger;
 
 import java.sql.Statement;
 import java.util.Properties;
+
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
@@ -24,7 +25,7 @@ public class MyBatisLoggerInterceptor implements Interceptor {
 		
 		StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
 		String query = statementHandler.getBoundSql().getSql();
-		query.replaceAll("\\n|\\r|\\t", " ");
+		query = query.replaceAll("\\n|\\r|\\t", " ");
 		LOGGER.info("SQL: {}", query);
 
 		return invocation.proceed();

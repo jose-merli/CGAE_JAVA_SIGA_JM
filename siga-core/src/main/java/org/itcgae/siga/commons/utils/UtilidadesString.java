@@ -45,8 +45,8 @@ public class UtilidadesString {
 	static public String getMensajeIdioma (String idioma, String key)	{
 
 		Properties prop = new Properties();//(Properties)idiomas.get(idi); 
-		if (prop == null)	{
-		}
+		/*if (prop == null)	{
+		}*/
 		String aux = prop.getProperty(key,key);
 		if (aux.equals(key)) {
 		    return aux;

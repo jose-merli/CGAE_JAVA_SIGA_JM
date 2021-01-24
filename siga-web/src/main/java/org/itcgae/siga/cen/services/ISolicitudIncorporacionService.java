@@ -1,10 +1,10 @@
 package org.itcgae.siga.cen.services;
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
+import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface ISolicitudIncorporacionService {

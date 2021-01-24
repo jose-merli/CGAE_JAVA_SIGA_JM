@@ -2,14 +2,15 @@ package org.itcgae.siga.db.services.cen.providers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.CenInstitucionExample.Criteria;
 import org.itcgae.siga.db.entities.CenInstitucionExample.Criterion;
 import org.itcgae.siga.db.mappers.CenInstitucionSqlProvider;
-import org.itcgae.siga.db.entities.CenInstitucionExample;
 
 public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 

@@ -1,9 +1,5 @@
 package org.itcgae.siga.ws.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.axis2.context.ConfigurationContext;
 import org.datacontract.schemas._2004._07.IntegracionCuotaYCapitalObjetivoJubilacion;
 import org.datacontract.schemas._2004._07.IntegracionEnumsCombos;
 import org.datacontract.schemas._2004._07.IntegracionSolicitudRespuesta;
@@ -32,7 +28,7 @@ import samples.servicemodel.microsoft.ObtenerCuotaYCapObjetivoResponseDocument;
 @Component
 public class ClientMutualidad extends  WebServiceGatewaySupport  {
 	
-	private static Map<Integer, ConfigurationContext> mapa = new HashMap<Integer, ConfigurationContext>();
+	//private static Map<Integer, ConfigurationContext> mapa = new HashMap<Integer, ConfigurationContext>();
 	
 	/**
 	 * Bean con la configuración básica del webServiceTemplate
@@ -51,38 +47,48 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		
 		
 		
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class);
-	    MutualidadClient client = context.getBean(MutualidadClient.class);
-	    EstadoMutualistaResponseDocument responsefinal = client.getEstadoMutualista(request);
-	        
-		
-		IntegracionSolicitudRespuesta estadoMutualista = responsefinal.getEstadoMutualistaResponse().getEstadoMutualistaResult();
-		
-		return estadoMutualista;
+		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
+		{
+		    MutualidadClient client = context.getBean(MutualidadClient.class);
+		    EstadoMutualistaResponseDocument responsefinal = client.getEstadoMutualista(request);
+		        
+			
+			IntegracionSolicitudRespuesta estadoMutualista = responsefinal.getEstadoMutualistaResponse().getEstadoMutualistaResult();
+			
+			return estadoMutualista;
+		}catch(Exception e) {
+			logger.error("ClienteMutualidad -> Error al obtener el Estado Mutualista");
+			return null;
+		}
 		
 	}
 	
 	public IntegracionSolicitudRespuesta getEstadoSolicitud (EstadoSolicitudDocument request , String uriService)throws Exception{
 		
 	
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class);
-	    MutualidadClient client = context.getBean(MutualidadClient.class);
-	    EstadoSolicitudResponseDocument responsefinal = client.getEstadoSolicitud(request);
+		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
+		{
+		    MutualidadClient client = context.getBean(MutualidadClient.class);
+		    EstadoSolicitudResponseDocument responsefinal = client.getEstadoSolicitud(request);
+		
 	
-
-		
-		IntegracionSolicitudRespuesta estadoSolicitud = responsefinal.getEstadoSolicitudResponse().getEstadoSolicitudResult();
-		
-		return estadoSolicitud;
+			
+			IntegracionSolicitudRespuesta estadoSolicitud = responsefinal.getEstadoSolicitudResponse().getEstadoSolicitudResult();
+			
+			return estadoSolicitud;
+		}catch(Exception e) {
+			logger.error("ClienteMutualidad -> Error al obtener el Estado Solicitud");
+			return null;
+		}
 		
 	}
 	
 	
 	public IntegracionEnumsCombos getEnums (GetEnumsDocument request , String uriService)throws Exception{
 		
-		try{
-			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class);
-		    MutualidadClient client = context.getBean(MutualidadClient.class);
+		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
+		{
+			MutualidadClient client = context.getBean(MutualidadClient.class);
 		    GetEnumsResponseDocument responsefinal = client.getMutualidad(request);
 		        
 			
@@ -99,9 +105,9 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		
 		
 		
-		try{
-			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class);
-		    MutualidadClient client = context.getBean(MutualidadClient.class);
+		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
+		{
+			MutualidadClient client = context.getBean(MutualidadClient.class);
 		    MGASolicitudPolizaAccuGratuitosResponseDocument responsefinal = client.mGASolicitudPolizaAccuGratuitos(request);
 		        
 			IntegracionSolicitudRespuesta response = responsefinal.getMGASolicitudPolizaAccuGratuitosResponse().getMGASolicitudPolizaAccuGratuitosResult();
@@ -119,9 +125,9 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 
 	public IntegracionSolicitudRespuesta MGASolicitudPolizaProfesional (MGASolicitudPolizaProfesionalDocument request , String uriService)throws Exception{
 		
-		try{
-			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class);
-		    MutualidadClient client = context.getBean(MutualidadClient.class);
+		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
+		{
+			MutualidadClient client = context.getBean(MutualidadClient.class);
 		    MGASolicitudPolizaProfesionalResponseDocument responsefinal = client.mGASolicitudPolizaProfesional(request);
 		        
 			IntegracionSolicitudRespuesta response = responsefinal.getMGASolicitudPolizaProfesionalResponse().getMGASolicitudPolizaProfesionalResult();
@@ -139,8 +145,8 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 	
 	public IntegracionCuotaYCapitalObjetivoJubilacion ObtenerCuotaYCapObjetivo (ObtenerCuotaYCapObjetivoDocument request , String uriService)throws Exception{
 		
-		try{
-			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class);
+		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
+		{
 		    MutualidadClient client = context.getBean(MutualidadClient.class);
 		    ObtenerCuotaYCapObjetivoResponseDocument responsefinal = client.getCuotaYCapObjetivo(request);
 		        

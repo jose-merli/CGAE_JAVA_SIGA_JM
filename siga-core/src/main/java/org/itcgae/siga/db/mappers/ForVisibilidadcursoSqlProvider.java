@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForVisibilidadcurso;
+import org.itcgae.siga.db.entities.ForVisibilidadcursoExample;
 import org.itcgae.siga.db.entities.ForVisibilidadcursoExample.Criteria;
 import org.itcgae.siga.db.entities.ForVisibilidadcursoExample.Criterion;
-import org.itcgae.siga.db.entities.ForVisibilidadcursoExample;
 
 public class ForVisibilidadcursoSqlProvider {
 

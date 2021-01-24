@@ -10,6 +10,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.Context;
@@ -20,9 +21,6 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
-import org.itcgae.siga.DTOs.cen.BancoBicItem;
-import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
-import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
@@ -45,6 +43,8 @@ import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenBancosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
+import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenColacambioletrado;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
@@ -55,6 +55,10 @@ import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenPais;
 import org.itcgae.siga.db.entities.CenPaisExample;
 import org.itcgae.siga.db.entities.CenPersona;
@@ -67,16 +71,19 @@ import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoMapper;
 import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
+import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColacambioletradoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionmodalidadExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadoSolicitudExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
@@ -87,6 +94,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 
@@ -150,15 +158,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	@Autowired
 	private CenClienteMapper _cenClienteMapper;
 	
-
+	@Autowired
+	private CenInstitucionMapper _cenInstitucionMapper;
+	
 	@Autowired
 	private CenBancosExtendsMapper cenBancosExtendsMapper;
 
 	@Autowired
 	private CenPaisExtendsMapper cenPaisExtendsMapper;
-
-	@Autowired
-	private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
 
 	@Autowired
 	private CenDatoscolegialesestadoMapper cenDatoscolegialesestadoMapper;
@@ -168,6 +175,12 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	@Autowired
+	private CenColacambioletradoExtendsMapper cenColacambioletradoMapper;
+	
+	@Autowired
+	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
 	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
@@ -197,7 +210,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -411,7 +424,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenTratamientoExtendsMapper.selectTratamiento(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -452,7 +465,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenEstadocivilExtendsMapper.distinctCivilStatus(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -494,7 +507,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenTipoidentificacionExtendsMapper.getIdentificationTypes(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -536,7 +549,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenTipocolegiacionExtendsMapper.selectTipoColegiacion(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -578,7 +591,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenDocumentacionmodalidadExtendsMapper.selectModalidadDocumentacion(usuario);
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
+//					ComboItem element = new ComboItem();
 //					element.setLabel("");
 //					element.setValue("");
 //					comboItems.add(0, element);
@@ -686,13 +699,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	}
 	
 	@Override
+	@Transactional(timeout=2400)
 	public InsertResponseDTO aprobarSolicitud(Long idSolicitud, HttpServletRequest request) {
 		
 		
 		LOGGER.info("aprobarSolicitud() -> Entrada al servicio para aprobar una solicitud");
 		
 		Long idDireccion;
-		Long idDireccion2;
 		Long idPersona;
 		Short idBancario = 0;
 		int insertColegiado;
@@ -743,16 +756,30 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
 					solIncorporacion.setFechaalta(new Date());
 					solIncorporacion.setFechaestadosolicitud(new Date());
+					solIncorporacion.setIdpersona(idPersona);
 					//solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
-					if(idPersona != null && idDireccion!= null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
-						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
+					if(idPersona != null && idDireccion != null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
+						response.setId(Long.toString(solIncorporacion.getIdsolicitud())+","+idPersona);
 						response.setStatus(SigaConstants.OK);
 						response.setError(null);
 						LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> " + solIncorporacion.getIdsolicitud()
 										+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
-//						
+						// Llamamos al PL para mantener los colegiados
+						//Insertamos en cen_colacambioletrado						
+						int res = insertarCambioEnCola(SigaConstants.COLA_CAMBIO_LETRADO_APROBACION_COLEGIACION,usuario.getIdinstitucion().intValue(),
+								idPersona, idDireccion, usuario.getIdusuario());
+						if(res <=0) {
+							LOGGER.error("Error al insertar en la cola de actualizacion de letrados. Institucion: " +
+									usuario.getIdinstitucion() + ", idpersona: " +
+									idPersona + ", usumodificacion: " +
+									usuario.getIdusuario());
+						}else {
+							LOGGER.info(
+									"updateDirection() -> OK al insertar en la cola de actualizacion de letrados.");
+						}
+						/*
 						Object[] paramMandatos = new Object[5];
 						paramMandatos[0] = idPersona.toString();
 						paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -761,6 +788,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						paramMandatos[4] = usuario.getIdusuario().toString();
 						String resultado[] = new String[2];
 						resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+						*/
+						
 					}else{
 						LOGGER.error("aprobarSolicitud() --> Borramos los registros al no poder aprobar la solicitud");
 						if(insertColegiado == 0) {
@@ -940,31 +969,133 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		CenPersona datosPersonales = new CenPersona();
 		
-		MaxIdDto personaID = _cenPersonaExtendsMapper.selectMaxIdPersona2(usuario.getIdinstitucion().toString());
-		
-		
-		datosPersonales.setIdpersona(personaID.getIdMax());
-		datosPersonales.setNombre(solicitud.getNombre());
-		datosPersonales.setApellidos1(solicitud.getApellido1());
-		datosPersonales.setApellidos2(solicitud.getApellido2());
-		datosPersonales.setFechamodificacion(new Date());
-		datosPersonales.setFechanacimiento(solicitud.getFechanacimiento());
-		datosPersonales.setIdestadocivil(solicitud.getIdestadocivil());
-		datosPersonales.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
-		datosPersonales.setNaturalde(solicitud.getNaturalde());
-		datosPersonales.setNifcif(solicitud.getNumeroidentificador());
-		datosPersonales.setSexo(solicitud.getSexo());
-		datosPersonales.setFallecido("0");
-		datosPersonales.setUsumodificacion(usuario.getIdusuario());
-		
 		CenPersonaExample ejemplo = new CenPersonaExample();
 		ejemplo.createCriteria().andNifcifEqualTo(solicitud.getNumeroidentificador());
 		List <CenPersona> busqueda = _cenPersonaMapper.selectByExample(ejemplo);
-
+		
 		if(busqueda.isEmpty()) {
+		
+			MaxIdDto personaID = _cenPersonaExtendsMapper.selectMaxIdPersona2(usuario.getIdinstitucion().toString());
+	
+			datosPersonales.setIdpersona(personaID.getIdMax());
+			datosPersonales.setNombre(solicitud.getNombre());
+			datosPersonales.setApellidos1(solicitud.getApellido1());
+			datosPersonales.setApellidos2(solicitud.getApellido2());
+			datosPersonales.setFechamodificacion(new Date());
+			datosPersonales.setFechanacimiento(solicitud.getFechanacimiento());
+			datosPersonales.setIdestadocivil(solicitud.getIdestadocivil());
+			datosPersonales.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+			datosPersonales.setNaturalde(solicitud.getNaturalde());
+			datosPersonales.setNifcif(solicitud.getNumeroidentificador());
+			datosPersonales.setSexo(solicitud.getSexo());
+			datosPersonales.setFallecido("0");
+			datosPersonales.setUsumodificacion(usuario.getIdusuario());
+
 			_cenPersonaMapper.insert(datosPersonales);
 			return datosPersonales.getIdpersona();
 		}else {
+			
+			CenClienteExample ejemploCliente = new CenClienteExample();
+			ejemploCliente.createCriteria().andIdpersonaEqualTo(busqueda.get(0).getIdpersona()).andIdinstitucionBetween(Short.valueOf("2001"), Short.valueOf("2100"));
+			
+			
+			List<CenCliente> clienteExistente = _cenClienteMapper.selectByExample(ejemploCliente);
+			
+			if(clienteExistente.size() > 1) {
+				int numeroAparicionesSiga = 0;
+				CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+				exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull();
+				//Colegios de SIGA
+				List<CenInstitucion> instituciones =_cenInstitucionMapper.selectByExample(exampleInstitucion);
+				List<Short> idInstituciones = new ArrayList<Short>();
+				for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
+					CenInstitucion string = (CenInstitucion) iterator.next();
+					idInstituciones.add(string.getIdinstitucion());
+				}
+				for (Iterator<CenCliente> iterator = clienteExistente.iterator(); iterator.hasNext();) {
+					CenCliente cenCliente = (CenCliente) iterator.next();
+					if (idInstituciones.contains(cenCliente.getIdinstitucion()) && !cenCliente.getIdinstitucion().equals(usuario.getIdinstitucion())) {
+						numeroAparicionesSiga++;
+					}					
+				}
+				if (numeroAparicionesSiga < 1) {
+					CenPersona personaUpdate = busqueda.get(0);
+					personaUpdate.setNombre(solicitud.getNombre());
+					personaUpdate.setApellidos1(solicitud.getApellido1());
+					personaUpdate.setApellidos2(solicitud.getApellido2());
+					personaUpdate.setFechamodificacion(new Date());
+					personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
+					personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
+					personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+					personaUpdate.setNaturalde(solicitud.getNaturalde());
+					personaUpdate.setNifcif(solicitud.getNumeroidentificador());
+					personaUpdate.setSexo(solicitud.getSexo());
+					personaUpdate.setUsumodificacion(usuario.getIdusuario());
+					_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+				}
+				return busqueda.get(0).getIdpersona();
+			}else{
+				if (clienteExistente.size() == 1) {
+					if (clienteExistente.get(0).getIdinstitucion().equals(usuario.getIdinstitucion())) {
+						CenPersona personaUpdate = busqueda.get(0);
+						personaUpdate.setNombre(solicitud.getNombre());
+						personaUpdate.setApellidos1(solicitud.getApellido1());
+						personaUpdate.setApellidos2(solicitud.getApellido2());
+						personaUpdate.setFechamodificacion(new Date());
+						personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
+						personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
+						personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+						personaUpdate.setNaturalde(solicitud.getNaturalde());
+						personaUpdate.setNifcif(solicitud.getNumeroidentificador());
+						personaUpdate.setSexo(solicitud.getSexo());
+						personaUpdate.setUsumodificacion(usuario.getIdusuario());
+						_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+					}else{
+						
+						CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+						exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull().andIdinstitucionEqualTo(clienteExistente.get(0).getIdinstitucion());
+						//Colegios de SIGA
+						List<CenInstitucion> instituciones =_cenInstitucionMapper.selectByExample(exampleInstitucion);
+						if (instituciones.isEmpty()) {
+							CenPersona personaUpdate = busqueda.get(0);
+							personaUpdate.setNombre(solicitud.getNombre());
+							personaUpdate.setApellidos1(solicitud.getApellido1());
+							personaUpdate.setApellidos2(solicitud.getApellido2());
+							personaUpdate.setFechamodificacion(new Date());
+							personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
+							personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
+							personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+							personaUpdate.setNaturalde(solicitud.getNaturalde());
+							personaUpdate.setNifcif(solicitud.getNumeroidentificador());
+							personaUpdate.setSexo(solicitud.getSexo());
+							personaUpdate.setUsumodificacion(usuario.getIdusuario());
+							_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+						}
+					}
+					
+				}else{
+					ejemploCliente = new CenClienteExample();
+					ejemploCliente.createCriteria().andIdpersonaEqualTo(busqueda.get(0).getIdpersona()).andIdinstitucionEqualTo(Short.valueOf("2000"));
+					List<CenCliente> clienteExistente2 = _cenClienteMapper.selectByExample(ejemploCliente);
+					if (!clienteExistente2.isEmpty()){
+						CenPersona personaUpdate = busqueda.get(0);
+						personaUpdate.setNombre(solicitud.getNombre());
+						personaUpdate.setApellidos1(solicitud.getApellido1());
+						personaUpdate.setApellidos2(solicitud.getApellido2());
+						personaUpdate.setFechamodificacion(new Date());
+						personaUpdate.setFechanacimiento(solicitud.getFechanacimiento());
+						personaUpdate.setIdestadocivil(solicitud.getIdestadocivil());
+						personaUpdate.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+						personaUpdate.setNaturalde(solicitud.getNaturalde());
+						personaUpdate.setNifcif(solicitud.getNumeroidentificador());
+						personaUpdate.setSexo(solicitud.getSexo());
+						personaUpdate.setUsumodificacion(usuario.getIdusuario());
+						_cenPersonaMapper.updateByPrimaryKey(personaUpdate);
+						
+					}
+					
+				}
+			}
 			return busqueda.get(0).getIdpersona();
 		}
 		
@@ -973,35 +1104,56 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	private int insertarDatosCliente(CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
 		
 		CenCliente cliente = new CenCliente();
+		CenClienteKey ejemploCliente = new CenClienteKey();
+		ejemploCliente.setIdpersona(idPersona);
+		ejemploCliente.setIdinstitucion(usuario.getIdinstitucion());
 		
-		cliente.setIdpersona(idPersona);
-		cliente.setIdinstitucion(usuario.getIdinstitucion());
-		cliente.setFechaalta(new Date());
-		cliente.setCaracter("P");
-		cliente.setPublicidad(SigaConstants.DB_FALSE);
-		cliente.setGuiajudicial(SigaConstants.DB_FALSE);
-		cliente.setComisiones(SigaConstants.DB_FALSE);
-		if(solicitud.getIdtratamiento() != null) {
-			cliente.setIdtratamiento(solicitud.getIdtratamiento()); // 1
+		CenCliente clienteExistente = _cenClienteMapper.selectByPrimaryKey(ejemploCliente);
+		if(null != clienteExistente) {
+
+			CenNocolegiadoKey key = new CenNocolegiadoKey();
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setIdpersona(idPersona);
+			CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(key );
+			
+			noColegiado.setFechaBaja(new Date());
+			noColegiado.setFechamodificacion(new Date());
+			noColegiado.setUsumodificacion(usuario.getIdusuario());
+			cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
+			CenCliente clienteupdate = clienteExistente;
+			clienteupdate.setLetrado("1");
+			if(solicitud.getIdtratamiento() != null) {
+				clienteupdate.setIdtratamiento(solicitud.getIdtratamiento()); // 1
+			}else {
+				clienteupdate.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+			} 
+			clienteupdate.setFechamodificacion(new Date());
+			clienteupdate.setUsumodificacion(usuario.getIdusuario());
+			return _cenClienteMapper.updateByPrimaryKey(clienteupdate);
+			//return ;
+			
 		}else {
-			cliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
-		} 
-		cliente.setFechamodificacion(new Date());
-		cliente.setUsumodificacion(usuario.getIdusuario());
-		cliente.setIdlenguaje(usuario.getIdlenguaje());
-		cliente.setExportarfoto(SigaConstants.DB_FALSE);
-		cliente.setLetrado("0");
-		cliente.setNoenviarrevista("0");
-		cliente.setNoaparecerredabogacia("0");
-		cliente.setFechacarga(new Date());
-		CenClienteExample ejemploCliente = new CenClienteExample();
-		ejemploCliente.createCriteria().andIdpersonaEqualTo(idPersona).andIdinstitucionEqualTo(usuario.getIdinstitucion());
-		
-		List <CenCliente> listaExistente = _cenClienteMapper.selectByExample(ejemploCliente);
-		if(listaExistente.isEmpty()) {
+			cliente.setIdpersona(idPersona);
+			cliente.setIdinstitucion(usuario.getIdinstitucion());
+			cliente.setFechaalta(new Date());
+			cliente.setCaracter("P");
+			cliente.setPublicidad(SigaConstants.DB_FALSE);
+			cliente.setGuiajudicial(SigaConstants.DB_FALSE);
+			cliente.setComisiones(SigaConstants.DB_FALSE);
+			if(solicitud.getIdtratamiento() != null) {
+				cliente.setIdtratamiento(solicitud.getIdtratamiento()); // 1
+			}else {
+				cliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+			} 
+			cliente.setFechamodificacion(new Date());
+			cliente.setUsumodificacion(usuario.getIdusuario());
+			cliente.setIdlenguaje(usuario.getIdlenguaje());
+			cliente.setExportarfoto(SigaConstants.DB_FALSE);
+			cliente.setLetrado("1");
+			cliente.setNoenviarrevista("0");
+			cliente.setNoaparecerredabogacia("0");
+			cliente.setFechacarga(new Date());
 			return _cenClienteMapper.insert(cliente);
-		}else {
-			return 1;
 		}
 	}
 
@@ -1052,6 +1204,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
 		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUARDIA));
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_CORREO));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_SMS));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		
 		
 		if(solicitud.getIdtiposolicitud() == SigaConstants.INCORPORACION_EJERCIENTE ||
 				solicitud.getIdtiposolicitud() == SigaConstants.REINCORPORACION_EJERCIENTE) {
@@ -1096,6 +1256,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_REVISTA));
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
 		
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_FAX));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
+		
 		if(solicitud.getIdtiposolicitud() != SigaConstants.INCORPORACION_EJERCIENTE &&
 				solicitud.getIdtiposolicitud() != SigaConstants.REINCORPORACION_EJERCIENTE) {
 			tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
@@ -1110,14 +1273,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		CenCuentasbancarias cuenta = new CenCuentasbancarias();
 
-		MaxIdDto personaID = _cenCuentasbancariasExtendsMapper.selectMaxID();
+		MaxIdDto personaID = _cenCuentasbancariasExtendsMapper.selectMaxID(idPersona,usuario.getIdinstitucion());
 		boolean tieneCargo = false;
 		boolean tieneSCSJ = false;
 		boolean tieneAbono = false;
 		if (null == solicitud.getAbonocargo() || (solicitud.getAbonocargo().equals("T") || solicitud.getAbonocargo().equals("C"))) {
 			tieneCargo =  true;
 		}
-		cuenta.setIdcuenta((short)(personaID.getIdMax()+0));
+		cuenta.setIdcuenta(Short.valueOf(personaID.getIdMax().toString()));
 		cuenta.setAbonocargo(solicitud.getAbonocargo());
 		cuenta.setAbonosjcs(solicitud.getAbonosjcs());
 		cuenta.setFechamodificacion(new Date());
@@ -1411,7 +1574,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setUsumodificacion(usuario.getIdusuario());
 		colegiado.setNumsolicitudcolegiacion(solicitud.getIdsolicitud().toString());
 		
-		colegiado.setFechapresentacion(new Date());
+		colegiado.setFechapresentacion(solicitud.getFechasolicitud());
 		if (solicitud.getIdtipocolegiacion() == 20) {
 			colegiado.setComunitario("1");
 			colegiado.setNcomunitario(solicitud.getNcolegiado());
@@ -1629,7 +1792,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 
 		Object[] paramIn = new Object[4]; //Parametros de entrada del PL
 		String resultado[] = new String[2]; //Parametros de salida del PL
-	
+		LOGGER.info("Entrada Ejecución PL Revision SuscripcionesLetrado " );
 		try {
 	 		// Parametros de entrada del PL
 	        paramIn[0] = idInstitucion;
@@ -1641,12 +1804,44 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO (?,?,?,?,?,?)}", 2, paramIn);
 			
 		} catch (Exception e) {
+			LOGGER.info("Error Ejecución PL Revision SuscripcionesLetrado: " + e.getMessage());
 			resultado[0] = "1"; 	// P_NUMREGISTRO
 	    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
 		}
-		
+		LOGGER.info("Salida Ejecución PL Revision SuscripcionesLetrado " );
 	    return resultado;
 	}
 
+	public int insertarCambioEnCola (int idTipoCambio,
+			 Integer idInstitucion,
+			 Long idPersona,
+			 Long idDireccion,
+			 Integer usumodificacion) 
+	{
+		try
+		{
+			CenColacambioletrado bean = new CenColacambioletrado ();
+			bean.setFechacambio(new Date());
+			bean.setIdcambio(getNuevoId (idInstitucion, idPersona));
+			if (idDireccion != null) 
+				bean.setIddireccion (idDireccion);
+			bean.setIdinstitucion (idInstitucion.shortValue());
+			bean.setIdpersona (idPersona);
+			bean.setIdtipocambio ((new Integer (idTipoCambio).shortValue()));
+			bean.setUsumodificacion(usumodificacion);
+			bean.setFechamodificacion(new Date());
+			return cenColacambioletradoMapper.insert(bean);
+		}
+		catch (Exception e) {
+			LOGGER.info("Error Ejecución PL Revision SuscripcionesLetrado: " + e.getMessage());
+		return 0;
+		}
+	} //insertarCambioEnCola()
+
+	private Long getNuevoId(Integer idInstitucion, Long idPersona) {
+		
+		MaxIdDto id = cenColacambioletradoMapper.selectNuevoId(idInstitucion, idPersona);
+		return id.idMax;
+	}
 
 }

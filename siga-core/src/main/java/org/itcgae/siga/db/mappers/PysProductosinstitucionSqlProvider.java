@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
+import org.itcgae.siga.db.entities.PysProductosinstitucionExample;
 import org.itcgae.siga.db.entities.PysProductosinstitucionExample.Criteria;
 import org.itcgae.siga.db.entities.PysProductosinstitucionExample.Criterion;
-import org.itcgae.siga.db.entities.PysProductosinstitucionExample;
 
 public class PysProductosinstitucionSqlProvider {
 

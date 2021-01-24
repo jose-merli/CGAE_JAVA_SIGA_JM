@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
+import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcionExample;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcionExample.Criteria;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcionExample.Criterion;
-import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcionExample;
 
 public class PysPeticioncomprasuscripcionSqlProvider {
 

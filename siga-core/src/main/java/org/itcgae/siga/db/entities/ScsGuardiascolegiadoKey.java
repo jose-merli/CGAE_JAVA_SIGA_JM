@@ -9,6 +9,8 @@ public class ScsGuardiascolegiadoKey {
      * This field corresponds to the database column USCGAE.SCS_GUARDIASCOLEGIADO.IDINSTITUCION
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     private Short idinstitucion;
 
@@ -18,6 +20,8 @@ public class ScsGuardiascolegiadoKey {
      * This field corresponds to the database column USCGAE.SCS_GUARDIASCOLEGIADO.IDTURNO
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     private Integer idturno;
 
@@ -27,6 +31,8 @@ public class ScsGuardiascolegiadoKey {
      * This field corresponds to the database column USCGAE.SCS_GUARDIASCOLEGIADO.IDGUARDIA
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     private Integer idguardia;
 
@@ -36,6 +42,8 @@ public class ScsGuardiascolegiadoKey {
      * This field corresponds to the database column USCGAE.SCS_GUARDIASCOLEGIADO.IDPERSONA
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     private Long idpersona;
 
@@ -45,6 +53,8 @@ public class ScsGuardiascolegiadoKey {
      * This field corresponds to the database column USCGAE.SCS_GUARDIASCOLEGIADO.FECHAINICIO
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     private Date fechainicio;
 
@@ -54,6 +64,8 @@ public class ScsGuardiascolegiadoKey {
      * This field corresponds to the database column USCGAE.SCS_GUARDIASCOLEGIADO.FECHAFIN
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     private Date fechafin;
 
@@ -64,6 +76,8 @@ public class ScsGuardiascolegiadoKey {
      * @return the value of USCGAE.SCS_GUARDIASCOLEGIADO.IDINSTITUCION
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public Short getIdinstitucion() {
         return idinstitucion;
@@ -76,6 +90,8 @@ public class ScsGuardiascolegiadoKey {
      * @param idinstitucion the value for USCGAE.SCS_GUARDIASCOLEGIADO.IDINSTITUCION
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public void setIdinstitucion(Short idinstitucion) {
         this.idinstitucion = idinstitucion;
@@ -88,6 +104,8 @@ public class ScsGuardiascolegiadoKey {
      * @return the value of USCGAE.SCS_GUARDIASCOLEGIADO.IDTURNO
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public Integer getIdturno() {
         return idturno;
@@ -100,6 +118,8 @@ public class ScsGuardiascolegiadoKey {
      * @param idturno the value for USCGAE.SCS_GUARDIASCOLEGIADO.IDTURNO
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public void setIdturno(Integer idturno) {
         this.idturno = idturno;
@@ -112,6 +132,8 @@ public class ScsGuardiascolegiadoKey {
      * @return the value of USCGAE.SCS_GUARDIASCOLEGIADO.IDGUARDIA
      *
      * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+=======
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public Integer getIdguardia() {
         return idguardia;
@@ -147,7 +169,7 @@ public class ScsGuardiascolegiadoKey {
      *
      * @param idpersona the value for USCGAE.SCS_GUARDIASCOLEGIADO.IDPERSONA
      *
-     * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public void setIdpersona(Long idpersona) {
         this.idpersona = idpersona;
@@ -159,7 +181,7 @@ public class ScsGuardiascolegiadoKey {
      *
      * @return the value of USCGAE.SCS_GUARDIASCOLEGIADO.FECHAINICIO
      *
-     * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public Date getFechainicio() {
         return fechainicio;
@@ -171,7 +193,7 @@ public class ScsGuardiascolegiadoKey {
      *
      * @param fechainicio the value for USCGAE.SCS_GUARDIASCOLEGIADO.FECHAINICIO
      *
-     * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public void setFechainicio(Date fechainicio) {
         this.fechainicio = fechainicio;
@@ -183,7 +205,7 @@ public class ScsGuardiascolegiadoKey {
      *
      * @return the value of USCGAE.SCS_GUARDIASCOLEGIADO.FECHAFIN
      *
-     * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public Date getFechafin() {
         return fechafin;
@@ -195,7 +217,7 @@ public class ScsGuardiascolegiadoKey {
      *
      * @param fechafin the value for USCGAE.SCS_GUARDIASCOLEGIADO.FECHAFIN
      *
-     * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public void setFechafin(Date fechafin) {
         this.fechafin = fechafin;

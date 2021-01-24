@@ -424,7 +424,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO updateTrainersCourse(FormadorCursoDTO formadorCursoDTO, HttpServletRequest request) {
 
 		LOGGER.info("updateTrainersCourse() -> Entrada al servicio para editar a los formadores");
@@ -720,7 +720,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO deleteTrainersCourse(FormadorCursoDTO formadorCursoDTO, HttpServletRequest request) {
 
 		LOGGER.info("deleteTrainersCourse() -> Salida del servicio para dar de baja a los formadores de un curso");
@@ -817,7 +817,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public InsertResponseDTO saveCourse(CursoItem cursoItem, HttpServletRequest request) {
 
 		LOGGER.info("saveCourse() -> Entrada al servicio para insertar un curso");
@@ -1076,7 +1076,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO updateCourse(CursoItem cursoItem, HttpServletRequest request) {
 		LOGGER.info("updateCourse() -> Entrada al servicio para modificar los eventos");
 
@@ -1393,7 +1393,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO releaseOrAnnounceCourse(CursoDTO cursoDTO, HttpServletRequest request) {
 		LOGGER.info("releaseOrAnnounceCourse() -> Entrada al servicio para modificar los eventos");
 
@@ -1763,7 +1763,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO uploadFileExcel(int idCurso, MultipartHttpServletRequest request)
 			throws IllegalStateException, IOException {
 		LOGGER.info("uploadFile() -> Entrada al servicio para guardar un archivo");
@@ -1850,6 +1850,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							inscripcionInsert.setIdpersona(inscripcion.getIdPersona());
 							inscripcionInsert.setUsumodificacion(usuario.getIdusuario().longValue());
 							inscripcionInsert.setIdcargainscripcion(forInscripcionesmasivas.getIdcargainscripcion());
+							if (null != inscripcion.getFormaPago()) {
+								inscripcionInsert.setIdformapago(Long.parseLong(inscripcion.getFormaPago()));
+							}
 
 							LOGGER.info(
 									"uploadFileExcel() / forInscripcionExtendsMapper.insert(inscripcionInsert) -> Entrada a forInscripcionExtendsMapper para insertar una inscripcion");
@@ -1911,7 +1914,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		return updateResponseDTO;
 	}
 
-	@Transactional
+	@Transactional(timeout=2400)
 	public List<InscripcionItem> parseExcelFile(Vector<Hashtable<String, Object>> datos, AdmUsuarios usuario,
 			int idCurso) throws BusinessException {
 
@@ -2476,7 +2479,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		return updateResponseDTO;
 	}
 
-	@Transactional
+	@Transactional(timeout=2400)
 	public int createServiceCourse(ForCurso cursoItem, AdmUsuarios usuario, Short idInstitucion) {
 
 		LOGGER.info("createServiceCourse() -> Entrada del servicio que crea los servicios para un curso");
@@ -2576,7 +2579,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO autovalidateInscriptionsCourse(CargaMasivaInscripcionesDTO cargaMasivaInscripcionesDTO,
 			HttpServletRequest request) {
 		LOGGER.info(
@@ -2684,7 +2687,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 												Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
 										pysServiciossolicitados.setIdpersona(inscription.getIdpersona());
 										pysServiciossolicitados.setCantidad(1);
-										pysServiciossolicitados.setIdformapago(Short.valueOf("10"));
+										pysServiciossolicitados.setIdformapago(Short.valueOf(inscription.getIdformapago().toString()));
 
 										LOGGER.info(
 												"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para insertar el servicio solicitado");
@@ -2706,7 +2709,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 												Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
 										pysSuscripcion.setIdpersona(inscription.getIdpersona());
 										pysSuscripcion.setCantidad(1);
-										pysSuscripcion.setIdformapago(Short.valueOf("10"));
+										pysSuscripcion.setIdformapago(Short.valueOf(inscription.getIdformapago().toString()));
 										pysSuscripcion.setFechasuscripcion(new Date());
 
 										CursoItem curso = forCursoExtendsMapper.searchCourseByIdcurso(
@@ -2892,7 +2895,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO cancelCourse(CursoDTO cursoDTO, HttpServletRequest request) {
 
 		LOGGER.info("cancelCourse() -> Entrada al servicio para cancelar las inscripciones y sesiones de un curso");
@@ -3084,7 +3087,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO finishCourse(CursoDTO cursoDTO, HttpServletRequest request) {
 		LOGGER.info("finishCourse() -> Entrada al servicio para finalizar un curso");
 
@@ -3576,7 +3579,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO updateCertificatesCourse(CertificadoCursoDTO certifcadoCursoDTO,
 			HttpServletRequest request) {
 
@@ -3657,7 +3660,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout=2400)
 	public UpdateResponseDTO deleteCertificatesCourse(CertificadoCursoDTO certifcadoCursoDTO,
 			HttpServletRequest request) {
 		LOGGER.info("deleteCertificatesCourse() -> Entrada al servicio para eliminar los certificados de un curso");

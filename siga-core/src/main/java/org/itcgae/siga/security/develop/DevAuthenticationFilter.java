@@ -1,16 +1,17 @@
 package org.itcgae.siga.security.develop;
 
 import java.io.IOException;
-import java.security.cert.X509Certificate;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,13 +28,17 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	Logger LOGGER = LoggerFactory.getLogger(DevAuthenticationFilter.class);
 
 	private AuthenticationManager authenticationManager;
+	
+	@SuppressWarnings("unused")
+	private SigaUserDetailsService userDetailsService;
 
 	private static String tokenHeaderAuthKey;
 
 	public DevAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
-			String tokenHeaderAuthKey) {
+			String tokenHeaderAuthKey, SigaUserDetailsService userDetailsService2) {
 		super(new AntPathRequestMatcher(loginUrl, loginMethod));
 		this.authenticationManager = authenticationManager;
+		this.userDetailsService = userDetailsService2;
 		DevAuthenticationFilter.tokenHeaderAuthKey = tokenHeaderAuthKey;
 	}
 
@@ -41,19 +46,23 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 		try{
-			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-			
-			// Confirmado con CGAE que debe accederse con el usuario con id -1 siempre que se acceda por los combos
 			LOGGER.info("Se accede por los combos");
-			String dni = "44149718E";
-			String grupo = request.getParameter("profile");
+//			String dni = "44149718E"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
+//			String nombre = "Jesus"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
+			String dni = (String) request.getHeader("CAS-username");
+			String nombre = (String) request.getHeader("CAS-displayName");
+
+			String grupo = "";
 			String institucion = request.getParameter("location");
-			String letrado = request.getParameter("letrado");
-			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,letrado);
-//			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,certs[0]));
+			String letrado = "";
+			AdmRol rol = null;
+			grupo = request.getParameter("profile");
+			letrado = request.getParameter("letrado");
+			
+			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,letrado, rol, nombre);
 			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,null));
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 	}
 

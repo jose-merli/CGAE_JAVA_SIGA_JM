@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenAccesodatos;
+import org.itcgae.siga.db.entities.CenAccesodatosExample;
 import org.itcgae.siga.db.entities.CenAccesodatosExample.Criteria;
 import org.itcgae.siga.db.entities.CenAccesodatosExample.Criterion;
-import org.itcgae.siga.db.entities.CenAccesodatosExample;
 
 public class CenAccesodatosSqlProvider {
 

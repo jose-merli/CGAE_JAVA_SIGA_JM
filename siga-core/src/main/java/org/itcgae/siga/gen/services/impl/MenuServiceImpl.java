@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
+/*import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;*/
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,28 +16,32 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.assertj.core.util.Strings;
-import org.bouncycastle.asn1.x500.RDN;
+/*import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;*/
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.EntornoDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.LoginMultipleItem;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.MenuItem;
+import org.itcgae.siga.DTOs.gen.ParamsItem;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
 import org.itcgae.siga.DTOs.gen.PermisoItem;
@@ -45,8 +49,7 @@ import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
-import org.itcgae.siga.commons.utils.InvalidClientCerticateException;
-import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.commons.utils.TokenGenerationException;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmGestorinterfaz;
@@ -54,6 +57,10 @@ import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmPerfilKey;
+import org.itcgae.siga.db.entities.AdmPerfilRol;
+import org.itcgae.siga.db.entities.AdmPerfilRolExample;
+import org.itcgae.siga.db.entities.AdmRol;
+import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmTiposacceso;
 import org.itcgae.siga.db.entities.AdmTiposaccesoKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -77,10 +84,13 @@ import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.AdmGestorinterfazMapper;
 import org.itcgae.siga.db.mappers.AdmPerfilMapper;
+import org.itcgae.siga.db.mappers.AdmPerfilRolMapper;
+import org.itcgae.siga.db.mappers.AdmRolMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
+import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenMenuMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
@@ -88,15 +98,18 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
+import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+
 
 @Service
 public class MenuServiceImpl implements IMenuService {
@@ -113,8 +126,14 @@ public class MenuServiceImpl implements IMenuService {
 	private CenInstitucionExtendsMapper institucionMapper;
 
 	@Autowired
+	private AdmRolMapper admRolMapper;
+	
+	@Autowired
 	private AdmPerfilExtendsMapper perfilMapper;
 
+	@Autowired
+	private AdmPerfilRolMapper perfilRolMapper;
+	
 	@Autowired
 	private AdmUsuariosMapper usuarioMapper;
 
@@ -129,6 +148,7 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Autowired
 	private AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
+	
 
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
@@ -149,7 +169,8 @@ public class MenuServiceImpl implements IMenuService {
 	private CenPersonaMapper cenPersonaMapper;
 
 	@Autowired
-	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+    private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	private CenColegiadoMapper cenColegiadoMapper;
 
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
@@ -419,9 +440,15 @@ public class MenuServiceImpl implements IMenuService {
 		// Obtener idInstitucion del certificado y idUsuario del certificado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String idInstitucionCert = validaInstitucionCertificado(request);
+		//String idInstitucionCert = validaInstitucionCertificado(request);
+		List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
+		
+		if(institucionList == null || institucionList.isEmpty()) {
+			throw new BadCredentialsException("Institucion No válida");
+		}
+		String idInstitucionRequest = institucionList.get(0).getIdinstitucion().toString();
 		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
-		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem, idInstitucionCert);
+		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem,idInstitucionRequest);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
 			List<PermisoItem> items = new ArrayList<PermisoItem>();
@@ -544,6 +571,7 @@ public class MenuServiceImpl implements IMenuService {
 		UsuarioLogeadoDTO response = new UsuarioLogeadoDTO();
 		usuario.get(0).setPerfiles(getDescripcion(perfiles, idInstitucion));
 		usuario.get(0).setRutaLogout(getUserRoutLogout(idInstitucion));
+		usuario.get(0).setRutaLogoutCAS(getUserRoutLogoutCAS());
 		usuario.get(0).setIdPerfiles(perfiles.toString());
 		response.setUsuarioLogeadoItem(usuario);
 
@@ -584,7 +612,7 @@ public class MenuServiceImpl implements IMenuService {
 		HashMap<String, String> permisos = UserTokenUtils.getPermisosFromJWTToken(token);
 		PermisoItem permisoItem = new PermisoItem();
 		permisoItem.setDerechoacceso(permisos.get(controlItem.getIdProceso()));
-
+		permisoItem.setData(controlItem.getIdProceso());
 		List<PermisoItem> permisosItem = new ArrayList<PermisoItem>();
 		permisosItem.add(permisoItem);
 		response.setPermisoItems(permisosItem);
@@ -732,46 +760,30 @@ public class MenuServiceImpl implements IMenuService {
 	@Override
 	public UpdateResponseDTO validaInstitucion(HttpServletRequest request) {
 		UpdateResponseDTO response = new UpdateResponseDTO();
-		try {
-			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-			String organizationName = null;
-			String organizationNameNuevo = null;
-			X509Certificate cert = null;
+		Boolean encontrado = false;
+		try{
+			LOGGER.debug("Validamos la institucion");
+			LOGGER.debug("Obtenemos de la request las instituciones del usuario en CAS");
+			List<String> institucionesList = getInstitucionesUsuarioRequest(request);
+			LOGGER.debug("Obtenemos de la lista de instituciones de base de datos");
+			List<CenInstitucion> lista = getlistIdInstitucionByListCodExterno(institucionesList);
 
-			if (certs == null) {
-				LOGGER.error(
-						"No se está recibiendo el certificado desde el apache. Revisa que tengas el apache activo y el check de la consola de weblogic para recibir el certificado");
-			}
-			try {
-				cert = certs[0];
-				X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
-
-				if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-					RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
-					organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-				} else {
-					RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
-					organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+			LOGGER.debug("Recorremos la lista de instituciones: "+lista.size() + " instituciones encontradas");
+			for(CenInstitucion institucion : lista) {
+	
+				if (institucion.getIdinstitucion().toString().equals(SigaConstants.InstitucionGeneral)) {
+					LOGGER.debug("El usuario tiene rol en la institucion 2000 en CAS");
+					encontrado = true;
+					break;
 				}
-
-			} catch (CertificateEncodingException e) {
-				throw new InvalidClientCerticateException(e);
 			}
-
-			String idInstitucion = null;
-			if (null != organizationNameNuevo) {
-				idInstitucion = organizationNameNuevo.substring(0, 4);
-			} else {
-				idInstitucion = organizationName.substring(organizationName.length() - 4, organizationName.length());
-			}
-			if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
-				if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
-					throw new BadCredentialsException("Certificado no validado para CGAE");
-				}
+			if(!encontrado) {
+				LOGGER.debug("ERROR: El usuario NO tiene rol en la institucion 2000 en CAS");
+				throw new BadCredentialsException("El usuario no tiene rol en la institucion CGAE");
 			}
 
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 		response.setStatus(SigaConstants.OK);
 		return response;
@@ -810,6 +822,20 @@ public class MenuServiceImpl implements IMenuService {
 			return response;
 		}
 
+	}
+	
+	private String getUserRoutLogoutCAS() {
+
+		GenParametrosExample example = new GenParametrosExample();
+		example.createCriteria().andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_0_SHORT).andParametroEqualTo("PATH_INICIO_SESION");
+		List<GenParametros> parametros = genParametrosMapper.selectByExample(example);
+		if (null != parametros && parametros.size() > 0) {
+			String response = parametros.get(0).getValor();
+			return response;
+		}else {
+			return "";
+		}
+		
 	}
 
 	@Override
@@ -858,7 +884,7 @@ public class MenuServiceImpl implements IMenuService {
 						CenColegiadoKey key = new CenColegiadoKey();
 						key.setIdinstitucion(idInstitucion);
 						key.setIdpersona(persona.getIdpersona());
-						colegiado = cenColegiadoExtendsMapper.selectByPrimaryKey(key);
+						colegiado = cenColegiadoMapper.selectByPrimaryKey(key);
 
 					}
 					CenCliente cliente = null;
@@ -885,9 +911,111 @@ public class MenuServiceImpl implements IMenuService {
 		}
 		LOGGER.info("setIdiomaUsuario() --> Salida del servicio de cambio de idioma");
 		return response;
+	}	
+	
+	private String getInstitucionRequest(HttpServletRequest request) {
+		String idInstitucion = null;
+		
+		try {
+			String roles = (String) request.getHeader("CAS-roles");
+			String defaultRole = null;
+			String [] roleAttributes;
+			String [] rolesList = roles.split("::");
+			if(rolesList.length > 1) {
+				defaultRole = (String) request.getHeader("CAS-defaultRole");
+				roleAttributes = defaultRole.split(" ");
+			}else {
+				roleAttributes = roles.split(" ");
+			}
+				
+			idInstitucion = roleAttributes[0];
+			
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage(),e);
+		}
+		if (idInstitucion == null){
+			idInstitucion = "";
+		}
+
+		return idInstitucion;
+	}
+	
+	private List<String> getInstitucionesUsuarioRequest(HttpServletRequest request) {
+		List<String> respuesta = new ArrayList<String>();
+		try {
+			String roles = (String) request.getHeader("CAS-roles");
+			String [] rolesList = roles.split("::");
+			
+			for(String rol: rolesList) {
+				String[] attributes = rol.split(" ");
+				respuesta.add(attributes[0]);
+			}
+			
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage(),e);
+		}
+		
+	
+		return respuesta;
+	}
+	
+	private List<String> getRolesUsuarioRequest(HttpServletRequest request, String idInstitucion) {
+		List<String> respuesta = new ArrayList<String>();
+		try {
+			String roles = (String) request.getHeader("CAS-roles");
+			String [] rolesList = roles.split("::");
+			int primero, ultimo = 0;
+			String tipoUsuario = "";
+			
+			for(String rol: rolesList) {
+				tipoUsuario = "";
+				String rolObtenido = "";
+				String[] attributes = rol.split(" ");
+				String institucionRol = getidInstitucionByCodExterno(attributes[0]).get(0).getIdinstitucion().toString();
+				if(institucionRol.equals(idInstitucion)) {
+					if(SigaUserDetailsService.isNumeric(attributes[1])) { //Si es númerico el segundo atributo
+						primero = 2; //el rol empieza en el tercero
+						if(attributes[attributes.length-1].equalsIgnoreCase("Residente")) { //Si el último atributo es Residente
+							ultimo = attributes.length -2; //la ultima palabra del rol es la penultima
+						}else {
+							ultimo = attributes.length -1; //Si no, la ultima palabra del rol es la ultima
+						}
+					}else {
+						primero = 1; //Si no es numerico, el rol empieza en el segundo atributo
+						ultimo = attributes.length -1; //Acaba en el ultimo atributo
+					}
+					
+					for(int i=primero;i<=ultimo ; i++) {
+						String constructRol = "";
+						if (i != ultimo) {
+							constructRol += attributes[i];
+
+							constructRol += " ";
+
+						} else {
+							constructRol += attributes[i];
+
+						}
+						tipoUsuario += constructRol;
+					}
+					
+					rolObtenido = SigaConstants.getTipoUsuario(tipoUsuario);	
+					
+					if(!respuesta.contains(rolObtenido)) {
+						respuesta.add(rolObtenido);
+					}
+				}
+			}
+			
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage(),e);
+		}
+		
+	
+		return respuesta;
 	}
 
-	private String validaInstitucionCertificado(HttpServletRequest request) {
+	/*private String validaInstitucionCertificado(HttpServletRequest request) {
 		String idInstitucion = null;
 		try {
 			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
@@ -899,14 +1027,20 @@ public class MenuServiceImpl implements IMenuService {
 				cert = certs[0];
 				X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
 
-				if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-					RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
-					organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-				} else {
+				boolean certificadoNuevo = Boolean.FALSE;
+
+				for (int i = 0; i < x500name.getAttributeTypes().length; i++) {
+					if (x500name.getAttributeTypes()[i].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+						RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[i])[0];
+						organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+						certificadoNuevo = Boolean.TRUE;
+					}
+				}
+
+				if (!certificadoNuevo) {
 					RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
 					organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
 				}
-
 			} catch (CertificateEncodingException e) {
 				throw new InvalidClientCerticateException(e);
 			}
@@ -918,10 +1052,286 @@ public class MenuServiceImpl implements IMenuService {
 			}
 
 		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
+			throw new BadCredentialsException(e.getMessage(),e);
 		}
 
 		return idInstitucion;
+	}*/
+	
+	@Override
+	public UpdateResponseDTO validaUsuario(HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		try{
+			//List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
+			
+			LOGGER.debug("Validamos el usuario");
+			LOGGER.debug("Obtenemos de la request las instituciones del usuario en CAS");
+			List<String> institucionesList = getInstitucionesUsuarioRequest(request);
+			LOGGER.debug("Obtenemos de la lista de instituciones de base de datos");
+			List<CenInstitucion> institucionList = getlistIdInstitucionByListCodExterno(institucionesList);
+			
+			if(institucionList == null || institucionList.isEmpty()) {
+				throw new BadCredentialsException("Usuario no válido");
+			}
+			Short idInstitucion = null;
+			List<Short> lista = new ArrayList<Short>();
+			LOGGER.debug("Comprobamos si la institución 2000 entá en las cabeceras CAS");
+			for(CenInstitucion inst : institucionList) {
+				if (inst.getIdinstitucion().toString().equals(SigaConstants.InstitucionGeneral)) {
+					idInstitucion = inst.getIdinstitucion();
+					break;
+				}
+				lista.add(inst.getIdinstitucion());
+			}
+			
+			String dni = (String) request.getHeader("CAS-username");
+			LOGGER.debug("Comprobamos si la el usuario tiene rol en la institución 2000");
+			AdmUsuariosExample  usuarioExampple = new AdmUsuariosExample();
+			if(idInstitucion != null) {
+				usuarioExampple.createCriteria().andActivoEqualTo("N").andIdinstitucionEqualTo(idInstitucion).andNifEqualTo(dni);
+			}
+			else {
+				usuarioExampple.createCriteria().andActivoEqualTo("N").andIdinstitucionIn(lista).andNifEqualTo(dni);
+			}
+			List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExampple);
+			if (null != usuarios && usuarios.size()>0) {
+				throw new BadCredentialsException("Usuario no válido");
+			}
+			
+			usuarioExampple = new AdmUsuariosExample();
+			if(idInstitucion != null) {
+				usuarioExampple.createCriteria().andFechaBajaIsNotNull().andIdinstitucionEqualTo(idInstitucion).andNifEqualTo(dni);
+			}
+			else {
+				usuarioExampple.createCriteria().andFechaBajaIsNotNull().andIdinstitucionIn(lista).andNifEqualTo(dni);
+			}
+			usuarios = usuarioMapper.selectByExample(usuarioExampple);
+			
+			if (null != usuarios && usuarios.size()>0) {
+				throw new BadCredentialsException("Usuario no válido");
+			}
+			
+				
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage(),e);
+		}
+		response.setStatus(SigaConstants.OK);
+		return response;
+
+	}
+
+	@Override
+	public PermisoDTO getVariosPermisos(List<ControlRequestItem> controlItem, HttpServletRequest request) {
+
+		PermisoDTO response = new PermisoDTO();
+		List<PermisoItem> permisosItem = new ArrayList<PermisoItem>();
+		String token = request.getHeader("Authorization");
+
+		HashMap<String, String> permisos = UserTokenUtils.getPermisosFromJWTToken(token);
+		for(int i = 0; i<controlItem.size(); i++) {
+		PermisoItem permisoItem = new PermisoItem();
+		permisoItem.setDerechoacceso(permisos.get(controlItem.get(i).getIdProceso()));
+		permisoItem.setData(controlItem.get(i).getIdProceso());
+		permisosItem.add(permisoItem);
+		}
+		response.setPermisoItems(permisosItem);
+
+		return response;
+	}
+	
+	@Override
+	public ParamsItem getEnvParams(HttpServletRequest request) {
+		ParamsItem paramsItem = new ParamsItem();
+		List<GenProperties> prop = new ArrayList<GenProperties>();
+		// Obtenemos atributos del usuario logeado
+		LOGGER.debug("Obtenemos atributos del usuario logeado");
+		
+		GenPropertiesExample propertiesExample = new GenPropertiesExample();
+		propertiesExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.entorno");
+		prop = genPropertiesMapper.selectByExample(propertiesExample);
+		paramsItem.setEnvironment(prop.get(0).getValor());
+
+		GenPropertiesExample propertiesfrontExample = new GenPropertiesExample();
+		propertiesfrontExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.frontsigaversion");
+		prop = genPropertiesMapper.selectByExample(propertiesfrontExample);
+		paramsItem.setSigaFrontVersion(prop.get(0).getValor());
+
+		GenPropertiesExample propertiesWebExample = new GenPropertiesExample();
+		propertiesWebExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.webversion");
+		prop = genPropertiesMapper.selectByExample(propertiesWebExample);
+		paramsItem.setSigaWebVersion(prop.get(0).getValor());
+		
+//		comboItem.setLabel(cenInstitucion.getAbreviatura());
+//		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
+		return paramsItem;
+	}
+	
+	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
+		if(codExterno != null && !codExterno.isEmpty()) {
+			CenInstitucionExample example = new CenInstitucionExample();
+			example.createCriteria().andCodigoextEqualTo(codExterno);
+			
+			return institucionMapper.selectByExample(example);
+		}else {
+			return null;
+		}
+	}
+	
+	public List<CenInstitucion> getlistIdInstitucionByListCodExterno(List<String> listCodExterno) {
+		if(listCodExterno != null && !listCodExterno.isEmpty()) {
+			CenInstitucionExample example = new CenInstitucionExample();
+			example.createCriteria().andCodigoextIn(listCodExterno);
+			
+			return institucionMapper.selectByExample(example);
+		}else {
+			return null;
+		}
+	}
+
+	@Override
+	public ComboDTO getInstitucionesUsuario(HttpServletRequest request) {
+		// Cargamos el combo de Instituciones
+				ComboDTO response = new ComboDTO();
+				
+				List<String> institucionesList = getInstitucionesUsuarioRequest(request);
+
+				CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+				exampleInstitucion.setDistinct(true);
+				exampleInstitucion.createCriteria().andCodigoextIn(institucionesList);
+				exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
+
+				List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
+				List<ComboItem> combos = new ArrayList<ComboItem>();
+				//ComboItem comboBlanco = new ComboItem();
+				//comboBlanco.setValue("");
+				//comboBlanco.setLabel("");
+				//combos.add(comboBlanco);
+				if (null != instituciones && instituciones.size() > 0) {
+					for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
+						CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
+						ComboItem combo = new ComboItem();
+						combo.setValue(cenInstitucion.getIdinstitucion().toString());
+						if (null != cenInstitucion.getFechaenproduccion()) {
+
+							combo.setLabel(cenInstitucion.getAbreviatura() + " (En producción: "
+									+ Converter.dateToString(cenInstitucion.getFechaenproduccion()) + ")");
+						} else {
+							combo.setLabel(cenInstitucion.getAbreviatura());
+						}
+
+						combos.add(combo);
+					}
+
+				}
+
+				response.setCombooItems(combos);
+				return response;
+
+	}
+
+	@Override
+	public ComboDTO getRolesUsuario(HttpServletRequest request, String idInstitucion) {
+		// Cargamos el combo de roles
+		ComboDTO response = new ComboDTO();
+		
+		List<String> rolesList = getRolesUsuarioRequest(request, idInstitucion);
+
+		AdmRolExample exampleRol = new AdmRolExample();
+		exampleRol.setDistinct(true);
+		exampleRol.createCriteria().andCodigoextIn(rolesList);
+		exampleRol.setOrderByClause("DESCRIPCION ASC");
+
+		List<AdmRol> roles = admRolMapper.selectByExample(exampleRol);
+		List<ComboItem> combos = new ArrayList<ComboItem>();
+		
+		if (null != roles && roles.size() > 0) {
+			for (Iterator<AdmRol> iterator = roles.iterator(); iterator.hasNext();) {
+				AdmRol rol = (AdmRol) iterator.next();
+				ComboItem combo = new ComboItem();
+				combo.setValue(rol.getIdrol().toString());
+				combo.setLabel(rol.getDescripcion());
+				
+				combos.add(combo);
+			}
+
+		}else {
+			ComboItem comboBlanco = new ComboItem();
+			comboBlanco.setValue("");
+			comboBlanco.setLabel("");
+			combos.add(comboBlanco);
+		}
+
+		response.setCombooItems(combos);
+		return response;	}
+
+	@Override
+	public ComboDTO getPerfilesColegioRol(LoginMultipleItem loginMultipleItem) {
+		// Cargamos el combo de Perfil
+		ComboDTO response = new ComboDTO();
+		
+		AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
+		examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(loginMultipleItem.getIdInstitucion())).
+			andIdrolEqualTo(loginMultipleItem.getRol());
+		List<AdmPerfilRol> perfilesRol = perfilRolMapper.selectByExample(examplePerfilRol);
+
+		List<String> listaPerfilesRol = new ArrayList<String>();
+		for(AdmPerfilRol perfil : perfilesRol) {
+			listaPerfilesRol.add(perfil.getIdperfil());
+		}
+		
+		AdmPerfilExample examplePerfil = new AdmPerfilExample();
+		examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(loginMultipleItem.getIdInstitucion())).
+			andIdperfilIn(listaPerfilesRol).andFechaBajaIsNull();
+		examplePerfil.setOrderByClause(" DESCRIPCION ASC ");
+		List<AdmPerfil> perfiles = perfilMapper.selectComboPerfilByExample(examplePerfil);
+		List<ComboItem> combos = new ArrayList<ComboItem>();
+		if (null != perfiles && perfiles.size() > 0) {
+			for (Iterator<AdmPerfil> iterator = perfiles.iterator(); iterator.hasNext();) {
+				AdmPerfil admPerfil = (AdmPerfil) iterator.next();
+				ComboItem combo = new ComboItem();
+				combo.setValue(admPerfil.getIdperfil().toString());
+				combo.setLabel(admPerfil.getDescripcion());
+				combos.add(combo);
+			}
+
+		}
+
+		response.setCombooItems(combos);
+		return response;
+	}
+
+	@Override
+	public StringDTO getTokenOldSiga(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		UserCgae userDesarrollo = UserTokenUtils.gerUserFromJWTToken(token);
+		
+		String header = "";
+		try {
+			header = UserTokenUtils.generateTokenOldSiga(userDesarrollo);
+		} catch (TokenGenerationException e) {
+			// TODO Auto-generated catch block
+			LOGGER.error("Se ha producido un error al generar el token de SIGA Classique");
+		}
+		StringDTO respuesta = new StringDTO();
+		respuesta.setValor(header);
+		return respuesta;
+	}
+	
+	@Override
+	public UpdateResponseDTO eliminaCookie(HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		
+		LOGGER.debug("Eliminando cookies");
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie: cookies) {
+         LOGGER.debug("Cookie: " + cookie.getName() );
+         cookie.setMaxAge(0);
+         cookie.setValue(null);
+         cookie.setPath("/"); 
+        }
+
+		response.setStatus(SigaConstants.OK);
+		return response;
 	}
 
 	@Override

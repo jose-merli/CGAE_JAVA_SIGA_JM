@@ -90,7 +90,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("COMPONENTE.IDPROVINCIA");
 		sql.SELECT("COMPONENTE.FLAG_SOCIO");
 		sql.SELECT("COMPONENTE.CEN_CLIENTE_IDINSTITUCION");
-		sql.SELECT("RECURSOCARGO.DESCRIPCION AS DESCRIPCIONCARGO");
+		sql.SELECT("COMPONENTE.CARGO as DESCRIPCIONCARGO");
 		sql.SELECT("INST.CODIGOEXT AS COLEGIO");
 		sql.SELECT("INST.abreviatura AS NOMBRECOLEGIO");
 		sql.SELECT("RECURSOACTIVIDAD.DESCRIPCION AS DESCRIPCIONPROFESION");
@@ -304,7 +304,8 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		
 		sql.WHERE("comp.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("comp.CEN_CLIENTE_IDPERSONA = '" + idPersona + "'");
-
+		sql.ORDER_BY("FECHACONSTITUCION ASC");
+		
 		return sql.toString();
 	}
 	

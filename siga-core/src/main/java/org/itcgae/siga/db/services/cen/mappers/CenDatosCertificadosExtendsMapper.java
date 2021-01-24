@@ -24,6 +24,6 @@ public interface CenDatosCertificadosExtendsMapper extends CerSolicitudcertifica
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAEMISION", property = "fechaEmision", jdbcType = JdbcType.VARCHAR)
 	})
-	List<CertificadoItem> datosCertificadosSearch(String idPersona);
+	List<CertificadoItem> datosCertificadosSearch(String idPersona,Short idInstitucion);
 	
 }

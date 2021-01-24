@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
+import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample.Criteria;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample.Criterion;
-import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 
 public class CenDireccionTipodireccionSqlProvider {
 

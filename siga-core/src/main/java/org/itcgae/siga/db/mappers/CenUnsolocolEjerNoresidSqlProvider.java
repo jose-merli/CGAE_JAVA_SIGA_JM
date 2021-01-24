@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenUnsolocolEjerNoresid;
+import org.itcgae.siga.db.entities.CenUnsolocolEjerNoresidExample;
 import org.itcgae.siga.db.entities.CenUnsolocolEjerNoresidExample.Criteria;
 import org.itcgae.siga.db.entities.CenUnsolocolEjerNoresidExample.Criterion;
-import org.itcgae.siga.db.entities.CenUnsolocolEjerNoresidExample;
 
 public class CenUnsolocolEjerNoresidSqlProvider {
 

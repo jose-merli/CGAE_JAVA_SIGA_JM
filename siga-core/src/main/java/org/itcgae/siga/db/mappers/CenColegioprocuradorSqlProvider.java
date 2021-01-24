@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenColegioprocurador;
+import org.itcgae.siga.db.entities.CenColegioprocuradorExample;
 import org.itcgae.siga.db.entities.CenColegioprocuradorExample.Criteria;
 import org.itcgae.siga.db.entities.CenColegioprocuradorExample.Criterion;
-import org.itcgae.siga.db.entities.CenColegioprocuradorExample;
 
 public class CenColegioprocuradorSqlProvider {
 

@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.mappers;
 
 import java.util.List;
+
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.InsertProvider;
