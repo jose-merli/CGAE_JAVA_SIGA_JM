@@ -13,7 +13,7 @@ import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
 import org.itcgae.siga.DTOs.scs.PagosjgDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionServices;
+import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FacturacionController {
 
 	@Autowired
-	private IFacturacionServices facturacionServices;
+	private IFacturacionSJCSServices facturacionServices;
 
 	@RequestMapping(value="/facturacionsjcs/buscarfacturaciones", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<FacturacionDTO> buscarFacturaciones(@RequestBody FacturacionItem facturacionItem, HttpServletRequest request){

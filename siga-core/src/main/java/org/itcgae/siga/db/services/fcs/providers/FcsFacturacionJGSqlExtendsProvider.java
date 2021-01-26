@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.CartasFacturacionPagosItem;
 import org.itcgae.siga.DTOs.scs.FacturacionItem;
+import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgSqlProvider;
 
@@ -60,6 +61,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		if (!UtilidadesString.esCadenaVacia(facturacionItem.getNombre())) {
 			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("FAC.NOMBRE", facturacionItem.getNombre().trim()));
 		}
+		
+		// FILTRO POR PARTIDA PRESUPUESTARIA
+		if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdPartidaPresupuestaria())) {
+			sql2.WHERE("FAC.IDPARTIDAPRESUPUESTARIA = " + facturacionItem.getIdPartidaPresupuestaria());
+		}
 
 		// FILTRO POR CONCEPTOS DE FACTURACIÓN Y POR GRUPOS DE FACTURACIÓN Y PARTIDA
 		// PRESUPUESTARIA
@@ -78,11 +84,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdFacturacion())) {
 				queryAux.append(" AND HIT.IDGRUPOFACTURACION = " + facturacionItem.getIdFacturacion());
 			}
-			// FILTRO POR PARTIDA PRESUPUESTARIA
-			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdPartidaPresupuestaria())) {
-				queryAux.append(" AND FAC.IDPARTIDAPRESUPUESTARIA = " + facturacionItem.getIdPartidaPresupuestaria());
-			}
-
+			
 			queryAux.append(")");
 			sql2.WHERE(queryAux.toString());
 		}
@@ -102,8 +104,9 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		}
 
 		sql.FROM("(" + sql2.toString() + ") busqueda");
-		sql.ORDER_BY("busqueda.NOMBRE");
-		sql.ORDER_BY("busqueda.FECHADESDE DESC");
+		sql.ORDER_BY("busqueda.FECHADESDE ASC");
+		sql.ORDER_BY("busqueda.FECHAHASTA");
+		sql.ORDER_BY("busqueda.FECHAESTADO DESC");
 
 		return sql.toString();
 	}
@@ -220,6 +223,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.WHERE("fac.idinstitucion = importes.idinstitucion");
 		sql.WHERE("fac.idinstitucion = grupo.idinstitucion");
 		sql.WHERE("fac.idfacturacion = grupo.idfacturacion");
+		sql.WHERE("fac.visible = '1'");
 		sql.WHERE("fac.idinstitucion = " + idInstitucion);
 		sql.WHERE("fac.idfacturacion = " + idFacturacion);
 		
@@ -414,6 +418,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.WHERE("fac.idinstitucion = importes.idinstitucion");
 		sql.WHERE("fac.idinstitucion = grupo.idinstitucion");
 		sql.WHERE("fac.idfacturacion = grupo.idfacturacion");
+		sql.WHERE("fac.visible = '1'");
 		sql.WHERE("fac.idinstitucion = " + idInstitucion);
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdFacturacion())) {
@@ -648,5 +653,110 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		}
 
 		return sqlOrder.toString();
+	}
+	
+	
+	public String facturacionesPorEstadoEjecucion(String idInstitucion) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql.SELECT("FAC.IDFACTURACION");
+		sql.SELECT("FAC.IDINSTITUCION");
+		sql.SELECT("FAC.FECHADESDE");
+		sql.SELECT("FAC.FECHAHASTA");
+		sql.SELECT("FAC.NOMBRE");
+		sql.SELECT("FAC.IMPORTETOTAL");
+		sql.SELECT("FAC.IMPORTEOFICIO");
+		sql.SELECT("FAC.IMPORTEGUARDIA");
+		sql.SELECT("FAC.IMPORTESOJ");
+		sql.SELECT("FAC.IMPORTEEJG");
+		sql.SELECT("FAC.PREVISION");
+		sql.SELECT("FAC.REGULARIZACION");
+		sql.SELECT("FAC.FECHAMODIFICACION");
+		sql.SELECT("FAC.USUMODIFICACION");
+		sql.SELECT("FAC.IDFACTURACION_REGULARIZA");
+		sql.SELECT("FAC.NOMBREFISICO");
+		sql.SELECT("FAC.IDECOMCOLA");
+		sql.SELECT("FAC.VISIBLE");
+		sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
+		sql.FROM("FCS_FACTURACIONJG FAC");
+		sql.JOIN("FCS_FACT_ESTADOSFACTURACION E ON (FAC.IDINSTITUCION = E.IDINSTITUCION AND FAC.IDFACTURACION = E.IDFACTURACION)");
+		sql.WHERE("E.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("E.IDESTADOFACTURACION = "+ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo());
+		sql2.SELECT("MAX(EST2.IDORDENESTADO)");
+		sql2.FROM("FCS_FACT_ESTADOSFACTURACION EST2 ");
+		sql2.WHERE("EST2.IDINSTITUCION = E.IDINSTITUCION");
+		sql2.WHERE("EST2.IDFACTURACION = E.IDFACTURACION");
+		sql.WHERE("E.IDORDENESTADO = (" + sql2.toString() +")");
+				
+		return sql.toString();
+	}
+	
+	public String facturacionesPorEstadoProgramadas(String idInstitucion) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql.SELECT("FAC.IDFACTURACION");
+		sql.SELECT("FAC.IDINSTITUCION");
+		sql.SELECT("FAC.FECHADESDE");
+		sql.SELECT("FAC.FECHAHASTA");
+		sql.SELECT("FAC.NOMBRE");
+		sql.SELECT("FAC.IMPORTETOTAL");
+		sql.SELECT("FAC.IMPORTEOFICIO");
+		sql.SELECT("FAC.IMPORTEGUARDIA");
+		sql.SELECT("FAC.IMPORTESOJ");
+		sql.SELECT("FAC.IMPORTEEJG");
+		sql.SELECT("FAC.PREVISION");
+		sql.SELECT("FAC.REGULARIZACION");
+		sql.SELECT("FAC.FECHAMODIFICACION");
+		sql.SELECT("FAC.USUMODIFICACION");
+		sql.SELECT("FAC.IDFACTURACION_REGULARIZA");
+		sql.SELECT("FAC.NOMBREFISICO");
+		sql.SELECT("FAC.IDECOMCOLA");
+		sql.SELECT("FAC.VISIBLE");
+		sql.SELECT("FAC.IDPARTIDAPRESUPUESTARIA");
+		sql.FROM("FCS_FACTURACIONJG FAC");
+		sql.JOIN("FCS_FACT_ESTADOSFACTURACION E ON (FAC.IDINSTITUCION = E.IDINSTITUCION AND FAC.IDFACTURACION = E.IDFACTURACION)");
+		sql.WHERE("E.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("E.IDESTADOFACTURACION = "+ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo());
+		sql2.SELECT("MAX(EST2.IDORDENESTADO)");
+		sql2.FROM("FCS_FACT_ESTADOSFACTURACION EST2 ");
+		sql2.WHERE("EST2.IDINSTITUCION = E.IDINSTITUCION");
+		sql2.WHERE("EST2.IDFACTURACION = E.IDFACTURACION");
+		sql.WHERE("E.IDORDENESTADO = (" + sql2.toString() +")");
+				
+		return sql.toString();
+	}
+	
+	public String ultimoEstadoFacturacion(String idFacturacion, String idInstitucion) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql.SELECT("est.idestadofacturacion idestadofacturacion");
+		sql.SELECT("est.idinstitucion idinstitucion");
+		sql.SELECT("est.idfacturacion idfacturacion");
+		sql.SELECT("est.fechaestado fechaestado");
+		sql.FROM("fcs_fact_estadosfacturacion est");
+		sql.JOIN("fcs_estadosfacturacion estados on (est.idestadofacturacion = estados.idestadofacturacion)");
+		sql.WHERE("est.idinstitucion = '" + idInstitucion + "'");
+		sql.WHERE("est.idfacturacion = '" + idFacturacion + "'");
+		sql2.SELECT("MAX(EST2.IDORDENESTADO)");
+		sql2.FROM("FCS_FACT_ESTADOSFACTURACION EST2 ");
+		sql2.WHERE("EST2.IDINSTITUCION = EST.IDINSTITUCION");
+		sql2.WHERE("EST2.IDFACTURACION = EST.IDFACTURACION");
+		sql.WHERE("EST.IDORDENESTADO = (" + sql2.toString() +")");
+		sql.ORDER_BY("fechaestado DESC");
+
+		return sql.toString();
+	}
+	
+	public String getParametroInstitucion(String idInstitucion, String parametro) {
+		SQL sql = new SQL();
+
+		sql.SELECT("VALOR");
+		sql.FROM("gen_parametros");
+		sql.WHERE("PARAMETRO = " + parametro);
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"'");
+		return sql.toString();
 	}
 }

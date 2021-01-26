@@ -678,6 +678,30 @@ public class SigaConstants {
 			return null;
 		}
 	}
+	
+	// Estados facturacion
+	public static enum ESTADO_FACTURACION {
+		  ESTADO_FACTURACION_ABIERTA (10)
+		, ESTADO_FACTURACION_EJECUTADA(20)
+		, ESTADO_FACTURACION_LISTA_CONSEJO(30)
+		, ESTADO_FACTURACION_EN_EJECUCION(40)
+		, ESTADO_FACTURACION_PROGRAMADA(50)
+		, ESTADO_FACTURACION_VALIDACION_NO_CORRECTA(60)
+		, ESTADO_FACTURACION_ENVIO_NO_ACEPTADO(70)
+		, ESTADO_FACTURACION_ENVIO_NO_DISPONIBLE(80)
+		, ESTADO_FACTURACION_ENVIO_EN_PROCESO(90);
+		  
+		
+		private Integer codigo;
+			
+		private ESTADO_FACTURACION (Integer codigo) {
+			this.codigo = codigo;
+		}
+		
+		public Integer getCodigo() {
+			return this.codigo;
+		}
+	}
 
 	public static enum CargaMasivaDatosCVVo {
 
@@ -1068,7 +1092,21 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static Integer USUMODIFICACION_0 = 0;
 	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
-
-
 	
+	public static final String I_INFORMEFACTSJCS = "FACJ2";
+	
+	// hitos generales de facturacion
+	public static final int HITO_GENERAL_TURNO=10;
+	public static final int HITO_GENERAL_GUARDIA=20;
+	public static final int HITO_GENERAL_SOJ=30;
+	public static final int HITO_GENERAL_EJG=40;
+
+	// si es facturacion o pago
+	public static final String FACTURACION_SJCS="F";
+	public static final String PAGOS_SJCS="P";
+
+	// se ha facturado todo el procedimiento o solo un porcentaje
+	public static final String FACTURACION_COMPLETA="C";
+	public static final String FACTURACION_PARCIAL="P";
+
 }
