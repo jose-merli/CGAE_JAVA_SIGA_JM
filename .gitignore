@@ -281,3 +281,5 @@ siga-core/target/
 .sonarlint/modules/siga-core/issues/8/a/8a4adc4325ca41c717b79951963506654c4019f7
 .sonarlint/default/.sonartmp_894246037603637028/sonarlint-slf4j-sonar-log7858517115907461621.jar
 .sonarlint/default/.sonartmp_4754965096649163948/sonarlint-slf4j-sonar-log714933638343291100.jar
+.sonarlint/
+siga-web/.sts4-cache/

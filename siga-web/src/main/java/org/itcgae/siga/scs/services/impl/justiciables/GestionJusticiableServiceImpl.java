@@ -2231,17 +2231,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					LOGGER.info(
 							"getJusticiableByIdPersona() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener representante");
 					ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
-				
-					//Si no proviene de justiciable se busca por la institucion a la que pertenece el justiciable
-					if(!UtilidadesString.esCadenaVacia(justiciableBusquedaItem.getIdInstitucion())) {
-						scsPersonajgExample.createCriteria().andIdinstitucionEqualTo(Short.valueOf(justiciableBusquedaItem.getIdInstitucion()))
-						.andIdpersonaEqualTo(Long.valueOf(justiciableBusquedaItem.getIdPersona()));
-					}else {
-						scsPersonajgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdpersonaEqualTo(Long.valueOf(justiciableBusquedaItem.getIdPersona()));
-					}
-					
-					
+					scsPersonajgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.valueOf(justiciableBusquedaItem.getIdPersona()));
 
 					scsPersonajgExample.setOrderByClause("FECHAMODIFICACION DESC");
 

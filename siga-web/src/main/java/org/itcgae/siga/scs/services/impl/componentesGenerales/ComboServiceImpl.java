@@ -163,7 +163,7 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboEstadoEjg() / scsEstadoEJGExtendsMapper.comboEstadoEjg() -> Entrada a scsTipoEJGExtendsMapper para obtener combo EstadoEjg");
 
-				List<ComboItem> comboItems = scsEstadoEJGExtendsMapper.comboEstadoEjg(Short.valueOf(usuarios.get(0).getIdlenguaje()));
+				List<ComboItem> comboItems = scsEstadoEJGExtendsMapper.comboEstadoEjg(Short.parseShort(usuarios.get(0).getIdlenguaje()));
 
 				LOGGER.info(
 						"comboEstadoEjg() / scsEstadoEJGExtendsMapper.comboEstadoEjg() -> Salida e scsTipoEJGExtendsMapper para obtener combo EstadoEjg");
@@ -318,7 +318,7 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboJuzgado() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo Juzgado");
 
-				List<ComboItem> comboItems = scsJuzgadoExtendsMapper.comboJuzgado( idInstitucion);
+				List<ComboItem> comboItems = scsJuzgadoExtendsMapper.comboJuzgado(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
 
 				LOGGER.info(
 						"comboJuzgado() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo Juzgado");

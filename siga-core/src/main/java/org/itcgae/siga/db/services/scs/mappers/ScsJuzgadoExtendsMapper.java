@@ -44,8 +44,6 @@ public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREPOBLACION", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-
 
 	})
 	List<JuzgadoItem> searchCourt(JuzgadoItem juzgadoItem, Short idInstitucion);
@@ -62,7 +60,7 @@ public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 		@Result(column = "IDJUZGADO", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> comboJuzgado(Short idInstitucion);
+	List<ComboItem> comboJuzgado(Short idLenguaje, Short idInstitucion);
 	
 	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "comboJuzgados")
 	@Results({ 
