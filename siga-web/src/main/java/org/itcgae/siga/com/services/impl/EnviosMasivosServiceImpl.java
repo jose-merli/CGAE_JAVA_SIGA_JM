@@ -1662,7 +1662,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			if (null != usuarios && usuarios.size() > 0) {
+			if (null != usuarios && usuarios.size() > 0 && datosTarjeta.getIdPlantillaEnvios() != null) {
 				//AdmUsuarios usuario = usuarios.get(0);
 
 				EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
