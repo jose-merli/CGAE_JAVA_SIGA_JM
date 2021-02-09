@@ -177,6 +177,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 					_envEnviosMapper.updateByPrimaryKey(envio);
 				}
 			}
+			
 		}catch(Exception e){
 			LOGGER.error("Error al procesar el envío", e);
 			envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
@@ -262,6 +263,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 		boolean envioMasivo = envio.getEnvio().contains("M") ? true : false;
 		
 		Short idEstadoEnvio = SigaConstants.ENVIO_PROCESADO;
+
 		if(envioMasivo){
 			
 			List<DestinatarioItem> destinatarios = new ArrayList<DestinatarioItem>();
@@ -349,6 +351,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				
 				LOGGER.debug("Procedemos al envio del email: tipo " + envio.getIdtipoenvios() + "--" + envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL));
 				
+				
 				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
 					idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 				}else{
@@ -374,12 +377,14 @@ public class ColaEnviosImpl implements IColaEnvios {
 //						destinatario.getDomicilio();
 //					}
 				}
+				
 			}else{
 				LOGGER.error("No se han encontrado consultas de destinatarios asociadas a la plantilla de envío");
 				envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
 				envio.setFechamodificacion(new Date());
 				_envEnviosMapper.updateByPrimaryKey(envio);
 			}
+			
 		}
 		envio.setIdestado(idEstadoEnvio);
 		envio.setFechamodificacion(new Date());
@@ -859,6 +864,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				LOGGER.debug("El idSolicitudEcos para el número " + envDestinatariosBurosms.getMovil() + " es " + idSolicitudEcos);
 				if (idSolicitudEcos != null && !idSolicitudEcos.trim().equals("")) {
 					if (isBuroSMS) {
+						
 					
 					//añadimos un documento vacío para que al descargar desde la web vayamos a buscar el pdf a la pfd
 					EnvDocumentos envDocumentos = addEnvDocument(envio.getIdenvio(), envio.getIdinstitucion(), envDestinatariosBurosms.getMovil());
@@ -869,11 +875,12 @@ public class ColaEnviosImpl implements IColaEnvios {
 					envDestinatariosBurosms.setIdsolicitudecos(idSolicitudEcos);
 					envDestinatariosBurosms.setIddocumento(envDocumentos.getIddocumento());
 					
-					buroSMSenviados += envDestinatariosBurosmsMapper.insert(envDestinatariosBurosms);						
+					buroSMSenviados += envDestinatariosBurosmsMapper.insert(envDestinatariosBurosms);	
 					}
 				}else{
 					hayError = true;
 					LOGGER.error("Error al enviar el sms al destinatario: " + envDestinatariosBurosms.getMovil());
+					
 				}
 			}catch(Exception e) {
 				hayError = true;

@@ -305,6 +305,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.WHERE("comp.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("comp.CEN_CLIENTE_IDPERSONA = '" + idPersona + "'");
 		sql.ORDER_BY("FECHACONSTITUCION ASC");
+		
 		return sql.toString();
 	}
 	

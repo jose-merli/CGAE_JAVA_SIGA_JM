@@ -1,10 +1,9 @@
 package org.itcgae.siga.DTOs.gen;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 

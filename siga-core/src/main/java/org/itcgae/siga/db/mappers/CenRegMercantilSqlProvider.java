@@ -2,6 +2,7 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenRegMercantil;
 import org.itcgae.siga.db.entities.CenRegMercantilExample;

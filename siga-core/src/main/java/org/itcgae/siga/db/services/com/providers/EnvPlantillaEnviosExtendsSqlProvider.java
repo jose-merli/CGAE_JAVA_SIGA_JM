@@ -57,9 +57,11 @@ public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSql
 		sql.SELECT("INITCAP(NOMBRE) AS LABEL");		
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N' AND FECHABAJA is NULL");
+		
 		if(!UtilidadesString.esCadenaVacia(idClaseComunicacion)) {
 			sql.WHERE("(IDCLASECOMUNICACION = '" + idClaseComunicacion  + "' or IDCLASECOMUNICACION is null)");
 		}
+		
 		sql.ORDER_BY("LABEL");
 		
 		return sql.toString();
@@ -137,23 +139,30 @@ public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSql
 	}
 
 	public String getTemplates(String idInstitucion) {
+
 		SQL sql = new SQL();
+
 		sql.SELECT_DISTINCT("IDPLANTILLAENVIOS");
 		sql.SELECT("INITCAP(NOMBRE) AS NOMBRE");
 		sql.SELECT("IDTIPOENVIOS");
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.ORDER_BY("NOMBRE");
+		
 		return sql.toString();
 	}
+	
 	public String getPlantillasByIdInstitucion(String idInstitucion) {
+
 		SQL sql = new SQL();
+
 		sql.SELECT_DISTINCT("IDPLANTILLAENVIOS");
 		sql.SELECT("NOMBRE");
 		sql.SELECT("IDTIPOENVIOS");
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.ORDER_BY("NOMBRE");
+		
 		return sql.toString();
 	}
 }

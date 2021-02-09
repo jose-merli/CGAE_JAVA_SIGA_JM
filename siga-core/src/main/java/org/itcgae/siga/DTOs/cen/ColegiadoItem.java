@@ -1129,7 +1129,9 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 		this.identificadords = identificadords;
 	}
 	
-
+	/**
+	 *
+	 */
 	public ColegiadoItem idTratamiento(String idTratamiento){
 		this.idTratamiento = idTratamiento;
 		return this;
@@ -1220,15 +1222,8 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 		return noAparecerRedAbogaciaFilter;
 	}
 
-	    
 	public void setNoAparecerRedAbogaciaFilter(String noAparecerRedAbogaciaFilter) {
 		this.noAparecerRedAbogaciaFilter = noAparecerRedAbogaciaFilter;
-		
-	
-	/**
-	* Convert the given object to string with each line indented by 4 spaces
-	* (except the first line).
-	*/
 	}
 
 	public Boolean getSearchLoggedUser() {
@@ -1254,7 +1249,6 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 	public void setInstitucion(String institucion) {
 		this.institucion = institucion;
 	}
-
 
 
 	public String[] getTemas() {
@@ -1296,31 +1290,42 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 	public void setCambioEstado(Boolean cambioEstado) {
 		this.cambioEstado = cambioEstado;
 	}
+
 	public String getNumberColegiado() {
 		return numberColegiado;
 	}
+
 	public void setNumberColegiado(String numberColegiado) {
 		this.numberColegiado = numberColegiado;
 	}
+
 	public Boolean getSearchCount() {
 		return searchCount;
 	}
+
 	public void setSearchCount(Boolean searchCount) {
 		this.searchCount = searchCount;
 	}
+
 	public String getCount() {
 		return count;
 	}
+
 	public void setCount(String count) {
 		this.count = count;
 	}
+
 	
 	public String getSituacionResidenteFilter() {
 		return situacionResidenteFilter;
 	}
+
 	public void setSituacionResidenteFilter(String situacionResidenteFilter) {
 		this.situacionResidenteFilter = situacionResidenteFilter;
 	}
+
+	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -1407,6 +1412,7 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 		result = prime * result + ((tipoDireccion == null) ? 0 : tipoDireccion.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -1797,9 +1803,12 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 	public String[] getSituaciones() {
 		return situaciones;
 	}
+
 	public void setSituaciones(String[] situaciones) {
 		this.situaciones = situaciones;
+ 
 	}
+	
 	@Override
 	public int compareTo(ColegiadoItem o) {
 		return getFechaEstado().compareTo(o.getFechaEstado());

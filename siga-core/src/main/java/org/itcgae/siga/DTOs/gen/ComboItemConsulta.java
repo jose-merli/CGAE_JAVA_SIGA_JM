@@ -2,71 +2,65 @@ package org.itcgae.siga.DTOs.gen;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
-
-
-
-
-
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
-public class ComboItemConsulta   {
-  
-  private String label = null;
-  private String value = null;
-  private String idInstitucion = null;
+public class ComboItemConsulta {
+
+	private String label = null;
+	private String value = null;
+	private String idInstitucion = null;
 	private String idClaseComunicacion = null;
 	private String claseComunicacion = null;
 
+	/**
+	   **/
 	public ComboItemConsulta idInstitucion(String idInstitucion) {
 		this.label = idInstitucion;
 		return this;
 	}
-  
+
 	@JsonProperty("idInstitucion")
-  public String getIdInstitucion() {
-	return idInstitucion;
-  }
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
 
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
 
-  public void setIdInstitucion(String idInstitucion) {
-	this.idInstitucion = idInstitucion;
-  }
+	/**
+	   **/
+	public ComboItemConsulta label(String label) {
+		this.label = label;
+		return this;
+	}
 
+	@JsonProperty("label")
+	public String getLabel() {
+		return label;
+	}
 
-/**
-   **/
-  public ComboItemConsulta label(String label) {
-    this.label = label;
-    return this;
-  }
-  
-  
-  @JsonProperty("label")
-  public String getLabel() {
-    return label;
-  }
-  public void setLabel(String label) {
-    this.label = label;
-  }
+	public void setLabel(String label) {
+		this.label = label;
+	}
 
-  
-  /**
-   **/
-  public ComboItemConsulta value(String value) {
-    this.value = value;
-    return this;
-  }
-  
-  
-  @JsonProperty("value")
-  public String getValue() {
-    return value;
-  }
-  public void setValue(String value) {
-    this.value = value;
-  }
+	/**
+	 **/
+	public ComboItemConsulta value(String value) {
+		this.value = value;
+		return this;
+	}
 
-  
+	@JsonProperty("value")
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	/**
+	 **/
 	public ComboItemConsulta idClaseComunicacion(String idClaseComunicacion) {
 		this.idClaseComunicacion = idClaseComunicacion;
 		return this;
@@ -81,22 +75,24 @@ public class ComboItemConsulta   {
 		this.idClaseComunicacion = idClaseComunicacion;
 	}
 
+	/**
+	 **/
 	public ComboItemConsulta claseComunicacion(String claseComunicacion) {
 		this.claseComunicacion = claseComunicacion;
 		return this;
-    }
+	}
 
 	@JsonProperty("claseComunicacion")
 	public String getClaseComunicacion() {
 		return claseComunicacion;
-    }
+	}
 
 	public void setClaseComunicacion(String claseComunicacion) {
 		this.claseComunicacion = claseComunicacion;
-  }
+	}
 
-  @Override
-  public int hashCode() {
+	@Override
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((claseComunicacion == null) ? 0 : claseComunicacion.hashCode());
@@ -105,9 +101,9 @@ public class ComboItemConsulta   {
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
-  }
+	}
 
-  @Override
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -136,22 +132,19 @@ public class ComboItemConsulta   {
 				return false;
 		} else if (!label.equals(other.label))
 			return false;
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
 		if (value == null) {
 			if (other.value != null)
 				return false;
 		} else if (!value.equals(other.value))
 			return false;
 		return true;
-    }
+	}
 
 	@Override
 	public String toString() {
 		return "ComboItemConsulta [label=" + label + ", value=" + value + ", idInstitucion=" + idInstitucion
 				+ ", idClaseComunicacion=" + idClaseComunicacion + ", claseComunicacion=" + claseComunicacion + "]";
-  }
-}
+	}
 
+	
+}

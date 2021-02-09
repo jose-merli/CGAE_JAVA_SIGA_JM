@@ -2,7 +2,6 @@ package org.itcgae.siga.DTOs.com;
 
 import java.util.Date;
 
-
 public class EnviosMasivosSearch {
 	
 	private String descripcion;

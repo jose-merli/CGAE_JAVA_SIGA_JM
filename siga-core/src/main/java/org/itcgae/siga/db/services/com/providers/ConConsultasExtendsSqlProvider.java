@@ -58,7 +58,7 @@ public class ConConsultasExtendsSqlProvider {
 			sql.WHERE("CONSULTA.IDOBJETIVO = '" + filtros.getIdObjetivo() +"'");
 		}
 		if(!filtros.getHistorico()) {
-		sql.WHERE("CONSULTA.FECHABAJA IS NULL");
+			sql.WHERE("CONSULTA.FECHABAJA IS NULL");
 		}
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
@@ -81,6 +81,7 @@ public class ConConsultasExtendsSqlProvider {
 		}else {
 			sql.WHERE("((CONSULTA.IDINSTITUCION = '2000' AND (UPPER(CONSULTA.GENERAL) = 'S'  OR  CONSULTA.GENERAL = '1')) OR (CONSULTA.IDINSTITUCION = '" + idInstitucion +"' AND (UPPER(CONSULTA.GENERAL) = 'N'  OR  CONSULTA.GENERAL = '0')))");
 		}
+		
 		sql.ORDER_BY("CONSULTA.DESCRIPCION");
 		
 		return sql.toString();

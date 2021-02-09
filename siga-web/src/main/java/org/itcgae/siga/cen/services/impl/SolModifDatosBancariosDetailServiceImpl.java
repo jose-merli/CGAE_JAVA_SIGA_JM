@@ -1,6 +1,5 @@
 package org.itcgae.siga.cen.services.impl;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.SolModifDatosBancariosItem;

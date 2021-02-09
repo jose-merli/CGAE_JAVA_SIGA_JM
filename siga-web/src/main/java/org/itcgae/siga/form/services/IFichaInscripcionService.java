@@ -1,6 +1,7 @@
 package org.itcgae.siga.form.services;
 
 import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,9 +30,12 @@ public interface IFichaInscripcionService {
 	public String compruebaMinimaAsistencia(InscripcionItem inscripcionItem, HttpServletRequest request);
 	
 	public ComboDTO getPaymentMode(HttpServletRequest request);
+
 	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
+
 	public FicheroDTO downloadFile(InscripcionItem inscripcionItem, HttpServletRequest request,
 			HttpServletResponse response);
+
 	public ComboItem fileDownloadInformation(InscripcionItem inscripcionItem, HttpServletRequest request);
 	
 }

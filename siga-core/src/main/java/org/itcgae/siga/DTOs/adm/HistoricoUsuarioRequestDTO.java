@@ -46,9 +46,13 @@ public class HistoricoUsuarioRequestDTO {
 	public String getIdPersonaReal() {
 		return idPersonaReal;
 	}
+
+
 	public void setIdPersonaReal(String idPersonaReal) {
 		this.idPersonaReal = idPersonaReal;
 	}
+
+
 	/**
 	**/
 	public HistoricoUsuarioRequestDTO usuarioAutomatico(String usuarioAutomatico) {

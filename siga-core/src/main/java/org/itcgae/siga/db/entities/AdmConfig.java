@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.entities;
 
-
 public class AdmConfig {
 
 	/**

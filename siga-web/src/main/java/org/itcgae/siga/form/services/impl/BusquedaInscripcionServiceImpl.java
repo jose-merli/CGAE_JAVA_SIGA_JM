@@ -390,8 +390,10 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				if (null != inscripcion.getFormaPago() ) {
 					pysServiciossolicitados.setIdformapago(Short.valueOf(inscripcion.getFormaPago().toString()));
 				}else{
-				pysServiciossolicitados.setIdformapago(Short.valueOf("10"));
+					pysServiciossolicitados.setIdformapago(Short.valueOf("10"));
 				}
+			
+				
 
 				LOGGER.info(
 						"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para insertar el servicio solicitado");
@@ -414,7 +416,7 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				if (null != inscripcion.getFormaPago() ) {
 					pysSuscripcion.setIdformapago(Short.valueOf(inscripcion.getFormaPago().toString()));
 				}else{
-				pysSuscripcion.setIdformapago(Short.valueOf("10"));
+					pysSuscripcion.setIdformapago(Short.valueOf("10"));
 				}
 				pysSuscripcion.setFechasuscripcion(new Date());
 

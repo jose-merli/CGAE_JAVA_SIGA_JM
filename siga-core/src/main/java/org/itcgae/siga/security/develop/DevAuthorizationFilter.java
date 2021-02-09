@@ -64,21 +64,27 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 			String grupo = "";
 			String nombre = (String) request.getHeader("CAS-displayName");
 			String institucion = "";	
+			
+			//grupo = this.userDetailsService.getGrupoCAS(request);
+			//institucion = this.userDetailsService.getInstitucionCAS(request);
 			grupo = "Personal";
 			institucion = "2000";
+			/*if (!perfiles.contains(grupo)) {
+				perfiles.add(grupo);
+			}*/
 			perfiles.add("ADG");
 			try {
-			UserCgae userDesarrollo = (UserCgae) userDetailsService
+				UserCgae userDesarrollo = (UserCgae) userDetailsService
 						.loadUserByUsername(new UserCgae(dni, grupo, institucion, null,perfiles, "N", null, nombre));
-			authentication = new UserAuthenticationToken(userDesarrollo.getDni(), null, userDesarrollo, null,
-					new ArrayList<>());
-			String header = null;
-			try {
-				header = UserTokenUtils.generateToken(userDesarrollo);
-			} catch (TokenGenerationException e) {
-				e.printStackTrace();
-			}
-			mutableRequest.addHeader("Authorization", header);
+				authentication = new UserAuthenticationToken(userDesarrollo.getDni(), null, userDesarrollo, null,
+						new ArrayList<>());
+				String header = null;
+				try {
+					header = UserTokenUtils.generateToken(userDesarrollo);
+				} catch (TokenGenerationException e) {
+					e.printStackTrace();
+				}
+				mutableRequest.addHeader("Authorization", header);
 			}catch(Exception e) {
 				e.printStackTrace();
 			}

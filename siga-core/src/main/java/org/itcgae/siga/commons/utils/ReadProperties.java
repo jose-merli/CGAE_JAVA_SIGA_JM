@@ -3,7 +3,6 @@ package org.itcgae.siga.commons.utils;
 import java.util.Hashtable;
 import java.util.Properties;
 
-
 public class ReadProperties{
 	// Read properties file.
 	Hashtable propertiesHt = new Hashtable();

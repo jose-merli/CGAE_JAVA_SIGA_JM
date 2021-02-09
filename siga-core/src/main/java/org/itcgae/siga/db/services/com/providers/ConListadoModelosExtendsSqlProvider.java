@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.services.com.providers;
 
-
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.commons.constants.SigaConstants;
 
@@ -8,7 +7,7 @@ public class ConListadoModelosExtendsSqlProvider {
 	public String selectListadoModelos(Short idInstitucion, String idConsulta, Short idInstitucionModelo) {
 
 		SQL sql = new SQL();
-		// Formateo de fecha para sentencia sql
+		
 
 		// TODO: Consulta real
 //		SELECT IDMODELOCOMUNICACION,NOMBRE,ORDEN,IDINSTITUCION,DESCRIPCION,PRESELECCIONAR,IDCLASECOMUNICACION
@@ -43,11 +42,20 @@ public class ConListadoModelosExtendsSqlProvider {
 		
 		
 		sql.WHERE("MODELO.IDMODELOCOMUNICACION IN (SELECT IDMODELOCOMUNICACION FROM MOD_PLANTILLADOC_CONSULTA WHERE IDINSTITUCION_CONSULTA='"+idInstitucion+"' AND IDCONSULTA='"+idConsulta+"' AND FECHABAJA IS NULL)");
+		
+
+		
         if(idInstitucionModelo.equals(SigaConstants.IDINSTITUCION_2000)) {
         	sql.WHERE("MODELO.IDINSTITUCION='"+idInstitucionModelo+"'");
+            
+
         }else {
+
             sql.WHERE("(MODELO.IDINSTITUCION='"+idInstitucionModelo+"' or (MODELO.IDINSTITUCION='"+SigaConstants.IDINSTITUCION_2000+"' AND MODELO.PORDEFECTO = 'SI'))");
         }
+
+		
+		
 		sql.WHERE("MODELO.FECHABAJA IS NULL");
 		return sql.toString();
 	}

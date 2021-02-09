@@ -541,10 +541,12 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 							// Llamada a metodo para obtener idgrupo
 							cen.createCriteria().andIdgrupoEqualTo(idGrupo)
 							.andIdinstitucionIn(instituciones);
-
+							
 							cen.setOrderByClause("IDINSTITUCION DESC");
+							
 							List<CenGruposcliente> gruposCliente = cenGruposclienteMapper
 									.selectByExample(cen);
+							
 							if (gruposCliente != null && gruposCliente.size() > 0) {
 								cenGruposCliente = gruposCliente.get(0);
 								genRecursosCatalogosKey.setIdrecurso(cenGruposCliente.getNombre());

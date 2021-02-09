@@ -85,14 +85,13 @@ public interface IPlantillasDocumentoService {
 	ResponseDataDTO guardarModPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 
 	/**
-	ResponseDataDTO guardarDatosSalida(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
-	 * Obtiene los combos de las consultas posibles seperadas por objetivo
+	 * Guarda datos salida de la plantilla documento
 	 * @param request
 	 * @param plantillaDoc
 	 * @return
 	 */
 	ResponseDataDTO guardarDatosSalida(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
-	
+
 	/**
 	 * Obtiene los combos de las consultas posibles seperadas por objetivo
 	 * @param request

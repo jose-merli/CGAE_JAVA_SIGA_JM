@@ -46,6 +46,7 @@ public interface IFichaDatosGeneralesService {
 //	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request);
 	
 	public ComboDTO getTopicsSpecificPerson(HttpServletRequest request, String idPersona);
+
 	public StringDTO getTipoIdentificacion(StringDTO nifcif,HttpServletRequest request);
 	
 }

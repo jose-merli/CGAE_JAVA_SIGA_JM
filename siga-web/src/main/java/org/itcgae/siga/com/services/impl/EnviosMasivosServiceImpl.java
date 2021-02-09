@@ -146,7 +146,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	private EnvEnvioprogramadoMapper _envEnvioprogramadoMapper;
 
 	@Autowired
-
 	private EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
 
 	@Autowired
@@ -179,7 +178,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	@Autowired
 	private EnvDestConsultaEnvioExtendsMapper _envDestConsultaEnvioExtendsMapper;
 
-
 	@Autowired
 	private EnvDestConsultaEnvioMapper _envDestConsultaEnvioMapper;
 
@@ -209,7 +207,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	@Autowired
 	private IPFDService pfdService;
-
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -334,20 +331,28 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		LOGGER.info("enviosMasivosSearch() -> Salida del servicio para obtener envios");
 		return enviosMasivos;
 	}
+
 	@Override
 	public EnviosMasivosDTO busquedaEnvioMasivoSearch(HttpServletRequest request, EnviosMasivosSearch filtros) {
 		LOGGER.info("busquedaEnvioMasivoSearch() -> Entrada al servicio para obtener envios");
+
 		EnviosMasivosDTO enviosMasivos = new EnviosMasivosDTO();
 		List<EnviosMasivosItem> enviosItemList = new ArrayList<EnviosMasivosItem>();
+
+		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
 			if (null != usuarios && usuarios.size() > 0) {
+
 				AdmUsuarios usuario = usuarios.get(0);
+
 				try {
 					enviosItemList = _envEnviosExtendsMapper.busquedaSelectEnviosMasivosSearch(usuario.getIdinstitucion(),
 							usuario.getIdlenguaje(), filtros);
@@ -360,8 +365,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					error.setMessage(e.getMessage());
 					enviosMasivos.setError(error);
 				}
+
 			}
 		}
+
 		LOGGER.info("busquedaEnvioMasivoSearch() -> Salida del servicio para obtener envios");
 		return enviosMasivos;
 	}
@@ -624,6 +631,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setEnvio("M");
 						@SuppressWarnings("unused")
 						int insert = _envEnviosMapper.insert(envio);
+						
 						/*if (insert > 0) {
 							EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
 							historico.setIdenvio(envio.getIdenvio());
@@ -799,6 +807,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		EnviosMasivosDTO respuesta = new EnviosMasivosDTO();
         //EnviosMasivosItem envioMasivoItem = new EnviosMasivosItem();
 
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -981,7 +990,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					histExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
 					/*List<EnvHistoricoestadoenvio> historicosEstados = _envHistoricoestadoenvioMapper
 							.selectByExample(histExample);
-					/*for (EnvHistoricoestadoenvio envHistorico : historicosEstados) {
+					for (EnvHistoricoestadoenvio envHistorico : historicosEstados) {
 						// el id historico se debería de calcular con secuencia en bdd
 						envHistorico.setIdenvio(idEnvioNuevo);
 						envHistorico.setFechamodificacion(new Date());
@@ -1653,7 +1662,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			if (null != usuarios && usuarios.size() > 0) {
+			if (null != usuarios && usuarios.size() > 0 && datosTarjeta.getIdPlantillaEnvios() != null) {
 				//AdmUsuarios usuario = usuarios.get(0);
 
 				EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
@@ -2213,7 +2222,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Integer idDocumento) {
+	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Short idDocumento) {
 
 		LOGGER.debug("Comprobando si es un envío burosms para recuperar el pdf para iddocumento " + idDocumento);
 		Resource inputStreamResource = null;
@@ -2307,45 +2316,63 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		}
 		return inputStreamResource;
 	}
+	
 	@Override
 	public EnviosMasivosDTO obtenerDestinatarios(HttpServletRequest request, EnviosMasivosDTO enviosMasivosDTO) {
 		LOGGER.info("obtenerDestinatarios() -> Entrada al servicio para obtener destinatarios de envios");
 
 		EnviosMasivosDTO enviosMasivos = new EnviosMasivosDTO();
 		List<EnviosMasivosItem> enviosItemList = new ArrayList<EnviosMasivosItem>();
+
+		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
 			if (null != usuarios && usuarios.size() > 0) {
+
 				AdmUsuarios usuario = usuarios.get(0);
+
 				try {
+					
 					List<EnviosMasivosItem> envios = enviosMasivosDTO.getEnviosMasivosItem();
+					
 					String idEnvios = "";
+					
 					for (int i = 0; i < envios.size(); i++) {
+						
 						if(i == envios.size()-1) {
 							idEnvios += envios.get(i).getIdEnvio(); 
 						}else {
 							idEnvios += envios.get(i).getIdEnvio() + ","; 
 						}
 					}
+					
+					
 					enviosItemList = _envEnviosExtendsMapper.obtenerDestinatarios(usuario.getIdinstitucion(),
 							idEnvios);
+				
 					if (enviosItemList.size() > 0) {
 						enviosMasivos.setEnviosMasivosItem(enviosItemList);
 					}
+					
 				} catch (Exception e) {
 					Error error = new Error();
 					error.setCode(500);
 					error.setMessage(e.getMessage());
 					enviosMasivos.setError(error);
 				}
+
 			}
 		}
+
 		LOGGER.info("obtenerDestinatarios() -> Salida del servicio para obtener destinatarios de envios");
 		return enviosMasivos;
 	}
+
 }

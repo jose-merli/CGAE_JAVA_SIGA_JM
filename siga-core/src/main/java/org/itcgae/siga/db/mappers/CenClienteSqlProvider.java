@@ -3,6 +3,7 @@ package org.itcgae.siga.db.mappers;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;

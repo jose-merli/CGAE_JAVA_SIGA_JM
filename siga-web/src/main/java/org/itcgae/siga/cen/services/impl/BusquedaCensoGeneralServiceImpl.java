@@ -224,9 +224,11 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 									busquedaPerFisica.setNif(
 											colegiadoName[i].getDatosPersonales().getIdentificacion().getPasaporte());
 								}
+								
 								if (colegiadoName[i].getDatosPersonales().getSexo() != null) {
 									busquedaPerFisica
 											.setSexo(colegiadoName[i].getDatosPersonales().getSexo().toString());
+
 								}
 
 								if (busquedaPerFisica.getNif() != null) {
@@ -310,7 +312,7 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 												instituciones.get(0).getIdinstitucion().toString());
 									}
 								}
-								if (null != colegiadoName[i].getLocalizacion()) {
+								if (null != colegiadoName[i].getLocalizacion()) {									
 									busquedaPerFisica.setDireccion(colegiadoName[i].getLocalizacion().getDomicilio());
 									if (null != colegiadoName[i].getLocalizacion().getNacional()) {
 										if (null != colegiadoName[i].getLocalizacion().getNacional().getProvincia()) {
@@ -321,9 +323,13 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 											busquedaPerFisica.setNombrePoblacion(colegiadoName[i].getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion());
 										}
 
+
 										busquedaPerFisica.setCodigoPostal(colegiadoName[i].getLocalizacion().getNacional().getCodigoPostal());
 									}
+
+
 								}
+
 								busquedaPerFisicaItems.add(busquedaPerFisica);
 							}
 						}
@@ -645,6 +651,7 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 									if (colegiado.getDatosPersonales().getSexo() != null) {
 										busquedaPerFisica
 												.setSexo(colegiado.getDatosPersonales().getSexo().toString());
+
 									}
 
 									// Extraemos el idPersona
@@ -669,8 +676,12 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 												busquedaPerFisica.setIdPoblacion(colegiado.getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion());
 												busquedaPerFisica.setNombrePoblacion(colegiado.getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion());
 											}
+
+
 											busquedaPerFisica.setCodigoPostal(colegiado.getLocalizacion().getNacional().getCodigoPostal());
 										}
+
+
 									}
 									busquedaPerFisicaItems.add(busquedaPerFisica);
 								}

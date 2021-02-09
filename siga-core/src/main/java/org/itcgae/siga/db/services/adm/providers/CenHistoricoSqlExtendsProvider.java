@@ -38,6 +38,7 @@ public class CenHistoricoSqlExtendsProvider {
 		if(null != historicoUsuarioRequestDTO.getIdTipoAccion() && !historicoUsuarioRequestDTO.getIdTipoAccion().equalsIgnoreCase("")){
 			sql.WHERE(" TIPO.IDTIPOCAMBIO = '"+ historicoUsuarioRequestDTO.getIdTipoAccion() +"'");
 		}
+		// campos que pueden ser opcionales
 		if(null != historicoUsuarioRequestDTO.getIdPersonaReal() && !historicoUsuarioRequestDTO.getIdPersonaReal().equalsIgnoreCase("")){
 			sql.WHERE(" HIST.IDPERSONA = '"+ historicoUsuarioRequestDTO.getIdPersonaReal() +"'");
 		}

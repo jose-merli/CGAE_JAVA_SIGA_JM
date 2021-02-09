@@ -72,6 +72,8 @@ public interface ModPlantillaDocumentoConsultaExtendsMapper {
 			"#{idioma,jdbcType=VARCHAR}, #{fechamodificacion,jdbcType=TIMESTAMP}, ",
 			"#{usumodificacion,jdbcType=DECIMAL})" })
 	int insertModPlantillaDocumento(ModPlantilladocumento record);
+
+	
 	@SelectProvider(type = ModPlantillaDocumentoConsultaExtendsSqlProvider.class, method = "selectConsultasDestinatario")
 	List<ConsultaItem> selectConsultasDestinatario(Short idinstitucion, long parseLong, Long codigo);
 }

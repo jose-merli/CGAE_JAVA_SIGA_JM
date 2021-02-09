@@ -92,6 +92,7 @@ public interface EnvPlantillaEnviosExtendsMapper extends EnvPlantillasenviosMapp
 		@Result(column = "NOMBRE", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR)
 	})
 	List<NotificacionEventoItem> getTemplates(String idInstitucion);
+	
 	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "getPlantillasByIdInstitucion")
 	@Results({
 		@Result(column = "IDPLANTILLAENVIOS", property = "value", jdbcType = JdbcType.VARCHAR),

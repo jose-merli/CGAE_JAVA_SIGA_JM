@@ -116,6 +116,8 @@ public class SigaConstants {
 	public static final int COLA_CAMBIO_LETRADO_BORRADO_DIRECCION = 40;
 	public static final int COLA_CAMBIO_LETRADO_LOPD = 50;
 	
+	// Tipos de Cambio ColaCambioLetrado
+	
 	//estados envio
 	public static final Short ENVIO_PENDIENTE_MANUAL = 1;
 	public static final Short ENVIO_PROCESADO = 2;
@@ -958,8 +960,11 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static String EXPRESION_REGULAR_MAIL = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,10}$";
 	public static String EXPRESION_REGULAR_MAIL2 = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-	
                         + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+	
+	
+	
+	
 	
 	public static String EVENTO_TIPO_FESTIVO = "9";
 

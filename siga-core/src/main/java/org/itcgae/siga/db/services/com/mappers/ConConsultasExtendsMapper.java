@@ -118,6 +118,7 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CLASECOMUNICACION", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR)
+
 	})
 	List<ComboItemConsulta> selectConsultasDisponiblesFiltro(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro);
 

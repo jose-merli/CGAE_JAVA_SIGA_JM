@@ -108,20 +108,27 @@ public class ModModeloComunicacionExtendsSqlProvider {
 
 		sql.FROM("MOD_MODELOCOMUNICACION MODELO");
 		sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = MODELO.IDCLASECOMUNICACION");
+
 		if(idInstitucionLogueada.equals(SigaConstants.IDINSTITUCION_2000.toString())) {
-		sql.JOIN( // = MODELO.IDINSTITUCION
-				"MOD_MODELO_PERFILES PERFILES ON PERFILES.IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION AND PERFILES.IDINSTITUCION = " + idInstitucionLogueada);
+			sql.JOIN( // = MODELO.IDINSTITUCION
+					"MOD_MODELO_PERFILES PERFILES ON PERFILES.IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION AND PERFILES.IDINSTITUCION = " + idInstitucionLogueada);
+			
 
 		}else {
 			sql.JOIN( // = MODELO.IDINSTITUCION
 					"MOD_MODELO_PERFILES PERFILES ON PERFILES.IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION AND (PERFILES.IDINSTITUCION = " + idInstitucionLogueada + " or PERFILES.IDINSTITUCION = " + SigaConstants.IDINSTITUCION_2000 + ")");
+
+
 		}
+		
 		if(idInstitucion.equals(SigaConstants.IDINSTITUCION_2000.toString())) {
+			
 			sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND (CLASE.IDMODULO = " + idModulo
 					+ " OR CLASE.IDMODULO IS NULL) AND MODELO.FECHABAJA IS NULL AND MODELO.IDINSTITUCION = "+idInstitucion);
 			sql.WHERE("MODELO.VISIBLE = '1'");
 
 		}else {
+
 			// CLASE.IDMODULO = " + idModulo + " OR 
 			sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND (CLASE.IDMODULO = " + idModulo + " OR CLASE.IDMODULO IS NULL) AND MODELO.FECHABAJA IS NULL ");	
 			sql.WHERE("((MODELO.IDINSTITUCION = " + idInstitucion + " AND MODELO.VISIBLE = '1') or (MODELO.IDINSTITUCION = " + SigaConstants.IDINSTITUCION_2000 + " AND MODELO.VISIBLE = '1' and modelo.pordefecto = 'SI'))");
@@ -243,14 +250,18 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	}
 	public String selectTodasPlantillasBorradas(String idModeloComunicacion, String idInstitucion) {
 		SQL sql = new SQL();
+		
 		sql.SELECT("");
+		
 		sql.FROM("MOD_MODELOCOMUNICACION mm");
 		sql.LEFT_OUTER_JOIN("MOD_MODELO_PLANTILLADOCUMENTO mp\r\n" + 
 				"	ON mm.IDMODELOCOMUNICACION = mp.IDMODELOCOMUNICACION");
+		
 		sql.LEFT_OUTER_JOIN("LEFT JOIN MOD_PLANTILLADOCUMENTO pl "
 				+ "ON pl.IDPLANTILLADOCUMENTO = mp.IDPLANTILLADOCUMENTO");
 		sql.WHERE("IDINSTITUCION = "+ idInstitucion);
 		sql.WHERE("IDMODELOCOMUNICACION = "+idModeloComunicacion);
+		
 		return sql.toString();
 	}
 }

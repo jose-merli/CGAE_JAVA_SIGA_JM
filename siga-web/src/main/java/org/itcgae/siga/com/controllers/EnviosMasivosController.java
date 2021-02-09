@@ -82,8 +82,10 @@ public class EnviosMasivosController {
 		else
 			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
 	@RequestMapping(value = "/searchBusqueda",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EnviosMasivosDTO> busquedaEnvioMasivoSearch(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody EnviosMasivosSearch filtros) {
+		
 		EnviosMasivosDTO response = _enviosMasivosService.busquedaEnvioMasivoSearch(request, filtros); 
 		if(response.getError() == null)
 			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
@@ -293,9 +295,9 @@ public class EnviosMasivosController {
 			throw new BusinessException("El fichero de log no existe");
 		}
 		
-			fileInfoDTO.setFilePath(file.getAbsolutePath());
-			fileInfoDTO.setName(file.getName());
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
+		fileInfoDTO.setFilePath(file.getAbsolutePath());
+		fileInfoDTO.setName(file.getName());
+		return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/detalle/descargarLog", method=RequestMethod.POST, produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -336,7 +338,7 @@ public class EnviosMasivosController {
 		Resource inputStreamResource = null;
 		if (documentoDTO.getIdInstitucion() != null && documentoDTO.getIdEnvio() != null && !documentoDTO.getIdEnvio().trim().equals("") 
 				&& documentoDTO.getIdDocumento() != null) {
-			inputStreamResource = _enviosMasivosService.recuperaPdfBuroSMS(documentoDTO.getIdInstitucion(), Long.parseLong(documentoDTO.getIdEnvio()), Integer.valueOf(documentoDTO.getIdDocumento()));
+			inputStreamResource = _enviosMasivosService.recuperaPdfBuroSMS(documentoDTO.getIdInstitucion(), Long.parseLong(documentoDTO.getIdEnvio()), documentoDTO.getIdDocumento());
 		}
 		
 		return inputStreamResource;
@@ -444,6 +446,7 @@ public class EnviosMasivosController {
 	
 	@RequestMapping(value = "/obtenerDestinatarios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EnviosMasivosDTO> obtenerDestinatarios(HttpServletRequest request, @RequestBody EnviosMasivosDTO enviosDTO) {
+		
 		EnviosMasivosDTO response = _enviosMasivosService.obtenerDestinatarios(request, enviosDTO);
 		if(response.getError() == null)
 			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
@@ -453,5 +456,8 @@ public class EnviosMasivosController {
 			else
 				return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+			
 	}
+	
+	
 }

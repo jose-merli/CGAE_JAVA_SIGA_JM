@@ -7,7 +7,7 @@ public class PlantillaDatosConsultaDTO {
 	private String idConsulta;
 	private String idInstitucion;
 	private String idClaseComunicacion;
-	
+
 
 	public String getIdInstitucion() {
 		return idInstitucion;
@@ -88,11 +88,14 @@ public class PlantillaDatosConsultaDTO {
 			return false;
 		return true;
 	}
+	
 	@Override
 	public String toString() {
 		return "PlantillaDatosConsultaDTO [idPlantillaEnvios=" + idPlantillaEnvios + ", idTipoEnvios=" + idTipoEnvios
 				+ ", idConsulta=" + idConsulta + ", idInstitucion=" + idInstitucion + ", idClaseComunicacion="
 				+ idClaseComunicacion + "]";
 	}
+	
+	
 
 }

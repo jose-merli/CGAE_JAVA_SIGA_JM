@@ -66,6 +66,7 @@ public class UserTokenUtils {
 			throw new TokenGenerationException(e);
 		}
 	}
+	
 	public static String generateTokenOldSiga(UserAuthenticationToken auth) throws TokenGenerationException {
 		try {
 			return tokenPrefix + Jwts.builder().setIssuedAt(new Date()).setIssuer("CONSEJO GENERAL DE LA ABOGACIA")
@@ -79,6 +80,7 @@ public class UserTokenUtils {
 			throw new TokenGenerationException(e);
 		}
 	}
+
 	public static String generateToken(UserCgae user) throws TokenGenerationException {
 		try {
 
@@ -88,12 +90,15 @@ public class UserTokenUtils {
 					.claim("letrado",user.getLetrado())
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
+
 		} catch (Exception e) {
 			throw new TokenGenerationException(e);
 		}
 	}
+	
 	public static String generateTokenOldSiga(UserCgae user) throws TokenGenerationException {
 		try {
+
 			return tokenPrefix + Jwts.builder().setIssuedAt(new Date()).setIssuer("CONSEJO GENERAL DE LA ABOGACIA")
 					.setSubject(user.getDni())
 					.claim("institucion", user.getInstitucion()).claim("grupo", user.getGrupo()).claim("perfiles", user.getPerfiles())

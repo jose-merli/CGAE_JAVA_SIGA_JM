@@ -32,14 +32,14 @@
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table>   -->
 			<table schema="USCGAE" tableName="ADM_ENVIOINFORME" >
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-		</table>  
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+			</table> 
 <!-- 		<table schema="USCGAE_DESA" tableName="ADM_GESTORINTERFAZ" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table>  -->
 			<table schema="USCGAE_DESA" tableName="ADM_INFORME" >
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-		</table>  
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+			</table> 
 <!-- 		<table schema="USCGAE_DESA" tableName="ADM_LENGUAJES" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table>  -->
@@ -82,8 +82,6 @@
 <!-- 		<table schema="USCGAE_DESA" tableName="ADM_VALORPREFERENTE" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table>   -->
-		
-		
 
 		
 

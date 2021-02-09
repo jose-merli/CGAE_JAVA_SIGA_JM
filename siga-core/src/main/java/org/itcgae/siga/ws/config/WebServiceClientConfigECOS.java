@@ -25,9 +25,6 @@ import org.springframework.ws.soap.server.SoapMessageDispatcher;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
 
-
-
-
 @EnableWs
 @Configuration 
 @SuppressWarnings("deprecation")

@@ -106,6 +106,8 @@ public class FichaDatosGeneralesController {
 		ComboDTO response = fichaDatosGenerales.getTopicsSpecificPerson(request, idPersona);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+
+	
 	@RequestMapping(value = "/fichaDatosGenerales/getTipoIdentificacion",  method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<StringDTO> getTipoIdentificacion(@RequestBody StringDTO nifCif, HttpServletRequest request) { 
 		StringDTO response = fichaDatosGenerales.getTipoIdentificacion(nifCif, request);

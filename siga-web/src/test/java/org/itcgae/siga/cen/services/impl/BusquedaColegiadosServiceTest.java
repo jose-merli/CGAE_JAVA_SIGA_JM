@@ -35,6 +35,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class BusquedaColegiadosServiceTest {
+
 	private Logger LOGGER = Logger.getLogger(BusquedaColegiadosServiceImpl.class);
 
 	@Mock
@@ -54,6 +55,7 @@ public class BusquedaColegiadosServiceTest {
 
 	@InjectMocks
 	private BusquedaColegiadosServiceImpl busquedaColegiadosServiceImpl;
+	
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
@@ -164,9 +166,9 @@ public class BusquedaColegiadosServiceTest {
 		GenParametrosExample genParametrosExample = new GenParametrosExample();
 	    genParametrosExample.createCriteria().andModuloEqualTo("CEN").andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO").andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
 	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaÃ±o mÃ¡ximo consulta");
 	    tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaÃ±o mÃ¡ximo consulta");
 		when(cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem,500)).thenReturn(colegiadoItemList);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();

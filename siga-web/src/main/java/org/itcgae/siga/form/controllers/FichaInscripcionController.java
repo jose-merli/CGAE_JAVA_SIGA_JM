@@ -1,6 +1,7 @@
 package org.itcgae.siga.form.controllers;
 
 import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -72,6 +73,7 @@ public class FichaInscripcionController {
 		ComboDTO response = fichaInscripcionService.getPaymentMode(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
 	@RequestMapping(value = "fichaInscripcion/uploadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	ResponseEntity<UpdateResponseDTO> uploadFile(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
 		UpdateResponseDTO response = fichaInscripcionService.uploadFile(request);
@@ -86,6 +88,8 @@ public class FichaInscripcionController {
         respuestaHeader.add("content-disposition", "attachment; filename= " + ficheroDTO.getFileName()); 
 		return new ResponseEntity<byte[]>(ficheroDTO.getFile(),respuestaHeader, HttpStatus.OK);
     }
+ 
+ 
 @RequestMapping(value = "fichaInscripcion/fileDownloadInformation", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboItem> fileDownloadInformation(@RequestBody InscripcionItem inscripcionItem, HttpServletRequest request) { 
 	ComboItem response = fichaInscripcionService.fileDownloadInformation(inscripcionItem, request);

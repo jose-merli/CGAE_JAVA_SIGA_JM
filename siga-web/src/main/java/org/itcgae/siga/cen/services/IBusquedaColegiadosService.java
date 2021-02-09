@@ -23,4 +23,7 @@ public interface IBusquedaColegiadosService {
 	public ColegiadoDTO searchColegiadoFicha(ColegiadoItem colegiadoItem, HttpServletRequest request);
 	
 	public ResponseFileDTO generateExcel(ColegiadoItem colegiadoItem, HttpServletRequest request);
+
+
+	
 }

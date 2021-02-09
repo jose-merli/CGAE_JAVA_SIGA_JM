@@ -4,7 +4,6 @@ import java.net.URISyntaxException;
 
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
-
 import service.serviciosecos.ConsultarEstadoMensajeDocument;
 import service.serviciosecos.ConsultarEstadoMensajeResponseDocument;
 import service.serviciosecos.EnviarSMSDocument;

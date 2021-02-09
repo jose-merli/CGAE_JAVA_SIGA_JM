@@ -56,9 +56,11 @@ public class InscripcionItem {
 	public String getIdModoPago() {
 		return idModoPago;
 	}
+
 	public void setIdModoPago(String idModoPago) {
 		this.idModoPago = idModoPago;
 	}
+
 	private String descripcionEstado;
 	private String fechaInscripcion;
 	private String fechaImparticion;

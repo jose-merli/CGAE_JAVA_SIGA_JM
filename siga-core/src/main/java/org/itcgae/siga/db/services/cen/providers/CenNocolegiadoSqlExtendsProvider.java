@@ -100,6 +100,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			//sql2.WHERE("COL.TIPO IN('0','A','B','C','D','E','F','G','H','J','P','Q','R','S','U','V')");
 		}
 		sql2.WHERE("PER.IDTIPOIDENTIFICACION IN ('20')");
+		
 		sql2.GROUP_BY("COL.IDINSTITUCION");
 		sql2.GROUP_BY("COL.IDPERSONA");
 		sql2.GROUP_BY("PER.NIFCIF");
@@ -579,6 +580,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.WHERE("SOCIEDAD.IDINSTITUCION = '" +idInstitucion+ "'");
 		String fechadesde = dateFormat.format(fechaDesde);
 		sql.WHERE("SOCIEDAD.FECHAMODIFICACION >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY')");
+		//TODO revisar este fechahasta
 		//String fechahasta = dateFormat.format(fechaHasta);
 		sql.WHERE("SOCIEDAD.FECHAMODIFICACION < SYSDATE +1");
 		sql.WHERE("SOCIEDAD.FECHA_BAJA IS NULL");

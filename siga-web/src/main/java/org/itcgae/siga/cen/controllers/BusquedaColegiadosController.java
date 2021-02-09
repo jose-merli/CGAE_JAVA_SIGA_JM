@@ -3,6 +3,7 @@ package org.itcgae.siga.cen.controllers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
@@ -113,9 +114,12 @@ public class BusquedaColegiadosController {
 		ComboSubtiposCVDTO response = subtipoCurricularService.getCurricularSubtypeCombo(idTipoCV, false, request);
 		return new ResponseEntity<ComboSubtiposCVDTO>(response, HttpStatus.OK);
 	}
+	
 	@RequestMapping(value = "busquedaColegiados/generarExcel", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	ResponseEntity<InputStreamResource> generateExcel(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) throws SigaExceptions {
+	
 		ResponseFileDTO response = busquedaColegiadosService.generateExcel(colegiadoItem, request);
+
 		File file = response.getFile();		
 		HttpHeaders headers = null;
 		InputStreamResource resource = null;
@@ -124,6 +128,7 @@ public class BusquedaColegiadosController {
 		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 		headers.add("Pragma", "no-cache");
 		headers.add("Expires", "0");
+		
 		if(response.isResultados()){
 			try {
 				resource = new InputStreamResource(new FileInputStream(file));
@@ -146,4 +151,5 @@ public class BusquedaColegiadosController {
 			}			
 		}
 	}
+		
 }

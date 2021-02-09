@@ -832,7 +832,6 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-
 				LOGGER.info(
 						"getPlantillas() / envPlantillasenviosExtendsMapper.getPlantillas() -> Entrada a envPlantillasenviosExtendsMapper para obtener las plantillas de notificaciones");
 

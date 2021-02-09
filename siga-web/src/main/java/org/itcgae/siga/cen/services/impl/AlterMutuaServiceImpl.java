@@ -45,8 +45,6 @@ import com.altermutua.www.wssiga.WSAsegurado;
 import com.altermutua.www.wssiga.WSCuentaBancaria;
 import com.altermutua.www.wssiga.WSDireccion;
 import com.altermutua.www.wssiga.WSPersona;
-
-
 import com.altermutua.www.wssiga.WSPropuesta;
 import com.altermutua.www.wssiga.WSRespuesta;
 import com.altermutua.www.wssiga.WSSolicitud;

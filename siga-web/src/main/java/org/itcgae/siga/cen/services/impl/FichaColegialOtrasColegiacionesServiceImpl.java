@@ -14,7 +14,6 @@ import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
-
 import org.itcgae.siga.cen.services.IFichaColegialOtrasColegiacionesService;
 import org.itcgae.siga.cen.services.IInstitucionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -75,7 +74,9 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 	
 	@Autowired
 	private GenRecursosMapper genRecursosMapper;
+	
 	private static final String ESTADO_EJERCIENTE = "Ejerciente";
+	
 	private static final String ESTADO_NOEJERCIENTE = "No Ejerciente";
 	
 	@Override
@@ -188,7 +189,7 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 									
 //									colegiadoItem.setResidencia(colegiadoColegiacion.getResidente().toString());
 									SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
-									String fechaEstado = format1.format(colegiadoColegiacion.getSituacion().getFechaSituacion().getTime());     
+									String fechaEstado = format1.format(colegiadoColegiacion.getSituacion().getFechaSituacion().getTime());  
 									colegiadoItem.setFechaEstado(colegiadoColegiacion.getSituacion().getFechaSituacion().getTime());
 									colegiadoItem.setFechaEstadoStr(fechaEstado);
 									if (null != colegiado.getColegiacionArray()[0].getColegio()) {
@@ -219,6 +220,7 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 										colegiadoItems.add(colegiadoItem);
 									}
 							}
+							//Establecemos el orden de las otras colegiaciones
 							List<ColegiadoItem> otrasColegiacionesEjercientes = new ArrayList<>();
 							List<ColegiadoItem> otrasColegiacionesNoEjercientes = new ArrayList<>();
 							List<ColegiadoItem> restoColegiaciones = new ArrayList<>();

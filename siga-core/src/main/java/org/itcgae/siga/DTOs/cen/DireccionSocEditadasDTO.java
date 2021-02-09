@@ -1,6 +1,5 @@
 package org.itcgae.siga.DTOs.cen;
 
-
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
 public class DireccionSocEditadasDTO {
 	

@@ -229,6 +229,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 								}
 
 								Collections.sort(busquedaSancionesItems);
+								
 								busquedaSancionesDTO.setBusquedaSancionesItem(busquedaSancionesItems);
 
 							}

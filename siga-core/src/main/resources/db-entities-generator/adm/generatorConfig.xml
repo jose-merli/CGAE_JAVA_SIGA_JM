@@ -30,12 +30,16 @@
 <!-- 		</table>   -->
 <!-- 		<table schema="USCGAE_DESA" tableName="ADM_CONTADOR" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
+<!-- 		</table>   
 			<table schema="USCGAE" tableName="ADM_USUARIOS" >
 				<property name="ignoreQualifiersAtRuntime" value="true"/>
+			</table> -->
 <!-- 		<table schema="USCGAE_DESA" tableName="ADM_GESTORINTERFAZ" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>  -->
+<!-- 		</table>  
+			<table schema="USCGAE_DESA" tableName="ADM_INFORME" >
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+			</table> -->
 <!-- 		<table schema="USCGAE_DESA" tableName="ADM_LENGUAJES" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table>  -->
@@ -66,6 +70,8 @@
 <!-- 		<table schema="USCGAE_DESA" tableName="ADM_USUARIO_EFECTIVO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table>   -->
+ 		<table schema="USCGAE" tableName="ADM_USUARIOS" >
+ 			<property name="ignoreQualifiersAtRuntime" value="true"/>
  			<generatedKey column="IDUSUARIO" sqlStatement="SELECT MAX(IDUSUARIO)  + 1 from ADM_USUARIOS  where IDINSTITUCION = #{idinstitucion}" />
  		</table> 
 <!-- 		<table schema="USCGAE_DESA" tableName="ADM_USUARIOS_EFECTIVOS_HIST" > -->

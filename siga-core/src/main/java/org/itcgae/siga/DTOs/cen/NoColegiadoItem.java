@@ -65,60 +65,78 @@ public class NoColegiadoItem {
 	private String movil;
 	private String direccion;
 	private String idPais;
+
 	public String getDireccion() {
 		return direccion;
 	}
+
 	public void setDireccion(String direccion) {
 		this.direccion = direccion;
 	}
+
 	public String getIdPais() {
 		return idPais;
 	}
+
 	public void setIdPais(String idPais) {
 		this.idPais = idPais;
 	}
+
 	public String getTelefono1() {
 		return telefono1;
 	}
+
 	public void setTelefono1(String telefono1) {
 		this.telefono1 = telefono1;
 	}
+
 	public String getTelefono2() {
 		return telefono2;
 	}
+
 	public void setTelefono2(String telefono2) {
 		this.telefono2 = telefono2;
 	}
+
 	public String getFax1() {
 		return fax1;
 	}
+
 	public void setFax1(String fax1) {
 		this.fax1 = fax1;
 	}
+
 	public String getFax2() {
 		return fax2;
 	}
+
 	public void setFax2(String fax2) {
 		this.fax2 = fax2;
 	}
+
 	public String getCorreoElectronico() {
 		return correoElectronico;
 	}
+
 	public void setCorreoElectronico(String correoElectronico) {
 		this.correoElectronico = correoElectronico;
 	}
+
 	public String getNombrePoblacion() {
 		return nombrePoblacion;
 	}
+
 	public void setNombrePoblacion(String nombrePoblacion) {
 		this.nombrePoblacion = nombrePoblacion;
 	}
+
 	private String telefono1;
 	private String telefono2;
 	private String fax1;
 	private String fax2;
 	private String correoElectronico;
 	private String nombrePoblacion;
+
 
 
 	public String[] getTemas() {

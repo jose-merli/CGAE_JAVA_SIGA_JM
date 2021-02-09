@@ -22,8 +22,11 @@ public class EnvDestinatariosExtendsSqlProvider {
 		
 		return sql.toString();
 	}
+	
 	public String selectDestinatariosComunicaciones (Short idInstitucion, String idEnvio){
+		
 		SQL sql = new SQL();
+		
 		sql.SELECT("IDPERSONA");
 		sql.SELECT("NIFCIF");
 		sql.SELECT("APELLIDOS1");
@@ -33,6 +36,7 @@ public class EnvDestinatariosExtendsSqlProvider {
 		sql.FROM("ENV_DESTINATARIOS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion +"'");
 		sql.WHERE("IDENVIO = '" + idEnvio +"'");
+		
 		return sql.toString();
 	}
 

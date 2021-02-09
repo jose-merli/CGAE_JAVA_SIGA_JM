@@ -441,6 +441,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 								}
 							}
 							if (null != colegiado.getLocalizacion()) {
+								
 								busquedaPerFisica.setDireccion(colegiado.getLocalizacion().getDomicilio());
 								if (null != colegiado.getLocalizacion().getNacional()) {
 									if (null != colegiado.getLocalizacion().getNacional().getProvincia()) {
@@ -450,8 +451,12 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 										busquedaPerFisica.setIdPoblacion(colegiado.getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion());
 										busquedaPerFisica.setNombrePoblacion(colegiado.getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion());
 									}
+
+
 									busquedaPerFisica.setCodigoPostal(colegiado.getLocalizacion().getNacional().getCodigoPostal());
 								}
+
+
 							}
 							busquedaPerFisicaItems.add(busquedaPerFisica);
 
@@ -544,6 +549,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 									}
 								}
 								if (null != colegiado[i].getLocalizacion()) {
+									
 									busquedaPerFisica.setDireccion(colegiado[i].getLocalizacion().getDomicilio());
 									if (null != colegiado[i].getLocalizacion().getNacional()) {
 										if (null != colegiado[i].getLocalizacion().getNacional().getProvincia()) {
@@ -553,8 +559,12 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 											busquedaPerFisica.setIdPoblacion(colegiado[i].getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion());
 											busquedaPerFisica.setNombrePoblacion(colegiado[i].getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion());
 										}
+
+
 										busquedaPerFisica.setCodigoPostal(colegiado[i].getLocalizacion().getNacional().getCodigoPostal());
 									}
+
+
 								}
 								busquedaPerFisicaItems.add(busquedaPerFisica);
 

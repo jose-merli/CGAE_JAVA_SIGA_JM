@@ -29,6 +29,7 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	private AuthenticationManager authenticationManager;
 
 	private static String tokenHeaderAuthKey;
+	
 	private SigaUserDetailsService userDetailsService;
 
 
@@ -51,27 +52,26 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				
 			String institucion = null;
 			if(request.getParameter("location")==null) {
-
 				institucion = this.userDetailsService.getInstitucionCAS(request);
-					}else{
+			}else {
 				//Hemos accedido por loginMultiple
 				institucion = request.getParameter("location");
-					}
+			}
 			if(request.getParameter("rol") == null) {
 				rol = this.userDetailsService.getRolLogin(request);
 				grupo = this.userDetailsService.getGrupoCAS(request);
-
-				}else{
+			}else {
+				//Hemos accedido por loginMultiple
 				rol = this.userDetailsService.getRolLoginMultiple(request.getParameter("rol"));
 				grupo = SigaConstants.getTipoUsuario(rol.getDescripcion());
-				}
-
-				LOGGER.debug("DNI: " + dni);
-				LOGGER.debug("INSTITUCION: " + institucion);
-				LOGGER.debug("GRUPO: " + grupo);
+			}
+			
+			LOGGER.debug("DNI: " + dni);
+			LOGGER.debug("INSTITUCION: " + institucion);
+			LOGGER.debug("GRUPO: " + grupo);
 
 			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,null, rol, nombre);
-				LOGGER.info("Intento de autenticación en siga {}", user);
+			LOGGER.info("Intento de autenticación en siga {}", user);
 			//return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
 			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, null));
 		} catch (Exception e) {

@@ -73,15 +73,19 @@ public class UserCgae implements UserDetails {
 	public void setGrupo(String grupo) {
 		this.grupo = grupo;
 	}
+	
 	public AdmRol getRol() {
 		return rol;
 	}
+
 	public void setRol(AdmRol rol) {
 		this.rol = rol;
 	}
+	
 	public String getNombre() {
 		return nombre;
 	}
+
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}

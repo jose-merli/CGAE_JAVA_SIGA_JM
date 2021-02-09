@@ -26,9 +26,12 @@ public class UsuarioLogeadoItem {
 	public void setRutaLogout(String rutaLogout) {
 		this.rutaLogout = rutaLogout;
 	}
+	
 	public String getRutaLogoutCAS() {
 		return rutaLogoutCAS;
 	}
+
+
 	public void setRutaLogoutCAS(String rutaLogoutCAS) {
 		this.rutaLogoutCAS = rutaLogoutCAS;
 	}

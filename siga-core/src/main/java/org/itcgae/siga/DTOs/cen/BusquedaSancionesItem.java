@@ -285,6 +285,7 @@ public class BusquedaSancionesItem implements Comparable<BusquedaSancionesItem>{
 	public void setIsRestablecer(boolean restablecer) {
 		this.restablecer = restablecer;
 	}
+	
 	@Override
 	public int compareTo(BusquedaSancionesItem o) {
 		return o.getFechaDesdeDate().compareTo(getFechaDesdeDate());

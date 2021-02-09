@@ -276,4 +276,7 @@ public class ModelosComunicacionItem {
 				+ ", porDefecto=" + porDefecto + ", tipoEnvio=" + tipoEnvio + ", generacionExcel=" + generacionExcel
 				+ ", generarExcel=" + generarExcel + ", plantillas=" + plantillas + "]";
 	}
+	
+	
+	
 }

@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.itcgae.siga.DTOs.gen.Error;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
 public class RetencionesDTO {
 
 	

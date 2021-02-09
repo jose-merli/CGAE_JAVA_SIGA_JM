@@ -92,11 +92,13 @@ public class FichaDatosColegialesController {
 		StringDTO response = fichaDatosColegiales.getNumColegiado(request);
 		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
+	
 	@RequestMapping(value = "/fichaDatosColegiales/searchTurnosGuardias", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<StringDTO> searchTurnosGuardias(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) { 
 		StringDTO response = fichaDatosColegiales.getTurnosGuardias(colegiadoItem, request);
 		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
+	
 	@RequestMapping(value = "/fichaDatosColegiales/datosColegialesUpdateMasivo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> datosColegialesUpdateMasivo(@RequestBody ColegiadoItemDTO listColegiadoItem, HttpServletRequest request) { 
 		UpdateResponseDTO response = fichaDatosColegiales.datosColegialesUpdateMasivo(listColegiadoItem, request);

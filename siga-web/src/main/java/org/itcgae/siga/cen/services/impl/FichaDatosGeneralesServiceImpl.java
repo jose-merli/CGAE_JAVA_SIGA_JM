@@ -115,8 +115,11 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
+	
 	@Autowired
 	private CenDireccionTipodireccionMapper cenDireccionTipoDireccionMapper;
+	
+	
 	@Autowired
 	private CenDireccionesExtendsMapper _cenDireccionesMapper;
 
@@ -764,8 +767,12 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							}
 
 							if (!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
+								
+								// Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se
+								// encargan de ello
 								LOGGER.info(
 										"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a ejecutarPL_RevisionSuscripcionesLetrado");
+								// Lanzamos el proceso de revision de suscripciones del letrado
 								String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado("" + idInstitucion.toString(),
 										"" + colegiadoItem.getIdPersona(), "", "" + usuario.getIdusuario().toString());
 								if ((resultado == null) || (!resultado[0].equals("0"))) {
@@ -784,6 +791,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							updateResponseDTO.setStatus(SigaConstants.OK);
 						}
 
+						
+						
 					} else {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.warn(
@@ -1721,6 +1730,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 									// Comprobamos si existe algun tema para el curso y les damos de baja
 								}
 
+								//Creamos la dirección si ya la tuviera.
 								if (null != noColegiadoItem.getIdPoblacion() || null != noColegiadoItem.getIdProvincia()) {
 									Long idDireccion = insertarDatosDireccion(noColegiadoItem, usuario, idPersona);
 								} 
@@ -1757,9 +1767,14 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 		return insertResponseDTO;
 	}
+
 	private Long insertarDatosDireccion(NoColegiadoItem noColegiadoItem, AdmUsuarios usuario, Long idPersona) {
+		
 		CenDirecciones direccion = new CenDirecciones();
+		
+		//Creamos la direccion con los tipos de direccion oblogatorios
 		 List<DatosDireccionesItem> direccionID = _cenDireccionesMapper.selectNewIdDireccion(idPersona.toString(),usuario.getIdinstitucion().toString());
+		
 		direccion.setIddireccion(Long.valueOf(direccionID.get(0).getIdDireccion()));
 		direccion.setCodigopostal(noColegiadoItem.getCodigoPostal());
 		direccion.setCorreoelectronico(noColegiadoItem.getCorreoElectronico());
@@ -1775,21 +1790,50 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		if(noColegiadoItem.getTelefono2()!= null)direccion.setTelefono1(noColegiadoItem.getTelefono2());
 		direccion.setMovil(noColegiadoItem.getMovil());
 		direccion.setUsumodificacion(usuario.getIdusuario());
+		
 		if(noColegiadoItem.getIdPais()!= null){
 			direccion.setIdpais(noColegiadoItem.getIdPais());
 		}else{
+			//Ponemos por defecto España
 			direccion.setIdpais("191");
 		}
+			
+			
+		//Añadimos las preferencias de direccion obligatorias
+		//direccion.setPreferente("ECS");
+		
 		_cenDireccionesMapper.insert(direccion);
+		
 		CenDireccionTipodireccion tipoDireccion =  new CenDireccionTipodireccion();
 		tipoDireccion.setFechamodificacion(new Date());
 		tipoDireccion.setIddireccion(direccion.getIddireccion());
 		tipoDireccion.setIdinstitucion(usuario.getIdinstitucion());
 		tipoDireccion.setIdpersona(idPersona);
 		tipoDireccion.setUsumodificacion(usuario.getIdusuario());
+		
+		//Añadimos los tipo de direcciones obligatorios
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_TRASPASO));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_FACTURACION));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
 		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_CENSOWEB));
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUIAJUDICIAL));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUARDIA));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_CORREO));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+//		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PREFERENTE_SMS));
+//		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		
 		return direccion.getIddireccion();
+		
 	}
 
 	@Override
@@ -1907,6 +1951,16 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 		return comboDTO;
 	}
+	
+	/**
+	 * PL que realiza una revision de letrado
+	 * 
+	 * @param idInstitucion
+	 * @param idPersona
+	 * @param usuario
+	 * @return
+	 * @throws ClsExceptions
+	 */
 	private String[] ejecutarPL_RevisionSuscripcionesLetrado(String idInstitucion, String idPersona, String fecha,
 			String usuario) throws Exception {
 		LOGGER.info("Entrada Ejecución PL Revision SuscripcionesLetrado");
@@ -1914,12 +1968,16 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		String resultado[] = new String[2]; // Parametros de salida del PL
 
 		try {
+			// Parametros de entrada del PL
 			paramIn[0] = idInstitucion;
 			paramIn[1] = idPersona;
 			paramIn[2] = fecha;
 			paramIn[3] = usuario;
+
+			// Ejecucion del PL
 			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO (?,?,?,?,?,?)}", 2,
 					paramIn);
+
 		} catch (Exception e) {
 			LOGGER.info("Error Ejecución PL Revision SuscripcionesLetrado: " + e.getMessage());
 			resultado[0] = "1"; // P_NUMREGISTRO
@@ -1928,9 +1986,28 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		LOGGER.info("Salida OK Ejecución PL Revision SuscripcionesLetrado");
 		return resultado;
 	}
+	
+	/**
+	 * Calls a PL Funtion
+	 * 
+	 * @author CSD
+	 * @param functionDefinition
+	 *            string that defines the function
+	 * @param inParameters
+	 *            input parameters
+	 * @param outParameters
+	 *            number of output parameters
+	 * @return error code, '0' if ok
+	 * @throws NamingException
+	 * @throws IOException
+	 * @throws SQLException
+	 * @throws ClsExceptions
+	 *             type Exception
+	 */
 	private String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters)
 			throws IOException, NamingException, SQLException {
 		String result[] = null;
+
 		if (outParameters > 0)
 			result = new String[outParameters];
 		DataSource ds = getOracleDataSource();
@@ -1938,29 +2015,40 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		try {
 			CallableStatement cs = con.prepareCall(functionDefinition);
 			int size = inParameters.length;
+
+			// input Parameters
 			for (int i = 0; i < size; i++) {
+
 				cs.setString(i + 1, (String) inParameters[i]);
 			}
+			// output Parameters
 			for (int i = 0; i < outParameters; i++) {
 				cs.registerOutParameter(i + size + 1, Types.VARCHAR);
 			}
+
 			for (int intento = 1; intento <= 2; intento++) {
 				try {
 					cs.execute();
 					break;
+
 				} catch (SQLTimeoutException tex) {
 					throw tex;
+
 				} catch (SQLException ex) {
 					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la
+																		// segunda vez deberia funcionar)
 						throw ex;
 					}
 				}
+
 			}
+
 			for (int i = 0; i < outParameters; i++) {
 				result[i] = cs.getString(i + size + 1);
 			}
 			cs.close();
 			return result;
+
 		} catch (SQLTimeoutException ex) {
 			return null;
 		} catch (SQLException ex) {
@@ -1972,9 +2060,20 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 			con = null;
 		}
 	}
+
+	/**
+	 * Recupera el datasource con los datos de conexión sacados del fichero de
+	 * configuracion
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws NamingException
+	 */
 	private DataSource getOracleDataSource() throws IOException, NamingException {
 		try {
+
 			LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)");
+
 			AdmConfigExample example = new AdmConfigExample();
 			example.createCriteria().andClaveEqualTo("spring.datasource.jndi-name");
 			List<AdmConfig> config = admConfigMapper.selectByExample(example);
@@ -1984,29 +2083,40 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 			throw e;
 		}
 	}
+
 	@Override
 	public StringDTO getTipoIdentificacion(StringDTO nifcif,HttpServletRequest request) {
 		LOGGER.info(
 				"verifyPerson() -> Entrada al servicio para verificar si la persona logueada está en la tabla cen_colegiado");
+
 		StringDTO stringDTO = new StringDTO();
+
+		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
+		
 		String dni = "";
+		
 		if(nifcif.getValor() == "") {
 			dni = UserTokenUtils.getDniFromJWTToken(token);
 		}else {
 			dni = nifcif.getValor();
 		}
+		
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
 		if (idInstitucion != null) {
+
 			CenPersonaExample cenPersonaExample = new CenPersonaExample();
 			cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
 			List<CenPersona> cenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+
 			if (!cenPersona.isEmpty()) {
 					if (null != cenPersona.get(0).getIdtipoidentificacion()) {
 						stringDTO.setValor(cenPersona.get(0).getIdtipoidentificacion().toString());
 					}
 			}
 		}
+
 		LOGGER.info(
 				"verifyPerson() -> Salida al servicio para verificar si la persona logueada está en la tabla cen_colegiado");
 		return stringDTO;

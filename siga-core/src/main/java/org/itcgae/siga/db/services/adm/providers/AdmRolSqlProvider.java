@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.services.adm.providers;
 
-
 import org.apache.ibatis.jdbc.SQL;
 
 public class AdmRolSqlProvider {

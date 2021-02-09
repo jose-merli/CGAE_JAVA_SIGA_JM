@@ -1269,7 +1269,6 @@ public class WSCommons {
 						if (insertCompleto(beanHis, direccionEnCGAE, 2, "1")) {
 							return true;
 						}
-						
 					}
 				}
 			
@@ -1451,7 +1450,6 @@ public class WSCommons {
 						if (insertCompleto(beanHis, beanDir, 1, idioma)) {
 							return "ok";
 						}
-						
 					}
 				}
 			}

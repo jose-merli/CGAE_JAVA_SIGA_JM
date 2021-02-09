@@ -423,12 +423,13 @@ public class DocushareHelper {
 					}
 
 					 Collections.sort(listDir);
+					 
 					 Collections.sort(listDir, new Comparator<DocuShareObjectVO>() {
 					 public int compare(DocuShareObjectVO o3, DocuShareObjectVO o4) {
 					 return (-1) * o3.getFechaModificacion().compareTo(o4.getFechaModificacion());
 					 }
 					 });
-					// }
+					 
 					 Collections.sort(listArch, new Comparator<DocuShareObjectVO>() {
 					 public int compare(DocuShareObjectVO o1, DocuShareObjectVO o2) {
 					 return (-1) * o1.getFechaModificacion().compareTo(o2.getFechaModificacion());

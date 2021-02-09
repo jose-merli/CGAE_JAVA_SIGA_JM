@@ -1,6 +1,5 @@
 package org.itcgae.siga.ws.client;
 
-
 import org.datacontract.schemas._2004._07.IntegracionCuotaYCapitalObjetivoJubilacion;
 import org.datacontract.schemas._2004._07.IntegracionEnumsCombos;
 import org.datacontract.schemas._2004._07.IntegracionSolicitudRespuesta;
@@ -50,13 +49,13 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
-	    MutualidadClient client = context.getBean(MutualidadClient.class);
-	    EstadoMutualistaResponseDocument responsefinal = client.getEstadoMutualista(request);
-	        
-		
-		IntegracionSolicitudRespuesta estadoMutualista = responsefinal.getEstadoMutualistaResponse().getEstadoMutualistaResult();
-		
-		return estadoMutualista;
+		    MutualidadClient client = context.getBean(MutualidadClient.class);
+		    EstadoMutualistaResponseDocument responsefinal = client.getEstadoMutualista(request);
+		        
+			
+			IntegracionSolicitudRespuesta estadoMutualista = responsefinal.getEstadoMutualistaResponse().getEstadoMutualistaResult();
+			
+			return estadoMutualista;
 		}catch(Exception e) {
 			logger.error("ClienteMutualidad -> Error al obtener el Estado Mutualista");
 			return null;
@@ -69,14 +68,14 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 	
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
-	    MutualidadClient client = context.getBean(MutualidadClient.class);
-	    EstadoSolicitudResponseDocument responsefinal = client.getEstadoSolicitud(request);
+		    MutualidadClient client = context.getBean(MutualidadClient.class);
+		    EstadoSolicitudResponseDocument responsefinal = client.getEstadoSolicitud(request);
+		
 	
-
-		
-		IntegracionSolicitudRespuesta estadoSolicitud = responsefinal.getEstadoSolicitudResponse().getEstadoSolicitudResult();
-		
-		return estadoSolicitud;
+			
+			IntegracionSolicitudRespuesta estadoSolicitud = responsefinal.getEstadoSolicitudResponse().getEstadoSolicitudResult();
+			
+			return estadoSolicitud;
 		}catch(Exception e) {
 			logger.error("ClienteMutualidad -> Error al obtener el Estado Solicitud");
 			return null;
@@ -89,7 +88,7 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
-		    MutualidadClient client = context.getBean(MutualidadClient.class);
+			MutualidadClient client = context.getBean(MutualidadClient.class);
 		    GetEnumsResponseDocument responsefinal = client.getMutualidad(request);
 		        
 			
@@ -108,7 +107,7 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
-		    MutualidadClient client = context.getBean(MutualidadClient.class);
+			MutualidadClient client = context.getBean(MutualidadClient.class);
 		    MGASolicitudPolizaAccuGratuitosResponseDocument responsefinal = client.mGASolicitudPolizaAccuGratuitos(request);
 		        
 			IntegracionSolicitudRespuesta response = responsefinal.getMGASolicitudPolizaAccuGratuitosResponse().getMGASolicitudPolizaAccuGratuitosResult();
@@ -128,7 +127,7 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
-		    MutualidadClient client = context.getBean(MutualidadClient.class);
+			MutualidadClient client = context.getBean(MutualidadClient.class);
 		    MGASolicitudPolizaProfesionalResponseDocument responsefinal = client.mGASolicitudPolizaProfesional(request);
 		        
 			IntegracionSolicitudRespuesta response = responsefinal.getMGASolicitudPolizaProfesionalResponse().getMGASolicitudPolizaProfesionalResult();

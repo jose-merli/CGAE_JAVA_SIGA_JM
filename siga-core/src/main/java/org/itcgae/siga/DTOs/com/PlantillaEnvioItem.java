@@ -116,6 +116,7 @@ public class PlantillaEnvioItem {
 		result = prime * result + ((tipoEnvio == null) ? 0 : tipoEnvio.hashCode());
 		return result;
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -192,6 +193,7 @@ public class PlantillaEnvioItem {
 			return false;
 		return true;
 	}
+	
 	@Override
 	public String toString() {
 		return "PlantillaEnvioItem [idTipoEnvios=" + idTipoEnvios + ", idPlantillaEnvios=" + idPlantillaEnvios
@@ -200,4 +202,5 @@ public class PlantillaEnvioItem {
 				+ idDireccion + ", idPersona=" + idPersona + ", descripcion=" + descripcion + ", tipoEnvio=" + tipoEnvio
 				+ ", claseComunicacion=" + claseComunicacion + "]";
 	}
+	
 }

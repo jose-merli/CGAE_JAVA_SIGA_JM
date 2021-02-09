@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ComboColegiadoDTO;
-
 import org.itcgae.siga.cen.services.IFichaColegialOtrasColegiacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

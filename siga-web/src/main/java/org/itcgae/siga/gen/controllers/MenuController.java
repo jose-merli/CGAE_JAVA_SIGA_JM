@@ -37,7 +37,7 @@ public class MenuController {
 	
 	@Autowired
 	private IMenuService menuService;
-    
+    	
 	@Autowired
 	private IProcesoService procesoService;
 	
@@ -70,6 +70,7 @@ public class MenuController {
     	UpdateResponseDTO response = menuService.validaUsuario(request);
     	return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+    
     @RequestMapping(value = "/perfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getPerfiles(@RequestParam("institucion") String idInstitucion) {
     	ComboDTO response = menuService.getPerfiles(idInstitucion);
@@ -87,11 +88,13 @@ public class MenuController {
     	ComboDTO response = menuService.getRolesUsuario(request, idInstitucion);
     	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+    
     @RequestMapping(value = "/perfilesColegioRol", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getPerfilesColegioRol(@RequestBody LoginMultipleItem loginMultipleItem, HttpServletRequest request) {
     	ComboDTO response = menuService.getPerfilesColegioRol(loginMultipleItem);
     	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+        
     @RequestMapping(value = "/permisos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<PermisoDTO> getPermisos(@RequestBody PermisoRequestItem permisoRequestItem,HttpServletRequest request) throws CertificateEncodingException {
     	PermisoDTO response = menuService.getPermisos(permisoRequestItem,request);
@@ -117,6 +120,7 @@ public class MenuController {
     	PermisoDTO response = new PermisoDTO(); 
     	response = menuService.getVariosPermisos(permisoRequestItem,request);
     	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
+
 	}
     
     @RequestMapping(value = "/accesControlUrl", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -126,7 +130,10 @@ public class MenuController {
       	permisoRequestItem.setIdProceso(procesoService.getIdProceso(url));      	
       	response = menuService.getAccessControl(permisoRequestItem,request);     	
       	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
+
   	}
+    
+    
     @RequestMapping(value = "/getInstitucionActual", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
    	ResponseEntity<ComboItem> getInstitucionActual(HttpServletRequest request) {
     	ComboItem response = menuService.getInstitucionActual(request);
@@ -138,18 +145,25 @@ public class MenuController {
     	ParamsItem response = menuService.getEnvParams(request);
        	return new ResponseEntity<ParamsItem>(response, HttpStatus.OK);
    	}
+    
+    
     @RequestMapping(value = "/getLetrado", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
    	ResponseEntity<ComboItem> getLetrado(HttpServletRequest request) {
     	ComboItem response = menuService.getLetrado(request);
        	return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
    	}
-
+    
     @RequestMapping(value = "/getTokenOldSiga", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
    	ResponseEntity<StringDTO> getTokenOldSiga(HttpServletRequest request) {
     	StringDTO response = menuService.getTokenOldSiga(request);
        	return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
    	}
     
+    /*@RequestMapping(value = "/eliminaCookie", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> eliminaCookie( HttpServletRequest request) {
+    	UpdateResponseDTO response = menuService.eliminaCookie(request);
+    	ResponseEntity<UpdateResponseDTO> response2 = new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}*/
     @RequestMapping(value = "/eliminaCookie", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     private void eliminaCookie( HttpServletRequest request, HttpServletResponse response ) {
     	Cookie[] cookies = request.getCookies();
@@ -160,4 +174,5 @@ public class MenuController {
           response.addCookie(cookie);
          }
     }
+    
 }

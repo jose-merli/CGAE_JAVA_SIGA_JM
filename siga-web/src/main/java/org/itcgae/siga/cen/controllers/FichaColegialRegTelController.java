@@ -1,6 +1,5 @@
 package org.itcgae.siga.cen.controllers;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

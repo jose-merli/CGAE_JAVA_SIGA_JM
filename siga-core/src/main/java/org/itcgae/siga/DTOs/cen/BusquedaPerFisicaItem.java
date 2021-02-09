@@ -22,6 +22,7 @@ public class BusquedaPerFisicaItem {
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaNacimiento;
 	private String fechaNacimientoString;
+	
 	private String numeroInstitucion;
 	private String idProvincia;
 	private String idActividadProfesional;
@@ -35,6 +36,7 @@ public class BusquedaPerFisicaItem {
 	private String direccion;
 	private String idPoblacion;
 	private String idPais;
+
 	private String codigoPostal;
 	private String telefono1;
 	private String telefono2;
@@ -45,73 +47,119 @@ public class BusquedaPerFisicaItem {
 	private String nombrePoblacion;
 	
 	
+	
+	
+	
+	
 	public String getIdPais() {
 		return idPais;
 	}
+
+
 	public void setIdPais(String idPais) {
 		this.idPais = idPais;
 	}
+
 	public String getDireccion() {
 		return direccion;
 	}
+
+
 	public void setDireccion(String direccion) {
 		this.direccion = direccion;
 	}
+
+
 	public String getIdPoblacion() {
 		return idPoblacion;
 	}
+
+
 	public void setIdPoblacion(String idPoblacion) {
 		this.idPoblacion = idPoblacion;
 	}
+
+
 	public String getCodigoPostal() {
 		return codigoPostal;
 	}
+
+
 	public void setCodigoPostal(String codigoPostal) {
 		this.codigoPostal = codigoPostal;
 	}
+
+
 	public String getTelefono1() {
 		return telefono1;
 	}
+
+
 	public void setTelefono1(String telefono1) {
 		this.telefono1 = telefono1;
 	}
+
+
 	public String getTelefono2() {
 		return telefono2;
 	}
+
+
 	public void setTelefono2(String telefono2) {
 		this.telefono2 = telefono2;
 	}
+
+
 	public String getFax1() {
 		return fax1;
 	}
+
+
 	public void setFax1(String fax1) {
 		this.fax1 = fax1;
 	}
+
+
 	public String getFax2() {
 		return fax2;
 	}
+
+
 	public void setFax2(String fax2) {
 		this.fax2 = fax2;
 	}
+
+
 	public String getMovil() {
 		return movil;
 	}
+
+
 	public void setMovil(String movil) {
 		this.movil = movil;
 	}
+
+
 	public String getCorreoelectronico() {
 		return correoelectronico;
 	}
+
+
 	public void setCorreoelectronico(String correoelectronico) {
 		this.correoelectronico = correoelectronico;
 	}
+
+
 	@JsonProperty("idInstitucion")
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}
+
+
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
+
 
 	/**
 	 *
@@ -332,17 +380,28 @@ public class BusquedaPerFisicaItem {
 		this.fechaNacimiento = fechaNacimiento;
 	}
 	
+	/**
+	 *
+	 */
 	public BusquedaPerFisicaItem fechaNacimientoString(String fechaNacimientoString){
 		this.fechaNacimientoString = fechaNacimientoString;
 		return this;
 	}
+	
+	
+	
 	@JsonProperty("fechaNacimientoString")
 	public String getFechaNacimientoString() {
 		return fechaNacimientoString;
 	}
+
+
+
+
 	public void setFechaNacimiento(String fechaNacimientoString) {
 		this.fechaNacimientoString = fechaNacimientoString;
 	}
+	
 	
 	/**
 	 *
@@ -567,11 +626,15 @@ public class BusquedaPerFisicaItem {
 	    return o.toString().replace("\n", "\n    ");
 	}
 
+
 	public String getNombrePoblacion() {
 		return nombrePoblacion;
 	}
+
+
 	public void setNombrePoblacion(String nombrePoblacion) {
 		this.nombrePoblacion = nombrePoblacion;
 	}
+
 	
 }
