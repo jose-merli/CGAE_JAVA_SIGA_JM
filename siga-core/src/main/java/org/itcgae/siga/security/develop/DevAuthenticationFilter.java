@@ -1,6 +1,7 @@
 package org.itcgae.siga.security.develop;
 
 import java.io.IOException;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
 	private AuthenticationManager authenticationManager;
 	
+	@SuppressWarnings("unused")
 	private SigaUserDetailsService userDetailsService;
 
 	private static String tokenHeaderAuthKey;

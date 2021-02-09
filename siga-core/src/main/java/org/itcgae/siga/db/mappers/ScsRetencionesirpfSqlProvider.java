@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ScsRetencionesirpf;
+import org.itcgae.siga.db.entities.ScsRetencionesirpfExample;
 import org.itcgae.siga.db.entities.ScsRetencionesirpfExample.Criteria;
 import org.itcgae.siga.db.entities.ScsRetencionesirpfExample.Criterion;
-import org.itcgae.siga.db.entities.ScsRetencionesirpfExample;
 
 public class ScsRetencionesirpfSqlProvider {
 

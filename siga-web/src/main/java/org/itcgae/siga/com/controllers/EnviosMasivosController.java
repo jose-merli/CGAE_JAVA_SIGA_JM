@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
@@ -15,7 +14,6 @@ import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DestinatarioIndvEnvioMasivoItem;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
-import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
@@ -297,13 +295,9 @@ public class EnviosMasivosController {
 			throw new BusinessException("El fichero de log no existe");
 		}
 		
-		if(file != null) {
-			fileInfoDTO.setFilePath(file.getAbsolutePath());
-			fileInfoDTO.setName(file.getName());
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
-		}else {
-			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		fileInfoDTO.setFilePath(file.getAbsolutePath());
+		fileInfoDTO.setName(file.getName());
+		return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/detalle/descargarLog", method=RequestMethod.POST, produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -464,5 +458,6 @@ public class EnviosMasivosController {
 		}
 			
 	}
+	
 	
 }

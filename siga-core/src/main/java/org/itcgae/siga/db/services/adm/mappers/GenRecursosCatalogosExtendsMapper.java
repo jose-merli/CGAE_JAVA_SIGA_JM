@@ -14,7 +14,6 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.GenRecursosCatalogosMapper;
 import org.itcgae.siga.db.services.adm.providers.GenRecursosCatalogosSqlExtendsProvider;
-import org.itcgae.siga.db.services.cen.providers.CenTiposCVSubtipo1SqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 

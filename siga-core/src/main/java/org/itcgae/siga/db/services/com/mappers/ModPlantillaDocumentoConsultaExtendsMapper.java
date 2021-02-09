@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.services.com.providers.ModPlantillaDocumentoConsultaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;

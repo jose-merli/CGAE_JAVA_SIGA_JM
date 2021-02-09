@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenInfluencia;
+import org.itcgae.siga.db.entities.CenInfluenciaExample;
 import org.itcgae.siga.db.entities.CenInfluenciaExample.Criteria;
 import org.itcgae.siga.db.entities.CenInfluenciaExample.Criterion;
-import org.itcgae.siga.db.entities.CenInfluenciaExample;
 
 public class CenInfluenciaSqlProvider {
 

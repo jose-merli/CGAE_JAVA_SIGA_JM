@@ -489,7 +489,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				
 				String preferente = SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO;
 				//Obtenemos la direccion preferente de la persona
-				if (SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios())) {
+				if (SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios().toString()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios().toString())) {
 					preferente = SigaConstants.TIPO_PREFERENTE_SMS;
 				}
 				exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + preferente + "%");
@@ -506,7 +506,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 					boolean añadido = false;
 					for (CenDirecciones dir : direcciones) {
 						DestinatarioItem destinatario = null;
-						if((SigaConstants.ID_ENVIO_MAIL.equals(envio.getIdtipoenvios()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equals(envio.getIdtipoenvios())) && dir.getCorreoelectronico() != null) {
+						if((SigaConstants.ID_ENVIO_MAIL.equals(envio.getIdtipoenvios().toString()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equals(envio.getIdtipoenvios().toString())) && dir.getCorreoelectronico() != null) {
 							if(!añadido){
 								destinatario = new DestinatarioItem();
 								añadido = true;
@@ -514,7 +514,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 							}
 						}
 
-						if((SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios())) && dir.getMovil() != null) {
+						if((SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios().toString()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios().toString())) && dir.getMovil() != null) {
 							if(!añadido){
 								destinatario = new DestinatarioItem();
 								añadido = true;

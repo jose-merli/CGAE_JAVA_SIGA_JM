@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForEventoCurso;
+import org.itcgae.siga.db.entities.ForEventoCursoExample;
 import org.itcgae.siga.db.entities.ForEventoCursoExample.Criteria;
 import org.itcgae.siga.db.entities.ForEventoCursoExample.Criterion;
-import org.itcgae.siga.db.entities.ForEventoCursoExample;
 
 public class ForEventoCursoSqlProvider {
 

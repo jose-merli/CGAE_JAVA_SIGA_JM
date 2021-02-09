@@ -140,8 +140,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 				
 				if (null != usuarios && usuarios.size() > 0) {
 					
-                    List<DestinatarioItem> destinatarios = _envDestinatariosExtendsMapper.selectDestinatariosComunicaciones(idInstitucion, idEnvio);
-
+					List<DestinatarioItem> destinatarios = _envDestinatariosExtendsMapper.selectDestinatariosComunicaciones(idInstitucion, idEnvio);
 					if(destinatarios.size()>0){
 						respuesta.setDestinatarios(destinatarios);
 					}

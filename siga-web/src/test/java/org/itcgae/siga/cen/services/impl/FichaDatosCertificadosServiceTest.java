@@ -53,7 +53,7 @@ public class FichaDatosCertificadosServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		
-		when(cenDatosCertificadosExtendsMapper.datosCertificadosSearch(Mockito.anyString())).thenReturn(certificadoListItem);
+		when(cenDatosCertificadosExtendsMapper.datosCertificadosSearch(Mockito.anyString(), usuarios.get(0).getIdinstitucion())).thenReturn(certificadoListItem);
 		
 		//	Ejecución del método a testear
 		CertificadoDTO response = fichaDatosCertificadosServiceImpl.datosCertificadosSearch(1, "", mockreq);

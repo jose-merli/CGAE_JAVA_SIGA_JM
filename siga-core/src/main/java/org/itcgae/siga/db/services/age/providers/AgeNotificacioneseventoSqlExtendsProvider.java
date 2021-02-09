@@ -1,9 +1,6 @@
 package org.itcgae.siga.db.services.age.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
-import org.itcgae.siga.commons.utils.SolModifSQLUtils;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.AgeNotificacioneseventoSqlProvider;
 
 public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificacioneseventoSqlProvider {

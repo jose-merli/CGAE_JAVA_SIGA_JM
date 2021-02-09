@@ -37,7 +37,6 @@ import org.itcgae.siga.db.entities.AdmPerfilRol;
 import org.itcgae.siga.db.entities.AdmPerfilRolExample;
 import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.db.entities.AdmRolExample;
-import org.itcgae.siga.db.entities.AdmUsuarioEfectivo;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosHist;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
@@ -103,9 +102,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 		if (roles != null && roles.size() > 0) {
 			ComboItem comboItem = new ComboItem();
-			comboItem.setValue("");
-			comboItem.setLabel("");
-			comboItems.add(comboItem);
+//			comboItem.setValue("");
+//			comboItem.setLabel("");
+//			comboItems.add(comboItem);
 			for (AdmRol admRol : roles) {
 				comboItem = new ComboItem();
 				comboItem.setValue(admRol.getIdrol());

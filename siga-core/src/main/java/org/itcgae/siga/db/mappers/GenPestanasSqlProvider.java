@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenPestanas;
+import org.itcgae.siga.db.entities.GenPestanasExample;
 import org.itcgae.siga.db.entities.GenPestanasExample.Criteria;
 import org.itcgae.siga.db.entities.GenPestanasExample.Criterion;
-import org.itcgae.siga.db.entities.GenPestanasExample;
 
 public class GenPestanasSqlProvider {
 

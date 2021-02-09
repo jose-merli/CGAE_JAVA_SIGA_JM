@@ -8,7 +8,6 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ComboSubtiposCVDTO;
 import org.itcgae.siga.DTOs.cen.SubtipoCurricularDTO;
 import org.itcgae.siga.DTOs.cen.SubtipoCurricularItem;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.ISubtipoCurricularService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;

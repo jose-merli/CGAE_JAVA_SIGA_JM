@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosHist;
+import org.itcgae.siga.db.entities.AdmUsuariosEfectivosHistExample;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosHistExample.Criteria;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosHistExample.Criterion;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosHistExample;
 
 public class AdmUsuariosEfectivosHistSqlProvider {
 

@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenComunidadesautonomas;
+import org.itcgae.siga.db.entities.CenComunidadesautonomasExample;
 import org.itcgae.siga.db.entities.CenComunidadesautonomasExample.Criteria;
 import org.itcgae.siga.db.entities.CenComunidadesautonomasExample.Criterion;
-import org.itcgae.siga.db.entities.CenComunidadesautonomasExample;
 
 public class CenComunidadesautonomasSqlProvider {
 

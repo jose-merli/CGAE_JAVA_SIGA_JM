@@ -1,14 +1,10 @@
 package org.itcgae.siga.cen.services.impl;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.SolModifDatosBancariosItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.cen.services.ISolModifDatosBancariosDetailService;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenSolicmodicuentas;

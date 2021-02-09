@@ -2,8 +2,6 @@ package org.itcgae.siga.DTOs.com;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class EnviosMasivosSearch {
 	
 	private String descripcion;

@@ -45,6 +45,12 @@ public interface IFichaDatosColegialesService {
 	public UpdateResponseDTO datosColegialesUpdateMasivo(ColegiadoItemDTO listColegiadoItem,
 			HttpServletRequest request);
 	
+	public StringDTO getTurnosGuardias(ColegiadoItem colegiadoItem,
+            HttpServletRequest request);
+
+	public UpdateResponseDTO datosColegialesUpdateMasivo(ColegiadoItemDTO listColegiadoItem,
+			HttpServletRequest request);
+	
 //	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request);
 	
 }

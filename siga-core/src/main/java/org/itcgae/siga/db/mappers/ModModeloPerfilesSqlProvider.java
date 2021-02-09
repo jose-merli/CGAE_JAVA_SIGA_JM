@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
+import org.itcgae.siga.db.entities.ModModeloPerfilesExample;
 import org.itcgae.siga.db.entities.ModModeloPerfilesExample.Criteria;
 import org.itcgae.siga.db.entities.ModModeloPerfilesExample.Criterion;
-import org.itcgae.siga.db.entities.ModModeloPerfilesExample;
 
 public class ModModeloPerfilesSqlProvider {
 

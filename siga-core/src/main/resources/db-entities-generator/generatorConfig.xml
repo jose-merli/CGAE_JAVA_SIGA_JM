@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-	<classPathEntry location="C:\Users\DTUser\Downloads\ojdbc6.jar" />
+	<classPathEntry location="C:\Users\acorral\Downloads\ojdbc6.jar" />
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
@@ -35,10 +35,11 @@
 <!-- 			<generatedKey column="IDCURSO"  -->
 <!--  				sqlStatement="SELECT SEQ_FORCURSO.NEXTVAL FROM DUAL" /> -->
 <!-- 		</table>   -->
-				<table schema="USCGAE" tableName="FOR_INSCRIPCION">
+		<table schema="USCGAE" tableName="ENV_DESTINATARIOS_BUROSMS">
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDINSCRIPCION" 
- 				sqlStatement="SELECT SEQ_FORINSCRIPCION.NEXTVAL FROM DUAL" />
+		</table>
+		<table schema="USCGAE" tableName="ENV_DOCUMENTOS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
 		</table>
 
 	</context>

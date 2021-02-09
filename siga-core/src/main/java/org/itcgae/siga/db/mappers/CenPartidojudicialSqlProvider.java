@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenPartidojudicial;
+import org.itcgae.siga.db.entities.CenPartidojudicialExample;
 import org.itcgae.siga.db.entities.CenPartidojudicialExample.Criteria;
 import org.itcgae.siga.db.entities.CenPartidojudicialExample.Criterion;
-import org.itcgae.siga.db.entities.CenPartidojudicialExample;
 
 public class CenPartidojudicialSqlProvider {
 

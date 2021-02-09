@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForTiposervicio;
+import org.itcgae.siga.db.entities.ForTiposervicioExample;
 import org.itcgae.siga.db.entities.ForTiposervicioExample.Criteria;
 import org.itcgae.siga.db.entities.ForTiposervicioExample.Criterion;
-import org.itcgae.siga.db.entities.ForTiposervicioExample;
 
 public class ForTiposervicioSqlProvider {
 

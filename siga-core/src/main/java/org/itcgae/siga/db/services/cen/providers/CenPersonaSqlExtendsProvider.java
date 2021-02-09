@@ -1,7 +1,7 @@
 package org.itcgae.siga.db.services.cen.providers;
 
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
@@ -355,7 +355,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			sql.VALUES("NIFCIF", "null");
 		}
 
-		if (!crearPersonaDTO.getIdtipoidentificacion().equals("")) {
+		if (null != crearPersonaDTO.getIdtipoidentificacion()) {
 			sql.VALUES("IDTIPOIDENTIFICACION", "'" + crearPersonaDTO.getIdtipoidentificacion() + "'");
 		}
 		if (null != crearPersonaDTO.getSexo()) {

@@ -13,8 +13,6 @@ import java.util.Vector;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.aspose.words.DataSet;
-import com.aspose.words.DataTable;
 import com.aspose.words.Document;
 import com.aspose.words.DocumentBuilder;
 import com.aspose.words.License;

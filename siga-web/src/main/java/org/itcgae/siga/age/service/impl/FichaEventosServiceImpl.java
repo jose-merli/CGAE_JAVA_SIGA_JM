@@ -308,10 +308,10 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 						ageEventoInsert.setTitulo(eventoItem.getTitulo());
 						ageEventoInsert.setFechainicio(eventoItem.getFechaInicio());
 						ageEventoInsert.setFechafin(eventoItem.getFechaFin());
-						if ((eventoItem.getIdCurso() == null && Long
-								.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION)
-								|| (eventoItem.getIdCurso() == null && Long.valueOf(
-										eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION)) {
+						if ((eventoItem.getIdCurso() == null && eventoItem.getIdTipoEvento()!= null &&
+								Long.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION)
+								|| (eventoItem.getIdCurso() == null && eventoItem.getIdTipoEvento()!= null &&
+									Long.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION)) {
 							ageEventoInsert.setFechabaja(new Date());
 						} else {
 							ageEventoInsert.setFechabaja(null);
@@ -322,7 +322,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 						ageEventoInsert.setLugar(eventoItem.getLugar());
 						ageEventoInsert.setDescripcion(eventoItem.getDescripcion());
 						ageEventoInsert.setRecursos(eventoItem.getRecursos());
-						ageEventoInsert.setIdtipoevento(Long.valueOf(eventoItem.getIdTipoEvento()));
+						if(eventoItem.getIdTipoEvento()!= null)
+							ageEventoInsert.setIdtipoevento(Long.valueOf(eventoItem.getIdTipoEvento()));
 						ageEventoInsert.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
 						// Si existen datos de repetición se guarda el idRepeticion referenciado a la
 						// tabla donde se guardan
@@ -352,11 +353,12 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 								error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 							} else {
 
-								if (Long.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_SESION
+								if (eventoItem.getIdTipoEvento()!= null && 
+										(Long.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_SESION
 										|| (eventoItem.getIdCurso() != null && Long.valueOf(eventoItem
 												.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION)
 										|| (eventoItem.getIdCurso() != null && Long.valueOf(eventoItem
-												.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION)) {
+												.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION))) {
 
 									ForEventoCurso forEventoCurso = new ForEventoCurso();
 									forEventoCurso.setFechabaja(null);

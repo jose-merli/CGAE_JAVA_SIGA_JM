@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenEstadoactividad;
+import org.itcgae.siga.db.entities.CenEstadoactividadExample;
 import org.itcgae.siga.db.entities.CenEstadoactividadExample.Criteria;
 import org.itcgae.siga.db.entities.CenEstadoactividadExample.Criterion;
-import org.itcgae.siga.db.entities.CenEstadoactividadExample;
 
 public class CenEstadoactividadSqlProvider {
 

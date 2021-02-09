@@ -248,4 +248,20 @@ public class ModModeloComunicacionExtendsSqlProvider {
 
 		return sql.toString();
 	}
+	public String selectTodasPlantillasBorradas(String idModeloComunicacion, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("");
+		
+		sql.FROM("MOD_MODELOCOMUNICACION mm");
+		sql.LEFT_OUTER_JOIN("MOD_MODELO_PLANTILLADOCUMENTO mp\r\n" + 
+				"	ON mm.IDMODELOCOMUNICACION = mp.IDMODELOCOMUNICACION");
+		
+		sql.LEFT_OUTER_JOIN("LEFT JOIN MOD_PLANTILLADOCUMENTO pl "
+				+ "ON pl.IDPLANTILLADOCUMENTO = mp.IDPLANTILLADOCUMENTO");
+		sql.WHERE("IDINSTITUCION = "+ idInstitucion);
+		sql.WHERE("IDMODELOCOMUNICACION = "+idModeloComunicacion);
+		
+		return sql.toString();
+	}
 }

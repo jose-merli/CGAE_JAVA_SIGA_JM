@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.entities;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 public class ModPlantilladocumento extends ModPlantilladocumentoKey {

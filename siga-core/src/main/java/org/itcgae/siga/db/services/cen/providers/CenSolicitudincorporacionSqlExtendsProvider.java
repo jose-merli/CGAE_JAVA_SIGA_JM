@@ -102,12 +102,12 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		
 		
 		
-		if(solIncorporacionSearchDTO.getFechaDesde()!=null && !solIncorporacionSearchDTO.getFechaDesde().equals("")){
+		if(solIncorporacionSearchDTO.getFechaDesde()!=null){
 			String fechaDesde = dateFormat.format(solIncorporacionSearchDTO.getFechaDesde());
 			sql.WHERE("FECHASOLICITUD >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY')");
 		}
 		
-		if(solIncorporacionSearchDTO.getFechaHasta()!=null && !solIncorporacionSearchDTO.getFechaHasta().equals("")){
+		if(solIncorporacionSearchDTO.getFechaHasta()!=null){
 			String fechaHasta = dateFormat.format(solIncorporacionSearchDTO.getFechaHasta());
 			sql.WHERE("FECHASOLICITUD <= TO_DATE('" + fechaHasta + "', 'DD/MM/YYYY')");
 		}

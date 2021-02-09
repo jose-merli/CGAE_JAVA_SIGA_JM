@@ -17,8 +17,6 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.util.IOUtils;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
-import org.itcgae.siga.DTOs.cen.TipoCurricularDTO;
-import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.commons.utils.TokenGenerationException;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -266,9 +264,10 @@ public class TestUtils {
 	}
 	
 	public void generaInputXLS() {
-		try {
+		try (HSSFWorkbook workbook = new HSSFWorkbook())
+		{
 			FileOutputStream fileOut = new FileOutputStream("input.xls");
-			HSSFWorkbook workbook = new HSSFWorkbook();
+			
 			HSSFSheet worksheet = workbook.createSheet("input");
 
 			// index from 0,0... cell A1 is cell(0,0)

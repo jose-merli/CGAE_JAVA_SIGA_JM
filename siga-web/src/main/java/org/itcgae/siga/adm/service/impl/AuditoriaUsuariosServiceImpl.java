@@ -65,9 +65,9 @@ public class AuditoriaUsuariosServiceImpl implements IAuditoriaUsuariosService{
 			LOGGER.info("getActionType() / cenTipocambioExtendsMapper.getActionType() -> Entrada a cenTipocambioExtendsMapper para obtener acciones del usuario logeado");		
 			combooItems = cenTipocambioExtendsMapper.getActionType(usuario.getIdlenguaje());
 			LOGGER.info("getActionType() / cenTipocambioExtendsMapper.getActionType() -> Salida de admUsuariosExtendsMapper para obtener acciones del usuario logeado");
-			comboItem.setLabel("");
-			comboItem.setValue("");
-			combooItems.add(0, comboItem);
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//			combooItems.add(0, comboItem);
 			comboDTO.setCombooItems(combooItems);
 		}
 		else {

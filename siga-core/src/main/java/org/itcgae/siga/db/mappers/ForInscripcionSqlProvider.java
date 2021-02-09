@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForInscripcion;
+import org.itcgae.siga.db.entities.ForInscripcionExample;
 import org.itcgae.siga.db.entities.ForInscripcionExample.Criteria;
 import org.itcgae.siga.db.entities.ForInscripcionExample.Criterion;
-import org.itcgae.siga.db.entities.ForInscripcionExample;
 
 public class ForInscripcionSqlProvider {
 

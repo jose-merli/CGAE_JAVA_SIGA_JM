@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.GenMenu;
+import org.itcgae.siga.db.entities.GenMenuExample;
 import org.itcgae.siga.db.entities.GenMenuExample.Criteria;
 import org.itcgae.siga.db.entities.GenMenuExample.Criterion;
-import org.itcgae.siga.db.entities.GenMenuExample;
 
 public class GenMenuSqlProvider {
 

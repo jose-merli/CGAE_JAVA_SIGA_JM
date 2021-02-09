@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.ForTemacursoPersona;
+import org.itcgae.siga.db.entities.ForTemacursoPersonaExample;
 import org.itcgae.siga.db.entities.ForTemacursoPersonaExample.Criteria;
 import org.itcgae.siga.db.entities.ForTemacursoPersonaExample.Criterion;
-import org.itcgae.siga.db.entities.ForTemacursoPersonaExample;
 
 public class ForTemacursoPersonaSqlProvider {
 

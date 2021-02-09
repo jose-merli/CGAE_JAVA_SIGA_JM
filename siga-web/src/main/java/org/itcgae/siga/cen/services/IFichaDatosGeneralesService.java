@@ -13,7 +13,6 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IFichaDatosGeneralesService {

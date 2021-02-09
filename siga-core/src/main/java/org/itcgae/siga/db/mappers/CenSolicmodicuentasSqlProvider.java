@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenSolicmodicuentas;
+import org.itcgae.siga.db.entities.CenSolicmodicuentasExample;
 import org.itcgae.siga.db.entities.CenSolicmodicuentasExample.Criteria;
 import org.itcgae.siga.db.entities.CenSolicmodicuentasExample.Criterion;
-import org.itcgae.siga.db.entities.CenSolicmodicuentasExample;
 
 public class CenSolicmodicuentasSqlProvider {
 

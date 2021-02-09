@@ -22,7 +22,6 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
-import org.itcgae.siga.db.services.cen.providers.CenClienteSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenPersonaSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

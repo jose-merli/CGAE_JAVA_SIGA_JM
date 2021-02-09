@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ColegiadoItem {
+public class ColegiadoItem implements Comparable<ColegiadoItem>{
 
 	private Boolean colegiado;
 	
@@ -39,6 +39,7 @@ public class ColegiadoItem {
 	private Date [] fechaIncorporacion;
 	private Date [] fechaNacimientoRango;
 	private String situacion;
+	private String[] situaciones;
 	private String residencia;
 	private String inscrito;	
 	private String  idProvincia;
@@ -1799,6 +1800,18 @@ public class ColegiadoItem {
 			return false;
 		return true;
 	}
+	public String[] getSituaciones() {
+		return situaciones;
+	}
+
+	public void setSituaciones(String[] situaciones) {
+		this.situaciones = situaciones;
+ 
+	}
 	
+	@Override
+	public int compareTo(ColegiadoItem o) {
+		return getFechaEstado().compareTo(o.getFechaEstado());
+    }
 }
 

@@ -2,11 +2,12 @@ package org.itcgae.siga.db.mappers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AgeDiassemana;
+import org.itcgae.siga.db.entities.AgeDiassemanaExample;
 import org.itcgae.siga.db.entities.AgeDiassemanaExample.Criteria;
 import org.itcgae.siga.db.entities.AgeDiassemanaExample.Criterion;
-import org.itcgae.siga.db.entities.AgeDiassemanaExample;
 
 public class AgeDiassemanaSqlProvider {
 
