@@ -5,7 +5,6 @@ import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 
 public class EnvEnviosExtendsSqlProvider {
 

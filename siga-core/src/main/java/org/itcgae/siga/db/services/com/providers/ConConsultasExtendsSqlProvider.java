@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 
 public class ConConsultasExtendsSqlProvider {
 	
@@ -63,10 +62,10 @@ public class ConConsultasExtendsSqlProvider {
 		}
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONSULTA.DESCRIPCION",filtros.getNombre()));
+			sql.WHERE(filtroTextoBusquedas("CONSULTA.DESCRIPCION",filtros.getNombre()));
 		}
 		if(filtros.getDescripcion() != null && !filtros.getDescripcion().trim().equals("")){
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONSULTA.OBSERVACIONES", filtros.getDescripcion()));
+			sql.WHERE(filtroTextoBusquedas("CONSULTA.OBSERVACIONES", filtros.getDescripcion()));
 		}
 		
 		if(filtros.getIdModulo() != null && !filtros.getIdModulo().trim().equals("")){

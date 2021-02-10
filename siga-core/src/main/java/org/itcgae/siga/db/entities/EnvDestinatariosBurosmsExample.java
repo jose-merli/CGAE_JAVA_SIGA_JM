@@ -683,7 +683,7 @@ public class EnvDestinatariosBurosmsExample {
 			return (Criteria) this;
 		}
 
-		public Criteria andIddocumentoEqualTo(Integer value) {
+		public Criteria andIddocumentoEqualTo(Short value) {
 			addCriterion("IDDOCUMENTO =", value, "iddocumento");
 			return (Criteria) this;
 		}

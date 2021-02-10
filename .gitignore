@@ -265,3 +265,8 @@ siga-core/target/
 .metadata/.log
 .metadata/.lock
 *rebel.xml
+/.metadata/
+.sonarlint/default/.sonartmp_1414692551072694739/sonarlint-slf4j-sonar-log2047473019009801676.jar
+.sonarlint/
+siga-core/.sts4-cache/classpath-data.json
+siga-web/.sts4-cache/

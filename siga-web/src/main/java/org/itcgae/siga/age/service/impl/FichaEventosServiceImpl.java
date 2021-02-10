@@ -65,8 +65,6 @@ import org.itcgae.siga.db.entities.AgeRepeticionevento;
 import org.itcgae.siga.db.entities.AgeRepeticioneventoExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
-import org.itcgae.siga.db.entities.CenInfluencia;
-import org.itcgae.siga.db.entities.CenInfluenciaExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.CenPartidojudicial;
@@ -172,7 +170,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	private AgeFestivosExtendsMapper ageFestivosExtendsMapper;
 
 	@Autowired
-	private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
+	private CenInstitucionExtendsMapper cenInstitucionMapper;
 
 	@Autowired
 	private CenPartidojudicialExtendsMapper cenPartidojudicialExtendsMapper;
@@ -238,7 +236,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		int responseNotificacion = 0;
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
-		boolean isColegio = false;
+
 		String idRepeticionEvento = null;
 
 		// Conseguimos información del usuario logeado
@@ -255,630 +253,197 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 			LOGGER.info(
 					"saveEventCalendar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			// Colegio
-			if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100")) {
-				isColegio = true;
-
-				// General
-			} else if (idInstitucion.equals(SigaConstants.IDINSTITUCION_2000)) {
-				isColegio = false;
-
-				// Consejo
-			} else {
-				isColegio = false;
-			}
-
 			try {
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-
-					// SI EL EVENTO ES DE TIPO FIESTA NACIONAL O AUTONOMICA
-					if (eventoItem.getIdTipoEvento().equals(SigaConstants.EVENTO_TIPO_FESTIVO)
-							&& eventoItem.getTitulo().equals(SigaConstants.EVENTO_TIPO_FIESTA_NACIONAL)) {
-
-						try {
-
-							int[] responseResult = new int[2];
-							responseResult = createEventosTipoFestivoNacionalAutonomico(eventoItem, usuario,
-									idInstitucion, isColegio);
-
-							if (responseResult[0] == 1) {
-								response = 1;
-								error.setCode(200);
-								insertResponseDTO.setId(String.valueOf(responseResult[1]));
-
-							} else if (responseResult[0] == 2) {
-								response = 0;
-								error.setCode(400);
-								error.setDescription("Ya existe un evento Nacional para el día seleccionado");
-							}
-
-						} catch (Exception e) {
-							error.setCode(400);
-							LOGGER.error(e);
-							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					// Si existen datos de repeticion, se inserta en la tabla los datos
+					if (eventoItem.getFechaInicioRepeticion() != null && eventoItem.getFechaFinRepeticion() != null
+							&& eventoItem.getValoresRepeticion() != null && eventoItem.getValoresRepeticion().length != 0) {
+						AgeRepeticionevento ageRepeticionEvento = new AgeRepeticionevento();
+						ageRepeticionEvento.setIdinstitucion(idInstitucion);
+						ageRepeticionEvento.setFechainicio(eventoItem.getFechaInicioRepeticion());
+						ageRepeticionEvento.setFechafin(eventoItem.getFechaFinRepeticion());
+						ageRepeticionEvento.setFechabaja(null);
+						ageRepeticionEvento.setUsumodificacion(usuario.getIdusuario().longValue());
+						ageRepeticionEvento.setFechamodificacion(new Date());
+						if (eventoItem.getValoresRepeticion().length != 0) {
+							String valoresrepeticion = Arrays.toString(eventoItem.getValoresRepeticion());
+							ageRepeticionEvento.setValoresrepeticion(valoresrepeticion);
+						} else {
+							ageRepeticionEvento.setValoresrepeticion(null);
 						}
-
-						// SI ES TIPO FESTIVO LOCAL
-					} else if (eventoItem.getIdTipoEvento().equals(SigaConstants.EVENTO_TIPO_FESTIVO)
-							&& eventoItem.getTitulo().equals(SigaConstants.EVENTO_TIPO_FIESTA_LOCAL)) {
-
-						try {
-
-							int responseResult[] = new int[2];
-
-							responseResult = createEventosTipoFestivoLocal(eventoItem, usuario, idInstitucion);
-
-							if (responseResult[0] == 1) {
-								response = 1;
-								error.setCode(200);
-								insertResponseDTO.setId(String.valueOf(responseResult[1]));
-
-							} else if (responseResult[0] == 2) {
-								response = 0;
-								error.setCode(400);
-								error.setDescription(
-										"Ya existe un evento Local para el partido judicial y día seleccionado");
-							} else if (responseResult[0] == 3) {
-								response = 0;
-								error.setCode(400);
-								error.setDescription("No existe el calendario para esta institución");
-							}
-
-						} catch (Exception e) {
-							error.setCode(400);
-							LOGGER.error(e);
-
-							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-						}
-						// SI ES TIPO FESTIVO AUTONOMICO
-					} else if (eventoItem.getIdTipoEvento().equals(SigaConstants.EVENTO_TIPO_FESTIVO)
-							&& eventoItem.getTitulo().equals(SigaConstants.EVENTO_TIPO_FIESTA_AUTONOMICA)) {
-
-						try {
-
-							int responseResult[] = new int[2];
-
-							responseResult = createEventosTipoFestivoNacionalAutonomico(eventoItem, usuario,
-									idInstitucion, isColegio);
-
-							if (responseResult[0] == 1) {
-								response = 1;
-								error.setCode(200);
-								insertResponseDTO.setId(String.valueOf(responseResult[1]));
-
-							} else if (responseResult[0] == 2) {
-								response = 0;
-								error.setCode(400);
-								error.setDescription("Ya existe un evento Autonómico para el día seleccionado");
-							}
-
-						} catch (Exception e) {
-							error.setCode(400);
-							LOGGER.error(e);
-
-							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-						}
-
-					} else {
-						// Si existen datos de repeticion, se inserta en la tabla los datos
-						if (eventoItem.getFechaInicioRepeticion() != null && eventoItem.getFechaFinRepeticion() != null
-								&& eventoItem.getValoresRepeticion() != null
-								&& eventoItem.getValoresRepeticion().length != 0) {
-
-							AgeRepeticionevento ageRepeticionEvento = new AgeRepeticionevento();
-							ageRepeticionEvento.setIdinstitucion(idInstitucion);
-							ageRepeticionEvento.setFechainicio(eventoItem.getFechaInicioRepeticion());
-							ageRepeticionEvento.setFechafin(eventoItem.getFechaFinRepeticion());
-							ageRepeticionEvento.setFechabaja(null);
-							ageRepeticionEvento.setUsumodificacion(usuario.getIdusuario().longValue());
-							ageRepeticionEvento.setFechamodificacion(new Date());
-
-							if (eventoItem.getValoresRepeticion().length != 0) {
-								String valoresrepeticion = Arrays.toString(eventoItem.getValoresRepeticion());
-								ageRepeticionEvento.setValoresrepeticion(valoresrepeticion);
-							} else {
-								ageRepeticionEvento.setValoresrepeticion(null);
-							}
-							ageRepeticionEvento.setTiporepeticion(eventoItem.getTipoRepeticion());
-							ageRepeticionEvento.setTipodiasrepeticion(eventoItem.getTipoDiasRepeticion());
-
-							LOGGER.info(
-									"saveEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Entrada a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
-
-							response = ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento);
-
-							LOGGER.info(
-									"saveEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Salida a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
-
-							LOGGER.info(
-									"saveEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Entrada a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
-
-							List<ComboItem> repeticionEventoInserted = ageRepeticionEventoExtendsMapper
-									.selectMaxRepetitionEvent();
-
-							LOGGER.info(
-									"saveEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Salida a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
-
-							idRepeticionEvento = repeticionEventoInserted.get(0).getValue();
-						}
-
-						AgeCalendarioExample exampleCalendario = new AgeCalendarioExample();
-
-						exampleCalendario.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
-								.andIdtipocalendarioEqualTo(Long.valueOf(eventoItem.getIdTipoCalendario()));
+						ageRepeticionEvento.setTiporepeticion(eventoItem.getTipoRepeticion());
+						ageRepeticionEvento.setTipodiasrepeticion(eventoItem.getTipoDiasRepeticion());
 
 						LOGGER.info(
-								"saveEventCalendar() / ageCalendarioExtendsMapper.selectByExample(exampleCalendario) -> Entrada a ageCalendarioExtendsMapper para obtener el idCalendario al que pertene el evento");
-						List<AgeCalendario> calendarios = ageCalendarioExtendsMapper.selectByExample(exampleCalendario);
+								"saveEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Entrada a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+						response = ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento);
 						LOGGER.info(
-								"saveEventCalendar() / ageCalendarioExtendsMapper.selectByExample(exampleCalendario) -> Salida de ageCalendarioExtendsMapper para obtener el idCalendario al que pertene el evento");
+								"saveEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Salida a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
 
-						if (null != calendarios && calendarios.size() > 0) {
+						LOGGER.info(
+								"saveEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Entrada a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
+						List<ComboItem> repeticionEventoInserted = ageRepeticionEventoExtendsMapper
+								.selectMaxRepetitionEvent();
+						LOGGER.info(
+								"saveEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Salida a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
+						idRepeticionEvento = repeticionEventoInserted.get(0).getValue();
+					}
 
-							AgeCalendario calendario = calendarios.get(0);
-							// Guardamos el evento al calendario que le pertenece
-							AgeEvento ageEventoInsert = new AgeEvento();
-							ageEventoInsert.setIdcalendario(calendario.getIdcalendario());
-							ageEventoInsert.setTitulo(eventoItem.getTitulo());
-							ageEventoInsert.setFechainicio(eventoItem.getFechaInicio());
-							ageEventoInsert.setFechafin(eventoItem.getFechaFin());
+					AgeCalendarioExample exampleCalendario = new AgeCalendarioExample();
+					exampleCalendario.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
+							.andIdtipocalendarioEqualTo(Long.valueOf(eventoItem.getIdTipoCalendario()));
 
-							if ((eventoItem.getIdCurso() == null && Long.valueOf(
-									eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION)
-									|| (eventoItem.getIdCurso() == null && Long.valueOf(eventoItem
-											.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION)) {
-								ageEventoInsert.setFechabaja(new Date());
-							} else {
-								ageEventoInsert.setFechabaja(null);
-							}
+					LOGGER.info(
+							"saveEventCalendar() / ageCalendarioExtendsMapper.selectByExample(exampleCalendario) -> Entrada a ageCalendarioExtendsMapper para obtener el idCalendario al que pertene el evento");
+					List<AgeCalendario> calendarios = ageCalendarioExtendsMapper.selectByExample(exampleCalendario);
+					LOGGER.info(
+							"saveEventCalendar() / ageCalendarioExtendsMapper.selectByExample(exampleCalendario) -> Salida de ageCalendarioExtendsMapper para obtener el idCalendario al que pertene el evento");
 
-							ageEventoInsert.setUsumodificacion(usuario.getIdusuario().longValue());
-							ageEventoInsert.setFechamodificacion(new Date());
-							ageEventoInsert.setLugar(eventoItem.getLugar());
-							ageEventoInsert.setIdinstitucion(idInstitucion);
-
-							ageEventoInsert.setDescripcion(eventoItem.getDescripcion());
-							ageEventoInsert.setRecursos(eventoItem.getRecursos());
+					if (null != calendarios && calendarios.size() > 0) {
+						AgeCalendario calendario = calendarios.get(0);
+						// Guardamos el evento al calendario que le pertenece
+						AgeEvento ageEventoInsert = new AgeEvento();
+						ageEventoInsert.setIdcalendario(calendario.getIdcalendario());
+						ageEventoInsert.setTitulo(eventoItem.getTitulo());
+						ageEventoInsert.setFechainicio(eventoItem.getFechaInicio());
+						ageEventoInsert.setFechafin(eventoItem.getFechaFin());
+						if ((eventoItem.getIdCurso() == null && eventoItem.getIdTipoEvento()!= null &&
+								Long.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION)
+								|| (eventoItem.getIdCurso() == null && eventoItem.getIdTipoEvento()!= null &&
+									Long.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION)) {
+							ageEventoInsert.setFechabaja(new Date());
+						} else {
+							ageEventoInsert.setFechabaja(null);
+						}
+						ageEventoInsert.setUsumodificacion(usuario.getIdusuario().longValue());
+						ageEventoInsert.setFechamodificacion(new Date());
+						ageEventoInsert.setIdinstitucion(idInstitucion);
+						ageEventoInsert.setLugar(eventoItem.getLugar());
+						ageEventoInsert.setDescripcion(eventoItem.getDescripcion());
+						ageEventoInsert.setRecursos(eventoItem.getRecursos());
+						if(eventoItem.getIdTipoEvento()!= null)
 							ageEventoInsert.setIdtipoevento(Long.valueOf(eventoItem.getIdTipoEvento()));
+						ageEventoInsert.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
+						// Si existen datos de repetición se guarda el idRepeticion referenciado a la
+						// tabla donde se guardan
+						if (idRepeticionEvento != null) {
+							ageEventoInsert.setIdrepeticionevento(Long.valueOf(idRepeticionEvento));
+						}
+						// Se guarda el evento creado
+						LOGGER.info(
+								"saveEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Entrada a ageEventoMapper para insertar un evento");
+						response = ageEventoExtendsMapper.insert(ageEventoInsert);
+						LOGGER.info(
+								"saveEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Salida a ageEventoMapper para insertar un evento");
 
-							if (eventoItem.getIdEstadoEvento() != null) {
-								ageEventoInsert.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
-							}
+						if (response == 0) {
+							error.setCode(400);
+							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+						} else {
+							error.setCode(200);
+							// Si no existe error se generan las notificaciones del evento generado
+							insertResponseDTO.setId(ageEventoInsert.getIdevento().toString());
 
-							// Si existen datos de repetición se guarda el idRepeticion referenciado a la
-							// tabla donde se guardan
-							if (idRepeticionEvento != null) {
-								ageEventoInsert.setIdrepeticionevento(Long.valueOf(idRepeticionEvento));
-							}
-							// Se guarda el evento creado
-							LOGGER.info(
-									"saveEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Entrada a ageEventoMapper para insertar un evento");
-							response = ageEventoExtendsMapper.insert(ageEventoInsert);
-							LOGGER.info(
-									"saveEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Salida a ageEventoMapper para insertar un evento");
+							responseNotificacion = generateNotificationsEvents(calendario.getIdcalendario().toString(),
+									eventoItem, idInstitucion, usuario);
 
-							if (response == 0) {
+							if (responseNotificacion == 0) {
 								error.setCode(400);
 								error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 							} else {
-								error.setCode(200);
-								// Si no existe error se generan las notificaciones del evento generado
-								insertResponseDTO.setId(ageEventoInsert.getIdevento().toString());
 
-								responseNotificacion = generateNotificationsEvents(
-										calendario.getIdcalendario().toString(), eventoItem, idInstitucion, usuario);
+								if (eventoItem.getIdTipoEvento()!= null && 
+										(Long.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_SESION
+										|| (eventoItem.getIdCurso() != null && Long.valueOf(eventoItem
+												.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION)
+										|| (eventoItem.getIdCurso() != null && Long.valueOf(eventoItem
+												.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION))) {
 
-								if (responseNotificacion == 0) {
-									error.setCode(400);
-									error.setDescription(
-											"Se ha producido un error en BBDD contacte con su administrador");
-								} else {
+									ForEventoCurso forEventoCurso = new ForEventoCurso();
+									forEventoCurso.setFechabaja(null);
+									forEventoCurso.setFechamodificacion(new Date());
+									forEventoCurso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
+									forEventoCurso.setIdevento(Long.valueOf(ageEventoInsert.getIdevento()));
+									forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+									forEventoCurso.setIdinstitucion(idInstitucion);
 
-									if (Long.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_SESION
-											|| (eventoItem.getIdCurso() != null && Long.valueOf(eventoItem
-													.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION)
-											|| (eventoItem.getIdCurso() != null && Long.valueOf(eventoItem
-													.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION)) {
+									response = forEventoCursoMapper.insert(forEventoCurso);
 
-										ForEventoCurso forEventoCurso = new ForEventoCurso();
-										forEventoCurso.setFechabaja(null);
-										forEventoCurso.setFechamodificacion(new Date());
-										forEventoCurso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
-										forEventoCurso.setIdevento(Long.valueOf(ageEventoInsert.getIdevento()));
-										forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-										forEventoCurso.setIdinstitucion(idInstitucion);
+									// comprobamos si la sesión es candidata a ser inicio o fin de impartición de
+									// curso
+									if (Long.valueOf(
+											eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_SESION) {
 
-										response = forEventoCursoMapper.insert(forEventoCurso);
+										ForCurso cursodesde = new ForCurso();
+										cursodesde.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
+										cursodesde.setFechaimparticiondesde(eventoItem.getFechaInicio());
+										ForCurso curso = forCursoExtendsMapper.selectCursoFechaMinMax(cursodesde);
 
-										// comprobamos si la sesión es candidata a ser inicio o fin de impartición de
-										// curso
-										if (Long.valueOf(
-												eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_SESION) {
-
-											ForCurso cursodesde = new ForCurso();
-											cursodesde.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
-											cursodesde.setFechaimparticiondesde(eventoItem.getFechaInicio());
-											ForCurso curso = forCursoExtendsMapper.selectCursoFechaMinMax(cursodesde);
-
-											if (null == curso) {
-												forCursoExtendsMapper.updateByPrimaryKeySelective(cursodesde);
-											}
-
-											ForCurso cursohasta = new ForCurso();
-											cursohasta.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
-											cursohasta.setFechaimparticionhasta(eventoItem.getFechaInicio());
-											curso = forCursoExtendsMapper.selectCursoFechaMinMax(cursohasta);
-											if (null == curso) {
-												forCursoExtendsMapper.updateByPrimaryKeySelective(cursohasta);
-											}
-
-											// Modificamos la fecha de inicio de inscripcion en el curso
-										} else if (Long.valueOf(eventoItem
-												.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
-
-											ForCurso curso = new ForCurso();
-											curso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
-											curso.setFechainscripciondesde(eventoItem.getFechaInicio());
-
-											forCursoExtendsMapper.updateByPrimaryKeySelective(curso);
-
-										} else if (Long.valueOf(eventoItem
-												.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
-
-											ForCurso curso = new ForCurso();
-											curso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
-											curso.setFechainscripcionhasta(eventoItem.getFechaInicio());
-
-											forCursoExtendsMapper.updateByPrimaryKeySelective(curso);
+										if (null == curso) {
+											forCursoExtendsMapper.updateByPrimaryKeySelective(cursodesde);
 										}
 
-									}
-
-									// Si existen datos de repetición se generan los eventos duplicados del generado
-									if (idRepeticionEvento != null) {
-
-										response = generateEvents(calendario.getIdcalendario().toString(), eventoItem,
-												ageEventoInsert, usuario);
-
-										if (response == 0) {
-											error.setCode(400);
-											error.setDescription(
-													"Se ha producido un error en BBDD contacte con su administrador");
-										} else {
-											error.setCode(200);
+										ForCurso cursohasta = new ForCurso();
+										cursohasta.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
+										cursohasta.setFechaimparticionhasta(eventoItem.getFechaInicio());
+										curso = forCursoExtendsMapper.selectCursoFechaMinMax(cursohasta);
+										if (null == curso) {
+											forCursoExtendsMapper.updateByPrimaryKeySelective(cursohasta);
 										}
+
+										// Modificamos la fecha de inicio de inscripcion en el curso
+									} else if (Long.valueOf(eventoItem
+											.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
+
+										ForCurso curso = new ForCurso();
+										curso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
+										curso.setFechainscripciondesde(eventoItem.getFechaInicio());
+
+										forCursoExtendsMapper.updateByPrimaryKeySelective(curso);
+
+									} else if (Long.valueOf(eventoItem
+											.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
+
+										ForCurso curso = new ForCurso();
+										curso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
+										curso.setFechainscripcionhasta(eventoItem.getFechaInicio());
+
+										forCursoExtendsMapper.updateByPrimaryKeySelective(curso);
 									}
+
 								}
 
+								// Si existen datos de repetición se generan los eventos duplicados del generado
+								if (idRepeticionEvento != null) {
+
+									response = generateEvents(calendario.getIdcalendario().toString(), eventoItem,
+											ageEventoInsert, usuario);
+
+									if (response == 0) {
+										error.setCode(400);
+										error.setDescription(
+												"Se ha producido un error en BBDD contacte con su administrador");
+									} else {
+										error.setCode(200);
+									}
+								}
 							}
-						} else {
-							error.setCode(400);
-							error.setDescription("No existe el calendario");
+
 						}
+					} else {
+						error.setCode(400);
+						error.setDescription("No existe el calendario");
 					}
 				}
 			} catch (Exception e) {
 				response = 0;
 				error.setCode(400);
-				LOGGER.error(e);
 				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 			}
 		}
-
 		insertResponseDTO.setError(error);
 		return insertResponseDTO;
-	}
-
-	private int[] createEventosTipoFestivoNacionalAutonomico(EventoItem eventoItem, AdmUsuarios usuario,
-			Short idInstitucion, boolean isColegio) throws ParseException {
-
-		int[] response = new int[2];
-
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		Date fechaInicio = formatter.parse(formatter.format(eventoItem.getFechaInicio()));
-
-		Calendar c = Calendar.getInstance();
-		c.setTime(fechaInicio);
-		c.add(Calendar.DATE, 1); // Adding 1 days
-
-		Date fechaPosterior = c.getTime();
-
-		AgeEventoExample exampleEvent = new AgeEventoExample();
-
-		if (isColegio) {
-			exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-					.andFechainicioLessThan(fechaPosterior)
-					.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-					.andIdinstitucionEqualTo(idInstitucion).andTituloEqualTo(eventoItem.getTitulo());
-		} else {
-			exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-					.andFechainicioLessThan(fechaPosterior)
-					.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-					.andTituloEqualTo(eventoItem.getTitulo());
-		}
-
-		LOGGER.info(
-				"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-		List<AgeEvento> eventList = ageEventoExtendsMapper.selectByExample(exampleEvent);
-
-		LOGGER.info(
-				"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-		if (null == eventList || eventList.size() == 0) {
-			// General
-			if (idInstitucion.equals(SigaConstants.IDINSTITUCION_2000)) {
-
-				AgeCalendarioExample exampleCalendario = new AgeCalendarioExample();
-				exampleCalendario.createCriteria().andIdtipocalendarioEqualTo(SigaConstants.CALENDARIO_LABORAL);
-
-				LOGGER.info(
-						"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-				List<AgeCalendario> calendariosList = ageCalendarioExtendsMapper.selectByExample(exampleCalendario);
-
-				LOGGER.info(
-						"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-				for (AgeCalendario calendario : calendariosList) {
-
-					AgeEvento evento = new AgeEvento();
-
-					evento.setFechamodificacion(new Date());
-					evento.setUsumodificacion(usuario.getIdusuario().longValue());
-					evento.setTitulo(eventoItem.getTitulo());
-					evento.setFechainicio(eventoItem.getFechaInicio());
-					evento.setFechafin(eventoItem.getFechaFin());
-					evento.setDescripcion(eventoItem.getDescripcion());
-					evento.setRecursos(eventoItem.getRecursos());
-					evento.setIdcalendario(calendario.getIdcalendario());
-					evento.setIdinstitucion(calendario.getIdinstitucion());
-					evento.setIdtipoevento(Long.valueOf(eventoItem.getIdTipoEvento()));
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para crear un evento");
-
-					response[0] = ageEventoExtendsMapper.insert(evento);
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para crear un evento");
-
-				}
-
-				// Consejo
-			} else if (!(idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100"))) {
-
-				LOGGER.info(
-						"saveEventCalendar() / cenInstitucionExtendsMapper.getInstitucionesConsejos(idInstitucion) -> Entrada a cenInstitucionExtendsMapper para buscar los colegios pertenecientes al consejo");
-
-				List<ComboItem> institucionList = cenInstitucionExtendsMapper.getInstitucionesConsejos(idInstitucion);
-
-				LOGGER.info(
-						"saveEventCalendar() / cenInstitucionExtendsMapper.getInstitucionesConsejos(idInstitucion) -> Salida a cenInstitucionExtendsMapper para buscar los colegios pertenecientes al consejo");
-
-				if (institucionList != null && institucionList.size() > 0) {
-
-					for (ComboItem cenInstitucion : institucionList) {
-
-						AgeCalendarioExample exampleCalendario = new AgeCalendarioExample();
-						exampleCalendario.createCriteria().andIdtipocalendarioEqualTo(SigaConstants.CALENDARIO_LABORAL)
-								.andIdinstitucionEqualTo(Short.valueOf(cenInstitucion.getValue()));
-
-						LOGGER.info(
-								"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-						List<AgeCalendario> calendariosList = ageCalendarioExtendsMapper
-								.selectByExample(exampleCalendario);
-
-						LOGGER.info(
-								"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-						if (calendariosList != null && calendariosList.size() > 0) {
-
-							AgeCalendario calendario = calendariosList.get(0);
-
-							AgeEvento evento = new AgeEvento();
-
-							evento.setFechamodificacion(new Date());
-							evento.setUsumodificacion(usuario.getIdusuario().longValue());
-							evento.setTitulo(eventoItem.getTitulo());
-							evento.setFechainicio(eventoItem.getFechaInicio());
-							evento.setFechafin(eventoItem.getFechaFin());
-							evento.setDescripcion(eventoItem.getDescripcion());
-							evento.setRecursos(eventoItem.getRecursos());
-							evento.setIdcalendario(calendario.getIdcalendario());
-							evento.setIdinstitucion(Short.valueOf(cenInstitucion.getValue()));
-							evento.setIdtipoevento(Long.valueOf(eventoItem.getIdTipoEvento()));
-
-							LOGGER.info(
-									"saveEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para crear un evento");
-
-							response[0] = ageEventoExtendsMapper.insert(evento);
-
-							if (cenInstitucion.getValue().equals(idInstitucion.toString())) {
-								response[1] = Integer.valueOf(evento.getIdevento().toString()).intValue();
-							}
-
-							LOGGER.info(
-									"saveEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para crear un evento");
-
-						}
-					}
-				}
-				// Colegio
-			} else {
-
-				AgeCalendarioExample ageCalendarioExample = new AgeCalendarioExample();
-				ageCalendarioExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdtipocalendarioEqualTo(SigaConstants.CALENDARIO_LABORAL);
-
-				LOGGER.info(
-						"saveEventCalendar() / ageCalendarioExtendsMapper.selectByExample(ageCalendarioExample) -> Entrada a ageCalendarioExtendsMapper para buscar idcalendario");
-
-				List<AgeCalendario> calendariosList = ageCalendarioExtendsMapper.selectByExample(ageCalendarioExample);
-
-				LOGGER.info(
-						"saveEventCalendar() / ageCalendarioExtendsMapper.selectByExample(ageCalendarioExample) -> Salida a ageCalendarioExtendsMapper para buscar idcalendario");
-
-				if (null != calendariosList && calendariosList.size() > 0) {
-
-					AgeCalendario calendario = calendariosList.get(0);
-
-					AgeEvento evento = new AgeEvento();
-
-					evento.setFechamodificacion(new Date());
-					evento.setUsumodificacion(usuario.getIdusuario().longValue());
-					evento.setTitulo(eventoItem.getTitulo());
-					evento.setFechainicio(eventoItem.getFechaInicio());
-					evento.setFechafin(eventoItem.getFechaFin());
-					evento.setDescripcion(eventoItem.getDescripcion());
-					evento.setRecursos(eventoItem.getRecursos());
-					evento.setLugar(eventoItem.getLugar());
-					evento.setIdcalendario(calendario.getIdcalendario());
-					evento.setIdinstitucion(idInstitucion);
-					evento.setIdtipoevento(Long.valueOf(eventoItem.getIdTipoEvento()));
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para crear un evento");
-
-					response[0] = ageEventoExtendsMapper.insert(evento);
-					response[1] = Integer.valueOf(evento.getIdevento().toString()).intValue();
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para crear un evento");
-				}
-			}
-		} else {
-			response[0] = 2;
-		}
-
-		return response;
-	}
-
-	private int[] createEventosTipoFestivoLocal(EventoItem eventoItem, AdmUsuarios usuario, Short idInstitucion)
-			throws ParseException {
-
-		int[] response = new int[2];
-
-		/*
-		 * Los eventos tipo festivo local se tratan iguales para los colegios y
-		 * consejos. Buscamos por el partido judicial al que se le asocia el evento para
-		 * crearlo
-		 */
-
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		Date fechaInicio = formatter.parse(formatter.format(eventoItem.getFechaInicio()));
-
-		Calendar c = Calendar.getInstance();
-		c.setTime(fechaInicio);
-		c.add(Calendar.DATE, 1);
-		Date fechaPosterior = c.getTime();
-
-		CenInfluenciaExample cenInfluenciaExample = new CenInfluenciaExample();
-		cenInfluenciaExample.createCriteria().andIdpartidoEqualTo(Long.valueOf(eventoItem.getLugar()));
-
-		LOGGER.info(
-				"saveEventCalendar() / cenInfluenciaExtendsMapper.selectByExample(cenInfluenciaExample) -> Entrada a cenInfluenciaExtendsMapper para buscar idinstitucion del partido judicial");
-
-		List<CenInfluencia> partidosList = cenInfluenciaExtendsMapper.selectByExample(cenInfluenciaExample);
-
-		LOGGER.info(
-				"saveEventCalendar() / cenInfluenciaExtendsMapper.selectByExample(cenInfluenciaExample) -> Salida a cenInfluenciaExtendsMapper para buscar idinstitucion del partido judicial");
-
-		if (null != partidosList && partidosList.size() > 0) {
-
-			CenInfluencia partido = partidosList.get(0);
-
-			AgeCalendarioExample ageCalendarioExample = new AgeCalendarioExample();
-			ageCalendarioExample.createCriteria().andIdinstitucionEqualTo(partido.getIdinstitucion())
-					.andIdtipocalendarioEqualTo(SigaConstants.CALENDARIO_LABORAL);
-
-			LOGGER.info(
-					"saveEventCalendar() / cenInfluenciaExtendsMapper.selectByExample(cenInfluenciaExample) -> Entrada a cenInfluenciaExtendsMapper para buscar idinstitucion del partido judicial");
-
-			List<AgeCalendario> calendariosList = ageCalendarioExtendsMapper.selectByExample(ageCalendarioExample);
-
-			LOGGER.info(
-					"saveEventCalendar() / cenInfluenciaExtendsMapper.selectByExample(cenInfluenciaExample) -> Salida a cenInfluenciaExtendsMapper para buscar idinstitucion del partido judicial");
-
-			if (null != calendariosList && calendariosList.size() > 0) {
-
-				AgeCalendario calendario = calendariosList.get(0);
-
-				AgeEventoExample exampleEvent = new AgeEventoExample();
-				exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-						.andFechainicioLessThan(fechaPosterior)
-						.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-						.andIdcalendarioEqualTo(calendario.getIdcalendario()).andTituloEqualTo(eventoItem.getTitulo())
-						.andLugarEqualTo(eventoItem.getLugar());
-
-				LOGGER.info(
-						"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-				List<AgeEvento> eventList = ageEventoExtendsMapper.selectByExample(exampleEvent);
-
-				LOGGER.info(
-						"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-				// Si no existe evento con esas caracteristicas, lo creamos
-				if (null == eventList || eventList.size() == 0) {
-
-					AgeEvento evento = new AgeEvento();
-
-					evento.setFechamodificacion(new Date());
-					evento.setUsumodificacion(usuario.getIdusuario().longValue());
-					evento.setTitulo(eventoItem.getTitulo());
-					evento.setFechainicio(eventoItem.getFechaInicio());
-					evento.setFechafin(eventoItem.getFechaFin());
-					evento.setDescripcion(eventoItem.getDescripcion());
-					evento.setRecursos(eventoItem.getRecursos());
-					evento.setLugar(eventoItem.getLugar());
-					evento.setIdcalendario(calendario.getIdcalendario());
-					evento.setIdinstitucion(partido.getIdinstitucion());
-					evento.setIdtipoevento(Long.valueOf(eventoItem.getIdTipoEvento()));
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para crear un evento");
-
-					response[0] = ageEventoExtendsMapper.insert(evento);
-					response[1] = Integer.valueOf(evento.getIdevento().toString()).intValue();
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para crear un evento");
-
-					// Si existe comprobamos que se encuentre de baja si existe le damos de alta
-				} else if (eventList.get(0).getFechabaja() != null) {
-
-					AgeEvento evento = eventList.get(0);
-					evento.setFechamodificacion(new Date());
-					evento.setUsumodificacion(usuario.getIdusuario().longValue());
-					evento.setDescripcion(eventoItem.getDescripcion());
-					evento.setRecursos(eventoItem.getRecursos());
-					evento.setFechabaja(null);
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para crear un evento");
-
-					response[0] = ageEventoExtendsMapper.updateByPrimaryKey(evento);
-					response[1] = Integer.valueOf(evento.getIdevento().toString()).intValue();
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para crear un evento");
-
-					// Si no es de baja significa que ya existe y que no se puede crear
-				} else {
-					response[0] = 2;
-				}
-
-			} else {
-				response[0] = 3;
-			}
-
-		}
-
-		return response;
-
 	}
 
 	private int generateEvents(String idCalendario, EventoItem eventoItem, AgeEvento ageEventoInsert,
@@ -1108,25 +673,25 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 					ForEventoCurso forEventoCurso = new ForEventoCurso();
 					forEventoCurso.setFechabaja(null);
 					forEventoCurso.setFechamodificacion(new Date());
-
-					if (eventoItem.getIdCurso() != null) {
+					
+					if(eventoItem.getIdCurso() != null) {
 						forEventoCurso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
 
-					} else {
-
+					}else {
+						
 						ForEventoCursoExample forEventoCursoExample = new ForEventoCursoExample();
 						forEventoCursoExample.createCriteria()
-								.andIdeventoEqualTo(Long.valueOf(eventoItem.getIdEventoOriginal()));
-
+						.andIdeventoEqualTo(Long.valueOf(eventoItem.getIdEventoOriginal()));
+						
 						List<ForEventoCurso> listEventos = forEventoCursoMapper.selectByExample(forEventoCursoExample);
-
+						
 						if (null != listEventos && listEventos.size() > 0) {
 							Long idCurso = listEventos.get(0).getIdcurso();
-							forEventoCurso.setIdcurso(idCurso);
-
+							forEventoCurso.setIdcurso(idCurso);	
+							
 						}
 					}
-
+					
 					forEventoCurso.setIdevento(Long.valueOf(ageEventoInsert.getIdevento()));
 					forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
 					forEventoCurso.setIdinstitucion(ageEventoInsert.getIdinstitucion());
@@ -1522,10 +1087,10 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				for (GenDiccionario rc : repetirCada) {
 					ComboItem item = new ComboItem();
 					item.setLabel(rc.getDescripcion());
-
-					if (rc.getIdrecurso().equals("fichaEventos.datosRepeticion.repetirCada.dia")) {
+					
+					if(rc.getIdrecurso().equals("fichaEventos.datosRepeticion.repetirCada.dia")) {
 						item.setValue("D");
-					} else if (rc.getIdrecurso().equals("fichaEventos.datosRepeticion.repetirCada.semana")) {
+					}else if(rc.getIdrecurso().equals("fichaEventos.datosRepeticion.repetirCada.semana")){
 						item.setValue("S");
 					}
 
@@ -1659,8 +1224,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	// TODO Revisar
 	@Override
 	public void insertarFestivosAuto() {
-		List<CenInstitucion> listCenInstitucion = cenInstitucionExtendsMapper
-				.selectByExample(new CenInstitucionExample());
+		List<CenInstitucion> listCenInstitucion = cenInstitucionMapper.selectByExample(new CenInstitucionExample());
 
 		for (CenInstitucion cenInstitucion : listCenInstitucion) {
 			Short idInstitucion = cenInstitucion.getIdinstitucion();
@@ -1749,7 +1313,6 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		Error error = new Error();
 		String idRepeticionEvento = null;
 		boolean cambioRepeticion = false;
-		boolean isColegio = false;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1767,155 +1330,34 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-				// Colegio
-				if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100")) {
-					isColegio = true;
+				AgeEventoExample exampleEvent = new AgeEventoExample();
+				exampleEvent.createCriteria().andIdeventoEqualTo(Long.valueOf(eventoItem.getIdEvento()))
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-					// General
-				} else if (idInstitucion.equals(SigaConstants.IDINSTITUCION_2000)) {
-					isColegio = false;
+				LOGGER.info(
+						"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageNotificacioneseventoMapper para buscar si existe el evento");
 
-					// Consejo
-				} else {
-					isColegio = false;
-				}
+				List<AgeEvento> eventList = ageEventoExtendsMapper.selectByExample(exampleEvent);
 
-				// SI EL EVENTO ES DE TIPO FIESTA NACIONAL O AUTONOMICA
-				if (eventoItem.getIdTipoEvento().equals(SigaConstants.EVENTO_TIPO_FESTIVO)
-						&& eventoItem.getTitulo().equals(SigaConstants.EVENTO_TIPO_FIESTA_NACIONAL)) {
+				LOGGER.info(
+						"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageNotificacioneseventoMapper para buscar si existe el evento");
 
-					try {
-
-						response = updateEventosTipoFestivoNacionalAutonomico(eventoItem, usuario, idInstitucion,
-								isColegio);
-
-						if (response == 1) {
-							response = 1;
-							error.setCode(200);
-
-						} else if (response == 2) {
-							response = 2;
-							error.setCode(400);
-							error.setDescription("Ya existe un evento Nacional para el día seleccionado");
-						}
-
-					} catch (Exception e) {
-						error.setCode(400);
-						error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-					}
-
-					// SI EL EVENTO ES DE TIPO FIESTA AUTONOMICA o LOCAL
-				} else if (eventoItem.getIdTipoEvento().equals(SigaConstants.EVENTO_TIPO_FESTIVO)
-						&& eventoItem.getTitulo().equals(SigaConstants.EVENTO_TIPO_FIESTA_AUTONOMICA)) {
-
-					try {
-
-						response = updateEventosTipoFestivoNacionalAutonomico(eventoItem, usuario, idInstitucion,
-								isColegio);
-
-						if (response == 1) {
-							response = 1;
-							error.setCode(200);
-
-						} else if (response == 2) {
-							response = 2;
-							error.setCode(400);
-							error.setDescription("Ya existe un evento Autónomico para el día seleccionado");
-						}
-					} catch (Exception e) {
-						error.setCode(400);
-						error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-					}
-
-				} else if (eventoItem.getIdTipoEvento().equals(SigaConstants.EVENTO_TIPO_FESTIVO)
-						&& eventoItem.getTitulo().equals(SigaConstants.EVENTO_TIPO_FIESTA_LOCAL)) {
-
-					try {
-
-						response = updateEventosTipoFestivoLocal(eventoItem, usuario, idInstitucion);
-
-						if (response == 1) {
-							response = 1;
-							error.setCode(200);
-
-						} else if (response == 2) {
-							response = 2;
-							error.setCode(400);
-							error.setDescription(
-									"Ya existe un evento Local para el partido judicial y día seleccionado");
-						}
-
-					} catch (Exception e) {
-						error.setCode(400);
-						error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-					}
-
-				} else {
-
-					AgeEventoExample exampleEvent = new AgeEventoExample();
-
-					if (eventoItem.getIdEvento() != null) {
-						exampleEvent.createCriteria().andIdeventoEqualTo(Long.valueOf(eventoItem.getIdEvento()));
-					}
+				if (null != eventList && eventList.size() > 0) {
+					AgeEvento event = eventList.get(0);
 
 					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageNotificacioneseventoMapper para buscar si existe el evento");
+							"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para modificar un evento");
 
-					List<AgeEvento> eventList = ageEventoExtendsMapper.selectByExample(exampleEvent);
+					// 1. SE GUARDA LAS MODIFICACIONES DEL EVENTO
+					if (event.getIdestadoevento() != Long.valueOf(eventoItem.getIdEstadoEvento())) {
 
-					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageNotificacioneseventoMapper para buscar si existe el evento");
+						if (event.getIdestadoevento() == Long.valueOf(SigaConstants.EVENTO_CUMPLIDO)
+								&& eventoItem.getIdEstadoEvento().equals(SigaConstants.EVENTO_CANCELADO)
+								&& event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_SESION) {
 
-					if (null != eventList && eventList.size() > 0) {
-						AgeEvento event = eventList.get(0);
+							error.setCode(200);
+							error.setDescription("La sesión debe tener estado planificado para poder ser cancelada");
 
-						LOGGER.info(
-								"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para modificar un evento");
-
-						// 1. SE GUARDA LAS MODIFICACIONES DEL EVENTO
-						if (eventoItem.getIdEstadoEvento() != null
-								&& event.getIdestadoevento() != Long.valueOf(eventoItem.getIdEstadoEvento())) {
-
-							if (event.getIdestadoevento() == Long.valueOf(SigaConstants.EVENTO_CUMPLIDO)
-									&& eventoItem.getIdEstadoEvento().equals(SigaConstants.EVENTO_CANCELADO)
-									&& event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_SESION) {
-
-								error.setCode(200);
-								error.setDescription(
-										"La sesión debe tener estado planificado para poder ser cancelada");
-
-							} else {
-
-								// Se comprueba si hay un cambio en la fecha del evento, por si tiene datos de
-								// repeticion cambiar
-								// los eventos hijos que tenga
-								if (!eventoItem.getFechaInicio().equals(event.getFechainicio())) {
-									cambioRepeticion = true;
-								}
-
-								if (!eventoItem.getFechaFin().equals(event.getFechafin())) {
-									cambioRepeticion = true;
-								}
-
-								event.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
-								event.setFechamodificacion(new Date());
-								event.setUsumodificacion(usuario.getIdusuario().longValue());
-								event.setTitulo(eventoItem.getTitulo());
-								event.setFechainicio(eventoItem.getFechaInicio());
-								event.setFechafin(eventoItem.getFechaFin());
-								event.setLugar(eventoItem.getLugar());
-								event.setDescripcion(eventoItem.getDescripcion());
-								event.setRecursos(eventoItem.getRecursos());
-
-								LOGGER.info(
-										"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para modificar un evento");
-
-								response = ageEventoExtendsMapper.updateByPrimaryKey(event);
-
-								LOGGER.info(
-										"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para modificar un evento");
-
-							}
 						} else {
 
 							// Se comprueba si hay un cambio en la fecha del evento, por si tiene datos de
@@ -1929,18 +1371,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 								cambioRepeticion = true;
 							}
 
-							// Si un evento hijo modifica su fecha de inicio/fin se desvincula del padre
-							if (cambioRepeticion) {
-								if (event.getIdeventooriginal() != null) {
-									event.setIdeventooriginal(null);
-								}
-							}
-
-							// Se guardan los datos modificados del evento
-							if (eventoItem.getIdEstadoEvento() != null) {
-								event.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
-							}
-
+							event.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
 							event.setFechamodificacion(new Date());
 							event.setUsumodificacion(usuario.getIdusuario().longValue());
 							event.setTitulo(eventoItem.getTitulo());
@@ -1951,267 +1382,294 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 							event.setRecursos(eventoItem.getRecursos());
 							response = ageEventoExtendsMapper.updateByPrimaryKey(event);
 
+							LOGGER.info(
+									"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para modificar un evento");
+
+						}
+					} else {
+
+						// Se comprueba si hay un cambio en la fecha del evento, por si tiene datos de
+						// repeticion cambiar
+						// los eventos hijos que tenga
+						if (!eventoItem.getFechaInicio().equals(event.getFechainicio())) {
+							cambioRepeticion = true;
 						}
 
-						// 2. SI ES UN EVENTO TIPO INSCRIPCION SE EDITA EN EL CURSO EL NUEVO CAMBIO DE
-						// LAS FECHAS DE INICIO Y FIN DE INSCRIPCION
-						if ((event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
-								|| event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION)
-								&& event.getFechabaja() == null) {
+						if (!eventoItem.getFechaFin().equals(event.getFechafin())) {
+							cambioRepeticion = true;
+						}
 
-							ForEventoCursoExample forEventoCursoExample = new ForEventoCursoExample();
-							forEventoCursoExample.createCriteria()
-									.andIdeventoEqualTo(Long.valueOf(eventoItem.getIdEvento()))
+						// Si un evento hijo modifica su fecha de inicio/fin se desvincula del padre
+						if (cambioRepeticion) {
+							if (event.getIdeventooriginal() != null) {
+								event.setIdeventooriginal(null);
+							}
+						}
+
+						// Se guardan los datos modificados del evento
+						event.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
+						event.setFechamodificacion(new Date());
+						event.setUsumodificacion(usuario.getIdusuario().longValue());
+						event.setTitulo(eventoItem.getTitulo());
+						event.setFechainicio(eventoItem.getFechaInicio());
+						event.setFechafin(eventoItem.getFechaFin());
+						event.setLugar(eventoItem.getLugar());
+						event.setDescripcion(eventoItem.getDescripcion());
+						event.setRecursos(eventoItem.getRecursos());
+						response = ageEventoExtendsMapper.updateByPrimaryKey(event);
+
+					}
+
+					// 2. SI ES UN EVENTO TIPO INSCRIPCION SE EDITA EN EL CURSO EL NUEVO CAMBIO DE
+					// LAS FECHAS DE INICIO Y FIN DE INSCRIPCION
+					if ((event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
+							|| event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION)
+							&& event.getFechabaja() == null) {
+
+						ForEventoCursoExample forEventoCursoExample = new ForEventoCursoExample();
+						forEventoCursoExample.createCriteria()
+								.andIdeventoEqualTo(Long.valueOf(eventoItem.getIdEvento()))
+								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+						LOGGER.info(
+								"updateEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Entrada a ageNotificacioneseventoMapper para buscar si existe el evento");
+
+						List<ForEventoCurso> cursoEventoList = forEventoCursoMapper
+								.selectByExample(forEventoCursoExample);
+
+						LOGGER.info(
+								"updateEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Salida a ageNotificacioneseventoMapper para buscar si existe el evento");
+
+						if (null != cursoEventoList && cursoEventoList.size() > 0) {
+							ForEventoCurso forEventoCurso = cursoEventoList.get(0);
+							eventoItem.setIdCurso(forEventoCurso.getIdcurso().toString());
+
+							ForCursoExample exampleCurso = new ForCursoExample();
+							exampleCurso.createCriteria().andIdcursoEqualTo(forEventoCurso.getIdcurso())
 									.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 							LOGGER.info(
 									"updateEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Entrada a ageNotificacioneseventoMapper para buscar si existe el evento");
 
-							List<ForEventoCurso> cursoEventoList = forEventoCursoMapper
-									.selectByExample(forEventoCursoExample);
+							List<ForCurso> cursoList = forCursoExtendsMapper.selectByExample(exampleCurso);
 
 							LOGGER.info(
 									"updateEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Salida a ageNotificacioneseventoMapper para buscar si existe el evento");
 
-							if (null != cursoEventoList && cursoEventoList.size() > 0) {
-								ForEventoCurso forEventoCurso = cursoEventoList.get(0);
-								eventoItem.setIdCurso(forEventoCurso.getIdcurso().toString());
-
-								ForCursoExample exampleCurso = new ForCursoExample();
-								exampleCurso.createCriteria().andIdcursoEqualTo(forEventoCurso.getIdcurso())
-										.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+							if (null != cursoList && cursoList.size() > 0) {
+								ForCurso curso = cursoList.get(0);
 
 								LOGGER.info(
-										"updateEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Entrada a ageNotificacioneseventoMapper para buscar si existe el evento");
+										"updateEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Entrada a forCursoExtendsMapper para modificar un curso");
 
-								List<ForCurso> cursoList = forCursoExtendsMapper.selectByExample(exampleCurso);
-
-								LOGGER.info(
-										"updateEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Salida a ageNotificacioneseventoMapper para buscar si existe el evento");
-
-								if (null != cursoList && cursoList.size() > 0) {
-									ForCurso curso = cursoList.get(0);
-
-									LOGGER.info(
-											"updateEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Entrada a forCursoExtendsMapper para modificar un curso");
-
-									curso.setFechamodificacion(new Date());
-									curso.setUsumodificacion(usuario.getIdusuario().longValue());
-									if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
-										curso.setFechainscripciondesde(eventoItem.getFechaInicio());
-									} else if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
-										curso.setFechainscripcionhasta(eventoItem.getFechaFin());
-									}
-
-									response = forCursoExtendsMapper.updateByPrimaryKey(curso);
-
-									LOGGER.info(
-											"updateEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Salida a forCursoExtendsMapper para modificar un curso");
-								}
-							}
-						}
-
-						// 3.COMPROBAMOS SI TIENE VALORES DE REPETICION
-						if (eventoItem.getFechaInicioRepeticion() != null && eventoItem.getFechaFinRepeticion() != null
-								&& eventoItem.getValoresRepeticion().length != 0) {
-
-							// Comprobamos q ageRepticion existe
-							if (eventoItem.getIdRepeticionEvento() != null) {
-
-								AgeRepeticioneventoExample ageRepeticioneventoExample = new AgeRepeticioneventoExample();
-								ageRepeticioneventoExample.createCriteria()
-										.andIdrepeticioneventoEqualTo(Long.valueOf(eventoItem.getIdRepeticionEvento()))
-										.andIdinstitucionEqualTo(idInstitucion);
-
-								LOGGER.info(
-										"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectByExample(exampleCurso) -> Entrada a ageRepeticionEventoExtendsMapper para buscar si existe la repeticion");
-
-								List<AgeRepeticionevento> ageRepeticionList = ageRepeticionEventoExtendsMapper
-										.selectByExample(ageRepeticioneventoExample);
-
-								LOGGER.info(
-										"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectByExample(exampleCurso) -> Salida a ageRepeticionEventoExtendsMapper para buscar si existe la repeticion");
-
-								// Si existe modificamos su ageRepeticion
-								if (null != ageRepeticionList && ageRepeticionList.size() > 0) {
-									AgeRepeticionevento rep = ageRepeticionList.get(0);
-									idRepeticionEvento = rep.getIdrepeticionevento().toString();
-
-									if (!rep.getFechainicio().equals(eventoItem.getFechaInicioRepeticion())) {
-										cambioRepeticion = true;
-										rep.setFechainicio(eventoItem.getFechaInicioRepeticion());
-									}
-
-									if (!rep.getFechafin().equals(eventoItem.getFechaFinRepeticion())) {
-										cambioRepeticion = true;
-										rep.setFechafin(eventoItem.getFechaFinRepeticion());
-									}
-
-									if (eventoItem.getValoresRepeticion() != null
-											&& rep.getValoresrepeticion() != null) {
-
-										String valoresrepeticion = Arrays.toString(eventoItem.getValoresRepeticion());
-										String valoresrepeticionRep = rep.getValoresrepeticion();
-
-										if (!valoresrepeticion.equals(valoresrepeticionRep)) {
-											cambioRepeticion = true;
-											if (eventoItem.getValoresRepeticion().length != 0) {
-												rep.setValoresrepeticion(valoresrepeticion);
-											} else {
-												rep.setValoresrepeticion(null);
-											}
-										}
-									}
-
-									if (!rep.getTiporepeticion().equals(eventoItem.getTipoRepeticion())) {
-										cambioRepeticion = true;
-										rep.setTiporepeticion(eventoItem.getTipoRepeticion());
-									}
-
-									if (rep.getTipodiasrepeticion() != null
-											&& eventoItem.getTipoDiasRepeticion() != null
-											&& !rep.getTipodiasrepeticion()
-													.equals(eventoItem.getTipoDiasRepeticion())) {
-										cambioRepeticion = true;
-										rep.setTipodiasrepeticion(eventoItem.getTipoDiasRepeticion());
-									}
-
-									if (cambioRepeticion) {
-
-										rep.setFechabaja(null);
-										rep.setUsumodificacion(usuario.getIdusuario().longValue());
-										rep.setFechamodificacion(new Date());
-
-										LOGGER.info(
-												"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Entrada a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
-										response = ageRepeticionEventoExtendsMapper.updateByPrimaryKey(rep);
-
-										LOGGER.info(
-												"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Salida a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
-
-									}
-
-									// Si no existe se lo creamos
-								}
-							} else {
-								AgeRepeticionevento ageRepeticionEvento = new AgeRepeticionevento();
-								ageRepeticionEvento.setIdinstitucion(idInstitucion);
-								ageRepeticionEvento.setFechainicio(eventoItem.getFechaInicioRepeticion());
-								ageRepeticionEvento.setFechafin(eventoItem.getFechaFinRepeticion());
-								ageRepeticionEvento.setFechabaja(null);
-								ageRepeticionEvento.setUsumodificacion(usuario.getIdusuario().longValue());
-								ageRepeticionEvento.setFechamodificacion(new Date());
-								if (eventoItem.getValoresRepeticion().length != 0) {
-									String valoresrepeticion = Arrays.toString(eventoItem.getValoresRepeticion());
-									ageRepeticionEvento.setValoresrepeticion(valoresrepeticion);
-								} else {
-									ageRepeticionEvento.setValoresrepeticion(null);
-								}
-								ageRepeticionEvento.setTiporepeticion(eventoItem.getTipoRepeticion());
-								ageRepeticionEvento.setTipodiasrepeticion(eventoItem.getTipoDiasRepeticion());
-
-								LOGGER.info(
-										"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Entrada a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
-								response = ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento);
-								LOGGER.info(
-										"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Salida a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
-
-								LOGGER.info(
-										"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Entrada a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
-								List<ComboItem> repeticionEventoInserted = ageRepeticionEventoExtendsMapper
-										.selectMaxRepetitionEvent();
-								LOGGER.info(
-										"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Salida a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
-								idRepeticionEvento = repeticionEventoInserted.get(0).getValue();
-
-								// Se guarda el evento creado
-								LOGGER.info(
-										"updateEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Entrada a ageEventoMapper para insertar un evento");
-								event.setIdrepeticionevento(Long.valueOf(idRepeticionEvento));
-								response = ageEventoExtendsMapper.updateByPrimaryKey(event);
-								LOGGER.info(
-										"updateEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Salida a ageEventoMapper para insertar un evento");
-
-								cambioRepeticion = true;
-							}
-
-							// Si existe cambios, se eliminan los antiguos y se crean los eventos nuevos con
-							// los nuevos datos
-							if (idRepeticionEvento != null && cambioRepeticion) {
-
-								AgeEventoExample ageEventoExample = new AgeEventoExample();
-								ageEventoExample.createCriteria().andIdeventooriginalEqualTo(event.getIdevento())
-										.andIdeventoNotEqualTo(event.getIdevento());
-
-								List<AgeEvento> eventosDelete = ageEventoExtendsMapper
-										.selectByExample(ageEventoExample);
-
-								if (null != eventosDelete && eventosDelete.size() > 0) {
-
-									try {
-
-										for (AgeEvento eventoDelete : eventosDelete) {
-
-											AgeNotificacioneseventoExample ageNotificacioneseventoExample = new AgeNotificacioneseventoExample();
-											ageNotificacioneseventoExample.createCriteria()
-													.andIdeventoEqualTo(eventoDelete.getIdevento());
-
-											List<AgeNotificacionesevento> notificacionesDelete = ageNotificacioneseventoExtendsMapper
-													.selectByExample(ageNotificacioneseventoExample);
-
-											if (null != notificacionesDelete && notificacionesDelete.size() > 0) {
-
-												for (AgeNotificacionesevento notificaionDelete : notificacionesDelete) {
-													notificaionDelete.setFechabaja(new Date());
-													notificaionDelete.setFechamodificacion(new Date());
-													notificaionDelete
-															.setUsumodificacion(usuario.getIdusuario().longValue());
-													ageNotificacioneseventoExtendsMapper
-															.updateByPrimaryKey(notificaionDelete);
-												}
-
-												eventoDelete.setFechabaja(new Date());
-												eventoDelete.setFechamodificacion(new Date());
-												eventoDelete.setUsumodificacion(usuario.getIdusuario().longValue());
-												ageEventoExtendsMapper.updateByPrimaryKey(eventoDelete);
-
-											} else {
-												eventoDelete.setFechabaja(new Date());
-												eventoDelete.setFechamodificacion(new Date());
-												eventoDelete.setUsumodificacion(usuario.getIdusuario().longValue());
-												ageEventoExtendsMapper.updateByPrimaryKey(eventoDelete);
-											}
-
-										}
-									} catch (Exception e) {
-										error.setCode(400);
-										error.setDescription(
-												"Se ha producido un error en BBDD contacte con su administrador");
-									}
-
+								curso.setFechamodificacion(new Date());
+								curso.setUsumodificacion(usuario.getIdusuario().longValue());
+								if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
+									curso.setFechainscripciondesde(eventoItem.getFechaInicio());
+								} else if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
+									curso.setFechainscripcionhasta(eventoItem.getFechaFin());
 								}
 
-								response = generateEvents(eventoItem.getIdCalendario(), eventoItem, event, usuario);
+								response = forCursoExtendsMapper.updateByPrimaryKey(curso);
 
-								if (response == 0) {
-									error.setCode(400);
-									error.setDescription(
-											"Se ha producido un error en BBDD contacte con su administrador");
-								} else {
-									error.setCode(200);
-								}
+								LOGGER.info(
+										"updateEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Salida a forCursoExtendsMapper para modificar un curso");
 							}
 						}
 					}
+
+					// 3.COMPROBAMOS SI TIENE VALORES DE REPETICION
+					if (eventoItem.getFechaInicioRepeticion() != null && eventoItem.getFechaFinRepeticion() != null
+							&& eventoItem.getValoresRepeticion().length != 0) {
+
+						// Comprobamos q ageRepticion existe
+						if (eventoItem.getIdRepeticionEvento() != null) {
+
+							AgeRepeticioneventoExample ageRepeticioneventoExample = new AgeRepeticioneventoExample();
+							ageRepeticioneventoExample.createCriteria()
+									.andIdrepeticioneventoEqualTo(Long.valueOf(eventoItem.getIdRepeticionEvento()))
+									.andIdinstitucionEqualTo(idInstitucion);
+
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectByExample(exampleCurso) -> Entrada a ageRepeticionEventoExtendsMapper para buscar si existe la repeticion");
+
+							List<AgeRepeticionevento> ageRepeticionList = ageRepeticionEventoExtendsMapper
+									.selectByExample(ageRepeticioneventoExample);
+
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectByExample(exampleCurso) -> Salida a ageRepeticionEventoExtendsMapper para buscar si existe la repeticion");
+
+							// Si existe modificamos su ageRepeticion
+							if (null != ageRepeticionList && ageRepeticionList.size() > 0) {
+								AgeRepeticionevento rep = ageRepeticionList.get(0);
+								idRepeticionEvento = rep.getIdrepeticionevento().toString();
+
+								if (!rep.getFechainicio().equals(eventoItem.getFechaInicioRepeticion())) {
+									cambioRepeticion = true;
+									rep.setFechainicio(eventoItem.getFechaInicioRepeticion());
+								}
+
+								if (!rep.getFechafin().equals(eventoItem.getFechaFinRepeticion())) {
+									cambioRepeticion = true;
+									rep.setFechafin(eventoItem.getFechaFinRepeticion());
+								}
+
+								if (eventoItem.getValoresRepeticion() != null && rep.getValoresrepeticion() != null) {
+
+									String valoresrepeticion = Arrays.toString(eventoItem.getValoresRepeticion());
+									String valoresrepeticionRep = rep.getValoresrepeticion();
+
+									if (!valoresrepeticion.equals(valoresrepeticionRep)) {
+										cambioRepeticion = true;
+										if (eventoItem.getValoresRepeticion().length != 0) {
+											rep.setValoresrepeticion(valoresrepeticion);
+										} else {
+											rep.setValoresrepeticion(null);
+										}
+									}
+								}
+
+								if (!rep.getTiporepeticion().equals(eventoItem.getTipoRepeticion())) {
+									cambioRepeticion = true;
+									rep.setTiporepeticion(eventoItem.getTipoRepeticion());
+								}
+
+								if (rep.getTipodiasrepeticion() != null && eventoItem.getTipoDiasRepeticion() != null
+										&& !rep.getTipodiasrepeticion().equals(eventoItem.getTipoDiasRepeticion())) {
+									cambioRepeticion = true;
+									rep.setTipodiasrepeticion(eventoItem.getTipoDiasRepeticion());
+								}
+
+								if (cambioRepeticion) {
+
+									rep.setFechabaja(null);
+									rep.setUsumodificacion(usuario.getIdusuario().longValue());
+									rep.setFechamodificacion(new Date());
+
+									LOGGER.info(
+											"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Entrada a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+									response = ageRepeticionEventoExtendsMapper.updateByPrimaryKey(rep);
+
+									LOGGER.info(
+											"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Salida a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+
+								}
+
+								// Si no existe se lo creamos
+							}
+						} else {
+							AgeRepeticionevento ageRepeticionEvento = new AgeRepeticionevento();
+							ageRepeticionEvento.setIdinstitucion(idInstitucion);
+							ageRepeticionEvento.setFechainicio(eventoItem.getFechaInicioRepeticion());
+							ageRepeticionEvento.setFechafin(eventoItem.getFechaFinRepeticion());
+							ageRepeticionEvento.setFechabaja(null);
+							ageRepeticionEvento.setUsumodificacion(usuario.getIdusuario().longValue());
+							ageRepeticionEvento.setFechamodificacion(new Date());
+							if (eventoItem.getValoresRepeticion().length != 0) {
+								String valoresrepeticion = Arrays.toString(eventoItem.getValoresRepeticion());
+								ageRepeticionEvento.setValoresrepeticion(valoresrepeticion);
+							} else {
+								ageRepeticionEvento.setValoresrepeticion(null);
+							}
+							ageRepeticionEvento.setTiporepeticion(eventoItem.getTipoRepeticion());
+							ageRepeticionEvento.setTipodiasrepeticion(eventoItem.getTipoDiasRepeticion());
+
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Entrada a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+							response = ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento);
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Salida a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Entrada a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
+							List<ComboItem> repeticionEventoInserted = ageRepeticionEventoExtendsMapper
+									.selectMaxRepetitionEvent();
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Salida a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
+							idRepeticionEvento = repeticionEventoInserted.get(0).getValue();
+
+							// Se guarda el evento creado
+							LOGGER.info(
+									"updateEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Entrada a ageEventoMapper para insertar un evento");
+							event.setIdrepeticionevento(Long.valueOf(idRepeticionEvento));
+							response = ageEventoExtendsMapper.updateByPrimaryKey(event);
+							LOGGER.info(
+									"updateEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Salida a ageEventoMapper para insertar un evento");
+
+							cambioRepeticion = true;
+						}
+
+						// Si existe cambios, se eliminan los antiguos y se crean los eventos nuevos con
+						// los nuevos datos
+						if (idRepeticionEvento != null && cambioRepeticion) {
+
+							AgeEventoExample ageEventoExample = new AgeEventoExample();
+							ageEventoExample.createCriteria().andIdeventooriginalEqualTo(event.getIdevento())
+									.andIdeventoNotEqualTo(event.getIdevento());
+
+							List<AgeEvento> eventosDelete = ageEventoExtendsMapper.selectByExample(ageEventoExample);
+
+							if (null != eventosDelete && eventosDelete.size() > 0) {
+
+								try {
+
+									for (AgeEvento eventoDelete : eventosDelete) {
+
+										AgeNotificacioneseventoExample ageNotificacioneseventoExample = new AgeNotificacioneseventoExample();
+										ageNotificacioneseventoExample.createCriteria()
+												.andIdeventoEqualTo(eventoDelete.getIdevento());
+
+										List<AgeNotificacionesevento> notificacionesDelete = ageNotificacioneseventoExtendsMapper
+												.selectByExample(ageNotificacioneseventoExample);
+
+										if (null != notificacionesDelete && notificacionesDelete.size() > 0) {
+
+											for (AgeNotificacionesevento notificaionDelete : notificacionesDelete) {
+												notificaionDelete.setFechabaja(new Date());
+												notificaionDelete.setFechamodificacion(new Date());
+												notificaionDelete
+														.setUsumodificacion(usuario.getIdusuario().longValue());
+												ageNotificacioneseventoExtendsMapper
+														.updateByPrimaryKey(notificaionDelete);
+											}
+
+											eventoDelete.setFechabaja(new Date());
+											eventoDelete.setFechamodificacion(new Date());
+											eventoDelete.setUsumodificacion(usuario.getIdusuario().longValue());
+											ageEventoExtendsMapper.updateByPrimaryKey(eventoDelete);
+
+										} else {
+											eventoDelete.setFechabaja(new Date());
+											eventoDelete.setFechamodificacion(new Date());
+											eventoDelete.setUsumodificacion(usuario.getIdusuario().longValue());
+											ageEventoExtendsMapper.updateByPrimaryKey(eventoDelete);
+										}
+
+									}
+								} catch (Exception e) {
+									error.setCode(400);
+									error.setDescription(
+											"Se ha producido un error en BBDD contacte con su administrador");
+								}
+
+							}
+
+							response = generateEvents(eventoItem.getIdCalendario(), eventoItem, event, usuario);
+
+							if (response == 0) {
+								error.setCode(400);
+								error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+							} else {
+								error.setCode(200);
+							}
+						}
+					}
+
 				}
 
 				if (response == 0) {
 					error.setCode(400);
-
-					if (error.getDescription() == null) {
-						error.setDescription("Error al modificar evento");
-					}
-
+					error.setDescription("Error al modificar evento");
 				} else {
 					error.setCode(200);
 				}
@@ -2223,595 +1681,6 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;
 
-	}
-
-	private int updateEventosTipoFestivoNacionalAutonomico(EventoItem eventoItem, AdmUsuarios usuario,
-			Short idInstitucion, boolean isColegio) throws ParseException {
-
-		int response = 0;
-
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		Date fechaInicio = formatter.parse(formatter.format(eventoItem.getFechaInicioOld()));
-
-		Calendar c = Calendar.getInstance();
-		c.setTime(fechaInicio);
-		c.add(Calendar.DATE, 1); // Adding 1 days
-
-		Date fechaPosterior = c.getTime();
-		boolean continua = false;
-		boolean sigue = false;
-		boolean isValidate = false;
-
-		AgeEventoExample exampleEvent = new AgeEventoExample();
-		AgeEvento sigueEvento = new AgeEvento();
-
-		isValidate = verificarCambioFechaEvento(isColegio, idInstitucion, eventoItem);
-
-		if (isValidate) { //Se comprueba si el evento selecionado es propio o ajeno
-			if (isColegio) {
-
-				if (eventoItem.getIdEvento() != null) {//Si es tipo local
-					exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-							.andFechainicioLessThan(fechaPosterior)
-							.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-							.andIdinstitucionEqualTo(idInstitucion).andTituloEqualTo(eventoItem.getTitulo())
-							.andIdeventoNotEqualTo(Long.valueOf(eventoItem.getIdEvento()));
-				} else { //Es tipo Nacional/Autonómico
-					exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-							.andFechainicioLessThan(fechaPosterior)
-							.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-							.andTituloEqualTo(eventoItem.getTitulo());
-				}
-
-			} else {
-				exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-						.andFechainicioLessThan(fechaPosterior)
-						.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-						.andTituloEqualTo(eventoItem.getTitulo()).andIdinstitucionEqualTo(idInstitucion);
-			}
-
-			LOGGER.info(
-					"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-			List<AgeEvento> eventList = ageEventoExtendsMapper.selectByExample(exampleEvent);
-
-			LOGGER.info(
-					"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-			// Colegio
-			if (isColegio) { 
-				//Si es propio continua
-				if (null == eventList || eventList.size() == 0) {
-					continua = true;
-					
-				//Si no es propio 	
-				}else {
-					// Obtiene el evento que pertenece a su colegio para editarlo aunque no haya sido creado por el mismo
-					AgeEventoExample example = new AgeEventoExample();
-
-					example.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-							.andFechainicioLessThan(fechaPosterior)
-							.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-							.andTituloEqualTo(eventoItem.getTitulo())
-							.andIdinstitucionEqualTo(idInstitucion)
-							.andDescripcionEqualTo(eventoItem.getDescripcionOld());
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-					List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(example);
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-					if (null != eventoList && eventoList.size() > 0) {
-						sigue = true; //Si tiene evento se modifica mas adelante
-						sigueEvento = eventoList.get(0);
-					} 
-				}
-				// Consejo y General
-			} else {
-
-				// Si existe uno, el propio consejo a creado un evento para ese dia
-				if (null != eventList && eventList.size() == 1) {
-					continua = true;
-
-					// Si no lo encuentra busca que exista un evento en esa fecha que no haya sido
-					// creado por el
-				} else if (null == eventList || eventList.size() == 0) {
-
-					AgeEventoExample example = new AgeEventoExample();
-
-					example.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-							.andFechainicioLessThan(fechaPosterior)
-							.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-							.andTituloEqualTo(eventoItem.getTitulo())
-							.andDescripcionEqualTo(eventoItem.getDescripcionOld());
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-					List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(example);
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-					if (null != eventoList && eventoList.size() == 1) {
-						sigue = true;
-						sigueEvento = eventoList.get(0);
-					} else {
-						modificaEvento(eventoItem, idInstitucion, usuario);
-
-					}
-
-				}
-			}
-
-			// Como no existe un evento en ese día se puede continuar editando
-			if (continua) {
-				// General
-				if (idInstitucion.equals(SigaConstants.IDINSTITUCION_2000)) {
-
-					AgeCalendarioExample exampleCalendario = new AgeCalendarioExample();
-					exampleCalendario.createCriteria().andIdtipocalendarioEqualTo(SigaConstants.CALENDARIO_LABORAL);
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-					List<AgeCalendario> calendariosList = ageCalendarioExtendsMapper.selectByExample(exampleCalendario);
-
-					LOGGER.info(
-							"saveEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-					for (AgeCalendario calendario : calendariosList) {
-
-						AgeEventoExample example = new AgeEventoExample();
-
-						example.createCriteria().andIdinstitucionEqualTo(calendario.getIdinstitucion())
-								.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-								.andFechainicioGreaterThanOrEqualTo(fechaInicio).andFechainicioLessThan(fechaPosterior)
-								.andTituloEqualTo(eventoItem.getTitulo());
-
-						LOGGER.info(
-								"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar el evento del colegio perteneciente al consejo");
-
-						List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(example);
-
-						LOGGER.info(
-								"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar el evento del colegio perteneciente al consejo");
-
-						if (null != eventoList && eventoList.size() > 0) {
-
-							AgeEvento event = eventoList.get(0);
-
-							event.setFechamodificacion(new Date());
-							event.setUsumodificacion(usuario.getIdusuario().longValue());
-							event.setFechainicio(eventoItem.getFechaInicio());
-							event.setFechafin(eventoItem.getFechaFin());
-							event.setDescripcion(eventoItem.getDescripcion());
-							event.setRecursos(eventoItem.getRecursos());
-
-							LOGGER.info(
-									"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para modificar un evento");
-
-							response = ageEventoExtendsMapper.updateByPrimaryKey(event);
-
-							LOGGER.info(
-									"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para modificar un evento");
-
-						}
-					}
-
-					// Consejo
-				} else if (!(idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100"))) {
-
-					LOGGER.info(
-							"saveEventCalendar() / cenInstitucionExtendsMapper.getInstitucionesConsejos(idInstitucion) -> Entrada a cenInstitucionExtendsMapper para buscar los colegios pertenecientes al consejo");
-
-					List<ComboItem> institucionList = cenInstitucionExtendsMapper
-							.getInstitucionesConsejos(idInstitucion);
-
-					LOGGER.info(
-							"saveEventCalendar() / cenInstitucionExtendsMapper.getInstitucionesConsejos(idInstitucion) -> Salida a cenInstitucionExtendsMapper para buscar los colegios pertenecientes al consejo");
-
-					if (institucionList != null && institucionList.size() > 0) {
-
-						for (ComboItem cenInstitucion : institucionList) {
-
-							AgeEventoExample example = new AgeEventoExample();
-
-							example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(cenInstitucion.getValue()))
-									.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-									.andFechainicioGreaterThanOrEqualTo(fechaInicio)
-									.andFechainicioLessThan(fechaPosterior).andTituloEqualTo(eventoItem.getTitulo());
-
-							LOGGER.info(
-									"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar el evento del colegio perteneciente al consejo");
-
-							List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(example);
-
-							LOGGER.info(
-									"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar el evento del colegio perteneciente al consejo");
-
-							if (null != eventoList && eventoList.size() > 0) {
-
-								AgeEvento event = eventoList.get(0);
-
-								event.setFechamodificacion(new Date());
-								event.setUsumodificacion(usuario.getIdusuario().longValue());
-								event.setFechainicio(eventoItem.getFechaInicio());
-								event.setFechafin(eventoItem.getFechaFin());
-								event.setDescripcion(eventoItem.getDescripcion());
-								event.setRecursos(eventoItem.getRecursos());
-
-								LOGGER.info(
-										"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para modificar un evento");
-
-								response = ageEventoExtendsMapper.updateByPrimaryKey(event);
-
-								LOGGER.info(
-										"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para modificar un evento");
-
-							}
-						}
-					}
-					// Colegio
-				} else {
-
-					AgeEventoExample example = new AgeEventoExample();
-
-					example.createCriteria().andIdeventoEqualTo(Long.valueOf(eventoItem.getIdEvento()));
-
-					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar el evento a modificar");
-
-					List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(example);
-
-					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar el evento a modificar");
-
-					if (null != eventoList && eventoList.size() > 0) {
-
-						AgeEvento event = eventoList.get(0);
-
-						event.setFechamodificacion(new Date());
-						event.setUsumodificacion(usuario.getIdusuario().longValue());
-						event.setFechainicio(eventoItem.getFechaInicio());
-						event.setFechafin(eventoItem.getFechaFin());
-						event.setDescripcion(eventoItem.getDescripcion());
-						event.setRecursos(eventoItem.getRecursos());
-
-						LOGGER.info(
-								"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para modificar un evento");
-
-						response = ageEventoExtendsMapper.updateByPrimaryKey(event);
-
-						LOGGER.info(
-								"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para modificar un evento");
-
-					}
-				}
-			} else {
-
-				// Si es un evento no creado por el propio consejo y perteneciente a un colegio
-				// q conforma el consejo, se modifica
-				if (sigue) {
-
-					sigueEvento.setFechamodificacion(new Date());
-					sigueEvento.setUsumodificacion(usuario.getIdusuario().longValue());
-					sigueEvento.setFechainicio(eventoItem.getFechaInicio());
-					sigueEvento.setFechafin(eventoItem.getFechaFin());
-					sigueEvento.setDescripcion(eventoItem.getDescripcion());
-					sigueEvento.setRecursos(eventoItem.getRecursos());
-
-					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para modificar un evento");
-
-					response = ageEventoExtendsMapper.updateByPrimaryKey(sigueEvento);
-
-					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para modificar un evento");
-
-				} else {
-					response = 2;
-				}
-
-			}
-		} else {
-			response = 2;
-		}
-
-		return response;
-
-	}
-
-	private int modificaEvento(EventoItem eventoItem, Short idInstitucion, AdmUsuarios usuario) {
-
-		int response = 0;
-
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		Date fechaInicio;
-
-		try {
-			fechaInicio = formatter.parse(formatter.format(eventoItem.getFechaInicioOld()));
-
-			Calendar c = Calendar.getInstance();
-			c.setTime(fechaInicio);
-			c.add(Calendar.DATE, 1); // Adding 1 days
-
-			Date fechaPosterior = c.getTime();
-
-			if (!(idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100"))) {
-
-				LOGGER.info(
-						"modificaEvento() / cenInstitucionExtendsMapper.getInstitucionesConsejos(idInstitucion) -> Entrada a cenInstitucionExtendsMapper para buscar los colegios pertenecientes al consejo");
-
-				List<ComboItem> institucionList = cenInstitucionExtendsMapper.getInstitucionesConsejos(idInstitucion);
-
-				LOGGER.info(
-						"modificaEvento() / cenInstitucionExtendsMapper.getInstitucionesConsejos(idInstitucion) -> Salida a cenInstitucionExtendsMapper para buscar los colegios pertenecientes al consejo");
-
-				if (institucionList != null && institucionList.size() > 0) {
-
-					for (ComboItem cenInstitucion : institucionList) {
-
-						AgeEventoExample example = new AgeEventoExample();
-
-						example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(cenInstitucion.getValue()))
-								.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-								.andFechainicioGreaterThanOrEqualTo(fechaInicio).andFechainicioLessThan(fechaPosterior)
-								.andTituloEqualTo(eventoItem.getTitulo());
-
-						LOGGER.info(
-								"modificaEvento() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar el evento del colegio perteneciente al consejo");
-
-						List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(example);
-
-						LOGGER.info(
-								"modificaEvento() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar el evento del colegio perteneciente al consejo");
-
-						if (null != eventoList && eventoList.size() > 0) {
-
-							AgeEvento event = eventoList.get(0);
-
-							event.setFechamodificacion(new Date());
-							event.setUsumodificacion(usuario.getIdusuario().longValue());
-							event.setFechainicio(eventoItem.getFechaInicio());
-							event.setFechafin(eventoItem.getFechaFin());
-							event.setDescripcion(eventoItem.getDescripcion());
-							event.setRecursos(eventoItem.getRecursos());
-
-							LOGGER.info(
-									"modificaEvento() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para modificar un evento");
-
-							response = ageEventoExtendsMapper.updateByPrimaryKey(event);
-
-							LOGGER.info(
-									"modificaEvento() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para modificar un evento");
-
-						}
-					}
-				}
-
-			}
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return response;
-	}
-
-	private boolean verificarCambioFechaEvento(boolean isColegio, Short idInstitucion, EventoItem eventoItem) {
-
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		Date fechaInicio;
-		Date fechaInicioOld;
-		boolean isValidate = false;
-
-		try {
-			fechaInicio = formatter.parse(formatter.format(eventoItem.getFechaInicio()));
-			fechaInicioOld = formatter.parse(formatter.format(eventoItem.getFechaInicioOld()));
-
-			Calendar c = Calendar.getInstance();
-			c.setTime(fechaInicio);
-			c.add(Calendar.DATE, 1); // Adding 1 days
-
-			Date fechaPosterior = c.getTime();
-
-			// Si es la misma fecha se modifica
-			if (fechaInicio.equals(fechaInicioOld)) {
-				isValidate = true;
-
-				// Si no es la misma fecha se comprueba que en la nueva fecha no exista ya un
-				// evento
-			} else {
-
-				// Comprobamos que en el dia seleccionado no exista un evento ya creado
-				AgeEventoExample exampleEvent = new AgeEventoExample();
-
-				if (eventoItem.getIdEvento() != null) {
-					exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-					.andFechainicioLessThan(fechaPosterior)
-					.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-					.andTituloEqualTo(eventoItem.getTitulo())
-					.andIdeventoNotEqualTo(Long.valueOf(eventoItem.getIdEvento()));
-				}else{
-					exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-					.andFechainicioLessThan(fechaPosterior)
-					.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-					.andTituloEqualTo(eventoItem.getTitulo())
-					.andDescripcionNotEqualTo(eventoItem.getDescripcionOld());
-				}
-				
-
-				LOGGER.info(
-						"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar el evento del colegio perteneciente al consejo");
-
-				List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(exampleEvent);
-
-				LOGGER.info(
-						"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar el evento del colegio perteneciente al consejo");
-
-				if (null != eventoList && eventoList.size() > 0) {
-					isValidate = false;
-				} else {
-					isValidate = true;
-				}
-
-			}
-
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return isValidate;
-	}
-
-	private int updateEventosTipoFestivoLocal(EventoItem eventoItem, AdmUsuarios usuario, Short idInstitucion)
-			throws ParseException {
-
-		int response = 0;
-		boolean isValidate = false;
-
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		Date fechaInicio = formatter.parse(formatter.format(eventoItem.getFechaInicio()));
-		Date fechaInicioOld = formatter.parse(formatter.format(eventoItem.getFechaInicioOld()));
-
-		Calendar c = Calendar.getInstance();
-		c.setTime(fechaInicio);
-		c.add(Calendar.DATE, 1);
-		Date fechaPosterior = c.getTime();
-
-		CenInfluencia partido = null;
-		AgeCalendario calendario = null;
-
-		if (fechaInicio.equals(fechaInicioOld)) {
-			isValidate = true;
-
-			// Se comprueba si existe un evento en la nueva fecha editada
-		} else {
-
-			CenInfluenciaExample cenInfluenciaExample = new CenInfluenciaExample();
-			cenInfluenciaExample.createCriteria().andIdpartidoEqualTo(Long.valueOf(eventoItem.getLugar()));
-
-			LOGGER.info(
-					"updateEventCalendar() / cenInfluenciaExtendsMapper.selectByExample(cenInfluenciaExample) -> Entrada a cenInfluenciaExtendsMapper para buscar idinstitucion del partido judicial");
-
-			List<CenInfluencia> partidosList = cenInfluenciaExtendsMapper.selectByExample(cenInfluenciaExample);
-
-			LOGGER.info(
-					"updateEventCalendar() / cenInfluenciaExtendsMapper.selectByExample(cenInfluenciaExample) -> Salida a cenInfluenciaExtendsMapper para buscar idinstitucion del partido judicial");
-
-			if (null != partidosList && partidosList.size() > 0) {
-
-				partido = partidosList.get(0);
-
-				AgeCalendarioExample ageCalendarioExample = new AgeCalendarioExample();
-				ageCalendarioExample.createCriteria().andIdinstitucionEqualTo(partido.getIdinstitucion())
-						.andIdtipocalendarioEqualTo(SigaConstants.CALENDARIO_LABORAL);
-
-				LOGGER.info(
-						"updateEventCalendar() / cenInfluenciaExtendsMapper.selectByExample(cenInfluenciaExample) -> Entrada a cenInfluenciaExtendsMapper para buscar idinstitucion del partido judicial");
-
-				List<AgeCalendario> calendariosList = ageCalendarioExtendsMapper.selectByExample(ageCalendarioExample);
-
-				LOGGER.info(
-						"updateEventCalendar() / cenInfluenciaExtendsMapper.selectByExample(cenInfluenciaExample) -> Salida a cenInfluenciaExtendsMapper para buscar idinstitucion del partido judicial");
-
-				if (null != calendariosList && calendariosList.size() > 0) {
-
-					calendario = calendariosList.get(0);
-
-					AgeEventoExample exampleEvent = new AgeEventoExample();
-					exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-							.andFechainicioLessThan(fechaPosterior)
-							.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-							.andTituloEqualTo(eventoItem.getTitulo()).andLugarEqualTo(eventoItem.getLugar())
-							.andIdeventoNotEqualTo(Long.valueOf(eventoItem.getIdEvento()))
-							.andIdcalendarioEqualTo(calendario.getIdcalendario()).andFechabajaIsNull();
-
-					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-					List<AgeEvento> eventList = ageEventoExtendsMapper.selectByExample(exampleEvent);
-
-					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-					if (null == eventList || eventList.size() == 0) {
-						isValidate = true;
-					} else {
-						isValidate = false;
-					}
-				}
-			}
-		}
-		// Si no existe un evento en esa fecha o no se ha modificado la fecha, se
-		// comprueba si hubiera alguna coincidencia con otro evento de tipo local
-		if (isValidate) {
-
-			AgeEventoExample exampleEvent = new AgeEventoExample();
-			exampleEvent.createCriteria().andFechainicioGreaterThanOrEqualTo(fechaInicio)
-					.andFechainicioLessThan(fechaPosterior)
-					.andIdtipoeventoEqualTo(Long.valueOf(eventoItem.getIdTipoEvento()))
-					.andTituloEqualTo(eventoItem.getTitulo()).andLugarEqualTo(eventoItem.getLugar())
-					.andIdeventoNotEqualTo(Long.valueOf(eventoItem.getIdEvento())).andFechabajaIsNull();
-
-			LOGGER.info(
-					"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-			List<AgeEvento> eventList = ageEventoExtendsMapper.selectByExample(exampleEvent);
-
-			LOGGER.info(
-					"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-			if (null != eventList && eventList.size() > 0) {
-				response = 2;
-
-			} else {
-
-				AgeEventoExample exampleEvento = new AgeEventoExample();
-				exampleEvento.createCriteria().andIdeventoEqualTo(Long.valueOf(eventoItem.getIdEvento()));
-
-				LOGGER.info(
-						"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageEventoExtendsMapper para buscar si existe el evento");
-
-				List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(exampleEvento);
-
-				LOGGER.info(
-						"updateEventCalendar() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Salida a ageEventoExtendsMapper para buscar si existe el evento");
-
-				if (null != eventoList && eventoList.size() > 0) {
-
-					AgeEvento evento = eventoList.get(0);
-
-					evento.setFechamodificacion(new Date());
-					evento.setUsumodificacion(usuario.getIdusuario().longValue());
-					evento.setTitulo(eventoItem.getTitulo());
-					evento.setFechainicio(eventoItem.getFechaInicio());
-					evento.setFechafin(eventoItem.getFechaFin());
-					evento.setDescripcion(eventoItem.getDescripcion());
-					evento.setRecursos(eventoItem.getRecursos());
-					evento.setLugar(eventoItem.getLugar());
-					evento.setIdtipoevento(Long.valueOf(eventoItem.getIdTipoEvento()));
-
-					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para crear un evento");
-
-					response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
-
-					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para crear un evento");
-				}
-			}
-
-		} else {
-			response = 2;
-		}
-
-		return response;
 	}
 
 	public int checkGenerationDateNotificationEvent(EventoItem evento, AdmUsuarios usuario, Short idInstitucion) {
@@ -3826,7 +2695,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 									for (Iterator iterator = destinatarios.iterator(); iterator.hasNext();) {
 										EnvDestinatarios envDestinatarios = (EnvDestinatarios) iterator.next();
 										_envDestinatariosMapper.insert(envDestinatarios);
-
+										
 										DestinatarioItem destItem = new DestinatarioItem();
 										destItem = envDestinatarios2DestinatarioItem(envDestinatarios);
 										destinatariosItem.add(destItem);
@@ -3905,7 +2774,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 												envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
 												envio.setFechamodificacion(new Date());
 												_envEnviosMapper.updateByPrimaryKey(envio);
-												envioService.envioSMS(remitente, destinatariosItem, envio,
+												envioService.envioSMS(remitente, destinatariosItem,
+														envio,
 														plantilla.get(0).getCuerpo(), false);
 												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
 												envio.setFechamodificacion(new Date());
@@ -3931,8 +2801,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 												envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
 												envio.setFechamodificacion(new Date());
 												_envEnviosMapper.updateByPrimaryKey(envio);
-
-												envioService.envioSMS(remitente, destinatariosItem, envio,
+												
+												envioService.envioSMS(remitente, destinatariosItem,
+														envio,
 														plantilla.get(0).getCuerpo(), true);
 												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
 												envio.setFechamodificacion(new Date());
