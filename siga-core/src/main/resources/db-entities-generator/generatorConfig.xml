@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-	<classPathEntry
-		location="C:\Oracle\OJDBC-Full\ojdbc6.jar" />
-	<context id="DB2Tables" targetRuntime="MyBatis3">
-
-		<jdbcConnection
-			connectionURL="jdbc:oracle:thin:@//vmcgaeap004.cloud.es.deloitte.com:1521/cgae"
-			driverClass="oracle.jdbc.OracleDriver" userId="uscgae"
+	<classPathEntry location="C:\Users\acorral\Downloads\ojdbc6.jar" />
+	  <context id="DB2Tables" targetRuntime="MyBatis3">
+	
+		<jdbcConnection 
+			connectionURL="jdbc:oracle:thin:@//vmcgaeap004.cloud.es.deloitte.com:1521/cgae" 
+			driverClass="oracle.jdbc.OracleDriver"
+			userId="uscgae"
 			password="uscgae" />
 			
 			
@@ -92,7 +92,12 @@
 			<property name="ignoreQualifiersAtRuntime" value="true" />
 			<columnOverride column="FECHADESDE" jdbcType="TIMESTAMP"/>
 			<columnOverride column="FECHAHASTA" jdbcType="TIMESTAMP"/>
-			<columnOverride column="FECHAMODIFICACION" jdbcType="TIMESTAMP"/>
+			<columnOverride column="FECHAMODIFICACION" jdbcType="TIMESTAMP"/></table>
+		<table schema="USCGAE" tableName="ENV_DESTINATARIOS_BUROSMS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>
+		<table schema="USCGAE" tableName="ENV_DOCUMENTOS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
 		</table>
 
 	</context>

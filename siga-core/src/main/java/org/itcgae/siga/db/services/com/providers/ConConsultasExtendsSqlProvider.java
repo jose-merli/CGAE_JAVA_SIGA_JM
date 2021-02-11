@@ -63,10 +63,10 @@ public class ConConsultasExtendsSqlProvider {
 		}
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONSULTA.DESCRIPCION",filtros.getNombre()));
+			sql.WHERE(filtroTextoBusquedas("CONSULTA.DESCRIPCION",filtros.getNombre()));
 		}
 		if(filtros.getDescripcion() != null && !filtros.getDescripcion().trim().equals("")){
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONSULTA.OBSERVACIONES", filtros.getDescripcion()));
+			sql.WHERE(filtroTextoBusquedas("CONSULTA.OBSERVACIONES", filtros.getDescripcion()));
 		}
 		
 		if(filtros.getIdModulo() != null && !filtros.getIdModulo().trim().equals("")){

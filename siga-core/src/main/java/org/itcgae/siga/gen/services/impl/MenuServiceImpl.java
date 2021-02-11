@@ -32,7 +32,6 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
@@ -98,7 +97,6 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
@@ -168,7 +166,6 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Autowired
 	private CenColegiadoMapper cenColegiadoMapper;
-	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
@@ -1330,53 +1327,6 @@ public class MenuServiceImpl implements IMenuService {
 
 		response.setStatus(SigaConstants.OK);
 		return response;
-	}
-
-	@Override
-	public ColegiadoItem isColegiado(HttpServletRequest request) {
-		LOGGER.info("isColegiado() ->  Entrada al servicio para saber si el usuario logeado es colegiado");
-		// Obtenemos si el usuario logeado es colegiado o administrador
-		ColegiadoItem colegiadoItem = null;
-
-		LOGGER.debug("Obtenemos atributos del usuario logeado");
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		CenPersonaExample cenPersonaExample = new CenPersonaExample();
-		cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
-
-		LOGGER.info(
-				"isColegiado() / cenPersonaMapper.selectByExample() -> Entrada a cenPersonaMapper para obtener idpersona del usuario logeado");
-
-		List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(cenPersonaExample);
-
-		LOGGER.info(
-				"isColegiado() / cenPersonaMapper.selectByExample() -> Salida a cenPersonaMapper para obtener idpersona del usuario logeado");
-
-		if (null != cenPersona && cenPersona.size() > 0) {
-
-			CenPersona usuario = cenPersona.get(0);
-
-			LOGGER.info(
-					"isColegiado() / cenColegiadoExtendsMapper.selectByExample() -> Entrada a cenColegiadoExtendsMapper para saber si es colegiado");
-
-			List<ColegiadoItem> colegiadoItems = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(idInstitucion,
-					usuario.getIdpersona().toString());
-
-			LOGGER.info(
-					"isColegiado() / cenColegiadoExtendsMapper.selectByExample() -> Salida a cenColegiadoExtendsMapper para saber si es colegiado");
-
-			if (null != colegiadoItems && colegiadoItems.size() > 0) {
-				colegiadoItem = colegiadoItems.get(0);
-			}
-
-		}
-
-		LOGGER.info("isColegiado() ->  Salida al servicio para saber si el usuario logeado es colegiado");
-
-		return colegiadoItem;
-
 	}
 
 }

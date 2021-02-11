@@ -252,7 +252,7 @@ public class ScsGuardiascolegiado extends ScsGuardiascolegiadoKey {
      *
      * @return the value of USCGAE.SCS_GUARDIASCOLEGIADO.FACTURADO
      *
-     * @mbg.generated Thu Dec 26 23:53:13 CET 2019
+     * @mbg.generated Thu Jan 30 10:17:22 CET 2020
      */
     public String getFacturado() {
         return facturado;
