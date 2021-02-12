@@ -265,3 +265,6 @@ siga-core/target/
 .metadata/.log
 .metadata/.lock
 *rebel.xml
+.sonarlint/
+siga-web/.sts4-cache/
+.metadata/
