@@ -76,6 +76,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -184,6 +185,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IllegalStateException, IOException {
 		LOGGER.info("uploadFile() -> Entrada al servicio para subir un archivo");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
