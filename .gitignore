@@ -572,3 +572,6 @@ siga-core/target/
 .metadata/.plugins/org.eclipse.core.resources/.history/bc/5053a00e075f001b1b50b7116e0f9d80
 .metadata/.plugins/org.eclipse.core.resources/.history/60/800c9faf0a5f001b1b50b7116e0f9d80
 .metadata/.plugins/org.eclipse.core.resources/.history/35/00561745de5e001b1abee9bd90b98a43
+.metadata/
+.sonarlint/
+siga-web/.sts4-cache/

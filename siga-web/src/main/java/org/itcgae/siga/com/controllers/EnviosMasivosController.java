@@ -338,7 +338,7 @@ public class EnviosMasivosController {
 		Resource inputStreamResource = null;
 		if (documentoDTO.getIdInstitucion() != null && documentoDTO.getIdEnvio() != null && !documentoDTO.getIdEnvio().trim().equals("") 
 				&& documentoDTO.getIdDocumento() != null) {
-			inputStreamResource = _enviosMasivosService.recuperaPdfBuroSMS(documentoDTO.getIdInstitucion(), Long.parseLong(documentoDTO.getIdEnvio()), Integer.valueOf(documentoDTO.getIdDocumento()));
+			inputStreamResource = _enviosMasivosService.recuperaPdfBuroSMS(documentoDTO.getIdInstitucion(), Long.parseLong(documentoDTO.getIdEnvio()), documentoDTO.getIdDocumento());
 		}
 		
 		return inputStreamResource;
