@@ -86,7 +86,7 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 	public BusquedaPerFisicaDTO search(int numPagina, BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO,
 			HttpServletRequest request) {
 
-		Colegiado colegiado = null;
+		//Colegiado colegiado = null;
 		BusquedaPerFisicaDTO busquedaPerFisicaDTO = new BusquedaPerFisicaDTO();
 		List<BusquedaPerFisicaItem> busquedaPerFisicaItems = new ArrayList<BusquedaPerFisicaItem>();
 		String token = request.getHeader("Authorization");
@@ -696,11 +696,11 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 			LOGGER.error("Error en la llamada a busqueda de colegiados.", e);
 		}
 
-		if (null != busquedaPerFisicaDTO) {
+		/*if (null != busquedaPerFisicaDTO) {
 			for (BusquedaPerFisicaItem busquedaPerFisicaItem : busquedaPerFisicaDTO.getBusquedaFisicaItems()) {
 
 			}
-		}
+		}*/
 		return busquedaPerFisicaDTO;
 
 	}

@@ -69,14 +69,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
-	@Autowired
-	private ICargasMasivasGFService cargasMasivasGFService;
+	//@Autowired
+	//private ICargasMasivasGFService cargasMasivasGFService;
 
 	@Autowired
 	private CenCargaMasivaExtendsMapper cenCargaMasivaExtendsMapper;
@@ -225,6 +226,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO uploadFileExcel(MultipartHttpServletRequest request)
 			throws IllegalStateException, IOException {
 
@@ -423,7 +425,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 		List<CargaMasivaDatosGFItem> masivaDatosCVVos = new ArrayList<CargaMasivaDatosGFItem>();
 		CargaMasivaDatosGFItem cargaMasivaDatosGFVo = null;
-		Hashtable<String, CenGruposcliente> idGruposHashTable = new Hashtable<String, CenGruposcliente>();
+		//Hashtable<String, CenGruposcliente> idGruposHashTable = new Hashtable<String, CenGruposcliente>();
 
 		Hashtable<Long, String> personaHashtable = new Hashtable<Long, String>();
 		List<String> clavesStrings = new ArrayList<String>();
@@ -532,7 +534,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 						Short idGrupo = Short.valueOf((String) hashtable.get(SigaConstants.C_IDGRUPO));
 						if (idGrupo > 9999)
 							throw new NumberFormatException();
-						String key = idInst + "||" + idGrupo;
+						//String key = idInst + "||" + idGrupo;
 //						if (!idGruposHashTable.containsKey(key)) {
 							CenGruposclienteExample cen = new CenGruposclienteExample();
 							List<Short> instituciones = new ArrayList<>();
