@@ -401,12 +401,17 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info("getComboSubZonas() -> Entrada para obtener la información de las distintas subZonas");
 
 				ScsSubzonaExample example = new ScsSubzonaExample();
-
-				example.createCriteria().andIdzonaEqualTo(Short.valueOf(idZona)).andIdinstitucionEqualTo(idInstitucion)
-						.andFechabajaIsNull();
-				example.setOrderByClause("nombre");
-				List<ScsSubzona> subZonas = scsSubZonasExtendsMapper.selectByExample(example);
-
+				
+				List<ScsSubzona> subZonas;
+				if(idZona.contains(",")) {
+					 subZonas = scsSubZonasExtendsMapper.getIdSubzona2(idInstitucion, idZona);
+				}else {
+					example.createCriteria().andIdzonaEqualTo(Short.valueOf(idZona)).andIdinstitucionEqualTo(idInstitucion)
+					.andFechabajaIsNull();
+					example.setOrderByClause("nombre");
+					 subZonas = scsSubZonasExtendsMapper.selectByExample(example);
+				}
+				
 				List<ComboItem> comboItems = new ArrayList<ComboItem>();
 
 				for (ScsSubzona zona : subZonas) {

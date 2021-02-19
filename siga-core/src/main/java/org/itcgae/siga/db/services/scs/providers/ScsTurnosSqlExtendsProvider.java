@@ -48,28 +48,29 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 			sql.WHERE("UPPER(turnos.nombre) like UPPER('%" + turnosItem.getNombre() + "%')");
 		}
 		if (turnosItem.getJurisdiccion() != null && turnosItem.getJurisdiccion() != "") {
-			sql.WHERE("turnos.idjurisdiccion ='" + turnosItem.getJurisdiccion() + "'");
+			sql.WHERE("turnos.idjurisdiccion IN (" + turnosItem.getJurisdiccion() + ")");
 		}
 		if (turnosItem.getIdtipoturno() != null && turnosItem.getIdtipoturno() != "") {
-			sql.WHERE("turnos.idtipoturno = '" + turnosItem.getIdtipoturno() + "'");
+			sql.WHERE("turnos.idtipoturno IN (" + turnosItem.getIdtipoturno() + ")");
 		}
 		if (turnosItem.getIdarea() != null && turnosItem.getIdarea() != "") {
-			sql.WHERE("area.idarea = '" + turnosItem.getIdarea() + "'");
+			sql.WHERE("area.idarea IN (" + turnosItem.getIdarea() + ")");
+			
 		}
 		if (turnosItem.getIdmateria() != null && turnosItem.getIdmateria() != "") {
-			sql.WHERE("materi.idmateria = '" + turnosItem.getIdmateria() + "'");
+			sql.WHERE("materi.idmateria IN (" + turnosItem.getIdmateria() + ")");
 		}
 		if (turnosItem.getIdzona() != null && turnosItem.getIdzona() != "") {
-			sql.WHERE("zona.idzona = '" + turnosItem.getIdzona() + "'");
+			sql.WHERE("zona.idzona IN (" + turnosItem.getIdzona() + ")");
 		}
 		if (turnosItem.getIdzubzona() != null && turnosItem.getIdzubzona() != "") {
-			sql.WHERE("subzon.idsubzona = '" + turnosItem.getIdzubzona() + "'");
+			sql.WHERE("subzon.idsubzona IN (" + turnosItem.getIdzubzona() + ")");
 		}
 		if (turnosItem.getIdpartidapresupuestaria() != null && turnosItem.getIdpartidapresupuestaria() != "") {
-			sql.WHERE("partid.IDPARTIDAPRESUPUESTARIA = '" + turnosItem.getIdpartidapresupuestaria() + "'");
+			sql.WHERE("partid.IDPARTIDAPRESUPUESTARIA IN (" + turnosItem.getIdpartidapresupuestaria() + ")");
 		}
 		if (turnosItem.getGrupofacturacion() != null && turnosItem.getGrupofacturacion() != "") {
-			sql.WHERE("grupof.idgrupofacturacion  = '" + turnosItem.getGrupofacturacion() + "'");
+			sql.WHERE("grupof.idgrupofacturacion  IN (" + turnosItem.getGrupofacturacion() + ")");
 		}
 		if (!turnosItem.isHistorico()) {
 			sql.WHERE("turnos.fechabaja is null");
