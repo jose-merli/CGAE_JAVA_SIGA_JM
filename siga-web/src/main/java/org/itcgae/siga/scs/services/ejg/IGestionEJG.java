@@ -1,7 +1,10 @@
 package org.itcgae.siga.scs.services.ejg;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -34,4 +37,6 @@ public interface IGestionEJG {
 	ResolucionEJGItem getResolucion(EjgItem ejgItem, HttpServletRequest request);
 
 	ComboDTO comboTipoExpediente(HttpServletRequest request);
+	
+	UpdateResponseDTO cambioEstadoMasivo(List<EjgItem> datos, HttpServletRequest request);
 }
