@@ -651,4 +651,78 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return responsedto;
 	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request) {
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			LOGGER.debug("GestionEJGServiceImpl.anadirExpedienteARemesa() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.anadirExpedienteARemesa() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug("GestionEJGServiceImpl.anadirExpedienteARemesa() -> Entrada para cambiar los estados y la fecha de estado para los ejgs");
+				
+				try {
+					
+				}catch(Exception e){
+					
+				}finally {
+					
+				}				
+			}
+		}		
+		
+		LOGGER.info("GestionEJGServiceImpl.anadirExpedienteARemesa() -> Salida del servicio.");
+
+		return responsedto;
+	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request) {
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Entrada para cambiar los estados y la fecha de estado para los ejgs");
+				
+				try {
+					
+				}catch(Exception e){
+					
+				}finally {
+					
+				}				
+			}
+		}		
+		
+		LOGGER.info("GestionEJGServiceImpl.descargarExpedientesJG() -> Salida del servicio.");
+
+		return responsedto;
+	}
 }
