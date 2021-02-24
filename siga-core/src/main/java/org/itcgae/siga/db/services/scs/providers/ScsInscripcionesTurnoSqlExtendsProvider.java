@@ -86,6 +86,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 	public String busquedaInscripciones(InscripcionesItem inscripcionesItem, Short idInstitucion,String fechadesde,String fechahasta, String afechade,Integer tamMax) {
 
 		SQL sql = new SQL();
+		
 		sql.SELECT(  
 				"       ( CASE\r\n" + 
 				"            WHEN ins.fechadenegacion IS NOT NULL THEN '4'\r\n" + 
@@ -142,7 +143,14 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"                                AND tur.idinstitucion = ins.idinstitucion");
 		sql.WHERE("ins.idinstitucion ='"+idInstitucion+"'");
 		if(inscripcionesItem.getIdturno() != null) {
-			sql.WHERE("ins.idturno ='"+inscripcionesItem.getIdturno()+"'");
+			String condturnos ="(";
+			for(int i = 0; i< inscripcionesItem.getIdturno().split(",").length; i++) {
+				if(i>0) condturnos+=" or ";
+				condturnos+="ins.idturno ='"+inscripcionesItem.getIdturno().split(",")[i]+"'";
+			}
+			condturnos+=")";
+			sql.WHERE(condturnos);
+			
 		}
 		if(inscripcionesItem.getIdpersona() != null) {
 			sql.WHERE("ins.idpersona ='"+inscripcionesItem.getIdpersona()+"'");
@@ -159,34 +167,45 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"            AND   it2.idpersona = ins.idpersona\r\n" + 
 				"    )");
 		if(inscripcionesItem.getEstado() != null) {
-			if(inscripcionesItem.getEstado().equals("0")) {
-				sql.WHERE("((ins.fechavalidacion is null and ins.fechasolicitudbaja is null and ins.fechabaja "
-						+ "is null and ins.fechadenegacion is null) OR (ins.fechavalidacion is not null and ins.fechasolicitudbaja is not null and ins.fechabaja"
-						+ " is null and ins.fechadenegacion is null))") ;
+			String condestados = "(";
+			String[] estados = inscripcionesItem.getEstado().split(",");
+			for(int i = 0; i< estados.length; i++) {
+				if(i>0) condestados+=" or ";
+				// Pendiente de alta
+				if(estados[i].equals("0")) {
+					condestados+="(ins.fechavalidacion is null and ins.fechadenegacion is null)" ;
+				}
+				// Alta
+				else if(estados[i].equals("1")) {
+					condestados+="(ins.fechavalidacion is not null and ins.fechasolicitudbaja is null)" ;
+				}
+				// Pendiente de Baja
+				else if(estados[i].equals("2")) {
+					condestados+="(ins.fechasolicitudbaja is not null and ins.fechabaja is null)" ;
+				}
+				// Baja
+				else if(estados[i].equals("3")) {
+					condestados+="(ins.fechabaja is not null)" ;
+				}
+				// Denegada
+				else if(estados[i].equals("4")) {
+					condestados+="(ins.fechadenegacion is not null)" ;
+				}
 			}
-			
-			if(inscripcionesItem.getEstado().equals("1")) {
-				sql.WHERE("((ins.fechavalidacion is not null and ins.fechasolicitudbaja is null and ins.fechabaja "
-						+ "is null and ins.fechadenegacion is null) OR (ins.fechavalidacion is not null and ins.fechasolicitudbaja is not null and ins.fechabaja"
-						+ " is not null and ins.fechadenegacion is null))") ;
-			}
-			
-			if(inscripcionesItem.getEstado().equals("2")) {
-				sql.WHERE("(ins.fechavalidacion is not null and ins.fechasolicitudbaja is not null and ins.fechabaja "
-						+ "is null and ins.fechadenegacion is not null)") ;
-			}
+			condestados+=")";
+			sql.WHERE(condestados);
 		}
 		if(inscripcionesItem.getAfechade() != null) {
-			sql.WHERE("((ins.fechavalidacion is not null and ins.fechavalidacion <= '"+afechade+"') and ins.fechasolicitudbaja is null and ins.fechabaja " + 
-					"is null and ins.fechadenegacion is null) OR (ins.fechavalidacion is not null and (ins.fechasolicitudbaja is not null and ins.fechavalidacion <= '"+afechade+"')and ins.fechabaja"
-					+ " is null and ins.fechadenegacion is null)") ;
+			sql.WHERE("((ins.fechavalidacion is not null and ins.fechavalidacion <= '"+afechade+"' and ins.fechasolicitudbaja is null)" + 
+					" OR (ins.fechasolicitudbaja is not null and ins.fechavalidacion <= '"+afechade+"'and ins.fechabaja"
+					+ " is null))") ;
 		}
 		if(inscripcionesItem.getFechadesde() != null) {
 			sql.WHERE("ins.fechasolicitud >= '"+fechadesde+"'");
 			if(inscripcionesItem.getFechahasta() != null)
 			sql.WHERE("ins.fechasolicitud <= '"+fechahasta+"'");
 		}
-		sql.ORDER_BY("nombreturno");
+		sql.ORDER_BY("fechasolicitud DESC");
 		if (tamMax != null) {
 			Integer tamMaxNumber = tamMax + 1;
 			sql.WHERE("rownum <= " + tamMaxNumber);
