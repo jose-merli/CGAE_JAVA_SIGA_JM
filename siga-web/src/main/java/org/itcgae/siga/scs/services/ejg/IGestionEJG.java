@@ -43,4 +43,8 @@ public interface IGestionEJG {
 	UpdateResponseDTO cambioEstadoMasivo(List<EjgItem> datos, HttpServletRequest request);
 	
 	ColegiadosSJCSDTO busquedaColegiadoEJG(ColegiadosSJCSItem datos, HttpServletRequest request);
+	
+	UpdateResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request);
+	
+	UpdateResponseDTO descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request);
 }
