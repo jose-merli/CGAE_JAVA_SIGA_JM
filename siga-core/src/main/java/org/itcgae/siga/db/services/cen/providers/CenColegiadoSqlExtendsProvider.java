@@ -875,7 +875,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql.WHERE("per.idtipoidentificacion not in '20'");
 
-		sql.WHERE("per.idpersona = '" + idPersona + "'");
+		sql.WHERE("col.ncolegiado = '" + idPersona + "'");
+		//sql.WHERE("per.idpersona = '" + idPersona + "'");
 
 		return sql.toString();
 	}

@@ -11,6 +11,8 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
@@ -80,7 +82,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ExpTipoexpedienteExtendsMapper expExpedienteExtendsMapper;
-	
+
 	@Autowired
 	private ScsEstadoejgMapper scsEstadoejgMapper;
 
@@ -584,23 +586,26 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (idInstitucion != null) {
-			LOGGER.debug("GestionEJGServiceImpl.cambiarEstadoEJGs() -> Entrada para obtener información del usuario logeado");
+			LOGGER.debug(
+					"GestionEJGServiceImpl.cambiarEstadoEJGs() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug("GestionEJGServiceImpl.cambiarEstadoEJGs() -> Salida de obtener información del usuario logeado");
+			LOGGER.debug(
+					"GestionEJGServiceImpl.cambiarEstadoEJGs() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug("GestionEJGServiceImpl.cambiarEstadoEJGs() -> Entrada para cambiar los estados y la fecha de estado para los ejgs");
+				LOGGER.debug(
+						"GestionEJGServiceImpl.cambiarEstadoEJGs() -> Entrada para cambiar los estados y la fecha de estado para los ejgs");
 
 				try {
-					for(int i=0; datos.size()>i; i++) {
+					for (int i = 0; datos.size() > i; i++) {
 						ScsEstadoejg record = new ScsEstadoejg();
-						response=0;
-						
-						//creamos el objeto para el insert
+						response = 0;
+
+						// creamos el objeto para el insert
 						record.setIdinstitucion(idInstitucion);
 						record.setIdtipoejg(Short.parseShort(datos.get(i).getTipoEJG()));
 						record.setAnio(Short.parseShort(datos.get(i).getAnnio()));
@@ -610,45 +615,83 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
 						record.setAutomatico("0");
-						
-						//obtenemos el maximo de idestadoporejg
+
+						// obtenemos el maximo de idestadoporejg
 						ScsEstadoejgExample example = new ScsEstadoejgExample();
 						example.setOrderByClause("IDESTADOPOREJG DESC");
-						example.createCriteria().andAnioEqualTo(Short.parseShort(datos.get(i).getAnnio())).andIdinstitucionEqualTo(idInstitucion)
-						.andIdtipoejgEqualTo(Short.parseShort(datos.get(i).getTipoEJG())).andNumeroEqualTo(Long.parseLong(datos.get(i).getNumero()));
-						
+						example.createCriteria().andAnioEqualTo(Short.parseShort(datos.get(i).getAnnio()))
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdtipoejgEqualTo(Short.parseShort(datos.get(i).getTipoEJG()))
+								.andNumeroEqualTo(Long.parseLong(datos.get(i).getNumero()));
+
 						List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
-						
-						//damos el varlo al idestadoporejg + 1
-						if(listEjg.size()>0) {
-							record.setIdestadoporejg(listEjg.get(0).getIdestadoporejg()+1);
-						}else {
+
+						// damos el varlo al idestadoporejg + 1
+						if (listEjg.size() > 0) {
+							record.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
+						} else {
 							record.setIdestadoporejg(Long.parseLong("0"));
 						}
-						
-						//scsEstadoejgMapper.selectByExample(example)
-						
+
+						// scsEstadoejgMapper.selectByExample(example)
+
 						response = scsEstadoejgMapper.insert(record);
 					}
-					
-					LOGGER.debug("GestionEJGServiceImpl.cambiarEstadoEJGs() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
-				}catch(Exception e){
-					LOGGER.debug("GestionEJGServiceImpl.cambiarEstadoEJGs() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ", e);
-				}finally {
+
+					LOGGER.debug(
+							"GestionEJGServiceImpl.cambiarEstadoEJGs() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.cambiarEstadoEJGs() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							e);
+				} finally {
 					// respuesta si se actualiza correctamente
 					if (response >= 1) {
 						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug("GestionEJGServiceImpl.cambiarEstadoEJGs() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+						LOGGER.debug(
+								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error("GestionEJGServiceImpl.cambiarEstadoEJGs() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+						LOGGER.error(
+								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
 					}
-				}				
+				}
 			}
-		}		
-		
+		}
+
 		LOGGER.info("GestionEJGServiceImpl.cambiarEstadoEJGs() -> Salida del servicio.");
 
+		return responsedto;
+	}
+	
+	public ColegiadosSJCSDTO busquedaColegiadoEJG(ColegiadosSJCSItem datos, HttpServletRequest request) {
+		ColegiadosSJCSDTO responsedto = null;
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.busquedaColegiadoEJG() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.busquedaColegiadoEJG() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug("GestionEJGServiceImpl.busquedaColegiadoEJG() -> Entrada para obtener los datos del colegiado segun los filtros");
+
+				try {
+					LOGGER.debug("asdf");
+				}catch (Exception e){
+					LOGGER.error("GestionEJGServiceImpl.busquedaColegiadoEJG() -> Se ha producido un error al tratar de obtener los datos del colegiado. ", e);
+				}
+			}
+		}
+		
 		return responsedto;
 	}
 }
