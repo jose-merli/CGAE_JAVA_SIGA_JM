@@ -7,7 +7,7 @@ import org.itcgae.siga.db.mappers.ScsGuardiasturnoSqlProvider;
 
 public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvider {
 
-	public String searchGuardias(GuardiasItem guardiaItem, String idInstitucion, String idLenguaje) {
+	public String searchGuardias(GuardiasItem guardiaItem, String idInstitucion, String idLenguaje, Integer tamMax) {
 		SQL sql = new SQL();
 
 		sql.SELECT("SCS_TURNO.NOMBRE AS turno");
@@ -137,6 +137,11 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 			sql.WHERE("SCS_GUARDIASTURNO.IDTIPOGUARDIA IN (" + guardiaItem.getTipoGuardia() + ")");
 
 		sql.ORDER_BY("SCS_TURNO.NOMBRE, SCS_GUARDIASTURNO.NOMBRE");
+		
+		if (tamMax != null) {
+			Integer tamMaxNumber = tamMax + 1;
+			sql.WHERE("rownum <= " + tamMaxNumber);
+		}
 
 		return sql.toString();
 	}

@@ -1068,6 +1068,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static Integer USUMODIFICACION_0 = 0;
 	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
+	
+	public static final String TAM_MAX_CONSULTA_JG = "TAM_MAX_CONSULTA_JG";
 
 
 	

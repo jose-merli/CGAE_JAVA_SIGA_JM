@@ -38,7 +38,8 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		@Result(column = "VALIDARJUSTIFICACIONES", property = "validaJustificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
 	})
-	List<GuardiasItem> searchGuardias(GuardiasItem guardiaItem , String idInstitucion, String idLenguaje);
+	List<GuardiasItem> searchGuardias(GuardiasItem guardiaItem, String idInstitucion, String idLenguaje,
+			Integer tamMax);
 	
 	
 
