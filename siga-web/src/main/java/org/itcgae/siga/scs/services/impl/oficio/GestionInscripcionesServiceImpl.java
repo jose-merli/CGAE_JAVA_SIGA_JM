@@ -140,6 +140,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
 		InscripcionesDTO inscripcionesDTO = new InscripcionesDTO();
 		List<InscripcionesItem> inscripcionesItems = null;
 		List<GenParametros> tamMax = null;
@@ -199,6 +200,13 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaInscripciones(inscripcionesItem,
 						idInstitucion, fechadesde, fechahasta, afechade, tamMaximo);
 
+				if((inscripcionesItems != null) && tamMaximo != null && (inscripcionesItems.size()) > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					inscripcionesDTO.setError(error);
+					inscripcionesItems.remove(inscripcionesItems.size()-1);
+					}
+				
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
 
@@ -627,7 +635,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 	
 	@Override
 	public UpdateResponseDTO updateCambiarFecha(InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
-		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
+		LOGGER.info("updateCambiarFecha() ->  Entrada al servicio para actualizar fechas efectivas");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -645,12 +653,12 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateCambiarFecha() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateCambiarFecha() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
@@ -669,15 +677,15 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							ScsInscripcionturno inscripcionturno = listainscripcion.get(i);
 
 							LOGGER.info(
-									"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");						
-								if(inscripcionesItem.getEstadonombre() == "Pendiente de Alta") {
-									inscripcionturno.setFechasolicitud(inscripcionesItem.getFechaActual());
-									inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
-								}
+									"updateCosteFijo()  -> Entrada a GestionInscripcionesServiceImpl");						
+//								if(inscripcionesItem.getEstadonombre().equals("Pendiente de Alta")) {
+//									inscripcionturno.setFechasolicitud(inscripcionesItem.getFechaActual());
+//									inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
+//								}
 								
-								if(inscripcionesItem.getEstadonombre() == "Alta") {
-									if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechasolicitud()) 
-											|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechasolicitud()) ) {
+								if(inscripcionesItem.getEstadonombre().equals("Alta") || inscripcionesItem.getEstadonombre().equals("Pendiente de Baja") ) {
+									if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechavalidacion()) 
+											|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechavalidacion()) ) {
 										inscripcionturno.setFechavalidacion(inscripcionesItem.getFechaActual());
 										inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
 
@@ -690,24 +698,9 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									
 								}
 								
-								if(inscripcionesItem.getEstadonombre() == "Pendiente de Baja") {
-									if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechasolicitud()) 
-											|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechasolicitud()) ) {
-										inscripcionturno.setFechasolicitudbaja(inscripcionesItem.getFechaActual());
-										inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
-
-									}else {
-										response = 0;
-										error.setCode(400);
-										error.setDescription("enviosMasivos.literal.fechaHora");
-										updateResponseDTO.setStatus(SigaConstants.KO);
-									}
-									
-								}
-								
-								if(inscripcionesItem.getEstadonombre() == "Baja") {
-									if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechasolicitud()) 
-											|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechasolicitud()) ) {
+								else if(inscripcionesItem.getEstadonombre().equals("Baja")) {
+									if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechabaja()) 
+											|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechabaja()) ) {
 										inscripcionturno.setFechabaja(inscripcionesItem.getFechaActual());
 										inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
 
@@ -720,26 +713,26 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									
 								}
 								
-								if(inscripcionesItem.getEstadonombre() == "Denegada") {
-									if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechasolicitud()) 
-											|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechasolicitud()) ) {
-										inscripcionturno.setFechadenegacion(inscripcionesItem.getFechaActual());
-										inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
-
-									}else {
-										response = 0;
-										error.setCode(400);
-										error.setDescription("enviosMasivos.literal.fechaHora");
-										updateResponseDTO.setStatus(SigaConstants.KO);
-									}
-									
-								}
+//								else if(inscripcionesItem.getEstadonombre().equals("Denegada")) {
+//									if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechasolicitud()) 
+//											|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechasolicitud()) ) {
+//										inscripcionturno.setFechadenegacion(inscripcionesItem.getFechaActual());
+//										inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
+//
+//									}else {
+//										response = 0;
+//										error.setCode(400);
+//										error.setDescription("enviosMasivos.literal.fechaHora");
+//										updateResponseDTO.setStatus(SigaConstants.KO);
+//									}
+//									
+//								}
 								
 								response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);						
 						}
 						
 						LOGGER.info(
-								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
+								"updateCambiarFecha()  -> Salida de GestionInscripcionesServiceImpl");
 					}
 				}
 
@@ -749,24 +742,23 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
-
 				if (response == 0 && error.getDescription() == null) {
 					error.setCode(400);
-					error.setDescription("No se ha modificado la partida presupuestaria");
+					error.setDescription("No se ha modificado la inscripcion");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				} else if (response == 1 && existentes != 0) {
 					error.setCode(200);
 					error.setDescription(
-							"Se han modificiado la partida presupuestaria excepto algunos que tiene las mismas características");
+							"Se han modificiado la inscripciones excepto algunos que tiene las mismas características");
 
 				} else if (error.getCode() == null) {
 					error.setCode(200);
-					error.setDescription("Se ha modificado la partida presupuestaria correctamente");
+					error.setDescription("Se ha modificado la inscripcion correctamente");
 				}
 
 				updateResponseDTO.setError(error);
 
-				LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar una partida presupuestaria");
+				LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar la fecha de validacion de inscripciones");
 
 			}
 

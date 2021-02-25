@@ -153,9 +153,11 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			
 		}
 		if(inscripcionesItem.getIdpersona() != null) {
-			sql.WHERE("ins.idpersona ='"+inscripcionesItem.getIdpersona()+"'");
+			sql.WHERE("(ins.idpersona ='"+inscripcionesItem.getIdpersona()+"')");
 		}
-		
+		if(inscripcionesItem.getNcolegiado() != null) {
+			sql.WHERE("(col.ncolegiado ='"+inscripcionesItem.getNcolegiado()+"')");
+		}
 		sql.WHERE("ins.fechasolicitud = (\r\n" + 
 				"        SELECT\r\n" + 
 				"            MAX(it2.fechasolicitud)\r\n" + 
