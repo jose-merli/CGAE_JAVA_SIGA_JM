@@ -23,8 +23,10 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -83,6 +85,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ScsEstadoejgMapper scsEstadoejgMapper;
+	
+	@Autowired
+	private ScsEjgMapper scsEjgMapper;
 
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -690,7 +695,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				}catch(Exception e){
 					
 				}finally {
-					
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug("GestionEJGServiceImpl.cambiarEstadoEJGs() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error("GestionEJGServiceImpl.cambiarEstadoEJGs() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+					}
 				}				
 			}
 		}		
@@ -727,12 +739,137 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				}catch(Exception e){
 					
 				}finally {
-					
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug("GestionEJGServiceImpl.cambiarEstadoEJGs() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error("GestionEJGServiceImpl.cambiarEstadoEJGs() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+					}
 				}				
 			}
 		}		
 		
 		LOGGER.info("GestionEJGServiceImpl.descargarExpedientesJG() -> Salida del servicio.");
+
+		return responsedto;
+	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO guardarDatosGenerales(EjgItem datos, HttpServletRequest request) {
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
+		
+		if (idInstitucion != null) {
+			LOGGER.debug("GestionEJGServiceImpl.guardarDatosGenerales() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.guardarDatosGenerales() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug("GestionEJGServiceImpl.guardarDatosGenerales() -> Entrada para cambiar los datos generales del ejg");
+				if(datos.getAnnio() != null && !datos.getAnnio().isEmpty())
+					record.setAnio(Short.parseShort(datos.getAnnio()));
+				
+				if(datos.getFechaApertura() != null)
+					record.setFechaapertura(datos.getFechaApertura());
+				
+				if(datos.getNumero() != null && datos.getNumero().isEmpty())
+					record.setNumero(Long.parseLong(datos.getNumero()));
+				try {
+					if(!datos.getNuevoEJG()) {
+						response = scsEjgMapper.insert(record);
+					}
+					
+				}catch(Exception e){
+					
+				}finally {
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug("GestionEJGServiceImpl.guardarDatosGenerales() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error("GestionEJGServiceImpl.guardarDatosGenerales() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+					}
+				}				
+			}
+		}		
+		
+		LOGGER.info("GestionEJGServiceImpl.guardarDatosGenerales() -> Salida del servicio.");
+
+		return responsedto;
+	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO borrarEstado(List<EjgItem> datos, HttpServletRequest request) {
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (idInstitucion != null) {
+			LOGGER.debug("GestionEJGServiceImpl.borrarEstado() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.borrarEstado() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug("GestionEJGServiceImpl.borrarEstado() -> Entrada para cambiar los datos generales del ejg");
+				
+				try {
+					for(int i=0; datos.size()>i; i++) {
+						ScsEstadoejg record = new ScsEstadoejg();
+						response=0;
+						
+						//creamos el objeto para el insert
+						record.setIdinstitucion(idInstitucion);
+						record.setIdtipoejg(Short.parseShort(datos.get(i).getTipoEJG()));
+						record.setAnio(Short.parseShort(datos.get(i).getAnnio()));
+						record.setNumero(Long.parseLong(datos.get(i).getNumero()));
+						record.setIdestadoejg(Short.parseShort(datos.get(i).getEstadoNew()));
+						record.setFechainicio(datos.get(i).getFechaEstadoNew());
+						record.setFechamodificacion(new Date());
+						record.setUsumodificacion(usuarios.get(0).getIdusuario());
+						record.setAutomatico("0");
+						record.setFechabaja(new Date());
+						
+						response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
+					}
+					LOGGER.debug("GestionEJGServiceImpl.cambiarEstadoEJGs() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+				}catch(Exception e){
+					LOGGER.debug("GestionEJGServiceImpl.borrarEstado() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ", e);
+				}finally {
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug("GestionEJGServiceImpl.borrarEstado() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error("GestionEJGServiceImpl.borrarEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+					}
+				}				
+			}
+		}		
+		
+		LOGGER.info("GestionEJGServiceImpl.borrarEstado() -> Salida del servicio.");
 
 		return responsedto;
 	}

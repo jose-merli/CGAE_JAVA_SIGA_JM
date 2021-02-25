@@ -43,4 +43,8 @@ public interface IGestionEJG {
 	UpdateResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request);
 	
 	UpdateResponseDTO descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request);
+	
+	UpdateResponseDTO guardarDatosGenerales(EjgItem datos, HttpServletRequest request);
+
+	UpdateResponseDTO borrarEstado(List<EjgItem> datos, HttpServletRequest request);
 }
