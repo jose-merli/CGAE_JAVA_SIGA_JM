@@ -758,11 +758,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		}
 		
 		if(item.getNombre() !=null && !item.getNombre().trim().isEmpty()) {
-			sql.WHERE("PER.NOMBRE LIKE UPPER('%"+item.getNombre().trim()+"%')");
+			sql.WHERE("UPPER(PER.NOMBRE) LIKE UPPER('%"+item.getNombre().trim()+"%')");
 		}
 		
 		if(item.getApellidos() !=null && !item.getApellidos().trim().isEmpty()) {
-			sql.WHERE("CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2) LIKE UPPER('%"+item.getApellidos().trim()+"%')");
+			sql.WHERE("CONCAT(CONCAT(UPPER(PER.APELLIDOS1), ' '), UPPER(PER.APELLIDOS2)) LIKE UPPER('%"+item.getApellidos().trim()+"%')");
 		}
 		
 		if(item.getIdEstado() !=null && !item.getIdEstado().isEmpty()) {
