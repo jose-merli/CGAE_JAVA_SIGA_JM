@@ -50,6 +50,10 @@ public interface IGestionEJG {
 	UpdateResponseDTO borrarEstado(List<EjgItem> datos, HttpServletRequest request);
 
 	InsertResponseDTO nuevoEstado(List<EjgItem> datos, HttpServletRequest request);
+	
+	UpdateResponseDTO borrarFamiliar(List<EjgItem> datos, HttpServletRequest request);
+
+	UpdateResponseDTO borrarRelacion(List<EjgItem> datos, HttpServletRequest request);
 
 	UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request);
 

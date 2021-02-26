@@ -216,19 +216,18 @@ public class EjgController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
+	// busquedaColegiadoEJG
+	ResponseEntity<ColegiadosSJCSDTO> busquedaColegiadoEJG(@RequestBody ColegiadosSJCSItem datos,
+			HttpServletRequest request) {
+		ColegiadosSJCSDTO response = busquedaEJG.busquedaColegiadoEJG(datos, request);
+		return new ResponseEntity<ColegiadosSJCSDTO>(response, HttpStatus.OK);
+	}
+
 	// combo para los turnos en la busqueda de colegiadoEJG
 	@RequestMapping(value = "/busquedaColegiadoEJG/comboTurnos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboTurnos(String pantalla, HttpServletRequest request) {
 		ComboDTO response = busquedaEJG.comboTurnos(pantalla, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-	}
-
-	// busquedaColegiadoEJG
-	@RequestMapping(value = "/busquedaColegiadoEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ColegiadosSJCSDTO> busquedaColegiadoEJG(@RequestBody ColegiadosSJCSItem datos,
-			HttpServletRequest request) {
-		ColegiadosSJCSDTO response = busquedaEJG.busquedaColegiadoEJG(datos, request);
-		return new ResponseEntity<ColegiadosSJCSDTO>(response, HttpStatus.OK);
 	}
 
 	// añadirRemesa
@@ -257,10 +256,18 @@ public class EjgController {
 	 * = gestionEJG.guardarDatosGenerales(datos, request); return new
 	 * ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK); }
 	 */
-//borrarEstado
+
+	// borrarEstado
 	@RequestMapping(value = "/gestion-ejg/borrarEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> borrarEstado(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.borrarEstado(datos, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	// borrarFamiliar
+	@RequestMapping(value = "/gestion-ejg/borrarFamiliar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> borrarFamiliar(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionEJG.borrarFamiliar(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
@@ -315,4 +322,12 @@ public class EjgController {
 		UpdateResponseDTO response = gestionEJG.descargarDocumentacion(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+
+	// borrarRelacion
+	@RequestMapping(value = "/gestion-ejg/borrarRelacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> borrarRelacion(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionEJG.borrarRelacion(datos, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
 }
