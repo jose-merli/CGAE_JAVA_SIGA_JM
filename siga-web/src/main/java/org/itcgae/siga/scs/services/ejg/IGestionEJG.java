@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
@@ -51,4 +52,18 @@ public interface IGestionEJG {
 	UpdateResponseDTO guardarDatosGenerales(EjgItem datos, HttpServletRequest request);
 
 	UpdateResponseDTO borrarEstado(List<EjgItem> datos, HttpServletRequest request);
+
+	InsertResponseDTO nuevoEstado(List<EjgItem> datos, HttpServletRequest request);
+
+	UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request);
+
+	UpdateResponseDTO guardarResolucion(EjgItem datos, HttpServletRequest request);
+
+	UpdateResponseDTO guardarInformeCalificacion(EjgItem datos, HttpServletRequest request);
+
+	UpdateResponseDTO borrarInformeCalificacion(EjgItem datos, HttpServletRequest request);
+	
+	UpdateResponseDTO descargarInformeCalificacion(EjgItem datos, HttpServletRequest request);
+	
+	UpdateResponseDTO descargarDocumentacion(EjgItem datos, HttpServletRequest request);
 }
