@@ -209,7 +209,6 @@ public class EjgController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
-
 	// guardarDatosGenerales
 	@RequestMapping(value = "/gestion-ejg/guardarDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> guardarDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
@@ -217,44 +216,54 @@ public class EjgController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
-	// borrarEstado
-	ResponseEntity<ColegiadosSJCSDTO> busquedaColegiadoEJG(@RequestBody ColegiadosSJCSItem datos, HttpServletRequest request) {
-		ColegiadosSJCSDTO response = busquedaEJG.busquedaColegiadoEJG(datos, request);
-		return new ResponseEntity<ColegiadosSJCSDTO>(response, HttpStatus.OK);
-	}
-	
-	//combo para los turnos en la busqueda de colegiadoEJG
+	// combo para los turnos en la busqueda de colegiadoEJG
 	@RequestMapping(value = "/busquedaColegiadoEJG/comboTurnos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboTurnos(String pantalla, HttpServletRequest request) {
 		ComboDTO response = busquedaEJG.comboTurnos(pantalla, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
+	// busquedaColegiadoEJG
+	@RequestMapping(value = "/busquedaColegiadoEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ColegiadosSJCSDTO> busquedaColegiadoEJG(@RequestBody ColegiadosSJCSItem datos,
+			HttpServletRequest request) {
+		ColegiadosSJCSDTO response = busquedaEJG.busquedaColegiadoEJG(datos, request);
+		return new ResponseEntity<ColegiadosSJCSDTO>(response, HttpStatus.OK);
+	}
+
 	// añadirRemesa
 	@RequestMapping(value = "/gestion-ejg/anadirExpedienteARemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> anadirExpedienteARemesa(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> anadirExpedienteARemesa(@RequestBody List<EjgItem> datos,
+			HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.anadirExpedienteARemesa(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
-//descargarEEJ
+
+	// descargarEEJ
 	@RequestMapping(value = "/gestion-ejg/descargarExpedientesJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> descargarExpedientesJG(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> descargarExpedientesJG(@RequestBody List<EjgItem> datos,
+			HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.descargarExpedientesJG(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
-/* //guardarDatosGenerales
-	@RequestMapping(value = "/gestion-ejg/guardarDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarDatosGenerales(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.guardarDatosGenerales(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-	}*/
+
+	/*
+	 * //guardarDatosGenerales
+	 * 
+	 * @RequestMapping(value = "/gestion-ejg/guardarDatosGenerales", method =
+	 * RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	 * ResponseEntity<UpdateResponseDTO> guardarDatosGenerales(@RequestBody
+	 * List<EjgItem> datos, HttpServletRequest request) { UpdateResponseDTO response
+	 * = gestionEJG.guardarDatosGenerales(datos, request); return new
+	 * ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK); }
+	 */
 //borrarEstado
 	@RequestMapping(value = "/gestion-ejg/borrarEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> borrarEstado(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.borrarEstado(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
-	
+
 	// nuevoEstado
 	@RequestMapping(value = "/gestion-ejg/nuevoEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> nuevoEstado(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
@@ -302,8 +311,7 @@ public class EjgController {
 
 	// descargarDocumentacion
 	@RequestMapping(value = "/gestion-ejg/descargarDocumentacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> descargarDocumentacion(@RequestBody EjgItem datos,
-			HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> descargarDocumentacion(@RequestBody EjgItem datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.descargarDocumentacion(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
