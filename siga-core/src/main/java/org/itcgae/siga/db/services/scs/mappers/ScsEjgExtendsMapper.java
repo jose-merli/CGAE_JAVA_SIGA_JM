@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosEjgItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
@@ -156,5 +157,20 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 	     @Result(column = "notascajg", property = "notasCAJG", jdbcType = JdbcType.VARCHAR),
 	})
 	ResolucionEJGItem getResolucion(EjgItem ejgItem, String idInstitucion, String idLenguaje);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "busquedaColegiadoEJG")
+	@Results({ 
+		 @Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "NCOMUNITARIO", property = "nComunitario", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "ESTADO", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.BOOLEAN),
+		 @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),		 
+	})
+	List<ColegiadosSJCSItem> busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje);
 }
 

@@ -12,8 +12,6 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
@@ -667,37 +665,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		LOGGER.info("GestionEJGServiceImpl.cambiarEstadoEJGs() -> Salida del servicio.");
 
-		return responsedto;
-	}
-	
-	public ColegiadosSJCSDTO busquedaColegiadoEJG(ColegiadosSJCSItem datos, HttpServletRequest request) {
-		ColegiadosSJCSDTO responsedto = null;
-
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		if (idInstitucion != null) {
-			LOGGER.debug("GestionEJGServiceImpl.busquedaColegiadoEJG() -> Entrada para obtener información del usuario logeado");
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.debug("GestionEJGServiceImpl.busquedaColegiadoEJG() -> Salida de obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug("GestionEJGServiceImpl.busquedaColegiadoEJG() -> Entrada para obtener los datos del colegiado segun los filtros");
-
-				try {
-					LOGGER.debug("asdf");
-				}catch (Exception e){
-					LOGGER.error("GestionEJGServiceImpl.busquedaColegiadoEJG() -> Se ha producido un error al tratar de obtener los datos del colegiado. ", e);
-				}
-			}
-		}
 		return responsedto;
 	}
 	

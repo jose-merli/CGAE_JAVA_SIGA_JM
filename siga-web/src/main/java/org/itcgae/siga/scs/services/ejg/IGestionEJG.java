@@ -7,8 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
@@ -42,8 +40,6 @@ public interface IGestionEJG {
 	ComboDTO comboTipoExpediente(HttpServletRequest request);
 	
 	UpdateResponseDTO cambioEstadoMasivo(List<EjgItem> datos, HttpServletRequest request);
-	
-	ColegiadosSJCSDTO busquedaColegiadoEJG(ColegiadosSJCSItem datos, HttpServletRequest request);
 	
 	UpdateResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request);
 	

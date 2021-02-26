@@ -32,9 +32,8 @@ public class ColegiadosSJCSItem {
 	private String telefono;
 	private String abreviatura;
 	private String idPersona;
-
+	private String nComunitario;
 	private boolean residente;
-	private String estadoColegial;
 
 	@JsonProperty("abreviatura")
 	public String getAbreviatura() {
@@ -352,7 +351,7 @@ public class ColegiadosSJCSItem {
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
-	
+
 	@JsonProperty("residente")
 	public boolean getResidente() {
 		return residente;
@@ -361,14 +360,19 @@ public class ColegiadosSJCSItem {
 	public void setResidente(boolean residente) {
 		this.residente = residente;
 	}
-	
-	@JsonProperty("estadoColegial")
-	public String getEstadoColegial() {
-		return estadoColegial;
+
+	/**
+	 * @return the nComunitario
+	 */
+	public String getnComunitario() {
+		return nComunitario;
 	}
 
-	public void setEstadoColegial(String estadoColegial) {
-		this.estadoColegial = estadoColegial;
+	/**
+	 * @param nComunitario the nComunitario to set
+	 */
+	public void setnComunitario(String nComunitario) {
+		this.nComunitario = nComunitario;
 	}
 
 	@Override
@@ -396,9 +400,11 @@ public class ColegiadosSJCSItem {
 		result = prime * result + ((inscritoguardia == null) ? 0 : inscritoguardia.hashCode());
 		result = prime * result + ((inscritoturno == null) ? 0 : inscritoturno.hashCode());
 		result = prime * result + ((nColegiado == null) ? 0 : nColegiado.hashCode());
+		result = prime * result + ((nComunitario == null) ? 0 : nComunitario.hashCode());
 		result = prime * result + ((nif == null) ? 0 : nif.hashCode());
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((nombrePoblacion == null) ? 0 : nombrePoblacion.hashCode());
+		result = prime * result + (residente ? 1231 : 1237);
 		result = prime * result + ((telefono == null) ? 0 : telefono.hashCode());
 		result = prime * result + ((usuModificacion == null) ? 0 : usuModificacion.hashCode());
 		return result;
@@ -515,6 +521,11 @@ public class ColegiadosSJCSItem {
 				return false;
 		} else if (!nColegiado.equals(other.nColegiado))
 			return false;
+		if (nComunitario == null) {
+			if (other.nComunitario != null)
+				return false;
+		} else if (!nComunitario.equals(other.nComunitario))
+			return false;
 		if (nif == null) {
 			if (other.nif != null)
 				return false;
@@ -529,6 +540,8 @@ public class ColegiadosSJCSItem {
 			if (other.nombrePoblacion != null)
 				return false;
 		} else if (!nombrePoblacion.equals(other.nombrePoblacion))
+			return false;
+		if (residente != other.residente)
 			return false;
 		if (telefono == null) {
 			if (other.telefono != null)
@@ -553,7 +566,7 @@ public class ColegiadosSJCSItem {
 				+ ", codigoPostal=" + codigoPostal + ", idPoblacion=" + idPoblacion + ", idProvincia=" + idProvincia
 				+ ", historico=" + historico + ", fechaestado=" + fechaestado + ", nif=" + nif + ", codigoExt="
 				+ codigoExt + ", email=" + email + ", nombrePoblacion=" + nombrePoblacion + ", idGuardia=" + idGuardia
-				+ ", telefono=" + telefono + ", abreviatura=" + abreviatura + ", idPersona=" + idPersona + "]";
+				+ ", telefono=" + telefono + ", abreviatura=" + abreviatura + ", idPersona=" + idPersona
+				+ ", nComunitario=" + nComunitario + ", residente=" + residente + "]";
 	}
-
 }

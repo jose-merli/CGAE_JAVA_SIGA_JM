@@ -2,7 +2,6 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
-import org.itcgae.siga.db.mappers.ScsTipoactuacionSqlProvider;
 import org.itcgae.siga.db.mappers.ScsTurnoSqlProvider;
 
 public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
@@ -18,16 +17,17 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
 	}
+
 	public String comboTurnosTipo(Short idInstitucion, String tipoturno) {
 
 		SQL sql = new SQL();
 
 		sql.SELECT("IDTURNO, NOMBRE");
 		sql.FROM("SCS_TURNO");
-		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("FECHABAJA IS NULL");
-		if(tipoturno.equals("1") || tipoturno.equals("2"))
-			sql.WHERE("IDTIPOTURNO= '"+tipoturno +"'");
+		if (tipoturno.equals("1") || tipoturno.equals("2"))
+			sql.WHERE("IDTIPOTURNO= '" + tipoturno + "'");
 		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
 	}
@@ -134,5 +134,24 @@ public String busquedaFichaTurnos(TurnosItem turnosItem, Short idInstitucion) {
 		sql.SELECT("MAX(IDORDENACIONCOLAS) AS IDORDENACIONCOLAS");
 		sql.FROM("scs_ordenacioncolas");
 		return sql.toString();
+	}
+	
+	//combo para la pantalla de busqueda de colegiado proveniente del busqueda colegiados express
+	public String comboTurnosBusqueda(Short idInstitucion, String pantalla) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDTURNO, NOMBRE");
+		sql.FROM("SCS_TURNO");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"'");
+		sql.WHERE("FECHABAJA IS NULL");
+		
+		if("EJG".equalsIgnoreCase(pantalla)) {
+			sql.WHERE("IDTIPOTURNO <> 2 AND IDTIPOTURNO IS NOT NULL");
 		}
+		
+		sql.ORDER_BY("NOMBRE");
+		
+		return sql.toString();
+	}
 }
