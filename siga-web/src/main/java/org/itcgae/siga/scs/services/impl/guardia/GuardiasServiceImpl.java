@@ -924,6 +924,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		idInstitucion = 2005;
 		String ordenaciones = "";
 		InscripcionGuardiaDTO inscritos = new InscripcionGuardiaDTO();
 
