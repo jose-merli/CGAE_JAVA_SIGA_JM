@@ -102,11 +102,11 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		// FILTRO POR AREA
 		if (guardiaItem.getArea() != null && guardiaItem.getArea() != "")
-			sql.WHERE("SCS_AREA.IDAREA IN (" + guardiaItem.getArea() + ")");
+			sql.WHERE("SCS_AREA.IDAREA = '" + guardiaItem.getArea() + "'");
 
 		// FILTRO POR AREA | MATERIA
 		if (guardiaItem.getMateria() != null && guardiaItem.getMateria() != "")
-			sql.WHERE("SCS_MATERIA.IDMATERIA IN (" + guardiaItem.getMateria() + ")");
+			sql.WHERE("SCS_MATERIA.IDMATERIA ='" + guardiaItem.getMateria() + "'");
 
 		// FILTRO POR GRUPOZONA
 		if (guardiaItem.getGrupoZona() != null && guardiaItem.getGrupoZona() != "")
