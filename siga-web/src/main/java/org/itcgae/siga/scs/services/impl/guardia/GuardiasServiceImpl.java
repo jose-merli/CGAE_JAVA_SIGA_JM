@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.services.impl.guardia;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +31,8 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsGrupoguardia;
 import org.itcgae.siga.db.entities.ScsGrupoguardiaExample;
 import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiado;
@@ -41,6 +44,7 @@ import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupoguardiaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupoguardiacolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
@@ -91,6 +95,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private ScsGrupoguardiacolegiadoExtendsMapper scsGrupoguardiacolegiadoExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
 	@Override
 	public GuardiasDTO searchGuardias(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -99,6 +106,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		GuardiasDTO guardiaDTO = new GuardiasDTO();
+		Error error = new Error();
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -113,16 +123,46 @@ public class GuardiasServiceImpl implements GuardiasService {
 					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
+				
+				LOGGER.info(
+						"searchGuardias() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
+				genParametrosExample.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+						.andParametroEqualTo(SigaConstants.TAM_MAX_CONSULTA_JG)
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				genParametrosExample.setOrderByClause(SigaConstants.C_IDINSTITUCION + " DESC");
+				
+				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+				LOGGER.info(
+						"searchGuardias() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+				
+				if(tamMax != null) {
+					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+				}else {
+					tamMaximo = null;
+				}
+				
 				LOGGER.info("searchGuardias() -> Entrada para obtener las guardias");
 
 				List<GuardiasItem> guardias = scsGuardiasturnoExtendsMapper.searchGuardias(guardiasItem,
-						idInstitucion.toString(), usuarios.get(0).getIdlenguaje());
+						idInstitucion.toString(), usuarios.get(0).getIdlenguaje(), tamMaximo);
 
 				guardias = guardias.stream().map(it -> {
 					it.setTipoDia(("Selección: Labor. " + it.getSeleccionLaborables() + ", Fest. "
 							+ it.getSeleccionFestivos()).replace("null", ""));
 					return it;
 				}).collect(Collectors.toList());
+				
+				if ((guardias != null) && tamMaximo != null && (guardias.size()) > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo
+							+ " resultados, pero se muestran sólo los " + tamMaximo
+							+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					guardiaDTO.setError(error);
+					guardias.remove(guardias.size() - 1);
+				}
 
 				guardiaDTO.setGuardiaItems(guardias);
 

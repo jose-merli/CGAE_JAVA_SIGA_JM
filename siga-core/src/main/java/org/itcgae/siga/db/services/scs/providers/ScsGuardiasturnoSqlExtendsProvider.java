@@ -7,7 +7,7 @@ import org.itcgae.siga.db.mappers.ScsGuardiasturnoSqlProvider;
 
 public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvider {
 
-	public String searchGuardias(GuardiasItem guardiaItem, String idInstitucion, String idLenguaje) {
+	public String searchGuardias(GuardiasItem guardiaItem, String idInstitucion, String idLenguaje, Integer tamMax) {
 		SQL sql = new SQL();
 
 		sql.SELECT("SCS_TURNO.NOMBRE AS turno");
@@ -94,7 +94,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		}
 		// FILTRO POR TURNO
 		if (guardiaItem.getIdTurno() != null && guardiaItem.getIdTurno() != "")
-			sql.WHERE("SCS_GUARDIASTURNO.IDTURNO ='" + guardiaItem.getIdTurno() + "'");
+			sql.WHERE("SCS_GUARDIASTURNO.IDTURNO IN (" + guardiaItem.getIdTurno() + ")");
 
 		// FILTRO POR NOMBRE DE GUARDIA
 		if (guardiaItem.getNombre() != null && guardiaItem.getNombre().trim() != "")
@@ -102,11 +102,11 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		// FILTRO POR AREA
 		if (guardiaItem.getArea() != null && guardiaItem.getArea() != "")
-			sql.WHERE("SCS_AREA.IDAREA = '" + guardiaItem.getArea() + "'");
+			sql.WHERE("SCS_AREA.IDAREA IN (" + guardiaItem.getArea() + ")");
 
 		// FILTRO POR AREA | MATERIA
 		if (guardiaItem.getMateria() != null && guardiaItem.getMateria() != "")
-			sql.WHERE("SCS_MATERIA.IDMATERIA ='" + guardiaItem.getMateria() + "'");
+			sql.WHERE("SCS_MATERIA.IDMATERIA IN (" + guardiaItem.getMateria() + ")");
 
 		// FILTRO POR GRUPOZONA
 		if (guardiaItem.getGrupoZona() != null && guardiaItem.getGrupoZona() != "")
@@ -118,25 +118,30 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		// FILTRO POR JURISDICCION
 		if (guardiaItem.getJurisdiccion() != null && guardiaItem.getJurisdiccion() != "")
-			sql.WHERE("SCS_TURNO.IDJURISDICCION = '" + guardiaItem.getJurisdiccion() + "'");
+			sql.WHERE("SCS_TURNO.IDJURISDICCION IN (" + guardiaItem.getJurisdiccion() + ")");
 
 		// FILTRO POR GRUPOFACTURACION
 		if (guardiaItem.getGrupoFacturacion() != null && guardiaItem.getGrupoFacturacion() != "")
-			sql.WHERE("SCS_TURNO.IDGRUPOFACTURACION = '" + guardiaItem.getGrupoFacturacion() + "'");
+			sql.WHERE("SCS_TURNO.IDGRUPOFACTURACION IN (" + guardiaItem.getGrupoFacturacion() + ")");
 
 		// FILTRO POR PARTIDAPRESUPUESTARIA
 		if (guardiaItem.getPartidaPresupuestaria() != null && guardiaItem.getPartidaPresupuestaria() != "")
-			sql.WHERE("SCS_TURNO.IDPARTIDAPRESUPUESTARIA = '" + guardiaItem.getPartidaPresupuestaria() + "'");
+			sql.WHERE("SCS_TURNO.IDPARTIDAPRESUPUESTARIA IN (" + guardiaItem.getPartidaPresupuestaria() + ")");
 
 		// FILTRO POR TIPOTURNO
 		if (guardiaItem.getTipoTurno() != null && guardiaItem.getTipoTurno() != "")
-			sql.WHERE("SCS_TURNO.IDTIPOTURNO = '" + guardiaItem.getTipoTurno() + "'");
+			sql.WHERE("SCS_TURNO.IDTIPOTURNO IN (" + guardiaItem.getTipoTurno() + ")");
 
 		// FILTRO POR TIPOGUARDIA
 		if (guardiaItem.getTipoGuardia() != null && guardiaItem.getTipoGuardia() != "")
-			sql.WHERE("SCS_GUARDIASTURNO.IDTIPOGUARDIA = " + guardiaItem.getTipoGuardia());
+			sql.WHERE("SCS_GUARDIASTURNO.IDTIPOGUARDIA IN (" + guardiaItem.getTipoGuardia() + ")");
 
 		sql.ORDER_BY("SCS_TURNO.NOMBRE, SCS_GUARDIASTURNO.NOMBRE");
+		
+		if (tamMax != null) {
+			Integer tamMaxNumber = tamMax + 1;
+			sql.WHERE("rownum <= " + tamMaxNumber);
+		}
 
 		return sql.toString();
 	}
