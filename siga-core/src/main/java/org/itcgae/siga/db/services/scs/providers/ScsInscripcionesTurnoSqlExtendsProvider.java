@@ -152,9 +152,6 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			sql.WHERE(condturnos);
 			
 		}
-		if(inscripcionesItem.getIdpersona() != null) {
-			sql.WHERE("(ins.idpersona ='"+inscripcionesItem.getIdpersona()+"')");
-		}
 		if(inscripcionesItem.getNcolegiado() != null) {
 			sql.WHERE("(col.ncolegiado ='"+inscripcionesItem.getNcolegiado()+"')");
 		}
@@ -179,15 +176,18 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				}
 				// Alta
 				else if(estados[i].equals("1")) {
-					condestados+="(ins.fechavalidacion is not null and ins.fechasolicitudbaja is null)" ;
+					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
+							" AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL)" ;
 				}
 				// Pendiente de Baja
 				else if(estados[i].equals("2")) {
-					condestados+="(ins.fechasolicitudbaja is not null and ins.fechabaja is null)" ;
+					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
+							" AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL)" ;
 				}
 				// Baja
 				else if(estados[i].equals("3")) {
-					condestados+="(ins.fechabaja is not null)" ;
+					condestados+="(ins.fechadenegacion IS NULL AND ins.fechabaja IS NOT NULL"
+							+ " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL )" ;
 				}
 				// Denegada
 				else if(estados[i].equals("4")) {
