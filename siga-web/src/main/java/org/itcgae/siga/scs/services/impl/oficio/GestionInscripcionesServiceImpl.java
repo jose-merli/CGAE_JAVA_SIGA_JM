@@ -257,7 +257,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 					InscripcionesTarjetaOficioItem solicitud4 = new InscripcionesTarjetaOficioItem();
 
 					
-						if(inscripcionesItems.get(0).getFechasolicitud() != null) {
+						if(inscripcionesItems.get(0).getFechasolicitud() != null && (inscripcionesItems.get(0).getObservacionessolicitud() != null ||inscripcionesItems.get(0).getObservacionessolicitud().equals(""))) {
 							
 							solicitud.setAccion("Solicitud");
 							solicitud.setObservaciones(inscripcionesItems.get(0).getObservacionessolicitud());
@@ -265,7 +265,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							solicitud.setId("0");
 							inscripcionesHistoricoItems.add(solicitud);
 						}
-						if(inscripcionesItems.get(0).getFechasolicitudbaja() != null) {
+						if(inscripcionesItems.get(0).getFechasolicitudbaja() != null && (inscripcionesItems.get(0).getObservacionesbaja() != null && !inscripcionesItems.get(0).getObservacionesbaja().equals(""))) {
 							solicitud1.setAccion("Solicitud de Baja");
 							solicitud1.setObservaciones(inscripcionesItems.get(0).getObservacionesbaja());
 							solicitud1.setFecha(inscripcionesItems.get(0).getFechasolicitudbaja());
@@ -274,7 +274,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 						}
 						
-						if(inscripcionesItems.get(0).getFechavalidacion() != null) {
+						if(inscripcionesItems.get(0).getFechavalidacion() != null && (inscripcionesItems.get(0).getObservacionesvalidacion() != null && !inscripcionesItems.get(0).getObservacionesvalidacion().equals(""))) {
 							solicitud2.setAccion("Validación de Alta");
 							solicitud2.setObservaciones(inscripcionesItems.get(0).getObservacionesvalidacion());
 							solicitud2.setFecha(inscripcionesItems.get(0).getFechavalidacion());
@@ -283,7 +283,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 						}
 						
-						if(inscripcionesItems.get(0).getFechadenegacion() != null) {
+						if(inscripcionesItems.get(0).getFechadenegacion() != null && (inscripcionesItems.get(0).getObservacionesdenegacion() != null && !inscripcionesItems.get(0).getObservacionesdenegacion().equals(""))) {
 							solicitud3.setAccion("Denegación");
 							solicitud3.setObservaciones(inscripcionesItems.get(0).getObservacionesdenegacion());
 							solicitud3.setFecha(inscripcionesItems.get(0).getFechadenegacion());
@@ -292,7 +292,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 						}
 						
-						if(inscripcionesItems.get(0).getFechabaja() != null) {
+						if(inscripcionesItems.get(0).getFechabaja() != null && (inscripcionesItems.get(0).getObservacionesvalbaja() != null && !inscripcionesItems.get(0).getObservacionesvalbaja().equals(""))) {
 							solicitud4.setAccion("Validación Baja");
 							solicitud4.setObservaciones(inscripcionesItems.get(0).getObservacionesvalbaja());
 							solicitud4.setFecha(inscripcionesItems.get(0).getFechabaja());
@@ -302,7 +302,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						}
 						Collections.sort(inscripcionesHistoricoItems, new Comparator<InscripcionesTarjetaOficioItem>() {
 						    public int compare(InscripcionesTarjetaOficioItem m1, InscripcionesTarjetaOficioItem m2) {
-						        return m1.getId().compareTo(m2.getId());
+						        return m2.getFecha().compareTo(m1.getFecha());
 						    }
 						});
 					inscripcionesDTO.setInscripcionesTarjetaItems(inscripcionesHistoricoItems);
