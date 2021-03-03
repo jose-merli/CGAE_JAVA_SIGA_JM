@@ -463,7 +463,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 	@Override
 	public UpdateResponseDTO updateConfiguracion(TurnosItem turnosItem, HttpServletRequest request) {
-		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
+		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de configuracion de turnos");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();

@@ -575,4 +575,23 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 		return sql.toString();
 
 	}
+	
+	
+	public String comboTurnosBusqueda(Short idInstitucion, String pantalla) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDTURNO, NOMBRE");
+		sql.FROM("SCS_TURNO");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"'");
+		sql.WHERE("FECHABAJA IS NULL");
+		
+		if("EJG".equalsIgnoreCase(pantalla)) {
+			sql.WHERE("IDTIPOTURNO <> 2 AND IDTIPOTURNO IS NOT NULL");
+		}
+		
+		sql.ORDER_BY("NOMBRE");
+		
+		return sql.toString();
+	}
 }

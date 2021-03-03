@@ -208,4 +208,11 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper{
 			@Result(column = "NOMBREGUARDIA", property = "nombreguardia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
 	    List<TurnosItem> busquedaColaGuardia(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
+	 
+	 @SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "comboTurnosBusqueda")
+	    @Results({
+	    	@Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),
+	    	@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
+	    })
+	 List<ComboItem> comboTurnosBusqueda(Short idInstitucion, String pantalla);
 }
