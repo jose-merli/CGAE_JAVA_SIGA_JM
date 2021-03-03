@@ -22,7 +22,7 @@ public class SaltosCompGuardiasController {
 	SaltosCompGuardiasService saltosCompGuardiasService;
 
 	@PostMapping(value = "/busquedaSaltosCompG/searchSaltosYCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<SaltoCompGuardiaDTO> searchSaltosYCompensaciones(@RequestBody SaltoCompGuardiaItem saltoItem, HttpServletRequest request){
+	public ResponseEntity<SaltoCompGuardiaDTO> searchSaltosYCompensaciones(@RequestBody SaltoCompGuardiaItem saltoItem, HttpServletRequest request){
 		SaltoCompGuardiaDTO response= saltosCompGuardiasService.searchSaltosYCompensaciones(saltoItem,request);
 		return new ResponseEntity<SaltoCompGuardiaDTO>(response, HttpStatus.OK);
 	}

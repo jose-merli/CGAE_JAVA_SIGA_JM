@@ -42,7 +42,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 					"			FROM\r\n" + 
 					"				SCS_GRUPOGUARDIA ))\r\n" + 
 					"	WHERE\r\n" + 
-					"		COLEGIADO = "+salto.getColegiadoGrupo()+") ");
+					"		COLEGIADO = "+salto.getColegiadoGrupo()+") ) ) ");
 		
 		
 		
@@ -107,7 +107,8 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 						+ " AND IDINSTITUCION ="+idInstitucion+"\r\n" + 
 						"	AND IDTURNO = "+salto.getIdTurno()+"\r\n" + 
 						"	AND IDGUARDIA = "+salto.getIdGuardia()+"\r\n" + 
-						"	AND IDGUARDIA IS NOT NULL " + salto.getFechaUso()+" "+salto.getSaltoCompensacion());
+						"	AND IDGUARDIA IS NOT NULL");
+		sql.ORDER_BY("FECHA DESC, IDSALTOSTURNO DESC");
 		
 		return sql.toString();
 	}
