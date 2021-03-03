@@ -217,6 +217,7 @@ public class EjgController {
 	}
 
 	// busquedaColegiadoEJG
+	@RequestMapping(value = "/busquedaColegiadoEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ColegiadosSJCSDTO> busquedaColegiadoEJG(@RequestBody ColegiadosSJCSItem datos,
 			HttpServletRequest request) {
 		ColegiadosSJCSDTO response = busquedaEJG.busquedaColegiadoEJG(datos, request);
