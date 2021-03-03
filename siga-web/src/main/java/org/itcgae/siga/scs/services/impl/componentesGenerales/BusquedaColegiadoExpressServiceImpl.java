@@ -7,10 +7,17 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.ColegiadoJGDTO;
 import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.componentesGenerales.IBusquedaColegiadosExpressService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +33,12 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 	
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+	
+	@Autowired
+	private ScsTurnosExtendsMapper scsTurnosextendsMapper;
+	
+	@Autowired
+	private ScsEjgExtendsMapper scsEjgExtendsMapper;
 
 	public ColegiadoJGDTO busquedaColegiadosExpress(String colegiadoJGItem, HttpServletRequest request) {
 		
@@ -63,5 +76,91 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 		
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
 		return colegiadoJGDTO;
+	}
+	
+	@Override
+	public ColegiadosSJCSDTO busquedaColegiadoEJG(ColegiadosSJCSItem datos, HttpServletRequest request) {
+		ColegiadosSJCSDTO responsedto = new ColegiadosSJCSDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		Error error = new Error();
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug(
+					"BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Entrada para obtener los datos del colegiado segun los filtros");
+
+				try {
+					responsedto.setColegiadosSJCSItem(
+							scsEjgExtendsMapper.busquedaColegiadoEJG(datos, usuarios.get(0).getIdlenguaje()));
+				} catch (Exception e) {
+					LOGGER.error(
+							"BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Se ha producido un error al tratar de obtener los datos del colegiado. ",
+							e);
+
+					error.setCode(500);
+					error.setDescription("Error al obtener los datos.");
+					error.setMessage(e.getMessage());
+
+					responsedto.setError(error);
+				}
+			}
+		}
+		return responsedto;
+	}
+
+	@Override
+	public ComboDTO comboTurnos(String pantalla, HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"BusquedaEJGServiceImpl.comboTurnos() -> Entrada al servicio para obtener los turnos. Viene desde "
+								+ pantalla);
+
+				if (pantalla != null && !pantalla.isEmpty()) {
+					comboItems = scsTurnosextendsMapper.comboTurnosBusqueda(idInstitucion, pantalla);
+				}
+
+				LOGGER.info(
+						"BusquedaEJGServiceImpl.comboTurnos()-> Salida del servicio para obtener los datos del combo");
+
+				if (comboItems != null) {
+					comboDTO.setCombooItems(comboItems);
+				}
+			}
+		}
+		LOGGER.info("cBusquedaEJGServiceImpl.comboTurnos() -> Salida del servicio para obtener los turnos");
+		return comboDTO;
 	}
 }

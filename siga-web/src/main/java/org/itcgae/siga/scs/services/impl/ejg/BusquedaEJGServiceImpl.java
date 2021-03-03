@@ -10,8 +10,6 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -742,81 +740,6 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 			}
 		}
 		LOGGER.info("comboTurnosTipo() -> Salida del servicio para obtener los tipos ejg");
-		return comboDTO;
-	}
-
-	@Override
-	public ColegiadosSJCSDTO busquedaColegiadoEJG(ColegiadosSJCSItem datos, HttpServletRequest request) {
-		ColegiadosSJCSDTO responsedto = new ColegiadosSJCSDTO();
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		Error error = new Error();
-
-		if (idInstitucion != null) {
-			LOGGER.debug("BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Entrada para obtener información del usuario logeado");
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.debug("BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Salida de obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug("BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Entrada para obtener los datos del colegiado segun los filtros");
-				
-				try {
-					responsedto.setColegiadosSJCSItem(scsEjgExtendsMapper.busquedaColegiadoEJG(datos, usuarios.get(0).getIdlenguaje()));
-				} catch (Exception e) {
-					LOGGER.error("BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Se ha producido un error al tratar de obtener los datos del colegiado. ",	e);
-
-					error.setCode(500);
-					error.setDescription("Error al obtener los datos.");
-					error.setMessage(e.getMessage());
-
-					responsedto.setError(error);
-				}
-			}
-		}
-		return responsedto;
-	}
-	
-	@Override
-	public ComboDTO comboTurnos(String pantalla, HttpServletRequest request) {
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = null;
-
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info("comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-
-				LOGGER.info("BusquedaEJGServiceImpl.comboTurnos() -> Entrada al servicio para obtener los turnos. Viene desde "+pantalla);
-
-				if(pantalla!=null && !pantalla.isEmpty()) {
-					comboItems = scsTurnosextendsMapper.comboTurnosBusqueda(idInstitucion, pantalla);
-				}
-
-				LOGGER.info("BusquedaEJGServiceImpl.comboTurnos()-> Salida del servicio para obtener los datos del combo");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
-			}
-		}
-		LOGGER.info("cBusquedaEJGServiceImpl.comboTurnos() -> Salida del servicio para obtener los turnos");
 		return comboDTO;
 	}
 }

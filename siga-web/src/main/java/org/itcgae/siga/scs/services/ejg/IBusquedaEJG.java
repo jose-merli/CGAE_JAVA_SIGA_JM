@@ -3,8 +3,6 @@ package org.itcgae.siga.scs.services.ejg;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 
@@ -39,8 +37,4 @@ public interface IBusquedaEJG {
 	ComboDTO comboPonente(HttpServletRequest request);
 
 	ComboDTO comboTurnosTipo(HttpServletRequest request, String idtipoturno);
-
-	ColegiadosSJCSDTO busquedaColegiadoEJG(ColegiadosSJCSItem datos, HttpServletRequest request);
-	
-	ComboDTO comboTurnos(String pantalla, HttpServletRequest request);
 }

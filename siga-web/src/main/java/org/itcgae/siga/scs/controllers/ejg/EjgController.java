@@ -7,8 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
@@ -214,21 +212,6 @@ public class EjgController {
 	ResponseEntity<UpdateResponseDTO> guardarDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.guardarDatosGenerales(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-	}
-
-	// busquedaColegiadoEJG
-	@RequestMapping(value = "/busquedaColegiadoEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ColegiadosSJCSDTO> busquedaColegiadoEJG(@RequestBody ColegiadosSJCSItem datos,
-			HttpServletRequest request) {
-		ColegiadosSJCSDTO response = busquedaEJG.busquedaColegiadoEJG(datos, request);
-		return new ResponseEntity<ColegiadosSJCSDTO>(response, HttpStatus.OK);
-	}
-
-	// combo para los turnos en la busqueda de colegiadoEJG
-	@RequestMapping(value = "/busquedaColegiadoEJG/comboTurnos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboTurnos(String pantalla, HttpServletRequest request) {
-		ComboDTO response = busquedaEJG.comboTurnos(pantalla, request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
 	// añadirRemesa

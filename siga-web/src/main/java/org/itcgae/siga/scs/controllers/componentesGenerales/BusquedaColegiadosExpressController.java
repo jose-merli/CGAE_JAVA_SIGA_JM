@@ -2,8 +2,10 @@ package org.itcgae.siga.scs.controllers.componentesGenerales;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ColegiadoJGDTO;
-import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.scs.services.componentesGenerales.IBusquedaColegiadosExpressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,9 +22,25 @@ public class BusquedaColegiadosExpressController {
 	
 	@Autowired
 	private IBusquedaColegiadosExpressService busquedaColegiadosExpressService;
+	
 	@RequestMapping(value = "/componenteGeneralJG/busquedaColegiado",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ColegiadoJGDTO> busquedaColegiadosExpress(@RequestParam("colegiadoJGItem") String colegiadoJGItem, HttpServletRequest request) {
 		ColegiadoJGDTO response = busquedaColegiadosExpressService.busquedaColegiadosExpress(colegiadoJGItem, request);
 		return new ResponseEntity<ColegiadoJGDTO>(response, HttpStatus.OK);
 	}
+	
+	// busquedaColegiadoEJG
+		@RequestMapping(value = "/componenteGeneralJG/busquedaColegiadoEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<ColegiadosSJCSDTO> busquedaColegiadoEJG(@RequestBody ColegiadosSJCSItem datos,
+				HttpServletRequest request) {
+			ColegiadosSJCSDTO response = busquedaColegiadosExpressService.busquedaColegiadoEJG(datos, request);
+			return new ResponseEntity<ColegiadosSJCSDTO>(response, HttpStatus.OK);
+		}
+
+		// combo para los turnos en la busqueda de colegiadoEJG
+		@RequestMapping(value = "/componenteGeneralJG/comboTurnos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<ComboDTO> comboTurnos(String pantalla, HttpServletRequest request) {
+			ComboDTO response = busquedaColegiadosExpressService.comboTurnos(pantalla, request);
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		}
 }
