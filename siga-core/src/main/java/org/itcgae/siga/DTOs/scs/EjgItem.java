@@ -99,7 +99,6 @@ public class EjgItem {
 	private Date fechaEstadoNew;
 	private String estadoNew;
 	
-	private boolean nuevoEJG;
 
 	/**
 	 **/
@@ -1428,22 +1427,5 @@ public class EjgItem {
 
 	public void seteEstadoNew(String estadoNew) {
 		this.estadoNew = estadoNew;
-	}
-	
-	/**
-	 * 
-	 */
-	public EjgItem nuevoEJG(boolean nuevoEJG) {
-		this.nuevoEJG = nuevoEJG;
-		return this;
-	}
-
-	@JsonProperty("nuevoEJG")
-	public boolean getNuevoEJG() {
-		return nuevoEJG;
-	}
-
-	public void setNuevoEJG(boolean nuevoEJG) {
-		this.nuevoEJG = nuevoEJG;
 	}
 }

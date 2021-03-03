@@ -207,10 +207,17 @@ public class EjgController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
-	// guardarDatosGenerales
-	@RequestMapping(value = "/gestion-ejg/guardarDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.guardarDatosGenerales(datos, request);
+	//insertaDatosGenerales
+	@RequestMapping(value = "/gestion-ejg/insertaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> insertaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
+		InsertResponseDTO response = gestionEJG.insertaDatosGenerales(datos, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	//actualizaDatosGenerales
+	@RequestMapping(value = "/gestion-ejg/actualizaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> actualizaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionEJG.actualizaDatosGenerales(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
