@@ -30,17 +30,16 @@ public class BusquedaColegiadosExpressController {
 	}
 	
 	// busquedaColegiadoEJG
-		@RequestMapping(value = "/componenteGeneralJG/busquedaColegiadoEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<ColegiadosSJCSDTO> busquedaColegiadoEJG(@RequestBody ColegiadosSJCSItem datos,
-				HttpServletRequest request) {
-			ColegiadosSJCSDTO response = busquedaColegiadosExpressService.busquedaColegiadoEJG(datos, request);
-			return new ResponseEntity<ColegiadosSJCSDTO>(response, HttpStatus.OK);
-		}
+	@RequestMapping(value = "/componenteGeneralJG/busquedaColegiadoEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ColegiadosSJCSDTO> busquedaColegiadoEJG(@RequestBody ColegiadosSJCSItem datos, HttpServletRequest request) {
+		ColegiadosSJCSDTO response = busquedaColegiadosExpressService.busquedaColegiadoEJG(datos, request);
+		return new ResponseEntity<ColegiadosSJCSDTO>(response, HttpStatus.OK);
+	}
 
-		// combo para los turnos en la busqueda de colegiadoEJG
-		@RequestMapping(value = "/componenteGeneralJG/comboTurnos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<ComboDTO> comboTurnos(String pantalla, HttpServletRequest request) {
-			ComboDTO response = busquedaColegiadosExpressService.comboTurnos(pantalla, request);
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-		}
+	// combo para los turnos en la busqueda de colegiadoEJG
+	@RequestMapping(value = "/componenteGeneralJG/comboTurnos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboTurnos(String pantalla, HttpServletRequest request) {
+		ComboDTO response = busquedaColegiadosExpressService.comboTurnos(pantalla, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 }
