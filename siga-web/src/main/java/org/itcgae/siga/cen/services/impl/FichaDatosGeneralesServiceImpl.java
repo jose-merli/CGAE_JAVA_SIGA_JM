@@ -865,6 +865,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					comboEtiquetasItem.setColor("#f70000");
 				}
 			}
+			
+			if(comboEtiquetasItem.getLabel().contains("#")) {
+				comboEtiquetasItem.setLabel(comboEtiquetasItem.getLabel().split("#")[0]);
+			}
 		}
 
 		comboEtiquetasDTO.setComboEtiquetasItems(comboEtiquetasItems);
