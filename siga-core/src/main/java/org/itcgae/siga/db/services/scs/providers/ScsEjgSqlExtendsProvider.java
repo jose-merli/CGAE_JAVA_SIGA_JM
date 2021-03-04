@@ -787,4 +787,16 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String getNumeroEJG(short idTipoEJG, short anio, short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("NVL(MAX(NUMERO) +1,1)");
+		sql.FROM("SCS_EJG");
+		sql.WHERE("IDINSTITUCION = "+idInstitucion);
+		sql.WHERE("ANIO = "+anio);
+		sql.WHERE("IDTIPOEJG = "+idTipoEJG);
+		
+		return sql.toString();
+	}
 }

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class EjgItem {
 	private String idEJG;
 	private String colegio;
+	private String idInstitucion;
 	private String annio;
 	private String numero;
 	private String numEjg;
@@ -1427,5 +1428,22 @@ public class EjgItem {
 
 	public void seteEstadoNew(String estadoNew) {
 		this.estadoNew = estadoNew;
+	}
+	
+
+	/**
+	 **/
+	public EjgItem idInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+		return this;
+	}
+
+	@JsonProperty("idInstitucion")
+	public String getidInstitucion() {
+		return idInstitucion;
+	}
+
+	public void seteidInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 }

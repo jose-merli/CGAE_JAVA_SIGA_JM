@@ -794,7 +794,35 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				try{
 					record = setDatosGeneralesEJG(datos);
 					
-					//response = scsEjgMapper.insertSelective(record);
+					//AGREGAMOS DATOS QUE FALTAN EN EL RECORD
+					
+					//longitud maxima para num ejg
+					GenParametrosExample genParametrosExample = new GenParametrosExample();
+					genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
+							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+					genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+					
+
+					List<GenParametros> listParam= genParametrosExtendsMapper.selectByExample(genParametrosExample);
+					
+					String longitudEJG = listParam.get(0).getValor();
+					
+					//numejg
+					
+					String numero = scsEjgExtendsMapper.getNumeroEJG(record.getIdtipoejg(), record.getAnio(), record.getIdinstitucion());
+					
+					int numCeros = Integer.parseInt(longitudEJG) - numero.length();
+					
+					String numEJG ="";
+					for(int i=0; i<numCeros; i++) {
+						numEJG += "0";
+					}
+					
+					numEJG+=numero;
+					
+					record.setNumejg(numEJG);
+					
+					response = scsEjgMapper.insertSelective(record);
 				} catch (Exception e) {
 					
 				} finally {
@@ -817,12 +845,84 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return responsedto;
 	}
 	
+	/**
+	 * metodo para settear los datos del objeto para el insert o update
+	 * @param item
+	 * @return
+	 */
 	private ScsEjgWithBLOBs setDatosGeneralesEJG(EjgItem item) {
 		ScsEjgWithBLOBs result = new ScsEjgWithBLOBs();
+		
+		
+		if(item.getidInstitucion()!=null) {
+			result.setIdinstitucion(Short.parseShort(item.getidInstitucion()));
+		}
+		
+		if(item.getFechaApertura()!=null) {
+			result.setFechaapertura(item.getFechaApertura());
+		}
 		
 		if(item.getAnnio()!=null) {
 			result.setAnio(Short.parseShort(item.getAnnio()));
 		}
+		
+		if(item.getNumero()!=null) {
+			result.setNumero(Long.parseLong(item.getNumEjg()));
+		}
+		
+		if(item.getFechapresentacion()!=null) {
+			result.setFechapresentacion(item.getFechapresentacion());
+		}
+		
+		if(item.getFechalimitepresentacion()!=null) {
+			result.setFechalimitepresentacion(item.getFechalimitepresentacion());
+		}
+		
+		//ver si id o nombre de estado ¿situacion?
+		if(item.getEstadoEJG()!=null) {
+			result.setIdsituacion(Short.parseShort(item.getEstadoEJG()));
+		}
+		
+		//tenemos q ver si devuleve id o nombre de tipo ejg
+		if(item.getTipoEJG()!=null) {
+			
+			result.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
+		}
+		
+		if(item.getTipoEJGColegio()!=null) {
+			result.setIdtipoejgcolegio(Short.parseShort(item.getTipoEJGColegio()));
+		}
+		
+		//PRETENSIONES FALTA POR HACER
+//		if(item.getPr!=null) {
+//			result.set.setPr();
+//		}
+		
+//		if(item.getAnioexpediente()!=null) {
+//			result.setAn(Short.parseShort(item.getAnioexpediente()));
+//		}
+//		
+//		if(item.getNumeroexpediente()!=null) {
+//			result.setNum(Short.parseShort(item.getNumeroexpediente()));
+//		}
+//		
+//
+//		if(item.getTurno()!=null) {
+//			result.setTu(Short.parseShort(item.getTurno()));
+//		}
+//		
+//		if(item.getGuardia()!=null) {
+//			result.setGuardiaturnoIdguardia(item.getGuardia());
+//		}
+//		
+//		if(item.getNumColegiado()!=null) {
+//			result.setNum(Short.parseShort(item.getNumColegiado()));
+//		}
+//		
+//		if(item.getNumeroexpediente()!=null) {
+//			result.setNum(Short.parseShort(item.getNumeroexpediente()));
+//		}
+		
 		
 		return result;
 	}

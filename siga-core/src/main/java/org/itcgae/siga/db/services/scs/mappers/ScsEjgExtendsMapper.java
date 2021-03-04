@@ -169,5 +169,8 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		 @Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),		 
 	})
 	List<ColegiadosSJCSItem> busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getNumeroEJG")
+	String getNumeroEJG(short idTipoEJG, short anio, short idInstitucion);
 }
 
