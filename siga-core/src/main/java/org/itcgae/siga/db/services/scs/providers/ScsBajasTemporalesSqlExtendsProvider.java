@@ -9,7 +9,7 @@ import org.itcgae.siga.db.mappers.ScsInscripcionturnoSqlProvider;
 public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlProvider {
 
 
-	public String busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Short idInstitucion,String fechadesde,String fechahasta) {
+	public String busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Short idInstitucion,String fechadesde,String fechahasta, String estado) {
 
 		SQL sql = new SQL();
 		sql.SELECT("DISTINCT\r\n" + 

@@ -84,7 +84,6 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 					}
 				}
-				
 
 				bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion, fechadesde, fechahasta);
 
