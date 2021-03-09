@@ -821,20 +821,19 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					numEJG+=numero;
 					
 					record.setNumejg(numEJG);
+					record.setNumero(Long.parseLong(numero));
 					
 					response = scsEjgMapper.insertSelective(record);
 				} catch (Exception e) {
-					
+					LOGGER.error("GestionEJGServiceImpl.insertaDatosGenerales(). ERROR: al hacer el insert de datos generales. ", e);
 				} finally {
 					// respuesta si se actualiza correctamente
 					if (response >= 1) {
 						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug(
-								"GestionEJGServiceImpl.insertaDatosGenerales() -> OK. Datos generales insertados");
+						LOGGER.debug("GestionEJGServiceImpl.insertaDatosGenerales() -> OK. Datos generales insertados");
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.insertaDatosGenerales() -> KO. No se ha insertado los datos generales");
+						LOGGER.error("GestionEJGServiceImpl.insertaDatosGenerales() -> KO. No se ha insertado los datos generales");
 					}
 				}
 			}
