@@ -767,6 +767,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return responsedto;
 	}
 
+	
+	
 	@Override
 	@Transactional
 	public InsertResponseDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request) {
@@ -843,7 +845,82 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return responsedto;
 	}
-	
+/*
+	@Override
+	@Transactional
+	public UpdateResponseDTO actualizaDatosGenerales(EjgItem datos, HttpServletRequest request) {
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+
+		ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.actualizaDatosGenerales() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug(
+					"GestionEJGServiceImpl.actualizaDatosGenerales() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.actualizaDatosGenerales() -> Entrada para actualizar los datos generales del ejg");
+
+				try {
+					for (int i = 0; datos.si > i; i++) {
+						response = 0;
+
+						// creamos el objeto para el update
+						record.setIdinstitucion(idInstitucion);
+						record.setFechaapertura(datos.getFechaApertura());
+						record.setAnio(Short.parseShort(datos.getAnnio()));
+						record.setNumero(Long.parseLong(datos.getNumero()));
+						
+						//Comprobar si estos 2 son las fechas de presentacion
+						record.setFechapresentacion(datos.getFechapresentacion());
+						record.setFechalimitepresentacion(datos.getFechalimitepresentacion());
+						//Falta el tipo de estado
+						record.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+						record.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
+						//Falta las prestaciones
+						//Falta el expediente
+
+						//response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
+					}
+
+					LOGGER.debug(
+							"GestionEJGServiceImpl.actualizaDatosGenerales() -> Salida del servicio para actualizar los datos generales del ejg");
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.actualizaDatosGenerales() -> Se ha producido un error al actualizar los datos generales del ejg",
+							e);
+				} finally {
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug(
+								"GestionEJGServiceImpl.actualizaDatosGenerales() -> OK. Datos Generales actualizados para el ejg");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"GestionEJGServiceImpl.actualizaDatosGenerales() -> KO. No se ha actualizado ningún dato general del ejg");
+					}
+				}
+			}
+		}
+
+		LOGGER.info("GestionEJGServiceImpl.actualizaDatosGenerales() -> Salida del servicio.");
+
+		return responsedto;
+	}*/
 	/**
 	 * metodo para settear los datos del objeto para el insert o update
 	 * @param item
@@ -1504,12 +1581,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio.");
 
 		return responsedto;
-	}
-
-	@Override
-	public UpdateResponseDTO actualizaDatosGenerales(EjgItem datos, HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
