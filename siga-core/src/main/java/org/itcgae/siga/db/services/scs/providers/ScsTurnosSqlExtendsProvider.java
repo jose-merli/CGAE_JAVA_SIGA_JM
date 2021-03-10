@@ -1,11 +1,20 @@
 package org.itcgae.siga.db.services.scs.providers;
 
-import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
-import org.itcgae.siga.db.mappers.ScsTipoactuacionSqlProvider;
-import org.itcgae.siga.db.mappers.ScsTurnoSqlProvider;
+import java.sql.SQLException;
+import java.util.List;
 
+import org.apache.ibatis.jdbc.SQL;
+import org.apache.ibatis.session.SqlSession;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.db.mappers.ScsTurnoSqlProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
 public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
+	
+	@Autowired
+	private SqlSession sqlSession;
 
 	public String comboTurnos(Short idInstitucion) {
 
@@ -262,7 +271,7 @@ public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String bus
 				"UNION ALL\r\n" + 
 				"SELECT * FROM (SELECT tabla_nueva.* FROM tabla_nueva, tabla_nueva2\r\n" + 
 				"WHERE tabla_nueva.orden<=tabla_nueva2.orden ORDER BY tabla_nueva.orden asc)\r\n" + 
-				") consulta_total");
+				") consulta_total ");
 		
 		
 		if(turnosItem.getIdpersonaUltimo() != null) {
@@ -284,6 +293,15 @@ public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String bus
 		sql2.FROM("("+sql3.toString());	
 		
 		sql.SELECT("ROWNUM AS  orden_cola,consulta_total.* from(WITH tabla_nueva AS ("+sql2.toString());
+		
+//		try {
+//			sqlSession.getConnection();
+//			List<TurnosItem> turno =  (List<TurnosItem>) sqlSession.getConnection().prepareStatement(sql.toString()).executeQuery();
+//			
+//		} catch (SQLException e) {
+//			System.out.println(e.getMessage());
+//		}
+		
 		return sql.toString();
 		
 	}
