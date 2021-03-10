@@ -70,5 +70,7 @@ public interface IMenuService {
 	public StringDTO getTokenOldSiga(HttpServletRequest request);
 	
 	public UpdateResponseDTO eliminaCookie(HttpServletRequest request);
+	
+	public StringDTO showMockups(HttpServletRequest request);
 
 }

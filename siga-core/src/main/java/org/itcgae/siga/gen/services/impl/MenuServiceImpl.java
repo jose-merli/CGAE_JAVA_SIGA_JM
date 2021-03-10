@@ -1328,5 +1328,27 @@ public class MenuServiceImpl implements IMenuService {
 		response.setStatus(SigaConstants.OK);
 		return response;
 	}
+	
+	@Override
+	public StringDTO showMockups(HttpServletRequest request) {
+
+		StringDTO response = new StringDTO();
+
+		LOGGER.debug("Inicio de showMockups()");
+
+		GenPropertiesExample propertiesExample = new GenPropertiesExample();
+		propertiesExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("showMockups");
+		List<GenProperties> prop = genPropertiesMapper.selectByExample(propertiesExample);
+
+		if (!prop.isEmpty()) {
+			response.setValor(prop.get(0).getValor());
+		} else {
+			response.setValor("false");
+		}
+
+		LOGGER.debug("showMockups --> " + response);
+
+		return response;
+	}
 
 }
