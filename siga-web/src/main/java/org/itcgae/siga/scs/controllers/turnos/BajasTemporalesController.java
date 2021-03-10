@@ -43,6 +43,15 @@ public class BajasTemporalesController {
 		BajasTemporalesDTO response = bajasTemporalesService.busquedaBajasTemporales(bajasTemporalesItem, request);
 		return new ResponseEntity<BajasTemporalesDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/bajasTemporales/updateDenegar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateDenegar(@RequestBody BajasTemporalesDTO bajasTemporalesDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = bajasTemporalesService.updateDenegar(bajasTemporalesDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }
  

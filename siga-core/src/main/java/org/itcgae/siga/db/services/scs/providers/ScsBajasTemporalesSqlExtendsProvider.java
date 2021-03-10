@@ -31,6 +31,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 				"    INNER JOIN cen_persona per ON per.idpersona = col.idpersona");
 		sql.WHERE("TO_CHAR(bt.fechabt,'YYYY') >= TO_CHAR(bt.fechabt,'YYYY') - 2");
 		sql.WHERE("bt.idinstitucion = '"+idInstitucion+"'");
+
 		if(bajasTemporalesItem.getValidado() != null) {
 			sql.WHERE("bt.validado = '"+bajasTemporalesItem.getValidado()+"'");
 		}
@@ -43,9 +44,11 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		if(bajasTemporalesItem.getIdpersona() != null) {
 			sql.WHERE("bt.idpersona = '"+bajasTemporalesItem.getIdpersona()+"'");
 		}
+		
+		if(bajasTemporalesItem.getNcolegiado() != null || !bajasTemporalesItem.getNcolegiado().trim().isEmpty()) {
+			sql.WHERE("(col.ncolegiado = '"+bajasTemporalesItem.getNcolegiado()+"' OR col.ncomunitario = '"+bajasTemporalesItem.getNcolegiado()+"')");
+		}
 			
 		return sql.toString();
 	}
-	
-	
 }

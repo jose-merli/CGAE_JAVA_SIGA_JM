@@ -8,11 +8,21 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesDTO;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenBajastemporales;
+import org.itcgae.siga.db.entities.CenBajastemporalesExample;
+import org.itcgae.siga.db.entities.CenBajastemporalesKey;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.ScsInscripcionturno;
+import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
 import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -22,6 +32,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsOrdenacionColasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsBajasTemporalesSqlExtendsProvider;
 import org.itcgae.siga.scs.services.impl.maestros.FichaPartidasJudicialesServiceImpl;
 import org.itcgae.siga.scs.services.oficio.IGestionBajasTemporalesService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -31,7 +42,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporalesService {
 
-	private Logger LOGGER = Logger.getLogger(FichaPartidasJudicialesServiceImpl.class);
+	private Logger LOGGER = Logger.getLogger(GestionBajasTemporalesServiceImpl.class);
 
 	@Autowired
 	private ScsInscripcionesTurnoExtendsMapper scsInscripcionturnoExtendsMapper;
@@ -85,7 +96,6 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 					}
 				}
 				
-
 				bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion, fechadesde, fechahasta);
 
 				LOGGER.info(
@@ -100,5 +110,200 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
 		return bajasTemporalesDTO;
 	}
+	
+
+	@Override
+	public UpdateResponseDTO updateAnular(BajasTemporalesDTO bajasTemporales, HttpServletRequest request) {
+		LOGGER.info("updateAnular() ->  Entrada al servicio para anular bajas temporales");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateAnular() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateAnular() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					
+
+				}catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha modificado la baja temporal");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else if (response == 1 && existentes != 0) {
+					error.setCode(200);
+					error.setDescription(
+							"Se han modificiado la baja temporal excepto algunos que tiene las mismas características");
+
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la baja temporal correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateAnular() -> Salida del servicio para anular bajas temporales");
+
+			}
+
+		}
+
+		return updateResponseDTO;
+	}
+	
+
+	@Override
+	public UpdateResponseDTO updateValidar(BajasTemporalesDTO bajasTemporales, HttpServletRequest request) {
+		LOGGER.info("updateValidar() ->  Entrada al servicio para validar bajas temporales");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateValidar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateValidar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					
+
+				}catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha modificado la baja temporal");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else if (response == 1 && existentes != 0) {
+					error.setCode(200);
+					error.setDescription(
+							"Se han modificiado la baja temporal excepto algunos que tiene las mismas características");
+
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la baja temporal correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateValidar() -> Salida del servicio para validar bajas temporales");
+
+			}
+
+		}
+
+		return updateResponseDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO updateDenegar(BajasTemporalesDTO bajasTemporales, HttpServletRequest request) {
+		LOGGER.info("updateDenegar() ->  Entrada al servicio para denegar bajas temporales");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateDenegar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateDenegar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					
+
+				}catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha modificado la baja temporal");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else if (response == 1 && existentes != 0) {
+					error.setCode(200);
+					error.setDescription(
+							"Se han modificiado la baja temporal excepto algunos que tiene las mismas características");
+
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la baja temporal correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateDenegar() -> Salida del servicio para denegar bajas temporales");
+
+			}
+
+		}
+
+		return updateResponseDTO;
+	}
+	
 	
 }
