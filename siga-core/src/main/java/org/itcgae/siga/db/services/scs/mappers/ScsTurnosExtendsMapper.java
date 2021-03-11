@@ -136,36 +136,27 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper{
 		NewIdDTO getIdOrdenacion(Short idInstitucion);
 	 
 	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="busquedaColaOficio")
-	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
-			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR, id = true),
-			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "GUARDIAS", property = "guardias", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "VALIDARJUSTIFICACIONES", property = "validarjustificaciones", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "DESIGNADIRECTA", property = "designadirecta", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "VALIDARINSCRIPCIONES", property = "validarinscripciones", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDAREA", property = "idarea", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "IDMATERIA", property = "idmateria", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "IDZONA", property = "idzona", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "IDORDENACIONCOLAS", property = "idordenacioncolas", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "IDGRUPOFACTURACION", property = "idgrupofacturacion", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
-			@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "IDSUBZONA", property = "idsubzona", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idpartidapresupuestaria", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "REQUISITOS", property = "requisitos", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPERSONA_ULTIMO", property = "idpersonaUltimo", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ACTIVARRETRICCIONACREDIT", property = "activarretriccionacredit", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "LETRADOASISTENCIAS", property = "letradoasistencias", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "LETRADOACTUACIONES", property = "letradoactuaciones", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "CODIGOEXT", property = "codigoext", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHASOLICITUD_ULTIMO", property = "fechasolicitudUltimo", jdbcType = JdbcType.TIMESTAMP),
-			@Result(column = "VISIBILIDAD", property = "visibilidad", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDTIPOTURNO", property = "idtipoturno", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "VISIBLEMOVIL", property = "visiblemovil", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
+	 @Results({ 
+		 	@Result(column = "AUX", property = "idmateria", jdbcType = JdbcType.DECIMAL),
+		 	@Result(column = "ORDEN_COLA", property = "orden", jdbcType = JdbcType.DECIMAL),
+		 	@Result(column = "ORDEN", property = "idzona", jdbcType = JdbcType.DECIMAL),
+		 	@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.DECIMAL) ,
+			@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "FECHABAJAPERSONA", property = "fechabajapersona", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "FECHASOLICITUD", property = "fechasolicitud", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "NIFCIF", property = "nifcif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREPERSONA", property = "nombrepersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ALFABETICOAPELLIDOS", property = "alfabeticoapellidos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROCOLEGIADO", property = "numerocolegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHANACIMIENTO", property = "fechanacimiento", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "ANTIGUEDADCOLA", property = "antiguedadcola", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "SALTOS", property = "saltos", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "COMPENSACIONES", property = "compensaciones", jdbcType = JdbcType.DECIMAL),
+			 })
 	    List<TurnosItem> busquedaColaOficio(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
 	 
 	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="busquedaColaOficio2")
@@ -198,7 +189,8 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper{
 			@Result(column = "IDTIPOTURNO", property = "idtipoturno", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "VISIBLEMOVIL", property = "visiblemovil", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
+			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "ORDEN_COLA", property = "idcomboguardias", jdbcType = JdbcType.DECIMAL) })
 	    List<TurnosItem> busquedaColaOficio2(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
 	 
 	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="busquedaColaGuardia")

@@ -24,6 +24,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -51,6 +52,7 @@ import org.itcgae.siga.db.mappers.ScsInscripcionturnoMapper;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsOrdenacionColasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.impl.maestros.FichaPartidasJudicialesServiceImpl;
@@ -87,6 +89,9 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private ScsInscripcionesTurnoExtendsMapper scsInscripcionturnoExtendsMapper;
 
 	@Override
 	public TurnosDTO busquedaTurnos(TurnosItem turnosItem, HttpServletRequest request) {
@@ -496,8 +501,10 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
 					List<ScsTurno> listaturno = null;
 					ScsTurnoExample exampleturno = new ScsTurnoExample();
+					if(turnosItem.getIdturno() != null) {
 					exampleturno.createCriteria().andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()))
 							.andIdinstitucionEqualTo(idInstitucion);
+					}
 					listaturno = scsTurnosExtendsMapper.selectByExample(exampleturno);
 
 					ScsTurno turno = new ScsTurno();
@@ -1345,5 +1352,126 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		}
 		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
 		return guardiasDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO changeRequisitoGuardias(TurnosItem turnosItem, HttpServletRequest request) {
+		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 1;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					LOGGER.info(
+							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
+
+					ScsTurnoExample example = new ScsTurnoExample();
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()));
+
+					ScsTurno scsTurno = new ScsTurno();
+					
+					List<ScsTurno> scsTurnoLista = scsTurnosExtendsMapper.selectByExample(example);
+					scsTurno = scsTurnoLista.get(0);
+
+					scsTurno.setIdinstitucion(idInstitucion);
+					scsTurno.setIdturno(Integer.parseInt(turnosItem.getIdturno()));
+					scsTurno.setFechamodificacion(new Date());
+					if(turnosItem.getIdpersona() != null) {
+					scsTurno.setIdpersonaUltimo(Long.parseLong(turnosItem.getIdpersona()));
+					}
+					scsTurno.setFechasolicitudUltimo(new Date());
+					scsTurno.setUsumodificacion(usuarios.get(0).getIdusuario());
+					
+					InscripcionesItem inscripcionesItem = new InscripcionesItem();
+					inscripcionesItem.setIdinstitucion(idInstitucion.toString());
+					inscripcionesItem.setIdturno(turnosItem.getIdturno());
+
+					String fechahasta = "";
+					String fechadesde = "";
+					String afechade = "";
+					DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+					
+					if (inscripcionesItem.getFechadesde() != null) {
+						Date fechad = inscripcionesItem.getFechadesde();
+
+						fechadesde = dateFormat.format(fechad);
+						if (inscripcionesItem.getFechahasta() != null) {
+							Date fechah = inscripcionesItem.getFechahasta();
+							fechahasta = dateFormat.format(fechah);
+
+						}
+					}
+					if (inscripcionesItem.getAfechade() != null) {
+						Date afechades = inscripcionesItem.getAfechade();
+						afechade = dateFormat.format(afechades);
+					}
+					
+					List<InscripcionesItem> inscripcionesTurno = null;
+					inscripcionesTurno = scsInscripcionturnoExtendsMapper.busquedaInscripciones(inscripcionesItem,
+							idInstitucion, fechadesde, fechahasta, afechade, null);
+					List<ComboItem> guardiasTurno = scsGuardiasturnoExtendsMapper.comboGuardias(turnosItem.getIdturno(),
+							idInstitucion.toString());
+				
+					List<InscripcionesItem> colegiadosAinscribir = new ArrayList<>();
+					for(InscripcionesItem inscripciones: inscripcionesTurno) {
+						for(ComboItem guardia: guardiasTurno) {
+							if(inscripciones.getIdguardia().equals(guardia.getValue())) {
+								colegiadosAinscribir.add(inscripciones);
+							}
+						}
+						
+					}
+					
+					//Añadimos los colegiados a las guardias
+
+				}
+
+				catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha modificado la partida presupuestaria");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la partida presupuestaria correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar una partida presupuestaria");
+
+			}
+		}
+		return updateResponseDTO;
 	}
 }
