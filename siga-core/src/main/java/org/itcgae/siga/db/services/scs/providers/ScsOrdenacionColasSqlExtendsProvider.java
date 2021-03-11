@@ -19,7 +19,7 @@ public class ScsOrdenacionColasSqlExtendsProvider extends ScsOrdenacioncolasSqlP
 
 		SQL sql = new SQL();
 
-		sql.SELECT("ABS(valor)as numero, POR_FILAS,  DECODE(SIGN(valor), '-1', 'desc', DECODE(SIGN(valor),0,'','asc')) AS orden FROM SCS_ORDENACIONCOLAS unpivot (valor for POR_FILAS in (alfabeticoapellidos, fechanacimiento, numerocolegiado, ANTIGUEDADCOLA,ordenacionmanual))" );
+		sql.SELECT("ABS(valor)as numero, POR_FILAS,  DECODE(SIGN(valor), '-1', 'desc', DECODE(SIGN(valor),0,'','asc')) AS orden FROM SCS_ORDENACIONCOLAS unpivot (valor for POR_FILAS in (alfabeticoapellidos, fechanacimiento, numerocolegiado, ANTIGUEDADCOLA))" );
 		sql.WHERE("idordenacioncolas = '"+idordenacioncolas +"'");
 		sql.ORDER_BY("numero desc");
 		return sql.toString();

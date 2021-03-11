@@ -216,5 +216,14 @@ public class TurnosController {
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/turnos/changeRequisitoGuardias", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> changeRequisitoGuardias(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
+		UpdateResponseDTO response = turnosService.changeRequisitoGuardias(turnosItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }
  
