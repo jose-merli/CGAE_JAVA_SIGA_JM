@@ -1,10 +1,14 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.util.Date;
+
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.db.mappers.CenBajastemporalesSqlProvider;
 import org.itcgae.siga.db.mappers.ScsInscripcionturnoSqlProvider;
+import java.text.SimpleDateFormat;
 
 public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlProvider {
 
@@ -45,10 +49,22 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 			sql.WHERE("bt.idpersona = '"+bajasTemporalesItem.getIdpersona()+"'");
 		}
 		
-		if(bajasTemporalesItem.getNcolegiado() != null || !bajasTemporalesItem.getNcolegiado().trim().isEmpty()) {
+		if(bajasTemporalesItem.getNcolegiado() != null && !bajasTemporalesItem.getNcolegiado().equals("")) {
 			sql.WHERE("(col.ncolegiado = '"+bajasTemporalesItem.getNcolegiado()+"' OR col.ncomunitario = '"+bajasTemporalesItem.getNcolegiado()+"')");
 		}
 			
+		return sql.toString();
+	}
+	
+	public String nuevaBajaTemporal(ColegiadoItem colegiadoItem) {
+		SQL sql = new SQL();
+		sql.INSERT_INTO("cen_bajastemporales");
+		sql.VALUES("idinstitucion", colegiadoItem.getInstitucion());
+		sql.VALUES("idpersona", colegiadoItem.getIdPersona());
+		sql.VALUES("valido", null);
+		sql.VALUES("fechaestado", new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
+		sql.VALUES("fechabt", new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
+		
 		return sql.toString();
 	}
 }

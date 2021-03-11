@@ -244,21 +244,23 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"          JOIN SCS_AREA ON SCS_AREA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_AREA.IDAREA = SCS_TURNO.IDAREA\r\n" + 
 				"          JOIN SCS_MATERIA ON SCS_MATERIA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_MATERIA.IDMATERIA = SCS_TURNO.IDMATERIA AND SCS_MATERIA.IDAREA = SCS_TURNO.IDAREA\r\n" + 
 				"          JOIN SCS_TIPOSGUARDIAS ON SCS_GUARDIASTURNO.IDTIPOGUARDIA = SCS_TIPOSGUARDIAS.IDTIPOGUARDIA\r\n" + 
-				"          LEFT JOIN GEN_RECURSOS_CATALOGOS ON SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO \r\n" + 
-				"WHERE\r\n" + 
-				"          SCS_INSCRIPCIONTURNO.IDINSTITUCION ='"+idInstitucion+"'" + 
-				"          AND SCS_INSCRIPCIONTURNO.IDTURNO = '"+inscripcionesItem.getIdturno()+"'" + 
-				"          AND SCS_INSCRIPCIONTURNO.IDPERSONA = '"+inscripcionesItem.getIdpersona()+"'" + 
-				"          AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE = 1\r\n" + 
+				"          LEFT JOIN GEN_RECURSOS_CATALOGOS ON SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO \r\n");
+		String where ="          SCS_TURNO.IDINSTITUCION ='"+idInstitucion+"'"+
+				"          AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE = 1\r\n" ;
+		if(inscripcionesItem.getIdturno() == null) {
+				where +=
 				"          AND\r\n" + 
 				"          --Nunca ha solicitado inscripcion\r\n" + 
-				"((SCS_INSCRIPCIONTURNO.FECHASOLICITUD IS NULL\r\n" + 
-				"          AND SCS_INSCRIPCIONTURNO.FECHABAJA IS NULL)\r\n" + 
+				"          --Se supone que todos los turnos tienen al menos una inscripcion\r\n" +
+				//(SCS_INSCRIPCIONTURNO.FECHASOLICITUD IS NULL
+				//AND SCS_INSCRIPCIONTURNO.FECHABAJA IS NULL)
+				"			((SCS_INSCRIPCIONTURNO.IDPERSONA != '"+inscripcionesItem.getIdpersona()+"')\r\n" + 
 				"          --Esté de baja\r\n" + 
 				"          OR (SCS_INSCRIPCIONTURNO.FECHABAJA IS NOT NULL)\r\n" + 
 				"          --está inscrito pero que tengan alguna guardia a la que no estén inscritos\r\n" + 
-				"          OR ((SCS_INSCRIPCIONTURNO.FECHASOLICITUD IS NULL\r\n" + 
-				"          AND SCS_INSCRIPCIONTURNO.FECHABAJA IS NULL\r\n" + 
+				"          OR ((" +
+				//"          SCS_INSCRIPCIONTURNO.FECHASOLICITUD IS NULL AND\r\n";
+				"           SCS_INSCRIPCIONTURNO.FECHABAJA IS NULL\r\n" + 
 				"          AND SCS_INSCRIPCIONTURNO.FECHADENEGACION IS NULL)\r\n" + 
 				"          --pero que tengan alguna guardia a la que no estén inscritos\r\n" + 
 				"          AND (\r\n" + 
@@ -267,7 +269,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"                    --0 SI ESTÁ INSCRITO EN TODAS\r\n" + 
 				"\r\n" + 
 				"                    FROM ( WITH GUARDIAS_EN_TURNO AS (\r\n" + 
-				"                    SELECT\r\n" + 
+				"                    SELECT DISTINCT\r\n" + 
 				"                              IDGUARDIA\r\n" + 
 				"                    FROM\r\n" + 
 				"                              SCS_GUARDIASTURNO\r\n" + 
@@ -288,12 +290,21 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"                                       SCS_INSCRIPCIONGUARDIA\r\n" + 
 				"                              WHERE\r\n" + 
 				"                                       IDINSTITUCION = '"+idInstitucion+"'" + 
-				"                                       AND IDTURNO = '"+inscripcionesItem.getIdturno()+"'" + 
-				"                                       AND IDPERSONA = '"+inscripcionesItem.getIdpersona()+"'" + 
+				"                                       AND IDTURNO = '"+inscripcionesItem.getIdturno()+"'"+ 
+				"                                       AND IDPERSONA = '"+inscripcionesItem.getIdpersona()+"'"+
+				"                                       AND IDPERSONA != '"+inscripcionesItem.getIdpersona()+"'"+
 				"                                       AND IDGUARDIA IN (GUARDIAS_EN_TURNO.IDGUARDIA)) GUARDIAS\r\n" + 
 				"                    FROM\r\n" + 
-				"                              GUARDIAS_EN_TURNO)");
-		sql.GROUP_BY("GUARDIAS_EN_TURNO_COUNT) > 0))");
+				"                              GUARDIAS_EN_TURNO)";
+				sql.GROUP_BY("GUARDIAS_EN_TURNO_COUNT) > 0))");
+		}
+		else {
+			where+=
+			"          AND SCS_INSCRIPCIONTURNO.IDTURNO = '"+inscripcionesItem.getIdturno()+"'" + 
+			"          AND SCS_INSCRIPCIONTURNO.IDPERSONA = '"+inscripcionesItem.getIdpersona()+"'";
+		}
+				sql.WHERE(where);
+		
 		
 			
 		return sql.toString();

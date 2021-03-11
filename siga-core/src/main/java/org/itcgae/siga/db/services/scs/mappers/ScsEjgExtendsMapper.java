@@ -60,13 +60,14 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		 @Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
+		 @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "NCOMUNITARIO", property = "nComunitario", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "ESTADO", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		 @Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.BOOLEAN),
 		 @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),		 
+		 @Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ColegiadosSJCSItem> busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje);
 }
