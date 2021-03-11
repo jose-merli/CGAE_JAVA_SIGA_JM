@@ -137,7 +137,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 			sql.WHERE("SCS_GUARDIASTURNO.IDTIPOGUARDIA IN (" + guardiaItem.getTipoGuardia() + ")");
 
 		sql.ORDER_BY("SCS_TURNO.NOMBRE, SCS_GUARDIASTURNO.NOMBRE");
-		
+
 		if (tamMax != null) {
 			Integer tamMaxNumber = tamMax + 1;
 			sql.WHERE("rownum <= " + tamMaxNumber);
@@ -154,7 +154,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		sql.FROM("SCS_GUARDIASTURNO");
 
-		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("IDTURNO IN (" + idTurno + ")");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.ORDER_BY("nombre");
 
@@ -169,7 +169,6 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		return sql.toString();
 	}
-
 
 	public String getResumen(String idGuardia, String idTurno, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
@@ -266,7 +265,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		return sql.toString();
 	}
 
-	public String resumenConfCola(String idGuardia,String idTurno, String idInstitucion) {
+	public String resumenConfCola(String idGuardia, String idTurno, String idInstitucion) {
 		SQL sql = new SQL();
 		sql.SELECT("DECODE(PORGRUPOS, 0, (SELECT\r\n" + "	LISTAGG(ORDENACION, ', ') WITHIN GROUP (\r\n"
 				+ "ORDER BY\r\n" + "	ORDEN DESC) \"Product_Listing\"\r\n" + "FROM\r\n" + "	(\r\n" + "	SELECT\r\n"
@@ -277,14 +276,14 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 				+ "		FROM\r\n"
 				+ "			SCS_ORDENACIONCOLAS unpivot (valor FOR POR_FILAS IN (alfabeticoapellidos,\r\n"
 				+ "			fechanacimiento,\r\n" + "			numerocolegiado,\r\n"
-				+ "			ANTIGUEDADCOLA, ORDENACIONMANUAL))\r\n" + "		WHERE\r\n" + "			idordenacioncolas = (\r\n"
-				+ "			SELECT\r\n" + "				IDORDENACIONCOLAS\r\n" + "			FROM\r\n"
-				+ "				SCS_GUARDIASTURNO\r\n" + "			WHERE\r\n" + "				idguardia = "
-				+ idGuardia + "\r\n" + "				AND idInstitucion = " + idInstitucion + " AND idturno ="+idTurno+")\r\n"
-				+ "		ORDER BY\r\n" + "			numero DESC)\r\n" + "	WHERE\r\n"
-				+ "		NUMERO > 0)),'Por grupos') AS ordenacion,\r\n" + "		numeroletradosguardia\r\n"
-				+ "	FROM\r\n" + "		SCS_GUARDIASTURNO\r\n" + "	WHERE\r\n" + "		idguardia = " + idGuardia
-				+ "\r\n" + "		AND idInstitucion = " + idInstitucion);
+				+ "			ANTIGUEDADCOLA, ORDENACIONMANUAL))\r\n" + "		WHERE\r\n"
+				+ "			idordenacioncolas = (\r\n" + "			SELECT\r\n" + "				IDORDENACIONCOLAS\r\n"
+				+ "			FROM\r\n" + "				SCS_GUARDIASTURNO\r\n" + "			WHERE\r\n"
+				+ "				idguardia = " + idGuardia + "\r\n" + "				AND idInstitucion = "
+				+ idInstitucion + " AND idturno =" + idTurno + ")\r\n" + "		ORDER BY\r\n"
+				+ "			numero DESC)\r\n" + "	WHERE\r\n" + "		NUMERO > 0)),'Por grupos') AS ordenacion,\r\n"
+				+ "		numeroletradosguardia\r\n" + "	FROM\r\n" + "		SCS_GUARDIASTURNO\r\n" + "	WHERE\r\n"
+				+ "		idguardia = " + idGuardia + "\r\n" + "		AND idInstitucion = " + idInstitucion);
 
 		return sql.toString();
 	}
