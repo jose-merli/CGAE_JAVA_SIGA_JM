@@ -37,4 +37,6 @@ public interface IGestionInscripcionesService {
 	public InscripcionesDTO TarjetaColaOficio(InscripcionesItem inscripcionesItem, HttpServletRequest request);
 	
 	public InscripcionesTarjetaOficioDTO busquedaTarjeta(InscripcionesItem inscripcionesItem, HttpServletRequest request);
+
+	public Boolean checkTrabajosSJCS(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
 }

@@ -71,6 +71,12 @@ public class InscripcionesController {
 		return new ResponseEntity<InscripcionesDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/inscripciones/checkTrabajosSJCS",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Boolean> checkTrabajosSJCS(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		Boolean response = inscripcionesService.checkTrabajosSJCS(inscripcionesDTO, request);
+		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/inscripciones/updateValidar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateValidar(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = inscripcionesService.updateValidar(inscripcionesDTO, request);

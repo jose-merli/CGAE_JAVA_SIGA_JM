@@ -976,32 +976,31 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
 						if (inscripcionesItem.getValidarinscripciones().equals("S")) {
+							
+							inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
 							inscripcionturno.setFechasolicitudbaja(new Date());
-							inscripcionturno.setFechabaja(null);
-							inscripcionturno.setFechadenegacion(null);
+							
 							response = scsInscripcionturnoExtendsMapper.updateByExampleSelective(inscripcionturno,
 									exampleinscripcion);
 							
 							guardia.setObservacionesbaja(inscripcionesItem.getObservaciones());
 							guardia.setFechasolicitudbaja(new Date());
-							guardia.setFechabaja(null);
-							guardia.setFechadenegacion(null);
 
 							response = scsInscripcionguardiaMapper.updateByExampleSelective(guardia, exampleguardia);
 							
 						} else {
+							
 							inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
 							inscripcionturno.setFechasolicitudbaja(new Date());
 							inscripcionturno.setFechabaja(new Date());
-							inscripcionturno.setFechadenegacion(null);
+							
 							response = scsInscripcionturnoExtendsMapper.updateByExampleSelective(inscripcionturno,
 									exampleinscripcion);
 							
 							guardia.setObservacionesbaja(inscripcionesItem.getObservaciones());
 							guardia.setFechasolicitudbaja(new Date());
 							guardia.setFechabaja(new Date());
-							guardia.setFechadenegacion(null);
-
+							
 							response = scsInscripcionguardiaMapper.updateByExampleSelective(guardia, exampleguardia);
 
 						}
@@ -1059,6 +1058,31 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 		return updateResponseDTO;
 	}
+	
+	@Override
+	public Boolean checkTrabajosSJCS(InscripcionesDTO inscripcionesDTO,
+			HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fechaActual;
+		Date fecha = new Date();
+		fechaActual = dateFormat.format(fecha);
+		int incidencias = 0;
+		
+		for (InscripcionesItem inscripcionesItem : inscripcionesDTO.getInscripcionesItems()) {
+			List<InscripcionesItem> trabajosSJCS = null;
+			List<InscripcionesItem> trabajosPendientes = null;
+			trabajosSJCS = scsInscripcionturnoExtendsMapper.busquedaTrabajosGuardias(inscripcionesItem, idInstitucion,fechaActual);
+			trabajosPendientes = scsInscripcionturnoExtendsMapper.busquedaTrabajosPendientes(inscripcionesItem, idInstitucion, fechaActual);
+			if(trabajosSJCS.size()>0 || trabajosPendientes.size() >0) {
+				incidencias++;
+			}
+		}
+		if(incidencias > 0) return true;
+		else return false;
+}
+
 	
 	@Override
 	public InscripcionesDTO busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem,
