@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -42,6 +43,15 @@ public class BajasTemporalesController {
 	ResponseEntity<BajasTemporalesDTO> busquedaTurnos(@RequestBody BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request) {
 		BajasTemporalesDTO response = bajasTemporalesService.busquedaBajasTemporales(bajasTemporalesItem, request);
 		return new ResponseEntity<BajasTemporalesDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/bajasTemporales/nuevaBajaTemporal", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> nuevaBajaTemporal(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) {
+		InsertResponseDTO response = bajasTemporalesService.nuevaBajaTemporal(colegiadoItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/bajasTemporales/updateDenegar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
