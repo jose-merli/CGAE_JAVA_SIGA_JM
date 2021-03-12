@@ -17,11 +17,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.db.entities.CenBajastemporales;
 import org.itcgae.siga.db.entities.CenBajastemporalesExample;
 import org.itcgae.siga.db.entities.CenBajastemporalesKey;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
 
-@Service
-@Primary
 public interface CenBajastemporalesMapper {
 
 	/**
