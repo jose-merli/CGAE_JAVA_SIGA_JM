@@ -24,8 +24,6 @@ import org.itcgae.siga.db.services.scs.providers.ScsTurnosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-@Service
-@Primary
 public interface ScsBajasTemporalesExtendsMapper extends CenBajastemporalesMapper{
 	
 	 @SelectProvider(type=ScsBajasTemporalesSqlExtendsProvider.class, method="busquedaBajasTemporales")

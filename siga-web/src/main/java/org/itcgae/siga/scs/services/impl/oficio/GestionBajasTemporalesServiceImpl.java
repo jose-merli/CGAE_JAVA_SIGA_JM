@@ -170,20 +170,18 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 						LOGGER.info(
 								"nuevaBajaTemporal() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
-
+						
 						BajasTemporalesItem bajasTemporalesItem=new BajasTemporalesItem();
 //						bajasTemporalesItem = scsBajasTemporalesExtendsMapper.nuevaBajaTemporal(colegiadoDTO.getColegiadoItem().get(0));
 						CenBajastemporales cenBajasTemporales = new CenBajastemporales();
 						cenBajasTemporales.setIdpersona(Long.parseLong(colegiadoDTO.getColegiadoItem().get(0).getIdPersona()));
 						cenBajasTemporales.setIdinstitucion(Short.parseShort(colegiadoDTO.getColegiadoItem().get(0).getIdInstitucion()));
-						cenBajasTemporales.setValidado(null);
-						cenBajasTemporales.setDescripcion("");
 						cenBajasTemporales.setFechaalta(new Date());
 						cenBajasTemporales.setFechadesde(new Date());
 						cenBajasTemporales.setFechahasta(new Date());
 						cenBajasTemporales.setFechamodificacion(new Date());
-						cenBajasTemporales.setTipo("");
-						cenBajasTemporales.setUsumodificacion(0);
+						cenBajasTemporales.setTipo("V");
+						cenBajasTemporales.setUsumodificacion(usuarios.get(0).getIdusuario());
 						cenBajasTemporales.setFechaestado(new Date());
 						cenBajasTemporales.setFechabt(new Date());
 						
