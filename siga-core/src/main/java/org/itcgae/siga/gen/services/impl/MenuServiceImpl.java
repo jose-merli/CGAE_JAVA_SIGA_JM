@@ -1146,15 +1146,15 @@ public class MenuServiceImpl implements IMenuService {
 		prop = genPropertiesMapper.selectByExample(propertiesExample);
 		paramsItem.setEnvironment(prop.get(0).getValor());
 
-		GenPropertiesExample propertiesfrontExample = new GenPropertiesExample();
-		propertiesfrontExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.frontsigaversion");
-		prop = genPropertiesMapper.selectByExample(propertiesfrontExample);
-		paramsItem.setSigaFrontVersion(prop.get(0).getValor());
+//		GenPropertiesExample propertiesfrontExample = new GenPropertiesExample();
+//		propertiesfrontExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.frontsigaversion");
+//		prop = genPropertiesMapper.selectByExample(propertiesfrontExample);
+		paramsItem.setSigaFrontVersion(SigaConstants.SIGAFRONT_VERSION);
 
-		GenPropertiesExample propertiesWebExample = new GenPropertiesExample();
-		propertiesWebExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.webversion");
-		prop = genPropertiesMapper.selectByExample(propertiesWebExample);
-		paramsItem.setSigaWebVersion(prop.get(0).getValor());
+//		GenPropertiesExample propertiesWebExample = new GenPropertiesExample();
+//		propertiesWebExample.createCriteria().andFicheroEqualTo("SIGA").andParametroEqualTo("administracion.login.webversion");
+//		prop = genPropertiesMapper.selectByExample(propertiesWebExample);
+		paramsItem.setSigaWebVersion(SigaConstants.SIGAWEB_VERSION);
 		
 //		comboItem.setLabel(cenInstitucion.getAbreviatura());
 //		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
