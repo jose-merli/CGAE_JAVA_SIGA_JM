@@ -1109,12 +1109,12 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 			if (usuarios != null && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
-
+				
 				LOGGER.info(
 						"busquedaColaOficio() -> Entrada a scsOrdenacioncolasExtendsMapper para obtener orden colas");
 
 				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaTarjetaInscripciones(inscripcionesItem,
-						idInstitucion);
+						idInstitucion, usuario.getIdlenguaje());
 
 				LOGGER.info(
 						"busquedaColaOficio()  -> Salida a scsOrdenacioncolasExtendsMapper para obtener orden colas");
