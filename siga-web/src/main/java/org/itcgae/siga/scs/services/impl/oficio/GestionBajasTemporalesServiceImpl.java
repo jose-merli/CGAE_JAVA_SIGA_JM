@@ -2,8 +2,6 @@ package org.itcgae.siga.scs.services.impl.oficio;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -15,40 +13,17 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesDTO;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
-import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
-import org.itcgae.siga.DTOs.scs.InscripcionesItem;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.cen.services.impl.BusquedaColegiadosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBajastemporales;
-import org.itcgae.siga.db.entities.CenBajastemporalesExample;
-import org.itcgae.siga.db.entities.CenBajastemporalesKey;
 import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.ScsInscripcionturno;
-import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
-import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
-import org.itcgae.siga.db.entities.ScsTurno;
-import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.mappers.CenBajastemporalesMapper;
-import org.itcgae.siga.db.mappers.CenBajastemporalesSqlProvider;
-import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
-import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsBajasTemporalesExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsOrdenacionColasExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
-import org.itcgae.siga.db.services.scs.providers.ScsBajasTemporalesSqlExtendsProvider;
-import org.itcgae.siga.scs.services.impl.maestros.FichaPartidasJudicialesServiceImpl;
 import org.itcgae.siga.scs.services.oficio.IGestionBajasTemporalesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,26 +35,17 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	private Logger LOGGER = Logger.getLogger(GestionBajasTemporalesServiceImpl.class);
 
 	@Autowired
-	private ScsInscripcionesTurnoExtendsMapper scsInscripcionturnoExtendsMapper;
-	
-	@Autowired
 	private ScsBajasTemporalesExtendsMapper scsBajasTemporalesExtendsMapper;
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
 	@Autowired
-	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
-	
-	@Autowired
 	private BusquedaColegiadosServiceImpl busquedaColegiadosServiceImpl;
 	
 	@Autowired
 	private CenBajastemporalesMapper cenBajastemporalesMapper;
 	
-	
-
-
 	@Override
 	public BajasTemporalesDTO busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
@@ -177,12 +143,19 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						cenBajasTemporales.setIdpersona(Long.parseLong(colegiadoDTO.getColegiadoItem().get(0).getIdPersona()));
 						cenBajasTemporales.setIdinstitucion(Short.parseShort(colegiadoDTO.getColegiadoItem().get(0).getIdInstitucion()));
 						cenBajasTemporales.setValidado(null);
+						cenBajasTemporales.setDescripcion("");
+						cenBajasTemporales.setFechaalta(new Date());
+						cenBajasTemporales.setFechadesde(new Date());
+						cenBajasTemporales.setFechahasta(new Date());
+						cenBajasTemporales.setFechamodificacion(new Date());
+						cenBajasTemporales.setTipo("");
+						cenBajasTemporales.setUsumodificacion(0);
 						cenBajasTemporales.setFechaestado(new Date());
 						cenBajasTemporales.setFechabt(new Date());
 						
 //						CenBajastemporalesMapper cenBajasTemporalesMapper;
 						
-						int result =cenBajastemporalesMapper.insertSelective(cenBajasTemporales);
+						int result =cenBajastemporalesMapper.insert(cenBajasTemporales);
 						LOGGER.info(
 								"nuevaBajaTemporal() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
 
