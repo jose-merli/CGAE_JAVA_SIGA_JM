@@ -25,11 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/oficio")
 public class DesignacionesController {
-	@Autowired
-	private ComboService comboService;
-	
-	@Autowired
-	private IGestionTurnosService turnosService;
 	
 //	@RequestMapping(value = "/combossjcs/comboTurnos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 //	ResponseEntity<ComboDTO> comboTurnos(HttpServletRequest request) {
