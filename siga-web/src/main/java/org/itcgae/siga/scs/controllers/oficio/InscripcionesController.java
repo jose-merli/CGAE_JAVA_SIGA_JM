@@ -1,4 +1,4 @@
-package org.itcgae.siga.scs.controllers.turnos;
+package org.itcgae.siga.scs.controllers.oficio;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -56,10 +56,25 @@ public class InscripcionesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/inscripciones/insertSolicitarAlta", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> insertSolicitarAlta(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		InsertResponseDTO response = inscripcionesService.insertSolicitarAlta(inscripcionesDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@RequestMapping(value = "/inscripciones/busquedaTarjetaInscripciones",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InscripcionesDTO> busquedaTarjetaInscripciones(@RequestBody InscripcionesItem inscripcionesItem, HttpServletRequest request) {
 		InscripcionesDTO response = inscripcionesService.busquedaTarjetaInscripciones(inscripcionesItem, request);
 		return new ResponseEntity<InscripcionesDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/inscripciones/checkTrabajosSJCS",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Boolean> checkTrabajosSJCS(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		Boolean response = inscripcionesService.checkTrabajosSJCS(inscripcionesDTO, request);
+		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/inscripciones/updateValidar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,4 +1,4 @@
-package org.itcgae.siga.scs.controllers.turnos;
+package org.itcgae.siga.scs.controllers.oficio;
 
 import javax.servlet.http.HttpServletRequest;
 
