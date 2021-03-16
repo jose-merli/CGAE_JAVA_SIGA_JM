@@ -66,6 +66,9 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 			sql.WHERE("area.idarea IN (" + turnosItem.getIdarea() + ")");
 			
 		}
+		if (turnosItem.getIdturno() != null && turnosItem.getIdturno() != "") {
+			sql.WHERE("turnos.idturno IN (" + turnosItem.getIdturno() + ")");
+		}
 		if (turnosItem.getIdmateria() != null && turnosItem.getIdmateria() != "") {
 			sql.WHERE("materi.idmateria IN (" + turnosItem.getIdmateria() + ")");
 		}
