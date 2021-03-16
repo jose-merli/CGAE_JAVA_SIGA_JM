@@ -12,6 +12,8 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesDTO;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
@@ -45,6 +47,37 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	
 	@Autowired
 	private CenBajastemporalesMapper cenBajastemporalesMapper;
+	
+	@Override
+	public ComboDTO comboEstado(HttpServletRequest request) {
+
+		LOGGER.info("comboEstado() -> Entrada al servicio para combo comboEstado");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboEstado() / scsBajasTemporalesExtendsMapper.comboEstado() -> Entrada a scsBajasTemporalesExtendsMapper para obtener combo Estado");
+
+				List<ComboItem> comboItems = scsBajasTemporalesExtendsMapper.comboEstado();
+
+				LOGGER.info(
+						"comboEstado() / scsBajasTemporalesExtendsMapper.comboEstado() -> Salida e scsBajasTemporalesExtendsMapper para obtener combo comboEstado");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboEstado() -> Salida del servicio para obtener combo comboEstado");
+		}
+		return comboDTO;
+	}
 	
 	@Override
 	public BajasTemporalesDTO busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request) {
@@ -146,7 +179,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						cenBajasTemporales.setFechadesde(new Date());
 						cenBajasTemporales.setFechahasta(new Date());
 						cenBajasTemporales.setFechamodificacion(new Date());
-						cenBajasTemporales.setTipo("V");
+						cenBajasTemporales.setTipo("P");
 						cenBajasTemporales.setUsumodificacion(usuarios.get(0).getIdusuario());
 						cenBajasTemporales.setFechaestado(new Date());
 						cenBajasTemporales.setFechabt(new Date());
@@ -188,7 +221,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	}
 	
 	@Override
-	public UpdateResponseDTO updateAnular(BajasTemporalesDTO bajasTemporales, HttpServletRequest request) {
+	public UpdateResponseDTO updateEstado(BajasTemporalesItem bajasTemporales, HttpServletRequest request) {
 		LOGGER.info("updateNuevo() ->  Entrada al servicio para crear nuevas bajas temporales");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -218,7 +251,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 				try {
 					
-
+					
 				}catch (Exception e) {
 					response = 0;
 					error.setCode(400);
@@ -250,135 +283,4 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 		return updateResponseDTO;
 	}
-	
-
-	@Override
-	public UpdateResponseDTO updateValidar(BajasTemporalesDTO bajasTemporales, HttpServletRequest request) {
-		LOGGER.info("updateValidar() ->  Entrada al servicio para validar bajas temporales");
-
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		int existentes = 0;
-
-		if (null != idInstitucion) {
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"updateValidar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"updateValidar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (null != usuarios && usuarios.size() > 0) {
-
-				try {
-					
-
-				}catch (Exception e) {
-					response = 0;
-					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-					updateResponseDTO.setStatus(SigaConstants.KO);
-				}
-
-				if (response == 0 && error.getDescription() == null) {
-					error.setCode(400);
-					error.setDescription("No se ha modificado la baja temporal");
-					updateResponseDTO.setStatus(SigaConstants.KO);
-				} else if (response == 1 && existentes != 0) {
-					error.setCode(200);
-					error.setDescription(
-							"Se han modificiado la baja temporal excepto algunos que tiene las mismas características");
-
-				} else if (error.getCode() == null) {
-					error.setCode(200);
-					error.setDescription("Se ha modificado la baja temporal correctamente");
-				}
-
-				updateResponseDTO.setError(error);
-
-				LOGGER.info("updateValidar() -> Salida del servicio para validar bajas temporales");
-
-			}
-
-		}
-
-		return updateResponseDTO;
-	}
-	
-	@Override
-	public UpdateResponseDTO updateDenegar(BajasTemporalesDTO bajasTemporales, HttpServletRequest request) {
-		LOGGER.info("updateDenegar() ->  Entrada al servicio para denegar bajas temporales");
-
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		int existentes = 0;
-
-		if (null != idInstitucion) {
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"updateDenegar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"updateDenegar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (null != usuarios && usuarios.size() > 0) {
-
-				try {
-					
-
-				}catch (Exception e) {
-					response = 0;
-					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-					updateResponseDTO.setStatus(SigaConstants.KO);
-				}
-
-				if (response == 0 && error.getDescription() == null) {
-					error.setCode(400);
-					error.setDescription("No se ha modificado la baja temporal");
-					updateResponseDTO.setStatus(SigaConstants.KO);
-				} else if (response == 1 && existentes != 0) {
-					error.setCode(200);
-					error.setDescription(
-							"Se han modificiado la baja temporal excepto algunos que tiene las mismas características");
-
-				} else if (error.getCode() == null) {
-					error.setCode(200);
-					error.setDescription("Se ha modificado la baja temporal correctamente");
-				}
-
-				updateResponseDTO.setError(error);
-
-				LOGGER.info("updateDenegar() -> Salida del servicio para denegar bajas temporales");
-
-			}
-
-		}
-
-		return updateResponseDTO;
-	}
-	
-	
 }
