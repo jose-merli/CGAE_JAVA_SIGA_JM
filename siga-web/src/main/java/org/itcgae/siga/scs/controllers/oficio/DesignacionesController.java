@@ -23,13 +23,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/oficio")
+@RequestMapping(value = "/designas")
 public class DesignacionesController {
 	
-//	@RequestMapping(value = "/combossjcs/comboTurnos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<ComboDTO> comboTurnos(HttpServletRequest request) {
-//		ComboDTO response = comboService.comboTurnos(request);
-//		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-//	}
+	@Autowired
+	private ComboService comboService;
+	
+	@RequestMapping(value = "/comboTipoDesgina",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboTurnos(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTipoDesignacion(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 }
  

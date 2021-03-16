@@ -1,20 +1,11 @@
 package org.itcgae.siga.db.services.scs.providers;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.ibatis.session.SqlSession;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.mappers.ScsTurnoSqlProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
 public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
-	
-	@Autowired
-	private SqlSession sqlSession;
 
 	public String comboTurnos(Short idInstitucion) {
 
@@ -57,29 +48,28 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 			sql.WHERE("UPPER(turnos.nombre) like UPPER('%" + turnosItem.getNombre() + "%')");
 		}
 		if (turnosItem.getJurisdiccion() != null && turnosItem.getJurisdiccion() != "") {
-			sql.WHERE("turnos.idjurisdiccion IN (" + turnosItem.getJurisdiccion() + ")");
+			sql.WHERE("turnos.idjurisdiccion ='" + turnosItem.getJurisdiccion() + "'");
 		}
 		if (turnosItem.getIdtipoturno() != null && turnosItem.getIdtipoturno() != "") {
-			sql.WHERE("turnos.idtipoturno IN (" + turnosItem.getIdtipoturno() + ")");
+			sql.WHERE("turnos.idtipoturno = '" + turnosItem.getIdtipoturno() + "'");
 		}
 		if (turnosItem.getIdarea() != null && turnosItem.getIdarea() != "") {
-			sql.WHERE("area.idarea IN (" + turnosItem.getIdarea() + ")");
-			
+			sql.WHERE("area.idarea = '" + turnosItem.getIdarea() + "'");
 		}
 		if (turnosItem.getIdmateria() != null && turnosItem.getIdmateria() != "") {
-			sql.WHERE("materi.idmateria IN (" + turnosItem.getIdmateria() + ")");
+			sql.WHERE("materi.idmateria = '" + turnosItem.getIdmateria() + "'");
 		}
 		if (turnosItem.getIdzona() != null && turnosItem.getIdzona() != "") {
-			sql.WHERE("zona.idzona IN (" + turnosItem.getIdzona() + ")");
+			sql.WHERE("zona.idzona = '" + turnosItem.getIdzona() + "'");
 		}
 		if (turnosItem.getIdzubzona() != null && turnosItem.getIdzubzona() != "") {
-			sql.WHERE("subzon.idsubzona IN (" + turnosItem.getIdzubzona() + ")");
+			sql.WHERE("subzon.idsubzona = '" + turnosItem.getIdzubzona() + "'");
 		}
 		if (turnosItem.getIdpartidapresupuestaria() != null && turnosItem.getIdpartidapresupuestaria() != "") {
-			sql.WHERE("partid.IDPARTIDAPRESUPUESTARIA IN (" + turnosItem.getIdpartidapresupuestaria() + ")");
+			sql.WHERE("partid.IDPARTIDAPRESUPUESTARIA = '" + turnosItem.getIdpartidapresupuestaria() + "'");
 		}
 		if (turnosItem.getGrupofacturacion() != null && turnosItem.getGrupofacturacion() != "") {
-			sql.WHERE("grupof.idgrupofacturacion  IN (" + turnosItem.getGrupofacturacion() + ")");
+			sql.WHERE("grupof.idgrupofacturacion  = '" + turnosItem.getGrupofacturacion() + "'");
 		}
 		if (!turnosItem.isHistorico()) {
 			sql.WHERE("turnos.fechabaja is null");
@@ -138,7 +128,7 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		return sql.toString();
 	}
 
-public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String busquedaOrden, Short idInstitucion) {
+	public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String busquedaOrden, Short idInstitucion) {
 
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -593,23 +583,27 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 		return sql.toString();
 
 	}
-	
-	
+
 	public String comboTurnosBusqueda(Short idInstitucion, String pantalla) {
-		
+
 		SQL sql = new SQL();
-		
+
 		sql.SELECT("IDTURNO, NOMBRE");
 		sql.FROM("SCS_TURNO");
-		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("FECHABAJA IS NULL");
-		
-		if("EJG".equalsIgnoreCase(pantalla)) {
+
+		if (SigaConstants.EJG.equalsIgnoreCase(pantalla)) {
 			sql.WHERE("IDTIPOTURNO <> 2 AND IDTIPOTURNO IS NOT NULL");
 		}
-		
+
+		if (SigaConstants.GUARDIA.equalsIgnoreCase(pantalla) || SigaConstants.OFICIO.equalsIgnoreCase(pantalla)) {
+			sql.WHERE("IDTIPOTURNO <> 1 AND IDTIPOTURNO IS NOT NULL");
+		}
+
 		sql.ORDER_BY("NOMBRE");
-		
+
 		return sql.toString();
 	}
+
 }
