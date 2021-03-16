@@ -486,22 +486,22 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							}
 						}
 						
-						if(inscripcionesItem.getEstadonombre().equals("Pendiente de Baja")) {
-							DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-							String fechaActual;
-							Date fecha = new Date();
-							fechaActual = dateFormat.format(fecha);
-							List<InscripcionesItem> trabajosPendientes = null;
-							trabajosSJCS = scsInscripcionturnoExtendsMapper.busquedaTrabajosGuardias(inscripcionesItem, idInstitucion,fechaActual);
-							trabajosPendientes = scsInscripcionturnoExtendsMapper.busquedaTrabajosPendientes(inscripcionesItem, idInstitucion, fechaActual);
-							if(trabajosSJCS.size()>0 || trabajosPendientes.size() >0) {								
-								error.setCode(400);								
-								error.setDescription("justiciaGratuita.oficio.inscripciones.mensajeSJCS");
-								updateResponseDTO.setError(error);
-								return updateResponseDTO;
-							}
-
-						}
+//						if(inscripcionesItem.getEstadonombre().equals("Pendiente de Baja")) {
+//							DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//							String fechaActual;
+//							Date fecha = new Date();
+//							fechaActual = dateFormat.format(fecha);
+//							List<InscripcionesItem> trabajosPendientes = null;
+//							trabajosSJCS = scsInscripcionturnoExtendsMapper.busquedaTrabajosGuardias(inscripcionesItem, idInstitucion,fechaActual);
+//							trabajosPendientes = scsInscripcionturnoExtendsMapper.busquedaTrabajosPendientes(inscripcionesItem, idInstitucion, fechaActual);
+//							if(trabajosSJCS.size()>0 || trabajosPendientes.size() >0) {								
+//								error.setCode(400);								
+//								error.setDescription("justiciaGratuita.oficio.inscripciones.mensajeSJCS");
+//								updateResponseDTO.setError(error);
+//								return updateResponseDTO;
+//							}
+//
+//						}
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
 					}
@@ -827,7 +827,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 	//EN PROCESO
 	@Override
 	public InsertResponseDTO insertSolicitarAlta(InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
-		LOGGER.info("insertSolicitarAlta() ->  Entrada al servicio para guardar una nueva inscripcion");
+		LOGGER.info("insertSolicitarAlta() ->  Entrada al servicio para guardar nuevas inscripciones");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -856,40 +856,59 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 				try {
 					for (InscripcionesItem inscripcionesItem : inscripcionesDTO.getInscripcionesItems()) {
-						ScsInscripcionturnoExample exampleinscripcion = new ScsInscripcionturnoExample();
-						exampleinscripcion.createCriteria()
-								.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-								.andIdinstitucionEqualTo(idInstitucion);
-
+						
+						//Buscamos el turno asociado para determinar si ese turno requiere validacion del colegio para las inscripciones o no
+						TurnosItem turnoItem = new TurnosItem();
+						turnoItem.setIdturno(inscripcionesItem.getIdturno());
+						List<TurnosItem> turnoItemsList;
+						turnoItemsList = scsTurnosExtendsMapper.busquedaTurnos(turnoItem, idInstitucion);
+						String valid = turnoItemsList.get(0).getValidarinscripciones();
+//						String valid = "S";
+						//CREAMOS INSCRIPCION A TURNO
+						if(inscripcionesItem.getIdguardia()==null) {
+							
+//							ScsInscripcionturnoExample exampleinscripcion = new ScsInscripcionturnoExample();
+//							exampleinscripcion.createCriteria()
+//									.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
+//									.andIdinstitucionEqualTo(idInstitucion);
+							
 						ScsInscripcionturno inscripcionturno = new ScsInscripcionturno();
 						
-						//CREAMOS INSCRIPCION A TURNO
 						inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservacionessolicitud());
-						inscripcionturno.setFechasolicitud(inscripcionesItem.getFechasolicitud());
+						inscripcionturno.setFechasolicitud(new Date());
+						if(valid=="N")	inscripcionturno.setFechavalidacion(new Date());
 						inscripcionturno.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 						inscripcionturno.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
-						inscripcionturno.setIdinstitucion(Short.parseShort(inscripcionesItem.getIdinstitucion()));
-						inscripcionturno.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
-						response = scsInscripcionturnoMapper.insert(inscripcionturno);
+						inscripcionturno.setIdinstitucion(idInstitucion);
+						inscripcionturno.setFechamodificacion(new Date());
+						inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
-						ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
-						exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()));
-
+						response = scsInscripcionturnoMapper.insert(inscripcionturno);
+						}
+						//CREAMOS INSCRIPCION A TURNO
+						else {
+							
+//							ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
+//							exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+//									.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()));
+						
 						ScsInscripcionguardia guardia = new ScsInscripcionguardia();
 						
-						//CREAMOS INSCRIPCION A TURNO
 						guardia.setObservacionessuscripcion(inscripcionesItem.getObservacionessolicitud());
-						guardia.setFechasuscripcion(inscripcionesItem.getFechasolicitud());
+						guardia.setFechasuscripcion(new Date());
+						if(valid=="N")	guardia.setFechavalidacion(new Date());
 						guardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 						guardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
-						guardia.setIdinstitucion(Short.parseShort(inscripcionesItem.getIdinstitucion()));
-						guardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
+						guardia.setIdinstitucion(idInstitucion);
+						guardia.setIdguardia(Integer.parseInt(inscripcionesItem.getIdguardia()));
+						guardia.setFechamodificacion(new Date());
+						guardia.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
 						response = scsInscripcionguardiaMapper.insert(guardia);
+						}
 					}
 					
-					LOGGER.info(
-								"insertSolicitarAlta() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
+					LOGGER.info("insertSolicitarAlta() / -> Salida del servicio para guardar nuevas inscripciones");
 						
 				}
 
@@ -1006,20 +1025,20 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						}
 						
 
-							DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-							String fechaActual;
-							Date fecha = new Date();
-							fechaActual = dateFormat.format(fecha);
-							List<InscripcionesItem> trabajosSJCS = null;
-							List<InscripcionesItem> trabajosPendientes = null;
-							trabajosSJCS = scsInscripcionturnoExtendsMapper.busquedaTrabajosGuardias(inscripcionesItem, idInstitucion,fechaActual);
-							trabajosPendientes = scsInscripcionturnoExtendsMapper.busquedaTrabajosPendientes(inscripcionesItem, idInstitucion, fechaActual);
-							if(trabajosSJCS.size()>0 || trabajosPendientes.size() >0) {								
-								error.setCode(400);								
-								error.setDescription("justiciaGratuita.oficio.inscripciones.mensajeSJCS");
-								updateResponseDTO.setError(error);
-								return updateResponseDTO;
-							}
+//							DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//							String fechaActual;
+//							Date fecha = new Date();
+//							fechaActual = dateFormat.format(fecha);
+//							List<InscripcionesItem> trabajosSJCS = null;
+//							List<InscripcionesItem> trabajosPendientes = null;
+//							trabajosSJCS = scsInscripcionturnoExtendsMapper.busquedaTrabajosGuardias(inscripcionesItem, idInstitucion,fechaActual);
+//							trabajosPendientes = scsInscripcionturnoExtendsMapper.busquedaTrabajosPendientes(inscripcionesItem, idInstitucion, fechaActual);
+//							if(trabajosSJCS.size()>0 || trabajosPendientes.size() >0) {								
+//								error.setCode(400);								
+//								error.setDescription("justiciaGratuita.oficio.inscripciones.mensajeSJCS");
+//								updateResponseDTO.setError(error);
+//								return updateResponseDTO;
+//							}
 
 						
 						LOGGER.info(
