@@ -35,10 +35,15 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 				"    INNER JOIN cen_persona per ON per.idpersona = col.idpersona");
 		sql.WHERE("TO_CHAR(bt.fechabt,'YYYY') >= TO_CHAR(bt.fechabt,'YYYY') - 2");
 		sql.WHERE("bt.idinstitucion = '"+idInstitucion+"'");
-
+		
 		if(bajasTemporalesItem.getValidado() != null) {
 			sql.WHERE("bt.validado = '"+bajasTemporalesItem.getValidado()+"'");
 		}
+		
+		if(bajasTemporalesItem.getValidado() == null) {
+			sql.WHERE("bt.validado = "+bajasTemporalesItem.getValidado());
+		}
+		
 		if(bajasTemporalesItem.getFechadesde() != null) {
 			sql.WHERE("trunc(bt.fechabt) >='"+fechadesde+"'");
 		}
@@ -56,15 +61,14 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		return sql.toString();
 	}
 	
-	public String nuevaBajaTemporal(ColegiadoItem colegiadoItem) {
+	public String comboEstado() {
+
 		SQL sql = new SQL();
-		sql.INSERT_INTO("cen_bajastemporales");
-		sql.VALUES("idinstitucion", colegiadoItem.getInstitucion());
-		sql.VALUES("idpersona", colegiadoItem.getIdPersona());
-		sql.VALUES("valido", null);
-		sql.VALUES("fechaestado", new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
-		sql.VALUES("fechabt", new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
+
+		sql.SELECT("idestado, descripcion");
 		
+		sql.FROM("cen_estadosbajastemp");
+
 		return sql.toString();
 	}
 }

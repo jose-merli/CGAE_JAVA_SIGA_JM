@@ -11,7 +11,6 @@ import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
-
 	public String comboCreadoDesde(String idLenguaje, String idInstitucion) {
 		SQL sql = new SQL();
 
@@ -157,61 +156,82 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sqlOrder.toString();
 	}
 
-
-	public String busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje) {
+	public String busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje, Integer tamMaximo) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
-		
-		//SUBQUERY PARA EL INNER JOIN
+		SQL sql3 = new SQL();
+
+		// SUBQUERY PARA EL INNER JOIN
 		sql2.SELECT("MAX(COL2.FECHAESTADO)");
 		sql2.FROM("CEN_DATOSCOLEGIALESESTADO COL2");
 		sql2.WHERE("COL2.IDPERSONA=PER.IDPERSONA AND COL2.IDINSTITUCION = COL.IDINSTITUCION");
 
-		//QUERY PRINCIPAL
-		sql.SELECT("PER.NIFCIF NIF, PER.NOMBRE NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2) APELLIDOS, PER.IDPERSONA IDPERSONA, COL.NCOLEGIADO NCOLEGIADO, COL.NCOMUNITARIO NCOMUNITARIO,"
-			+ "ESTADO.IDESTADO IDESTADO,COL.IDINSTITUCION IDINSTITUCION, INS.ABREVIATURA ABREVIATURA, F_SIGA_GETRECURSO(TIPOESTADO.DESCRIPCION,"+idLenguaje+") ESTADO, COL.SITUACIONRESIDENTE RESIDENTE");
-		
+		// QUERY PRINCIPAL
+		sql.SELECT(
+				"PER.NIFCIF NIF, PER.NOMBRE NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2) APELLIDOS, COL.NCOLEGIADO NCOLEGIADO, COL.NCOMUNITARIO NCOMUNITARIO,"
+						+ "ESTADO.IDESTADO IDESTADO,COL.IDINSTITUCION IDINSTITUCION, INS.ABREVIATURA ABREVIATURA, F_SIGA_GETRECURSO(TIPOESTADO.DESCRIPCION,"
+						+ idLenguaje + ") ESTADO, COL.SITUACIONRESIDENTE RESIDENTE");
+
 		sql.FROM("CEN_PERSONA PER");
-		
+
 		sql.INNER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = PER.IDPERSONA)");
-		sql.INNER_JOIN("CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION AND ESTADO.FECHAESTADO = ("+sql2.toString()+"))");
-		sql.INNER_JOIN("SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
+		sql.INNER_JOIN(
+				"CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION AND ESTADO.FECHAESTADO = ("
+						+ sql2.toString() + "))");
+		sql.INNER_JOIN(
+				"SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
 		sql.INNER_JOIN("CEN_ESTADOCOLEGIAL TIPOESTADO ON (TIPOESTADO.IDESTADO=ESTADO.IDESTADO)");
 		sql.INNER_JOIN("CEN_INSTITUCION INS ON (INS.IDINSTITUCION=COL.IDINSTITUCION)");
-		
-		//CONDICIONES WHERE
-		if(item.getIdInstitucion()!=null && !item.getIdInstitucion().isEmpty()) {
-			sql.WHERE("COL.IDINSTITUCION = "+item.getIdInstitucion());
+
+		// CONDICIONES WHERE
+		if (item.getIdInstitucion() != null && !item.getIdInstitucion().isEmpty()) {
+			sql.WHERE("COL.IDINSTITUCION = " + item.getIdInstitucion());
 		}
-		
-		if(item.getNombre() !=null && !item.getNombre().trim().isEmpty()) {
-			sql.WHERE("UPPER(PER.NOMBRE) LIKE UPPER('%"+item.getNombre().trim()+"%')");
+
+		if (item.getNombre() != null && !item.getNombre().trim().isEmpty()) {
+			sql.WHERE("UPPER(PER.NOMBRE) LIKE UPPER('%" + item.getNombre().trim() + "%')");
 		}
-		
-		if(item.getApellidos() !=null && !item.getApellidos().trim().isEmpty()) {
-			sql.WHERE("CONCAT(CONCAT(UPPER(PER.APELLIDOS1), ' '), UPPER(PER.APELLIDOS2)) LIKE UPPER('%"+item.getApellidos().trim()+"%')");
+
+		if (item.getApellidos() != null && !item.getApellidos().trim().isEmpty()) {
+			sql.WHERE("CONCAT(CONCAT(UPPER(PER.APELLIDOS1), ' '), UPPER(PER.APELLIDOS2)) LIKE UPPER('%"
+					+ item.getApellidos().trim() + "%')");
 		}
-		
-		if(item.getIdEstado() !=null && !item.getIdEstado().isEmpty()) {
-			sql.WHERE("ESTADO.IDESTADO = "+item.getIdEstado());
+
+		if (item.getIdEstado() != null && !item.getIdEstado().isEmpty()) {
+			sql.WHERE("ESTADO.IDESTADO = " + item.getIdEstado());
 		}
-		
-		if(item.getnColegiado() !=null && !item.getnColegiado().trim().isEmpty()) {
-			sql.WHERE("(COL.NCOLEGIADO = "+item.getnColegiado().trim()+" OR COL.NCOMUNITARIO = "+item.getnColegiado().trim()+")");
+
+		if (item.getnColegiado() != null && !item.getnColegiado().trim().isEmpty()) {
+			sql.WHERE("(COL.NCOLEGIADO = " + item.getnColegiado().trim() + " OR COL.NCOMUNITARIO = "
+					+ item.getnColegiado().trim() + ")");
 		}
-		
-		if(item.getIdTurno() !=null && !item.getIdTurno().isEmpty()) {
+
+		if (item.getIdTurno() != null && !item.getIdTurno().isEmpty()) {
 			sql.WHERE("GUARDIAS.IDTURNO = " + item.getIdTurno());
 		}
-		
-		if(item.getIdGuardia()!=null && !item.getIdGuardia().isEmpty()) {
+
+		if (item.getIdGuardia() != null && !item.getIdGuardia().isEmpty()) {
 			sql.WHERE("GUARDIAS.IDGUARDIA = " + item.getIdGuardia());
 		}
-		
-		sql.GROUP_BY("PER.NIFCIF, PER.NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2), PER.IDPERSONA, COL.NCOLEGIADO, "
+
+		if (item.getNif() != null && !item.getNif().isEmpty()) {
+			sql.WHERE("PER.NIFCIF = '" + item.getNif() + "'");
+		}
+
+		sql.GROUP_BY("PER.NIFCIF, PER.NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2), COL.NCOLEGIADO, "
 				+ "COL.NCOMUNITARIO, COL.IDINSTITUCION, INS.ABREVIATURA, ESTADO.IDESTADO, TIPOESTADO.DESCRIPCION, COL.SITUACIONRESIDENTE");
 		sql.ORDER_BY("PER.NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2)");
 
-		return sql.toString();
+		// Se realiza esta consulta para poder aplicar el filtro del número máximo de
+		// registros
+		sql3.SELECT("* FROM ( " + sql.toString() + ")");
+
+		if (tamMaximo != null) {
+			Integer tamMaxNumber = tamMaximo + 1;
+			sql3.WHERE("rownum <= " + tamMaxNumber);
+
+		}
+
+		return sql3.toString();
 	}
 }

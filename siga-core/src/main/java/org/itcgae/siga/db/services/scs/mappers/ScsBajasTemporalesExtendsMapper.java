@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -20,12 +21,11 @@ import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsBajasTemporalesSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsInscripcionesTurnoSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsProcedimientosSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsTipoEJGSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTurnosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-@Service
-@Primary
 public interface ScsBajasTemporalesExtendsMapper extends CenBajastemporalesMapper{
 	
 	 @SelectProvider(type=ScsBajasTemporalesSqlExtendsProvider.class, method="busquedaBajasTemporales")
@@ -42,12 +42,14 @@ public interface ScsBajasTemporalesExtendsMapper extends CenBajastemporalesMappe
 				@Result(column = "VALIDADO", property = "validado", jdbcType = JdbcType.CHAR),
 				@Result(column = "FECHAESTADO", property = "fechaestado", jdbcType = JdbcType.TIMESTAMP) })
 	    List<BajasTemporalesItem> busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem,Short idInstitucion,String fechadesde,String fechahasta);
-	
 	 
-	 @InsertProvider(type=ScsBajasTemporalesSqlExtendsProvider.class, method="nuevaBajaTemporal")
-	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
-			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.DECIMAL, id = true),
-			@Result(column = "VALIDADO", property = "validado", jdbcType = JdbcType.CHAR),
-			@Result(column = "FECHAESTADO", property = "fechaestado", jdbcType = JdbcType.TIMESTAMP) })
-     BajasTemporalesItem nuevaBajaTemporal(ColegiadoItem bajasTemporalesItem);
+
+	@SelectProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "comboEstado")
+		@Results({
+			@Result(column = "IDESTADO", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+		})
+	
+		List<ComboItem> comboEstado();
+		
 }
