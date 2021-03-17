@@ -36,12 +36,12 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		sql.WHERE("TO_CHAR(bt.fechabt,'YYYY') >= TO_CHAR(bt.fechabt,'YYYY') - 2");
 		sql.WHERE("bt.idinstitucion = '"+idInstitucion+"'");
 		
-		if(bajasTemporalesItem.getValidado() != null) {
+		if(bajasTemporalesItem.getValidado() != null && !bajasTemporalesItem.getValidado().equals("2") && !bajasTemporalesItem.getValidado().equals("")) {
 			sql.WHERE("bt.validado = '"+bajasTemporalesItem.getValidado()+"'");
 		}
-		
-		if(bajasTemporalesItem.getValidado() == null) {
-			sql.WHERE("bt.validado = "+bajasTemporalesItem.getValidado());
+
+		if(bajasTemporalesItem.getValidado().equals("2")) {
+			sql.WHERE("bt.validado IS NULL");
 		}
 		
 		if(bajasTemporalesItem.getFechadesde() != null) {

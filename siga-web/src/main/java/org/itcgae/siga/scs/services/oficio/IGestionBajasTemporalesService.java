@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.services.oficio;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -19,6 +21,6 @@ public interface IGestionBajasTemporalesService {
 	
 	public InsertResponseDTO nuevaBajaTemporal(ColegiadoItem colegiadoItem,HttpServletRequest request);
 
-	public UpdateResponseDTO updateEstado(BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request);
+	public UpdateResponseDTO updateEstado(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request);
 	
 }

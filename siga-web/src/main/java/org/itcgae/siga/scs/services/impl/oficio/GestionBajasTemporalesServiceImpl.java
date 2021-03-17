@@ -17,12 +17,17 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesDTO;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.cen.services.impl.BusquedaColegiadosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBajastemporales;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.ScsInscripcionguardia;
+import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
+import org.itcgae.siga.db.entities.ScsInscripcionturno;
+import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.mappers.CenBajastemporalesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsBajasTemporalesExtendsMapper;
@@ -221,8 +226,8 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	}
 	
 	@Override
-	public UpdateResponseDTO updateEstado(BajasTemporalesItem bajasTemporales, HttpServletRequest request) {
-		LOGGER.info("updateNuevo() ->  Entrada al servicio para crear nuevas bajas temporales");
+	public UpdateResponseDTO updateEstado(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request) {
+		LOGGER.info("updateEstado() ->  Entrada al servicio para modificar nuevas bajas temporales");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -240,18 +245,26 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"updateNuevo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateEstado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"updateNuevo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateEstado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
+//					bajasTemporalesItem = scsBajasTemporalesExtendsMapper.nuevaBajaTemporal(colegiadoDTO.getColegiadoItem().get(0));
+					CenBajastemporales cenBajasTemporales = new CenBajastemporales();
+					//cenBajasTemporales.setIdpersona(Long.parseLong(colegiadoDTO.getColegiadoItem().get(0).getIdPersona()));
+					cenBajasTemporales.setIdinstitucion(idInstitucion);
+					cenBajasTemporales.setTipo(cenBajasTemporales.getValidado());
 					
+//					CenBajastemporalesMapper cenBajasTemporalesMapper;
 					
+					int result =cenBajastemporalesMapper.updateByPrimaryKeySelective(cenBajasTemporales);
+				
 				}catch (Exception e) {
 					response = 0;
 					error.setCode(400);
@@ -266,16 +279,16 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				} else if (response == 1 && existentes != 0) {
 					error.setCode(200);
 					error.setDescription(
-							"Se han creado las bajas temporales excepto algunos que tiene las mismas características");
+							"Se han modificado las bajas temporales excepto algunos que tiene las mismas características");
 
 				} else if (error.getCode() == null) {
 					error.setCode(200);
-					error.setDescription("Se ha creado la baja temporal correctamente");
+					error.setDescription("Se ha modificado la baja temporal correctamente");
 				}
 
 				updateResponseDTO.setError(error);
 
-				LOGGER.info("updateNuevo() -> Salida del servicio para crear bajas temporales");
+				LOGGER.info("updateEstado() -> Salida del servicio para modificar bajas temporales");
 
 			}
 
