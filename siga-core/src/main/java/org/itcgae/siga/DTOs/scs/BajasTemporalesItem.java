@@ -17,6 +17,7 @@ public class BajasTemporalesItem {
 	public String nombre;
 	public String apellidos1;
 	public String apellidos2;
+	public String eliminado;
 	
 	public String getIdinstitucion() {
 		return idinstitucion;
@@ -96,5 +97,10 @@ public class BajasTemporalesItem {
 	public void setApellidos2(String apellidos2) {
 		this.apellidos2 = apellidos2;
 	}
-	
+	public String getEliminado() {
+		return eliminado;
+	}
+	public void setEliminado(String eliminado) {
+		this.eliminado = eliminado;
+	}
 }

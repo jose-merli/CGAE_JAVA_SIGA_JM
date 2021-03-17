@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.controllers.oficio;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -49,7 +51,7 @@ public class BajasTemporalesController {
 	}
 	
 	@RequestMapping(value = "/bajasTemporales/updateEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateEstado(@RequestBody BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> updateEstado(@RequestBody List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request) {
 		UpdateResponseDTO response = bajasTemporalesService.updateEstado(bajasTemporalesItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
