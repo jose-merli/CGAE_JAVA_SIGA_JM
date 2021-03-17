@@ -18,6 +18,7 @@ public class BajasTemporalesItem {
 	public String apellidos1;
 	public String apellidos2;
 	public String eliminado;
+	public Date fechabt;
 	
 	public String getIdinstitucion() {
 		return idinstitucion;
@@ -102,5 +103,11 @@ public class BajasTemporalesItem {
 	}
 	public void setEliminado(String eliminado) {
 		this.eliminado = eliminado;
+	}
+	public Date getFechabt() {
+		return fechabt;
+	}
+	public void setFechabt(Date fechabt) {
+		this.fechabt = fechabt;
 	}
 }

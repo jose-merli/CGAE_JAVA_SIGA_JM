@@ -27,7 +27,7 @@ public class DesignacionesController {
 	@RequestMapping(value = "/comboTipoDesgina",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboTurnos(HttpServletRequest request) {
 		ComboDTO response = comboService.comboTipoDesignacion(request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);}
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
 	
