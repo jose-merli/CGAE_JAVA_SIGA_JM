@@ -22,11 +22,14 @@ public class DesignacionesController {
 	@Autowired
 	private ComboService comboService;
 	
+	private IDesignacionesService designacionesService;
+	
 	@RequestMapping(value = "/comboTipoDesgina",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboTurnos(HttpServletRequest request) {
 		ComboDTO response = comboService.comboTipoDesignacion(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);}
-	private IDesignacionesService designacionesService;
+	}
+	
 	
 	@RequestMapping(value = "/busquedaJustificacionExpres",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<JustificacionExpressItem> busquedaTurnos(@RequestBody JustificacionExpressItem item, HttpServletRequest request) {
