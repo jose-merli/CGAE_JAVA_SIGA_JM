@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
 import java.util.Date;
+import java.util.List;
 
 public class DesignaItem {
 	
@@ -38,6 +39,12 @@ public class DesignaItem {
 	private String resumenAsunto;
 	private String sufijo;
 	private int usuModificacion;
+	private String nombreTurno;
+	private int numColegiado;
+	private String apellidosNombre;
+	private String[] interesados;
+	private String validadas;
+	
 	
 	public DesignaItem() {
 		super();
@@ -75,8 +82,12 @@ public class DesignaItem {
 		this.resumenAsunto = "";
 		this.sufijo = "";
 		this.usuModificacion = 0;
+		this.nombreTurno = "";
+		this.numColegiado = 0;
+		this.apellidosNombre = "";
+		this.interesados = null;
+		this.validadas = "";
 	}
-
 	
 	public DesignaItem(int ano, int anoProcedimiento, String art27, String codigo, String defensaJuridica,
 			String delitos, String estados, int factConvenio, Date fechaAlta, Date fechaAnulacion, Date fechaEntrada,
@@ -84,7 +95,8 @@ public class DesignaItem {
 			Date fechaRecepcionColegio, int idInstitucion, int idInstitucion_juzg, int idInstitucion_procur,
 			int idJuzgado, int idPretension, String idProcedimiento, int idProcurador, int idTipoDesignaColegio,
 			int idTurno, String nig, int numero, String numProcedimiento, String observaciones, String procurador,
-			String resumenAsunto, String sufijo, int usuModificacion) {
+			String resumenAsunto, String sufijo, int usuModificacion, String nombreTurno, int numColegiado,
+			String apellidosNombre, String[] interesados, String validadas) {
 		super();
 		this.ano = ano;
 		this.anoProcedimiento = anoProcedimiento;
@@ -120,8 +132,12 @@ public class DesignaItem {
 		this.resumenAsunto = resumenAsunto;
 		this.sufijo = sufijo;
 		this.usuModificacion = usuModificacion;
+		this.nombreTurno = nombreTurno;
+		this.numColegiado = numColegiado;
+		this.apellidosNombre = apellidosNombre;
+		this.interesados = interesados;
+		this.validadas = validadas;
 	}
-
 
 	public int getAno() {
 		return ano;
