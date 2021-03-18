@@ -141,4 +141,25 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		// return sql.toString();
 	}
 
+	public String comboModulos(Short idInstitucion){
+
+		SQL sql = new SQL();
+		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE ");
+		sql.FROM("SCS_PROCEDIMIENTOS MODULO");
+		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
+
+		return sql.toString();
+	}
+	
+	public String comboProcedimientos(Short idInstitucion){
+
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT B.IDPROCEDIMIENTO, B.NOMBRE ");
+		sql.FROM("SCS_PRETENSIONESPROCED A ");
+		sql.INNER_JOIN("SCS_PROCEDIMIENTOS B ON A.IDPROCEDIMIENTO = B.IDPROCEDIMIENTO AND A.IDINSTITUCION = B.IDINSTITUCION ");
+		sql.WHERE("A.IDINSTITUCION = " + idInstitucion);
+
+		return sql.toString();
+	}
+
 }
