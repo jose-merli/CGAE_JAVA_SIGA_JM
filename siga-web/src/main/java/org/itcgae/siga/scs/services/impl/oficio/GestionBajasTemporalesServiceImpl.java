@@ -188,10 +188,11 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						cenBajasTemporales.setUsumodificacion(usuarios.get(0).getIdusuario());
 						cenBajasTemporales.setFechaestado(new Date());
 						cenBajasTemporales.setFechabt(new Date());
+						cenBajasTemporales.setEliminado(0);
 						
 //						CenBajastemporalesMapper cenBajasTemporalesMapper;
 						
-						int result =cenBajastemporalesMapper.insert(cenBajasTemporales);
+						response =cenBajastemporalesMapper.insert(cenBajasTemporales);
 						LOGGER.info(
 								"nuevaBajaTemporal() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
 
@@ -269,7 +270,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 							cenBajasTemporales.setValidado("1");
 						}
 						
-						int result =cenBajastemporalesMapper.updateByPrimaryKeySelective(cenBajasTemporales);
+						response =cenBajastemporalesMapper.updateByPrimaryKeySelective(cenBajasTemporales);
 					}
 				
 				}catch (Exception e) {
@@ -305,7 +306,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	}
 	@Override
 	public UpdateResponseDTO deleteBaja(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request) {
-		LOGGER.info("updateEstado() ->  Entrada al servicio para modificar nuevas bajas temporales");
+		LOGGER.info("deleteBaja() ->  Entrada al servicio para eliminar bajas temporales");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -323,12 +324,12 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"updateEstado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteBaja() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"updateEstado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteBaja() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
@@ -340,7 +341,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						cenBajasTemporales.setFechabt(bajasTemporalesItem.get(x).getFechabt());
 						cenBajasTemporales.setEliminado(1);
 						
-						int result =cenBajastemporalesMapper.updateByPrimaryKeySelective(cenBajasTemporales);
+						response = cenBajastemporalesMapper.updateByPrimaryKeySelective(cenBajasTemporales);
 					}
 				
 				}catch (Exception e) {
@@ -352,21 +353,21 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 				if (response == 0 && error.getDescription() == null) {
 					error.setCode(400);
-					error.setDescription("No se ha creado la baja temporal");
+					error.setDescription("No se ha eliminado la baja temporal");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				} else if (response == 1 && existentes != 0) {
 					error.setCode(200);
 					error.setDescription(
-							"Se han modificado las bajas temporales excepto algunos que tiene las mismas características");
+							"Se han eliminado las bajas temporales excepto algunos que tiene las mismas características");
 
 				} else if (error.getCode() == null) {
 					error.setCode(200);
-					error.setDescription("Se ha modificado la baja temporal correctamente");
+					error.setDescription("Se ha eliminado la baja temporal correctamente");
 				}
 
 				updateResponseDTO.setError(error);
 
-				LOGGER.info("updateEstado() -> Salida del servicio para modificar bajas temporales");
+				LOGGER.info("deleteBaja() -> Salida del servicio para eliminar bajas temporales");
 
 			}
 
