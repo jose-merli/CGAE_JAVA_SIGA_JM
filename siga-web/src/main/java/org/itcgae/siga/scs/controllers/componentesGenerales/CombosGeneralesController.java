@@ -142,5 +142,10 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping("/comboJuzgadoDesignaciones")
+	public ResponseEntity<ComboDTO> comboJuzgadoDesignaciones(HttpServletRequest request) {
+		ComboDTO response = comboService.comboJuzgadoDesignaciones(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 }

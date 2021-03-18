@@ -43,5 +43,25 @@ public class DesignacionesController {
 		DesignaItem response = designacionesService.busquedaDesignas(item, request);
 		return new ResponseEntity<DesignaItem>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/comboModulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboModulos(HttpServletRequest request) {
+
+		ComboDTO response = designacionesService.modulo(request);
+		if (response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/comboProcedimientos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboProcedimientos(HttpServletRequest request) {
+
+		ComboDTO response = designacionesService.comboProcedimientos(request);
+		if (response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }
  
