@@ -22,5 +22,7 @@ public interface IGestionBajasTemporalesService {
 	public InsertResponseDTO nuevaBajaTemporal(ColegiadoItem colegiadoItem,HttpServletRequest request);
 
 	public UpdateResponseDTO updateEstado(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request);
+
+	public UpdateResponseDTO deleteBaja(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request);
 	
 }
