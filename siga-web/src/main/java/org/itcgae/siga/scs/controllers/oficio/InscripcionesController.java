@@ -77,6 +77,21 @@ public class InscripcionesController {
 		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/inscripciones/checkSaltos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InscripcionesDTO> checkSaltos(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		InscripcionesDTO response = inscripcionesService.checkSaltos(inscripcionesDTO, request);
+		return new ResponseEntity<InscripcionesDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/inscripciones/updateBorrarSaltos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateBorrarSaltos(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = inscripcionesService.updateBorrarSaltos(inscripcionesDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@RequestMapping(value = "/inscripciones/updateValidar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateValidar(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = inscripcionesService.updateValidar(inscripcionesDTO, request);
