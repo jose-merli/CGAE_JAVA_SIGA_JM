@@ -90,34 +90,34 @@ import org.itcgae.siga.db.services.scs.mappers.ScsCabeceraguardiasExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.ValidationException;
 import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasRequestDocument;
-import org.itcgae.sspp.ws.registroSociedades.ColegioDocument.Colegio;
-import org.itcgae.sspp.ws.registroSociedades.ContactoDocument.Contacto;
-import org.itcgae.sspp.ws.registroSociedades.ContactoDocument.Contacto.Fax;
-import org.itcgae.sspp.ws.registroSociedades.ContactoDocument.Contacto.Telefono;
-import org.itcgae.sspp.ws.registroSociedades.ContactoDocument.Contacto.TelefonoMovil;
-import org.itcgae.sspp.ws.registroSociedades.DatosCargoDocument.DatosCargo;
-import org.itcgae.sspp.ws.registroSociedades.DatosEntidad;
-import org.itcgae.sspp.ws.registroSociedades.DatosEntidad.FormaSocial;
-import org.itcgae.sspp.ws.registroSociedades.DatosPersona;
-import org.itcgae.sspp.ws.registroSociedades.DatosProfesionalDocument.DatosProfesional;
-import org.itcgae.sspp.ws.registroSociedades.DatosRegistroDocument.DatosRegistro;
-import org.itcgae.sspp.ws.registroSociedades.DireccionDocument.Direccion;
-import org.itcgae.sspp.ws.registroSociedades.DireccionDocument.Direccion.CorreoElectronico;
-import org.itcgae.sspp.ws.registroSociedades.DireccionDocument.Direccion.Poblacion;
-import org.itcgae.sspp.ws.registroSociedades.DireccionDocument.Direccion.Provincia;
-import org.itcgae.sspp.ws.registroSociedades.ErrorType;
-import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesRequestDocument.GetListaSociedadesRequest;
-import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesResponseDocument.GetListaSociedadesResponse;
-import org.itcgae.sspp.ws.registroSociedades.IdentificacionDocument.Identificacion;
-import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.IntegranteSociedad;
-import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.IntegranteSociedad.IntegranteFisico;
-import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.IntegranteSociedad.IntegranteJuridico;
-import org.itcgae.sspp.ws.registroSociedades.ProfesionalAbogadoDocument.ProfesionalAbogado;
-import org.itcgae.sspp.ws.registroSociedades.ProfesionalDocument.Profesional;
-import org.itcgae.sspp.ws.registroSociedades.RegistroSociedadDocument.RegistroSociedad;
-import org.itcgae.sspp.ws.registroSociedades.SociedadActualizacionDocument.SociedadActualizacion;
-import org.itcgae.sspp.ws.registroSociedades.SociedadActualizacionDocument.SociedadActualizacion.Resena;
-import org.itcgae.sspp.ws.registroSociedades.SociedadBajaDocument.SociedadBaja;
+import org.itcgae.sspp.ws.registrosociedades.ColegioDocument.Colegio;
+import org.itcgae.sspp.ws.registrosociedades.ContactoDocument.Contacto;
+import org.itcgae.sspp.ws.registrosociedades.ContactoDocument.Contacto.Fax;
+import org.itcgae.sspp.ws.registrosociedades.ContactoDocument.Contacto.Telefono;
+import org.itcgae.sspp.ws.registrosociedades.ContactoDocument.Contacto.TelefonoMovil;
+import org.itcgae.sspp.ws.registrosociedades.DatosCargoDocument.DatosCargo;
+import org.itcgae.sspp.ws.registrosociedades.DatosEntidad;
+import org.itcgae.sspp.ws.registrosociedades.DatosEntidad.FormaSocial;
+import org.itcgae.sspp.ws.registrosociedades.DatosPersona;
+import org.itcgae.sspp.ws.registrosociedades.DatosProfesionalDocument.DatosProfesional;
+import org.itcgae.sspp.ws.registrosociedades.DatosRegistroDocument.DatosRegistro;
+import org.itcgae.sspp.ws.registrosociedades.DireccionDocument.Direccion;
+import org.itcgae.sspp.ws.registrosociedades.DireccionDocument.Direccion.CorreoElectronico;
+import org.itcgae.sspp.ws.registrosociedades.DireccionDocument.Direccion.Poblacion;
+import org.itcgae.sspp.ws.registrosociedades.DireccionDocument.Direccion.Provincia;
+import org.itcgae.sspp.ws.registrosociedades.ErrorType;
+import org.itcgae.sspp.ws.registrosociedades.GetListaSociedadesRequestDocument.GetListaSociedadesRequest;
+import org.itcgae.sspp.ws.registrosociedades.GetListaSociedadesResponseDocument.GetListaSociedadesResponse;
+import org.itcgae.sspp.ws.registrosociedades.IdentificacionDocument.Identificacion;
+import org.itcgae.sspp.ws.registrosociedades.IntegranteSociedadDocument.IntegranteSociedad;
+import org.itcgae.sspp.ws.registrosociedades.IntegranteSociedadDocument.IntegranteSociedad.IntegranteFisico;
+import org.itcgae.sspp.ws.registrosociedades.IntegranteSociedadDocument.IntegranteSociedad.IntegranteJuridico;
+import org.itcgae.sspp.ws.registrosociedades.ProfesionalAbogadoDocument.ProfesionalAbogado;
+import org.itcgae.sspp.ws.registrosociedades.ProfesionalDocument.Profesional;
+import org.itcgae.sspp.ws.registrosociedades.RegistroSociedadDocument.RegistroSociedad;
+import org.itcgae.sspp.ws.registrosociedades.SociedadActualizacionDocument.SociedadActualizacion;
+import org.itcgae.sspp.ws.registrosociedades.SociedadActualizacionDocument.SociedadActualizacion.Resena;
+import org.itcgae.sspp.ws.registrosociedades.SociedadBajaDocument.SociedadBaja;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -251,7 +251,7 @@ public class WSCommons {
 		if (xmlObjectResponse instanceof GetListaSociedadesResponse) {
 
 			ErrorType errorType = ((GetListaSociedadesResponse) xmlObjectResponse).addNewErrorServidor();
-			org.itcgae.sspp.ws.registroSociedades.ErrorDocument.Error error = errorType.addNewError();
+			org.itcgae.sspp.ws.registrosociedades.ErrorDocument.Error error = errorType.addNewError();
 
 			error.setCodRetorno(codigo);
 			error.setDescRetorno(message);
@@ -273,7 +273,7 @@ public class WSCommons {
 		if (xmlObjectResponse instanceof GetListaSociedadesResponse) {
 
 			ErrorType errorType = ((GetListaSociedadesResponse) xmlObjectResponse).addNewErrorServidor();
-			org.itcgae.sspp.ws.registroSociedades.ErrorDocument.Error error = errorType.addNewError();
+			org.itcgae.sspp.ws.registrosociedades.ErrorDocument.Error error = errorType.addNewError();
 
 			error.setCodRetorno(codigo);
 			error.setDescRetorno(message);
@@ -302,6 +302,8 @@ public class WSCommons {
 		// Método genérico que recibe una peticion de un cliente de ws y comprueba si la
 		// IP del colegio se corresponde con la correcta
 		String valor = obtenerValorParametroColegio(idInstitucion, nombreParametroIP);
+		//Para probar las sociedades
+		//valor = "127.0.0.1";
 		if (valor == null || !endpointReference.equals(valor)) {
 			// Si no hemos encontrado el parámetro, o hemos encontrado más de uno hay que
 			// construir error si es solicitado y devolver excepcion
@@ -321,7 +323,8 @@ public class WSCommons {
 			ERROR_SERVER error) throws ValidationException {
 
 		String valor = obtenerValorParametroColegio(idInstitucion, nombreParametro);
-
+		//Solo para probar
+		//valor = "1";
 		if (valor == null || valor.equals("0")) {
 			// Si no hemos encontrado el parámetro, o hemos encontrado más de uno hay que
 			// construir error si es solicitado y devolver excepcion
@@ -607,6 +610,7 @@ public class WSCommons {
 								argResena.setStringValue(regSociedad.getResena());
 							}
 						}
+						//sociedadActualizacion.setResena(argResena);
 						sociedadActualizacion.setResena(argResena);
 						if (null != regSociedad.getObjetoSocial()) {
 							if(regSociedad.getObjetoSocial().length()>=20){
