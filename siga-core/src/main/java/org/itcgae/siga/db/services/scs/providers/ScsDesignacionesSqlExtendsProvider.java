@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
 
@@ -106,6 +107,59 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		return sqlOrder.toString();
 		// return sql.toString();
+	}
+	
+	public String busquedaDesignaciones(DesignaItem designaItem, Integer tamMax) {
+		SQL sql = new SQL();
+		SQL sqlOrder = new SQL();
+
+//		sqlOrder.SELECT("*");
+//		sql.SELECT(
+//				"DESIGNA.idinstitucion, DESIGNA.anio,DESIGNA.numero,to_char(DESIGNA.idturno)  as clave, '' as rol, 'D' as tipo");
+//		sql.FROM("SCS_DESIGNA DESIGNA");
+//		// El Join con la tabla de scs_personaJG, solo realizará si nos viene informado
+//		// alguno de los datos del solicitante(Nif, nombre o apellidos).
+//		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
+//			sql.INNER_JOIN(
+//					"SCS_DESIGNASLETRADO DESIGNALETRADO ON DESIGNALETRADO.idinstitucion = DESIGNA.idinstitucion  and DESIGNALETRADO.idturno = DESIGNA.idturno\r\n"
+//							+ "  and DESIGNALETRADO.anio = DESIGNA.anio and DESIGNALETRADO.numero = DESIGNA.numero");
+//		}
+//		sql.INNER_JOIN(
+//				"scs_defendidosdesigna DEFENDIDOSDESIGNA ON DEFENDIDOSDESIGNA.idinstitucion = DESIGNA.idinstitucion  and DEFENDIDOSDESIGNA.idturno = DESIGNA.idturno\r\n"
+//						+ "                            and DEFENDIDOSDESIGNA.anio = DESIGNA.anio and DEFENDIDOSDESIGNA.numero = DESIGNA.numero");
+//		sql.LEFT_OUTER_JOIN(
+//				"SCS_PERSONAJG PERSONA ON  DEFENDIDOSDESIGNA.IDPERSONA = PERSONA.IDPERSONA  AND DEFENDIDOSDESIGNA.IDINSTITUCION = PERSONA.IDINSTITUCION");
+//		sql.WHERE("DESIGNA.idinstitucion =" + asuntosJusticiableItem.getIdInstitucion());
+
+		sqlOrder.FROM("(" + sql + " )");
+		if (tamMax != null) {
+			Integer tamMaxNumber = tamMax + 1;
+			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+		}
+
+		return sqlOrder.toString();
+		// return sql.toString();
+	}
+
+	public String comboModulos(Short idInstitucion){
+
+		SQL sql = new SQL();
+		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE ");
+		sql.FROM("SCS_PROCEDIMIENTOS MODULO");
+		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
+
+		return sql.toString();
+	}
+	
+	public String comboProcedimientos(Short idInstitucion){
+
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT B.IDPROCEDIMIENTO, B.NOMBRE ");
+		sql.FROM("SCS_PRETENSIONESPROCED A ");
+		sql.INNER_JOIN("SCS_PROCEDIMIENTOS B ON A.IDPROCEDIMIENTO = B.IDPROCEDIMIENTO AND A.IDINSTITUCION = B.IDINSTITUCION ");
+		sql.WHERE("A.IDINSTITUCION = " + idInstitucion);
+
+		return sql.toString();
 	}
 
 }

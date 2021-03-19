@@ -48,4 +48,6 @@ public interface ComboService {
 	public ComboDTO comboComisaria(HttpServletRequest request);
 
 	public ComboDTO comboJuzgado(HttpServletRequest request);
+	
+	public ComboDTO comboJuzgadoDesignaciones(HttpServletRequest request);
 }

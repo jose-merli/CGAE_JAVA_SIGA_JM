@@ -268,3 +268,4 @@ siga-core/target/
 .sonarlint/
 siga-web/.sts4-cache/
 .metadata/
+siga-core/.sts4-cache/classpath-data.json

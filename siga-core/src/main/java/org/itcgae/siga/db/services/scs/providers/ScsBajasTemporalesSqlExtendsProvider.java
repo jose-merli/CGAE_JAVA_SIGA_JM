@@ -6,6 +6,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
+import org.itcgae.siga.db.entities.CenBajastemporales;
 import org.itcgae.siga.db.mappers.CenBajastemporalesSqlProvider;
 import org.itcgae.siga.db.mappers.ScsInscripcionturnoSqlProvider;
 import java.text.SimpleDateFormat;
@@ -24,7 +25,8 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 				"    bt.fechahasta,\r\n" + 
 				"    bt.fechaalta,\r\n" + 
 				"    bt.descripcion,\r\n" + 
-				"    bt.validado,\r\n" + 
+				"    bt.validado,\r\n" +
+				"    bt.fechabt,\r\n" + 
 				"    trunc(bt.fechaestado),\r\n" + 
 				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado,\r\n" + 
 				"    per.nombre,\r\n" + 
@@ -36,16 +38,24 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		sql.WHERE("TO_CHAR(bt.fechabt,'YYYY') >= TO_CHAR(bt.fechabt,'YYYY') - 2");
 		sql.WHERE("bt.idinstitucion = '"+idInstitucion+"'");
 		
-		if(bajasTemporalesItem.getValidado() != null && !bajasTemporalesItem.getValidado().equals("2") && !bajasTemporalesItem.getValidado().equals("")) {
+		if(bajasTemporalesItem.getValidado() != null && !bajasTemporalesItem.getValidado().equals("2")) {
 			sql.WHERE("bt.validado = '"+bajasTemporalesItem.getValidado()+"'");
 		}
 
-		if(bajasTemporalesItem.getValidado().equals("2")) {
+		if("2".equals(bajasTemporalesItem.getValidado())) {
 			sql.WHERE("bt.validado IS NULL");
 		}
-		
 		if(bajasTemporalesItem.getFechadesde() != null) {
-			sql.WHERE("trunc(bt.fechabt) >='"+fechadesde+"'");
+			sql.WHERE("bt.fechadesde >='"+fechadesde+"'");
+		}
+		if(bajasTemporalesItem.getFechahasta() != null) {
+			sql.WHERE("bt.fechahasta <='"+fechahasta+"'");
+		}
+		if(bajasTemporalesItem.getFechaalta() != null) {
+			sql.WHERE("bt.fechaalta >='"+bajasTemporalesItem.getFechaalta()+"'");
+		}
+		if(bajasTemporalesItem.getFechabt() != null) {
+			sql.WHERE("bt.fechabt <='"+bajasTemporalesItem.getFechabt()+"'");
 		}
 		if(bajasTemporalesItem.getTipo() != null) {
 			sql.WHERE("bt.tipo = '"+bajasTemporalesItem.getTipo()+"'");
@@ -53,11 +63,14 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		if(bajasTemporalesItem.getIdpersona() != null) {
 			sql.WHERE("bt.idpersona = '"+bajasTemporalesItem.getIdpersona()+"'");
 		}
-		
 		if(bajasTemporalesItem.getNcolegiado() != null && !bajasTemporalesItem.getNcolegiado().equals("")) {
 			sql.WHERE("(col.ncolegiado = '"+bajasTemporalesItem.getNcolegiado()+"' OR col.ncomunitario = '"+bajasTemporalesItem.getNcolegiado()+"')");
 		}
-			
+		if(!bajasTemporalesItem.isHistorico()) {
+			sql.WHERE("bt.eliminado = 0");
+		}else {
+			sql.WHERE("bt.eliminado = 1 AND bt.eliminado = 0");
+		}
 		return sql.toString();
 	}
 	
@@ -71,4 +84,5 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 
 		return sql.toString();
 	}
+	
 }
