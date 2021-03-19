@@ -611,7 +611,7 @@ public class WSCommons {
 							}
 						}
 						//sociedadActualizacion.setResena(argResena);
-						sociedadActualizacion.setResena(argResena);
+						sociedadActualizacion.setResena(argResena.getStringValue());
 						if (null != regSociedad.getObjetoSocial()) {
 							if(regSociedad.getObjetoSocial().length()>=20){
 								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial().substring(0, 20));
