@@ -70,7 +70,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		if(!bajasTemporalesItem.isHistorico()) {
 			sql.WHERE("bt.eliminado = 0");
 		}else {
-			sql.WHERE("bt.eliminado = 1 OR bt.eliminado = 0");
+			sql.WHERE("(bt.eliminado = 1 OR bt.eliminado = 0)");
 		}
 		return sql.toString();
 	}

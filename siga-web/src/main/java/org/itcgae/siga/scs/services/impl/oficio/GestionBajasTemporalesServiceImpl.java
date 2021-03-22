@@ -276,10 +276,15 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						cenBajasTemporales.setIdinstitucion(Short.parseShort(bajasTemporalesItem.get(x).getIdinstitucion()));
 						cenBajasTemporales.setIdpersona(Long.parseLong(bajasTemporalesItem.get(x).getIdpersona()));
 						cenBajasTemporales.setFechabt(bajasTemporalesItem.get(x).getFechabt());
+						cenBajasTemporales.setFechadesde(bajasTemporalesItem.get(x).getFechadesde());
+						cenBajasTemporales.setFechaalta(bajasTemporalesItem.get(x).getFechaalta());
+						cenBajasTemporales.setFechaestado(bajasTemporalesItem.get(x).getFechaestado());
+						cenBajasTemporales.setDescripcion(bajasTemporalesItem.get(x).getDescripcion());
+						cenBajasTemporales.setTipo(bajasTemporalesItem.get(x).getTipo());
 						
-						if(bajasTemporalesItem.get(x).getValidado().equals("Anular")) {
+						if(bajasTemporalesItem.get(x).getValidado().equals("Anular") || bajasTemporalesItem.get(x).getValidado().equals("Anulada")) {
 							cenBajasTemporales.setValidado("3");
-						}else if(bajasTemporalesItem.get(x).getValidado().equals("Denegar")) {
+						}else if(bajasTemporalesItem.get(x).getValidado().equals("Denegar") || bajasTemporalesItem.get(x).getValidado().equals("Denegada")) {
 							cenBajasTemporales.setValidado("0");
 						}else {
 							cenBajasTemporales.setValidado("1");
