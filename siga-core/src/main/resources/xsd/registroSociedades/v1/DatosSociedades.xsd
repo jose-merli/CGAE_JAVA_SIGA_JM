@@ -124,6 +124,15 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:simpleType name="string20MinLength3">
+	<xs:annotation>
+	<xs:documentation>Tipo string de longitud máxima de 20 y mínima 3</xs:documentation>
+	</xs:annotation>
+	<xs:restriction base="xs:string">
+	<xs:maxLength value="20"/>
+	<xs:minLength value="3"/>
+	</xs:restriction>
+	</xs:simpleType>
   <xs:simpleType name="string20MinLength9">
     <xs:annotation>
       <xs:documentation>Tipo string de longitud máxima de 20 y mínima 9</xs:documentation>
@@ -316,7 +325,7 @@
             <xs:documentation>Profesion del profesional</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
-            <xs:restriction base="string20"/>
+            <xs:restriction base="string20MinLength3"/>
           </xs:simpleType>
         </xs:element>
         <xs:choice  minOccurs="0">
