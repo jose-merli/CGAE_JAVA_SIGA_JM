@@ -87,6 +87,11 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	@Override
 	public BajasTemporalesDTO busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
+
+		Error error = new Error();
+		
+		try {
+		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -125,9 +130,10 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 					}
 				}
-				
-				bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion, fechadesde, fechahasta);
+					
+					bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion, fechadesde, fechahasta);
 
+				
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
 
@@ -137,8 +143,17 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 			}
 
 		}
+		
 		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
+		
 		return bajasTemporalesDTO;
+		
+		} catch (Exception e) {
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			LOGGER.error(e.getMessage());
+			return null;
+		}
 	}
 	
 	@Override

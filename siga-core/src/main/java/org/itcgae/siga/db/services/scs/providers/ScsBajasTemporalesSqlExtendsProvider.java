@@ -31,6 +31,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado,\r\n" + 
 				"    per.nombre,\r\n" + 
 				"    per.apellidos1,\r\n" + 
+				"    bt.eliminado,\r\n" + 
 				"    per.apellidos2");
 		sql.FROM("cen_bajastemporales bt");
 		sql.INNER_JOIN("cen_colegiado col ON col.idpersona = bt.idpersona and col.idinstitucion = bt.idinstitucion\r\n" + 
@@ -69,7 +70,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		if(!bajasTemporalesItem.isHistorico()) {
 			sql.WHERE("bt.eliminado = 0");
 		}else {
-			sql.WHERE("bt.eliminado = 1 AND bt.eliminado = 0");
+			sql.WHERE("bt.eliminado = 1 OR bt.eliminado = 0");
 		}
 		return sql.toString();
 	}
