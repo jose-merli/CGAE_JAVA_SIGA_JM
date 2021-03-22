@@ -1,7 +1,10 @@
 package org.itcgae.siga.scs.controllers.guardia;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.scs.services.guardia.SaltosCompGuardiasService;
@@ -15,16 +18,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/guardia")
+@RequestMapping(value = "/guardia/saltosCompensaciones")
 public class SaltosCompGuardiasController {
-	
+
 	@Autowired
 	SaltosCompGuardiasService saltosCompGuardiasService;
 
-	@PostMapping(value = "/busquedaSaltosCompG/searchSaltosYCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<SaltoCompGuardiaDTO> searchSaltosYCompensaciones(@RequestBody SaltoCompGuardiaItem saltoItem, HttpServletRequest request){
-		SaltoCompGuardiaDTO response= saltosCompGuardiasService.searchSaltosYCompensaciones(saltoItem,request);
-		return new ResponseEntity<SaltoCompGuardiaDTO>(response, HttpStatus.OK);
+	@PostMapping(value = "/buscarSaltosOCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<SaltoCompGuardiaDTO> searchSaltosYCompensaciones(@RequestBody SaltoCompGuardiaItem saltoItem,
+			HttpServletRequest request) {
+		SaltoCompGuardiaDTO response = saltosCompGuardiasService.searchSaltosYCompensaciones(saltoItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
+	@PostMapping(value = "/guardarSaltosCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> guardarSaltosCompensaciones(
+			@RequestBody List<SaltoCompGuardiaItem> listaSaltoItem, HttpServletRequest request) {
+		DeleteResponseDTO response = saltosCompGuardiasService.guardarSaltosCompensaciones(listaSaltoItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
 }
