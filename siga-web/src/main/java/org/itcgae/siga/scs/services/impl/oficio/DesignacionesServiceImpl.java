@@ -7,6 +7,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
@@ -17,8 +19,10 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -44,13 +48,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	
 	@Override
-	public JustificacionExpressItem busquedaJustificacionExpres(JustificacionExpressItem item, HttpServletRequest request) {
-		JustificacionExpressItem result = new JustificacionExpressItem();
+	public List<DesignaItem> busquedaJustificacionExpres(JustificacionExpressItem item, HttpServletRequest request) {
+		List <DesignaItem> result = null;
 		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		StringDTO parametros = new StringDTO();
+		String idPersona = null;
 		
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -64,8 +73,44 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> Entrada a servicio para la busqueda de justifiacion express");
-
-				LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> Salida del servicio");
+				
+				try {
+					//cargamos los parámetros necesarios	
+					String longitudCodEJG;
+					
+					//LONGITUD_CODEJG
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG", idInstitucion.toString());
+					
+					//si el ncolegiado, viene relleno, debemos obtener la idpersona
+					if(item.getnColegiado()!=null && !item.getnColegiado().trim().isEmpty()) {
+						//obtenemos la idpersona
+						ColegiadosSJCSItem colegiadosSJCSItem = new ColegiadosSJCSItem();
+						colegiadosSJCSItem.setnColegiado(item.getnColegiado());
+						
+						List<ColegiadosSJCSItem> colegiadosSJCSItems = cenColegiadoExtendsMapper.busquedaColegiadosSJCS(idInstitucion.toString(), colegiadosSJCSItem);
+						
+						if(colegiadosSJCSItems.size()>0) {
+							idPersona = colegiadosSJCSItems.get(0).getIdPersona();
+						}
+					}
+					
+					//comprobamos la longitud para la institucion, si no tiene nada, cogemos el de la institucion 0
+					if(parametros != null && parametros.getValor()!=null) {
+						longitudCodEJG = parametros.getValor();
+					}else {
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG", "0");
+						longitudCodEJG = parametros.getValor();
+					}
+					
+					
+					//PaginadorBind paginador = admDesignas.getDesignasJustificacionPaginador(fInformeJustificacion,longitudNumEjg,false,isPermitidoEditarActFicha,ejisActivo.equals(AppConstants.DB_TRUE));
+					
+					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpres(item, idInstitucion.toString(), longitudCodEJG, idPersona);
+					
+					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> Salida del servicio");
+				}catch (Exception e){
+					LOGGER.error("DesignacionesServiceImpl.busquedaJustificacionExpres -> ERROR: al consultar datos de la bd. ", e);
+				}
 			}
 		}
 		

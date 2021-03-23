@@ -1,7 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 public class DesignaItem {
 	
@@ -70,6 +70,103 @@ public class DesignaItem {
 	private String documentacionActuacion;
 	private String[] idModuloActuaciones;
 	
+	private String expedientes;
+	private String cliente;
+	
+	
+	public DesignaItem() {
+		super();
+		this.ano = 0;
+		this.anoProcedimiento = 0;
+		this.art27 = "";
+		this.codigo = "";
+		this.defensaJuridica = "";
+		this.delitos = "";
+		this.estados = "";
+		this.factConvenio = 0;
+		this.fechaAlta = new Date();
+		this.fechaAnulacion = new Date();
+		this.fechaEntrada = new Date();
+		this.fechaEstado = new Date();
+		this.fechaFin = new Date();
+		this.fechaJuicio = new Date();
+		this.fechaModificacion = new Date();
+		this.fechaOficioJuzgado = new Date();
+		this.fechaRecepcionColegio = new Date();
+		this.idInstitucion = 0;
+		this.idInstitucion_juzg = 0;
+		this.idInstitucion_procur = 0;
+		this.idJuzgado = 0;
+		this.idPretension = 0;
+		this.idProcedimiento = "";
+		this.idProcurador = 0;
+		this.idTipoDesignaColegio = 0;
+		this.idTurno = 0;
+		this.nig = "";
+		this.numero = 0;
+		this.numProcedimiento = "";
+		this.observaciones = "";
+		this.procurador = "";
+		this.resumenAsunto = "";
+		this.sufijo = "";
+		this.usuModificacion = 0;
+		this.nombreTurno = "";
+		this.numColegiado = 0;
+		this.apellidosNombre = "";
+		this.interesados = null;
+		this.validadas = "";
+	}
+	
+	public DesignaItem(int ano, int anoProcedimiento, String art27, String codigo, String defensaJuridica,
+			String delitos, String estados, int factConvenio, Date fechaAlta, Date fechaAnulacion, Date fechaEntrada,
+			Date fechaEstado, Date fechaFin, Date fechaJuicio, Date fechaModificacion, Date fechaOficioJuzgado,
+			Date fechaRecepcionColegio, int idInstitucion, int idInstitucion_juzg, int idInstitucion_procur,
+			int idJuzgado, int idPretension, String idProcedimiento, int idProcurador, int idTipoDesignaColegio,
+			int idTurno, String nig, int numero, String numProcedimiento, String observaciones, String procurador,
+			String resumenAsunto, String sufijo, int usuModificacion, String nombreTurno, int numColegiado,
+			String apellidosNombre, String[] interesados, String validadas) {
+		super();
+		this.ano = ano;
+		this.anoProcedimiento = anoProcedimiento;
+		this.art27 = art27;
+		this.codigo = codigo;
+		this.defensaJuridica = defensaJuridica;
+		this.delitos = delitos;
+		this.estados = estados;
+		this.factConvenio = factConvenio;
+		this.fechaAlta = fechaAlta;
+		this.fechaAnulacion = fechaAnulacion;
+		this.fechaEntrada = fechaEntrada;
+		this.fechaEstado = fechaEstado;
+		this.fechaFin = fechaFin;
+		this.fechaJuicio = fechaJuicio;
+		this.fechaModificacion = fechaModificacion;
+		this.fechaOficioJuzgado = fechaOficioJuzgado;
+		this.fechaRecepcionColegio = fechaRecepcionColegio;
+		this.idInstitucion = idInstitucion;
+		this.idInstitucion_juzg = idInstitucion_juzg;
+		this.idInstitucion_procur = idInstitucion_procur;
+		this.idJuzgado = idJuzgado;
+		this.idPretension = idPretension;
+		this.idProcedimiento = idProcedimiento;
+		this.idProcurador = idProcurador;
+		this.idTipoDesignaColegio = idTipoDesignaColegio;
+		this.idTurno = idTurno;
+		this.nig = nig;
+		this.numero = numero;
+		this.numProcedimiento = numProcedimiento;
+		this.observaciones = observaciones;
+		this.procurador = procurador;
+		this.resumenAsunto = resumenAsunto;
+		this.sufijo = sufijo;
+		this.usuModificacion = usuModificacion;
+		this.nombreTurno = nombreTurno;
+		this.numColegiado = numColegiado;
+		this.apellidosNombre = apellidosNombre;
+		this.interesados = interesados;
+		this.validadas = validadas;
+	}
+
 	public int getAno() {
 		return ano;
 	}
@@ -456,4 +553,94 @@ public class DesignaItem {
 	}
 	
 
+}
+
+	/**
+	 * @return the nombreTurno
+	 */
+	public String getNombreTurno() {
+		return nombreTurno;
+	}
+
+	/**
+	 * @param nombreTurno the nombreTurno to set
+	 */
+	public void setNombreTurno(String nombreTurno) {
+		this.nombreTurno = nombreTurno;
+	}
+
+	/**
+	 * @return the numColegiado
+	 */
+	public int getNumColegiado() {
+		return numColegiado;
+	}
+
+	/**
+	 * @param numColegiado the numColegiado to set
+	 */
+	public void setNumColegiado(int numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+
+	/**
+	 * @return the apellidosNombre
+	 */
+	public String getApellidosNombre() {
+		return apellidosNombre;
+	}
+
+	/**
+	 * @param apellidosNombre the apellidosNombre to set
+	 */
+	public void setApellidosNombre(String apellidosNombre) {
+		this.apellidosNombre = apellidosNombre;
+	}
+
+	/**
+	 * @return the interesados
+	 */
+	public String[] getInteresados() {
+		return interesados;
+	}
+
+	/**
+	 * @param interesados the interesados to set
+	 */
+	public void setInteresados(String[] interesados) {
+		this.interesados = interesados;
+	}
+
+	/**
+	 * @return the validadas
+	 */
+	public String getValidadas() {
+		return validadas;
+	}
+
+	/**
+	 * @param validadas the validadas to set
+	 */
+	public void setValidadas(String validadas) {
+		this.validadas = validadas;
+	}
+
+	@Override
+	public String toString() {
+		return "DesignaItem [ano=" + ano + ", anoProcedimiento=" + anoProcedimiento + ", art27=" + art27 + ", codigo="
+				+ codigo + ", defensaJuridica=" + defensaJuridica + ", delitos=" + delitos + ", estados=" + estados
+				+ ", factConvenio=" + factConvenio + ", fechaAlta=" + fechaAlta + ", fechaAnulacion=" + fechaAnulacion
+				+ ", fechaEntrada=" + fechaEntrada + ", fechaEstado=" + fechaEstado + ", fechaFin=" + fechaFin
+				+ ", fechaJuicio=" + fechaJuicio + ", fechaModificacion=" + fechaModificacion + ", fechaOficioJuzgado="
+				+ fechaOficioJuzgado + ", fechaRecepcionColegio=" + fechaRecepcionColegio + ", idInstitucion="
+				+ idInstitucion + ", idInstitucion_juzg=" + idInstitucion_juzg + ", idInstitucion_procur="
+				+ idInstitucion_procur + ", idJuzgado=" + idJuzgado + ", idPretension=" + idPretension
+				+ ", idProcedimiento=" + idProcedimiento + ", idProcurador=" + idProcurador + ", idTipoDesignaColegio="
+				+ idTipoDesignaColegio + ", idTurno=" + idTurno + ", nig=" + nig + ", numero=" + numero
+				+ ", numProcedimiento=" + numProcedimiento + ", observaciones=" + observaciones + ", procurador="
+				+ procurador + ", resumenAsunto=" + resumenAsunto + ", sufijo=" + sufijo + ", usuModificacion="
+				+ usuModificacion + ", nombreTurno=" + nombreTurno + ", numColegiado=" + numColegiado
+				+ ", apellidosNombre=" + apellidosNombre + ", interesados=" + Arrays.toString(interesados)
+				+ ", validadas=" + validadas + "]";
+	}
 }

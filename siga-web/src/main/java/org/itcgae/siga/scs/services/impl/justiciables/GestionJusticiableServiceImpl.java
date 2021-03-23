@@ -53,7 +53,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenPoblacionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipoviaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDefendidosdesignasExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsDesignaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignasLetradoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
@@ -104,7 +104,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	private ScsEstadoejgExtendsMapper scsEstadoejgExtendsMapper;
 
 	@Autowired
-	private ScsDesignaExtendsMapper scsDesignaExtendsMapper;
+	private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
 
 	@Autowired
 	private ScsDesignasLetradoExtendsMapper scsDesignasLetradoExtendsMapper;
@@ -1424,7 +1424,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info(
 				"getAsuntoTipoDesigna() / scsDesignaExtendsMapper.getAsuntoTipoDesigna() -> Entrada a scsDesignaExtendsMapper para obtener el asunto tipo Designa");
 
-		asuntoDesigna = scsDesignaExtendsMapper.getAsuntoTipoDesigna(asuntoClave, usuario.getIdlenguaje());
+		asuntoDesigna = scsDesignacionesExtendsMapper.getAsuntoTipoDesigna(asuntoClave, usuario.getIdlenguaje());
 
 		LOGGER.info(
 				"getAsuntoTipoDesigna() / scsDesignaExtendsMapper.getAsuntoTipoDesigna() -> Salida a scsDesignaExtendsMapper para obtener el asunto tipo Designa");
