@@ -272,4 +272,61 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		return sql.toString();
 	}
 
+	public String borrarSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.DELETE_FROM("SCS_SALTOSCOMPENSACIONES");
+
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + saltoItem.getIdTurno() + "'");
+		sql.WHERE("IDSALTOSTURNO = '" + saltoItem.getIdSaltosTurno() + "'");
+		sql.WHERE("IDGUARDIA = '" + saltoItem.getIdGuardia() + "'");
+
+		return sql.toString();
+	}
+
+	public String borrarSaltosCompensacionesGrupo(SaltoCompGuardiaItem saltoItem) {
+
+		SQL sql = new SQL();
+
+		sql.DELETE_FROM("SCS_SALTOCOMPENSACIONGRUPO");
+
+		sql.WHERE("IDSALTOCOMPENSACIONGRUPO = '" + saltoItem.getIdSaltosTurno() + "'");
+
+		return sql.toString();
+	}
+
+	public String anularSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion,
+			AdmUsuarios usuario) {
+
+		SQL sql = new SQL();
+
+		sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
+
+		sql.SET("FECHA_ANULACION = SYSTIMESTAMP");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + saltoItem.getIdTurno() + "'");
+		sql.WHERE("IDSALTOSTURNO = '" + saltoItem.getIdSaltosTurno() + "'");
+		sql.WHERE("IDGUARDIA = '" + saltoItem.getIdGuardia() + "'");
+
+		return sql.toString();
+	}
+
+	public String anularSaltosCompensacionesGrupo(SaltoCompGuardiaItem saltoItem, AdmUsuarios usuario) {
+
+		SQL sql = new SQL();
+
+		sql.UPDATE("SCS_SALTOCOMPENSACIONGRUPO");
+
+		sql.SET("FECHA_ANULACION = SYSTIMESTAMP");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+
+		sql.WHERE("IDSALTOCOMPENSACIONGRUPO = '" + saltoItem.getIdSaltosTurno() + "'");
+
+		return sql.toString();
+	}
+
 }

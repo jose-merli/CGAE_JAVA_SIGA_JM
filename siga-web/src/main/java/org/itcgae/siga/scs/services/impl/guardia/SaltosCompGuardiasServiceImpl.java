@@ -64,8 +64,7 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
 				LOGGER.info(
 						"searchSaltosYCompensaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
@@ -170,6 +169,8 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
+		String errorStr = "Se ha producido un error al tratar de guardar el salto u compensacion.";
+		String errorStrActu = "Se ha producido un error al tratar de actualizar el salto u compensacion.";
 
 		try {
 
@@ -215,11 +216,11 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 										deleteResponseDTO.setStatus("OK");
 									} else {
 										deleteResponseDTO.setStatus("KO");
-										LOGGER.error(
-												"SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> Se ha producido un error al tratar de guardar el salto u compensacion.");
+										LOGGER.error("SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> "
+												+ errorStr);
 
 										error.setCode(500);
-										error.setDescription("Error al guardar el salto u compensación.");
+										error.setDescription(errorStr);
 										deleteResponseDTO.setError(error);
 									}
 
@@ -248,10 +249,11 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 										} else {
 											deleteResponseDTO.setStatus("KO");
 											LOGGER.error(
-													"SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> Se ha producido un error al tratar de guardar el salto u compensacion.");
+													"SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> "
+															+ errorStr);
 
 											error.setCode(500);
-											error.setDescription("Error al guardar el salto u compensación.");
+											error.setDescription(errorStr);
 											deleteResponseDTO.setError(error);
 										}
 
@@ -271,11 +273,11 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 										deleteResponseDTO.setStatus("OK");
 									} else {
 										deleteResponseDTO.setStatus("KO");
-										LOGGER.error(
-												"SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> Se ha producido un error al tratar de actualizar el salto u compensacion.");
+										LOGGER.error("SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> "
+												+ errorStrActu);
 
 										error.setCode(500);
-										error.setDescription("Error al actualizar el salto u compensación.");
+										error.setDescription(errorStrActu);
 										deleteResponseDTO.setError(error);
 									}
 								} else {
@@ -296,11 +298,11 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 										deleteResponseDTO.setStatus("OK");
 									} else {
 										deleteResponseDTO.setStatus("KO");
-										LOGGER.error(
-												"SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> Se ha producido un error al tratar de actualizar el salto u compensacion.");
+										LOGGER.error("SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> "
+												+ errorStrActu);
 
 										error.setCode(500);
-										error.setDescription("Error al actualizar el salto u compensación.");
+										error.setDescription(errorStrActu);
 										deleteResponseDTO.setError(error);
 									}
 								}
@@ -321,6 +323,178 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 
 			error.setCode(500);
 			error.setDescription("Error al guardar y/o actualizar el salto u compensación.");
+			error.setMessage(e.getMessage());
+
+			deleteResponseDTO.setError(error);
+		}
+
+		return deleteResponseDTO;
+	}
+
+	@Override
+	public DeleteResponseDTO borrarSaltosCompensaciones(List<SaltoCompGuardiaItem> listaSaltoItem,
+			HttpServletRequest request) {
+
+		LOGGER.info("borrarSaltosCompensaciones() -> Entrada para borrar los saltos y compensaciones");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		String errorStr = "Se ha producido un error al tratar de borrar el salto u compensacion.";
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"borrarSaltosCompensaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"borrarSaltosCompensaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty() && listaSaltoItem != null && !listaSaltoItem.isEmpty()) {
+
+					for (SaltoCompGuardiaItem saltoCompGuardiaItem : listaSaltoItem) {
+
+						if (!UtilidadesString.esCadenaVacia(saltoCompGuardiaItem.getGrupo())) {
+
+							if (UtilidadesString.esCadenaVacia(saltoCompGuardiaItem.getFechaUso())) {
+								int borrado = saltoscompensacionesMapper
+										.borrarSaltosCompensacionesGrupo(saltoCompGuardiaItem);
+
+								if (borrado == 1) {
+									deleteResponseDTO.setStatus("OK");
+								} else {
+									deleteResponseDTO.setStatus("KO");
+									LOGGER.error("SaltosCompGuardiasServiceImpl.borrarSaltosCompensaciones() -> "
+											+ errorStr);
+
+									error.setCode(500);
+									error.setDescription(errorStr);
+									deleteResponseDTO.setError(error);
+								}
+							}
+
+						} else {
+							if (UtilidadesString.esCadenaVacia(saltoCompGuardiaItem.getFechaUso())) {
+								int borrado = saltoscompensacionesMapper.borrarSaltosCompensaciones(
+										saltoCompGuardiaItem, Short.toString(idInstitucion));
+
+								if (borrado == 1) {
+									deleteResponseDTO.setStatus("OK");
+								} else {
+									deleteResponseDTO.setStatus("KO");
+									LOGGER.error("SaltosCompGuardiasServiceImpl.borrarSaltosCompensaciones() -> "
+											+ errorStr);
+
+									error.setCode(500);
+									error.setDescription(errorStr);
+									deleteResponseDTO.setError(error);
+								}
+							}
+						}
+
+					}
+
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("SaltosCompGuardiasServiceImpl.borrarSaltosCompensaciones() -> " + errorStr, e);
+
+			error.setCode(500);
+			error.setDescription(errorStr);
+			error.setMessage(e.getMessage());
+
+			deleteResponseDTO.setError(error);
+		}
+
+		return deleteResponseDTO;
+	}
+
+	@Override
+	public DeleteResponseDTO anularSaltosCompensaciones(List<SaltoCompGuardiaItem> listaSaltoItem,
+			HttpServletRequest request) {
+
+		LOGGER.info("anularSaltosCompensaciones() -> Entrada para anular los saltos y compensaciones");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		String errorStr = "Se ha producido un error al tratar de anular el salto u compensacion.";
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"anularSaltosCompensaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"anularSaltosCompensaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty() && listaSaltoItem != null && !listaSaltoItem.isEmpty()) {
+
+					for (SaltoCompGuardiaItem saltoCompGuardiaItem : listaSaltoItem) {
+
+						if (!UtilidadesString.esCadenaVacia(saltoCompGuardiaItem.getGrupo())) {
+
+							if (UtilidadesString.esCadenaVacia(saltoCompGuardiaItem.getFechaUso())) {
+								int anulado = saltoscompensacionesMapper
+										.anularSaltosCompensacionesGrupo(saltoCompGuardiaItem, usuarios.get(0));
+
+								if (anulado == 1) {
+									deleteResponseDTO.setStatus("OK");
+								} else {
+									deleteResponseDTO.setStatus("KO");
+									LOGGER.error("SaltosCompGuardiasServiceImpl.anularSaltosCompensaciones() -> "
+											+ errorStr);
+
+									error.setCode(500);
+									error.setDescription(errorStr);
+									deleteResponseDTO.setError(error);
+								}
+							}
+
+						} else {
+							if (UtilidadesString.esCadenaVacia(saltoCompGuardiaItem.getFechaUso())) {
+								int anulado = saltoscompensacionesMapper.anularSaltosCompensaciones(
+										saltoCompGuardiaItem, Short.toString(idInstitucion), usuarios.get(0));
+
+								if (anulado == 1) {
+									deleteResponseDTO.setStatus("OK");
+								} else {
+									deleteResponseDTO.setStatus("KO");
+									LOGGER.error("SaltosCompGuardiasServiceImpl.anularSaltosCompensaciones() -> "
+											+ errorStr);
+
+									error.setCode(500);
+									error.setDescription(errorStr);
+									deleteResponseDTO.setError(error);
+								}
+							}
+						}
+
+					}
+
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("SaltosCompGuardiasServiceImpl.anularSaltosCompensaciones() -> " + errorStr, e);
+
+			error.setCode(500);
+			error.setDescription(errorStr);
 			error.setMessage(e.getMessage());
 
 			deleteResponseDTO.setError(error);

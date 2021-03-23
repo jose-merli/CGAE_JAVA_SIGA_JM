@@ -15,4 +15,10 @@ public interface SaltosCompGuardiasService {
 	public DeleteResponseDTO guardarSaltosCompensaciones(List<SaltoCompGuardiaItem> listaSaltoItem,
 			HttpServletRequest request);
 
+	public DeleteResponseDTO borrarSaltosCompensaciones(List<SaltoCompGuardiaItem> listaSaltoItem,
+			HttpServletRequest request);
+
+	public DeleteResponseDTO anularSaltosCompensaciones(List<SaltoCompGuardiaItem> listaSaltoItem,
+			HttpServletRequest request);
+
 }

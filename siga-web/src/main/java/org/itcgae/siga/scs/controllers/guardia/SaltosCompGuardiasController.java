@@ -38,4 +38,18 @@ public class SaltosCompGuardiasController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	@PostMapping(value = "/borrarSaltosCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> borrarSaltosCompensaciones(
+			@RequestBody List<SaltoCompGuardiaItem> listaSaltoItem, HttpServletRequest request) {
+		DeleteResponseDTO response = saltosCompGuardiasService.borrarSaltosCompensaciones(listaSaltoItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/anularSaltosCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> anularSaltosCompensaciones(
+			@RequestBody List<SaltoCompGuardiaItem> listaSaltoItem, HttpServletRequest request) {
+		DeleteResponseDTO response = saltosCompGuardiasService.anularSaltosCompensaciones(listaSaltoItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
 }

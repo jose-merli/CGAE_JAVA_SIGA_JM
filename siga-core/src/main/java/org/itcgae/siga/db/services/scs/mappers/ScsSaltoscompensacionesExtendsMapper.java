@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
@@ -63,5 +64,17 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 
 	@UpdateProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "actualizarSaltosCompensacionesGrupo")
 	int actualizarSaltosCompensacionesGrupo(SaltoCompGuardiaItem saltoItem, String idInstitucion, AdmUsuarios usuario);
+
+	@UpdateProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "anularSaltosCompensaciones")
+	int anularSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion, AdmUsuarios usuario);
+
+	@UpdateProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "anularSaltosCompensacionesGrupo")
+	int anularSaltosCompensacionesGrupo(SaltoCompGuardiaItem saltoItem, AdmUsuarios usuario);
+
+	@DeleteProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "borrarSaltosCompensaciones")
+	int borrarSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion);
+
+	@DeleteProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "borrarSaltosCompensacionesGrupo")
+	int borrarSaltosCompensacionesGrupo(SaltoCompGuardiaItem saltoItem);
 
 }
