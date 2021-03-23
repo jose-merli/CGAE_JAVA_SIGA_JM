@@ -213,9 +213,9 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 											nuevoIdGrupo.getIdMax().toString(), usuarios.get(0));
 
 									if (insertado == 1) {
-										deleteResponseDTO.setStatus("OK");
+										deleteResponseDTO.setStatus(SigaConstants.OK);
 									} else {
-										deleteResponseDTO.setStatus("KO");
+										deleteResponseDTO.setStatus(SigaConstants.KO);
 										LOGGER.error("SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> "
 												+ errorStr);
 
@@ -245,9 +245,9 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 												Long.toString(nuevoId.getIdMax()), usuarios.get(0));
 
 										if (insertado == 1) {
-											deleteResponseDTO.setStatus("OK");
+											deleteResponseDTO.setStatus(SigaConstants.OK);
 										} else {
-											deleteResponseDTO.setStatus("KO");
+											deleteResponseDTO.setStatus(SigaConstants.KO);
 											LOGGER.error(
 													"SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> "
 															+ errorStr);
@@ -270,9 +270,9 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 											saltoCompGuardiaItem, Short.toString(idInstitucion), usuarios.get(0));
 
 									if (actualizado == 1) {
-										deleteResponseDTO.setStatus("OK");
+										deleteResponseDTO.setStatus(SigaConstants.OK);
 									} else {
-										deleteResponseDTO.setStatus("KO");
+										deleteResponseDTO.setStatus(SigaConstants.KO);
 										LOGGER.error("SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> "
 												+ errorStrActu);
 
@@ -295,9 +295,9 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 											saltoCompGuardiaItem, Short.toString(idInstitucion), usuarios.get(0));
 
 									if (actualizado == 1) {
-										deleteResponseDTO.setStatus("OK");
+										deleteResponseDTO.setStatus(SigaConstants.OK);
 									} else {
-										deleteResponseDTO.setStatus("KO");
+										deleteResponseDTO.setStatus(SigaConstants.KO);
 										LOGGER.error("SaltosCompGuardiasServiceImpl.guardarSaltosCompensaciones() -> "
 												+ errorStrActu);
 
@@ -368,9 +368,9 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 										.borrarSaltosCompensacionesGrupo(saltoCompGuardiaItem);
 
 								if (borrado == 1) {
-									deleteResponseDTO.setStatus("OK");
+									deleteResponseDTO.setStatus(SigaConstants.OK);
 								} else {
-									deleteResponseDTO.setStatus("KO");
+									deleteResponseDTO.setStatus(SigaConstants.KO);
 									LOGGER.error("SaltosCompGuardiasServiceImpl.borrarSaltosCompensaciones() -> "
 											+ errorStr);
 
@@ -386,9 +386,9 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 										saltoCompGuardiaItem, Short.toString(idInstitucion));
 
 								if (borrado == 1) {
-									deleteResponseDTO.setStatus("OK");
+									deleteResponseDTO.setStatus(SigaConstants.OK);
 								} else {
-									deleteResponseDTO.setStatus("KO");
+									deleteResponseDTO.setStatus(SigaConstants.KO);
 									LOGGER.error("SaltosCompGuardiasServiceImpl.borrarSaltosCompensaciones() -> "
 											+ errorStr);
 
@@ -454,9 +454,9 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 										.anularSaltosCompensacionesGrupo(saltoCompGuardiaItem, usuarios.get(0));
 
 								if (anulado == 1) {
-									deleteResponseDTO.setStatus("OK");
+									deleteResponseDTO.setStatus(SigaConstants.OK);
 								} else {
-									deleteResponseDTO.setStatus("KO");
+									deleteResponseDTO.setStatus(SigaConstants.KO);
 									LOGGER.error("SaltosCompGuardiasServiceImpl.anularSaltosCompensaciones() -> "
 											+ errorStr);
 
@@ -472,9 +472,9 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 										saltoCompGuardiaItem, Short.toString(idInstitucion), usuarios.get(0));
 
 								if (anulado == 1) {
-									deleteResponseDTO.setStatus("OK");
+									deleteResponseDTO.setStatus(SigaConstants.OK);
 								} else {
-									deleteResponseDTO.setStatus("KO");
+									deleteResponseDTO.setStatus(SigaConstants.KO);
 									LOGGER.error("SaltosCompGuardiasServiceImpl.anularSaltosCompensaciones() -> "
 											+ errorStr);
 
