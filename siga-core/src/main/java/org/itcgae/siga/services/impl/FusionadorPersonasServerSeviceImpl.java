@@ -23,9 +23,9 @@ import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasRequestDocumen
 import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasRequestDocument.GetFusionadorPersonasRequest;
 import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasResponseDocument;
 import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasResponseDocument.GetFusionadorPersonasResponse;
-import org.itcgae.sspp.ws.registrosociedades.ColegioDocument.Colegio;
-import org.itcgae.sspp.ws.registrosociedades.GetListaSociedadesRequestDocument.GetListaSociedadesRequest;
-import org.itcgae.sspp.ws.registrosociedades.GetListaSociedadesResponseDocument.GetListaSociedadesResponse;
+import org.itcgae.sspp.ws.registroSociedades.ColegioDocument.Colegio;
+import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesRequestDocument.GetListaSociedadesRequest;
+import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesResponseDocument.GetListaSociedadesResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

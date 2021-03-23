@@ -3,8 +3,8 @@ package org.itcgae.siga.endpoints;
 
 
 import org.itcgae.siga.services.ISociedadesServerSevice;
-import org.itcgae.sspp.ws.registrosociedades.GetListaSociedadesRequestDocument;
-import org.itcgae.sspp.ws.registrosociedades.GetListaSociedadesResponseDocument;
+import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesRequestDocument;
+import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesResponseDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
