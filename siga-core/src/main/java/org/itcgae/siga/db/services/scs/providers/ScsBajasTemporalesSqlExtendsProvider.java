@@ -31,6 +31,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado,\r\n" + 
 				"    per.nombre,\r\n" + 
 				"    per.apellidos1,\r\n" + 
+				"    bt.eliminado,\r\n" + 
 				"    per.apellidos2");
 		sql.FROM("cen_bajastemporales bt");
 		sql.INNER_JOIN("cen_colegiado col ON col.idpersona = bt.idpersona and col.idinstitucion = bt.idinstitucion\r\n" + 
@@ -45,9 +46,17 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		if("2".equals(bajasTemporalesItem.getValidado())) {
 			sql.WHERE("bt.validado IS NULL");
 		}
-		
 		if(bajasTemporalesItem.getFechadesde() != null) {
-			sql.WHERE("trunc(bt.fechabt) >='"+fechadesde+"'");
+			sql.WHERE("bt.fechadesde >='"+fechadesde+"'");
+		}
+		if(bajasTemporalesItem.getFechahasta() != null) {
+			sql.WHERE("bt.fechahasta <='"+fechahasta+"'");
+		}
+		if(bajasTemporalesItem.getFechaalta() != null) {
+			sql.WHERE("bt.fechaalta >='"+bajasTemporalesItem.getFechaalta()+"'");
+		}
+		if(bajasTemporalesItem.getFechabt() != null) {
+			sql.WHERE("bt.fechabt <='"+bajasTemporalesItem.getFechabt()+"'");
 		}
 		if(bajasTemporalesItem.getTipo() != null) {
 			sql.WHERE("bt.tipo = '"+bajasTemporalesItem.getTipo()+"'");
@@ -55,11 +64,14 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		if(bajasTemporalesItem.getIdpersona() != null) {
 			sql.WHERE("bt.idpersona = '"+bajasTemporalesItem.getIdpersona()+"'");
 		}
-		
 		if(bajasTemporalesItem.getNcolegiado() != null && !bajasTemporalesItem.getNcolegiado().equals("")) {
 			sql.WHERE("(col.ncolegiado = '"+bajasTemporalesItem.getNcolegiado()+"' OR col.ncomunitario = '"+bajasTemporalesItem.getNcolegiado()+"')");
 		}
-			
+		if(!bajasTemporalesItem.isHistorico()) {
+			sql.WHERE("bt.eliminado = 0");
+		}else {
+			sql.WHERE("bt.eliminado = 1 OR bt.eliminado = 0");
+		}
 		return sql.toString();
 	}
 	

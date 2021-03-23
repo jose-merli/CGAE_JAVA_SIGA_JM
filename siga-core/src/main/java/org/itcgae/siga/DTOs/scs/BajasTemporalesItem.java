@@ -19,6 +19,7 @@ public class BajasTemporalesItem {
 	public String apellidos2;
 	public String eliminado;
 	public Date fechabt;
+	public boolean historico;
 	
 	public String getIdinstitucion() {
 		return idinstitucion;
@@ -110,4 +111,11 @@ public class BajasTemporalesItem {
 	public void setFechabt(Date fechabt) {
 		this.fechabt = fechabt;
 	}
+	public boolean isHistorico() {
+		return historico;
+	}
+	public void setHistorico(boolean historico) {
+		this.historico = historico;
+	}
+	
 }

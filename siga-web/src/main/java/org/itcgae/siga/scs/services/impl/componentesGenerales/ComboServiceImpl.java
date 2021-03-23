@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
+import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestaria;
@@ -855,6 +856,45 @@ public class ComboServiceImpl implements ComboService {
 		}
 
 		LOGGER.info("getPerfiles() -> Salida del servicio para obtener los perfiles disponibles");
+		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboJuzgadoDesignaciones(HttpServletRequest request) {
+
+		LOGGER.info("comboJuzgadoDesignaciones() -> Entrada al servicio para búsqueda de Juzgado");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboJuzgadoDesignaciones() / scsJuzgadoExtendsMapper.comboJuzgadoDesignaciones() -> Entrada a scsJuzgadoExtendsMapper para obtener combo Juzgado");
+
+				List<JuzgadoItem> juzgadosItems = scsJuzgadoExtendsMapper.comboJuzgadoDesignaciones(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
+
+				LOGGER.info(
+						"comboJuzgadoDesignaciones() / scsJuzgadoExtendsMapper.comboJuzgadoDesignaciones() -> Salida a scsJuzgadoExtendsMapper para obtener combo Juzgado");
+				
+				List<ComboItem> comboItems = new ArrayList<>();
+				for(JuzgadoItem j: juzgadosItems) {
+					ComboItem comboItem = new ComboItem();
+					comboItem.setValue(j.getCodigoExt2());
+					comboItem.setLabel(j.getCodigoExt2()+j.getNombre()+"("+j.getNombrePoblacion()+")");
+					comboItems.add(comboItem);
+				}
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboJuzgadoDesignaciones() -> Salida del servicio para obtener combo Juzgado");
+		}
 		return comboDTO;
 	}
 

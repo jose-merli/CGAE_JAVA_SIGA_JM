@@ -946,7 +946,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 	@Override
 	public UpdateResponseDTO updateSolicitarBaja(InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
-		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
+		LOGGER.info("updateSolicitarBaja() ->  Entrada al servicio para solicitar baja en una inscripcion");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -975,70 +975,93 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 				try {
 					for (InscripcionesItem inscripcionesItem : inscripcionesDTO.getInscripcionesItems()) {
-
-						ScsInscripcionturnoExample exampleinscripcion = new ScsInscripcionturnoExample();
-						exampleinscripcion.createCriteria()
-								.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-								.andIdinstitucionEqualTo(idInstitucion)
-								.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
 						
-						ScsInscripcionturno inscripcionturno = new ScsInscripcionturno();
-
-						ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
-						exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-								.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
-
-						ScsInscripcionguardia guardia = new ScsInscripcionguardia();
-						
-						
+                        ScsInscripcionturnoExample exampleinscripcion = new ScsInscripcionturnoExample();
+                        exampleinscripcion.createCriteria()
+                                .andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
+                                .andIdinstitucionEqualTo(idInstitucion)
+                                .andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+                        
+                        List<ScsInscripcionturno> inscripcionesturno = scsInscripcionturnoExtendsMapper.selectByExample(exampleinscripcion);
+                        
+                        ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
+                        exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                                .andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
+                                .andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()))
+                        		.andIdinstitucionEqualTo(idInstitucion);
+                        
+												
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
+						
+						ScsInscripcionturno inscripcionturno =inscripcionesturno.get(0);
+						List<ScsInscripcionguardia> guardias = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
+						
+						
 						if (inscripcionesItem.getValidarinscripciones().equals("S")) {
 							
 							inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
 							inscripcionturno.setFechasolicitudbaja(new Date());
 							
-							response = scsInscripcionturnoExtendsMapper.updateByExampleSelective(inscripcionturno,
-									exampleinscripcion);
+//							inscripcionturno.setIdinstitucion(Short.parseShort(inscripcionesItem.getIdinstitucion()));
+//							inscripcionturno.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
+//							inscripcionturno.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
+//							inscripcionturno.setFechasolicitud(inscripcionesItem.getFechasolicitud());
 							
-							guardia.setObservacionesbaja(inscripcionesItem.getObservaciones());
-							guardia.setFechasolicitudbaja(new Date());
-
-							response = scsInscripcionguardiaMapper.updateByExampleSelective(guardia, exampleguardia);
+							response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);
 							
+							if(!guardias.isEmpty()) {
+							
+								for(ScsInscripcionguardia guardia:guardias) {
+		                        
+								guardia.setObservacionesbaja(inscripcionesItem.getObservaciones());
+								guardia.setFechasolicitudbaja(new Date());
+								
+//								guardia.setIdinstitucion(Short.parseShort(inscripcionesItem.getIdinstitucion()));
+//								guardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
+//								guardia.setIdguardia(Integer.parseInt(inscripcionesItem.getIdguardia()));
+//								guardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
+//								guardia.setFechasuscripcion(inscripcionesItem.getFechasolicitud());
+//	
+								response = scsInscripcionguardiaMapper.updateByPrimaryKeySelective(guardia);
+								
+								}
+							
+							}
 						} else {
 							
 							inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
 							inscripcionturno.setFechasolicitudbaja(new Date());
 							inscripcionturno.setFechabaja(new Date());
 							
-							response = scsInscripcionturnoExtendsMapper.updateByExampleSelective(inscripcionturno,
-									exampleinscripcion);
+//							inscripcionturno.setIdinstitucion(Short.parseShort(inscripcionesItem.getIdinstitucion()));
+//							inscripcionturno.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
+//							inscripcionturno.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
+//							inscripcionturno.setFechasolicitud(inscripcionesItem.getFechasolicitud());
 							
-							guardia.setObservacionesbaja(inscripcionesItem.getObservaciones());
-							guardia.setFechasolicitudbaja(new Date());
-							guardia.setFechabaja(new Date());
+							response = scsInscripcionturnoExtendsMapper.updateByPrimaryKey(inscripcionturno);
 							
-							response = scsInscripcionguardiaMapper.updateByExampleSelective(guardia, exampleguardia);
+							if(!guardias.isEmpty()) {	
+								
+	                        	for(ScsInscripcionguardia guardia:guardias) {
+	                        	
+								guardia.setObservacionesbaja(inscripcionesItem.getObservaciones());
+								guardia.setFechasolicitudbaja(new Date());
+								guardia.setFechabaja(new Date());
+								
+//								guardia.setIdinstitucion(Short.parseShort(inscripcionesItem.getIdinstitucion()));
+//								guardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
+//								guardia.setIdguardia(Integer.parseInt(inscripcionesItem.getIdguardia()));
+//								guardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
+//								guardia.setFechasuscripcion(inscripcionesItem.getFechasolicitud());
+								
+								response = scsInscripcionguardiaMapper.updateByPrimaryKeySelective(guardia);
+	                        	}
+							}
 
 						}
 						
 
-//							DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-//							String fechaActual;
-//							Date fecha = new Date();
-//							fechaActual = dateFormat.format(fecha);
-//							List<InscripcionesItem> trabajosSJCS = null;
-//							List<InscripcionesItem> trabajosPendientes = null;
-//							trabajosSJCS = scsInscripcionturnoExtendsMapper.busquedaTrabajosGuardias(inscripcionesItem, idInstitucion,fechaActual);
-//							trabajosPendientes = scsInscripcionturnoExtendsMapper.busquedaTrabajosPendientes(inscripcionesItem, idInstitucion, fechaActual);
-//							if(trabajosSJCS.size()>0 || trabajosPendientes.size() >0) {								
-//								error.setCode(400);								
-//								error.setDescription("justiciaGratuita.oficio.inscripciones.mensajeSJCS");
-//								updateResponseDTO.setError(error);
-//								return updateResponseDTO;
-//							}
 
 						
 						LOGGER.info(
@@ -1069,7 +1092,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 				updateResponseDTO.setError(error);
 
-				LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar una partida presupuestaria");
+				LOGGER.info("updateSolicitarBaja() -> Salida del servicio para solicitar baja en una inscripcion");
 
 			}
 
@@ -1101,7 +1124,93 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 		if(incidencias > 0) return true;
 		else return false;
 }
+	
+	@Override
+	public InscripcionesDTO checkSaltos(InscripcionesDTO inscripcionesDTO,
+			HttpServletRequest request) {
+		
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		List<InscripcionesItem> inscripcionesSaltos = new ArrayList();
+		for (InscripcionesItem inscripcionesItem : inscripcionesDTO.getInscripcionesItems()) {
+			
+			inscripcionesSaltos.addAll(scsInscripcionturnoExtendsMapper.checkSaltos(inscripcionesItem, dateFormat.format(inscripcionesItem.getFechaActual()), null,
+					idInstitucion));
+			
+		}
+		InscripcionesDTO inscripcionesDTOReturn = new InscripcionesDTO();
+		inscripcionesDTOReturn.setInscripcionesItems(inscripcionesSaltos);
+		return inscripcionesDTOReturn;
+}
 
+	public UpdateResponseDTO updateBorrarSaltos(InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		
+		LOGGER.info("updateBorrarSaltos() ->  Entrada al servicio para borrar saltos y compensaciones");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+
+		if (null != idInstitucion) {
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			int response = 0;
+			Error error = new Error();
+			try {
+			if (null != usuarios && usuarios.size() > 0) {
+				
+				
+				List<InscripcionesItem>inscripcionesSaltos =new ArrayList();
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				int usumodificacion = usuarios.get(0).getUsumodificacion();
+				for (InscripcionesItem inscripcionesItem : inscripcionesDTO.getInscripcionesItems()) {
+					
+					response = scsInscripcionturnoExtendsMapper.borrarSaltos(inscripcionesItem, idInstitucion, usumodificacion);
+				
+				}
+			}
+			
+			}
+
+			catch (Exception e) {
+				response = 0;
+				error.setCode(400);
+				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				updateResponseDTO.setStatus(SigaConstants.KO);
+			}
+
+			if (response == 0 && error.getDescription() == null) {
+				error.setCode(400);
+				error.setDescription("No se ha borrado parte de los saltos o copmpensaciones");
+				updateResponseDTO.setStatus(SigaConstants.KO);
+			} else if (error.getCode() == null) {
+				error.setCode(200);
+				error.setDescription("Se ha modificado el salto o la compensacion correctamente");
+			}
+
+			updateResponseDTO.setError(error);
+
+			LOGGER.info("updateBorrarSaltos() -> Salida del servicio para borrar saltos y compensaciones");
+
+		}
+		
+	
+		return updateResponseDTO;
+	}
 	
 	@Override
 	public InscripcionesDTO busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem,

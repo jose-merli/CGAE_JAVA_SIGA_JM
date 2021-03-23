@@ -28,8 +28,6 @@ public interface IGestionInscripcionesService {
 	
 	public InscripcionesDTO busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem, HttpServletRequest request);
 	
-	public UpdateResponseDTO updateValidar(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
-	
 	public UpdateResponseDTO updateDenegar(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
 	
 	public UpdateResponseDTO updateCambiarFecha(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
@@ -39,4 +37,10 @@ public interface IGestionInscripcionesService {
 	public InscripcionesTarjetaOficioDTO busquedaTarjeta(InscripcionesItem inscripcionesItem, HttpServletRequest request);
 
 	public Boolean checkTrabajosSJCS(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
+
+	public InscripcionesDTO checkSaltos(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateBorrarSaltos(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
+
+	public UpdateResponseDTO updateValidar(InscripcionesDTO inscripcionesDTO, HttpServletRequest request);
 }
