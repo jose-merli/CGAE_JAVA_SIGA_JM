@@ -172,7 +172,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String busquedaJustificacionExpres(JustificacionExpressItem item, String idInstitucion, String longitudCodEJG, String idPersona) {
 		
 		StringBuilder sql = new StringBuilder();
-		sql.append(" ");
+		sql.append(" SELECT * FROM (");
 		sql.append(" SELECT DECODE(ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA,1,'FAVORABLE', 2,'NO_FAVORABLE', 3,'PTE_CAJG', 4, 'SIN_RESOLUCION','SIN_EJG') AS TIPO_RESOLUCION_DESIGNA, ");
 		sql.append(" ALLDESIGNAS.* ");
 		sql.append(" FROM ( ");
@@ -433,6 +433,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" AND ACT.VALIDADA = '1'))>0 ");
 			sql.append(" ) ");
 		}
+		
+		sql.append(" ) query WHERE ROWNUM <= 200");
 		
 		return sql.toString();
 	}
