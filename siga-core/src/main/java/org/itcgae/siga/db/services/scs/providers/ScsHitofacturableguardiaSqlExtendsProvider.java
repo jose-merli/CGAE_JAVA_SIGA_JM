@@ -7,8 +7,10 @@ public class ScsHitofacturableguardiaSqlExtendsProvider extends ScsHitofacturabl
 	public String getBaremos(String idGuardia, String idLenguaje) {
 		SQL sql = new SQL();
 		
-		sql.SELECT("GEN_RECURSOS_CATALOGOS.DESCRIPCION AS DESCRIPCION");
+//		sql.SELECT("GEN_RECURSOS_CATALOGOS.DESCRIPCION AS DESCRIPCION");
+		sql.SELECT("SCS_HITOFACTURABLE.NOMBRE AS NOMBRE");
 		sql.SELECT("SCS_HITOFACTURABLEGUARDIA.PRECIOHITO AS PRECIO");
+		
 		
 		sql.FROM("SCS_HITOFACTURABLEGUARDIA");
 

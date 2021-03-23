@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -21,12 +22,17 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
+import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
+import org.itcgae.siga.DTOs.scs.IncompatibilidadesDTO;
+import org.itcgae.siga.DTOs.scs.IncompatibilidadesDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.IncompatibilidadesItem;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
 import org.itcgae.siga.DTOs.scs.LetradosGuardiaDTO;
+import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -498,7 +504,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return guardiaItem;
 
 	}
+			
+	@Override
+	public UpdateResponseDTO updateColaGuardia(InscripcionGuardiaDTO guardiaBody, HttpServletRequest request) {
+		UpdateResponseDTO res = guardarColaGuardias(guardiaBody.getInscripcionesItem(), request);
+		return res;
 
+	
+	}
 	@Override
 	public UpdateResponseDTO updateGuardia(GuardiasItem guardiasItem, HttpServletRequest request) {
 		LOGGER.info("updateGuardia() ->  Entrada al servicio para editar guardia");
@@ -880,8 +893,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
 
+				//guardias = scsIncompatibilidadguardiasExtendsMapper.tarjetaIncompatibilidades(idGuardia,
+						//idInstitucion.toString());
 				guardias = scsIncompatibilidadguardiasExtendsMapper.tarjetaIncompatibilidades(idGuardia,
-						idInstitucion.toString());
+						"2003");
 				guardias = guardias.stream().map(it -> {
 					it.setTipoDia(("Selección: Labor. " + it.getSeleccionLaborables() + ", Fest. "
 							+ it.getSeleccionFestivos()).replace("null", ""));
@@ -967,7 +982,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		idInstitucion = 2005;
+		//idInstitucion = (short) 2005; // borrar
 		String ordenaciones = "";
 		InscripcionGuardiaDTO inscritos = new InscripcionGuardiaDTO();
 
@@ -1056,6 +1071,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
 							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(),
 							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo);
+					
+					for (int i = 0; i < colaGuardia.size(); i++) {
+						if (colaGuardia.get(i).getNumeroGrupo() == null || colaGuardia.get(i).getNumeroGrupo().equals("null")) {
+							colaGuardia.remove(i);
+						}
+					}
 					inscritos.setInscripcionesItem(colaGuardia);
 
 					// Si se ha pasado de por grupos a sin grupos o que estuviese sin grupos y se
@@ -1182,7 +1203,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 						colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(guardiasItem.getIdGuardia(),
 								guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo, ordenaciones,
 								idInstitucion.toString(), grupoUltimo);
-
+						for (int i = 0; i < colaGuardia.size(); i++) {
+							if(colaGuardia.get(i).getNombre() == "CARLA") {
+								String duda = colaGuardia.get(i).getNumeroGrupo();
+							}
+							if (colaGuardia.get(i).getNumeroGrupo() == null || colaGuardia.get(i).getNumeroGrupo() == "null") {
+								colaGuardia.remove(i);
+							}
+						}
 						inscritos.setInscripcionesItem(colaGuardia);
 					}
 
@@ -1288,6 +1316,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<GuardiasItem> guardias = new ArrayList<GuardiasItem>();
+		List<GuardiasItem> guardias2 = new ArrayList<GuardiasItem>();
 		GuardiasDTO guardiaDTO = new GuardiasDTO();
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1304,8 +1333,18 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("resumenIncompatibilidades() -> Entrada para obtener las incompatibilidades");
 
-				guardias = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades(guardiasItem,
-						idInstitucion.toString());
+				guardias = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades(guardiasItem, idInstitucion.toString());
+//				guardiasItem.setIdGuardia("358");//borrar
+//				guardiasItem.setIdTurno("177");//borrar
+//				guardias = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades(guardiasItem,
+//						"2003"); //borrar
+				String numIcompatibilidades = guardias.get(0).getIncompatibilidades();
+				guardias2 = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades2(guardiasItem, "2003");
+				guardias2.forEach(guardia -> {
+					guardia.setIncompatibilidades(numIcompatibilidades);
+					guardia.setTipoDia(("Selección: Labor. " + guardia.getSeleccionLaborables() + ", Fest. "
+							+ guardia.getSeleccionFestivos()).replace("null", ""));
+				});
 				guardiaDTO.setGuardiaItems(guardias);
 				LOGGER.info("resumenIncompatibilidades() -> Salida ya con los datos recogidos");
 			}
@@ -1633,4 +1672,342 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return letradosGuardiaDTO;
 	}
 
+	
+	@Override
+	public IncompatibilidadesDTO getIncompatibilidades( IncompatibilidadesDatosEntradaItem incompBody, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<IncompatibilidadesItem> incompatibilidades = new ArrayList<IncompatibilidadesItem>();
+		IncompatibilidadesDTO inc = new IncompatibilidadesDTO();
+		String idGuardia = ""; 
+		
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
+
+				//incompatibilidades = scsIncompatibilidadguardiasExtendsMapper.getListadoIncompatibilidades(incompBody, idInstitucion.toString(), idGuardia);
+
+				
+				LOGGER.info("tarjetaIncompatibilidades() -> Salida ya con los datos recogidos");
+			}
+		}
+		/*BORRAR*/
+		IncompatibilidadesItem item = new IncompatibilidadesItem(); 
+		item.setDiasSeparacionGuardias("0");
+		item.setMotivos("prueba");
+		item.setNombreGuardia("prueba");
+		item.setNombreGuardiaIncompatible("prueba1");
+		item.setNombreTurno("prueba");
+		item.setExiste("existe");
+		item.setIdGuardia("14");
+		item.setIdGuardiaIncompatible("100");
+		item.setIdTurno("idTurno");
+		item.setIdTurnoIncompatible("101");
+		item.setNombreTurnoIncompatible("prueba");
+		incompatibilidades.add(item);
+		IncompatibilidadesItem item1 = new IncompatibilidadesItem(); 
+		item1.setDiasSeparacionGuardias("0");
+		item1.setMotivos("prueba");
+		item1.setNombreGuardia("prueba");
+		item1.setNombreGuardiaIncompatible("prueba2");
+		item1.setNombreTurno("prueba");
+		item1.setExiste("existe");
+		item1.setIdGuardia("14");
+		item1.setIdGuardiaIncompatible("102");
+		item1.setIdTurno("idTurno");
+		item1.setIdTurnoIncompatible("103");
+		item1.setNombreTurnoIncompatible("prueba");
+		incompatibilidades.add(item1);
+		IncompatibilidadesItem item2 = new IncompatibilidadesItem(); 
+		item2.setDiasSeparacionGuardias("0");
+		item2.setMotivos("prueba");
+		item2.setNombreGuardia("prueba");
+		item2.setNombreGuardiaIncompatible("prueba3");
+		item2.setNombreTurno("prueba");
+		item2.setExiste("existe");
+		item2.setIdGuardia("14");
+		item2.setIdGuardiaIncompatible("104");
+		item2.setIdTurno("idTurno");
+		item2.setIdTurnoIncompatible("105");
+		item2.setNombreTurnoIncompatible("prueba");
+		incompatibilidades.add(item2);
+		IncompatibilidadesItem item3 = new IncompatibilidadesItem(); 
+		item3.setDiasSeparacionGuardias("1");
+		item3.setMotivos("prueba");
+		item3.setNombreGuardia("prueba");
+		item3.setNombreGuardiaIncompatible("prueba4");
+		item3.setNombreTurno("prueba");
+		item3.setExiste("existe");
+		item3.setIdGuardia("14");
+		item3.setIdGuardiaIncompatible("106");
+		item3.setIdTurno("idTurno");
+		item3.setIdTurnoIncompatible("107");
+		item3.setNombreTurnoIncompatible("prueba");
+		incompatibilidades.add(item3);
+		IncompatibilidadesItem item4 = new IncompatibilidadesItem(); 
+		item4.setDiasSeparacionGuardias("3");
+		item4.setMotivos("prueba");
+		item4.setNombreGuardia("prueba");
+		item4.setNombreGuardiaIncompatible("prueba5");
+		item4.setNombreTurno("prueba");
+		item4.setExiste("existe");
+		item4.setIdGuardia("14");
+		item4.setIdGuardiaIncompatible("108");
+		item4.setIdTurno("idTurno");
+		item4.setIdTurnoIncompatible("109");
+		item4.setNombreTurnoIncompatible("prueba");
+		item4.setDiasSeparacionGuardias("0");
+		incompatibilidades.add(item4);
+		IncompatibilidadesItem item5 = new IncompatibilidadesItem(); 
+		item5.setMotivos("prueba");
+		item5.setNombreGuardia("prueba");
+		item5.setNombreGuardiaIncompatible("prueba6");
+		item5.setNombreTurno("prueba");
+		item5.setExiste("existe");
+		item5.setIdGuardia("14");
+		item5.setIdGuardiaIncompatible("110");
+		item5.setIdTurno("idTurno");
+		item5.setIdTurnoIncompatible("111");
+		item5.setNombreTurnoIncompatible("prueba");
+		item5.setDiasSeparacionGuardias("0");
+		incompatibilidades.add(item5);
+		IncompatibilidadesItem item6 = new IncompatibilidadesItem(); 
+		item6.setMotivos("prueba");
+		item6.setNombreGuardia("prueba");
+		item6.setNombreGuardiaIncompatible("prueba7");
+		item6.setNombreTurno("prueba");
+		item6.setExiste("existe");
+		item6.setIdGuardia("14");
+		item6.setIdGuardiaIncompatible("112");
+		item6.setIdTurno("idTurno");
+		item6.setIdTurnoIncompatible("113");
+		item6.setNombreTurnoIncompatible("prueba");
+		item6.setDiasSeparacionGuardias("0");
+		incompatibilidades.add(item6);
+		item.setMotivos("prueba");
+		item.setNombreGuardia("prueba");
+		item.setNombreGuardiaIncompatible("prueba8");
+		item.setNombreTurno("prueba");
+		item.setExiste("existe");
+		item.setIdGuardia("14");
+		item.setIdGuardiaIncompatible("114");
+		item.setIdTurno("idTurno");
+		item.setIdTurnoIncompatible("115");
+		item.setNombreTurnoIncompatible("prueba");
+		incompatibilidades.add(item);
+		item.setDiasSeparacionGuardias("0");
+		item.setMotivos("prueba");
+		item.setNombreGuardia("prueba");
+		item.setNombreGuardiaIncompatible("prueba9");
+		item.setNombreTurno("prueba");
+		item.setExiste("existe");
+		item.setIdGuardia("14");
+		item.setIdGuardiaIncompatible("100");
+		item.setIdTurno("idTurno");
+		item.setIdTurnoIncompatible("101");
+		item.setNombreTurnoIncompatible("prueba");
+		item.setDiasSeparacionGuardias("0");
+		incompatibilidades.add(item);
+		item.setMotivos("prueba");
+		item.setNombreGuardia("prueba");
+		item.setNombreGuardiaIncompatible("prueba10");
+		item.setNombreTurno("prueba");
+		item.setExiste("existe");
+		item.setIdGuardia("14");
+		item.setIdGuardiaIncompatible("102");
+		item.setIdTurno("idTurno");
+		item.setIdTurnoIncompatible("103");
+		item.setNombreTurnoIncompatible("prueba");
+		item.setDiasSeparacionGuardias("0");
+		incompatibilidades.add(item);
+		item.setMotivos("prueba");
+		item.setNombreGuardia("prueba");
+		item.setNombreGuardiaIncompatible("prueba11");
+		item.setNombreTurno("prueba");
+		item.setExiste("existe");
+		item.setIdGuardia("14");
+		item.setIdGuardiaIncompatible("104");
+		item.setIdTurno("idTurno");
+		item.setIdTurnoIncompatible("105");
+		item.setNombreTurnoIncompatible("prueba");
+		item.setDiasSeparacionGuardias("0");
+		incompatibilidades.add(item);
+		item.setMotivos("prueba");
+		item.setNombreGuardia("prueba");
+		item.setNombreGuardiaIncompatible("prueba12");
+		item.setNombreTurno("prueba");
+		item.setExiste("existe");
+		item.setIdGuardia("14");
+		item.setIdGuardiaIncompatible("106");
+		item.setIdTurno("idTurno");
+		item.setIdTurnoIncompatible("107");
+		item.setNombreTurnoIncompatible("prueba");
+		item.setDiasSeparacionGuardias("0");
+		incompatibilidades.add(item);
+		item.setMotivos("prueba");
+		item.setNombreGuardia("prueba");
+		item.setNombreGuardiaIncompatible("prueba13");
+		item.setNombreTurno("prueba");
+		item.setExiste("existe");
+		item.setIdGuardia("14");
+		item.setIdGuardiaIncompatible("108");
+		item.setIdTurno("idTurno");
+		item.setIdTurnoIncompatible("109");
+		item.setNombreTurnoIncompatible("prueba");
+		item.setDiasSeparacionGuardias("0");
+		incompatibilidades.add(item);
+		item.setMotivos("prueba");
+		item.setNombreGuardia("prueba");
+		item.setNombreGuardiaIncompatible("prueba14");
+		item.setNombreTurno("prueba");
+		item.setExiste("existe");
+		item.setIdGuardia("14");
+		item.setIdGuardiaIncompatible("110");
+		item.setIdTurno("idTurno");
+		item.setIdTurnoIncompatible("111");
+		item.setNombreTurnoIncompatible("prueba");
+		item.setDiasSeparacionGuardias("0");
+		incompatibilidades.add(item);
+		item.setMotivos("prueba");
+		item.setNombreGuardia("prueba");
+		item.setNombreGuardiaIncompatible("prueba15");
+		item.setNombreTurno("prueba");
+		item.setExiste("existe");
+		item.setIdGuardia("14");
+		item.setIdGuardiaIncompatible("112");
+		item.setIdTurno("idTurno");
+		item.setIdTurnoIncompatible("113");
+		item.setNombreTurnoIncompatible("prueba");
+		item.setDiasSeparacionGuardias("0");
+		incompatibilidades.add(item);
+		item.setMotivos("prueba");
+		item.setNombreGuardia("prueba");
+		item.setNombreGuardiaIncompatible("prueba16");
+		item.setNombreTurno("prueba");
+		item.setExiste("existe");
+		item.setIdGuardia("14");
+		item.setIdGuardiaIncompatible("114");
+		item.setIdTurno("idTurno");
+		item.setIdTurnoIncompatible("115");
+		item.setNombreTurnoIncompatible("prueba");
+		incompatibilidades.add(item);
+		
+		
+		/*BORRAR*/
+		inc.setIncompatibilidadesItem(incompatibilidades);
+		return inc;
+	}
+	
+	@Override
+	public DeleteResponseDTO deleteIncompatibilidades(DeleteIncompatibilidadesDatosEntradaItem deleteIncompatibilidadesBody, HttpServletRequest request) {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		int response = 0;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String idGuardia = ""; // DUDA
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
+				scsIncompatibilidadguardiasExtendsMapper.deleteIncompatibilidades(deleteIncompatibilidadesBody.getIdTurno(), deleteIncompatibilidadesBody.getIdInstitucion(), deleteIncompatibilidadesBody.getIdGuardia(), deleteIncompatibilidadesBody.getIdTurnoIncompatible(), deleteIncompatibilidadesBody.getIdGuardiaIncompatible());
+				LOGGER.info("tarjetaIncompatibilidades() -> Salida ya con los datos recogidos");
+			}
+		}
+		
+		// comprobacion actualización
+		if (response >= 1) {
+			LOGGER.info("deleteSubtipoCurricular() -> OK. Delete para tipo curricular realizado correctamente");
+			deleteResponseDTO.setStatus(SigaConstants.OK);
+		} else {
+			LOGGER.info("deleteSubtipoCurricular() -> KO. Delete para tipo curricular NO realizado correctamente");
+			deleteResponseDTO.setStatus(SigaConstants.KO);
+		}
+
+		LOGGER.info("deleteSubtipoCurricular() -> Salida del servicio para eliminar subtipo curricular");
+		return deleteResponseDTO;
+	}
+	
+	
+	@Override
+	public DeleteResponseDTO saveIncompatibilidades(SaveIncompatibilidadesDatosEntradaItem incompatibilidadesBody,
+			HttpServletRequest request) {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		int response = 0;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String idInstitucion = incompatibilidadesBody.getIdInstitucion();
+		String idGuardia = ""; // DUDA
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			//if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
+				
+				int existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(incompatibilidadesBody.getIdTurno(), incompatibilidadesBody.getIdInstitucion(), incompatibilidadesBody.getIdGuardia(), incompatibilidadesBody.getIdTurnoIncompatible(), incompatibilidadesBody.getIdGuardiaIncompatible());
+				if (existe == 2) {
+					//existe en ambas direcciones - la actualizamos
+					scsIncompatibilidadguardiasExtendsMapper.updateIfExists(incompatibilidadesBody.getIdTurno(), incompatibilidadesBody.getIdInstitucion(), incompatibilidadesBody.getIdGuardia(), incompatibilidadesBody.getIdTurnoIncompatible(), incompatibilidadesBody.getIdGuardiaIncompatible(), incompatibilidadesBody.getMotivos(), incompatibilidadesBody.getDiasSeparacionGuardias());
+					
+				}else {
+					String pattern = "dd/MM/YY";
+					SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+					String fechaModificacion = simpleDateFormat.format(new Date());	
+					//no existe - llamamos dos veces para guardar en ambas direcciones
+					scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(incompatibilidadesBody.getIdTurno()), Integer.parseInt(incompatibilidadesBody.getIdInstitucion()), Integer.parseInt(incompatibilidadesBody.getIdGuardia()), Integer.parseInt(incompatibilidadesBody.getIdTurnoIncompatible()), Integer.parseInt(incompatibilidadesBody.getIdGuardiaIncompatible()), usuarios.get(0).getIdusuario(), incompatibilidadesBody.getMotivos(), Integer.parseInt(incompatibilidadesBody.getDiasSeparacionGuardias()), fechaModificacion);
+					scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(incompatibilidadesBody.getIdTurno()), Integer.parseInt(incompatibilidadesBody.getIdInstitucion()), Integer.parseInt(incompatibilidadesBody.getIdGuardiaIncompatible()), Integer.parseInt(incompatibilidadesBody.getIdTurnoIncompatible()), Integer.parseInt(incompatibilidadesBody.getIdGuardia()), usuarios.get(0).getIdusuario(), incompatibilidadesBody.getMotivos(), Integer.parseInt(incompatibilidadesBody.getDiasSeparacionGuardias()), fechaModificacion);
+
+				}
+				
+				LOGGER.info("tarjetaIncompatibilidades() -> Salida ya con los datos recogidos");
+			//}
+		}
+		
+		// comprobacion actualización
+		if (response >= 1) {
+			LOGGER.info("deleteSubtipoCurricular() -> OK. Delete para tipo curricular realizado correctamente");
+			deleteResponseDTO.setStatus(SigaConstants.OK);
+		} else {
+			LOGGER.info("deleteSubtipoCurricular() -> KO. Delete para tipo curricular NO realizado correctamente");
+			deleteResponseDTO.setStatus(SigaConstants.KO);
+		}
+
+		LOGGER.info("deleteSubtipoCurricular() -> Salida del servicio para eliminar subtipo curricular");
+		return deleteResponseDTO;
+	}
+	
 }
+

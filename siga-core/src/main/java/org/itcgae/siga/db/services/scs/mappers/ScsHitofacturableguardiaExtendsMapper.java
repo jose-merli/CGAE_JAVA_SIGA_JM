@@ -15,7 +15,8 @@ public interface ScsHitofacturableguardiaExtendsMapper extends ScsHitofacturable
 
 	@SelectProvider(type = ScsHitofacturableguardiaSqlExtendsProvider.class, method = "getBaremos")
 	@Results({ 
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PRECIO", property = "value", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> getBaremos(String idGuardia, String idLenguaje);
