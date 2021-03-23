@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.controllers.oficio;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -33,9 +35,9 @@ public class DesignacionesController {
 	}
 		
 	@RequestMapping(value = "/busquedaJustificacionExpres",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<JustificacionExpressItem> busquedaTurnos(@RequestBody JustificacionExpressItem item, HttpServletRequest request) {
-		JustificacionExpressItem response = designacionesService.busquedaJustificacionExpres(item, request);
-		return new ResponseEntity<JustificacionExpressItem>(response, HttpStatus.OK);
+	ResponseEntity<List<DesignaItem>> busquedaJustificacionExpres(@RequestBody JustificacionExpressItem item, HttpServletRequest request) {
+		List<DesignaItem> response = designacionesService.busquedaJustificacionExpres(item, request);
+		return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/busquedaDesignaciones",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
