@@ -42,8 +42,8 @@ public class BajasTemporalesController {
 	}
 	
 	@RequestMapping(value = "/bajasTemporales/nuevaBajaTemporal", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> nuevaBajaTemporal(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) {
-		InsertResponseDTO response = bajasTemporalesService.nuevaBajaTemporal(colegiadoItem, request);
+	ResponseEntity<InsertResponseDTO> nuevaBajaTemporal(@RequestBody BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request) {
+		InsertResponseDTO response = bajasTemporalesService.nuevaBajaTemporal(bajasTemporalesItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else

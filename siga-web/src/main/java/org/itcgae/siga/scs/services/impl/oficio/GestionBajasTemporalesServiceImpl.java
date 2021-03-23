@@ -130,8 +130,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 					}
 				}
-					
-					bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion, fechadesde, fechahasta);
+						bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion, fechadesde, fechahasta);
 
 				
 				LOGGER.info(
@@ -157,7 +156,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	}
 	
 	@Override
-	public InsertResponseDTO nuevaBajaTemporal(ColegiadoItem colegiadoItem, HttpServletRequest request) {
+	public InsertResponseDTO nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request) {
 		LOGGER.info("nuevaBajaTemporal() ->  Entrada al servicio para insertar bajas temporales");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
@@ -185,25 +184,20 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 			if (null != usuarios && usuarios.size() >= 0) {
 				try {
-			        ColegiadoDTO colegiadoDTO = busquedaColegiadosServiceImpl.searchColegiado(colegiadoItem, request);
-
 						LOGGER.info(
 								"nuevaBajaTemporal() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
-						
-						BajasTemporalesItem bajasTemporalesItem=new BajasTemporalesItem();
-//						bajasTemporalesItem = scsBajasTemporalesExtendsMapper.nuevaBajaTemporal(colegiadoDTO.getColegiadoItem().get(0));
+					
 						CenBajastemporales cenBajasTemporales = new CenBajastemporales();
-						cenBajasTemporales.setIdpersona(Long.parseLong(colegiadoDTO.getColegiadoItem().get(0).getIdPersona()));
-						cenBajasTemporales.setIdinstitucion(Short.parseShort(colegiadoDTO.getColegiadoItem().get(0).getIdInstitucion()));
-						cenBajasTemporales.setFechaalta(new Date());
-						cenBajasTemporales.setFechadesde(new Date());
-						cenBajasTemporales.setFechahasta(new Date());
-						cenBajasTemporales.setFechamodificacion(new Date());
-						cenBajasTemporales.setTipo("P");
+						cenBajasTemporales.setIdinstitucion(Short.parseShort(bajasTemporalesItem.getIdinstitucion()));
+						cenBajasTemporales.setIdpersona(Long.parseLong(bajasTemporalesItem.getIdpersona()));
+						cenBajasTemporales.setFechabt(bajasTemporalesItem.getFechabt());
+						cenBajasTemporales.setFechadesde(bajasTemporalesItem.getFechadesde());
+						cenBajasTemporales.setFechaalta(bajasTemporalesItem.getFechaalta());
+						cenBajasTemporales.setFechaestado(bajasTemporalesItem.getFechaestado());
+						cenBajasTemporales.setDescripcion(bajasTemporalesItem.getDescripcion());
+						cenBajasTemporales.setTipo(bajasTemporalesItem.getTipo());
 						cenBajasTemporales.setUsumodificacion(usuarios.get(0).getIdusuario());
-						cenBajasTemporales.setFechaestado(new Date());
-						cenBajasTemporales.setFechabt(new Date());
-						cenBajasTemporales.setEliminado(0);
+						cenBajasTemporales.setFechamodificacion(new Date());
 						
 //						CenBajastemporalesMapper cenBajasTemporalesMapper;
 						
@@ -276,11 +270,18 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						cenBajasTemporales.setIdinstitucion(Short.parseShort(bajasTemporalesItem.get(x).getIdinstitucion()));
 						cenBajasTemporales.setIdpersona(Long.parseLong(bajasTemporalesItem.get(x).getIdpersona()));
 						cenBajasTemporales.setFechabt(bajasTemporalesItem.get(x).getFechabt());
+						cenBajasTemporales.setFechadesde(bajasTemporalesItem.get(x).getFechadesde());
+						cenBajasTemporales.setFechaalta(bajasTemporalesItem.get(x).getFechaalta());
+						cenBajasTemporales.setFechaestado(bajasTemporalesItem.get(x).getFechaestado());
+						cenBajasTemporales.setDescripcion(bajasTemporalesItem.get(x).getDescripcion());
+						cenBajasTemporales.setTipo(bajasTemporalesItem.get(x).getTipo());
 						
-						if(bajasTemporalesItem.get(x).getValidado().equals("Anular")) {
+						if(bajasTemporalesItem.get(x).getValidado().equals("Anular") || bajasTemporalesItem.get(x).getValidado().equals("Anulada")) {
 							cenBajasTemporales.setValidado("3");
-						}else if(bajasTemporalesItem.get(x).getValidado().equals("Denegar")) {
+						}else if(bajasTemporalesItem.get(x).getValidado().equals("Denegar") || bajasTemporalesItem.get(x).getValidado().equals("Denegada")) {
 							cenBajasTemporales.setValidado("0");
+						}else if(bajasTemporalesItem.get(x).getValidado().equals("Pendiente")){
+							cenBajasTemporales.setValidado("2");
 						}else {
 							cenBajasTemporales.setValidado("1");
 						}
