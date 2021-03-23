@@ -5,14 +5,19 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
+import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
+import org.itcgae.siga.DTOs.scs.IncompatibilidadesDTO;
+import org.itcgae.siga.DTOs.scs.IncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
+import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +109,12 @@ public class GuardiaController {
 		return new ResponseEntity<InscripcionGuardiaDTO>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/busquedaGuardia/updateColaGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> setColaGuardia(@RequestBody InscripcionGuardiaDTO guardiaBody, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasService.updateColaGuardia(guardiaBody, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
 	@PostMapping(value = "/gestionGuardia/ultimo", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateUltimoCola(@RequestBody GuardiasItem guardia, HttpServletRequest request){
 		UpdateResponseDTO response= guardiasService.updateUltimoCola(guardia, request);
@@ -132,6 +143,22 @@ public class GuardiaController {
 	ResponseEntity<UpdateResponseDTO> guardarCola(@RequestBody List<InscripcionGuardiaItem> inscripciones, HttpServletRequest request){
 		UpdateResponseDTO response= guardiasService.guardarColaGuardias(inscripciones, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/buscarIncompatibilidades", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<IncompatibilidadesDTO> getIncompatibilidades(@RequestBody IncompatibilidadesDatosEntradaItem incompatibilidadesBody, HttpServletRequest request){
+		IncompatibilidadesDTO response= guardiasService.getIncompatibilidades(incompatibilidadesBody, request);
+		return new ResponseEntity<IncompatibilidadesDTO>(response, HttpStatus.OK);
+	}
+	@PostMapping(value = "/eliminarIncompatibilidades", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> deleteIncompatibilidades(@RequestBody DeleteIncompatibilidadesDatosEntradaItem deleteIncompatibilidadesBody, HttpServletRequest request){
+		DeleteResponseDTO response= guardiasService.deleteIncompatibilidades(deleteIncompatibilidadesBody, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+	@PostMapping(value = "/guardarIncompatibilidades", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> saveIncompatibilidades(@RequestBody SaveIncompatibilidadesDatosEntradaItem incompatibilidadesBody, HttpServletRequest request){
+		DeleteResponseDTO response= guardiasService.saveIncompatibilidades(incompatibilidadesBody, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	
 }
