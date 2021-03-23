@@ -885,7 +885,7 @@ public class ComboServiceImpl implements ComboService {
 				List<ComboItem> comboItems = new ArrayList<>();
 				for(JuzgadoItem j: juzgadosItems) {
 					ComboItem comboItem = new ComboItem();
-					comboItem.setValue(j.getCodigoExt2());
+					comboItem.setValue(j.getIdJuzgado());
 					comboItem.setLabel(j.getCodigoExt2()+j.getNombre()+"("+j.getNombrePoblacion()+")");
 					comboItems.add(comboItem);
 				}

@@ -36,10 +36,10 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper{
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR), 
+//			@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR), 
 			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR) 
 	})
-	List<DesignaItem> busquedaDesignaciones(DesignaItem designaItem, Integer tamMaximo);
+	List<DesignaItem> busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboModulos")
 	@Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),

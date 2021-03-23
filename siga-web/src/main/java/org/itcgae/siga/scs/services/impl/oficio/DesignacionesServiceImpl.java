@@ -110,8 +110,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("DesignacionesServiceImpl.busquedaDesignas -> Entrada a servicio para la busqueda de justifiacion express");
 				List<DesignaItem> designas = null;
-				designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, tamMaximo);
-				
+				try {
+				designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, idInstitucion, tamMaximo);
+				}catch(Exception e) {
+					LOGGER.info("DesignacionesServiceImpl.busquedaDesignas -> Salida del servicio");
+				}
 				LOGGER.info("DesignacionesServiceImpl.busquedaDesignas -> Salida del servicio");
 			}
 		}
