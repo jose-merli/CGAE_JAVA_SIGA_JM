@@ -1,7 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 public class DesignaItem {
 	
@@ -44,6 +44,9 @@ public class DesignaItem {
 	private String apellidosNombre;
 	private String[] interesados;
 	private String validadas;
+	
+	private String expedientes;
+	private String cliente;
 	
 	
 	public DesignaItem() {
@@ -478,6 +481,75 @@ public class DesignaItem {
 		this.usuModificacion = usuModificacion;
 	}
 
+	/**
+	 * @return the nombreTurno
+	 */
+	public String getNombreTurno() {
+		return nombreTurno;
+	}
+
+	/**
+	 * @param nombreTurno the nombreTurno to set
+	 */
+	public void setNombreTurno(String nombreTurno) {
+		this.nombreTurno = nombreTurno;
+	}
+
+	/**
+	 * @return the numColegiado
+	 */
+	public int getNumColegiado() {
+		return numColegiado;
+	}
+
+	/**
+	 * @param numColegiado the numColegiado to set
+	 */
+	public void setNumColegiado(int numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+
+	/**
+	 * @return the apellidosNombre
+	 */
+	public String getApellidosNombre() {
+		return apellidosNombre;
+	}
+
+	/**
+	 * @param apellidosNombre the apellidosNombre to set
+	 */
+	public void setApellidosNombre(String apellidosNombre) {
+		this.apellidosNombre = apellidosNombre;
+	}
+
+	/**
+	 * @return the interesados
+	 */
+	public String[] getInteresados() {
+		return interesados;
+	}
+
+	/**
+	 * @param interesados the interesados to set
+	 */
+	public void setInteresados(String[] interesados) {
+		this.interesados = interesados;
+	}
+
+	/**
+	 * @return the validadas
+	 */
+	public String getValidadas() {
+		return validadas;
+	}
+
+	/**
+	 * @param validadas the validadas to set
+	 */
+	public void setValidadas(String validadas) {
+		this.validadas = validadas;
+	}
 
 	@Override
 	public String toString() {
@@ -493,8 +565,8 @@ public class DesignaItem {
 				+ idTipoDesignaColegio + ", idTurno=" + idTurno + ", nig=" + nig + ", numero=" + numero
 				+ ", numProcedimiento=" + numProcedimiento + ", observaciones=" + observaciones + ", procurador="
 				+ procurador + ", resumenAsunto=" + resumenAsunto + ", sufijo=" + sufijo + ", usuModificacion="
-				+ usuModificacion + "]";
+				+ usuModificacion + ", nombreTurno=" + nombreTurno + ", numColegiado=" + numColegiado
+				+ ", apellidosNombre=" + apellidosNombre + ", interesados=" + Arrays.toString(interesados)
+				+ ", validadas=" + validadas + "]";
 	}
-	
-	
 }
