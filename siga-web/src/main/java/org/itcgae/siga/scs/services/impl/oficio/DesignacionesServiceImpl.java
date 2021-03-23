@@ -104,6 +104,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					
 					
 					//PaginadorBind paginador = admDesignas.getDesignasJustificacionPaginador(fInformeJustificacion,longitudNumEjg,false,isPermitidoEditarActFicha,ejisActivo.equals(AppConstants.DB_TRUE));
+					LOGGER.debug("prrrrrrrrrrrrrrrrrrrrrrrrruddegba");
+					System.out.println("sdfasdfasdf");
 					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpres(item, idInstitucion.toString(), longitudCodEJG, idPersona);
 					
 					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> Salida del servicio");

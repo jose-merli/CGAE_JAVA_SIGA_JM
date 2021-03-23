@@ -10,8 +10,6 @@ import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
 
-import com.siga.gratuita.form.DesignaForm;
-
 public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 	public String searchClaveDesignaciones(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax) {
@@ -379,55 +377,33 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		sql.append(" ) ALLDESIGNAS ");
 
-		//cuando no estan activas las restricciones sacamos todo. Entonces la union se pone siempre que no esten activas las restricciones o cuando la restriccion nos lo diga
-		if(item.isMuestraPendiente()){
-			if(designasList!=null && designasList.size()>0){
-				sql.append(" WHERE (ALLDESIGNAS.IDINSTITUCION,ALLDESIGNAS.ANIO,ALLDESIGNAS.IDTURNO,ALLDESIGNAS.NUMERO) IN ( ");
+		StringBuilder tiposResolucionBuilder = new StringBuilder();
 
-				for(DesignaForm designa:designasList){
-					sql.append("(");
-					sql.append(designa.getIdInstitucion());
-					sql.append(",");
-					sql.append(designa.getAnio());
-					sql.append(",");
-					sql.append(designa.getIdTurno());
-					sql.append(",");
-					sql.append(designa.getNumero());
-					sql.append(")");
-					sql.append(",");
-				}
-
-				//quitamos la coma
-				sql.deleteCharAt(sqlDesignas.length()-1);
-				sql.append(")");
-			}		
-		}else{
-			StringBuilder tiposResolucionBuilder = new StringBuilder();
-	
-			tiposResolucionBuilder.append(" WHERE (ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA IN (1");
-			
-			if (!item.isRestriccionesVisualizacion() || (item.getResolucionPTECAJG() !=null && !"0".equals(item.getResolucionPTECAJG()))) {
-				tiposResolucionBuilder.append(",3");
-			}		
-			
-			if (!item.isRestriccionesVisualizacion() || (item.getConEJGNoFavorables() !=null && !"0".equals(item.getConEJGNoFavorables()))) {
-				tiposResolucionBuilder.append(",2");
-			}
-			
-			if (!item.isRestriccionesVisualizacion() || (item.getEjgSinResolucion() !=null && !"0".equals(item.getEjgSinResolucion()))){
-				tiposResolucionBuilder.append(",4");
-			}
-			
-			tiposResolucionBuilder.append(")");
-			
-			if (!item.isRestriccionesVisualizacion() || (item.getEjgSinResolucion() !=null && !"0".equals(item.getEjgSinResolucion()))){
-				tiposResolucionBuilder.append(" OR ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA is null ");
-			}
-			
-			tiposResolucionBuilder.append(")");
-			
-			sql.append(tiposResolucionBuilder);
-			
+		tiposResolucionBuilder.append(" WHERE (ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA IN (1");
+		
+		if (!item.isRestriccionesVisualizacion() || (item.getResolucionPTECAJG() !=null && !"0".equals(item.getResolucionPTECAJG()))) {
+			tiposResolucionBuilder.append(",3");
+		}		
+		
+		if (!item.isRestriccionesVisualizacion() || (item.getConEJGNoFavorables() !=null && !"0".equals(item.getConEJGNoFavorables()))) {
+			tiposResolucionBuilder.append(",2");
+		}
+		
+		if (!item.isRestriccionesVisualizacion() || (item.getEjgSinResolucion() !=null && !"0".equals(item.getEjgSinResolucion()))){
+			tiposResolucionBuilder.append(",4");
+		}
+		
+		tiposResolucionBuilder.append(")");
+		
+		if (!item.isRestriccionesVisualizacion() || (item.getEjgSinResolucion() !=null && !"0".equals(item.getEjgSinResolucion()))){
+			tiposResolucionBuilder.append(" OR ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA is null ");
+		}
+		
+		tiposResolucionBuilder.append(")");
+		
+		sql.append(tiposResolucionBuilder);
+		
+		if (item.isMuestraPendiente()) {
 			sql.append(" AND (NOT EXISTS ");
 			sql.append(" (SELECT * ");
 			sql.append(" FROM SCS_ACTUACIONDESIGNA ACT ");
