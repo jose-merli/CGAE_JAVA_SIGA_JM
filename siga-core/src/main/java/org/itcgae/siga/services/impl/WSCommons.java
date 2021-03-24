@@ -301,6 +301,8 @@ public class WSCommons {
 
 		// Método genérico que recibe una peticion de un cliente de ws y comprueba si la
 		// IP del colegio se corresponde con la correcta
+		LOGGER.info("Se ha recibido una llamada desde la IP " + endpointReference + " para el colegio "
+				+ idInstitucion); 
 		String valor = obtenerValorParametroColegio(idInstitucion, nombreParametroIP);
 		//Para probar las sociedades
 		//valor = "127.0.0.1";
