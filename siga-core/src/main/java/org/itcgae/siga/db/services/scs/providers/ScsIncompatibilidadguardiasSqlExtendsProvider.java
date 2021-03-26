@@ -1,5 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.util.List;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.IncompatibilidadesDatosEntradaItem;
@@ -184,7 +186,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		if (incompatibilidades.getIdTurno() != null && !incompatibilidades.getIdTurno().isEmpty()) {
 			listado_guardias.WHERE("SCS_GUARDIASTURNO.IDTURNO IN (" + incompatibilidades.getIdTurno() + ")" );
 		}
-		listado_guardias.WHERE("SCS_GUARDIASTURNO.IDGUARDIA = (" + listado_guardias_idGuardia + ")" );
+		/*listado_guardias.WHERE("SCS_GUARDIASTURNO.IDGUARDIA IN (" + listado_guardias_idGuardia + ")" );*/
 		if (incompatibilidades.getIdArea() != null && !incompatibilidades.getIdArea().isEmpty()) {
 			listado_guardias.WHERE("SCS_AREA.IDAREA = " + incompatibilidades.getIdArea() );
 		}
@@ -269,7 +271,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 			if (incompatibilidades.getIdTurno() != null && !incompatibilidades.getIdTurno().isEmpty()) {
 				sql.WHERE("g1.IDTURNO IN ( " + incompatibilidades.getIdTurno() + " )" );
 			}
-			sql.WHERE("g1.IDGUARDIA = (" +sqlSCSGuardiasTurnoIdGuardia + ")" );
+			sql.WHERE("g1.IDGUARDIA IN (" +sqlSCSGuardiasTurnoIdGuardia + ")" );
 				
 			sql.ORDER_BY(" turno, guardia, motivos, diasseparacionguardias");
 
@@ -362,32 +364,32 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		
 		/*Será necesario comprobar si ya existe dicha incompatibilidad, para ello realizaremos la siguiente consulta, 
 		que debrerá devolver como resultado 2 (esto significa que existe la incompatibilidad en ambas direcciones)*/
-		
+		//Campos obligatorios : Turno, Guardia, Guardias Incompatibles (al menos seleccionar una guardia) y Días de separación.
 		sql.SELECT("COUNT(*)");
 					
 		sql.FROM("SCS_INCOMPATIBILIDADGUARDIAS");
 					
 		sql.WHERE("IDINSTITUCION = " + idInstitucion +
-					" AND ((IDTURNO IN ( " + idTurno + " )" +
+				" AND ((IDTURNO IN ( " + idTurno + " )" +
 				" AND IDGUARDIA = " + idGuardia + 
 				" AND IDTURNO_INCOMPATIBLE = " + "'" + idTurnoIncompatible + "'" + 
 				" AND IDGUARDIA_INCOMPATIBLE = " + "'" + idGuardiaIncompatible + "'"  + ") " +
-				" OR (IDTURNO = " +  "'" + idTurnoIncompatible + "'" +
+				" OR (IDTURNO IN ( " + idTurnoIncompatible + " )" +
 				" AND IDGUARDIA = " + "'" + idGuardiaIncompatible + "'" +
-				" AND IDTURNO_INCOMPATIBLE = " + "'" + idTurnoIncompatible + "'" +
+				" AND IDTURNO_INCOMPATIBLE = " + "'" + idTurno + "'" +
 				" AND IDGUARDIA_INCOMPATIBLE = " + idGuardia + ")) "
 					);
 		return sql.toString();
 	}
 	
-	public String updateIfExists(String idTurno, String idInstitucion, String idGuardia, String idTurnoIncompatible, String idGuardiaIncompatible, String motivos, String diasSeparacionGuardia) {
+	public String updateIfExists(String idTurno, String idInstitucion, String idGuardia, String idTurnoIncompatible, String idGuardiaIncompatible, String motivos, String diasSeparacionGuardia, String fechaModificacion) {
 		SQL sql = new SQL();
-		
+		//Campos obligatorios : Turno, Guardia, Guardias Incompatibles (al menos seleccionar una guardia) y Días de separación.
 		//Si ya existía la incompatibilidad, se actualizará (este update actualiza ambas incompatibilidades al la vez)
 		sql.UPDATE("SCS_INCOMPATIBILIDADGUARDIAS");
-		sql.SET("MOTIVOS = " + motivos + "," +
+		sql.SET("MOTIVOS = '" + motivos + "'," +
 			" DIASSEPARACIONGUARDIAS = " + diasSeparacionGuardia + "," + 
-			" FECHAMODIFICACION = SYSDATE()");
+			" FECHAMODIFICACION = '"+ fechaModificacion + "'");
 		sql.WHERE(
 			"IDINSTITUCION =" + idInstitucion +
 			" AND ((IDTURNO IN ( " + idTurno + " )" +
@@ -400,4 +402,123 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 			" AND IDGUARDIA_INCOMPATIBLE = " + idGuardia + "))");
 		return sql.toString();
 	}
+	
+	
+	public String getIdTurnoFromNombreTurno(String nombreTurno) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("SCS_TURNO.IDTURNO");
+					
+		sql.FROM("SCS_TURNO");
+					
+		sql.WHERE("SCS_TURNO.NOMBRE = " + "'" + nombreTurno + "'" );
+		
+		return sql.toString();
+	}
+	
+	public String getIdGuardiaFromNombreGuardia(String nombreGuardia) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDGUARDIA");
+					
+		sql.FROM("SCS_GUARDIASTURNO");
+					
+		sql.WHERE("SCS_GUARDIASTURNO.NOMBRE = '" + nombreGuardia+ "'" );
+		
+		return sql.toString();
+	}
+	
+	public String getIdTurnoIncompatibleFromNombreTurno(String nombreTurnoIncompatible) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("SCS_TURNO.IDTURNO");
+					
+		sql.FROM("SCS_TURNO");
+					
+		sql.WHERE("SCS_TURNO.NOMBRE = '" + nombreTurnoIncompatible + "'");
+		
+		return sql.toString();
+	}
+	
+	public String getIdGuardiaIncompatibleFromNombreGuardia(String nombreGuardiaIncompatible) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDGUARDIA");
+		
+		sql.FROM("SCS_GUARDIASTURNO");
+					
+		sql.WHERE("SCS_GUARDIASTURNO.NOMBRE = '" + nombreGuardiaIncompatible + "'");
+		
+		return sql.toString();
+	}
+	
+	
+	public String getIdTurnoIncByIdGuardiaInc(String idGuardiaInc) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDTURNO");
+					
+		sql.FROM("SCS_GUARDIASTURNO");
+					
+		sql.WHERE("SCS_GUARDIASTURNO.IDGUARDIA = '" + idGuardiaInc + "'");
+		
+		return sql.toString();
+	}
+	
+	
+	
+	public String getListaLabelsGuardiasInc(String idInstitucion, String idTipoGuardia, String idTurno, Integer usu, String idPartidaPresupuestaria) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.NOMBRE");
+		
+		sql.FROM("SCS_GUARDIASTURNO");
+		
+		if (idInstitucion != null && !idInstitucion.isEmpty()) {
+			sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = " + idInstitucion );
+		}
+		if (idTipoGuardia != null && !idTipoGuardia.isEmpty()) {
+			sql.WHERE("SCS_GUARDIASTURNO.IDTIPOGUARDIA IN ( " + idTipoGuardia + ")");
+		}
+		if (idTurno != null && !idTurno.isEmpty()) {
+			sql.WHERE("SCS_GUARDIASTURNO.IDTURNO IN ( " + idTurno + ")");
+		}
+		if (usu != null) {
+			sql.WHERE("SCS_GUARDIASTURNO.USUMODIFICACION = " + usu );
+		}
+		if (idPartidaPresupuestaria != null && !idPartidaPresupuestaria.isEmpty()) {
+			sql.WHERE("SCS_GUARDIASTURNO.IDPARTIDAPRESUPUESTARIA IN ( " + idPartidaPresupuestaria + ")"  );
+		}
+		
+		return sql.toString();
+	}
+	
+	public String getListaValueGuardiasInc(String idInstitucion, String idTipoGuardia, String idTurno, Integer usu, String idPartidaPresupuestaria) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDGUARDIA");
+		
+		sql.FROM("SCS_GUARDIASTURNO");
+		
+		if (idInstitucion != null && !idInstitucion.isEmpty()) {
+			sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = " + idInstitucion );
+		}
+		if (idTipoGuardia != null && !idTipoGuardia.isEmpty()) {
+			sql.WHERE("SCS_GUARDIASTURNO.IDTIPOGUARDIA IN ( " + idTipoGuardia + ")");
+		}
+		if (idTurno != null && !idTurno.isEmpty()) {
+			sql.WHERE("SCS_GUARDIASTURNO.IDTURNO IN ( " + idTurno + ")");
+		}
+		if (usu != null) {
+			sql.WHERE("SCS_GUARDIASTURNO.USUMODIFICACION = " + usu );
+		}
+		if (idPartidaPresupuestaria != null && !idPartidaPresupuestaria.isEmpty()) {
+			sql.WHERE("SCS_GUARDIASTURNO.IDPARTIDAPRESUPUESTARIA IN ( " + idPartidaPresupuestaria + ")"  );
+		}
+		
+		
+		return sql.toString();
+	}
+	
+	
 }

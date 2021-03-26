@@ -9,6 +9,8 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesResponse;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -159,6 +162,12 @@ public class GuardiaController {
 	ResponseEntity<DeleteResponseDTO> saveIncompatibilidades(@RequestBody SaveIncompatibilidadesDatosEntradaItem incompatibilidadesBody, HttpServletRequest request){
 		DeleteResponseDTO response= guardiasService.saveIncompatibilidades(incompatibilidadesBody, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/getComboGuardiasInc", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboIncompatibilidadesResponse> getCombo(@RequestBody ComboIncompatibilidadesDatosEntradaItem comboIncompatibilidadesDatosEntradaItem, HttpServletRequest request){
+		ComboIncompatibilidadesResponse response= guardiasService.getCombo(comboIncompatibilidadesDatosEntradaItem, request);
+		return new ResponseEntity<ComboIncompatibilidadesResponse>(response, HttpStatus.OK);
 	}
 	
 }

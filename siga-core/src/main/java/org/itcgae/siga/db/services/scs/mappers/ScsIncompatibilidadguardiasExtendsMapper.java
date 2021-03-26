@@ -46,13 +46,18 @@ public interface ScsIncompatibilidadguardiasExtendsMapper extends ScsIncompatibi
 	
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "listadoIncompatibilidades")
 	@Results({ 
+		@Result(column = "EXISTE", property = "existe", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNO", property = "nombreTurno", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRE", property = "nombreGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "GUARDIA", property = "nombreGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDTIPOGUARDIA", property = "idTipoGuardia", jdbcType = JdbcType.VARCHAR)
-		
+		@Result(column = "TURNO_INCOMPATIBLE", property = "nombreTurnoIncompatible", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTURNO_INCOMPATIBLE", property = "idTurnoIncompatible", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "GUARDIA_INCOMPATIBLE", property = "nombreGuardiaIncompatible", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGUARDIA_INCOMPATIBLE", property = "idGuardiaIncompatible", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOTIVOS", property = "motivos", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DIASSEPARACIONGUARDIAS", property = "diasSeparacionGuardias", jdbcType = JdbcType.VARCHAR)
+
 	})
 	List<IncompatibilidadesItem> getListadoIncompatibilidades(IncompatibilidadesDatosEntradaItem incompatibilidades, String idInstitucion,  String idGuardia);
 	
@@ -64,11 +69,47 @@ public interface ScsIncompatibilidadguardiasExtendsMapper extends ScsIncompatibi
 	void saveListadoIncompatibilidades(int idTurno, int idInstitucion, int idGuardia, int idTurnoIncompatible, int idGuardiaIncompatible, int usuario, String motivos, int diasSeparacionGuardias, String fechaModificacion);
 		
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "updateIfExists")
-	void updateIfExists(String idTurno, String idInstitucion, String idGuardia, String idTurnoIncompatible, String idGuardiaIncompatible, String motivos, String diasSeparacionGuardia);
+	void updateIfExists(String idTurno, String idInstitucion, String idGuardia, String idTurnoIncompatible, String idGuardiaIncompatible, String motivos, String diasSeparacionGuardia, String fecha);
 		
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "checkIncompatibilidadesExists")
 	int checkIncompatibilidadesExists(String idTurno, String idInstitucion, String idGuardia, String idTurnoIncompatible, String idGuardiaIncompatible);
 		
+	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getIdTurnoFromNombreTurno")
+	@Results({ 
+		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+		
+	})
+	String getIdTurnoFromNombreTurno(String nombre);
+	
+	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getIdGuardiaFromNombreGuardia")
+	@Results({ 
+		@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+		
+	})
+	String getIdGuardiaFromNombreGuardia(String nombre);
+	
+	
+	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getIdTurnoIncompatibleFromNombreTurno")
+	@Results({ 
+		@Result(column = "IDTURNO_INCOMPATIBLE", property = "idTurnoIncompatible", jdbcType = JdbcType.VARCHAR),
+		
+	})
+	String getIdTurnoIncompatibleFromNombreTurno(String nombre);
+	
+	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getIdGuardiaIncompatibleFromNombreGuardia")
 
+	String getIdGuardiaIncompatibleFromNombreGuardia(String nombre);
+	
+	
+	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getIdTurnoIncByIdGuardiaInc")
+
+	String getIdTurnoIncByIdGuardiaInc(String idGuardiaInc);
+	
+	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getListaValueGuardiasInc")
+	List<String> getListaValueGuardiasInc(String idInstitucion, String idTipoGuardia, String idTurno, Integer usu, String idPartidaPresupuestaria);
+	
+	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "getListaLabelsGuardiasInc")
+	List<String> getListaLabelsGuardiasInc(String idInstitucion, String idTipoGuardia, String idTurno, Integer usu, String idPartidaPresupuestaria);
+	
 }	
 
