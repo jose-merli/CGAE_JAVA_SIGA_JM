@@ -32,6 +32,8 @@ import org.itcgae.siga.DTOs.scs.IncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.IncompatibilidadesItem;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
+import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
+import org.itcgae.siga.DTOs.scs.LetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
@@ -103,7 +105,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private ScsGrupoguardiacolegiadoExtendsMapper scsGrupoguardiacolegiadoExtendsMapper;
-	
+
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
@@ -131,7 +133,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					"searchGuardias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				
+
 				LOGGER.info(
 						"searchGuardias() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
@@ -140,18 +142,18 @@ public class GuardiasServiceImpl implements GuardiasService {
 						.andParametroEqualTo(SigaConstants.TAM_MAX_CONSULTA_JG)
 						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 				genParametrosExample.setOrderByClause(SigaConstants.C_IDINSTITUCION + " DESC");
-				
+
 				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
 
 				LOGGER.info(
 						"searchGuardias() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-				
-				if(tamMax != null) {
+
+				if (tamMax != null) {
 					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-				}else {
+				} else {
 					tamMaximo = null;
 				}
-				
+
 				LOGGER.info("searchGuardias() -> Entrada para obtener las guardias");
 
 				List<GuardiasItem> guardias = scsGuardiasturnoExtendsMapper.searchGuardias(guardiasItem,
@@ -162,7 +164,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							+ it.getSeleccionFestivos()).replace("null", ""));
 					return it;
 				}).collect(Collectors.toList());
-				
+
 				if ((guardias != null) && tamMaximo != null && (guardias.size()) > tamMaximo) {
 					error.setCode(200);
 					error.setDescription("La consulta devuelve más de " + tamMaximo
@@ -577,10 +579,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						List<ScsOrdenacioncolas> colas = scsOrdenacionColasExtendsMapper.selectByExample(ordExample);
 
-						// Esto sirve para ver si habrá que generar grupos automaticamente despues de updatear
+						// Esto sirve para ver si habrá que generar grupos automaticamente despues de
+						// updatear
 						resetGrupos = false;
 						if ((item.get(0).getPorgrupos().equals("1") || colas.get(0).getOrdenacionmanual() == 0)
-								&& !Boolean.valueOf(guardiasItem.getPorGrupos()) 
+								&& !Boolean.valueOf(guardiasItem.getPorGrupos())
 								&& Short.valueOf(guardiasItem.getFiltros().split(",")[4]) != 0) {
 							resetGrupos = true;
 						}
@@ -704,7 +707,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					ScsGuardiasturnoExample scsGuardiasturnoExample = null;
 					LOGGER.info(
-				"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Setteo de los campos que se han introducido y el resto de datos heredados de la guardia vinculada");
+							"createGuardia() / admUsuariosExtendsMapper.selectByExample() -> Setteo de los campos que se han introducido y el resto de datos heredados de la guardia vinculada");
 
 					ScsGuardiasturno guardia = new ScsGuardiasturno();
 					if (!UtilidadesString.esCadenaVacia(guardiasItem.getIdGuardiaPrincipal())
@@ -1017,7 +1020,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 					ScsOrdenacioncolasExample example2 = new ScsOrdenacioncolasExample();
 					example2.createCriteria()
 							.andIdordenacioncolasEqualTo(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
-					// Segun lo que nos llega del front preparamos el ORDER BY que habra en la query.
+					// Segun lo que nos llega del front preparamos el ORDER BY que habra en la
+					// query.
 					List<ScsOrdenacioncolas> cola = scsOrdenacionColasExtendsMapper.selectByExample(example2);
 					Map<Short, String> mapilla = new HashMap();
 					Map<Short, String> mapa = new TreeMap<Short, String>(Collections.reverseOrder());
@@ -1076,7 +1080,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 					}
 					inscritos.setInscripcionesItem(colaGuardia);
-					// Si se ha pasado de por grupos a sin grupos o que estuviese sin grupos y se añada la ord. manual
+
+					// Si se ha pasado de por grupos a sin grupos o que estuviese sin grupos y se
+					// añada la ord. manual
 					// hay que updatear todos los grupos
 					// y generarlos con el mismo valor de la posicion que tienen en la lista.
 					if (colaGuardia != null && colaGuardia.size() > 0 && resetGrupos) {
@@ -1101,11 +1107,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 								.selectByExample(grupoGuardiaExample);
 
 						ScsGrupoguardiacolegiadoExample scsGrupoguardiacolegiadoExample = null;
-						
+
 						for (int i = 0; i < todaColaGuardia.size(); i++) {
 							grupoColegiado = new ScsGrupoguardiacolegiado();
-							//Aqui se buscan de los grupos existentes uno cuyo numero sea adecuado para el 
-							//orden cola. Si encuentra uno le settea el campo FK.
+							// Aqui se buscan de los grupos existentes uno cuyo numero sea adecuado para el
+							// orden cola. Si encuentra uno le settea el campo FK.
 							for (ScsGrupoguardia g : gruposGuardia)
 								if ((i + 1) == g.getNumerogrupo())
 									grupoColegiado.setIdgrupoguardia(g.getIdgrupoguardia());
@@ -1121,14 +1127,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 								grupoColegiado.setIdpersona(Long.valueOf(todaColaGuardia.get(i).getIdPersona()));
 								grupoColegiado.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
 								grupoColegiado.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
-								
+
 								NewIdDTO idP = scsGrupoguardiacolegiadoExtendsMapper.getLastId();
 
-								if (idP == null) 
+								if (idP == null)
 									grupoColegiado.setIdgrupoguardiacolegiado((long) 1);
-								else 
+								else
 									grupoColegiado.setIdgrupoguardiacolegiado(Long.parseLong(idP.getNewId()) + 1);
-								
+
 								// Si se encontro un grupo se inserta sino se crea uno nuevo y se asigna.
 								if (grupoColegiado.getIdgrupoguardia() != null)
 									scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
@@ -1155,7 +1161,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 							} else {
 								// En este caso el Grupoguardiacolegiado existe y solo setteamos
-								// lo necesario. 
+								// lo necesario.
 								grupoColegiado.setFechamodificacion(new Date());
 								grupoColegiado.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
 								grupoColegiado.setOrden(1);
@@ -1255,7 +1261,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					LOGGER.info(
 							"updateUltimoCola() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear DatosGenerales de guardias");
-					// Se obtiene de la tabla de inscripciones la fecha de suscripcion y se asigna el idpersona.
+					// Se obtiene de la tabla de inscripciones la fecha de suscripcion y se asigna
+					// el idpersona.
 					// Hacen falta ambos para definir el ultimo de la cola.
 					ScsInscripcionguardiaExample example = new ScsInscripcionguardiaExample();
 					example.createCriteria().andIdguardiaEqualTo(Integer.valueOf(guardiasItem.getIdGuardia()))
@@ -1430,7 +1437,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if (idGrupoDTO != null)
 						idGrupo = Integer.valueOf(idGrupoDTO.getNewId());
 
-
 					// Comprobamos si hay algun grupo nuevo
 					ScsGrupoguardiaExample grupoGuardiaExample = new ScsGrupoguardiaExample();
 					grupoGuardiaExample.createCriteria()
@@ -1454,7 +1460,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						} else {
 							grupoColegiado = new ScsGrupoguardiacolegiado();
 							// Si tenia Grupoguardiacolegiado, es decir, no tenia ni grupo ni orden
-							// creamos uno. Para crear es importante la Fechasuscripcion que se obtiene 
+							// creamos uno. Para crear es importante la Fechasuscripcion que se obtiene
 							// con mybatis
 							if (element.getIdGrupoGuardiaColegiado() == null
 									|| element.getIdGrupoGuardiaColegiado().equals("")) {
@@ -1621,6 +1627,51 @@ public class GuardiasServiceImpl implements GuardiasService {
 		LOGGER.info("guardarColaGuardia() -> Salida del servicio para guardar la cola de guardia");
 
 		return updateResponseDTO;
+	}
+
+	@Override
+	public LetradosGuardiaDTO letradosGuardia(String idTurno, String idGuardia, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		LetradosGuardiaDTO letradosGuardiaDTO = new LetradosGuardiaDTO();
+		Error error = new Error();
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"letradosGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"letradosGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+
+					List<LetradoGuardiaItem> letradosGuardiaItem = scsGuardiasturnoExtendsMapper
+							.searchLetradosGuardia(Short.toString(idInstitucion), idTurno, idGuardia);
+
+					letradosGuardiaDTO.setLetradosGuardiaItem(letradosGuardiaItem);
+
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"GuardiasServiceImpl.letradosGuardia() -> Se ha producido un error en consultando los letrados", e);
+
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+
+			letradosGuardiaDTO.setError(error);
+		}
+
+		return letradosGuardiaDTO;
 	}
 
 	
