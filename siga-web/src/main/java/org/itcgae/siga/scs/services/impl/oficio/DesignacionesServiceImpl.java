@@ -118,9 +118,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}	
 	
 	@Override
-	public DesignaItem busquedaDesignas(DesignaItem designaItem, HttpServletRequest request) {
+	public List<DesignaItem> busquedaDesignas(DesignaItem designaItem, HttpServletRequest request) {
 		DesignaItem result = new DesignaItem();
-		
+		List<DesignaItem> designas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
 		
@@ -154,17 +154,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("DesignacionesServiceImpl.busquedaDesignas -> Entrada a servicio para la busqueda de justifiacion express");
-				List<DesignaItem> designas = null;
+				
 				try {
 				designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, idInstitucion, tamMaximo);
 				}catch(Exception e) {
+					LOGGER.error(e.getMessage());
 					LOGGER.info("DesignacionesServiceImpl.busquedaDesignas -> Salida del servicio");
 				}
 				LOGGER.info("DesignacionesServiceImpl.busquedaDesignas -> Salida del servicio");
 			}
 		}
 		
-		return result;
+		return designas;
 	}	
 	
 	@Override
