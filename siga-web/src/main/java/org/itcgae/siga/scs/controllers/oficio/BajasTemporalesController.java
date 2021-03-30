@@ -50,7 +50,7 @@ public class BajasTemporalesController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/bajasTemporales/updateEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/bajasTemporales/updateBaja", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateEstado(@RequestBody List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request) {
 		UpdateResponseDTO response = bajasTemporalesService.updateEstado(bajasTemporalesItem, request);
 		if (response.getError().getCode() == 200)
