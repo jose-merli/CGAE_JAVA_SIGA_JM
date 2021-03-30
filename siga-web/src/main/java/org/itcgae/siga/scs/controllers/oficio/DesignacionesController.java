@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.controllers.oficio;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,9 +42,13 @@ public class DesignacionesController {
 	}
 	
 	@RequestMapping(value = "/busquedaDesignaciones",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DesignaItem> busquedaDesignas(@RequestBody DesignaItem item, HttpServletRequest request) {
-		DesignaItem response = designacionesService.busquedaDesignas(item, request);
-		return new ResponseEntity<DesignaItem>(response, HttpStatus.OK);
+	ResponseEntity<List<DesignaItem>> busquedaDesignas(@RequestBody DesignaItem item, HttpServletRequest request) {
+		List<DesignaItem> response = designacionesService.busquedaDesignas(item, request);
+		if(response != null) {
+			return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<List<DesignaItem>>(new ArrayList<DesignaItem>(), HttpStatus.OK);
+		}
 	}
 	
 	@RequestMapping(value = "/comboModulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
