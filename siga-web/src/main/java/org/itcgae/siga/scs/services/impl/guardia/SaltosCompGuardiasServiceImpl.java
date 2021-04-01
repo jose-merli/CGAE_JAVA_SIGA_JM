@@ -142,14 +142,16 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 										.searchLetradosGuardia(Short.toString(idInstitucion), saltoComp.getIdTurno(),
 												saltoComp.getIdGuardia());
 
-								saltoComp.setComboColegiados(transformToListComboItem(listaLetradoGuardiaItem, true));
+								saltoComp.setComboColegiados(
+										transformToListComboItemGuardia(listaLetradoGuardiaItem, true));
 
 							} else {
 								List<LetradoGuardiaItem> listaLetradoGuardiaItem = saltoscompensacionesMapper
 										.searchLetradosGuardia(Short.toString(idInstitucion), saltoComp.getIdTurno(),
 												saltoComp.getIdGuardia());
 
-								saltoComp.setComboColegiados(transformToListComboItem(listaLetradoGuardiaItem, false));
+								saltoComp.setComboColegiados(
+										transformToListComboItemGuardia(listaLetradoGuardiaItem, false));
 							}
 
 							List<ComboItem> listaComboItem = scsGuardiasturnoExtendsMapper
@@ -525,7 +527,7 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 		return deleteResponseDTO;
 	}
 
-	private List<ComboItem> transformToListComboItem(List<LetradoGuardiaItem> listaLetradoGuardiaItem,
+	private List<ComboItem> transformToListComboItemGuardia(List<LetradoGuardiaItem> listaLetradoGuardiaItem,
 			boolean isGrupo) {
 
 		List<ComboItem> listaCombo = new ArrayList<>();
@@ -557,76 +559,6 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 		}
 
 		return listaCombo;
-	}
-
-	@Override
-	public SaltoCompGuardiaDTO searchSaltosYCompensacionesOficio(SaltoCompGuardiaItem saltoItem,
-			HttpServletRequest request) {
-
-		LOGGER.info("searchSaltosYCompensacionesOficio() -> Entrada para obtener los saltos y compensaciones");
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		SaltoCompGuardiaDTO saltoCompDTO = new SaltoCompGuardiaDTO();
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
-		Error error = new Error();
-
-		try {
-
-			if (idInstitucion != null) {
-
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"searchSaltosYCompensacionesOficio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"searchSaltosYCompensacionesOficio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-
-					GenParametrosExample genParametrosExample = new GenParametrosExample();
-
-					genParametrosExample.createCriteria().andModuloEqualTo("SCS")
-							.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-
-					genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-
-					LOGGER.info(
-							"searchSaltosYCompensacionesOficio() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-					tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-
-					LOGGER.info(
-							"searchSaltosYCompensacionesOficio() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-					if (tamMax != null) {
-						tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-					} else {
-						tamMaximo = null;
-					}
-
-					List<SaltoCompGuardiaItem> saltosComp = saltoscompensacionesMapper
-							.searchSaltosYCompensacionesOficio(saltoItem, idInstitucion.toString(), tamMaximo);
-
-					saltoCompDTO.setSaltosCompItems(saltosComp);
-
-				}
-
-			}
-
-		} catch (Exception e) {
-			error.setCode(500);
-			saltoCompDTO.setError(error);
-		}
-
-		return saltoCompDTO;
 	}
 
 }

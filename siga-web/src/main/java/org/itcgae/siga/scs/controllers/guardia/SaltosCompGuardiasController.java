@@ -30,13 +30,6 @@ public class SaltosCompGuardiasController {
 		SaltoCompGuardiaDTO response = saltosCompGuardiasService.searchSaltosYCompensaciones(saltoItem, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
-	@PostMapping(value = "/buscarSaltosOCompensacionesOficio", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<SaltoCompGuardiaDTO> searchSaltosYCompensacionesOficio(@RequestBody SaltoCompGuardiaItem saltoItem,
-			HttpServletRequest request) {
-		SaltoCompGuardiaDTO response = saltosCompGuardiasService.searchSaltosYCompensacionesOficio(saltoItem, request);
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
 
 	@PostMapping(value = "/guardarSaltosCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<DeleteResponseDTO> guardarSaltosCompensaciones(
