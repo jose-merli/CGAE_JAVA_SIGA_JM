@@ -48,35 +48,90 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 			sql.WHERE("UPPER(turnos.nombre) like UPPER('%" + turnosItem.getNombre() + "%')");
 		}
 		if (turnosItem.getJurisdiccion() != null && turnosItem.getJurisdiccion() != "") {
-			sql.WHERE("turnos.idjurisdiccion ='" + turnosItem.getJurisdiccion() + "'");
+				String condturnos ="(";
+				for(int i = 0; i< turnosItem.getJurisdiccion().split(",").length; i++) {
+					if(i>0) condturnos+=" or ";
+					condturnos+="turnos.idjurisdiccion ='"+turnosItem.getJurisdiccion().split(",")[i]+"'";
+				}
+				condturnos+=")";
+				sql.WHERE(condturnos);
 		}
 		if (turnosItem.getIdtipoturno() != null && turnosItem.getIdtipoturno() != "") {
-			sql.WHERE("turnos.idtipoturno = '" + turnosItem.getIdtipoturno() + "'");
+			String condturnos ="(";
+			for(int i = 0; i< turnosItem.getIdtipoturno().split(",").length; i++) {
+				if(i>0) condturnos+=" or ";
+				condturnos+="turnos.idtipoturno ='"+turnosItem.getIdtipoturno().split(",")[i]+"'";
+			}
+			condturnos+=")";
+			sql.WHERE(condturnos);
 		}
 		if (turnosItem.getIdarea() != null && turnosItem.getIdarea() != "") {
-			sql.WHERE("area.idarea = '" + turnosItem.getIdarea() + "'");
+			String condturnos ="(";
+			for(int i = 0; i< turnosItem.getIdarea().split(",").length; i++) {
+				if(i>0) condturnos+=" or ";
+				condturnos+="area.idarea ='"+turnosItem.getIdarea().split(",")[i]+"'";
+			}
+			condturnos+=")";
+			sql.WHERE(condturnos);
 		}
 		if (turnosItem.getIdturno() != null && turnosItem.getIdturno() != "") {
-			sql.WHERE("turnos.idturno IN (" + turnosItem.getIdturno() + ")");
+			String condturnos ="(";
+			for(int i = 0; i< turnosItem.getIdturno().split(",").length; i++) {
+				if(i>0) condturnos+=" or ";
+				condturnos+="turnos.idturno ='"+turnosItem.getIdturno().split(",")[i]+"'";
+			}
+			condturnos+=")";
+			sql.WHERE(condturnos);
 		}
 		if (turnosItem.getIdmateria() != null && turnosItem.getIdmateria() != "") {
-			sql.WHERE("materi.idmateria = '" + turnosItem.getIdmateria() + "'");
+			String condturnos ="(";
+			for(int i = 0; i< turnosItem.getIdmateria().split(",").length; i++) {
+				if(i>0) condturnos+=" or ";
+				condturnos+="materi.idmateria ='"+turnosItem.getIdmateria().split(",")[i]+"'";
+			}
+			condturnos+=")";
+			sql.WHERE(condturnos);
 		}
 		if (turnosItem.getIdzona() != null && turnosItem.getIdzona() != "") {
-			sql.WHERE("zona.idzona = '" + turnosItem.getIdzona() + "'");
+			String condturnos ="(";
+			for(int i = 0; i< turnosItem.getIdzona().split(",").length; i++) {
+				if(i>0) condturnos+=" or ";
+				condturnos+="zona.idzona ='"+turnosItem.getIdzona().split(",")[i]+"'";
+			}
+			condturnos+=")";
+			sql.WHERE(condturnos);
 		}
 		if (turnosItem.getIdzubzona() != null && turnosItem.getIdzubzona() != "") {
-			sql.WHERE("subzon.idsubzona = '" + turnosItem.getIdzubzona() + "'");
+			String condturnos ="(";
+			for(int i = 0; i< turnosItem.getIdzona().split(",").length; i++) {
+				if(i>0) condturnos+=" or ";
+				condturnos+="subzon.idsubzona ='"+turnosItem.getIdzona().split(",")[i]+"'";
+			}
+			condturnos+=")";
+			sql.WHERE(condturnos);
 		}
 		if (turnosItem.getIdpartidapresupuestaria() != null && turnosItem.getIdpartidapresupuestaria() != "") {
-			sql.WHERE("partid.IDPARTIDAPRESUPUESTARIA = '" + turnosItem.getIdpartidapresupuestaria() + "'");
+			String condturnos ="(";
+			for(int i = 0; i< turnosItem.getIdpartidapresupuestaria().split(",").length; i++) {
+				if(i>0) condturnos+=" or ";
+				condturnos+="partid.IDPARTIDAPRESUPUESTARIA ='"+turnosItem.getIdpartidapresupuestaria().split(",")[i]+"'";
+			}
+			condturnos+=")";
+			sql.WHERE(condturnos);
 		}
 		if (turnosItem.getGrupofacturacion() != null && turnosItem.getGrupofacturacion() != "") {
-			sql.WHERE("grupof.idgrupofacturacion  = '" + turnosItem.getGrupofacturacion() + "'");
+			String condturnos ="(";
+			for(int i = 0; i< turnosItem.getGrupofacturacion().split(",").length; i++) {
+				if(i>0) condturnos+=" or ";
+				condturnos+="grupof.idgrupofacturacion ='"+turnosItem.getGrupofacturacion().split(",")[i]+"'";
+			}
+			condturnos+=")";
+			sql.WHERE(condturnos);
 		}
 		if (!turnosItem.isHistorico()) {
 			sql.WHERE("turnos.fechabaja is null");
 		}
+		sql.WHERE(" rownum <= 200");
 		sql.GROUP_BY("turnos.idturno ,\r\n" + "    turnos.nombre ,\r\n" + "    turnos.abreviatura ,\r\n"
 				+ "    area.nombre ,\r\n" + "    materi.nombre ,\r\n" + "    zona.nombre ,\r\n"
 				+ "    subzon.nombre ,  \r\n" + "    grupof.idgrupofacturacion ,\r\n"

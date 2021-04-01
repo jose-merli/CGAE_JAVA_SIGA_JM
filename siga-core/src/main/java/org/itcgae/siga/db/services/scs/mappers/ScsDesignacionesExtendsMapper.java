@@ -34,12 +34,14 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper{
 	
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaDesignaciones")
-	@Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.DATE),
-			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
-//			@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR), 
-			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR) 
+	@Results({ 
+		@Result(column = "ANIO", property = "ano", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "ESTADO", property = "art27", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
+			@Result(column = "NOMBRE", property = "nombreTurno", jdbcType = JdbcType.VARCHAR), 
+			@Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPODESIGNACOLEGIO", property = "observaciones", jdbcType = JdbcType.VARCHAR)
 	})
 	List<DesignaItem> busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo);
 	
@@ -62,12 +64,13 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper{
 		@Result(column = "FECHAENTRADA", property = "fechaEntrada", jdbcType = JdbcType.DATE),
 		@Result(column = "EXPEDIENTES", property = "expedientes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CLIENTE", property = "cliente", jdbcType = JdbcType.VARCHAR),	
-	/*	@Result(column = "ESTADO", property = "estados", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDINSTITUCION_JUZG", property = "idInstitucion_juzg", jdbcType = JdbcType.VARCHAR),	
-		@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NUMPROCEDIMIENTNO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),	*/
+
+//		@Result(column = "ESTADO", property = "estados", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "IDINSTITUCION_JUZG", property = "idInstitucion_juzg", jdbcType = JdbcType.VARCHAR),	
+//		@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "NUMPROCEDIMIENTNO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
 	})
 	List<DesignaItem> busquedaJustificacionExpres(JustificacionExpressItem item, String idInstitucion, String longitudCodEJG, String idPersona);
 

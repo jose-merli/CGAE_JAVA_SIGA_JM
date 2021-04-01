@@ -5,75 +5,73 @@ import java.util.Date;
 
 public class DesignaItem {
 	private int ano;
-    private int anoProcedimiento;
-    private String art27;
-    private String codigo;
-    private String defensaJuridica;
-    private String delitos;
-    private String[] estados;
-    private int factConvenio;
-    private Date fechaAlta;
-    private Date fechaAnulacion;
-    private Date fechaEntradaInicio;
-    private Date fechaEntradaFin;
-    private Date fechaEstado;
-    private Date fechaFin;
-    private Date fechaJuicio;
-    private Date fechaModificacion;
-    private Date fechaOficioJuzgado;
-    private Date fechaRecepcionColegio;
-    private int idInstitucion;
-    private int idInstitucion_juzg;
-    private int idInstitucion_procur;
-    private String[] idJuzgado;
-    private String nombreJuzgado;
-    private String[] idJuzgadoActu;
-    private String nombreJuzgadoActu;
-    private int idPretension;
-    private String[] idProcedimiento;
-    private int idProcurador;
-    private String[] idTipoDesignaColegio;
-    private String[] idTurno;
-    private String nig;
-    private int numero;
-    private String numProcedimiento;
-    private String observaciones;
-    private String procurador;
-    private String resumenAsunto;
-    private String sufijo;
-    private int usuModificacion;
-    private String nombreTurno;
-    private String numColegiado;
-    private String apellidosNombre;
-    private String[] interesados;
-    private String[] validadas;
-    private String[] calidad;
-    private String asunto;
-    private String acreditacion;
-    private String[] idAcreditacion;
-    private String modulo;
-    private String[] idModulo;
-    private Date fechaJustificacionDesde;
-    private Date fechaJustificacionHasta;
-    private String origen;
-    private String[] idOrigen;
-    private String nif;
-    private String nombreInteresado;
-    private String apellidosInteresado;
-    private String[] idActuacionesV;
-    private String idArt27;
-    private String[] idCalidad;
-    private String[] idProcedimientoActuaciones;
-    private int idRol;
-    private String[] rol;
-    private String documentacionActuacion;
-    private String[] idModuloActuaciones;
-   
-    private String expedientes;
-    private String cliente;
-	/**
-	 * @return the ano
-	 */
+	private int anoProcedimiento;
+	private String art27;
+	private String codigo;
+	private String defensaJuridica;
+	private String delitos;
+	private String[] estados;
+	private int factConvenio;
+	private Date fechaAlta;
+	private Date fechaAnulacion;
+	private Date fechaEntradaInicio;
+	private Date fechaEntradaFin;
+	private Date fechaEstado;
+	private Date fechaFin;
+	private Date fechaJuicio;
+	private Date fechaModificacion;
+	private Date fechaOficioJuzgado;
+	private Date fechaRecepcionColegio;
+	private int idInstitucion;
+	private int idInstitucion_juzg;
+	private int idInstitucion_procur;
+	private String[] idJuzgado;
+	private String nombreJuzgado;
+	private String[] idJuzgadoActu;
+	private String nombreJuzgadoActu;
+	private int idPretension;
+	private String[] idProcedimiento;
+	private int idProcurador;
+	private String[] idTipoDesignaColegio;
+	private String[] idTurno;
+	private String nig;
+	private int numero;
+	private String numProcedimiento;
+	private String observaciones;
+	private String procurador;
+	private String resumenAsunto;
+	private String sufijo;
+	private int usuModificacion;
+	private String nombreTurno;
+	private String numColegiado;
+	private String apellidosNombre;
+	private String[] interesados;
+	private String[] validadas;
+	private String[] calidad;
+	private String asunto;
+	private String acreditacion;
+	private String[] idAcreditacion;
+	private String modulo;
+	private String[] idModulo;
+	private Date fechaJustificacionDesde;
+	private Date fechaJustificacionHasta;
+	private String origen;
+	private String idOrigen;
+	private String nif;
+	private String nombreInteresado;
+	private String apellidosInteresado;
+	private String idActuacionesV;
+	private String idArt27;
+	private String[] idCalidad;
+	private String[] idProcedimientoActuaciones;
+	private int idRol;
+	private String[] rol;
+	private String documentacionActuacion;
+	private String[] idModuloActuaciones;
+	private String descripcionTipoDesigna;
+	private String expedientes;
+	private String cliente;
+	
 	public int getAno() {
 		return ano;
 	}
@@ -695,16 +693,11 @@ public class DesignaItem {
 	public void setOrigen(String origen) {
 		this.origen = origen;
 	}
-	/**
-	 * @return the idOrigen
-	 */
-	public String[] getIdOrigen() {
+
+	public String getIdOrigen() {
 		return idOrigen;
 	}
-	/**
-	 * @param idOrigen the idOrigen to set
-	 */
-	public void setIdOrigen(String[] idOrigen) {
+	public void setIdOrigen(String idOrigen) {
 		this.idOrigen = idOrigen;
 	}
 	/**
@@ -743,16 +736,11 @@ public class DesignaItem {
 	public void setApellidosInteresado(String apellidosInteresado) {
 		this.apellidosInteresado = apellidosInteresado;
 	}
-	/**
-	 * @return the idActuacionesV
-	 */
-	public String[] getIdActuacionesV() {
+
+	public String getIdActuacionesV() {
 		return idActuacionesV;
 	}
-	/**
-	 * @param idActuacionesV the idActuacionesV to set
-	 */
-	public void setIdActuacionesV(String[] idActuacionesV) {
+	public void setIdActuacionesV(String idActuacionesV) {
 		this.idActuacionesV = idActuacionesV;
 	}
 	/**
@@ -803,65 +791,43 @@ public class DesignaItem {
 	public void setIdRol(int idRol) {
 		this.idRol = idRol;
 	}
-	/**
-	 * @return the rol
-	 */
+
 	public String[] getRol() {
 		return rol;
 	}
-	/**
-	 * @param rol the rol to set
-	 */
 	public void setRol(String[] rol) {
 		this.rol = rol;
 	}
-	/**
-	 * @return the documentacionActuacion
-	 */
 	public String getDocumentacionActuacion() {
 		return documentacionActuacion;
 	}
-	/**
-	 * @param documentacionActuacion the documentacionActuacion to set
-	 */
 	public void setDocumentacionActuacion(String documentacionActuacion) {
 		this.documentacionActuacion = documentacionActuacion;
 	}
-	/**
-	 * @return the idModuloActuaciones
-	 */
 	public String[] getIdModuloActuaciones() {
 		return idModuloActuaciones;
 	}
-	/**
-	 * @param idModuloActuaciones the idModuloActuaciones to set
-	 */
 	public void setIdModuloActuaciones(String[] idModuloActuaciones) {
 		this.idModuloActuaciones = idModuloActuaciones;
 	}
-	/**
-	 * @return the expedientes
-	 */
 	public String getExpedientes() {
 		return expedientes;
 	}
-	/**
-	 * @param expedientes the expedientes to set
-	 */
 	public void setExpedientes(String expedientes) {
 		this.expedientes = expedientes;
 	}
-	/**
-	 * @return the cliente
-	 */
 	public String getCliente() {
 		return cliente;
 	}
-	/**
-	 * @param cliente the cliente to set
-	 */
 	public void setCliente(String cliente) {
 		this.cliente = cliente;
+	}
+	
+	public String getDescripcionTipoDesigna() {
+		return descripcionTipoDesigna;
+	}
+	public void setDescripcionTipoDesigna(String descripcionTipoDesigna) {
+		this.descripcionTipoDesigna = descripcionTipoDesigna;
 	}
 	@Override
 	public String toString() {
@@ -887,8 +853,8 @@ public class DesignaItem {
 				+ ", idAcreditacion=" + Arrays.toString(idAcreditacion) + ", modulo=" + modulo + ", idModulo="
 				+ Arrays.toString(idModulo) + ", fechaJustificacionDesde=" + fechaJustificacionDesde
 				+ ", fechaJustificacionHasta=" + fechaJustificacionHasta + ", origen=" + origen + ", idOrigen="
-				+ Arrays.toString(idOrigen) + ", nif=" + nif + ", nombreInteresado=" + nombreInteresado
-				+ ", apellidosInteresado=" + apellidosInteresado + ", idActuacionesV=" + Arrays.toString(idActuacionesV)
+				+ idOrigen + ", nif=" + nif + ", nombreInteresado=" + nombreInteresado
+				+ ", apellidosInteresado=" + apellidosInteresado + ", idActuacionesV=" + idActuacionesV
 				+ ", idArt27=" + idArt27 + ", idCalidad=" + Arrays.toString(idCalidad) + ", idProcedimientoActuaciones="
 				+ Arrays.toString(idProcedimientoActuaciones) + ", idRol=" + idRol + ", rol=" + Arrays.toString(rol)
 				+ ", documentacionActuacion=" + documentacionActuacion + ", idModuloActuaciones="

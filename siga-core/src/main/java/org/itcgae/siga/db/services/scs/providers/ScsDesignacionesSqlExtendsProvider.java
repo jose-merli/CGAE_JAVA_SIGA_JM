@@ -125,8 +125,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		//aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
-			sql=" select distinct des.estado estado, des.anio anio, des.numero numero, des.fechaentrada fechaentrada,des.idturno idturno, des.codigo||'' codigo, des.sufijo sufijo,des.idinstitucion idinstitucion ";
-			sql+=" from scs_designa des ";
+			sql=" select distinct des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo,des.idinstitucion idinstitucion, turno.nombre, des.fechaestado fechaestado, colegiado.ncolegiado ";
+			sql+=" from scs_designa des, CEN_COLEGIADO colegiado ";
 
 			if(String.valueOf(designaItem.getNumColegiado()) !=null && !String.valueOf(designaItem.getNumColegiado()).equals("") ){
 				sql += ", SCS_DESIGNASLETRADO l ";
@@ -142,9 +142,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			boolean tiene_modulo=designaItem.getModulo() != null && !designaItem.getModulo().equalsIgnoreCase("");
 			boolean tiene_fechaJustificacionDesde=designaItem.getFechaJustificacionDesde() != null && designaItem.getFechaJustificacionDesde().toString() != null && !designaItem.getFechaJustificacionDesde().toString().equalsIgnoreCase("");
 			boolean tiene_fechaJustificacionHasta=designaItem.getFechaJustificacionHasta() != null && designaItem.getFechaJustificacionHasta().toString() != null && !designaItem.getFechaJustificacionHasta().toString().equalsIgnoreCase("");
-			boolean tiene_origen=designaItem.getOrigen() != null && !designaItem.getOrigen().equalsIgnoreCase("");
-
-			if (tiene_juzg||tiene_asunto||tiene_acreditacion||tiene_modulo||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta || tiene_origen){
+			boolean tiene_origen=designaItem.getIdOrigen() != null && !designaItem.getIdOrigen().equalsIgnoreCase("");
+			boolean tiene_actuacionesV = designaItem.getIdActuacionesV() != null && !designaItem.getIdActuacionesV().equalsIgnoreCase("");
+			boolean tiene_moduloDesignacion =  (designaItem.getIdModulo() != null && designaItem.getIdModulo().length > 0);
+			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimiento() != null && designaItem.getIdProcedimiento().length > 0);
+			
+			if (tiene_juzg||tiene_asunto||tiene_acreditacion||tiene_modulo||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta || tiene_origen || tiene_actuacionesV){
 				sql+=	", scs_actuaciondesigna act ";
 			}
 
@@ -155,28 +158,35 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				tiene_interesado = true;
 			}
 
+			sql += ", scs_turno turno";
+			
 			if (tiene_interesado){
 				sql += ", SCS_DEFENDIDOSDESIGNA DED, SCS_PERSONAJG PER ";
 			}
+			
+			if(tienePretensionesDesignacion) {
+				sql += ", SCS_PRETENSION pret ";
+			}
 
-			contador++;
-			codigosBind.put(new Integer(contador),idInstitucion);
-			sql+=" where des.idinstitucion ="+idInstitucion;
+			if(idInstitucion != null) {
+				sql+=" where des.idinstitucion = colegiado.idinstitucion and des.idinstitucion ="+idInstitucion + " and des.idturno = turno.idturno and des.idinstitucion = turno.idinstitucion ";
+			}
 
 			if(String.valueOf(designaItem.getNumColegiado()) !=null && !(String.valueOf(designaItem.getNumColegiado())).equals("") ){
 				sql += " and l.idinstitucion =des.idinstitucion ";
 				sql += " and l.idturno =des.idturno ";
 				sql += " and l.anio =des.anio "; 
 				sql += " and l.numero =des.numero ";
+				sql += " and l.idpersona =colegiado.idpersona ";
+				sql += " and l.idinstitucion =colegiado.idinstitucion ";
+				sql += " and l.idinstitucion =des.idinstitucion ";
 				sql += " and (l.Fechadesigna is null or";
 				sql += " l.Fechadesigna = (SELECT MAX(LET2.Fechadesigna) FROM SCS_DESIGNASLETRADO LET2";
 				sql += " WHERE l.IDINSTITUCION = LET2.IDINSTITUCION AND l.IDTURNO = LET2.IDTURNO";
 				sql += " AND l.ANIO = LET2.ANIO AND l.NUMERO = LET2.NUMERO";
 				sql += " AND TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)))";
 
-				contador++;
-				codigosBind.put(new Integer(contador),String.valueOf(designaItem.getNumColegiado()));
-				sql += " and l.idPersona = " + String.valueOf(designaItem.getNumColegiado()) + " ";
+				sql += " and colegiado.ncolegiado = " + String.valueOf(designaItem.getNumColegiado()) + " ";
 			}
 
 			if ( designaItem.getIdTurno() != null && (String.valueOf(designaItem.getIdTurno()) != "-1")&&!String.valueOf(designaItem.getIdTurno()).equals("")){
@@ -211,20 +221,27 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				}	
 			}
 
-			if (String.valueOf(designaItem.getCodigo()) != null && !String.valueOf(designaItem.getCodigo()).equalsIgnoreCase("")) {
+			if (designaItem.getCodigo() != null && !designaItem.getCodigo().equalsIgnoreCase("")) {
 
-
-				if (hasComodin(String.valueOf(designaItem.getCodigo())))	{
-					contador++;
-					sql += " AND " + prepararSentenciaCompletaBind(String.valueOf(designaItem.getCodigo()),"des.codigo",contador,codigosBind ); 
-
-				}else {
-					contador++;
-					codigosBind.put(new Integer(contador),String.valueOf(designaItem.getCodigo()).trim());
-					sql += " AND ltrim(des.codigo,'0') = ltrim(" + String.valueOf(designaItem.getCodigo())+",'0')" ; 
+				if((designaItem.getCodigo().indexOf(',') != -1) && (designaItem.getCodigo().indexOf('-') == 1)) {
+					String[] parts = designaItem.getCodigo().split(",");
+					sql += " AND (des.codigo = ";
+					for(int i = 0; i< parts.length; i++) {
+						if(i == parts.length - 1) {
+							sql += parts[i].trim() + ")"; 
+						}
+						sql += parts[i].trim() + " OR des.codigo = "; 
+					}
+				}else if((designaItem.getCodigo().indexOf('-') != -1) && (designaItem.getCodigo().indexOf(',') == -1)) {
+					String[] parts = designaItem.getCodigo().split("-");
+					if(parts.length == 2) {
+						sql += " des.codigo IN ("+parts[0]+","+parts[1]+")";
+					}
+				}else if((designaItem.getCodigo().indexOf('-') == -1) && (designaItem.getCodigo().indexOf(',') == -1)){
+					sql += " AND des.codigo = " + String.valueOf(designaItem.getCodigo()).trim() ; 
 				}
 			}
-			if (designaItem.getIdJuzgado() != null && !String.valueOf(designaItem.getIdJuzgado()).equalsIgnoreCase("")) {
+			if (designaItem.getIdJuzgado() != null && designaItem.getIdJuzgado().length > 0) {
 				if(designaItem.getIdJuzgado().length == 1) {
 					sql += " AND des.idjuzgado = " + designaItem.getIdJuzgado()[0];
 				}else {
@@ -237,14 +254,51 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 							juzgadoIN = juzgadoIN + juzgado +" ,";
 						}
 					}
-					sql += " AND des.idjuzgado IN (" + juzgadoIN +" )";
+					sql += " AND act.idjuzgado IN (" + juzgadoIN +" )";
 				}
 			}
 			if (designaItem.getAsunto() != null && !designaItem.getAsunto().equalsIgnoreCase("")) {
 				contador++;
 				codigosBind.put(new Integer(contador),designaItem.getAsunto().trim());
-				sql += " AND des.resumenasunto = " + designaItem.getAsunto() ;
+				sql += " AND des.resumenasunto = '" + designaItem.getAsunto()+"'" ;
 			}
+			
+			if (designaItem.getIdModulo() != null && designaItem.getIdModulo().length > 0) {
+				if(designaItem.getIdModulo().length == 1) {
+					sql += " AND des.IDPROCEDIMIENTO = '" + designaItem.getIdModulo()[0]+"'";
+				}else {
+					String estadoIN = "";
+					for(int i = 0; i<designaItem.getIdModulo().length; i++) {
+						String estado = designaItem.getIdModulo()[i];
+						if(i == designaItem.getIdModulo().length-1) {
+							estadoIN = estadoIN + "'"+estado+"'";
+						}else {
+							estadoIN = estadoIN + "'"+estado+"'" +" ,";
+						}
+					}
+					sql += " AND des.IDPROCEDIMIENTO IN (" + estadoIN +" )";
+				}
+				
+			}
+			
+			if (designaItem.getIdModuloActuaciones() != null && designaItem.getIdModuloActuaciones().length > 0) {
+				if(designaItem.getIdModuloActuaciones().length == 1) {
+					sql += " AND act.IDPROCEDIMIENTO = '" + designaItem.getIdModuloActuaciones()[0]+"'";
+				}else {
+					String estadoIN = "";
+					for(int i = 0; i<designaItem.getIdModuloActuaciones().length; i++) {
+						String estado = designaItem.getIdModuloActuaciones()[i];
+						if(i == designaItem.getIdModuloActuaciones().length-1) {
+							estadoIN = estadoIN + "'"+estado+"'";
+						}else {
+							estadoIN = estadoIN + "'"+estado+"'" +" ,";
+						}
+					}
+					sql += " AND act.IDPROCEDIMIENTO IN (" + estadoIN +" )";
+				}
+				
+			}
+			
 			if (designaItem.getEstados() != null && designaItem.getEstados().length > 0) {
 				if(designaItem.getEstados().length == 1) {
 					sql += " AND des.estado = '" + designaItem.getEstados()[0]+"'";
@@ -270,20 +324,57 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if (designaItem.getNig() != null && !designaItem.getNig().equalsIgnoreCase("")) {
 				contador++;
 				codigosBind.put(new Integer(contador),designaItem.getNig().trim());
-				sql += " AND des.nig = " + designaItem.getNig();
-			}			
+				sql += " AND des.nig = '" + designaItem.getNig()+"'";
+			}	
+			if(tienePretensionesDesignacion) {
+				if (designaItem.getIdProcedimiento() != null && designaItem.getIdProcedimiento().length > 0) {
+					if(designaItem.getIdProcedimiento().length == 1) {
+						sql += " AND pret.IDPRETENSION = '" + designaItem.getIdProcedimiento()[0]+"'";
+					}else {
+						String estadoIN = "";
+						for(int i = 0; i<designaItem.getIdProcedimiento().length; i++) {
+							String estado = designaItem.getIdProcedimiento()[i];
+							if(i == designaItem.getIdProcedimiento().length-1) {
+								estadoIN = estadoIN + "'"+estado+"'";
+							}else {
+								estadoIN = estadoIN + "'"+estado+"'" +" ,";
+							}
+						}
+						sql += " AND pret.IDPRETENSION IN (" + estadoIN +" )";
+					}
+
+				}
+			}
+			
 			// ACTUACIONES PENDIENTES
-//			String[] actuacionesPendientes = designaItem.getIdActuacionesV();
-//			if (actuacionesPendientes!= null && actuacionesPendientes.length > 0) {
-//				if(actuacionesPendientes.equalsIgnoreCase("SINACTUACIONES")){
-//					actuacionesPendientes="";
-//					sql += " and upper(F_SIGA_ACTUACIONESDESIG(des.idinstitucion,des.idturno,des.anio,des.numero)) is null";
-//				}else{
-//					contador++;
-//					codigosBind.put(new Integer(contador),actuacionesPendientes.trim());
-//					sql += " and upper(F_SIGA_ACTUACIONESDESIG(des.idinstitucion,des.idturno,des.anio,des.numero))=upper(" + contador + ")";
+//			if (designaItem.getIdActuacionesV() != null && !designaItem.getIdActuacionesV().equalsIgnoreCase("")) {
+//				if(designaItem.getIdActuacionesV().equalsIgnoreCase("SINACTUACIONES")){
+//					sql += " and upper(SCS_ACTUACIONDESIGNA(des.idinstitucion,des.idturno,des.anio,des.numero)) is null";  // -----FALTA
+//				}else if(designaItem.getIdActuacionesV().equalsIgnoreCase("SI")){
+//					sql += " and act.VALIDADA = '1' ";
+//				}else if(designaItem.getIdActuacionesV().equalsIgnoreCase("NO")){
+//					sql += " and act.VALIDADA = '0' ";
 //				}
 //			}
+			
+			if(designaItem.getIdActuacionesV()!=null && !designaItem.getIdActuacionesV().trim().isEmpty()){
+				if("SINACTUACIONES".equalsIgnoreCase(designaItem.getIdActuacionesV().trim())){
+					sql += (" AND F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) IS NULL ");
+				}else{
+				    sql += (" AND UPPER(F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO))=UPPER('"+designaItem.getIdActuacionesV()+"')");
+				}
+			}
+			
+			
+			if (designaItem.getDocumentacionActuacion() != null && !designaItem.getDocumentacionActuacion().equalsIgnoreCase("")) {
+				if(designaItem.getDocumentacionActuacion().equalsIgnoreCase("TODAS")){
+					sql += " and act.DOCJUSTIFICACION IS NOT NULL ";
+				}else if(designaItem.getDocumentacionActuacion().equalsIgnoreCase("ALGUNAS")){
+					sql += " and act.DOCJUSTIFICACION = '1'";  // -----FALTA
+				}else if(designaItem.getDocumentacionActuacion().equalsIgnoreCase("NINGUNA")){
+					sql += " and act.DOCJUSTIFICACION IS NULL";
+				}
+			}
 
 			//Mostrar ART 27
 			String mostarArt27 = designaItem.getArt27() ;
@@ -301,7 +392,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 							" and def.NUMERO = des.numero"+
 							" and def.IDINSTITUCION = des.idinstitucion"+
 							" and def.IDTURNO = des.idturno"+
-							" and def.idtipoencalidad= '" + designaItem.getIdCalidad()[0]+ "' ";
+							" and def.idtipoencalidad= " + designaItem.getIdCalidad()[0];
 				}else {
 					String calidadIN = "";
 					for(int i = 0; i<designaItem.getIdCalidad().length; i++) {
@@ -309,7 +400,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						if(i == designaItem.getIdCalidad().length-1) {
 							calidadIN = calidadIN + "'"+calidad+"'";
 						}else {
-							calidadIN = calidadIN + "'"+calidad+"'" +" ,";
+							calidadIN = calidadIN +calidad+" ,";
 						}
 					}
 					sql +=" and def.ANIO = des.anio"+
@@ -370,19 +461,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql+="    AND DED.NUMERO = des.NUMERO";
 
 				if(designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase("")){
-					sql+=" and ";
-					if (hasComodin(designaItem.getNif())){	
-						contador++;
-						sql+=prepararSentenciaCompletaBind(designaItem.getNif().trim(),"PER.NIF",contador,codigosBind);
-					}else{
-						contador++;
-						sql +=prepararSentenciaNIFBind(designaItem.getNif(),"PER.NIF",contador, codigosBind);
-					}
+					sql+=" and PER.NIF = " + "'"+designaItem.getNif().trim()+"'";
 				}
-				if(designaItem.getNombreInteresado() != null && !designaItem.getNombreInteresado() .equalsIgnoreCase("")){
-					sql+=" and ";
-					contador++;
-					sql+=prepararSentenciaCompletaBind(designaItem.getNombreInteresado() .trim(),"PER.NOMBRE",contador, codigosBind);
+				if(designaItem.getNombreInteresado() != null && !designaItem.getNombreInteresado().equalsIgnoreCase("")){
+					sql+=" and PER.NOMBRE = "+"'"+designaItem.getNombreInteresado().trim()+"'";
 				}
 //				if(designaItem.getApellidosInteresado() != null && !designaItem.getApellidosInteresado().equalsIgnoreCase("")){
 //					sql+=" and ";
@@ -419,9 +501,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					}
 				}
 				if (tiene_asunto) {
-					contador++;
-					codigosBind.put(new Integer(contador),designaItem.getAsunto().trim());
-					sql += " AND act.numeroasunto = " + designaItem.getAsunto().trim();
+					sql += " AND des.RESUMENASUNTO = '" + designaItem.getAsunto().trim()+"' ";
 				}
 				if (tiene_acreditacion) {
 					if(designaItem.getIdAcreditacion().toString().indexOf(',') != -1) {
@@ -439,24 +519,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						sql += " AND act.idacreditacion IN (" + turnoIN +" )";
 					}
 				}
-				if (tiene_modulo) {
-					if(designaItem.getIdProcedimiento().length == 1) {
-						sql += " AND act.idprocedimiento = " + designaItem.getIdProcedimiento()[0];
-					}else {
-						String turnoIN = "";
-						for(int i = 0; i<designaItem.getIdProcedimiento().length; i++) {
-							String turno = designaItem.getIdProcedimiento()[i];
-							if(i == designaItem.getIdProcedimiento().length-1) {
-								turnoIN = turnoIN + turno;
-							}else {
-								turnoIN = turnoIN + turno +" ,";
-							}
-						}
-						sql += " AND act.idprocedimiento IN (" + turnoIN +" )";
-					}
-				}
 				if (tiene_origen) {
-					if(designaItem.getOrigen().equalsIgnoreCase("ICA")){
+					if(designaItem.getIdOrigen().equalsIgnoreCase("COLEGIO")){
 						sql +=" AND act.USUCREACION <> ";
 					}else{
 						sql +=" AND act.USUCREACION = ";
@@ -476,7 +540,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 //			}
 			// jbd // inc7744 // Cambiamos el order by porque parece que afecta a la query cuando se busca por colegiado
 			// sql+=" order by des.idturno, des.anio desc, des.numero desc";
-			sql+=" order by des.anio desc, codigo desc;";
+			sql+="  and rownum <= 200 order by des.anio desc, codigo desc ";
 			// No utilizamos la clase Paginador para la busqueda de letrados porque al filtrar por residencia la sql no devolvia bien los 
 			//  datos que eran de tipo varchar (devolvía n veces el mismo resultado), utilizamos el paginador PaginadorCaseSensitive
 			// y hacemos a parte el tratamiento de mayusculas y signos de acentuación

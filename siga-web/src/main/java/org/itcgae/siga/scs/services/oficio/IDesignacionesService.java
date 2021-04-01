@@ -12,7 +12,7 @@ public interface IDesignacionesService{
 
 	public List<DesignaItem> busquedaJustificacionExpres(JustificacionExpressItem item, HttpServletRequest request);
 	
-	public DesignaItem busquedaDesignas(DesignaItem item, HttpServletRequest request);
+	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
 	
 	public ComboDTO modulo(HttpServletRequest request);
 
