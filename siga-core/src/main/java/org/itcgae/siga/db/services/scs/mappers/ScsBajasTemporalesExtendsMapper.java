@@ -52,5 +52,15 @@ public interface ScsBajasTemporalesExtendsMapper extends CenBajastemporalesMappe
 		})
 	
 		List<ComboItem> comboEstado();
+	
+	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "deleteBajasTemporales")
+	int eliminarBaja(BajasTemporalesItem bajasTemporalesItem);
+	
+	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "updateBajasTemporales")
+	int updateBajaTemporal(BajasTemporalesItem bajasTemporalesItem);
+	
+	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "saveBajaTemporal")
+	int saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem);
+
 		
 }
