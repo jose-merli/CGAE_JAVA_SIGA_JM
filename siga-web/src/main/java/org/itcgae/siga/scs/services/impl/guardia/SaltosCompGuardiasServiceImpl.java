@@ -140,7 +140,7 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 
 								List<LetradoGuardiaItem> listaLetradoGuardiaItem = saltoscompensacionesMapper
 										.searchLetradosGuardia(Short.toString(idInstitucion), saltoComp.getIdTurno(),
-												saltoComp.getIdGuardia());
+												saltoComp.getIdGuardia(), true);
 
 								saltoComp.setComboColegiados(
 										transformToListComboItemGuardia(listaLetradoGuardiaItem, true));
@@ -148,7 +148,7 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 							} else {
 								List<LetradoGuardiaItem> listaLetradoGuardiaItem = saltoscompensacionesMapper
 										.searchLetradosGuardia(Short.toString(idInstitucion), saltoComp.getIdTurno(),
-												saltoComp.getIdGuardia());
+												saltoComp.getIdGuardia(), true);
 
 								saltoComp.setComboColegiados(
 										transformToListComboItemGuardia(listaLetradoGuardiaItem, false));

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
@@ -271,6 +272,55 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 		return deleteResponseDTO;
 	}
 
+	@Override
+	public ComboDTO searchLetradosGuardia(SaltoCompGuardiaItem saltoItem, HttpServletRequest request) {
+
+		LOGGER.info(
+				"SaltosCompOficioServiceImpl.searchLetradosGuardia() -> Entrada para buscar los letrados inscritos a una guardia");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		String errorStr = "Se ha producido un error al tratar obtener los letrados inscritos a una guardia.";
+		ComboDTO comboDTO = new ComboDTO();
+
+		try {
+
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"SaltosCompOficioServiceImpl.searchLetradosGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"SaltosCompOficioServiceImpl.searchLetradosGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty() && saltoItem != null) {
+
+					List<LetradoGuardiaItem> listLetradoGuardiaItem = saltoscompensacionesMapper.searchLetradosGuardia(
+							Short.toString(idInstitucion), saltoItem.getIdTurno(), saltoItem.getIdGuardia(), false);
+
+					comboDTO.setCombooItems(transformToListComboItemOficio(listLetradoGuardiaItem));
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("SaltosCompOficioServiceImpl.searchLetradosGuardia() -> " + errorStr, e);
+			error.setCode(500);
+			error.setDescription(errorStr);
+			error.setMessage(e.getMessage());
+			comboDTO.setError(error);
+		}
+
+		return comboDTO;
+	}
+
 	private List<ComboItem> transformToListComboItemOficio(List<LetradoGuardiaItem> listaLetradoGuardiaItem) {
 
 		List<ComboItem> listaCombo = new ArrayList<>();
@@ -279,10 +329,9 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 
 			ComboItem comboItem = new ComboItem();
 
-			String label = letradoGuardiaItem.getApellidos2() + " " + letradoGuardiaItem.getApellidos1() + ", "
-					+ letradoGuardiaItem.getNombre();
-			comboItem.setLabel(label);
-			comboItem.setValue(letradoGuardiaItem.getNumeroColegiado());
+			comboItem.setLabel("(" + letradoGuardiaItem.getNumeroColegiado() + ") " + letradoGuardiaItem.getApellidos2()
+					+ " " + letradoGuardiaItem.getApellidos1() + ", " + letradoGuardiaItem.getNombre());
+			comboItem.setValue(letradoGuardiaItem.getIdPersona());
 			listaCombo.add(comboItem);
 
 		}
@@ -302,13 +351,13 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 		for (SaltoCompGuardiaItem saltoComp : listaSaltosCompensaciones) {
 
 			if (!isHistorico(saltoComp)) {
-				List<ComboItem> comboGuardia = scsGuardiasturnoExtendsMapper.comboGuardias(saltoComp.getIdTurno(),
-						Short.toString(idInstitucion));
+				List<ComboItem> comboGuardia = scsGuardiasturnoExtendsMapper
+						.comboGuardiasNoGrupo(saltoComp.getIdTurno(), Short.toString(idInstitucion));
 
 				saltoComp.setComboGuardia(comboGuardia);
 
 				List<LetradoGuardiaItem> comboColegiados = saltoscompensacionesMapper.searchLetradosGuardia(
-						Short.toString(idInstitucion), saltoComp.getIdTurno(), saltoComp.getIdGuardia());
+						Short.toString(idInstitucion), saltoComp.getIdTurno(), saltoComp.getIdGuardia(), false);
 
 				saltoComp.setComboColegiados(transformToListComboItemOficio(comboColegiados));
 			}

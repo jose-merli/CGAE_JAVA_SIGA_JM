@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.scs.services.oficio.ISaltosCompOficioService;
@@ -42,6 +43,13 @@ public class SaltosCompOficioController {
 	public ResponseEntity<DeleteResponseDTO> borrarSaltosCompensaciones(
 			@RequestBody List<SaltoCompGuardiaItem> listaSaltoItem, HttpServletRequest request) {
 		DeleteResponseDTO response = saltosCompOficioService.borrarSaltosCompensaciones(listaSaltoItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/searchLetradosGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ComboDTO> searchLetradosGuardia(@RequestBody SaltoCompGuardiaItem saltoItem,
+			HttpServletRequest request) {
+		ComboDTO response = saltosCompOficioService.searchLetradosGuardia(saltoItem, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 

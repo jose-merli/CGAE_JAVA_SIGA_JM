@@ -49,7 +49,8 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 			@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAUSO", property = "fechaUso", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHA_ANULACION", property = "fechaAnulacion", jdbcType = JdbcType.VARCHAR) })
+			@Result(column = "FECHA_ANULACION", property = "fechaAnulacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR) })
 	List<SaltoCompGuardiaItem> searchSaltosYCompensacionesOficio(SaltoCompGuardiaItem saltoItem, String idInstitucion,
 			Integer tamMax);
 
@@ -73,7 +74,8 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 			@Result(column = "GRUPO", property = "grupo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMEROGRUPO", property = "numeroGrupo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ORDENGRUPO", property = "ordenGrupo", jdbcType = JdbcType.VARCHAR) })
-	List<LetradoGuardiaItem> searchLetradosGuardia(String idInstitucion, String idTurno, String idGuardia);
+	List<LetradoGuardiaItem> searchLetradosGuardia(String idInstitucion, String idTurno, String idGuardia,
+			boolean grupo);
 
 	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "selectNuevoIdSaltosCompensaciones")
 	@Results({ @Result(column = "IDSALTOSTURNO", property = "idMax", jdbcType = JdbcType.VARCHAR), })
