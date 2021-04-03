@@ -13,6 +13,9 @@ public interface ISaltosCompOficioService {
 
 	public SaltoCompGuardiaDTO searchSaltosYCompensaciones(SaltoCompGuardiaItem saltoItem, HttpServletRequest request);
 
+	public DeleteResponseDTO guardarSaltosCompensaciones(List<SaltoCompGuardiaItem> listaSaltoItem,
+			HttpServletRequest request);
+
 	public DeleteResponseDTO anularSaltosCompensaciones(List<SaltoCompGuardiaItem> listaSaltoItem,
 			HttpServletRequest request);
 

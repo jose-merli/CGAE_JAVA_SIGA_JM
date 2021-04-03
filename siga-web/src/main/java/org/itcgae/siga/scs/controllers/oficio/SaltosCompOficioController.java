@@ -32,6 +32,13 @@ public class SaltosCompOficioController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	@PostMapping(value = "/guardarSaltosCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> guardarSaltosCompensaciones(
+			@RequestBody List<SaltoCompGuardiaItem> listaSaltoItem, HttpServletRequest request) {
+		DeleteResponseDTO response = saltosCompOficioService.guardarSaltosCompensaciones(listaSaltoItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
 	@PostMapping(value = "/anularSaltosCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<DeleteResponseDTO> anularSaltosCompensaciones(
 			@RequestBody List<SaltoCompGuardiaItem> listaSaltoItem, HttpServletRequest request) {
