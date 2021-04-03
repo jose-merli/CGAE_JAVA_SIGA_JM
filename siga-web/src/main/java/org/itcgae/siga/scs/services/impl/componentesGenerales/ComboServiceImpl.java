@@ -790,6 +790,38 @@ public class ComboServiceImpl implements ComboService {
 	}
 	
 	@Override
+	public ComboDTO comboGuardiasNoGrupo(HttpServletRequest request, String idTurno) {
+		LOGGER.info("comboGuardiasNoGrupo() -> Entrada al servicio para búsqueda de las guardias que no son por grupo");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				LOGGER.info(
+						"comboGuardiasNoGrupo() / scsGuardiasturnoExtendsMapper.comboGuardiasNoGrupo() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias que no son por grupo");
+
+				List<ComboItem> comboItems = scsGuardiasturnoExtendsMapper.comboGuardiasNoGrupo(idTurno,
+						idInstitucion.toString());
+
+				LOGGER.info(
+						"comboGuardiasNoGrupo() / scsGuardiasturnoExtendsMapper.comboGuardiasNoGrupo() -> Salida a scsGuardiasturnoExtendsMapper para obtener las guardias que no son por grupo");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboGuardiasNoGrupo() -> Salida del servicio para obtener combo guardias que no son por grupo");
+		}
+		return comboDTO;
+
+	}
+	
+	@Override
 	public ComboDTO comboGuardiasUpdate(HttpServletRequest request, String idTurno) {
 		LOGGER.info("comboGuardias() -> Entrada al servicio para búsqueda de las guardias");
 		String token = request.getHeader("Authorization");

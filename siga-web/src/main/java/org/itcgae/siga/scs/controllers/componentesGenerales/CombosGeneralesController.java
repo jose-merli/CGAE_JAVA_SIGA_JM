@@ -115,6 +115,12 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping("/guardiasNoGrupo")
+	public ResponseEntity<ComboDTO> comboGuardiasNoGrupo(HttpServletRequest request, String idTurno) {
+		ComboDTO response = comboService.comboGuardiasNoGrupo(request, idTurno);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping("/comboTipoDesignacion")
 	public ResponseEntity<ComboDTO> comboTipoDesignacion(HttpServletRequest request) {
 		ComboDTO response = comboService.comboTipoDesignacion(request);
