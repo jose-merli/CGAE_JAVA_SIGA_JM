@@ -41,6 +41,8 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper{
 			@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
 			@Result(column = "NOMBRE", property = "nombreTurno", jdbcType = JdbcType.VARCHAR), 
 			@Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "asunto", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPODESIGNACOLEGIO", property = "observaciones", jdbcType = JdbcType.VARCHAR)
 	})
 	List<DesignaItem> busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo);

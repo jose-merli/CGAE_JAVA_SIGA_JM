@@ -119,13 +119,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		Hashtable codigosBind = new Hashtable();
 		int contador=0;
-
 		// Acceso a BBDD
-		int totalRegistros=0;
 
 		//aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
-			sql=" select distinct des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo,des.idinstitucion idinstitucion, turno.nombre, des.fechaestado fechaestado, colegiado.ncolegiado ";
+			sql=" select distinct des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta, des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo,des.idinstitucion idinstitucion, turno.nombre, des.fechaestado fechaestado, colegiado.ncolegiado ";
 			sql+=" from scs_designa des, CEN_COLEGIADO colegiado ";
 
 			if(String.valueOf(designaItem.getNumColegiado()) !=null && !String.valueOf(designaItem.getNumColegiado()).equals("") ){
