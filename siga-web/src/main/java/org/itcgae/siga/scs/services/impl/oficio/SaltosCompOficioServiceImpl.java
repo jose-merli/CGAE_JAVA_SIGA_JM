@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -146,6 +147,95 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 		}
 
 		return saltoCompDTO;
+	}
+
+	@Override
+	public DeleteResponseDTO guardarSaltosCompensaciones(List<SaltoCompGuardiaItem> listaSaltoItem,
+			HttpServletRequest request) {
+
+		LOGGER.info(
+				"SaltosCompOficioServiceImpl.guardarSaltosCompensaciones() -> Entrada para guardar los saltos y compensaciones");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		String errorStr = "Se ha producido un error al tratar de guardar el salto u compensacion.";
+		String errorStrActu = "Se ha producido un error al tratar de actualizar el salto u compensacion.";
+
+		try {
+
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"SaltosCompOficioServiceImpl.guardarSaltosCompensaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"SaltosCompOficioServiceImpl.guardarSaltosCompensaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty() && listaSaltoItem != null && !listaSaltoItem.isEmpty()) {
+
+					for (SaltoCompGuardiaItem saltoCompGuardiaItem : listaSaltoItem) {
+
+						if (UtilidadesString.esCadenaVacia(saltoCompGuardiaItem.getIdSaltosTurno())) {
+
+							MaxIdDto nuevoId = saltoscompensacionesMapper.selectNuevoIdSaltosCompensaciones(
+									saltoCompGuardiaItem, Short.toString(idInstitucion));
+
+							int insertado = saltoscompensacionesMapper.guardarSaltosCompensaciones(saltoCompGuardiaItem,
+									Short.toString(idInstitucion), Long.toString(nuevoId.getIdMax()), usuarios.get(0));
+
+							if (insertado == 1) {
+								deleteResponseDTO.setStatus(SigaConstants.OK);
+							} else {
+								deleteResponseDTO.setStatus(SigaConstants.KO);
+								LOGGER.error(
+										"SaltosCompOficioServiceImpl.guardarSaltosCompensaciones() -> " + errorStr);
+
+								error.setCode(500);
+								error.setDescription(errorStr);
+								deleteResponseDTO.setError(error);
+							}
+
+						} else {
+
+							int actualizado = saltoscompensacionesMapper.actualizarSaltosCompensaciones(
+									saltoCompGuardiaItem, Short.toString(idInstitucion), usuarios.get(0));
+
+							if (actualizado == 1) {
+								deleteResponseDTO.setStatus(SigaConstants.OK);
+							} else {
+								deleteResponseDTO.setStatus(SigaConstants.KO);
+								LOGGER.error(
+										"SaltosCompOficioServiceImpl.guardarSaltosCompensaciones() -> " + errorStrActu);
+
+								error.setCode(500);
+								error.setDescription(errorStrActu);
+								deleteResponseDTO.setError(error);
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("SaltosCompOficioServiceImpl.guardarSaltosCompensaciones() -> " + errorStr, e);
+			error.setCode(500);
+			error.setDescription(errorStr);
+			error.setMessage(e.getMessage());
+			deleteResponseDTO.setError(error);
+		}
+
+		return deleteResponseDTO;
 	}
 
 	@Override
