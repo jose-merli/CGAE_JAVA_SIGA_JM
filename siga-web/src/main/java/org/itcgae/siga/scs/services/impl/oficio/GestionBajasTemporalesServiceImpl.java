@@ -2,8 +2,12 @@ package org.itcgae.siga.scs.services.impl.oficio;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -363,7 +367,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	}
 	
 	@Override
-	public UpdateResponseDTO saveBajaTemporal(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request) {
+	public UpdateResponseDTO saveBajaTemporal(List<Object> bajasTemporalesItem, HttpServletRequest request) {
 		LOGGER.info("deleteBaja() ->  Entrada al servicio para eliminar bajas temporales");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -391,9 +395,45 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
-					
-					for(BajasTemporalesItem bti: bajasTemporalesItem) {
-						response = scsBajasTemporalesExtendsMapper.saveBajaTemporal(bti);
+					String nombres[];
+					for(Object bti: bajasTemporalesItem) {
+						BajasTemporalesItem bjtmp = new BajasTemporalesItem();
+						java.util.LinkedHashMap bj = (java.util.LinkedHashMap)bti;
+						Set entrySet = bj.entrySet();
+						// Obtain an Iterator for the entries Set
+						Iterator it = entrySet.iterator();
+						while(it.hasNext()) {
+							nombres = it.next().toString().split("=");
+							if(nombres[0].equals("ncolegiado")) {
+								bjtmp.setNcolegiado(nombres[1]);
+							}
+							if(nombres[0].equals("nombre")) {
+								bjtmp.setNombre(nombres[1]);
+							}
+							if(nombres[0].equals("tipo")) {
+								bjtmp.setTipo(nombres[1]);
+							}
+							if(nombres[0].equals("descripcion")) {
+								bjtmp.setDescripcion(nombres[1]);
+							}
+							if(nombres[0].equals("fechadesde")) {
+								//TRANSFORMAR FECHA
+							}
+							if(nombres[0].equals("fechahasta")) {
+								//TRANSFORMAR FECHA
+							}
+							if(nombres[0].equals("fechaalta")) {
+								//TRANSFORMAR FECHA
+							}
+							if(nombres[0].equals("validado")) {
+								bjtmp.setValidado(nombres[1]);
+							}
+							if(nombres[0].equals("fechabt")) {
+								//TRANSFORMAR FECHA
+							}
+						}
+							
+						response = scsBajasTemporalesExtendsMapper.saveBajaTemporal(bjtmp);
 					}
 				}catch (Exception e) {
 					response = 0;
