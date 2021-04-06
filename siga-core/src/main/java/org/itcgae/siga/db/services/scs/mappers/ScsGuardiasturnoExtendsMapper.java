@@ -9,6 +9,8 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.CargaMasivaDatosITItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsGuardiasturnoSqlExtendsProvider;
@@ -60,5 +62,19 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	@Results({ @Result(column = "IDGUARDIA", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})
 	NewIdDTO getIdGuardia();
+	
+	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "busquedaGuardiasCMO")
+	@Results({
+		@Result(column = "NOMBRE_TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE_GUARDIA", property = "guardia", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "NCOLEGIADO", property = "ncolegiado", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PORGRUPOS", property = "grupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDORDENCOLAS", property = "orden", jdbcType = JdbcType.VARCHAR)
+		
+	})
+	List<CargaMasivaDatosITItem> busquedaGuardiasCMO(String turnos, String guardias, Short idInstitucion);
 	
 }

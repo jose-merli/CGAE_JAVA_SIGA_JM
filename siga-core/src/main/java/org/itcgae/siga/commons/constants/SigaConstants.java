@@ -865,6 +865,35 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 			,TIPOCVCOD,TIPOCVNOMBRE,C_IDTIPOCV,SUBTIPOCV1COD,SUBTIPOCV1NOMBRE,C_IDTIPOCVSUBTIPO1,SUBTIPOCV2COD,SUBTIPOCV2NOMBRE,C_IDTIPOCVSUBTIPO2,ERRORES);
 	public static String EVENTO_TIPO_FIESTA_NACIONAL = "Fiesta Nacional";
 
+	
+	//CARGA MASIVA INSCRIPCIONES
+	public static final String IT_TURNO = "TURNO";
+	public static final String IT_GUARDIA = "GUARDIA";
+	public static final String IT_NCOLEGIADO = "Nº COLEGIADO";
+	public static final String IT_FECHAEFECTIVA = "FECHA EFECTIVA";
+	public static final String IT_TIPO = "TIPO";
+	public static final String IT_GRUPO= "GRUPO";
+	public static final String IT_ORDEN = "ORDEN";
+	
+	public static final String nombreFicheroModeloIT = "PlantillaMasivaDatosIT";
+	
+	public static final List<String> CAMPOSMODEL_IT = Arrays.asList(IT_TURNO,IT_GUARDIA,IT_NCOLEGIADO,IT_FECHAEFECTIVA,
+			IT_TIPO,IT_GRUPO,IT_ORDEN);
+	
+	//CARGA MASIVA BAJAS TEMPORALES
+		
+	public static final String BT_NCOLEGIADO = "Nº COLEGIADO";
+	public static final String BT_NIF = "PERSONA NIFCIF";
+	public static final String BT_TIPO = "TIPO SOLICITUD";
+	public static final String BT_MOTIVO= "MOTIVO";
+	public static final String BT_FECHAI = "FECHA INICIO";
+	public static final String BT_FECHAF = "FECHA FIN";
+		
+	public static final String nombreFicheroModeloBT = "PlantillaMasivaDatosBT";
+	
+	public static final List<String> CAMPOSMODEL_BT = Arrays.asList(BT_NCOLEGIADO,BT_NIF,BT_TIPO,BT_MOTIVO,
+			BT_FECHAI,BT_FECHAF);
+	
 	//AGENDA
 	public static final long CALENDARIO_GENERAL = 1; 
 	public static final long CALENDARIO_LABORAL = 2;

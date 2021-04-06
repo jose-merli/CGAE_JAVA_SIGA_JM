@@ -865,7 +865,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						String valid = turnoItemsList.get(0).getValidarinscripciones();
 //						String valid = "S";
 						//CREAMOS INSCRIPCION A TURNO
-						if(inscripcionesItem.getIdguardia()==null) {
+						
 							
 //							ScsInscripcionturnoExample exampleinscripcion = new ScsInscripcionturnoExample();
 //							exampleinscripcion.createCriteria()
@@ -884,9 +884,9 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 						inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
 						response = scsInscripcionturnoMapper.insert(inscripcionturno);
-						}
-						//CREAMOS INSCRIPCION A TURNO
-						else {
+						
+						//Creamos inscripcion a turno
+						if(inscripcionesItem.getIdguardia()!=null) {
 							
 //							ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
 //							exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
