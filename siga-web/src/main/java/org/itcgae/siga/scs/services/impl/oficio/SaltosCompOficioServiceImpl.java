@@ -363,16 +363,16 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 	}
 
 	@Override
-	public ComboDTO searchLetradosGuardia(SaltoCompGuardiaItem saltoItem, HttpServletRequest request) {
+	public ComboDTO searchLetradosTurno(SaltoCompGuardiaItem saltoItem, HttpServletRequest request) {
 
 		LOGGER.info(
-				"SaltosCompOficioServiceImpl.searchLetradosGuardia() -> Entrada para buscar los letrados inscritos a una guardia");
+				"SaltosCompOficioServiceImpl.searchLetradosTurno() -> Entrada para buscar los letrados inscritos a un turno");
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
-		String errorStr = "Se ha producido un error al tratar obtener los letrados inscritos a una guardia.";
+		String errorStr = "Se ha producido un error al tratar obtener los letrados inscritos a un turno.";
 		ComboDTO comboDTO = new ComboDTO();
 
 		try {
@@ -382,17 +382,17 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
 				LOGGER.info(
-						"SaltosCompOficioServiceImpl.searchLetradosGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"SaltosCompOficioServiceImpl.searchLetradosTurno() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 				LOGGER.info(
-						"SaltosCompOficioServiceImpl.searchLetradosGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"SaltosCompOficioServiceImpl.searchLetradosTurno() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && !usuarios.isEmpty() && saltoItem != null) {
 
-					List<LetradoGuardiaItem> listLetradoGuardiaItem = saltoscompensacionesMapper.searchLetradosGuardia(
-							Short.toString(idInstitucion), saltoItem.getIdTurno(), saltoItem.getIdGuardia(), false);
+					List<LetradoGuardiaItem> listLetradoGuardiaItem = saltoscompensacionesMapper
+							.searchLetradosTurno(saltoItem.getIdTurno(), Short.toString(idInstitucion));
 
 					comboDTO.setCombooItems(transformToListComboItemOficio(listLetradoGuardiaItem));
 
@@ -401,7 +401,7 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 			}
 
 		} catch (Exception e) {
-			LOGGER.error("SaltosCompOficioServiceImpl.searchLetradosGuardia() -> " + errorStr, e);
+			LOGGER.error("SaltosCompOficioServiceImpl.searchLetradosTurno() -> " + errorStr, e);
 			error.setCode(500);
 			error.setDescription(errorStr);
 			error.setMessage(e.getMessage());
@@ -441,13 +441,9 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 		for (SaltoCompGuardiaItem saltoComp : listaSaltosCompensaciones) {
 
 			if (!isHistorico(saltoComp)) {
-				List<ComboItem> comboGuardia = scsGuardiasturnoExtendsMapper
-						.comboGuardiasNoGrupo(saltoComp.getIdTurno(), Short.toString(idInstitucion));
 
-				saltoComp.setComboGuardia(comboGuardia);
-
-				List<LetradoGuardiaItem> comboColegiados = saltoscompensacionesMapper.searchLetradosGuardia(
-						Short.toString(idInstitucion), saltoComp.getIdTurno(), saltoComp.getIdGuardia(), false);
+				List<LetradoGuardiaItem> comboColegiados = saltoscompensacionesMapper
+						.searchLetradosTurno(saltoComp.getIdTurno(), Short.toString(idInstitucion));
 
 				saltoComp.setComboColegiados(transformToListComboItemOficio(comboColegiados));
 			}

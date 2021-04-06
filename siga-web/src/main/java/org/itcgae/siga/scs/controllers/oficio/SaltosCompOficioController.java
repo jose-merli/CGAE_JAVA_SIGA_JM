@@ -53,10 +53,10 @@ public class SaltosCompOficioController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "/searchLetradosGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ComboDTO> searchLetradosGuardia(@RequestBody SaltoCompGuardiaItem saltoItem,
+	@PostMapping(value = "/searchLetradosTurno", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ComboDTO> searchLetradosTurno(@RequestBody SaltoCompGuardiaItem saltoItem,
 			HttpServletRequest request) {
-		ComboDTO response = saltosCompOficioService.searchLetradosGuardia(saltoItem, request);
+		ComboDTO response = saltosCompOficioService.searchLetradosTurno(saltoItem, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 

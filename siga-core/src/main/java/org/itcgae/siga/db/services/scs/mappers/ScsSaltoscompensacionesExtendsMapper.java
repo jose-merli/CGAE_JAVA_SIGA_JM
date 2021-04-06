@@ -37,11 +37,8 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 			Integer tamMax);
 
 	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "searchSaltosYCompensacionesOficio")
-	@Results({ @Result(column = "GRUPO", property = "grupo", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.NUMERIC),
+	@Results({ @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NOMBRE_TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBREGUARDIA", property = "guardia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDSALTOSTURNO", property = "idSaltosTurno", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "COLEGIADO_GRUPO", property = "colegiadoGrupo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
@@ -76,6 +73,15 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 			@Result(column = "ORDENGRUPO", property = "ordenGrupo", jdbcType = JdbcType.VARCHAR) })
 	List<LetradoGuardiaItem> searchLetradosGuardia(String idInstitucion, String idTurno, String idGuardia,
 			boolean grupo);
+
+	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "searchLetradosTurno")
+	@Results({ @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ALFABETICOAPELLIDOS", property = "alfabeticoApellidos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR) })
+	List<LetradoGuardiaItem> searchLetradosTurno(String idTurno, String idInstitucion);
 
 	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "selectNuevoIdSaltosCompensaciones")
 	@Results({ @Result(column = "IDSALTOSTURNO", property = "idMax", jdbcType = JdbcType.VARCHAR), })

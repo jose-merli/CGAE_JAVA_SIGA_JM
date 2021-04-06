@@ -22,6 +22,6 @@ public interface ISaltosCompOficioService {
 	public DeleteResponseDTO borrarSaltosCompensaciones(List<SaltoCompGuardiaItem> listaSaltoItem,
 			HttpServletRequest request);
 
-	public ComboDTO searchLetradosGuardia(SaltoCompGuardiaItem saltoItem, HttpServletRequest request);
+	public ComboDTO searchLetradosTurno(SaltoCompGuardiaItem saltoItem, HttpServletRequest request);
 
 }

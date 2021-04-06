@@ -116,75 +116,64 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
+		SQL sql3 = new SQL();
 
-		sql.SELECT("*\r\n" + "FROM\r\n" + "	(\r\n" + "	SELECT\r\n" + "		SCS_SALTOSCOMPENSACIONES.IDINSTITUCION,\r\n"
-				+ "		NULL AS GRUPO,\r\n" + "		SCS_TURNO.IDTURNO,\r\n"
-				+ "		SCS_TURNO.NOMBRE AS NOMBRE_TURNO,\r\n" + "		SCS_GUARDIASTURNO.IDGUARDIA,\r\n"
-				+ "		SCS_GUARDIASTURNO.NOMBRE AS NOMBREGUARDIA,\r\n"
-				+ "		SCS_SALTOSCOMPENSACIONES.IDSALTOSTURNO,\r\n"
-				+ "		DECODE(CEN_COLEGIADO.COMUNITARIO, '1', CEN_COLEGIADO.NCOMUNITARIO, CEN_COLEGIADO.NCOLEGIADO) AS COLEGIADO_GRUPO,\r\n"
-				+ "		CEN_PERSONA.APELLIDOS2 || ' ' || CEN_PERSONA.APELLIDOS1 || ', ' || CEN_PERSONA.NOMBRE AS LETRADO,\r\n"
-				+ "		SCS_SALTOSCOMPENSACIONES.SALTOOCOMPENSACION,\r\n" + "		SCS_SALTOSCOMPENSACIONES.FECHA,\r\n"
-				+ "		SCS_SALTOSCOMPENSACIONES.MOTIVOS AS MOTIVO,\r\n"
-				+ "		SCS_SALTOSCOMPENSACIONES.FECHACUMPLIMIENTO AS FECHAUSO,\r\n"
-				+ "		SCS_SALTOSCOMPENSACIONES.FECHA_ANULACION, CEN_COLEGIADO.IDPERSONA\r\n" + "	FROM\r\n"
-				+ "		SCS_SALTOSCOMPENSACIONES\r\n" + "	LEFT JOIN SCS_TURNO ON\r\n"
-				+ "		SCS_TURNO.IDINSTITUCION = SCS_SALTOSCOMPENSACIONES.IDINSTITUCION\r\n"
-				+ "		AND SCS_TURNO.IDTURNO = SCS_SALTOSCOMPENSACIONES.IDTURNO\r\n"
-				+ "	LEFT JOIN SCS_GUARDIASTURNO ON\r\n"
-				+ "		SCS_GUARDIASTURNO.IDINSTITUCION = SCS_SALTOSCOMPENSACIONES.IDINSTITUCION\r\n"
-				+ "		AND SCS_GUARDIASTURNO.IDTURNO = SCS_SALTOSCOMPENSACIONES.IDTURNO\r\n"
-				+ "		AND SCS_GUARDIASTURNO.IDGUARDIA = SCS_SALTOSCOMPENSACIONES.IDGUARDIA\r\n"
-				+ "	JOIN CEN_PERSONA ON\r\n" + "		CEN_PERSONA.IDPERSONA = SCS_SALTOSCOMPENSACIONES.IDPERSONA\r\n"
-				+ "	JOIN CEN_COLEGIADO ON\r\n"
-				+ "		CEN_COLEGIADO.IDPERSONA = SCS_SALTOSCOMPENSACIONES.IDPERSONA\r\n"
-				+ "		AND CEN_COLEGIADO.IDINSTITUCION = SCS_SALTOSCOMPENSACIONES.IDINSTITUCION ) CONSULTA");
+		sql3.SELECT("SCS_SALTOSCOMPENSACIONES.IDINSTITUCION");
+		sql3.SELECT("SCS_TURNO.IDTURNO");
+		sql3.SELECT("SCS_TURNO.NOMBRE AS NOMBRE_TURNO");
+		sql3.SELECT("SCS_SALTOSCOMPENSACIONES.IDSALTOSTURNO");
+		sql3.SELECT(
+				"DECODE(CEN_COLEGIADO.COMUNITARIO, '1', CEN_COLEGIADO.NCOMUNITARIO, CEN_COLEGIADO.NCOLEGIADO) AS COLEGIADO_GRUPO");
+		sql3.SELECT("CEN_PERSONA.APELLIDOS2 || ' ' || CEN_PERSONA.APELLIDOS1 || ', ' || CEN_PERSONA.NOMBRE AS LETRADO");
+		sql3.SELECT("SCS_SALTOSCOMPENSACIONES.SALTOOCOMPENSACION");
+		sql3.SELECT("SCS_SALTOSCOMPENSACIONES.FECHA");
+		sql3.SELECT("SCS_SALTOSCOMPENSACIONES.MOTIVOS AS MOTIVO");
+		sql3.SELECT("SCS_SALTOSCOMPENSACIONES.FECHACUMPLIMIENTO AS FECHAUSO");
+		sql3.SELECT("SCS_SALTOSCOMPENSACIONES.FECHA_ANULACION");
+		sql3.SELECT("CEN_COLEGIADO.IDPERSONA");
+		sql3.SELECT("SCS_SALTOSCOMPENSACIONES.IDGUARDIA");
 
-		if (!UtilidadesString.esCadenaVacia(salto.getIdSaltosTurno())) {
-			sql.WHERE("IDSALTOSTURNO =" + salto.getIdSaltosTurno());
-		}
+		sql3.FROM(
+				"SCS_SALTOSCOMPENSACIONES LEFT JOIN SCS_TURNO ON SCS_TURNO.IDINSTITUCION = SCS_SALTOSCOMPENSACIONES.IDINSTITUCION AND SCS_TURNO.IDTURNO = SCS_SALTOSCOMPENSACIONES.IDTURNO JOIN CEN_PERSONA ON CEN_PERSONA.IDPERSONA = SCS_SALTOSCOMPENSACIONES.IDPERSONA JOIN CEN_COLEGIADO ON CEN_COLEGIADO.IDPERSONA = SCS_SALTOSCOMPENSACIONES.IDPERSONA AND CEN_COLEGIADO.IDINSTITUCION = SCS_SALTOSCOMPENSACIONES.IDINSTITUCION");
+
+		sql2.SELECT("*");
+		sql2.FROM("( " + sql3.toString() + " ) CONSULTA");
 
 		if (!salto.isHistorico()) {
-			sql.WHERE("FECHAUSO IS NULL");
-			sql.WHERE("FECHA_ANULACION IS NULL");
+			sql2.WHERE("FECHAUSO IS NULL");
+			sql2.WHERE("FECHA_ANULACION IS NULL");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(salto.getColegiadoGrupo())) {
-			sql.WHERE("COLEGIADO_GRUPO = '" + salto.getColegiadoGrupo() + "'");
-			sql.WHERE("GRUPO IS NULL");
+			sql2.WHERE("COLEGIADO_GRUPO = '" + salto.getColegiadoGrupo() + "'");
 		}
-
-		sql.WHERE("IDINSTITUCION =" + idInstitucion);
 
 		if (!UtilidadesString.esCadenaVacia(salto.getIdTurno())) {
-			sql.WHERE("IDTURNO IN (" + salto.getIdTurno() + " )");
+			sql2.WHERE("IDTURNO IN (" + salto.getIdTurno() + " )");
 		}
-
-		if (!UtilidadesString.esCadenaVacia(salto.getIdGuardia())) {
-			sql.WHERE("IDGUARDIA IN (" + salto.getIdGuardia() + " )");
-		}
-
-		sql.WHERE("IDGUARDIA IS NOT NULL");
 
 		if (!UtilidadesString.esCadenaVacia(salto.getFechaDesde())) {
-			sql.WHERE("TRUNC(FECHA) >= TRUNC(TO_DATE('" + salto.getFechaDesde() + "', 'DD/MM/YYYY HH24:MI:SS'))");
+			sql2.WHERE("TRUNC(FECHA) >= TRUNC(TO_DATE('" + salto.getFechaDesde() + "', 'DD/MM/YYYY HH24:MI:SS'))");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(salto.getFechaHasta())) {
-			sql.WHERE("TRUNC(FECHA) <= TRUNC(TO_DATE('" + salto.getFechaHasta() + "', 'DD/MM/YYYY HH24:MI:SS'))");
+			sql2.WHERE("TRUNC(FECHA) <= TRUNC(TO_DATE('" + salto.getFechaHasta() + "', 'DD/MM/YYYY HH24:MI:SS'))");
 		}
 
-		sql.ORDER_BY("FECHA DESC, IDSALTOSTURNO DESC");
+		sql2.WHERE("IDINSTITUCION =" + idInstitucion);
+		sql2.WHERE("IDGUARDIA IS NULL");
 
-		sql2.SELECT("*");
-		sql2.FROM("( " + sql.toString() + " )");
+		sql2.ORDER_BY("FECHA DESC, IDSALTOSTURNO DESC");
+
+		sql.SELECT("*");
+		sql.FROM("( " + sql2.toString() + " )");
 
 		if (tamMax != null) {
 			Integer tamMaxNumber = tamMax + 1;
-			sql2.WHERE("ROWNUM <= " + tamMaxNumber);
+			sql.WHERE("ROWNUM <= " + tamMaxNumber);
 		}
 
-		return sql2.toString();
+		return sql.toString();
 
 	}
 
@@ -278,6 +267,26 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		return sql.toString();
 	}
 
+	public String searchLetradosTurno(String idTurno, String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("PER.IDPERSONA");
+		sql.SELECT("PER.NOMBRE");
+		sql.SELECT("PER.APELLIDOS1");
+		sql.SELECT("DECODE(PER.APELLIDOS2, NULL, '', ' ' || PER.APELLIDOS2) APELLIDOS2");
+		sql.SELECT("PER.APELLIDOS1 || DECODE(PER.APELLIDOS2, NULL, '', ' ' || PER.APELLIDOS2) ALFABETICOAPELLIDOS");
+		sql.SELECT("DECODE(COL.COMUNITARIO, '1', COL.NCOMUNITARIO, COL.NCOLEGIADO) NUMEROCOLEGIADO");
+
+		sql.FROM(
+				"SCS_INSCRIPCIONTURNO IT LEFT JOIN CEN_PERSONA PER ON PER.IDPERSONA = IT.IDPERSONA JOIN CEN_COLEGIADO COL ON COL.IDPERSONA = IT.IDPERSONA AND COL.IDINSTITUCION = IT.IDINSTITUCION");
+
+		sql.WHERE("IT.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IT.IDTURNO = '" + idTurno + "'");
+		sql.WHERE("FECHABAJA IS NULL");
+
+		return sql.toString();
+	}
+
 	public String selectNuevoIdSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion) {
 
 		SQL sql = new SQL();
@@ -310,7 +319,11 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.VALUES("FECHA", "'" + saltoItem.getFecha() + "'");
 		sql.VALUES("FECHACUMPLIMIENTO", "NULL");
 		sql.VALUES("FECHAMODIFICACION", "SYSTIMESTAMP");
-		sql.VALUES("IDGUARDIA", "'" + saltoItem.getIdGuardia() + "'");
+		if (!UtilidadesString.esCadenaVacia(saltoItem.getIdGuardia())) {
+			sql.VALUES("IDGUARDIA", "'" + saltoItem.getIdGuardia() + "'");
+		} else {
+			sql.VALUES("IDGUARDIA", "NULL");
+		}
 		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
 		sql.VALUES("IDPERSONA", "'" + saltoItem.getIdPersona() + "'");
 		sql.VALUES("IDSALTOSTURNO", "'" + idSaltosTurno + "'");
@@ -366,7 +379,11 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.SET("FECHA = '" + saltoItem.getFecha() + "'");
 		sql.SET("FECHACUMPLIMIENTO = NULL");
 		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
-		sql.SET("IDGUARDIA = '" + saltoItem.getIdGuardia() + "'");
+		if (!UtilidadesString.esCadenaVacia(saltoItem.getIdGuardia())) {
+			sql.SET("IDGUARDIA = '" + saltoItem.getIdGuardia() + "'");
+		} else {
+			sql.SET("IDGUARDIA = NULL");
+		}
 		sql.SET("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.SET("IDPERSONA = '" + saltoItem.getIdPersona() + "'");
 		sql.SET("IDSALTOSTURNO = '" + saltoItem.getIdSaltosTurno() + "'");
@@ -417,7 +434,10 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("IDTURNO = '" + saltoItem.getIdTurno() + "'");
 		sql.WHERE("IDSALTOSTURNO = '" + saltoItem.getIdSaltosTurno() + "'");
-		sql.WHERE("IDGUARDIA = '" + saltoItem.getIdGuardia() + "'");
+
+		if (!UtilidadesString.esCadenaVacia(saltoItem.getIdGuardia())) {
+			sql.WHERE("IDGUARDIA = '" + saltoItem.getIdGuardia() + "'");
+		}
 
 		return sql.toString();
 	}
@@ -446,7 +466,10 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("IDTURNO = '" + saltoItem.getIdTurno() + "'");
 		sql.WHERE("IDSALTOSTURNO = '" + saltoItem.getIdSaltosTurno() + "'");
-		sql.WHERE("IDGUARDIA = '" + saltoItem.getIdGuardia() + "'");
+
+		if (!UtilidadesString.esCadenaVacia(saltoItem.getIdGuardia())) {
+			sql.WHERE("IDGUARDIA = '" + saltoItem.getIdGuardia() + "'");
+		}
 
 		return sql.toString();
 	}
