@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.controllers.oficio;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,13 +70,21 @@ public class BajasTemporalesController {
 	}
 	
 	@RequestMapping(value = "/bajasTemporales/saveBajaTemporal", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> saveBajaTemporal(@RequestBody BajasTemporalesItem[] bajasTemporalesItem, HttpServletRequest request) {
-//		UpdateResponseDTO response = bajasTemporalesService.saveBajaTemporal(bajasTemporalesItem, request);
-		UpdateResponseDTO response = new UpdateResponseDTO();
+	ResponseEntity<UpdateResponseDTO> saveBajaTemporal(@RequestBody List<Object> bajasTemporalesItem, HttpServletRequest request) {
+//		List<BajasTemporalesItem> bajasTemporales = convertObjectToBajaItem(bajasTemporalesItem);
+		UpdateResponseDTO response = bajasTemporalesService.saveBajaTemporal(bajasTemporalesItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	private List<BajasTemporalesItem> convertObjectToBajaItem(List<Object> bajasTemporalesItem){
+		List<BajasTemporalesItem> bajasTemporales = new ArrayList<BajasTemporalesItem>();
+		for(Object obj: bajasTemporalesItem) {
+		}
+		
+		return bajasTemporales;
 	}
 }
  
