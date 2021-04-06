@@ -732,11 +732,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" AND ACT.IDTURNO = D.IDTURNO AND ACT.NUMERO = D.NUMERO" );
 			
 			if (item.getJustificacionDesde() != null) {
-				sql.append(" AND ACT.FECHAJUSTIFICACION >= '"+item.getJustificacionDesde()+"'");
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				String fecha = dateFormat.format(item.getJustificacionDesde());
+				sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) >= '" + fecha + "'");
 			}
 
 			if (item.getJustificacionHasta() != null) {
-				sql.append(" AND ACT.FECHAJUSTIFICACION<= '"+item.getJustificacionHasta()+"'");
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				String fecha = dateFormat.format(item.getJustificacionHasta());
+				
+				sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) <= '" + fecha + "'");
 			}
 
 			sql.append(" )>0");
@@ -744,13 +749,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		//fechas designacion
 		if (item.getDesignacionDesde() != null) {
-			sql.append(" AND TRUNC(D.FECHAENTRADA) >= '"+item.getDesignacionDesde()+"'");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			String fecha = dateFormat.format(item.getDesignacionDesde());
+			
+			sql.append("AND TRUNC(D.FECHAENTRADA) >= '" + fecha + "'");
 		}else{
 			sql.append(" AND TRUNC(D.FECHAENTRADA) > '01/01/1950'");
 		}
 		
 		if (item.getDesignacionHasta() != null){
-			sql.append(" AND TRUNC(D.FECHAENTRADA) <='"+item.getDesignacionHasta()+"'");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			String fecha = dateFormat.format(item.getDesignacionHasta());
+			
+			sql.append("AND D.FECHAENTRADA <= '" + fecha + "'");
 		}
 		
 		//nombre y apellidos
@@ -848,6 +859,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		return sql.toString();
 	}
+	
 	public String comboModulos(Short idInstitucion){
 
 		SQL sql = new SQL();

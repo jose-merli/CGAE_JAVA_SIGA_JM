@@ -36,9 +36,9 @@ public class DesignacionesController {
 	}
 		
 	@RequestMapping(value = "/busquedaJustificacionExpres",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<List<DesignaItem>> busquedaJustificacionExpres(@RequestBody JustificacionExpressItem item, HttpServletRequest request) {
-		List<DesignaItem> response = designacionesService.busquedaJustificacionExpres(item, request);
-		return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
+	ResponseEntity<List<JustificacionExpressItem>> busquedaJustificacionExpres(@RequestBody JustificacionExpressItem item, HttpServletRequest request) {
+		List<JustificacionExpressItem> response = designacionesService.busquedaJustificacionExpres(item, request);
+		return new ResponseEntity<List<JustificacionExpressItem>>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/busquedaDesignaciones",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

@@ -10,7 +10,7 @@ import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 
 public interface IDesignacionesService{
 
-	public List<DesignaItem> busquedaJustificacionExpres(JustificacionExpressItem item, HttpServletRequest request);
+	public List<JustificacionExpressItem> busquedaJustificacionExpres(JustificacionExpressItem item, HttpServletRequest request);
 	
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
 	

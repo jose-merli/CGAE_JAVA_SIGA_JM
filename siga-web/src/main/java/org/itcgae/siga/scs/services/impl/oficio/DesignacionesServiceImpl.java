@@ -52,8 +52,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 	
 	@Override
-	public List<DesignaItem> busquedaJustificacionExpres(JustificacionExpressItem item, HttpServletRequest request) {
-		List <DesignaItem> result = null;
+	public List<JustificacionExpressItem> busquedaJustificacionExpres(JustificacionExpressItem item, HttpServletRequest request) {
+		List <JustificacionExpressItem> result = null;
 		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
