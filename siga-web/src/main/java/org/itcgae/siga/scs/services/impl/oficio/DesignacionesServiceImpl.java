@@ -102,10 +102,28 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						longitudCodEJG = parametros.getValor();
 					}
 					
-					
-					//PaginadorBind paginador = admDesignas.getDesignasJustificacionPaginador(fInformeJustificacion,longitudNumEjg,false,isPermitidoEditarActFicha,ejisActivo.equals(AppConstants.DB_TRUE));
-					
 					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpres(item, idInstitucion.toString(), longitudCodEJG, idPersona);
+					
+					//cogemos los expedientes devueltos de la consulta y los tratamos para el front
+					for(int i=0; i<result.size(); i++){						
+						List<String> expedientes = new ArrayList<String>();
+						
+						if(result.get(i).getEjgs()!=null && !result.get(i).getEjgs().isEmpty()) {
+							String[] parts = result.get(i).getEjgs().split(",");
+														
+							for(String str : parts) {
+								if(str.indexOf("##")!=-1) {
+									expedientes.add("E"+str.substring(0, str.indexOf("##")).trim());
+								}
+							}
+						}
+						
+						result.get(i).setCodigoDesignacion(result.get(0).getCodigoDesignacion().trim());
+						
+						if(expedientes.size()>0) {
+							result.get(i).setExpedientes(expedientes);
+						}
+					}
 					
 					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> Salida del servicio");
 				}catch (Exception e){

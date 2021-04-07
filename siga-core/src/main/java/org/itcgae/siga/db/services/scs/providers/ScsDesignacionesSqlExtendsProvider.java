@@ -855,7 +855,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" ) ");
 		}
 		
-		sql.append(" ) query WHERE ROWNUM <= 200");
+		sql.append(" ) query WHERE ROWNUM <= 200 ORDER BY CODIGODESIGNA DESC");
 		
 		return sql.toString();
 	}

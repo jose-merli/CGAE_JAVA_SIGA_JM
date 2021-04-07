@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -26,7 +27,7 @@ public class JustificacionExpressItem {
 	private String anioDesignacion;
 	private String numDesignacion;
 	private String codigoDesignacion;
-	private String expedientes;
+	private String ejgs;
 	private String cliente;
 	private String art27;
 	private String nig;
@@ -43,6 +44,7 @@ public class JustificacionExpressItem {
 	private String idTurno;
 	private String idPersona;
 	private String idProcedimiento;
+	private List<String> expedientes;
 	
 	/**
 	 * @return the nColegiado
@@ -343,18 +345,18 @@ public class JustificacionExpressItem {
 	}
 
 	/**
-	 * @return the expedientes
+	 * @return the ejgs
 	 */
-	@JsonProperty("expedientes")
-	public String getExpedientes() {
-		return expedientes;
+	@JsonProperty("ejgs")
+	public String getEjgs() {
+		return ejgs;
 	}
 
 	/**
-	 * @param expedientes the expedientes to set
+	 * @param ejgs the ejgs to set
 	 */
-	public void setExpedientes(String expedientes) {
-		this.expedientes = expedientes;
+	public void setEjgs(String ejgs) {
+		this.ejgs = ejgs;
 	}
 
 	/**
@@ -595,5 +597,20 @@ public class JustificacionExpressItem {
 	 */
 	public void setIdProcedimiento(String idProcedimiento) {
 		this.idProcedimiento = idProcedimiento;
+	}
+
+	/**
+	 * @return the expedientes
+	 */
+	@JsonProperty("expedientes")
+	public List<String> getExpedientes() {
+		return expedientes;
+	}
+
+	/**
+	 * @param expedientes the expedientes to set
+	 */
+	public void setExpedientes(List<String> expedientes) {
+		this.expedientes = expedientes;
 	}
 }
