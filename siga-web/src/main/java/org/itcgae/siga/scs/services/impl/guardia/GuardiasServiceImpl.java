@@ -1689,20 +1689,17 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"getIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
+				LOGGER.info("getIncompatibilidades() -> Entrada para obtener las incompatibilidades");
 
 				incompatibilidades = scsIncompatibilidadguardiasExtendsMapper.getListadoIncompatibilidades(incompBody, idInstitucion.toString(), idGuardia);
 
 				
-				LOGGER.info("tarjetaIncompatibilidades() -> Salida ya con los datos recogidos");
+				LOGGER.info("getIncompatibilidades() -> Salida ya con los datos recogidos");
 			}
 		}
 		
@@ -1733,7 +1730,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	@Override
 	public DeleteResponseDTO deleteIncompatibilidades(DeleteIncompatibilidadesDatosEntradaItem deleteIncompatibilidadesBody, HttpServletRequest request) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-		int response = 0;
+		int response = 1;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -1751,23 +1748,28 @@ public class GuardiasServiceImpl implements GuardiasService {
 			LOGGER.info(
 					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
+			if (usuarios != null && usuarios.size() > 0 && deleteIncompatibilidadesBody.getIdTurno() != null && !deleteIncompatibilidadesBody.getIdTurno().isEmpty() && deleteIncompatibilidadesBody.getIdInstitucion() != null && 
+					!deleteIncompatibilidadesBody.getIdInstitucion().isEmpty() && deleteIncompatibilidadesBody.getIdGuardia() != null && !deleteIncompatibilidadesBody.getIdGuardia().isEmpty() && 
+					deleteIncompatibilidadesBody.getIdTurnoIncompatible() != null && !deleteIncompatibilidadesBody.getIdTurnoIncompatible().isEmpty() && deleteIncompatibilidadesBody.getIdGuardiaIncompatible() != null && ! deleteIncompatibilidadesBody.getIdGuardiaIncompatible().isEmpty()) {
+				LOGGER.info("deleteIncompatibilidades() -> Entrada para borrar las incompatibilidades");
+				//Doble borrado
 				scsIncompatibilidadguardiasExtendsMapper.deleteIncompatibilidades(deleteIncompatibilidadesBody.getIdTurno(), deleteIncompatibilidadesBody.getIdInstitucion(), deleteIncompatibilidadesBody.getIdGuardia(), deleteIncompatibilidadesBody.getIdTurnoIncompatible(), deleteIncompatibilidadesBody.getIdGuardiaIncompatible());
-				LOGGER.info("tarjetaIncompatibilidades() -> Salida ya con los datos recogidos");
+				LOGGER.info("deleteIncompatibilidades() -> Salida ya con los datos recogidos");
+			}else {
+				response = 0;
 			}
 		}
 		
 		// comprobacion actualización
 		if (response >= 1) {
-			LOGGER.info("deleteSubtipoCurricular() -> OK. Delete para tipo curricular realizado correctamente");
+			LOGGER.info("deleteIncompatibilidades() -> OK. Delete para incompatibilidades realizado correctamente");
 			deleteResponseDTO.setStatus(SigaConstants.OK);
 		} else {
-			LOGGER.info("deleteSubtipoCurricular() -> KO. Delete para tipo curricular NO realizado correctamente");
+			LOGGER.info("deleteIncompatibilidades() -> KO. Delete para incompatibilidades NO realizado correctamente");
 			deleteResponseDTO.setStatus(SigaConstants.KO);
 		}
 
-		LOGGER.info("deleteSubtipoCurricular() -> Salida del servicio para eliminar subtipo curricular");
+		LOGGER.info("deleteIncompatibilidades() -> Salida del servicio para eliminar incompatibilidades");
 		return deleteResponseDTO;
 	}
 	
@@ -1792,12 +1794,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"saveIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			//if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
@@ -1833,7 +1832,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				String pattern = "dd/MM/YY";
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 				String fechaModificacion = simpleDateFormat.format(new Date());	
-				if(idTurno != null && idTurno.isEmpty() &&  incompatibilidadesBody.getIdInstitucion() != null && ! incompatibilidadesBody.getIdInstitucion().isEmpty() && idGuardia != null && !idGuardia.isEmpty() && idTurnoIncompatible != null && !idTurnoIncompatible.isEmpty() && idGuardiaIncompatible != null && !idGuardiaIncompatible.isEmpty()) {
+				if(idTurno != null && !idTurno.isEmpty() &&  incompatibilidadesBody.getIdInstitucion() != null && ! incompatibilidadesBody.getIdInstitucion().isEmpty() && idGuardia != null && !idGuardia.isEmpty() && idTurnoIncompatible != null && !idTurnoIncompatible.isEmpty() && idGuardiaIncompatible != null && !idGuardiaIncompatible.isEmpty()) {
 					int existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(idTurno, incompatibilidadesBody.getIdInstitucion(), idGuardia, idTurnoIncompatible, idGuardiaIncompatible);
 					if (existe == 2) {
 						//existe en ambas direcciones - la actualizamos
@@ -1841,7 +1840,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						
 					}
 					if (existe == 0) {
-			//no existe - llamamos dos veces para guardar en ambas direcciones
+						//no existe - llamamos dos veces para guardar en ambas direcciones
 						scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidadesBody.getIdInstitucion()), Integer.parseInt(idGuardia), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardiaIncompatible), usuarios.get(0).getIdusuario(), incompatibilidadesBody.getMotivos(), Integer.parseInt(incompatibilidadesBody.getDiasSeparacionGuardias()), fechaModificacion);
 						scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidadesBody.getIdInstitucion()), Integer.parseInt(idGuardiaIncompatible), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(), incompatibilidadesBody.getMotivos(), Integer.parseInt(incompatibilidadesBody.getDiasSeparacionGuardias()), fechaModificacion);
 
@@ -1851,20 +1850,20 @@ public class GuardiasServiceImpl implements GuardiasService {
 				}
 				
 				
-				LOGGER.info("tarjetaIncompatibilidades() -> Salida ya con los datos recogidos");
+				LOGGER.info("saveIncompatibilidades() -> Salida ya con los datos recogidos");
 			//}
 		}
 		
 		// comprobacion actualización
 		if (response >= 1) {
-			LOGGER.info("deleteSubtipoCurricular() -> OK. Delete para tipo curricular realizado correctamente");
+			LOGGER.info("saveIncompatibilidades() -> OK. Save para incompatibilidades realizado correctamente");
 			deleteResponseDTO.setStatus(SigaConstants.OK);
 		} else {
-			LOGGER.info("deleteSubtipoCurricular() -> KO. Delete para tipo curricular NO realizado correctamente");
+			LOGGER.info("saveIncompatibilidades() -> KO. Save para incompatibilidades NO realizado correctamente");
 			deleteResponseDTO.setStatus(SigaConstants.KO);
 		}
 
-		LOGGER.info("deleteSubtipoCurricular() -> Salida del servicio para eliminar subtipo curricular");
+		LOGGER.info("deleteSubtipoCurricular() -> Salida del servicio para guardar incompatibilidades");
 		return deleteResponseDTO;
 	}
 	

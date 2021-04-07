@@ -470,7 +470,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 	public String getListaLabelsGuardiasInc(String idInstitucion, String idTipoGuardia, String idTurno, Integer usu, String idPartidaPresupuestaria) {
 		SQL sql = new SQL();
 		
-		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.NOMBRE");
+		sql.SELECT("SCS_GUARDIASTURNO.NOMBRE");
 		
 		sql.FROM("SCS_GUARDIASTURNO");
 		
@@ -483,20 +483,20 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		if (idTurno != null && !idTurno.isEmpty()) {
 			sql.WHERE("SCS_GUARDIASTURNO.IDTURNO IN ( " + idTurno + ")");
 		}
-		if (usu != null) {
-			sql.WHERE("SCS_GUARDIASTURNO.USUMODIFICACION = " + usu );
-		}
+//		if (usu != null) {
+//			sql.WHERE("SCS_GUARDIASTURNO.USUMODIFICACION = " + usu );
+//		}
 		if (idPartidaPresupuestaria != null && !idPartidaPresupuestaria.isEmpty()) {
 			sql.WHERE("SCS_GUARDIASTURNO.IDPARTIDAPRESUPUESTARIA IN ( " + idPartidaPresupuestaria + ")"  );
 		}
-		
+		sql.ORDER_BY("SCS_GUARDIASTURNO.FECHAMODIFICACION DESC");
 		return sql.toString();
 	}
 	
 	public String getListaValueGuardiasInc(String idInstitucion, String idTipoGuardia, String idTurno, Integer usu, String idPartidaPresupuestaria) {
 		SQL sql = new SQL();
 		
-		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDGUARDIA");
+		sql.SELECT("SCS_GUARDIASTURNO.IDGUARDIA");
 		
 		sql.FROM("SCS_GUARDIASTURNO");
 		
@@ -509,14 +509,14 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		if (idTurno != null && !idTurno.isEmpty()) {
 			sql.WHERE("SCS_GUARDIASTURNO.IDTURNO IN ( " + idTurno + ")");
 		}
-		if (usu != null) {
-			sql.WHERE("SCS_GUARDIASTURNO.USUMODIFICACION = " + usu );
-		}
+//		if (usu != null) {
+//			sql.WHERE("SCS_GUARDIASTURNO.USUMODIFICACION = " + usu );
+//		}
 		if (idPartidaPresupuestaria != null && !idPartidaPresupuestaria.isEmpty()) {
 			sql.WHERE("SCS_GUARDIASTURNO.IDPARTIDAPRESUPUESTARIA IN ( " + idPartidaPresupuestaria + ")"  );
 		}
 		
-		
+		sql.ORDER_BY("SCS_GUARDIASTURNO.FECHAMODIFICACION DESC");
 		return sql.toString();
 	}
 	
