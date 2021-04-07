@@ -53,10 +53,23 @@ public interface ScsBajasTemporalesExtendsMapper extends CenBajastemporalesMappe
 	
 		List<ComboItem> comboEstado();
 	
+<<<<<<< HEAD
 	
 	@SelectProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "checkNifColegiado")
 	@Results({
 		@Result(column = "IDPERSONA", property = "value", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> checkNifColegiado(String nif, Short idInstitucion);
+=======
+	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "deleteBajasTemporales")
+	int eliminarBaja(BajasTemporalesItem bajasTemporalesItem);
+	
+	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "updateBajasTemporales")
+	int updateBajaTemporal(BajasTemporalesItem bajasTemporalesItem);
+	
+	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "saveBajaTemporal")
+	int saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem);
+
+		
+>>>>>>> b2d5471d245055c06ce3ed9c25bc6c25d0b4837c
 }

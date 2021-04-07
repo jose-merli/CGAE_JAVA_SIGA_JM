@@ -25,6 +25,24 @@ public class JustificacionExpressItem {
 	private Date designacionHasta;
 	private String anioDesignacion;
 	private String numDesignacion;
+	private String codigoDesignacion;
+	private String expedientes;
+	private String cliente;
+	private String art27;
+	private String nig;
+	private String idJuzgado;
+	private String nombreJuzgado;
+	private int idInstitucionJuzgado;
+	private int anioProcedimiento;
+	private String numProcedimiento;
+	private Date fechaJustificacion;
+	private Date fechaActuacion;
+	private Date fechaDesignacion;
+	private String resolucionDesignacion;
+	private String idInstitucion;
+	private String idTurno;
+	private String idPersona;
+	private String idProcedimiento;
 	
 	/**
 	 * @return the nColegiado
@@ -307,5 +325,275 @@ public class JustificacionExpressItem {
 	 */
 	public void setNumDesignacion(String numDesignacion) {
 		this.numDesignacion = numDesignacion;
+	}
+
+	/**
+	 * @return the codigoDesignacion
+	 */
+	@JsonProperty("codigoDesignacion")
+	public String getCodigoDesignacion() {
+		return codigoDesignacion;
+	}
+
+	/**
+	 * @param codigoDesignacion the codigoDesignacion to set
+	 */
+	public void setCodigoDesignacion(String codigoDesignacion) {
+		this.codigoDesignacion = codigoDesignacion;
+	}
+
+	/**
+	 * @return the expedientes
+	 */
+	@JsonProperty("expedientes")
+	public String getExpedientes() {
+		return expedientes;
+	}
+
+	/**
+	 * @param expedientes the expedientes to set
+	 */
+	public void setExpedientes(String expedientes) {
+		this.expedientes = expedientes;
+	}
+
+	/**
+	 * @return the cliente
+	 */
+	@JsonProperty("cliente")
+	public String getCliente() {
+		return cliente;
+	}
+
+	/**
+	 * @param cliente the cliente to set
+	 */
+	public void setCliente(String cliente) {
+		this.cliente = cliente;
+	}
+
+	/**
+	 * @return the art27
+	 */
+	@JsonProperty("art27")
+	public String getArt27() {
+		return art27;
+	}
+
+	/**
+	 * @param art27 the art27 to set
+	 */
+	public void setArt27(String art27) {
+		this.art27 = art27;
+	}
+
+	/**
+	 * @return the nig
+	 */
+	@JsonProperty("nig")
+	public String getNig() {
+		return nig;
+	}
+
+	/**
+	 * @param nig the nig to set
+	 */
+	public void setNig(String nig) {
+		this.nig = nig;
+	}
+
+	/**
+	 * @return the idJuzgado
+	 */
+	@JsonProperty("idJuzgado")
+	public String getIdJuzgado() {
+		return idJuzgado;
+	}
+
+	/**
+	 * @param idJuzgado the idJuzgado to set
+	 */
+	public void setIdJuzgado(String idJuzgado) {
+		this.idJuzgado = idJuzgado;
+	}
+
+	/**
+	 * @return the nombreJuzgado
+	 */
+	@JsonProperty("nombreJuzgado")
+	public String getNombreJuzgado() {
+		return nombreJuzgado;
+	}
+
+	/**
+	 * @param nombreJuzgado the nombreJuzgado to set
+	 */
+	public void setNombreJuzgado(String nombreJuzgado) {
+		this.nombreJuzgado = nombreJuzgado;
+	}
+
+	/**
+	 * @return the idInstitucionJuzgado
+	 */
+	@JsonProperty("idInstitucionJuzgado")
+	public int getIdInstitucionJuzgado() {
+		return idInstitucionJuzgado;
+	}
+
+	/**
+	 * @param idInstitucionJuzgado the idInstitucionJuzgado to set
+	 */
+	public void setIdInstitucionJuzgado(int idInstitucionJuzgado) {
+		this.idInstitucionJuzgado = idInstitucionJuzgado;
+	}
+
+	/**
+	 * @return the anioProcedimiento
+	 */
+	@JsonProperty("anioProcedimiento")
+	public int getAnioProcedimiento() {
+		return anioProcedimiento;
+	}
+
+	/**
+	 * @param anioProcedimiento the anioProcedimiento to set
+	 */
+	public void setAnioProcedimiento(int anioProcedimiento) {
+		this.anioProcedimiento = anioProcedimiento;
+	}
+
+	/**
+	 * @return the numProcedimiento
+	 */
+	@JsonProperty("numProcedimiento")
+	public String getNumProcedimiento() {
+		return numProcedimiento;
+	}
+
+	/**
+	 * @param numProcedimiento the numProcedimiento to set
+	 */
+	public void setNumProcedimiento(String numProcedimiento) {
+		this.numProcedimiento = numProcedimiento;
+	}
+
+	/**
+	 * @return the fechaJustificacion
+	 */
+	@JsonProperty("fechaJustificacion")
+	public Date getFechaJustificacion() {
+		return fechaJustificacion;
+	}
+
+	/**
+	 * @param fechaJustificacion the fechaJustificacion to set
+	 */
+	public void setFechaJustificacion(Date fechaJustificacion) {
+		this.fechaJustificacion = fechaJustificacion;
+	}
+
+	/**
+	 * @return the fechaActuacion
+	 */
+	@JsonProperty("fechaActuacion")
+	public Date getFechaActuacion() {
+		return fechaActuacion;
+	}
+
+	/**
+	 * @param fechaActuacion the fechaActuacion to set
+	 */
+	public void setFechaActuacion(Date fechaActuacion) {
+		this.fechaActuacion = fechaActuacion;
+	}
+
+	/**
+	 * @return the fechaDesignacion
+	 */
+	@JsonProperty("fechaDesignacion")
+	public Date getFechaDesignacion() {
+		return fechaDesignacion;
+	}
+
+	/**
+	 * @param fechaDesignacion the fechaDesignacion to set
+	 */
+	public void setFechaDesignacion(Date fechaDesignacion) {
+		this.fechaDesignacion = fechaDesignacion;
+	}
+
+	/**
+	 * @return the resolucionDesignacion
+	 */
+	@JsonProperty("resolucionDesignacion")
+	public String getResolucionDesignacion() {
+		return resolucionDesignacion;
+	}
+
+	/**
+	 * @param resolucionDesignacion the resolucionDesignacion to set
+	 */
+	public void setResolucionDesignacion(String resolucionDesignacion) {
+		this.resolucionDesignacion = resolucionDesignacion;
+	}
+
+	/**
+	 * @return the idInstitucion
+	 */
+	@JsonProperty("idInstitucion")
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	/**
+	 * @param idInstitucion the idInstitucion to set
+	 */
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+
+	/**
+	 * @return the idTurno
+	 */
+	@JsonProperty("idTurno")
+	public String getIdTurno() {
+		return idTurno;
+	}
+
+	/**
+	 * @param idTurno the idTurno to set
+	 */
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
+	}
+
+	/**
+	 * @return the idPersona
+	 */
+	@JsonProperty("idPersona")
+	public String getIdPersona() {
+		return idPersona;
+	}
+
+	/**
+	 * @param idPersona the idPersona to set
+	 */
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+
+	/**
+	 * @return the idProcedimiento
+	 */
+	@JsonProperty("idProcedimiento")
+	public String getIdProcedimiento() {
+		return idProcedimiento;
+	}
+
+	/**
+	 * @param idProcedimiento the idProcedimiento to set
+	 */
+	public void setIdProcedimiento(String idProcedimiento) {
+		this.idProcedimiento = idProcedimiento;
 	}
 }

@@ -1,21 +1,21 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 public class DesignaItem {
-	
 	private int ano;
 	private int anoProcedimiento;
 	private String art27;
 	private String codigo;
 	private String defensaJuridica;
 	private String delitos;
-	private String estados;
+	private String[] estados;
 	private int factConvenio;
 	private Date fechaAlta;
 	private Date fechaAnulacion;
-	private Date fechaEntrada;
+	private Date fechaEntradaInicio;
+	private Date fechaEntradaFin;
 	private Date fechaEstado;
 	private Date fechaFin;
 	private Date fechaJuicio;
@@ -25,12 +25,15 @@ public class DesignaItem {
 	private int idInstitucion;
 	private int idInstitucion_juzg;
 	private int idInstitucion_procur;
-	private int idJuzgado;
+	private String[] idJuzgado;
+	private String nombreJuzgado;
+	private String[] idJuzgadoActu;
+	private String nombreJuzgadoActu;
 	private int idPretension;
-	private String idProcedimiento;
+	private String[] idProcedimiento;
 	private int idProcurador;
-	private int idTipoDesignaColegio;
-	private int idTurno;
+	private String[] idTipoDesignaColegio;
+	private String[] idTurno;
 	private String nig;
 	private int numero;
 	private String numProcedimiento;
@@ -40,461 +43,821 @@ public class DesignaItem {
 	private String sufijo;
 	private int usuModificacion;
 	private String nombreTurno;
-	private int numColegiado;
+	private String numColegiado;
 	private String apellidosNombre;
 	private String[] interesados;
-	private String validadas;
+	private String[] validadas;
+	private String[] calidad;
+	private String asunto;
+	private String acreditacion;
+	private String[] idAcreditacion;
+	private String modulo;
+	private String[] idModulo;
+	private Date fechaJustificacionDesde;
+	private Date fechaJustificacionHasta;
+	private String origen;
+	private String idOrigen;
+	private String nif;
+	private String nombreInteresado;
+	private String apellidosInteresado;
+	private String idActuacionesV;
+	private String idArt27;
+	private String[] idCalidad;
+	private String[] idProcedimientoActuaciones;
+	private int idRol;
+	private String[] rol;
+	private String documentacionActuacion;
+	private String[] idModuloActuaciones;
+	private String descripcionTipoDesigna;
+	private String expedientes;
+	private String cliente;
 	
-	
-	public DesignaItem() {
-		super();
-		this.ano = 0;
-		this.anoProcedimiento = 0;
-		this.art27 = "";
-		this.codigo = "";
-		this.defensaJuridica = "";
-		this.delitos = "";
-		this.estados = "";
-		this.factConvenio = 0;
-		this.fechaAlta = new Date();
-		this.fechaAnulacion = new Date();
-		this.fechaEntrada = new Date();
-		this.fechaEstado = new Date();
-		this.fechaFin = new Date();
-		this.fechaJuicio = new Date();
-		this.fechaModificacion = new Date();
-		this.fechaOficioJuzgado = new Date();
-		this.fechaRecepcionColegio = new Date();
-		this.idInstitucion = 0;
-		this.idInstitucion_juzg = 0;
-		this.idInstitucion_procur = 0;
-		this.idJuzgado = 0;
-		this.idPretension = 0;
-		this.idProcedimiento = "";
-		this.idProcurador = 0;
-		this.idTipoDesignaColegio = 0;
-		this.idTurno = 0;
-		this.nig = "";
-		this.numero = 0;
-		this.numProcedimiento = "";
-		this.observaciones = "";
-		this.procurador = "";
-		this.resumenAsunto = "";
-		this.sufijo = "";
-		this.usuModificacion = 0;
-		this.nombreTurno = "";
-		this.numColegiado = 0;
-		this.apellidosNombre = "";
-		this.interesados = null;
-		this.validadas = "";
-	}
-	
-	public DesignaItem(int ano, int anoProcedimiento, String art27, String codigo, String defensaJuridica,
-			String delitos, String estados, int factConvenio, Date fechaAlta, Date fechaAnulacion, Date fechaEntrada,
-			Date fechaEstado, Date fechaFin, Date fechaJuicio, Date fechaModificacion, Date fechaOficioJuzgado,
-			Date fechaRecepcionColegio, int idInstitucion, int idInstitucion_juzg, int idInstitucion_procur,
-			int idJuzgado, int idPretension, String idProcedimiento, int idProcurador, int idTipoDesignaColegio,
-			int idTurno, String nig, int numero, String numProcedimiento, String observaciones, String procurador,
-			String resumenAsunto, String sufijo, int usuModificacion, String nombreTurno, int numColegiado,
-			String apellidosNombre, String[] interesados, String validadas) {
-		super();
-		this.ano = ano;
-		this.anoProcedimiento = anoProcedimiento;
-		this.art27 = art27;
-		this.codigo = codigo;
-		this.defensaJuridica = defensaJuridica;
-		this.delitos = delitos;
-		this.estados = estados;
-		this.factConvenio = factConvenio;
-		this.fechaAlta = fechaAlta;
-		this.fechaAnulacion = fechaAnulacion;
-		this.fechaEntrada = fechaEntrada;
-		this.fechaEstado = fechaEstado;
-		this.fechaFin = fechaFin;
-		this.fechaJuicio = fechaJuicio;
-		this.fechaModificacion = fechaModificacion;
-		this.fechaOficioJuzgado = fechaOficioJuzgado;
-		this.fechaRecepcionColegio = fechaRecepcionColegio;
-		this.idInstitucion = idInstitucion;
-		this.idInstitucion_juzg = idInstitucion_juzg;
-		this.idInstitucion_procur = idInstitucion_procur;
-		this.idJuzgado = idJuzgado;
-		this.idPretension = idPretension;
-		this.idProcedimiento = idProcedimiento;
-		this.idProcurador = idProcurador;
-		this.idTipoDesignaColegio = idTipoDesignaColegio;
-		this.idTurno = idTurno;
-		this.nig = nig;
-		this.numero = numero;
-		this.numProcedimiento = numProcedimiento;
-		this.observaciones = observaciones;
-		this.procurador = procurador;
-		this.resumenAsunto = resumenAsunto;
-		this.sufijo = sufijo;
-		this.usuModificacion = usuModificacion;
-		this.nombreTurno = nombreTurno;
-		this.numColegiado = numColegiado;
-		this.apellidosNombre = apellidosNombre;
-		this.interesados = interesados;
-		this.validadas = validadas;
-	}
-
 	public int getAno() {
 		return ano;
 	}
-
-
+	/**
+	 * @param ano the ano to set
+	 */
 	public void setAno(int ano) {
 		this.ano = ano;
 	}
-
-
+	/**
+	 * @return the anoProcedimiento
+	 */
 	public int getAnoProcedimiento() {
 		return anoProcedimiento;
 	}
-
-
+	/**
+	 * @param anoProcedimiento the anoProcedimiento to set
+	 */
 	public void setAnoProcedimiento(int anoProcedimiento) {
 		this.anoProcedimiento = anoProcedimiento;
 	}
-
-
+	/**
+	 * @return the art27
+	 */
 	public String getArt27() {
 		return art27;
 	}
-
-
+	/**
+	 * @param art27 the art27 to set
+	 */
 	public void setArt27(String art27) {
 		this.art27 = art27;
 	}
-
-
+	/**
+	 * @return the codigo
+	 */
 	public String getCodigo() {
 		return codigo;
 	}
-
-
+	/**
+	 * @param codigo the codigo to set
+	 */
 	public void setCodigo(String codigo) {
 		this.codigo = codigo;
 	}
-
-
+	/**
+	 * @return the defensaJuridica
+	 */
 	public String getDefensaJuridica() {
 		return defensaJuridica;
 	}
-
-
+	/**
+	 * @param defensaJuridica the defensaJuridica to set
+	 */
 	public void setDefensaJuridica(String defensaJuridica) {
 		this.defensaJuridica = defensaJuridica;
 	}
-
-
+	/**
+	 * @return the delitos
+	 */
 	public String getDelitos() {
 		return delitos;
 	}
-
-
+	/**
+	 * @param delitos the delitos to set
+	 */
 	public void setDelitos(String delitos) {
 		this.delitos = delitos;
 	}
-
-
-	public String getEstados() {
+	/**
+	 * @return the estados
+	 */
+	public String[] getEstados() {
 		return estados;
 	}
-
-
-	public void setEstados(String estados) {
+	/**
+	 * @param estados the estados to set
+	 */
+	public void setEstados(String[] estados) {
 		this.estados = estados;
 	}
-
-
+	/**
+	 * @return the factConvenio
+	 */
 	public int getFactConvenio() {
 		return factConvenio;
 	}
-
-
+	/**
+	 * @param factConvenio the factConvenio to set
+	 */
 	public void setFactConvenio(int factConvenio) {
 		this.factConvenio = factConvenio;
 	}
-
-
+	/**
+	 * @return the fechaAlta
+	 */
 	public Date getFechaAlta() {
 		return fechaAlta;
 	}
-
-
+	/**
+	 * @param fechaAlta the fechaAlta to set
+	 */
 	public void setFechaAlta(Date fechaAlta) {
 		this.fechaAlta = fechaAlta;
 	}
-
-
+	/**
+	 * @return the fechaAnulacion
+	 */
 	public Date getFechaAnulacion() {
 		return fechaAnulacion;
 	}
-
-
+	/**
+	 * @param fechaAnulacion the fechaAnulacion to set
+	 */
 	public void setFechaAnulacion(Date fechaAnulacion) {
 		this.fechaAnulacion = fechaAnulacion;
 	}
-
-
-	public Date getFechaEntrada() {
-		return fechaEntrada;
+	/**
+	 * @return the fechaEntradaInicio
+	 */
+	public Date getFechaEntradaInicio() {
+		return fechaEntradaInicio;
 	}
-
-
-	public void setFechaEntrada(Date fechaEntrada) {
-		this.fechaEntrada = fechaEntrada;
+	/**
+	 * @param fechaEntradaInicio the fechaEntradaInicio to set
+	 */
+	public void setFechaEntradaInicio(Date fechaEntradaInicio) {
+		this.fechaEntradaInicio = fechaEntradaInicio;
 	}
-
-
+	/**
+	 * @return the fechaEntradaFin
+	 */
+	public Date getFechaEntradaFin() {
+		return fechaEntradaFin;
+	}
+	/**
+	 * @param fechaEntradaFin the fechaEntradaFin to set
+	 */
+	public void setFechaEntradaFin(Date fechaEntradaFin) {
+		this.fechaEntradaFin = fechaEntradaFin;
+	}
+	/**
+	 * @return the fechaEstado
+	 */
 	public Date getFechaEstado() {
 		return fechaEstado;
 	}
-
-
+	/**
+	 * @param fechaEstado the fechaEstado to set
+	 */
 	public void setFechaEstado(Date fechaEstado) {
 		this.fechaEstado = fechaEstado;
 	}
-
-
+	/**
+	 * @return the fechaFin
+	 */
 	public Date getFechaFin() {
 		return fechaFin;
 	}
-
-
+	/**
+	 * @param fechaFin the fechaFin to set
+	 */
 	public void setFechaFin(Date fechaFin) {
 		this.fechaFin = fechaFin;
 	}
-
-
+	/**
+	 * @return the fechaJuicio
+	 */
 	public Date getFechaJuicio() {
 		return fechaJuicio;
 	}
-
-
+	/**
+	 * @param fechaJuicio the fechaJuicio to set
+	 */
 	public void setFechaJuicio(Date fechaJuicio) {
 		this.fechaJuicio = fechaJuicio;
 	}
-
-
+	/**
+	 * @return the fechaModificacion
+	 */
 	public Date getFechaModificacion() {
 		return fechaModificacion;
 	}
-
-
+	/**
+	 * @param fechaModificacion the fechaModificacion to set
+	 */
 	public void setFechaModificacion(Date fechaModificacion) {
 		this.fechaModificacion = fechaModificacion;
 	}
-
-
+	/**
+	 * @return the fechaOficioJuzgado
+	 */
 	public Date getFechaOficioJuzgado() {
 		return fechaOficioJuzgado;
 	}
-
-
+	/**
+	 * @param fechaOficioJuzgado the fechaOficioJuzgado to set
+	 */
 	public void setFechaOficioJuzgado(Date fechaOficioJuzgado) {
 		this.fechaOficioJuzgado = fechaOficioJuzgado;
 	}
-
-
+	/**
+	 * @return the fechaRecepcionColegio
+	 */
 	public Date getFechaRecepcionColegio() {
 		return fechaRecepcionColegio;
 	}
-
-
+	/**
+	 * @param fechaRecepcionColegio the fechaRecepcionColegio to set
+	 */
 	public void setFechaRecepcionColegio(Date fechaRecepcionColegio) {
 		this.fechaRecepcionColegio = fechaRecepcionColegio;
 	}
-
-
+	/**
+	 * @return the idInstitucion
+	 */
 	public int getIdInstitucion() {
 		return idInstitucion;
 	}
-
-
+	/**
+	 * @param idInstitucion the idInstitucion to set
+	 */
 	public void setIdInstitucion(int idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
-
-
+	/**
+	 * @return the idInstitucion_juzg
+	 */
 	public int getIdInstitucion_juzg() {
 		return idInstitucion_juzg;
 	}
-
-
+	/**
+	 * @param idInstitucion_juzg the idInstitucion_juzg to set
+	 */
 	public void setIdInstitucion_juzg(int idInstitucion_juzg) {
 		this.idInstitucion_juzg = idInstitucion_juzg;
 	}
-
-
+	/**
+	 * @return the idInstitucion_procur
+	 */
 	public int getIdInstitucion_procur() {
 		return idInstitucion_procur;
 	}
-
-
+	/**
+	 * @param idInstitucion_procur the idInstitucion_procur to set
+	 */
 	public void setIdInstitucion_procur(int idInstitucion_procur) {
 		this.idInstitucion_procur = idInstitucion_procur;
 	}
-
-
-	public int getIdJuzgado() {
+	/**
+	 * @return the idJuzgado
+	 */
+	public String[] getIdJuzgado() {
 		return idJuzgado;
 	}
-
-
-	public void setIdJuzgado(int idJuzgado) {
+	/**
+	 * @param idJuzgado the idJuzgado to set
+	 */
+	public void setIdJuzgado(String[] idJuzgado) {
 		this.idJuzgado = idJuzgado;
 	}
-
-
+	/**
+	 * @return the nombreJuzgado
+	 */
+	public String getNombreJuzgado() {
+		return nombreJuzgado;
+	}
+	/**
+	 * @param nombreJuzgado the nombreJuzgado to set
+	 */
+	public void setNombreJuzgado(String nombreJuzgado) {
+		this.nombreJuzgado = nombreJuzgado;
+	}
+	/**
+	 * @return the idJuzgadoActu
+	 */
+	public String[] getIdJuzgadoActu() {
+		return idJuzgadoActu;
+	}
+	/**
+	 * @param idJuzgadoActu the idJuzgadoActu to set
+	 */
+	public void setIdJuzgadoActu(String[] idJuzgadoActu) {
+		this.idJuzgadoActu = idJuzgadoActu;
+	}
+	/**
+	 * @return the nombreJuzgadoActu
+	 */
+	public String getNombreJuzgadoActu() {
+		return nombreJuzgadoActu;
+	}
+	/**
+	 * @param nombreJuzgadoActu the nombreJuzgadoActu to set
+	 */
+	public void setNombreJuzgadoActu(String nombreJuzgadoActu) {
+		this.nombreJuzgadoActu = nombreJuzgadoActu;
+	}
+	/**
+	 * @return the idPretension
+	 */
 	public int getIdPretension() {
 		return idPretension;
 	}
-
-
+	/**
+	 * @param idPretension the idPretension to set
+	 */
 	public void setIdPretension(int idPretension) {
 		this.idPretension = idPretension;
 	}
-
-
-	public String getIdProcedimiento() {
+	/**
+	 * @return the idProcedimiento
+	 */
+	public String[] getIdProcedimiento() {
 		return idProcedimiento;
 	}
-
-
-	public void setIdProcedimiento(String idProcedimiento) {
+	/**
+	 * @param idProcedimiento the idProcedimiento to set
+	 */
+	public void setIdProcedimiento(String[] idProcedimiento) {
 		this.idProcedimiento = idProcedimiento;
 	}
-
-
+	/**
+	 * @return the idProcurador
+	 */
 	public int getIdProcurador() {
 		return idProcurador;
 	}
-
-
+	/**
+	 * @param idProcurador the idProcurador to set
+	 */
 	public void setIdProcurador(int idProcurador) {
 		this.idProcurador = idProcurador;
 	}
-
-
-	public int getIdTipoDesignaColegio() {
+	/**
+	 * @return the idTipoDesignaColegio
+	 */
+	public String[] getIdTipoDesignaColegio() {
 		return idTipoDesignaColegio;
 	}
-
-
-	public void setIdTipoDesignaColegio(int idTipoDesignaColegio) {
+	/**
+	 * @param idTipoDesignaColegio the idTipoDesignaColegio to set
+	 */
+	public void setIdTipoDesignaColegio(String[] idTipoDesignaColegio) {
 		this.idTipoDesignaColegio = idTipoDesignaColegio;
 	}
-
-
-	public int getIdTurno() {
+	/**
+	 * @return the idTurno
+	 */
+	public String[] getIdTurno() {
 		return idTurno;
 	}
-
-
-	public void setIdTurno(int idTurno) {
+	/**
+	 * @param idTurno the idTurno to set
+	 */
+	public void setIdTurno(String[] idTurno) {
 		this.idTurno = idTurno;
 	}
-
-
+	/**
+	 * @return the nig
+	 */
 	public String getNig() {
 		return nig;
 	}
-
-
+	/**
+	 * @param nig the nig to set
+	 */
 	public void setNig(String nig) {
 		this.nig = nig;
 	}
-
-
+	/**
+	 * @return the numero
+	 */
 	public int getNumero() {
 		return numero;
 	}
-
-
+	/**
+	 * @param numero the numero to set
+	 */
 	public void setNumero(int numero) {
 		this.numero = numero;
 	}
-
-
+	/**
+	 * @return the numProcedimiento
+	 */
 	public String getNumProcedimiento() {
 		return numProcedimiento;
 	}
-
-
+	/**
+	 * @param numProcedimiento the numProcedimiento to set
+	 */
 	public void setNumProcedimiento(String numProcedimiento) {
 		this.numProcedimiento = numProcedimiento;
 	}
-
-
+	/**
+	 * @return the observaciones
+	 */
 	public String getObservaciones() {
 		return observaciones;
 	}
-
-
+	/**
+	 * @param observaciones the observaciones to set
+	 */
 	public void setObservaciones(String observaciones) {
 		this.observaciones = observaciones;
 	}
-
-
+	/**
+	 * @return the procurador
+	 */
 	public String getProcurador() {
 		return procurador;
 	}
-
-
+	/**
+	 * @param procurador the procurador to set
+	 */
 	public void setProcurador(String procurador) {
 		this.procurador = procurador;
 	}
-
-
+	/**
+	 * @return the resumenAsunto
+	 */
 	public String getResumenAsunto() {
 		return resumenAsunto;
 	}
-
-
+	/**
+	 * @param resumenAsunto the resumenAsunto to set
+	 */
 	public void setResumenAsunto(String resumenAsunto) {
 		this.resumenAsunto = resumenAsunto;
 	}
-
-
+	/**
+	 * @return the sufijo
+	 */
 	public String getSufijo() {
 		return sufijo;
 	}
-
-
+	/**
+	 * @param sufijo the sufijo to set
+	 */
 	public void setSufijo(String sufijo) {
 		this.sufijo = sufijo;
 	}
-
-
+	/**
+	 * @return the usuModificacion
+	 */
 	public int getUsuModificacion() {
 		return usuModificacion;
 	}
-
-
+	/**
+	 * @param usuModificacion the usuModificacion to set
+	 */
 	public void setUsuModificacion(int usuModificacion) {
 		this.usuModificacion = usuModificacion;
 	}
+	/**
+	 * @return the nombreTurno
+	 */
+	public String getNombreTurno() {
+		return nombreTurno;
+	}
+	/**
+	 * @param nombreTurno the nombreTurno to set
+	 */
+	public void setNombreTurno(String nombreTurno) {
+		this.nombreTurno = nombreTurno;
+	}
+	/**
+	 * @return the numColegiado
+	 */
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+	/**
+	 * @param numColegiado the numColegiado to set
+	 */
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+	/**
+	 * @return the apellidosNombre
+	 */
+	public String getApellidosNombre() {
+		return apellidosNombre;
+	}
+	/**
+	 * @param apellidosNombre the apellidosNombre to set
+	 */
+	public void setApellidosNombre(String apellidosNombre) {
+		this.apellidosNombre = apellidosNombre;
+	}
+	/**
+	 * @return the interesados
+	 */
+	public String[] getInteresados() {
+		return interesados;
+	}
+	/**
+	 * @param interesados the interesados to set
+	 */
+	public void setInteresados(String[] interesados) {
+		this.interesados = interesados;
+	}
+	/**
+	 * @return the validadas
+	 */
+	public String[] getValidadas() {
+		return validadas;
+	}
+	/**
+	 * @param validadas the validadas to set
+	 */
+	public void setValidadas(String[] validadas) {
+		this.validadas = validadas;
+	}
+	/**
+	 * @return the calidad
+	 */
+	public String[] getCalidad() {
+		return calidad;
+	}
+	/**
+	 * @param calidad the calidad to set
+	 */
+	public void setCalidad(String[] calidad) {
+		this.calidad = calidad;
+	}
+	/**
+	 * @return the asunto
+	 */
+	public String getAsunto() {
+		return asunto;
+	}
+	/**
+	 * @param asunto the asunto to set
+	 */
+	public void setAsunto(String asunto) {
+		this.asunto = asunto;
+	}
+	/**
+	 * @return the acreditacion
+	 */
+	public String getAcreditacion() {
+		return acreditacion;
+	}
+	/**
+	 * @param acreditacion the acreditacion to set
+	 */
+	public void setAcreditacion(String acreditacion) {
+		this.acreditacion = acreditacion;
+	}
+	/**
+	 * @return the idAcreditacion
+	 */
+	public String[] getIdAcreditacion() {
+		return idAcreditacion;
+	}
+	/**
+	 * @param idAcreditacion the idAcreditacion to set
+	 */
+	public void setIdAcreditacion(String[] idAcreditacion) {
+		this.idAcreditacion = idAcreditacion;
+	}
+	/**
+	 * @return the modulo
+	 */
+	public String getModulo() {
+		return modulo;
+	}
+	/**
+	 * @param modulo the modulo to set
+	 */
+	public void setModulo(String modulo) {
+		this.modulo = modulo;
+	}
+	/**
+	 * @return the idModulo
+	 */
+	public String[] getIdModulo() {
+		return idModulo;
+	}
+	/**
+	 * @param idModulo the idModulo to set
+	 */
+	public void setIdModulo(String[] idModulo) {
+		this.idModulo = idModulo;
+	}
+	/**
+	 * @return the fechaJustificacionDesde
+	 */
+	public Date getFechaJustificacionDesde() {
+		return fechaJustificacionDesde;
+	}
+	/**
+	 * @param fechaJustificacionDesde the fechaJustificacionDesde to set
+	 */
+	public void setFechaJustificacionDesde(Date fechaJustificacionDesde) {
+		this.fechaJustificacionDesde = fechaJustificacionDesde;
+	}
+	/**
+	 * @return the fechaJustificacionHasta
+	 */
+	public Date getFechaJustificacionHasta() {
+		return fechaJustificacionHasta;
+	}
+	/**
+	 * @param fechaJustificacionHasta the fechaJustificacionHasta to set
+	 */
+	public void setFechaJustificacionHasta(Date fechaJustificacionHasta) {
+		this.fechaJustificacionHasta = fechaJustificacionHasta;
+	}
+	/**
+	 * @return the origen
+	 */
+	public String getOrigen() {
+		return origen;
+	}
+	/**
+	 * @param origen the origen to set
+	 */
+	public void setOrigen(String origen) {
+		this.origen = origen;
+	}
 
+	public String getIdOrigen() {
+		return idOrigen;
+	}
+	public void setIdOrigen(String idOrigen) {
+		this.idOrigen = idOrigen;
+	}
+	/**
+	 * @return the nif
+	 */
+	public String getNif() {
+		return nif;
+	}
+	/**
+	 * @param nif the nif to set
+	 */
+	public void setNif(String nif) {
+		this.nif = nif;
+	}
+	/**
+	 * @return the nombreInteresado
+	 */
+	public String getNombreInteresado() {
+		return nombreInteresado;
+	}
+	/**
+	 * @param nombreInteresado the nombreInteresado to set
+	 */
+	public void setNombreInteresado(String nombreInteresado) {
+		this.nombreInteresado = nombreInteresado;
+	}
+	/**
+	 * @return the apellidosInteresado
+	 */
+	public String getApellidosInteresado() {
+		return apellidosInteresado;
+	}
+	/**
+	 * @param apellidosInteresado the apellidosInteresado to set
+	 */
+	public void setApellidosInteresado(String apellidosInteresado) {
+		this.apellidosInteresado = apellidosInteresado;
+	}
 
+	public String getIdActuacionesV() {
+		return idActuacionesV;
+	}
+	public void setIdActuacionesV(String idActuacionesV) {
+		this.idActuacionesV = idActuacionesV;
+	}
+	/**
+	 * @return the idArt27
+	 */
+	public String getIdArt27() {
+		return idArt27;
+	}
+	/**
+	 * @param idArt27 the idArt27 to set
+	 */
+	public void setIdArt27(String idArt27) {
+		this.idArt27 = idArt27;
+	}
+	/**
+	 * @return the idCalidad
+	 */
+	public String[] getIdCalidad() {
+		return idCalidad;
+	}
+	/**
+	 * @param idCalidad the idCalidad to set
+	 */
+	public void setIdCalidad(String[] idCalidad) {
+		this.idCalidad = idCalidad;
+	}
+	/**
+	 * @return the idProcedimientoActuaciones
+	 */
+	public String[] getIdProcedimientoActuaciones() {
+		return idProcedimientoActuaciones;
+	}
+	/**
+	 * @param idProcedimientoActuaciones the idProcedimientoActuaciones to set
+	 */
+	public void setIdProcedimientoActuaciones(String[] idProcedimientoActuaciones) {
+		this.idProcedimientoActuaciones = idProcedimientoActuaciones;
+	}
+	/**
+	 * @return the idRol
+	 */
+	public int getIdRol() {
+		return idRol;
+	}
+	/**
+	 * @param idRol the idRol to set
+	 */
+	public void setIdRol(int idRol) {
+		this.idRol = idRol;
+	}
+
+	public String[] getRol() {
+		return rol;
+	}
+	public void setRol(String[] rol) {
+		this.rol = rol;
+	}
+	public String getDocumentacionActuacion() {
+		return documentacionActuacion;
+	}
+	public void setDocumentacionActuacion(String documentacionActuacion) {
+		this.documentacionActuacion = documentacionActuacion;
+	}
+	public String[] getIdModuloActuaciones() {
+		return idModuloActuaciones;
+	}
+	public void setIdModuloActuaciones(String[] idModuloActuaciones) {
+		this.idModuloActuaciones = idModuloActuaciones;
+	}
+	public String getExpedientes() {
+		return expedientes;
+	}
+	public void setExpedientes(String expedientes) {
+		this.expedientes = expedientes;
+	}
+	public String getCliente() {
+		return cliente;
+	}
+	public void setCliente(String cliente) {
+		this.cliente = cliente;
+	}
+	
+	public String getDescripcionTipoDesigna() {
+		return descripcionTipoDesigna;
+	}
+	public void setDescripcionTipoDesigna(String descripcionTipoDesigna) {
+		this.descripcionTipoDesigna = descripcionTipoDesigna;
+	}
 	@Override
 	public String toString() {
 		return "DesignaItem [ano=" + ano + ", anoProcedimiento=" + anoProcedimiento + ", art27=" + art27 + ", codigo="
-				+ codigo + ", defensaJuridica=" + defensaJuridica + ", delitos=" + delitos + ", estados=" + estados
-				+ ", factConvenio=" + factConvenio + ", fechaAlta=" + fechaAlta + ", fechaAnulacion=" + fechaAnulacion
-				+ ", fechaEntrada=" + fechaEntrada + ", fechaEstado=" + fechaEstado + ", fechaFin=" + fechaFin
+				+ codigo + ", defensaJuridica=" + defensaJuridica + ", delitos=" + delitos + ", estados="
+				+ Arrays.toString(estados) + ", factConvenio=" + factConvenio + ", fechaAlta=" + fechaAlta
+				+ ", fechaAnulacion=" + fechaAnulacion + ", fechaEntradaInicio=" + fechaEntradaInicio
+				+ ", fechaEntradaFin=" + fechaEntradaFin + ", fechaEstado=" + fechaEstado + ", fechaFin=" + fechaFin
 				+ ", fechaJuicio=" + fechaJuicio + ", fechaModificacion=" + fechaModificacion + ", fechaOficioJuzgado="
 				+ fechaOficioJuzgado + ", fechaRecepcionColegio=" + fechaRecepcionColegio + ", idInstitucion="
 				+ idInstitucion + ", idInstitucion_juzg=" + idInstitucion_juzg + ", idInstitucion_procur="
-				+ idInstitucion_procur + ", idJuzgado=" + idJuzgado + ", idPretension=" + idPretension
-				+ ", idProcedimiento=" + idProcedimiento + ", idProcurador=" + idProcurador + ", idTipoDesignaColegio="
-				+ idTipoDesignaColegio + ", idTurno=" + idTurno + ", nig=" + nig + ", numero=" + numero
-				+ ", numProcedimiento=" + numProcedimiento + ", observaciones=" + observaciones + ", procurador="
-				+ procurador + ", resumenAsunto=" + resumenAsunto + ", sufijo=" + sufijo + ", usuModificacion="
-				+ usuModificacion + "]";
+				+ idInstitucion_procur + ", idJuzgado=" + Arrays.toString(idJuzgado) + ", nombreJuzgado="
+				+ nombreJuzgado + ", idJuzgadoActu=" + Arrays.toString(idJuzgadoActu) + ", nombreJuzgadoActu="
+				+ nombreJuzgadoActu + ", idPretension=" + idPretension + ", idProcedimiento="
+				+ Arrays.toString(idProcedimiento) + ", idProcurador=" + idProcurador + ", idTipoDesignaColegio="
+				+ Arrays.toString(idTipoDesignaColegio) + ", idTurno=" + Arrays.toString(idTurno) + ", nig=" + nig
+				+ ", numero=" + numero + ", numProcedimiento=" + numProcedimiento + ", observaciones=" + observaciones
+				+ ", procurador=" + procurador + ", resumenAsunto=" + resumenAsunto + ", sufijo=" + sufijo
+				+ ", usuModificacion=" + usuModificacion + ", nombreTurno=" + nombreTurno + ", numColegiado="
+				+ numColegiado + ", apellidosNombre=" + apellidosNombre + ", interesados="
+				+ Arrays.toString(interesados) + ", validadas=" + Arrays.toString(validadas) + ", calidad="
+				+ Arrays.toString(calidad) + ", asunto=" + asunto + ", acreditacion=" + acreditacion
+				+ ", idAcreditacion=" + Arrays.toString(idAcreditacion) + ", modulo=" + modulo + ", idModulo="
+				+ Arrays.toString(idModulo) + ", fechaJustificacionDesde=" + fechaJustificacionDesde
+				+ ", fechaJustificacionHasta=" + fechaJustificacionHasta + ", origen=" + origen + ", idOrigen="
+				+ idOrigen + ", nif=" + nif + ", nombreInteresado=" + nombreInteresado
+				+ ", apellidosInteresado=" + apellidosInteresado + ", idActuacionesV=" + idActuacionesV
+				+ ", idArt27=" + idArt27 + ", idCalidad=" + Arrays.toString(idCalidad) + ", idProcedimientoActuaciones="
+				+ Arrays.toString(idProcedimientoActuaciones) + ", idRol=" + idRol + ", rol=" + Arrays.toString(rol)
+				+ ", documentacionActuacion=" + documentacionActuacion + ", idModuloActuaciones="
+				+ Arrays.toString(idModuloActuaciones) + ", expedientes=" + expedientes + ", cliente=" + cliente + "]";
 	}
-	
-	
 }

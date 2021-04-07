@@ -19,10 +19,12 @@ public interface IGestionBajasTemporalesService {
 
 	public BajasTemporalesDTO busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request);
 	
-	public InsertResponseDTO nuevaBajaTemporal(ColegiadoItem colegiadoItem,HttpServletRequest request);
+	public InsertResponseDTO nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem,HttpServletRequest request);
 
 	public UpdateResponseDTO updateEstado(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request);
 
 	public UpdateResponseDTO deleteBaja(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request);
+	
+	public UpdateResponseDTO saveBajaTemporal(List<Object> bajasTemporalesItem, HttpServletRequest request);
 	
 }

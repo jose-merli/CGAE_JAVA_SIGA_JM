@@ -97,6 +97,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 		sql.SELECT("juzgado.CODIGOEXT2");
 		sql.SELECT("juzgado.NOMBRE");
 		sql.SELECT("P.NOMBRE AS NOMBREPOBLACION");
+		sql.SELECT("juzgado.IDJUZGADO");
 		sql.FROM("SCS_JUZGADO juzgado");
 		sql.INNER_JOIN("CEN_POBLACIONES P ON P.IDPOBLACION = juzgado.IDPOBLACION");
 		sql.WHERE("juzgado.fechabaja is null");
