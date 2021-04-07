@@ -3,6 +3,8 @@ package org.itcgae.siga.DTOs.scs;
 
 import java.util.List;
 
+import org.itcgae.siga.DTOs.gen.ComboItem;
+
 public class SaltoCompGuardiaItem {
 
 	private String idPersona;
@@ -23,6 +25,24 @@ public class SaltoCompGuardiaItem {
 	private boolean historico;
 	private List<String> letradosGrupo;
 	private String fechaAnulacion;
+	private List<ComboItem> comboGuardia;
+	private List<ComboItem> comboColegiados;
+
+	public List<ComboItem> getComboColegiados() {
+		return comboColegiados;
+	}
+
+	public void setComboColegiados(List<ComboItem> comboColegiados) {
+		this.comboColegiados = comboColegiados;
+	}
+
+	public List<ComboItem> getComboGuardia() {
+		return comboGuardia;
+	}
+
+	public void setComboGuardia(List<ComboItem> comboGuardia) {
+		this.comboGuardia = comboGuardia;
+	}
 
 	public String getIdPersona() {
 		return idPersona;
