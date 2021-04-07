@@ -23,7 +23,14 @@ import org.springframework.stereotype.Service;
 public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 
 	
-
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "searchNombreTurnoGuardia")
+	@Results({ 
+		@Result(column = "turno", property = "nombreTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "nombreGuardia", jdbcType = JdbcType.VARCHAR)
+		})
+	List<CargaMasivaDatosITItem> searchNombreTurnoGuardia(String idInstitucion, String idGuardia);
 	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "searchGuardias")
 	@Results({ 

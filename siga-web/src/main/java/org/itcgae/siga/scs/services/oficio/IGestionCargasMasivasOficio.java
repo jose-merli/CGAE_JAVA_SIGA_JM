@@ -8,9 +8,13 @@ import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.InputStreamResource;
@@ -22,7 +26,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @Primary
 public interface IGestionCargasMasivasOficio {
 	
-	public ResponseEntity<InputStreamResource>  descargarModelo(HttpServletRequest requestCargasMasivas, String turnos, String guardias, String tipo);
+	public ResponseEntity<InputStreamResource>  descargarModelo(HttpServletRequest requestCargasMasivas, String turnos, String guardias, String tipo) 
+			throws IOException, EncryptedDocumentException, InvalidFormatException;
 
 	public File createExcelFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector, String tipo)
 			throws BusinessException;
@@ -30,6 +35,9 @@ public interface IGestionCargasMasivasOficio {
 	public DeleteResponseDTO uploadFileIT(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 
 	public DeleteResponseDTO uploadFileBT(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
+
+	public ResponseEntity<InputStreamResource> downloadLogFile(CargaMasivaItem cargaMasivaItem, HttpServletRequest request)
+			throws SigaExceptions;
 
 
 }

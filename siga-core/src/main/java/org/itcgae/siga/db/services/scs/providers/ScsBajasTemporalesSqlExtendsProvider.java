@@ -86,4 +86,19 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		return sql.toString();
 	}
 	
+	public String checkNifColegiado(String nif, Short idInstitucion ) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("cen_persona.idpersona");
+		
+		sql.FROM("cen_persona");
+		sql.JOIN("cen_colegiado on cen.persona.idpersona=cen_colegiado.idpersona");
+		
+		sql.WHERE("cen_persona.nifcif= '"+nif+"'");
+		sql.WHERE("cen_colegiado.idinstitucion= '"+idInstitucion+"'");
+
+		return sql.toString();
+	}
+	
 }
