@@ -123,7 +123,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		//aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
-			sql=" select distinct des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta, des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo,des.idinstitucion idinstitucion, turno.nombre, des.fechaestado fechaestado, colegiado.ncolegiado ";
+			sql=" select distinct procd.nombre as nombreprocedimiento, juzgado.nombre as nombrejuzgado, des.nig, des.numprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta, des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo,des.idinstitucion idinstitucion, turno.nombre, des.fechaestado fechaestado, colegiado.ncolegiado ";
 			sql+=" from scs_designa des, CEN_COLEGIADO colegiado ";
 
 			if(String.valueOf(designaItem.getNumColegiado()) !=null && !String.valueOf(designaItem.getNumColegiado()).equals("") ){
@@ -156,7 +156,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				tiene_interesado = true;
 			}
 
-			sql += ", scs_turno turno";
+			sql += ", scs_turno turno,  scs_juzgado juzgado, scs_pretensionesproced pret, scs_procedimientos procd";
 			
 			if (tiene_interesado){
 				sql += ", SCS_DEFENDIDOSDESIGNA DED, SCS_PERSONAJG PER ";
@@ -172,6 +172,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 			if(String.valueOf(designaItem.getNumColegiado()) !=null && !(String.valueOf(designaItem.getNumColegiado())).equals("") ){
 				sql += " and l.idinstitucion =des.idinstitucion ";
+				sql += " and des.idinstitucion = juzgado.idinstitucion and des.idjuzgado = juzgado.idjuzgado";
+				sql += "  and procd.idinstitucion = des.idinstitucion and procd.idprocedimiento = des.idprocedimiento and pret.idinstitucion = procd.idinstitucion and procd.idprocedimiento = pret.idprocedimiento ";
 				sql += " and l.idturno =des.idturno ";
 				sql += " and l.anio =des.anio "; 
 				sql += " and l.numero =des.numero ";
@@ -855,7 +857,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" ) ");
 		}
 		
-		sql.append(" ) query WHERE ROWNUM <= 200");
+		sql.append(" ) query WHERE ROWNUM <= 200 ORDER BY CODIGODESIGNA DESC");
 		
 		return sql.toString();
 	}
