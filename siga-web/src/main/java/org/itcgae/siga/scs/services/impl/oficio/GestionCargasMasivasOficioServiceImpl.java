@@ -31,6 +31,7 @@ import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
@@ -200,19 +201,19 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 	private BusquedaColegiadosServiceImpl busquedaColegiadosServiceImpl;
 	
 	@Override
+//	public ResponseEntity<FileOutputStream> descargarModelo(HttpServletRequest request, String turnos, String guardias, String tipo) 
 	public ResponseEntity<InputStreamResource> descargarModelo(HttpServletRequest request, String turnos, String guardias, String tipo) 
 	throws IOException, EncryptedDocumentException, InvalidFormatException{
 		
-		LOGGER.info("descargarModelo() -> Entrada al servicio para generar el modelo de inscripciones o bajas temporales");
 
 		
 		//BUSCAMOS LAS INSCRPICIONES A PRESENTAR CON LOS PARAMETROS OBTENIDOS
 		
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		File file;
-		Vector<Hashtable<String, Object>> datosVector = new Vector<Hashtable<String, Object>>();
+//		Vector<Hashtable<String, Object>> datosVector = new Vector<Hashtable<String, Object>>();
 
 //		if(tipo.equals("IT")) {
 //
@@ -322,32 +323,47 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 		InputStream fileStream = null;
 		ResponseEntity<InputStreamResource> res = null;
 		try {
-//			fileStream = new FileInputStream(file);
-			if(tipo.equals("IT")) fileStream = newModelIT(turnos, guardias, idInstitucion);
-			else fileStream = newModelBT();
+			if(tipo.equals("IT")) file = newModelIT(turnos, guardias, idInstitucion);
+			else file = newModelBT();
+				
+			fileStream = new FileInputStream(file);
+			
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
 
-//			headers.setContentLength(file.length());
+			headers.setContentLength(file.length());
 			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 
+//		ResponseEntity<FileOutputStream> res = null;
+//		try {
+//			
+//			HttpHeaders headers = new HttpHeaders();
+//			headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+//			
+//			if(tipo.equals("IT")) res = new ResponseEntity<FileOutputStream>(newModelIT(turnos, guardias, idInstitucion), headers, HttpStatus.OK);
+//			else res = new ResponseEntity<FileOutputStream>(newModelBT(), headers, HttpStatus.OK);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
 		LOGGER.info("descargarModelo() -> Salida del servicio para generar el modelo de inscripciones o bajas temporales");
 	
 		return res;
 	}
 	
-	public InputStream  newModelIT(String turnos, String guardias, Short idInstitucion) throws FileNotFoundException, IOException, EncryptedDocumentException, InvalidFormatException {
-		Workbook wb = WorkbookFactory.create(new File("MyExcel.xlsx"));
+	public File  newModelIT(String turnos, String guardias, Short idInstitucion) throws FileNotFoundException, IOException, EncryptedDocumentException, InvalidFormatException {
+		Workbook wb =  new HSSFWorkbook();
 		Sheet sheet = wb.createSheet("Modelo Inscripciones Guardias");
 
 		// Create a row and put some cells in it. Rows are 0 based.
 		Row row = sheet.createRow(0);
 		//CABECERA
 		for(String p :SigaConstants.CAMPOSMODEL_IT) {
-		row.createCell(row.getLastCellNum()).setCellValue(p);
+			if(row.getLastCellNum()==-1)row.createCell(row.getLastCellNum()+1).setCellValue(p);
+			else row.createCell(row.getLastCellNum()).setCellValue(p);
+			sheet.autoSizeColumn(row.getLastCellNum()-1);
 		}
 		
 		String[] gparts = guardias.split(",");
@@ -355,14 +371,21 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 		String[] listTurnos = new String[gparts.length];
 		
 		if(!guardias.equals("") ) {
+//			try {
 			for (int i=0; i<gparts.length; i++) {
+				
 				row = sheet.createRow(i+1);
 				//Busqueda para obtener turno asociado a la guardia y su nombre
 				List<CargaMasivaDatosITItem> listGu = scsGuardiasTurnoExtendsMapper.searchNombreTurnoGuardia(idInstitucion.toString(), gparts[i]);
-				listTurnos[i] = listGu.get(0).getIdTurno();
+				listTurnos[i] = listGu.get(0).getNombreTurno();
 				row.createCell(0).setCellValue(listGu.get(0).getNombreTurno());
 				row.createCell(1).setCellValue(gparts[i]);
+				row.createCell(4);
 			}
+//			}
+//			catch (Exception e) {
+//				throw new BusinessException("Error al buscar asociacion de guardia" + e.toString());
+//			}
 			//Eliminamos de los turnos seleccionados los turnos que tienen guardia seleccionada
 			
 			List<String> union = new ArrayList<String>(Arrays.asList(tparts));
@@ -372,73 +395,135 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 			intersection.retainAll(Arrays.asList(listTurnos));
 			// Subtract the intersection from the union
 			union.removeAll(intersection);
-			tparts=(String[]) union.toArray();
+			tparts= union.toArray(new String[0]);
 		}
-		if(!tparts[0].equals("") ) {
-			for(String t: tparts) {
-				ScsTurnoKey key = new ScsTurnoKey();
-				key.setIdinstitucion(idInstitucion);
-				key.setIdturno(Integer.parseInt(t));
-				scsTurnoMapper.selectByPrimaryKey(key);
-				row = sheet.createRow(sheet.getLastRowNum()+1);
-				row.createCell(0).setCellValue(t);
+		if(tparts.length>0) {
+			if(!tparts[0].equals("")) {
+				for(String t: tparts) {
+	//				ScsTurnoKey key = new ScsTurnoKey();
+	//				key.setIdinstitucion(idInstitucion);
+	//				key.setIdturno(Integer.parseInt(t));
+	//				scsTurnoMapper.selectByPrimaryKey(key);
+					row = sheet.createRow(sheet.getLastRowNum()+1);
+					row.createCell(0).setCellValue(t);
+					row.createCell(4);
+				}
 			}
 		}
 		
 		//Creamos desplegable
-		CellRangeAddressList addressList = new CellRangeAddressList(
-		  1, 4, sheet.getLastRowNum(), 0);
-		DVConstraint dvConstraint = DVConstraint.createExplicitListConstraint(
-		  new String[]{"ALTA", "BAJA"});
-		DataValidation dataValidation = new HSSFDataValidation
-		  (addressList, dvConstraint);
-		dataValidation.setSuppressDropDownArrow(true);
-		sheet.addValidationData(dataValidation);
+		if(sheet.getLastRowNum()>0) {
+			CellRangeAddressList addressList = new CellRangeAddressList(
+		  1, sheet.getLastRowNum()+1, 4, 4);
+			DVConstraint dvConstraint = DVConstraint.createExplicitListConstraint(
+			  new String[]{"ALTA", "BAJA"});
+			DataValidation dataValidation = new HSSFDataValidation
+			  (addressList, dvConstraint);
+			dataValidation.setSuppressDropDownArrow(false);
+			sheet.addValidationData(dataValidation);
+		}
 		
-		InputStream is = null;
+		sheet.autoSizeColumn(0);
+		sheet.autoSizeColumn(1);
+		
+//		InputStream is = null;
+//		try {
+//	        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//	        wb.write(bos);
+//	        byte[] barray = bos.toByteArray();
+//	        is = new ByteArrayInputStream(barray);
+//	    } catch (IOException e) {
+//	        e.printStackTrace();
+//	    }
+		File returnFile = null;
 		try {
-	        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	        wb.write(bos);
-	        byte[] barray = bos.toByteArray();
-	        is = new ByteArrayInputStream(barray);
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-		return is;
+			File tmpFile = File.createTempFile("xls","");
+			returnFile = new File(tmpFile.getParent()+File.separator+"ModeloCargaIT"+".xls");
+			returnFile.createNewFile();
+			tmpFile.delete();
+			FileOutputStream archivo = new FileOutputStream(returnFile);
+			wb.write(archivo);
+			archivo.flush();
+			archivo.close();
+		} catch (Exception e) {
+			throw new BusinessException("Error al crear el fichero Excel" + e.toString());
+		}
+//		FileOutputStream fileOut = null;
+//		try {
+//			fileOut = new FileOutputStream("ModeloDatosIT.xls");
+//		    wb.write(fileOut);
+//		    fileOut.close();
+//		    wb.close();
+//		}
+//		 catch (IOException e) {
+//	        e.printStackTrace();
+//	    }
+		return returnFile;
 		
 	}
 	
-	public InputStream  newModelBT() throws FileNotFoundException, IOException, EncryptedDocumentException, InvalidFormatException {
-		Workbook wb = WorkbookFactory.create(new File("MyExcel.xlsx"));
+	public File  newModelBT() throws FileNotFoundException, IOException, EncryptedDocumentException, InvalidFormatException {
+		Workbook wb = new HSSFWorkbook();
 		Sheet sheet = wb.createSheet("Modelo Inscripciones Guardias");
 
 		// Create a row and put some cells in it. Rows are 0 based.
 		Row row = sheet.createRow(0);
 		//CABECERA
 		for(String p :SigaConstants.CAMPOSMODEL_BT) {
-		row.createCell(row.getLastCellNum()).setCellValue(p);
+			if(row.getLastCellNum()==-1)row.createCell(row.getLastCellNum()+1).setCellValue(p);
+			else row.createCell(row.getLastCellNum()).setCellValue(p);
+			sheet.autoSizeColumn(row.getLastCellNum()-1);
 		}
+		
+		
 		
 		//Creamos desplegable
 		CellRangeAddressList addressList = new CellRangeAddressList(
-		  1, 2, sheet.getLastRowNum(), 0);
+		  1, 1, 2, 2);
 		DVConstraint dvConstraint = DVConstraint.createExplicitListConstraint(
 		  new String[]{"V", "B", "M", "S"});
 		DataValidation dataValidation = new HSSFDataValidation
 		  (addressList, dvConstraint);
-		dataValidation.setSuppressDropDownArrow(true);
+		dataValidation.setSuppressDropDownArrow(false);
 		sheet.addValidationData(dataValidation);
 		
-		InputStream is = null;
+//		InputStream is = null;
+//		try {
+//	        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//	        wb.write(bos);
+//	        byte[] barray = bos.toByteArray();
+//	        is = new ByteArrayInputStream(barray);
+//	    } catch (IOException e) {
+//	        e.printStackTrace();
+//	    }
+//		return is;
+//		CreationHelper createHelper = wb.getCreationHelper();
+//		createHelper.crea
+//		FileOutputStream fileOut = null;
+//		try {
+//			fileOut = new FileOutputStream("ModeloDatosBT.xls");
+//		    wb.write(fileOut);
+//		    fileOut.close();
+//		    wb.close();
+//		}
+//		 catch (IOException e) {
+//	        e.printStackTrace();
+//	    }
+//		return fileOut;
+		File returnFile = null;
 		try {
-	        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	        wb.write(bos);
-	        byte[] barray = bos.toByteArray();
-	        is = new ByteArrayInputStream(barray);
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-		return is;
+			File tmpFile = File.createTempFile("xls","");
+			returnFile = new File(tmpFile.getParent()+File.separator+"ModeloCargaIT"+".xls");
+			returnFile.createNewFile();
+			tmpFile.delete();
+			FileOutputStream archivo = new FileOutputStream(returnFile);
+			wb.write(archivo);
+			archivo.flush();
+			archivo.close();
+		} catch (Exception e) {
+			throw new BusinessException("Error al crear el fichero Excel" + e.toString());
+		}
+		return returnFile;
 	}
 	
 	
@@ -646,7 +731,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					error.setMessage("No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.OK); 
 				}else {
-					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSMODEL_IT, datosLog);
+					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGIT, datosLog);
 
 					cenCargamasivacv.setTipocarga("IT");
 					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
@@ -1144,6 +1229,10 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 			String fechaEfectiva = df2.format(cargaMasivaDatosITItem.getFechaEfectiva());
 			e.put(SigaConstants.IT_FECHAEFECTIVA, fechaEfectiva);
 		}
+
+		if (cargaMasivaDatosITItem.getErrores() != null) {
+			e.put(SigaConstants.ERRORES, cargaMasivaDatosITItem.getErrores());
+		}
 		
 		LOGGER.info(dateLog + ":fin.GestionCargasMasivasOficioServiceImpl.convertItemtoHashIT");
 		return e;
@@ -1293,6 +1382,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					if (cargaMasivaDatosBTItem.getErrores() == null) {
 						
 						CenBajastemporales cenBajasTemporales = new CenBajastemporales();
+								
 						cenBajasTemporales.setIdpersona(Long.parseLong(cargaMasivaDatosBTItem.getIdPersona()));
 						cenBajasTemporales.setIdinstitucion(idInstitucion);
 						cenBajasTemporales.setFechadesde(cargaMasivaDatosBTItem.getFechaInicio());
@@ -1302,8 +1392,10 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 						cenBajasTemporales.setUsumodificacion(usuario.getIdusuario());
 						cenBajasTemporales.setFechaestado(new Date());
 						cenBajasTemporales.setFechabt(new Date());
+						cenBajasTemporales.setDescripcion(cargaMasivaDatosBTItem.getMotivo());
 						cenBajasTemporales.setFechaalta(cargaMasivaDatosBTItem.getFechaFinal());
 						cenBajasTemporales.setEliminado(0);
+						cenBajasTemporales.setValidado("1");
 						
 //						CenBajastemporalesMapper cenBajasTemporalesMapper;
 						
@@ -1336,7 +1428,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					error.setMessage("No existen registros en el fichero.");
 					deleteResponseDTO.setStatus(SigaConstants.OK); 
 				}else {
-					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSMODEL_IT, datosLog);
+					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGBT, datosLog);
 
 					cenCargamasivacv.setTipocarga("BT");
 					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
@@ -1402,6 +1494,9 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 		if (cargaMasivaDatosBTItem.getFechaFinal() != null) {
 			String fechaFinal = df2.format(cargaMasivaDatosBTItem.getFechaFinal());
 			e.put(SigaConstants.BT_FECHAF, fechaFinal);
+		}
+		if (cargaMasivaDatosBTItem.getErrores() != null) {
+			e.put(SigaConstants.ERRORES, cargaMasivaDatosBTItem.getErrores());
 		}
 		
 		LOGGER.info(dateLog + ":fin.GestionCargasMasivasOficioServiceImpl.convertItemtoHashBT");
@@ -1486,14 +1581,9 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 
 
 			// Comprobamos tipo 
-			if (hashtable.get(SigaConstants.BT_TIPO) != null
-					&& !hashtable.get(SigaConstants.BT_TIPO).toString().equals("")) {
-				
-				if(hashtable.get(SigaConstants.BT_TIPO).toString().equals("V") ||
-						hashtable.get(SigaConstants.BT_TIPO).toString().equals("B") ||
-						hashtable.get(SigaConstants.BT_TIPO).toString().equals("M") ||
-						hashtable.get(SigaConstants.BT_TIPO).toString().equals("S")) {
-					cargaMasivaDatosBTItem.setTipo((String) hashtable.get(SigaConstants.IT_TIPO));
+			if (hashtable.get(SigaConstants.BT_TIPO) != null && !hashtable.get(SigaConstants.BT_TIPO).toString().equals("")) {
+				if(hashtable.get(SigaConstants.BT_TIPO).toString().equals("V") ||	hashtable.get(SigaConstants.BT_TIPO).toString().equals("B") ||	hashtable.get(SigaConstants.BT_TIPO).toString().equals("M") ||	hashtable.get(SigaConstants.BT_TIPO).toString().equals("S")) {
+					cargaMasivaDatosBTItem.setTipo((String) hashtable.get(SigaConstants.BT_TIPO));
 				}
 				else{
 					errorLinea.append("El valor de tipo solo puede ser \"V\", \"B\", \"M\" o \"S\".");
@@ -1515,10 +1605,12 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					&& !hashtable.get(SigaConstants.BT_FECHAI).toString().equals("")) {
 				try {
 					cargaMasivaDatosBTItem.setFechaInicio(new SimpleDateFormat("dd-MM-yyyy").parse((String) hashtable.get(SigaConstants.BT_FECHAI)));				
-					} catch (Exception e) {
+				} catch (Exception e) {
 					errorLinea.append("La fecha de inicio introducida no tiene un formato valido.");
 					cargaMasivaDatosBTItem.setFechaInicio(null);
 				}
+				
+				
 			}
 			else {
 				errorLinea.append("Es obligatorio introducir la fecha de inicio. ");
@@ -1533,6 +1625,13 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 				} catch (Exception e) {
 					errorLinea.append("La fecha de finalizacion introducida no tiene un formato valido.");
 					cargaMasivaDatosBTItem.setFechaFinal(null);
+				}
+				//Comprobamos que la fincha de incio es anterior a la final
+				if(cargaMasivaDatosBTItem.getFechaFinal()!=null && cargaMasivaDatosBTItem.getFechaInicio()!=null) {
+					if(cargaMasivaDatosBTItem.getFechaInicio().after(cargaMasivaDatosBTItem.getFechaFinal())){
+						errorLinea.append("La fecha de finalizacion no puede ser anterior a la de inicio.");
+						cargaMasivaDatosBTItem.setFechaFinal(null);
+					}
 				}
 			}
 			else {

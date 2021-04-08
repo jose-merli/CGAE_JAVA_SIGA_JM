@@ -87,7 +87,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		return sql.toString();
 	}
 	
-<<<<<<< HEAD
+
 	public String checkNifColegiado(String nif, Short idInstitucion ) {
 
 		SQL sql = new SQL();
@@ -103,7 +103,6 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		return sql.toString();
 	}
 	
-=======
 	public String deleteBajasTemporales(BajasTemporalesItem bajasTemporalesItem) {
 		
 
@@ -160,5 +159,4 @@ public String saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem) {
 	return sql.toString();
 
 }
->>>>>>> b2d5471d245055c06ce3ed9c25bc6c25d0b4837c
 }

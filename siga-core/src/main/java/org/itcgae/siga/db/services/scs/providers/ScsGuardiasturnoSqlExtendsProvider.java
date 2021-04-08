@@ -8,24 +8,21 @@ import org.itcgae.siga.db.mappers.ScsGuardiasturnoSqlProvider;
 
 public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvider {
 
-	public String searchNombreTurnoGuardia(String idInstitucion, String idGuardia) {
+	public String searchNombreTurnoGuardia(String idInstitucion, String nombreGuardia) {
 		SQL sql = new SQL();
 
-		sql.SELECT_DISTINCT("SCS_TURNO.NOMBRE AS turno");
+		sql.SELECT_DISTINCT("SCS_TURNO.abreviatura AS abreviaturaTurno");
 
 		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDTURNO AS idturno");
 		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDGUARDIA AS idguardia");
-		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.NOMBRE AS nombre");
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.NOMBRE AS nombreGuardia");
 		sql.FROM("SCS_GUARDIASTURNO");
 
 		sql.JOIN(
 				"SCS_TURNO ON SCS_TURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO AND SCS_GUARDIASTURNO.IDINSTITUCION = SCS_TURNO.IDINSTITUCION");
 		sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("SCS_GUARDIASTURNO.FECHABAJA is null");
-		sql.WHERE("SCS_GUARDIASTURNO.IDGUARDIA ='"+idGuardia+"'");
-		
-		
-		sql.ORDER_BY("SCS_TURNO.NOMBRE, SCS_GUARDIASTURNO.NOMBRE");
+		sql.WHERE("SCS_GUARDIASTURNO.nombre ='"+nombreGuardia+"'");
 
 		return sql.toString();
 	}
@@ -103,12 +100,6 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		
 		sql.FROM("SCS_GUARDIASTURNO");
 		
-<<<<<<< HEAD
-		if(idTurno.contains(",")) {
-			sql.WHERE("IDTURNO IN ("+idTurno+")");
-		}
-		else sql.WHERE("IDTURNO = '"+idTurno+"'");
-=======
 		sql.WHERE("IDTURNO IN (" + idTurno + ")");
 		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
 		sql.ORDER_BY("nombre");
@@ -125,7 +116,6 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		sql.FROM("SCS_GUARDIASTURNO");
 		
 		sql.WHERE("IDTURNO IN (" + idTurno + ")");
->>>>>>> b2d5471d245055c06ce3ed9c25bc6c25d0b4837c
 		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
 		sql.WHERE("PORGRUPOS = 0");
 		sql.ORDER_BY("nombre");

@@ -879,6 +879,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static final List<String> CAMPOSMODEL_IT = Arrays.asList(IT_TURNO,IT_GUARDIA,IT_NCOLEGIADO,IT_FECHAEFECTIVA,
 			IT_TIPO,IT_GRUPO,IT_ORDEN);
+	public static final List<String> CAMPOSLOGIT = Arrays.asList(IT_TURNO,IT_GUARDIA,IT_NCOLEGIADO,IT_FECHAEFECTIVA,
+			IT_TIPO,IT_GRUPO,IT_ORDEN,ERRORES);
 	
 	//CARGA MASIVA BAJAS TEMPORALES
 		
@@ -893,6 +895,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static final List<String> CAMPOSMODEL_BT = Arrays.asList(BT_NCOLEGIADO,BT_NIF,BT_TIPO,BT_MOTIVO,
 			BT_FECHAI,BT_FECHAF);
+	public static final List<String> CAMPOSLOGBT = Arrays.asList(BT_NCOLEGIADO,BT_NIF,BT_TIPO,BT_MOTIVO,
+			BT_FECHAI,BT_FECHAF,ERRORES);
 	
 	//AGENDA
 	public static final long CALENDARIO_GENERAL = 1; 
