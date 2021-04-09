@@ -56,7 +56,7 @@ public class DesignacionesController {
 	@RequestMapping(value = "/comboModulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboModulos(HttpServletRequest request) {
 
-		ComboDTO response = designacionesService.modulo(request);
+		ComboDTO response = comboService.comboModulo(request);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
@@ -66,7 +66,7 @@ public class DesignacionesController {
 	@RequestMapping(value = "/comboProcedimientos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboProcedimientos(HttpServletRequest request) {
 
-		ComboDTO response = designacionesService.comboProcedimientos(request);
+		ComboDTO response = comboService.comboProcedimientos(request);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else

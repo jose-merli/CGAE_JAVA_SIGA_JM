@@ -183,67 +183,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		
 		return designas;
 	}	
-	
-	@Override
-	public ComboDTO modulo(HttpServletRequest request) {
-		LOGGER.info("modulo() -> Entrada al servicio para obtener combo modulos");
 
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			if (null != usuarios && usuarios.size() > 0) {
-
-				comboItems = scsDesignacionesExtendsMapper.comboModulos(idInstitucion);
-
-				comboDTO.setCombooItems(comboItems);
-
-			}
-		}
-
-		LOGGER.info("objetivo() -> Salida del servicio para obtener combo modulo");
-
-		return comboDTO;
-	}
-	
-	@Override
-	public ComboDTO comboProcedimientos(HttpServletRequest request) {
-		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
-
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			if (null != usuarios && usuarios.size() > 0) {
-
-				comboItems = scsDesignacionesExtendsMapper.comboProcedimientos(idInstitucion);
-
-				comboDTO.setCombooItems(comboItems);
-
-			}
-		}
-
-		LOGGER.info("objetivo() -> Salida del servicio para obtener comboProcedimientos");
-
-		return comboDTO;
-	}
 
 }
