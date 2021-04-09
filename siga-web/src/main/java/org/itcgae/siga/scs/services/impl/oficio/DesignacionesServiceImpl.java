@@ -113,12 +113,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 														
 							for(String str : parts) {
 								if(str.indexOf("##")!=-1) {
-									expedientes.add("E"+str.substring(0, str.indexOf("##")).trim());
+									expedientes.add(str.substring(0, str.indexOf("##")).trim());
 								}
 							}
 						}
-						
-						result.get(i).setCodigoDesignacion(result.get(0).getCodigoDesignacion().trim());
 						
 						if(expedientes.size()>0) {
 							result.get(i).setExpedientes(expedientes);
