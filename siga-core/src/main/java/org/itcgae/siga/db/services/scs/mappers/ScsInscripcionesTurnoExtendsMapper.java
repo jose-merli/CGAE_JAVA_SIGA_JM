@@ -54,6 +54,8 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	        @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR) })
 	    List<InscripcionesItem> busquedaInscripciones(InscripcionesItem inscripcionesItem,Short idInstitucion,String fechadesde,String fechahasta,String afechade,Integer tamMaximo);
 	 
+	 
+	 
 	 @SelectProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="busquedaTarjetaInscripciones")
 	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
 		 @Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),
@@ -198,4 +200,12 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	        @Result(column="OBSERVACIONESDENEGACION", property="observacionesdenegacion", jdbcType=JdbcType.VARCHAR),
 	        @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR) })
 	    List<InscripcionesItem> busquedaTrabajosPendientes(InscripcionesItem inscripcionesItem,Short idInstitucion, String fechaActual);
+	 
+	 @SelectProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="busquedaInscripcionesCMO")
+	 @Results({ 
+	        @Result(column="IDTURNO", property="idturno", jdbcType=JdbcType.DECIMAL, id=true),
+	        @Result(column="NCOLEGIADO", property="ncolegiado", jdbcType=JdbcType.DECIMAL, id=true),
+	        @Result(column="FECHAVALIDACION", property="fechavalidacion", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP) })
+	    List<InscripcionesItem> busquedaInscripcionesCMO(String turnos, Short idInstitucion);
 }

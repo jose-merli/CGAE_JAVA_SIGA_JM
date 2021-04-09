@@ -8,6 +8,25 @@ import org.itcgae.siga.db.mappers.ScsGuardiasturnoSqlProvider;
 
 public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvider {
 
+	public String searchNombreTurnoGuardia(String idInstitucion, String nombreGuardia) {
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("SCS_TURNO.abreviatura AS abreviaturaTurno");
+
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDTURNO AS idturno");
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDGUARDIA AS idguardia");
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.NOMBRE AS nombreGuardia");
+		sql.FROM("SCS_GUARDIASTURNO");
+
+		sql.JOIN(
+				"SCS_TURNO ON SCS_TURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO AND SCS_GUARDIASTURNO.IDINSTITUCION = SCS_TURNO.IDINSTITUCION");
+		sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("SCS_GUARDIASTURNO.FECHABAJA is null");
+		sql.WHERE("SCS_GUARDIASTURNO.nombre ='"+nombreGuardia+"'");
+
+		return sql.toString();
+	}
+	
 	public String searchGuardias(TurnosItem turnosItem, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 
@@ -60,7 +79,10 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 				"GEN_RECURSOS_CATALOGOS ON GEN_RECURSOS_CATALOGOS.IDRECURSO = SCS_TIPOSGUARDIAS.DESCRIPCION AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE = '"
 						+ idLenguaje + "'");
 		sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE("SCS_TURNO.IDTURNO= '"+turnosItem.getIdturno()+"'");
+		if(turnosItem.getIdturno().contains(",")) {
+			sql.WHERE("SCS_GUARDIASTURNO.IDTURNO IN ("+turnosItem.getIdturno()+")");
+		}
+		else sql.WHERE("SCS_GUARDIASTURNO.IDTURNO = '"+turnosItem.getIdturno()+"'");
 		if(!turnosItem.isHistorico()) {
 			sql.WHERE("SCS_GUARDIASTURNO.FECHABAJA is null");
 		}
@@ -109,7 +131,8 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		
 		sql.FROM("SCS_GUARDIASTURNO");
 		
-		sql.WHERE("IDTURNO = '"+idTurno+"'");
+		if(!idTurno.contains(","))sql.WHERE("IDTURNO = '"+idTurno+"'");
+		else sql.WHERE("IDTURNO IN ("+idTurno+")");
 		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
 		sql.WHERE("fechabaja is null");
 		sql.ORDER_BY("nombre");
@@ -126,6 +149,28 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		return sql.toString();
 	}
 
-	
+	public String busquedaGuardiasCMO(String turnos, String guardias, Short idInstitucion) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("SCS_TURNO.NOMBRE AS NOMBRE_TURNO");
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.NOMBRE AS NOMBRE_GUARDIA");
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.PORGRUPOS");
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDORDENACIONCOLAS");
+//		sql.SELECT_DISTINCT("CEN_COLEGIADO.NCOLEGIADO");
+//		sql.SELECT_DISTINCT("SCS_INSCRIPCIONGUARDIA.FECHABAJA");
+//		sql.SELECT_DISTINCT("SCS_INSCRIPCIONGUARDIA.FECHAVALIDACION");
+		sql.FROM("SCS_GUARDIASTURNO ");
+		sql.JOIN("SCS_TURNO ON SCS_TURNO.IDTURNO=SCS_GUARDIASTURNO.IDTURNO AND SCS_TURNO.IDINSTITUCION=SCS_GUARDIASTURNO.IDINSTITUCION");
+//				+ "JOIN SCS_INSCRIPCIONGUARDIA ON SCS_INSCRIPCIONGUARDIA.IDGUARDIA=SCS_GUARDIASTURNO.IDGUARDIA AND SCS_INSCRIPCIONGUARDIA.IDINSTITUCION=SCS_GUARDIASTURNO.IDINSTITUCION "
+//				+ "JOIN CEN_COLEGIADO ON CEN_COLEGIADO.IDPERSONA=SCS_INSCRIPCIONGUARDIA.IDPERSONA");
+		if(turnos.contains(",")) sql.WHERE("SCS_GUARDIASTURNO.IDTURNO IN ("+turnos+")");
+		else sql.WHERE("SCS_GUARDIASTURNO.IDTURNO = '"+turnos+"'");
+		if(guardias.contains(",")) sql.WHERE("SCS_GUARDIASTURNO.IDGUARDIA IN ("+guardias+")");
+		else sql.WHERE("SCS_GUARDIASTURNO.IDGUARDIA = '"+guardias+"'");
+		sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = '"+idInstitucion.toString()+"'");
+		
+		return sql.toString();
+	}
 
 }

@@ -1,6 +1,0 @@
-package org.itcgae.siga.scs.services.oficio;
-
-public interface IGestionCargasMasivasOficioService {
-	
-	public ComboDTO comboGuardias(HttpServletRequest request, Strin[] idTurnos);
-}

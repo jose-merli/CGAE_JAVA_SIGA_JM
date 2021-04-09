@@ -71,7 +71,14 @@ public class DesignaItem {
 	private String descripcionTipoDesigna;
 	private String expedientes;
 	private String cliente;
+	private String nombreProcedimiento;
 	
+	public String getNombreProcedimiento() {
+		return nombreProcedimiento;
+	}
+	public void setNombreProcedimiento(String nombreProcedimiento) {
+		this.nombreProcedimiento = nombreProcedimiento;
+	}
 	public int getAno() {
 		return ano;
 	}
