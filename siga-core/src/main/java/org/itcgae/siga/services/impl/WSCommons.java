@@ -728,7 +728,9 @@ public class WSCommons {
 						argDireccion.setPaginaWeb(regSociedad.getPaginaWeb());
 						argDireccion.setContactoArray(contactosArray);
 						argDireccion.setPublicar(Boolean.FALSE);
-						sociedadActualizacion.setDireccion(argDireccion);
+						if(validarDireccion(argDireccion)) {
+							sociedadActualizacion.setDireccion(argDireccion);
+						}
 						
 						//INSERTAMOS LOS DATOS DE LOS INTEGRANTES
 						DatosIntegrantesSearchDTO datosIntegrantesSearchDTO = new DatosIntegrantesSearchDTO();
@@ -1784,5 +1786,15 @@ public class WSCommons {
 			} catch (NamingException e) {
 				throw e;
 			}
+		}
+		
+		private boolean validarDireccion(Direccion argDireccion) {
+			boolean valido = true;
+			if(argDireccion.getDomicilio() == null && argDireccion.getCodigoPostal() == null && argDireccion.getProvincia().getCodigoProvincia() == null 
+					&& argDireccion.getProvincia().getDescripcionProvincia() == null && argDireccion.getPoblacion().getCodigoPoblacion() == null 
+					&& argDireccion.getPoblacion().getDescripcionPoblacion() == null) {
+				valido = false;
+			}
+			return valido;
 		}
 }
