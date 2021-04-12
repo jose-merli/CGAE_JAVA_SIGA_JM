@@ -116,7 +116,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	
 	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMax) throws Exception {
 		String sql = "";
-
+		
 		Hashtable codigosBind = new Hashtable();
 		int contador=0;
 		// Acceso a BBDD
@@ -1038,5 +1038,85 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 			return resultV;
 		}
+	    
+	    public String busquedaListaContrarios(DesignaItem designaItem, Short idInstitucion) {
+	    	
+	    	SQL sql1 = new SQL();
+	    	
+	    	//Extraemos el identificador y apellidos y nombre de la persona asociada al contrario
+	    	sql1.SELECT("SCS_CONTRARIODESIGNA.NUMERO");
+	    	sql1.SELECT("SCS_CONTRARIODESIGNA.IDINSTITUCION");
+	    	sql1.SELECT("SCS_CONTRARIODESIGNA.IDTURNO");
+	    	sql1.SELECT("SCS_CONTRARIODESIGNA.ANIO");
+	    	sql1.SELECT("SCS_CONTRARIODESIGNA.IDPERSONA");
+	    	sql1.SELECT("CEN_PERSONA.NIFCIF");
+	    	sql1.SELECT("CONCAT( CEN_PERSONA.APELLIDOS1, ' ', CEN_PERSONA.APELLIDOS2, ', ', CEN_PERSONA.NOMBRE ) as APELLIDOSNOMBRE");
+	    	sql1.FROM("SCS_CONTRARIODESIGNA ON SCS_CONTRARIODESIGNA.NUMERO=SCS_DESIGNA.NUMERO");
+	    	sql1.JOIN("CEN_PERSONA ON CEN.PERSONA.IDPERSONA=SCS_CONTRARIODESIGNA.IDPERSONA");
+	    	sql1.WHERE("SCS_CONTRARIODESIGNA.NUMERO = '"+designaItem.getNumero()+"'");
+	    	sql1.WHERE("SCS_CONTRARIODESIGNA.IDINSTITUCION = '"+idInstitucion+"");
+
+	    	
+	    	SQL sql2 = new SQL();
+	    	
+	    	//Extraemos el nº colegiado y los apellidos y el nombre del abogado asociado al contrario
+	    	sql2.SELECT("SCS_CONTRARIODESIGNA.NUMERO");
+	    	sql2.SELECT("SCS_CONTRARIODESIGNA.IDINSTITUCION");
+	    	sql2.SELECT("SCS_CONTRARIODESIGNA.IDTURNO");
+	    	sql2.SELECT("SCS_CONTRARIODESIGNA.ANIO");
+	    	sql2.SELECT("SCS_CONTRARIODESIGNA.IDPERSONA");
+	    	sql2.SELECT("CONCAT(CEN_COLEGIADO.NCOLEGIADO, ' : ', CEN_PERSONA.APELLIDOS1, ' ', CEN_PERSONA.APELLIDOS2, ', ', CEN_PERSONA.NOMBRE ) as ABOGADO");
+	    	sql2.FROM("SCS_CONTRARIODESIGNA");
+	    	sql2.JOIN("CEN_PERSONA ON CEN.PERSONA.IDPERSONA=SCS_CONTRARIODESIGNA.IDABOGADOCONTRARIO");
+	    	sql2.JOIN("CEN_COLEGIADO ON CEN.COLEGIADO.IDPERSONA=SCS_CONTRARIODESIGNA.IDABOGADOCONTRARIO");
+	    	sql2.WHERE("SCS_CONTRARIODESIGNA.NUMERO = '"+designaItem.getNumero()+"");
+	    	sql2.WHERE("SCS_CONTRARIODESIGNA.IDINSTITUCION = '"+idInstitucion+"");
+
+	    	
+	    	SQL sql3 = new SQL();
+	    	
+	    	//Extraemos el nº colegiado y los apellidos y el nombre del procurador asociado al contrario
+	    	sql3.SELECT("SCS_CONTRARIODESIGNA.NUMERO");
+	    	sql3.SELECT("SCS_CONTRARIODESIGNA.IDINSTITUCION");
+	    	sql3.SELECT("SCS_CONTRARIODESIGNA.IDTURNO");
+	    	sql3.SELECT("SCS_CONTRARIODESIGNA.ANIO");
+	    	sql3.SELECT("SCS_CONTRARIODESIGNA.IDPERSONA");
+	    	sql3.SELECT("CONCAT(CEN_COLEGIADO.NCOLEGIADO, ' : ', CEN_PERSONA.APELLIDOS1, ' ', CEN_PERSONA.APELLIDOS2, ', ', CEN_PERSONA.NOMBRE ) as PROCURADOR");
+	    	sql3.FROM("SCS_CONTRARIODESIGNA");
+	    	sql3.JOIN("CEN_PERSONA ON CEN.PERSONA.IDPERSONA=SCS_CONTRARIODESIGNA.IDPROCURADOR");
+	    	sql3.JOIN("CEN_COLEGIADO ON CEN.COLEGIADO.IDPERSONA=SCS_CONTRARIODESIGNA.IDPROCURADOR");
+	    	sql3.WHERE("SCS_CONTRARIODESIGNA.NUMERO = '"+designaItem.getNumero()+"");
+	    	sql3.WHERE("SCS_CONTRARIODESIGNA.IDINSTITUCION = '"+idInstitucion+"");
+	    	
+//	    	SELECT t1.ks, t1.[# Tasks], COALESCE(t2.[# Late], 0) AS [# Late]
+//			FROM 
+//			    (SELECT ks, COUNT(*) AS 'Procurador' FROM Table GROUP BY ks) t1
+//			LEFT JOIN
+//			    (SELECT ks, COUNT(*) AS '# Late' FROM Table WHERE Age > Palt GROUP BY ks) t2
+//			ON (t1.SCS_CONTRARIODESIGNA.NUMERO = t2.SCS_CONTRARIODESIGNA.NUMERO &&
+
+	    	
+	    	SQL sql4 = new SQL();
+	    	
+	    	sql4.SELECT("t1.SCS_CONTRARIODESIGNA.NUMERO, t1.SCS_CONTRARIODESIGNA.IDINSTITUCION"
+	    			+ "t1.SCS_CONTRARIODESIGNA.IDTURNO, t1.SCS_CONTRARIODESIGNA.NUMEROt1.ANIO,"
+	    			+ "t1.SCS_CONTRARIODESIGNA.IDPERSONA, COALESCE(t2.Abogado, 0) AS Abogado,"
+	    			+ "COALESCE(t3.Procurador, 0) AS Procurador ");
+	    	sql4.FROM("("+sql1.toString()+") t1");
+	    	sql4.LEFT_OUTER_JOIN("("+sql2.toString()+") t2");
+	    	sql4.LEFT_OUTER_JOIN("("+sql3.toString()+") t3");
+	    	
+	    	sql4.FROM("ON t1.SCS_CONTRARIODESIGNA.IDINSTITUCION = t2.SCS_CONTRARIODESIGNA.IDINSTITUCION &&"
+	    			+ "t1.SCS_CONTRARIODESIGNA.IDTURNO = t2.SCS_CONTRARIODESIGNA.IDTURNO &&"
+	    			+ "t1.SCS_CONTRARIODESIGNA.ANIO = t2.SCS_CONTRARIODESIGNA.ANIO &&"
+	    			+ "t1.SCS_CONTRARIODESIGNA.IDPERSONA = t1.SCS_CONTRARIODESIGNA.IDPERSONA"+
+	    			"t1.SCS_CONTRARIODESIGNA.IDINSTITUCION = t3.SCS_CONTRARIODESIGNA.IDINSTITUCION &&"
+	    	    			+ "t1.SCS_CONTRARIODESIGNA.IDTURNO = t3.SCS_CONTRARIODESIGNA.IDTURNO &&"
+	    	    			+ "t1.SCS_CONTRARIODESIGNA.ANIO = t3.SCS_CONTRARIODESIGNA.ANIO &&"
+	    	    			+ "t1.SCS_CONTRARIODESIGNA.IDPERSONA = t3.SCS_CONTRARIODESIGNA.IDPERSONA");
+	    	
+	    	
+	    	return sql4.toString();
+	    }
 	    
 }
