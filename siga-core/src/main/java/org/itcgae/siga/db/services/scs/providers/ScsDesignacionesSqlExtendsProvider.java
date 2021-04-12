@@ -149,7 +149,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			boolean tiene_origen=designaItem.getIdOrigen() != null && !designaItem.getIdOrigen().equalsIgnoreCase("");
 			boolean tiene_actuacionesV = designaItem.getIdActuacionesV() != null && !designaItem.getIdActuacionesV().equalsIgnoreCase("");
 			boolean tiene_moduloDesignacion =  (designaItem.getIdModulo() != null && designaItem.getIdModulo().length > 0);
-			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimiento() != null && designaItem.getIdProcedimiento().length > 0);
+			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimiento() != null && designaItem.getIdProcedimientos().length > 0);
 			
 			if (tiene_juzg||tiene_asunto||tiene_acreditacion||tiene_modulo||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta || tiene_origen || tiene_actuacionesV){
 				sql+=	", scs_actuaciondesigna act ";
@@ -195,14 +195,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql += " and colegiado.ncolegiado = " + String.valueOf(designaItem.getNumColegiado()) + " ";
 			}
 
-			if ( designaItem.getIdTurno() != null && (String.valueOf(designaItem.getIdTurno()) != "-1")&&!String.valueOf(designaItem.getIdTurno()).equals("")){
-				if(designaItem.getIdTurno().length == 1) {
-					sql += " AND des.idTurno = " + designaItem.getIdTurno()[0];
+			if ( designaItem.getIdTurnos() != null && (String.valueOf(designaItem.getIdTurnos()) != "-1")&&!String.valueOf(designaItem.getIdTurnos()).equals("")){
+				if(designaItem.getIdTurnos().length == 1) {
+					sql += " AND des.idTurno = " + designaItem.getIdTurnos()[0];
 				}else {
 					String turnoIN = "";
-					for(int i = 0; i<designaItem.getIdTurno().length; i++) {
-						String turno = designaItem.getIdTurno()[i];
-						if(i == designaItem.getIdTurno().length-1) {
+					for(int i = 0; i<designaItem.getIdTurnos().length; i++) {
+						String turno = designaItem.getIdTurnos()[i];
+						if(i == designaItem.getIdTurnos().length-1) {
 							turnoIN = turnoIN + turno;
 						}else {
 							turnoIN = turnoIN + turno +" ,";
@@ -247,14 +247,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					sql += " AND des.codigo = " + String.valueOf(designaItem.getCodigo()).trim() ; 
 				}
 			}
-			if (designaItem.getIdJuzgado() != null && designaItem.getIdJuzgado().length > 0) {
-				if(designaItem.getIdJuzgado().length == 1) {
-					sql += " AND des.idjuzgado = " + designaItem.getIdJuzgado()[0];
+			if (designaItem.getIdJuzgados() != null && designaItem.getIdJuzgados().length > 0) {
+				if(designaItem.getIdJuzgados().length == 1) {
+					sql += " AND des.idjuzgado = " + designaItem.getIdJuzgados()[0];
 				}else {
 					String juzgadoIN = "";
-					for(int i = 0; i<designaItem.getIdJuzgado().length; i++) {
-						String juzgado = designaItem.getIdJuzgado()[i];
-						if(i == designaItem.getIdJuzgado().length-1) {
+					for(int i = 0; i<designaItem.getIdJuzgados().length; i++) {
+						String juzgado = designaItem.getIdJuzgados()[i];
+						if(i == designaItem.getIdJuzgados().length-1) {
 							juzgadoIN = juzgadoIN + juzgado;
 						}else {
 							juzgadoIN = juzgadoIN + juzgado +" ,";
@@ -333,14 +333,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql += " AND des.nig = '" + designaItem.getNig()+"'";
 			}	
 			if(tienePretensionesDesignacion) {
-				if (designaItem.getIdProcedimiento() != null && designaItem.getIdProcedimiento().length > 0) {
-					if(designaItem.getIdProcedimiento().length == 1) {
-						sql += " AND pret.IDPRETENSION = '" + designaItem.getIdProcedimiento()[0]+"'";
+				if (designaItem.getIdProcedimientos() != null && designaItem.getIdProcedimientos().length > 0) {
+					if(designaItem.getIdProcedimientos().length == 1) {
+						sql += " AND pret.IDPRETENSION = '" + designaItem.getIdProcedimientos()[0]+"'";
 					}else {
 						String estadoIN = "";
-						for(int i = 0; i<designaItem.getIdProcedimiento().length; i++) {
-							String estado = designaItem.getIdProcedimiento()[i];
-							if(i == designaItem.getIdProcedimiento().length-1) {
+						for(int i = 0; i<designaItem.getIdProcedimientos().length; i++) {
+							String estado = designaItem.getIdProcedimientos()[i];
+							if(i == designaItem.getIdProcedimientos().length-1) {
 								estadoIN = estadoIN + "'"+estado+"'";
 							}else {
 								estadoIN = estadoIN + "'"+estado+"'" +" ,";
@@ -517,7 +517,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						String turnoIN = "";
 						for(int i = 0; i<designaItem.getIdAcreditacion().length; i++) {
 							String turno = designaItem.getIdAcreditacion()[i];
-							if(i == designaItem.getIdTurno().length-1) {
+							if(i == designaItem.getIdTurnos().length-1) {
 								turnoIN = turnoIN + turno;
 							}else {
 								turnoIN = turnoIN + turno +" ,";

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
@@ -17,4 +18,7 @@ public interface IDesignacionesService{
 
 	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request);
 
+	public UpdateResponseDTO updateDetalleDesigna(DesignaItem designaItem, HttpServletRequest request);
+
+	public UpdateResponseDTO updateDatosAdicionales(DesignaItem designaItem, HttpServletRequest request);
 }

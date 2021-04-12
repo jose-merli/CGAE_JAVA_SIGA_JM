@@ -11,6 +11,7 @@ public class DesignaItem {
 	private String defensaJuridica;
 	private String delitos;
 	private String[] estados;
+	private String estado;
 	private int factConvenio;
 	private Date fechaAlta;
 	private Date fechaAnulacion;
@@ -25,15 +26,18 @@ public class DesignaItem {
 	private int idInstitucion;
 	private int idInstitucion_juzg;
 	private int idInstitucion_procur;
-	private String[] idJuzgado;
+	private String[] idJuzgados;
+	private int idJuzgado;
 	private String nombreJuzgado;
 	private String[] idJuzgadoActu;
 	private String nombreJuzgadoActu;
 	private int idPretension;
-	private String[] idProcedimiento;
+	private String[] idProcedimientos;
+	private String idProcedimiento;
 	private int idProcurador;
 	private String[] idTipoDesignaColegio;
-	private String[] idTurno;
+	private String[] idTurnos;
+	private int idTurno;
 	private String nig;
 	private int numero;
 	private String numProcedimiento;
@@ -349,16 +353,17 @@ public class DesignaItem {
 	public void setIdInstitucion_procur(int idInstitucion_procur) {
 		this.idInstitucion_procur = idInstitucion_procur;
 	}
-	/**
-	 * @return the idJuzgado
-	 */
-	public String[] getIdJuzgado() {
+
+	public String[] getIdJuzgados() {
+		return idJuzgados;
+	}
+	public void setIdJuzgados(String[] idJuzgados) {
+		this.idJuzgados = idJuzgados;
+	}
+	public int getIdJuzgado() {
 		return idJuzgado;
 	}
-	/**
-	 * @param idJuzgado the idJuzgado to set
-	 */
-	public void setIdJuzgado(String[] idJuzgado) {
+	public void setIdJuzgado(int idJuzgado) {
 		this.idJuzgado = idJuzgado;
 	}
 	/**
@@ -409,23 +414,24 @@ public class DesignaItem {
 	public void setIdPretension(int idPretension) {
 		this.idPretension = idPretension;
 	}
-	/**
-	 * @return the idProcedimiento
-	 */
-	public String[] getIdProcedimiento() {
-		return idProcedimiento;
-	}
-	/**
-	 * @param idProcedimiento the idProcedimiento to set
-	 */
-	public void setIdProcedimiento(String[] idProcedimiento) {
-		this.idProcedimiento = idProcedimiento;
-	}
+
 	/**
 	 * @return the idProcurador
 	 */
 	public int getIdProcurador() {
 		return idProcurador;
+	}
+	public String[] getIdProcedimientos() {
+		return idProcedimientos;
+	}
+	public void setIdProcedimientos(String[] idProcedimientos) {
+		this.idProcedimientos = idProcedimientos;
+	}
+	public String getIdProcedimiento() {
+		return idProcedimiento;
+	}
+	public void setIdProcedimiento(String idProcedimiento) {
+		this.idProcedimiento = idProcedimiento;
 	}
 	/**
 	 * @param idProcurador the idProcurador to set
@@ -445,16 +451,17 @@ public class DesignaItem {
 	public void setIdTipoDesignaColegio(String[] idTipoDesignaColegio) {
 		this.idTipoDesignaColegio = idTipoDesignaColegio;
 	}
-	/**
-	 * @return the idTurno
-	 */
-	public String[] getIdTurno() {
+	
+	public String[] getIdTurnos() {
+		return idTurnos;
+	}
+	public void setIdTurnos(String[] idTurnos) {
+		this.idTurnos = idTurnos;
+	}
+	public int getIdTurno() {
 		return idTurno;
 	}
-	/**
-	 * @param idTurno the idTurno to set
-	 */
-	public void setIdTurno(String[] idTurno) {
+	public void setIdTurno(int idTurno) {
 		this.idTurno = idTurno;
 	}
 	/**
@@ -857,35 +864,47 @@ public class DesignaItem {
 	public void setDescripcionTipoDesigna(String descripcionTipoDesigna) {
 		this.descripcionTipoDesigna = descripcionTipoDesigna;
 	}
+	
+	public String getEstado() {
+		return estado;
+	}
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
 	@Override
 	public String toString() {
 		return "DesignaItem [ano=" + ano + ", anoProcedimiento=" + anoProcedimiento + ", art27=" + art27 + ", codigo="
 				+ codigo + ", defensaJuridica=" + defensaJuridica + ", delitos=" + delitos + ", estados="
-				+ Arrays.toString(estados) + ", factConvenio=" + factConvenio + ", fechaAlta=" + fechaAlta
-				+ ", fechaAnulacion=" + fechaAnulacion + ", fechaEntradaInicio=" + fechaEntradaInicio
+				+ Arrays.toString(estados) + ", estado=" + estado + ", factConvenio=" + factConvenio + ", fechaAlta="
+				+ fechaAlta + ", fechaAnulacion=" + fechaAnulacion + ", fechaEntradaInicio=" + fechaEntradaInicio
 				+ ", fechaEntradaFin=" + fechaEntradaFin + ", fechaEstado=" + fechaEstado + ", fechaFin=" + fechaFin
 				+ ", fechaJuicio=" + fechaJuicio + ", fechaModificacion=" + fechaModificacion + ", fechaOficioJuzgado="
 				+ fechaOficioJuzgado + ", fechaRecepcionColegio=" + fechaRecepcionColegio + ", idInstitucion="
 				+ idInstitucion + ", idInstitucion_juzg=" + idInstitucion_juzg + ", idInstitucion_procur="
-				+ idInstitucion_procur + ", idJuzgado=" + Arrays.toString(idJuzgado) + ", nombreJuzgado="
-				+ nombreJuzgado + ", idJuzgadoActu=" + Arrays.toString(idJuzgadoActu) + ", nombreJuzgadoActu="
-				+ nombreJuzgadoActu + ", idPretension=" + idPretension + ", idProcedimiento="
-				+ Arrays.toString(idProcedimiento) + ", idProcurador=" + idProcurador + ", idTipoDesignaColegio="
-				+ Arrays.toString(idTipoDesignaColegio) + ", idTurno=" + Arrays.toString(idTurno) + ", nig=" + nig
-				+ ", numero=" + numero + ", numProcedimiento=" + numProcedimiento + ", observaciones=" + observaciones
-				+ ", procurador=" + procurador + ", resumenAsunto=" + resumenAsunto + ", sufijo=" + sufijo
-				+ ", usuModificacion=" + usuModificacion + ", nombreTurno=" + nombreTurno + ", numColegiado="
-				+ numColegiado + ", apellidosNombre=" + apellidosNombre + ", interesados="
-				+ Arrays.toString(interesados) + ", validadas=" + Arrays.toString(validadas) + ", calidad="
-				+ Arrays.toString(calidad) + ", asunto=" + asunto + ", acreditacion=" + acreditacion
-				+ ", idAcreditacion=" + Arrays.toString(idAcreditacion) + ", modulo=" + modulo + ", idModulo="
-				+ Arrays.toString(idModulo) + ", fechaJustificacionDesde=" + fechaJustificacionDesde
-				+ ", fechaJustificacionHasta=" + fechaJustificacionHasta + ", origen=" + origen + ", idOrigen="
-				+ idOrigen + ", nif=" + nif + ", nombreInteresado=" + nombreInteresado
-				+ ", apellidosInteresado=" + apellidosInteresado + ", idActuacionesV=" + idActuacionesV
-				+ ", idArt27=" + idArt27 + ", idCalidad=" + Arrays.toString(idCalidad) + ", idProcedimientoActuaciones="
+				+ idInstitucion_procur + ", idJuzgados=" + Arrays.toString(idJuzgados) + ", idJuzgado=" + idJuzgado
+				+ ", nombreJuzgado=" + nombreJuzgado + ", idJuzgadoActu=" + Arrays.toString(idJuzgadoActu)
+				+ ", nombreJuzgadoActu=" + nombreJuzgadoActu + ", idPretension=" + idPretension + ", idProcedimientos="
+				+ Arrays.toString(idProcedimientos) + ", idProcedimiento=" + idProcedimiento + ", idProcurador="
+				+ idProcurador + ", idTipoDesignaColegio=" + Arrays.toString(idTipoDesignaColegio) + ", idTurnos="
+				+ Arrays.toString(idTurnos) + ", idTurno=" + idTurno + ", nig=" + nig + ", numero=" + numero
+				+ ", numProcedimiento=" + numProcedimiento + ", observaciones=" + observaciones + ", procurador="
+				+ procurador + ", resumenAsunto=" + resumenAsunto + ", sufijo=" + sufijo + ", usuModificacion="
+				+ usuModificacion + ", nombreTurno=" + nombreTurno + ", numColegiado=" + numColegiado
+				+ ", apellidosNombre=" + apellidosNombre + ", interesados=" + Arrays.toString(interesados)
+				+ ", validadas=" + Arrays.toString(validadas) + ", calidad=" + Arrays.toString(calidad) + ", asunto="
+				+ asunto + ", acreditacion=" + acreditacion + ", idAcreditacion=" + Arrays.toString(idAcreditacion)
+				+ ", modulo=" + modulo + ", idModulo=" + Arrays.toString(idModulo) + ", fechaJustificacionDesde="
+				+ fechaJustificacionDesde + ", fechaJustificacionHasta=" + fechaJustificacionHasta + ", origen="
+				+ origen + ", idOrigen=" + idOrigen + ", nif=" + nif + ", nombreInteresado=" + nombreInteresado
+				+ ", apellidosInteresado=" + apellidosInteresado + ", idActuacionesV=" + idActuacionesV + ", idArt27="
+				+ idArt27 + ", idCalidad=" + Arrays.toString(idCalidad) + ", idProcedimientoActuaciones="
 				+ Arrays.toString(idProcedimientoActuaciones) + ", idRol=" + idRol + ", rol=" + Arrays.toString(rol)
 				+ ", documentacionActuacion=" + documentacionActuacion + ", idModuloActuaciones="
-				+ Arrays.toString(idModuloActuaciones) + ", expedientes=" + expedientes + ", cliente=" + cliente + "]";
+				+ Arrays.toString(idModuloActuaciones) + ", descripcionTipoDesigna=" + descripcionTipoDesigna
+				+ ", expedientes=" + expedientes + ", cliente=" + cliente + ", nombreProcedimiento="
+				+ nombreProcedimiento + ", nombreColegiado=" + nombreColegiado + ", apellido1Colegiado="
+				+ apellido1Colegiado + ", apellido2Colegiado=" + apellido2Colegiado + "]";
 	}
+
+	
 }
