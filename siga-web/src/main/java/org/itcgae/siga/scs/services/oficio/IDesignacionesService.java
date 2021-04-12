@@ -13,8 +13,5 @@ public interface IDesignacionesService{
 	public List<JustificacionExpressItem> busquedaJustificacionExpres(JustificacionExpressItem item, HttpServletRequest request);
 	
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
-	
-	public ComboDTO modulo(HttpServletRequest request);
 
-	public ComboDTO comboProcedimientos(HttpServletRequest request);
 }

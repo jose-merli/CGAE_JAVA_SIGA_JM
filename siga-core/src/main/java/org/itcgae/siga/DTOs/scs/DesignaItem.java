@@ -72,7 +72,28 @@ public class DesignaItem {
 	private String expedientes;
 	private String cliente;
 	private String nombreProcedimiento;
+	private String nombreColegiado;
+	private String apellido1Colegiado;
+	private String apellido2Colegiado;
 	
+	public String getApellido1Colegiado() {
+		return apellido1Colegiado;
+	}
+	public void setApellido1Colegiado(String apellido1Colegiado) {
+		this.apellido1Colegiado = apellido1Colegiado;
+	}
+	public String getApellido2Colegiado() {
+		return apellido2Colegiado;
+	}
+	public void setApellido2Colegiado(String apellido2Colegiado) {
+		this.apellido2Colegiado = apellido2Colegiado;
+	}
+	public String getNombreColegiado() {
+		return nombreColegiado;
+	}
+	public void setNombreColegiado(String nombreColegiado) {
+		this.nombreColegiado = nombreColegiado;
+	}
 	public String getNombreProcedimiento() {
 		return nombreProcedimiento;
 	}

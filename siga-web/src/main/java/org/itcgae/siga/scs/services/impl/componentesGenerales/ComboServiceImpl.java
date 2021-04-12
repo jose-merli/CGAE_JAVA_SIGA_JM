@@ -23,6 +23,7 @@ import org.itcgae.siga.db.entities.ScsZonaExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAreasMateriasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupofacturacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
@@ -113,6 +114,9 @@ public class ComboServiceImpl implements ComboService {
 	
 	@Autowired
 	private ScsJuzgadoExtendsMapper scsJuzgadoExtendsMapper;
+	
+	@Autowired
+	private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
 
 	@Override
 	public ComboDTO comboTipoEjg(HttpServletRequest request) {
@@ -930,4 +934,66 @@ public class ComboServiceImpl implements ComboService {
 		return comboDTO;
 	}
 
+	@Override
+	public ComboDTO comboModulo(HttpServletRequest request) {
+		LOGGER.info("modulo() -> Entrada al servicio para obtener combo modulos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				comboItems = scsDesignacionesExtendsMapper.comboModulos(idInstitucion);
+
+				comboDTO.setCombooItems(comboItems);
+
+			}
+		}
+
+		LOGGER.info("objetivo() -> Salida del servicio para obtener combo modulo");
+
+		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboProcedimientos(HttpServletRequest request) {
+		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				comboItems = scsDesignacionesExtendsMapper.comboProcedimientos(idInstitucion);
+
+				comboDTO.setCombooItems(comboItems);
+
+			}
+		}
+
+		LOGGER.info("objetivo() -> Salida del servicio para obtener comboProcedimientos");
+
+		return comboDTO;
+	}
+	
 }

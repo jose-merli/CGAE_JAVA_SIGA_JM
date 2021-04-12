@@ -52,4 +52,8 @@ public interface ComboService {
 	public ComboDTO comboJuzgado(HttpServletRequest request);
 	
 	public ComboDTO comboJuzgadoDesignaciones(HttpServletRequest request);
+	
+	public ComboDTO comboModulo(HttpServletRequest request);
+	
+	public ComboDTO comboProcedimientos(HttpServletRequest request);
 }
