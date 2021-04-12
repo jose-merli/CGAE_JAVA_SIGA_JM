@@ -104,13 +104,16 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper{
 	})
 	List<ComboItem> comboProcedimientos(Short idInstitucion);
 	
-	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "searchClaveDesignaciones")
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaListaContrarios")
 	@Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.DATE),
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.DATE),
-			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ABOGADO", property = "abogado", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PROCURADOR", property = "procurador", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem designaItem, Short idInstitucion);
+	List<ListaContrarioJusticiableItem> busquedaListaContrarios(String numero, Short idInstitucion);
+	
+	
 }

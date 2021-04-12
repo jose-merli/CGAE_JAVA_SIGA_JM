@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -184,5 +185,56 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return designas;
 	}	
 
+	@Override
+	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(String numero, HttpServletRequest request) {
+		
+		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio servicio");
+		List<ListaContrarioJusticiableItem> contrarios = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		
+		if (idInstitucion != null) {
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+		    genParametrosExample.createCriteria().andModuloEqualTo("CEN").andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO").andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+		    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+		    LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+		    tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+		    LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+	        if (tamMax != null) {
+	            tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+	        } else {
+	            tamMaximo = null;
+	        }
+			
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Entrada a servicio para la busqueda de contrarios");
+				
+				try {
+				contrarios = scsDesignacionesExtendsMapper.busquedaListaContrarios(numero, idInstitucion);
+				}catch(Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Salida del servicio");
+				}
+				LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Salida del servicio");
+			}
+		}
+		
+		return contrarios;
+	}	
 
 }
