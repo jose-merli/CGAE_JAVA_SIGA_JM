@@ -149,7 +149,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			boolean tiene_origen=designaItem.getIdOrigen() != null && !designaItem.getIdOrigen().equalsIgnoreCase("");
 			boolean tiene_actuacionesV = designaItem.getIdActuacionesV() != null && !designaItem.getIdActuacionesV().equalsIgnoreCase("");
 			boolean tiene_moduloDesignacion =  (designaItem.getIdModulo() != null && designaItem.getIdModulo().length > 0);
-			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimiento() != null && designaItem.getIdProcedimiento().length > 0);
+			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimiento() != null && designaItem.getIdProcedimientos().length > 0);
 			
 			if (tiene_juzg||tiene_asunto||tiene_acreditacion||tiene_modulo||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta || tiene_origen || tiene_actuacionesV){
 				sql+=	", scs_actuaciondesigna act ";
@@ -333,14 +333,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql += " AND des.nig = '" + designaItem.getNig()+"'";
 			}	
 			if(tienePretensionesDesignacion) {
-				if (designaItem.getIdProcedimiento() != null && designaItem.getIdProcedimiento().length > 0) {
-					if(designaItem.getIdProcedimiento().length == 1) {
-						sql += " AND pret.IDPRETENSION = '" + designaItem.getIdProcedimiento()[0]+"'";
+				if (designaItem.getIdProcedimientos() != null && designaItem.getIdProcedimientos().length > 0) {
+					if(designaItem.getIdProcedimientos().length == 1) {
+						sql += " AND pret.IDPRETENSION = '" + designaItem.getIdProcedimientos()[0]+"'";
 					}else {
 						String estadoIN = "";
-						for(int i = 0; i<designaItem.getIdProcedimiento().length; i++) {
-							String estado = designaItem.getIdProcedimiento()[i];
-							if(i == designaItem.getIdProcedimiento().length-1) {
+						for(int i = 0; i<designaItem.getIdProcedimientos().length; i++) {
+							String estado = designaItem.getIdProcedimientos()[i];
+							if(i == designaItem.getIdProcedimientos().length-1) {
 								estadoIN = estadoIN + "'"+estado+"'";
 							}else {
 								estadoIN = estadoIN + "'"+estado+"'" +" ,";

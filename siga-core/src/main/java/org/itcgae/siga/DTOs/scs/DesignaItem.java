@@ -32,7 +32,8 @@ public class DesignaItem {
 	private String[] idJuzgadoActu;
 	private String nombreJuzgadoActu;
 	private int idPretension;
-	private String[] idProcedimiento;
+	private String[] idProcedimientos;
+	private String idProcedimiento;
 	private int idProcurador;
 	private String[] idTipoDesignaColegio;
 	private String[] idTurnos;
@@ -413,23 +414,24 @@ public class DesignaItem {
 	public void setIdPretension(int idPretension) {
 		this.idPretension = idPretension;
 	}
-	/**
-	 * @return the idProcedimiento
-	 */
-	public String[] getIdProcedimiento() {
-		return idProcedimiento;
-	}
-	/**
-	 * @param idProcedimiento the idProcedimiento to set
-	 */
-	public void setIdProcedimiento(String[] idProcedimiento) {
-		this.idProcedimiento = idProcedimiento;
-	}
+
 	/**
 	 * @return the idProcurador
 	 */
 	public int getIdProcurador() {
 		return idProcurador;
+	}
+	public String[] getIdProcedimientos() {
+		return idProcedimientos;
+	}
+	public void setIdProcedimientos(String[] idProcedimientos) {
+		this.idProcedimientos = idProcedimientos;
+	}
+	public String getIdProcedimiento() {
+		return idProcedimiento;
+	}
+	public void setIdProcedimiento(String idProcedimiento) {
+		this.idProcedimiento = idProcedimiento;
 	}
 	/**
 	 * @param idProcurador the idProcurador to set
@@ -873,29 +875,29 @@ public class DesignaItem {
 	public String toString() {
 		return "DesignaItem [ano=" + ano + ", anoProcedimiento=" + anoProcedimiento + ", art27=" + art27 + ", codigo="
 				+ codigo + ", defensaJuridica=" + defensaJuridica + ", delitos=" + delitos + ", estados="
-				+ Arrays.toString(estados) + ", factConvenio=" + factConvenio + ", fechaAlta=" + fechaAlta
-				+ ", fechaAnulacion=" + fechaAnulacion + ", fechaEntradaInicio=" + fechaEntradaInicio
+				+ Arrays.toString(estados) + ", estado=" + estado + ", factConvenio=" + factConvenio + ", fechaAlta="
+				+ fechaAlta + ", fechaAnulacion=" + fechaAnulacion + ", fechaEntradaInicio=" + fechaEntradaInicio
 				+ ", fechaEntradaFin=" + fechaEntradaFin + ", fechaEstado=" + fechaEstado + ", fechaFin=" + fechaFin
 				+ ", fechaJuicio=" + fechaJuicio + ", fechaModificacion=" + fechaModificacion + ", fechaOficioJuzgado="
 				+ fechaOficioJuzgado + ", fechaRecepcionColegio=" + fechaRecepcionColegio + ", idInstitucion="
 				+ idInstitucion + ", idInstitucion_juzg=" + idInstitucion_juzg + ", idInstitucion_procur="
 				+ idInstitucion_procur + ", idJuzgados=" + Arrays.toString(idJuzgados) + ", idJuzgado=" + idJuzgado
 				+ ", nombreJuzgado=" + nombreJuzgado + ", idJuzgadoActu=" + Arrays.toString(idJuzgadoActu)
-				+ ", nombreJuzgadoActu=" + nombreJuzgadoActu + ", idPretension=" + idPretension + ", idProcedimiento="
-				+ Arrays.toString(idProcedimiento) + ", idProcurador=" + idProcurador + ", idTipoDesignaColegio="
-				+ Arrays.toString(idTipoDesignaColegio) + ", idTurnos=" + Arrays.toString(idTurnos) + ", idTurno="
-				+ idTurno + ", nig=" + nig + ", numero=" + numero + ", numProcedimiento=" + numProcedimiento
-				+ ", observaciones=" + observaciones + ", procurador=" + procurador + ", resumenAsunto=" + resumenAsunto
-				+ ", sufijo=" + sufijo + ", usuModificacion=" + usuModificacion + ", nombreTurno=" + nombreTurno
-				+ ", numColegiado=" + numColegiado + ", apellidosNombre=" + apellidosNombre + ", interesados="
-				+ Arrays.toString(interesados) + ", validadas=" + Arrays.toString(validadas) + ", calidad="
-				+ Arrays.toString(calidad) + ", asunto=" + asunto + ", acreditacion=" + acreditacion
-				+ ", idAcreditacion=" + Arrays.toString(idAcreditacion) + ", modulo=" + modulo + ", idModulo="
-				+ Arrays.toString(idModulo) + ", fechaJustificacionDesde=" + fechaJustificacionDesde
-				+ ", fechaJustificacionHasta=" + fechaJustificacionHasta + ", origen=" + origen + ", idOrigen="
-				+ idOrigen + ", nif=" + nif + ", nombreInteresado=" + nombreInteresado + ", apellidosInteresado="
-				+ apellidosInteresado + ", idActuacionesV=" + idActuacionesV + ", idArt27=" + idArt27 + ", idCalidad="
-				+ Arrays.toString(idCalidad) + ", idProcedimientoActuaciones="
+				+ ", nombreJuzgadoActu=" + nombreJuzgadoActu + ", idPretension=" + idPretension + ", idProcedimientos="
+				+ Arrays.toString(idProcedimientos) + ", idProcedimiento=" + idProcedimiento + ", idProcurador="
+				+ idProcurador + ", idTipoDesignaColegio=" + Arrays.toString(idTipoDesignaColegio) + ", idTurnos="
+				+ Arrays.toString(idTurnos) + ", idTurno=" + idTurno + ", nig=" + nig + ", numero=" + numero
+				+ ", numProcedimiento=" + numProcedimiento + ", observaciones=" + observaciones + ", procurador="
+				+ procurador + ", resumenAsunto=" + resumenAsunto + ", sufijo=" + sufijo + ", usuModificacion="
+				+ usuModificacion + ", nombreTurno=" + nombreTurno + ", numColegiado=" + numColegiado
+				+ ", apellidosNombre=" + apellidosNombre + ", interesados=" + Arrays.toString(interesados)
+				+ ", validadas=" + Arrays.toString(validadas) + ", calidad=" + Arrays.toString(calidad) + ", asunto="
+				+ asunto + ", acreditacion=" + acreditacion + ", idAcreditacion=" + Arrays.toString(idAcreditacion)
+				+ ", modulo=" + modulo + ", idModulo=" + Arrays.toString(idModulo) + ", fechaJustificacionDesde="
+				+ fechaJustificacionDesde + ", fechaJustificacionHasta=" + fechaJustificacionHasta + ", origen="
+				+ origen + ", idOrigen=" + idOrigen + ", nif=" + nif + ", nombreInteresado=" + nombreInteresado
+				+ ", apellidosInteresado=" + apellidosInteresado + ", idActuacionesV=" + idActuacionesV + ", idArt27="
+				+ idArt27 + ", idCalidad=" + Arrays.toString(idCalidad) + ", idProcedimientoActuaciones="
 				+ Arrays.toString(idProcedimientoActuaciones) + ", idRol=" + idRol + ", rol=" + Arrays.toString(rol)
 				+ ", documentacionActuacion=" + documentacionActuacion + ", idModuloActuaciones="
 				+ Arrays.toString(idModuloActuaciones) + ", descripcionTipoDesigna=" + descripcionTipoDesigna
@@ -904,6 +906,5 @@ public class DesignaItem {
 				+ apellido1Colegiado + ", apellido2Colegiado=" + apellido2Colegiado + "]";
 	}
 
-	
 	
 }
