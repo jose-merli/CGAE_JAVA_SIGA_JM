@@ -25,6 +25,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -51,6 +53,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	
+	@Autowired
+	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
 	
 	@Override
 	public List<JustificacionExpressItem> busquedaJustificacionExpres(JustificacionExpressItem item, HttpServletRequest request) {
@@ -186,7 +191,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}	
 
 	@Override
-	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(String numero, HttpServletRequest request) {
+	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request) {
 		
 		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio servicio");
 		List<ListaContrarioJusticiableItem> contrarios = null;
@@ -223,9 +228,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Entrada a servicio para la busqueda de contrarios");
-				
+				if(item.getIdTurno() == null && item.getNombreTurno() != null) {
+					try {
+						TurnosItem turnosItem = new TurnosItem();
+						turnosItem.setAbreviatura(item.getNombreTurno());
+						List<TurnosItem> listaTur = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
+						if(listaTur!=null) item.setIdTurno(listaTur.get(0).getIdturno());
+			
+					}catch(Exception e) {
+						LOGGER.error(e.getMessage());
+						LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Error buscando id del turno");
+					}
+				}
 				try {
-				contrarios = scsDesignacionesExtendsMapper.busquedaListaContrarios(numero, idInstitucion);
+				contrarios = scsDesignacionesExtendsMapper.busquedaListaContrarios(item, idInstitucion);
 				}catch(Exception e) {
 					LOGGER.error(e.getMessage());
 					LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Salida del servicio");

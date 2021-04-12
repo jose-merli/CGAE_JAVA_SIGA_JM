@@ -55,8 +55,8 @@ public class DesignacionesController {
 	}
 	
 	@RequestMapping(value = "/busquedaListaContrarios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<List<ListaContrarioJusticiableItem>> busquedaListaContrarios(@RequestBody String numero, HttpServletRequest request) {
-		List<ListaContrarioJusticiableItem> response = designacionesService.busquedaListaContrarios(numero, request);
+	ResponseEntity<List<ListaContrarioJusticiableItem>> busquedaListaContrarios(@RequestBody DesignaItem item, HttpServletRequest request) {
+		List<ListaContrarioJusticiableItem> response = designacionesService.busquedaListaContrarios(item, request);
 		if(response != null) {
 			return new ResponseEntity<List<ListaContrarioJusticiableItem>>(response, HttpStatus.OK);
 		}else {

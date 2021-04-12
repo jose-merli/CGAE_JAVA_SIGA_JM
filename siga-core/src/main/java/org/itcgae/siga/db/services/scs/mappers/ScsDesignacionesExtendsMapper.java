@@ -18,6 +18,7 @@ import org.itcgae.siga.db.services.com.providers.ConModulosExtendsSqlProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 @Primary
@@ -113,7 +114,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper{
 			@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PROCURADOR", property = "procurador", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ListaContrarioJusticiableItem> busquedaListaContrarios(String numero, Short idInstitucion);
+	List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, Short idInstitucion);
 	
 	
 }

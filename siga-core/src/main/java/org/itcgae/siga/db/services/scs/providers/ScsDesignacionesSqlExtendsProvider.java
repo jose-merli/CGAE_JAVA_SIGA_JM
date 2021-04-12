@@ -1046,83 +1046,89 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			return resultV;
 		}
 	    
-	    public String busquedaListaContrarios(String numero, Short idInstitucion) {
+	    public String busquedaListaContrarios(String numero, Short idInstitucion, String anio, String idTurno) {
 	    	
-	    	SQL sql1 = new SQL();
+	    	String consulta ="SELECT\r\n" + 
+	    			"    t1.numero,\r\n" + 
+	    			"    t1.idinstitucion,\r\n" + 
+	    			"    t1.idturno,\r\n" + 
+	    			"    t1.anio,\r\n" + 
+	    			"    t1.nif,\r\n" + 
+	    			"    CASE\r\n" + 
+	    			"        WHEN t1.idabogadocontrario IS NOT NULL THEN\r\n" + 
+	    			"            (\r\n" + 
+	    			"                SELECT\r\n" + 
+	    			"                    col.ncolegiado\r\n" + 
+	    			"                    || ', '\r\n" + 
+	    			"                    || t1.NOMBREABOGADOCONTRARIO\r\n" + 
+	    			"--                    || per.apellidos1\r\n" + 
+	    			"--                    || ' '\r\n" + 
+	    			"--                    || per.apellidos2\r\n" + 
+	    			"--                    || ', '\r\n" + 
+	    			"--                    || per.nombre \r\n" + 
+	    			"                    AS abogado\r\n" + 
+	    			"                FROM\r\n" + 
+	    			"                    cen_persona     per,\r\n" + 
+	    			"                    cen_colegiado   col\r\n" + 
+	    			"                WHERE\r\n" + 
+	    			"                    ( per.idpersona = col.idpersona\r\n" + 
+	    			"                      AND per.idpersona = t1.idabogadocontrario\r\n" + 
+	    			"                      AND col.idinstitucion = t1.idinstitucion )\r\n" + 
+	    			"            )\r\n" + 
+	    			"        ELSE\r\n" + 
+	    			"            ''\r\n" + 
+	    			"    END AS abogado,\r\n" + 
+	    			"    CASE\r\n" + 
+	    			"        WHEN t1.idprocurador IS NOT NULL THEN\r\n" + 
+	    			"            (\r\n" + 
+	    			"                SELECT\r\n" + 
+	    			"                    procu.ncolegiado\r\n" + 
+	    			"                    || ', '\r\n" + 
+	    			"                    || procu.apellidos1\r\n" + 
+	    			"                    || ' '\r\n" + 
+	    			"                    || procu.apellidos2\r\n" + 
+	    			"                    || ', '\r\n" + 
+	    			"                    || procu.nombre AS procurador\r\n" + 
+	    			"                FROM\r\n" + 
+	    			"                    scs_procurador procu\r\n" + 
+	    			"                WHERE\r\n" + 
+	    			"                    ( idprocurador = t1.idprocurador\r\n" + 
+	    			"                      AND idinstitucion = t1.IDINSTITUCION_PROCU )\r\n" + 
+	    			"            )\r\n" + 
+	    			"        ELSE\r\n" + 
+	    			"            ''\r\n" + 
+	    			"    END AS procurador\r\n" + 
+	    			"FROM\r\n" + 
+	    			"    (\r\n" + 
+	    			"        SELECT\r\n" + 
+	    			"            scs_contrariosdesigna.numero,\r\n" + 
+	    			"            scs_contrariosdesigna.idinstitucion,\r\n" + 
+	    			"            scs_contrariosdesigna.idturno,\r\n" + 
+	    			"            scs_contrariosdesigna.anio,\r\n" + 
+	    			"            scs_contrariosdesigna.idpersona,\r\n" + 
+	    			"            scs_contrariosdesigna.NOMBREABOGADOCONTRARIO,\r\n" + 
+	    			"            persona.nif,\r\n" + 
+	    			"            persona.apellido1\r\n" + 
+	    			"            || decode(persona.apellido2, NULL, '', ' ' || persona.apellido2)\r\n" + 
+	    			"            || ', '\r\n" + 
+	    			"            || persona.nombre AS apellidosnombre,\r\n" + 
+	    			"            scs_contrariosdesigna.idabogadocontrario,\r\n" + 
+	    			"            scs_contrariosdesigna.idprocurador,\r\n" + 
+	    			"            scs_contrariosdesigna.IDINSTITUCION_PROCU\r\n" + 
+	    			"        FROM\r\n" + 
+	    			"            scs_contrariosdesigna\r\n" + 
+	    			"            JOIN scs_personajg persona ON persona.idpersona = scs_contrariosdesigna.idpersona\r\n" + 
+	    			"                                          AND persona.idinstitucion = scs_contrariosdesigna.idinstitucion\r\n" + 
+	    			"        WHERE\r\n" + 
+	    			"            ( scs_contrariosdesigna.anio = "+anio+"\r\n" + 
+	    			"              AND scs_contrariosdesigna.numero = "+numero+"\r\n" + 
+	    			"              AND scs_contrariosdesigna.idinstitucion = "+idInstitucion+"\r\n" + 
+	    			"              AND scs_contrariosdesigna.idturno = "+idTurno+" )\r\n" + 
+	    			"    ) t1;\r\n" + 
+	    			"\r\n" + 
+	    			"";
 	    	
-	    	//Extraemos el identificador y apellidos y nombre de la persona asociada al contrario
-	    	sql1.SELECT("SCS_CONTRARIOSDESIGNA.NUMERO");
-	    	sql1.SELECT("SCS_CONTRARIOSDESIGNA.IDINSTITUCION");
-	    	sql1.SELECT("SCS_CONTRARIOSDESIGNA.IDTURNO");
-	    	sql1.SELECT("SCS_CONTRARIOSDESIGNA.ANIO");
-	    	sql1.SELECT("SCS_CONTRARIOSDESIGNA.IDPERSONA");
-	    	sql1.SELECT("CEN_PERSONA.NIFCIF");
-	    	sql1.SELECT(" CEN_PERSONA.APELLIDOS1 + ' ' + CEN_PERSONA.APELLIDOS2 + ', ' + CEN_PERSONA.NOMBRE as APELLIDOSNOMBRE");
-	    	sql1.FROM("SCS_CONTRARIOSDESIGNA");
-	    	sql1.JOIN("CEN_PERSONA ON CEN_PERSONA.IDPERSONA=SCS_CONTRARIOSDESIGNA.IDPERSONA");
-	    	sql1.WHERE("SCS_CONTRARIOSDESIGNA.NUMERO = '"+numero+"'");
-	    	sql1.WHERE("SCS_CONTRARIOSDESIGNA.IDINSTITUCION = '"+idInstitucion+"'");
-
-	    	
-	    	SQL sql2 = new SQL();
-	    	
-	    	//Extraemos el nº colegiado y los apellidos y el nombre del abogado asociado al contrario
-	    	sql2.SELECT("SCS_CONTRARIOSDESIGNA.NUMERO");
-	    	sql2.SELECT("SCS_CONTRARIOSDESIGNA.IDINSTITUCION");
-	    	sql2.SELECT("SCS_CONTRARIOSDESIGNA.IDTURNO");
-	    	sql2.SELECT("SCS_CONTRARIOSDESIGNA.ANIO");
-	    	sql2.SELECT("SCS_CONTRARIOSDESIGNA.IDPERSONA");
-	    	sql2.SELECT("CEN_COLEGIADO.NCOLEGIADO + ' : ' + CEN_PERSONA.APELLIDOS1 + ' ' + CEN_PERSONA.APELLIDOS2 + ', ' + CEN_PERSONA.NOMBRE as ABOGADO");
-	    	sql2.FROM("SCS_CONTRARIOSDESIGNA");
-	    	sql2.JOIN("CEN_PERSONA ON CEN_PERSONA.IDPERSONA=SCS_CONTRARIOSDESIGNA.IDABOGADOCONTRARIO");
-	    	sql2.JOIN("CEN_COLEGIADO ON CEN_COLEGIADO.IDPERSONA=SCS_CONTRARIOSDESIGNA.IDABOGADOCONTRARIO");
-	    	sql2.WHERE("SCS_CONTRARIOSDESIGNA.NUMERO = '"+numero+"'");
-	    	sql2.WHERE("SCS_CONTRARIOSDESIGNA.IDINSTITUCION = '"+idInstitucion+"'");
-
-	    	
-	    	SQL sql3 = new SQL();
-	    	
-	    	//Extraemos el nº colegiado y los apellidos y el nombre del procurador asociado al contrario
-	    	sql3.SELECT("SCS_CONTRARIOSDESIGNA.NUMERO");
-	    	sql3.SELECT("SCS_CONTRARIOSDESIGNA.IDINSTITUCION");
-	    	sql3.SELECT("SCS_CONTRARIOSDESIGNA.IDTURNO");
-	    	sql3.SELECT("SCS_CONTRARIOSDESIGNA.ANIO");
-	    	sql3.SELECT("SCS_CONTRARIOSDESIGNA.IDPERSONA");
-	    	sql3.SELECT("CEN_COLEGIADO.NCOLEGIADO + ' : ' + CEN_PERSONA.APELLIDOS1 + ' ' + CEN_PERSONA.APELLIDOS2 + ', ' + CEN_PERSONA.NOMBRE as PROCURADOR");
-	    	sql3.FROM("SCS_CONTRARIOSDESIGNA");
-	    	sql3.JOIN("CEN_PERSONA ON CEN_PERSONA.IDPERSONA=SCS_CONTRARIOSDESIGNA.IDPROCURADOR");
-	    	sql3.JOIN("CEN_COLEGIADO ON CEN_COLEGIADO.IDPERSONA=SCS_CONTRARIOSDESIGNA.IDPROCURADOR");
-	    	sql3.WHERE("SCS_CONTRARIOSDESIGNA.NUMERO = '"+numero+"'");
-	    	sql3.WHERE("SCS_CONTRARIOSDESIGNA.IDINSTITUCION = '"+idInstitucion+"'");
-	    	
-//	    	SELECT t1.ks, t1.[# Tasks], COALESCE(t2.[# Late], 0) AS [# Late]
-//			FROM 
-//			    (SELECT ks, COUNT(*) AS 'Procurador' FROM Table GROUP BY ks) t1
-//			LEFT JOIN
-//			    (SELECT ks, COUNT(*) AS '# Late' FROM Table WHERE Age > Palt GROUP BY ks) t2
-//			ON (t1.SCS_CONTRARIOSDESIGNA.NUMERO = t2.SCS_CONTRARIOSDESIGNA.NUMERO &&
-
-	    	
-	    	SQL sql4 = new SQL();
-	    	
-	    	sql4.SELECT("t1.NUMERO, t1.IDINSTITUCION, "
-	    			+ "t1.IDTURNO, t1.NUMERO, t1.ANIO, "
-	    			+ "t1.IDPERSONA, COALESCE(t2.Abogado, 0) AS Abogado,"
-	    			+ "COALESCE(t3.Procurador, 0) AS Procurador ");
-	    	sql4.FROM("("+sql1.toString()+") AS t1, ");
-	    	sql4.LEFT_OUTER_JOIN("("+sql2.toString()+") AS t2, ");
-	    	sql4.LEFT_OUTER_JOIN("("+sql3.toString()+") AS t3, ");
-	    	
-	    	String result = sql4.toString()+" \n ON (t1.SCS_CONTRARIOSDESIGNA.IDINSTITUCION = t2.SCS_CONTRARIOSDESIGNA.IDINSTITUCION AND "
-	    			+ "t1.SCS_CONTRARIOSDESIGNA.IDTURNO = t2.SCS_CONTRARIOSDESIGNA.IDTURNO AND "
-	    			+ "t1.SCS_CONTRARIOSDESIGNA.ANIO = t2.SCS_CONTRARIOSDESIGNA.ANIO AND "
-	    			+ "t1.SCS_CONTRARIOSDESIGNA.IDPERSONA = t1.SCS_CONTRARIOSDESIGNA.IDPERSONA AND "+
-	    			"t1.SCS_CONTRARIOSDESIGNA.IDINSTITUCION = t3.SCS_CONTRARIOSDESIGNA.IDINSTITUCION AND "
-	    	    			+ "t1.SCS_CONTRARIOSDESIGNA.IDTURNO = t3.SCS_CONTRARIOSDESIGNA.IDTURNO AND "
-	    	    			+ "t1.SCS_CONTRARIOSDESIGNA.ANIO = t3.SCS_CONTRARIOSDESIGNA.ANIO AND "
-	    	    			+ "t1.SCS_CONTRARIOSDESIGNA.IDPERSONA = t3.SCS_CONTRARIOSDESIGNA.IDPERSONA)";
-	    	
-	    	return result;
+	    	return consulta;
 	    }
 	    
 }

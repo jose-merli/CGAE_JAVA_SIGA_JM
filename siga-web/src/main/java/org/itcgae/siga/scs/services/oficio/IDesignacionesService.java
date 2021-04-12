@@ -15,6 +15,6 @@ public interface IDesignacionesService{
 	
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
 
-	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(String numero, HttpServletRequest request);
+	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request);
 
 }
