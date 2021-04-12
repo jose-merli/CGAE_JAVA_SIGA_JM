@@ -247,14 +247,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					sql += " AND des.codigo = " + String.valueOf(designaItem.getCodigo()).trim() ; 
 				}
 			}
-			if (designaItem.getIdJuzgado() != null && designaItem.getIdJuzgado().length > 0) {
-				if(designaItem.getIdJuzgado().length == 1) {
-					sql += " AND des.idjuzgado = " + designaItem.getIdJuzgado()[0];
+			if (designaItem.getIdJuzgados() != null && designaItem.getIdJuzgados().length > 0) {
+				if(designaItem.getIdJuzgados().length == 1) {
+					sql += " AND des.idjuzgado = " + designaItem.getIdJuzgados()[0];
 				}else {
 					String juzgadoIN = "";
-					for(int i = 0; i<designaItem.getIdJuzgado().length; i++) {
-						String juzgado = designaItem.getIdJuzgado()[i];
-						if(i == designaItem.getIdJuzgado().length-1) {
+					for(int i = 0; i<designaItem.getIdJuzgados().length; i++) {
+						String juzgado = designaItem.getIdJuzgados()[i];
+						if(i == designaItem.getIdJuzgados().length-1) {
 							juzgadoIN = juzgadoIN + juzgado;
 						}else {
 							juzgadoIN = juzgadoIN + juzgado +" ,";

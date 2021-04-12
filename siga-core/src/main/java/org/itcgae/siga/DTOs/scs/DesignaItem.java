@@ -25,7 +25,8 @@ public class DesignaItem {
 	private int idInstitucion;
 	private int idInstitucion_juzg;
 	private int idInstitucion_procur;
-	private String[] idJuzgado;
+	private String[] idJuzgados;
+	private int idJuzgado;
 	private String nombreJuzgado;
 	private String[] idJuzgadoActu;
 	private String nombreJuzgadoActu;
@@ -350,16 +351,17 @@ public class DesignaItem {
 	public void setIdInstitucion_procur(int idInstitucion_procur) {
 		this.idInstitucion_procur = idInstitucion_procur;
 	}
-	/**
-	 * @return the idJuzgado
-	 */
-	public String[] getIdJuzgado() {
+
+	public String[] getIdJuzgados() {
+		return idJuzgados;
+	}
+	public void setIdJuzgados(String[] idJuzgados) {
+		this.idJuzgados = idJuzgados;
+	}
+	public int getIdJuzgado() {
 		return idJuzgado;
 	}
-	/**
-	 * @param idJuzgado the idJuzgado to set
-	 */
-	public void setIdJuzgado(String[] idJuzgado) {
+	public void setIdJuzgado(int idJuzgado) {
 		this.idJuzgado = idJuzgado;
 	}
 	/**
@@ -869,9 +871,9 @@ public class DesignaItem {
 				+ ", fechaJuicio=" + fechaJuicio + ", fechaModificacion=" + fechaModificacion + ", fechaOficioJuzgado="
 				+ fechaOficioJuzgado + ", fechaRecepcionColegio=" + fechaRecepcionColegio + ", idInstitucion="
 				+ idInstitucion + ", idInstitucion_juzg=" + idInstitucion_juzg + ", idInstitucion_procur="
-				+ idInstitucion_procur + ", idJuzgado=" + Arrays.toString(idJuzgado) + ", nombreJuzgado="
-				+ nombreJuzgado + ", idJuzgadoActu=" + Arrays.toString(idJuzgadoActu) + ", nombreJuzgadoActu="
-				+ nombreJuzgadoActu + ", idPretension=" + idPretension + ", idProcedimiento="
+				+ idInstitucion_procur + ", idJuzgados=" + Arrays.toString(idJuzgados) + ", idJuzgado=" + idJuzgado
+				+ ", nombreJuzgado=" + nombreJuzgado + ", idJuzgadoActu=" + Arrays.toString(idJuzgadoActu)
+				+ ", nombreJuzgadoActu=" + nombreJuzgadoActu + ", idPretension=" + idPretension + ", idProcedimiento="
 				+ Arrays.toString(idProcedimiento) + ", idProcurador=" + idProcurador + ", idTipoDesignaColegio="
 				+ Arrays.toString(idTipoDesignaColegio) + ", idTurnos=" + Arrays.toString(idTurnos) + ", idTurno="
 				+ idTurno + ", nig=" + nig + ", numero=" + numero + ", numProcedimiento=" + numProcedimiento
@@ -893,6 +895,7 @@ public class DesignaItem {
 				+ nombreProcedimiento + ", nombreColegiado=" + nombreColegiado + ", apellido1Colegiado="
 				+ apellido1Colegiado + ", apellido2Colegiado=" + apellido2Colegiado + "]";
 	}
+
 	
 	
 }
