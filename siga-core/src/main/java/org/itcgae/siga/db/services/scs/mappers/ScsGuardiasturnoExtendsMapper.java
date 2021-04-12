@@ -8,6 +8,8 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.CalendariosProgDatosSalidaItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
@@ -41,6 +43,11 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper {
 	@Results({ @Result(column = "IDGUARDIA", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
 	List<ComboItem> comboGuardias(String idTurno, String idInstitucion);
+	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboListasGuardias")
+	@Results({ @Result(column = "IDLISTA", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
+	List<ComboItem> comboListasGuardias(String idInstitucion);
 
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getIdGuardia")
 	@Results({ @Result(column = "IDGUARDIA", property = "newId", jdbcType = JdbcType.VARCHAR) })
@@ -100,6 +107,13 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper {
 			@Result(column = "ORDENGRUPO", property = "ordenGrupo", jdbcType = JdbcType.VARCHAR) })
 	List<LetradoGuardiaItem> searchLetradosGuardia(String idInstitucion, String idTurno, String idGuardia);
 
+	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "searchCalendarios")
+	@Results({ @Result(column = "turno", property = "turno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "lugar", property = "lugar", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR) })
+	List<CalendariosProgDatosSalidaItem> searchCalendarios(CalendariosProgDatosEntradaItem calendarioItem, String idInstitucion);
 //	
 //	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "separarGuardias")
 //	@Results({

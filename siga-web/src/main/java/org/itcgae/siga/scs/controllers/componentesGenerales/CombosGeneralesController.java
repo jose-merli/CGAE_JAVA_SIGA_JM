@@ -142,5 +142,15 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-
+	@GetMapping("/listasguardias")
+	public ResponseEntity<ComboDTO> comboListasGuardias(HttpServletRequest request, String idTurno) {
+		ComboDTO response = comboService.comboListasGuardias(request, idTurno);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/estado")
+	public ResponseEntity<ComboDTO> comboEstados(HttpServletRequest request) {
+		ComboDTO response = comboService.comboEstados(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 }

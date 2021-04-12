@@ -178,5 +178,14 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String comboEstados(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("VALOR");
+		sql.FROM("GEN_CATALOGOS_WS");
+		return sql.toString();
+	}
 
 }

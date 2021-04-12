@@ -21,6 +21,8 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.CalendariosProgDatosSalidaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesResponse;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
@@ -1865,6 +1867,39 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		LOGGER.info("deleteSubtipoCurricular() -> Salida del servicio para guardar incompatibilidades");
 		return deleteResponseDTO;
+	}
+
+	@Override
+	public List<CalendariosProgDatosSalidaItem> getCalendariosProg(CalendariosProgDatosEntradaItem calendarioProgBody,
+			HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		CalendariosProgDatosSalidaItem calendarios = new CalendariosProgDatosSalidaItem();
+		List<CalendariosProgDatosSalidaItem> calendariosList = new ArrayList<CalendariosProgDatosSalidaItem>();
+		String idGuardia = ""; 
+		
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("getIncompatibilidades() -> Entrada para obtener las incompatibilidades");
+
+				calendariosList = scsGuardiasturnoExtendsMapper.searchCalendarios(calendarioProgBody, idInstitucion.toString());
+
+				
+				LOGGER.info("getIncompatibilidades() -> Salida ya con los datos recogidos");
+				
+			}
+		}
+		
+		return calendariosList;
 	}
 	
 }

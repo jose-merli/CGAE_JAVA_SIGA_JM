@@ -12,6 +12,8 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesResponse;
 import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
+import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.CalendariosProgDatosSalidaItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
@@ -183,6 +185,12 @@ public class GuardiaController {
 	ResponseEntity<ComboIncompatibilidadesResponse> getCombo(@RequestBody ComboIncompatibilidadesDatosEntradaItem comboIncompatibilidadesDatosEntradaItem, HttpServletRequest request){
 		ComboIncompatibilidadesResponse response= guardiasService.getCombo(comboIncompatibilidadesDatosEntradaItem, request);
 		return new ResponseEntity<ComboIncompatibilidadesResponse>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/buscarCalendariosProgramados", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<CalendariosProgDatosSalidaItem>> getCalendariosProgramados(@RequestBody CalendariosProgDatosEntradaItem calendarioProgBody, HttpServletRequest request){
+		List<CalendariosProgDatosSalidaItem> response= guardiasService.getCalendariosProg(calendarioProgBody, request);
+		return new ResponseEntity<List<CalendariosProgDatosSalidaItem>>(response, HttpStatus.OK);
 	}
 	
 }

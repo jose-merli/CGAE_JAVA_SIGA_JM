@@ -2,6 +2,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoSqlProvider;
 
@@ -155,6 +156,19 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		sql.FROM("SCS_GUARDIASTURNO");
 
 		sql.WHERE("IDTURNO IN (" + idTurno + ")");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("nombre");
+
+		return sql.toString();
+	}
+
+	public String comboListasGuardias(String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("NOMBRE");
+		sql.SELECT("IDLISTA");
+
+		sql.FROM("SCS_LISTAGUARDIAS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.ORDER_BY("nombre");
 
@@ -403,4 +417,30 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	//
 	// return sql.toString();
 	// }
+
+	public String searchCalendarios(CalendariosProgDatosEntradaItem calendarioItem, String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("SCS_TURNO.NOMBRE AS turno");
+
+		sql.SELECT("SCS_LISTAGUARDIAS.NOMBRE AS nombre");
+		sql.SELECT("SCS_LISTAGUARDIAS.LUGAR AS lugar");
+		sql.SELECT("SCS_LISTAGUARDIAS.OBSERVACIONES AS observaciones");
+
+		sql.FROM("SCS_LISTAGUARDIAS");
+
+		sql.JOIN("SCS_TURNO ON SCS_LISTAGUARDIAS.IDINSTITUCION = SCS_TURNO.IDINSTITUCION");
+
+		sql.WHERE("SCS_LISTAGUARDIAS.IDINSTITUCION = '" + idInstitucion + "'");
+
+		if (calendarioItem.getListaGuardias() != null) {
+			sql.WHERE("SCS_LISTAGUARDIAS.IDLISTA IN (" + calendarioItem.getListaGuardias() + ")");
+		}
+		if (calendarioItem.getIdTurno() != null && calendarioItem.getIdTurno() != "")
+			sql.WHERE("SCS_TURNO.IDTURNO IN (" + calendarioItem.getIdTurno() + ")");
+
+		sql.ORDER_BY("SCS_TURNO.NOMBRE");
+
+		return sql.toString();
+	}
 }
