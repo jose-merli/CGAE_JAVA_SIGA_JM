@@ -11,6 +11,7 @@ public class DesignaItem {
 	private String defensaJuridica;
 	private String delitos;
 	private String[] estados;
+	private String estado;
 	private int factConvenio;
 	private Date fechaAlta;
 	private Date fechaAnulacion;
@@ -860,6 +861,13 @@ public class DesignaItem {
 	}
 	public void setDescripcionTipoDesigna(String descripcionTipoDesigna) {
 		this.descripcionTipoDesigna = descripcionTipoDesigna;
+	}
+	
+	public String getEstado() {
+		return estado;
+	}
+	public void setEstado(String estado) {
+		this.estado = estado;
 	}
 	@Override
 	public String toString() {
