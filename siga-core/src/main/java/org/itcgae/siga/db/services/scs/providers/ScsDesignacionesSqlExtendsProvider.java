@@ -195,14 +195,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql += " and colegiado.ncolegiado = " + String.valueOf(designaItem.getNumColegiado()) + " ";
 			}
 
-			if ( designaItem.getIdTurno() != null && (String.valueOf(designaItem.getIdTurno()) != "-1")&&!String.valueOf(designaItem.getIdTurno()).equals("")){
-				if(designaItem.getIdTurno().length == 1) {
-					sql += " AND des.idTurno = " + designaItem.getIdTurno()[0];
+			if ( designaItem.getIdTurnos() != null && (String.valueOf(designaItem.getIdTurnos()) != "-1")&&!String.valueOf(designaItem.getIdTurnos()).equals("")){
+				if(designaItem.getIdTurnos().length == 1) {
+					sql += " AND des.idTurno = " + designaItem.getIdTurnos()[0];
 				}else {
 					String turnoIN = "";
-					for(int i = 0; i<designaItem.getIdTurno().length; i++) {
-						String turno = designaItem.getIdTurno()[i];
-						if(i == designaItem.getIdTurno().length-1) {
+					for(int i = 0; i<designaItem.getIdTurnos().length; i++) {
+						String turno = designaItem.getIdTurnos()[i];
+						if(i == designaItem.getIdTurnos().length-1) {
 							turnoIN = turnoIN + turno;
 						}else {
 							turnoIN = turnoIN + turno +" ,";
@@ -517,7 +517,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						String turnoIN = "";
 						for(int i = 0; i<designaItem.getIdAcreditacion().length; i++) {
 							String turno = designaItem.getIdAcreditacion()[i];
-							if(i == designaItem.getIdTurno().length-1) {
+							if(i == designaItem.getIdTurnos().length-1) {
 								turnoIN = turnoIN + turno;
 							}else {
 								turnoIN = turnoIN + turno +" ,";
