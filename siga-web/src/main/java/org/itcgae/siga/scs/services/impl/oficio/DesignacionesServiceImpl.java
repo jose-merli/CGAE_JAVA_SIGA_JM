@@ -251,13 +251,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
-		int response = 0;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		int existentes = 0;
 
 		if (null != idInstitucion) {
 
@@ -285,7 +283,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(ejemplo);
 
 					if ((designaExistentes != null && designaExistentes.size() > 0)) {
-						response = 0;
 						error.setCode(400);
 						//TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
@@ -320,13 +317,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						LOGGER.info(
 								"updateDetalleDesigna() / scsDesignacionesExtendsMapper.update()-> Entrada a scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
 
-						response = scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+						 scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
 
 						LOGGER.info(
 								"updateDetalleDesigna() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
 					}
 				} catch (Exception e) {
-					response = 0;
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 					updateResponseDTO.setStatus(SigaConstants.KO);
@@ -340,7 +336,102 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				updateResponseDTO.setError(error);
 
-				LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar una partida presupuestaria");
+				LOGGER.info("updateDetalleDesigna() -> Salida del servicio para actualizar una partida presupuestaria");
+
+			}
+		}
+		return updateResponseDTO;
+	}
+
+	
+	@Override
+	public UpdateResponseDTO updateDatosAdicionales(DesignaItem designaItem, HttpServletRequest request) {
+		LOGGER.info("updateDatosAdicionales() ->  Entrada al servicio para guardar la tarjeta de detalle designacion");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateDatosAdicionales() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateDatosAdicionales() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					LOGGER.info(
+							"updateDatosAdicionales()-> Entrada a scsDesignacionesExtendsMapper ");
+					ScsDesignaExample ejemplo = new ScsDesignaExample();
+					ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdprocedimientoEqualTo(designaItem.getNumProcedimiento()).andIdjuzgadoEqualTo(new Long(designaItem.getIdJuzgado()));
+
+					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(ejemplo);
+
+					if ((designaExistentes != null && designaExistentes.size() > 0)) {
+						error.setCode(400);
+						//TODO crear description
+						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						updateResponseDTO.setError(error);
+						return updateResponseDTO;
+					} else {
+
+						ScsDesignaExample example = new ScsDesignaExample();
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdturnoEqualTo(designaItem.getIdTurno()).andAnioEqualTo((short)designaItem.getAno()).andNumeroEqualTo(new Long(designaItem.getNumero()));
+
+						ScsDesigna scsDesigna = new ScsDesigna();
+						List<ScsDesigna> scsDesignaLista = scsDesignacionesExtendsMapper.selectByExample(example);
+						scsDesigna = scsDesignaLista.get(0);
+
+						scsDesigna.setFechaoficiojuzgado(designaItem.getFechaOficioJuzgado() );
+						//TODO faltan dos campos observaciones
+						scsDesigna.setObservaciones(designaItem.getObservaciones());
+						scsDesigna.setFecharecepcioncolegio(designaItem.getFechaRecepcionColegio());
+						//TODO hora juicio?
+						scsDesigna.setFechajuicio(designaItem.getFechaJuicio());
+						
+
+						LOGGER.info(
+								"updateDatosAdicionales() / scsDesignacionesExtendsMapper -> Salida ");
+
+						
+						LOGGER.info(
+								"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update()-> Entrada a scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
+
+						scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+
+						LOGGER.info(
+								"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
+					}
+				} catch (Exception e) {
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				
+				 if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la designacion  correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateDatosAdicionales() -> Salida del servicio para actualizar una partida presupuestaria");
 
 			}
 		}
