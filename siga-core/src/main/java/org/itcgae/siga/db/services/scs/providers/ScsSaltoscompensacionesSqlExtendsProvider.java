@@ -163,6 +163,18 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql2.WHERE("IDINSTITUCION =" + idInstitucion);
 		sql2.WHERE("IDGUARDIA IS NULL");
 
+		// INICIO - Query para comprobar si el letrado sigue inscrito al turno
+		SQL sql4 = new SQL();
+		sql4.SELECT("IDPERSONA");
+		sql4.FROM("SCS_INSCRIPCIONTURNO IT");
+		sql4.WHERE("IT.IDPERSONA = CONSULTA.IDPERSONA");
+		sql4.WHERE("IT.IDINSTITUCION = CONSULTA.IDINSTITUCION");
+		sql4.WHERE("IT.IDTURNO = CONSULTA.IDTURNO");
+		sql4.WHERE("IT.FECHABAJA IS NULL");
+		// FIN - Query para comprobar si el letrado sigue inscrito al turno
+
+		sql2.WHERE("IDPERSONA IN ( " + sql4.toString() + " )");
+
 		sql2.ORDER_BY("FECHA DESC, IDSALTOSTURNO DESC");
 
 		sql.SELECT("*");

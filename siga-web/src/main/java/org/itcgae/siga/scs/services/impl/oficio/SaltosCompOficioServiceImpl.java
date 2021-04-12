@@ -23,8 +23,6 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSaltoscompensacionesExtendsMapper;
 import org.itcgae.siga.scs.services.oficio.ISaltosCompOficioService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -44,12 +42,6 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
-
-	@Autowired
-	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
-
-	@Autowired
-	private ScsGuardiasturnoExtendsMapper scsGuardiasturnoExtendsMapper;
 
 	@Override
 	public SaltoCompGuardiaDTO searchSaltosYCompensaciones(SaltoCompGuardiaItem saltoItem, HttpServletRequest request) {
@@ -121,8 +113,6 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 							listaSaltosCompensaciones.remove(listaSaltosCompensaciones.size() - 1);
 						}
 
-						listaSaltosCompensaciones = getCombos(listaSaltosCompensaciones, idInstitucion);
-
 						saltoCompDTO.setSaltosCompItems(listaSaltosCompensaciones);
 
 						LOGGER.info(
@@ -186,6 +176,11 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 
 							MaxIdDto nuevoId = saltoscompensacionesMapper.selectNuevoIdSaltosCompensaciones(
 									saltoCompGuardiaItem, Short.toString(idInstitucion));
+
+							if (nuevoId == null) {
+								nuevoId = new MaxIdDto();
+								nuevoId.setIdMax(1L);
+							}
 
 							int insertado = saltoscompensacionesMapper.guardarSaltosCompensaciones(saltoCompGuardiaItem,
 									Short.toString(idInstitucion), Long.toString(nuevoId.getIdMax()), usuarios.get(0));
@@ -428,29 +423,4 @@ public class SaltosCompOficioServiceImpl implements ISaltosCompOficioService {
 
 		return listaCombo;
 	}
-
-	private boolean isHistorico(SaltoCompGuardiaItem saltoComp) {
-
-		return (!UtilidadesString.esCadenaVacia(saltoComp.getFechaAnulacion())
-				|| !UtilidadesString.esCadenaVacia(saltoComp.getFechaUso()));
-	}
-
-	private List<SaltoCompGuardiaItem> getCombos(List<SaltoCompGuardiaItem> listaSaltosCompensaciones,
-			Short idInstitucion) {
-
-		for (SaltoCompGuardiaItem saltoComp : listaSaltosCompensaciones) {
-
-			if (!isHistorico(saltoComp)) {
-
-				List<LetradoGuardiaItem> comboColegiados = saltoscompensacionesMapper
-						.searchLetradosTurno(saltoComp.getIdTurno(), Short.toString(idInstitucion));
-
-				saltoComp.setComboColegiados(transformToListComboItemOficio(comboColegiados));
-			}
-
-		}
-
-		return listaSaltosCompensaciones;
-	}
-
 }
