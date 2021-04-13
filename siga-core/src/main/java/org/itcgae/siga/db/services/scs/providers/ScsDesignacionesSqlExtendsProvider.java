@@ -117,9 +117,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMax) throws Exception {
 		String sql = "";
 		
-		idInstitucion = new Short("2035");
-		designaItem.setNumColegiado("2048");
-		
 		Hashtable codigosBind = new Hashtable();
 		int contador=0;
 		// Acceso a BBDD
