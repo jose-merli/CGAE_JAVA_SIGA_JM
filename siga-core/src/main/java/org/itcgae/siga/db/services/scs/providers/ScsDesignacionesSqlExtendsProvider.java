@@ -120,7 +120,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		Hashtable codigosBind = new Hashtable();
 		int contador=0;
 		// Acceso a BBDD
-		idInstitucion = new Short("2035"); designaItem.setNumColegiado("2048");
 
 		//aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
