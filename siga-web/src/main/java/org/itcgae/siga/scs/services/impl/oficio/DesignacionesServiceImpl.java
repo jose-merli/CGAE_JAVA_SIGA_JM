@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -452,6 +453,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			}
 		}
 		return updateResponseDTO;
+	}
+
+	@Override
+	public ActuacionDesignaDTO busquedaActDesigna(HttpServletRequest request) {
+		return null;
 	}
 
 

@@ -7,16 +7,17 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -253,8 +254,13 @@ public class DesignacionesController {
 	
 	// 3.3.6.2.14.	Tarjeta actuaciones
 	
-	// 3.3.6.2.14.3.	Ficha Actuación
+	@PostMapping(value = "/designas/busquedaActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ActuacionDesignaDTO> busquedaActDesigna(HttpServletRequest request) {
+		ActuacionDesignaDTO response = designacionesService.busquedaActDesigna(request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 	
+	// 3.3.6.2.14.3.	Ficha Actuación
 
 }
  
