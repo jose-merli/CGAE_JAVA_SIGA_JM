@@ -272,7 +272,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL sql = new SQL();
 
 		//Busca si tiene alguna guardia
-		sql.SELECT("IDGUARDIA");
+		sql.SELECT("DISTINCT IDGUARDIA");
 		sql.FROM("SCS_INSCRIPCIONGUARDIA");
 		sql.WHERE("IDINSTITUCION = "+ idInstitucion);
 		sql.WHERE("IDPERSONA = "+ tieneTurno.getIdPersona());

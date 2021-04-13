@@ -459,10 +459,16 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 								bjtmp.setValidado(nombres[1]);
 							}
 							
+							if(nombres[0].equals("fechabt")) {
+								bjtmp.setFechabt(format.parse(nombres[1]));
+							}
+							
 							bjtmp.setIdinstitucion(String.valueOf(idInstitucion));
 						}
-							
-						response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp);
+						
+						bjtmp.setIdpersona(scsBajasTemporalesExtendsMapper.persona(bjtmp));
+						
+						response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
 					}
 				}catch (Exception e) {
 					response = 0;
