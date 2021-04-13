@@ -66,10 +66,42 @@ public class DesignacionesController {
 		}
 	}
 	
-	@RequestMapping(value = "/comboModulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboModulos(HttpServletRequest request) {
 
-		ComboDTO response = comboService.comboModulo(request);
+	
+	// FIN Busqueda designaciones
+	
+	
+	// 3.3.6.2.2.	Tarjeta Datos Generales
+	
+
+	
+	// 3.3.6.2.3.	Tarjeta Detalle Designación
+	
+	
+	@RequestMapping(value = "/designas/updateDetalleDesignacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateDetalleDesignacion(@RequestBody DesignaItem designaItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.updateDetalleDesigna(designaItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
+//	@RequestMapping(value = "/designas/comboEstadoDesignacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//	ResponseEntity<ComboDTO> comboEstadoDesignacion(HttpServletRequest request) {
+//
+//		ComboDTO response = new ComboDTO(); //TODO
+//		if (response.getError() == null)
+//			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+//		else
+//			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//	}
+	
+	@RequestMapping(value = "/designas/comboJuzgado", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboJuzgado(HttpServletRequest request) {
+
+		ComboDTO response = comboService.comboJuzgadoDesignaciones(request);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
@@ -87,79 +119,10 @@ public class DesignacionesController {
 	}
 	
 	
-	// FIN Busqueda designaciones
-	
-	
-	// 3.3.6.2.2.	Tarjeta Datos Generales
-	
-	@RequestMapping(value = "/designas/comboTurnosDatosGenerales", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboTurnosDatosGenerales(HttpServletRequest request) {
+	@RequestMapping(value = "/comboModulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboModulos(HttpServletRequest request) {
 
-		ComboDTO response = new ComboDTO(); //TODO
-		if (response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	
-	@RequestMapping(value = "/designas/comboTipoDesignacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboTipoDesignacion(HttpServletRequest request) {
-
-		ComboDTO response = new ComboDTO(); //TODO
-		if (response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	// 3.3.6.2.3.	Tarjeta Detalle Designación
-	
-	
-	@RequestMapping(value = "/designas/updateDetalleDesignacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateDetalleDesignacion(@RequestBody DesignaItem designaItem, HttpServletRequest request) {
-		UpdateResponseDTO response = designacionesService.updateDetalleDesigna(designaItem, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-
-	}
-	
-	@RequestMapping(value = "/designas/comboEstadoDesignacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboEstadoDesignacion(HttpServletRequest request) {
-
-		ComboDTO response = new ComboDTO(); //TODO
-		if (response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(value = "/designas/comboJuzgado", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboJuzgado(HttpServletRequest request) {
-
-		ComboDTO response = new ComboDTO(); //TODO
-		if (response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(value = "/designas/comboProcedimiento", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboProcedimiento(HttpServletRequest request) {
-
-		ComboDTO response = new ComboDTO(); //TODO
-		if (response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(value = "/designas/comboModulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboModulo(HttpServletRequest request) {
-
-		ComboDTO response = new ComboDTO(); //TODO
+		ComboDTO response = comboService.comboModulo(request);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
@@ -193,7 +156,7 @@ public class DesignacionesController {
 	@RequestMapping(value = "/designas/comboPartidaPresupuestaria", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboPartidaPresupuestaria(HttpServletRequest request) {
 
-		ComboDTO response = new ComboDTO(); //TODO
+		ComboDTO response = comboService.getComboPartidasPresupuestarias(request);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
