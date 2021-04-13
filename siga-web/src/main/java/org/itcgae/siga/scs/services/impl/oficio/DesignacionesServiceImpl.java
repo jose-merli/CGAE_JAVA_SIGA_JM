@@ -235,7 +235,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Entrada a servicio para la busqueda de contrarios");
-				if(item.getIdTurno() == null && item.getNombreTurno() != null) {
+			/*	if(item.getIdTurno() == null && item.getNombreTurno() != null) {
 					try {
 						TurnosItem turnosItem = new TurnosItem();
 						turnosItem.setAbreviatura(item.getNombreTurno());
@@ -246,7 +246,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						LOGGER.error(e.getMessage());
 						LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Error buscando id del turno");
 					}
-				}
+				}*/
 				try {
 				contrarios = scsDesignacionesExtendsMapper.busquedaListaContrarios(item, idInstitucion);
 				}catch(Exception e) {
