@@ -159,4 +159,39 @@ public String saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem) {
 	return sql.toString();
 
 }
+
+public String nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem) {
+	
+	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	
+	SQL sql = new SQL();
+	sql.INSERT_INTO("cen_bajastemporales");
+	
+	if(bajasTemporalesItem.getFechadesde() != null) {
+		sql.SET("fechadesde = '"+dateFormat.format(bajasTemporalesItem.getFechadesde())+"'");
+	}
+	if(bajasTemporalesItem.getFechahasta() != null) {
+		sql.SET("fechahasta = '"+dateFormat.format(bajasTemporalesItem.getFechahasta())+"'");
+	}
+	if(bajasTemporalesItem.getTipo() != null) {
+		sql.SET("TIPO = '"+bajasTemporalesItem.getTipo()+"'");
+	}
+	if(bajasTemporalesItem.getDescripcion() != null) {
+		sql.SET("DESCRIPCION = '"+bajasTemporalesItem.getDescripcion()+"'");
+	}
+	
+	if(bajasTemporalesItem.getTipo() != null) {
+		sql.SET("TIPO = '"+bajasTemporalesItem.getTipo()+"'");
+	}
+	if(bajasTemporalesItem.getDescripcion() != null) {
+		sql.SET("DESCRIPCION = '"+bajasTemporalesItem.getDescripcion()+"'");
+	}
+	
+	sql.WHERE("FECHABT = '"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"'");
+	sql.WHERE("IDPERSONA= "+ bajasTemporalesItem.getIdpersona());
+	sql.WHERE("IDINSTITUCION="+bajasTemporalesItem.getIdinstitucion());
+
+	return sql.toString();
+
+}
 }
