@@ -41,16 +41,7 @@ public class BajasTemporalesController {
 		BajasTemporalesDTO response = bajasTemporalesService.busquedaBajasTemporales(bajasTemporalesItem, request);
 		return new ResponseEntity<BajasTemporalesDTO>(response, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value = "/bajasTemporales/nuevaBajaTemporal", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> nuevaBajaTemporal(@RequestBody BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request) {
-		InsertResponseDTO response = bajasTemporalesService.nuevaBajaTemporal(bajasTemporalesItem, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
+
 	@RequestMapping(value = "/bajasTemporales/updateBaja", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateEstado(@RequestBody List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request) {
 		UpdateResponseDTO response = bajasTemporalesService.updateEstado(bajasTemporalesItem, request);
@@ -78,6 +69,16 @@ public class BajasTemporalesController {
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/bajasTemporales/nuevaBajaTemporal", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> nuevaBajaTemporal(@RequestBody List<Object> bajasTemporalesItem, HttpServletRequest request) {
+		InsertResponseDTO response = bajasTemporalesService.nuevaBajaTemporal(bajasTemporalesItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	
 	private List<BajasTemporalesItem> convertObjectToBajaItem(List<Object> bajasTemporalesItem){
 		List<BajasTemporalesItem> bajasTemporales = new ArrayList<BajasTemporalesItem>();

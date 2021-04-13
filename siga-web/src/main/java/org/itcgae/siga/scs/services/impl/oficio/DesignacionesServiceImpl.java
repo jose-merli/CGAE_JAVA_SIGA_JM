@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
@@ -15,6 +16,7 @@ import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -26,6 +28,8 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
+import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
@@ -236,7 +240,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Entrada a servicio para la busqueda de contrarios");
-				if(item.getIdTurno() == null && item.getNombreTurno() != null) {
+			/*	if(item.getIdTurno() == null && item.getNombreTurno() != null) {
 					try {
 						TurnosItem turnosItem = new TurnosItem();
 						turnosItem.setAbreviatura(item.getNombreTurno());
@@ -247,7 +251,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						LOGGER.error(e.getMessage());
 						LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Error buscando id del turno");
 					}
-				}
+				}*/
 				try {
 				contrarios = scsDesignacionesExtendsMapper.busquedaListaContrarios(item, idInstitucion);
 				}catch(Exception e) {
@@ -461,4 +465,91 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 
+	@Override
+	public InsertResponseDTO createDesigna(DesignaItem designaItem, HttpServletRequest request) {
+		LOGGER.info("createDesigna() ->  Entrada al servicio para insertar designacion");
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+		Integer idTurnoNuevo = 0;
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"createDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			AdmUsuarios usuario = usuarios.get(0);
+			
+			LOGGER.info(
+					"createDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() >= 0) {
+				try {
+					
+				
+						ScsDesigna designa = new ScsDesigna();
+						designa.setIdinstitucion(idInstitucion);
+						designa.setIdturno(designaItem.getIdTurno());
+						designa.setAnio((short)designaItem.getAno());
+						designa.setNumero(new Long(designaItem.getNumero()));
+						designa.setIdtipodesignacolegio((short)designaItem.getIdTipoDesignaColegio());
+						designa.setArt27(designaItem.getArt27());
+						
+						ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
+						designaLetrado.setIdinstitucion(idInstitucion);
+						designaLetrado.setIdturno(designaItem.getIdTurno());
+						designaLetrado.setAnio((short)designaItem.getAno());
+						designaLetrado.setNumero(new Long(designaItem.getNumero()));
+						//designaLetrado.set
+						
+						
+
+						LOGGER.info(
+								"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
+
+						//response = scsTurnosExtendsMapper.insert(turno);
+
+						LOGGER.info(
+								"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
+
+					
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					insertResponseDTO.setError(error);
+					return insertResponseDTO;
+				}
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			if (error.getDescription() == null) {
+				error.setDescription("areasmaterias.materias.ficha.insertarerror");
+			}
+			insertResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			insertResponseDTO.setId(String.valueOf(idTurnoNuevo));
+			error.setCode(200);
+			error.setDescription("general.message.registro.insertado");
+		}
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("updateModules() -> Salida del servicio para insertar modulos");
+
+		return insertResponseDTO;
+	
+	}
 }

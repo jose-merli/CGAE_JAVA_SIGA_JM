@@ -1,6 +1,9 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
+
+import javax.ws.rs.GET;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
@@ -168,7 +171,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		// QUERY PRINCIPAL
 		sql.SELECT(
-				"PER.NIFCIF NIF, PER.NOMBRE NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2) APELLIDOS, COL.NCOLEGIADO NCOLEGIADO, COL.NCOMUNITARIO NCOMUNITARIO,"
+				"PER.NIFCIF NIF,PER.IDPERSONA, PER.NOMBRE NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2) APELLIDOS, COL.NCOLEGIADO NCOLEGIADO, COL.NCOMUNITARIO NCOMUNITARIO,"
 						+ "ESTADO.IDESTADO IDESTADO,COL.IDINSTITUCION IDINSTITUCION, INS.ABREVIATURA ABREVIATURA, F_SIGA_GETRECURSO(TIPOESTADO.DESCRIPCION,"
 						+ idLenguaje + ") ESTADO, COL.SITUACIONRESIDENTE RESIDENTE");
 
@@ -178,10 +181,14 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION AND ESTADO.FECHAESTADO = ("
 						+ sql2.toString() + "))");
-		sql.INNER_JOIN(
-				"SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
+		if ((item.getIdGuardia() != null && !item.getIdGuardia().isEmpty()) || (item.getIdTurno() != null && !item.getIdTurno().isEmpty())) {
+			sql.INNER_JOIN(
+					"SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
+		}
+		
 		sql.INNER_JOIN("CEN_ESTADOCOLEGIAL TIPOESTADO ON (TIPOESTADO.IDESTADO=ESTADO.IDESTADO)");
 		sql.INNER_JOIN("CEN_INSTITUCION INS ON (INS.IDINSTITUCION=COL.IDINSTITUCION)");
+		
 
 		// CONDICIONES WHERE
 		if (item.getIdInstitucion() != null && !item.getIdInstitucion().isEmpty()) {
@@ -207,18 +214,18 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		}
 
 		if (item.getIdTurno() != null && !item.getIdTurno().isEmpty()) {
-			sql.WHERE("GUARDIAS.IDTURNO = " + item.getIdTurno());
+			sql.WHERE("GUARDIAS.IDTURNO IN  (" + item.getIdTurno()+")");
 		}
 
 		if (item.getIdGuardia() != null && !item.getIdGuardia().isEmpty()) {
-			sql.WHERE("GUARDIAS.IDGUARDIA = " + item.getIdGuardia());
+			sql.WHERE("GUARDIAS.IDGUARDIA IN (" + item.getIdGuardia()+")");
 		}
 
 		if (item.getNif() != null && !item.getNif().isEmpty()) {
 			sql.WHERE("PER.NIFCIF = '" + item.getNif() + "'");
 		}
 
-		sql.GROUP_BY("PER.NIFCIF, PER.NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2), COL.NCOLEGIADO, "
+		sql.GROUP_BY("PER.NIFCIF, PER.IDPERSONA, PER.NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2), COL.NCOLEGIADO, "
 				+ "COL.NCOMUNITARIO, COL.IDINSTITUCION, INS.ABREVIATURA, ESTADO.IDESTADO, TIPOESTADO.DESCRIPCION, COL.SITUACIONRESIDENTE");
 		sql.ORDER_BY("PER.NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2)");
 
@@ -234,4 +241,46 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		return sql3.toString();
 	}
+	
+	public String tieneTurnos(String idInstitucion, String idPersona) {
+		SQL sql = new SQL();
+
+		//Busca si tiene algun turno
+		sql.SELECT("IDPERSONA, IDTURNO");
+		sql.FROM("SCS_INSCRIPCIONTURNO");
+		sql.WHERE("IDINSTITUCION = "+ idInstitucion);
+		sql.WHERE("IDPERSONA = "+ idPersona);
+		
+		return sql.toString();
+	}
+	
+	public String tieneGuardias(String idInstitucion,ColegiadosSJCSItem tieneTurno) {
+		SQL sql = new SQL();
+
+		//Busca si tiene alguna guardia
+		sql.SELECT("IDGUARDIA");
+		sql.FROM("SCS_INSCRIPCIONGUARDIA");
+		sql.WHERE("IDINSTITUCION = "+ idInstitucion);
+		sql.WHERE("IDPERSONA = "+ tieneTurno.getIdPersona());
+		sql.WHERE("IDTURNO = "+ tieneTurno.getIdTurno());
+		
+		return sql.toString();
+	}
+	
+
+	public String tieneGuardiasPendientes(String idInstitucion,ColegiadosSJCSItem tieneTurno,String idGuardia) {
+		SQL sql = new SQL();
+
+		//Busca si tiene alguna guardia
+		sql.SELECT("IDGUARDIA");
+		sql.FROM("SCS_INSCRIPCIONGUARDIA");
+		sql.WHERE("IDINSTITUCION = "+ idInstitucion);
+		sql.WHERE("IDPERSONA = "+ tieneTurno.getIdPersona());
+		sql.WHERE("IDTURNO = "+ tieneTurno.getIdTurno());
+		sql.WHERE("IDGUARDIA = "+ idGuardia);
+		sql.WHERE("FECHAVALIDACION IS NULL");
+		
+		return sql.toString();
+	}
+
 }

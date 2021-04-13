@@ -67,6 +67,9 @@ public interface ScsBajasTemporalesExtendsMapper extends CenBajastemporalesMappe
 	
 	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "saveBajaTemporal")
 	int saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem);
+	
+	@InsertProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "nuevaBajaTemporal")
+	int nuevaBaja(BajasTemporalesItem bajasTemporalesItem);
 
 		
 }

@@ -1,5 +1,8 @@
 package org.itcgae.siga.scs.services.impl.componentesGenerales;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,6 +29,8 @@ import org.itcgae.siga.scs.services.componentesGenerales.IBusquedaColegiadosExpr
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.jayway.jsonpath.internal.filter.ValueNode.UndefinedNode;
 
 @Service
 public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosExpressService {
@@ -134,10 +139,18 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 					} else {
 						tamMaximo = null;
 					}
+					if(datos.getIdGuardia() != null) {
+						datos.setIdGuardia(datos.getIdGuardia().substring(0,datos.getIdGuardia().length()-1));
+					}
+					
+					if(datos.getIdTurno() != null) {
+						datos.setIdTurno(datos.getIdTurno().substring(0,datos.getIdTurno().length()-1));
+					}
 
 					List<ColegiadosSJCSItem> colegiadosSJCSItemList = scsEjgExtendsMapper.busquedaColegiadoEJG(datos,
 							usuarios.get(0).getIdlenguaje(), tamMaximo);
 
+					
 					if ((colegiadosSJCSItemList != null) && tamMaximo != null
 							&& (colegiadosSJCSItemList.size()) > tamMaximo) {
 						error.setCode(200);
@@ -149,6 +162,39 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 					}
 
 					responsedto.setColegiadosSJCSItem(colegiadosSJCSItemList);
+					
+					
+					for(int x=0;x<colegiadosSJCSItemList.size();x++) {
+						List<ColegiadosSJCSItem> tieneTurno=scsEjgExtendsMapper.tieneTurnos(colegiadosSJCSItemList.get(x).getIdInstitucion(), colegiadosSJCSItemList.get(x).getIdPersona());
+//						List<String> tieneGuardia = null;
+						List<List<String>> tieneGuardia = new ArrayList<List<String>>();
+						List<String> guardiasPendientes = new ArrayList<String>();
+						
+						if(tieneTurno != null) {
+							colegiadosSJCSItemList.get(x).setTieneTurno("Si");
+
+							for(int z = 0; z<tieneTurno.size();z++) {
+								tieneGuardia.add(scsEjgExtendsMapper.tieneGuardias(colegiadosSJCSItemList.get(x).getIdInstitucion(), tieneTurno.get(z)));
+							}
+							
+							for(int z = 0; z<tieneTurno.size();z++) {
+								for(int guardia = 0; guardia<tieneGuardia.get(z).size(); guardia++) {
+									guardiasPendientes.add(scsEjgExtendsMapper.tieneGuardiasPendientes(colegiadosSJCSItemList.get(x).getIdInstitucion(), tieneTurno.get(z),tieneGuardia.get(z).get(guardia)));
+								}
+							}
+
+							colegiadosSJCSItemList.get(x).setGuardiasPendientes(String.valueOf(guardiasPendientes.size()));
+							
+						}else {
+							colegiadosSJCSItemList.get(x).setTieneTurno("No");
+						}
+						
+						if(tieneGuardia.size() != 0) {
+							colegiadosSJCSItemList.get(x).setTieneGuardia("Si");
+						}else {
+							colegiadosSJCSItemList.get(x).setTieneGuardia("No");
+						}
+					}
 
 				} catch (Exception e) {
 					LOGGER.error(
