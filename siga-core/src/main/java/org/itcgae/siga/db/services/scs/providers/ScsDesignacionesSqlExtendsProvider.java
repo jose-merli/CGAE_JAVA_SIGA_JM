@@ -117,6 +117,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMax) throws Exception {
 		String sql = "";
 		
+		idInstitucion = new Short("2035");
+		designaItem.setNumColegiado("2048");
+		
 		Hashtable codigosBind = new Hashtable();
 		int contador=0;
 		// Acceso a BBDD
@@ -440,14 +443,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql += " and act.fechaJustificacion between '" + fechaEntradaInicio + "' and '" + fechaEntradaFin + "' ";
 
 			}
-			if(designaItem.getIdTipoDesignaColegio() != null && (!String.valueOf(designaItem.getIdTipoDesignaColegio()).equalsIgnoreCase(""))){
-				if(designaItem.getIdTipoDesignaColegio().length == 1) {
-					sql += " AND des.IDTIPODESIGNACOLEGIO = " + designaItem.getIdTipoDesignaColegio()[0];
+			if(designaItem.getIdTipoDesignaColegios() != null && (!String.valueOf(designaItem.getIdTipoDesignaColegios()).equalsIgnoreCase(""))){
+				if(designaItem.getIdTipoDesignaColegios().length == 1) {
+					sql += " AND des.IDTIPODESIGNACOLEGIO = " + designaItem.getIdTipoDesignaColegios()[0];
 				}else {
 					String turnoIN = "";
-					for(int i = 0; i<designaItem.getIdTipoDesignaColegio().length; i++) {
-						String turno = designaItem.getIdTipoDesignaColegio()[i];
-						if(i == designaItem.getIdTipoDesignaColegio().length-1) {
+					for(int i = 0; i<designaItem.getIdTipoDesignaColegios().length; i++) {
+						String turno = designaItem.getIdTipoDesignaColegios()[i];
+						if(i == designaItem.getIdTipoDesignaColegios().length-1) {
 							turnoIN = turnoIN + turno;
 						}else {
 							turnoIN = turnoIN + turno +" ,";

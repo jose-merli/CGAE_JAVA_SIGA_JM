@@ -35,7 +35,8 @@ public class DesignaItem {
 	private String[] idProcedimientos;
 	private String idProcedimiento;
 	private int idProcurador;
-	private String[] idTipoDesignaColegio;
+	private String[] idTipoDesignaColegios;
+	private int idTipoDesignaColegio;
 	private String[] idTurnos;
 	private int idTurno;
 	private String nig;
@@ -440,18 +441,29 @@ public class DesignaItem {
 		this.idProcurador = idProcurador;
 	}
 	/**
+	 * @return the idTipoDesignaColegios
+	 */
+	public String[] getIdTipoDesignaColegios() {
+		return idTipoDesignaColegios;
+	}
+	/**
+	 * @param idTipoDesignaColegios the idTipoDesignaColegios to set
+	 */
+	public void setIdTipoDesignaColegios(String[] idTipoDesignaColegios) {
+		this.idTipoDesignaColegios = idTipoDesignaColegios;
+	}
+	/**
 	 * @return the idTipoDesignaColegio
 	 */
-	public String[] getIdTipoDesignaColegio() {
+	public int getIdTipoDesignaColegio() {
 		return idTipoDesignaColegio;
 	}
 	/**
 	 * @param idTipoDesignaColegio the idTipoDesignaColegio to set
 	 */
-	public void setIdTipoDesignaColegio(String[] idTipoDesignaColegio) {
+	public void setIdTipoDesignaColegio(int idTipoDesignaColegio) {
 		this.idTipoDesignaColegio = idTipoDesignaColegio;
 	}
-	
 	public String[] getIdTurnos() {
 		return idTurnos;
 	}
@@ -885,15 +897,16 @@ public class DesignaItem {
 				+ ", nombreJuzgado=" + nombreJuzgado + ", idJuzgadoActu=" + Arrays.toString(idJuzgadoActu)
 				+ ", nombreJuzgadoActu=" + nombreJuzgadoActu + ", idPretension=" + idPretension + ", idProcedimientos="
 				+ Arrays.toString(idProcedimientos) + ", idProcedimiento=" + idProcedimiento + ", idProcurador="
-				+ idProcurador + ", idTipoDesignaColegio=" + Arrays.toString(idTipoDesignaColegio) + ", idTurnos="
-				+ Arrays.toString(idTurnos) + ", idTurno=" + idTurno + ", nig=" + nig + ", numero=" + numero
-				+ ", numProcedimiento=" + numProcedimiento + ", observaciones=" + observaciones + ", procurador="
-				+ procurador + ", resumenAsunto=" + resumenAsunto + ", sufijo=" + sufijo + ", usuModificacion="
-				+ usuModificacion + ", nombreTurno=" + nombreTurno + ", numColegiado=" + numColegiado
-				+ ", apellidosNombre=" + apellidosNombre + ", interesados=" + Arrays.toString(interesados)
-				+ ", validadas=" + Arrays.toString(validadas) + ", calidad=" + Arrays.toString(calidad) + ", asunto="
-				+ asunto + ", acreditacion=" + acreditacion + ", idAcreditacion=" + Arrays.toString(idAcreditacion)
-				+ ", modulo=" + modulo + ", idModulo=" + Arrays.toString(idModulo) + ", fechaJustificacionDesde="
+				+ idProcurador + ", idTipoDesignaColegios=" + Arrays.toString(idTipoDesignaColegios)
+				+ ", idTipoDesignaColegio=" + idTipoDesignaColegio + ", idTurnos=" + Arrays.toString(idTurnos)
+				+ ", idTurno=" + idTurno + ", nig=" + nig + ", numero=" + numero + ", numProcedimiento="
+				+ numProcedimiento + ", observaciones=" + observaciones + ", procurador=" + procurador
+				+ ", resumenAsunto=" + resumenAsunto + ", sufijo=" + sufijo + ", usuModificacion=" + usuModificacion
+				+ ", nombreTurno=" + nombreTurno + ", numColegiado=" + numColegiado + ", apellidosNombre="
+				+ apellidosNombre + ", interesados=" + Arrays.toString(interesados) + ", validadas="
+				+ Arrays.toString(validadas) + ", calidad=" + Arrays.toString(calidad) + ", asunto=" + asunto
+				+ ", acreditacion=" + acreditacion + ", idAcreditacion=" + Arrays.toString(idAcreditacion) + ", modulo="
+				+ modulo + ", idModulo=" + Arrays.toString(idModulo) + ", fechaJustificacionDesde="
 				+ fechaJustificacionDesde + ", fechaJustificacionHasta=" + fechaJustificacionHasta + ", origen="
 				+ origen + ", idOrigen=" + idOrigen + ", nif=" + nif + ", nombreInteresado=" + nombreInteresado
 				+ ", apellidosInteresado=" + apellidosInteresado + ", idActuacionesV=" + idActuacionesV + ", idArt27="
@@ -905,6 +918,7 @@ public class DesignaItem {
 				+ nombreProcedimiento + ", nombreColegiado=" + nombreColegiado + ", apellido1Colegiado="
 				+ apellido1Colegiado + ", apellido2Colegiado=" + apellido2Colegiado + "]";
 	}
+
 
 	
 }
