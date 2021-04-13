@@ -5,9 +5,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +53,16 @@ public class DesignacionesController {
 			return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
 		}else {
 			return new ResponseEntity<List<DesignaItem>>(new ArrayList<DesignaItem>(), HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/busquedaListaContrarios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<ListaContrarioJusticiableItem>> busquedaListaContrarios(@RequestBody DesignaItem item, HttpServletRequest request) {
+		List<ListaContrarioJusticiableItem> response = designacionesService.busquedaListaContrarios(item, request);
+		if(response != null) {
+			return new ResponseEntity<List<ListaContrarioJusticiableItem>>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<List<ListaContrarioJusticiableItem>>(new ArrayList<ListaContrarioJusticiableItem>(), HttpStatus.OK);
 		}
 	}
 	
@@ -101,6 +114,17 @@ public class DesignacionesController {
 	}
 	
 	// 3.3.6.2.3.	Tarjeta Detalle Designación
+	
+	
+	@RequestMapping(value = "/designas/updateDetalleDesignacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateDetalleDesignacion(@RequestBody DesignaItem designaItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.updateDetalleDesigna(designaItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
 	
 	@RequestMapping(value = "/designas/comboEstadoDesignacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboEstadoDesignacion(HttpServletRequest request) {
@@ -154,6 +178,16 @@ public class DesignacionesController {
 	
 	// 3.3.6.2.4.	Tarjeta Datos Adicionales
 
+	@RequestMapping(value = "/designas/updateDatosAdicionales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateDatosAdicionales(@RequestBody DesignaItem designaItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.updateDatosAdicionales(designaItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
 	// 3.3.6.2.5.	Tarjeta Datos Facturación 
 	
 	@RequestMapping(value = "/designas/comboPartidaPresupuestaria", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
