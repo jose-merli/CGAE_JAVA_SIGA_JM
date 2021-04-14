@@ -17,17 +17,21 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.ScsContrariosdesigna;
+import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
@@ -63,6 +67,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
+	
+	@Autowired
+	private ScsContrariosdesignaMapper scsContrariosDesignaMapper;
 	
 	@Override
 	public List<JustificacionExpressItem> busquedaJustificacionExpres(JustificacionExpressItem item, HttpServletRequest request) {
@@ -198,8 +205,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}	
 
 	@Override
-	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request) {
+	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request, Boolean historico) {
 		
+		// [designaItem.idTurno, designaItem.nombreTurno, designaItem.numero, designaItem.anio]
+				 
 		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio servicio");
 		List<ListaContrarioJusticiableItem> contrarios = null;
 		List<GenParametros> tamMax = null;
@@ -235,20 +244,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Entrada a servicio para la busqueda de contrarios");
-				if(item.getIdTurno() == null && item.getNombreTurno() != null) {
-					try {
-						TurnosItem turnosItem = new TurnosItem();
-						turnosItem.setAbreviatura(item.getNombreTurno());
-						List<TurnosItem> listaTur = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
-						if(listaTur!=null) item.setIdTurno(listaTur.get(0).getIdturno());
-			
-					}catch(Exception e) {
-						LOGGER.error(e.getMessage());
-						LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Error buscando id del turno");
-					}
-				}
 				try {
-				contrarios = scsDesignacionesExtendsMapper.busquedaListaContrarios(item, idInstitucion);
+				contrarios = scsDesignacionesExtendsMapper.busquedaListaContrarios(item, idInstitucion, historico);
 				}catch(Exception e) {
 					LOGGER.error(e.getMessage());
 					LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Salida del servicio");
@@ -259,6 +256,89 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		
 		return contrarios;
 	}	
+	
+	
+	@Override
+	public UpdateResponseDTO deleteContrario(ScsContrariosdesignaKey item, HttpServletRequest request) {
+		LOGGER.info("deleteContrarios() ->  Entrada al servicio para eliminar contrarios");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"deleteContrario() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"deleteContrario() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					    ScsContrariosdesignaKey key = new ScsContrariosdesignaKey();
+						key.setAnio(item.getAnio());
+						key.setNumero(item.getNumero());
+						key.setIdturno(item.getIdturno());
+						key.setIdinstitucion(item.getIdinstitucion());
+
+						ScsContrariosdesigna contrario = scsContrariosDesignaMapper.selectByPrimaryKey(key);
+
+						if (contrario.getFechabaja() == null) {
+							contrario.setFechabaja(new Date());
+						} else {
+							contrario.setFechabaja(null);
+						}
+
+						contrario.setFechamodificacion(new Date());
+						contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+						LOGGER.info(
+								"deleteContrario() / scsContrariosDesignaMapper.updateByPrimaryKey() -> Entrada a scsContrariosDesignaMapper para eliminar los contrarios seleccionados");
+
+						response = scsContrariosDesignaMapper.updateByPrimaryKey(contrario);
+
+						LOGGER.info(
+								"deleteContrario() / scsContrariosDesignaMapper.updateByPrimaryKey() -> Salida de scsContrariosDesignaMapper para eliminar los contrarios seleccionados");
+
+					
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("deleteContrario() -> Salida del servicio para eliminar contrarios");
+
+		return updateResponseDTO;
+	}
 	
 	
 	@Override

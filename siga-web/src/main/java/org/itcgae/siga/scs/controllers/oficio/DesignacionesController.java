@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,15 +57,7 @@ public class DesignacionesController {
 		}
 	}
 	
-	@RequestMapping(value = "/busquedaListaContrarios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<List<ListaContrarioJusticiableItem>> busquedaListaContrarios(@RequestBody DesignaItem item, HttpServletRequest request) {
-		List<ListaContrarioJusticiableItem> response = designacionesService.busquedaListaContrarios(item, request);
-		if(response != null) {
-			return new ResponseEntity<List<ListaContrarioJusticiableItem>>(response, HttpStatus.OK);
-		}else {
-			return new ResponseEntity<List<ListaContrarioJusticiableItem>>(new ArrayList<ListaContrarioJusticiableItem>(), HttpStatus.OK);
-		}
-	}
+	
 	
 	@RequestMapping(value = "/comboModulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboModulos(HttpServletRequest request) {
@@ -205,6 +198,33 @@ public class DesignacionesController {
 	// 3.3.6.2.6.3.	Ficha detalle del interesado 
 	
 	// 3.3.6.2.7.	Tarjeta Contrarios
+	
+	// [designaItem.idTurno, designaItem.nombreTurno, designaItem.numero, designaItem.anio, historico]
+		@RequestMapping(value = "/designas/busquedaListaContrarios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<List<ListaContrarioJusticiableItem>> busquedaListaContrarios(@RequestBody String[] item, HttpServletRequest request) {
+			DesignaItem designa = new DesignaItem();
+			String ano = item[3].substring(1,5);
+			designa.setAno(Integer.parseInt(ano));
+			designa.setNombreTurno(item[1]);
+			designa.setIdTurno(Integer.parseInt(item[0]));
+			designa.setNumero(Integer.parseInt(item[2]));
+			List<ListaContrarioJusticiableItem> response = designacionesService.busquedaListaContrarios(designa, request, Boolean.parseBoolean(item[4]));
+			if(response != null) {
+				return new ResponseEntity<List<ListaContrarioJusticiableItem>>(response, HttpStatus.OK);
+			}else {
+				return new ResponseEntity<List<ListaContrarioJusticiableItem>>(new ArrayList<ListaContrarioJusticiableItem>(), HttpStatus.OK);
+			}
+		}
+		
+	@RequestMapping(value = "/designas/deleteContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteContrario(@RequestBody ScsContrariosdesignaKey contrarioItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.deleteContrario(contrarioItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
 	
 	// 3.3.6.2.7.3.	Ficha detalle del contrario
 	

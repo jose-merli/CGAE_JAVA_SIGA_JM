@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -13,6 +14,8 @@ import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.db.entities.ScsTurno;
+import org.itcgae.siga.db.entities.ScsTurnoKey;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.services.com.providers.ConModulosExtendsSqlProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
@@ -106,15 +109,14 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper{
 	List<ComboItem> comboProcedimientos(Short idInstitucion);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaListaContrarios")
-	@Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.DATE),
-			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+	@Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.DATE),
-			@Result(column = "ABOGADO", property = "abogado", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "PROCURADOR", property = "procurador", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ABOGADO", property = "abogado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PROCURADOR", property = "procurador", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOSNOMBRE", property = "apellidosnombre", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, Short idInstitucion);
-	
-	
+	List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, Short idInstitucion, Boolean historico);
 }

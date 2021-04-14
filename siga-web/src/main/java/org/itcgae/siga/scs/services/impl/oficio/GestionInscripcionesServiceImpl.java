@@ -1227,25 +1227,25 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"busquedaColaOficio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"busquedaTarjetaInscripciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"busquedaColaOficio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"busquedaTarjetaInscripciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
 				
 				LOGGER.info(
-						"busquedaColaOficio() -> Entrada a scsOrdenacioncolasExtendsMapper para obtener orden colas");
+						"busquedaTarjetaInscripciones() -> Entrada a csInscripcionturnoExtendsMapper para obtener las tarjetas de inscripciones");
 
 				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaTarjetaInscripciones(inscripcionesItem,
 						idInstitucion, usuario.getIdlenguaje());
 
 				LOGGER.info(
-						"busquedaColaOficio()  -> Salida a scsOrdenacioncolasExtendsMapper para obtener orden colas");
+						"busquedaTarjetaInscripciones()  -> Salida a csInscripcionturnoExtendsMapper para obtener la tarjetas de inscripciones");
 
 				if (inscripcionesItems != null) {
 					inscripcionesDTO.setInscripcionesItems(inscripcionesItems);
@@ -1253,7 +1253,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 			}
 
 		}
-		LOGGER.info("busquedaColaOficio() -> Salida del servicio para obtener la busqueda Cola Oficio");
+		LOGGER.info("busquedaTarjetaInscripciones() -> Salida del servicio para obtener las tarjetas de inscripciones");
 		return inscripcionesDTO;
 	}
 
