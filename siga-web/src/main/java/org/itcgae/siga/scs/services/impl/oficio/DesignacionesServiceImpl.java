@@ -259,7 +259,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	
 	@Override
-	public UpdateResponseDTO deleteContrario(ScsContrariosdesignaKey item, HttpServletRequest request) {
+	public UpdateResponseDTO deleteContrario(ScsContrariosdesigna item, HttpServletRequest request) {
 		LOGGER.info("deleteContrarios() ->  Entrada al servicio para eliminar contrarios");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -292,6 +292,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						key.setNumero(item.getNumero());
 						key.setIdturno(item.getIdturno());
 						key.setIdinstitucion(item.getIdinstitucion());
+						key.setIdpersona(item.getIdpersona());
 
 						ScsContrariosdesigna contrario = scsContrariosDesignaMapper.selectByPrimaryKey(key);
 

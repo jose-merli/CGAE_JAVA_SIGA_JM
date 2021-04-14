@@ -1055,6 +1055,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"    t1.idturno,\r\n" + 
 	    			"    t1.anio,\r\n" + 
 	    			"    t1.nif,\r\n" + 
+	    			"    t1.fechabaja,\r\n" +
+	    			"    t1.idpersona,\r\n" + 
 	    			"    CASE\r\n" + 
 	    			"        WHEN t1.idabogadocontrario IS NOT NULL THEN\r\n" + 
 	    			"            (\r\n" + 
@@ -1109,6 +1111,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"            scs_contrariosdesigna.anio,\r\n" + 
 	    			"            scs_contrariosdesigna.idpersona,\r\n" + 
 	    			"            scs_contrariosdesigna.NOMBREABOGADOCONTRARIO,\r\n" + 
+	    			"            scs_contrariosdesigna.fechabaja,\r\n" + 
 	    			"            persona.nif,\r\n" + 
 	    			"            persona.apellido1\r\n" + 
 	    			"            || decode(persona.apellido2, NULL, '', ' ' || persona.apellido2)\r\n" + 

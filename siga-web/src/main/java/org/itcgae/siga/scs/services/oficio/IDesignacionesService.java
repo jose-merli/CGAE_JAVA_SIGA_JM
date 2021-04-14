@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 
 public interface IDesignacionesService{
@@ -23,5 +24,5 @@ public interface IDesignacionesService{
 
 	public UpdateResponseDTO updateDatosAdicionales(DesignaItem designaItem, HttpServletRequest request);
 
-	public UpdateResponseDTO deleteContrario(ScsContrariosdesignaKey contrarioItem, HttpServletRequest request);
+	public UpdateResponseDTO deleteContrario(ScsContrariosdesigna item, HttpServletRequest request);
 }

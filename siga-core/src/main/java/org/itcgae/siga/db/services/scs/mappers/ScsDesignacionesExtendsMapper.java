@@ -116,7 +116,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper{
 			@Result(column = "ABOGADO", property = "abogado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PROCURADOR", property = "procurador", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "APELLIDOSNOMBRE", property = "apellidosnombre", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOSNOMBRE", property = "apellidosnombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 	})
 	List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, Short idInstitucion, Boolean historico);
 }

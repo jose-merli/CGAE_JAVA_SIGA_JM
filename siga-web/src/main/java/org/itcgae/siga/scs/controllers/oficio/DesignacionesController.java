@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
@@ -199,7 +200,7 @@ public class DesignacionesController {
 	
 	// 3.3.6.2.7.	Tarjeta Contrarios
 	
-	// [designaItem.idTurno, designaItem.nombreTurno, designaItem.numero, designaItem.anio, historico]
+	// [designaItem.idTurno, nombreTurno, numero, anio, historico]
 		@RequestMapping(value = "/designas/busquedaListaContrarios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 		ResponseEntity<List<ListaContrarioJusticiableItem>> busquedaListaContrarios(@RequestBody String[] item, HttpServletRequest request) {
 			DesignaItem designa = new DesignaItem();
@@ -216,9 +217,16 @@ public class DesignacionesController {
 			}
 		}
 		
+		// [ idInstitucion,  idPersona, this.selectedDatos.anio,  this.selectedDatos.idTurno, this.selectedDatos.numero]
 	@RequestMapping(value = "/designas/deleteContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> deleteContrario(@RequestBody ScsContrariosdesignaKey contrarioItem, HttpServletRequest request) {
-		UpdateResponseDTO response = designacionesService.deleteContrario(contrarioItem, request);
+	ResponseEntity<UpdateResponseDTO> deleteContrario(@RequestBody String[] item, HttpServletRequest request) {
+		ScsContrariosdesigna contrario = new ScsContrariosdesigna();
+		contrario.setIdinstitucion(Short.parseShort(item[0]));
+		contrario.setIdpersona(Long.parseLong(item[1]));
+		contrario.setAnio(Short.parseShort(item[2]));
+		contrario.setIdturno(Integer.parseInt(item[3]));
+		contrario.setNumero(Long.parseLong(item[4]));
+		UpdateResponseDTO response = designacionesService.deleteContrario(contrario, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
