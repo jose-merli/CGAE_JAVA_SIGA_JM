@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
@@ -1129,7 +1130,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return consulta;
 	}
 
-	public String busquedaActDesigna(DesignaItem designaItem, String idInstitucion) {
+	public String busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, String idInstitucion) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 
@@ -1149,11 +1150,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.JOIN(
 				"SCS_PROCEDIMIENTOS PRO ON PRO.IDPROCEDIMIENTO = ACT.IDPROCEDIMIENTO AND PRO.IDINSTITUCION = ACT.IDINSTITUCION AND FAC.IDINSTITUCION = ACT.IDINSTITUCION");
 
-		sql2.WHERE("ACT.ANULACION = 0");
+		if (!actuacionDesignaRequestDTO.isHistorico()) {
+			sql2.WHERE("ACT.ANULACION = 0");
+		}
+
 		sql2.WHERE("ACT.IDINSTITUCION = '" + idInstitucion + "'");
-		sql2.WHERE("ACT.IDTURNO = '" + designaItem.getIdTurno() + "'");
-		sql2.WHERE("ACT.ANIO = '" + designaItem.getAno() + "'");
-		sql2.WHERE("ACT.NUMERO = '" + designaItem.getNumero() + "'");
+		sql2.WHERE("ACT.IDTURNO = '" + actuacionDesignaRequestDTO.getIdTurno() + "'");
+		sql2.WHERE("ACT.ANIO = '" + actuacionDesignaRequestDTO.getAnio() + "'");
+		sql2.WHERE("ACT.NUMERO = '" + actuacionDesignaRequestDTO.getNumero() + "'");
 
 		sql2.ORDER_BY("FECHAACTUACION DESC, NUMEROASUNTO DESC");
 

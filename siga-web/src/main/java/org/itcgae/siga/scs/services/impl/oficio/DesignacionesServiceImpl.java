@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
+import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
@@ -462,7 +463,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
-	public ActuacionDesignaDTO busquedaActDesigna(DesignaItem designaItem, HttpServletRequest request) {
+	public ActuacionDesignaDTO busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
+			HttpServletRequest request) {
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -488,7 +490,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						"DesignacionesServiceImpl.busquedaActDesigna() -> Se inicia la búsqueda de actuaciones asociadas a una designación");
 
 				List<ActuacionDesignaItem> listaActuacionDesignaItem = scsDesignacionesExtendsMapper
-						.busquedaActDesigna(designaItem, Short.toString(idInstitucion));
+						.busquedaActDesigna(actuacionDesignaRequestDTO, Short.toString(idInstitucion));
 
 				actuacionDedignaDTO.setActuacionesDesignaItems(listaActuacionDesignaItem);
 

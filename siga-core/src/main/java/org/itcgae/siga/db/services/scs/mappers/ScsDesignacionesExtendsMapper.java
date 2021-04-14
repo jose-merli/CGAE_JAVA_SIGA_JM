@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
+import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosDesignaItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
@@ -116,6 +117,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "VALIDADA", property = "validada", jdbcType = JdbcType.BOOLEAN),
 			@Result(column = "ANULADA", property = "anulada", jdbcType = JdbcType.BOOLEAN),
 			@Result(column = "FACTURACION", property = "facturacion", jdbcType = JdbcType.VARCHAR) })
-	List<ActuacionDesignaItem> busquedaActDesigna(DesignaItem designaItem, String idInstitucion);
+	List<ActuacionDesignaItem> busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
+			String idInstitucion);
 
 }
