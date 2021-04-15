@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
+import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -225,8 +226,9 @@ public class DesignacionesController {
 	// 3.3.6.2.14. Tarjeta actuaciones
 
 	@PostMapping(value = "/designas/busquedaActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ActuacionDesignaDTO> busquedaActDesigna(DesignaItem designaItem, HttpServletRequest request) {
-		ActuacionDesignaDTO response = designacionesService.busquedaActDesigna(designaItem, request);
+	public ResponseEntity<ActuacionDesignaDTO> busquedaActDesigna(
+			@RequestBody ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, HttpServletRequest request) {
+		ActuacionDesignaDTO response = designacionesService.busquedaActDesigna(actuacionDesignaRequestDTO, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
