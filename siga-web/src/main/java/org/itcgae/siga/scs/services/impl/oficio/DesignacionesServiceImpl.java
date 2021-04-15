@@ -70,40 +70,39 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaJustificacionExpres() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaJustificacionExpres -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info(
-						"DesignacionesServiceImpl.busquedaJustificacionExpres -> Entrada a servicio para la busqueda de justifiacion express");
+				LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> Entrada a servicio para la busqueda de justifiacion express");
 
 				try {
+					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo longitud_codeejg...");
 					// cargamos los parámetros necesarios
 					String longitudCodEJG;
 
 					// LONGITUD_CODEJG
-					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG",
-							idInstitucion.toString());
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG", idInstitucion.toString());
 
 					// si el ncolegiado, viene relleno, debemos obtener la idpersona
 					if (item.getnColegiado() != null && !item.getnColegiado().trim().isEmpty()) {
+						LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo la idpersona...");
+						
 						// obtenemos la idpersona
 						ColegiadosSJCSItem colegiadosSJCSItem = new ColegiadosSJCSItem();
 						colegiadosSJCSItem.setnColegiado(item.getnColegiado());
 
-						List<ColegiadosSJCSItem> colegiadosSJCSItems = cenColegiadoExtendsMapper
-								.busquedaColegiadosSJCS(idInstitucion.toString(), colegiadosSJCSItem);
+						List<ColegiadosSJCSItem> colegiadosSJCSItems = cenColegiadoExtendsMapper.busquedaColegiadosSJCS(idInstitucion.toString(), colegiadosSJCSItem);
 
 						if (colegiadosSJCSItems.size() > 0) {
 							idPersona = colegiadosSJCSItems.get(0).getIdPersona();
 						}
 					}
 
+					
 					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
 					// la institucion 0
 					if (parametros != null && parametros.getValor() != null) {
@@ -113,9 +112,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						longitudCodEJG = parametros.getValor();
 					}
 
-					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpres(item, idInstitucion.toString(),
-							longitudCodEJG, idPersona);
+					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo justificacion pendientes...");
+					//busqueda de designaciones segun los filtros (max 200)
+					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item, idInstitucion.toString(), longitudCodEJG, idPersona);
 
+					
+					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo las actuaciones...");
+					//obtenemos las actuaciones
+					
+					for(JustificacionExpressItem record : result) {
+						record.setActuaciones(scsDesignacionesExtendsMapper.busquedaActuacionesJustificacionExpres(record.getIdInstitucion(), record.getIdTurno(),
+								record.getAnioDesignacion(), record.getNumDesignacion()));
+					}
+
+					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> tratando expedientes...");
 					// cogemos los expedientes devueltos de la consulta y los tratamos para el front
 					for (int i = 0; i < result.size(); i++) {
 						List<String> expedientes = new ArrayList<String>();
@@ -137,9 +147,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> Salida del servicio");
 				} catch (Exception e) {
-					LOGGER.error(
-							"DesignacionesServiceImpl.busquedaJustificacionExpres -> ERROR: al consultar datos de la bd. ",
-							e);
+					LOGGER.error("DesignacionesServiceImpl.busquedaJustificacionExpres -> ERROR: al consultar datos de la bd. ",e);
 				}
 			}
 		}
