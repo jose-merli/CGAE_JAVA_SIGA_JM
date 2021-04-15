@@ -6,12 +6,14 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
 
 public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
@@ -1135,7 +1137,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql2 = new SQL();
 
 		sql2.SELECT("ACT.FECHA AS FECHAACTUACION");
-		sql2.SELECT("ACT.NUMEROASUNTO AS NUMERO");
+		sql2.SELECT("ACT.NUMEROASUNTO");
+		sql2.SELECT("ACT.NUMERO");
+		sql2.SELECT("ACT.IDTURNO");
+		sql2.SELECT("ACT.ANIO");
+		sql2.SELECT("ACT.FACTURADO");
 		sql2.SELECT("PRO.NOMBRE AS MODULO");
 		sql2.SELECT("ACR.DESCRIPCION AS ACREDITACION");
 		sql2.SELECT("ACT.FECHAJUSTIFICACION AS JUSTIFICACION");
@@ -1164,6 +1170,26 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("*");
 		sql.FROM("( " + sql2.toString() + " )");
 		sql.WHERE("ROWNUM <= 201");
+
+		return sql.toString();
+	}
+
+	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion,
+			AdmUsuarios usuario, boolean anular) {
+		SQL sql = new SQL();
+		String anulReact = anular ? "1" : "0";
+
+		sql.UPDATE("SCS_ACTUACIONDESIGNA");
+
+		sql.SET("ANULACION = '" + anulReact + "'");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
+
+		sql.WHERE("NUMERO = '" + actuacionDesignaItem.getNumero() + "'");
+		sql.WHERE("IDTURNO = '" + actuacionDesignaItem.getIdTurno() + "'");
+		sql.WHERE("ANIO = '" + actuacionDesignaItem.getAnio() + "'");
+		sql.WHERE("NUMEROASUNTO = '" + actuacionDesignaItem.getNumeroAsunto() + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 
 		return sql.toString();
 	}

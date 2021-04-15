@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -503,12 +504,75 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					"DesignacionesServiceImpl.busquedaActDesigna() -> Se ha producido un error al consultar las actuaciones asociadas a una designación",
 					e);
 			error.setCode(500);
-			error.setDescription("Se ha producido un error al consultar las actuaciones asociadas a una designación");
+			error.setDescription("general.mensaje.error.bbdd");
 			error.setMessage(e.getMessage());
 			actuacionDedignaDTO.setError(error);
 		}
 
 		return actuacionDedignaDTO;
+	}
+
+	@Override
+	public DeleteResponseDTO anularReactivarActDesigna(List<ActuacionDesignaItem> listaActuacionDesignaItem,
+			boolean anular, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.anularReactivarActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.anularReactivarActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				List<Integer> responses = new ArrayList<>();
+
+				for (ActuacionDesignaItem actuacionDesignaItem : listaActuacionDesignaItem) {
+
+					if ((anular && !actuacionDesignaItem.isFacturado()) || !anular) {
+						int response = scsDesignacionesExtendsMapper.anularReactivarActDesigna(actuacionDesignaItem,
+								Short.toString(idInstitucion), usuarios.get(0), anular);
+						responses.add(response);
+					}
+
+				}
+
+				deleteResponseDTO.setStatus(SigaConstants.OK);
+
+				if (responses.contains(0)) {
+					LOGGER.error(
+							"DesignacionesServiceImpl.anularReactivarActDesigna() -> Se ha producido un error al anular/reactivar las actuaciones asociadas a la designación");
+					error.setCode(500);
+					error.setDescription(
+							"Se ha producido un error al anular/reactivar las actuaciones asociadas a la designación");
+					deleteResponseDTO.setError(error);
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.activarActDesigna() -> Se ha producido un error al anular/reactivar las actuaciones asociadas a la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			deleteResponseDTO.setError(error);
+			deleteResponseDTO.setStatus(SigaConstants.KO);
+		}
+
+		return deleteResponseDTO;
 	}
 
 	@Override
@@ -593,4 +657,5 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return insertResponseDTO;
 
 	}
+
 }
