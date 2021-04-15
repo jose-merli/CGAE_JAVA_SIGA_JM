@@ -6,7 +6,7 @@ public class ColegiadoJGItem {
 
 	private int idInstitucion;
 	private String nColegiado;
-	private int idPersona;
+	private String idPersona;
 	private String nombre;
 	
 	@JsonProperty("idInstitucion")
@@ -28,11 +28,11 @@ public class ColegiadoJGItem {
 	}
 	
 	@JsonProperty("idPersona")
-	public int getIdPersona() {
+	public String getIdPersona() {
 		return idPersona;
 	}
 	
-	public void setIdPersona(int idPersona) {
+	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
 	

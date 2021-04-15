@@ -35,6 +35,8 @@ public class ColegiadosSJCSItem {
 	private String idPersona;
 	private String nComunitario;
 	private boolean residente;
+	private String tieneGuardia;
+	private String tieneTurno;
 
 	@JsonProperty("abreviatura")
 	public String getAbreviatura() {
@@ -375,6 +377,36 @@ public class ColegiadosSJCSItem {
 	public void setnComunitario(String nComunitario) {
 		this.nComunitario = nComunitario;
 	}
+	
+	
+
+	/**
+	 * @return the tieneGuardia
+	 */
+	public String getTieneGuardia() {
+		return tieneGuardia;
+	}
+
+	/**
+	 * @param tieneGuardia the tieneGuardia to set
+	 */
+	public void setTieneGuardia(String tieneGuardia) {
+		this.tieneGuardia = tieneGuardia;
+	}
+
+	/**
+	 * @return the tieneTurno
+	 */
+	public String getTieneTurno() {
+		return tieneTurno;
+	}
+
+	/**
+	 * @param tieneTurno the tieneTurno to set
+	 */
+	public void setTieneTurno(String tieneTurno) {
+		this.tieneTurno = tieneTurno;
+	}
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -398,7 +430,9 @@ public class ColegiadosSJCSItem {
 				&& Objects.equals(this.nombrePoblacion, prisionItem.nombrePoblacion)
 				&& Objects.equals(this.idPersona, prisionItem.idPersona)
 				&& Objects.equals(this.nComunitario, prisionItem.nComunitario)
-				&& Objects.equals(this.residente, prisionItem.residente);
+				&& Objects.equals(this.residente, prisionItem.residente)
+				&& Objects.equals(this.tieneGuardia, prisionItem.tieneGuardia)
+				&& Objects.equals(this.tieneTurno, prisionItem.tieneTurno);
 
 	}
 
@@ -406,7 +440,7 @@ public class ColegiadosSJCSItem {
 	public int hashCode() {
 		return Objects.hash(idProcurador, nombre, usuModificacion, fechaModificacion, codigoPostal, idPoblacion,
 				idProvincia, idInstitucion, historico, codigoExt, email, nombrePoblacion, idPersona, nComunitario,
-				residente);
+				residente, tieneGuardia, tieneTurno);
 	}
 
 	@Override
@@ -429,6 +463,8 @@ public class ColegiadosSJCSItem {
 		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 		sb.append("    nComunitario: ").append(toIndentedString(nComunitario)).append("\n");
 		sb.append("    residente: ").append(toIndentedString(residente)).append("\n");
+		sb.append("    tieneGuardia: ").append(toIndentedString(tieneGuardia)).append("\n");
+		sb.append("    tieneTurno: ").append(toIndentedString(tieneTurno)).append("\n");
 
 		sb.append("}");
 		return sb.toString();

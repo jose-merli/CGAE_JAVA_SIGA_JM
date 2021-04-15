@@ -159,4 +159,55 @@ public String saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem) {
 	return sql.toString();
 
 }
+
+public String nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer usuario) {
+	
+	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	
+	SQL sql = new SQL();
+	sql.INSERT_INTO("cen_bajastemporales");
+	
+	if(bajasTemporalesItem.getFechadesde() != null) {
+		sql.VALUES("fechadesde","'"+dateFormat.format(bajasTemporalesItem.getFechadesde())+"'");
+	}
+	if(bajasTemporalesItem.getFechahasta() != null) {
+		sql.VALUES("fechahasta","'"+dateFormat.format(bajasTemporalesItem.getFechahasta())+"'");
+	}
+	if(bajasTemporalesItem.getTipo() != null) {
+		sql.VALUES("TIPO","'"+bajasTemporalesItem.getTipo()+"'");
+	}
+	if(bajasTemporalesItem.getDescripcion() != null) {
+		sql.VALUES("DESCRIPCION","'"+bajasTemporalesItem.getDescripcion()+"'");
+	}
+	
+	sql.VALUES("VALIDADO", "2");
+	sql.VALUES("FECHAESTADO", "'"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"'");
+	sql.VALUES("FECHAMODIFICACION", "'"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"'");
+	sql.VALUES("FECHAALTA", "'"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"'");
+	sql.VALUES("ELIMINADO", "0");
+	sql.VALUES("FECHABT","'"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"'");
+	sql.VALUES("IDPERSONA", bajasTemporalesItem.getIdpersona());
+	sql.VALUES("IDINSTITUCION",bajasTemporalesItem.getIdinstitucion());
+	sql.VALUES("USUMODIFICACION","'"+usuario+"'");
+
+	return sql.toString();
+
+}
+
+
+public String idPersona(BajasTemporalesItem bajasTemporalesItem) {
+	SQL sql = new SQL();
+	sql.SELECT("idpersona");
+	
+	sql.FROM("cen_colegiado");
+	
+	sql.WHERE("idinstitucion="+bajasTemporalesItem.getIdinstitucion());
+	sql.WHERE("ncolegiado= "+bajasTemporalesItem.getNcolegiado());
+	
+	return sql.toString();
+}
+
+
+
+
 }
