@@ -5,14 +5,18 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
+import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,7 +200,59 @@ public class DesignacionesController {
 	
 	// 3.3.6.2.6.	Tarjeta Interesados
 	
+	@RequestMapping(value = "/designas/busquedaListaInteresados",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<ListaInteresadoJusticiableItem>> busquedaListaInteresados(@RequestBody String[] item, HttpServletRequest request) {
+		DesignaItem designa = new DesignaItem();
+		String ano = item[3].substring(1,5);
+		designa.setAno(Integer.parseInt(ano));
+		designa.setNombreTurno(item[1]);
+		designa.setIdTurno(Integer.parseInt(item[0]));
+		designa.setNumero(Integer.parseInt(item[2]));
+		List<ListaInteresadoJusticiableItem> response = designacionesService.busquedaListaInteresados(designa, request);
+		if(response != null) {
+			return new ResponseEntity<List<ListaInteresadoJusticiableItem>>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<List<ListaInteresadoJusticiableItem>>(new ArrayList<ListaInteresadoJusticiableItem>(), HttpStatus.OK);
+		}
+	}
+	
+	// [ idInstitucion,  idPersona, this.selectedDatos.anio,  this.selectedDatos.idTurno, this.selectedDatos.numero]
+		@RequestMapping(value = "/designas/deleteInteresado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<DeleteResponseDTO> deleteInteresado(@RequestBody String[] item, HttpServletRequest request) {
+			ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
+			interesado.setIdinstitucion(Short.parseShort(item[0]));
+			interesado.setIdpersona(Long.parseLong(item[1]));
+			interesado.setAnio(Short.parseShort(item[2]));
+			interesado.setIdturno(Integer.parseInt(item[3]));
+			interesado.setNumero(Long.parseLong(item[4]));
+			DeleteResponseDTO response = designacionesService.deleteInteresado(interesado, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+		
+		//[ designa.idInstitucion,  justiciable.idPersona, designa.anio,  designa.idTurno, designa.numero]
+		@RequestMapping(value = "/designas/insertInteresado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<InsertResponseDTO> insertInteresado(@RequestBody String[] item, HttpServletRequest request) {
+			String anio = item[2].substring(1,5);
+			ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
+			interesado.setIdinstitucion(Short.parseShort(item[0]));
+			interesado.setIdpersona(Long.parseLong(item[1]));
+			interesado.setAnio(Short.parseShort(anio));
+			interesado.setIdturno(Integer.parseInt(item[3]));
+			interesado.setNumero(Long.parseLong(item[4]));
+			InsertResponseDTO response = designacionesService.insertInteresado(interesado, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+		
 	// 3.3.6.2.6.3.	Ficha detalle del interesado 
+	
 	
 	// 3.3.6.2.7.	Tarjeta Contrarios
 	
@@ -216,24 +272,42 @@ public class DesignacionesController {
 				return new ResponseEntity<List<ListaContrarioJusticiableItem>>(new ArrayList<ListaContrarioJusticiableItem>(), HttpStatus.OK);
 			}
 		}
-		
-		// [ idInstitucion,  idPersona, this.selectedDatos.anio,  this.selectedDatos.idTurno, this.selectedDatos.numero]
-	@RequestMapping(value = "/designas/deleteContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> deleteContrario(@RequestBody String[] item, HttpServletRequest request) {
-		ScsContrariosdesigna contrario = new ScsContrariosdesigna();
-		contrario.setIdinstitucion(Short.parseShort(item[0]));
-		contrario.setIdpersona(Long.parseLong(item[1]));
-		contrario.setAnio(Short.parseShort(item[2]));
-		contrario.setIdturno(Integer.parseInt(item[3]));
-		contrario.setNumero(Long.parseLong(item[4]));
-		UpdateResponseDTO response = designacionesService.deleteContrario(contrario, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
-	}
-	
+		// [ idInstitucion,  idPersona, this.selectedDatos.anio,  this.selectedDatos.idTurno, this.selectedDatos.numero]
+		@RequestMapping(value = "/designas/deleteContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> deleteContrario(@RequestBody String[] item, HttpServletRequest request) {
+			ScsContrariosdesigna contrario = new ScsContrariosdesigna();
+			contrario.setIdinstitucion(Short.parseShort(item[0]));
+			contrario.setIdpersona(Long.parseLong(item[1]));
+			contrario.setAnio(Short.parseShort(item[2]));
+			contrario.setIdturno(Integer.parseInt(item[3]));
+			contrario.setNumero(Long.parseLong(item[4]));
+			UpdateResponseDTO response = designacionesService.deleteContrario(contrario, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+
+		//[ designa.idInstitucion,  justiciable.idPersona, designa.anio,  designa.idTurno, designa.numero]
+		@RequestMapping(value = "/designas/insertContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<InsertResponseDTO> insertContrario(@RequestBody String[] item, HttpServletRequest request) {
+			String anio = item[2].substring(1,5);
+			ScsContrariosdesigna contrario = new ScsContrariosdesigna();
+			contrario.setIdinstitucion(Short.parseShort(item[0]));
+			contrario.setIdpersona(Long.parseLong(item[1]));
+			contrario.setAnio(Short.parseShort(anio));
+			contrario.setIdturno(Integer.parseInt(item[3]));
+			contrario.setNumero(Long.parseLong(item[4]));
+			InsertResponseDTO response = designacionesService.insertContrario(contrario, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+
 	// 3.3.6.2.7.3.	Ficha detalle del contrario
 	
 	// 3.3.6.2.8.	Tarjeta Procurador

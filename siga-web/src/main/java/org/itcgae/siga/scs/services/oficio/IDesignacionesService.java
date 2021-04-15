@@ -4,13 +4,17 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
+import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 
 public interface IDesignacionesService{
 
@@ -25,4 +29,12 @@ public interface IDesignacionesService{
 	public UpdateResponseDTO updateDatosAdicionales(DesignaItem designaItem, HttpServletRequest request);
 
 	public UpdateResponseDTO deleteContrario(ScsContrariosdesigna item, HttpServletRequest request);
+
+	public List<ListaInteresadoJusticiableItem> busquedaListaInteresados(DesignaItem designa, HttpServletRequest request);
+	
+	public DeleteResponseDTO deleteInteresado(ScsDefendidosdesigna item, HttpServletRequest request);
+
+	public InsertResponseDTO insertInteresado(ScsDefendidosdesigna item, HttpServletRequest request);
+
+	public InsertResponseDTO insertContrario(ScsContrariosdesigna contrario, HttpServletRequest request);
 }

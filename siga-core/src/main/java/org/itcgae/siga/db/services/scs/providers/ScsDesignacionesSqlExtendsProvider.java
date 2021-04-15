@@ -121,7 +121,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		Hashtable codigosBind = new Hashtable();
 		int contador=0;
 		// Acceso a BBDD
-		idInstitucion = new Short("2035"); designaItem.setNumColegiado("2048");
+		//idInstitucion = new Short("2035"); designaItem.setNumColegiado("2048");
 
 		//aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
@@ -1127,9 +1127,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"        WHERE\r\n" + 
 	    			"            ( scs_contrariosdesigna.anio = "+item.getAno()+"\r\n" + 
 	    			"              AND scs_contrariosdesigna.numero = "+item.getNumero()+"\r\n" + 
-	    			//Cuando se deje de trabajar con designas fijadas hay que descomentar la linea.
-	    			//"              AND scs_contrariosdesigna.idinstitucion = "+idInstitucion+"\r\n" + 
-	    			"              AND scs_contrariosdesigna.idinstitucion = '2035' \r\n";
+	    			"              AND scs_contrariosdesigna.idinstitucion = "+idInstitucion+"\r\n";
 	    			if(!historico) {
 	    				consulta+=" AND scs_contrariosdesigna.fechabaja is null \r\n";
 	    			}
@@ -1141,4 +1139,37 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    	return consulta;
 	    }
 	    
+		public String busquedaListaInteresados(DesignaItem item, Short idInstitucion) {
+			    	
+			SQL sql = new SQL();
+			
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.idinstitucion");
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.idturno");
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.anio");
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.idpersona");
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
+			sql.SELECT("persona.nif");
+			sql.SELECT("persona.direccion");
+			sql.SELECT("    CASE\r\n" + 
+			    			"        WHEN nombrerepresentante IS NOT NULL THEN\r\n" + 
+			    			"            nombrerepresentante\r\n" + 
+			    			"        ELSE\r\n" + 
+			    			"            ''\r\n" + 
+			    			"    END AS representante\r\n");
+			sql.SELECT("            persona.apellido1\r\n" + 
+	    			"            || decode(persona.apellido2, NULL, '', ' ' || persona.apellido2)\r\n" + 
+	    			"            || ', '\r\n" + 
+	    			"            || persona.nombre AS apellidosnombre\r\n");
+			sql.FROM("SCS_DEFENDIDOSDESIGNA");
+			sql.JOIN("scs_personajg persona ON persona.idpersona = scs_DEFENDIDOSDESIGNA.idpersona AND persona.idinstitucion = scs_DEFENDIDOSDESIGNA.idinstitucion");
+			sql.WHERE("            ( scs_DEFENDIDOSDESIGNA.anio = "+item.getAno()+"\r\n" + 
+			"              AND scs_DEFENDIDOSDESIGNA.numero = "+item.getNumero()+"\r\n" + 
+			//Cuando se deje de trabajar con designas fijadas hay que descomentar la linea.
+			"              AND scs_contrariosdesigna.idinstitucion = "+idInstitucion+"\r\n" + 
+			"              AND scs_DEFENDIDOSDESIGNA.idturno = "+item.getIdTurno()+" )\r\n");
+	
+	    	
+	    	return sql.toString();
+	    }
 }

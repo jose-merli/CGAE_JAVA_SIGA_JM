@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoKey;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
@@ -121,4 +122,18 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper{
 			@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 	})
 	List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, Short idInstitucion, Boolean historico);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaListaInteresados")
+	@Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "REPRESENTANTE", property = "representante", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOSNOMBRE", property = "apellidosnombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DIRECCION", property = "direccion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ListaInteresadoJusticiableItem> busquedaListaInteresados(DesignaItem item, Short idInstitucion);
+
 }
