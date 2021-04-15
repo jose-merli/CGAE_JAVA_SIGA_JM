@@ -45,6 +45,7 @@ public class JustificacionExpressItem {
 	private String idPersona;
 	private String idProcedimiento;
 	private List<String> expedientes;
+	private List<ActuacionesJustificacionExpressItem> actuaciones;	
 	
 	/**
 	 * @return the nColegiado
@@ -612,5 +613,20 @@ public class JustificacionExpressItem {
 	 */
 	public void setExpedientes(List<String> expedientes) {
 		this.expedientes = expedientes;
+	}
+
+	/**
+	 * @return the actuaciones
+	 */
+	@JsonProperty("actuaciones")
+	public List<ActuacionesJustificacionExpressItem> getActuaciones() {
+		return actuaciones;
+	}
+
+	/**
+	 * @param actuaciones the actuaciones to set
+	 */
+	public void setActuaciones(List<ActuacionesJustificacionExpressItem> actuaciones) {
+		this.actuaciones = actuaciones;
 	}
 }
