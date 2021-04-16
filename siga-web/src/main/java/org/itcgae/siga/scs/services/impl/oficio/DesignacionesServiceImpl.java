@@ -10,13 +10,17 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
-import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
+//import org.itcgae.siga.DTOs.gen.Error;
+//import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
+//import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -557,7 +561,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
 
-					// response = scsTurnosExtendsMapper.insert(turno);
+					 response = scsTurnosExtendsMapper.insert(turno);
 
 					LOGGER.info(
 							"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
@@ -591,4 +595,81 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return insertResponseDTO;
 
 	}
+
+	@Override
+	public ProcuradorDTO busquedaProcurador(List<String>procurador, HttpServletRequest request) {
+		LOGGER.info("searchPrisiones() -> Entrada al servicio para obtener prisiones");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ProcuradorDTO procuradorDTO = new ProcuradorDTO();
+		List<ProcuradorItem> procuradorItemList = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Entrada a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				String num = procurador.get(1);
+				String idinstitucion = procurador.get(0);
+				procuradorItemList = scsDesignacionesExtendsMapper.busquedaProcurador(num,idinstitucion);
+				
+				LOGGER.info(
+						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				if (procuradorItemList != null) {
+					procuradorDTO.setProcuradorItems(procuradorItemList);
+				}
+			}
+
+		}
+		LOGGER.info("searchComisarias() -> Salida del servicio para obtener prisiones");
+		return procuradorDTO;
+	}
+	
+	@Override
+	public ComboDTO comboTipoMotivo(HttpServletRequest request) {
+
+		LOGGER.info("comboTipoMotivo() -> Entrada al servicio para combo comboTipoMotivo");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboTipoMotivo() / scsDesignacionesExtendsMapper.comboTipoMotivo() -> Entrada a scsDesignacionesExtendsMapper para obtener combo TipoMotivo");
+
+				List<ComboItem> comboItems = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion);
+
+				LOGGER.info(
+						"comboTipoMotivo() / scsDesignacionesExtendsMapper.comboTipoMotivo() -> Salida e scsDesignacionesExtendsMapper para obtener combo TipoMotivo");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboTipoMotivo() -> Salida del servicio para obtener combo TipoMotivo");
+		}
+		return comboDTO;
+	}
+
+
 }

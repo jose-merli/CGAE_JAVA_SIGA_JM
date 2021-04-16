@@ -8,16 +8,21 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
+import org.itcgae.siga.DTOs.scs.BajasTemporalesDTO;
+import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
+//import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -231,5 +236,19 @@ public class DesignacionesController {
 	}
 
 	// 3.3.6.2.14.3. Ficha Actuación
+	
+	// 3.3.6.2.2. Ficha Procurador
+
+	@RequestMapping(value = "/designas/busquedaProcurador",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ProcuradorDTO> busquedaProcurador(@RequestBody List<String> procurador, HttpServletRequest request) {
+		ProcuradorDTO response = designacionesService.busquedaProcurador(procurador, request);
+		return new ResponseEntity<ProcuradorDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/designas/comboTipoMotivo")
+	public ResponseEntity<ComboDTO> comboTipoMotivo(HttpServletRequest request) {
+		ComboDTO response = designacionesService.comboTipoMotivo(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 }

@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.scs.providers;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.ibatis.jdbc.SQL;
@@ -10,6 +11,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
 
@@ -1160,6 +1162,37 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("*");
 		sql.FROM("( " + sql2.toString() + " )");
 		sql.WHERE("ROWNUM <= 201");
+
+		return sql.toString();
+	}
+
+	
+	public String busquedaProcurador(String num, String idinstitucion) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT("p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivorenuncia, dp.fecharenunciasolicita");
+
+		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
+		sql.WHERE("dp.idinstitucion = "+idinstitucion);
+		sql.WHERE("dp.numero ="+num);
+		sql.WHERE("p.idprocurador = dp.idprocurador");
+		sql2.ORDER_BY("dp.FECHADESIGNA DESC");
+
+		sql.SELECT("*");
+		sql.FROM("( " + sql2.toString() + " )");
+		sql.WHERE("ROWNUM <= 201");
+
+		return sql.toString();
+	}
+	
+	public String comboTipoMotivo(short institucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("E.nombre, F_SIGA_GETRECURSO(E.nombre, 1)");
+		sql.FROM("cen_gruposcliente E");
+		sql.WHERE(" E.IDINSTITUCION ='"+institucion+"'");
+		sql.ORDER_BY("idgrupo ASC");
 
 		return sql.toString();
 	}

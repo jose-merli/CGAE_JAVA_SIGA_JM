@@ -6,10 +6,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+//import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 
 public interface IDesignacionesService {
 
@@ -27,4 +30,8 @@ public interface IDesignacionesService {
 	public ActuacionDesignaDTO busquedaActDesigna(DesignaItem designaItem, HttpServletRequest request);
 
 	public InsertResponseDTO createDesigna(DesignaItem designaItem, HttpServletRequest request);
+	
+	public ProcuradorDTO busquedaProcurador(List<String> procurador, HttpServletRequest request);
+
+	ComboDTO comboTipoMotivo(HttpServletRequest request);
 }

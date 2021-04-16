@@ -7,14 +7,16 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
+//import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosDesignaItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsBajasTemporalesSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -118,4 +120,25 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FACTURACION", property = "facturacion", jdbcType = JdbcType.VARCHAR) })
 	List<ActuacionDesignaItem> busquedaActDesigna(DesignaItem designaItem, String idInstitucion);
 
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaProcurador")
+	@Results({
+			@Result(column = "NCOLEGIADO", property = "ncolegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMERODESIGNACION", property = "numerodesignacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHADESIGNA", property = "fechadesigna", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "MOTIVOSRENUNCIA", property = "motivosrenuncia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciaefectiva", jdbcType = JdbcType.VARCHAR) })
+	List<ProcuradorItem> busquedaProcurador(String num, String idinstitucion);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboTipoMotivo")
+	@Results({
+		@Result(column = "NOMBRE", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+
+	List<ComboItem> comboTipoMotivo(short idInstitucion);
 }
