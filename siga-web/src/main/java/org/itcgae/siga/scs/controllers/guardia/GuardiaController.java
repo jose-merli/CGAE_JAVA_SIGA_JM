@@ -15,6 +15,8 @@ import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosSalidaItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
+import org.itcgae.siga.DTOs.scs.DeleteCalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
@@ -187,10 +189,23 @@ public class GuardiaController {
 		return new ResponseEntity<ComboIncompatibilidadesResponse>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping(value = "/buscarCalendariosProgramados", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<List<CalendariosProgDatosSalidaItem>> getCalendariosProgramados(@RequestBody CalendariosProgDatosEntradaItem calendarioProgBody, HttpServletRequest request){
+	@PostMapping(value = "/buscarCalendariosProgramados2", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<CalendariosProgDatosSalidaItem>> getCalendariosProgramados2(@RequestBody CalendariosProgDatosEntradaItem calendarioProgBody, HttpServletRequest request){
 		List<CalendariosProgDatosSalidaItem> response= guardiasService.getCalendariosProg(calendarioProgBody, request);
 		return new ResponseEntity<List<CalendariosProgDatosSalidaItem>>(response, HttpStatus.OK);
+	}
+	
+	
+	@PostMapping(value = "/buscarCalendariosProgramados", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<DatosCalendarioProgramadoItem>> getCalendarioProgramado(@RequestBody CalendariosProgDatosEntradaItem calendarioProgBody, HttpServletRequest request) {
+		List<DatosCalendarioProgramadoItem> response = guardiasService.getCalendarioProgramado(calendarioProgBody, request);
+		return new ResponseEntity<List<DatosCalendarioProgramadoItem>>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/eliminarCalendariosProgramados", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> deleteCalendariosProgramados(@RequestBody DeleteCalendariosProgDatosEntradaItem deleteCalBody, HttpServletRequest request){
+		DeleteResponseDTO response= guardiasService.deleteCalendariosProgramados(deleteCalBody, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	
 }

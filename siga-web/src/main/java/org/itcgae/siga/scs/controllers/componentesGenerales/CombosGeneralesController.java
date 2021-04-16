@@ -148,6 +148,12 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping("/conjuntoguardias")
+	public ResponseEntity<ComboDTO> comboConjuntoGuardias(HttpServletRequest request) {
+		ComboDTO response = comboService.comboConjuntoGuardias(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping("/estado")
 	public ResponseEntity<ComboDTO> comboEstados(HttpServletRequest request) {
 		ComboDTO response = comboService.comboEstados(request);

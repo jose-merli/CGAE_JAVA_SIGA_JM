@@ -26,6 +26,8 @@ import org.itcgae.siga.DTOs.scs.CalendariosProgDatosSalidaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesResponse;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
+import org.itcgae.siga.DTOs.scs.DeleteCalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
@@ -1901,6 +1903,105 @@ public class GuardiasServiceImpl implements GuardiasService {
 		
 		return calendariosList;
 	}
-	
+	@Override
+	public List<DatosCalendarioProgramadoItem> getCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<DatosCalendarioProgramadoItem> datos = new ArrayList<DatosCalendarioProgramadoItem>();
+		List<DatosCalendarioProgramadoItem> datosFull = new ArrayList<DatosCalendarioProgramadoItem>();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getCalendarioProgramado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getCalendarioProgramado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("getCalendarioProgramado() -> Entrada para obtener los datos del calendario");
+
+				datos = scsGuardiasturnoExtendsMapper.getCalendarioProgramado(calendarioProgBody, idInstitucion.toString());
+
+				datos.forEach(d ->{
+					String numGuardias = scsGuardiasturnoExtendsMapper.getNumGuardiasCalProg(d.getIdCalG());
+					String turno = scsGuardiasturnoExtendsMapper.getTurnoCalProg( d.getIdTurno(), d.getIdCalG(), idInstitucion.toString());
+					String guardia = scsGuardiasturnoExtendsMapper.getGuardiaCalProg( d.getIdTurno(), calendarioProgBody.getIdGuardia(), d.getIdCalG(), idInstitucion.toString());
+//					List<String> observaciones = scsGuardiasturnoExtendsMapper.getObservacionesCalendario(calendarioProgBody.getIdGuardia(), calendarioProgBody.getIdTurno(), idInstitucion.toString(), d.getFechaDesde(), d.getFechaHasta());
+//					String observacionesSt = "";
+//					for (int i = 0; i <=observaciones.size(); i++) {
+//						observacionesSt = observacionesSt.concat(observaciones.get(i) + " ,");
+//					}
+//					
+					d.setNumGuardias(numGuardias);
+					d.setTurno(turno);
+					d.setGuardia(guardia);
+//					d.setObservaciones(observacionesSt);
+					d.setObservaciones("duda");
+					datosFull.add(d);
+				});
+				
+				LOGGER.info("getCalendarioProgramado() -> Salida ya con los datos recogidos");
+			}
+		}
+
+		return datosFull;
+	}
+
+	@Override
+	public DeleteResponseDTO deleteCalendariosProgramados(DeleteCalendariosProgDatosEntradaItem deleteCalBody,
+			HttpServletRequest request) {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		int response = 1;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"deleteCalendariosProgramados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"deleteCalendariosProgramados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0 && deleteCalBody.getIdTurno() != null && !deleteCalBody.getIdTurno().isEmpty() && deleteCalBody.getIdInstitucion() != null && 
+					!deleteCalBody.getIdInstitucion().isEmpty() && deleteCalBody.getIdGuardia() != null && !deleteCalBody.getIdGuardia().isEmpty() && 
+							deleteCalBody.getIdCalendarioProgramado() != null && !deleteCalBody.getIdCalendarioProgramado().isEmpty()) {
+				LOGGER.info("deleteIncompatibilidades() -> Entrada para borrar las incompatibilidades");
+				//Doble borrado
+				scsIncompatibilidadguardiasExtendsMapper.deleteCalendarioProgramado1(deleteCalBody.getIdTurno(), deleteCalBody.getIdInstitucion(), deleteCalBody.getIdGuardia(), deleteCalBody.getIdCalendarioProgramado());
+				scsIncompatibilidadguardiasExtendsMapper.deleteCalendarioProgramado2(deleteCalBody.getIdTurno(), deleteCalBody.getIdInstitucion(), deleteCalBody.getIdGuardia(), deleteCalBody.getIdCalendarioProgramado());
+				
+				LOGGER.info("deleteCalendariosProgramados() -> Salida ya con los datos recogidos");
+			}else {
+				response = 0;
+			}
+		}
+		
+		// comprobacion actualización
+		if (response >= 1) {
+			LOGGER.info("deleteCalendariosProgramados() -> OK. Delete para incompatibilidades realizado correctamente");
+			deleteResponseDTO.setStatus(SigaConstants.OK);
+		} else {
+			LOGGER.info("deleteCalendariosProgramados() -> KO. Delete para incompatibilidades NO realizado correctamente");
+			deleteResponseDTO.setStatus(SigaConstants.KO);
+		}
+
+		LOGGER.info("deleteCalendariosProgramados() -> Salida del servicio para eliminar incompatibilidades");
+		return deleteResponseDTO;
+	}
+
 }
 

@@ -305,6 +305,26 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 
 		return sql.toString();
 	}
+	public String deleteCalendarioProgramado1(String idTurno, String idInstitucion, String idGuardia, String idCalendarioProgramado) {
+		SQL sql = new SQL();
+		sql.DELETE_FROM("SCS_HCO_CONF_PROG_CALENDARIOS" );
+			sql.WHERE(
+				"SCS_HCO_CONF_PROG_CALENDARIOS.IDPROGCALENDARIO = " + idCalendarioProgramado );
+	
+
+		return sql.toString();
+	}
+	
+	public String deleteCalendarioProgramado2(String idTurno, String idInstitucion, String idGuardia, String idCalendarioProgramado) {
+		SQL sql = new SQL();
+		sql.DELETE_FROM("SCS_PROG_CALENDARIOS" );
+			sql.WHERE(
+				"SCS_PROG_CALENDARIOS.IDPROGCALENDARIO = " + idCalendarioProgramado );
+	
+
+		return sql.toString();
+	}
+	
 	
 	public String saveIncompatibilidades(int idTurno, int idInstitucion, int idGuardia, int idTurnoIncompatible, int idGuardiaIncompatible, int usuario, String motivos, int diasSeparacionGuardias, String fechaModificacion) {
 		SQL sql = new SQL();

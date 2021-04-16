@@ -4,8 +4,8 @@ package org.itcgae.siga.DTOs.scs;
 public class CalendariosProgDatosEntradaItem {
 	
 	private String idTurno;
-	private String guardia;
-	private String listaGuardias;
+	private String idGuardia;
+	private String idConjuntoGuardia;
 	private String estado;
 	private String fechaCalendarioDesde;
 	private String fechaCalendarioHasta;
@@ -18,17 +18,17 @@ public class CalendariosProgDatosEntradaItem {
 	public void setIdTurno(String idTurno) {
 		this.idTurno = idTurno;
 	}
-	public String getGuardia() {
-		return guardia;
+	public String getIdGuardia() {
+		return idGuardia;
 	}
-	public void setGuardia(String guardia) {
-		this.guardia = guardia;
+	public void setIdGuardia(String idGuardia) {
+		this.idGuardia = idGuardia;
 	}
-	public String getListaGuardias() {
-		return listaGuardias;
+	public String getIdConjuntoGuardia() {
+		return idConjuntoGuardia;
 	}
-	public void setListaGuardias(String listaGuardias) {
-		this.listaGuardias = listaGuardias;
+	public void setIdConjuntoGuardia(String idConjuntoGuardia) {
+		this.idConjuntoGuardia = idConjuntoGuardia;
 	}
 	public String getEstado() {
 		return estado;

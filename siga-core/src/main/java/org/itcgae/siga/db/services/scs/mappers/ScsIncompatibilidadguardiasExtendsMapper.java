@@ -64,6 +64,13 @@ public interface ScsIncompatibilidadguardiasExtendsMapper extends ScsIncompatibi
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "deleteIncompatibilidades")
 	void deleteIncompatibilidades(String idTurno, String idInstitucion, String idGuardia, String idTurnoIncompatible, String idGuardiaIncompatible);
 		
+	
+	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "deleteCalendarioProgramado1")
+	void deleteCalendarioProgramado1(String idTurno, String idInstitucion, String idGuardia, String idCalendarioProgramado);
+	
+	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "deleteCalendarioProgramado2")
+	void deleteCalendarioProgramado2(String idTurno, String idInstitucion, String idGuardia, String idCalendarioProgramado);
+	
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "saveIncompatibilidades")
 
 	void saveListadoIncompatibilidades(int idTurno, int idInstitucion, int idGuardia, int idTurnoIncompatible, int idGuardiaIncompatible, int usuario, String motivos, int diasSeparacionGuardias, String fechaModificacion);

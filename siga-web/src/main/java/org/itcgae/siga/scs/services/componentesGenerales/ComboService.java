@@ -50,4 +50,6 @@ public interface ComboService {
 	public ComboDTO comboListasGuardias(HttpServletRequest request, String idTurno);
 
 	public ComboDTO comboEstados(HttpServletRequest request);
+
+	public ComboDTO comboConjuntoGuardias(HttpServletRequest request);
 }
