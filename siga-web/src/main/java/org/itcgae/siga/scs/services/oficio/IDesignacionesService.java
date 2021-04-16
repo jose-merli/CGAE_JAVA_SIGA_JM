@@ -14,8 +14,15 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+<<<<<<< HEAD
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
+=======
+import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
+import org.itcgae.siga.db.entities.ScsContrariosdesigna;
+import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
+import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
+>>>>>>> dcfbe3753501618628abbbbc852a37cd2cbbf8aa
 
 public interface IDesignacionesService {
 
@@ -24,12 +31,22 @@ public interface IDesignacionesService {
 
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
 
-	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request);
+	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request, Boolean historico);
 
 	public UpdateResponseDTO updateDetalleDesigna(DesignaItem designaItem, HttpServletRequest request);
 
 	public UpdateResponseDTO updateDatosAdicionales(DesignaItem designaItem, HttpServletRequest request);
 
+	public UpdateResponseDTO deleteContrario(ScsContrariosdesigna item, HttpServletRequest request);
+
+	public List<ListaInteresadoJusticiableItem> busquedaListaInteresados(DesignaItem designa, HttpServletRequest request);
+	
+	public DeleteResponseDTO deleteInteresado(ScsDefendidosdesigna item, HttpServletRequest request);
+
+	public InsertResponseDTO insertInteresado(ScsDefendidosdesigna item, HttpServletRequest request);
+
+	public InsertResponseDTO insertContrario(ScsContrariosdesigna contrario, HttpServletRequest request);
+	
 	public ActuacionDesignaDTO busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			HttpServletRequest request);
 
