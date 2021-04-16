@@ -147,7 +147,7 @@ public class DesignacionesController {
 		else
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-
+	// 3.3.6.2.4. Tarjeta Detalle Designacion
 	// 3.3.6.2.4. Tarjeta Datos Adicionales
 
 	@RequestMapping(value = "/designas/updateDatosAdicionales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

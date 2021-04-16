@@ -123,13 +123,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		Hashtable codigosBind = new Hashtable();
 		int contador = 0;
 		// Acceso a BBDD
-
+		
 		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
 			sql = " select distinct procd.nombre as nombreprocedimiento, juzgado.nombre as nombrejuzgado,"
 					+ " des.nig, des.numprocedimiento, des.estado estado, des.anio anio, des.numero numero,"
 					+ " des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta, des.fechaentrada fechaentrada,"
-					+ "des.idturno idturno, des.codigo codigo, des.sufijo sufijo,des.idinstitucion idinstitucion,"
+					+ "des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 					+ " turno.nombre, des.fechaestado fechaestado, colegiado.ncolegiado, persona.nombre as nombrepersona,"
 					+ " persona.APELLIDOS1 as apellido1persona,  persona.APELLIDOS2 as apellido2persona ";
 			sql += " from scs_designa des, CEN_COLEGIADO colegiado, cen_persona persona ";
@@ -920,11 +920,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String comboProcedimientos(Short idInstitucion) {
 
 		SQL sql = new SQL();
-		sql.SELECT("DISTINCT B.IDPROCEDIMIENTO, B.NOMBRE ");
-		sql.FROM("SCS_PRETENSIONESPROCED A ");
-		sql.INNER_JOIN(
-				"SCS_PROCEDIMIENTOS B ON A.IDPROCEDIMIENTO = B.IDPROCEDIMIENTO AND A.IDINSTITUCION = B.IDINSTITUCION ");
-		sql.WHERE("A.IDINSTITUCION = " + idInstitucion);
+		sql.SELECT(" DISTINCT IDPRETENSION, F_SIGA_GETRECURSO(DESCRIPCION, 1) AS NOMBRE");
+		sql.FROM("SCS_PRETENSION");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 
 		return sql.toString();
 	}

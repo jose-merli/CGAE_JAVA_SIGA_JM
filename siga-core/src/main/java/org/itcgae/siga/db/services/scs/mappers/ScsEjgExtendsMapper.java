@@ -64,15 +64,15 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	List<ColegiadosSJCSItem> busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje, Integer tamMaximo);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "tieneGuardias")
-	@Results({ @Result(column = "idGuardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),})
+	@Results({ @Result(column = "idGuardia", property = "tieneGuardia", jdbcType = JdbcType.VARCHAR),})
 	List<String> tieneGuardias(String idInstitucion, ColegiadosSJCSItem colegiadosSJCSItem);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "tieneTurnos")
-	@Results({ @Result(column = "idTurno", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "idTurno", property = "tieneTurno", jdbcType = JdbcType.VARCHAR),
 	@Result(column = "idPersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),})
 	List<ColegiadosSJCSItem> tieneTurnos(String idInstitucion, String idPersona);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "tieneGuardiasPendientes")
-	@Results({ @Result(column = "idGuardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),})
+	@Results({ @Result(column = "idGuardia", property = "tieneGuardia", jdbcType = JdbcType.VARCHAR),})
 	String tieneGuardiasPendientes(String idInstitucion, ColegiadosSJCSItem colegiadosSJCSItem, String idGuardia);
 }
