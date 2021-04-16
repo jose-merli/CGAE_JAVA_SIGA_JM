@@ -18,13 +18,10 @@ import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
-<<<<<<< HEAD
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
-=======
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoKey;
->>>>>>> dcfbe3753501618628abbbbc852a37cd2cbbf8aa
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsBajasTemporalesSqlExtendsProvider;

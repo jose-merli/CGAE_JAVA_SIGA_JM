@@ -14,15 +14,12 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
-<<<<<<< HEAD
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
-=======
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
->>>>>>> dcfbe3753501618628abbbbc852a37cd2cbbf8aa
 
 public interface IDesignacionesService {
 

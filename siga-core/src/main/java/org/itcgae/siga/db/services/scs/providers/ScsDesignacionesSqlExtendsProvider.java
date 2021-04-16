@@ -1262,8 +1262,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 	
-<<<<<<< HEAD
-=======
 	    public String busquedaListaContrarios(DesignaItem item, Short idInstitucion, Boolean historico) {
 	    	
 	    	String consulta ="SELECT\r\n" + 
@@ -1392,7 +1390,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    	return sql.toString();
 	    }
 
->>>>>>> dcfbe3753501618628abbbbc852a37cd2cbbf8aa
 	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion,
 			AdmUsuarios usuario, boolean anular) {
 		SQL sql = new SQL();
