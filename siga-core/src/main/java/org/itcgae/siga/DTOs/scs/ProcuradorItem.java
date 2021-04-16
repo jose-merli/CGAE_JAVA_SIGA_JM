@@ -30,6 +30,12 @@ public class ProcuradorItem {
 		private String nombrePoblacion;
 		private String nombreProvincia;
 		private String nombreApe;
+		private String numero;
+		private String numerodesignacion;
+		private String fechaDesigna;
+		private String observaciones;
+		private String motivosRenuncia;
+		private String fecharenunciasolicita;
 		
 		
 		
@@ -365,6 +371,104 @@ public class ProcuradorItem {
 			this.nombreProvincia = nombreProvincia;
 		}
 
+		/**
+		 * @return the fechabaja
+		 */
+		public Date getFechabaja() {
+			return fechabaja;
+		}
+
+		/**
+		 * @param fechabaja the fechabaja to set
+		 */
+		public void setFechabaja(Date fechabaja) {
+			this.fechabaja = fechabaja;
+		}
+
+		/**
+		 * @return the numero
+		 */
+		public String getNumero() {
+			return numero;
+		}
+
+		/**
+		 * @param numero the numero to set
+		 */
+		public void setNumero(String numero) {
+			this.numero = numero;
+		}
+
+		/**
+		 * @return the numerodesignacion
+		 */
+		public String getNumerodesignacion() {
+			return numerodesignacion;
+		}
+
+		/**
+		 * @param numerodesignacion the numerodesignacion to set
+		 */
+		public void setNumerodesignacion(String numerodesignacion) {
+			this.numerodesignacion = numerodesignacion;
+		}
+
+		/**
+		 * @return the fechaDesigna
+		 */
+		public String getFechaDesigna() {
+			return fechaDesigna;
+		}
+
+		/**
+		 * @param fechaDesigna the fechaDesigna to set
+		 */
+		public void setFechaDesigna(String fechaDesigna) {
+			this.fechaDesigna = fechaDesigna;
+		}
+
+		/**
+		 * @return the observaciones
+		 */
+		public String getObservaciones() {
+			return observaciones;
+		}
+
+		/**
+		 * @param observaciones the observaciones to set
+		 */
+		public void setObservaciones(String observaciones) {
+			this.observaciones = observaciones;
+		}
+
+		/**
+		 * @return the motivosRenuncia
+		 */
+		public String getMotivosRenuncia() {
+			return motivosRenuncia;
+		}
+
+		/**
+		 * @param motivosRenuncia the motivosRenuncia to set
+		 */
+		public void setMotivosRenuncia(String motivosRenuncia) {
+			this.motivosRenuncia = motivosRenuncia;
+		}
+
+		/**
+		 * @return the fecharenunciasolicita
+		 */
+		public String getFecharenunciasolicita() {
+			return fecharenunciasolicita;
+		}
+
+		/**
+		 * @param fecharenunciasolicita the fecharenunciasolicita to set
+		 */
+		public void setFecharenunciasolicita(String fecharenunciasolicita) {
+			this.fecharenunciasolicita = fecharenunciasolicita;
+		}
+
 		@Override
 		public boolean equals(java.lang.Object o) {
 			if (this == o) {
@@ -389,7 +493,8 @@ public class ProcuradorItem {
 					&& Objects.equals(this.codigoExt, prisionItem.codigoExt)
 					&& Objects.equals(this.email, prisionItem.email)
 					&& Objects.equals(this.nombrePoblacion, prisionItem.nombrePoblacion)
-					&& Objects.equals(this.nombreProvincia, prisionItem.nombreProvincia);
+					&& Objects.equals(this.nombreProvincia, prisionItem.nombreProvincia)
+					&& Objects.equals(this.numero, prisionItem.numero);
 
 		}
 
@@ -399,7 +504,7 @@ public class ProcuradorItem {
 		public int hashCode() {
 			return Objects.hash(idProcurador, nombre, domicilio, usuModificacion, fechaModificacion, codigoPostal,
 					idPoblacion, idProvincia, idInstitucion, historico, fechabaja, telefono1, telefono2,
-					codigoExt, email, nombrePoblacion, nombreProvincia);
+					codigoExt, email, nombrePoblacion, nombreProvincia, numero);
 		}
 
 		@Override
@@ -424,6 +529,7 @@ public class ProcuradorItem {
 			sb.append("    email: ").append(toIndentedString(email)).append("\n");
 			sb.append("    nombrePoblacion: ").append(toIndentedString(nombrePoblacion)).append("\n");
 			sb.append("    nombreProvincia: ").append(toIndentedString(nombreProvincia)).append("\n");
+			sb.append("    numero: ").append(toIndentedString(numero)).append("\n");
 
 			sb.append("}");
 			return sb.toString();

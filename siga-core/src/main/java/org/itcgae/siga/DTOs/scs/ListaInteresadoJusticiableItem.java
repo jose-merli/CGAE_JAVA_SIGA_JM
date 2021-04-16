@@ -1,19 +1,19 @@
 package org.itcgae.siga.DTOs.scs;
 
-import java.util.Date;
 
-public class ListaContrarioJusticiableItem {
-	
+
+public class ListaInteresadoJusticiableItem {
+
+
 	private String idInstitucion;
 	private String idTurno;
 	private String anio;
 	private String numero;
 	private String nif;
-	private String abogado;
-	private String procurador;
 	private String apellidosnombre;
 	private String idPersona;
-	private Date fechaBaja;
+	private String direccion;
+	private String representante;
 	
 	public String getIdPersona() {
 		return idPersona;
@@ -51,30 +51,22 @@ public class ListaContrarioJusticiableItem {
 	public void setNif(String nif) {
 		this.nif = nif;
 	}
-	public String getAbogado() {
-		return abogado;
-	}
-	public void setAbogado(String abogado) {
-		this.abogado = abogado;
-	}
-	public String getProcurador() {
-		return procurador;
-	}
-	public void setProcurador(String procurador) {
-		this.procurador = procurador;
-	}
 	public String getApellidosnombre() {
 		return apellidosnombre;
 	}
 	public void setApellidosnombre(String apellidosnombre) {
 		this.apellidosnombre = apellidosnombre;
 	}
-	public Date getFechaBaja() {
-		return fechaBaja;
+	public String getDireccion() {
+		return direccion;
 	}
-	public void setFechaBaja(Date fechaBaja) {
-		this.fechaBaja = fechaBaja;
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
 	}
-	
-	
+	public String getRepresentante() {
+		return representante;
+	}
+	public void setRepresentante(String representante) {
+		this.representante = representante;
+	}
 }
