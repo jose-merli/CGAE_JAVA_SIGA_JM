@@ -235,18 +235,25 @@ public class DesignacionesController {
 	}
 
 	@PostMapping(value = "/designas/reactivarActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<DeleteResponseDTO> reactivarActDesigna(
+	public ResponseEntity<UpdateResponseDTO> reactivarActDesigna(
 			@RequestBody List<ActuacionDesignaItem> listaActuacionDesignaItem, HttpServletRequest request) {
-		DeleteResponseDTO response = designacionesService.anularReactivarActDesigna(listaActuacionDesignaItem, false,
+		UpdateResponseDTO response = designacionesService.anularReactivarActDesigna(listaActuacionDesignaItem, false,
 				request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/designas/anularActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<DeleteResponseDTO> anularActDesigna(
+	public ResponseEntity<UpdateResponseDTO> anularActDesigna(
 			@RequestBody List<ActuacionDesignaItem> listaActuacionDesignaItem, HttpServletRequest request) {
-		DeleteResponseDTO response = designacionesService.anularReactivarActDesigna(listaActuacionDesignaItem, true,
+		UpdateResponseDTO response = designacionesService.anularReactivarActDesigna(listaActuacionDesignaItem, true,
 				request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/designas/eliminarActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> eliminarActDesigna(
+			@RequestBody List<ActuacionDesignaItem> listaActuacionDesignaItem, HttpServletRequest request) {
+		DeleteResponseDTO response = designacionesService.eliminarActDesigna(listaActuacionDesignaItem, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
