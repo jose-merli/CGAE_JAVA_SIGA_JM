@@ -635,7 +635,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
 
-					 response = scsTurnosExtendsMapper.insert(turno);
+					 //response = scsTurnosExtendsMapper.insert(turno);
 
 					LOGGER.info(
 							"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
