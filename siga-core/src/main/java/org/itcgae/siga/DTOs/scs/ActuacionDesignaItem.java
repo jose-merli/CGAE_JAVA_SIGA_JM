@@ -4,6 +4,10 @@ public class ActuacionDesignaItem {
 
 	private String fechaActuacion;
 	private String numero;
+	private String numeroAsunto;
+	private String idTurno;
+	private String anio;
+	private boolean facturado;
 	private String modulo;
 	private String acreditacion;
 	private String fechaJustificacion;
@@ -37,6 +41,62 @@ public class ActuacionDesignaItem {
 	 */
 	public void setNumero(String numero) {
 		this.numero = numero;
+	}
+
+	/**
+	 * @return the numeroAsunto
+	 */
+	public String getNumeroAsunto() {
+		return numeroAsunto;
+	}
+
+	/**
+	 * @param numeroAsunto the numeroAsunto to set
+	 */
+	public void setNumeroAsunto(String numeroAsunto) {
+		this.numeroAsunto = numeroAsunto;
+	}
+
+	/**
+	 * @return the idTurno
+	 */
+	public String getIdTurno() {
+		return idTurno;
+	}
+
+	/**
+	 * @param idTurno the idTurno to set
+	 */
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
+	}
+
+	/**
+	 * @return the anio
+	 */
+	public String getAnio() {
+		return anio;
+	}
+
+	/**
+	 * @param anio the anio to set
+	 */
+	public void setAnio(String anio) {
+		this.anio = anio;
+	}
+
+	/**
+	 * @return the facturado
+	 */
+	public boolean isFacturado() {
+		return facturado;
+	}
+
+	/**
+	 * @param facturado the facturado to set
+	 */
+	public void setFacturado(boolean facturado) {
+		this.facturado = facturado;
 	}
 
 	/**
@@ -125,9 +185,10 @@ public class ActuacionDesignaItem {
 
 	@Override
 	public String toString() {
-		return "ActuacionDesignaItem [fechaActuacion=" + fechaActuacion + ", numero=" + numero + ", modulo=" + modulo
-				+ ", acreditacion=" + acreditacion + ", fechaJustificacion=" + fechaJustificacion + ", validada="
-				+ validada + ", anulada=" + anulada + ", facturacion=" + facturacion + "]";
+		return "ActuacionDesignaItem [fechaActuacion=" + fechaActuacion + ", numero=" + numero + ", numeroAsunto="
+				+ numeroAsunto + ", idTurno=" + idTurno + ", anio=" + anio + ", facturado=" + facturado + ", modulo="
+				+ modulo + ", acreditacion=" + acreditacion + ", fechaJustificacion=" + fechaJustificacion
+				+ ", validada=" + validada + ", anulada=" + anulada + ", facturacion=" + facturacion + "]";
 	}
 
 }
