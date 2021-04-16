@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
@@ -1415,7 +1416,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 
-		sql2.SELECT("p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivorenuncia, dp.fecharenunciasolicita");
+		sql2.SELECT("p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia, dp.fecharenunciasolicita");
 
 		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
 		sql.WHERE("dp.idinstitucion = "+idinstitucion);
@@ -1438,6 +1439,21 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" E.IDINSTITUCION ='"+institucion+"'");
 		sql.ORDER_BY("idgrupo ASC");
 		
+		return sql.toString();
+	}
+	
+	public String guardarProcurador(ProcuradorItem procuradorItem) {
+		
+		SQL sql = new SQL();
+		sql.UPDATE("scs_designaprocuraodr dp");
+		
+		sql.SET("fechadesigna ="+procuradorItem.getFechaDesigna());
+		sql.SET("numerodesignacion ="+procuradorItem.getNumerodesignacion());
+		sql.SET("motivosrenuncia ="+procuradorItem.getMotivosRenuncia());
+
+		sql.WHERE("dp.numero= "+procuradorItem.getNumero());
+		sql.WHERE("dp.idinstitucion="+procuradorItem.getIdInstitucion());
+
 		return sql.toString();
 	}
 

@@ -367,6 +367,15 @@ public class DesignacionesController {
 	public ResponseEntity<ComboDTO> comboTipoMotivo(HttpServletRequest request) {
 		ComboDTO response = designacionesService.comboTipoMotivo(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}	
+	
+	@RequestMapping(value = "/designas/guardarProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> guardarProcurador(@RequestBody List<ProcuradorItem> procuradorItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.guardarProcurador(procuradorItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

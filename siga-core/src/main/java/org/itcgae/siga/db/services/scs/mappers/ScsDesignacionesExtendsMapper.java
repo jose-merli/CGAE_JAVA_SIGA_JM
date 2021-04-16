@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosDesignaItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -222,4 +223,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	})
 
 	List<ComboItem> comboTipoMotivo(short idInstitucion);
+	
+	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "guardarProcurador")
+	int guardarProcurador(ProcuradorItem procuradorItem);
 }
