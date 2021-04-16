@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.services.impl.oficio;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -54,6 +55,12 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.atos.utils.Row;
+import com.siga.Utilidades.UtilidadesString;
+import com.siga.beans.Hashtable;
+import com.siga.beans.ScsDesignaBean;
+import com.siga.beans.String;
 
 @Service
 public class DesignacionesServiceImpl implements IDesignacionesService {
@@ -989,14 +996,84 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			if (null != usuarios && usuarios.size() >= 0) {
 				try {
 
+					//Obtenemos el parametro de limite para el campo CODIGO en BBDD
+					StringDTO parametros = new StringDTO();
+					String longitudDesigna;
+					
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG", idInstitucion.toString());
+					
+					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+					// la institucion 0
+					if (parametros != null && parametros.getValor() != null) {
+						longitudDesigna = parametros.getValor();
+					} else {
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", "0");
+						longitudDesigna = parametros.getValor();
+					}
+					
+					
+					
+					
 					ScsDesigna designa = new ScsDesigna();
 					designa.setIdinstitucion(idInstitucion);
 					designa.setIdturno(designaItem.getIdTurno());
-					designa.setAnio((short) designaItem.getAno());
+					
+					Calendar cal= Calendar.getInstance();
+					short year= (short) cal.get(Calendar.YEAR);
+					designa.setAnio(year);
+					
+					//CALCULO CAMPO CODIGO (NUMERO EN FRONT)
+					designa.setCodigo(longitudDesigna);
+					
+					String sqlNumeroDesig ="SELECT (MAX(to_number(CODIGO)) + 1) AS NUMERODESIG FROM " + nombreTabla + 
+							" WHERE IDINSTITUCION =" + entrada.get("IDINSTITUCION") +
+							" AND ANIO =" + ((((String)entrada.get("FECHAENTRADAINICIO")).substring(((String)entrada.get("FECHAENTRADAINICIO")).indexOf("/")+1)).substring(((String)entrada.get("FECHAENTRADAINICIO")).indexOf("/")+1));
+					
+					
+					
+					if (rc1.query(sqlNumeroDesig)) {
+						Row fila1 = (Row) rc1.get(0);
+						Hashtable prueba1 = fila1.getRow();			
+						if (prueba1.get("NUMERODESIG").equals("")) {
+							codigo="1";
+							codigo=UtilidadesString.formatea(codigo,Integer.parseInt(longitudDesigna),true);
+							entrada.put(ScsDesignaBean.C_CODIGO,codigo);
+						}
+						else{
+							codigo=(String)prueba1.get("NUMERODESIG");
+							codigo=UtilidadesString.formatea(codigo,Integer.parseInt(longitudDesigna),true);
+							entrada.put(ScsDesignaBean.C_CODIGO,codigo);								
+						}
+					}
+					
+					
+					//CALCULO CAMPO NUMERO 
 					designa.setNumero(new Long(designaItem.getNumero()));
+					
+					String sql ="SELECT (MAX(NUMERO) + 1) AS NUMERO FROM " + nombreTabla + 
+							" WHERE IDINSTITUCION =" + entrada.get("IDINSTITUCION") +
+							" AND ANIO =" + ((((String)entrada.get("FECHAENTRADAINICIO")).substring(((String)entrada.get("FECHAENTRADAINICIO")).indexOf("/")+1)).substring(((String)entrada.get("FECHAENTRADAINICIO")).indexOf("/")+1)) +
+							" AND IDTURNO =" + entrada.get("IDTURNO");		
+					
+					if (rc.query(sql)) {
+						Row fila = (Row) rc.get(0);
+						Hashtable prueba = fila.getRow();			
+						if (prueba.get("NUMERO").equals("")) {
+							entrada.put(ScsDesignaBean.C_NUMERO,"1");
+						}
+						else entrada.put(ScsDesignaBean.C_NUMERO,(String)prueba.get("NUMERO"));								
+					}
+					
+					
+					
+					
+					
 					designa.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
 					designa.setArt27(designaItem.getArt27());
 
+					
+					//SCS_INSCRIPCIONTURNO por idPersona idinstitucion idturno. 
+					
 					ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
 					designaLetrado.setIdinstitucion(idInstitucion);
 					designaLetrado.setIdturno(designaItem.getIdTurno());
@@ -1004,6 +1081,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designaLetrado.setNumero(new Long(designaItem.getNumero()));
 					// designaLetrado.set
 
+					
+		
+					
+					
+					
+					
 					LOGGER.info(
 							"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
 
