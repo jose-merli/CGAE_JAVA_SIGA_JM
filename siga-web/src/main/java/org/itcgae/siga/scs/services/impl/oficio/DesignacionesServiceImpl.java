@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.services.impl.oficio;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -431,7 +432,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 
 	@Override
-	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request) {
+	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request, Boolean historico) {
 		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio servicio");
 		List<ListaContrarioJusticiableItem> contrarios = null;
 		List<GenParametros> tamMax = null;
@@ -475,7 +476,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						"DesignacionesServiceImpl.busquedaListaContrarios -> Entrada a servicio para la busqueda de contrarios");
 				
 				try {
-					contrarios = scsDesignacionesExtendsMapper.busquedaListaContrarios(item, idInstitucion);
+					contrarios = scsDesignacionesExtendsMapper.busquedaListaContrarios(item, idInstitucion, historico);
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
 					LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Salida del servicio");

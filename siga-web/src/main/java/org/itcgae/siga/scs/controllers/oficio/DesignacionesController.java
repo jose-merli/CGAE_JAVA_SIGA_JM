@@ -66,15 +66,6 @@ public class DesignacionesController {
 		}
 	}
 	
-	@RequestMapping(value = "/comboModulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboModulos(HttpServletRequest request) {
-
-		ComboDTO response = comboService.comboModulo(request);
-		if (response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
 
 	// FIN Busqueda designaciones
 
