@@ -228,6 +228,53 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 	List<ComboItem> comboTipoMotivo(short idInstitucion);
 	
-	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "guardarProcurador")
-	int guardarProcurador(ProcuradorItem procuradorItem);
+//	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "guardarProcurador")
+//	int guardarProcurador(ProcuradorItem procuradorItem);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getProcedimientosJuzgados")
+	@Results({@Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> getProcedimientosJuzgados(Short idInstitucion, String idJuzgado);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getProcedimientosPretension")
+	@Results({@Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPRETENSION", property = "label", jdbcType = JdbcType.VARCHAR)})
+	List<ComboItem> getProcedimientosPretension(Short idInstitucion, List<String> idProcedimeintos);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboProcedimientosConJuzgado")
+	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR)})
+	List<ComboItem> comboProcedimientosConJuzgado(Short idInstitucion, List<String> idPretensiones);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboModulosConJuzgado")
+	@Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR)})
+	List<ComboItem> comboModulosConJuzgado(Short idInstitucion, List<String> procedimientosJuzgados);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getProcedimientoPretension")
+	@Results({@Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> getProcedimientoPretension(Short idInstitucion, String idJuzgado);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboModulosConProcedimientos")
+	@Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR)})
+	List<ComboItem> comboModulosConProcedimientos(Short idInstitucion, List<String> idPretensiones);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getPretensionModulo")
+	@Results({@Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> getPretensionModulo(Short idInstitucion, String idJuzgado);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboProcedimientosConModulos")
+	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR)})
+	List<ComboItem> comboProcedimientosConModulos(Short idInstitucion, List<String> idPretensiones);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDatosAdicionales")
+	@Results({ @Result(column = "FECHAOFICIOJUZGADO", property = "fechaOficioJuzgado", jdbcType = JdbcType.DATE),
+			@Result(column = "DELITOS", property = "delitos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHARECEPCIONCOLEGIO", property = "fechaRecepcionColegio", jdbcType = JdbcType.DATE),
+			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAJUICIO", property = "fechaJuicio", jdbcType = JdbcType.DATE),
+			@Result(column = "DEFENSAJURIDICA", property = "defensaJuridica", jdbcType = JdbcType.VARCHAR),
+			})
+	List<DesignaItem> getDatosAdicionales(Short idInstitucion, Integer tamMaximo, DesignaItem designa);
 }

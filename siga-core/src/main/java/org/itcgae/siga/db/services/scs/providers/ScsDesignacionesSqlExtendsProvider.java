@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.scs.providers;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.ibatis.jdbc.SQL;
@@ -128,7 +129,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		Hashtable codigosBind = new Hashtable();
 		int contador = 0;
 		// Acceso a BBDD
-		
+		idInstitucion = new Short("2035");
+        designaItem.setNumColegiado("2048");
 		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
 			sql = " select distinct procd.nombre as nombreprocedimiento, juzgado.nombre as nombrejuzgado,"
@@ -1044,6 +1046,144 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
+	public String getProcedimientosJuzgados(Short idInstitucion, String idJuzgado) {
+
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT JUZGADO.IDPROCEDIMIENTO");
+		sql.FROM("SCS_JUZGADOPROCEDIMIENTO JUZGADO");
+		sql.WHERE("JUZGADO.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("JUZGADO.IDJUZGADO = " + idJuzgado);
+
+		return sql.toString();
+	}
+	
+	public String getProcedimientosPretension(Short idInstitucion, List<String> idProcedimientos) {
+
+		String inSQL = "(";
+		
+		for(int i=0; i<idProcedimientos.size(); i++) {
+			if(i != idProcedimientos.size()-1) {
+				inSQL += idProcedimientos.get(i) + " ,";
+			}else {
+				inSQL += idProcedimientos.get(i) + ")";
+			}
+		}
+		
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT IDPRETENSION, IDPROCEDIMIENTO");
+		sql.FROM("SCS_PRETENSIONESPROCED PETRENSION");
+		sql.WHERE("PETRENSION.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("PETRENSION.IDPROCEDIMIENTO IN " + inSQL);
+
+		return sql.toString();
+	}
+	
+	public String comboProcedimientosConJuzgado(Short idInstitucion, List<String> idPretensiones) {
+
+		String inSQL = "(";
+		
+		for(int i=0; i<idPretensiones.size(); i++) {
+			if(i != idPretensiones.size()-1) {
+				inSQL += idPretensiones.get(i) + " ,";
+			}else {
+				inSQL += idPretensiones.get(i) + ")";
+			}
+		}
+		
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT IDPRETENSION, F_SIGA_GETRECURSO(DESCRIPCION, 1) AS DESCRIPCION ");
+		sql.FROM("SCS_PRETENSION ");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDPRETENSION IN " + inSQL);
+
+		return sql.toString();
+	}
+	
+	public String comboModulosConJuzgado(Short idInstitucion, List<String> procedimientosJuzgados) {
+
+		String inSQL = "(";
+		
+		for(int i=0; i<procedimientosJuzgados.size(); i++) {
+			if(i != procedimientosJuzgados.size()-1) {
+				inSQL += procedimientosJuzgados.get(i) + " ,";
+			}else {
+				inSQL += procedimientosJuzgados.get(i) + ")";
+			}
+		}
+		
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE ");
+		sql.FROM("SCS_PROCEDIMIENTOS MODULO ");
+		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("MODULO.IDPROCEDIMIENTO IN " + inSQL);
+
+		return sql.toString();
+	}
+	
+	public String getProcedimientoPretension(Short idInstitucion, String idPretension) {
+
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT IDPROCEDIMIENTO");
+		sql.FROM("SCS_PRETENSIONESPROCED PETRENSION");
+		sql.WHERE("PETRENSION.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE(" PETRENSION.IDPRETENSION = " + idPretension);
+
+		return sql.toString();
+	}
+	
+	public String comboModulosConProcedimientos(Short idInstitucion, List<String> idPretensiones) {
+
+		String inSQL = "(";
+		
+		for(int i=0; i<idPretensiones.size(); i++) {
+			if(i != idPretensiones.size()-1) {
+				inSQL += idPretensiones.get(i) + " ,";
+			}else {
+				inSQL += idPretensiones.get(i) + ")";
+			}
+		}
+		
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE ");
+		sql.FROM("SCS_PROCEDIMIENTOS MODULO ");
+		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("MODULO.IDPROCEDIMIENTO IN " + inSQL);
+
+		return sql.toString();
+	}
+	
+	public String getPretensionModulo(Short idInstitucion, String idModulo) {
+
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT PETRENSION.IDPRETENSION ");
+		sql.FROM("SCS_PRETENSIONESPROCED PETRENSION");
+		sql.WHERE("PETRENSION.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("PETRENSION.IDPROCEDIMIENTO = " + idModulo);
+
+		return sql.toString();
+	}
+	
+	public String comboProcedimientosConModulos(Short idInstitucion, List<String> idPretensiones) {
+
+		String inSQL = "(";
+		
+		for(int i=0; i<idPretensiones.size(); i++) {
+			if(i != idPretensiones.size()-1) {
+				inSQL += idPretensiones.get(i) + " ,";
+			}else {
+				inSQL += idPretensiones.get(i) + ")";
+			}
+		}
+		
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT IDPRETENSION, F_SIGA_GETRECURSO(DESCRIPCION, 1) AS DESCRIPCION ");
+		sql.FROM("SCS_PRETENSION ");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDPROCEDIMIENTO IN " + inSQL);
+
+		return sql.toString();
+	}
+	
 	public static String prepararSentenciaCompletaBind(String cadena, String Campo, int contador, Hashtable codigos) {
 		String temp = "";
 		String sentenciaCompleta = "";
@@ -1442,6 +1582,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("IDTURNO = '" + actuacionDesignaItem.getIdTurno() + "'");
 		sql.WHERE("ANIO = '" + actuacionDesignaItem.getAnio() + "'");
 		sql.WHERE("NUMEROASUNTO = '" + actuacionDesignaItem.getNumeroAsunto() + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
+	
+	public String getDatosAdicionales( Short idInstitucion, Integer tamMax, DesignaItem designa) {
+		
+		SQL sql = new SQL();
+		sql.SELECT("FECHAOFICIOJUZGADO, DELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
+		sql.FROM("SCS_DESIGNA");
+		sql.WHERE("NUMERO = '" + designa.getCodigo() + "'");
+		sql.WHERE("IDTURNO = '" + designa.getIdTurno() + "'");
+		sql.WHERE("ANIO = '" + designa.getAno() + "'");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 
 		return sql.toString();

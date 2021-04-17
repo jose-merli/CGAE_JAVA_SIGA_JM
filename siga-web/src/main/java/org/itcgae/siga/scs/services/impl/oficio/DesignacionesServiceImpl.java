@@ -1225,7 +1225,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					
 					for(ProcuradorItem bti: procuradorItem) {
-						response = scsDesignacionesExtendsMapper.guardarProcurador(bti);
+//						response = scsDesignacionesExtendsMapper.guardarProcurador(bti);
 					}
 				}catch (Exception e) {
 					response = 0;
@@ -1257,4 +1257,60 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return updateResponseDTO;
 	}
 
+	@Override
+	public List<DesignaItem> getDatosAdicionales(DesignaItem designa, HttpServletRequest request) {
+		DesignaItem result = new DesignaItem();
+		List<DesignaItem> designas = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDatosAdicionales() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDatosAdicionales -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.getDatosAdicionales -> Entrada a servicio para la busqueda de datos adicionales de una designa");
+
+				try {
+					designas = scsDesignacionesExtendsMapper.getDatosAdicionales(idInstitucion, tamMaximo, designa);
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("DesignacionesServiceImpl.getDatosAdicionales -> Salida del servicio");
+				}
+				LOGGER.info("DesignacionesServiceImpl.getDatosAdicionales -> Salida del servicio");
+			}
+		}
+
+		return designas;
+	}	
 }
