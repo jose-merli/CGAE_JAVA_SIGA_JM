@@ -1375,14 +1375,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.SELECT("            persona.apellido1\r\n" + 
 	    			"            || decode(persona.apellido2, NULL, '', ' ' || persona.apellido2)\r\n" + 
 	    			"            || ', '\r\n" + 
-	    			"            || persona.nombre AS apellidosnombre\r\n");
+	    			"            || persona.nombre AS apellidosnombre");
 			sql.FROM("SCS_DEFENDIDOSDESIGNA");
 			sql.JOIN("scs_personajg persona ON persona.idpersona = scs_DEFENDIDOSDESIGNA.idpersona AND persona.idinstitucion = scs_DEFENDIDOSDESIGNA.idinstitucion");
 			sql.WHERE("            ( scs_DEFENDIDOSDESIGNA.anio = "+item.getAno()+"\r\n" + 
 			"              AND scs_DEFENDIDOSDESIGNA.numero = "+item.getNumero()+"\r\n" + 
 			//Cuando se deje de trabajar con designas fijadas hay que descomentar la linea.
-			//"              AND scs_contrariosdesigna.idinstitucion = "+idInstitucion+"\r\n" + 
-			"              AND scs_contrariosdesigna.idinstitucion = 2035\r\n" +
+			//"              AND scs_DEFENDIDOSDESIGNA.idinstitucion = "+idInstitucion+"\r\n" + 
+			"              AND scs_DEFENDIDOSDESIGNA.idinstitucion = 2035\r\n" +
 			"              AND scs_DEFENDIDOSDESIGNA.idturno = "+item.getIdTurno()+" )\r\n");
 	
 	    	

@@ -415,7 +415,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("general.mensaje.error.bbdd");
+					error.setDescription(e.getMessage());
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -556,7 +556,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("general.mensaje.error.bbdd");
+					error.setDescription(e.getMessage());
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -632,7 +632,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("general.mensaje.error.bbdd");
+					error.setDescription(e.getMessage());
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
