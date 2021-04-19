@@ -7,8 +7,10 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.PrisionItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ScsPrisionMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsPrisionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -43,5 +45,10 @@ public interface ScsPrisionExtendsMapper extends ScsPrisionMapper{
 	
 	})
 	NewIdDTO getIdPrision(Short idInstitucion);
+	
+	@SelectProvider(type = ScsPrisionSqlExtendsProvider.class, method = "getComboPrisiones")
+	@Results({ @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPRISION", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> getComboPrisiones(Short idInstitucion);
 	
 }

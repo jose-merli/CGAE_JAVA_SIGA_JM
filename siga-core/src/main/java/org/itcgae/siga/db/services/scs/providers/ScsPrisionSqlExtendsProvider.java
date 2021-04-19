@@ -31,16 +31,16 @@ public class ScsPrisionSqlExtendsProvider extends ScsPrisionSqlProvider {
 		sql.FROM("SCS_PRISION prision");
 		sql.LEFT_OUTER_JOIN("CEN_PROVINCIAS PROVINCIAS ON PROVINCIAS.IDPROVINCIA = prision.IDPROVINCIA");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES POBLACION ON POBLACION.IDPOBLACION = prision.IDPOBLACION");
-		if(idInstitucion != 2000) {
+		if (idInstitucion != 2000) {
 			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 		}
 		if (prisionItem.getNombre() != null && prisionItem.getNombre() != "") {
-		
+
 			String columna = "PRISION.NOMBRE";
 			String cadena = prisionItem.getNombre();
-			
+
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-			
+
 		}
 
 		if (prisionItem.getCodigoExt() != null && prisionItem.getCodigoExt() != "") {
@@ -68,6 +68,17 @@ public class ScsPrisionSqlExtendsProvider extends ScsPrisionSqlProvider {
 		SQL sql = new SQL();
 
 		sql.SELECT("MAX(IDPRISION) AS IDPRISION");
+		sql.FROM("SCS_PRISION");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
+
+	public String getComboPrisiones(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("IDPRISION");
+		sql.SELECT("NOMBRE");
 		sql.FROM("SCS_PRISION");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 
