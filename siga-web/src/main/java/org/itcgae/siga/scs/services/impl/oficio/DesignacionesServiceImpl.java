@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,9 +21,11 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
+import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.LetradoInscripcionItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
@@ -54,6 +58,7 @@ import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.atos.utils.Row;
@@ -996,23 +1001,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			if (null != usuarios && usuarios.size() >= 0) {
 				try {
 
-					//Obtenemos el parametro de limite para el campo CODIGO en BBDD
-					StringDTO parametros = new StringDTO();
-					String longitudDesigna;
-					
-					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG", idInstitucion.toString());
-					
-					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
-					// la institucion 0
-					if (parametros != null && parametros.getValor() != null) {
-						longitudDesigna = parametros.getValor();
-					} else {
-						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", "0");
-						longitudDesigna = parametros.getValor();
-					}
-					
-					
-					
 					
 					ScsDesigna designa = new ScsDesigna();
 					designa.setIdinstitucion(idInstitucion);
@@ -1023,67 +1011,122 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designa.setAnio(year);
 					
 					//CALCULO CAMPO CODIGO (NUMERO EN FRONT)
-					designa.setCodigo(longitudDesigna);
-					
-					String sqlNumeroDesig ="SELECT (MAX(to_number(CODIGO)) + 1) AS NUMERODESIG FROM " + nombreTabla + 
-							" WHERE IDINSTITUCION =" + entrada.get("IDINSTITUCION") +
-							" AND ANIO =" + ((((String)entrada.get("FECHAENTRADAINICIO")).substring(((String)entrada.get("FECHAENTRADAINICIO")).indexOf("/")+1)).substring(((String)entrada.get("FECHAENTRADAINICIO")).indexOf("/")+1));
-					
-					
-					
-					if (rc1.query(sqlNumeroDesig)) {
-						Row fila1 = (Row) rc1.get(0);
-						Hashtable prueba1 = fila1.getRow();			
-						if (prueba1.get("NUMERODESIG").equals("")) {
-							codigo="1";
-							codigo=UtilidadesString.formatea(codigo,Integer.parseInt(longitudDesigna),true);
-							entrada.put(ScsDesignaBean.C_CODIGO,codigo);
-						}
-						else{
-							codigo=(String)prueba1.get("NUMERODESIG");
-							codigo=UtilidadesString.formatea(codigo,Integer.parseInt(longitudDesigna),true);
-							entrada.put(ScsDesignaBean.C_CODIGO,codigo);								
-						}
+					String codigoDesigna = scsDesignacionesExtendsMapper.obtenerCodigoDesigna(
+							String.valueOf(designaItem.getIdInstitucion()), String.valueOf(designaItem.getAno()));
+
+					if (codigoDesigna.equals("")) {
+						codigoDesigna = "1";
+						designa.setCodigo(codigoDesigna);
+					} else {
+						designa.setCodigo(codigoDesigna);
 					}
 					
 					
 					//CALCULO CAMPO NUMERO 
-					designa.setNumero(new Long(designaItem.getNumero()));
 					
-					String sql ="SELECT (MAX(NUMERO) + 1) AS NUMERO FROM " + nombreTabla + 
-							" WHERE IDINSTITUCION =" + entrada.get("IDINSTITUCION") +
-							" AND ANIO =" + ((((String)entrada.get("FECHAENTRADAINICIO")).substring(((String)entrada.get("FECHAENTRADAINICIO")).indexOf("/")+1)).substring(((String)entrada.get("FECHAENTRADAINICIO")).indexOf("/")+1)) +
-							" AND IDTURNO =" + entrada.get("IDTURNO");		
-					
-					if (rc.query(sql)) {
-						Row fila = (Row) rc.get(0);
-						Hashtable prueba = fila.getRow();			
-						if (prueba.get("NUMERO").equals("")) {
-							entrada.put(ScsDesignaBean.C_NUMERO,"1");
-						}
-						else entrada.put(ScsDesignaBean.C_NUMERO,(String)prueba.get("NUMERO"));								
+					//Limitacion campo numero en updateDesigna
+
+					//Obtenemos el parametro de limite para el campo CODIGO en BBDD
+					StringDTO parametros = new StringDTO();
+					Integer longitudDesigna;
+
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", idInstitucion.toString());
+
+					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+					// la institucion 0
+					if (parametros != null && parametros.getValor() != null) {
+						longitudDesigna =  Integer.parseInt(parametros.getValor())  ;
+					} else {
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", "0");
+						longitudDesigna =  Integer.parseInt(parametros.getValor())  ;
 					}
 					
+					//Obtenemos el ultimo numero + 1
+					String numeroDesigna = scsDesignacionesExtendsMapper.obtenerNumeroDesigna(
+							String.valueOf(designaItem.getIdInstitucion()), String.valueOf(designaItem.getAno()));
+
 					
-					
+					if (numeroDesigna.equals("")) {
+						//Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+						while(numeroDesigna.length() < longitudDesigna) {
+							numeroDesigna = "1";
+							numeroDesigna = "0" + numeroDesigna;
+						}
+						designa.setNumero(Long.parseLong(numeroDesigna) );
+					} else {
+						//Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+						while(numeroDesigna.length() < longitudDesigna) {
+							numeroDesigna = "0" + numeroDesigna;
+						}
+						designa.setNumero(Long.parseLong(numeroDesigna));
+					}
 					
 					
 					designa.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
 					designa.setArt27(designaItem.getArt27());
 
 					
+					//ALGORITMO ELECCION LETRADO
+					
+					
 					//SCS_INSCRIPCIONTURNO por idPersona idinstitucion idturno. 
 					
-					ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
-					designaLetrado.setIdinstitucion(idInstitucion);
-					designaLetrado.setIdturno(designaItem.getIdTurno());
-					designaLetrado.setAnio((short) designaItem.getAno());
-					designaLetrado.setNumero(new Long(designaItem.getNumero()));
-					// designaLetrado.set
-
+					String numeroColegiado = designaItem.getNumColegiado();
+					if(StringUtils.isEmpty(numeroColegiado)) {
+						//Se realiza busqueda en la cola de oficio
+						
+//						this.getLetradoTurno();
+						
+//						List<TurnosItem> listadoTurnosLetrados =  scsTurnosExtendsMapper.seleccionLetradoColaOficio( designaItem.getIdTurno() , busquedaOrden, strDate, idInstitucion );
+//						
+////					    Se obtiene la cola de oficio actual dada por lo órdenes establecidos. Si no es la primera vez que se utiliza dicha cola para la obtención de un
+////						letrado tendremos el valor ultimo letrado en la cola y con este sabremos cual es el primero que le toca (al siguiente).
+////						Con esta información ya se tiene la cola ordenada. 
+//						
+//						
+//						//Anotamos log
+//						short mes= (short) cal.get(Calendar.MONTH);
+//						short dia = (short) cal.get(Calendar.DAY_OF_MONTH);
+//						LOGGER.info("Buscando letrado para el turno " + designaItem.getIdTurno() +   " en la fecha " + dia + "/" + mes + "/"+ year  ); 
+//						
+//						
+//						//Si hay compensaciones se coge el letrado con la compensación mas antigua.
+//						LOGGER.info("Buscando compensaciones…" ); 
+//						
+//						
+//						//Si no hay compensaciones se coge el primer letrado de la cola 
+//						LOGGER.info("Buscando en la cola" ); 
+//						
+//						
+//						
+//						ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
+//						designaLetrado.setIdinstitucion(idInstitucion);
+//						designaLetrado.setIdturno(designaItem.getIdTurno());
+//						designaLetrado.setAnio(year);
+//						designaLetrado.setNumero(Long.parseLong(numeroDesigna));
+//						designaLetrado.setFechadesigna(null);
+//						designaLetrado.set
+						
+						
+					}else {
+						
+						ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
+						designaLetrado.setIdinstitucion(idInstitucion);
+						designaLetrado.setIdturno(designaItem.getIdTurno());
+						designaLetrado.setAnio(year);
+						designaLetrado.setNumero(Long.parseLong(numeroDesigna));
+						designaLetrado.setFechadesigna(null);
+						//designaLetrado.setId
+						
+					}
 					
-		
 					
+//
+//					MANUAL = 0, LETRADODELTURNO = 1 si el sistema elige automáticamente de la cola
+//
+//					MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
+//
+//					MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
 					
 					
 					
@@ -1125,6 +1168,135 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	}
 
+//	public LetradoInscripcionItem getLetradoTurno(){
+//		
+//		// Controles generales
+//		//CenBajasTemporalesAdm bajasAdm = new CenBajasTemporalesAdm(this.usrBean);
+//		//ScsSaltosCompensacionesAdm scAdm = new ScsSaltosCompensacionesAdm(this.usrBean);
+//		
+//		// Variables generales
+//		ArrayList<String> diasGuardia; // Periodo o dia de guardia para rellenar con letrado
+//		
+//		HashMap<Long, TreeMap<String,BajasTemporalesItem>> hmBajasTemporales;
+//		
+//		HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos; // Lista de saltos
+//		
+//		List<LetradoInscripcionItem> alCompensaciones; // Lista de compensaciones
+//		
+//		ArrayList<LetradoInscripcionItem> alLetradosOrdenados; // Cola de letrados en la guardia
+//		
+//		Puntero punteroListaLetrados;
+//		
+//		LetradoInscripcionItem unLetrado;
+//		
+//
+//		try {
+//			// obteniendo bajas temporales por letrado
+//			hmBajasTemporales = bajasAdm.getLetradosDiasBajaTemporalTurno(this.idInstitucion, this.idTurno, this.fechaInicio);
+//
+//			// obteniendo saltos
+//			hmPersonasConSaltos = scAdm.getSaltos(this.idInstitucion, this.idTurno, null);
+//			diasGuardia = new ArrayList<String>();
+//			diasGuardia.add(this.fechaInicio);
+//
+//			// obteniendo cola de letrados
+//			punteroListaLetrados = new Puntero();
+//			alLetradosOrdenados = (ArrayList<LetradoInscripcion>) InscripcionTurno.getColaTurno(idInstitucion, idTurno,this.fechaInicio ,false, usrBean);
+//			
+//
+//			if (alLetradosOrdenados == null || alLetradosOrdenados.size() == 0)
+//				throw new SIGAException("No existe cola de letrados de guardia");
+//
+//			// obteniendo las compensaciones. Se obtienen dentro de este
+//			// bucle, ya que si hay incompatibilidades se a�ade una compensacion
+//			alCompensaciones = scAdm.getCompensaciones(this.idInstitucion, this.idTurno, null,this.fechaInicio);
+//			// obteniendo el letrado a asignar.
+//			// ATENCION: este metodo es el nucleo del proceso
+//			LetradoInscripcion letradoGuardia = getSiguienteLetradoTurno(alCompensaciones, alLetradosOrdenados,
+//					punteroListaLetrados, diasGuardia, hmPersonasConSaltos, hmBajasTemporales);
+//			
+//			
+//			if (letradoGuardia == null) {
+//				throw new SIGAException("gratuita.modalRegistro_DefinirCalendarioGuardia.literal.errorLetradosSuficientes");			}
+//			int punteroUltimo = 0;
+//			if (punteroListaLetrados.getValor() == 0)
+//				punteroUltimo = alLetradosOrdenados.size() - 1;
+//			else
+//				punteroUltimo = punteroListaLetrados.getValor() - 1;
+//
+//			unLetrado = alLetradosOrdenados.get(punteroUltimo);
+//			// actualizando el ultimo letrado en la guardia solo si no es de la lista de compensaciones
+//			if (unLetrado.getSaltoCompensacion() == null){
+//				ScsTurnoAdm turnoAdm = new ScsTurnoAdm(this.usrBean);
+//				turnoAdm.cambiarUltimoCola(unLetrado.getIdInstitucion(), unLetrado.getIdTurno(), 
+//						 unLetrado.getIdPersona(),unLetrado.getInscripcionTurno().getFechaSolicitud());
+//				
+//			}
+//
+//			return letradoGuardia;
+//
+//		} catch (SIGAException e) {
+//			throw e;
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			throw new ClsExceptions(e, e.getMessage());
+//		}
+//	} // calcularMatrizLetradosGuardia()
+//	
+//	private LetradoInscripcion getSiguienteLetradoTurno(List<LetradoInscripcion> alCompensaciones,
+//			List<LetradoInscripcion> alLetradosOrdenados,
+//			Puntero punteroLetrado,
+//			ArrayList<String> diasGuardia,
+//			HashMap<Long, ArrayList<LetradoInscripcion>> hmPersonasConSaltos,
+//			HashMap<Long, TreeMap<String,CenBajasTemporalesBean>> hmBajasTemporales) throws SIGAException, ClsExceptions
+//	{
+//		LetradoInscripcion letradoGuardia, auxLetradoSeleccionado;
+//
+//		letradoGuardia = null;
+//
+//		// recorriendo compensaciones
+//		if (alCompensaciones != null && alCompensaciones.size() > 0) {
+//
+//			Iterator<LetradoInscripcion> iterador = alCompensaciones.iterator();
+//			while (iterador.hasNext()) {
+//				auxLetradoSeleccionado = (LetradoInscripcion) iterador.next();
+//				// vale
+//				if (comprobarRestriccionesLetradoCompensadoTurno(auxLetradoSeleccionado, diasGuardia, iterador, null, hmBajasTemporales)) {
+//					letradoGuardia = auxLetradoSeleccionado;
+//					break;
+//				}
+//			}
+//		}
+//		if (letradoGuardia != null)
+//			return letradoGuardia;
+//
+//		// recorriendo la cola
+//		if (alLetradosOrdenados != null && alLetradosOrdenados.size() > 0) {
+//
+//			int fin = punteroLetrado.getValor();
+//			do {
+//				auxLetradoSeleccionado = (LetradoInscripcion) alLetradosOrdenados.get(punteroLetrado.getValor());
+//				// vale
+//				if (comprobarRestriccionesLetradoColaTurno(auxLetradoSeleccionado, diasGuardia, hmPersonasConSaltos, hmBajasTemporales))
+//					letradoGuardia = auxLetradoSeleccionado;
+//
+//				// obteniendo siguiente en la cola
+//				if (punteroLetrado.getValor() < alLetradosOrdenados.size() - 1)
+//					punteroLetrado.setValor(punteroLetrado.getValor() + 1);
+//				else
+//					punteroLetrado.setValor(0); // como es una cola circular hay que volver al principio
+//
+//			} while (letradoGuardia == null && fin != punteroLetrado.getValor());
+//		}
+//
+//		if (letradoGuardia != null)
+//			return letradoGuardia;
+//		else
+//			return null;
+//	} 
+	
+	
+	
 	@Override
 	public ProcuradorDTO busquedaProcurador(List<String>procurador, HttpServletRequest request) {
 		LOGGER.info("searchPrisiones() -> Entrada al servicio para obtener prisiones");

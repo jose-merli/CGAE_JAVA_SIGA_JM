@@ -223,9 +223,18 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 	List<ComboItem> comboTipoMotivo(short idInstitucion);
 	
-	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerNumeroDesigna")
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerCodigoDesigna")
 	@Results({ 
 			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
 	})
+	String obtenerCodigoDesigna(String idInstitucion, String anio);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerNumeroDesigna")
+	@Results({ 
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+	})
 	String obtenerNumeroDesigna(String idInstitucion, String anio);
+	
+	
+	
 }

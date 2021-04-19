@@ -1443,28 +1443,27 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 	
 	
-	public String  obtenerNumeroDesigna(String idInstitucion, String anio){
-    	
+	public String  obtenerCodigoDesigna(String idInstitucion, String anio){
 		SQL sql = new SQL();
 		
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.idinstitucion");
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.idturno");
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.anio");
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.idpersona");
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
+		sql.SELECT("(MAX(to_number(CODIGO)) + 1) AS CODIGO");
+		sql.FROM("SCS_DESIGNA");
+		sql.WHERE(" IDINSTITUCION ='"+idInstitucion+"'");
+		sql.WHERE(" ANIO ='"+anio+"'");
 
-		sql.FROM("SCS_DEFENDIDOSDESIGNA");
-		sql.JOIN("scs_personajg persona ON persona.idpersona = scs_DEFENDIDOSDESIGNA.idpersona AND persona.idinstitucion = scs_DEFENDIDOSDESIGNA.idinstitucion");
-		sql.WHERE("            ( scs_DEFENDIDOSDESIGNA.anio = "+item.getAno()+"\r\n" + 
-		"              AND scs_DEFENDIDOSDESIGNA.numero = "+item.getNumero()+"\r\n" + 
-		//Cuando se deje de trabajar con designas fijadas hay que descomentar la linea.
-		//"              AND scs_contrariosdesigna.idinstitucion = "+idInstitucion+"\r\n" + 
-		"              AND scs_contrariosdesigna.idinstitucion = 2035\r\n" +
-		"              AND scs_DEFENDIDOSDESIGNA.idturno = "+item.getIdTurno()+" )\r\n");
-
-    	
     	return sql.toString();
     }
 	
+	
+	
+	public String  obtenerNumeroDesigna(String idInstitucion, String anio){
+		SQL sql = new SQL();
+		
+		sql.SELECT("(MAX(NUMERO) + 1) AS NUMERO");
+		sql.FROM("SCS_DESIGNA");
+		sql.WHERE(" IDINSTITUCION ='"+idInstitucion+"'");
+		sql.WHERE(" ANIO ='"+anio+"'");
+
+    	return sql.toString();
+    }
 }
