@@ -246,14 +246,15 @@ public class DesignacionesController {
 
 		// [ idInstitucion,  idPersona, this.selectedDatos.anio,  this.selectedDatos.idTurno, this.selectedDatos.numero]
 		@RequestMapping(value = "/designas/deleteContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<UpdateResponseDTO> deleteContrario(@RequestBody String[] item, HttpServletRequest request) {
-			ScsContrariosdesigna contrario = new ScsContrariosdesigna();
-			contrario.setIdinstitucion(Short.parseShort(item[0]));
-			contrario.setIdpersona(Long.parseLong(item[1]));
-			contrario.setAnio(Short.parseShort(item[2]));
-			contrario.setIdturno(Integer.parseInt(item[3]));
-			contrario.setNumero(Long.parseLong(item[4]));
-			UpdateResponseDTO response = designacionesService.deleteContrario(contrario, request);
+		ResponseEntity<UpdateResponseDTO> deleteContrario(@RequestBody ScsContrariosdesigna[] item, HttpServletRequest request) {
+//			ScsContrariosdesigna contrario = new ScsContrariosdesigna();
+//			contrario.setIdinstitucion(Short.parseShort(item[0]));
+//			contrario.setIdpersona(Long.parseLong(item[1]));
+//			contrario.setAnio(Short.parseShort(item[2]));
+//			contrario.setIdturno(Integer.parseInt(item[3]));
+//			contrario.setNumero(Long.parseLong(item[4]));
+//			UpdateResponseDTO response = designacionesService.deleteContrario(contrario, request);
+			UpdateResponseDTO response = designacionesService.deleteContrario(item, request);
 			if (response.getError().getCode() == 200)
 				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 			else

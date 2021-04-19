@@ -31,7 +31,7 @@ public interface IDesignacionesService {
 
 	public UpdateResponseDTO updateDatosAdicionales(DesignaItem designaItem, HttpServletRequest request);
 
-	public UpdateResponseDTO deleteContrario(ScsContrariosdesigna item, HttpServletRequest request);
+	public UpdateResponseDTO deleteContrario(ScsContrariosdesigna[] item, HttpServletRequest request);
 
 	public List<ListaInteresadoJusticiableItem> busquedaListaInteresados(DesignaItem designa, HttpServletRequest request);
 	
