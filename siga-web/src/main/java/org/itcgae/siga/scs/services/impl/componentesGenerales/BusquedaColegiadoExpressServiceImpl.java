@@ -139,13 +139,13 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 					} else {
 						tamMaximo = null;
 					}
-					if(datos.getIdGuardia() != null) {
-						datos.setIdGuardia(datos.getIdGuardia().substring(0,datos.getIdGuardia().length()-1));
-					}
+//					if(datos.getIdGuardia() != null) {
+//						datos.setIdGuardia(datos.getIdGuardia().substring(0,datos.getIdGuardia().length>0));
+//					}
 					
-					if(datos.getIdTurno() != null) {
-						datos.setIdTurno(datos.getIdTurno().substring(0,datos.getIdTurno().length()-1));
-					}
+//					if(datos.getIdTurno() != null) {
+//						datos.setIdTurno(datos.getIdTurno().substring(0,datos.getIdTurno().length-1));
+//					}
 
 					List<ColegiadosSJCSItem> colegiadosSJCSItemList = scsEjgExtendsMapper.busquedaColegiadoEJG(datos,
 							usuarios.get(0).getIdlenguaje(), tamMaximo);

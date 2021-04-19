@@ -64,6 +64,8 @@ public class DesignaItem {
 	private String idOrigen;
 	private String nif;
 	private String nombreInteresado;
+	private String apellido1Interesado;
+	private String apellido2Interesado;
 	private String apellidosInteresado;
 	private String idActuacionesV;
 	private String idArt27;
@@ -882,6 +884,20 @@ public class DesignaItem {
 	}
 	public void setEstado(String estado) {
 		this.estado = estado;
+	}
+	
+	public String getApellido1Interesado() {
+		return apellido1Interesado;
+	}
+	public void setApellido1Interesado(String apellido1Interesado) {
+		this.apellido1Interesado = apellido1Interesado;
+	}
+	
+	public String getApellido2Interesado() {
+		return apellido2Interesado;
+	}
+	public void setApellido2Interesado(String apellido2Interesado) {
+		this.apellido2Interesado = apellido2Interesado;
 	}
 	@Override
 	public String toString() {

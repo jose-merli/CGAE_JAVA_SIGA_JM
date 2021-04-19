@@ -16,7 +16,7 @@ public class ColegiadosSJCSItem {
 	private String inscritoturno;
 	private String inscritoguardia;
 	private String guardiasPendientes;
-	private String idTurno;
+	private String[] idTurno;
 	private String idInstitucion;
 	private Long usuModificacion;
 	private Date fechaModificacion;
@@ -29,7 +29,7 @@ public class ColegiadosSJCSItem {
 	private String codigoExt;
 	private String email;
 	private String nombrePoblacion;
-	private String idGuardia;
+	private String[] idGuardia;
 	private String telefono;
 	private String abreviatura;
 	private String idPersona;
@@ -111,20 +111,20 @@ public class ColegiadosSJCSItem {
 	}
 
 	@JsonProperty("idGuardia")
-	public String getIdGuardia() {
+	public String[] getIdGuardia() {
 		return idGuardia;
 	}
 
-	public void setIdGuardia(String idGuardia) {
+	public void setIdGuardia(String[] idGuardia) {
 		this.idGuardia = idGuardia;
 	}
 
 	@JsonProperty("idTurno")
-	public String getIdTurno() {
+	public String[] getIdTurno() {
 		return idTurno;
 	}
 
-	public void setIdTurno(String idTurno) {
+	public void setIdTurno(String[] idTurno) {
 		this.idTurno = idTurno;
 	}
 
