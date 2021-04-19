@@ -304,9 +304,13 @@ public class WSCommons {
 		LOGGER.info("Se ha recibido una llamada desde la IP " + endpointReference + " para el colegio "
 				+ idInstitucion); 
 		String valor = obtenerValorParametroColegio(idInstitucion, nombreParametroIP);
+		String[] valores = null;
+		if(valor != null) {
+			valores = valor.split(",");
+		}
 		//Para probar las sociedades
 		//valor = "127.0.0.1";
-		if (valor == null || !endpointReference.equals(valor)) {
+		if (valores == null || !validarIPs(endpointReference, valores)) {
 			// Si no hemos encontrado el parámetro, o hemos encontrado más de uno hay que
 			// construir error si es solicitado y devolver excepcion
 			if (error != null) {
@@ -1796,5 +1800,17 @@ public class WSCommons {
 				valido = false;
 			}
 			return valido;
+		}
+		
+		private boolean validarIPs(String endpointReference, String[] valores) {
+			boolean valid = false;
+			if(valores != null) {
+				for(int i = 0; i < valores.length; i++) {
+					if(valores[i].equals(endpointReference)) {
+						valid = true;
+					}
+				}
+			}
+			return valid;
 		}
 }
