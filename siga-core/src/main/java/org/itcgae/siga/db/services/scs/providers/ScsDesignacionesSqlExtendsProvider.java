@@ -11,14 +11,12 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
-import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
-import org.springframework.web.bind.annotation.RequestBody;
 
 public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
@@ -629,7 +627,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "    ), 2)) porcentaje,\r\n" + "    tac.descripcion   tipo,\r\n"
 				+ "    pro.nombre        procedimiento,\r\n" + "    pro.codigo        categoria,\r\n"
 				+ "    pro.idjurisdiccion,\r\n" + "    pro.complemento,\r\n" + "    pro.permitiraniadirletrado,\r\n"
-				+ "    act.numeroasunto,\r\n" + "    act.idprocedimiento,\r\n" + "    act.idjuzgado,\r\n"
+				+ "    act.numeroasunto,\r\n" + "    act.idprocedimiento,\r\n" + "    act.idjuzgado, j.nombre nombreJuzgado,\r\n"
 				+ "    to_char(act.fechajustificacion, 'dd/mm/yyyy') fechajustificacion,\r\n" + "    act.validada,\r\n"
 				+ "    act.idfacturacion,\r\n" + "    act.numeroprocedimiento,\r\n" + "    act.anioprocedimiento,\r\n"
 				+ "    (\r\n" + "        SELECT\r\n" + "            nombre\r\n" + "            || ' ('\r\n"
@@ -641,8 +639,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "    act.nig,\r\n" + "    act.fecha,\r\n" + "    0 permitireditarletrado\r\n" + "FROM\r\n"
 				+ "    scs_actuaciondesigna            act,\r\n" + "    scs_procedimientos              pro,\r\n"
 				+ "    scs_acreditacionprocedimiento   acp,\r\n" + "    scs_acreditacion                ac,\r\n"
-				+ "    scs_tipoacreditacion            tac\r\n" + "WHERE\r\n"
+				+ "    scs_tipoacreditacion            tac,\r\n" + "    scs_juzgado               j\r\n" 
+				+ "WHERE\r\n"
 				+ "    ac.idtipoacreditacion = tac.idtipoacreditacion\r\n"
+				+ "    AND act.idinstitucion = j.idinstitucion AND act.idjuzgado=j.idjuzgado\r\n"
 				+ "    AND act.idacreditacion = ac.idacreditacion\r\n"
 				+ "    AND act.idacreditacion = acp.idacreditacion\r\n"
 				+ "    AND act.idinstitucion_proc = acp.idinstitucion\r\n"
@@ -743,10 +743,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
 		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA ");
 
-		sql.append(" FROM SCS_DESIGNA D, ");
-		sql.append(" SCS_DESIGNASLETRADO DL ");
+		sql.append(" FROM SCS_DESIGNA D, SCS_DESIGNASLETRADO DL, SCS_JUZGADO J ");
 
 		sql.append(" WHERE D.IDINSTITUCION = DL.IDINSTITUCION ");
+		sql.append(" AND  D.IDJUZGADO=J.IDJUZGADO AND D.IDINSTITUCION_JUZG=J.IDINSTITUCION");
 		sql.append(" AND D.ANIO = DL.ANIO ");
 		sql.append(" AND D.NUMERO = DL.NUMERO ");
 		sql.append(" AND D.IDTURNO = DL.IDTURNO ");
