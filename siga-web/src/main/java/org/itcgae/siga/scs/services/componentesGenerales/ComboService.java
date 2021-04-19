@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
+import org.springframework.http.ResponseEntity;
 
 public interface ComboService {
 	
@@ -56,4 +57,12 @@ public interface ComboService {
 	public ComboDTO comboModulo(HttpServletRequest request);
 	
 	public ComboDTO comboProcedimientos(HttpServletRequest request);
+	
+	public ComboDTO comboProcedimientosConJuzgado(HttpServletRequest request, String idJuzgado);
+	
+	public ComboDTO comboModulosConJuzgado(HttpServletRequest request, String idJuzgado);
+	
+	public ComboDTO comboModulosConProcedimientos(HttpServletRequest request, String idPretension);
+	
+	public ComboDTO comboProcedimientosConModulo(HttpServletRequest request, String idModulo);
 }

@@ -181,7 +181,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION AND ESTADO.FECHAESTADO = ("
 						+ sql2.toString() + "))");
-		if ((item.getIdGuardia() != null && !item.getIdGuardia().isEmpty()) || (item.getIdTurno() != null && !item.getIdTurno().isEmpty())) {
+		if ((item.getIdGuardia() != null && item.getIdGuardia().length>0) || (item.getIdTurno() != null && item.getIdTurno().length > 0)) {
 			sql.INNER_JOIN(
 					"SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
 		}
@@ -213,12 +213,20 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					+ item.getnColegiado().trim() + ")");
 		}
 
-		if (item.getIdTurno() != null && !item.getIdTurno().isEmpty()) {
-			sql.WHERE("GUARDIAS.IDTURNO IN  (" + item.getIdTurno()+")");
+		if (item.getIdTurno() != null && item.getIdTurno().length > 0) {
+			String inSQL = item.getIdTurno()[0];
+			for(int i = 1; i< item.getIdTurno().length; i++) {
+				inSQL += ", "+item.getIdTurno()[i];
+			}
+			sql.WHERE("GUARDIAS.IDTURNO IN  (" + inSQL +")");
 		}
 
-		if (item.getIdGuardia() != null && !item.getIdGuardia().isEmpty()) {
-			sql.WHERE("GUARDIAS.IDGUARDIA IN (" + item.getIdGuardia()+")");
+		if (item.getIdGuardia() != null && item.getIdGuardia().length > 0) {
+			String inSQL = item.getIdGuardia()[0];
+			for(int i = 1; i< item.getIdGuardia().length; i++) {
+				inSQL += ", "+item.getIdGuardia()[i];
+			}
+			sql.WHERE("GUARDIAS.IDGUARDIA IN (" + inSQL +")");
 		}
 
 		if (item.getNif() != null && !item.getNif().isEmpty()) {
@@ -262,7 +270,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.FROM("SCS_INSCRIPCIONGUARDIA");
 		sql.WHERE("IDINSTITUCION = "+ idInstitucion);
 		sql.WHERE("IDPERSONA = "+ tieneTurno.getIdPersona());
-		sql.WHERE("IDTURNO = "+ tieneTurno.getIdTurno());
+		sql.WHERE("IDTURNO = "+ tieneTurno.getTieneTurno());
 		
 		return sql.toString();
 	}
@@ -276,7 +284,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.FROM("SCS_INSCRIPCIONGUARDIA");
 		sql.WHERE("IDINSTITUCION = "+ idInstitucion);
 		sql.WHERE("IDPERSONA = "+ tieneTurno.getIdPersona());
-		sql.WHERE("IDTURNO = "+ tieneTurno.getIdTurno());
+		sql.WHERE("IDTURNO = "+ tieneTurno.getTieneTurno());
 		sql.WHERE("IDGUARDIA = "+ idGuardia);
 		sql.WHERE("FECHAVALIDACION IS NULL");
 		
