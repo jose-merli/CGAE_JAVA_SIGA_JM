@@ -129,6 +129,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		Hashtable codigosBind = new Hashtable();
 		int contador = 0;
 		// Acceso a BBDD
+		idInstitucion = new Short("2035"); designaItem.setNumColegiado("2048");
 		
 		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
@@ -1391,6 +1392,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"    t1.nif,\r\n" + 
 	    			"    t1.fechabaja,\r\n" +
 	    			"    t1.idpersona,\r\n" + 
+	    			"    t1.idrepresentantelegal,\r\n" + 
 	    			"    CASE\r\n" + 
 	    			"        WHEN t1.idabogadocontrario IS NOT NULL THEN\r\n" + 
 	    			"            (\r\n" + 
@@ -1444,6 +1446,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"            scs_contrariosdesigna.idturno,\r\n" + 
 	    			"            scs_contrariosdesigna.anio,\r\n" + 
 	    			"            scs_contrariosdesigna.idpersona,\r\n" + 
+	    			"            scs_contrariosdesigna.idrepresentantelegal,\r\n" + 
 	    			"            scs_contrariosdesigna.NOMBREABOGADOCONTRARIO,\r\n" + 
 	    			"            scs_contrariosdesigna.fechabaja,\r\n" + 
 	    			"            persona.nif,\r\n" + 

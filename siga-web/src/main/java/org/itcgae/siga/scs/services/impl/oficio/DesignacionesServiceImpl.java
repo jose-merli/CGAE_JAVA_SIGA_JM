@@ -21,6 +21,7 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
+import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
@@ -45,10 +46,13 @@ import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsPersonajgExample;
+import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -84,6 +88,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired 
 	private ScsContrariosdesignaMapper scsContrariosdesignaMapper;
+	
+	@Autowired
+	private ScsPersonajgExtendsMapper scsPersonajgExtendsMapper;
 	
 	@Override
 	public List<JustificacionExpressItem> busquedaJustificacionExpres(JustificacionExpressItem item,
@@ -416,7 +423,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designa.setIdpersona(item.getIdpersona());
 						designa.setFechamodificacion(new Date());
 						designa.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
+//						LOGGER.info(
+//								"insertInteresado() / scsPersonajgExtendsMapper.searchJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables");
+//
+//						ScsPersonajgKey scsPersonajgkey = new ScsPersonajgKey();
+//						scsPersonajgExample.createCriteria()
+//								.andIdpersonaEqualTo(Long.valueOf(item.getIdpersona()))
+//								.andIdinstitucionEqualTo(idInstitucion);
+//
+//						personajgList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
+//
+//						LOGGER.info(
+//								"insertInteresado() / scsPersonajgExtendsMapper.searchJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
 
+						
 						
 						LOGGER.info(
 								"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Entrada a ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
@@ -452,6 +473,89 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info("insertInteresado() -> Salida del servicio para eliminar contrarios");
 
 		return insertResponseDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO updateRepresentanteInteresado(ScsDefendidosdesigna item, HttpServletRequest request) {
+		LOGGER.info("deleteContrarios() ->  Entrada al servicio para eliminar contrarios");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateRepresentanteInteresado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateRepresentanteInteresado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					
+					//for(ScsContrariosdesigna item: items) {
+
+						ScsDefendidosdesignaKey key = new ScsDefendidosdesignaKey();
+						key.setAnio(item.getAnio());
+						key.setNumero(item.getNumero());
+						key.setIdturno(item.getIdturno());
+						key.setIdinstitucion(item.getIdinstitucion());
+						key.setIdpersona(item.getIdpersona());
+
+						ScsDefendidosdesigna interesado = scsDefendidosdesignaMapper.selectByPrimaryKey(key);
+
+						
+						interesado.setNombrerepresentante(item.getNombrerepresentante());
+						
+
+						interesado.setFechamodificacion(new Date());
+						interesado.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+						LOGGER.info(
+								"updateRepresentanteInteresado() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Entrada a scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
+
+						response = scsDefendidosdesignaMapper.updateByPrimaryKey(interesado);
+
+						LOGGER.info(
+								"updateRepresentanteInteresado() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Salida de scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
+
+					//}
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription(e.getMessage());
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("updateRepresentanteInteresado() -> Salida del servicio para eliminar contrarios");
+
+		return updateResponseDTO;
 	}
 	
 
@@ -513,7 +617,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
-	public UpdateResponseDTO deleteContrario(ScsContrariosdesigna[] items, HttpServletRequest request) {
+	public UpdateResponseDTO deleteContrario(ScsContrariosdesigna item, HttpServletRequest request) {
 		LOGGER.info("deleteContrarios() ->  Entrada al servicio para eliminar contrarios");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -541,7 +645,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 					
-					for(ScsContrariosdesigna item: items) {
+					//for(ScsContrariosdesigna item: items) {
 
 					    ScsContrariosdesignaKey key = new ScsContrariosdesignaKey();
 						key.setAnio(item.getAnio());
@@ -569,7 +673,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						LOGGER.info(
 								"deleteContrario() / scsContrariosDesignaMapper.updateByPrimaryKey() -> Salida de scsContrariosDesignaMapper para eliminar los contrarios seleccionados");
 
-					}
+					//}
 
 				} catch (Exception e) {
 					response = 0;

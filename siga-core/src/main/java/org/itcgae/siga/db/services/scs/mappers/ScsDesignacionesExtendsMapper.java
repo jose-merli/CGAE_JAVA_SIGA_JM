@@ -172,6 +172,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ABOGADO", property = "abogado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idrepresentantelegal", property = "representante", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PROCURADOR", property = "procurador", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDOSNOMBRE", property = "apellidosnombre", jdbcType = JdbcType.VARCHAR),
