@@ -206,7 +206,19 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "JUSTIFICACION", property = "fechaJustificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "VALIDADA", property = "validada", jdbcType = JdbcType.BOOLEAN),
 			@Result(column = "ANULADA", property = "anulada", jdbcType = JdbcType.BOOLEAN),
-			@Result(column = "FACTURACION", property = "facturacion", jdbcType = JdbcType.VARCHAR) })
+			@Result(column = "FACTURACION", property = "facturacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROPROCEDIMIENTO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPRETENSION", property = "idPretension", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDACREDITACION", property = "idAcreditacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPRISION", property = "idPrision", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TALONARIO", property = "talonario", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TALON", property = "talon", jdbcType = JdbcType.VARCHAR)})
 	List<ActuacionDesignaItem> busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			String idInstitucion);
 

@@ -432,5 +432,11 @@ public class DesignacionesController {
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@GetMapping("/comboPrisiones")
+	public ResponseEntity<ComboDTO> comboPrisiones(HttpServletRequest request) {
+		ComboDTO response = designacionesService.comboPrisiones(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 }
