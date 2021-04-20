@@ -2,6 +2,7 @@ package org.itcgae.siga.DTOs.scs;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -44,7 +45,7 @@ public class JustificacionExpressItem {
 	private String idTurno;
 	private String idPersona;
 	private String idProcedimiento;
-	private List<String> expedientes;
+	private Map<String, String> expedientes;
 	private List<ActuacionesJustificacionExpressItem> actuaciones;	
 	
 	/**
@@ -604,14 +605,14 @@ public class JustificacionExpressItem {
 	 * @return the expedientes
 	 */
 	@JsonProperty("expedientes")
-	public List<String> getExpedientes() {
+	public Map<String, String> getExpedientes() {
 		return expedientes;
 	}
 
 	/**
 	 * @param expedientes the expedientes to set
 	 */
-	public void setExpedientes(List<String> expedientes) {
+	public void setExpedientes(Map<String, String> expedientes) {
 		this.expedientes = expedientes;
 	}
 

@@ -18,5 +18,21 @@ public class ScsTipodictamenejgSqlExtendsProvider extends ScsTipodictamenejgSqlP
 		
 		return sql.toString();
 	}
+	
+	/**
+	 * 
+	 * @param idLenguaje
+	 * @param idInstitucion
+	 * @return
+	 */
+	public String estadosDictamen(String idLenguaje, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("T.IDTIPODICTAMENEJG, F_SIGA_GETRECURSO(T.DESCRIPCION,"+idLenguaje+") DESCRIPCION");
+		sql.FROM("SCS_TIPODICTAMENEJG T"); 
+		sql.WHERE("T.IDINSTITUCION = "+idInstitucion+" AND T.FECHA_BAJA IS NULL AND T.BLOQUEADO = 'N'");  
+		
+		return sql.toString();
+	}
 }
 

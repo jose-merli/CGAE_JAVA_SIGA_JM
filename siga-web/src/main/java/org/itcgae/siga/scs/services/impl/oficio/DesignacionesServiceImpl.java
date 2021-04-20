@@ -3,7 +3,9 @@ package org.itcgae.siga.scs.services.impl.oficio;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -38,12 +40,14 @@ import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTipodictamenejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
@@ -79,6 +83,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private ScsContrariosdesignaMapper scsContrariosdesignaMapper;
+	
+	@Autowired
+	private ScsTipodictamenejgExtendsMapper scsTipodictamenejgExtendsMapper;
 
 	@Autowired
 	private ScsPrisionExtendsMapper scsPrisionExtendsMapper;
@@ -163,16 +170,31 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> tratando expedientes...");
+					//obtenemos los estados para los expedientes
+					
+					List<ScsTipodictamenejg> estadosExpedientes = scsTipodictamenejgExtendsMapper.estadosDictamen(usuarios.get(0).getIdlenguaje(), idInstitucion.toString());
+					String idFavorable = null;
+					String idDesfavorable = null;
+					
+					for(ScsTipodictamenejg tipoDictamen : estadosExpedientes) {
+						if("FAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())){
+							idFavorable=tipoDictamen.getIdtipodictamenejg().toString();
+						}else if("DESFAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())){
+							idDesfavorable=tipoDictamen.getIdtipodictamenejg().toString();
+						}
+					}
+					
 					// cogemos los expedientes devueltos de la consulta y los tratamos para el front
 					for (int i = 0; i < result.size(); i++) {
-						List<String> expedientes = new ArrayList<String>();
+						Map<String, String> expedientes = new HashMap<String, String>();
 
 						if (result.get(i).getEjgs() != null && !result.get(i).getEjgs().isEmpty()) {
 							String[] parts = result.get(i).getEjgs().split(",");
 
 							for (String str : parts) {
 								if (str.indexOf("##") != -1) {
-									expedientes.add(str.substring(0, str.indexOf("##")).trim());
+									expedientes.put(str.substring(0, str.indexOf("##")).trim(), 
+											(str.substring(str.length()-1)==idFavorable ? "FAVORABLE" : (str.substring(str.length()-1)==idDesfavorable ? "DESFAVORABLE" : "''")));
 								}
 							}
 						}
