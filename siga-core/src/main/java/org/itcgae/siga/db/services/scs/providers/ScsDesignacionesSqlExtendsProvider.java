@@ -127,6 +127,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		Hashtable codigosBind = new Hashtable();
 		int contador = 0;
 		// Acceso a BBDD
+		//idInstitucion = new Short("2035"); designaItem.setNumColegiado("2773");
 		
 		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
@@ -946,9 +947,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append("'%" + item.getNombre().trim().toUpperCase() + "%'");
 		}
 
-		// QUITAR AL ACABAR LAS PRUEBAS
-		sql.append(" AND dl.idpersona = 2005002515");
-
 		// NCOLEGIADO
 		if (idPersona != null && !idPersona.isEmpty()) {
 			sql.append(" AND DL.IDPERSONA = " + idPersona);
@@ -1396,6 +1394,22 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 	
+	public String getNewIdActuDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, Short idInstitucion) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("NVL(MAX(ACT.NUMEROASUNTO),0) +1 AS ID");
+		
+		sql.FROM("SCS_ACTUACIONDESIGNA ACT");
+		
+		sql.WHERE("ACT.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("ACT.IDTURNO = '" + actuacionDesignaRequestDTO.getIdTurno() + "'");
+		sql.WHERE("ACT.ANIO = '" + actuacionDesignaRequestDTO.getAnio() + "'");
+		sql.WHERE("ACT.NUMERO = '" + actuacionDesignaRequestDTO.getNumero() + "'");
+		
+		return sql.toString();
+	}
+	
 	    public String busquedaListaContrarios(DesignaItem item, Short idInstitucion, Boolean historico) {
 	    	
 	    	String consulta ="SELECT\r\n" + 
@@ -1406,6 +1420,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"    t1.nif,\r\n" + 
 	    			"    t1.fechabaja,\r\n" +
 	    			"    t1.idpersona,\r\n" + 
+	    			"    t1.idrepresentantelegal,\r\n" + 
 	    			"    CASE\r\n" + 
 	    			"        WHEN t1.idabogadocontrario IS NOT NULL THEN\r\n" + 
 	    			"            (\r\n" + 
@@ -1459,6 +1474,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"            scs_contrariosdesigna.idturno,\r\n" + 
 	    			"            scs_contrariosdesigna.anio,\r\n" + 
 	    			"            scs_contrariosdesigna.idpersona,\r\n" + 
+	    			"            scs_contrariosdesigna.idrepresentantelegal,\r\n" + 
 	    			"            scs_contrariosdesigna.NOMBREABOGADOCONTRARIO,\r\n" + 
 	    			"            scs_contrariosdesigna.fechabaja,\r\n" + 
 	    			"            persona.nif,\r\n" + 
@@ -1476,8 +1492,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"        WHERE\r\n" + 
 	    			"            ( scs_contrariosdesigna.anio = "+item.getAno()+"\r\n" + 
 	    			"              AND scs_contrariosdesigna.numero = "+item.getNumero()+"\r\n" + 
-	    			//"              AND scs_contrariosdesigna.idinstitucion = "+idInstitucion+"\r\n";
-	    			"              AND scs_contrariosdesigna.idinstitucion = 2035\r\n";
+	    			"              AND scs_contrariosdesigna.idinstitucion = "+idInstitucion+"\r\n";
 	    			if(!historico) {
 	    				consulta+=" AND scs_contrariosdesigna.fechabaja is null \r\n";
 	    			}
@@ -1510,14 +1525,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.SELECT("            persona.apellido1\r\n" + 
 	    			"            || decode(persona.apellido2, NULL, '', ' ' || persona.apellido2)\r\n" + 
 	    			"            || ', '\r\n" + 
-	    			"            || persona.nombre AS apellidosnombre\r\n");
+	    			"            || persona.nombre AS apellidosnombre");
 			sql.FROM("SCS_DEFENDIDOSDESIGNA");
 			sql.JOIN("scs_personajg persona ON persona.idpersona = scs_DEFENDIDOSDESIGNA.idpersona AND persona.idinstitucion = scs_DEFENDIDOSDESIGNA.idinstitucion");
 			sql.WHERE("            ( scs_DEFENDIDOSDESIGNA.anio = "+item.getAno()+"\r\n" + 
 			"              AND scs_DEFENDIDOSDESIGNA.numero = "+item.getNumero()+"\r\n" + 
-			//Cuando se deje de trabajar con designas fijadas hay que descomentar la linea.
-			//"              AND scs_contrariosdesigna.idinstitucion = "+idInstitucion+"\r\n" + 
-			"              AND scs_contrariosdesigna.idinstitucion = 2035\r\n" +
+			"              AND scs_DEFENDIDOSDESIGNA.idinstitucion = "+idInstitucion+"\r\n" + 
 			"              AND scs_DEFENDIDOSDESIGNA.idturno = "+item.getIdTurno()+" )\r\n");
 	
 	    	

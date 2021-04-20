@@ -7,10 +7,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
+import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -22,7 +24,44 @@ import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 
 public interface IDesignacionesService {
 
+	/**
+	 * busquedaJustificacionExpres
+	 * 
+	 * @param item
+	 * @param request
+	 * @return
+	 */
 	public List<JustificacionExpressItem> busquedaJustificacionExpres(JustificacionExpressItem item,
+			HttpServletRequest request);
+	
+	/**
+	 * insertaJustificacionExpres
+	 * 
+	 * @param item
+	 * @param request
+	 * @return
+	 */
+	public InsertResponseDTO insertaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+			HttpServletRequest request);
+	
+	/**
+	 * actualizaJustificacionExpres
+	 * 
+	 * @param item
+	 * @param request
+	 * @return
+	 */
+	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+			HttpServletRequest request);
+	
+	/**
+	 * eliminaJustificacionExpres
+	 * 
+	 * @param item
+	 * @param request
+	 * @return
+	 */
+	public DeleteResponseDTO eliminaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
 			HttpServletRequest request);
 
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
@@ -34,7 +73,7 @@ public interface IDesignacionesService {
 
 	public UpdateResponseDTO updateDatosAdicionales(DesignaItem designaItem, HttpServletRequest request);
 
-	public UpdateResponseDTO deleteContrario(ScsContrariosdesigna item, HttpServletRequest request);
+	public UpdateResponseDTO deleteContrario(ScsContrariosdesigna contrario, HttpServletRequest request);
 
 	public List<ListaInteresadoJusticiableItem> busquedaListaInteresados(DesignaItem designa,
 			HttpServletRequest request);
@@ -46,6 +85,9 @@ public interface IDesignacionesService {
 	public InsertResponseDTO insertContrario(ScsContrariosdesigna contrario, HttpServletRequest request);
 
 	public ActuacionDesignaDTO busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
+			HttpServletRequest request);
+	
+	public MaxIdDto getNewIdActuDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			HttpServletRequest request);
 
 	public UpdateResponseDTO anularReactivarActDesigna(List<ActuacionDesignaItem> listaActuacionDesignaItem,
@@ -63,6 +105,8 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO guardarProcurador(List<ProcuradorItem> procurador, HttpServletRequest request);
 
 	public List<DesignaItem> getDatosAdicionales(DesignaItem designa, HttpServletRequest request);
+
+	public UpdateResponseDTO updateRepresentanteInteresado(ScsDefendidosdesigna item, HttpServletRequest request);
 
 	public ComboDTO comboPrisiones(HttpServletRequest request);
 }
