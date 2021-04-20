@@ -11,14 +11,12 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
-import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
-import org.springframework.web.bind.annotation.RequestBody;
 
 public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
@@ -630,7 +628,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "    ), 2)) porcentaje,\r\n" + "    tac.descripcion   tipo,\r\n"
 				+ "    pro.nombre        procedimiento,\r\n" + "    pro.codigo        categoria,\r\n"
 				+ "    pro.idjurisdiccion,\r\n" + "    pro.complemento,\r\n" + "    pro.permitiraniadirletrado,\r\n"
-				+ "    act.numeroasunto,\r\n" + "    act.idprocedimiento,\r\n" + "    act.idjuzgado,\r\n"
+				+ "    act.numeroasunto,\r\n" + "    act.idprocedimiento,\r\n" + "    act.idjuzgado, j.nombre nombreJuzgado,\r\n"
 				+ "    to_char(act.fechajustificacion, 'dd/mm/yyyy') fechajustificacion,\r\n" + "    act.validada,\r\n"
 				+ "    act.idfacturacion,\r\n" + "    act.numeroprocedimiento,\r\n" + "    act.anioprocedimiento,\r\n"
 				+ "    (\r\n" + "        SELECT\r\n" + "            nombre\r\n" + "            || ' ('\r\n"
@@ -642,8 +640,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "    act.nig,\r\n" + "    act.fecha,\r\n" + "    0 permitireditarletrado\r\n" + "FROM\r\n"
 				+ "    scs_actuaciondesigna            act,\r\n" + "    scs_procedimientos              pro,\r\n"
 				+ "    scs_acreditacionprocedimiento   acp,\r\n" + "    scs_acreditacion                ac,\r\n"
-				+ "    scs_tipoacreditacion            tac\r\n" + "WHERE\r\n"
+				+ "    scs_tipoacreditacion            tac,\r\n" + "    scs_juzgado               j\r\n" 
+				+ "WHERE\r\n"
 				+ "    ac.idtipoacreditacion = tac.idtipoacreditacion\r\n"
+				+ "    AND act.idinstitucion = j.idinstitucion AND act.idjuzgado=j.idjuzgado\r\n"
 				+ "    AND act.idacreditacion = ac.idacreditacion\r\n"
 				+ "    AND act.idacreditacion = acp.idacreditacion\r\n"
 				+ "    AND act.idinstitucion_proc = acp.idinstitucion\r\n"
@@ -744,10 +744,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
 		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA ");
 
-		sql.append(" FROM SCS_DESIGNA D, ");
-		sql.append(" SCS_DESIGNASLETRADO DL ");
+		sql.append(" FROM SCS_DESIGNA D, SCS_DESIGNASLETRADO DL, SCS_JUZGADO J ");
 
 		sql.append(" WHERE D.IDINSTITUCION = DL.IDINSTITUCION ");
+		sql.append(" AND  D.IDJUZGADO=J.IDJUZGADO AND D.IDINSTITUCION_JUZG=J.IDINSTITUCION");
 		sql.append(" AND D.ANIO = DL.ANIO ");
 		sql.append(" AND D.NUMERO = DL.NUMERO ");
 		sql.append(" AND D.IDTURNO = DL.IDTURNO ");
@@ -1357,6 +1357,18 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT("ACT.VALIDADA");
 		sql2.SELECT("ACT.ANULACION AS ANULADA");
 		sql2.SELECT("FAC.NOMBRE AS FACTURACION");
+		sql2.SELECT("PER.APELLIDOS2 || ' ' || PER.APELLIDOS1 || ', ' || PER.NOMBRE AS LETRADO");
+		sql2.SELECT("ACT.NIG");
+		sql2.SELECT("ACT.NUMEROPROCEDIMIENTO");
+		sql2.SELECT("ACT.IDJUZGADO");
+		sql2.SELECT("ACT.IDPROCEDIMIENTO");
+		sql2.SELECT("ACT.IDPRETENSION");
+		sql2.SELECT("ACT.IDACREDITACION");
+		sql2.SELECT("ACT.IDPRISION");
+		sql2.SELECT("ACT.OBSERVACIONES");
+		sql2.SELECT("ACT.TALONARIO");
+		sql2.SELECT("ACT.TALON");
+		sql2.SELECT("DECODE(COL.COMUNITARIO, '1', COL.NCOMUNITARIO, COL.NCOLEGIADO) AS NUMCOLEGIADO");
 
 		sql2.FROM("SCS_ACTUACIONDESIGNA ACT");
 
@@ -1364,6 +1376,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.JOIN("FCS_FACTURACIONJG FAC ON FAC.IDFACTURACION = ACT.IDFACTURACION");
 		sql2.JOIN(
 				"SCS_PROCEDIMIENTOS PRO ON PRO.IDPROCEDIMIENTO = ACT.IDPROCEDIMIENTO AND PRO.IDINSTITUCION = ACT.IDINSTITUCION AND FAC.IDINSTITUCION = ACT.IDINSTITUCION");
+		sql2.JOIN("CEN_COLEGIADO COL ON COL.IDPERSONA = ACT.IDPERSONACOLEGIADO AND COL.IDINSTITUCION = ACT.IDINSTITUCION");
+		sql2.JOIN("CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
 
 		if (!actuacionDesignaRequestDTO.isHistorico()) {
 			sql2.WHERE("ACT.ANULACION = 0");
