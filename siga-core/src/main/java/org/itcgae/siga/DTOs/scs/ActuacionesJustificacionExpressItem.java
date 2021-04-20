@@ -18,6 +18,7 @@ public class ActuacionesJustificacionExpressItem {
 	private String numAsunto;
 	private String idProcedimiento;
 	private String idJuzgado;
+	private String nombreJuzgado;
 	private String fechaJustificacion;
 	private String validada;
 	private String idFacturacion;
@@ -367,5 +368,18 @@ public class ActuacionesJustificacionExpressItem {
 	 */
 	public void setPermitirLetrado(String permitirLetrado) {
 		this.permitirLetrado = permitirLetrado;
+	}
+	/**
+	 * @return the nombreJuzgado
+	 */
+	@JsonProperty("nombreJuzgado")
+	public String getNombreJuzgado() {
+		return nombreJuzgado;
+	}
+	/**
+	 * @param nombreJuzgado the nombreJuzgado to set
+	 */
+	public void setNombreJuzgado(String nombreJuzgado) {
+		this.nombreJuzgado = nombreJuzgado;
 	}
 }

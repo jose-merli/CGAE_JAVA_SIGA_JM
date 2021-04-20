@@ -1030,7 +1030,7 @@ public class ComboServiceImpl implements ComboService {
 					if(pretensionProcedimiento != null && pretensionProcedimiento.size() > 0) {
 					idPretensiones = new ArrayList<String>();
 					for(ComboItem label: pretensionProcedimiento) {
-						idPretensiones.add(label.getValue());
+						idPretensiones.add(label.getLabel());
 					}
 					
 					comboItems = scsDesignacionesExtendsMapper.comboProcedimientosConJuzgado(idInstitucion, idPretensiones);

@@ -11,14 +11,12 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
-import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
-import org.springframework.web.bind.annotation.RequestBody;
 
 public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
@@ -133,7 +131,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
-			sql = " select distinct procd.nombre as nombreprocedimiento, juzgado.nombre as nombrejuzgado, "
+			sql = " select distinct  procd.nombre as modulo,  des.idpretension, F_SIGA_GETRECURSO(pretension.DESCRIPCION, 1) AS procedimiento, procd.IDPROCEDIMIENTO as IDMODULO,  des.idjuzgado, juzgado.nombre as nombrejuzgado,  des.idjuzgado, juzgado.nombre as nombrejuzgado, "
 					+ "des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA, "
 					+ " des.nig, des.numprocedimiento, des.estado estado, des.anio anio, des.numero numero,"
 					+ " des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta, des.fechaentrada fechaentrada,"
@@ -168,7 +166,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			boolean tiene_actuacionesV = designaItem.getIdActuacionesV() != null
 					&& !designaItem.getIdActuacionesV().equalsIgnoreCase("");
 			boolean tiene_moduloDesignacion = (designaItem.getIdModulo() != null
-					&& designaItem.getIdModulo().length > 0);
+					&& designaItem.getIdModulos().length > 0);
 			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimiento() != null
 					&& designaItem.getIdProcedimientos().length > 0);
 
@@ -186,7 +184,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				tiene_interesado = true;
 			}
 
-			sql += ", scs_turno turno,  scs_juzgado juzgado, scs_pretensionesproced pret, scs_procedimientos procd";
+			sql += ", scs_turno turno,  scs_juzgado juzgado, scs_pretensionesproced pret, scs_procedimientos procd, scs_pretension pretension";
 
 //			if (tiene_interesado) {
 				sql += ", SCS_DEFENDIDOSDESIGNA DED, SCS_PERSONAJG PER ";
@@ -208,6 +206,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql += " and l.idinstitucion =des.idinstitucion and persona.idpersona = colegiado.idpersona ";
 				sql += " and des.idinstitucion = juzgado.idinstitucion and des.idjuzgado = juzgado.idjuzgado";
 				sql += "  and procd.idinstitucion = des.idinstitucion and procd.idprocedimiento = des.idprocedimiento and pret.idinstitucion = procd.idinstitucion and procd.idprocedimiento = pret.idprocedimiento ";
+				sql += " and pretension.idpretension = des.idpretension and pretension.idinstitucion = des.idinstitucion ";
 				sql += " and l.idturno =des.idturno ";
 				sql += " and l.anio =des.anio ";
 				sql += " and l.numero =des.numero ";
@@ -630,7 +629,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "    ), 2)) porcentaje,\r\n" + "    tac.descripcion   tipo,\r\n"
 				+ "    pro.nombre        procedimiento,\r\n" + "    pro.codigo        categoria,\r\n"
 				+ "    pro.idjurisdiccion,\r\n" + "    pro.complemento,\r\n" + "    pro.permitiraniadirletrado,\r\n"
-				+ "    act.numeroasunto,\r\n" + "    act.idprocedimiento,\r\n" + "    act.idjuzgado,\r\n"
+				+ "    act.numeroasunto,\r\n" + "    act.idprocedimiento,\r\n" + "    act.idjuzgado, j.nombre nombreJuzgado,\r\n"
 				+ "    to_char(act.fechajustificacion, 'dd/mm/yyyy') fechajustificacion,\r\n" + "    act.validada,\r\n"
 				+ "    act.idfacturacion,\r\n" + "    act.numeroprocedimiento,\r\n" + "    act.anioprocedimiento,\r\n"
 				+ "    (\r\n" + "        SELECT\r\n" + "            nombre\r\n" + "            || ' ('\r\n"
@@ -642,8 +641,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "    act.nig,\r\n" + "    act.fecha,\r\n" + "    0 permitireditarletrado\r\n" + "FROM\r\n"
 				+ "    scs_actuaciondesigna            act,\r\n" + "    scs_procedimientos              pro,\r\n"
 				+ "    scs_acreditacionprocedimiento   acp,\r\n" + "    scs_acreditacion                ac,\r\n"
-				+ "    scs_tipoacreditacion            tac\r\n" + "WHERE\r\n"
+				+ "    scs_tipoacreditacion            tac,\r\n" + "    scs_juzgado               j\r\n" 
+				+ "WHERE\r\n"
 				+ "    ac.idtipoacreditacion = tac.idtipoacreditacion\r\n"
+				+ "    AND act.idinstitucion = j.idinstitucion AND act.idjuzgado=j.idjuzgado\r\n"
 				+ "    AND act.idacreditacion = ac.idacreditacion\r\n"
 				+ "    AND act.idacreditacion = acp.idacreditacion\r\n"
 				+ "    AND act.idinstitucion_proc = acp.idinstitucion\r\n"
@@ -744,10 +745,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
 		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA ");
 
-		sql.append(" FROM SCS_DESIGNA D, ");
-		sql.append(" SCS_DESIGNASLETRADO DL ");
+		sql.append(" FROM SCS_DESIGNA D, SCS_DESIGNASLETRADO DL, SCS_JUZGADO J ");
 
 		sql.append(" WHERE D.IDINSTITUCION = DL.IDINSTITUCION ");
+		sql.append(" AND  D.IDJUZGADO=J.IDJUZGADO AND D.IDINSTITUCION_JUZG=J.IDINSTITUCION");
 		sql.append(" AND D.ANIO = DL.ANIO ");
 		sql.append(" AND D.NUMERO = DL.NUMERO ");
 		sql.append(" AND D.IDTURNO = DL.IDTURNO ");
@@ -945,9 +946,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					+ ",D.anio,D.idturno,D.numero,1) ) like ");
 			sql.append("'%" + item.getNombre().trim().toUpperCase() + "%'");
 		}
-
-		// QUITAR AL ACABAR LAS PRUEBAS
-		sql.append(" AND dl.idpersona = 2005002515");
 
 		// NCOLEGIADO
 		if (idPersona != null && !idPersona.isEmpty()) {
@@ -1357,6 +1355,18 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT("ACT.VALIDADA");
 		sql2.SELECT("ACT.ANULACION AS ANULADA");
 		sql2.SELECT("FAC.NOMBRE AS FACTURACION");
+		sql2.SELECT("PER.APELLIDOS2 || ' ' || PER.APELLIDOS1 || ', ' || PER.NOMBRE AS LETRADO");
+		sql2.SELECT("ACT.NIG");
+		sql2.SELECT("ACT.NUMEROPROCEDIMIENTO");
+		sql2.SELECT("ACT.IDJUZGADO");
+		sql2.SELECT("ACT.IDPROCEDIMIENTO");
+		sql2.SELECT("ACT.IDPRETENSION");
+		sql2.SELECT("ACT.IDACREDITACION");
+		sql2.SELECT("ACT.IDPRISION");
+		sql2.SELECT("ACT.OBSERVACIONES");
+		sql2.SELECT("ACT.TALONARIO");
+		sql2.SELECT("ACT.TALON");
+		sql2.SELECT("DECODE(COL.COMUNITARIO, '1', COL.NCOMUNITARIO, COL.NCOLEGIADO) AS NUMCOLEGIADO");
 
 		sql2.FROM("SCS_ACTUACIONDESIGNA ACT");
 
@@ -1364,6 +1374,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.JOIN("FCS_FACTURACIONJG FAC ON FAC.IDFACTURACION = ACT.IDFACTURACION");
 		sql2.JOIN(
 				"SCS_PROCEDIMIENTOS PRO ON PRO.IDPROCEDIMIENTO = ACT.IDPROCEDIMIENTO AND PRO.IDINSTITUCION = ACT.IDINSTITUCION AND FAC.IDINSTITUCION = ACT.IDINSTITUCION");
+		sql2.JOIN("CEN_COLEGIADO COL ON COL.IDPERSONA = ACT.IDPERSONACOLEGIADO AND COL.IDINSTITUCION = ACT.IDINSTITUCION");
+		sql2.JOIN("CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
 
 		if (!actuacionDesignaRequestDTO.isHistorico()) {
 			sql2.WHERE("ACT.ANULACION = 0");
@@ -1379,6 +1391,22 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("( " + sql2.toString() + " )");
 		sql.WHERE("ROWNUM <= 201");
 
+		return sql.toString();
+	}
+	
+	public String getNewIdActuDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, Short idInstitucion) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("NVL(MAX(ACT.NUMEROASUNTO),0) +1 AS ID");
+		
+		sql.FROM("SCS_ACTUACIONDESIGNA ACT");
+		
+		sql.WHERE("ACT.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("ACT.IDTURNO = '" + actuacionDesignaRequestDTO.getIdTurno() + "'");
+		sql.WHERE("ACT.ANIO = '" + actuacionDesignaRequestDTO.getAnio() + "'");
+		sql.WHERE("ACT.NUMERO = '" + actuacionDesignaRequestDTO.getNumero() + "'");
+		
 		return sql.toString();
 	}
 	
