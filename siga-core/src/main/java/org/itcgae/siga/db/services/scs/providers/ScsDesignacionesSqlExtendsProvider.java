@@ -130,7 +130,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
-			sql = " select distinct procd.nombre as nombreprocedimiento, juzgado.nombre as nombrejuzgado, "
+			sql = " select distinct  procd.nombre as modulo,  des.idpretension, F_SIGA_GETRECURSO(pretension.DESCRIPCION, 1) AS procedimiento, procd.IDPROCEDIMIENTO as IDMODULO,  des.idjuzgado, juzgado.nombre as nombrejuzgado,  des.idjuzgado, juzgado.nombre as nombrejuzgado, "
 					+ "des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA, "
 					+ " des.nig, des.numprocedimiento, des.estado estado, des.anio anio, des.numero numero,"
 					+ " des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta, des.fechaentrada fechaentrada,"
@@ -165,7 +165,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			boolean tiene_actuacionesV = designaItem.getIdActuacionesV() != null
 					&& !designaItem.getIdActuacionesV().equalsIgnoreCase("");
 			boolean tiene_moduloDesignacion = (designaItem.getIdModulo() != null
-					&& designaItem.getIdModulo().length > 0);
+					&& designaItem.getIdModulos().length > 0);
 			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimiento() != null
 					&& designaItem.getIdProcedimientos().length > 0);
 
@@ -183,7 +183,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				tiene_interesado = true;
 			}
 
-			sql += ", scs_turno turno,  scs_juzgado juzgado, scs_pretensionesproced pret, scs_procedimientos procd";
+			sql += ", scs_turno turno,  scs_juzgado juzgado, scs_pretensionesproced pret, scs_procedimientos procd, scs_pretension pretension";
 
 //			if (tiene_interesado) {
 				sql += ", SCS_DEFENDIDOSDESIGNA DED, SCS_PERSONAJG PER ";
@@ -205,6 +205,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql += " and l.idinstitucion =des.idinstitucion and persona.idpersona = colegiado.idpersona ";
 				sql += " and des.idinstitucion = juzgado.idinstitucion and des.idjuzgado = juzgado.idjuzgado";
 				sql += "  and procd.idinstitucion = des.idinstitucion and procd.idprocedimiento = des.idprocedimiento and pret.idinstitucion = procd.idinstitucion and procd.idprocedimiento = pret.idprocedimiento ";
+				sql += " and pretension.idpretension = des.idpretension and pretension.idinstitucion = des.idinstitucion ";
 				sql += " and l.idturno =des.idturno ";
 				sql += " and l.anio =des.anio ";
 				sql += " and l.numero =des.numero ";
@@ -1389,6 +1390,22 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("( " + sql2.toString() + " )");
 		sql.WHERE("ROWNUM <= 201");
 
+		return sql.toString();
+	}
+	
+	public String getNewIdActuDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, Short idInstitucion) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("NVL(MAX(ACT.NUMEROASUNTO),0) +1 AS ID");
+		
+		sql.FROM("SCS_ACTUACIONDESIGNA ACT");
+		
+		sql.WHERE("ACT.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("ACT.IDTURNO = '" + actuacionDesignaRequestDTO.getIdTurno() + "'");
+		sql.WHERE("ACT.ANIO = '" + actuacionDesignaRequestDTO.getAnio() + "'");
+		sql.WHERE("ACT.NUMERO = '" + actuacionDesignaRequestDTO.getNumero() + "'");
+		
 		return sql.toString();
 	}
 	
