@@ -945,9 +945,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append("'%" + item.getNombre().trim().toUpperCase() + "%'");
 		}
 
-		// QUITAR AL ACABAR LAS PRUEBAS
-		sql.append(" AND dl.idpersona = 2005002515");
-
 		// NCOLEGIADO
 		if (idPersona != null && !idPersona.isEmpty()) {
 			sql.append(" AND DL.IDPERSONA = " + idPersona);

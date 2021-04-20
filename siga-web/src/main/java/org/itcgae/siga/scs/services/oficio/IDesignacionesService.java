@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
+import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -22,7 +23,44 @@ import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 
 public interface IDesignacionesService {
 
+	/**
+	 * busquedaJustificacionExpres
+	 * 
+	 * @param item
+	 * @param request
+	 * @return
+	 */
 	public List<JustificacionExpressItem> busquedaJustificacionExpres(JustificacionExpressItem item,
+			HttpServletRequest request);
+	
+	/**
+	 * insertaJustificacionExpres
+	 * 
+	 * @param item
+	 * @param request
+	 * @return
+	 */
+	public InsertResponseDTO insertaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+			HttpServletRequest request);
+	
+	/**
+	 * actualizaJustificacionExpres
+	 * 
+	 * @param item
+	 * @param request
+	 * @return
+	 */
+	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+			HttpServletRequest request);
+	
+	/**
+	 * eliminaJustificacionExpres
+	 * 
+	 * @param item
+	 * @param request
+	 * @return
+	 */
+	public DeleteResponseDTO eliminaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
 			HttpServletRequest request);
 
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
