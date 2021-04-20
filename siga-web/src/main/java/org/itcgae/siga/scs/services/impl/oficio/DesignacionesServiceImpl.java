@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -902,6 +903,43 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
+	public MaxIdDto getNewIdActuDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		MaxIdDto maxIdDto = new MaxIdDto();
+
+		try {
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.getNewIdActuDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getNewIdActuDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				
+				LOGGER.info("DesignacionesServiceImpl.getNewIdActuDesigna() / scsDesignacionesExtendsMapper.getNewIdActuDesigna() -> Se inicia la búsqueda del nuevo ID de actuación");
+				
+				maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actuacionDesignaRequestDTO, idInstitucion);
+				
+				LOGGER.info("DesignacionesServiceImpl.getNewIdActuDesigna() / scsDesignacionesExtendsMapper.getNewIdActuDesigna() -> Se finaliza la búsqueda del nuevo ID de actuación");
+			}
+			
+		} catch (Exception e) {
+			LOGGER.error("DesignacionesServiceImpl.getNewIdActuDesigna() -> Se ha producido un error al intentar recuperar el nuevo ID de actuación.");
+		}
+
+		return maxIdDto;
+	}
+
+	@Override
 	public UpdateResponseDTO anularReactivarActDesigna(List<ActuacionDesignaItem> listaActuacionDesignaItem,
 			boolean anular, HttpServletRequest request) {
 
@@ -1308,7 +1346,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return designas;
 	}
 
-	 @Override
+	@Override
 	public ComboDTO comboPrisiones(HttpServletRequest request) {
 
 		LOGGER.info("comboPrisiones() -> Entrada al servicio para combo comboPrisiones");
@@ -1338,4 +1376,5 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 		return comboDTO;
 	}
+
 }

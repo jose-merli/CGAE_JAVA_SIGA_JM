@@ -1395,6 +1395,22 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 	
+	public String getNewIdActuDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, Short idInstitucion) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("NVL(MAX(ACT.NUMEROASUNTO),0) +1 AS ID");
+		
+		sql.FROM("SCS_ACTUACIONDESIGNA ACT");
+		
+		sql.WHERE("ACT.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("ACT.IDTURNO = '" + actuacionDesignaRequestDTO.getIdTurno() + "'");
+		sql.WHERE("ACT.ANIO = '" + actuacionDesignaRequestDTO.getAnio() + "'");
+		sql.WHERE("ACT.NUMERO = '" + actuacionDesignaRequestDTO.getNumero() + "'");
+		
+		return sql.toString();
+	}
+	
 	    public String busquedaListaContrarios(DesignaItem item, Short idInstitucion, Boolean historico) {
 	    	
 	    	String consulta ="SELECT\r\n" + 

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesDTO;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
@@ -386,6 +387,13 @@ public class DesignacionesController {
 	public ResponseEntity<ActuacionDesignaDTO> busquedaActDesigna(
 			@RequestBody ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, HttpServletRequest request) {
 		ActuacionDesignaDTO response = designacionesService.busquedaActDesigna(actuacionDesignaRequestDTO, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/getNewIdActuDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<MaxIdDto> getNewIdActuDesigna(
+			@RequestBody ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, HttpServletRequest request) {
+		MaxIdDto response = designacionesService.getNewIdActuDesigna(actuacionDesignaRequestDTO, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
