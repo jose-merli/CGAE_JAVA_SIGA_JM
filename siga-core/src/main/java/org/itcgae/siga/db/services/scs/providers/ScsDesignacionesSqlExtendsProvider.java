@@ -140,7 +140,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					+ " persona.APELLIDOS1 as apellido1persona,  persona.APELLIDOS2 as apellido2persona, PER.NOMBRE AS NOMBREINTERESADO, PER.APELLIDO1, PER.APELLIDO2 ";
 			sql += " from scs_designa des, CEN_COLEGIADO colegiado, cen_persona persona ";
 
-			if (String.valueOf(designaItem.getNumColegiado()) != null
+			if (designaItem.getNumColegiado() != null
 					&& !String.valueOf(designaItem.getNumColegiado()).equals("")) {
 				sql += ", SCS_DESIGNASLETRADO l ";
 			}
@@ -201,7 +201,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						+ " AND DED.IDTURNO = des.idTURNO AND DED.NUMERO = des.NUMERO ";
 			}
 
-			if (String.valueOf(designaItem.getNumColegiado()) != null
+			if (designaItem.getNumColegiado() != null
 					&& !(String.valueOf(designaItem.getNumColegiado())).equals("")) {
 				sql += " and l.idinstitucion =des.idinstitucion and persona.idpersona = colegiado.idpersona ";
 				sql += " and des.idinstitucion = juzgado.idinstitucion and des.idjuzgado = juzgado.idjuzgado";
