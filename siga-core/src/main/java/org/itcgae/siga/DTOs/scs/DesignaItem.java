@@ -57,13 +57,16 @@ public class DesignaItem {
 	private String acreditacion;
 	private String[] idAcreditacion;
 	private String modulo;
-	private String[] idModulo;
+	private String[] idModulos;
+	private String idModulo;
 	private Date fechaJustificacionDesde;
 	private Date fechaJustificacionHasta;
 	private String origen;
 	private String idOrigen;
 	private String nif;
 	private String nombreInteresado;
+	private String apellido1Interesado;
+	private String apellido2Interesado;
 	private String apellidosInteresado;
 	private String idActuacionesV;
 	private String idArt27;
@@ -695,14 +698,14 @@ public class DesignaItem {
 	/**
 	 * @return the idModulo
 	 */
-	public String[] getIdModulo() {
-		return idModulo;
+	public String[] getIdModulos() {
+		return idModulos;
 	}
 	/**
 	 * @param idModulo the idModulo to set
 	 */
-	public void setIdModulo(String[] idModulo) {
-		this.idModulo = idModulo;
+	public void setIdModulos(String[] idModulos) {
+		this.idModulos = idModulos;
 	}
 	/**
 	 * @return the fechaJustificacionDesde
@@ -883,6 +886,28 @@ public class DesignaItem {
 	public void setEstado(String estado) {
 		this.estado = estado;
 	}
+	
+	public String getApellido1Interesado() {
+		return apellido1Interesado;
+	}
+	public void setApellido1Interesado(String apellido1Interesado) {
+		this.apellido1Interesado = apellido1Interesado;
+	}
+	
+	public String getApellido2Interesado() {
+		return apellido2Interesado;
+	}
+	public void setApellido2Interesado(String apellido2Interesado) {
+		this.apellido2Interesado = apellido2Interesado;
+	}
+	
+	
+	public String getIdModulo() {
+		return idModulo;
+	}
+	public void setIdModulo(String idModulo) {
+		this.idModulo = idModulo;
+	}
 	@Override
 	public String toString() {
 		return "DesignaItem [ano=" + ano + ", anoProcedimiento=" + anoProcedimiento + ", art27=" + art27 + ", codigo="
@@ -906,7 +931,7 @@ public class DesignaItem {
 				+ apellidosNombre + ", interesados=" + Arrays.toString(interesados) + ", validadas="
 				+ Arrays.toString(validadas) + ", calidad=" + Arrays.toString(calidad) + ", asunto=" + asunto
 				+ ", acreditacion=" + acreditacion + ", idAcreditacion=" + Arrays.toString(idAcreditacion) + ", modulo="
-				+ modulo + ", idModulo=" + Arrays.toString(idModulo) + ", fechaJustificacionDesde="
+				+ modulo + ", idModulo=" + Arrays.toString(idModulos) + ", fechaJustificacionDesde="
 				+ fechaJustificacionDesde + ", fechaJustificacionHasta=" + fechaJustificacionHasta + ", origen="
 				+ origen + ", idOrigen=" + idOrigen + ", nif=" + nif + ", nombreInteresado=" + nombreInteresado
 				+ ", apellidosInteresado=" + apellidosInteresado + ", idActuacionesV=" + idActuacionesV + ", idArt27="

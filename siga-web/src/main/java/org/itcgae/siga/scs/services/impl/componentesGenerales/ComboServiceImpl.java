@@ -996,4 +996,175 @@ public class ComboServiceImpl implements ComboService {
 		return comboDTO;
 	}
 	
+	@Override
+	public ComboDTO comboProcedimientosConJuzgado(HttpServletRequest request, String idJuzgado) {
+		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<ComboItem> procedimientosJuzgados = new ArrayList<ComboItem>();
+		List<ComboItem> pretensionProcedimiento = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientosJuzgados(idInstitucion, idJuzgado);
+				
+				if(procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
+					List<String> idPretensiones = new ArrayList<String>();
+					for(ComboItem label: procedimientosJuzgados) {
+						idPretensiones.add(label.getValue());
+					}
+					
+					pretensionProcedimiento = scsDesignacionesExtendsMapper.getProcedimientosPretension(idInstitucion, idPretensiones);
+
+					if(pretensionProcedimiento != null && pretensionProcedimiento.size() > 0) {
+					idPretensiones = new ArrayList<String>();
+					for(ComboItem label: pretensionProcedimiento) {
+						idPretensiones.add(label.getLabel());
+					}
+					
+					comboItems = scsDesignacionesExtendsMapper.comboProcedimientosConJuzgado(idInstitucion, idPretensiones);
+					}
+				}
+				
+				
+				comboDTO.setCombooItems(comboItems);
+			}
+		}
+
+		LOGGER.info("objetivo() -> Salida del servicio para obtener comboProcedimientos");
+
+		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboModulosConJuzgado(HttpServletRequest request, String idJuzgado) {
+		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<ComboItem> procedimientosJuzgados = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientosJuzgados(idInstitucion, idJuzgado);
+				
+				if(procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
+				List<String> idPretensiones = new ArrayList<String>();
+				for(ComboItem label: procedimientosJuzgados) {
+					idPretensiones.add(label.getValue());
+				}
+				
+				
+				comboItems = scsDesignacionesExtendsMapper.comboModulosConJuzgado(idInstitucion, idPretensiones);
+				}
+				
+				comboDTO.setCombooItems(comboItems);
+			}
+		}
+
+		LOGGER.info("objetivo() -> Salida del servicio para obtener comboProcedimientos");
+
+		return comboDTO;
+	}
+	
+	
+	@Override
+	public ComboDTO comboModulosConProcedimientos(HttpServletRequest request, String idPretension) {
+		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<ComboItem> procedimientosJuzgados = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientoPretension(idInstitucion, idPretension);
+				
+				if(procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
+				List<String> idPretensiones = new ArrayList<String>();
+				for(ComboItem label: procedimientosJuzgados) {
+					idPretensiones.add(label.getValue());
+				}
+				
+				comboItems = scsDesignacionesExtendsMapper.comboModulosConProcedimientos(idInstitucion, idPretensiones);
+				
+				}
+				
+				comboDTO.setCombooItems(comboItems);
+			}
+		}
+
+		LOGGER.info("objetivo() -> Salida del servicio para obtener comboProcedimientos");
+
+		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboProcedimientosConModulo(HttpServletRequest request, String idModulo) {
+		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<ComboItem> procedimientosJuzgados = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				procedimientosJuzgados = scsDesignacionesExtendsMapper.getPretensionModulo(idInstitucion, idModulo);
+				if(procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
+				List<String> idPretensiones = new ArrayList<String>();
+				for(ComboItem label: procedimientosJuzgados) {
+					idPretensiones.add(label.getValue());
+				}
+				
+				comboItems = scsDesignacionesExtendsMapper.comboProcedimientosConModulos(idInstitucion, idPretensiones);
+				}
+				comboDTO.setCombooItems(comboItems);
+			}
+		}
+
+		LOGGER.info("objetivo() -> Salida del servicio para obtener comboProcedimientos");
+
+		return comboDTO;
+	}
 }

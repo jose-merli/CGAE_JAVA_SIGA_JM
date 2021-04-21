@@ -13,6 +13,7 @@ public class ListaContrarioJusticiableItem {
 	private String procurador;
 	private String apellidosnombre;
 	private String idPersona;
+	private String representante;
 	private Date fechaBaja;
 	
 	public String getIdPersona() {
@@ -74,6 +75,12 @@ public class ListaContrarioJusticiableItem {
 	}
 	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
+	}
+	public String getRepresentante() {
+		return representante;
+	}
+	public void setRepresentante(String representante) {
+		this.representante = representante;
 	}
 	
 	
