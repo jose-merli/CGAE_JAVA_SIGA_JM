@@ -69,13 +69,25 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "NOMBREINTERESADO", property = "nombreInteresado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDO1", property = "apellido1Interesado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDO2", property = "apellido2Interesado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPODESIGNACOLEGIO", property = "idTipoDesignaColegio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDMODULO", property = "idModulo", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPRETENSION", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPRETENSION", property = "idPretension", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR)})
 	List<DesignaItem> busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaProcedimientoDesignas")
+	@Results({@Result(column = "PROCEDIMIENTO", property = "nombreProcedimiento", jdbcType = JdbcType.VARCHAR)})
+	List<DesignaItem> busquedaProcedimientoDesignas(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaModuloDesignas")
+	@Results({@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
+			  @Result(column = "IDMODULO", property = "idModulo", jdbcType = JdbcType.VARCHAR)})
+	List<DesignaItem> busquedaModuloDesignas(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo);
 
+	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getAsuntoTipoDesigna")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),

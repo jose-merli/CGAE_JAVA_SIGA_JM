@@ -478,6 +478,121 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
+	public List<DesignaItem> busquedaProcedimientoDesignas(DesignaItem designaItem, HttpServletRequest request) {
+		DesignaItem result = new DesignaItem();
+		List<DesignaItem> designas = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaProcedimientoDesignas() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaProcedimientoDesignas -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.busquedaProcedimientoDesignas -> Entrada a servicio para la busqueda de ProcedimientoDesignas");
+
+				try {
+					designas = scsDesignacionesExtendsMapper.busquedaProcedimientoDesignas(designaItem, idInstitucion,
+							tamMaximo);
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("DesignacionesServiceImpl.busquedaProcedimientoDesignas -> Salida del servicio");
+				}
+				LOGGER.info("DesignacionesServiceImpl.busquedaProcedimientoDesignas -> Salida del servicio");
+			}
+		}
+
+		return designas;
+	}
+	
+	@Override
+	public List<DesignaItem> busquedaModuloDesignas(DesignaItem designaItem, HttpServletRequest request) {
+		DesignaItem result = new DesignaItem();
+		List<DesignaItem> designas = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaModuloDesignas() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaModuloDesignas -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.busquedaModuloDesignas -> Entrada a servicio para la busqueda de ModuloDesignas");
+
+				try {
+					designas = scsDesignacionesExtendsMapper.busquedaModuloDesignas(designaItem, idInstitucion,
+							tamMaximo);
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("DesignacionesServiceImpl.busquedaModuloDesignas -> Salida del servicio");
+				}
+				LOGGER.info("DesignacionesServiceImpl.busquedaModuloDesignas -> Salida del servicio");
+			}
+		}
+
+		return designas;
+	}
+	@Override
 	public List<ListaInteresadoJusticiableItem> busquedaListaInteresados(DesignaItem item, HttpServletRequest request) {
 
 		// [designaItem.idTurno, designaItem.nombreTurno, designaItem.numero,
