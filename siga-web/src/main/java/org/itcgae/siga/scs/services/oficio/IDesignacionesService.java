@@ -61,4 +61,6 @@ public interface IDesignacionesService {
 	ComboDTO comboTipoMotivo(HttpServletRequest request);
 
 	public UpdateResponseDTO guardarProcurador(List<ProcuradorItem> procurador, HttpServletRequest request);
+
+	InsertResponseDTO nuevoProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
 }

@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.scs.mappers;
 import java.util.List;
 
 import org.apache.ibatis.annotations.DeleteProvider;
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
@@ -208,16 +209,16 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaProcurador")
 	@Results({
-			@Result(column = "NCOLEGIADO", property = "ncolegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMERODESIGNACION", property = "numerodesignacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHADESIGNA", property = "fechadesigna", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHADESIGNA", property = "fechaDesigna", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "MOTIVOSRENUNCIA", property = "motivosrenuncia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "MOTIVOSRENUNCIA", property = "motivosRenuncia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciaefectiva", jdbcType = JdbcType.VARCHAR) })
+			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) })
 	List<ProcuradorItem> busquedaProcurador(String num, String idinstitucion);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboTipoMotivo")
@@ -228,6 +229,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 	List<ComboItem> comboTipoMotivo(short idInstitucion);
 	
-	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "guardarProcurador")
+	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "guardarProcurador")
 	int guardarProcurador(ProcuradorItem procuradorItem);
+	
+	@InsertProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "nuevoProcurador")
+	int nuevoProcurador(ProcuradorItem procuradorItem, Integer usuario);
 }

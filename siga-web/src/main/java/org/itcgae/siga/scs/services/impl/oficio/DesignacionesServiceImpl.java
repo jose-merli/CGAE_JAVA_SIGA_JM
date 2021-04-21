@@ -1,9 +1,12 @@
 package org.itcgae.siga.scs.services.impl.oficio;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -1146,8 +1149,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				LOGGER.info(
 						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Entrada a scsProcuradorExtendsMapper para obtener los procuradores");
 
-				String num = procurador.get(1);
-				String idinstitucion = procurador.get(0);
+				String num = procurador.get(0);
+				String idinstitucion = procurador.get(1);
 				procuradorItemList = scsDesignacionesExtendsMapper.busquedaProcurador(num,idinstitucion);
 				
 				LOGGER.info(
@@ -1255,6 +1258,58 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return updateResponseDTO;
+	}
+	
+	@Override
+	public InsertResponseDTO nuevoProcurador(ProcuradorItem procuradorItem, HttpServletRequest request) {
+		LOGGER.info("deleteBaja() ->  Entrada al servicio para eliminar bajas temporales");
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info("deleteBaja() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"deleteBaja() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+						response = scsDesignacionesExtendsMapper.nuevoProcurador(procuradorItem,usuarios.get(0).getIdusuario());
+				
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha eliminado la baja temporal");
+					insertResponseDTO.setStatus(SigaConstants.KO);
+				} else if (response == 1 && existentes != 0) {
+					error.setCode(200);
+					error.setDescription("Se han elimiando las bajas temporales excepto algunas");
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha eliminado la baja temporal correctamente");
+				}
+
+				insertResponseDTO.setError(error);
+
+				LOGGER.info("deleteBaja() -> Salida del servicio para eliminar bajas temporales");
+
+			}
+
+		}
+
+		return insertResponseDTO;
 	}
 
 }
