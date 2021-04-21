@@ -43,6 +43,7 @@ import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
@@ -645,19 +646,28 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designa.setFechamodificacion(new Date());
 						designa.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
-//						LOGGER.info(
-//								"insertInteresado() / scsPersonajgExtendsMapper.searchJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables");
-//
-//						ScsPersonajgKey scsPersonajgkey = new ScsPersonajgKey();
-//						scsPersonajgExample.createCriteria()
-//								.andIdpersonaEqualTo(Long.valueOf(item.getIdpersona()))
-//								.andIdinstitucionEqualTo(idInstitucion);
-//
-//						personajgList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
-//
-//						LOGGER.info(
-//								"insertInteresado() / scsPersonajgExtendsMapper.searchJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
+						LOGGER.info(
+								"insertInteresado() / scsPersonajgExtendsMapper.selectByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables");
 
+						ScsPersonajgKey scsPersonajgkey = new ScsPersonajgKey();
+						scsPersonajgkey.setIdpersona(Long.valueOf(item.getIdpersona()));
+						scsPersonajgkey.setIdinstitucion(idInstitucion);
+
+						ScsPersonajg personajg = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajgkey);
+
+						LOGGER.info(
+								"insertInteresado() / scsPersonajgExtendsMapper.selectByPrimaryKey() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
+
+						//Se comprueba si tiene representante y se busca.
+						if(personajg.getIdrepresentantejg()!=null) {
+
+							scsPersonajgkey.setIdpersona(personajg.getIdrepresentantejg());
+
+	
+							ScsPersonajg representante = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajgkey);
+							
+							designa.setNombrerepresentante(representante.getApellido1()+" "+representante.getApellido2()+", "+representante.getNombre());
+						}
 						
 						
 						LOGGER.info(
@@ -962,7 +972,31 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designa.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 					LOGGER.info(
-							"insertContrario() / ScsDefendidosdesignaMapper.insert() -> Entrada a ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
+							"insertInteresado() / scsPersonajgExtendsMapper.selectByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables");
+
+					ScsPersonajgKey scsPersonajgkey = new ScsPersonajgKey();
+					scsPersonajgkey.setIdpersona(Long.valueOf(item.getIdpersona()));
+					scsPersonajgkey.setIdinstitucion(idInstitucion);
+
+					ScsPersonajg personajg = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajgkey);
+
+					LOGGER.info(
+							"insertInteresado() / scsPersonajgExtendsMapper.selectByPrimaryKey() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
+
+					//Se comprueba si tiene representante y se busca.
+					if(personajg.getIdrepresentantejg()!=null) {
+
+						scsPersonajgkey.setIdpersona(personajg.getIdrepresentantejg());
+
+
+						ScsPersonajg representante = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajgkey);
+						
+						designa.setNombrerepresentante(representante.getApellido1()+" "+representante.getApellido2()+", "+representante.getNombre());
+					}
+					
+					
+					LOGGER.info(
+							"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Entrada a ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
 
 					response = scsContrariosdesignaMapper.insert(designa);
 
