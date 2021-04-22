@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -1032,11 +1033,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						ScsContrariosdesigna contrario = scsContrariosDesignaMapper.selectByPrimaryKey(key);
 
 						
-						contrario.setNombreabogadocontrario(item.getNombreabogadocontrario());
+						contrario.setIdabogadocontrario(item.getIdabogadocontrario());
 						
 
 						contrario.setFechamodificacion(new Date());
 						contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
+//						List<ColegiadoItem> colegiadosItems = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(idInstitucion, contrario.getIdabogadocontrario().toString());
+//						
+//						FichaDatosColegialesItem abogado = colegiadosItems.get(0);
+						
+						
+//						contrario.set
 
 						LOGGER.info(
 								"updateAbogadoContrario() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Entrada a scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
@@ -1072,6 +1080,69 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info("updateAbogadoContrario() -> Salida del servicio para eliminar contrarios");
 
 		return updateResponseDTO;
+	}
+	
+	@Override
+	public ColegiadoItem SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request) {
+		LOGGER.info("updateAbogadoContrario() ->  Entrada al servicio para eliminar contrarios");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		
+		ColegiadoItem abogado = new ColegiadoItem();
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateAbogadoContrario() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateAbogadoContrario() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					
+					
+						
+						List<ColegiadoItem> colegiadosItems = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(idInstitucion, idPersona);
+						
+						abogado = colegiadosItems.get(0);
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription(e.getMessage());
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("updateAbogadoContrario() -> Salida del servicio para eliminar contrarios");
+
+		return abogado;
 	}
 	
 	@Override
@@ -1115,7 +1186,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						ScsContrariosdesigna contrario = scsContrariosDesignaMapper.selectByPrimaryKey(key);
 
 						
-						contrario.setIdprocurador(item.getIdprocurador());
 						
 						contrario.setIdprocurador(item.getIdprocurador());
 						

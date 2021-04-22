@@ -1473,6 +1473,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"    t1.idturno,\r\n" + 
 	    			"    t1.anio,\r\n" + 
 	    			"    t1.nif,\r\n" + 
+	    			"    t1.idabogadocontrario,\r\n" + 
+	    			"    t1.idprocurador,\r\n" + 
 	    			"    t1.fechabaja,\r\n" +
 	    			"    t1.idpersona,\r\n" + 
 	    			"    t1.idrepresentantelegal,\r\n" + 
@@ -1531,6 +1533,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"            scs_contrariosdesigna.idpersona,\r\n" + 
 	    			"            scs_contrariosdesigna.idrepresentantelegal,\r\n" + 
 	    			"            scs_contrariosdesigna.NOMBREABOGADOCONTRARIO,\r\n" + 
+	    			"            scs_contrariosdesigna.idabogadocontrario,\r\n" + 
+	    			"            scs_contrariosdesigna.idprocurador,\r\n" +
 	    			"            scs_contrariosdesigna.fechabaja,\r\n" + 
 	    			"            persona.nif,\r\n" + 
 	    			"            persona.apellido1\r\n" + 

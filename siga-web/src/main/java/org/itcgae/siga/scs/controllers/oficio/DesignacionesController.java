@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
@@ -474,6 +475,17 @@ public class DesignacionesController {
 				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 			else
 				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+		
+		@RequestMapping(value = "/designas/SearchAbogadoById", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<ColegiadoItem> searchAbogadoById(@RequestBody String idPersona, HttpServletRequest request) {
+			
+			ColegiadoItem response = designacionesService.searchAbogadoById(idPersona, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity<ColegiadoItem>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<ColegiadoItem>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
 
