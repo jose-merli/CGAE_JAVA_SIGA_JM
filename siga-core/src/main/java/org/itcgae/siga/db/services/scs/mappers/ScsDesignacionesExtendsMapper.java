@@ -168,7 +168,10 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "NIG_NUMPROCEDIMIENTO", property = "nigNumProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "PERMITIREDITARLETRADO", property = "permitirLetrado", jdbcType = JdbcType.VARCHAR), })
+			@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR), 
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR), 
+			})
 	List<ActuacionesJustificacionExpressItem> busquedaActuacionesJustificacionExpres(String idInstitucion,
 			String idTurno, String anio, String numero);
 
