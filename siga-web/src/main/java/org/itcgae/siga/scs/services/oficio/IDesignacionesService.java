@@ -108,6 +108,8 @@ public interface IDesignacionesService {
 
 	public UpdateResponseDTO guardarProcurador(List<ProcuradorItem> procurador, HttpServletRequest request);
 
+	InsertResponseDTO nuevoProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
+	
 	public List<DesignaItem> getDatosAdicionales(DesignaItem designa, HttpServletRequest request);
 
 	public UpdateResponseDTO updateRepresentanteInteresado(ScsDefendidosdesigna item, HttpServletRequest request);

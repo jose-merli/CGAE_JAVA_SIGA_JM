@@ -526,6 +526,15 @@ public class DesignacionesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/designas/nuevoProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> nuevoProcurador(@RequestBody ProcuradorItem procuradorItem, HttpServletRequest request) {
+		InsertResponseDTO response = designacionesService.nuevoProcurador(procuradorItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	@GetMapping("/comboPrisiones")
 	public ResponseEntity<ComboDTO> comboPrisiones(HttpServletRequest request) {
 		ComboDTO response = designacionesService.comboPrisiones(request);
