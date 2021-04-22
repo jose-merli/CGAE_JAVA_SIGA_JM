@@ -116,6 +116,26 @@ public class DesignacionesController {
 		}
 	}
 	
+	@RequestMapping(value = "/busquedaProcedimientoDesignas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<DesignaItem>> busquedaProcedimientoDesignas(@RequestBody DesignaItem item, HttpServletRequest request) {
+		List<DesignaItem> response = designacionesService.busquedaProcedimientoDesignas(item, request);
+		if (response != null) {
+			return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<List<DesignaItem>>(new ArrayList<DesignaItem>(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/busquedaModuloDesignas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<DesignaItem>> busquedaModuloDesignas(@RequestBody DesignaItem item, HttpServletRequest request) {
+		List<DesignaItem> response = designacionesService.busquedaModuloDesignas(item, request);
+		if (response != null) {
+			return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<List<DesignaItem>>(new ArrayList<DesignaItem>(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 
 	// FIN Busqueda designaciones
 
@@ -563,6 +583,15 @@ public class DesignacionesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/designas/nuevoProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> nuevoProcurador(@RequestBody ProcuradorItem procuradorItem, HttpServletRequest request) {
+		InsertResponseDTO response = designacionesService.nuevoProcurador(procuradorItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	@GetMapping("/comboPrisiones")
 	public ResponseEntity<ComboDTO> comboPrisiones(HttpServletRequest request) {
 		ComboDTO response = designacionesService.comboPrisiones(request);

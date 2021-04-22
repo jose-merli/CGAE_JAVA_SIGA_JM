@@ -65,6 +65,10 @@ public interface IDesignacionesService {
 			HttpServletRequest request);
 
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
+	
+	public List<DesignaItem> busquedaProcedimientoDesignas(DesignaItem item, HttpServletRequest request);
+	
+	public List<DesignaItem> busquedaModuloDesignas(DesignaItem item, HttpServletRequest request);
 
 	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request,
 			Boolean historico);
@@ -104,6 +108,8 @@ public interface IDesignacionesService {
 
 	public UpdateResponseDTO guardarProcurador(List<ProcuradorItem> procurador, HttpServletRequest request);
 
+	InsertResponseDTO nuevoProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
+	
 	public List<DesignaItem> getDatosAdicionales(DesignaItem designa, HttpServletRequest request);
 
 	public UpdateResponseDTO updateRepresentanteInteresado(ScsDefendidosdesigna item, HttpServletRequest request);
