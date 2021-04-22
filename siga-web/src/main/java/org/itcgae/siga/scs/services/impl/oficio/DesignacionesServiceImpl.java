@@ -1504,41 +1504,50 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 
 					LOGGER.info("updateDetalleDesigna()-> Entrada a scsDesignacionesExtendsMapper ");
-					ScsDesignaExample ejemplo = new ScsDesignaExample();
-					ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdprocedimientoEqualTo(designaItem.getNumProcedimiento())
-							.andIdjuzgadoEqualTo(new Long(designaItem.getIdJuzgado()));
+					ScsDesignaExample example = new ScsDesignaExample();
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andIdturnoEqualTo(designaItem.getIdTurno())
+					.andAnioEqualTo((short) designaItem.getAno())
+					.andNumeroEqualTo(new Long(designaItem.getNumero()));
 
-					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(ejemplo);
+					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
 
-					if ((designaExistentes != null && designaExistentes.size() > 0)) {
+					if ((designaExistentes == null || designaExistentes.size() == 0)) {
 						error.setCode(400);
 						// TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						updateResponseDTO.setError(error);
 						return updateResponseDTO;
-					} else {
-
-						ScsDesignaExample example = new ScsDesignaExample();
-						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdturnoEqualTo(designaItem.getIdTurno())
-								.andAnioEqualTo((short) designaItem.getAno())
-								.andNumeroEqualTo(new Long(designaItem.getNumero()));
+					} 
+//					else {
+//
+//						ScsDesignaExample example = new ScsDesignaExample();
+//						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+//								.andIdturnoEqualTo(designaItem.getIdTurno())
+//								.andAnioEqualTo((short) designaItem.getAno())
+//								.andNumeroEqualTo(new Long(designaItem.getNumero()));
 
 						ScsDesigna scsDesigna = new ScsDesigna();
-						List<ScsDesigna> scsDesignaLista = scsDesignacionesExtendsMapper.selectByExample(example);
-						scsDesigna = scsDesignaLista.get(0);
+//						List<ScsDesigna> scsDesignaLista = scsDesignacionesExtendsMapper.selectByExample(example);
+						scsDesigna = designaExistentes.get(0);
 
 						scsDesigna.setEstado(designaItem.getEstado());
-						scsDesigna.setFechaestado(designaItem.getFechaEstado());
-						scsDesigna.setFechafin(designaItem.getFechaFin()); // Fecha cierre
-						scsDesigna.setNig(designaItem.getNig());
-						scsDesigna.setNumprocedimiento(designaItem.getNumProcedimiento());
-						scsDesigna.setIdjuzgado(new Long(designaItem.getIdJuzgado()));
-						scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
+//						scsDesigna.setFechaestado(designaItem.getFechaEstado());
+//						scsDesigna.setFechafin(designaItem.getFechaFin()); // Fecha cierre
+//						scsDesigna.setNig(designaItem.getNig());
+//						scsDesigna.setNumprocedimiento(designaItem.getNumProcedimiento());
+//						scsDesigna.setIdjuzgado(new Long(designaItem.getIdJuzgado()));
+//						scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
 						// TODO modulo
-						scsDesigna.setDelitos(designaItem.getDelitos());
+//						scsDesigna.setDelitos(designaItem.getDelitos());
+						scsDesigna.setIdturno(designaItem.getIdTurno());
+						Integer a = new Integer(designaItem.getIdInstitucion());
+						scsDesigna.setIdinstitucion(a.shortValue());
+						a = designaItem.getAno();
+						scsDesigna.setAnio(a.shortValue());
+						Long b = new Long(designaItem.getNumero());
+						scsDesigna.setNumero(b.longValue());
 
 						LOGGER.info("updateDetalleDesigna() / scsDesignacionesExtendsMapper -> Salida ");
 
@@ -1549,7 +1558,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						LOGGER.info(
 								"updateDetalleDesigna() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
-					}
+//					}
 				} catch (Exception e) {
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
@@ -1599,31 +1608,33 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 
 					LOGGER.info("updateDatosAdicionales()-> Entrada a scsDesignacionesExtendsMapper ");
-					ScsDesignaExample ejemplo = new ScsDesignaExample();
-					ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdprocedimientoEqualTo(designaItem.getNumProcedimiento())
-							.andIdjuzgadoEqualTo(new Long(designaItem.getIdJuzgado()));
+					ScsDesignaExample example = new ScsDesignaExample();
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andIdturnoEqualTo(designaItem.getIdTurno())
+					.andAnioEqualTo((short) designaItem.getAno())
+					.andNumeroEqualTo(new Long(designaItem.getNumero()));
 
-					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(ejemplo);
+					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
 
-					if ((designaExistentes != null && designaExistentes.size() > 0)) {
+					if ((designaExistentes == null && designaExistentes.size() == 0)) {
 						error.setCode(400);
 						// TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						updateResponseDTO.setError(error);
 						return updateResponseDTO;
-					} else {
-
-						ScsDesignaExample example = new ScsDesignaExample();
-						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdturnoEqualTo(designaItem.getIdTurno())
-								.andAnioEqualTo((short) designaItem.getAno())
-								.andNumeroEqualTo(new Long(designaItem.getNumero()));
+					} 
+//					else {
+//
+//						ScsDesignaExample example = new ScsDesignaExample();
+//						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+//								.andIdturnoEqualTo(designaItem.getIdTurno())
+//								.andAnioEqualTo((short) designaItem.getAno())
+//								.andNumeroEqualTo(new Long(designaItem.getNumero()));
 
 						ScsDesigna scsDesigna = new ScsDesigna();
-						List<ScsDesigna> scsDesignaLista = scsDesignacionesExtendsMapper.selectByExample(example);
-						scsDesigna = scsDesignaLista.get(0);
+//						List<ScsDesigna> scsDesignaLista = scsDesignacionesExtendsMapper.selectByExample(example);
+						scsDesigna = designaExistentes.get(0);
 
 						scsDesigna.setFechaoficiojuzgado(designaItem.getFechaOficioJuzgado());
 						// TODO faltan dos campos observaciones
@@ -1641,7 +1652,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						LOGGER.info(
 								"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
-					}
+					
 				} catch (Exception e) {
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
