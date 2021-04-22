@@ -308,9 +308,9 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 				if (perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro() != null) {
 
 					CenRegMercantil datosRegistro = new CenRegMercantil();
-					if (!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro())) {
-						datosRegistro.setIdDatosReg(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
-						datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
+//					if (!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro())) {
+					datosRegistro.setIdDatosReg(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
+					datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
 
 //					if(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro() != null) {
 //						datosRegistro.setIdDatosReg(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
@@ -324,29 +324,27 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 //						datosRegistro.setNumRegistro(" ");
 //					}
 
-						datosRegistro.setIdentificacionReg(perJuridicaDatosRegistralesUpdateDTO.getIdentificacionReg());
-						datosRegistro.setFechaInscripcion(perJuridicaDatosRegistralesUpdateDTO.getFechaInscripcion());
-						datosRegistro.setFechaCancelacion(perJuridicaDatosRegistralesUpdateDTO.getFechaCancelacion());
-						datosRegistro.setFechamodificacion(new Date());
-						datosRegistro.setUsumodificacion(usuario.getIdusuario());
+					datosRegistro.setIdentificacionReg(perJuridicaDatosRegistralesUpdateDTO.getIdentificacionReg());
+					datosRegistro.setFechaInscripcion(perJuridicaDatosRegistralesUpdateDTO.getFechaInscripcion());
+					datosRegistro.setFechaCancelacion(perJuridicaDatosRegistralesUpdateDTO.getFechaCancelacion());
+					datosRegistro.setFechamodificacion(new Date());
+					datosRegistro.setUsumodificacion(usuario.getIdusuario());
 
-						responseCenRegMercantil = cenRegMercantilMapper.updateByPrimaryKey(datosRegistro);
-					} else {
-						CenNocolegiado record = new CenNocolegiado();
-						CenNocolegiadoKey key = new CenNocolegiadoKey();
-						key.setIdinstitucion(idInstitucion);
-						key.setIdpersona(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
-
-						record = cenNocolegiadoExtendsMapper.selectByPrimaryKey(key);
-						record.setIdDatosReg(null);
-
-						responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByPrimaryKey(record);// ExampleDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO,
-																										// String.valueOf(idInstitucion),
-																										// usuario);
-						responseCenRegMercantil = cenRegMercantilMapper
-								.deleteByPrimaryKey(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
-						perJuridicaDatosRegistralesUpdateDTO.setIdDatosRegistro(null);
-					}
+					responseCenRegMercantil = cenRegMercantilMapper.updateByPrimaryKey(datosRegistro);
+//					} else {
+//						CenNocolegiado record = new CenNocolegiado();
+//						CenNocolegiadoKey key = new CenNocolegiadoKey();
+//						key.setIdinstitucion(idInstitucion);
+//						key.setIdpersona(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
+//
+//						record = cenNocolegiadoExtendsMapper.selectByPrimaryKey(key);
+//						record.setIdDatosReg(null);
+//
+//						responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByPrimaryKey(record);
+//						responseCenRegMercantil = cenRegMercantilMapper
+//								.deleteByPrimaryKey(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
+//						perJuridicaDatosRegistralesUpdateDTO.setIdDatosRegistro(null);
+//					}
 				} else {
 					if (!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro())) {
 						CenRegMercantil datosRegistro = new CenRegMercantil();
