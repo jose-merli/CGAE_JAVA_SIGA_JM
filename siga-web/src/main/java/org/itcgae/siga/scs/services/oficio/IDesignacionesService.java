@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
@@ -123,5 +124,5 @@ public interface IDesignacionesService {
 
 	public UpdateResponseDTO updateProcuradorContrario(ScsContrariosdesigna item, HttpServletRequest request);
 
-	public ColegiadoItem SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request);
+	public ColegiadoItemDTO SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request);
 }

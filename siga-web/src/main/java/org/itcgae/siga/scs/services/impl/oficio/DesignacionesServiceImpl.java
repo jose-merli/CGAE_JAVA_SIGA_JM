@@ -18,6 +18,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -1034,7 +1035,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						
 						contrario.setIdabogadocontrario(item.getIdabogadocontrario());
-						
+						contrario.setNombreabogadocontrario(item.getNombreabogadocontrario());
 
 						contrario.setFechamodificacion(new Date());
 						contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -1083,19 +1084,19 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 	
 	@Override
-	public ColegiadoItem SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request) {
+	public  ColegiadoItemDTO SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request) {
 		LOGGER.info("updateAbogadoContrario() ->  Entrada al servicio para eliminar contrarios");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
-		int response = 0;
+		int response = 1;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		
-		ColegiadoItem abogado = new ColegiadoItem();
+		 ColegiadoItemDTO abogado = new  ColegiadoItemDTO();
 		if (null != idInstitucion) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1117,7 +1118,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 						List<ColegiadoItem> colegiadosItems = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(idInstitucion, idPersona);
 						
-						abogado = colegiadosItems.get(0);
+						abogado.setColegiadoItem(colegiadosItems.get(0));
 
 				} catch (Exception e) {
 					response = 0;
@@ -1138,7 +1139,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			error.setDescription("general.message.registro.actualizado");
 		}
 
-		updateResponseDTO.setError(error);
+		abogado.setError(error);
 
 		LOGGER.info("updateAbogadoContrario() -> Salida del servicio para eliminar contrarios");
 

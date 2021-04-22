@@ -1533,8 +1533,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    			"            scs_contrariosdesigna.idpersona,\r\n" + 
 	    			"            scs_contrariosdesigna.idrepresentantelegal,\r\n" + 
 	    			"            scs_contrariosdesigna.NOMBREABOGADOCONTRARIO,\r\n" + 
-	    			"            scs_contrariosdesigna.idabogadocontrario,\r\n" + 
-	    			"            scs_contrariosdesigna.idprocurador,\r\n" +
 	    			"            scs_contrariosdesigna.fechabaja,\r\n" + 
 	    			"            persona.nif,\r\n" + 
 	    			"            persona.apellido1\r\n" + 
