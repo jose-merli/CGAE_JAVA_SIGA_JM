@@ -33,7 +33,7 @@ public interface IDesignacionesService {
 	 */
 	public List<JustificacionExpressItem> busquedaJustificacionExpres(JustificacionExpressItem item,
 			HttpServletRequest request);
-	
+
 	/**
 	 * insertaJustificacionExpres
 	 * 
@@ -43,7 +43,7 @@ public interface IDesignacionesService {
 	 */
 	public InsertResponseDTO insertaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
 			HttpServletRequest request);
-	
+
 	/**
 	 * actualizaJustificacionExpres
 	 * 
@@ -53,7 +53,7 @@ public interface IDesignacionesService {
 	 */
 	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
 			HttpServletRequest request);
-	
+
 	/**
 	 * eliminaJustificacionExpres
 	 * 
@@ -65,9 +65,9 @@ public interface IDesignacionesService {
 			HttpServletRequest request);
 
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
-	
+
 	public List<DesignaItem> busquedaProcedimientoDesignas(DesignaItem item, HttpServletRequest request);
-	
+
 	public List<DesignaItem> busquedaModuloDesignas(DesignaItem item, HttpServletRequest request);
 
 	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request,
@@ -90,15 +90,20 @@ public interface IDesignacionesService {
 
 	public ActuacionDesignaDTO busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			HttpServletRequest request);
-	
+
 	public MaxIdDto getNewIdActuDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			HttpServletRequest request);
 
 	public UpdateResponseDTO anularReactivarActDesigna(List<ActuacionDesignaItem> listaActuacionDesignaItem,
 			boolean anular, HttpServletRequest request);
 
+	public UpdateResponseDTO validarDesvalidarActDesigna(ActuacionDesignaItem actuacionDesignaItem, boolean validar,
+			HttpServletRequest request);
+
 	public DeleteResponseDTO eliminarActDesigna(List<ActuacionDesignaItem> listaActuacionDesignaItem,
 			HttpServletRequest request);
+
+	public InsertResponseDTO guardarActDesigna(ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request);
 
 	public InsertResponseDTO createDesigna(DesignaItem designaItem, HttpServletRequest request);
 
@@ -109,7 +114,7 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO guardarProcurador(List<ProcuradorItem> procurador, HttpServletRequest request);
 
 	InsertResponseDTO nuevoProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
-	
+
 	public List<DesignaItem> getDatosAdicionales(DesignaItem designa, HttpServletRequest request);
 
 	public UpdateResponseDTO updateRepresentanteInteresado(ScsDefendidosdesigna item, HttpServletRequest request);
