@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
@@ -442,6 +444,78 @@ public class DesignacionesController {
 	// 3.3.6.2.7.3. Ficha detalle del contrario
 
 	// 3.3.6.2.8. Tarjeta Procurador
+	// 3.3.6.2.7.3.	Ficha detalle del contrario
+
+		//[ designa.idInstitucion,  justiciable.idPersona, designa.anio,  designa.idTurno, designa.numero, representante]
+		@RequestMapping(value = "/designas/updateRepresentanteContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> updateRepresentanteContrario(@RequestBody String[] item, HttpServletRequest request) {
+			String anio = item[2].substring(1,5);
+			ScsContrariosdesigna contrario = new ScsContrariosdesigna();
+			contrario.setIdinstitucion(Short.parseShort(item[0]));
+			contrario.setIdpersona(Long.parseLong(item[1]));
+			contrario.setAnio(Short.parseShort(anio));
+			contrario.setIdturno(Integer.parseInt(item[3]));
+			contrario.setNumero(Long.parseLong(item[4]));
+			contrario.setNombrerepresentante(item[5]);
+			UpdateResponseDTO response = designacionesService.updateRepresentanteContrario(contrario, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+
+		//[ designa.idInstitucion,  justiciable.idPersona, designa.anio,  designa.idTurno, designa.numero, representante]
+		@RequestMapping(value = "/designas/updateProcuradorContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> updateProcuradorContrario(@RequestBody String[] item, HttpServletRequest request) {
+			String anio = item[2].substring(1,5);
+			ScsContrariosdesigna contrario = new ScsContrariosdesigna();
+			contrario.setIdinstitucion(Short.parseShort(item[0]));
+			contrario.setIdpersona(Long.parseLong(item[1]));
+			contrario.setAnio(Short.parseShort(anio));
+			contrario.setIdturno(Integer.parseInt(item[3]));
+			contrario.setNumero(Long.parseLong(item[4]));
+			contrario.setNombrerepresentante(item[5]);
+			UpdateResponseDTO response = designacionesService.updateProcuradorContrario(contrario, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+
+		//[ designa.idInstitucion,  sessionStorage.getItem("personaDesigna"), designa.ano,  designa.idTurno, designa.numero, this.generalBody.idPersona, this.generalBody.nombre]
+		@RequestMapping(value = "/designas/updateAbogadoContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> updateAbogadoContrario(@RequestBody String[] item, HttpServletRequest request) {
+			String anio = item[2].substring(1,5);
+			ScsContrariosdesigna contrario = new ScsContrariosdesigna();
+			contrario.setIdinstitucion(Short.parseShort(item[0]));
+			contrario.setIdpersona(Long.parseLong(item[1]));
+			contrario.setAnio(Short.parseShort(anio));
+			contrario.setIdturno(Integer.parseInt(item[3]));
+			contrario.setNumero(Long.parseLong(item[4]));
+			contrario.setIdabogadocontrario(Long.parseLong(item[5]));
+			contrario.setNombrerepresentante(item[6]);
+			UpdateResponseDTO response = designacionesService.updateAbogadoContrario(contrario, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+		
+		@RequestMapping(value = "/designas/searchAbogadoByIdPersona", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<ColegiadoItemDTO> searchAbogadoById(@RequestBody String idPersona, HttpServletRequest request) {
+			
+			 ColegiadoItemDTO response = designacionesService.SearchAbogadoByIdPersona(idPersona, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity< ColegiadoItemDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity< ColegiadoItemDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+
+	// 3.3.6.2.8.	Tarjeta Procurador
 
 	@RequestMapping(value = "/designas/comboMotivo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboMotivo(HttpServletRequest request) {
