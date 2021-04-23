@@ -1636,7 +1636,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String comboTipoMotivo(short institucion) {
 		SQL sql = new SQL();
 		
-		sql.SELECT("E.nombre, F_SIGA_GETRECURSO(E.nombre, 1) as Descripcion");
+		sql.SELECT("E.nombre, F_SIGA_GETRECURSO(E.nombre, 1) as DESCRIPCION");
 		sql.FROM("cen_gruposcliente E");
 		sql.WHERE(" E.IDINSTITUCION ='"+institucion+"'");
 		sql.ORDER_BY("idgrupo ASC");
@@ -1644,17 +1644,34 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 	
+	public String compruebaProcurador(String num, String anio) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT("*");
+
+		sql2.FROM("SCS_EJGDESIGNA");
+		sql2.WHERE("NUMERODESIGNA = "+num);
+		sql2.WHERE("ANIODESIGNA ="+anio);
+
+		sql.SELECT("*");
+		sql.FROM("( " + sql2.toString() + " )");
+		sql.WHERE("ROWNUM <= 201");
+
+		return sql.toString();
+	}
+	
 	public String guardarProcurador(ProcuradorItem procuradorItem) {
 		
 		SQL sql = new SQL();
-		sql.UPDATE("scs_designaprocuraodr dp");
+		sql.UPDATE("scs_designaprocurador");
 		
-		sql.SET("fechadesigna ="+procuradorItem.getFechaDesigna());
-		sql.SET("numerodesignacion ="+procuradorItem.getNumerodesignacion());
-		sql.SET("motivosrenuncia ="+procuradorItem.getMotivosRenuncia());
+		sql.SET("fechadesigna ='"+procuradorItem.getFechaDesigna()+"'");
+		sql.SET("numerodesignacion ='"+procuradorItem.getNumerodesignacion()+"'");
+		sql.SET("motivosrenuncia ='"+procuradorItem.getMotivosRenuncia()+"'");
 
-		sql.WHERE("dp.numero= "+procuradorItem.getNumero());
-		sql.WHERE("dp.idinstitucion="+procuradorItem.getIdInstitucion());
+		sql.WHERE("numero= "+procuradorItem.getNumero());
+		sql.WHERE("idinstitucion="+procuradorItem.getIdInstitucion());
 
 		return sql.toString();
 	}

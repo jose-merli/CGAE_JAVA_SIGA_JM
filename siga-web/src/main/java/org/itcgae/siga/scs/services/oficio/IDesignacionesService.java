@@ -103,10 +103,14 @@ public interface IDesignacionesService {
 	public InsertResponseDTO createDesigna(DesignaItem designaItem, HttpServletRequest request);
 
 	public ProcuradorDTO busquedaProcurador(List<String> procurador, HttpServletRequest request);
+	
+	public ProcuradorDTO compruebaProcurador(String procurador, HttpServletRequest request);
+	
+	public ProcuradorDTO compruebaFechaProcurador(String procurador, HttpServletRequest request);
 
 	ComboDTO comboTipoMotivo(HttpServletRequest request);
 
-	public UpdateResponseDTO guardarProcurador(List<ProcuradorItem> procurador, HttpServletRequest request);
+	public UpdateResponseDTO guardarProcurador(List<String> procurador, HttpServletRequest request);
 
 	InsertResponseDTO nuevoProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
 	
