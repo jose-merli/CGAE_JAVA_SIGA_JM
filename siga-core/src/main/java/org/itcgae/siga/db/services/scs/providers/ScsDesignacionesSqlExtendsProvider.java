@@ -674,6 +674,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
+	/**
+	 * 
+	 * @param idInstitucion
+	 * @param idTurno
+	 * @param anio
+	 * @param numero
+	 * @return
+	 */
 	public String busquedaActuacionesJustificacionExpres(String idInstitucion, String idTurno, String anio,
 			String numero) {
 		StringBuilder sql = new StringBuilder();
@@ -741,7 +749,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" D.ANIO, ");
 		sql.append(" D.NUMERO, ");
 		sql.append(" D.CODIGO, ");
-		sql.append(" D.IDJUZGADO, ");
+		sql.append(" D.IDJUZGADO, J.NOMBRE NOMBREJUZGADO, ");
 		sql.append(" D.IDINSTITUCION_JUZG, ");
 		sql.append(" D.ESTADO, ");
 		sql.append(" D.SUFIJO, ");
@@ -749,7 +757,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" DL.IDPERSONA, ");
 		sql.append(" D.IDPROCEDIMIENTO, ");
 		sql.append(" D.NUMPROCEDIMIENTO, ");
-		sql.append(" D.ANIOPROCEDIMIENTO, ");
+		sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
 		sql.append(" D.NIG, ");
 
 		sql.append(
@@ -789,9 +797,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
 		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA ");
 
-		sql.append(" FROM SCS_DESIGNA D, SCS_DESIGNASLETRADO DL, SCS_JUZGADO J ");
+		sql.append(" FROM SCS_DESIGNA D, SCS_DESIGNASLETRADO DL, SCS_JUZGADO J,  SCS_PROCEDIMIENTOS p ");
 
-		sql.append(" WHERE D.IDINSTITUCION = DL.IDINSTITUCION ");
+		sql.append(" WHERE D.IDINSTITUCION = DL.IDINSTITUCION AND P.IDPROCEDIMIENTO = D.IDPROCEDIMIENTO");
 		sql.append(" AND  D.IDJUZGADO=J.IDJUZGADO AND D.IDINSTITUCION_JUZG=J.IDINSTITUCION");
 		sql.append(" AND D.ANIO = DL.ANIO ");
 		sql.append(" AND D.NUMERO = DL.NUMERO ");
