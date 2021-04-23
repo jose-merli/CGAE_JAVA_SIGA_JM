@@ -45,6 +45,7 @@ import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsPersonajg;
+import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
