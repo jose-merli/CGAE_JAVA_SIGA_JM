@@ -49,12 +49,14 @@ import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
+import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
+import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsPersonajgExample;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -112,6 +114,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Autowired
 	private ScsActuaciondesignaMapper scsActuaciondesignaMapper;
 
+	@Autowired
+	private ScsDesignaMapper scsDesignaMapper;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -2248,6 +2252,73 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info("comboPrisiones() -> Salida del servicio para obtener combo de prisiones");
 		}
 		return comboDTO;
+	}
+	
+	//Tarjeta Letrado
+	//ScsDesignaMapper
+	
+	@Override
+	public ScsDesigna busquedaDesigna(DesignaItem item, HttpServletRequest request) {
+		LOGGER.info("DesignacionesServiceImpl.busquedaDesigna() -> Entrada al servicio servicio");
+		ScsDesigna designa = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaDesigna() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.busquedaDesigna -> Entrada a servicio para la busqueda de contrarios");
+
+				try {
+					
+					ScsDesignaKey key = new ScsDesignaKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setAnio((short) item.getAno());
+					key.setIdturno(item.getIdTurno());
+					key.setNumero((long) item.getNumero());
+					
+					designa = scsDesignaMapper.selectByPrimaryKey(key);
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("DesignacionesServiceImpl.busquedaDesigna -> Salida del servicio");
+				}
+				LOGGER.info("DesignacionesServiceImpl.busquedaDesigna -> Salida del servicio");
+			}
+		}
+
+		return designa;
 	}
 
 }

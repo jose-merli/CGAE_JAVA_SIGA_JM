@@ -23,6 +23,7 @@ import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
+import org.itcgae.siga.db.entities.ScsDesigna;
 
 public interface IDesignacionesService {
 
@@ -125,4 +126,6 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO updateProcuradorContrario(ScsContrariosdesigna item, HttpServletRequest request);
 
 	public ColegiadoItemDTO SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request);
+
+	public ScsDesigna busquedaDesigna(DesignaItem item, HttpServletRequest request);
 }
