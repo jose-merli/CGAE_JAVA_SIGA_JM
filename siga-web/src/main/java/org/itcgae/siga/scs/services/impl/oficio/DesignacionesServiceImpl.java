@@ -50,6 +50,7 @@ import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsDesignasletradoExample;
 import org.itcgae.siga.db.entities.ScsPersonajg;
+import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
@@ -2111,7 +2112,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Override
 	public ProcuradorDTO busquedaProcurador(List<String> procurador, HttpServletRequest request) {
 		LOGGER.info("searchPrisiones() -> Entrada al servicio para obtener prisiones");
-
+		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -2182,9 +2183,102 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 		return comboDTO;
 	}
+	
+	@Override
+	public ProcuradorDTO compruebaProcurador(String procurador, HttpServletRequest request) {
+		LOGGER.info("searchPrisiones() -> Entrada al servicio para obtener prisiones");
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ProcuradorDTO procuradorDTO = new ProcuradorDTO();
+		List<ProcuradorItem> procuradorItemList = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Entrada a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				String[] parts = procurador.split("/");
+				String anio = parts[0];
+				String num = parts[1];
+				
+				procuradorItemList = scsDesignacionesExtendsMapper.compruebaProcurador(num, anio);
+
+				LOGGER.info(
+						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				if (procuradorItemList != null) {
+					procuradorDTO.setProcuradorItems(procuradorItemList);
+				}
+			}
+
+		}
+		LOGGER.info("searchComisarias() -> Salida del servicio para obtener prisiones");
+		return procuradorDTO;
+	}
+	
+	@Override
+	public ProcuradorDTO compruebaFechaProcurador(String procurador, HttpServletRequest request) {
+		LOGGER.info("searchPrisiones() -> Entrada al servicio para obtener prisiones");
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ProcuradorDTO procuradorDTO = new ProcuradorDTO();
+		List<ProcuradorItem> procuradorItemList = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Entrada a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				String[] parts = procurador.split("/");
+				String anio = parts[0];
+				String num = parts[1];
+				
+				procuradorItemList = scsDesignacionesExtendsMapper.compruebaProcurador(num, anio);
+
+				LOGGER.info(
+						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				if (procuradorItemList != null) {
+					procuradorDTO.setProcuradorItems(procuradorItemList);
+				}
+			}
+
+		}
+		LOGGER.info("searchComisarias() -> Salida del servicio para obtener prisiones");
+		return procuradorDTO;
+	}
+
 
 	@Override
-	public UpdateResponseDTO guardarProcurador(List<ProcuradorItem> procuradorItem, HttpServletRequest request) {
+	public UpdateResponseDTO guardarProcurador( List<String> procurador, HttpServletRequest request) {
 		LOGGER.info("deleteBaja() ->  Entrada al servicio para eliminar bajas temporales");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -2213,10 +2307,22 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
+					
 
-					for (ProcuradorItem bti : procuradorItem) {
-//						response = scsDesignacionesExtendsMapper.guardarProcurador(bti);
-					}
+					ProcuradorItem procuradorItem = new ProcuradorItem();
+					
+					procuradorItem.setFechaDesigna(procurador.get(0));
+					procuradorItem.setNumerodesignacion(procurador.get(1));
+					procuradorItem.setnColegiado(procurador.get(2));
+					procuradorItem.setNombre(procurador.get(3));
+					procuradorItem.setMotivosRenuncia(procurador.get(4));
+					procuradorItem.setObservaciones(procurador.get(5));
+					procuradorItem.setFecharenunciasolicita(procurador.get(6));
+					procuradorItem.setIdInstitucion(procurador.get(7));
+					procuradorItem.setNumero(procurador.get(8));
+
+					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem);
+
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);

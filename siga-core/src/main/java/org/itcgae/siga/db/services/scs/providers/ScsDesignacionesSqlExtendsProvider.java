@@ -673,6 +673,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
+	/**
+	 * 
+	 * @param idInstitucion
+	 * @param idTurno
+	 * @param anio
+	 * @param numero
+	 * @return
+	 */
 	public String busquedaActuacionesJustificacionExpres(String idInstitucion, String idTurno, String anio,
 			String numero) {
 		StringBuilder sql = new StringBuilder();
@@ -740,7 +748,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" D.ANIO, ");
 		sql.append(" D.NUMERO, ");
 		sql.append(" D.CODIGO, ");
-		sql.append(" D.IDJUZGADO, ");
+		sql.append(" D.IDJUZGADO, J.NOMBRE NOMBREJUZGADO, ");
 		sql.append(" D.IDINSTITUCION_JUZG, ");
 		sql.append(" D.ESTADO, ");
 		sql.append(" D.SUFIJO, ");
@@ -748,7 +756,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" DL.IDPERSONA, ");
 		sql.append(" D.IDPROCEDIMIENTO, ");
 		sql.append(" D.NUMPROCEDIMIENTO, ");
-		sql.append(" D.ANIOPROCEDIMIENTO, ");
+		sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
 		sql.append(" D.NIG, ");
 
 		sql.append(
@@ -788,9 +796,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
 		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA ");
 
-		sql.append(" FROM SCS_DESIGNA D, SCS_DESIGNASLETRADO DL, SCS_JUZGADO J ");
+		sql.append(" FROM SCS_DESIGNA D, SCS_DESIGNASLETRADO DL, SCS_JUZGADO J,  SCS_PROCEDIMIENTOS p ");
 
-		sql.append(" WHERE D.IDINSTITUCION = DL.IDINSTITUCION ");
+		sql.append(" WHERE D.IDINSTITUCION = DL.IDINSTITUCION AND P.IDPROCEDIMIENTO = D.IDPROCEDIMIENTO AND P.IDINSTITUCION = D.IDINSTITUCION");
 		sql.append(" AND  D.IDJUZGADO=J.IDJUZGADO AND D.IDINSTITUCION_JUZG=J.IDINSTITUCION");
 		sql.append(" AND D.ANIO = DL.ANIO ");
 		sql.append(" AND D.NUMERO = DL.NUMERO ");
@@ -1382,7 +1390,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return resultV;
 	}
 
-
 	public String busquedaProcurador(String num, String idinstitucion) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -1411,21 +1418,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("cen_gruposcliente E");
 		sql.WHERE(" E.IDINSTITUCION ='" + institucion + "'");
 		sql.ORDER_BY("idgrupo ASC");
-
-		return sql.toString();
-	}
-
-	public String guardarProcurador(ProcuradorItem procuradorItem) {
-
-		SQL sql = new SQL();
-		sql.UPDATE("scs_designaprocuraodr dp");
-
-		sql.SET("fechadesigna =" + procuradorItem.getFechaDesigna());
-		sql.SET("numerodesignacion =" + procuradorItem.getNumerodesignacion());
-		sql.SET("motivosrenuncia =" + procuradorItem.getMotivosRenuncia());
-
-		sql.WHERE("dp.numero= " + procuradorItem.getNumero());
-		sql.WHERE("dp.idinstitucion=" + procuradorItem.getIdInstitucion());
 
 		return sql.toString();
 	}
@@ -1716,6 +1708,38 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("NUMEROASUNTO = '" + actuacionDesignaItem.getNumeroAsunto() + "'");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 
+		return sql.toString();
+	}
+	
+	public String compruebaProcurador(String num, String anio) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT("*");
+
+		sql2.FROM("SCS_EJGDESIGNA");
+		sql2.WHERE("NUMERODESIGNA = "+num);
+		sql2.WHERE("ANIODESIGNA ="+anio);
+
+		sql.SELECT("*");
+		sql.FROM("( " + sql2.toString() + " )");
+		sql.WHERE("ROWNUM <= 201");
+
+		return sql.toString();
+	}
+	
+	public String guardarProcurador(ProcuradorItem procuradorItem) {
+		
+		SQL sql = new SQL();
+		sql.UPDATE("scs_designaprocurador");
+		
+		sql.SET("fechadesigna ='"+procuradorItem.getFechaDesigna()+"'");
+		sql.SET("numerodesignacion ='"+procuradorItem.getNumerodesignacion()+"'");
+		sql.SET("motivosrenuncia ='"+procuradorItem.getMotivosRenuncia()+"'");
+
+		sql.WHERE("numero= "+procuradorItem.getNumero());
+		sql.WHERE("idinstitucion="+procuradorItem.getIdInstitucion());
+		
 		return sql.toString();
 	}
 
