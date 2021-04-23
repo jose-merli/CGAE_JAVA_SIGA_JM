@@ -19,10 +19,13 @@ import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
+import org.itcgae.siga.db.entities.ScsDesigna;
+import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -527,6 +530,46 @@ public class DesignacionesController {
 	}
 
 	// 3.3.6.2.9. Tarjeta Letrados de la designación
+	
+//	[ designa.ano,  designa.idTurno, designa.numero]
+	@RequestMapping(value = "/designas/busquedaDesignacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ScsDesigna>  busquedaDesigna(
+//			@RequestBody ScsDesigna designa,
+			@RequestBody String[] item,
+			HttpServletRequest request) {
+		ScsDesigna designa = new ScsDesigna();
+		String ano = item[0].substring(1, 5);
+		designa.setAnio((short) Integer.parseInt(ano));
+		designa.setIdturno(Integer.parseInt(item[1]));
+		designa.setNumero((long) Integer.parseInt(item[2]));
+		ScsDesigna response = designacionesService.busquedaDesigna(designa, request);
+		if (response != null) {
+			return new ResponseEntity<ScsDesigna>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<ScsDesigna>(
+					new ScsDesigna(), HttpStatus.OK);
+		}
+	}
+	
+//	[ designa.ano,  designa.idTurno, designa.numero]
+	@RequestMapping(value = "/designas/busquedaLetradosDesignacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<ListaLetradosDesignaItem>>  busquedaLetradosDesigna(
+//			@RequestBody ScsDesigna designa,
+			@RequestBody String[] item,
+			HttpServletRequest request) {
+		ScsDesigna designa = new ScsDesigna();
+		String ano = item[0].substring(1, 5);
+		designa.setAnio((short) Integer.parseInt(ano));
+		designa.setIdturno(Integer.parseInt(item[1]));
+		designa.setNumero((long) Integer.parseInt(item[2]));
+		List<ListaLetradosDesignaItem> response = designacionesService.busquedaLetradosDesigna(designa, request);
+		if (response != null) {
+			return new ResponseEntity<List<ListaLetradosDesignaItem>>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<List<ListaLetradosDesignaItem>>(
+					new ArrayList<ListaLetradosDesignaItem>(), HttpStatus.OK);
+		}
+	}
 
 	// 3.3.6.2.9.3. Ficha cambio del letrado designado
 
@@ -648,15 +691,21 @@ public class DesignacionesController {
 	}
 
 	@RequestMapping(value = "/designas/guardarProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarProcurador(@RequestBody List<ProcuradorItem> procuradorItem,
-			HttpServletRequest request) {
+
+	ResponseEntity<UpdateResponseDTO> guardarProcurador(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.guardarProcurador(procuradorItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-
+	
+	@RequestMapping(value = "/designas/compruebaProcurador",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ProcuradorDTO> compruebaProcurador(@RequestBody String procurador, HttpServletRequest request) {
+		ProcuradorDTO response = designacionesService.compruebaProcurador(procurador, request);
+		return new ResponseEntity<ProcuradorDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/designas/nuevoProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> nuevoProcurador(@RequestBody ProcuradorItem procuradorItem,
 			HttpServletRequest request) {

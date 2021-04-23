@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
 
 public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
@@ -672,6 +673,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
+	/**
+	 * 
+	 * @param idInstitucion
+	 * @param idTurno
+	 * @param anio
+	 * @param numero
+	 * @return
+	 */
 	public String busquedaActuacionesJustificacionExpres(String idInstitucion, String idTurno, String anio,
 			String numero) {
 		StringBuilder sql = new StringBuilder();
@@ -682,18 +691,20 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "pro.nombre procedimiento, pro.codigo categoria, pro.idjurisdiccion, pro.complemento, pro.permitiraniadirletrado, "
 				+ "act.numeroasunto, act.idprocedimiento, act.idjuzgado, j.nombre nombreJuzgado, "
 				+ "to_char(act.fechajustificacion, 'dd/mm/yyyy') fechajustificacion, act.validada, act.idfacturacion, "
-				+ "act.numeroprocedimiento, act.anioprocedimiento, act.anio, act.idTurno, act.idInstitucion, " + "( "
-				+ "SELECT nombre || ' (' || fechadesde || '-' || fechahasta || ')' " + "FROM fcs_facturacionjg fjg "
+				+ "act.numeroprocedimiento, act.anioprocedimiento, act.anio, act.idTurno, act.idInstitucion, "
+				+ "( "
+				+ "SELECT nombre || ' (' || fechadesde || '-' || fechahasta || ')' "
+				+ "FROM fcs_facturacionjg fjg "
 				+ "WHERE fjg.idinstitucion = act.idinstitucion AND fjg.idfacturacion = act.idfacturacion"
 				+ ") AS descripcionfacturacion, "
 				+ "act.docjustificacion, act.anulacion, acp.nig_numprocedimiento, act.nig, act.fecha, 0 permitireditarletrado "
 				+ "FROM scs_actuaciondesigna act, scs_procedimientos pro, scs_acreditacionprocedimiento acp, scs_acreditacion ac, "
-				+ "scs_tipoacreditacion tac, scs_juzgado j "
+				+ "scs_tipoacreditacion tac, scs_juzgado j " 
 				+ "WHERE ac.idtipoacreditacion = tac.idtipoacreditacion AND act.idinstitucion = j.idinstitucion AND act.idjuzgado=j.idjuzgado "
 				+ "AND act.idacreditacion = ac.idacreditacion AND act.idacreditacion = acp.idacreditacion AND act.idinstitucion_proc = acp.idinstitucion "
 				+ "AND act.idprocedimiento = acp.idprocedimiento AND act.idinstitucion_proc = pro.idinstitucion AND act.idprocedimiento = pro.idprocedimiento "
-				+ "AND act.idinstitucion = " + idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = "
-				+ anio + " AND act.numero = " + numero + " " + "ORDER BY act.fechajustificacion, act.numeroasunto");
+				+ "AND act.idinstitucion = "+ idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = " + anio + " AND act.numero = " + numero + " " 
+				+ "ORDER BY act.fechajustificacion, act.numeroasunto");
 
 		return sql.toString();
 	}
@@ -737,7 +748,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" D.ANIO, ");
 		sql.append(" D.NUMERO, ");
 		sql.append(" D.CODIGO, ");
-		sql.append(" D.IDJUZGADO, ");
+		sql.append(" D.IDJUZGADO, J.NOMBRE NOMBREJUZGADO, ");
 		sql.append(" D.IDINSTITUCION_JUZG, ");
 		sql.append(" D.ESTADO, ");
 		sql.append(" D.SUFIJO, ");
@@ -745,7 +756,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" DL.IDPERSONA, ");
 		sql.append(" D.IDPROCEDIMIENTO, ");
 		sql.append(" D.NUMPROCEDIMIENTO, ");
-		sql.append(" D.ANIOPROCEDIMIENTO, ");
+		sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
 		sql.append(" D.NIG, ");
 
 		sql.append(
@@ -785,9 +796,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
 		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA ");
 
-		sql.append(" FROM SCS_DESIGNA D, SCS_DESIGNASLETRADO DL, SCS_JUZGADO J ");
+		sql.append(" FROM SCS_DESIGNA D, SCS_DESIGNASLETRADO DL, SCS_JUZGADO J,  SCS_PROCEDIMIENTOS p ");
 
-		sql.append(" WHERE D.IDINSTITUCION = DL.IDINSTITUCION ");
+		sql.append(" WHERE D.IDINSTITUCION = DL.IDINSTITUCION AND P.IDPROCEDIMIENTO = D.IDPROCEDIMIENTO AND P.IDINSTITUCION = D.IDINSTITUCION");
 		sql.append(" AND  D.IDJUZGADO=J.IDJUZGADO AND D.IDINSTITUCION_JUZG=J.IDINSTITUCION");
 		sql.append(" AND D.ANIO = DL.ANIO ");
 		sql.append(" AND D.NUMERO = DL.NUMERO ");
@@ -1411,21 +1422,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String guardarProcurador(ProcuradorItem procuradorItem) {
-
-		SQL sql = new SQL();
-		sql.UPDATE("scs_designaprocuraodr dp");
-
-		sql.SET("fechadesigna =" + procuradorItem.getFechaDesigna());
-		sql.SET("numerodesignacion =" + procuradorItem.getNumerodesignacion());
-		sql.SET("motivosrenuncia =" + procuradorItem.getMotivosRenuncia());
-
-		sql.WHERE("dp.numero= " + procuradorItem.getNumero());
-		sql.WHERE("dp.idinstitucion=" + procuradorItem.getIdInstitucion());
-
-		return sql.toString();
-	}
-
 	public String nuevoProcurador(ProcuradorItem procuradorItem, Integer usuario) {
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -1546,90 +1542,135 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		return sql.toString();
 	}
-
-	public String busquedaListaContrarios(DesignaItem item, Short idInstitucion, Boolean historico) {
-
-		String consulta = "SELECT\r\n" + "    t1.numero,\r\n" + "    t1.idinstitucion,\r\n" + "    t1.idturno,\r\n"
-				+ "    t1.anio,\r\n" + "    t1.nif,\r\n" + "    t1.idabogadocontrario,\r\n" + "    t1.idprocurador,\r\n"
-				+ "    t1.fechabaja,\r\n" + "    t1.idpersona,\r\n" + "    t1.idrepresentantelegal,\r\n"
-				+ "    CASE\r\n" + "        WHEN t1.idabogadocontrario IS NOT NULL THEN\r\n" + "            (\r\n"
-				+ "                SELECT\r\n" + "                    col.ncolegiado\r\n"
-				+ "                    || ', '\r\n" + "                    || t1.NOMBREABOGADOCONTRARIO\r\n"
-				+ "--                    || per.apellidos1\r\n" + "--                    || ' '\r\n"
-				+ "--                    || per.apellidos2\r\n" + "--                    || ', '\r\n"
-				+ "--                    || per.nombre \r\n" + "                    AS abogado\r\n"
-				+ "                FROM\r\n" + "                    cen_persona     per,\r\n"
-				+ "                    cen_colegiado   col\r\n" + "                WHERE\r\n"
-				+ "                    ( per.idpersona = col.idpersona\r\n"
-				+ "                      AND per.idpersona = t1.idabogadocontrario\r\n"
-				+ "                      AND col.idinstitucion = t1.idinstitucion )\r\n" + "            )\r\n"
-				+ "        ELSE\r\n" + "            ''\r\n" + "    END AS abogado,\r\n" + "    CASE\r\n"
-				+ "        WHEN t1.idprocurador IS NOT NULL THEN\r\n" + "            (\r\n"
-				+ "                SELECT\r\n" + "                    procu.ncolegiado\r\n"
-				+ "                    || ', '\r\n" + "                    || procu.apellidos1\r\n"
-				+ "                    || ' '\r\n" + "                    || procu.apellidos2\r\n"
-				+ "                    || ', '\r\n" + "                    || procu.nombre AS procurador\r\n"
-				+ "                FROM\r\n" + "                    scs_procurador procu\r\n"
-				+ "                WHERE\r\n" + "                    ( idprocurador = t1.idprocurador\r\n"
-				+ "                      AND idinstitucion = t1.IDINSTITUCION_PROCU )\r\n" + "            )\r\n"
-				+ "        ELSE\r\n" + "            ''\r\n" + "    END AS procurador,\r\n"
-				+ "    t1.apellidosnombre\r\n" + "FROM\r\n" + "    (\r\n" + "        SELECT\r\n"
-				+ "            scs_contrariosdesigna.numero,\r\n"
-				+ "            scs_contrariosdesigna.idinstitucion,\r\n"
-				+ "            scs_contrariosdesigna.idturno,\r\n" + "            scs_contrariosdesigna.anio,\r\n"
-				+ "            scs_contrariosdesigna.idpersona,\r\n"
-				+ "            scs_contrariosdesigna.idrepresentantelegal,\r\n"
-				+ "            scs_contrariosdesigna.NOMBREABOGADOCONTRARIO,\r\n"
-				+ "            scs_contrariosdesigna.fechabaja,\r\n" + "            persona.nif,\r\n"
-				+ "            persona.apellido1\r\n"
-				+ "            || decode(persona.apellido2, NULL, '', ' ' || persona.apellido2)\r\n"
-				+ "            || ', '\r\n" + "            || persona.nombre AS apellidosnombre,\r\n"
-				+ "            scs_contrariosdesigna.idabogadocontrario,\r\n"
-				+ "            scs_contrariosdesigna.idprocurador,\r\n"
-				+ "            scs_contrariosdesigna.IDINSTITUCION_PROCU\r\n" + "        FROM\r\n"
-				+ "            scs_contrariosdesigna\r\n"
-				+ "            JOIN scs_personajg persona ON persona.idpersona = scs_contrariosdesigna.idpersona\r\n"
-				+ "                                          AND persona.idinstitucion = scs_contrariosdesigna.idinstitucion\r\n"
-				+ "        WHERE\r\n" + "            ( scs_contrariosdesigna.anio = " + item.getAno() + "\r\n"
-				+ "              AND scs_contrariosdesigna.numero = " + item.getNumero() + "\r\n"
-				+ "              AND scs_contrariosdesigna.idinstitucion = " + idInstitucion + "\r\n";
-		if (!historico) {
-			consulta += " AND scs_contrariosdesigna.fechabaja is null \r\n";
-		}
-		consulta += "              AND scs_contrariosdesigna.idturno = " + item.getIdTurno() + " )\r\n" + "    ) t1\r\n"
-				+ "\r\n" + "";
-
-		return consulta;
-	}
-
-	public String busquedaListaInteresados(DesignaItem item, Short idInstitucion) {
-
-		SQL sql = new SQL();
-
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.idinstitucion");
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.idturno");
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.anio");
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.idpersona");
-		sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
-		sql.SELECT("persona.nif");
-		sql.SELECT("persona.direccion");
-		sql.SELECT("    CASE\r\n" + "        WHEN nombrerepresentante IS NOT NULL THEN\r\n"
-				+ "            nombrerepresentante\r\n" + "        ELSE\r\n" + "            ''\r\n"
-				+ "    END AS representante\r\n");
-		sql.SELECT("            persona.apellido1\r\n"
-				+ "            || decode(persona.apellido2, NULL, '', ' ' || persona.apellido2)\r\n"
-				+ "            || ', '\r\n" + "            || persona.nombre AS apellidosnombre");
-		sql.FROM("SCS_DEFENDIDOSDESIGNA");
-		sql.JOIN(
-				"scs_personajg persona ON persona.idpersona = scs_DEFENDIDOSDESIGNA.idpersona AND persona.idinstitucion = scs_DEFENDIDOSDESIGNA.idinstitucion");
-		sql.WHERE("            ( scs_DEFENDIDOSDESIGNA.anio = " + item.getAno() + "\r\n"
-				+ "              AND scs_DEFENDIDOSDESIGNA.numero = " + item.getNumero() + "\r\n"
-				+ "              AND scs_DEFENDIDOSDESIGNA.idinstitucion = " + idInstitucion + "\r\n"
-				+ "              AND scs_DEFENDIDOSDESIGNA.idturno = " + item.getIdTurno() + " )\r\n");
-
-		return sql.toString();
-	}
+	
+	    public String busquedaListaContrarios(DesignaItem item, Short idInstitucion, Boolean historico) {
+	    	
+	    	String consulta ="SELECT\r\n" + 
+	    			"    t1.numero,\r\n" + 
+	    			"    t1.idinstitucion,\r\n" + 
+	    			"    t1.idturno,\r\n" + 
+	    			"    t1.anio,\r\n" + 
+	    			"    t1.nif,\r\n" + 
+	    			"    t1.idabogadocontrario,\r\n" + 
+	    			"    t1.idprocurador,\r\n" + 
+	    			"    t1.fechabaja,\r\n" +
+	    			"    t1.idpersona,\r\n" + 
+	    			"    t1.idrepresentantelegal,\r\n" + 
+	    			"    CASE\r\n" + 
+	    			"        WHEN t1.idabogadocontrario IS NOT NULL THEN\r\n" + 
+	    			"            (\r\n" + 
+	    			"                SELECT\r\n" + 
+	    			"                    col.ncolegiado\r\n" + 
+	    			"                    || ', '\r\n" + 
+	    			"                    || t1.NOMBREABOGADOCONTRARIO\r\n" + 
+	    			"--                    || per.apellidos1\r\n" + 
+	    			"--                    || ' '\r\n" + 
+	    			"--                    || per.apellidos2\r\n" + 
+	    			"--                    || ', '\r\n" + 
+	    			"--                    || per.nombre \r\n" + 
+	    			"                    AS abogado\r\n" + 
+	    			"                FROM\r\n" + 
+	    			"                    cen_persona     per,\r\n" + 
+	    			"                    cen_colegiado   col\r\n" + 
+	    			"                WHERE\r\n" + 
+	    			"                    ( per.idpersona = col.idpersona\r\n" + 
+	    			"                      AND per.idpersona = t1.idabogadocontrario\r\n" + 
+	    			"                      AND col.idinstitucion = t1.idinstitucion )\r\n" + 
+	    			"            )\r\n" + 
+	    			"        ELSE\r\n" + 
+	    			"            ''\r\n" + 
+	    			"    END AS abogado,\r\n" + 
+	    			"    CASE\r\n" + 
+	    			"        WHEN t1.idprocurador IS NOT NULL THEN\r\n" + 
+	    			"            (\r\n" + 
+	    			"                SELECT\r\n" + 
+	    			"                    procu.ncolegiado\r\n" + 
+	    			"                    || ', '\r\n" + 
+	    			"                    || procu.apellidos1\r\n" + 
+	    			"                    || ' '\r\n" + 
+	    			"                    || procu.apellidos2\r\n" + 
+	    			"                    || ', '\r\n" + 
+	    			"                    || procu.nombre AS procurador\r\n" + 
+	    			"                FROM\r\n" + 
+	    			"                    scs_procurador procu\r\n" + 
+	    			"                WHERE\r\n" + 
+	    			"                    ( idprocurador = t1.idprocurador\r\n" + 
+	    			"                      AND idinstitucion = t1.IDINSTITUCION_PROCU )\r\n" + 
+	    			"            )\r\n" + 
+	    			"        ELSE\r\n" + 
+	    			"            ''\r\n" + 
+	    			"    END AS procurador,\r\n" + 
+	    			"    t1.apellidosnombre\r\n" + 
+	    			"FROM\r\n" + 
+	    			"    (\r\n" + 
+	    			"        SELECT\r\n" + 
+	    			"            scs_contrariosdesigna.numero,\r\n" + 
+	    			"            scs_contrariosdesigna.idinstitucion,\r\n" + 
+	    			"            scs_contrariosdesigna.idturno,\r\n" + 
+	    			"            scs_contrariosdesigna.anio,\r\n" + 
+	    			"            scs_contrariosdesigna.idpersona,\r\n" + 
+	    			"            scs_contrariosdesigna.idrepresentantelegal,\r\n" + 
+	    			"            scs_contrariosdesigna.NOMBREABOGADOCONTRARIO,\r\n" + 
+	    			"            scs_contrariosdesigna.fechabaja,\r\n" + 
+	    			"            persona.nif,\r\n" + 
+	    			"            persona.apellido1\r\n" + 
+	    			"            || decode(persona.apellido2, NULL, '', ' ' || persona.apellido2)\r\n" + 
+	    			"            || ', '\r\n" + 
+	    			"            || persona.nombre AS apellidosnombre,\r\n" + 
+	    			"            scs_contrariosdesigna.idabogadocontrario,\r\n" + 
+	    			"            scs_contrariosdesigna.idprocurador,\r\n" + 
+	    			"            scs_contrariosdesigna.IDINSTITUCION_PROCU\r\n" + 
+	    			"        FROM\r\n" + 
+	    			"            scs_contrariosdesigna\r\n" + 
+	    			"            JOIN scs_personajg persona ON persona.idpersona = scs_contrariosdesigna.idpersona\r\n" + 
+	    			"                                          AND persona.idinstitucion = scs_contrariosdesigna.idinstitucion\r\n" + 
+	    			"        WHERE\r\n" + 
+	    			"            ( scs_contrariosdesigna.anio = "+item.getAno()+"\r\n" + 
+	    			"              AND scs_contrariosdesigna.numero = "+item.getNumero()+"\r\n" + 
+	    			"              AND scs_contrariosdesigna.idinstitucion = "+idInstitucion+"\r\n";
+	    			if(!historico) {
+	    				consulta+=" AND scs_contrariosdesigna.fechabaja is null \r\n";
+	    			}
+	    			consulta+="              AND scs_contrariosdesigna.idturno = "+item.getIdTurno()+" )\r\n" + 
+	    			"    ) t1\r\n" + 
+	    			"\r\n" + 
+	    			"";
+	    	
+	    	return consulta;
+	    }
+	    
+		public String busquedaListaInteresados(DesignaItem item, Short idInstitucion) {
+			    	
+			SQL sql = new SQL();
+			
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.idinstitucion");
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.idturno");
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.anio");
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.idpersona");
+			sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
+			sql.SELECT("persona.nif");
+			sql.SELECT("persona.direccion");
+			sql.SELECT("    CASE\r\n" + 
+			    			"        WHEN nombrerepresentante IS NOT NULL THEN\r\n" + 
+			    			"            nombrerepresentante\r\n" + 
+			    			"        ELSE\r\n" + 
+			    			"            ''\r\n" + 
+			    			"    END AS representante\r\n");
+			sql.SELECT("            persona.apellido1\r\n" + 
+	    			"            || decode(persona.apellido2, NULL, '', ' ' || persona.apellido2)\r\n" + 
+	    			"            || ', '\r\n" + 
+	    			"            || persona.nombre AS apellidosnombre");
+			sql.FROM("SCS_DEFENDIDOSDESIGNA");
+			sql.JOIN("scs_personajg persona ON persona.idpersona = scs_DEFENDIDOSDESIGNA.idpersona AND persona.idinstitucion = scs_DEFENDIDOSDESIGNA.idinstitucion");
+			sql.WHERE("            ( scs_DEFENDIDOSDESIGNA.anio = "+item.getAno()+"\r\n" + 
+			"              AND scs_DEFENDIDOSDESIGNA.numero = "+item.getNumero()+"\r\n" + 
+			"              AND scs_DEFENDIDOSDESIGNA.idinstitucion = "+idInstitucion+"\r\n" + 
+			"              AND scs_DEFENDIDOSDESIGNA.idturno = "+item.getIdTurno()+" )\r\n");
+	
+	    	
+	    	return sql.toString();
+	    }
 
 	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion,
 			AdmUsuarios usuario, boolean anular) {
@@ -1672,6 +1713,38 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("NUMEROASUNTO = '" + actuacionDesignaItem.getNumeroAsunto() + "'");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 
+		return sql.toString();
+	}
+	
+	public String compruebaProcurador(String num, String anio) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT("*");
+
+		sql2.FROM("SCS_EJGDESIGNA");
+		sql2.WHERE("NUMERODESIGNA = "+num);
+		sql2.WHERE("ANIODESIGNA ="+anio);
+
+		sql.SELECT("*");
+		sql.FROM("( " + sql2.toString() + " )");
+		sql.WHERE("ROWNUM <= 201");
+
+		return sql.toString();
+	}
+	
+	public String guardarProcurador(ProcuradorItem procuradorItem) {
+		
+		SQL sql = new SQL();
+		sql.UPDATE("scs_designaprocurador");
+		
+		sql.SET("fechadesigna ='"+procuradorItem.getFechaDesigna()+"'");
+		sql.SET("numerodesignacion ='"+procuradorItem.getNumerodesignacion()+"'");
+		sql.SET("motivosrenuncia ='"+procuradorItem.getMotivosRenuncia()+"'");
+
+		sql.WHERE("numero= "+procuradorItem.getNumero());
+		sql.WHERE("idinstitucion="+procuradorItem.getIdInstitucion());
+		
 		return sql.toString();
 	}
 
@@ -1815,6 +1888,29 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("ANIO = '" + actuacionDesignaItem.getAnio() + "'");
 		sql.WHERE("NUMEROASUNTO = '" + actuacionDesignaItem.getNumeroAsunto() + "'");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		
+		return sql.toString();
+	}
+		
+	public String getListaLetradosDesigna(ScsDesigna designa, Short idInstitucion) {
+
+		SQL sql = new SQL();
+		sql.SELECT("SCS_DESIGNASLETRADO.FECHADESIGNA, \r\n" + 
+				"SCS_DESIGNASLETRADO.FECHARENUNCIA, \r\n" + 
+				"SCS_DESIGNASLETRADO.MOTIVOSRENUNCIA, \r\n" + 
+				"SCS_DESIGNASLETRADO.FECHARENUNCIASOLICITA, \r\n"+
+				"CEN_COLEGIADO.NCOLEGIADO \r\n");
+		sql.SELECT("            persona.apellidos1\r\n" + 
+    			"            || decode(persona.apellidos2, NULL, '', ' ' || persona.apellidos2)\r\n" + 
+    			"            || ', '\r\n" + 
+    			"            || persona.nombre AS apellidosnombre");
+		sql.FROM("SCS_DESIGNASLETRADO");
+		sql.JOIN("CEN_COLEGIADO ON CEN_COLEGIADO.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA AND CEN_COLEGIADO.IDINSTITUCION=SCS_DESIGNASLETRADO.IDINSTITUCION");
+		sql.JOIN("CEN_PERSONA PERSONA ON PERSONA.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA");
+		sql.WHERE("SCS_DESIGNASLETRADO.NUMERO = '" + designa.getNumero() + "'");
+		sql.WHERE("SCS_DESIGNASLETRADO.IDTURNO = '" + designa.getIdturno() + "'");
+		sql.WHERE("SCS_DESIGNASLETRADO.ANIO = '" + designa.getAnio() + "'");
+		sql.WHERE("SCS_DESIGNASLETRADO.IDINSTITUCION = '" + idInstitucion + "'");
 
 		return sql.toString();
 	}

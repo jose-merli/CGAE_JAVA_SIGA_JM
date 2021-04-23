@@ -30,6 +30,7 @@ import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -43,13 +44,17 @@ import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
+import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
+import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
+import org.itcgae.siga.db.mappers.ScsDesignaMapper;
+import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
@@ -104,6 +109,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Autowired
 	private ScsActuaciondesignaMapper scsActuaciondesignaMapper;
 
+	@Autowired
+	private ScsDesignaMapper scsDesignaMapper;
+
+	@Autowired
+	private ScsDesignasletradoMapper scsDesignasletradoMapper;
+	
+	@Autowired
+	private CenColegiadoMapper cenColegiadoMapper;
 	/**
 	 * busquedaJustificacionExpres
 	 */
@@ -2093,7 +2106,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Override
 	public ProcuradorDTO busquedaProcurador(List<String> procurador, HttpServletRequest request) {
 		LOGGER.info("searchPrisiones() -> Entrada al servicio para obtener prisiones");
-
+		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -2164,9 +2177,102 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 		return comboDTO;
 	}
+	
+	@Override
+	public ProcuradorDTO compruebaProcurador(String procurador, HttpServletRequest request) {
+		LOGGER.info("searchPrisiones() -> Entrada al servicio para obtener prisiones");
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ProcuradorDTO procuradorDTO = new ProcuradorDTO();
+		List<ProcuradorItem> procuradorItemList = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Entrada a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				String[] parts = procurador.split("/");
+				String anio = parts[0];
+				String num = parts[1];
+				
+				procuradorItemList = scsDesignacionesExtendsMapper.compruebaProcurador(num, anio);
+
+				LOGGER.info(
+						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				if (procuradorItemList != null) {
+					procuradorDTO.setProcuradorItems(procuradorItemList);
+				}
+			}
+
+		}
+		LOGGER.info("searchComisarias() -> Salida del servicio para obtener prisiones");
+		return procuradorDTO;
+	}
+	
+	@Override
+	public ProcuradorDTO compruebaFechaProcurador(String procurador, HttpServletRequest request) {
+		LOGGER.info("searchPrisiones() -> Entrada al servicio para obtener prisiones");
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ProcuradorDTO procuradorDTO = new ProcuradorDTO();
+		List<ProcuradorItem> procuradorItemList = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Entrada a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				String[] parts = procurador.split("/");
+				String anio = parts[0];
+				String num = parts[1];
+				
+				procuradorItemList = scsDesignacionesExtendsMapper.compruebaProcurador(num, anio);
+
+				LOGGER.info(
+						"searchProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				if (procuradorItemList != null) {
+					procuradorDTO.setProcuradorItems(procuradorItemList);
+				}
+			}
+
+		}
+		LOGGER.info("searchComisarias() -> Salida del servicio para obtener prisiones");
+		return procuradorDTO;
+	}
+
 
 	@Override
-	public UpdateResponseDTO guardarProcurador(List<ProcuradorItem> procuradorItem, HttpServletRequest request) {
+	public UpdateResponseDTO guardarProcurador( List<String> procurador, HttpServletRequest request) {
 		LOGGER.info("deleteBaja() ->  Entrada al servicio para eliminar bajas temporales");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -2195,10 +2301,22 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
+					
 
-					for (ProcuradorItem bti : procuradorItem) {
-//						response = scsDesignacionesExtendsMapper.guardarProcurador(bti);
-					}
+					ProcuradorItem procuradorItem = new ProcuradorItem();
+					
+					procuradorItem.setFechaDesigna(procurador.get(0));
+					procuradorItem.setNumerodesignacion(procurador.get(1));
+					procuradorItem.setnColegiado(procurador.get(2));
+					procuradorItem.setNombre(procurador.get(3));
+					procuradorItem.setMotivosRenuncia(procurador.get(4));
+					procuradorItem.setObservaciones(procurador.get(5));
+					procuradorItem.setFecharenunciasolicita(procurador.get(6));
+					procuradorItem.setIdInstitucion(procurador.get(7));
+					procuradorItem.setNumero(procurador.get(8));
+
+					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem);
+
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
@@ -2371,7 +2489,162 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return comboDTO;
 	}
 	
+	// Tarjeta Letrado
+	// ScsDesignaMapper
+
 	@Override
+	public ScsDesigna busquedaDesigna(ScsDesigna item, HttpServletRequest request) {
+		LOGGER.info("DesignacionesServiceImpl.busquedaDesigna() -> Entrada al servicio servicio");
+		ScsDesigna designa = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaDesigna() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.busquedaDesigna -> Entrada a servicio para la busqueda de contrarios");
+
+				try {
+
+					ScsDesignaKey key = new ScsDesignaKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setAnio(item.getAnio());
+					key.setIdturno(item.getIdturno());
+					key.setNumero(item.getNumero());
+
+					designa = scsDesignaMapper.selectByPrimaryKey(key);
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("DesignacionesServiceImpl.busquedaDesigna -> Salida del servicio");
+				}
+				LOGGER.info("DesignacionesServiceImpl.busquedaDesigna -> Salida del servicio");
+			}
+		}
+
+		return designa;
+	}
+
+	@Override
+	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request) {
+		LOGGER.info(
+				"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada al servicio para buscar los letrados asociados a una designacion");
+		List<ListaLetradosDesignaItem> listaLetrados = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada a servicio para la busqueda de letrados de la designacion");
+
+				try {
+
+//						ScsDesignasletradoExample example = new ScsDesignasletradoExample();
+//						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(item.getAnio())
+//						.andIdturnoEqualTo(item.getIdturno()).andNumeroEqualTo(item.getNumero());
+//						
+//						List<ScsDesignasletrado> letrados = scsDesignasletradoMapper.selectByExample(example);
+
+//						int i = 0;
+					// Buscamos las columnas de la tabla que no podemos extraer de latabla
+					// designasletado
+					// Nº COlegiado y nombre y apellido
+//						for (ScsDesignasletrado letrado: letrados) {
+
+//							listaLetrados.add(new ListaLetradosDesignaItem());
+
+					listaLetrados = scsDesignacionesExtendsMapper.getListaLetradosDesigna(item, idInstitucion);
+//							listaLetrados.get(i).setFechaDesignacion(letrado.getFechadesigna());
+//							listaLetrados.get(i).setFechaSolRenuncia(letrado.getFecharenunciasolicita());
+//							listaLetrados.get(i).setFechaEfecRenuncia(letrado.getFecharenuncia());
+//							listaLetrados.get(i).setMotivoRenuncia(letrado.getMotivosrenuncia());
+//							
+//							CenColegiadoKey key = new CenColegiadoKey();
+//							key.setIdinstitucion(idInstitucion);
+//							key.setIdpersona(letrado.getIdpersona());
+//							
+//							CenColegiado colegiado = cenColegiadoMapper.selectByPrimaryKey(key);
+//							colegiado.getNcolegiado();
+//							colegiado.getn
+//							
+//							
+//							i++;
+//						}
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida del servicio");
+				}
+				LOGGER.info("DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida del servicio");
+			}
+		}
+
+		return listaLetrados;
+	}
+
 	public ComboDTO comboMotivosCambioActDesigna(HttpServletRequest request) {
 
 		LOGGER.info(
@@ -2459,5 +2732,4 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		return updateResponseDTO;
 	}
-
 }
