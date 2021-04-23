@@ -2004,7 +2004,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			insertResponseDTO.setError(error);
 		}
 
-		return null;
+		return insertResponseDTO;
 	}
 
 	@Override
@@ -2369,6 +2369,95 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info("comboPrisiones() -> Salida del servicio para obtener combo de prisiones");
 		}
 		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboMotivosCambioActDesigna(HttpServletRequest request) {
+
+		LOGGER.info(
+				"comboMotivosCambioActDesigna() -> Entrada al servicio para obtener combo de movitos de cambio de la actuación");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboMotivosCambioActDesigna() / scsDesignacionesExtendsMapper.comboMotivosCambioActDesigna() -> Entrada a scsDesignacionesExtendsMapper para obtener combo de movitos de cambio de la actuación");
+
+				List<ComboItem> comboItems = scsDesignacionesExtendsMapper.comboMotivosCambioActDesigna(idInstitucion);
+
+				LOGGER.info(
+						"comboMotivosCambioActDesigna() / scsDesignacionesExtendsMapper.comboMotivosCambioActDesigna() -> Salida e scsDesignacionesExtendsMapper para obtener combo de movitos de cambio de la actuación");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info(
+					"comboMotivosCambioActDesigna() -> Salida del servicio para obtener combo de movitos de cambio de la actuación");
+		}
+		return comboDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO updateJustiActDesigna(ActuacionDesignaItem actuacionDesignaItem,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.updateJustiActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.updateJustiActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				int response = scsDesignacionesExtendsMapper.updateJustiActDesigna(actuacionDesignaItem,
+						Short.toString(idInstitucion), usuarios.get(0));
+
+				if (response == 1) {
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
+
+				if (response == 0) {
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.error(
+							"DesignacionesServiceImpl.updateJustiActDesigna() -> Se ha producido un error al actualizar los datos de justificación de la actuación");
+					error.setCode(500);
+					error.setDescription(
+							"Se ha producido un error al actualizar los datos de justificación de la actuación");
+					updateResponseDTO.setError(error);
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.updateJustiActDesigna() -> Se ha producido un error al actualizar los datos de justificación de la actuación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			updateResponseDTO.setError(error);
+		}
+
+		return updateResponseDTO;
 	}
 
 }

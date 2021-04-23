@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -106,6 +105,10 @@ public interface IDesignacionesService {
 			HttpServletRequest request);
 
 	public InsertResponseDTO guardarActDesigna(ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateJustiActDesigna(ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request);
+	
+	public ComboDTO comboMotivosCambioActDesigna(HttpServletRequest request);
 
 	public InsertResponseDTO createDesigna(DesignaItem designaItem, HttpServletRequest request);
 

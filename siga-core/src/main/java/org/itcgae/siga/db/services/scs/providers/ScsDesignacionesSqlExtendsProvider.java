@@ -1496,6 +1496,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT("ACT.TALON");
 		sql2.SELECT("DECODE(COL.COMUNITARIO, '1', COL.NCOMUNITARIO, COL.NCOLEGIADO) AS NUMCOLEGIADO");
 		sql2.SELECT("ACT.IDPERSONACOLEGIADO");
+		sql2.SELECT("ACT.ID_MOTIVO_CAMBIO");
 
 		sql2.FROM("SCS_ACTUACIONDESIGNA ACT");
 
@@ -1660,6 +1661,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SET("VALIDADA = '" + validarReact + "'");
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
+		
+		if(validar && !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
+			sql.SET("FECHAJUSTIFICACION = '" + actuacionDesignaItem.getFechaJustificacion() + "'");
+		}
 
 		sql.WHERE("NUMERO = '" + actuacionDesignaItem.getNumero() + "'");
 		sql.WHERE("IDTURNO = '" + actuacionDesignaItem.getIdTurno() + "'");
@@ -1769,6 +1774,46 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("NUMERO = '" + designa.getCodigo() + "'");
 		sql.WHERE("IDTURNO = '" + designa.getIdTurno() + "'");
 		sql.WHERE("ANIO = '" + designa.getAno() + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
+	
+	public String comboMotivosCambioActDesigna(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDACTDESMOTCAMBIO");
+		sql.SELECT("NOMBRE");
+
+		sql.FROM("SCS_ACTUADESIG_MOTCAMBIO");
+
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
+	
+	public String updateJustiActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario) {
+
+		SQL sql = new SQL();
+		
+		sql.UPDATE("SCS_ACTUACIONDESIGNA");
+
+		if(!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
+			sql.SET("FECHAJUSTIFICACION = '" + actuacionDesignaItem.getFechaJustificacion() + "'");
+		}
+		
+		if(!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservacionesJusti())) {
+			sql.SET("OBSERVACIONESJUSTIFICACION = '" + actuacionDesignaItem.getObservacionesJusti() + "'");
+		}
+		
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
+		
+		sql.WHERE("NUMERO = '" + actuacionDesignaItem.getNumero() + "'");
+		sql.WHERE("IDTURNO = '" + actuacionDesignaItem.getIdTurno() + "'");
+		sql.WHERE("ANIO = '" + actuacionDesignaItem.getAnio() + "'");
+		sql.WHERE("NUMEROASUNTO = '" + actuacionDesignaItem.getNumeroAsunto() + "'");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 
 		return sql.toString();

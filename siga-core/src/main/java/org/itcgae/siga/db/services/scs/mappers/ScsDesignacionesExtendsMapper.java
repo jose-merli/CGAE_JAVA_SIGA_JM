@@ -240,7 +240,8 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "OBSERVACIONESJUSTIFICACION", property = "observacionesJusti", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TALONARIO", property = "talonario", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "TALON", property = "talon", jdbcType = JdbcType.VARCHAR) })
+			@Result(column = "TALON", property = "talon", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ID_MOTIVO_CAMBIO", property = "idMotivoCambio", jdbcType = JdbcType.VARCHAR) })
 	List<ActuacionDesignaItem> busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			String idInstitucion);
 
@@ -331,5 +332,13 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHAJUICIO", property = "fechaJuicio", jdbcType = JdbcType.DATE),
 			@Result(column = "DEFENSAJURIDICA", property = "defensaJuridica", jdbcType = JdbcType.VARCHAR), })
 	List<DesignaItem> getDatosAdicionales(Short idInstitucion, Integer tamMaximo, DesignaItem designa);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboMotivosCambioActDesigna")
+	@Results({ @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDACTDESMOTCAMBIO", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> comboMotivosCambioActDesigna(Short idInstitucion);
+	
+	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "updateJustiActDesigna")
+	int updateJustiActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario);
 
 }

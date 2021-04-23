@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -611,13 +610,26 @@ public class DesignacionesController {
 		DeleteResponseDTO response = designacionesService.eliminarActDesigna(listaActuacionDesignaItem, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-
+	
 	// 3.3.6.2.14.3. Ficha Actuación
 
-	@PostMapping(value = "/designas/guardarActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/designas/guardarNewActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<InsertResponseDTO> guardarActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem,
 			HttpServletRequest request) {
 		InsertResponseDTO response = designacionesService.guardarActDesigna(actuacionDesignaItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/comboMotivosCambioActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ComboDTO> comboMotivosCambioActDesigna(HttpServletRequest request) {
+		ComboDTO response = designacionesService.comboMotivosCambioActDesigna(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/updateJustiActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> guardarJustiActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.updateJustiActDesigna(actuacionDesignaItem, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
