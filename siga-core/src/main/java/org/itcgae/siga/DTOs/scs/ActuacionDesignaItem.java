@@ -26,6 +26,9 @@ public class ActuacionDesignaItem {
 	private String observaciones;
 	private String talonario;
 	private String talon;
+	private String idPersonaColegiado;
+	private String nombreJuzgado;
+	private String observacionesJusti;
 
 	/**
 	 * @return the fechaActuacion
@@ -363,6 +366,48 @@ public class ActuacionDesignaItem {
 		this.talon = talon;
 	}
 
+	/**
+	 * @return the idPersonaColegiado
+	 */
+	public String getIdPersonaColegiado() {
+		return idPersonaColegiado;
+	}
+
+	/**
+	 * @param idPersonaColegiado the idPersonaColegiado to set
+	 */
+	public void setIdPersonaColegiado(String idPersonaColegiado) {
+		this.idPersonaColegiado = idPersonaColegiado;
+	}
+
+	/**
+	 * @return the nombreJuzgado
+	 */
+	public String getNombreJuzgado() {
+		return nombreJuzgado;
+	}
+
+	/**
+	 * @param nombreJuzgado the nombreJuzgado to set
+	 */
+	public void setNombreJuzgado(String nombreJuzgado) {
+		this.nombreJuzgado = nombreJuzgado;
+	}
+
+	/**
+	 * @return the observacionesJusti
+	 */
+	public String getObservacionesJusti() {
+		return observacionesJusti;
+	}
+
+	/**
+	 * @param observacionesJusti the observacionesJusti to set
+	 */
+	public void setObservacionesJusti(String observacionesJusti) {
+		this.observacionesJusti = observacionesJusti;
+	}
+
 	@Override
 	public String toString() {
 		return "ActuacionDesignaItem [fechaActuacion=" + fechaActuacion + ", numero=" + numero + ", numeroAsunto="
@@ -372,7 +417,8 @@ public class ActuacionDesignaItem {
 				+ letrado + ", numColegiado=" + numColegiado + ", nig=" + nig + ", numProcedimiento=" + numProcedimiento
 				+ ", idJuzgado=" + idJuzgado + ", idProcedimiento=" + idProcedimiento + ", idPretension=" + idPretension
 				+ ", idAcreditacion=" + idAcreditacion + ", idPrision=" + idPrision + ", observaciones=" + observaciones
-				+ ", talonario=" + talonario + ", talon=" + talon + "]";
+				+ ", talonario=" + talonario + ", talon=" + talon + ", idPersonaColegiado=" + idPersonaColegiado
+				+ ", nombreJuzgado=" + nombreJuzgado + ", observacionesJusti=" + observacionesJusti + "]";
 	}
 
 }
