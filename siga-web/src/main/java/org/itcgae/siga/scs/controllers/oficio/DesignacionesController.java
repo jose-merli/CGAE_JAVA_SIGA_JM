@@ -151,6 +151,12 @@ public class DesignacionesController {
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/designas/deleteDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> deleteDesigna(@RequestBody List<DesignaItem> item, HttpServletRequest request) {
+		DeleteResponseDTO response = designacionesService.deleteDesigna(item, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
 
 	// 3.3.6.2.3. Tarjeta Detalle Designación
 
@@ -290,6 +296,28 @@ public class DesignacionesController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/designas/getPartidaPresupuestariaDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getPartidaPresupuestariaDesigna(HttpServletRequest request, @RequestBody DesignaItem designaItem) {
+		ComboDTO response = designacionesService.getPartidaPresupuestariaDesigna(request, designaItem);
+			if (response.getError() == null)
+				return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+
+	}
+	
+	@RequestMapping(value = "/designas/updatePartidaPresupuestaria", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updatePartidaPresupuestaria(@RequestBody DesignaItem designaItem,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.updatePartidaPresupuestaria(designaItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 	}
 	
 	// 3.3.6.2.6.	Tarjeta Interesados
