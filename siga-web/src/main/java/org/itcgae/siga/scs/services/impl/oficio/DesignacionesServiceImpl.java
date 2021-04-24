@@ -30,6 +30,7 @@ import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
