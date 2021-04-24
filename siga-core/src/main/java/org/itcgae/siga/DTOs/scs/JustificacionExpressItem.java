@@ -45,6 +45,7 @@ public class JustificacionExpressItem {
 	private String idTurno;
 	private String idPersona;
 	private String idProcedimiento;
+	private String procedimiento;
 	private Map<String, String> expedientes;
 	private List<ActuacionesJustificacionExpressItem> actuaciones;	
 	
@@ -629,5 +630,20 @@ public class JustificacionExpressItem {
 	 */
 	public void setActuaciones(List<ActuacionesJustificacionExpressItem> actuaciones) {
 		this.actuaciones = actuaciones;
+	}
+
+	/**
+	 * @return the procedimiento
+	 */
+	@JsonProperty("procedimiento")
+	public String getProcedimiento() {
+		return procedimiento;
+	}
+
+	/**
+	 * @param procedimiento the procedimiento to set
+	 */
+	public void setProcedimiento(String procedimiento) {
+		this.procedimiento = procedimiento;
 	}
 }
