@@ -30,6 +30,7 @@ public class ActuacionDesignaItem {
 	private String nombreJuzgado;
 	private String observacionesJusti;
 	private String idMotivoCambio;
+	private String idFacturacion;
 
 	/**
 	 * @return the fechaActuacion
@@ -423,6 +424,20 @@ public class ActuacionDesignaItem {
 		this.idMotivoCambio = idMotivoCambio;
 	}
 
+	/**
+	 * @return the idFacturacion
+	 */
+	public String getIdFacturacion() {
+		return idFacturacion;
+	}
+
+	/**
+	 * @param idFacturacion the idFacturacion to set
+	 */
+	public void setIdFacturacion(String idFacturacion) {
+		this.idFacturacion = idFacturacion;
+	}
+
 	@Override
 	public String toString() {
 		return "ActuacionDesignaItem [fechaActuacion=" + fechaActuacion + ", numero=" + numero + ", numeroAsunto="
@@ -434,7 +449,7 @@ public class ActuacionDesignaItem {
 				+ ", idAcreditacion=" + idAcreditacion + ", idPrision=" + idPrision + ", observaciones=" + observaciones
 				+ ", talonario=" + talonario + ", talon=" + talon + ", idPersonaColegiado=" + idPersonaColegiado
 				+ ", nombreJuzgado=" + nombreJuzgado + ", observacionesJusti=" + observacionesJusti
-				+ ", idMotivoCambio=" + idMotivoCambio + "]";
+				+ ", idMotivoCambio=" + idMotivoCambio + ", idFacturacion=" + idFacturacion + "]";
 	}
 
 }

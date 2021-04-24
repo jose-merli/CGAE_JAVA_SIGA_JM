@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.DeleteProvider;
@@ -28,7 +27,6 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsPrisionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -247,6 +245,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "OBSERVACIONESJUSTIFICACION", property = "observacionesJusti", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TALONARIO", property = "talonario", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TALON", property = "talon", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ID_MOTIVO_CAMBIO", property = "idMotivoCambio", jdbcType = JdbcType.VARCHAR) })
 	List<ActuacionDesignaItem> busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			String idInstitucion);
