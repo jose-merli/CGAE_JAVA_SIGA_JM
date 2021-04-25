@@ -343,7 +343,10 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboProcedimientosConModulos(Short idInstitucion, List<String> idPretensiones);
-
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "existeDesginaJuzgadoProcedimiento")
+	@Results({@Result(column = "NUM", property = "existeDesignaJuzgadoProcedimiento", jdbcType = JdbcType.VARCHAR), })
+	DesignaItem existeDesginaJuzgadoProcedimiento(Short idInstitucion, DesignaItem designa);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDatosAdicionales")
 	@Results({ @Result(column = "FECHAOFICIOJUZGADO", property = "fechaOficioJuzgado", jdbcType = JdbcType.DATE),

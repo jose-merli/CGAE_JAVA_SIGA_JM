@@ -1835,6 +1835,17 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 
 	}
+	
+	public String existeDesginaJuzgadoProcedimiento(Short idInstitucion, DesignaItem designa) {
+
+		SQL sql = new SQL();
+		sql.SELECT("count(*) as num");
+		sql.FROM("SCS_DESIGNA");
+		sql.WHERE("IDJUZGADO = '" + designa.getIdJuzgado() + "'");
+		sql.WHERE("NUMPROCEDIMIENTO = '" + designa.getNumProcedimiento() + "'");
+
+		return sql.toString();
+	}
 
 	public String getDatosAdicionales(Short idInstitucion, Integer tamMax, DesignaItem designa) {
 

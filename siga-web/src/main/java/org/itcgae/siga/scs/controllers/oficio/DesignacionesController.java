@@ -272,6 +272,18 @@ public class DesignacionesController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	@RequestMapping(value = "/designas/existeDesginaJuzgadoProcedimiento", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DesignaItem> existeDesginaJuzgadoProcedimiento(HttpServletRequest request,
+			@RequestBody DesignaItem designaItem) {
+		DesignaItem response = designacionesService.existeDesginaJuzgadoProcedimiento(designaItem, request);
+		if (response != null) {
+			return new ResponseEntity<DesignaItem>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<DesignaItem>(new DesignaItem(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
 	// 3.3.6.2.4. Tarjeta Datos Adicionales
 
 	@RequestMapping(value = "/designas/getDatosAdicionales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
