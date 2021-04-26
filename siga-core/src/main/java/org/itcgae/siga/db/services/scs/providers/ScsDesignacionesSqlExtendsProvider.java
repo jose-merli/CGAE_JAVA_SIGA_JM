@@ -1,7 +1,10 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import java.text.DateFormat;
+import java.text.Format;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -11,14 +14,15 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
-import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
-import org.springframework.web.bind.annotation.RequestBody;
+
+
 
 public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
@@ -1628,4 +1632,274 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
     	return sql.toString();
     }
+	
+	public String getLetradosDiasBajaTemporalTurno(String idInstitucion,String idTurno,String fecha) {
+		
+        SQL sql = new SQL();
+		
+		sql.SELECT("BAJAS.*");
+		sql.FROM(" CEN_BAJASTEMPORALES BAJAS, SCS_INSCRIPCIONTURNO INS ");
+		sql.WHERE(" BAJAS.IDINSTITUCION = INS.IDINSTITUCION ");
+		sql.WHERE(" BAJAS.IDPERSONA = INS.IDPERSONA ");
+		sql.WHERE(" INS.IDINSTITUCION ='"+idInstitucion+"'");
+		sql.WHERE(" INS.IDTURNO ='"+idTurno+"'");
+		sql.WHERE(" TO_DATE(BAJAS.FECHABT, 'YYYY-MM-DD') BETWEEN  TO_DATE('"+ fecha+"' , 'YYYY-MM-DD') AND  TO_DATE( '"+ fecha+"' , 'YYYY-MM-DD')  " );
+		
+		
+    	return sql.toString();
+    	
+	}
+	
+	public String getSaltos(String idInstitucion, String idTurno, String idGuardia) {
+		SQL sql = new SQL();
+		sql.SELECT(" * ");
+		sql.FROM(" SCS_SALTOSCOMPENSACIONES ");
+		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
+		if (idTurno != null && !idTurno.equals("")) {
+			sql.WHERE(" IDTURNO ='" + idTurno + "'");
+		}
+		if (idGuardia != null && !idGuardia.equals("")) {
+			sql.WHERE(" IDGUARDIA ='" + idGuardia + "'");
+		} else {
+			sql.WHERE(" IDGUARDIA IS NULL ");
+		}
+		sql.WHERE(" SALTOOCOMPENSACION = 'S'  ");
+		sql.ORDER_BY("FECHA, IDSALTOSTURNO");
+		
+		return sql.toString();
+	}
+	
+	
+	public String getCompensaciones(String idInstitucion, String idTurno, String fecha) {
+
+		SQL sql = new SQL();
+		sql.SELECT(" * ");
+		sql.FROM(" SCS_SALTOSCOMPENSACIONES ");
+		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
+		if (idTurno != null && !idTurno.equals("")) {
+			sql.WHERE(" IDTURNO ='" + idTurno + "'");
+		}
+		sql.WHERE(" IDGUARDIA IS NULL ");
+		sql.WHERE(" SALTOOCOMPENSACION = 'C' ");
+		sql.WHERE(" FECHACUMPLIMIENTO is NULL ");
+		sql.ORDER_BY("FECHA, IDSALTOSTURNO");
+		
+		return sql.toString();
+	}
+    
+    
+	
+	public String getInscripcionTurnoActiva(String idInstitucion, String idTurno, String idPersona, String fecha) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT(" Ins.Idinstitucion,Ins.Idturno, Per.Idpersona,Ins.fechasolicitud,TO_CHAR(TRUNC(Ins.fechavalidacion),'DD/MM/YYYY') As Fechavalidacion,"
+				+ "TO_CHAR(trunc(Ins.fechabaja),'DD/MM/YYYY') As Fechabaja,Per.Nombre,Per.Apellidos1,Decode(Per.Apellidos2, Null, '', ' ' || Per.Apellidos2) apellidos2,"
+				+ " Per.Apellidos1 || Decode(Per.Apellidos2, Null, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,  Decode(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO, Per.Fechanacimiento FECHANACIMIENTO,"
+				+ "  Ins.Fechavalidacion AS ANTIGUEDADCOLA ");
+		
+		sql.FROM(" Scs_Turno              Tur, Cen_Colegiado          Col, Cen_Persona            Per,Scs_Inscripcionturno   Ins");
+		sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
+		sql.WHERE(" Tur.Idinstitucion ='" + idInstitucion + "'");
+		sql.WHERE(" Tur.Idturno ='" + idTurno + "'");
+		sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
+		sql.WHERE( " Trunc(Ins.Fechavalidacion) <= nvl('"+fecha+"',  Ins.Fechavalidacion)" );
+		sql.WHERE( "(Ins.Fechabaja Is Null Or    Trunc(Ins.Fechabaja) > nvl('"+fecha+"', '01/01/1900')) ");
+		sql.WHERE(" Ins.idpersona ='" + idPersona + "'");
+		
+		return sql.toString();
+		
+	}
+	
+	
+	public String cambiarUltimoCola(String idInstitucion, String idTurno, String idPersonaUltimo, Date fechaSolicitudUltimo, AdmUsuarios usuario) throws ParseException {
+		
+		String sIdpersona = (idPersonaUltimo == null) ? "null" : idPersonaUltimo.toString();
+		String sFechaSolicitudUltimo = (fechaSolicitudUltimo == null || fechaSolicitudUltimo.equals("")) ? "null" : fechaSolicitudUltimo.toString();
+		
+		 Format formatter = new SimpleDateFormat("yyyy-MM-dd");
+		 String fechaBBDD2 = formatter.format(fechaSolicitudUltimo);
+		 
+		SQL sql = new SQL();
+
+		sql.UPDATE("SCS_TURNO");
+
+		sql.SET("IDPERSONA_ULTIMO = '" + sIdpersona + "'");
+		sql.SET("FECHASOLICITUD_ULTIMO = TO_DATE('" + fechaBBDD2 + "' , 'YYYY/MM/DD') ");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
+		
+
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		
+
+		return sql.toString();
+	}
+	
+	public String marcarSaltoCompensacion(ScsSaltoscompensaciones saltoCompensacion, AdmUsuarios usuario) throws Exception {
+		SQL sql = new SQL();
+	
+		try {
+			String s_idinstitucion = saltoCompensacion.getIdinstitucion().toString();
+			String s_idturno = null;
+			if (saltoCompensacion.getIdturno() != null) {
+				s_idturno = saltoCompensacion.getIdturno().toString();
+			}
+			String s_idguardia = null;
+			if (saltoCompensacion.getIdguardia() != null) {
+				s_idguardia = saltoCompensacion.getIdguardia().toString();
+			}
+			String s_idpersona = null;
+			if (saltoCompensacion.getIdpersona() != null) {
+				s_idpersona = saltoCompensacion.getIdpersona().toString();
+			}
+			String s_saltocompensacion = null;
+			if (saltoCompensacion.getSaltoocompensacion() != null) {
+				s_saltocompensacion = saltoCompensacion.getSaltoocompensacion();
+				if (s_saltocompensacion.equals(""))
+					s_saltocompensacion = " ";
+			}
+
+			
+			
+			 Format formatter = new SimpleDateFormat("yyyy/MM/dd");
+			 String fechaBBDD2 = formatter.format(saltoCompensacion.getFechacumplimiento());
+			
+			sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
+
+			sql.SET("FECHACUMPLIMIENTO = '" + fechaBBDD2+ "'");
+			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+			sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
+			if (saltoCompensacion.getIdguardia() != null) {
+				sql.SET("IDCALENDARIOGUARDIAS = '" + saltoCompensacion.getIdcalendarioguardias() + "'");
+			}
+			if (saltoCompensacion.getMotivos() != null && !saltoCompensacion.getMotivos().equals("")) {
+				
+				sql.SET("MOTIVOS = '" + saltoCompensacion.getMotivos() + "'");
+			}
+
+			
+			sql.WHERE("IDINSTITUCION = '" + s_idinstitucion + "'");
+		
+			if (s_idturno != null && !s_idturno.equals("")) {
+				sql.WHERE("IDTURNO = '" + s_idturno + "'");
+				
+			}
+			if (s_idguardia != null && !s_idguardia.equals("")) {
+				sql.WHERE("IDGUARDIA = '" + s_idguardia + "'");
+			} else {
+				sql.WHERE("IDGUARDIA IS NULL");
+			}
+			
+			
+			if (s_idpersona != null && !s_idpersona.equals("")) {
+				sql.WHERE("IDPERSONA = '" + s_idpersona + "'");
+			}
+			
+			if (s_saltocompensacion != " ") {
+				sql.WHERE("SALTOOCOMPENSACION = '" + s_saltocompensacion + "'");
+			}
+			
+			sql.WHERE("FECHACUMPLIMIENTO IS NULL");
+			
+
+			if (saltoCompensacion.getIdsaltosturno() != null) {
+				
+				sql.WHERE("IDSALTOSTURNO = '" + saltoCompensacion.getIdsaltosturno() + "'");
+			}
+
+			//sql.append(" AND rownum=1");
+
+
+		} catch (Exception e) {
+			throw new Exception( "Excepcion en marcarSaltoCompensacionBBDD.",e);
+		}
+		
+
+		return sql.toString();
+	}
+	
+	
+	/**
+	 * Obtiene de BD las inscripciones ordenadas para formar la cola de un turno dada una fecha
+	 * 
+	 * @param idinstitucion
+	 * @param idturno
+	 * @param fecha
+	 * @param order
+	 * @return
+	 * @throws Exception 
+	 */
+ 	public String getColaTurnoBBDD(String idinstitucion, String idturno, String fecha, String order) throws Exception   {
+ 		try {
+			if (idinstitucion == null || idinstitucion.equals(""))
+				return null;
+			if (idturno == null || idturno.equals(""))
+				return null;
+			if (fecha == null || fecha.equals(""))
+				fecha = "null";
+			else if(!fecha.trim().equalsIgnoreCase("sysdate"))
+				fecha = "'"+fecha.trim()+"'";
+			
+			String consulta = 
+			"Select "+
+				"       (case when Ins.Fechavalidacion Is Not Null "+
+				"              And Trunc(Ins.Fechavalidacion) <= nvl("+fecha+",  Ins.Fechavalidacion) "+
+				"              And (Ins.Fechabaja Is Null Or "+
+				"                   Trunc(Ins.Fechabaja) > nvl("+fecha+", '01/01/1900')) "+
+				"             then '1' "+
+				"             else '0' "+
+				"        end) Activo, "+
+				" Ins.Idinstitucion,"+
+				"       Ins.Idturno, " +
+				" TO_CHAR(TRUNC(Ins.fechavalidacion),'DD/MM/YYYY') AS fechavalidacion, "+
+			    "   TO_CHAR(trunc(Ins.fechabaja),'DD/MM/YYYY') AS fechabaja, "+
+			    "    Ins.fechasolicitud AS fechaSolicitud, "+
+			    "       Per.Nifcif,"+
+				"       Per.Idpersona,"+
+				"       Per.Nombre, " +
+				"       Per.Apellidos1, " +
+				"       Decode(Per.Apellidos2, Null, '', ' ' || Per.Apellidos2) apellidos2, " +
+				"       Decode(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) Ncolegiado, " +
+				
+				"       Per.Apellidos1 || " +
+				"       Decode(Per.Apellidos2, Null, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS, " +
+				"       Decode(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO, " +
+				"       Per.Fechanacimiento FECHANACIMIENTO, " +
+				"       Ins.Fechavalidacion ANTIGUEDADCOLA " +
+				"  From Scs_Turno              Tur, " +
+				"       Cen_Colegiado          Col, " +
+				"       Cen_Persona            Per, " +
+				"       Scs_Inscripcionturno   Ins " +
+				" Where Col.Idpersona = Per.Idpersona " +
+				"   And Ins.Idinstitucion = Tur.Idinstitucion " +
+				"   And Ins.Idturno = Tur.Idturno " +
+				"   And Ins.Idinstitucion = Col.Idinstitucion " +
+				"   And Ins.Idpersona = Col.Idpersona " +
+				
+				//cuando no se pasa fecha, se sacan todas las validadas (en cualquier fecha)
+				"   And Ins.Fechavalidacion Is Not Null " +
+	/*
+				"   And Trunc(Ins.Fechavalidacion) <= nvl("+fecha+",  Ins.Fechavalidacion) " +
+					//cuando no se pasa fecha, se sacan aunque esten de baja
+				"   And (Ins.Fechabaja Is Null Or   Trunc(Ins.Fechabaja) > nvl("+fecha+", '01/01/1900')) " +*/
+				"   And Tur.Idinstitucion = "+idinstitucion+" " +
+				"   And Tur.Idturno = "+idturno+" ";
+			
+			consulta += " order by " + order;
+			// Para el caso de que coincida el orden establecido, a�adimos un orden que siempre deberia ser diferente: la fecha de suscripcion
+			consulta += ", Ins.fechasolicitud, Ins.Idpersona ";
+			
+			
+	
+			return consulta;
+			
+		} catch (Exception e) {
+			throw new Exception ( "Error al ejecutar getColaTurno()",e);
+		}			
+	} 
+	
+	
+	
 }
