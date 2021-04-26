@@ -402,8 +402,8 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	List<RelacionesItem> busquedaRelaciones(String anio, String num, String idTurno, String idinstitucion);
 	
 
-	@DeleteProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "eliminarRelacion")
-	int eliminarRelacion(String idInstitucion);
+//	@DeleteProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "eliminarRelacion")
+//	int eliminarRelacion(String idInstitucion);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getPartidaPresupuestariaDesigna")
 	@Results({ @Result(column = "NOMBREPARTIDA", property = "label", jdbcType = JdbcType.VARCHAR),
@@ -528,6 +528,10 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 	
 
-
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerIdPersonaByNumCol")
+	@Results({ 
+			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+	})
+	String obtenerIdPersonaByNumCol(String idInstitucion, String numColegiado);
 
 }

@@ -2096,12 +2096,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int response = 0;
-		Integer idTurnoNuevo = 0;
-
+		String numeroDesigna = "";
+		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
+		
 		if (null != idInstitucion) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -2140,7 +2141,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 					}
 					
-					
+					designa.setFechaentrada(new Date());
+					designa.setFechamodificacion(new Date());
+					designa.setUsumodificacion(usuario.getIdusuario());
+					designa.setEstado("A");
+					designa.setFechaestado(new Date());
+					designa.setFechaalta(new Date());
 					//CALCULO CAMPO NUMERO 
 					
 					//Limitacion campo numero en updateDesigna
@@ -2161,14 +2167,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 					
 					//Obtenemos el ultimo numero + 1
-					String numeroDesigna = scsDesignacionesExtendsMapper.obtenerNumeroDesigna(
+					 numeroDesigna = scsDesignacionesExtendsMapper.obtenerNumeroDesigna(
 							String.valueOf(idInstitucion), String.valueOf(designaItem.getAno()));
 
 					
-					if (numeroDesigna.equals("")) {
+					if (numeroDesigna == null) {
+						numeroDesigna = "1";
 						//Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
 						while(numeroDesigna.length() < longitudDesigna) {
-							numeroDesigna = "1";
 							numeroDesigna = "0" + numeroDesigna;
 						}
 						designa.setNumero(Long.parseLong(numeroDesigna) );
@@ -2185,6 +2191,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					
 					//SCS_INSCRIPCIONTURNO por idPersona idinstitucion idturno. 
+					ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
 					String numeroColegiado = designaItem.getNumColegiado();
 					if(StringUtils.isEmpty(numeroColegiado)) {
 						//Se realiza busqueda en la cola de oficio
@@ -2200,51 +2207,56 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						short dia = (short) cal.get(Calendar.DAY_OF_MONTH);
 						LOGGER.info("Buscando letrado para el turno " + designaItem.getIdTurno() +   " en la fecha " + dia + "/" + mes + "/"+ year  ); 
 //						
-						 
-						
-						
-
-//						
 //						//MANUAL = 0, LETRADODELTURNO = 1 si el sistema elige automáticamente de la cola
 //						
-						ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
 						designaLetrado.setIdinstitucion(idInstitucion);
 						designaLetrado.setIdturno(designaItem.getIdTurno());
 						designaLetrado.setAnio(year);
 						designaLetrado.setNumero(Long.parseLong(numeroDesigna));
 						designaLetrado.setFechadesigna(new Date());
+						designaLetrado.setFechamodificacion(new Date());
+						designaLetrado.setUsumodificacion(usuario.getIdusuario());
 						designaLetrado.setIdpersona(letradoAlgoritmoSeleccion.getIdpersona());
 						designaLetrado.setManual((short)0);
 						designaLetrado.setLetradodelturno("1");
 						
 					}else {
 						
-						ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
 						designaLetrado.setIdinstitucion(idInstitucion);
 						designaLetrado.setIdturno(designaItem.getIdTurno());
 						designaLetrado.setAnio(year);
 						designaLetrado.setNumero(Long.parseLong(numeroDesigna));
 						designaLetrado.setFechadesigna(new Date());
-						//TODO obtener id Persona from idcolegiado
-						//designaLetrado.setIdpersona(designaItem.get)
+						designaLetrado.setFechamodificacion(new Date());
+						designaLetrado.setUsumodificacion(usuario.getIdusuario());					
+						designaLetrado.setManual((short)1);
+						//TODO 
+//						MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
+//						MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
+						designaLetrado.setLetradodelturno("1");
+						String idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
+						designaLetrado.setIdpersona(Long.parseLong(idPersona));
 						
 					}
 					
 					
-//
-//					MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
-//
-//					MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
-					
-					
 					
 					LOGGER.info(
-							"createModules() / scsDesignaMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
+							"createDesigna() / scsDesignaMapper.insert() -> Entrada a scsDesignaMapper para insertar la designacion");
 
-					 response = scsDesignaMapper.insert(designa);
+					  scsDesignaMapper.insert(designa);
 
 					LOGGER.info(
-							"createModules() / scsDesignaMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
+							"createDesigna() / scsDesignaMapper.insert() -> Salida de scsDesignaMapper para insertar la designacion");
+
+					LOGGER.info(
+							"createDesigna() / scsDesignasletradoMapper.insert() -> Entrada a scsDesignasletradoMapper para insertar designaLetrado");
+
+					
+					scsDesignasletradoMapper.insert(designaLetrado);
+					
+					LOGGER.info(
+							"createDesigna() / scsDesignasletradoMapper.insert() -> Salida de scsDesignasletradoMapper para insertar designaLetrado");
 
 
 				} catch (Exception e) {
@@ -2265,13 +2277,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			}
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		} else {
-			insertResponseDTO.setId(String.valueOf(idTurnoNuevo));
+			insertResponseDTO.setId(numeroDesigna);
 			error.setCode(200);
 			error.setDescription("general.message.registro.insertado");
 		}
 		insertResponseDTO.setError(error);
 
-		LOGGER.info("updateModules() -> Salida del servicio para insertar modulos");
+		LOGGER.info("createDesigna() -> Salida del servicio para insertar modulos");
 
 		return insertResponseDTO;
 
@@ -2540,6 +2552,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			String fechaBBDD2 = formatter.format(fechaBBDD);
 	//		obteniendo lista de letrados (ordenada)
 			List<InscripcionTurnoItem> listaLetrados = scsDesignacionesExtendsMapper.getColaTurnoBBDD(idInstitucion.toString(), idTurno.toString(), fechaBBDD2, orden);
+			
+//			Format formatter2 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+//			
+//			Date fechaprueba = listaLetrados.get(0).getFechasolicitud();
+//			LOGGER.info(formatter2.format(fechaprueba));
 			
 			if (listaLetrados == null || listaLetrados.size()==0) {
 				return colaLetrados;
