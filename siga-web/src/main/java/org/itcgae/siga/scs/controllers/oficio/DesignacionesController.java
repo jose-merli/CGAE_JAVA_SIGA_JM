@@ -22,6 +22,7 @@ import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
+import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
@@ -771,7 +772,7 @@ public class DesignacionesController {
 
 	@PostMapping(value = "/designas/eliminarRelacion", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<DeleteResponseDTO> eliminarRelacion(
-			@RequestBody List<String> listaRelaciones, HttpServletRequest request) {
+			@RequestBody RelacionesItem listaRelaciones, HttpServletRequest request) {
 		DeleteResponseDTO response = designacionesService.eliminarRelacion(listaRelaciones, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}

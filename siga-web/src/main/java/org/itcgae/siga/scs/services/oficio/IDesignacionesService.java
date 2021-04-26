@@ -21,6 +21,7 @@ import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
+import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
@@ -143,8 +144,6 @@ public interface IDesignacionesService {
 
 	public RelacionesDTO busquedaRelaciones(List<String> procurador, HttpServletRequest request);
 	
-	public DeleteResponseDTO eliminarRelacion(List<String> listaRelaciones,HttpServletRequest request);
-	
 	public ComboDTO getPartidaPresupuestariaDesigna(HttpServletRequest request, DesignaItem designaItem);
 	
 	public UpdateResponseDTO updatePartidaPresupuestaria(DesignaItem designaItem, HttpServletRequest request);
@@ -154,4 +153,6 @@ public interface IDesignacionesService {
 	public ScsDesigna busquedaDesigna(ScsDesigna designa, HttpServletRequest request);
 
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
+
+	DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request);
 }
