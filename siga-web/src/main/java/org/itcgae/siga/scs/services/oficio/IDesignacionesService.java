@@ -138,7 +138,7 @@ public interface IDesignacionesService {
 
 	public ColegiadoItemDTO SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request);
 
-	public ScsDesigna busquedaDesigna(ScsDesigna designa, HttpServletRequest request);
+	public ScsDesigna busquedaDesignaActual(ScsDesigna designa, HttpServletRequest request);
 
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
 }

@@ -2499,7 +2499,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	//ScsDesignaMapper
 	
 	@Override
-	public ScsDesigna busquedaDesigna(ScsDesigna item, HttpServletRequest request) {
+	public ScsDesigna busquedaDesignaActual(ScsDesigna item, HttpServletRequest request) {
 		LOGGER.info("DesignacionesServiceImpl.busquedaDesigna() -> Entrada al servicio servicio");
 		ScsDesigna designa = null;
 		List<GenParametros> tamMax = null;
