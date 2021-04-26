@@ -3905,15 +3905,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					LOGGER.info(
 							"deleteInteresado() / ScsDefendidosdesignaMapper.deleteByPrimaryKey() -> Entrada a ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
-
-					ScsDesignaKey key = new ScsDesignaKey();
 					
-					key.setAnio(Short.parseShort(listaRelaciones.getAnio()));
-					key.setNumero(Long.parseLong(listaRelaciones.getNumero()));
-					key.setIdturno(Integer.parseInt(listaRelaciones.getIdturno()));
-					key.setIdinstitucion(Short.parseShort(listaRelaciones.getIdinstitucion()));
+					String anio = listaRelaciones.getAnio();
+					String num = listaRelaciones.getNumero();
+					String idTurno = listaRelaciones.getIdturno();
+					String institucion = listaRelaciones.getIdinstitucion();
 					
-					response = scsDesignaMapper.deleteByPrimaryKey(key);
+					response = scsDesignacionesExtendsMapper.eliminarRelacion(anio, num, idTurno, institucion);
 
 					LOGGER.info(
 							"deleteInteresado() / ScsDefendidosdesignaMapper.deleteByPrimaryKey() -> Salida de ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");

@@ -2046,6 +2046,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		return sql.toString();
 	}
+	
+	public String eliminarRelacion(String anio, String num, String idTurno, String idinstitucion) {
+		SQL sql = new SQL();
+
+		sql.DELETE_FROM("SCS_EJGDESIGNA");
+
+		sql.WHERE("NUMEROEJG = " + num);
+		sql.WHERE("IDTURNO = " + idTurno);
+		sql.WHERE("ANIODESIGNA = " + anio);
+		sql.WHERE("IDINSTITUCION = " + idinstitucion);
+
+		return sql.toString();
+	}
 		
 	public String getPartidaPresupuestariaDesigna(Short idInstitucion, DesignaItem designaItem) {
 		SQL sql = new SQL();
