@@ -1845,4 +1845,21 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String  comboAcreditacionesPorModulo(Short idInstitucion, String idModulo) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("a.idacreditacion || ',' || a.nig_numprocedimiento AS id");
+		sql.SELECT("acred.descripcion || ' (' || DECODE(TO_CHAR(a.porcentaje), TO_CHAR(trunc(a.porcentaje) ), "
+				+ "TO_CHAR(a.porcentaje), f_siga_formatonumero(TO_CHAR(a.porcentaje), 2)) || '%)' AS descripcion");
+	    sql.SELECT("IDTIPOACREDITACION");
+	
+	    sql.FROM("scs_acreditacionprocedimiento a, scs_acreditacion acred");
+	    sql.WHERE("a.idprocedimiento = "+idModulo+" and a.idinstitucion = "+idInstitucion);
+	    sql.WHERE("a.idacreditacion = acred.idacreditacion");
+	    sql.ORDER_BY("descripcion");
+		
+		return sql.toString();
+	}
+
 }

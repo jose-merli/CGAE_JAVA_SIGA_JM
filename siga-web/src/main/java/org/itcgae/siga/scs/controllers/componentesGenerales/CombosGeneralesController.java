@@ -7,9 +7,12 @@ import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -151,6 +154,30 @@ public class CombosGeneralesController {
 	@GetMapping("/comboJuzgadoDesignaciones")
 	public ResponseEntity<ComboDTO> comboJuzgadoDesignaciones(HttpServletRequest request) {
 		ComboDTO response = comboService.comboJuzgadoDesignaciones(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	/**
+	 * 
+	 * @param idInstitucion
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/comboJuzgadoPorInstitucion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ComboDTO> comboJuzgadoPorInstitucion(@RequestBody String idInstitucion, HttpServletRequest request) {
+		ComboDTO response = comboService.comboJuzgadoPorInstitucion(idInstitucion, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	/**
+	 * 
+	 * @param idInstitucion
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/comboAcreditacionesPorModulo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ComboDTO> comboAcreditacionesPorModulo(@RequestBody String idModulo, HttpServletRequest request) {
+		ComboDTO response = comboService.comboAcreditacionesPorModulo(request, idModulo);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
