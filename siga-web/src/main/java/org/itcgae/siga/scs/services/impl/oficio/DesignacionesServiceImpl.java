@@ -54,6 +54,8 @@ import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.ScsActuaciondesigna;
+import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
@@ -140,12 +142,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private ScsDesignaMapper scsDesignaMapper;
 
 	@Autowired
-	private ScsDesignasletradoMapper scsDesignasletradoMapper;
-	
-	@Autowired
-	private CenColegiadoMapper cenColegiadoMapper;
-	
-	@Autowired
 	private ScsSaltoscompensacionesMapper scsSaltoscompensacionesMapper;
 	
 	@Autowired
@@ -156,8 +152,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private CenPersonaMapper cenPersonaMapper;
-
-
 
 	/**
 	 * busquedaJustificacionExpres
@@ -296,7 +290,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	 * insertaJustificacionExpres
 	 */
 	@Override
-	public InsertResponseDTO insertaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+	public InsertResponseDTO insertaJustificacionExpres(ActuacionesJustificacionExpressItem item,
 			HttpServletRequest request) {
 		InsertResponseDTO responseDTO = new InsertResponseDTO();
 
@@ -305,6 +299,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		int response = 0;
+
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		Date fecha = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -325,12 +322,49 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					LOGGER.info("DesignacionesServiceImpl.insertaJustificacionExpres() -> Haciendo el insert...");
 
-//					for(ActuacionesJustificacionExpressItem record : item) {
-					// rellenar la key
-//						key.setAnio(item.get);
-
-//						response = scsActuaciondesignaMapper.insert();
-//					}
+					ScsActuaciondesigna record = new ScsActuaciondesigna();
+					
+					if(item.getAnio()!=null && !item.getAnio().trim().isEmpty()){
+						record.setAnio(Short.parseShort(item.getAnio()));
+					}
+					
+					if(item.getAnioProcedimiento() !=null && !item.getAnioProcedimiento().trim().isEmpty()){
+						record.setAnioprocedimiento(Short.parseShort(item.getAnioProcedimiento()));
+					}
+					
+					if(item.getFecha()!=null && !item.getFecha().trim().isEmpty()){
+						fecha = formatter.parse(item.getFecha());  
+						record.setFecha(fecha);
+					}
+					
+					if(item.getFechaJustificacion()!=null && !item.getFechaJustificacion().trim().isEmpty()){
+						fecha = formatter.parse(item.getFechaJustificacion());  
+						record.setFechajustificacion(fecha);
+					}
+					
+					record.setFechamodificacion(new Date());
+					
+					if(item.getIdAcreditacion()!=null && !item.getIdAcreditacion().trim().isEmpty()){
+						record.setIdacreditacion(Short.parseShort(item.getIdAcreditacion()));
+					}
+					
+					if(item.getIdInstitucion()!=null && !item.getIdInstitucion().trim().isEmpty()){
+						record.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
+					}
+				
+					if(item.getIdJuzgado()!=null && !item.getIdJuzgado().trim().isEmpty()){
+						record.setIdjuzgado(Long.parseLong(item.getIdJuzgado()));
+					}
+					
+					if(item.getIdProcedimiento()!=null && !item.getIdProcedimiento().trim().isEmpty()){
+						record.setIdprocedimiento(item.getIdProcedimiento());
+					}
+					
+					if(item.getIdTurno()!=null && !item.getIdTurno().trim().isEmpty()){
+						record.setIdturno(Integer.parseInt(item.getIdTurno()));
+					}
+					
+					response = scsActuaciondesignaMapper.insertSelective(record);
 
 					LOGGER.info("DesignacionesServiceImpl.insertaJustificacionExpres() -> Insert finalizado");
 				} catch (Exception e) {
@@ -358,8 +392,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	
-
-	public DeleteResponseDTO eliminaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+	/**
+	 * eliminaJustificacionExpres
+	 */
+	public DeleteResponseDTO eliminaJustificacionExpres(List<ActuacionesJustificacionExpressItem> listaItem,
 			HttpServletRequest request) {
 		DeleteResponseDTO responseDTO = new DeleteResponseDTO();
 
@@ -388,17 +424,35 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					LOGGER.info("DesignacionesServiceImpl.eliminaJustificacionExpres() -> Realizando borrado...");
 
-//					for(ActuacionesJustificacionExpressItem record : item) {
-
-					// rellenar la key
-//						key.setAnio(item.get);
-
-//						response = scsActuaciondesignaMapper.insert();
-//					}
-
+					ScsActuaciondesignaKey key = new ScsActuaciondesignaKey();
+					
+					for(ActuacionesJustificacionExpressItem item : listaItem) {
+						if(item.getAnio()!=null && !item.getAnio().isEmpty()){
+							key.setAnio(Short.parseShort(item.getAnio()));
+						}
+						
+						if(item.getIdInstitucion()!=null && !item.getIdInstitucion().isEmpty()){
+							key.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
+						}
+						
+						if(item.getIdTurno()!=null && !item.getIdTurno().isEmpty()){
+							key.setIdturno(Integer.parseInt(item.getIdTurno()));
+						}
+						
+						if(item.getNumActuacion()!=null && !item.getNumActuacion().isEmpty()){
+							key.setNumero(Long.parseLong(item.getNumActuacion()));
+						}
+						
+						if(item.getNumAsunto()!=null && !item.getNumAsunto().isEmpty()){
+							key.setNumeroasunto(Long.parseLong(item.getNumAsunto()));
+						}
+						
+						response += scsActuaciondesignaMapper.deleteByPrimaryKey(key);
+					}
+					
 					LOGGER.info("DesignacionesServiceImpl.eliminaJustificacionExpres() -> Borrado finalizado");
 				} catch (Exception e) {
-					LOGGER.error("DesignacionesServiceImpl.eliminaJustificacionExpres() -> Se ha producido un error ",
+					LOGGER.error("DesignacionesServiceImpl.eliminaJustificacionExpres() -> Se ha producido un error al borrar la actuacion. ",
 							e);
 					response = 0;
 				}
@@ -3963,7 +4017,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	 * actualizaJustificacionExpres
 	 */
 	@Override
-	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> listaItem,
 			HttpServletRequest request) {
 		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
 
@@ -3972,7 +4026,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		int response = 0;
-
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		Date fecha = null;
+				 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -3992,13 +4049,51 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Realizando update...");
 
-//					for(ActuacionesJustificacionExpressItem record : item) {
-
-					// rellenar la key
-//						key.setAnio(item.get);
-
-//						response = scsActuaciondesignaMapper.insert();
-//					}
+					ScsActuaciondesigna record = new ScsActuaciondesigna();
+					
+					for(ActuacionesJustificacionExpressItem item : listaItem) {
+						if(item.getAnio()!=null && !item.getAnio().trim().isEmpty()){
+							record.setAnio(Short.parseShort(item.getAnio()));
+						}
+						
+						if(item.getAnioProcedimiento() !=null && !item.getAnioProcedimiento().trim().isEmpty()){
+							record.setAnioprocedimiento(Short.parseShort(item.getAnioProcedimiento()));
+						}
+						
+						if(item.getFecha()!=null && !item.getFecha().trim().isEmpty()){
+							fecha = formatter.parse(item.getFecha());  
+							record.setFecha(fecha);
+						}
+						
+						if(item.getFechaJustificacion()!=null && !item.getFechaJustificacion().trim().isEmpty()){
+							fecha = formatter.parse(item.getFechaJustificacion());  
+							record.setFechajustificacion(fecha);
+						}
+						
+						record.setFechamodificacion(new Date());
+						
+						if(item.getIdAcreditacion()!=null && !item.getIdAcreditacion().trim().isEmpty()){
+							record.setIdacreditacion(Short.parseShort(item.getIdAcreditacion()));
+						}
+						
+						if(item.getIdInstitucion()!=null && !item.getIdInstitucion().trim().isEmpty()){
+							record.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
+						}
+					
+						if(item.getIdJuzgado()!=null && !item.getIdJuzgado().trim().isEmpty()){
+							record.setIdjuzgado(Long.parseLong(item.getIdJuzgado()));
+						}
+						
+						if(item.getIdProcedimiento()!=null && !item.getIdProcedimiento().trim().isEmpty()){
+							record.setIdprocedimiento(item.getIdProcedimiento());
+						}
+						
+						if(item.getIdTurno()!=null && !item.getIdTurno().trim().isEmpty()){
+							record.setIdturno(Integer.parseInt(item.getIdTurno()));
+						}
+						
+						response += scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
+					}
 
 					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Actualizacion realizada");
 				} catch (Exception e) {
