@@ -122,6 +122,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private CenColegiadoMapper cenColegiadoMapper;
+	
 	/**
 	 * busquedaJustificacionExpres
 	 */
@@ -3094,7 +3095,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"deleteInteresado() / ScsDefendidosdesignaMapper.deleteByPrimaryKey() -> Entrada a ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
 
-					response = scsDesignacionesExtendsMapper.eliminarRelacion(dni);
+					ScsDesignaKey key = new ScsDesignaKey();
+					
+					response = scsDesignaMapper.deleteByPrimaryKey(key);
 
 					LOGGER.info(
 							"deleteInteresado() / ScsDefendidosdesignaMapper.deleteByPrimaryKey() -> Salida de ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
