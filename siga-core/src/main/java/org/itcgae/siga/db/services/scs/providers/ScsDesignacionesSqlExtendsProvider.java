@@ -2063,6 +2063,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		return sql.toString();
 	}
+	
+	public String eliminarRelacion(String anio, String num, String idTurno, String idinstitucion) {
+		SQL sql = new SQL();
+
+		sql.DELETE_FROM("SCS_EJGDESIGNA");
+
+		sql.WHERE("NUMEROEJG = " + num);
+		sql.WHERE("IDTURNO = " + idTurno);
+		sql.WHERE("ANIODESIGNA = " + anio);
+		sql.WHERE("IDINSTITUCION = " + idinstitucion);
+
+		return sql.toString();
+	}
 		
 	public String getPartidaPresupuestariaDesigna(Short idInstitucion, DesignaItem designaItem) {
 		SQL sql = new SQL();
@@ -2254,7 +2267,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		String sIdpersona = (idPersonaUltimo == null) ? "null" : idPersonaUltimo.toString();
 		String sFechaSolicitudUltimo = (fechaSolicitudUltimo == null || fechaSolicitudUltimo.equals("")) ? "null" : fechaSolicitudUltimo.toString();
 		
-		 Format formatter = new SimpleDateFormat("yyyy-MM-dd");
+		 Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
 		 String fechaBBDD2 = formatter.format(fechaSolicitudUltimo);
 		 
 		SQL sql = new SQL();
@@ -2262,7 +2275,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.UPDATE("SCS_TURNO");
 
 		sql.SET("IDPERSONA_ULTIMO = '" + sIdpersona + "'");
-		sql.SET("FECHASOLICITUD_ULTIMO = TO_DATE('" + fechaBBDD2 + "' , 'YYYY/MM/DD') ");
+		sql.SET("FECHASOLICITUD_ULTIMO = TO_DATE('" + fechaBBDD2 + "' , 'YYYY/MM/DD HH:MM:ss') ");
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
 		
@@ -2437,6 +2450,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}			
 	} 
 	
- 	
- 	
+	
+	public String  obtenerIdPersonaByNumCol(String idInstitucion, String numColegiado) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDPERSONA ");
+		sql.FROM("CEN_COLEGIADO");
+		sql.WHERE(" IDINSTITUCION ='"+idInstitucion+"'");
+		sql.WHERE(" NCOLEGIADO ='"+numColegiado+"'");
+
+    	return sql.toString();
+    }
+	
 }

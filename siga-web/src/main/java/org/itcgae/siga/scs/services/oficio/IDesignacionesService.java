@@ -45,7 +45,7 @@ public interface IDesignacionesService {
 	 * @param request
 	 * @return
 	 */
-	public InsertResponseDTO insertaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+	public InsertResponseDTO insertaJustificacionExpres(ActuacionesJustificacionExpressItem item,
 			HttpServletRequest request);
 
 	/**

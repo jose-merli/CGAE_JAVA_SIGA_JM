@@ -80,7 +80,7 @@ public class DesignacionesController {
 	 */
 	@RequestMapping(value = "/insertaJustificacionExpres", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> nuevaJustificacionExpres(
-			@RequestBody List<ActuacionesJustificacionExpressItem> item, HttpServletRequest request) {
+			@RequestBody ActuacionesJustificacionExpressItem item, HttpServletRequest request) {
 		InsertResponseDTO response = designacionesService.insertaJustificacionExpres(item, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
