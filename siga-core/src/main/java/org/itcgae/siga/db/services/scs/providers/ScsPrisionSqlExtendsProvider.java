@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.PrisionItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsPrisionSqlProvider;
@@ -84,5 +85,6 @@ public class ScsPrisionSqlExtendsProvider extends ScsPrisionSqlProvider {
 
 		return sql.toString();
 	}
+	
 
 }
