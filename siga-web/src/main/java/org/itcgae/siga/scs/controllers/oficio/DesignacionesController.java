@@ -9,7 +9,6 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
-import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
@@ -22,10 +21,10 @@ import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
+import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
-import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -648,13 +647,6 @@ public class DesignacionesController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "/designas/getNewIdActuDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<MaxIdDto> getNewIdActuDesigna(
-			@RequestBody ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, HttpServletRequest request) {
-		MaxIdDto response = designacionesService.getNewIdActuDesigna(actuacionDesignaRequestDTO, request);
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
-
 	@PostMapping(value = "/designas/reactivarActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UpdateResponseDTO> reactivarActDesigna(
 			@RequestBody List<ActuacionDesignaItem> listaActuacionDesignaItem, HttpServletRequest request) {
@@ -700,6 +692,13 @@ public class DesignacionesController {
 	public ResponseEntity<InsertResponseDTO> guardarActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem,
 			HttpServletRequest request) {
 		InsertResponseDTO response = designacionesService.guardarActDesigna(actuacionDesignaItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/actualizarActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> actualizarActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.actualizarActDesigna(actuacionDesignaItem, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
@@ -760,6 +759,21 @@ public class DesignacionesController {
 	public ResponseEntity<ComboDTO> comboPrisiones(HttpServletRequest request) {
 		ComboDTO response = designacionesService.comboPrisiones(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+
+	@RequestMapping(value = "/designas/busquedaRelaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<RelacionesDTO> busquedaRelaciones(@RequestBody List<String> procurador, HttpServletRequest request) {
+		RelacionesDTO response = designacionesService.busquedaRelaciones(procurador, request);
+		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
+	}
+	
+
+	@PostMapping(value = "/designas/eliminarRelacion", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> eliminarRelacion(
+			@RequestBody List<String> listaRelaciones, HttpServletRequest request) {
+		DeleteResponseDTO response = designacionesService.eliminarRelacion(listaRelaciones, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 }

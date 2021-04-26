@@ -8,7 +8,6 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
-import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
@@ -21,12 +20,10 @@ import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
+import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.itcgae.siga.db.entities.ScsDesigna;
-import org.itcgae.siga.db.entities.ScsDesignasletrado;
 
 public interface IDesignacionesService {
 
@@ -97,9 +94,6 @@ public interface IDesignacionesService {
 	public ActuacionDesignaDTO busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			HttpServletRequest request);
 
-	public MaxIdDto getNewIdActuDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
-			HttpServletRequest request);
-
 	public UpdateResponseDTO anularReactivarActDesigna(List<ActuacionDesignaItem> listaActuacionDesignaItem,
 			boolean anular, HttpServletRequest request);
 
@@ -110,6 +104,8 @@ public interface IDesignacionesService {
 			HttpServletRequest request);
 
 	public InsertResponseDTO guardarActDesigna(ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request);
+	
+	public UpdateResponseDTO actualizarActDesigna(ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request);
 	
 	public UpdateResponseDTO updateJustiActDesigna(ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request);
 	
@@ -144,6 +140,10 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO updateProcuradorContrario(ScsContrariosdesigna item, HttpServletRequest request);
 
 	public ColegiadoItemDTO SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request);
+
+	public RelacionesDTO busquedaRelaciones(List<String> procurador, HttpServletRequest request);
+	
+	public DeleteResponseDTO eliminarRelacion(List<String> listaRelaciones,HttpServletRequest request);
 	
 	public ComboDTO getPartidaPresupuestariaDesigna(HttpServletRequest request, DesignaItem designaItem);
 	
