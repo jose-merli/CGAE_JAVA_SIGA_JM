@@ -21,6 +21,7 @@ import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
+import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 
@@ -134,4 +135,10 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO updateProcuradorContrario(ScsContrariosdesigna item, HttpServletRequest request);
 
 	public ColegiadoItemDTO SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request);
+
+	public RelacionesDTO busquedaRelaciones(List<String> procurador, HttpServletRequest request);
+	
+
+	public DeleteResponseDTO eliminarRelacion(List<String> listaRelaciones,
+			HttpServletRequest request);
 }
