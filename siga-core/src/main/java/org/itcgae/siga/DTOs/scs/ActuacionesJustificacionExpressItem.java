@@ -18,6 +18,7 @@ public class ActuacionesJustificacionExpressItem {
 	private String numAsunto;
 	private String idProcedimiento;
 	private String idJuzgado;
+	private String nombreJuzgado;
 	private String fechaJustificacion;
 	private String validada;
 	private String idFacturacion;
@@ -30,6 +31,9 @@ public class ActuacionesJustificacionExpressItem {
 	private String nig;
 	private String fecha;
 	private String permitirLetrado;
+	private String anio;
+	private String idTurno;
+	private String idInstitucion;
 	/**
 	 * @return the numActuacion
 	 */
@@ -367,5 +371,57 @@ public class ActuacionesJustificacionExpressItem {
 	 */
 	public void setPermitirLetrado(String permitirLetrado) {
 		this.permitirLetrado = permitirLetrado;
+	}
+	/**
+	 * @return the nombreJuzgado
+	 */
+	@JsonProperty("nombreJuzgado")
+	public String getNombreJuzgado() {
+		return nombreJuzgado;
+	}
+	/**
+	 * @param nombreJuzgado the nombreJuzgado to set
+	 */
+	public void setNombreJuzgado(String nombreJuzgado) {
+		this.nombreJuzgado = nombreJuzgado;
+	}
+	/**
+	 * @return the anio
+	 */
+	@JsonProperty("anio")
+	public String getAnio() {
+		return anio;
+	}
+	/**
+	 * @param anio the anio to set
+	 */
+	public void setAnio(String anio) {
+		this.anio = anio;
+	}
+	/**
+	 * @return the idTurno
+	 */
+	@JsonProperty("idTurno")
+	public String getIdTurno() {
+		return idTurno;
+	}
+	/**
+	 * @param idTurno the idTurno to set
+	 */
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
+	}
+	/**
+	 * @return the idInstitucion
+	 */
+	@JsonProperty("idInstitucion")
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	/**
+	 * @param idInstitucion the idInstitucion to set
+	 */
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 }

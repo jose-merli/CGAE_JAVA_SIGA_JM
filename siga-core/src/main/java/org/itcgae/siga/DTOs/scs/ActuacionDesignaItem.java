@@ -14,6 +14,23 @@ public class ActuacionDesignaItem {
 	private boolean validada;
 	private boolean anulada;
 	private String facturacion;
+	private String letrado;
+	private String numColegiado;
+	private String nig;
+	private String numProcedimiento;
+	private String idJuzgado;
+	private String idProcedimiento;
+	private String idPretension;
+	private String idAcreditacion;
+	private String idPrision;
+	private String observaciones;
+	private String talonario;
+	private String talon;
+	private String idPersonaColegiado;
+	private String nombreJuzgado;
+	private String observacionesJusti;
+	private String idMotivoCambio;
+	private String idFacturacion;
 
 	/**
 	 * @return the fechaActuacion
@@ -183,12 +200,256 @@ public class ActuacionDesignaItem {
 		this.facturacion = facturacion;
 	}
 
+	/**
+	 * @return the letrado
+	 */
+	public String getLetrado() {
+		return letrado;
+	}
+
+	/**
+	 * @param letrado the letrado to set
+	 */
+	public void setLetrado(String letrado) {
+		this.letrado = letrado;
+	}
+
+	/**
+	 * @return the numColegiado
+	 */
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+
+	/**
+	 * @param numColegiado the numColegiado to set
+	 */
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+
+	/**
+	 * @return the nig
+	 */
+	public String getNig() {
+		return nig;
+	}
+
+	/**
+	 * @param nig the nig to set
+	 */
+	public void setNig(String nig) {
+		this.nig = nig;
+	}
+
+	/**
+	 * @return the numProcedimiento
+	 */
+	public String getNumProcedimiento() {
+		return numProcedimiento;
+	}
+
+	/**
+	 * @param numProcedimiento the numProcedimiento to set
+	 */
+	public void setNumProcedimiento(String numProcedimiento) {
+		this.numProcedimiento = numProcedimiento;
+	}
+
+	/**
+	 * @return the idJuzgado
+	 */
+	public String getIdJuzgado() {
+		return idJuzgado;
+	}
+
+	/**
+	 * @param idJuzgado the idJuzgado to set
+	 */
+	public void setIdJuzgado(String idJuzgado) {
+		this.idJuzgado = idJuzgado;
+	}
+
+	/**
+	 * @return the idProcedimiento
+	 */
+	public String getIdProcedimiento() {
+		return idProcedimiento;
+	}
+
+	/**
+	 * @param idProcedimiento the idProcedimiento to set
+	 */
+	public void setIdProcedimiento(String idProcedimiento) {
+		this.idProcedimiento = idProcedimiento;
+	}
+
+	/**
+	 * @return the idPretension
+	 */
+	public String getIdPretension() {
+		return idPretension;
+	}
+
+	/**
+	 * @param idPretension the idPretension to set
+	 */
+	public void setIdPretension(String idPretension) {
+		this.idPretension = idPretension;
+	}
+
+	/**
+	 * @return the idAcreditacion
+	 */
+	public String getIdAcreditacion() {
+		return idAcreditacion;
+	}
+
+	/**
+	 * @param idAcreditacion the idAcreditacion to set
+	 */
+	public void setIdAcreditacion(String idAcreditacion) {
+		this.idAcreditacion = idAcreditacion;
+	}
+
+	/**
+	 * @return the idPrision
+	 */
+	public String getIdPrision() {
+		return idPrision;
+	}
+
+	/**
+	 * @param idPrision the idPrision to set
+	 */
+	public void setIdPrision(String idPrision) {
+		this.idPrision = idPrision;
+	}
+
+	/**
+	 * @return the observaciones
+	 */
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	/**
+	 * @param observaciones the observaciones to set
+	 */
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
+
+	/**
+	 * @return the talonario
+	 */
+	public String getTalonario() {
+		return talonario;
+	}
+
+	/**
+	 * @param talonario the talonario to set
+	 */
+	public void setTalonario(String talonario) {
+		this.talonario = talonario;
+	}
+
+	/**
+	 * @return the talon
+	 */
+	public String getTalon() {
+		return talon;
+	}
+
+	/**
+	 * @param talon the talon to set
+	 */
+	public void setTalon(String talon) {
+		this.talon = talon;
+	}
+
+	/**
+	 * @return the idPersonaColegiado
+	 */
+	public String getIdPersonaColegiado() {
+		return idPersonaColegiado;
+	}
+
+	/**
+	 * @param idPersonaColegiado the idPersonaColegiado to set
+	 */
+	public void setIdPersonaColegiado(String idPersonaColegiado) {
+		this.idPersonaColegiado = idPersonaColegiado;
+	}
+
+	/**
+	 * @return the nombreJuzgado
+	 */
+	public String getNombreJuzgado() {
+		return nombreJuzgado;
+	}
+
+	/**
+	 * @param nombreJuzgado the nombreJuzgado to set
+	 */
+	public void setNombreJuzgado(String nombreJuzgado) {
+		this.nombreJuzgado = nombreJuzgado;
+	}
+
+	/**
+	 * @return the observacionesJusti
+	 */
+	public String getObservacionesJusti() {
+		return observacionesJusti;
+	}
+
+	/**
+	 * @param observacionesJusti the observacionesJusti to set
+	 */
+	public void setObservacionesJusti(String observacionesJusti) {
+		this.observacionesJusti = observacionesJusti;
+	}
+
+	/**
+	 * @return the idMotivoCambio
+	 */
+	public String getIdMotivoCambio() {
+		return idMotivoCambio;
+	}
+
+	/**
+	 * @param idMotivoCambio the idMotivoCambio to set
+	 */
+	public void setIdMotivoCambio(String idMotivoCambio) {
+		this.idMotivoCambio = idMotivoCambio;
+	}
+
+	/**
+	 * @return the idFacturacion
+	 */
+	public String getIdFacturacion() {
+		return idFacturacion;
+	}
+
+	/**
+	 * @param idFacturacion the idFacturacion to set
+	 */
+	public void setIdFacturacion(String idFacturacion) {
+		this.idFacturacion = idFacturacion;
+	}
+
 	@Override
 	public String toString() {
 		return "ActuacionDesignaItem [fechaActuacion=" + fechaActuacion + ", numero=" + numero + ", numeroAsunto="
 				+ numeroAsunto + ", idTurno=" + idTurno + ", anio=" + anio + ", facturado=" + facturado + ", modulo="
 				+ modulo + ", acreditacion=" + acreditacion + ", fechaJustificacion=" + fechaJustificacion
-				+ ", validada=" + validada + ", anulada=" + anulada + ", facturacion=" + facturacion + "]";
+				+ ", validada=" + validada + ", anulada=" + anulada + ", facturacion=" + facturacion + ", letrado="
+				+ letrado + ", numColegiado=" + numColegiado + ", nig=" + nig + ", numProcedimiento=" + numProcedimiento
+				+ ", idJuzgado=" + idJuzgado + ", idProcedimiento=" + idProcedimiento + ", idPretension=" + idPretension
+				+ ", idAcreditacion=" + idAcreditacion + ", idPrision=" + idPrision + ", observaciones=" + observaciones
+				+ ", talonario=" + talonario + ", talon=" + talon + ", idPersonaColegiado=" + idPersonaColegiado
+				+ ", nombreJuzgado=" + nombreJuzgado + ", observacionesJusti=" + observacionesJusti
+				+ ", idMotivoCambio=" + idMotivoCambio + ", idFacturacion=" + idFacturacion + "]";
 	}
 
 }

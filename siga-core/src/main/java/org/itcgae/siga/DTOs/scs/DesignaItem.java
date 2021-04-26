@@ -57,7 +57,8 @@ public class DesignaItem {
 	private String acreditacion;
 	private String[] idAcreditacion;
 	private String modulo;
-	private String[] idModulo;
+	private String[] idModulos;
+	private String idModulo;
 	private Date fechaJustificacionDesde;
 	private Date fechaJustificacionHasta;
 	private String origen;
@@ -82,6 +83,10 @@ public class DesignaItem {
 	private String nombreColegiado;
 	private String apellido1Colegiado;
 	private String apellido2Colegiado;
+	private int idPartidaPresupuestaria;
+	private String nombrePartida;
+	private String validada;
+	private int existeDesignaJuzgadoProcedimiento;
 	
 	public String getApellido1Colegiado() {
 		return apellido1Colegiado;
@@ -697,14 +702,14 @@ public class DesignaItem {
 	/**
 	 * @return the idModulo
 	 */
-	public String[] getIdModulo() {
-		return idModulo;
+	public String[] getIdModulos() {
+		return idModulos;
 	}
 	/**
 	 * @param idModulo the idModulo to set
 	 */
-	public void setIdModulo(String[] idModulo) {
-		this.idModulo = idModulo;
+	public void setIdModulos(String[] idModulos) {
+		this.idModulos = idModulos;
 	}
 	/**
 	 * @return the fechaJustificacionDesde
@@ -899,6 +904,41 @@ public class DesignaItem {
 	public void setApellido2Interesado(String apellido2Interesado) {
 		this.apellido2Interesado = apellido2Interesado;
 	}
+	
+	public String getIdModulo() {
+		return idModulo;
+	}
+	public void setIdModulo(String idModulo) {
+		this.idModulo = idModulo;
+	}
+	
+	public int getIdPartidaPresupuestaria() {
+		return idPartidaPresupuestaria;
+	}
+	public void setIdPartidaPresupuestaria(int idPartidaPresupuestaria) {
+		this.idPartidaPresupuestaria = idPartidaPresupuestaria;
+	}
+	
+	public String getNombrePartida() {
+		return nombrePartida;
+	}
+	public void setNombrePartida(String nombrePartida) {
+		this.nombrePartida = nombrePartida;
+	}
+	
+	public String getValidada() {
+		return validada;
+	}
+	public void setValidada(String validada) {
+		this.validada = validada;
+	}
+	
+	public int getExisteDesignaJuzgadoProcedimiento() {
+		return existeDesignaJuzgadoProcedimiento;
+	}
+	public void setExisteDesignaJuzgadoProcedimiento(int existeDesignaJuzgadoProcedimiento) {
+		this.existeDesignaJuzgadoProcedimiento = existeDesignaJuzgadoProcedimiento;
+	}
 	@Override
 	public String toString() {
 		return "DesignaItem [ano=" + ano + ", anoProcedimiento=" + anoProcedimiento + ", art27=" + art27 + ", codigo="
@@ -922,7 +962,7 @@ public class DesignaItem {
 				+ apellidosNombre + ", interesados=" + Arrays.toString(interesados) + ", validadas="
 				+ Arrays.toString(validadas) + ", calidad=" + Arrays.toString(calidad) + ", asunto=" + asunto
 				+ ", acreditacion=" + acreditacion + ", idAcreditacion=" + Arrays.toString(idAcreditacion) + ", modulo="
-				+ modulo + ", idModulo=" + Arrays.toString(idModulo) + ", fechaJustificacionDesde="
+				+ modulo + ", idModulo=" + Arrays.toString(idModulos) + ", fechaJustificacionDesde="
 				+ fechaJustificacionDesde + ", fechaJustificacionHasta=" + fechaJustificacionHasta + ", origen="
 				+ origen + ", idOrigen=" + idOrigen + ", nif=" + nif + ", nombreInteresado=" + nombreInteresado
 				+ ", apellidosInteresado=" + apellidosInteresado + ", idActuacionesV=" + idActuacionesV + ", idArt27="

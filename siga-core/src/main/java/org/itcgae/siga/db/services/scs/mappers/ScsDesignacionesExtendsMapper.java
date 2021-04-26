@@ -18,18 +18,24 @@ import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosDesignaItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
-import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoInscripcionItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
+<<<<<<< HEAD
+=======
+import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
+>>>>>>> branch 'Oficio' of https://bitbucket.es.deloitte.com/scm/dxd/cgae_java_siga.git
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsDesigna;
+<<<<<<< HEAD
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
+=======
+>>>>>>> branch 'Oficio' of https://bitbucket.es.deloitte.com/scm/dxd/cgae_java_siga.git
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -302,6 +308,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) })
 	List<ProcuradorItem> compruebaProcurador(String num, String anio);
+<<<<<<< HEAD
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboTipoMotivo")
 	@Results({ @Result(column = "NOMBRE", property = "value", jdbcType = JdbcType.VARCHAR),
@@ -313,7 +320,10 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 	@InsertProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "nuevoProcurador")
 	int nuevoProcurador(ProcuradorItem procuradorItem, Integer usuario);
+=======
+>>>>>>> branch 'Oficio' of https://bitbucket.es.deloitte.com/scm/dxd/cgae_java_siga.git
 
+<<<<<<< HEAD
 	List<ComboItem> comboTipoMotivo(short idInstitucion);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerCodigoDesigna")
@@ -331,6 +341,19 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "guardarProcurador")
 	int guardarProcurador(ProcuradorItem procuradorItem);
 	
+=======
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboTipoMotivo")
+	@Results({ @Result(column = "NOMBRE", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR), })
+	List<ComboItem> comboTipoMotivo(Short idInstitucion);
+
+	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "guardarProcurador")
+	int guardarProcurador(ProcuradorItem procuradorItem);
+
+	@InsertProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "nuevoProcurador")
+	int nuevoProcurador(ProcuradorItem procuradorItem, Integer usuario);
+
+>>>>>>> branch 'Oficio' of https://bitbucket.es.deloitte.com/scm/dxd/cgae_java_siga.git
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getProcedimientosJuzgados")
 	@Results({ @Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> getProcedimientosJuzgados(Short idInstitucion, String idJuzgado);
@@ -386,6 +409,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "DEFENSAJURIDICA", property = "defensaJuridica", jdbcType = JdbcType.VARCHAR), })
 	List<DesignaItem> getDatosAdicionales(Short idInstitucion, Integer tamMaximo, DesignaItem designa);
 	
+<<<<<<< HEAD
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaRelaciones")
 	@Results({ @Result(column = "SJCS", property = "sjcs", jdbcType = JdbcType.VARCHAR),
@@ -528,5 +552,47 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 	
 
+=======
+
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaRelaciones")
+	@Results({ @Result(column = "SJCS", property = "sjcs", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDLETRADO", property = "idletrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNODESIGNA", property = "idturnodesigna", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPO", property = "idtipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DES_TURNO", property = "desturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DES_TIPO", property = "destipo", jdbcType = JdbcType.VARCHAR) })
+	List<RelacionesItem> busquedaRelaciones(String anio, String num, String idTurno, String idinstitucion);
+	
+
+	@DeleteProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "eliminarRelacion")
+	int eliminarRelacion(String idInstitucion);
+
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getPartidaPresupuestariaDesigna")
+	@Results({ @Result(column = "NOMBREPARTIDA", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> getPartidaPresupuestariaDesigna(Short idInstitucion, DesignaItem designaItem);
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboMotivosCambioActDesigna")
+	@Results({ @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDACTDESMOTCAMBIO", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> comboMotivosCambioActDesigna(Short idInstitucion);
+	
+	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "updateJustiActDesigna")
+	int updateJustiActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario);
+
+
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getListaLetradosDesigna")
+	@Results({ @Result(column = "FECHAdesigna", property = "fechaDesignacion", jdbcType = JdbcType.DATE),
+			@Result(column = "fecharenuncia", property = "fechaEfecRenuncia", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHAREnunciasolicita", property = "fechaSolRenuncia", jdbcType = JdbcType.DATE),
+			@Result(column = "motivosrenuncia", property = "motivoRenuncia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ncolegiado", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "apellidosnombre", property = "apellidosNombre", jdbcType = JdbcType.VARCHAR), })
+	List<ListaLetradosDesignaItem> getListaLetradosDesigna( ScsDesigna designa, Short idInstitucion);
+>>>>>>> branch 'Oficio' of https://bitbucket.es.deloitte.com/scm/dxd/cgae_java_siga.git
 
 }

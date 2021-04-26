@@ -334,6 +334,40 @@ public class ComboServiceImpl implements ComboService {
 		}
 		return comboDTO;
 	}
+
+	/**
+	 * comboJuzgadoPorInstitucion
+	 */
+	public ComboDTO comboJuzgadoPorInstitucion(String idInstitucion, HttpServletRequest request) {
+		LOGGER.info("comboJuzgadoPorInstitucion() -> Entrada al servicio para búsqueda de Juzgado por institucion");
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info("comboJuzgadoPorInstitucion() -> Obteniendo los juzgados por institucion....");
+
+				List<ComboItem> comboItems = scsJuzgadoExtendsMapper.comboJuzgado(Short.parseShort(usuarios.get(0).getIdlenguaje()), Short.parseShort(idInstitucion));
+
+				LOGGER.info("comboJuzgadoPorInstitucion() -> Salida del servicio");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboJuzgado() -> Salida del servicio para obtener combo Juzgado");
+		}else {
+			LOGGER.warn("comboJuzgadoPorInstitucion() -> Salida del servicio. No viene informado la idInstitucion");
+		}
+		
+		return comboDTO;
+	}
 	
 	// PK
 
@@ -922,7 +956,7 @@ public class ComboServiceImpl implements ComboService {
 				for(JuzgadoItem j: juzgadosItems) {
 					ComboItem comboItem = new ComboItem();
 					comboItem.setValue(j.getIdJuzgado());
-					comboItem.setLabel(j.getCodigoExt2()+j.getNombre()+"("+j.getNombrePoblacion()+")");
+					comboItem.setLabel(j.getCodigoExt2()+": "+j.getNombre()+"("+j.getNombrePoblacion()+")");
 					comboItems.add(comboItem);
 				}
 
@@ -1030,7 +1064,7 @@ public class ComboServiceImpl implements ComboService {
 					if(pretensionProcedimiento != null && pretensionProcedimiento.size() > 0) {
 					idPretensiones = new ArrayList<String>();
 					for(ComboItem label: pretensionProcedimiento) {
-						idPretensiones.add(label.getValue());
+						idPretensiones.add(label.getLabel());
 					}
 					
 					comboItems = scsDesignacionesExtendsMapper.comboProcedimientosConJuzgado(idInstitucion, idPretensiones);
@@ -1164,6 +1198,39 @@ public class ComboServiceImpl implements ComboService {
 		}
 
 		LOGGER.info("objetivo() -> Salida del servicio para obtener comboProcedimientos");
+
+		return comboDTO;
+	}
+	
+	/**
+	 * 
+	 */
+	public ComboDTO comboAcreditacionesPorModulo(HttpServletRequest request, String idModulo) {
+		LOGGER.info("comboAcreditacionesPorModulo() -> Entrada al servicio para obtener el comboAcreditacionesPorModulo");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<ComboItem> acreditaciones = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				acreditaciones = scsDesignacionesExtendsMapper.comboAcreditacionesPorModulo(idInstitucion, idModulo);
+				
+				comboDTO.setCombooItems(comboItems);
+			}
+		}
+
+		LOGGER.info("comboAcreditacionesPorModulo() -> Salida del servicio para obtener comboAcreditacionesPorModulo");
 
 		return comboDTO;
 	}
