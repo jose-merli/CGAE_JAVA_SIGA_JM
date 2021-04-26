@@ -201,4 +201,7 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
 	    List<TurnosItem> busquedaColaGuardia(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
 
+	 
+
+	 
 }
