@@ -83,6 +83,10 @@ public class DesignaItem {
 	private String nombreColegiado;
 	private String apellido1Colegiado;
 	private String apellido2Colegiado;
+	private int idPartidaPresupuestaria;
+	private String nombrePartida;
+	private String validada;
+	private int existeDesignaJuzgadoProcedimiento;
 	
 	public String getApellido1Colegiado() {
 		return apellido1Colegiado;
@@ -901,12 +905,39 @@ public class DesignaItem {
 		this.apellido2Interesado = apellido2Interesado;
 	}
 	
-	
 	public String getIdModulo() {
 		return idModulo;
 	}
 	public void setIdModulo(String idModulo) {
 		this.idModulo = idModulo;
+	}
+	
+	public int getIdPartidaPresupuestaria() {
+		return idPartidaPresupuestaria;
+	}
+	public void setIdPartidaPresupuestaria(int idPartidaPresupuestaria) {
+		this.idPartidaPresupuestaria = idPartidaPresupuestaria;
+	}
+	
+	public String getNombrePartida() {
+		return nombrePartida;
+	}
+	public void setNombrePartida(String nombrePartida) {
+		this.nombrePartida = nombrePartida;
+	}
+	
+	public String getValidada() {
+		return validada;
+	}
+	public void setValidada(String validada) {
+		this.validada = validada;
+	}
+	
+	public int getExisteDesignaJuzgadoProcedimiento() {
+		return existeDesignaJuzgadoProcedimiento;
+	}
+	public void setExisteDesignaJuzgadoProcedimiento(int existeDesignaJuzgadoProcedimiento) {
+		this.existeDesignaJuzgadoProcedimiento = existeDesignaJuzgadoProcedimiento;
 	}
 	@Override
 	public String toString() {
