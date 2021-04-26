@@ -3,6 +3,10 @@ package org.itcgae.siga.DTOs.scs;
 import java.util.Arrays;
 import java.util.Date;
 
+/**
+ * @author Dani
+ *
+ */
 public class DesignaItem {
 	private int ano;
 	private int anoProcedimiento;
@@ -87,6 +91,7 @@ public class DesignaItem {
 	private String nombrePartida;
 	private String validada;
 	private int existeDesignaJuzgadoProcedimiento;
+	private String idPersona;
 	
 	public String getApellido1Colegiado() {
 		return apellido1Colegiado;
@@ -938,6 +943,14 @@ public class DesignaItem {
 	}
 	public void setExisteDesignaJuzgadoProcedimiento(int existeDesignaJuzgadoProcedimiento) {
 		this.existeDesignaJuzgadoProcedimiento = existeDesignaJuzgadoProcedimiento;
+	}
+	
+	
+	public String getIdPersona() {
+		return idPersona;
+	}
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
 	}
 	@Override
 	public String toString() {

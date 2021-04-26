@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.DeleteProvider;
@@ -17,8 +18,11 @@ import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosDesignaItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.LetradoInscripcionItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
@@ -26,10 +30,13 @@ import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsDesigna;
+import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+
+
 
 @Service
 @Primary
@@ -80,7 +87,8 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ART27", property = "art27", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)})
 	List<DesignaItem> busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaProcedimientoDesignas")
@@ -298,6 +306,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) })
 	List<ProcuradorItem> compruebaProcurador(String num, String anio);
 
+
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboTipoMotivo")
 	@Results({ @Result(column = "NOMBRE", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR), })
@@ -308,6 +317,19 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 	@InsertProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "nuevoProcurador")
 	int nuevoProcurador(ProcuradorItem procuradorItem, Integer usuario);
+
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerCodigoDesigna")
+	@Results({ 
+			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+	})
+	String obtenerCodigoDesigna(String idInstitucion, String anio);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerNumeroDesigna")
+	@Results({ 
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+	})
+	String obtenerNumeroDesigna(String idInstitucion, String anio);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getProcedimientosJuzgados")
 	@Results({ @Result(column = "IDPROCEDIMIENTO", property = "value", jdbcType = JdbcType.VARCHAR) })
@@ -365,6 +387,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	List<DesignaItem> getDatosAdicionales(Short idInstitucion, Integer tamMaximo, DesignaItem designa);
 	
 
+	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaRelaciones")
 	@Results({ @Result(column = "SJCS", property = "sjcs", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
@@ -378,16 +401,12 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "DES_TURNO", property = "desturno", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DES_TIPO", property = "destipo", jdbcType = JdbcType.VARCHAR) })
 	List<RelacionesItem> busquedaRelaciones(String anio, String num, String idTurno, String idinstitucion);
-	
-
-	@DeleteProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "eliminarRelacion")
-	int eliminarRelacion(String idInstitucion);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getPartidaPresupuestariaDesigna")
 	@Results({ @Result(column = "NOMBREPARTIDA", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> getPartidaPresupuestariaDesigna(Short idInstitucion, DesignaItem designaItem);
-	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboMotivosCambioActDesigna")
+	
 	@Results({ @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDACTDESMOTCAMBIO", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboMotivosCambioActDesigna(Short idInstitucion);
@@ -404,5 +423,108 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "ncolegiado", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "apellidosnombre", property = "apellidosNombre", jdbcType = JdbcType.VARCHAR), })
 	List<ListaLetradosDesignaItem> getListaLetradosDesigna( ScsDesigna designa, Short idInstitucion);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getLetradosDiasBajaTemporalTurno")
+	@Results({ @Result(column = "IDPERSONA", property = "idersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHABT", property = "fechabt", jdbcType = JdbcType.DATE),
+			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHADESDE", property = "fechadesde", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAHASTA", property = "fechahasta", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHAALTA", property = "fechaalta", jdbcType = JdbcType.DATE),
+			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "VALIDADO", property = "validado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAESTADO", property = "fechaestado", jdbcType = JdbcType.DATE),
+			@Result(column = "ELIMINADO", property = "eliminado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR)
+			})
+	List<BajasTemporalesItem> getLetradosDiasBajaTemporalTurno(String idInstitucion,String idTurno,String fecha);
+	
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getSaltos")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
+	        @Result(column = "IDSALTOSTURNOS", property = "idsaltosturnos", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "SALTOCOMPENSACION", property = "saltoocompensacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.DATE),
+			@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "MOTIVOS", property = "motivos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHACUMPLIMIENTO", property = "fechacumplimiento", jdbcType = JdbcType.DATE),
+			@Result(column = "IDCALENDARIOGUARDIAS", property = "idcalendarioguardias", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDCALENDARIOGUARDIASCREACION", property = "idcalendarioguardiascreacion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "TIPOMANUAL", property = "tipomanual", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "FECHA_ANULACION", property = "fecha_anulacion", jdbcType = JdbcType.DATE)
+			
+			})
+	List<LetradoInscripcionItem> getSaltos(String idInstitucion, String idTurno, String idGuardia);
+	
+	
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getCompensaciones")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
+	        @Result(column = "IDSALTOSTURNOS", property = "idsaltosturnos", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "SALTOCOMPENSACION", property = "saltoocompensacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.DATE),
+			@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "MOTIVOS", property = "motivos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHACUMPLIMIENTO", property = "fechacumplimiento", jdbcType = JdbcType.DATE),
+			@Result(column = "IDCALENDARIOGUARDIAS", property = "idcalendarioguardias", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDCALENDARIOGUARDIASCREACION", property = "idcalendarioguardiascreacion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "TIPOMANUAL", property = "tipomanual", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "FECHA_ANULACION", property = "fecha_anulacion", jdbcType = JdbcType.DATE)
+			
+			})
+    List<LetradoInscripcionItem> getCompensaciones(String idInstitucion, String idTurno, String fecha);
+	
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getInscripcionTurnoActiva")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "FECHASOLICITUD", property = "fechasolicitud", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ALFABETICOAPELLIDOS", property = "alfabeticoapellidos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROCOLEGIADO", property = "numerocolegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHANACIMIENTO", property = "fechanacimiento", jdbcType = JdbcType.DATE),
+			@Result(column = "ANTIGUEDADCOLA", property = "antiguedadcola", jdbcType = JdbcType.DATE)
+			
+			})
+	InscripcionTurnoItem getInscripcionTurnoActiva(String idinstitucion, String idturno, String idpersona, String fecha);
+	
+
+	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "cambiarUltimoCola")
+	int cambiarUltimoCola(String idInstitucion, String idTurno, String idPersonaUltimo, Date fechaSolicitudUltimo,AdmUsuarios usuario);
+	
+	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "marcarSaltoCompensacion")
+	int marcarSaltoCompensacion(ScsSaltoscompensaciones saltoCompensacion, AdmUsuarios usuario);
+	
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getColaTurnoBBDD")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHASOLICITUD", property = "fechasolicitud", jdbcType = JdbcType.DATE),
+			@Result(column = "NIFCIF", property = "nifcif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ALFABETICOAPELLIDOS", property = "alfabeticoapellidos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROCOLEGIADO", property = "numerocolegiado", jdbcType = JdbcType.VARCHAR),
+		
+			@Result(column = "ACTIVO", property = "estado", jdbcType = JdbcType.VARCHAR)
+			})
+ 	 List<InscripcionTurnoItem> getColaTurnoBBDD(String idinstitucion, String idturno, String fecha, String order);
+	
+	
+
+
 
 }

@@ -1,11 +1,17 @@
 package org.itcgae.siga.scs.services.impl.oficio;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,9 +31,13 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
+import org.itcgae.siga.DTOs.scs.CenPersonaItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.LetradoInscripcionItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
@@ -36,8 +46,12 @@ import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.Puntero;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
@@ -48,17 +62,24 @@ import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
+import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
+import org.itcgae.siga.db.entities.ScsTurnoKey;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
+import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
+import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
+import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
@@ -71,6 +92,7 @@ import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
@@ -123,6 +145,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Autowired
 	private CenColegiadoMapper cenColegiadoMapper;
 	
+	@Autowired
+	private ScsSaltoscompensacionesMapper scsSaltoscompensacionesMapper;
+	
+	@Autowired
+	private ScsTurnoMapper scsTurnoMapper;
+
+	@Autowired
+	private ScsOrdenacioncolasMapper scsOrdenacioncolasMapper;
+	
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
+
+
+
 	/**
 	 * busquedaJustificacionExpres
 	 */
@@ -321,76 +357,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return responseDTO;
 	}
 
-	/**
-	 * actualizaJustificacionExpres
-	 */
-	@Override
-	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
-			HttpServletRequest request) {
-		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
+	
 
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		Error error = new Error();
-		int response = 0;
-
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"DesignacionesServiceImpl.actualizaJustificacionExpres() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"DesignacionesServiceImpl.actualizaJustificacionExpres() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info(
-						"DesignacionesServiceImpl.actualizaJustificacionExpres() -> Entrada a servicio para actualizar las justificaciones express");
-
-				try {
-					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Realizando update...");
-
-//					for(ActuacionesJustificacionExpressItem record : item) {
-
-					// rellenar la key
-//						key.setAnio(item.get);
-
-//						response = scsActuaciondesignaMapper.insert();
-//					}
-
-					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Actualizacion realizada");
-				} catch (Exception e) {
-					LOGGER.error("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Se ha producido un error ",
-							e);
-					response = 0;
-				}
-
-				LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Saliendo del servicio. ");
-			}
-		}
-
-		if (response == 0) {
-			error.setCode(400);
-			error.setDescription("general.mensaje.error.bbdd");
-			responseDTO.setStatus(SigaConstants.KO);
-		} else {
-			error.setCode(200);
-			error.setDescription("general.message.registro.actualizado");
-		}
-
-		responseDTO.setError(error);
-
-		return responseDTO;
-	}
-
-	/**
-	 * eliminaJustificacionExpres
-	 */
-	@Override
 	public DeleteResponseDTO eliminaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
 			HttpServletRequest request) {
 		DeleteResponseDTO responseDTO = new DeleteResponseDTO();
@@ -999,7 +967,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
-
 		}
 
 		if (response == 0) {
@@ -2152,28 +2119,133 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			if (null != usuarios && usuarios.size() >= 0) {
 				try {
 
+					
 					ScsDesigna designa = new ScsDesigna();
 					designa.setIdinstitucion(idInstitucion);
 					designa.setIdturno(designaItem.getIdTurno());
-					designa.setAnio((short) designaItem.getAno());
-					designa.setNumero(new Long(designaItem.getNumero()));
+					
+					Calendar cal= Calendar.getInstance();
+					short year= (short) cal.get(Calendar.YEAR);
+					designa.setAnio(year);
+					
+					//CALCULO CAMPO CODIGO (NUMERO EN FRONT)
+					String codigoDesigna = scsDesignacionesExtendsMapper.obtenerCodigoDesigna(
+							String.valueOf(idInstitucion), String.valueOf(designaItem.getAno()));
+
+					if (codigoDesigna != null && !codigoDesigna.equals("")) {
+						designa.setCodigo(codigoDesigna);
+					} else {
+						codigoDesigna = "1";
+						designa.setCodigo(codigoDesigna);
+						
+					}
+					
+					
+					//CALCULO CAMPO NUMERO 
+					
+					//Limitacion campo numero en updateDesigna
+
+					//Obtenemos el parametro de limite para el campo CODIGO en BBDD
+					StringDTO parametros = new StringDTO();
+					Integer longitudDesigna;
+
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", idInstitucion.toString());
+
+					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+					// la institucion 0
+					if (parametros != null && parametros.getValor() != null) {
+						longitudDesigna =  Integer.parseInt(parametros.getValor())  ;
+					} else {
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", "0");
+						longitudDesigna =  Integer.parseInt(parametros.getValor())  ;
+					}
+					
+					//Obtenemos el ultimo numero + 1
+					String numeroDesigna = scsDesignacionesExtendsMapper.obtenerNumeroDesigna(
+							String.valueOf(idInstitucion), String.valueOf(designaItem.getAno()));
+
+					
+					if (numeroDesigna.equals("")) {
+						//Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+						while(numeroDesigna.length() < longitudDesigna) {
+							numeroDesigna = "1";
+							numeroDesigna = "0" + numeroDesigna;
+						}
+						designa.setNumero(Long.parseLong(numeroDesigna) );
+					} else {
+						//Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+						while(numeroDesigna.length() < longitudDesigna) {
+							numeroDesigna = "0" + numeroDesigna;
+						}
+						designa.setNumero(Long.parseLong(numeroDesigna));
+					}
+					
 					designa.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
 					designa.setArt27(designaItem.getArt27());
 
-					ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
-					designaLetrado.setIdinstitucion(idInstitucion);
-					designaLetrado.setIdturno(designaItem.getIdTurno());
-					designaLetrado.setAnio((short) designaItem.getAno());
-					designaLetrado.setNumero(new Long(designaItem.getNumero()));
-					// designaLetrado.set
+					
+					//SCS_INSCRIPCIONTURNO por idPersona idinstitucion idturno. 
+					String numeroColegiado = designaItem.getNumColegiado();
+					if(StringUtils.isEmpty(numeroColegiado)) {
+						//Se realiza busqueda en la cola de oficio
+						
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+						
+						String fechaform = sdf.format(designaItem.getFechaAlta());
+						
+						LetradoInscripcionItem letradoAlgoritmoSeleccion = 	this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designaItem.getIdTurno()), fechaform,  usuario);
+						
+//						//Anotamos log
+						short mes= (short) cal.get(Calendar.MONTH);
+						short dia = (short) cal.get(Calendar.DAY_OF_MONTH);
+						LOGGER.info("Buscando letrado para el turno " + designaItem.getIdTurno() +   " en la fecha " + dia + "/" + mes + "/"+ year  ); 
+//						
+						 
+						
+						
+
+//						
+//						//MANUAL = 0, LETRADODELTURNO = 1 si el sistema elige automáticamente de la cola
+//						
+						ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
+						designaLetrado.setIdinstitucion(idInstitucion);
+						designaLetrado.setIdturno(designaItem.getIdTurno());
+						designaLetrado.setAnio(year);
+						designaLetrado.setNumero(Long.parseLong(numeroDesigna));
+						designaLetrado.setFechadesigna(new Date());
+						designaLetrado.setIdpersona(letradoAlgoritmoSeleccion.getIdpersona());
+						designaLetrado.setManual((short)0);
+						designaLetrado.setLetradodelturno("1");
+						
+					}else {
+						
+						ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
+						designaLetrado.setIdinstitucion(idInstitucion);
+						designaLetrado.setIdturno(designaItem.getIdTurno());
+						designaLetrado.setAnio(year);
+						designaLetrado.setNumero(Long.parseLong(numeroDesigna));
+						designaLetrado.setFechadesigna(new Date());
+						//TODO obtener id Persona from idcolegiado
+						//designaLetrado.setIdpersona(designaItem.get)
+						
+					}
+					
+					
+//
+//					MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
+//
+//					MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
+					
+					
+					
+					LOGGER.info(
+							"createModules() / scsDesignaMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
+
+					 response = scsDesignaMapper.insert(designa);
 
 					LOGGER.info(
-							"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
+							"createModules() / scsDesignaMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
 
-					// response = scsTurnosExtendsMapper.insert(turno);
-
-					LOGGER.info(
-							"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
 
 				} catch (Exception e) {
 					response = 0;
@@ -2221,6 +2293,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.eliminarActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
+			
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
@@ -2278,6 +2351,743 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		return deleteResponseDTO;
 	}
+			
+			
+
+	public LetradoInscripcionItem getLetradoTurno(String idInstitucion, String idTurno, String fechaForm, AdmUsuarios usuario) throws java.lang.Exception{
+		
+		// Variables generales
+		ArrayList<String> diasGuardia; // Periodo o dia de guardia para rellenar con letrado
+		
+		List<BajasTemporalesItem> hmBajasTemporalesList;
+		
+		HashMap<Long, TreeMap<String,BajasTemporalesItem>> hmBajasTemporales; //variable siga classique
+		
+		List<LetradoInscripcionItem> hmPersonasConSaltosList; // Lista de saltos
+		
+		HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos;  //variable siga classique
+		
+		List<LetradoInscripcionItem> alCompensaciones; // Lista de compensaciones
+		
+		ArrayList<LetradoInscripcionItem> alLetradosOrdenados; // Cola de letrados en la guardia
+		
+		Puntero punteroListaLetrados;
+		
+		LetradoInscripcionItem unLetrado;
+		
+		LetradoInscripcionItem letradoGuardia;
+
+		try {
+			
+			
+			// obteniendo bajas temporales por letrado
+			hmBajasTemporalesList = scsDesignacionesExtendsMapper.getLetradosDiasBajaTemporalTurno(idInstitucion, idTurno, fechaForm);
+			
+			hmBajasTemporales = this.getLetradosDiasBajaTemporalTurnoHash(hmBajasTemporalesList);
+			
+			
+			// obteniendo saltos
+			hmPersonasConSaltosList = scsDesignacionesExtendsMapper.getSaltos(idInstitucion, idTurno, null);
+			
+			hmPersonasConSaltos = this.getSaltosHash(hmPersonasConSaltosList, Integer.parseInt(idInstitucion), Integer.parseInt(idTurno), null,usuario);
+			
+			diasGuardia = new ArrayList<String>();
+			diasGuardia.add(fechaForm);
+
+			// obteniendo cola de letrados
+			punteroListaLetrados = new Puntero();
+			alLetradosOrdenados = (ArrayList<LetradoInscripcionItem>) this.getColaTurno(Integer.parseInt(idInstitucion), Integer.parseInt(idTurno),fechaForm ,false, usuario);
+			
+
+			if (alLetradosOrdenados == null || alLetradosOrdenados.size() == 0) {
+				throw new Exception("No existe cola de letrados de guardia");
+				
+			}
+			
+
+			// obteniendo las compensaciones. Se obtienen dentro de este
+			// bucle, ya que si hay incompatibilidades señade una compensacion
+			alCompensaciones =  this.getLogicaCompensaciones( idInstitucion,  idTurno,  fechaForm);
+			
+			// obteniendo el letrado a asignar.
+			// ATENCION: este metodo es el nucleo del proceso
+			letradoGuardia = getSiguienteLetradoTurno(alCompensaciones, alLetradosOrdenados,
+					punteroListaLetrados, diasGuardia, hmPersonasConSaltos, hmBajasTemporales,  idInstitucion,  idTurno,  null, null ,  usuario);
+			
+			
+			if (letradoGuardia == null) {
+				 throw new  Exception("gratuita.modalRegistro_DefinirCalendarioGuardia.literal.errorLetradosSuficientes");
+			}
+			
+			int punteroUltimo = 0;
+			
+			if (punteroListaLetrados.getValor() == 0)
+				punteroUltimo = alLetradosOrdenados.size() - 1;
+			else
+				punteroUltimo = punteroListaLetrados.getValor() - 1;
+
+			unLetrado = alLetradosOrdenados.get(punteroUltimo);
+			
+			// actualizando el ultimo letrado en la guardia solo si no es de la lista de compensaciones
+			if (unLetrado.getSaltoocompensacion() == null){
+				
+				scsDesignacionesExtendsMapper.cambiarUltimoCola(unLetrado.getIdinstitucion().toString(), unLetrado.getIdturno().toString(),  unLetrado.getIdpersona().toString(), unLetrado.getInscripcionTurno().getFechasolicitud(), usuario);
+				
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(e);
+			throw new Exception(e);
+		}
+		
+		return letradoGuardia;
+	} 
+	
+	
+	
+	public CenPersonaItem getPersonaPorId (String idPersona) throws Exception {
+
+		
+		try {
+
+			CenPersona cenPersona = null;
+			CenPersonaItem cenPersonaItem = new CenPersonaItem();
+			
+			CenPersonaExample cenPersonaExample  = new CenPersonaExample();
+			cenPersonaExample.createCriteria().andIdpersonaEqualTo(Long.parseLong(idPersona));
+			
+			List<CenPersona> personas = cenPersonaMapper.selectByExample(cenPersonaExample);
+			
+			
+			if ((personas != null) && personas.size() == 1) {
+				cenPersona = personas.get(0);
+			}
+			
+			if(cenPersona != null) {
+				cenPersonaItem.setApellidos1(cenPersona.getApellidos1());
+				cenPersonaItem.setApellidos2(cenPersona.getApellidos2());
+				cenPersonaItem.setFallecido(cenPersona.getFallecido());
+				cenPersonaItem.setFechanacimiento(cenPersona.getFechanacimiento());
+				cenPersonaItem.setIdestadocivil(cenPersona.getIdestadocivil());
+				cenPersonaItem.setIdpersona(cenPersona.getIdpersona());
+				cenPersonaItem.setIdtipoidentificacion(cenPersona.getIdtipoidentificacion());
+				cenPersonaItem.setNaturalde(cenPersona.getNaturalde());
+				cenPersonaItem.setNifcif(cenPersona.getNifcif());
+				cenPersonaItem.setNombre(cenPersona.getNombre());
+				cenPersonaItem.setSexo(cenPersona.getSexo());
+				
+			}
+			
+			return cenPersonaItem;
+		}
+		catch (Exception e) {
+			throw new Exception ( "Error al recuperar los datos", e);
+		}
+	}
+		
+	
+
+	
+	/**
+	 * Obtiene la cola de turno dada una fecha
+	 * 
+	 * @param idInstitucion
+	 * @param idTurno
+	 * @param idGuardia
+	 * @param fecha
+	 * @param usr
+	 * @return
+	 * @throws Exception 
+	 * @throws ClsExceptions
+	 */
+	public  List<LetradoInscripcionItem> getColaTurno(Integer idInstitucion, Integer idTurno, String fecha, boolean quitarSaltos, AdmUsuarios usr) throws Exception {
+		try {
+			
+			ArrayList<LetradoInscripcionItem> colaLetrados = new ArrayList<LetradoInscripcionItem>();
+//			ScsInscripcionTurnoAdm insadm = new ScsInscripcionTurnoAdm(usr);
+//			ScsSaltosCompensacionesAdm saladm = new ScsSaltosCompensacionesAdm(usr);
+//			ScsOrdenacionColasAdm ordenacionColasAdm = new ScsOrdenacionColasAdm(usr);
+			
+			
+			// obteniendo la guardia
+			ScsTurnoKey scsTurnoKey = new ScsTurnoKey();
+			scsTurnoKey.setIdinstitucion(Short.valueOf(idInstitucion.toString()));
+			scsTurnoKey.setIdturno(idTurno);
+			
+			ScsTurno beanTurno = scsTurnoMapper.selectByPrimaryKey(scsTurnoKey);
+			
+			Integer idOrdenacionColas = beanTurno.getIdordenacioncolas();
+			if(idOrdenacionColas==null)
+				throw new Exception("messages.general.error");
+			
+			Long idPersonaUltimo = beanTurno.getIdpersonaUltimo();
+			
+			// obteniendo ordenacion de la guardia
+			String orden = this.getOrderBy(idOrdenacionColas.toString());
+			
+			InscripcionTurnoItem ultimoAnterior;
+			
+			// obteniendo ultimo apuntado de la guardia
+			if (idPersonaUltimo == null) {
+				ultimoAnterior = null;
+			}else {
+				ultimoAnterior = new InscripcionTurnoItem(Short.valueOf(idInstitucion.toString()), idTurno, idPersonaUltimo, beanTurno.getFechasolicitudUltimo());
+			}
+				
+
+			Date fechaBBDD = new SimpleDateFormat("yyyy-MM-dd").parse(fecha);
+			Format formatter = new SimpleDateFormat("dd/MM/yyyy");
+			String fechaBBDD2 = formatter.format(fechaBBDD);
+	//		obteniendo lista de letrados (ordenada)
+			List<InscripcionTurnoItem> listaLetrados = scsDesignacionesExtendsMapper.getColaTurnoBBDD(idInstitucion.toString(), idTurno.toString(), fechaBBDD2, orden);
+			
+			if (listaLetrados == null || listaLetrados.size()==0) {
+				return colaLetrados;
+			}
+			
+			
+			InscripcionTurnoItem punteroInscripciones = null;
+			boolean foundUltimo;
+			LetradoInscripcionItem letradoTurno;
+			if (ultimoAnterior == null) {
+				// si no existe ultimo colegiado, se empieza la cola desde el
+				// primero en la lista
+				for (int i = 0; i < listaLetrados.size(); i++) {
+					punteroInscripciones = (InscripcionTurnoItem) listaLetrados.get(i);
+					if (punteroInscripciones.getEstado().equals("1")) {
+						colaLetrados.add(new LetradoInscripcionItem(punteroInscripciones));
+					}
+				}
+			} else {
+				// ordenando la cola en funcion del idPersonaUltimo guardado
+				List<LetradoInscripcionItem> colaAuxiliar = new ArrayList<LetradoInscripcionItem>();
+				foundUltimo = false;
+				for (int i = 0; i < listaLetrados.size(); i++) {
+					punteroInscripciones = listaLetrados.get(i);
+	
+					// insertando en la cola si la inscripcion esta activa
+					if (punteroInscripciones.getEstado().equals("1")) {
+						// El primero que se anyade es el siguiente al ultimo
+						if (foundUltimo) {
+							colaLetrados.add(new LetradoInscripcionItem(punteroInscripciones));
+						} else {
+							colaAuxiliar.add(new LetradoInscripcionItem(punteroInscripciones));
+						}
+					}
+	
+					// revisando si se encontro ya al ultimo
+					if (!foundUltimo && punteroInscripciones.equals(ultimoAnterior)) {
+						foundUltimo = true;
+					}
+						
+				}
+				colaLetrados.addAll(colaAuxiliar);
+			}
+			
+			
+			// quitando letrados de la cola si tienen saltos
+			if (quitarSaltos) {
+				List<LetradoInscripcionItem> personasConSaltosList = scsDesignacionesExtendsMapper.getSaltos(idInstitucion.toString(), idTurno.toString(), null);
+				HashMap<Long, ArrayList<LetradoInscripcionItem>> personasConSaltos = this.getSaltosHash(personasConSaltosList,  idInstitucion,  idTurno,  null,  usr); 
+				for (Iterator iter = colaLetrados.iterator(); iter.hasNext(); ) {
+					letradoTurno = (LetradoInscripcionItem) iter.next();
+					if ( personasConSaltos.get(letradoTurno.getIdpersona()) != null ) {
+						iter.remove();
+					}
+				}
+			}
+			
+			return colaLetrados;
+			
+		} catch (Exception e) {
+			LOGGER.error(e);
+			throw new Exception ( "Error al ejecutar getColaTurno()", e);
+		}			
+	} 
+	
+	private HashMap<Long, TreeMap<String,BajasTemporalesItem>> getLetradosDiasBajaTemporalTurnoHash(List<BajasTemporalesItem> hmBajasTemporalesList) throws java.lang.Exception{
+		
+		HashMap<Long, TreeMap<String, BajasTemporalesItem>> mSalida = new HashMap<Long, TreeMap<String, BajasTemporalesItem>>();
+		
+		for (int i = 0; i < hmBajasTemporalesList.size(); i++) {
+			
+		
+			
+			BajasTemporalesItem bajasBean = hmBajasTemporalesList.get(i);
+			
+			Long idPersona = new Long(bajasBean.getIdpersona());
+			String fechaBT = bajasBean.getFechabt().toString();
+			
+			TreeMap<String, BajasTemporalesItem> bajasDePersona = (TreeMap<String, BajasTemporalesItem>) mSalida.get(idPersona);
+			
+			if (bajasDePersona != null)
+				bajasDePersona.put(this.getFormatedDateShort("", fechaBT), bajasBean);
+			else {
+				bajasDePersona = new TreeMap<String, BajasTemporalesItem>();
+				bajasDePersona.put(this.getFormatedDateShort("", fechaBT), bajasBean);
+				mSalida.put(idPersona, bajasDePersona);
+			}
+		}
+		
+		
+		return mSalida;
+	}
+	
+	
+	private  String getFormatedDateShort(String lang, String date) throws java.lang.Exception {
+		String dat = "";
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date datFormat = null;
+
+		if (date != null && !date.trim().equals("")) {
+			try {
+
+				// DCG date = GstDate.getFechaLenguaje(lang, date);
+				datFormat = sdf.parse(date.trim());
+			} catch (Exception ex) {
+				Exception exc = new Exception( "THIS DATE " + date + " IS BAD FORMATED");
+				//exc.setErrorCode("DATEFORMAT");
+				throw exc;
+			}
+
+			if (lang.equalsIgnoreCase("EN")) {
+				sdf.applyPattern("dd/MM/yyyy");
+			} else {
+				sdf.applyPattern("dd/MM/yyyy");
+			}
+			dat = sdf.format(datFormat);
+		}
+		return dat;
+	}
+	
+	private  String getApplicationFormatDate(String lang, String date)
+			throws Exception {
+		if (date == null || date.length() == 0)
+			return null;
+		String dat = "";
+		Date oDate = null;
+		SimpleDateFormat sdf;
+		sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		if (date.length() == 11 && date.substring(2, 3).equals(".")) {
+			String DATE_FORMAT_LOGBOOK = "dd.MMM.yyyy";
+			if (lang.equalsIgnoreCase("EN")) {
+				oDate =  this.parseStringToDate(date,
+						DATE_FORMAT_LOGBOOK, Locale.ENGLISH);
+			} else {
+				// Espanhol oDate = new
+				// GstDate().parseStringToDate(date,DATE_FORMAT_LOGBOOK,Locale.ENGLISH);
+			}
+		} else if (date.length() == 20 && date.substring(4, 5).equals("-")) {
+			String DATE_FORMAT_LOGBOOK = "dd.MMM.yyyy";
+			if (lang.equalsIgnoreCase("EN")) {
+				oDate =  this.parseStringToDate(date,
+						DATE_FORMAT_LOGBOOK, Locale.ENGLISH);
+			} else {
+				// Espanhol oDate=new
+				// GstDate().parseStringToDate(date,DATE_FORMAT_LOGBOOK,Locale.ENGLISH);
+			}
+		} else {
+			if (date.length() > 11) {
+				// LONG
+				if (lang.equalsIgnoreCase("EN")) {
+					sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+				} else {
+					sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+				}
+			} else {
+				// SHORT
+				if (lang.equalsIgnoreCase("EN")) {
+					sdf = new SimpleDateFormat("dd/MM/yyyy");
+				} else {
+					sdf = new SimpleDateFormat("dd/MM/yyyy");
+				}
+			}
+
+			try {
+				oDate = sdf.parse(date);
+			} catch (Exception ex) {
+				Exception exc = new Exception( "THIS DATE " + date
+						+ " IS BAD FORMATED",ex);
+				//exc.setErrorCode("DATEFORMAT");
+				throw exc;
+			}
+		}
+		if (oDate == null) {
+			sdf.applyPattern("yyyy/MM/dd HH:mm:ss");
+			try {
+				oDate = sdf.parse(date);
+			} catch (Exception ex) {
+				Exception exc = new Exception( "THIS DATE " + date
+						+ " IS BAD FORMATED",ex);
+				//exc.setErrorCode("DATEFORMAT");
+				throw exc;
+			}
+		}
+
+		sdf.applyPattern("yyyy/MM/dd HH:mm:ss");
+		dat = sdf.format(oDate);
+		return dat;
+	}
+
+	private Date parseStringToDate(String date, String format, Locale locale)
+			throws Exception {
+		Date dat = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat(format, locale);
+		try {
+			dat = sdf.parse(date);
+		} catch (Exception e) {
+			Exception exc = new Exception( "error en GstDate     :"+ e.toString(),e);
+			//exc.setErrorCode("DATEFORMAT");
+			throw exc;
+		}
+		return dat;
+	}
+	
+	
+	private List<LetradoInscripcionItem> getLogicaCompensaciones(String idInstitucion, String idTurno,
+			String fechaForm) throws Exception {
+
+		List<LetradoInscripcionItem> alLetradosCompensados;
+		LetradoInscripcionItem letradoSeleccionado;
+		String idPersona;
+
+
+		alLetradosCompensados = scsDesignacionesExtendsMapper.getCompensaciones(idInstitucion, idTurno, fechaForm);
+
+		try {
+
+			for (LetradoInscripcionItem elem : alLetradosCompensados) {
+
+				idPersona = elem.getIdpersona().toString();
+
+				
+				 Date fechaBBDD = new SimpleDateFormat("yyyy-MM-dd").parse(fechaForm);
+				 Format formatter = new SimpleDateFormat("dd/MM/yyyy");
+				 String fechaBBDD2 = formatter.format(fechaBBDD);
+				
+				InscripcionTurnoItem inscripcionTurno = scsDesignacionesExtendsMapper.getInscripcionTurnoActiva(idInstitucion.toString(), idTurno.toString(), idPersona, fechaBBDD2);
+				
+				if (inscripcionTurno == null) {
+					continue;
+				}
+
+				letradoSeleccionado = new LetradoInscripcionItem();
+
+				letradoSeleccionado.setIdpersona(inscripcionTurno.getIdpersona());
+				letradoSeleccionado.setIdinstitucion(Short.valueOf(inscripcionTurno.getIdinstitucion().toString()));
+				letradoSeleccionado.setIdturno(inscripcionTurno.getIdturno());
+				letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
+				letradoSeleccionado.setSaltoocompensacion("C");
+				alLetradosCompensados.add(letradoSeleccionado);
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(e);
+			throw new Exception("Error al obtener letrados compensados  en BD.", e);
+		}
+
+		return alLetradosCompensados;
+	}
+	
+	private HashMap<Long, ArrayList<LetradoInscripcionItem>> getSaltosHash(List<LetradoInscripcionItem> hmPersonasConSaltosList, Integer idInstitucion, Integer idTurno, Integer idGuardia, AdmUsuarios usuario) throws Exception{
+		
+		HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos = new HashMap<Long, ArrayList<LetradoInscripcionItem>>();
+		ArrayList<LetradoInscripcionItem> alLetradosSaltados;
+		
+		for (int i = 0; i < hmPersonasConSaltosList.size(); i++) {
+			
+			LetradoInscripcionItem htFila = hmPersonasConSaltosList.get(i);
+
+			Long idPersona =  htFila.getIdpersona();
+			
+			LetradoInscripcionItem letradoSeleccionado = new LetradoInscripcionItem(this.getPersonaPorId(idPersona.toString()), idInstitucion, idTurno, idGuardia, "S");
+
+			if (hmPersonasConSaltos.containsKey(idPersona))
+				alLetradosSaltados = hmPersonasConSaltos.get(idPersona);
+			else
+				alLetradosSaltados = new ArrayList<LetradoInscripcionItem>();
+
+			alLetradosSaltados.add(letradoSeleccionado);
+			hmPersonasConSaltos.put(idPersona, alLetradosSaltados);
+		}
+		
+		return hmPersonasConSaltos;
+	}
+	
+	private String getOrderBy(String idOrdenacionColas)  throws Exception{
+		
+		// obteniendo el orden
+		ScsOrdenacioncolas ordenBean = scsOrdenacioncolasMapper.selectByPrimaryKey(Integer.parseInt(idOrdenacionColas));
+		
+		
+		Integer apellidos = Integer.parseInt( ordenBean.getAlfabeticoapellidos().toString());
+		Integer antiguedad = Integer.parseInt(  ordenBean.getAntiguedadcola().toString());
+		Integer fechanacimiento = Integer.parseInt(ordenBean.getFechanacimiento().toString());
+		Integer numerocolegiado = Integer.parseInt( ordenBean.getNumerocolegiado().toString());
+		
+		// calculando order by
+		String orden = "";
+		for (int i=4; i>0; i--) {
+			if (Math.abs(apellidos) == i) {
+				orden += "ALFABETICOAPELLIDOS";
+				if (Math.abs(apellidos) != apellidos) orden += " desc";
+				orden += "," + "NOMBRE";
+				if (Math.abs(apellidos) != apellidos) orden += " desc";
+				orden += ", ";
+			}
+			if (Math.abs(antiguedad) == i) {
+				orden += "ANTIGUEDADCOLA";
+				if (Math.abs(antiguedad) != antiguedad) orden += " desc";
+				orden += ", ";
+			}
+			if (Math.abs(fechanacimiento) == i) {
+				orden += "FECHANACIMIENTO";
+				if (Math.abs(fechanacimiento) != fechanacimiento) orden += " desc";
+				orden += ", ";
+			}
+			if (Math.abs(numerocolegiado) == i) {
+				//orden += "to_number("+ScsOrdenacionColasBean.C_NUMEROCOLEGIADO+")"; esta linea queda comentada para que se vea que el to_number es peligroso				 
+				orden += "lpad("+"NUMEROCOLEGIADO"+",20,'0')";
+				if (Math.abs(numerocolegiado) != numerocolegiado) orden += " desc";
+				orden += ", ";
+			}
+		}
+		
+		if (orden.equals("")) { 
+			// En el caso de que no se haya establecido orden, se ordena por antiguedad en la cola
+			orden = " "+"ANTIGUEDADCOLA"+" ";
+			orden += ", ";
+		}
+		orden = orden.substring(0, orden.length()-2); // quitando ultima coma
+		
+		return orden;
+	} 
+	
+	private LetradoInscripcionItem getSiguienteLetradoTurno(List<LetradoInscripcionItem> alCompensaciones,
+			ArrayList<LetradoInscripcionItem> alLetradosOrdenados, Puntero punteroLetrado, ArrayList<String> diasGuardia,
+			HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos,
+			HashMap<Long, TreeMap<String,BajasTemporalesItem>> hmBajasTemporales, String idInstitucion, String idTurno, String idGuardia,String idCalendarioGuardias , AdmUsuarios usuario) throws Exception {
+		
+		LetradoInscripcionItem letradoGuardia, auxLetradoSeleccionado;
+
+		letradoGuardia = null;
+
+		// recorriendo compensaciones
+		if (alCompensaciones != null && alCompensaciones.size() > 0) {
+
+			//Si hay compensaciones se coge el letrado con la compensación mas antigua.
+			LOGGER.info("Buscando compensaciones…" );
+			
+			Iterator<LetradoInscripcionItem> iterador = alCompensaciones.iterator();
+			while (iterador.hasNext()) {
+				auxLetradoSeleccionado = (LetradoInscripcionItem) iterador.next();
+				// vale
+				if (comprobarRestriccionesLetradoCompensadoTurno(auxLetradoSeleccionado, diasGuardia, iterador, null, hmBajasTemporales,   idInstitucion,  idTurno,  idGuardia, idCalendarioGuardias ,  usuario)) {
+					letradoGuardia = auxLetradoSeleccionado;
+					LOGGER.info("Letrado encontrado. " + letradoGuardia.getPersona().getNombre() + " " +  letradoGuardia.getPersona().getApellidos1() + " " +  letradoGuardia.getPersona().getApellidos2() );
+					break;
+				}
+			}
+		}
+		if (letradoGuardia != null)
+			return letradoGuardia;
+
+		// recorriendo la cola
+		if (alLetradosOrdenados != null && alLetradosOrdenados.size() > 0) {
+
+//			//Si no hay compensaciones se coge el primer letrado de la cola 
+			LOGGER.info("Buscando en la cola" ); 
+			
+			int fin = punteroLetrado.getValor();
+			do {
+				auxLetradoSeleccionado = (LetradoInscripcionItem) alLetradosOrdenados.get(punteroLetrado.getValor());
+				// vale
+				if (comprobarRestriccionesLetradoColaTurno(auxLetradoSeleccionado, diasGuardia, hmPersonasConSaltos, hmBajasTemporales,  idInstitucion,  idTurno,  idGuardia, idCalendarioGuardias ,  usuario) )
+					letradoGuardia = auxLetradoSeleccionado;
+				if(letradoGuardia.getInscripcionTurno() != null) {
+					LOGGER.info("Letrado encontrado. " + letradoGuardia.getInscripcionTurno().getNombre() + " " +  letradoGuardia.getInscripcionTurno().getApellidos1() + " " +  letradoGuardia.getInscripcionTurno().getApellidos2() );
+				}
+				    
+				
+				// obteniendo siguiente en la cola
+				if (punteroLetrado.getValor() < alLetradosOrdenados.size() - 1)
+					punteroLetrado.setValor(punteroLetrado.getValor() + 1);
+				else
+					punteroLetrado.setValor(0); // como es una cola circular hay que volver al principio
+
+			} while (letradoGuardia == null && fin != punteroLetrado.getValor());
+		}
+
+		if (letradoGuardia != null)
+			return letradoGuardia;
+		else
+			return null;
+	} 
+
+	
+	
+	private boolean comprobarRestriccionesLetradoColaTurno(LetradoInscripcionItem letradoGuardia,
+			ArrayList<String> diasGuardia, HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos,
+			HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales, String idInstitucion, String idTurno, String idGuardia,String idCalendarioGuardias , AdmUsuarios usuario) throws Exception {
+
+		LOGGER.info("Probando letrados");
+		
+		// si esta de vacaciones, ...
+		if (isLetradoBajaTemporal(hmBajasTemporales.get(letradoGuardia.getIdpersona()), diasGuardia, letradoGuardia)) {
+			// ... crear un salto cumplido (como si fuera un log)
+			insertarNuevoSaltoBT(letradoGuardia, diasGuardia, "Salto por BT", idInstitucion,  idTurno,  idGuardia, idCalendarioGuardias ,  usuario);
+
+			return false; // y no seleccionar
+		}
+
+		// si tiene saltos, ...
+		List<LetradoInscripcionItem> alSaltos;
+		if ((alSaltos = hmPersonasConSaltos.get(letradoGuardia.getIdpersona())) != null) {
+			// ... compensar uno
+			cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "S", " - Salto cumplido", idInstitucion,  idTurno,  idGuardia,  idCalendarioGuardias,usuario);
+			alSaltos.remove(0);
+			if (alSaltos.size() == 0)
+				hmPersonasConSaltos.remove(letradoGuardia.getIdpersona());
+			return false; // y no seleccionar
+		}
+
+		
+		// una vez comprobado todo, se selecciona a este letrado
+		return true;
+	} // comprobarRestriccionesLetradoCola()
+	
+	
+	private boolean comprobarRestriccionesLetradoCompensadoTurno(LetradoInscripcionItem letradoGuardia,
+			ArrayList<String> diasGuardia, Iterator<LetradoInscripcionItem> iteCompensaciones,
+			String idSaltoCompensacionGrupo, HashMap<Long, TreeMap<String,BajasTemporalesItem>> hmBajasTemporales, String idInstitucion, String idTurno, String idGuardia,String idCalendarioGuardias , AdmUsuarios usuario) throws Exception {
+
+
+				LOGGER.info("Probando letrados");
+				
+				// si esta de vacaciones, ...
+				if (isLetradoBajaTemporal(hmBajasTemporales.get(letradoGuardia.getIdpersona()), diasGuardia, letradoGuardia)) {
+						// ... crear un salto cumplido (como si fuera un log)
+					insertarNuevoSaltoBT(letradoGuardia, diasGuardia, "Salto por BT", idInstitucion,  idTurno,  idGuardia, idCalendarioGuardias ,  usuario);
+					return false; // y no seleccionar
+				}
+
+				// cumpliendo compensacion
+				cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "C", " - Compensacion cumplida",  idInstitucion,  idTurno,  idGuardia,  idCalendarioGuardias,usuario);
+				iteCompensaciones.remove();
+				
+
+				// una vez comprobado todo, se selecciona a este letrado
+				return true;
+		}
+
+		
+	
+	
+	
+	/**
+	 * Si el letrado esta de baja seteamos la baja temporarl en el objeto LetradoGuardia, para luego insertar un salto
+	 */
+	private boolean isLetradoBajaTemporal(TreeMap<String, BajasTemporalesItem> hmBajasTemporales,
+			ArrayList<String> diasGuardia, LetradoInscripcionItem letradoGuardia) {
+		boolean isLetradoBaja = false;
+		BajasTemporalesItem bajaTemporal;
+		
+		LOGGER.info("Se comprueba que no tenga baja temporal");
+
+		if (hmBajasTemporales == null)
+			return isLetradoBaja;
+
+		for (int j = 0; j < diasGuardia.size(); j++) {
+			String fechaPeriodo = (String) diasGuardia.get(j);
+			if (hmBajasTemporales.containsKey(fechaPeriodo)) {
+				bajaTemporal = hmBajasTemporales.get(fechaPeriodo);
+				letradoGuardia.setBajaTemporal(bajaTemporal);
+				isLetradoBaja = true;
+				LOGGER.info("Se anota en el log Letrado"+letradoGuardia.getPersona().getNombre() + " " + letradoGuardia.getPersona().getApellidos1() + " "+ letradoGuardia.getPersona().getApellidos2() +" saltado por baja temporal");
+				break;
+			}
+		}
+
+		return isLetradoBaja;
+	}
+	
+	
+	private void insertarNuevoSaltoBT(LetradoInscripcionItem letradoGuardia, ArrayList<String> diasGuardia, String motivo, String idInstitucion, String idTurno, String idGuardia,String idCalendarioGuardias , AdmUsuarios usuario ) throws Exception {
+		
+		String saltoOCompensacion = "S";
+
+		Integer idGuardiaInt = null;
+		if(idGuardia != null) {
+			idGuardiaInt = Integer.parseInt(idGuardia);
+		}
+		Integer idCalendarioGuardiasInt = null;
+		if(idCalendarioGuardias != null) {
+			idCalendarioGuardiasInt = Integer.parseInt(idCalendarioGuardias);
+		}
+		
+		// obteniendo motivo
+		StringBuffer descripcion = new StringBuffer();
+		BajasTemporalesItem bajaTemporalBean = letradoGuardia.getBajaTemporal();
+		
+		if (bajaTemporalBean.getTipo().equals("V")){
+			descripcion.append(UtilidadesString.getMensajeIdioma(usuario.getIdlenguaje(), "censo.bajastemporales.tipo.vacaciones" ));
+		} 	else if (bajaTemporalBean.getTipo().equals("B")) {
+			descripcion.append(UtilidadesString.getMensajeIdioma(usuario.getIdlenguaje(), "censo.bajastemporales.tipo.baja"));
+		}
+		descripcion.append(" ");
+		descripcion.append(bajaTemporalBean.getDescripcion());
+
+		//Creamos la entity para insertar
+		ScsSaltoscompensaciones scsSaltoscompensaciones = new ScsSaltoscompensaciones();
+		scsSaltoscompensaciones.setIdinstitucion(Short.parseShort( idInstitucion));
+		scsSaltoscompensaciones.setIdturno(Integer.parseInt(idTurno));
+		scsSaltoscompensaciones.setIdguardia(idGuardiaInt);
+		scsSaltoscompensaciones.setIdcalendarioguardiascreacion(idCalendarioGuardiasInt);
+		Date fechaBBDD = new SimpleDateFormat("yyyy-MM-dd").parse(diasGuardia.get(0).toString());
+		scsSaltoscompensaciones.setFechacumplimiento(fechaBBDD);
+		scsSaltoscompensaciones.setIdcalendarioguardias(idCalendarioGuardiasInt);
+		scsSaltoscompensaciones.setMotivos(descripcion + ": " + motivo);
+		scsSaltoscompensaciones.setSaltoocompensacion(saltoOCompensacion);
+		
+		scsSaltoscompensacionesMapper.insert(scsSaltoscompensaciones);
+	}
+	
+
+
+	private void cumplirSaltoCompensacion(LetradoInscripcionItem letradoGuardia, ArrayList<String> diasGuardia,
+			String saltoOCompensacion, String motivo,String idInstitucion, String idTurno, String idGuardia, String idCalendarioGuardias, AdmUsuarios usuario) throws Exception  {
+	
+		Integer idGuardiaInt = null;
+		if(idGuardia != null) {
+			idGuardiaInt = Integer.parseInt(idGuardia);
+		}
+		Integer idCalendarioGuardiasInt = null;
+		if(idCalendarioGuardias != null) {
+			idCalendarioGuardiasInt = Integer.parseInt(idCalendarioGuardias);
+		}
+		
+		
+		ScsSaltoscompensaciones scsSaltoscompensaciones = new ScsSaltoscompensaciones();
+		scsSaltoscompensaciones.setIdinstitucion(Short.parseShort( idInstitucion));
+		scsSaltoscompensaciones.setIdturno(Integer.parseInt(idTurno));
+		scsSaltoscompensaciones.setIdguardia(idGuardiaInt);
+		scsSaltoscompensaciones.setIdpersona(letradoGuardia.getIdpersona());
+		scsSaltoscompensaciones.setSaltoocompensacion(saltoOCompensacion);
+		Date fechaBBDD = new SimpleDateFormat("yyyy-MM-dd").parse(diasGuardia.get(0).toString());
+		scsSaltoscompensaciones.setFechacumplimiento(fechaBBDD);
+		if (idGuardia != null) {
+			scsSaltoscompensaciones.setIdcalendarioguardias(idCalendarioGuardiasInt);
+		}
+		scsSaltoscompensaciones.setMotivos( motivo);
+		
+		
+		scsDesignacionesExtendsMapper.marcarSaltoCompensacion(scsSaltoscompensaciones, usuario);
+	}
+
+	
+	
+	
 	
 	@Override
 	public ProcuradorDTO busquedaProcurador(List<String> procurador, HttpServletRequest request) {
@@ -2323,6 +3133,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info("busquedaProcurador() -> Salida del servicio para obtener procuradores");
 		return procuradorDTO;
 	}
+
 
 	@Override
 	public ComboDTO comboTipoMotivo(HttpServletRequest request) {
@@ -3069,7 +3880,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 
 	@Override
-	public DeleteResponseDTO eliminarRelacion(List<String> listaRelaciones, HttpServletRequest request) {
+	public DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request) {
 		LOGGER.info("deleteInteresado() ->  Entrada al servicio para eliminar contrarios");
 
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
@@ -3102,6 +3913,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					ScsDesignaKey key = new ScsDesignaKey();
 					
+					key.setAnio(Short.parseShort(listaRelaciones.getAnio()));
+					key.setNumero(Long.parseLong(listaRelaciones.getNumero()));
+					key.setIdturno(Integer.parseInt(listaRelaciones.getIdturno()));
+					key.setIdinstitucion(Short.parseShort(listaRelaciones.getIdinstitucion()));
+					
 					response = scsDesignaMapper.deleteByPrimaryKey(key);
 
 					LOGGER.info(
@@ -3131,5 +3947,71 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info("deleteInteresado() -> Salida del servicio para eliminar contrarios");
 
 		return deleteResponseDTO;
+	}
+
+	/**
+	 * actualizaJustificacionExpres
+	 */
+	@Override
+	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+			HttpServletRequest request) {
+		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		int response = 0;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.actualizaJustificacionExpres() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.actualizaJustificacionExpres() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.actualizaJustificacionExpres() -> Entrada a servicio para actualizar las justificaciones express");
+
+				try {
+					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Realizando update...");
+
+//					for(ActuacionesJustificacionExpressItem record : item) {
+
+					// rellenar la key
+//						key.setAnio(item.get);
+
+//						response = scsActuaciondesignaMapper.insert();
+//					}
+
+					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Actualizacion realizada");
+				} catch (Exception e) {
+					LOGGER.error("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Se ha producido un error ",
+							e);
+					response = 0;
+				}
+
+				LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Saliendo del servicio. ");
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
+			responseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		responseDTO.setError(error);
+
+		return responseDTO;
 	}
 }
