@@ -2926,6 +2926,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		return listaLetrados;
 	}
+	
+	public UpdateResponseDTO updateLetradoDesigna(DesignaItem designa, ScsDesignasletrado letrado,
+			HttpServletRequest request) {
+		return new UpdateResponseDTO();
+	}
 
 	public ComboDTO comboMotivosCambioActDesigna(HttpServletRequest request) {
 

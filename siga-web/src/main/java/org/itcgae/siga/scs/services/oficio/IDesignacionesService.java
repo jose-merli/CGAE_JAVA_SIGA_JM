@@ -24,6 +24,7 @@ import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
+import org.itcgae.siga.db.entities.ScsDesignasletrado;
 
 public interface IDesignacionesService {
 
@@ -154,4 +155,7 @@ public interface IDesignacionesService {
 	public ScsDesigna busquedaDesignaActual(ScsDesigna designa, HttpServletRequest request);
 
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
+
+	public UpdateResponseDTO updateLetradoDesigna(DesignaItem designa, ScsDesignasletrado letrado,
+			HttpServletRequest request);
 }
