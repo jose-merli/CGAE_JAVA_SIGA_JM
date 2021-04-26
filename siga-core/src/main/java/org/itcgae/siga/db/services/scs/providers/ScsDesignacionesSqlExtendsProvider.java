@@ -1526,7 +1526,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String getNewIdActuDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, Short idInstitucion) {
+	public String getNewIdActuDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion) {
 
 		SQL sql = new SQL();
 
@@ -1535,9 +1535,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_ACTUACIONDESIGNA ACT");
 
 		sql.WHERE("ACT.IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE("ACT.IDTURNO = '" + actuacionDesignaRequestDTO.getIdTurno() + "'");
-		sql.WHERE("ACT.ANIO = '" + actuacionDesignaRequestDTO.getAnio() + "'");
-		sql.WHERE("ACT.NUMERO = '" + actuacionDesignaRequestDTO.getNumero() + "'");
+		sql.WHERE("ACT.IDTURNO = '" + actuacionDesignaItem.getIdTurno() + "'");
+		sql.WHERE("ACT.ANIO = '" + actuacionDesignaItem.getAnio() + "'");
+		sql.WHERE("ACT.NUMERO = '" + actuacionDesignaItem.getNumero() + "'");
 
 		return sql.toString();
 	}
@@ -1671,8 +1671,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    	return sql.toString();
 	    }
 
-	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion,
-			AdmUsuarios usuario, boolean anular) {
+	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario, boolean anular) {
 		SQL sql = new SQL();
 		String anulReact = anular ? "1" : "0";
 
@@ -1686,7 +1685,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("IDTURNO = '" + actuacionDesignaItem.getIdTurno() + "'");
 		sql.WHERE("ANIO = '" + actuacionDesignaItem.getAnio() + "'");
 		sql.WHERE("NUMEROASUNTO = '" + actuacionDesignaItem.getNumeroAsunto() + "'");
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDINSTITUCION = '" +idInstitucion + "'");
 
 		return sql.toString();
 	}
@@ -1748,8 +1747,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String eliminarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion,
-			AdmUsuarios usuario) {
+	public String eliminarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario) {
 		SQL sql = new SQL();
 
 		sql.DELETE_FROM("SCS_ACTUACIONDESIGNA");
@@ -1812,6 +1810,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdJuzgado())) {
 			sql.VALUES("IDJUZGADO", "'" + actuacionDesignaItem.getIdJuzgado() + "'");
 		}
+		
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdMotivoCambio())) {
+			sql.VALUES("ID_MOTIVO_CAMBIO", "'" + actuacionDesignaItem.getIdMotivoCambio() + "'");
+		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdProcedimiento())) {
 			sql.VALUES("IDPROCEDIMIENTO", "'" + actuacionDesignaItem.getIdProcedimiento() + "'");
@@ -1829,6 +1831,77 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.VALUES("IDPRISION", "'" + actuacionDesignaItem.getIdPrision() + "'");
 		}
 
+		return sql.toString();
+
+	}
+	
+	public String actualizarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion,
+			AdmUsuarios usuario) {
+
+		SQL sql = new SQL();
+
+		sql.UPDATE("SCS_ACTUACIONDESIGNA");
+		
+		if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
+			sql.SET("IDINSTITUCION = '" + idInstitucion + "'");
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaActuacion())) {
+			sql.SET("FECHA = '" + actuacionDesignaItem.getFechaActuacion() + "'");
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPersonaColegiado())) {
+			sql.SET("IDPERSONACOLEGIADO = '" + actuacionDesignaItem.getIdPersonaColegiado() + "'");
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservaciones())) {
+			sql.SET("OBSERVACIONES = '" + actuacionDesignaItem.getObservaciones() + "'");
+		}
+
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getTalonario())) {
+			sql.SET("TALONARIO = '" + actuacionDesignaItem.getTalonario() + "'");
+		}
+
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getTalon())) {
+			sql.SET("TALON = '" + actuacionDesignaItem.getTalon() + "'");
+		}
+		
+
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNig())) {
+			sql.SET("NIG = '" + actuacionDesignaItem.getNig() + "'");
+		}
+
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNumProcedimiento())) {
+			sql.SET("NUMEROPROCEDIMIENTO = '" + actuacionDesignaItem.getNumProcedimiento() + "'");
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdJuzgado())) {
+			sql.SET("IDJUZGADO = '" + actuacionDesignaItem.getIdJuzgado() + "'");
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdMotivoCambio())) {
+			sql.SET("ID_MOTIVO_CAMBIO = '" + actuacionDesignaItem.getIdMotivoCambio() + "'");
+		}
+
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdProcedimiento())) {
+			sql.SET("IDPROCEDIMIENTO = '" + actuacionDesignaItem.getIdProcedimiento() + "'");
+		}
+
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPretension())) {
+			sql.SET("IDPRETENSION = '" + actuacionDesignaItem.getIdPretension() + "'");
+		}
+
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdAcreditacion())) {
+			sql.SET("IDACREDITACION = '" + actuacionDesignaItem.getIdAcreditacion() + "'");
+		}
+
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPrision())) {
+			sql.SET("IDPRISION = '" + actuacionDesignaItem.getIdPrision() + "'");
+		}
+
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+		
 		sql.WHERE("NUMERO = '" + actuacionDesignaItem.getNumero() + "'");
 		sql.WHERE("IDTURNO = '" + actuacionDesignaItem.getIdTurno() + "'");
 		sql.WHERE("ANIO = '" + actuacionDesignaItem.getAnio() + "'");
