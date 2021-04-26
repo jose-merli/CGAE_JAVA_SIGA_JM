@@ -86,6 +86,7 @@ public class DesignaItem {
 	private int idPartidaPresupuestaria;
 	private String nombrePartida;
 	private String validada;
+	private int existeDesignaJuzgadoProcedimiento;
 	
 	public String getApellido1Colegiado() {
 		return apellido1Colegiado;
@@ -930,6 +931,13 @@ public class DesignaItem {
 	}
 	public void setValidada(String validada) {
 		this.validada = validada;
+	}
+	
+	public int getExisteDesignaJuzgadoProcedimiento() {
+		return existeDesignaJuzgadoProcedimiento;
+	}
+	public void setExisteDesignaJuzgadoProcedimiento(int existeDesignaJuzgadoProcedimiento) {
+		this.existeDesignaJuzgadoProcedimiento = existeDesignaJuzgadoProcedimiento;
 	}
 	@Override
 	public String toString() {

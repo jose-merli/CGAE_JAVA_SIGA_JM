@@ -23,6 +23,7 @@ import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
+import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
@@ -281,7 +282,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "MOTIVOSRENUNCIA", property = "motivosRenuncia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) })
-	List<ProcuradorItem> busquedaProcurador(String num, String idinstitucion);
+	List<ProcuradorItem> busquedaProcurador(String num, String idinstitucion, String idturno);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "compruebaProcurador")
 	@Results({
@@ -344,7 +345,15 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboProcedimientosConModulos(Short idInstitucion, List<String> idPretensiones);
-
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboAcreditacionesPorModulo")
+	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPRETENSION", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> comboAcreditacionesPorModulo(Short idInstitucion, String idModulo);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "existeDesginaJuzgadoProcedimiento")
+	@Results({@Result(column = "NUM", property = "existeDesignaJuzgadoProcedimiento", jdbcType = JdbcType.VARCHAR), })
+	DesignaItem existeDesginaJuzgadoProcedimiento(Short idInstitucion, DesignaItem designa);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDatosAdicionales")
 	@Results({ @Result(column = "FECHAOFICIOJUZGADO", property = "fechaOficioJuzgado", jdbcType = JdbcType.DATE),
@@ -355,6 +364,25 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "DEFENSAJURIDICA", property = "defensaJuridica", jdbcType = JdbcType.VARCHAR), })
 	List<DesignaItem> getDatosAdicionales(Short idInstitucion, Integer tamMaximo, DesignaItem designa);
 	
+
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaRelaciones")
+	@Results({ @Result(column = "SJCS", property = "sjcs", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDLETRADO", property = "idletrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNODESIGNA", property = "idturnodesigna", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPO", property = "idtipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DES_TURNO", property = "desturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DES_TIPO", property = "destipo", jdbcType = JdbcType.VARCHAR) })
+	List<RelacionesItem> busquedaRelaciones(String anio, String num, String idTurno, String idinstitucion);
+	
+
+	@DeleteProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "eliminarRelacion")
+	int eliminarRelacion(String idInstitucion);
+
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getPartidaPresupuestariaDesigna")
 	@Results({ @Result(column = "NOMBREPARTIDA", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "value", jdbcType = JdbcType.VARCHAR) })

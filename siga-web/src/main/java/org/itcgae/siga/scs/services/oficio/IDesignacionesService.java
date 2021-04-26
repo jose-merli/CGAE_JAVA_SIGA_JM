@@ -20,6 +20,7 @@ import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
+import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
@@ -123,6 +124,8 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO guardarProcurador(List<String> procurador, HttpServletRequest request);
 
 	InsertResponseDTO nuevoProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
+	
+	public DesignaItem existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request);
 
 	public List<DesignaItem> getDatosAdicionales(DesignaItem designa, HttpServletRequest request);
 
@@ -137,6 +140,10 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO updateProcuradorContrario(ScsContrariosdesigna item, HttpServletRequest request);
 
 	public ColegiadoItemDTO SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request);
+
+	public RelacionesDTO busquedaRelaciones(List<String> procurador, HttpServletRequest request);
+	
+	public DeleteResponseDTO eliminarRelacion(List<String> listaRelaciones,HttpServletRequest request);
 	
 	public ComboDTO getPartidaPresupuestariaDesigna(HttpServletRequest request, DesignaItem designaItem);
 	

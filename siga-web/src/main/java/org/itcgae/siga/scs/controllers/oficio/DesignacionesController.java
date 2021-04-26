@@ -21,6 +21,7 @@ import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
+import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
@@ -270,6 +271,18 @@ public class DesignacionesController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	@RequestMapping(value = "/designas/existeDesginaJuzgadoProcedimiento", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DesignaItem> existeDesginaJuzgadoProcedimiento(HttpServletRequest request,
+			@RequestBody DesignaItem designaItem) {
+		DesignaItem response = designacionesService.existeDesginaJuzgadoProcedimiento(designaItem, request);
+		if (response != null) {
+			return new ResponseEntity<DesignaItem>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<DesignaItem>(new DesignaItem(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
 	// 3.3.6.2.4. Tarjeta Datos Adicionales
 
 	@RequestMapping(value = "/designas/getDatosAdicionales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -746,6 +759,21 @@ public class DesignacionesController {
 	public ResponseEntity<ComboDTO> comboPrisiones(HttpServletRequest request) {
 		ComboDTO response = designacionesService.comboPrisiones(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+
+	@RequestMapping(value = "/designas/busquedaRelaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<RelacionesDTO> busquedaRelaciones(@RequestBody List<String> procurador, HttpServletRequest request) {
+		RelacionesDTO response = designacionesService.busquedaRelaciones(procurador, request);
+		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
+	}
+	
+
+	@PostMapping(value = "/designas/eliminarRelacion", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> eliminarRelacion(
+			@RequestBody List<String> listaRelaciones, HttpServletRequest request) {
+		DeleteResponseDTO response = designacionesService.eliminarRelacion(listaRelaciones, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 }

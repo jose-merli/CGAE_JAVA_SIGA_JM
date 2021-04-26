@@ -20,6 +20,7 @@ public class ProcuradorItem {
 		private String codigoPostal;
 		private String idPoblacion;
 		private String idProvincia;
+		private String idTurno;
 		private boolean historico;
 		private Date fechabaja;
 		private String fax1;
@@ -40,6 +41,14 @@ public class ProcuradorItem {
 		
 		
 		
+		public String getIdTurno() {
+			return idTurno;
+		}
+
+		public void setIdTurno(String idTurno) {
+			this.idTurno = idTurno;
+		}
+
 		public String getNombreApe() {
 			return nombreApe;
 		}
