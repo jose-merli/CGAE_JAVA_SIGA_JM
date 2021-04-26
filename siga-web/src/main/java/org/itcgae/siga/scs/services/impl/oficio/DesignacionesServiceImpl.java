@@ -3064,7 +3064,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 
 	@Override
-	public DeleteResponseDTO eliminarRelacion(List<String> listaRelaciones, HttpServletRequest request) {
+	public DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request) {
 		LOGGER.info("deleteInteresado() ->  Entrada al servicio para eliminar contrarios");
 
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
@@ -3096,6 +3096,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							"deleteInteresado() / ScsDefendidosdesignaMapper.deleteByPrimaryKey() -> Entrada a ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
 
 					ScsDesignaKey key = new ScsDesignaKey();
+					
+					key.setAnio(Short.parseShort(listaRelaciones.getAnio()));
+					key.setNumero(Long.parseLong(listaRelaciones.getNumero()));
+					key.setIdturno(Integer.parseInt(listaRelaciones.getIdturno()));
+					key.setIdinstitucion(Short.parseShort(listaRelaciones.getIdinstitucion()));
 					
 					response = scsDesignaMapper.deleteByPrimaryKey(key);
 
