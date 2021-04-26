@@ -715,6 +715,13 @@ public class DesignacionesController {
 		UpdateResponseDTO response = designacionesService.updateJustiActDesigna(actuacionDesignaItem, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	@PostMapping(value = "/designas/getHistorioAccionesActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ActuacionDesignaItem> getHistorioAccionesActDesigna(
+			@RequestBody ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, HttpServletRequest request) {
+		ActuacionDesignaItem response = designacionesService.getHistorioAccionesActDesigna(actuacionDesignaRequestDTO, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
 	// 3.3.6.2.2. Ficha Procurador
 
