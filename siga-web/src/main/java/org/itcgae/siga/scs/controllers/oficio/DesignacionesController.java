@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
@@ -97,7 +98,7 @@ public class DesignacionesController {
 	 */
 	@RequestMapping(value = "/actualizaJustificacionExpres", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> actualizaJustificacionesExpres(
-			@RequestBody List<ActuacionesJustificacionExpressItem> item, HttpServletRequest request) {
+			@RequestBody List<JustificacionExpressItem> item, HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.actualizaJustificacionExpres(item, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
@@ -164,19 +165,26 @@ public class DesignacionesController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	
 	@RequestMapping(value = "/designas/updateDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> updateDesigna(@RequestBody DesignaItem designaItem, HttpServletRequest request) {
-		InsertResponseDTO response = designacionesService.createDesigna(designaItem, request);
+	ResponseEntity<UpdateResponseDTO> updateDesigna(@RequestBody DesignaItem designaItem,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.updateDesigna(designaItem, request);
 		if (response.getError().getCode() == 200)
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 	}
 	
 	@RequestMapping(value = "/designas/deleteDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> deleteDesigna(@RequestBody List<DesignaItem> item, HttpServletRequest request) {
 		DeleteResponseDTO response = designacionesService.deleteDesigna(item, request);
-		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 	}
 
 	// 3.3.6.2.3. Tarjeta Detalle Designación
@@ -812,6 +820,12 @@ public class DesignacionesController {
 			@RequestBody AsuntosClaveJusticiableItem asuntoClave, HttpServletRequest request) {
 		LetradoDesignaDTO response = designacionesService.getLetradoDesigna(asuntoClave, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/designas/busquedaComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComunicacionesDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
+		ComunicacionesDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
+		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
 	}
 
 }

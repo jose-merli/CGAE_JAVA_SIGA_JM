@@ -54,7 +54,7 @@ public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlP
 		sql.SELECT("PERSONA.APELLIDOS2");
 		sql.SELECT("PERSONA.NOMBRE");
 		sql.SELECT(
-				"(COLEGIADO.NCOLEGIADO || ' ' || PERSONA.APELLIDOS1  || ' ' || PERSONA.APELLIDOS2 || ', ' || PERSONA.NOMBRE) AS COLEGIADO");
+				"(COLEGIADO.NCOLEGIADO || ' - ' || PERSONA.APELLIDOS1  || ' ' || PERSONA.APELLIDOS2 || ', ' || PERSONA.NOMBRE) AS COLEGIADO");
 		sql.SELECT("PERSONA.IDPERSONA");
 
 		sql.FROM("SCS_DESIGNASLETRADO DESIGNALETRADO");
@@ -70,7 +70,7 @@ public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlP
 		sql.WHERE("DESIGNALETRADO.numero   = '" + asuntoClave.getNumero() + "'");
 
 		if (!UtilidadesString.esCadenaVacia(asuntoClave.getFechaDesigna())) {
-			sql.WHERE("DESIGNALETRADO.FECHADESIGNA = '" + asuntoClave.getFechaDesigna() + "'");
+			sql.WHERE("TRUNC(DESIGNALETRADO.FECHADESIGNA) = '" + asuntoClave.getFechaDesigna() + "'");
 		}
 
 		SQL sql2 = new SQL();
