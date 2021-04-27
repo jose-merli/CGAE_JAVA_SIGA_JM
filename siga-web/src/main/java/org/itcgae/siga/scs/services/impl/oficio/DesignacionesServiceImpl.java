@@ -50,6 +50,7 @@ import org.itcgae.siga.commons.utils.Puntero;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenParametros;
@@ -64,6 +65,7 @@ import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsDesignasletradoKey;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -3811,8 +3813,92 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return listaLetrados;
 	}
 	
-	public UpdateResponseDTO updateLetradoDesigna(DesignaItem designa, ScsDesignasletrado letrado,
+	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente, ScsDesignasletrado letradoEntrante,
 			HttpServletRequest request) {
+		LOGGER.info(
+				"updateLetradoDesigna() -> Entrada al servicio para obtener combo de movitos de cambio de la actuación");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+		
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				try {
+
+					ScsDesignasletradoKey key = new ScsDesignasletradoKey();
+					
+					key.setIdinstitucion(idInstitucion);
+					key.setAnio(designa.getAnio());
+					key.setIdturno(designa.getIdturno());
+					key.setNumero(designa.getNumero());
+					key.setIdpersona(letradoSaliente.getIdpersona());
+					key.setFechadesigna(letradoSaliente.getFechadesigna());
+
+					//ScsDesigna designaActual = scsDesignaMapper.selectByPrimaryKey(key);
+					
+					//Gestionamos el antiguo letrado
+					if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
+						response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
+					}
+					else {
+						ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
+						
+						oldLetrado.setFecharenuncia(letradoEntrante.getFechadesigna());
+						oldLetrado.setObservaciones(letradoSaliente.getObservaciones());
+						oldLetrado.setMotivosrenuncia(letradoSaliente.getMotivosrenuncia());
+						
+						response = scsDesignasletradoMapper.updateByPrimaryKeySelective(oldLetrado);
+					}
+					
+					//Seleccion de un letrado en el caso de que no se haya introducido
+					if(letradoEntrante.getIdpersona()==null) {
+						LetradoInscripcionItem newLetrado = this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designa.getIdturno()), letradoSaliente.getFechadesigna().toString(),  usuarios.get(0)); 
+						
+						if (newLetrado==null) {
+							updateResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"DesignacionesServiceImpl.updateJustiActDesigna() -> Se ha producido un error al actualizar los datos de justificación de la actuación");
+							error.setCode(500);
+							error.setDescription(
+									"Se ha producido un error al actualizar los datos de justificación de la actuación");
+							updateResponseDTO.setError(error);
+						}
+						else {
+							letradoEntrante.setIdpersona(newLetrado.getIdpersona());
+							
+							response = scsDesignasletradoMapper.insert(letradoEntrante);
+						}						
+					}
+					else {
+						response = scsDesignasletradoMapper.insert(letradoEntrante);
+					}
+					if (response == 0) {
+						error.setCode(400);
+						error.setDescription("general.mensaje.error.bbdd");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+					} else {
+						error.setCode(200);
+						error.setDescription("general.message.registro.actualizado");
+					}
+					
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("updateLetradoDesigna() -> Salida del servicio");
+				}
+				
+			}
+
+			LOGGER.info(
+					"updateLetradoDesigna() -> Salida del servicio");
+		}
 		return new UpdateResponseDTO();
 	}
 
@@ -4194,5 +4280,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return actuacionDesignaItem;
+	}
+
+	@Override
+	public UpdateResponseDTO updateLetradoDesigna(DesignaItem designa, ScsDesignasletrado letrado,
+			HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
