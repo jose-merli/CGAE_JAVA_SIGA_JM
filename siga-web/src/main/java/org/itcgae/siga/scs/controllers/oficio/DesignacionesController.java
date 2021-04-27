@@ -14,9 +14,11 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
@@ -827,6 +829,12 @@ public class DesignacionesController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/designas/getLetradoDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<LetradoDesignaDTO> getLetradoDesigna(
+			@RequestBody AsuntosClaveJusticiableItem asuntoClave, HttpServletRequest request) {
+		LetradoDesignaDTO response = designacionesService.getLetradoDesigna(asuntoClave, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/designas/busquedaComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComunicacionesDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {

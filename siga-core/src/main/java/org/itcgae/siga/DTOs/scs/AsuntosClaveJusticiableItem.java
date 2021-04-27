@@ -15,6 +15,7 @@ public class AsuntosClaveJusticiableItem {
 	private String clave;
 	private String rol;
 	private String tipo;
+	private String fechaDesigna;
 	
 	/**
 	 **/
@@ -160,6 +161,20 @@ public class AsuntosClaveJusticiableItem {
 		this.tipo = tipo;
 	}
 
+	/**
+	 * @return the fechaDesigna
+	 */
+	public String getFechaDesigna() {
+		return fechaDesigna;
+	}
+
+	/**
+	 * @param fechaDesigna the fechaDesigna to set
+	 */
+	public void setFechaDesigna(String fechaDesigna) {
+		this.fechaDesigna = fechaDesigna;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -235,9 +250,9 @@ public class AsuntosClaveJusticiableItem {
 
 	@Override
 	public String toString() {
-		return "AsuntosClaveJusticiableItem [idPersona=" + idPersona + ", idInstitucion=" + idInstitucion + ", anio=" + anio
-				+ ", nombre=" + nombre + ", numero=" + numero + ", fechaModificacion=" + fechaModificacion + ", clave="
-				+ clave + ", rol=" + rol + ", tipo=" + tipo + "]";
+		return "AsuntosClaveJusticiableItem [idPersona=" + idPersona + ", idInstitucion=" + idInstitucion + ", anio="
+				+ anio + ", nombre=" + nombre + ", numero=" + numero + ", fechaModificacion=" + fechaModificacion
+				+ ", clave=" + clave + ", rol=" + rol + ", tipo=" + tipo + ", fechaDesigna=" + fechaDesigna + "]";
 	}
 
 	
