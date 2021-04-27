@@ -1497,6 +1497,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT("ACT.IDPERSONACOLEGIADO");
 		sql2.SELECT("ACT.ID_MOTIVO_CAMBIO");
 		sql2.SELECT("ACT.IDFACTURACION");
+		sql2.SELECT("ACT.USUCREACION");
+		sql2.SELECT("ACT.FECHACREACION");
+		sql2.SELECT("ACT.USUMODIFICACION");
+		sql2.SELECT("ACT.FECHAMODIFICACION");
+		sql2.SELECT("ACT.USUJUSTIFICACION");
+		sql2.SELECT("ACT.FECHAUSUJUSTIFICACION");
+		sql2.SELECT("ACT.USUVALIDACION");
+		sql2.SELECT("ACT.FECHAVALIDACION");
 
 		sql2.FROM("SCS_ACTUACIONDESIGNA ACT");
 
@@ -1515,6 +1523,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaRequestDTO.getIdPersonaColegiado())) {
 			sql2.WHERE("ACT.IDPERSONACOLEGIADO = '" + actuacionDesignaRequestDTO.getIdPersonaColegiado() + "'");
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaRequestDTO.getNumeroAsunto())) {
+			sql2.WHERE("ACT.NUMEROASUNTO = '" + actuacionDesignaRequestDTO.getNumeroAsunto() + "'");
 		}
 
 		sql2.WHERE("ACT.IDINSTITUCION = '" + idInstitucion + "'");
@@ -1708,6 +1720,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		if(validar && !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
 			sql.SET("FECHAJUSTIFICACION = '" + actuacionDesignaItem.getFechaJustificacion() + "'");
+		}
+		
+		if(validar) {
+			sql.SET("FECHAVALIDACION = SYSDATE");
+			sql.SET("USUVALIDACION = '" + usuario.getIdusuario() + "'");
 		}
 
 		sql.WHERE("NUMERO = '" + actuacionDesignaItem.getNumero() + "'");
@@ -2097,6 +2114,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if(!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
 			sql.SET("FECHAJUSTIFICACION = '" + actuacionDesignaItem.getFechaJustificacion() + "'");
+			sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
+			sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
 		}
 		
 		if(!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservacionesJusti())) {
@@ -2127,6 +2146,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
     			"            || decode(persona.apellidos2, NULL, '', ' ' || persona.apellidos2)\r\n" + 
     			"            || ', '\r\n" + 
     			"            || persona.nombre AS apellidosnombre");
+		sql.SELECT("SCS_DESIGNASLETRADO.IDPERSONA");
 		sql.FROM("SCS_DESIGNASLETRADO");
 		sql.JOIN("CEN_COLEGIADO ON CEN_COLEGIADO.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA AND CEN_COLEGIADO.IDINSTITUCION=SCS_DESIGNASLETRADO.IDINSTITUCION");
 		sql.JOIN("CEN_PERSONA PERSONA ON PERSONA.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA");
