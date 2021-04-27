@@ -38,6 +38,7 @@ import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoInscripcionItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -87,6 +88,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipodictamenejgExtendsMapper;
@@ -157,6 +159,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private ScsDesignasletradoMapper scsDesignasletradoMapper;
+	
+	@Autowired
+	private ScsInscripcionesTurnoExtendsMapper scsInscripcionesTurnoExtendsMapper;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -2286,12 +2291,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setFechamodificacion(new Date());
 						designaLetrado.setUsumodificacion(usuario.getIdusuario());
 						designaLetrado.setManual((short) 1);
-						// TODO
-//						MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
-//						MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
-						designaLetrado.setLetradodelturno("1");
-						String idPersona = scsDesignacionesExtendsMapper
-								.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
+						
+						String idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
+						
+						List<InscripcionesItem> listaInscripciones=	scsInscripcionesTurnoExtendsMapper.obtenerColegiadoInscritoTurno(idInstitucion,String.valueOf(designaItem.getIdTurno()), idPersona);
+						if(listaInscripciones != null && listaInscripciones.size() > 0) {
+//							MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
+							designaLetrado.setLetradodelturno("1");
+						}else {
+//							MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
+							designaLetrado.setLetradodelturno("0");
+						}
+						
 						designaLetrado.setIdpersona(Long.parseLong(idPersona));
 
 					}
@@ -4226,5 +4237,172 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return actuacionDesignaItem;
+	}
+	
+	
+	
+	@Override
+	public UpdateResponseDTO updateDesigna(DesignaItem designaItem, HttpServletRequest request) {
+		LOGGER.info("updateDetalleDesigna() ->  Entrada al servicio para guardar la tarjeta general designacion");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				try {
+
+					LOGGER.info("updateDesigna()-> Entrada a seteo de datos ");
+					ScsDesignaExample example = new ScsDesignaExample();
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdturnoEqualTo(designaItem.getIdTurno()).andAnioEqualTo((short) designaItem.getAno())
+							.andNumeroEqualTo(new Long(designaItem.getNumero()));
+
+					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
+
+					if ((designaExistentes == null && designaExistentes.size() == 0)) {
+						error.setCode(400);
+						// TODO crear description
+						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						updateResponseDTO.setError(error);
+						return updateResponseDTO;
+					}
+
+					
+					ScsDesigna scsDesigna = new ScsDesigna();
+
+					scsDesigna.setIdturno(designaItem.getIdTurno());
+					Integer a = new Integer(idInstitucion);
+					scsDesigna.setIdinstitucion(idInstitucion);
+					a = designaItem.getAno();
+					scsDesigna.setAnio(a.shortValue());
+					Long b = new Long(designaItem.getNumero());
+					scsDesigna.setNumero(b.longValue());
+
+					scsDesigna.setFechamodificacion(new Date());
+					scsDesigna.setUsumodificacion(usuario.getIdusuario());
+
+					scsDesigna.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
+					scsDesigna.setArt27(designaItem.getArt27());
+					
+					//DesignaLetrado
+					ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
+					String numeroColegiado = designaItem.getNumColegiado();
+					Calendar cal = Calendar.getInstance();
+					short year = (short) cal.get(Calendar.YEAR);
+					short mes = (short) cal.get(Calendar.MONTH);
+					short dia = (short) cal.get(Calendar.DAY_OF_MONTH);
+					if (StringUtils.isEmpty(numeroColegiado)) {
+						// Se realiza busqueda en la cola de oficio
+
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+						String fechaform = sdf.format(designaItem.getFechaAlta());
+
+						LetradoInscripcionItem letradoAlgoritmoSeleccion = this.getLetradoTurno(
+								idInstitucion.toString(), String.valueOf(designaItem.getIdTurno()), fechaform, usuario);
+
+//						//Anotamos log
+
+						LOGGER.info("Buscando letrado para el turno " + designaItem.getIdTurno() + " en la fecha " + dia
+								+ "/" + mes + "/" + year);
+//						
+//						//MANUAL = 0, LETRADODELTURNO = 1 si el sistema elige automáticamente de la cola
+//						
+						designaLetrado.setIdinstitucion(idInstitucion);
+						designaLetrado.setIdturno(designaItem.getIdTurno());
+						designaLetrado.setAnio(year);
+						designaLetrado.setNumero(Long.valueOf(designaItem.getNumero()));
+						designaLetrado.setFechadesigna(new Date());
+						designaLetrado.setFechamodificacion(new Date());
+						designaLetrado.setUsumodificacion(usuario.getIdusuario());
+						designaLetrado.setIdpersona(letradoAlgoritmoSeleccion.getIdpersona());
+						designaLetrado.setManual((short) 0);
+						designaLetrado.setLetradodelturno("1");
+
+					} else {
+
+						designaLetrado.setIdinstitucion(idInstitucion);
+						designaLetrado.setIdturno(designaItem.getIdTurno());
+						designaLetrado.setAnio(year);
+						designaLetrado.setNumero(Long.valueOf(designaItem.getNumero()));
+						designaLetrado.setFechadesigna(new Date());
+						designaLetrado.setFechamodificacion(new Date());
+						designaLetrado.setUsumodificacion(usuario.getIdusuario());
+						designaLetrado.setManual((short) 1);
+						
+						String idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
+						
+						List<InscripcionesItem> listaInscripciones=	scsInscripcionesTurnoExtendsMapper.obtenerColegiadoInscritoTurno(idInstitucion,String.valueOf(designaItem.getIdTurno()), idPersona);
+						if(listaInscripciones != null && listaInscripciones.size() > 0) {
+//							MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
+							designaLetrado.setLetradodelturno("1");
+						}else {
+//							MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
+							designaLetrado.setLetradodelturno("0");
+						}
+						
+						designaLetrado.setIdpersona(Long.parseLong(idPersona));
+
+					}
+					
+					LOGGER.info("updateDesigna() / scsDesignacionesExtendsMapper -> Salida a seteo de datos");
+					
+
+					LOGGER.info(
+							"updateDesigna() / scsDesignacionesExtendsMapper.update()-> Entrada a scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
+
+					scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+
+					LOGGER.info(
+							"updateDesigna() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
+					
+					
+					LOGGER.info(
+							"updateDesigna() / scsDesignasletradoMapper.insert() -> Entrada a scsDesignasletradoMapper para insertar designaLetrado");
+
+					scsDesignasletradoMapper.updateByPrimaryKey(designaLetrado);
+
+					LOGGER.info(
+							"updateDesigna() / scsDesignasletradoMapper.insert() -> Salida de scsDesignasletradoMapper para insertar designaLetrado");
+
+				} catch (Exception e) {
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la designacion  correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateDetalleDesigna() -> Salida del servicio para actualizar una partida presupuestaria");
+
+			}
+		}
+		return updateResponseDTO;
 	}
 }

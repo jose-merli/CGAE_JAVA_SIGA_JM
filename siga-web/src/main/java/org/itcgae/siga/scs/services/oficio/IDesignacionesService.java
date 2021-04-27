@@ -165,4 +165,6 @@ public interface IDesignacionesService {
 
 	public ActuacionDesignaItem getHistorioAccionesActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			HttpServletRequest request);
+	
+	public UpdateResponseDTO updateDesigna(DesignaItem designaItem, HttpServletRequest request);
 }

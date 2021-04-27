@@ -2,25 +2,15 @@ package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
-import org.itcgae.siga.DTOs.scs.TiposActuacionItem;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
-import org.itcgae.siga.db.entities.ScsInscripcionturno;
-import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.mappers.ScsInscripcionturnoMapper;
-import org.itcgae.siga.db.mappers.ScsInscripcionturnoSqlProvider;
-import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsInscripcionesTurnoSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsProcedimientosSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsTurnosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -208,4 +198,14 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	        @Result(column="FECHAVALIDACION", property="fechavalidacion", jdbcType=JdbcType.TIMESTAMP),
 	        @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP) })
 	    List<InscripcionesItem> busquedaInscripcionesCMO(String turnos, Short idInstitucion);
+	 
+	 
+	 @SelectProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="obtenerColegiadoInscritoTurno")
+	 @Results({ 
+		    @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
+	        @Result(column="IDTURNO", property="idturno", jdbcType=JdbcType.DECIMAL),
+	        @Result(column="IDPERSONA", property="idpersona", jdbcType=JdbcType.DECIMAL),
+	        @Result(column="IDTURNO", property="idturno", jdbcType=JdbcType.DECIMAL),
+	        @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP) })
+	    List<InscripcionesItem> obtenerColegiadoInscritoTurno(Short idInstitucion, String idTurno, String idPersona);
 }
