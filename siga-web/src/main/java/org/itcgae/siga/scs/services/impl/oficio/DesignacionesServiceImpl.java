@@ -2299,11 +2299,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"createDesigna() / scsDesignaMapper.insert() -> Entrada a scsDesignaMapper para insertar la designacion");
 
-<<<<<<< HEAD
-					  response = scsDesignaMapper.insert(designa);
-=======
-					scsDesignaMapper.insert(designa);
->>>>>>> branch 'Oficio' of https://bitbucket.es.deloitte.com/scm/dxd/cgae_java_siga.git
+
+					 response = scsDesignaMapper.insert(designa);
+
 
 					LOGGER.info(
 							"createDesigna() / scsDesignaMapper.insert() -> Salida de scsDesignaMapper para insertar la designacion");
