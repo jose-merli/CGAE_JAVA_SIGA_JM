@@ -25,6 +25,7 @@ import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
+import org.itcgae.siga.db.entities.ScsDesignasletrado;
 
 public interface IDesignacionesService {
 
@@ -45,7 +46,7 @@ public interface IDesignacionesService {
 	 * @param request
 	 * @return
 	 */
-	public InsertResponseDTO insertaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+	public InsertResponseDTO insertaJustificacionExpres(ActuacionesJustificacionExpressItem item,
 			HttpServletRequest request);
 
 	/**
@@ -150,9 +151,15 @@ public interface IDesignacionesService {
 	
 	public DeleteResponseDTO deleteDesigna(List<DesignaItem> item, HttpServletRequest request);
 
-	public ScsDesigna busquedaDesigna(ScsDesigna designa, HttpServletRequest request);
+	public ScsDesigna busquedaDesignaActual(ScsDesigna designa, HttpServletRequest request);
 
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
 
+	public UpdateResponseDTO updateLetradoDesigna(DesignaItem designa, ScsDesignasletrado letrado,
+			HttpServletRequest request);
+			
 	DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request);
+	
+	public ActuacionDesignaItem getHistorioAccionesActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
+			HttpServletRequest request);
 }
