@@ -34,6 +34,8 @@ import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.CenPersonaItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
+import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
+import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
@@ -4007,4 +4009,52 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		return responseDTO;
 	}
+	
+
+	@Override
+	public ComunicacionesDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request) {
+		LOGGER.info("busquedaProcurador() -> Entrada al servicio para obtener prisiones");
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComunicacionesDTO comunicacionesDTO = new ComunicacionesDTO();
+		List<ComunicacionesItem> comunicacionesItem = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"busquedaProcurador() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"busquedaProcurador() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"busquedaProcurador() / scsProcuradorExtendsMapper.busquedaProcurador() -> Entrada a scsProcuradorExtendsMapper para obtener los procuradores");
+				
+				String[] parts = comunicaciones.get(0).split("/");
+				String anio = parts[0].substring(1);
+				String num = parts[1];
+				String idTurno = comunicaciones.get(1);
+				comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno);
+
+				LOGGER.info(
+						"busquedaProcurador() / scsProcuradorExtendsMapper.busquedaProcurador() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				if (comunicacionesItem != null) {
+					//comunicacionesDTO.setComunicacionesItem(comunicacionesDTO);
+				}
+			}
+
+		}
+		LOGGER.info("busquedaProcurador() -> Salida del servicio para obtener procuradores");
+		return comunicacionesDTO;
+	}
+	
 }

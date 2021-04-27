@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -775,6 +776,13 @@ public class DesignacionesController {
 			@RequestBody RelacionesItem listaRelaciones, HttpServletRequest request) {
 		DeleteResponseDTO response = designacionesService.eliminarRelacion(listaRelaciones, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+
+	@RequestMapping(value = "/designas/busquedaComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComunicacionesDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
+		ComunicacionesDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
+		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
 	}
 
 }

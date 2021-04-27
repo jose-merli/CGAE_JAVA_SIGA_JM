@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -155,4 +156,6 @@ public interface IDesignacionesService {
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
 
 	DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request);
+	
+	public ComunicacionesDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request);
 }
