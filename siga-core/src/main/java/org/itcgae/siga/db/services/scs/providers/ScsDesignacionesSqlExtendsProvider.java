@@ -2114,6 +2114,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
     			"            || decode(persona.apellidos2, NULL, '', ' ' || persona.apellidos2)\r\n" + 
     			"            || ', '\r\n" + 
     			"            || persona.nombre AS apellidosnombre");
+		sql.SELECT("SCS_DESIGNASLETRADO.IDPERSONA");
 		sql.FROM("SCS_DESIGNASLETRADO");
 		sql.JOIN("CEN_COLEGIADO ON CEN_COLEGIADO.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA AND CEN_COLEGIADO.IDINSTITUCION=SCS_DESIGNASLETRADO.IDINSTITUCION");
 		sql.JOIN("CEN_PERSONA PERSONA ON PERSONA.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA");

@@ -421,6 +421,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHAREnunciasolicita", property = "fechaSolRenuncia", jdbcType = JdbcType.DATE),
 			@Result(column = "motivosrenuncia", property = "motivoRenuncia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ncolegiado", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idpersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "apellidosnombre", property = "apellidosNombre", jdbcType = JdbcType.VARCHAR), })
 	List<ListaLetradosDesignaItem> getListaLetradosDesigna( ScsDesigna designa, Short idInstitucion);
 	
