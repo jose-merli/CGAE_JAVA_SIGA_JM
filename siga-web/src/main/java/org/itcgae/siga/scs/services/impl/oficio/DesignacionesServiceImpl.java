@@ -2059,6 +2059,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			if (usuarios != null && !usuarios.isEmpty()) {
 				
 				MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actuacionDesignaItem, idInstitucion);
+				
+				actuacionDesignaItem.setNumeroAsunto(maxIdDto.getIdMax().toString());
 
 				int response = scsDesignacionesExtendsMapper.guardarActDesigna(actuacionDesignaItem,
 						Short.toString(idInstitucion), usuarios.get(0));
