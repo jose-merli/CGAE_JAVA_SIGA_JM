@@ -118,6 +118,9 @@ public class DesignacionesController {
 	@RequestMapping(value = "/busquedaDesignaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<List<DesignaItem>> busquedaDesignas(@RequestBody DesignaItem item, HttpServletRequest request) {
 		List<DesignaItem> response = designacionesService.busquedaDesignas(item, request);
+		if(response == null || response.isEmpty()) {
+			response = designacionesService.busquedaNuevaDesigna(item, request);
+		}
 		if (response != null) {
 			return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
 		} else {
@@ -126,6 +129,17 @@ public class DesignacionesController {
 		}
 	}
 
+	
+	@RequestMapping(value = "/busquedaNuevaDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<DesignaItem>> busquedaNuevaDesigna(@RequestBody DesignaItem item, HttpServletRequest request) {
+		List<DesignaItem> response = designacionesService.busquedaNuevaDesigna(item, request);
+		if (response != null) {
+			return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<List<DesignaItem>>(new ArrayList<DesignaItem>(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	@RequestMapping(value = "/busquedaProcedimientoDesignas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<List<DesignaItem>> busquedaProcedimientoDesignas(@RequestBody DesignaItem item,
 			HttpServletRequest request) {

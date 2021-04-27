@@ -27,6 +27,7 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.springframework.web.bind.annotation.RequestBody;
 
 public interface IDesignacionesService {
 
@@ -71,6 +72,8 @@ public interface IDesignacionesService {
 			HttpServletRequest request);
 
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
+	
+	public List<DesignaItem> busquedaNuevaDesigna(@RequestBody DesignaItem item, HttpServletRequest request);
 
 	public List<DesignaItem> busquedaProcedimientoDesignas(DesignaItem item, HttpServletRequest request);
 
