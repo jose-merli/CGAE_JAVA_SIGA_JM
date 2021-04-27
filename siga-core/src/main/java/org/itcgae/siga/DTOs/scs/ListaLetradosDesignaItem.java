@@ -7,6 +7,7 @@ public class ListaLetradosDesignaItem {
 	private String nColegiado;
 	private String apellidosNombre;
 	private String motivoRenuncia;
+	private String idPersona;
 	private Date fechaDesignacion;
 	private Date fechaSolRenuncia;
 	private Date fechaEfecRenuncia;
@@ -47,6 +48,12 @@ public class ListaLetradosDesignaItem {
 	}
 	public void setFechaEfecRenuncia(Date fechaEfecRenuncia) {
 		this.fechaEfecRenuncia = fechaEfecRenuncia;
+	}
+	public String getIdPersona() {
+		return idPersona;
+	}
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
 	}
 	
 

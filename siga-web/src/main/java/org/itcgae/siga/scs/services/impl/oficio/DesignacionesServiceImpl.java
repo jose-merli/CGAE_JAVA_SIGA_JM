@@ -3661,7 +3661,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 	
 	@Override
-	public ScsDesigna busquedaDesigna(ScsDesigna item, HttpServletRequest request) {
+	public ScsDesigna busquedaDesignaActual(ScsDesigna item, HttpServletRequest request) {
 		LOGGER.info("DesignacionesServiceImpl.busquedaDesigna() -> Entrada al servicio servicio");
 		ScsDesigna designa = null;
 		List<GenParametros> tamMax = null;
@@ -3811,6 +3811,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return listaLetrados;
+	}
+	
+	public UpdateResponseDTO updateLetradoDesigna(DesignaItem designa, ScsDesignasletrado letrado,
+			HttpServletRequest request) {
+		return new UpdateResponseDTO();
 	}
 
 	public ComboDTO comboMotivosCambioActDesigna(HttpServletRequest request) {
