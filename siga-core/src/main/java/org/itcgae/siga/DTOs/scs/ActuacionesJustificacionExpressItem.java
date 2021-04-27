@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ActuacionesJustificacionExpressItem {
 
-	private String numActuacion;
+	private String numDesignacion;
 	private String idAcreditacion;
 	private String descripcion;
 	private String idTipoAcreditacion;
@@ -35,17 +35,17 @@ public class ActuacionesJustificacionExpressItem {
 	private String idTurno;
 	private String idInstitucion;
 	/**
-	 * @return the numActuacion
+	 * @return the numDesignacion
 	 */
-	@JsonProperty("numActuacion")
-	public String getNumActuacion() {
-		return numActuacion;
+	@JsonProperty("numDesignacion")
+	public String getNumDesignacion() {
+		return numDesignacion;
 	}
 	/**
-	 * @param numActuacion the numActuacion to set
+	 * @param numDesignacion the numDesignacion to set
 	 */
-	public void setNumActuacion(String numActuacion) {
-		this.numActuacion = numActuacion;
+	public void setNumDesignacion(String numDesignacion) {
+		this.numDesignacion = numDesignacion;
 	}
 	/**
 	 * @return the idAcreditacion

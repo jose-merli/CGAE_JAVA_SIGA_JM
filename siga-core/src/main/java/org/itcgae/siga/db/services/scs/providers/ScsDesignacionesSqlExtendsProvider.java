@@ -19,9 +19,9 @@ import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
-import org.itcgae.siga.db.entities.ScsDesigna;
 
 
 public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
@@ -1495,6 +1495,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT("ACT.IDPERSONACOLEGIADO");
 		sql2.SELECT("ACT.ID_MOTIVO_CAMBIO");
 		sql2.SELECT("ACT.IDFACTURACION");
+		sql2.SELECT("ACT.USUCREACION");
+		sql2.SELECT("ACT.FECHACREACION");
+		sql2.SELECT("ACT.USUMODIFICACION");
+		sql2.SELECT("ACT.FECHAMODIFICACION");
+		sql2.SELECT("ACT.USUJUSTIFICACION");
+		sql2.SELECT("ACT.FECHAUSUJUSTIFICACION");
+		sql2.SELECT("ACT.USUVALIDACION");
+		sql2.SELECT("ACT.FECHAVALIDACION");
 
 		sql2.FROM("SCS_ACTUACIONDESIGNA ACT");
 
@@ -1513,6 +1521,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaRequestDTO.getIdPersonaColegiado())) {
 			sql2.WHERE("ACT.IDPERSONACOLEGIADO = '" + actuacionDesignaRequestDTO.getIdPersonaColegiado() + "'");
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaRequestDTO.getNumeroAsunto())) {
+			sql2.WHERE("ACT.NUMEROASUNTO = '" + actuacionDesignaRequestDTO.getNumeroAsunto() + "'");
 		}
 
 		sql2.WHERE("ACT.IDINSTITUCION = '" + idInstitucion + "'");
@@ -1706,6 +1718,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		if(validar && !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
 			sql.SET("FECHAJUSTIFICACION = '" + actuacionDesignaItem.getFechaJustificacion() + "'");
+		}
+		
+		if(validar) {
+			sql.SET("FECHAVALIDACION = SYSDATE");
+			sql.SET("USUVALIDACION = '" + usuario.getIdusuario() + "'");
 		}
 
 		sql.WHERE("NUMERO = '" + actuacionDesignaItem.getNumero() + "'");
@@ -2095,6 +2112,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if(!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
 			sql.SET("FECHAJUSTIFICACION = '" + actuacionDesignaItem.getFechaJustificacion() + "'");
+			sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
+			sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
 		}
 		
 		if(!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservacionesJusti())) {
@@ -2125,6 +2144,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
     			"            || decode(persona.apellidos2, NULL, '', ' ' || persona.apellidos2)\r\n" + 
     			"            || ', '\r\n" + 
     			"            || persona.nombre AS apellidosnombre");
+		sql.SELECT("SCS_DESIGNASLETRADO.IDPERSONA");
 		sql.FROM("SCS_DESIGNASLETRADO");
 		sql.JOIN("CEN_COLEGIADO ON CEN_COLEGIADO.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA AND CEN_COLEGIADO.IDINSTITUCION=SCS_DESIGNASLETRADO.IDINSTITUCION");
 		sql.JOIN("CEN_PERSONA PERSONA ON PERSONA.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA");
@@ -2246,7 +2266,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		String sIdpersona = (idPersonaUltimo == null) ? "null" : idPersonaUltimo.toString();
 		String sFechaSolicitudUltimo = (fechaSolicitudUltimo == null || fechaSolicitudUltimo.equals("")) ? "null" : fechaSolicitudUltimo.toString();
 		
-		 Format formatter = new SimpleDateFormat("yyyy-MM-dd");
+		 Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		 String fechaBBDD2 = formatter.format(fechaSolicitudUltimo);
 		 
 		SQL sql = new SQL();
@@ -2254,7 +2274,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.UPDATE("SCS_TURNO");
 
 		sql.SET("IDPERSONA_ULTIMO = '" + sIdpersona + "'");
-		sql.SET("FECHASOLICITUD_ULTIMO = TO_DATE('" + fechaBBDD2 + "' , 'YYYY/MM/DD') ");
+		sql.SET("FECHASOLICITUD_ULTIMO = TO_DATE('" + fechaBBDD2 + "' , 'YYYY/MM/DD HH24:MI:SS') ");
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
 		
@@ -2266,9 +2286,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 	
-	public String marcarSaltoCompensacion(ScsSaltoscompensaciones saltoCompensacion, AdmUsuarios usuario) throws Exception {
+	public String marcarSaltoCompensacion(ScsSaltoscompensaciones saltoCompensacion, AdmUsuarios usuario)
+			throws Exception {
 		SQL sql = new SQL();
-	
+
 		try {
 			String s_idinstitucion = saltoCompensacion.getIdinstitucion().toString();
 			String s_idturno = null;
@@ -2290,61 +2311,54 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					s_saltocompensacion = " ";
 			}
 
-			
-			
-			 Format formatter = new SimpleDateFormat("yyyy/MM/dd");
-			 String fechaBBDD2 = formatter.format(saltoCompensacion.getFechacumplimiento());
-			
+			Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String fechaBBDD2 = formatter.format(saltoCompensacion.getFechacumplimiento());
+
 			sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
 
-			sql.SET("FECHACUMPLIMIENTO = '" + fechaBBDD2+ "'");
+			sql.SET("FECHACUMPLIMIENTO = '" + fechaBBDD2 + "'");
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 			sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
 			if (saltoCompensacion.getIdguardia() != null) {
 				sql.SET("IDCALENDARIOGUARDIAS = '" + saltoCompensacion.getIdcalendarioguardias() + "'");
 			}
 			if (saltoCompensacion.getMotivos() != null && !saltoCompensacion.getMotivos().equals("")) {
-				
+
 				sql.SET("MOTIVOS = '" + saltoCompensacion.getMotivos() + "'");
 			}
 
-			
 			sql.WHERE("IDINSTITUCION = '" + s_idinstitucion + "'");
-		
+
 			if (s_idturno != null && !s_idturno.equals("")) {
 				sql.WHERE("IDTURNO = '" + s_idturno + "'");
-				
+
 			}
 			if (s_idguardia != null && !s_idguardia.equals("")) {
 				sql.WHERE("IDGUARDIA = '" + s_idguardia + "'");
 			} else {
 				sql.WHERE("IDGUARDIA IS NULL");
 			}
-			
-			
+
 			if (s_idpersona != null && !s_idpersona.equals("")) {
 				sql.WHERE("IDPERSONA = '" + s_idpersona + "'");
 			}
-			
+
 			if (s_saltocompensacion != " ") {
 				sql.WHERE("SALTOOCOMPENSACION = '" + s_saltocompensacion + "'");
 			}
-			
+
 			sql.WHERE("FECHACUMPLIMIENTO IS NULL");
-			
 
 			if (saltoCompensacion.getIdsaltosturno() != null) {
-				
+
 				sql.WHERE("IDSALTOSTURNO = '" + saltoCompensacion.getIdsaltosturno() + "'");
 			}
 
-			//sql.append(" AND rownum=1");
-
+			// sql.append(" AND rownum=1");
 
 		} catch (Exception e) {
-			throw new Exception( "Excepcion en marcarSaltoCompensacionBBDD.",e);
+			throw new Exception("Excepcion en marcarSaltoCompensacionBBDD.", e);
 		}
-		
 
 		return sql.toString();
 	}
@@ -2450,5 +2464,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	}
 	
 	
+	public String  obtenerIdPersonaByNumCol(String idInstitucion, String numColegiado) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDPERSONA ");
+		sql.FROM("CEN_COLEGIADO");
+		sql.WHERE(" IDINSTITUCION ='"+idInstitucion+"'");
+		sql.WHERE(" NCOLEGIADO ='"+numColegiado+"'");
+
+    	return sql.toString();
+    }
 	
 }
