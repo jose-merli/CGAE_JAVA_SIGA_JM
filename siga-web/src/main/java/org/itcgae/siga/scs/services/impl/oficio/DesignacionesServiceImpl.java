@@ -2609,10 +2609,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	//		obteniendo lista de letrados (ordenada)
 			List<InscripcionTurnoItem> listaLetrados = scsDesignacionesExtendsMapper.getColaTurnoBBDD(idInstitucion.toString(), idTurno.toString(), fechaBBDD2, orden);
 			
-//			Format formatter2 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-//			
-//			Date fechaprueba = listaLetrados.get(0).getFechasolicitud();
-//			LOGGER.info(formatter2.format(fechaprueba));
+			Format formatter2 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			
+			Date fechaprueba = listaLetrados.get(0).getFechasolicitud();
+			LOGGER.info(formatter2.format(fechaprueba));
 			
 			if (listaLetrados == null || listaLetrados.size()==0) {
 				return colaLetrados;

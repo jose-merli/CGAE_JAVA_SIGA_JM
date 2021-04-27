@@ -2248,7 +2248,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		String sIdpersona = (idPersonaUltimo == null) ? "null" : idPersonaUltimo.toString();
 		String sFechaSolicitudUltimo = (fechaSolicitudUltimo == null || fechaSolicitudUltimo.equals("")) ? "null" : fechaSolicitudUltimo.toString();
 		
-		 Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
+		 Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		 String fechaBBDD2 = formatter.format(fechaSolicitudUltimo);
 		 
 		SQL sql = new SQL();
@@ -2256,7 +2256,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.UPDATE("SCS_TURNO");
 
 		sql.SET("IDPERSONA_ULTIMO = '" + sIdpersona + "'");
-		sql.SET("FECHASOLICITUD_ULTIMO = TO_DATE('" + fechaBBDD2 + "' , 'YYYY/MM/DD HH:MM:ss') ");
+		sql.SET("FECHASOLICITUD_ULTIMO = TO_DATE('" + fechaBBDD2 + "' , 'YYYY/MM/DD HH24:MI:SS') ");
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
 		
@@ -2268,9 +2268,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 	
-	public String marcarSaltoCompensacion(ScsSaltoscompensaciones saltoCompensacion, AdmUsuarios usuario) throws Exception {
+	public String marcarSaltoCompensacion(ScsSaltoscompensaciones saltoCompensacion, AdmUsuarios usuario)
+			throws Exception {
 		SQL sql = new SQL();
-	
+
 		try {
 			String s_idinstitucion = saltoCompensacion.getIdinstitucion().toString();
 			String s_idturno = null;
@@ -2292,61 +2293,54 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					s_saltocompensacion = " ";
 			}
 
-			
-			
-			 Format formatter = new SimpleDateFormat("yyyy/MM/dd");
-			 String fechaBBDD2 = formatter.format(saltoCompensacion.getFechacumplimiento());
-			
+			Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String fechaBBDD2 = formatter.format(saltoCompensacion.getFechacumplimiento());
+
 			sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
 
-			sql.SET("FECHACUMPLIMIENTO = '" + fechaBBDD2+ "'");
+			sql.SET("FECHACUMPLIMIENTO = '" + fechaBBDD2 + "'");
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 			sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
 			if (saltoCompensacion.getIdguardia() != null) {
 				sql.SET("IDCALENDARIOGUARDIAS = '" + saltoCompensacion.getIdcalendarioguardias() + "'");
 			}
 			if (saltoCompensacion.getMotivos() != null && !saltoCompensacion.getMotivos().equals("")) {
-				
+
 				sql.SET("MOTIVOS = '" + saltoCompensacion.getMotivos() + "'");
 			}
 
-			
 			sql.WHERE("IDINSTITUCION = '" + s_idinstitucion + "'");
-		
+
 			if (s_idturno != null && !s_idturno.equals("")) {
 				sql.WHERE("IDTURNO = '" + s_idturno + "'");
-				
+
 			}
 			if (s_idguardia != null && !s_idguardia.equals("")) {
 				sql.WHERE("IDGUARDIA = '" + s_idguardia + "'");
 			} else {
 				sql.WHERE("IDGUARDIA IS NULL");
 			}
-			
-			
+
 			if (s_idpersona != null && !s_idpersona.equals("")) {
 				sql.WHERE("IDPERSONA = '" + s_idpersona + "'");
 			}
-			
+
 			if (s_saltocompensacion != " ") {
 				sql.WHERE("SALTOOCOMPENSACION = '" + s_saltocompensacion + "'");
 			}
-			
+
 			sql.WHERE("FECHACUMPLIMIENTO IS NULL");
-			
 
 			if (saltoCompensacion.getIdsaltosturno() != null) {
-				
+
 				sql.WHERE("IDSALTOSTURNO = '" + saltoCompensacion.getIdsaltosturno() + "'");
 			}
 
-			//sql.append(" AND rownum=1");
-
+			// sql.append(" AND rownum=1");
 
 		} catch (Exception e) {
-			throw new Exception( "Excepcion en marcarSaltoCompensacionBBDD.",e);
+			throw new Exception("Excepcion en marcarSaltoCompensacionBBDD.", e);
 		}
-		
 
 		return sql.toString();
 	}
