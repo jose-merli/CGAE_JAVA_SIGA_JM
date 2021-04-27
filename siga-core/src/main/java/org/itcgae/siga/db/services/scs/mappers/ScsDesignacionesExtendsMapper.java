@@ -154,7 +154,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	 * @return
 	 */
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaActuacionesJustificacionExpres")
-	@Results({ @Result(column = "NUMERO", property = "numActuacion", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "NUMERO", property = "numDesignacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDACREDITACION", property = "idAcreditacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ACREDITACION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPOACREDITACION", property = "idTipoAcreditacion", jdbcType = JdbcType.VARCHAR),

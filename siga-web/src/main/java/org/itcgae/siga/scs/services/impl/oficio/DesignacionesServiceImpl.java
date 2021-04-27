@@ -93,6 +93,7 @@ import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -292,6 +293,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	 * insertaJustificacionExpres
 	 */
 	@Override
+	@Transactional
 	public InsertResponseDTO insertaJustificacionExpres(ActuacionesJustificacionExpressItem item,
 			HttpServletRequest request) {
 		InsertResponseDTO responseDTO = new InsertResponseDTO();
@@ -366,6 +368,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						record.setIdturno(Integer.parseInt(item.getIdTurno()));
 					}
 					
+					if(item.getNumDesignacion()!=null  && !item.getNumDesignacion().trim().isEmpty()){
+						record.setNumero(Long.parseLong(item.getNumDesignacion()));
+					}
+					
+					//cogemos el numAsunto
+					ActuacionDesignaItem actDesignaItem = new ActuacionDesignaItem();
+					
+					actDesignaItem.setAnio(item.getAnio());
+					actDesignaItem.setIdTurno(item.getIdTurno());
+					actDesignaItem.setNumero(item.getNumDesignacion());
+					
+					MaxIdDto maxNumAsunto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actDesignaItem, idInstitucion);
+					record.setNumeroasunto(maxNumAsunto.getIdMax());
+					
 					response = scsActuaciondesignaMapper.insertSelective(record);
 
 					LOGGER.info("DesignacionesServiceImpl.insertaJustificacionExpres() -> Insert finalizado");
@@ -397,6 +413,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	/**
 	 * eliminaJustificacionExpres
 	 */
+	@Transactional
 	public DeleteResponseDTO eliminaJustificacionExpres(List<ActuacionesJustificacionExpressItem> listaItem,
 			HttpServletRequest request) {
 		DeleteResponseDTO responseDTO = new DeleteResponseDTO();
@@ -429,25 +446,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					ScsActuaciondesignaKey key = new ScsActuaciondesignaKey();
 					
 					for(ActuacionesJustificacionExpressItem item : listaItem) {
-						if(item.getAnio()!=null && !item.getAnio().isEmpty()){
-							key.setAnio(Short.parseShort(item.getAnio()));
-						}
-						
-						if(item.getIdInstitucion()!=null && !item.getIdInstitucion().isEmpty()){
-							key.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
-						}
-						
-						if(item.getIdTurno()!=null && !item.getIdTurno().isEmpty()){
-							key.setIdturno(Integer.parseInt(item.getIdTurno()));
-						}
-						
-						if(item.getNumActuacion()!=null && !item.getNumActuacion().isEmpty()){
-							key.setNumero(Long.parseLong(item.getNumActuacion()));
-						}
-						
-						if(item.getNumAsunto()!=null && !item.getNumAsunto().isEmpty()){
-							key.setNumeroasunto(Long.parseLong(item.getNumAsunto()));
-						}
+						key.setAnio(Short.parseShort(item.getAnio()));
+						key.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
+						key.setIdturno(Integer.parseInt(item.getIdTurno()));
+						key.setNumero(Long.parseLong(item.getNumDesignacion()));
+						key.setNumeroasunto(Long.parseLong(item.getNumAsunto()));
 						
 						response += scsActuaciondesignaMapper.deleteByPrimaryKey(key);
 					}
@@ -4019,6 +4022,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	 * actualizaJustificacionExpres
 	 */
 	@Override
+	@Transactional
 	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> listaItem,
 			HttpServletRequest request) {
 		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
