@@ -5,6 +5,7 @@ public class ActuacionDesignaRequestDTO {
 	private String anio;
 	private String idTurno;
 	private String numero;
+	private String numeroAsunto;
 	private String idPersonaColegiado;
 	private boolean historico;
 
@@ -51,6 +52,20 @@ public class ActuacionDesignaRequestDTO {
 	}
 
 	/**
+	 * @return the numeroAsunto
+	 */
+	public String getNumeroAsunto() {
+		return numeroAsunto;
+	}
+
+	/**
+	 * @param numeroAsunto the numeroAsunto to set
+	 */
+	public void setNumeroAsunto(String numeroAsunto) {
+		this.numeroAsunto = numeroAsunto;
+	}
+
+	/**
 	 * @return the historico
 	 */
 	public boolean isHistorico() {
@@ -81,7 +96,8 @@ public class ActuacionDesignaRequestDTO {
 	@Override
 	public String toString() {
 		return "ActuacionDesignaRequestDTO [anio=" + anio + ", idTurno=" + idTurno + ", numero=" + numero
-				+ ", idPersonaColegiado=" + idPersonaColegiado + ", historico=" + historico + "]";
+				+ ", numeroAsunto=" + numeroAsunto + ", idPersonaColegiado=" + idPersonaColegiado + ", historico="
+				+ historico + "]";
 	}
 
 }
