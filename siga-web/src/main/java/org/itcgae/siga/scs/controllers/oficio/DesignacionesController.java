@@ -14,8 +14,10 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
@@ -27,7 +29,6 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
-import org.itcgae.siga.db.services.scs.providers.ScsDesignasLetradoSqlExtendsProvider;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -803,6 +804,13 @@ public class DesignacionesController {
 	public ResponseEntity<DeleteResponseDTO> eliminarRelacion(
 			@RequestBody RelacionesItem listaRelaciones, HttpServletRequest request) {
 		DeleteResponseDTO response = designacionesService.eliminarRelacion(listaRelaciones, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/getLetradoDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<LetradoDesignaDTO> getLetradoDesigna(
+			@RequestBody AsuntosClaveJusticiableItem asuntoClave, HttpServletRequest request) {
+		LetradoDesignaDTO response = designacionesService.getLetradoDesigna(asuntoClave, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
