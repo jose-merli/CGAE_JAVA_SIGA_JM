@@ -31,6 +31,14 @@ public class ActuacionDesignaItem {
 	private String observacionesJusti;
 	private String idMotivoCambio;
 	private String idFacturacion;
+	private String usuCreacion;
+	private String fechaCreacion;
+	private String usuModificacion;
+	private String fechaModificacion;
+	private String usuJustificacion;
+	private String fechaUsuJustificacion;
+	private String usuValidacion;
+	private String fechaValidacion;
 
 	/**
 	 * @return the fechaActuacion
@@ -438,6 +446,118 @@ public class ActuacionDesignaItem {
 		this.idFacturacion = idFacturacion;
 	}
 
+	/**
+	 * @return the usuCreacion
+	 */
+	public String getUsuCreacion() {
+		return usuCreacion;
+	}
+
+	/**
+	 * @param usuCreacion the usuCreacion to set
+	 */
+	public void setUsuCreacion(String usuCreacion) {
+		this.usuCreacion = usuCreacion;
+	}
+
+	/**
+	 * @return the fechaCreacion
+	 */
+	public String getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	/**
+	 * @param fechaCreacion the fechaCreacion to set
+	 */
+	public void setFechaCreacion(String fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+	/**
+	 * @return the usuModificacion
+	 */
+	public String getUsuModificacion() {
+		return usuModificacion;
+	}
+
+	/**
+	 * @param usuModificacion the usuModificacion to set
+	 */
+	public void setUsuModificacion(String usuModificacion) {
+		this.usuModificacion = usuModificacion;
+	}
+
+	/**
+	 * @return the fechaModificacion
+	 */
+	public String getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	/**
+	 * @param fechaModificacion the fechaModificacion to set
+	 */
+	public void setFechaModificacion(String fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	/**
+	 * @return the usuJustificacion
+	 */
+	public String getUsuJustificacion() {
+		return usuJustificacion;
+	}
+
+	/**
+	 * @param usuJustificacion the usuJustificacion to set
+	 */
+	public void setUsuJustificacion(String usuJustificacion) {
+		this.usuJustificacion = usuJustificacion;
+	}
+
+	/**
+	 * @return the fechaUsuJustificacion
+	 */
+	public String getFechaUsuJustificacion() {
+		return fechaUsuJustificacion;
+	}
+
+	/**
+	 * @param fechaUsuJustificacion the fechaUsuJustificacion to set
+	 */
+	public void setFechaUsuJustificacion(String fechaUsuJustificacion) {
+		this.fechaUsuJustificacion = fechaUsuJustificacion;
+	}
+
+	/**
+	 * @return the usuValidacion
+	 */
+	public String getUsuValidacion() {
+		return usuValidacion;
+	}
+
+	/**
+	 * @param usuValidacion the usuValidacion to set
+	 */
+	public void setUsuValidacion(String usuValidacion) {
+		this.usuValidacion = usuValidacion;
+	}
+
+	/**
+	 * @return the fechaValidacion
+	 */
+	public String getFechaValidacion() {
+		return fechaValidacion;
+	}
+
+	/**
+	 * @param fechaValidacion the fechaValidacion to set
+	 */
+	public void setFechaValidacion(String fechaValidacion) {
+		this.fechaValidacion = fechaValidacion;
+	}
+
 	@Override
 	public String toString() {
 		return "ActuacionDesignaItem [fechaActuacion=" + fechaActuacion + ", numero=" + numero + ", numeroAsunto="
@@ -449,7 +569,11 @@ public class ActuacionDesignaItem {
 				+ ", idAcreditacion=" + idAcreditacion + ", idPrision=" + idPrision + ", observaciones=" + observaciones
 				+ ", talonario=" + talonario + ", talon=" + talon + ", idPersonaColegiado=" + idPersonaColegiado
 				+ ", nombreJuzgado=" + nombreJuzgado + ", observacionesJusti=" + observacionesJusti
-				+ ", idMotivoCambio=" + idMotivoCambio + ", idFacturacion=" + idFacturacion + "]";
+				+ ", idMotivoCambio=" + idMotivoCambio + ", idFacturacion=" + idFacturacion + ", usuCreacion="
+				+ usuCreacion + ", fechaCreacion=" + fechaCreacion + ", usuModificacion=" + usuModificacion
+				+ ", fechaModificacion=" + fechaModificacion + ", usuJustificacion=" + usuJustificacion
+				+ ", fechaUsuJustificacion=" + fechaUsuJustificacion + ", usuValidacion=" + usuValidacion
+				+ ", fechaValidacion=" + fechaValidacion + "]";
 	}
 
 }

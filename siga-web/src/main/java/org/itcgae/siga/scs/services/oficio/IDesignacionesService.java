@@ -46,7 +46,7 @@ public interface IDesignacionesService {
 	 * @param request
 	 * @return
 	 */
-	public InsertResponseDTO insertaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+	public InsertResponseDTO insertaJustificacionExpres(ActuacionesJustificacionExpressItem item,
 			HttpServletRequest request);
 
 	/**
@@ -159,4 +159,7 @@ public interface IDesignacionesService {
 			HttpServletRequest request);
 			
 	DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request);
+	
+	public ActuacionDesignaItem getHistorioAccionesActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
+			HttpServletRequest request);
 }

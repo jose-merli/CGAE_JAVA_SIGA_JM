@@ -82,7 +82,7 @@ public class DesignacionesController {
 	 */
 	@RequestMapping(value = "/insertaJustificacionExpres", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> nuevaJustificacionExpres(
-			@RequestBody List<ActuacionesJustificacionExpressItem> item, HttpServletRequest request) {
+			@RequestBody ActuacionesJustificacionExpressItem item, HttpServletRequest request) {
 		InsertResponseDTO response = designacionesService.insertaJustificacionExpres(item, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
@@ -726,6 +726,13 @@ public class DesignacionesController {
 	public ResponseEntity<UpdateResponseDTO> guardarJustiActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem,
 			HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.updateJustiActDesigna(actuacionDesignaItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/getHistorioAccionesActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ActuacionDesignaItem> getHistorioAccionesActDesigna(
+			@RequestBody ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, HttpServletRequest request) {
+		ActuacionDesignaItem response = designacionesService.getHistorioAccionesActDesigna(actuacionDesignaRequestDTO, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
