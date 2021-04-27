@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosDesignaItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
+import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
@@ -316,7 +317,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboTipoMotivo")
-	@Results({ @Result(column = "NOMBRE", property = "value", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "IDTIPOMOTIVO", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR), })
 	List<ComboItem> comboTipoMotivo(Short idInstitucion);
 
@@ -538,6 +539,20 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
  	 List<InscripcionTurnoItem> getColaTurnoBBDD(String idinstitucion, String idturno, String fecha, String order);
 	
 	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaComunicaciones")
+	@Results({
+			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMERODESIGNACION", property = "numerodesignacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHADESIGNA", property = "fechaDesigna", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "MOTIVOSRENUNCIA", property = "motivosRenuncia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) })
+	List<ComunicacionesItem> busquedaComunicaciones(String num, String anio, String idturno);
+
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerIdPersonaByNumCol")
 	@Results({ 

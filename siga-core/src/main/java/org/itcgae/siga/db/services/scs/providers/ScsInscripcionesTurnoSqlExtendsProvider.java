@@ -3,9 +3,8 @@ package org.itcgae.siga.db.services.scs.providers;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;import org.apache.ibatis.annotations.Result;
+
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.db.mappers.ScsInscripcionturnoSqlProvider;
 
@@ -608,6 +607,23 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		else sql1.WHERE("SCS_INSCRIPCIONTURNO.IDTURNO IN ("+turnos+")");
 		sql1.WHERE("SCS_INSCRIPCIONTURNO.idinstitucion ='"+idInstitucion.toString()+"'");
 		sql1.WHERE("SCS_INSCRIPCIONTURNO.fechavalidacion is not null");
+		
+		return sql1.toString();
+	}
+	
+	
+	public String obtenerColegiadoInscritoTurno(Short idInstitucion, String idTurno, String idPersona) {
+		
+		SQL sql1 = new SQL();
+		
+		sql1.SELECT_DISTINCT("*");
+		sql1.FROM("SCS_INSCRIPCIONTURNO");
+	
+
+		sql1.WHERE("SCS_INSCRIPCIONTURNO.idinstitucion ='"+idInstitucion.toString()+"'");
+		sql1.WHERE("SCS_INSCRIPCIONTURNO.idturno ='"+idTurno+"'");
+		sql1.WHERE("SCS_INSCRIPCIONTURNO.idpersona ='"+idPersona+"'");
+		sql1.WHERE("SCS_INSCRIPCIONTURNO.fechabaja is null");
 		
 		return sql1.toString();
 	}

@@ -1417,10 +1417,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String comboTipoMotivo(Short institucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("E.nombre, F_SIGA_GETRECURSO(E.nombre, 1) as Descripcion");
-		sql.FROM("cen_gruposcliente E");
-		sql.WHERE(" E.IDINSTITUCION ='" + institucion + "'");
-		sql.ORDER_BY("idgrupo ASC");
+		sql.SELECT("IDTIPOMOTIVO, F_SIGA_GETRECURSO(E.DESCRIPCION, 1) as Descripcion");
+		sql.FROM("SCS_TIPOMOTIVO E");
 
 		return sql.toString();
 	}
@@ -2043,12 +2041,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "	            scs_ejg          e,\r\n"
 				+ "	            scs_ejgdesigna   ed\r\n"
 				+ "	        WHERE\r\n"
-				//+ "	            ed.aniodesigna = "+anio+"\r\n"
-				+ "	             ed.numerodesigna = "+num+"\r\n"
-				//+ "	            AND ed.idturno = "+idTurno+"\r\n"
+				+ "	            ed.aniodesigna = "+anio+"\r\n"
+				+ "	            AND ed.numerodesigna = "+num+"\r\n"
+				+ "	            AND ed.idturno = "+idTurno+"\r\n"
 				+ "	            AND ed.idinstitucion = "+idinstitucion+"\r\n"
 				+ "	            AND ed.idinstitucion = e.idinstitucion\r\n"
-				//+ "	            AND ed.anioejg = e.anio\r\n"
+				+ "	            AND ed.anioejg = e.anio\r\n"
 				+ "	            AND ed.numeroejg = e.numero\r\n"
 				+ "	            AND ed.idtipoejg = e.idtipoejg\r\n"
 				+ "	            AND ed.idinstitucion = e.idinstitucion\r\n");
@@ -2069,7 +2067,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.DELETE_FROM("SCS_EJGDESIGNA");
 
-		sql.WHERE("NUMEROEJG = " + num);
+		sql.WHERE("NUMERODESIGNA = " + num);
 		sql.WHERE("IDTURNO = " + idTurno);
 		sql.WHERE("ANIODESIGNA = " + anio);
 		sql.WHERE("IDINSTITUCION = " + idinstitucion);
@@ -2444,6 +2442,26 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			throw new Exception ( "Error al ejecutar getColaTurno()",e);
 		}			
 	} 
+ 	
+	public String busquedaComunicaciones(String num, String idturno) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT(
+				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia, dp.fecharenunciasolicita");
+
+		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
+		sql2.WHERE("dp.idturno = " + idturno);
+		sql2.WHERE("dp.numero =" + num);
+		sql2.WHERE("dp.idprocurador = p.idprocurador");
+		sql2.WHERE("dp.idinstitucion = p.idinstitucion");
+
+		sql.SELECT("*");
+		sql.FROM("( " + sql2.toString() + " )");
+		sql.WHERE("ROWNUM <= 201");
+
+		return sql.toString();
+	}
 	
 	
 	public String  obtenerIdPersonaByNumCol(String idInstitucion, String numColegiado) {

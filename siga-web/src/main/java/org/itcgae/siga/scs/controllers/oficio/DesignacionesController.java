@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -27,7 +28,6 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
-import org.itcgae.siga.db.services.scs.providers.ScsDesignasLetradoSqlExtendsProvider;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,13 +163,16 @@ public class DesignacionesController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	
 	@RequestMapping(value = "/designas/updateDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> updateDesigna(@RequestBody DesignaItem designaItem, HttpServletRequest request) {
-		InsertResponseDTO response = designacionesService.createDesigna(designaItem, request);
+	ResponseEntity<UpdateResponseDTO> updateDesigna(@RequestBody DesignaItem designaItem,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.updateDesigna(designaItem, request);
 		if (response.getError().getCode() == 200)
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 	}
 	
 	@RequestMapping(value = "/designas/deleteDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -808,6 +811,13 @@ public class DesignacionesController {
 			@RequestBody RelacionesItem listaRelaciones, HttpServletRequest request) {
 		DeleteResponseDTO response = designacionesService.eliminarRelacion(listaRelaciones, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+
+	@RequestMapping(value = "/designas/busquedaComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComunicacionesDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
+		ComunicacionesDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
+		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
 	}
 
 }
