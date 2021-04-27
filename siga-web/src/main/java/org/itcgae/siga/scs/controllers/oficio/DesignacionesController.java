@@ -164,7 +164,11 @@ public class DesignacionesController {
 	@RequestMapping(value = "/designas/deleteDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> deleteDesigna(@RequestBody List<DesignaItem> item, HttpServletRequest request) {
 		DeleteResponseDTO response = designacionesService.deleteDesigna(item, request);
-		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 	}
 
 	// 3.3.6.2.3. Tarjeta Detalle Designación
