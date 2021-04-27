@@ -478,6 +478,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		responseDTO.setError(error);
 
 		return responseDTO;
+		
 	}
 
 	@Override
@@ -4030,7 +4031,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	 */
 	@Override
 	@Transactional
-	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> listaItem,
+	public UpdateResponseDTO actualizaJustificacionExpres(List<JustificacionExpressItem> listaItem,
 			HttpServletRequest request) {
 		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
 
@@ -4062,52 +4063,77 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Realizando update...");
 
-					ScsActuaciondesigna record = new ScsActuaciondesigna();
-					
-					for(ActuacionesJustificacionExpressItem item : listaItem) {
-						if(item.getAnio()!=null && !item.getAnio().trim().isEmpty()){
-							record.setAnio(Short.parseShort(item.getAnio()));
+					for(JustificacionExpressItem justificacion : listaItem) {
+						//guardamos los cambios de la designacion
+						
+						ScsDesigna recordJust = new ScsDesigna();
+						
+						recordJust.setIdinstitucion(Short.parseShort(justificacion.getIdInstitucion()));
+						recordJust.setIdturno(Integer.parseInt(justificacion.getIdTurno()));
+						recordJust.setAnio(Short.parseShort(justificacion.getAnioDesignacion()));
+						recordJust.setNumero(Long.parseLong(justificacion.getNumDesignacion()));
+						recordJust.setFechamodificacion(new Date());
+						recordJust.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
+						if(justificacion.getIdJuzgado()!=null){
+							recordJust.setIdjuzgado(Long.parseLong(justificacion.getIdJuzgado()));
 						}
 						
-						if(item.getAnioProcedimiento() !=null && !item.getAnioProcedimiento().trim().isEmpty()){
-							record.setAnioprocedimiento(Short.parseShort(item.getAnioProcedimiento()));
+						if(justificacion.getNig() != null && !justificacion.getNig().trim().isEmpty()) {
+							recordJust.setNig(justificacion.getNig());
 						}
+//						
+//						if(justificacion.getEstado()!=null && justificacion.getEstado().trim().isEmpty()){
+//							recordJust.setEstado(justificacion.getEstado());
+//						}
+//						
+						response = scsDesignaMapper.updateByPrimaryKeySelective(recordJust);
 						
-						if(item.getFecha()!=null && !item.getFecha().trim().isEmpty()){
-							fecha = formatter.parse(item.getFecha());  
-							record.setFecha(fecha);
+						//guardamos las actuaciones
+						if(justificacion.getActuaciones() != null && justificacion.getActuaciones().size()>0) {
+							for(ActuacionesJustificacionExpressItem actuacion : justificacion.getActuaciones()) {
+								
+								ScsActuaciondesigna record = new ScsActuaciondesigna();
+								
+								if(actuacion.getAnioProcedimiento() !=null && !actuacion.getAnioProcedimiento().trim().isEmpty()){
+									record.setAnioprocedimiento(Short.parseShort(actuacion.getAnioProcedimiento()));
+								}
+								
+								if(actuacion.getFecha()!=null && !actuacion.getFecha().trim().isEmpty()){
+									fecha = formatter.parse(actuacion.getFecha());  
+									record.setFecha(fecha);
+								}
+								
+								if(actuacion.getFechaJustificacion()!=null && !actuacion.getFechaJustificacion().trim().isEmpty()){
+									fecha = formatter.parse(actuacion.getFechaJustificacion());  
+									record.setFechajustificacion(fecha);
+								}
+								
+								record.setFechamodificacion(new Date());
+								
+								if(actuacion.getIdAcreditacion()!=null && !actuacion.getIdAcreditacion().trim().isEmpty()){
+									record.setIdacreditacion(Short.parseShort(actuacion.getIdAcreditacion()));
+								}
+								
+								if(actuacion.getIdJuzgado()!=null && !actuacion.getIdJuzgado().trim().isEmpty()){
+									record.setIdjuzgado(Long.parseLong(actuacion.getIdJuzgado()));
+								}
+								
+								if(actuacion.getIdProcedimiento()!=null && !actuacion.getIdProcedimiento().trim().isEmpty()){
+									record.setIdprocedimiento(actuacion.getIdProcedimiento());
+								}
+								
+								record.setIdinstitucion(Short.parseShort(actuacion.getIdInstitucion()));
+								record.setNumeroasunto(Long.parseLong(actuacion.getNumAsunto()));
+								record.setNumero(Long.parseLong(actuacion.getNumDesignacion()));
+								record.setIdturno(Integer.parseInt(actuacion.getIdTurno()));
+								record.setAnio(Short.parseShort(actuacion.getAnio()));
+								
+								response = scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
+							}
 						}
-						
-						if(item.getFechaJustificacion()!=null && !item.getFechaJustificacion().trim().isEmpty()){
-							fecha = formatter.parse(item.getFechaJustificacion());  
-							record.setFechajustificacion(fecha);
-						}
-						
-						record.setFechamodificacion(new Date());
-						
-						if(item.getIdAcreditacion()!=null && !item.getIdAcreditacion().trim().isEmpty()){
-							record.setIdacreditacion(Short.parseShort(item.getIdAcreditacion()));
-						}
-						
-						if(item.getIdInstitucion()!=null && !item.getIdInstitucion().trim().isEmpty()){
-							record.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
-						}
-					
-						if(item.getIdJuzgado()!=null && !item.getIdJuzgado().trim().isEmpty()){
-							record.setIdjuzgado(Long.parseLong(item.getIdJuzgado()));
-						}
-						
-						if(item.getIdProcedimiento()!=null && !item.getIdProcedimiento().trim().isEmpty()){
-							record.setIdprocedimiento(item.getIdProcedimiento());
-						}
-						
-						if(item.getIdTurno()!=null && !item.getIdTurno().trim().isEmpty()){
-							record.setIdturno(Integer.parseInt(item.getIdTurno()));
-						}
-						
-						response += scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
 					}
-
+					
 					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Actualizacion realizada");
 				} catch (Exception e) {
 					LOGGER.error("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Se ha producido un error ",

@@ -96,7 +96,7 @@ public class DesignacionesController {
 	 */
 	@RequestMapping(value = "/actualizaJustificacionExpres", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> actualizaJustificacionesExpres(
-			@RequestBody List<ActuacionesJustificacionExpressItem> item, HttpServletRequest request) {
+			@RequestBody List<JustificacionExpressItem> item, HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.actualizaJustificacionExpres(item, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
