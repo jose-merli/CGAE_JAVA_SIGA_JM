@@ -3881,7 +3881,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 	
 	
-	
+	@Override
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente, ScsDesignasletrado letradoEntrante,
 			HttpServletRequest request) {
 		LOGGER.info(
@@ -3910,6 +3910,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					key.setNumero(designa.getNumero());
 					key.setIdpersona(letradoSaliente.getIdpersona());
 					key.setFechadesigna(letradoSaliente.getFechadesigna());
+					
 
 					//ScsDesigna designaActual = scsDesignaMapper.selectByPrimaryKey(key);
 					
@@ -3921,6 +3922,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
 						
 						oldLetrado.setFecharenuncia(letradoEntrante.getFechadesigna());
+						oldLetrado.setFecharenunciasolicita(letradoEntrante.getFecharenunciasolicita());
 						oldLetrado.setObservaciones(letradoSaliente.getObservaciones());
 						oldLetrado.setMotivosrenuncia(letradoSaliente.getMotivosrenuncia());
 						
@@ -4448,13 +4450,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return actuacionDesignaItem;
-	}
-
-	@Override
-	public UpdateResponseDTO updateLetradoDesigna(DesignaItem designa, ScsDesignasletrado letrado,
-			HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	

@@ -18,8 +18,11 @@ import org.itcgae.siga.db.entities.ScsPartidapresupuestaria;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestariaExample;
 import org.itcgae.siga.db.entities.ScsSubzona;
 import org.itcgae.siga.db.entities.ScsSubzonaExample;
+import org.itcgae.siga.db.entities.ScsTurno;
+import org.itcgae.siga.db.entities.ScsTurnoKey;
 import org.itcgae.siga.db.entities.ScsZona;
 import org.itcgae.siga.db.entities.ScsZonaExample;
+import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAreasMateriasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
@@ -60,6 +63,9 @@ public class ComboServiceImpl implements ComboService {
 
 	@Autowired
 	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
+
+	@Autowired
+	private ScsTurnoMapper scsTurnoMapper;
 
 	@Autowired
 	private ScsJurisdiccionExtendsMapper scsJurisdiccionExtendsMapper;
@@ -108,13 +114,13 @@ public class ComboServiceImpl implements ComboService {
 
 	@Autowired
 	private ScsTipoSOJExtendsMapper scsTipoSOJExtendsMapper;
-	
+
 	@Autowired
 	private ScsComisariaExtendsMapper scsComisariaExtendsMapper;
-	
+
 	@Autowired
 	private ScsJuzgadoExtendsMapper scsJuzgadoExtendsMapper;
-	
+
 	@Autowired
 	private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
 
@@ -136,7 +142,8 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboTipoEjg() / scsTipoEJGExtendsMapper.comboTipoEjg() -> Entrada a scsTipoEJGExtendsMapper para obtener combo tipoejg");
 
-				List<ComboItem> comboItems = scsTipoEJGExtendsMapper.comboTipoEjg(Short.parseShort(usuarios.get(0).getIdlenguaje()));
+				List<ComboItem> comboItems = scsTipoEJGExtendsMapper
+						.comboTipoEjg(Short.parseShort(usuarios.get(0).getIdlenguaje()));
 
 				LOGGER.info(
 						"comboTipoEjg() / scsTipoEJGExtendsMapper.comboTipoEjg() -> Salida e scsTipoEJGExtendsMapper para obtener combo tipoejg");
@@ -148,7 +155,7 @@ public class ComboServiceImpl implements ComboService {
 		}
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboEstadoEjg(HttpServletRequest request) {
 
@@ -167,7 +174,8 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboEstadoEjg() / scsEstadoEJGExtendsMapper.comboEstadoEjg() -> Entrada a scsTipoEJGExtendsMapper para obtener combo EstadoEjg");
 
-				List<ComboItem> comboItems = scsEstadoEJGExtendsMapper.comboEstadoEjg(Short.parseShort(usuarios.get(0).getIdlenguaje()));
+				List<ComboItem> comboItems = scsEstadoEJGExtendsMapper
+						.comboEstadoEjg(Short.parseShort(usuarios.get(0).getIdlenguaje()));
 
 				LOGGER.info(
 						"comboEstadoEjg() / scsEstadoEJGExtendsMapper.comboEstadoEjg() -> Salida e scsTipoEJGExtendsMapper para obtener combo EstadoEjg");
@@ -179,7 +187,7 @@ public class ComboServiceImpl implements ComboService {
 		}
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboTipoEjgColegio(HttpServletRequest request) {
 
@@ -198,7 +206,8 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboTipoEjgColegio() / scsTipoEJGColegioExtendsMapper.comboTipoEjgColegio() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo TipoEjgColegio");
 
-				List<ComboItem> comboItems = scsTipoEJGColegioExtendsMapper.comboTipoEjgColegio(Short.parseShort(usuarios.get(0).getIdlenguaje()));
+				List<ComboItem> comboItems = scsTipoEJGColegioExtendsMapper
+						.comboTipoEjgColegio(Short.parseShort(usuarios.get(0).getIdlenguaje()));
 
 				LOGGER.info(
 						"comboTipoEjgColegio() / scsTipoEJGColegioExtendsMapper.comboTipoEjgColegio() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo TipoEjgColegio");
@@ -210,7 +219,7 @@ public class ComboServiceImpl implements ComboService {
 		}
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboTipoDesignacion(HttpServletRequest request) {
 
@@ -229,7 +238,8 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboTipoDesignacion() / scsTipoDesignaColegioExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo TipoDesignacion");
 
-				List<ComboItem> comboItems = scsTipoDesignaColegioExtendsMapper.comboTipoDesignacion(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion.toString());
+				List<ComboItem> comboItems = scsTipoDesignaColegioExtendsMapper.comboTipoDesignacion(
+						Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion.toString());
 
 				LOGGER.info(
 						"comboTipoDesignacion() / scsTipoDesignaColegioExtendsMapper.comboGuardias() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo TipoDesignacion");
@@ -241,7 +251,7 @@ public class ComboServiceImpl implements ComboService {
 		}
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboTipoSOJ(HttpServletRequest request) {
 
@@ -260,7 +270,8 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboTipoSOJ() / scsTipoSOJExtendsMapper.comboTipoSOJ() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo TipoSOJ");
 
-				List<ComboItem> comboItems = scsTipoSOJExtendsMapper.comboTipoSOJ(Short.parseShort(usuarios.get(0).getIdlenguaje()));
+				List<ComboItem> comboItems = scsTipoSOJExtendsMapper
+						.comboTipoSOJ(Short.parseShort(usuarios.get(0).getIdlenguaje()));
 
 				LOGGER.info(
 						"comboTipoSOJ() / scsTipoSOJExtendsMapper.comboTipoSOJ() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo TipoSOJ");
@@ -272,7 +283,7 @@ public class ComboServiceImpl implements ComboService {
 		}
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboComisaria(HttpServletRequest request) {
 
@@ -291,7 +302,8 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboComisaria() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo Comisaria");
 
-				List<ComboItem> comboItems = scsComisariaExtendsMapper.comboComisaria(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
+				List<ComboItem> comboItems = scsComisariaExtendsMapper
+						.comboComisaria(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
 
 				LOGGER.info(
 						"comboComisaria() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo Comisaria");
@@ -303,7 +315,7 @@ public class ComboServiceImpl implements ComboService {
 		}
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboJuzgado(HttpServletRequest request) {
 
@@ -322,7 +334,8 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboJuzgado() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo Juzgado");
 
-				List<ComboItem> comboItems = scsJuzgadoExtendsMapper.comboJuzgado(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
+				List<ComboItem> comboItems = scsJuzgadoExtendsMapper
+						.comboJuzgado(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
 
 				LOGGER.info(
 						"comboJuzgado() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo Juzgado");
@@ -340,11 +353,11 @@ public class ComboServiceImpl implements ComboService {
 	 */
 	public ComboDTO comboJuzgadoPorInstitucion(String idInstitucion, HttpServletRequest request) {
 		LOGGER.info("comboJuzgadoPorInstitucion() -> Entrada al servicio para búsqueda de Juzgado por institucion");
-		
+
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		ComboDTO comboDTO = new ComboDTO();
-		
+
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -354,7 +367,8 @@ public class ComboServiceImpl implements ComboService {
 
 				LOGGER.info("comboJuzgadoPorInstitucion() -> Obteniendo los juzgados por institucion....");
 
-				List<ComboItem> comboItems = scsJuzgadoExtendsMapper.comboJuzgado(Short.parseShort(usuarios.get(0).getIdlenguaje()), Short.parseShort(idInstitucion));
+				List<ComboItem> comboItems = scsJuzgadoExtendsMapper.comboJuzgado(
+						Short.parseShort(usuarios.get(0).getIdlenguaje()), Short.parseShort(idInstitucion));
 
 				LOGGER.info("comboJuzgadoPorInstitucion() -> Salida del servicio");
 
@@ -362,13 +376,13 @@ public class ComboServiceImpl implements ComboService {
 			}
 
 			LOGGER.info("comboJuzgado() -> Salida del servicio para obtener combo Juzgado");
-		}else {
+		} else {
 			LOGGER.warn("comboJuzgadoPorInstitucion() -> Salida del servicio. No viene informado la idInstitucion");
 		}
-		
+
 		return comboDTO;
 	}
-	
+
 	// PK
 
 	public ComboDTO getComboZonas(HttpServletRequest request) {
@@ -440,17 +454,17 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info("getComboSubZonas() -> Entrada para obtener la información de las distintas subZonas");
 
 				ScsSubzonaExample example = new ScsSubzonaExample();
-				
+
 				List<ScsSubzona> subZonas;
-				if(idZona.contains(",")) {
-					 subZonas = scsSubZonasExtendsMapper.getIdSubzona2(idInstitucion, idZona);
-				}else {
-					example.createCriteria().andIdzonaEqualTo(Short.valueOf(idZona)).andIdinstitucionEqualTo(idInstitucion)
-					.andFechabajaIsNull();
+				if (idZona.contains(",")) {
+					subZonas = scsSubZonasExtendsMapper.getIdSubzona2(idInstitucion, idZona);
+				} else {
+					example.createCriteria().andIdzonaEqualTo(Short.valueOf(idZona))
+							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 					example.setOrderByClause("nombre");
-					 subZonas = scsSubZonasExtendsMapper.selectByExample(example);
+					subZonas = scsSubZonasExtendsMapper.selectByExample(example);
 				}
-				
+
 				List<ComboItem> comboItems = new ArrayList<ComboItem>();
 
 				for (ScsSubzona zona : subZonas) {
@@ -826,7 +840,7 @@ public class ComboServiceImpl implements ComboService {
 		return comboDTO;
 
 	}
-	
+
 	@Override
 	public ComboDTO comboGuardiasNoGrupo(HttpServletRequest request, String idTurno) {
 		LOGGER.info("comboGuardiasNoGrupo() -> Entrada al servicio para búsqueda de las guardias que no son por grupo");
@@ -853,12 +867,13 @@ public class ComboServiceImpl implements ComboService {
 				comboDTO.setCombooItems(comboItems);
 			}
 
-			LOGGER.info("comboGuardiasNoGrupo() -> Salida del servicio para obtener combo guardias que no son por grupo");
+			LOGGER.info(
+					"comboGuardiasNoGrupo() -> Salida del servicio para obtener combo guardias que no son por grupo");
 		}
 		return comboDTO;
 
 	}
-	
+
 	@Override
 	public ComboDTO comboGuardiasUpdate(HttpServletRequest request, String idTurno) {
 		LOGGER.info("comboGuardias() -> Entrada al servicio para búsqueda de las guardias");
@@ -928,7 +943,7 @@ public class ComboServiceImpl implements ComboService {
 		LOGGER.info("getPerfiles() -> Salida del servicio para obtener los perfiles disponibles");
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboJuzgadoDesignaciones(HttpServletRequest request) {
 
@@ -947,16 +962,17 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"comboJuzgadoDesignaciones() / scsJuzgadoExtendsMapper.comboJuzgadoDesignaciones() -> Entrada a scsJuzgadoExtendsMapper para obtener combo Juzgado");
 
-				List<JuzgadoItem> juzgadosItems = scsJuzgadoExtendsMapper.comboJuzgadoDesignaciones(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
+				List<JuzgadoItem> juzgadosItems = scsJuzgadoExtendsMapper
+						.comboJuzgadoDesignaciones(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
 
 				LOGGER.info(
 						"comboJuzgadoDesignaciones() / scsJuzgadoExtendsMapper.comboJuzgadoDesignaciones() -> Salida a scsJuzgadoExtendsMapper para obtener combo Juzgado");
-				
+
 				List<ComboItem> comboItems = new ArrayList<>();
-				for(JuzgadoItem j: juzgadosItems) {
+				for (JuzgadoItem j : juzgadosItems) {
 					ComboItem comboItem = new ComboItem();
 					comboItem.setValue(j.getIdJuzgado());
-					comboItem.setLabel(j.getCodigoExt2()+": "+j.getNombre()+"("+j.getNombrePoblacion()+")");
+					comboItem.setLabel(j.getCodigoExt2() + ": " + j.getNombre() + "(" + j.getNombrePoblacion() + ")");
 					comboItems.add(comboItem);
 				}
 
@@ -998,7 +1014,7 @@ public class ComboServiceImpl implements ComboService {
 
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboProcedimientos(HttpServletRequest request) {
 		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
@@ -1029,7 +1045,7 @@ public class ComboServiceImpl implements ComboService {
 
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboProcedimientosConJuzgado(HttpServletRequest request, String idJuzgado) {
 		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
@@ -1051,27 +1067,29 @@ public class ComboServiceImpl implements ComboService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientosJuzgados(idInstitucion, idJuzgado);
-				
-				if(procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
+				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientosJuzgados(idInstitucion,
+						idJuzgado);
+
+				if (procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
 					List<String> idPretensiones = new ArrayList<String>();
-					for(ComboItem label: procedimientosJuzgados) {
+					for (ComboItem label : procedimientosJuzgados) {
 						idPretensiones.add(label.getValue());
 					}
-					
-					pretensionProcedimiento = scsDesignacionesExtendsMapper.getProcedimientosPretension(idInstitucion, idPretensiones);
 
-					if(pretensionProcedimiento != null && pretensionProcedimiento.size() > 0) {
-					idPretensiones = new ArrayList<String>();
-					for(ComboItem label: pretensionProcedimiento) {
-						idPretensiones.add(label.getLabel());
-					}
-					
-					comboItems = scsDesignacionesExtendsMapper.comboProcedimientosConJuzgado(idInstitucion, idPretensiones);
+					pretensionProcedimiento = scsDesignacionesExtendsMapper.getProcedimientosPretension(idInstitucion,
+							idPretensiones);
+
+					if (pretensionProcedimiento != null && pretensionProcedimiento.size() > 0) {
+						idPretensiones = new ArrayList<String>();
+						for (ComboItem label : pretensionProcedimiento) {
+							idPretensiones.add(label.getLabel());
+						}
+
+						comboItems = scsDesignacionesExtendsMapper.comboProcedimientosConJuzgado(idInstitucion,
+								idPretensiones);
 					}
 				}
-				
-				
+
 				comboDTO.setCombooItems(comboItems);
 			}
 		}
@@ -1080,7 +1098,7 @@ public class ComboServiceImpl implements ComboService {
 
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboModulosConJuzgado(HttpServletRequest request, String idJuzgado) {
 		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
@@ -1101,18 +1119,18 @@ public class ComboServiceImpl implements ComboService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientosJuzgados(idInstitucion, idJuzgado);
-				
-				if(procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
-				List<String> idPretensiones = new ArrayList<String>();
-				for(ComboItem label: procedimientosJuzgados) {
-					idPretensiones.add(label.getValue());
+				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientosJuzgados(idInstitucion,
+						idJuzgado);
+
+				if (procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
+					List<String> idPretensiones = new ArrayList<String>();
+					for (ComboItem label : procedimientosJuzgados) {
+						idPretensiones.add(label.getValue());
+					}
+
+					comboItems = scsDesignacionesExtendsMapper.comboModulosConJuzgado(idInstitucion, idPretensiones);
 				}
-				
-				
-				comboItems = scsDesignacionesExtendsMapper.comboModulosConJuzgado(idInstitucion, idPretensiones);
-				}
-				
+
 				comboDTO.setCombooItems(comboItems);
 			}
 		}
@@ -1121,8 +1139,7 @@ public class ComboServiceImpl implements ComboService {
 
 		return comboDTO;
 	}
-	
-	
+
 	@Override
 	public ComboDTO comboModulosConProcedimientos(HttpServletRequest request, String idPretension) {
 		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
@@ -1143,18 +1160,20 @@ public class ComboServiceImpl implements ComboService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientoPretension(idInstitucion, idPretension);
-				
-				if(procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
-				List<String> idPretensiones = new ArrayList<String>();
-				for(ComboItem label: procedimientosJuzgados) {
-					idPretensiones.add(label.getValue());
+				procedimientosJuzgados = scsDesignacionesExtendsMapper.getProcedimientoPretension(idInstitucion,
+						idPretension);
+
+				if (procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
+					List<String> idPretensiones = new ArrayList<String>();
+					for (ComboItem label : procedimientosJuzgados) {
+						idPretensiones.add(label.getValue());
+					}
+
+					comboItems = scsDesignacionesExtendsMapper.comboModulosConProcedimientos(idInstitucion,
+							idPretensiones);
+
 				}
-				
-				comboItems = scsDesignacionesExtendsMapper.comboModulosConProcedimientos(idInstitucion, idPretensiones);
-				
-				}
-				
+
 				comboDTO.setCombooItems(comboItems);
 			}
 		}
@@ -1163,7 +1182,7 @@ public class ComboServiceImpl implements ComboService {
 
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboProcedimientosConModulo(HttpServletRequest request, String idModulo) {
 		LOGGER.info("comboProcedimientos() -> Entrada al servicio para obtener comboProcedimientos");
@@ -1185,13 +1204,14 @@ public class ComboServiceImpl implements ComboService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				procedimientosJuzgados = scsDesignacionesExtendsMapper.getPretensionModulo(idInstitucion, idModulo);
-				if(procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
-				List<String> idPretensiones = new ArrayList<String>();
-				for(ComboItem label: procedimientosJuzgados) {
-					idPretensiones.add(label.getValue());
-				}
-				
-				comboItems = scsDesignacionesExtendsMapper.comboProcedimientosConModulos(idInstitucion, idPretensiones);
+				if (procedimientosJuzgados != null && procedimientosJuzgados.size() > 0) {
+					List<String> idPretensiones = new ArrayList<String>();
+					for (ComboItem label : procedimientosJuzgados) {
+						idPretensiones.add(label.getValue());
+					}
+
+					comboItems = scsDesignacionesExtendsMapper.comboProcedimientosConModulos(idInstitucion,
+							idPretensiones);
 				}
 				comboDTO.setCombooItems(comboItems);
 			}
@@ -1201,12 +1221,13 @@ public class ComboServiceImpl implements ComboService {
 
 		return comboDTO;
 	}
-	
+
 	/**
 	 * 
 	 */
-	public ComboDTO comboAcreditacionesPorModulo(HttpServletRequest request, String idModulo) {
-		LOGGER.info("comboAcreditacionesPorModulo() -> Entrada al servicio para obtener el comboAcreditacionesPorModulo");
+	public ComboDTO comboAcreditacionesPorModulo(HttpServletRequest request, String idModulo, String idTurno) {
+		LOGGER.info(
+				"comboAcreditacionesPorModulo() -> Entrada al servicio para obtener el comboAcreditacionesPorModulo");
 
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> acreditaciones = new ArrayList<ComboItem>();
@@ -1223,8 +1244,21 @@ public class ComboServiceImpl implements ComboService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				acreditaciones = scsDesignacionesExtendsMapper.comboAcreditacionesPorModulo(idInstitucion, idModulo);
-				
+				ScsTurnoKey scsTurnoKey = new ScsTurnoKey();
+				scsTurnoKey.setIdinstitucion(idInstitucion);
+				scsTurnoKey.setIdturno(Integer.valueOf(idTurno));
+
+				ScsTurno scsTurno = scsTurnoMapper.selectByPrimaryKey(scsTurnoKey);
+
+				if (scsTurno.getActivarretriccionacredit().toUpperCase().equals("1")
+						|| scsTurno.getActivarretriccionacredit().toUpperCase().equals("S")) {
+
+					acreditaciones = scsDesignacionesExtendsMapper.comboAcreditacionesPorTipo();
+				} else {
+					acreditaciones = scsDesignacionesExtendsMapper.comboAcreditacionesPorModulo(idInstitucion,
+							idModulo);
+				}
+
 				comboDTO.setCombooItems(acreditaciones);
 			}
 		}

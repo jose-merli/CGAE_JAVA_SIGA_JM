@@ -2960,4 +2960,21 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
     	return sql.toString();
     }
 	
+	public String comboAcreditacionesPorTipo() {
+		
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql2.SELECT("DESCRIPCION");
+		sql2.SELECT("IDTIPOACREDITACION");
+		
+		sql2.FROM("SCS_TIPOACREDITACION");
+		
+		sql.SELECT("*");
+		sql.FROM("( " + sql2.toString() + " )");
+		sql.WHERE("ROWNUM <= 3");
+		
+		return sql.toString();
+	}
+	
 }
