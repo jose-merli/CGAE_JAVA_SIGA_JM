@@ -319,7 +319,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboTipoMotivo")
 	@Results({ @Result(column = "IDTIPOMOTIVO", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR), })
-	List<ComboItem> comboTipoMotivo(Short idInstitucion);
+	List<ComboItem> comboTipoMotivo(Short idInstitucion, String idLenguaje);
 
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "guardarProcurador")
 	int guardarProcurador(ProcuradorItem procuradorItem);
@@ -436,7 +436,8 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "motivosrenuncia", property = "motivoRenuncia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ncolegiado", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idpersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "apellidosnombre", property = "apellidosNombre", jdbcType = JdbcType.VARCHAR), })
+			@Result(column = "apellidosnombre", property = "apellidosNombre", jdbcType = JdbcType.VARCHAR), 
+			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR)})
 	List<ListaLetradosDesignaItem> getListaLetradosDesigna( ScsDesigna designa, Short idInstitucion);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getLetradosDiasBajaTemporalTurno")
