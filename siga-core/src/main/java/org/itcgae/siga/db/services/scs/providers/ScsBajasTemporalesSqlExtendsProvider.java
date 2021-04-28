@@ -47,16 +47,16 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 			sql.WHERE("(bt.validado IS NULL OR bt.validado = 2)");
 		}
 		if(bajasTemporalesItem.getFechadesde() != null) {
-			sql.WHERE("bt.fechadesde >='"+fechadesde+"'");
+			sql.WHERE("bt.fechadesde >=TO_DATE('"+fechadesde+"',DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechahasta() != null) {
-			sql.WHERE("bt.fechahasta <='"+fechahasta+"'");
+			sql.WHERE("bt.fechahasta <=TO_DATE('"+fechahasta+"',DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechaalta() != null) {
-			sql.WHERE("bt.fechaalta >='"+bajasTemporalesItem.getFechaalta()+"'");
+			sql.WHERE("bt.fechaalta >=TO_DATE('"+bajasTemporalesItem.getFechaalta()+"',DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechabt() != null) {
-			sql.WHERE("bt.fechabt <='"+bajasTemporalesItem.getFechabt()+"'");
+			sql.WHERE("bt.fechabt <=TO_DATE('"+bajasTemporalesItem.getFechabt()+"',DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getTipo() != null) {
 			sql.WHERE("bt.tipo = '"+bajasTemporalesItem.getTipo()+"'");
