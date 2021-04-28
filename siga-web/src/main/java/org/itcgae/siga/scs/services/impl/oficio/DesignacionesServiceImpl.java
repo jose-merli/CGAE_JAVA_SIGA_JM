@@ -4094,7 +4094,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
-		int response = 0;
+		int responseDesig = 0;
+		int responseAct = 0;
 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		Date fecha = null;
@@ -4142,7 +4143,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //							recordJust.setEstado(justificacion.getEstado());
 //						}
 //						
-						response = scsDesignaMapper.updateByPrimaryKeySelective(recordJust);
+						responseDesig = scsDesignaMapper.updateByPrimaryKeySelective(recordJust);
 
 						// guardamos las actuaciones
 						if (justificacion.getActuaciones() != null && justificacion.getActuaciones().size() > 0) {
@@ -4166,8 +4167,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									record.setFechajustificacion(fecha);
 								}
 
-								record.setFechamodificacion(new Date());
-
 								if (actuacion.getIdAcreditacion() != null
 										&& !actuacion.getIdAcreditacion().trim().isEmpty()) {
 									record.setIdacreditacion(Short.parseShort(actuacion.getIdAcreditacion()));
@@ -4181,14 +4180,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 										&& !actuacion.getIdProcedimiento().trim().isEmpty()) {
 									record.setIdprocedimiento(actuacion.getIdProcedimiento());
 								}
+								
+								if (actuacion.getNumProcedimiento() != null	&& !actuacion.getNumProcedimiento().trim().isEmpty()) {
+									record.setNumeroprocedimiento(actuacion.getNumProcedimiento());
+								}
+								
+								if (actuacion.getNig() != null	&& !actuacion.getNig().trim().isEmpty()) {
+									record.setNig(actuacion.getNig());
+								}
+								
+//								if (actuacion.getValidada() != null) {
+//									record.setValidada(getValidada).setNig(actuacion.getNig());
+//								}
 
+								record.setFechamodificacion(new Date());
 								record.setIdinstitucion(Short.parseShort(actuacion.getIdInstitucion()));
 								record.setNumeroasunto(Long.parseLong(actuacion.getNumAsunto()));
 								record.setNumero(Long.parseLong(actuacion.getNumDesignacion()));
 								record.setIdturno(Integer.parseInt(actuacion.getIdTurno()));
 								record.setAnio(Short.parseShort(actuacion.getAnio()));
 
-								response = scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
+								responseAct = scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
 							}
 						}
 					}
@@ -4197,14 +4209,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				} catch (Exception e) {
 					LOGGER.error("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Se ha producido un error ",
 							e);
-					response = 0;
+					responseDesig = 0;
 				}
 
 				LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Saliendo del servicio. ");
 			}
 		}
 
-		if (response == 0) {
+		if (responseDesig == 0 || responseAct==0) {
 			error.setCode(400);
 			error.setDescription("general.mensaje.error.bbdd");
 			responseDTO.setStatus(SigaConstants.KO);
