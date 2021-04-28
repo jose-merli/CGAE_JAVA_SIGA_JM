@@ -1,6 +1,9 @@
 package org.itcgae.siga.scs.controllers.oficio;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -649,14 +652,38 @@ public class DesignacionesController {
 
 	
 	//Servicio de guardado
+//	[designa.anio, designa.idTurno, designa.numero, 
+//     this.saliente.body.idPersona,  this.saliente.body.observaciones, this.saliente.body.motivoRenuncia, this.saliente.body.fechaDesigna,
+//     this.entrante.body.fechaDesigna, this.entrante.body.idPersona]
 	@RequestMapping(value = "/designas/updateLetradoDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(@RequestBody DesignaItem designa, @RequestBody ScsDesignasletrado letrado, HttpServletRequest request) {
-		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letrado, request);
+	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(@RequestBody String[] item, HttpServletRequest request) throws ParseException {
+		
+		ScsDesigna designa = new ScsDesigna();
+		designa.setAnio(Short.parseShort(item[0]));
+		designa.setIdturno(Integer.parseInt(item[1]));
+		designa.setNumero(Long.parseLong(item[2]));
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		
+		ScsDesignasletrado letradoSaliente = new ScsDesignasletrado();
+		letradoSaliente.setIdpersona(Long.parseLong(item[3]));
+		letradoSaliente.setObservaciones(item[4]);
+		letradoSaliente.setMotivosrenuncia(item[5]);
+		letradoSaliente.setFechadesigna(formatter.parse(item[6]));
+		
+		ScsDesignasletrado letradoEntrante = new ScsDesignasletrado();
+		
+		letradoEntrante.setFechadesigna(formatter.parse(item[7]));
+		letradoSaliente.setIdpersona(Long.parseLong(item[8]));
+		
+		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	
 	
 	// 3.3.6.2.10. Tarjeta Relaciones
 
