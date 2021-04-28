@@ -13,9 +13,11 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
@@ -27,6 +29,7 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.springframework.web.bind.annotation.RequestBody;
 
 public interface IDesignacionesService {
 
@@ -57,7 +60,7 @@ public interface IDesignacionesService {
 	 * @param request
 	 * @return
 	 */
-	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> item,
+	public UpdateResponseDTO actualizaJustificacionExpres(List<JustificacionExpressItem> item,
 			HttpServletRequest request);
 
 	/**
@@ -71,6 +74,8 @@ public interface IDesignacionesService {
 			HttpServletRequest request);
 
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
+	
+	public List<DesignaItem> busquedaNuevaDesigna(@RequestBody DesignaItem item, HttpServletRequest request);
 
 	public List<DesignaItem> busquedaProcedimientoDesignas(DesignaItem item, HttpServletRequest request);
 
@@ -165,6 +170,8 @@ public interface IDesignacionesService {
 
 	public ActuacionDesignaItem getHistorioAccionesActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			HttpServletRequest request);
+	
+	public LetradoDesignaDTO getLetradoDesigna(AsuntosClaveJusticiableItem asuntoClave, HttpServletRequest request);
 	
 	public UpdateResponseDTO updateDesigna(DesignaItem designaItem, HttpServletRequest request);
 }
