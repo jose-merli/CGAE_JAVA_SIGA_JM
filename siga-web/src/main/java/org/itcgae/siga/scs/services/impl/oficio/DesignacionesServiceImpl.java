@@ -2314,8 +2314,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 						designa.setNumero(Long.parseLong(numeroDesigna));
 					}
+
+					if( designaItem.getIdTipoDesignaColegio() != 0 ) {
+						designa.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
+					}
 					
-					designa.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
 					designa.setArt27(designaItem.getArt27());
 
 					
