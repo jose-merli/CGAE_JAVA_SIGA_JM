@@ -594,5 +594,10 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
 	})
 	String obtenerIdPersonaByNumCol(String idInstitucion, String numColegiado);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboAcreditacionesPorTipo")
+	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPOACREDITACION", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> comboAcreditacionesPorTipo();
 
 }
