@@ -107,6 +107,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.sun.mail.imap.protocol.Item;
+
 @Service
 public class DesignacionesServiceImpl implements IDesignacionesService {
 
@@ -342,18 +344,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info("DesignacionesServiceImpl.insertaJustificacionExpres() -> Haciendo el insert...");
 
 					ScsActuaciondesigna record = new ScsActuaciondesigna();
-					
-					if(item.getAnio()!=null && !item.getAnio().trim().isEmpty()){
-						record.setAnio(Short.parseShort(item.getAnio()));
-					}
-					
+
 					if(item.getAnioProcedimiento() !=null && !item.getAnioProcedimiento().trim().isEmpty()){
 						record.setAnioprocedimiento(Short.parseShort(item.getAnioProcedimiento()));
-					}
-					
-					if(item.getFecha()!=null && !item.getFecha().trim().isEmpty()){
-						fecha = formatter.parse(item.getFecha());  
-						record.setFecha(fecha);
 					}
 					
 					if(item.getFechaJustificacion()!=null && !item.getFechaJustificacion().trim().isEmpty()){
@@ -361,27 +354,52 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						record.setFechajustificacion(fecha);
 					}
 					
-					record.setFechamodificacion(new Date());
-					
-					if(item.getIdAcreditacion()!=null && !item.getIdAcreditacion().trim().isEmpty()){
-						record.setIdacreditacion(Short.parseShort(item.getIdAcreditacion()));
-					}
-					
-					if(item.getIdInstitucion()!=null && !item.getIdInstitucion().trim().isEmpty()){
-						record.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
+					//Idacreditacion, hecho asi por el front
+					if(item.getDescripcion()!=null && !item.getDescripcion().trim().isEmpty() && item.getDescripcion().indexOf(",")!=-1){
+						record.setIdacreditacion(Short.parseShort(item.getDescripcion().substring(0, item.getDescripcion().indexOf(","))));
 					}
 				
-					if(item.getIdJuzgado()!=null && !item.getIdJuzgado().trim().isEmpty()){
-						record.setIdjuzgado(Long.parseLong(item.getIdJuzgado()));
+					//idJuzgado, hecho asi por el front
+					if(item.getNombreJuzgado()!=null && !item.getNombreJuzgado().trim().isEmpty()){
+						record.setIdjuzgado(Long.parseLong(item.getNombreJuzgado()));
+						record.setIdinstitucionJuzg(idInstitucion);
 					}
 					
-					if(item.getIdProcedimiento()!=null && !item.getIdProcedimiento().trim().isEmpty()){
-						record.setIdprocedimiento(item.getIdProcedimiento());
+					if(item.getNig()!=null && !item.getNig().trim().isEmpty()){
+						record.setNig(item.getNig());
 					}
 					
-					if(item.getIdTurno()!=null && !item.getIdTurno().trim().isEmpty()){
-						record.setIdturno(Integer.parseInt(item.getIdTurno()));
+					if(item.getNumProcedimiento()!=null && !item.getNumProcedimiento().trim().isEmpty()){
+						record.setNumeroprocedimiento(item.getNumProcedimiento());
 					}
+					
+					fecha = formatter.parse(item.getFecha());  
+					record.setFecha(fecha);
+					
+					record.setIdturno(Integer.parseInt(item.getIdTurno()));
+					record.setIdinstitucion(idInstitucion);
+					record.setAnio(Short.parseShort(item.getAnio()));
+					record.setNumero(Long.parseLong(item.getNumDesignacion()));
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
+					record.setFechamodificacion(new Date());
+					record.setAcuerdoextrajudicial((short) 0);
+					record.setAnulacion((short) 0);
+					record.setIdprocedimiento(item.getProcedimiento());//idprocedimiento, por el front
+					record.setIdinstitucionProc(idInstitucion);
+					
+					record.setUsucreacion(usuarios.get(0).getIdusuario());
+					record.setFechacreacion(new Date());
+					
+					//cogemos el numasunot
+					ActuacionDesignaItem actDesItem = new ActuacionDesignaItem();
+					
+					actDesItem.setIdTurno(item.getIdTurno());
+					actDesItem.setAnio(item.getAnio());
+					actDesItem.setNumero(item.getNumDesignacion());
+					
+					MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actDesItem, idInstitucion);
+					
+					record.setNumeroasunto(maxIdDto.getIdMax());
 					
 					response = scsActuaciondesignaMapper.insertSelective(record);
 
