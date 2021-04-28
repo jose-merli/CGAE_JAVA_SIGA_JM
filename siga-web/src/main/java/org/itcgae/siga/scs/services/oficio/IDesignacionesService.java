@@ -160,11 +160,8 @@ public interface IDesignacionesService {
 	public ScsDesigna busquedaDesignaActual(ScsDesigna designa, HttpServletRequest request);
 
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
-
-	public UpdateResponseDTO updateLetradoDesigna(DesignaItem designa, ScsDesignasletrado letrado,
-			HttpServletRequest request);
 			
-	DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request);
+	public DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request);
 	
 	public ComunicacionesDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request);
 
@@ -174,4 +171,7 @@ public interface IDesignacionesService {
 	public LetradoDesignaDTO getLetradoDesigna(AsuntosClaveJusticiableItem asuntoClave, HttpServletRequest request);
 	
 	public UpdateResponseDTO updateDesigna(DesignaItem designaItem, HttpServletRequest request);
+
+	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente,
+			ScsDesignasletrado letradoEntrante, HttpServletRequest request);
 }
