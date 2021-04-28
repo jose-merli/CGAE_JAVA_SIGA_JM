@@ -758,7 +758,7 @@ public class WSCommons {
 											cargo.setFechaCargo(UtilidadesString.toCalendar(fechaCargo));
 										}
 									}
-									if(integrante.getSocio()=="1"){
+									if("1".equals(integrante.getSocio())){
 										integranteFisico.setSocio(Boolean.TRUE);
 									}else{
 										integranteFisico.setSocio(Boolean.FALSE);
