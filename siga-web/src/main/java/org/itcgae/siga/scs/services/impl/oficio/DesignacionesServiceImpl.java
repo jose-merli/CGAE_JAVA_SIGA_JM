@@ -1679,8 +1679,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						scsDesigna.setEstado(designaItem.getEstado());
 						Long juzgado = new Long(designaItem.getIdJuzgado());
 						scsDesigna.setIdjuzgado(juzgado);
-						Short idPretension = new Short((short) designaItem.getIdPretension());
-						scsDesigna.setIdpretension(idPretension);
+						if(designaItem.getIdPretension() == 0){
+							scsDesigna.setIdpretension(null);
+						}else {
+							Short idPretension = new Short((short) designaItem.getIdPretension());
+							scsDesigna.setIdpretension(idPretension);
+						}
 						scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
 						scsDesigna.setDelitos(designaItem.getDelitos());
 						scsDesigna.setFechaestado(designaItem.getFechaEstado());
