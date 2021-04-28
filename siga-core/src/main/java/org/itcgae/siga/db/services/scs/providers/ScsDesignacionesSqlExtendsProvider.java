@@ -2443,18 +2443,28 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}			
 	} 
  	
-	public String busquedaComunicaciones(String num, String idturno) {
+	public String busquedaComunicaciones(String anio, String num, String idturno, String idPersona) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
+		
+		
+		sql2.SELECT("S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, F_SIGA_GETRECURSO(A.DESCRIPCION, 1) as IDESTADO, N.NOMBRE , N.APELLIDOS1 , N.APELLIDOS2");
 
-		sql2.SELECT(
-				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia, dp.fecharenunciasolicita");
-
-		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
-		sql2.WHERE("dp.idturno = " + idturno);
-		sql2.WHERE("dp.numero =" + num);
-		sql2.WHERE("dp.idprocurador = p.idprocurador");
-		sql2.WHERE("dp.idinstitucion = p.idinstitucion");
+		sql2.FROM("SCS_COMUNICACIONES C");
+		sql2.INNER_JOIN("ENV_ENVIOS S on (s.idenvio = C.IDENVIOSALIDA)");
+		sql2.INNER_JOIN("ENV_TIPOENVIOS T on (T.IDTIPOENVIOS = S.IDTIPOENVIOS)");
+		sql2.INNER_JOIN("CEN_ESTADOSOLICITUD A on (A.IDESTADO = S.IDESTADO)");
+		sql2.INNER_JOIN("ENV_DESTINATARIOS D on (D.IDENVIO = S.IDENVIO)");
+		sql2.INNER_JOIN("CEN_PERSONA N on (N.IDPERSONA = D.IDPERSONA)");
+		sql2.WHERE("C.DESIGNAANIO = " + anio);
+		sql2.WHERE("C.DESIGNAIDTURNO =" + idturno);
+		
+		if(idPersona == null) {
+			sql2.WHERE("C.DESIGNANUMERO =" + num);
+		}else {
+			sql2.WHERE("C.DESIGNANUMERO =" + num + "OR D.IDPERSONA ="+idPersona);
+		}
+		
 
 		sql.SELECT("*");
 		sql.FROM("( " + sql2.toString() + " )");
@@ -2462,7 +2472,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		return sql.toString();
 	}
-	
 	
 	public String  obtenerIdPersonaByNumCol(String idInstitucion, String numColegiado) {
 		SQL sql = new SQL();

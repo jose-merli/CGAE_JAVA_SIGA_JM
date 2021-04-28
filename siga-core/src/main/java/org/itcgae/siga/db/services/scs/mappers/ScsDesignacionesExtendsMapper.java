@@ -541,17 +541,16 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaComunicaciones")
 	@Results({
-			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NUMERODESIGNACION", property = "numerodesignacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHADESIGNA", property = "fechaDesigna", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "MOTIVOSRENUNCIA", property = "motivosRenuncia", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) })
-	List<ComunicacionesItem> busquedaComunicaciones(String num, String anio, String idturno);
+			@Result(column = "FECHA", property = "fechaCreacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAPROGRAMADA", property = "fechaProgramacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
+			})
+	List<ComunicacionesItem> busquedaComunicaciones(String num, String anio, String idturno, String idpersona);
 
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerIdPersonaByNumCol")
