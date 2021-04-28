@@ -2308,7 +2308,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designa.setNumero(Long.parseLong(numeroDesigna));
 					}
 
-					designa.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
+					if( designaItem.getIdTipoDesignaColegio() != 0 ) {
+						designa.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
+					}
+					
 					designa.setArt27(designaItem.getArt27());
 
 					// SCS_INSCRIPCIONTURNO por idPersona idinstitucion idturno.
