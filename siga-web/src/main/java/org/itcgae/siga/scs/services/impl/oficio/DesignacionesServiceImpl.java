@@ -4279,7 +4279,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
 
-					if ((designaExistentes == null && designaExistentes.size() == 0)) {
+					if (designaExistentes == null || (designaExistentes != null && designaExistentes.size() == 0)) {
 						error.setCode(400);
 						// TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
