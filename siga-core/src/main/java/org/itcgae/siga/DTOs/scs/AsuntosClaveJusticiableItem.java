@@ -15,8 +15,7 @@ public class AsuntosClaveJusticiableItem {
 	private String clave;
 	private String rol;
 	private String tipo;
-	private String fechaDesigna;
-	
+
 	/**
 	 **/
 	public AsuntosClaveJusticiableItem idPersona(String idPersona) {
@@ -32,7 +31,7 @@ public class AsuntosClaveJusticiableItem {
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
-	
+
 	/**
 	 **/
 	public AsuntosClaveJusticiableItem idInstitucion(String idInstitucion) {
@@ -151,7 +150,7 @@ public class AsuntosClaveJusticiableItem {
 		this.tipo = tipo;
 		return this;
 	}
-	
+
 	@JsonProperty("tipo")
 	public String getTipo() {
 		return tipo;
@@ -159,20 +158,6 @@ public class AsuntosClaveJusticiableItem {
 
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
-	}
-
-	/**
-	 * @return the fechaDesigna
-	 */
-	public String getFechaDesigna() {
-		return fechaDesigna;
-	}
-
-	/**
-	 * @param fechaDesigna the fechaDesigna to set
-	 */
-	public void setFechaDesigna(String fechaDesigna) {
-		this.fechaDesigna = fechaDesigna;
 	}
 
 	@Override
@@ -252,8 +237,7 @@ public class AsuntosClaveJusticiableItem {
 	public String toString() {
 		return "AsuntosClaveJusticiableItem [idPersona=" + idPersona + ", idInstitucion=" + idInstitucion + ", anio="
 				+ anio + ", nombre=" + nombre + ", numero=" + numero + ", fechaModificacion=" + fechaModificacion
-				+ ", clave=" + clave + ", rol=" + rol + ", tipo=" + tipo + ", fechaDesigna=" + fechaDesigna + "]";
+				+ ", clave=" + clave + ", rol=" + rol + ", tipo=" + tipo + "]";
 	}
 
-	
 }
