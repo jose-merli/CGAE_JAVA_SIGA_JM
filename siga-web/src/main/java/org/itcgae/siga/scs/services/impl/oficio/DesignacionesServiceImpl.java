@@ -56,7 +56,6 @@ import org.itcgae.siga.commons.utils.Puntero;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenParametros;
@@ -2267,7 +2266,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 					}
 					
-					designa.setFechaentrada(new Date());
+					designa.setFechaentrada(designaItem.getFechaAlta());
 					designa.setFechamodificacion(new Date());
 					designa.setUsumodificacion(usuario.getIdusuario());
 					designa.setEstado("V");
@@ -2342,7 +2341,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setIdturno(designaItem.getIdTurno());
 						designaLetrado.setAnio(year);
 						designaLetrado.setNumero(Long.parseLong(numeroDesigna));
-						designaLetrado.setFechadesigna(new Date());
+						designaLetrado.setFechadesigna(designaItem.getFechaAlta());
 						designaLetrado.setFechamodificacion(new Date());
 						designaLetrado.setUsumodificacion(usuario.getIdusuario());
 						designaLetrado.setIdpersona(letradoAlgoritmoSeleccion.getIdpersona());
@@ -4530,6 +4529,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					//OJO en el campo codigo se mete el numero de front, que viene en el getNumero().
 					scsDesigna.setCodigo(String.valueOf(designaItem.getNumero()));
 
+					scsDesigna.setFechaentrada(designaItem.getFechaAlta());
 					scsDesigna.setFechamodificacion(new Date());
 					scsDesigna.setUsumodificacion(usuario.getIdusuario());
 
