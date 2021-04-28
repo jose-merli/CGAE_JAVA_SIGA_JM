@@ -106,8 +106,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.sun.mail.imap.protocol.Item;
-
 @Service
 public class DesignacionesServiceImpl implements IDesignacionesService {
 
@@ -2150,6 +2148,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			if (usuarios != null && !usuarios.isEmpty()) {
 				
 				MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actuacionDesignaItem, idInstitucion);
+				
+				actuacionDesignaItem.setNumeroAsunto(maxIdDto.getIdMax().toString());
 
 				int response = scsDesignacionesExtendsMapper.guardarActDesigna(actuacionDesignaItem,
 						Short.toString(idInstitucion), usuarios.get(0));
