@@ -1209,7 +1209,6 @@ public class ComboServiceImpl implements ComboService {
 		LOGGER.info("comboAcreditacionesPorModulo() -> Entrada al servicio para obtener el comboAcreditacionesPorModulo");
 
 		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		List<ComboItem> acreditaciones = new ArrayList<ComboItem>();
 
 		// Conseguimos información del usuario logeado
@@ -1226,7 +1225,7 @@ public class ComboServiceImpl implements ComboService {
 
 				acreditaciones = scsDesignacionesExtendsMapper.comboAcreditacionesPorModulo(idInstitucion, idModulo);
 				
-				comboDTO.setCombooItems(comboItems);
+				comboDTO.setCombooItems(acreditaciones);
 			}
 		}
 

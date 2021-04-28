@@ -31,13 +31,18 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.CenPersonaItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
+import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
+import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
+import org.itcgae.siga.DTOs.scs.LetradoDesignaItem;
 import org.itcgae.siga.DTOs.scs.LetradoInscripcionItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
@@ -88,6 +93,8 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDesignasLetradoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipodictamenejgExtendsMapper;
@@ -96,6 +103,7 @@ import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -157,6 +165,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private ScsDesignasletradoMapper scsDesignasletradoMapper;
+
+	@Autowired
+	private ScsDesignasLetradoExtendsMapper scsDesignasLetradoExtendMapper;
+
+	@Autowired
+	private ScsInscripcionesTurnoExtendsMapper scsInscripcionesTurnoExtendsMapper;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -478,6 +492,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		responseDTO.setError(error);
 
 		return responseDTO;
+
 	}
 
 	@Override
@@ -526,6 +541,64 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 					designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, idInstitucion,
+							tamMaximo);
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("DesignacionesServiceImpl.busquedaDesignas -> Salida del servicio");
+				}
+				LOGGER.info("DesignacionesServiceImpl.busquedaDesignas -> Salida del servicio");
+			}
+		}
+
+		return designas;
+	}
+	
+	@Override
+	public List<DesignaItem> busquedaNuevaDesigna(DesignaItem designaItem, HttpServletRequest request) {
+		DesignaItem result = new DesignaItem();
+		List<DesignaItem> designas = null;
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaDesignas() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaDesignas -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.busquedaDesignas -> Entrada a servicio para la busqueda de justifiacion express");
+
+				try {
+					designas = scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem, idInstitucion,
 							tamMaximo);
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
@@ -1896,8 +1969,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.error(
 							"DesignacionesServiceImpl.anularReactivarActDesigna() -> Se ha producido un error al anular/reactivar alguna de las actuaciones asociadas a la designación");
 					error.setCode(500);
-					error.setDescription(
-							"Se ha producido un error al anular/reactivar alguna de las actuaciones asociadas a la designación");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setError(error);
 				}
 
@@ -1953,8 +2025,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.error(
 							"DesignacionesServiceImpl.validarDesvalidarActDesigna() -> Se ha producido un error al validar/desvalidar la actuación asociada a la designación");
 					error.setCode(500);
-					error.setDescription(
-							"Se ha producido un error al validar/desvalidar la actuación asociada a la designación");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setError(error);
 				}
 
@@ -2013,8 +2084,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.error(
 							"DesignacionesServiceImpl.eliminarActDesigna() -> Se ha producido un error al eliminar alguna de las actuaciones asociadas a la designación");
 					error.setCode(500);
-					error.setDescription(
-							"Se ha producido un error al eliminar alguna las actuaciones asociadas a la designación");
+					error.setDescription("general.mensaje.error.bbdd");
 					deleteResponseDTO.setError(error);
 				} else {
 					error.setCode(200);
@@ -2075,7 +2145,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.error(
 							"DesignacionesServiceImpl.guardarActDesigna() -> Se ha producido un error al guardar la actuación asociada a la designación");
 					error.setCode(500);
-					error.setDescription("Se ha producido un error al guardar la actuación asociada a la designación");
+					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setError(error);
 				}
 
@@ -2129,7 +2199,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.error(
 							"DesignacionesServiceImpl.actualizarActDesigna() -> Se ha producido un error al actualizar la actuación asociada a la designación");
 					error.setCode(500);
-					error.setDescription("Se ha producido un error al actualizar la actuación asociada a la designación");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setError(error);
 				}
 
@@ -2293,7 +2363,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //						MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
 //						MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
 						designaLetrado.setLetradodelturno("1");
-						String idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
+
+						String idPersona = scsDesignacionesExtendsMapper
+								.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
+
+						List<InscripcionesItem> listaInscripciones = scsInscripcionesTurnoExtendsMapper
+								.obtenerColegiadoInscritoTurno(idInstitucion, String.valueOf(designaItem.getIdTurno()),
+										idPersona);
+						if (listaInscripciones != null && listaInscripciones.size() > 0) {
+//							MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
+							designaLetrado.setLetradodelturno("1");
+						} else {
+//							MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
+							designaLetrado.setLetradodelturno("0");
+						}
+
 						designaLetrado.setIdpersona(Long.parseLong(idPersona));
 						
 					}
@@ -2303,7 +2387,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"createDesigna() / scsDesignaMapper.insert() -> Entrada a scsDesignaMapper para insertar la designacion");
 
-					  scsDesignaMapper.insert(designa);
+					response = scsDesignaMapper.insert(designa);
 
 					LOGGER.info(
 							"createDesigna() / scsDesignaMapper.insert() -> Salida de scsDesignaMapper para insertar la designacion");
@@ -3980,8 +4064,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.error(
 							"DesignacionesServiceImpl.updateJustiActDesigna() -> Se ha producido un error al actualizar los datos de justificación de la actuación");
 					error.setCode(500);
-					error.setDescription(
-							"Se ha producido un error al actualizar los datos de justificación de la actuación");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setError(error);
 				}
 
@@ -4119,8 +4202,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	/**
 	 * actualizaJustificacionExpres
 	 */
-	@Override
-	public UpdateResponseDTO actualizaJustificacionExpres(List<ActuacionesJustificacionExpressItem> listaItem,
+	@Transactional
+	public UpdateResponseDTO actualizaJustificacionExpres(List<JustificacionExpressItem> listaItem,
 			HttpServletRequest request) {
 		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
 
@@ -4152,50 +4235,79 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Realizando update...");
 
-					ScsActuaciondesigna record = new ScsActuaciondesigna();
-					
-					for(ActuacionesJustificacionExpressItem item : listaItem) {
-						if(item.getAnio()!=null && !item.getAnio().trim().isEmpty()){
-							record.setAnio(Short.parseShort(item.getAnio()));
+					for (JustificacionExpressItem justificacion : listaItem) {
+						// guardamos los cambios de la designacion
+
+						ScsDesigna recordJust = new ScsDesigna();
+
+						recordJust.setIdinstitucion(Short.parseShort(justificacion.getIdInstitucion()));
+						recordJust.setIdturno(Integer.parseInt(justificacion.getIdTurno()));
+						recordJust.setAnio(Short.parseShort(justificacion.getAnioDesignacion()));
+						recordJust.setNumero(Long.parseLong(justificacion.getNumDesignacion()));
+						recordJust.setFechamodificacion(new Date());
+						recordJust.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+						if (justificacion.getIdJuzgado() != null) {
+							recordJust.setIdjuzgado(Long.parseLong(justificacion.getIdJuzgado()));
 						}
-						
-						if(item.getAnioProcedimiento() !=null && !item.getAnioProcedimiento().trim().isEmpty()){
-							record.setAnioprocedimiento(Short.parseShort(item.getAnioProcedimiento()));
+
+						if (justificacion.getNig() != null && !justificacion.getNig().trim().isEmpty()) {
+							recordJust.setNig(justificacion.getNig());
 						}
-						
-						if(item.getFecha()!=null && !item.getFecha().trim().isEmpty()){
-							fecha = formatter.parse(item.getFecha());  
-							record.setFecha(fecha);
+//						
+//						if(justificacion.getEstado()!=null && justificacion.getEstado().trim().isEmpty()){
+//							recordJust.setEstado(justificacion.getEstado());
+//						}
+//						
+						response = scsDesignaMapper.updateByPrimaryKeySelective(recordJust);
+
+						// guardamos las actuaciones
+						if (justificacion.getActuaciones() != null && justificacion.getActuaciones().size() > 0) {
+							for (ActuacionesJustificacionExpressItem actuacion : justificacion.getActuaciones()) {
+
+								ScsActuaciondesigna record = new ScsActuaciondesigna();
+
+								if (actuacion.getAnioProcedimiento() != null
+										&& !actuacion.getAnioProcedimiento().trim().isEmpty()) {
+									record.setAnioprocedimiento(Short.parseShort(actuacion.getAnioProcedimiento()));
+								}
+
+								if (actuacion.getFecha() != null && !actuacion.getFecha().trim().isEmpty()) {
+									fecha = formatter.parse(actuacion.getFecha());
+									record.setFecha(fecha);
+								}
+
+								if (actuacion.getFechaJustificacion() != null
+										&& !actuacion.getFechaJustificacion().trim().isEmpty()) {
+									fecha = formatter.parse(actuacion.getFechaJustificacion());
+									record.setFechajustificacion(fecha);
+								}
+
+								record.setFechamodificacion(new Date());
+
+								if (actuacion.getIdAcreditacion() != null
+										&& !actuacion.getIdAcreditacion().trim().isEmpty()) {
+									record.setIdacreditacion(Short.parseShort(actuacion.getIdAcreditacion()));
+								}
+
+								if (actuacion.getIdJuzgado() != null && !actuacion.getIdJuzgado().trim().isEmpty()) {
+									record.setIdjuzgado(Long.parseLong(actuacion.getIdJuzgado()));
+								}
+
+								if (actuacion.getIdProcedimiento() != null
+										&& !actuacion.getIdProcedimiento().trim().isEmpty()) {
+									record.setIdprocedimiento(actuacion.getIdProcedimiento());
+								}
+
+								record.setIdinstitucion(Short.parseShort(actuacion.getIdInstitucion()));
+								record.setNumeroasunto(Long.parseLong(actuacion.getNumAsunto()));
+								record.setNumero(Long.parseLong(actuacion.getNumDesignacion()));
+								record.setIdturno(Integer.parseInt(actuacion.getIdTurno()));
+								record.setAnio(Short.parseShort(actuacion.getAnio()));
+
+								response = scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
+							}
 						}
-						
-						if(item.getFechaJustificacion()!=null && !item.getFechaJustificacion().trim().isEmpty()){
-							fecha = formatter.parse(item.getFechaJustificacion());  
-							record.setFechajustificacion(fecha);
-						}
-						
-						record.setFechamodificacion(new Date());
-						
-						if(item.getIdAcreditacion()!=null && !item.getIdAcreditacion().trim().isEmpty()){
-							record.setIdacreditacion(Short.parseShort(item.getIdAcreditacion()));
-						}
-						
-						if(item.getIdInstitucion()!=null && !item.getIdInstitucion().trim().isEmpty()){
-							record.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
-						}
-					
-						if(item.getIdJuzgado()!=null && !item.getIdJuzgado().trim().isEmpty()){
-							record.setIdjuzgado(Long.parseLong(item.getIdJuzgado()));
-						}
-						
-						if(item.getIdProcedimiento()!=null && !item.getIdProcedimiento().trim().isEmpty()){
-							record.setIdprocedimiento(item.getIdProcedimiento());
-						}
-						
-						if(item.getIdTurno()!=null && !item.getIdTurno().trim().isEmpty()){
-							record.setIdturno(Integer.parseInt(item.getIdTurno()));
-						}
-						
-						response += scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
 					}
 
 					LOGGER.info("DesignacionesServiceImpl.actualizaJustificacionExpres() -> Actualizacion realizada");
@@ -4221,6 +4333,53 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		responseDTO.setError(error);
 
 		return responseDTO;
+	}
+
+
+	@Override
+	public ComunicacionesDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request) {
+		LOGGER.info("busquedaProcurador() -> Entrada al servicio para obtener prisiones");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComunicacionesDTO comunicacionesDTO = new ComunicacionesDTO();
+		List<ComunicacionesItem> comunicacionesItem = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"busquedaProcurador() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"busquedaProcurador() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"busquedaProcurador() / scsProcuradorExtendsMapper.busquedaProcurador() -> Entrada a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				String[] parts = comunicaciones.get(0).split("/");
+				String anio = parts[0].substring(1);
+				String num = parts[1];
+				String idTurno = comunicaciones.get(1);
+				comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno);
+
+				LOGGER.info(
+						"busquedaProcurador() / scsProcuradorExtendsMapper.busquedaProcurador() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
+
+				if (comunicacionesItem != null) {
+					// comunicacionesDTO.setComunicacionesItem(comunicacionesItem);
+				}
+			}
+
+		}
+		LOGGER.info("busquedaProcurador() -> Salida del servicio para obtener procuradores");
+		return comunicacionesDTO;
 	}
 
 	@Override
@@ -4299,9 +4458,214 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return null;
 	}
 
+	
+
 	@Override
-	public ComunicacionesDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
+	public UpdateResponseDTO updateDesigna(DesignaItem designaItem, HttpServletRequest request) {
+		LOGGER.info("updateDetalleDesigna() ->  Entrada al servicio para guardar la tarjeta general designacion");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+
+					LOGGER.info("updateDesigna()-> Entrada a seteo de datos ");
+					ScsDesignaExample example = new ScsDesignaExample();
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdturnoEqualTo(designaItem.getIdTurno()).andAnioEqualTo((short) designaItem.getAno())
+							.andNumeroEqualTo(new Long(designaItem.getNumero()));
+
+					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
+
+					if (designaExistentes == null || (designaExistentes != null && designaExistentes.size() == 0)) {
+						error.setCode(400);
+						// TODO crear description
+						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						updateResponseDTO.setError(error);
+						return updateResponseDTO;
+					}
+
+					ScsDesigna scsDesigna = new ScsDesigna();
+
+					scsDesigna.setIdturno(designaItem.getIdTurno());
+					Integer a = new Integer(idInstitucion);
+					scsDesigna.setIdinstitucion(idInstitucion);
+					a = designaItem.getAno();
+					scsDesigna.setAnio(a.shortValue());
+					Long b = new Long(designaItem.getNumero());
+					scsDesigna.setNumero(b.longValue());
+
+					scsDesigna.setFechamodificacion(new Date());
+					scsDesigna.setUsumodificacion(usuario.getIdusuario());
+
+					scsDesigna.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
+					scsDesigna.setArt27(designaItem.getArt27());
+
+					// DesignaLetrado
+					ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
+					String numeroColegiado = designaItem.getNumColegiado();
+					Calendar cal = Calendar.getInstance();
+					short year = (short) cal.get(Calendar.YEAR);
+					short mes = (short) cal.get(Calendar.MONTH);
+					short dia = (short) cal.get(Calendar.DAY_OF_MONTH);
+					if (StringUtils.isEmpty(numeroColegiado)) {
+						// Se realiza busqueda en la cola de oficio
+
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+						String fechaform = sdf.format(designaItem.getFechaAlta());
+
+						LetradoInscripcionItem letradoAlgoritmoSeleccion = this.getLetradoTurno(
+								idInstitucion.toString(), String.valueOf(designaItem.getIdTurno()), fechaform, usuario);
+
+//						//Anotamos log
+
+						LOGGER.info("Buscando letrado para el turno " + designaItem.getIdTurno() + " en la fecha " + dia
+								+ "/" + mes + "/" + year);
+//						
+//						//MANUAL = 0, LETRADODELTURNO = 1 si el sistema elige automáticamente de la cola
+//						
+						designaLetrado.setIdinstitucion(idInstitucion);
+						designaLetrado.setIdturno(designaItem.getIdTurno());
+						designaLetrado.setAnio(year);
+						designaLetrado.setNumero(Long.valueOf(designaItem.getNumero()));
+						designaLetrado.setFechadesigna(new Date());
+						designaLetrado.setFechamodificacion(new Date());
+						designaLetrado.setUsumodificacion(usuario.getIdusuario());
+						designaLetrado.setIdpersona(letradoAlgoritmoSeleccion.getIdpersona());
+						designaLetrado.setManual((short) 0);
+						designaLetrado.setLetradodelturno("1");
+
+					} else {
+
+						designaLetrado.setIdinstitucion(idInstitucion);
+						designaLetrado.setIdturno(designaItem.getIdTurno());
+						designaLetrado.setAnio(year);
+						designaLetrado.setNumero(Long.valueOf(designaItem.getNumero()));
+						designaLetrado.setFechadesigna(new Date());
+						designaLetrado.setFechamodificacion(new Date());
+						designaLetrado.setUsumodificacion(usuario.getIdusuario());
+						designaLetrado.setManual((short) 1);
+
+						String idPersona = scsDesignacionesExtendsMapper
+								.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
+
+						List<InscripcionesItem> listaInscripciones = scsInscripcionesTurnoExtendsMapper
+								.obtenerColegiadoInscritoTurno(idInstitucion, String.valueOf(designaItem.getIdTurno()),
+										idPersona);
+						if (listaInscripciones != null && listaInscripciones.size() > 0) {
+//							MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
+							designaLetrado.setLetradodelturno("1");
+						} else {
+//							MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
+							designaLetrado.setLetradodelturno("0");
+						}
+
+						designaLetrado.setIdpersona(Long.parseLong(idPersona));
+
+					}
+
+					LOGGER.info("updateDesigna() / scsDesignacionesExtendsMapper -> Salida a seteo de datos");
+
+					LOGGER.info(
+							"updateDesigna() / scsDesignacionesExtendsMapper.update()-> Entrada a scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
+
+					scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+
+					LOGGER.info(
+							"updateDesigna() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
+
+					LOGGER.info(
+							"updateDesigna() / scsDesignasletradoMapper.insert() -> Entrada a scsDesignasletradoMapper para insertar designaLetrado");
+
+					scsDesignasletradoMapper.updateByPrimaryKey(designaLetrado);
+
+					LOGGER.info(
+							"updateDesigna() / scsDesignasletradoMapper.insert() -> Salida de scsDesignasletradoMapper para insertar designaLetrado");
+
+				} catch (Exception e) {
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la designacion  correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateDetalleDesigna() -> Salida del servicio para actualizar una partida presupuestaria");
+
+			}
+		}
+		return updateResponseDTO;
+	}
+
+	@Override
+	public LetradoDesignaDTO getLetradoDesigna(AsuntosClaveJusticiableItem asuntoClave, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		LetradoDesignaDTO letradoDesignaDTO = new LetradoDesignaDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.getLetradoDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getLetradoDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				asuntoClave.setIdInstitucion(idInstitucion.toString());
+
+				List<LetradoDesignaItem> listaLetradoDesignaItem = scsDesignasLetradoExtendMapper
+						.getDesignaLetradoPorFecha(asuntoClave);
+
+				letradoDesignaDTO.setListaLetradosDesignaItem(listaLetradoDesignaItem);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.getLetradoDesigna() -> Se ha producido un error al tratar de obtener el letrado designado",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			letradoDesignaDTO.setError(error);
+		}
+
+		return letradoDesignaDTO;
 	}
 }
