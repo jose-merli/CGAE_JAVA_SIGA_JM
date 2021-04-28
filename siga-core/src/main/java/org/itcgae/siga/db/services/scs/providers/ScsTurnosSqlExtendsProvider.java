@@ -202,9 +202,9 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		
 		sql4.SELECT("(CASE\r\n" + 
 				"				WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-				"				AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
+				"				AND TRUNC(Ins.Fechavalidacion) <= NVL(TO_DATE('"+strDate+"','DD/MM/RRRR'), Ins.Fechavalidacion)\r\n" + 
 				"				AND (Ins.Fechabaja IS NULL\r\n" + 
-				"				OR TRUNC(Ins.Fechabaja) > NVL('"+strDate+"', '01/01/1900')) THEN '1'\r\n" + 
+				"				OR TRUNC(Ins.Fechabaja) > TO_DATE(NVL('"+strDate+"', '01/01/1900'),'DD/MM/RRRR')) THEN '1'\r\n" + 
 				"				ELSE '0'\r\n" + 
 				"				END) Activo,\r\n" + 
 				"				Ins.Idinstitucion,\r\n" + 
@@ -258,9 +258,9 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		sqls5.SELECT("consulta4.* from(SELECT ROWNUM AS orden,consulta3.* FROM (SELECT \r\n" + 
 				"	(CASE\r\n" + 
 				"		WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-				"		AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
+				"		AND TRUNC(Ins.Fechavalidacion) <= NVL(TO_DATE('"+strDate+"','DD/MM/RRRR'), Ins.Fechavalidacion)\r\n" + 
 				"		AND (Ins.Fechabaja IS NULL\r\n" + 
-				"		OR TRUNC(Ins.Fechabaja) > NVL('"+strDate+"', '01/01/1900')) THEN '1'\r\n" + 
+				"		OR TRUNC(Ins.Fechabaja) > TO_DATE(NVL('"+strDate+"', '01/01/1900'),'DD/MM/RRRR')) THEN '1'\r\n" + 
 				"		ELSE '0'\r\n" + 
 				"	END) Activo,\r\n" + 
 				"	Ins.Idinstitucion,\r\n" + 
