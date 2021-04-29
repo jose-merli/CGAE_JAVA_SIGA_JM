@@ -574,7 +574,7 @@ public class DesignacionesController {
 			contrario.setIdturno(Integer.parseInt(item[3]));
 			contrario.setNumero(Long.parseLong(item[4]));
 			contrario.setIdabogadocontrario(Long.parseLong(item[5]));
-			contrario.setNombrerepresentante(item[6]);
+			contrario.setNombreabogadocontrario(item[6]);
 			UpdateResponseDTO response = designacionesService.updateAbogadoContrario(contrario, request);
 			if (response.getError().getCode() == 200)
 				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);

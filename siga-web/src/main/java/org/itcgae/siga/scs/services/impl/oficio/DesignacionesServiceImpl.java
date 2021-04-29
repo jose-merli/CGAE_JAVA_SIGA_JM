@@ -3900,10 +3900,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					key.setFechadesigna(letradoSaliente.getFechadesigna());
 
 
-					//ScsDesigna designaActual = scsDesignaMapper.selectByPrimaryKey(key);
+					ScsDesignasletrado designaVieja = scsDesignasletradoMapper.selectByPrimaryKey(key);
+					
+					ScsDesignasletrado designaNueva = new ScsDesignasletrado();
+					designaNueva.setIdinstitucion(idInstitucion);
+					designaNueva.setAnio(designa.getAnio());
+					designaNueva.setIdturno(designa.getIdturno());
+					designaNueva.setNumero(designa.getNumero());
+					designaNueva.setFechadesigna(letradoEntrante.getFechadesigna());
 
 					//Seleccion de un letrado en el caso de que no se haya introducido
 					if(letradoEntrante.getIdpersona()==null) {
+						
 
 						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 						LetradoInscripcionItem newLetrado = this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designa.getIdturno()), dateFormat.format(letradoSaliente.getFechadesigna()),  usuarios.get(0)); 
@@ -3911,22 +3919,24 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						if (newLetrado==null) {
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							LOGGER.error(
-									"DesignacionesServiceImpl.updateJustiActDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
+									"DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
 							error.setCode(500);
 							error.setDescription(
-									"Se ha producido un error al actualizar el letrado asociado a la designación");
+									"justiciaGratuita.oficio.designas.letrados.nocolaletrado");
 							updateResponseDTO.setError(error);
 						}
 						else {
 							letradoEntrante.setIdpersona(newLetrado.getIdpersona());
-
+							designaNueva.setIdpersona(letradoEntrante.getIdpersona());
+							
 							response = scsDesignasletradoMapper.insert(letradoEntrante);
 						}						
 					}
 					else {
-						response = scsDesignasletradoMapper.insert(letradoEntrante);
+						designaNueva.setIdpersona(letradoEntrante.getIdpersona());
+						response = scsDesignasletradoMapper.insert(designaNueva);
 					}
-					if(response!=0) {
+					if(response!=0 && error.getCode()!=500) {
 						//Gestionamos el antiguo letrado
 						if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
 							response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
