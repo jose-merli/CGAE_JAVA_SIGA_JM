@@ -362,9 +362,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info("DesignacionesServiceImpl.insertaJustificacionExpres() -> Haciendo el insert...");
 
 					ScsActuaciondesigna record = new ScsActuaciondesigna();
-
+					
+					if(item.getAnio()!=null && !item.getAnio().trim().isEmpty()){
+						record.setAnio(Short.parseShort(item.getAnio()));
+					}
+					
 					if(item.getAnioProcedimiento() !=null && !item.getAnioProcedimiento().trim().isEmpty()){
 						record.setAnioprocedimiento(Short.parseShort(item.getAnioProcedimiento()));
+					}
+					
+					if(item.getFecha()!=null && !item.getFecha().trim().isEmpty()){
+						fecha = formatter.parse(item.getFecha());  
+						record.setFecha(fecha);
 					}
 					
 					if(item.getFechaJustificacion()!=null && !item.getFechaJustificacion().trim().isEmpty()){
@@ -372,52 +381,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						record.setFechajustificacion(fecha);
 					}
 					
-					//Idacreditacion, hecho asi por el front
-					if(item.getDescripcion()!=null && !item.getDescripcion().trim().isEmpty() && item.getDescripcion().indexOf(",")!=-1){
-						record.setIdacreditacion(Short.parseShort(item.getDescripcion().substring(0, item.getDescripcion().indexOf(","))));
+					record.setFechamodificacion(new Date());
+					
+					if(item.getIdAcreditacion()!=null && !item.getIdAcreditacion().trim().isEmpty()){
+						record.setIdacreditacion(Short.parseShort(item.getIdAcreditacion()));
+					}
+					
+					if(item.getIdInstitucion()!=null && !item.getIdInstitucion().trim().isEmpty()){
+						record.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
 					}
 				
-					//idJuzgado, hecho asi por el front
-					if(item.getNombreJuzgado()!=null && !item.getNombreJuzgado().trim().isEmpty()){
-						record.setIdjuzgado(Long.parseLong(item.getNombreJuzgado()));
-						record.setIdinstitucionJuzg(idInstitucion);
+					if(item.getIdJuzgado()!=null && !item.getIdJuzgado().trim().isEmpty()){
+						record.setIdjuzgado(Long.parseLong(item.getIdJuzgado()));
 					}
 					
-					if(item.getNig()!=null && !item.getNig().trim().isEmpty()){
-						record.setNig(item.getNig());
+					if(item.getIdProcedimiento()!=null && !item.getIdProcedimiento().trim().isEmpty()){
+						record.setIdprocedimiento(item.getIdProcedimiento());
 					}
 					
-					if(item.getNumProcedimiento()!=null && !item.getNumProcedimiento().trim().isEmpty()){
-						record.setNumeroprocedimiento(item.getNumProcedimiento());
+					if(item.getIdTurno()!=null && !item.getIdTurno().trim().isEmpty()){
+						record.setIdturno(Integer.parseInt(item.getIdTurno()));
 					}
-					
-					fecha = formatter.parse(item.getFecha());  
-					record.setFecha(fecha);
-					
-					record.setIdturno(Integer.parseInt(item.getIdTurno()));
-					record.setIdinstitucion(idInstitucion);
-					record.setAnio(Short.parseShort(item.getAnio()));
-					record.setNumero(Long.parseLong(item.getNumDesignacion()));
-					record.setUsumodificacion(usuarios.get(0).getIdusuario());
-					record.setFechamodificacion(new Date());
-					record.setAcuerdoextrajudicial((short) 0);
-					record.setAnulacion((short) 0);
-					record.setIdprocedimiento(item.getProcedimiento());//idprocedimiento, por el front
-					record.setIdinstitucionProc(idInstitucion);
-					
-					record.setUsucreacion(usuarios.get(0).getIdusuario());
-					record.setFechacreacion(new Date());
-					
-					//cogemos el numasunot
-					ActuacionDesignaItem actDesItem = new ActuacionDesignaItem();
-					
-					actDesItem.setIdTurno(item.getIdTurno());
-					actDesItem.setAnio(item.getAnio());
-					actDesItem.setNumero(item.getNumDesignacion());
-					
-					MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actDesItem, idInstitucion);
-					
-					record.setNumeroasunto(maxIdDto.getIdMax());
 					
 					response = scsActuaciondesignaMapper.insertSelective(record);
 
@@ -482,25 +466,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					ScsActuaciondesignaKey key = new ScsActuaciondesignaKey();
 					
 					for(ActuacionesJustificacionExpressItem item : listaItem) {
-						if(item.getAnio()!=null && !item.getAnio().isEmpty()){
-							key.setAnio(Short.parseShort(item.getAnio()));
-						}
-						
-						if(item.getIdInstitucion()!=null && !item.getIdInstitucion().isEmpty()){
-							key.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
-						}
-						
-						if(item.getIdTurno()!=null && !item.getIdTurno().isEmpty()){
-							key.setIdturno(Integer.parseInt(item.getIdTurno()));
-						}
-						
-//						if(item.getNumActuacion()!=null && !item.getNumActuacion().isEmpty()){
-//							key.setNumero(Long.parseLong(item.getNumActuacion()));
-//						}
-						
-						if(item.getNumAsunto()!=null && !item.getNumAsunto().isEmpty()){
-							key.setNumeroasunto(Long.parseLong(item.getNumAsunto()));
-						}
+                        key.setAnio(Short.parseShort(item.getAnio()));
+                        key.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
+                        key.setIdturno(Integer.parseInt(item.getIdTurno()));
+                        key.setNumero(Long.parseLong(item.getNumDesignacion()));
+                        key.setNumeroasunto(Long.parseLong(item.getNumAsunto()));
 						
 						response += scsActuaciondesignaMapper.deleteByPrimaryKey(key);
 					}
@@ -1834,6 +1804,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 		return updateResponseDTO;
 	}
+
 	@Override
 	public ActuacionDesignaDTO busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			HttpServletRequest request) {
@@ -2379,6 +2350,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		Error error = new Error();
 		int response = 0;
 		String numeroDesigna = "";
+		ScsDesigna designa = new ScsDesigna();
 		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -2403,7 +2375,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 
 					
-					ScsDesigna designa = new ScsDesigna();
+					
 					designa.setIdinstitucion(idInstitucion);
 					designa.setIdturno(designaItem.getIdTurno());
 					
@@ -2538,8 +2510,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 					}
 					
-					
-					
 					LOGGER.info(
 							"createDesigna() / scsDesignaMapper.insert() -> Entrada a scsDesignaMapper para insertar la designacion");
 
@@ -2582,7 +2552,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 		insertResponseDTO.setError(error);
 
-		LOGGER.info("createDesigna() -> Salida del servicio para insertar modulos");
+		if(designa != null && designa.getCodigo() != null) {
+			LOGGER.info("createDesigna() -> Salida del servicio para insertar designa Codigo: " + designa.getCodigo());
+		}else {
+			LOGGER.info("createDesigna() -> Salida del servicio para insertar designa");
+		}
+		
 
 		return insertResponseDTO;
 
@@ -2711,7 +2686,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			
 
 			if (alLetradosOrdenados == null || alLetradosOrdenados.size() == 0) {
-				throw new Exception("No existe cola de letrados de guardia");
+				letradoGuardia = null;
+				return letradoGuardia;
 				
 			}
 			

@@ -257,10 +257,10 @@ public class DesignacionesController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@RequestMapping(value = "/designas/comboDelitos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboDelitos(HttpServletRequest request) {
+	@RequestMapping(value = "/designas/comboDelitos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboDelitos(@RequestBody DesignaItem designaItem, HttpServletRequest request) {
 
-		ComboDTO response = new ComboDTO(); // TODO
+		ComboDTO response = comboService.comboDelitos(designaItem, request);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else

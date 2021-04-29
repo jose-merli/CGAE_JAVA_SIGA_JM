@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
@@ -1561,6 +1562,20 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE ");
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
+
+		return sql.toString();
+	}
+	
+	public String comboDelitos(DesignaItem designaItem, Short idInstitucion) {
+
+		SQL sql = new SQL();
+		sql.SELECT("D.IDDELITO, F_SIGA_GETRECURSO(D.DESCRIPCION, 1) as DESCRIPCION ");
+		sql.FROM("SCS_DELITO D ");
+		sql.INNER_JOIN("SCS_DELITOSDESIGNA DD ON D.IDINSTITUCION = DD.IDINSTITUCION AND D.IDDELITO=DD.IDDELITO ");
+		sql.WHERE("DD.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("DD.ANIO = " + designaItem.getAno());
+		sql.WHERE("DD.NUMERO = " + designaItem.getNumero());
+		sql.WHERE("DD.IDTURNO = " + designaItem.getIdTurno());
 
 		return sql.toString();
 	}

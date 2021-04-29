@@ -885,7 +885,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	//CARGA MASIVA BAJAS TEMPORALES
 		
 	public static final String BT_NCOLEGIADO = "Nº COLEGIADO";
-	public static final String BT_NIF = "PERSONA NIFCIF";
+	public static final String BT_NIF = "NIF";
 	public static final String BT_TIPO = "TIPO SOLICITUD";
 	public static final String BT_MOTIVO= "MOTIVO";
 	public static final String BT_FECHAI = "FECHA INICIO";
