@@ -652,29 +652,38 @@ public class DesignacionesController {
 
 	
 	//Servicio de guardado
-//	[designa.anio, designa.idTurno, designa.numero, 
+//	[designa.ano, designa.idTurno, designa.numero, 
 //     this.saliente.body.idPersona,  this.saliente.body.observaciones, this.saliente.body.motivoRenuncia, this.saliente.body.fechaDesigna,
 //     this.entrante.body.fechaDesigna, this.entrante.body.idPersona]
 	@RequestMapping(value = "/designas/updateLetradoDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(@RequestBody String[] item, HttpServletRequest request) throws ParseException {
 		
+		String anio = item[0].substring(1, 5);
+		
 		ScsDesigna designa = new ScsDesigna();
-		designa.setAnio(Short.parseShort(item[0]));
+		designa.setAnio(Short.parseShort(anio));
 		designa.setIdturno(Integer.parseInt(item[1]));
 		designa.setNumero(Long.parseLong(item[2]));
 		
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		
 		ScsDesignasletrado letradoSaliente = new ScsDesignasletrado();
 		letradoSaliente.setIdpersona(Long.parseLong(item[3]));
 		letradoSaliente.setObservaciones(item[4]);
-		letradoSaliente.setMotivosrenuncia(item[5]);
-		letradoSaliente.setFechadesigna(formatter.parse(item[6]));
+		letradoSaliente.setIdtipomotivo(Short.parseShort(item[5]));
+		if(item[6]!=null) {
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			String date = item[6].substring(0, 10);
+			letradoSaliente.setFechadesigna(formatter.parse(date));
+		}
 		
 		ScsDesignasletrado letradoEntrante = new ScsDesignasletrado();
 		
-		letradoEntrante.setFechadesigna(formatter.parse(item[7]));
-		letradoSaliente.setIdpersona(Long.parseLong(item[8]));
+		if(item[7]!=null) {
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String date = item[7].substring(0, 10);
+			letradoEntrante.setFechadesigna(formatter.parse(date));
+		}
+		if(item[8]!=null) letradoEntrante.setIdpersona(Long.parseLong(item[8]));
 		
 		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, request);
 		if (response.getError().getCode() == 200)
