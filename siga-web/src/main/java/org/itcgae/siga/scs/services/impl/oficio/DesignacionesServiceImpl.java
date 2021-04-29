@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.impl.oficio;
 
+import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -3932,7 +3933,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					
 					//Seleccion de un letrado en el caso de que no se haya introducido
 					if(letradoEntrante.getIdpersona()==null) {
-						LetradoInscripcionItem newLetrado = this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designa.getIdturno()), letradoSaliente.getFechadesigna().toString(),  usuarios.get(0)); 
+						
+						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+						LetradoInscripcionItem newLetrado = this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designa.getIdturno()), dateFormat.format(letradoSaliente.getFechadesigna()),  usuarios.get(0)); 
 						
 						if (newLetrado==null) {
 							updateResponseDTO.setStatus(SigaConstants.KO);
