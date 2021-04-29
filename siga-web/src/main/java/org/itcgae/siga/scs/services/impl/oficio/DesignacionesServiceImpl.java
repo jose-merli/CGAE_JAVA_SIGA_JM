@@ -2192,6 +2192,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		Error error = new Error();
 		int response = 0;
 		String numeroDesigna = "";
+		ScsDesigna designa = new ScsDesigna();
 		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -2216,7 +2217,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 
 					
-					ScsDesigna designa = new ScsDesigna();
+					
 					designa.setIdinstitucion(idInstitucion);
 					designa.setIdturno(designaItem.getIdTurno());
 					
@@ -2351,8 +2352,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 					}
 					
-					
-					
 					LOGGER.info(
 							"createDesigna() / scsDesignaMapper.insert() -> Entrada a scsDesignaMapper para insertar la designacion");
 
@@ -2395,7 +2394,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 		insertResponseDTO.setError(error);
 
-		LOGGER.info("createDesigna() -> Salida del servicio para insertar modulos");
+		if(designa != null && designa.getCodigo() != null) {
+			LOGGER.info("createDesigna() -> Salida del servicio para insertar designa Codigo: " + designa.getCodigo());
+		}else {
+			LOGGER.info("createDesigna() -> Salida del servicio para insertar designa");
+		}
+		
 
 		return insertResponseDTO;
 
@@ -2524,7 +2528,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			
 
 			if (alLetradosOrdenados == null || alLetradosOrdenados.size() == 0) {
-				throw new Exception("No existe cola de letrados de guardia");
+				letradoGuardia = null;
+				return letradoGuardia;
 				
 			}
 			
