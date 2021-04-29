@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
+import org.itcgae.siga.DTOs.scs.DesignaItem;
 
 public interface ComboService {
 	
@@ -56,6 +57,8 @@ public interface ComboService {
 	public ComboDTO comboJuzgadoPorInstitucion(String idInstitucion, HttpServletRequest request);
 	
 	public ComboDTO comboModulo(HttpServletRequest request);
+	
+	public ComboDTO comboDelitos(DesignaItem designaItem, HttpServletRequest request);
 	
 	public ComboDTO comboProcedimientos(HttpServletRequest request);
 	
