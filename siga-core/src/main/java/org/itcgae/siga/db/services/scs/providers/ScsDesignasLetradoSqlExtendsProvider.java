@@ -2,7 +2,6 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoSqlProvider;
 
 public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlProvider {
@@ -64,27 +63,13 @@ public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlP
 		sql.LEFT_OUTER_JOIN(
 				"CEN_COLEGIADO COLEGIADO ON  DESIGNALETRADO.IDPERSONA = COLEGIADO.IDPERSONA AND DESIGNALETRADO.IDINSTITUCION =  COLEGIADO.IDINSTITUCION");
 
-		sql.WHERE("DESIGNALETRADO.idinstitucion = '" + asuntoClave.getIdInstitucion() + "'");
-		sql.WHERE("DESIGNALETRADO.idturno  = '" + asuntoClave.getClave() + "'");
-		sql.WHERE("DESIGNALETRADO.anio   = '" + asuntoClave.getAnio() + "'");
-		sql.WHERE("DESIGNALETRADO.numero   = '" + asuntoClave.getNumero() + "'");
+		sql.WHERE("DESIGNALETRADO.IDINSTITUCION = '" + asuntoClave.getIdInstitucion() + "'");
+		sql.WHERE("DESIGNALETRADO.IDTURNO = '" + asuntoClave.getClave() + "'");
+		sql.WHERE("DESIGNALETRADO.ANIO = '" + asuntoClave.getAnio() + "'");
+		sql.WHERE("DESIGNALETRADO.NUMERO = '" + asuntoClave.getNumero() + "'");
 
-		if (!UtilidadesString.esCadenaVacia(asuntoClave.getFechaDesigna())) {
-			sql.WHERE("TRUNC(DESIGNALETRADO.FECHADESIGNA) = '" + asuntoClave.getFechaDesigna() + "'");
-		}
+		sql.WHERE("DESIGNALETRADO.FECHARENUNCIA IS NULL");
 
-		SQL sql2 = new SQL();
-
-		sql2.SELECT("MAX(LET2.Fechadesigna)");
-		sql2.FROM("SCS_DESIGNASLETRADO LET2");
-		sql2.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
-		sql2.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
-		sql2.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
-		sql2.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
-		sql2.WHERE("TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)");
-
-		sql.WHERE("(DESIGNALETRADO.fecharenuncia is null or TRUNC(DESIGNALETRADO.Fechadesigna) = (" + sql2 + "))");
-		sql.ORDER_BY("DESIGNALETRADO.fechadesigna");
 		return sql.toString();
 	}
 }
