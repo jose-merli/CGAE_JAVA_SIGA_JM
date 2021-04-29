@@ -461,25 +461,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					ScsActuaciondesignaKey key = new ScsActuaciondesignaKey();
 					
 					for(ActuacionesJustificacionExpressItem item : listaItem) {
-						if(item.getAnio()!=null && !item.getAnio().isEmpty()){
-							key.setAnio(Short.parseShort(item.getAnio()));
-						}
-						
-						if(item.getIdInstitucion()!=null && !item.getIdInstitucion().isEmpty()){
-							key.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
-						}
-						
-						if(item.getIdTurno()!=null && !item.getIdTurno().isEmpty()){
-							key.setIdturno(Integer.parseInt(item.getIdTurno()));
-						}
-						
-//						if(item.getNumActuacion()!=null && !item.getNumActuacion().isEmpty()){
-//							key.setNumero(Long.parseLong(item.getNumActuacion()));
-//						}
-						
-						if(item.getNumAsunto()!=null && !item.getNumAsunto().isEmpty()){
-							key.setNumeroasunto(Long.parseLong(item.getNumAsunto()));
-						}
+                        key.setAnio(Short.parseShort(item.getAnio()));
+                        key.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
+                        key.setIdturno(Integer.parseInt(item.getIdTurno()));
+                        key.setNumero(Long.parseLong(item.getNumDesignacion()));
+                        key.setNumeroasunto(Long.parseLong(item.getNumAsunto()));
 						
 						response += scsActuaciondesignaMapper.deleteByPrimaryKey(key);
 					}
