@@ -599,5 +599,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPOACREDITACION", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboAcreditacionesPorTipo();
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getNewIdDocumentacionAsi")
+	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR), })
+	MaxIdDto getNewIdDocumentacionAsi(Short idInstitucion);
 
 }

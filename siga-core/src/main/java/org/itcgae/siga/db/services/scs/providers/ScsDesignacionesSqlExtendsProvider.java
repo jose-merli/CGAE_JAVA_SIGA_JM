@@ -2159,7 +2159,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    	return sql.toString();
 	    }
 
-	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario, boolean anular) {
+	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion, AdmUsuarios usuario, boolean anular) {
 		SQL sql = new SQL();
 		String anulReact = anular ? "1" : "0";
 
@@ -2240,7 +2240,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String eliminarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario) {
+	public String eliminarActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion, AdmUsuarios usuario) {
 		SQL sql = new SQL();
 
 		sql.DELETE_FROM("SCS_ACTUACIONDESIGNA");
@@ -2968,6 +2968,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("( " + sql2.toString() + " )");
 		sql.WHERE("ROWNUM <= 3");
 		
+		return sql.toString();
+	}
+	
+	public String getNewIdDocumentacionAsi(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("NVL(MAX(DOC.IDDOCUMENTACIONASI),0) +1 AS ID");
+
+		sql.FROM("SCS_DOCUMENTACIONASI DOC");
+
+		sql.WHERE("DOC.IDINSTITUCION = '" + idInstitucion + "'");
+
 		return sql.toString();
 	}
 	

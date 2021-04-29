@@ -3,7 +3,6 @@ package org.itcgae.siga.scs.controllers.oficio;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/oficio")
@@ -768,12 +768,12 @@ public class DesignacionesController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-//	@PostMapping(value = "/designas/actualizarActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-//	public ResponseEntity<UpdateResponseDTO> actualizarActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem,
-//			HttpServletRequest request) {
-//		UpdateResponseDTO response = designacionesService.actualizarActDesigna(actuacionDesignaItem, request);
-//		return new ResponseEntity<>(response, HttpStatus.OK);
-//	}
+	@PostMapping(value = "/designas/actualizarActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> actualizarActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.actualizarActDesigna(actuacionDesignaItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 	
 	@GetMapping(value = "/comboMotivosCambioActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ComboDTO> comboMotivosCambioActDesigna(HttpServletRequest request) {
@@ -867,6 +867,12 @@ public class DesignacionesController {
 	ResponseEntity<ComunicacionesDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
 		ComunicacionesDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
 		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/subirDocumentoActDesigna", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<InsertResponseDTO> subirDocumentoActDesigna(MultipartHttpServletRequest request) {
+		InsertResponseDTO response = designacionesService.subirDocumentoActDesigna(request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 
 }

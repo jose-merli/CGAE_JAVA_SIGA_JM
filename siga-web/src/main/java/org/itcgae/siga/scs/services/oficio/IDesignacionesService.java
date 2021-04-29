@@ -30,6 +30,7 @@ import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IDesignacionesService {
 
@@ -174,4 +175,6 @@ public interface IDesignacionesService {
 
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente,
 			ScsDesignasletrado letradoEntrante, HttpServletRequest request);
+	
+	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request);
 }
