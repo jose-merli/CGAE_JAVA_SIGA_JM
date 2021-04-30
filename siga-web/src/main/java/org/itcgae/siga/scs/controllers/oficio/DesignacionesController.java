@@ -3,7 +3,6 @@ package org.itcgae.siga.scs.controllers.oficio;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/oficio")
@@ -574,7 +574,7 @@ public class DesignacionesController {
 			contrario.setIdturno(Integer.parseInt(item[3]));
 			contrario.setNumero(Long.parseLong(item[4]));
 			contrario.setIdabogadocontrario(Long.parseLong(item[5]));
-			contrario.setNombrerepresentante(item[6]);
+			contrario.setNombreabogadocontrario(item[6]);
 			UpdateResponseDTO response = designacionesService.updateAbogadoContrario(contrario, request);
 			if (response.getError().getCode() == 200)
 				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -652,32 +652,46 @@ public class DesignacionesController {
 
 	
 	//Servicio de guardado
-//	[designa.anio, designa.idTurno, designa.numero, 
-//     this.saliente.body.idPersona,  this.saliente.body.observaciones, this.saliente.body.motivoRenuncia, this.saliente.body.fechaDesigna,
+//	[designa.ano, designa.idTurno, designa.numero, 
+//     this.saliente.body.idPersona,  this.saliente.body.observaciones, this.saliente.body.motivoRenuncia, this.saliente.body.fechaDesigna, this.saliente.body.fechaSolRenuncia,
 //     this.entrante.body.fechaDesigna, this.entrante.body.idPersona]
 	@RequestMapping(value = "/designas/updateLetradoDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(@RequestBody String[] item, HttpServletRequest request) throws ParseException {
 		
+		String anio = item[0].substring(1, 5);
+		
 		ScsDesigna designa = new ScsDesigna();
-		designa.setAnio(Short.parseShort(item[0]));
+		designa.setAnio(Short.parseShort(anio));
 		designa.setIdturno(Integer.parseInt(item[1]));
 		designa.setNumero(Long.parseLong(item[2]));
 		
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		
 		ScsDesignasletrado letradoSaliente = new ScsDesignasletrado();
 		letradoSaliente.setIdpersona(Long.parseLong(item[3]));
 		letradoSaliente.setObservaciones(item[4]);
-		letradoSaliente.setMotivosrenuncia(item[5]);
-		letradoSaliente.setFechadesigna(formatter.parse(item[6]));
+		letradoSaliente.setIdtipomotivo(Short.parseShort(item[5]));
+		if(item[6]!=null) {
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			String date = item[6].substring(0, 10);
+			letradoSaliente.setFechadesigna(formatter.parse(date));
+		}
+		if(item[7]!=null) {
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String date = item[7].substring(0, 10);
+			letradoSaliente.setFecharenunciasolicita(formatter.parse(date));
+		}
 		
 		ScsDesignasletrado letradoEntrante = new ScsDesignasletrado();
 		
-		letradoEntrante.setFechadesigna(formatter.parse(item[7]));
-		letradoSaliente.setIdpersona(Long.parseLong(item[8]));
+		if(item[8]!=null) {
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String date = item[8].substring(0, 10);
+			letradoEntrante.setFechadesigna(formatter.parse(date));
+		}
+		if(item[9]!=null) letradoEntrante.setIdpersona(Long.parseLong(item[9]));
 		
 		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, request);
-		if (response.getError().getCode() == 200)
+		if (response.getError().getCode().intValue() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -768,12 +782,12 @@ public class DesignacionesController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-//	@PostMapping(value = "/designas/actualizarActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-//	public ResponseEntity<UpdateResponseDTO> actualizarActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem,
-//			HttpServletRequest request) {
-//		UpdateResponseDTO response = designacionesService.actualizarActDesigna(actuacionDesignaItem, request);
-//		return new ResponseEntity<>(response, HttpStatus.OK);
-//	}
+	@PostMapping(value = "/designas/actualizarActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> actualizarActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.actualizarActDesigna(actuacionDesignaItem, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 	
 	@GetMapping(value = "/comboMotivosCambioActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ComboDTO> comboMotivosCambioActDesigna(HttpServletRequest request) {
@@ -867,6 +881,12 @@ public class DesignacionesController {
 	ResponseEntity<ComunicacionesDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
 		ComunicacionesDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
 		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/subirDocumentoActDesigna", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<InsertResponseDTO> subirDocumentoActDesigna(MultipartHttpServletRequest request) {
+		InsertResponseDTO response = designacionesService.subirDocumentoActDesigna(request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 
 }

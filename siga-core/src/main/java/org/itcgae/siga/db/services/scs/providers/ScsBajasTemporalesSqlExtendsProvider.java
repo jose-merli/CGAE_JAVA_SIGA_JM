@@ -1,21 +1,15 @@
 package org.itcgae.siga.db.services.scs.providers;
 
-import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
-import org.itcgae.siga.DTOs.scs.InscripcionesItem;
-import org.itcgae.siga.db.entities.CenBajastemporales;
 import org.itcgae.siga.db.mappers.CenBajastemporalesSqlProvider;
-import org.itcgae.siga.db.mappers.ScsInscripcionturnoSqlProvider;
-import java.text.SimpleDateFormat;
 
 public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlProvider {
 
 
-	public String busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Short idInstitucion,String fechadesde,String fechahasta) {
-
+	public String busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Short idInstitucion) {
 		SQL sql = new SQL();
 		sql.SELECT("DISTINCT\r\n" + 
 				"    bt.idinstitucion,\r\n" + 
@@ -47,10 +41,10 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 			sql.WHERE("(bt.validado IS NULL OR bt.validado = 2)");
 		}
 		if(bajasTemporalesItem.getFechadesde() != null) {
-			sql.WHERE("bt.fechadesde >=TO_DATE('"+fechadesde+"','DD/MM/RRRR')");
+			sql.WHERE("bt.fechadesde >=TO_DATE('"+bajasTemporalesItem.getFechadesde()+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechahasta() != null) {
-			sql.WHERE("bt.fechahasta <=TO_DATE('"+fechahasta+"','DD/MM/RRRR')");
+			sql.WHERE("bt.fechahasta <=TO_DATE('"+bajasTemporalesItem.getFechahasta()+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechaalta() != null) {
 			sql.WHERE("bt.fechaalta >=TO_DATE('"+bajasTemporalesItem.getFechaalta()+"','DD/MM/RRRR')");

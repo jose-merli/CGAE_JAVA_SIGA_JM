@@ -15,6 +15,7 @@ public class AsuntosClaveJusticiableItem {
 	private String clave;
 	private String rol;
 	private String tipo;
+	private String fechaActuacion;
 
 	/**
 	 **/
@@ -160,6 +161,20 @@ public class AsuntosClaveJusticiableItem {
 		this.tipo = tipo;
 	}
 
+	/**
+	 * @return the fechaActuacion
+	 */
+	public String getFechaActuacion() {
+		return fechaActuacion;
+	}
+
+	/**
+	 * @param fechaActuacion the fechaActuacion to set
+	 */
+	public void setFechaActuacion(String fechaActuacion) {
+		this.fechaActuacion = fechaActuacion;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -237,7 +252,7 @@ public class AsuntosClaveJusticiableItem {
 	public String toString() {
 		return "AsuntosClaveJusticiableItem [idPersona=" + idPersona + ", idInstitucion=" + idInstitucion + ", anio="
 				+ anio + ", nombre=" + nombre + ", numero=" + numero + ", fechaModificacion=" + fechaModificacion
-				+ ", clave=" + clave + ", rol=" + rol + ", tipo=" + tipo + "]";
+				+ ", clave=" + clave + ", rol=" + rol + ", tipo=" + tipo + ", fechaActuacion=" + fechaActuacion + "]";
 	}
 
 }

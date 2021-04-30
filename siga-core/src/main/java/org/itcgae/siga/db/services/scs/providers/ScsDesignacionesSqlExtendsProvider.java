@@ -2172,7 +2172,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    	return sql.toString();
 	    }
 
-	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario, boolean anular) {
+	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion, AdmUsuarios usuario, boolean anular) {
 		SQL sql = new SQL();
 		String anulReact = anular ? "1" : "0";
 
@@ -2253,7 +2253,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String eliminarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario) {
+	public String eliminarActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion, AdmUsuarios usuario) {
 		SQL sql = new SQL();
 
 		sql.DELETE_FROM("SCS_ACTUACIONDESIGNA");
@@ -2621,6 +2621,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				"SCS_DESIGNASLETRADO.FECHARENUNCIA, \r\n" + 
 				"SCS_DESIGNASLETRADO.MOTIVOSRENUNCIA, \r\n" + 
 				"SCS_DESIGNASLETRADO.FECHARENUNCIASOLICITA, \r\n"+
+				"SCS_DESIGNASLETRADO.LETRADODELTURNO, \r\n"+
 				"CEN_COLEGIADO.NCOLEGIADO \r\n");
 		sql.SELECT("            persona.apellidos1\r\n" + 
     			"            || decode(persona.apellidos2, NULL, '', ' ' || persona.apellidos2)\r\n" + 
@@ -2635,6 +2636,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("SCS_DESIGNASLETRADO.IDTURNO = '" + designa.getIdturno() + "'");
 		sql.WHERE("SCS_DESIGNASLETRADO.ANIO = '" + designa.getAnio() + "'");
 		sql.WHERE("SCS_DESIGNASLETRADO.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
+		
 		
 		return sql.toString();
 	}
@@ -2981,6 +2984,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("( " + sql2.toString() + " )");
 		sql.WHERE("ROWNUM <= 3");
 		
+		return sql.toString();
+	}
+	
+	public String getNewIdDocumentacionAsi(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("NVL(MAX(DOC.IDDOCUMENTACIONASI),0) +1 AS ID");
+
+		sql.FROM("SCS_DOCUMENTACIONASI DOC");
+
+		sql.WHERE("DOC.IDINSTITUCION = '" + idInstitucion + "'");
+
 		return sql.toString();
 	}
 	

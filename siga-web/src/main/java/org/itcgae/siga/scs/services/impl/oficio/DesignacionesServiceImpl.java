@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.services.impl.oficio;
 
+import java.text.DateFormat;
+import java.io.File;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -22,6 +25,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
+import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -51,15 +55,20 @@ import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
+import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Puntero;
+import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.ScsActuaciondesigna;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
@@ -71,6 +80,7 @@ import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsDesignasletradoKey;
+import org.itcgae.siga.db.entities.ScsDocumentacionasi;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -80,11 +90,13 @@ import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.entities.ScsTurnoKey;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
+import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
@@ -105,6 +117,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class DesignacionesServiceImpl implements IDesignacionesService {
@@ -170,6 +184,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private ScsInscripcionesTurnoExtendsMapper scsInscripcionesTurnoExtendsMapper;
+	
+	@Autowired
+	private FicherosServiceImpl ficherosServiceImpl;
+	
+	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;
+	
+	@Autowired
+	private ScsDocumentacionasiMapper scsDocumentacionasiMapper;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -2117,14 +2140,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					"DesignacionesServiceImpl.guardarActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty()) {
-				
-				MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actuacionDesignaItem, idInstitucion);
+
+				MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actuacionDesignaItem,
+						idInstitucion);
+
+				actuacionDesignaItem.setNumeroAsunto(maxIdDto.getIdMax().toString());
 
 				int response = scsDesignacionesExtendsMapper.guardarActDesigna(actuacionDesignaItem,
 						Short.toString(idInstitucion), usuarios.get(0));
 
 				if (response == 1) {
 					insertResponseDTO.setStatus(SigaConstants.OK);
+					insertResponseDTO.setId(maxIdDto.getIdMax().toString());
 				}
 
 				if (response == 0) {
@@ -2134,6 +2161,61 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					error.setCode(500);
 					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setError(error);
+				}
+
+				ScsDesignaKey scsDesignaKey = new ScsDesignaKey();
+				scsDesignaKey.setIdturno(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
+				scsDesignaKey.setNumero(Long.valueOf(actuacionDesignaItem.getNumero()));
+				scsDesignaKey.setAnio(Short.valueOf(actuacionDesignaItem.getAnio()));
+				scsDesignaKey.setIdinstitucion(idInstitucion);
+
+				ScsDesigna scsDesigna = scsDesignaMapper.selectByPrimaryKey(scsDesignaKey);
+
+				if (scsDesigna != null) {
+
+					if (scsDesigna.getIdjuzgado() == null
+							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdJuzgado())) {
+						scsDesigna.setIdjuzgado(Long.valueOf(actuacionDesignaItem.getIdJuzgado()));
+					}
+
+					if (UtilidadesString.esCadenaVacia(scsDesigna.getIdprocedimiento())
+							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdProcedimiento())) {
+						scsDesigna.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
+					}
+
+					if (scsDesigna.getIdpretension() == null
+							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPretension())) {
+						scsDesigna.setIdpretension(Short.valueOf(actuacionDesignaItem.getIdPretension()));
+					}
+
+					if (UtilidadesString.esCadenaVacia(scsDesigna.getNumprocedimiento())
+							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNumProcedimiento())) {
+						scsDesigna.setNumprocedimiento(actuacionDesignaItem.getNumProcedimiento());
+					}
+
+					if (UtilidadesString.esCadenaVacia(scsDesigna.getNig())
+							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNig())) {
+						scsDesigna.setNig(actuacionDesignaItem.getNig());
+					}
+
+					scsDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+					scsDesigna.setFechamodificacion(new Date());
+
+					int response2 = scsDesignaMapper.updateByPrimaryKeySelective(scsDesigna);
+
+					if (response2 == 1) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response2 == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.guardarActDesigna() -> Se ha producido un error al actualizar los datos de la designación");
+						error.setCode(400);
+						error.setDescription("general.mensaje.error.bbdd");
+						insertResponseDTO.setError(error);
+					}
+
 				}
 
 			}
@@ -2152,7 +2234,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 	
 	@Override
-	public UpdateResponseDTO actualizarActDesigna(ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request) {
+	public UpdateResponseDTO actualizarActDesigna(ActuacionDesignaItem actuacionDesignaItem,
+			HttpServletRequest request) {
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -2179,6 +2262,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				if (response == 1) {
 					updateResponseDTO.setStatus(SigaConstants.OK);
+					updateResponseDTO.setId(actuacionDesignaItem.getNumeroAsunto());
 				}
 
 				if (response == 0) {
@@ -2188,6 +2272,61 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					error.setCode(500);
 					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setError(error);
+				}
+
+				ScsDesignaKey scsDesignaKey = new ScsDesignaKey();
+				scsDesignaKey.setIdturno(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
+				scsDesignaKey.setNumero(Long.valueOf(actuacionDesignaItem.getNumero()));
+				scsDesignaKey.setAnio(Short.valueOf(actuacionDesignaItem.getAnio()));
+				scsDesignaKey.setIdinstitucion(idInstitucion);
+
+				ScsDesigna scsDesigna = scsDesignaMapper.selectByPrimaryKey(scsDesignaKey);
+
+				if (scsDesigna != null) {
+
+					if (scsDesigna.getIdjuzgado() == null
+							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdJuzgado())) {
+						scsDesigna.setIdjuzgado(Long.valueOf(actuacionDesignaItem.getIdJuzgado()));
+					}
+
+					if (UtilidadesString.esCadenaVacia(scsDesigna.getIdprocedimiento())
+							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdProcedimiento())) {
+						scsDesigna.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
+					}
+
+					if (scsDesigna.getIdpretension() == null
+							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPretension())) {
+						scsDesigna.setIdpretension(Short.valueOf(actuacionDesignaItem.getIdPretension()));
+					}
+
+					if (UtilidadesString.esCadenaVacia(scsDesigna.getNumprocedimiento())
+							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNumProcedimiento())) {
+						scsDesigna.setNumprocedimiento(actuacionDesignaItem.getNumProcedimiento());
+					}
+
+					if (UtilidadesString.esCadenaVacia(scsDesigna.getNig())
+							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNig())) {
+						scsDesigna.setNig(actuacionDesignaItem.getNig());
+					}
+
+					scsDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+					scsDesigna.setFechamodificacion(new Date());
+
+					int response2 = scsDesignaMapper.updateByPrimaryKeySelective(scsDesigna);
+
+					if (response2 == 1) {
+						updateResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response2 == 0) {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.guardarActDesigna() -> Se ha producido un error al actualizar los datos de la designación");
+						error.setCode(400);
+						error.setDescription("general.mensaje.error.bbdd");
+						updateResponseDTO.setError(error);
+					}
+
 				}
 
 			}
@@ -2258,7 +2397,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 					}
 					
-					designa.setFechaentrada(designaItem.getFechaAlta());
+					designa.setFechaentrada(new Date());
 					designa.setFechamodificacion(new Date());
 					designa.setUsumodificacion(usuario.getIdusuario());
 					designa.setEstado("V");
@@ -2333,7 +2472,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setIdturno(designaItem.getIdTurno());
 						designaLetrado.setAnio(year);
 						designaLetrado.setNumero(Long.parseLong(numeroDesigna));
-						designaLetrado.setFechadesigna(designaItem.getFechaAlta());
+						designaLetrado.setFechadesigna(new Date());
 						designaLetrado.setFechamodificacion(new Date());
 						designaLetrado.setUsumodificacion(usuario.getIdusuario());
 						designaLetrado.setIdpersona(letradoAlgoritmoSeleccion.getIdpersona());
@@ -3917,58 +4056,90 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 
 					ScsDesignasletradoKey key = new ScsDesignasletradoKey();
-					
+
 					key.setIdinstitucion(idInstitucion);
 					key.setAnio(designa.getAnio());
 					key.setIdturno(designa.getIdturno());
 					key.setNumero(designa.getNumero());
 					key.setIdpersona(letradoSaliente.getIdpersona());
 					key.setFechadesigna(letradoSaliente.getFechadesigna());
-					
 
-					//ScsDesigna designaActual = scsDesignaMapper.selectByPrimaryKey(key);
+
+					ScsDesignasletrado designaVieja = scsDesignasletradoMapper.selectByPrimaryKey(key);
 					
-					//Gestionamos el antiguo letrado
-					if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
-						response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
-					}
-					else {
-						ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
-						
-						oldLetrado.setFecharenuncia(letradoEntrante.getFechadesigna());
-						oldLetrado.setFecharenunciasolicita(letradoEntrante.getFecharenunciasolicita());
-						oldLetrado.setObservaciones(letradoSaliente.getObservaciones());
-						oldLetrado.setMotivosrenuncia(letradoSaliente.getMotivosrenuncia());
-						
-						response = scsDesignasletradoMapper.updateByPrimaryKeySelective(oldLetrado);
-					}
-					
+					ScsDesignasletrado designaNueva = new ScsDesignasletrado();
+					designaNueva.setIdinstitucion(idInstitucion);
+					designaNueva.setAnio(designa.getAnio());
+					designaNueva.setIdturno(designa.getIdturno());
+					designaNueva.setNumero(designa.getNumero());
+					designaNueva.setFechadesigna(letradoEntrante.getFechadesigna());
+					designaNueva.setFechamodificacion(new Date());
+					designaNueva.setManual((short) 0);
+					designaNueva.setLetradodelturno("S");
+					designaNueva.setUsumodificacion(usuarios.get(0).getIdusuario());;
+
 					//Seleccion de un letrado en el caso de que no se haya introducido
 					if(letradoEntrante.getIdpersona()==null) {
-						LetradoInscripcionItem newLetrado = this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designa.getIdturno()), letradoSaliente.getFechadesigna().toString(),  usuarios.get(0)); 
 						
+
+						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+						LetradoInscripcionItem newLetrado = this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designa.getIdturno()), dateFormat.format(letradoSaliente.getFechadesigna()),  usuarios.get(0)); 
+
 						if (newLetrado==null) {
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							LOGGER.error(
-									"DesignacionesServiceImpl.updateJustiActDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
-							error.setCode(500);
+									"DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
+							error.setCode(100);
 							error.setDescription(
-									"Se ha producido un error al actualizar el letrado asociado a la designación");
+									"justiciaGratuita.oficio.designas.letrados.nocolaletrado");
 							updateResponseDTO.setError(error);
 						}
 						else {
 							letradoEntrante.setIdpersona(newLetrado.getIdpersona());
+							designaNueva.setIdpersona(newLetrado.getIdpersona());
 							
 							response = scsDesignasletradoMapper.insert(letradoEntrante);
 						}						
 					}
 					else {
-						response = scsDesignasletradoMapper.insert(letradoEntrante);
+						designaNueva.setIdpersona(letradoEntrante.getIdpersona());
+						
+						response = scsDesignasletradoMapper.insert(designaNueva);
+					}
+					if(response!=0 && letradoEntrante.getIdpersona()!=null) {
+						//Gestionamos el antiguo letrado
+						if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
+							response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
+						}
+						else {
+							//ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
+
+							//if(usuarios.get(0).)oldLetrado.setFecharenuncia(letradoEntrante.getFechadesigna());
+							designaVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
+							List<ComboItem> motivos = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion, usuarios.get(0).getIdlenguaje());
+							int i=0;
+							while(i<motivos.size() && designaVieja.getMotivosrenuncia() == null) {
+								if(motivos.get(i).getValue().equals(letradoSaliente.getIdtipomotivo().toString())) {
+									designaVieja.setMotivosrenuncia(motivos.get(i).getLabel());
+								}
+								i++;
+							}
+							designaVieja.setObservaciones(letradoSaliente.getObservaciones());
+							designaVieja.setIdtipomotivo(letradoSaliente.getIdtipomotivo());
+							designaVieja.setUsumodificacion(usuarios.get(0).getIdusuario());
+							designaVieja.setFechamodificacion(new Date());
+							designaVieja.setLetradodelturno("N");
+							
+							response = scsDesignasletradoMapper.updateByPrimaryKeySelective(designaVieja);
+						}
+
 					}
 					if (response == 0) {
-						error.setCode(400);
-						error.setDescription("general.mensaje.error.bbdd");
-						updateResponseDTO.setStatus(SigaConstants.KO);
+						if(error.getCode()!=100) {
+							error.setCode(400);
+							error.setDescription("general.mensaje.error.bbdd");
+							updateResponseDTO.setStatus(SigaConstants.KO);
+						}
 					} else {
 						error.setCode(200);
 						error.setDescription("general.message.registro.actualizado");
@@ -3979,12 +4150,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info("updateLetradoDesigna() -> Salida del servicio");
 				}
 				
+				updateResponseDTO.setError(error);
+				
 			}
 
 			LOGGER.info(
 					"updateLetradoDesigna() -> Salida del servicio");
+			
 		}
-		return new UpdateResponseDTO();
+		return updateResponseDTO;
 	}
 
 	public ComboDTO comboMotivosCambioActDesigna(HttpServletRequest request) {
@@ -4525,7 +4699,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					//OJO en el campo codigo se mete el numero de front, que viene en el getNumero().
 					scsDesigna.setCodigo(String.valueOf(designaItem.getNumero()));
 
-					scsDesigna.setFechaentrada(designaItem.getFechaAlta());
 					scsDesigna.setFechamodificacion(new Date());
 					scsDesigna.setUsumodificacion(usuario.getIdusuario());
 
@@ -4676,5 +4849,132 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return letradoDesignaDTO;
+	}
+	
+	@Override
+	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.getLetradoDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getLetradoDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				// Cargamos el fichero de la request
+				Iterator<String> itr = request.getFileNames();
+				MultipartFile file = request.getFile(itr.next());
+				String nombreFichero = file.getOriginalFilename();
+				String extension = FilenameUtils.getExtension(nombreFichero);
+
+				Long idFile = uploadFileActDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+						nombreFichero, extension);
+
+				MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionAsi(idInstitucion);
+
+				String anio = request.getParameter("anio");
+				String numero = request.getParameter("numero");
+				String idActuacion = request.getParameter("idActuacion");
+				String observaciones = request.getParameter("observaciones");
+
+				ScsDocumentacionasi scsDocumentacionasi = new ScsDocumentacionasi();
+
+				scsDocumentacionasi.setAnio(Short.valueOf(anio));
+				scsDocumentacionasi.setNumero(Long.valueOf(numero));
+				scsDocumentacionasi.setIdactuacion(Long.valueOf(idActuacion));
+				scsDocumentacionasi.setObservaciones(observaciones);
+				scsDocumentacionasi.setIddocumentacionasi(Integer.valueOf(nuevoId.getIdMax().toString()));
+				scsDocumentacionasi.setIdtipodocumento(Short.valueOf("2"));
+				scsDocumentacionasi.setIdfichero(idFile);
+				scsDocumentacionasi.setIdinstitucion(idInstitucion);
+				scsDocumentacionasi.setUsumodificacion(usuarios.get(0).getIdusuario());
+				scsDocumentacionasi.setFechamodificacion(new Date());
+				scsDocumentacionasi.setFechaentrada(new Date());
+
+				int response = scsDocumentacionasiMapper.insertSelective(scsDocumentacionasi);
+
+				if (response == 1) {
+					insertResponseDTO.setStatus(SigaConstants.OK);
+				}
+
+				if (response == 0) {
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.error(
+							"DesignacionesServiceImpl.subirDocumentoActDesigna() -> Se ha producido un error al subir un fichero perteneciente a la actuación");
+					error.setCode(500);
+					error.setDescription("general.mensaje.error.bbdd");
+					insertResponseDTO.setError(error);
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.subirDocumentoActDesigna() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			insertResponseDTO.setError(error);
+		}
+
+		return insertResponseDTO;
+	}
+
+	private Long uploadFileActDesigna(byte[] bytes, Integer idUsuario, Short idInstitucion, String nombreFichero,
+			String extension) {
+
+		FicheroVo ficheroVo = new FicheroVo();
+
+		String directorioFichero = getDirectorioFichero(idInstitucion);
+		ficheroVo.setDirectorio(directorioFichero);
+		ficheroVo.setNombre(nombreFichero);
+		ficheroVo.setDescripcion("Fichero asociado a la actuación " + ficheroVo.getNombre());
+
+		ficheroVo.setIdinstitucion(idInstitucion);
+		ficheroVo.setFichero(bytes);
+		ficheroVo.setExtension(extension.toLowerCase());
+
+		ficheroVo.setUsumodificacion(idUsuario);
+		ficheroVo.setFechamodificacion(new Date());
+		ficherosServiceImpl.insert(ficheroVo);
+
+		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
+
+		return ficheroVo.getIdfichero();
+	}
+
+	private String getDirectorioFichero(Short idInstitucion) {
+
+		// Extraemos el path para los ficheros
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String path = genPropertiesPath.get(0).getValor();
+
+		StringBuffer directorioFichero = new StringBuffer(path);
+		directorioFichero.append(idInstitucion);
+		directorioFichero.append(File.separator);
+
+		// Extraemos el path concreto para actuaciones
+		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
+		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.actuaciones");
+		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+
+		return directorioFichero.toString();
 	}
 }
