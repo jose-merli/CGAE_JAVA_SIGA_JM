@@ -1573,8 +1573,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_DELITO D ");
 		sql.INNER_JOIN("SCS_DELITOSDESIGNA DD ON D.IDINSTITUCION = DD.IDINSTITUCION AND D.IDDELITO=DD.IDDELITO ");
 		sql.WHERE("DD.IDINSTITUCION = " + idInstitucion);
-		sql.WHERE("DD.ANIO = " + designaItem.getAno());
-		sql.WHERE("DD.NUMERO = " + designaItem.getNumero());
 		sql.WHERE("DD.IDTURNO = " + designaItem.getIdTurno());
 
 		return sql.toString();
@@ -2432,7 +2430,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 		sql.SELECT("FECHAOFICIOJUZGADO, DELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
 		sql.FROM("SCS_DESIGNA");
-		sql.WHERE("NUMERO = '" + designa.getCodigo() + "'");
+		sql.WHERE("NUMERO = '" + designa.getNumero() + "'");
 		sql.WHERE("IDTURNO = '" + designa.getIdTurno() + "'");
 		sql.WHERE("ANIO = '" + designa.getAno() + "'");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
