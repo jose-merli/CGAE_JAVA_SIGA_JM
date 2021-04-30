@@ -121,20 +121,11 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
 				String fechahasta = "";
 				String fechadesde = "";
-				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
-				if (bajasTemporalesItem.getFechadesde() != null) {
-					Date fechad = bajasTemporalesItem.getFechadesde();
-
-					fechadesde = dateFormat.format(fechad);
-					if (bajasTemporalesItem.getFechahasta() != null) {
-						Date fechah = bajasTemporalesItem.getFechahasta();
-						fechahasta = dateFormat.format(fechah);
-
-					}
-				}
-						bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion, fechadesde, fechahasta);
+				
+						bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion);
 
 				
 				LOGGER.info(
