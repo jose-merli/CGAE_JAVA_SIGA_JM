@@ -2623,6 +2623,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				"SCS_DESIGNASLETRADO.FECHARENUNCIA, \r\n" + 
 				"SCS_DESIGNASLETRADO.MOTIVOSRENUNCIA, \r\n" + 
 				"SCS_DESIGNASLETRADO.FECHARENUNCIASOLICITA, \r\n"+
+				"SCS_DESIGNASLETRADO.LETRADODELTURNO, \r\n"+
 				"CEN_COLEGIADO.NCOLEGIADO \r\n");
 		sql.SELECT("            persona.apellidos1\r\n" + 
     			"            || decode(persona.apellidos2, NULL, '', ' ' || persona.apellidos2)\r\n" + 
@@ -2637,6 +2638,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("SCS_DESIGNASLETRADO.IDTURNO = '" + designa.getIdturno() + "'");
 		sql.WHERE("SCS_DESIGNASLETRADO.ANIO = '" + designa.getAnio() + "'");
 		sql.WHERE("SCS_DESIGNASLETRADO.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
+		
 		
 		return sql.toString();
 	}

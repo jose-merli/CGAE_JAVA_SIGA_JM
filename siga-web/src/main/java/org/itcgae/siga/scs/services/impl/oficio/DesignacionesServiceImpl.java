@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.impl.oficio;
 
+import java.text.DateFormat;
 import java.io.File;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -61,6 +62,7 @@ import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenParametros;
@@ -2395,7 +2397,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 					}
 					
-					designa.setFechaentrada(designaItem.getFechaAlta());
+					designa.setFechaentrada(new Date());
 					designa.setFechamodificacion(new Date());
 					designa.setUsumodificacion(usuario.getIdusuario());
 					designa.setEstado("V");
@@ -2470,7 +2472,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setIdturno(designaItem.getIdTurno());
 						designaLetrado.setAnio(year);
 						designaLetrado.setNumero(Long.parseLong(numeroDesigna));
-						designaLetrado.setFechadesigna(designaItem.getFechaAlta());
+						designaLetrado.setFechadesigna(new Date());
 						designaLetrado.setFechamodificacion(new Date());
 						designaLetrado.setUsumodificacion(usuario.getIdusuario());
 						designaLetrado.setIdpersona(letradoAlgoritmoSeleccion.getIdpersona());
@@ -4054,58 +4056,90 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 
 					ScsDesignasletradoKey key = new ScsDesignasletradoKey();
-					
+
 					key.setIdinstitucion(idInstitucion);
 					key.setAnio(designa.getAnio());
 					key.setIdturno(designa.getIdturno());
 					key.setNumero(designa.getNumero());
 					key.setIdpersona(letradoSaliente.getIdpersona());
 					key.setFechadesigna(letradoSaliente.getFechadesigna());
-					
 
-					//ScsDesigna designaActual = scsDesignaMapper.selectByPrimaryKey(key);
+
+					ScsDesignasletrado designaVieja = scsDesignasletradoMapper.selectByPrimaryKey(key);
 					
-					//Gestionamos el antiguo letrado
-					if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
-						response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
-					}
-					else {
-						ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
-						
-						oldLetrado.setFecharenuncia(letradoEntrante.getFechadesigna());
-						oldLetrado.setFecharenunciasolicita(letradoEntrante.getFecharenunciasolicita());
-						oldLetrado.setObservaciones(letradoSaliente.getObservaciones());
-						oldLetrado.setMotivosrenuncia(letradoSaliente.getMotivosrenuncia());
-						
-						response = scsDesignasletradoMapper.updateByPrimaryKeySelective(oldLetrado);
-					}
-					
+					ScsDesignasletrado designaNueva = new ScsDesignasletrado();
+					designaNueva.setIdinstitucion(idInstitucion);
+					designaNueva.setAnio(designa.getAnio());
+					designaNueva.setIdturno(designa.getIdturno());
+					designaNueva.setNumero(designa.getNumero());
+					designaNueva.setFechadesigna(letradoEntrante.getFechadesigna());
+					designaNueva.setFechamodificacion(new Date());
+					designaNueva.setManual((short) 0);
+					designaNueva.setLetradodelturno("S");
+					designaNueva.setUsumodificacion(usuarios.get(0).getIdusuario());;
+
 					//Seleccion de un letrado en el caso de que no se haya introducido
 					if(letradoEntrante.getIdpersona()==null) {
-						LetradoInscripcionItem newLetrado = this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designa.getIdturno()), letradoSaliente.getFechadesigna().toString(),  usuarios.get(0)); 
 						
+
+						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+						LetradoInscripcionItem newLetrado = this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designa.getIdturno()), dateFormat.format(letradoSaliente.getFechadesigna()),  usuarios.get(0)); 
+
 						if (newLetrado==null) {
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							LOGGER.error(
-									"DesignacionesServiceImpl.updateJustiActDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
-							error.setCode(500);
+									"DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
+							error.setCode(100);
 							error.setDescription(
-									"Se ha producido un error al actualizar el letrado asociado a la designación");
+									"justiciaGratuita.oficio.designas.letrados.nocolaletrado");
 							updateResponseDTO.setError(error);
 						}
 						else {
 							letradoEntrante.setIdpersona(newLetrado.getIdpersona());
+							designaNueva.setIdpersona(newLetrado.getIdpersona());
 							
 							response = scsDesignasletradoMapper.insert(letradoEntrante);
 						}						
 					}
 					else {
-						response = scsDesignasletradoMapper.insert(letradoEntrante);
+						designaNueva.setIdpersona(letradoEntrante.getIdpersona());
+						
+						response = scsDesignasletradoMapper.insert(designaNueva);
+					}
+					if(response!=0 && letradoEntrante.getIdpersona()!=null) {
+						//Gestionamos el antiguo letrado
+						if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
+							response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
+						}
+						else {
+							//ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
+
+							//if(usuarios.get(0).)oldLetrado.setFecharenuncia(letradoEntrante.getFechadesigna());
+							designaVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
+							List<ComboItem> motivos = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion, usuarios.get(0).getIdlenguaje());
+							int i=0;
+							while(i<motivos.size() && designaVieja.getMotivosrenuncia() == null) {
+								if(motivos.get(i).getValue().equals(letradoSaliente.getIdtipomotivo().toString())) {
+									designaVieja.setMotivosrenuncia(motivos.get(i).getLabel());
+								}
+								i++;
+							}
+							designaVieja.setObservaciones(letradoSaliente.getObservaciones());
+							designaVieja.setIdtipomotivo(letradoSaliente.getIdtipomotivo());
+							designaVieja.setUsumodificacion(usuarios.get(0).getIdusuario());
+							designaVieja.setFechamodificacion(new Date());
+							designaVieja.setLetradodelturno("N");
+							
+							response = scsDesignasletradoMapper.updateByPrimaryKeySelective(designaVieja);
+						}
+
 					}
 					if (response == 0) {
-						error.setCode(400);
-						error.setDescription("general.mensaje.error.bbdd");
-						updateResponseDTO.setStatus(SigaConstants.KO);
+						if(error.getCode()!=100) {
+							error.setCode(400);
+							error.setDescription("general.mensaje.error.bbdd");
+							updateResponseDTO.setStatus(SigaConstants.KO);
+						}
 					} else {
 						error.setCode(200);
 						error.setDescription("general.message.registro.actualizado");
@@ -4116,12 +4150,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info("updateLetradoDesigna() -> Salida del servicio");
 				}
 				
+				updateResponseDTO.setError(error);
+				
 			}
 
 			LOGGER.info(
 					"updateLetradoDesigna() -> Salida del servicio");
+			
 		}
-		return new UpdateResponseDTO();
+		return updateResponseDTO;
 	}
 
 	public ComboDTO comboMotivosCambioActDesigna(HttpServletRequest request) {
@@ -4662,7 +4699,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					//OJO en el campo codigo se mete el numero de front, que viene en el getNumero().
 					scsDesigna.setCodigo(String.valueOf(designaItem.getNumero()));
 
-					scsDesigna.setFechaentrada(designaItem.getFechaAlta());
 					scsDesigna.setFechamodificacion(new Date());
 					scsDesigna.setUsumodificacion(usuario.getIdusuario());
 
