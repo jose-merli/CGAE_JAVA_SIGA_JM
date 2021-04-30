@@ -19,6 +19,8 @@ import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -35,6 +37,7 @@ import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -874,5 +877,21 @@ public class DesignacionesController {
 		InsertResponseDTO response = designacionesService.subirDocumentoActDesigna(request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
-
+	
+	@PostMapping(value = "/designas/getDocumentosPorActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DocumentoActDesignaDTO> getDocumentosPorActDesigna(
+			@RequestBody DocumentoActDesignaItem documentoActDesignaItem, HttpServletRequest request) {
+		DocumentoActDesignaDTO response = designacionesService.getDocumentosPorActDesigna(documentoActDesignaItem,
+				request);
+		return new ResponseEntity<DocumentoActDesignaDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/descargarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
+			@RequestBody DocumentoActDesignaItem documentoActDesignaItem, HttpServletRequest request) {
+		ResponseEntity<InputStreamResource> response = designacionesService.descargarDocumentosActDesigna(documentoActDesignaItem,
+				request);
+		return response;
+	}
+	
 }

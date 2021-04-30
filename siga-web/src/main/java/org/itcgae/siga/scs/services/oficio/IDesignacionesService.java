@@ -16,6 +16,8 @@ import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -29,6 +31,8 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -177,4 +181,11 @@ public interface IDesignacionesService {
 			ScsDesignasletrado letradoEntrante, HttpServletRequest request);
 	
 	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request);
+	
+	public DocumentoActDesignaDTO getDocumentosPorActDesigna(DocumentoActDesignaItem documentoActDesignaItem,
+			HttpServletRequest request);
+	
+	public ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(DocumentoActDesignaItem documentoActDesignaItem,
+			HttpServletRequest request);
+	
 }

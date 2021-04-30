@@ -21,6 +21,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoInscripcionItem;
@@ -608,5 +609,23 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getNewIdDocumentacionAsi")
 	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR), })
 	MaxIdDto getNewIdDocumentacionAsi(Short idInstitucion);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDocumentosPorActDesigna")
+	@Results({
+			@Result(column = "IDDOCUMENTACIONASI", property = "idDocumentacionasi", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPODOCUMENTO", property = "idTipoDocumento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRETIPODOCUMENTO", property = "nombreTipoDocumento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDFICHERO", property = "idFichero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDACTUACION", property = "idActuacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "USUMODIFICACION", property = "usuModificacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAENTRADA", property = "fechaEntrada", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
+			})
+	List<DocumentoActDesignaItem> getDocumentosPorActDesigna(DocumentoActDesignaItem documentoActDesignaItem, Short idInstitucion);
 
 }
