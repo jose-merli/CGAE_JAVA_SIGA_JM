@@ -653,7 +653,7 @@ public class DesignacionesController {
 	
 	//Servicio de guardado
 //	[designa.ano, designa.idTurno, designa.numero, 
-//     this.saliente.body.idPersona,  this.saliente.body.observaciones, this.saliente.body.motivoRenuncia, this.saliente.body.fechaDesigna,
+//     this.saliente.body.idPersona,  this.saliente.body.observaciones, this.saliente.body.motivoRenuncia, this.saliente.body.fechaDesigna, this.saliente.body.fechaSolRenuncia,
 //     this.entrante.body.fechaDesigna, this.entrante.body.idPersona]
 	@RequestMapping(value = "/designas/updateLetradoDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(@RequestBody String[] item, HttpServletRequest request) throws ParseException {
@@ -675,18 +675,23 @@ public class DesignacionesController {
 			String date = item[6].substring(0, 10);
 			letradoSaliente.setFechadesigna(formatter.parse(date));
 		}
-		
-		ScsDesignasletrado letradoEntrante = new ScsDesignasletrado();
-		
 		if(item[7]!=null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			String date = item[7].substring(0, 10);
+			letradoSaliente.setFecharenunciasolicita(formatter.parse(date));
+		}
+		
+		ScsDesignasletrado letradoEntrante = new ScsDesignasletrado();
+		
+		if(item[8]!=null) {
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String date = item[8].substring(0, 10);
 			letradoEntrante.setFechadesigna(formatter.parse(date));
 		}
-		if(item[8]!=null) letradoEntrante.setIdpersona(Long.parseLong(item[8]));
+		if(item[9]!=null) letradoEntrante.setIdpersona(Long.parseLong(item[9]));
 		
 		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, request);
-		if (response.getError().getCode() == 200)
+		if (response.getError() == null)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);

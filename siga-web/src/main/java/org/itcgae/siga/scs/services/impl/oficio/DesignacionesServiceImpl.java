@@ -3913,6 +3913,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designaNueva.setIdturno(designa.getIdturno());
 					designaNueva.setNumero(designa.getNumero());
 					designaNueva.setFechadesigna(letradoEntrante.getFechadesigna());
+					designaNueva.setFechamodificacion(new Date());
+					designaNueva.setManual((short) 0);
+					designaNueva.setLetradodelturno("S");
+					designaNueva.setUsumodificacion(usuarios.get(0).getIdusuario());;
 
 					//Seleccion de un letrado en el caso de que no se haya introducido
 					if(letradoEntrante.getIdpersona()==null) {
@@ -3932,36 +3936,41 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 						else {
 							letradoEntrante.setIdpersona(newLetrado.getIdpersona());
-							designaNueva.setIdpersona(letradoEntrante.getIdpersona());
+							designaNueva.setIdpersona(newLetrado.getIdpersona());
 							
 							response = scsDesignasletradoMapper.insert(letradoEntrante);
 						}						
 					}
 					else {
 						designaNueva.setIdpersona(letradoEntrante.getIdpersona());
+						
 						response = scsDesignasletradoMapper.insert(designaNueva);
 					}
-					if(response!=0 && error.getCode()!=500) {
+					if(response!=0 && letradoEntrante.getIdpersona()!=null) {
 						//Gestionamos el antiguo letrado
 						if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
 							response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
 						}
 						else {
-							ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
+							//ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
 
 							//if(usuarios.get(0).)oldLetrado.setFecharenuncia(letradoEntrante.getFechadesigna());
-							oldLetrado.setFecharenunciasolicita(letradoEntrante.getFecharenunciasolicita());
+							designaVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
 							List<ComboItem> motivos = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion, usuarios.get(0).getIdlenguaje());
 							int i=0;
-							while(i<motivos.size() && letradoSaliente.getMotivosrenuncia() == null) {
-								if(motivos.get(i).getValue() == letradoSaliente.getIdtipomotivo().toString()) oldLetrado.setMotivosrenuncia(motivos.get(i).getLabel());
+							while(i<motivos.size() && designaVieja.getMotivosrenuncia() == null) {
+								if(motivos.get(i).getValue().equals(letradoSaliente.getIdtipomotivo().toString())) {
+									designaVieja.setMotivosrenuncia(motivos.get(i).getLabel());
+								}
 								i++;
 							}
-							oldLetrado.setObservaciones(letradoSaliente.getObservaciones());
-							oldLetrado.setIdtipomotivo(letradoSaliente.getIdtipomotivo());
-							oldLetrado.setMotivosrenuncia(letradoSaliente.getMotivosrenuncia());
-
-							response = scsDesignasletradoMapper.updateByPrimaryKeySelective(oldLetrado);
+							designaVieja.setObservaciones(letradoSaliente.getObservaciones());
+							designaVieja.setIdtipomotivo(letradoSaliente.getIdtipomotivo());
+							designaVieja.setUsumodificacion(usuarios.get(0).getIdusuario());
+							designaVieja.setFechamodificacion(new Date());
+							designaVieja.setLetradodelturno("N");
+							
+							response = scsDesignasletradoMapper.updateByPrimaryKeySelective(designaVieja);
 						}
 
 					}
@@ -3969,7 +3978,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						error.setCode(400);
 						error.setDescription("general.mensaje.error.bbdd");
 						updateResponseDTO.setStatus(SigaConstants.KO);
-					} else {
+					} else if(error.getCode()!=500) {
 						error.setCode(200);
 						error.setDescription("general.message.registro.actualizado");
 					}
@@ -3979,10 +3988,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info("updateLetradoDesigna() -> Salida del servicio");
 				}
 				
+				updateResponseDTO.setError(error);
+				
 			}
 
 			LOGGER.info(
 					"updateLetradoDesigna() -> Salida del servicio");
+			
 		}
 		return new UpdateResponseDTO();
 	}
