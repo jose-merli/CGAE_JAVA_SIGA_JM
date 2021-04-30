@@ -1573,8 +1573,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_DELITO D ");
 		sql.INNER_JOIN("SCS_DELITOSDESIGNA DD ON D.IDINSTITUCION = DD.IDINSTITUCION AND D.IDDELITO=DD.IDDELITO ");
 		sql.WHERE("DD.IDINSTITUCION = " + idInstitucion);
-		sql.WHERE("DD.ANIO = " + designaItem.getAno());
-		sql.WHERE("DD.NUMERO = " + designaItem.getNumero());
 		sql.WHERE("DD.IDTURNO = " + designaItem.getIdTurno());
 
 		return sql.toString();
@@ -2432,7 +2430,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 		sql.SELECT("FECHAOFICIOJUZGADO, DELITOS, FECHARECEPCIONCOLEGIO, OBSERVACIONES, FECHAJUICIO, DEFENSAJURIDICA");
 		sql.FROM("SCS_DESIGNA");
-		sql.WHERE("NUMERO = '" + designa.getCodigo() + "'");
+		sql.WHERE("NUMERO = '" + designa.getNumero() + "'");
 		sql.WHERE("IDTURNO = '" + designa.getIdTurno() + "'");
 		sql.WHERE("ANIO = '" + designa.getAno() + "'");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
@@ -2623,6 +2621,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				"SCS_DESIGNASLETRADO.FECHARENUNCIA, \r\n" + 
 				"SCS_DESIGNASLETRADO.MOTIVOSRENUNCIA, \r\n" + 
 				"SCS_DESIGNASLETRADO.FECHARENUNCIASOLICITA, \r\n"+
+				"SCS_DESIGNASLETRADO.LETRADODELTURNO, \r\n"+
 				"CEN_COLEGIADO.NCOLEGIADO \r\n");
 		sql.SELECT("            persona.apellidos1\r\n" + 
     			"            || decode(persona.apellidos2, NULL, '', ' ' || persona.apellidos2)\r\n" + 
@@ -2637,6 +2636,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("SCS_DESIGNASLETRADO.IDTURNO = '" + designa.getIdturno() + "'");
 		sql.WHERE("SCS_DESIGNASLETRADO.ANIO = '" + designa.getAnio() + "'");
 		sql.WHERE("SCS_DESIGNASLETRADO.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
+		
 		
 		return sql.toString();
 	}

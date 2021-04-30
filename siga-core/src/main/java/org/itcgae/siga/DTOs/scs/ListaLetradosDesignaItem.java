@@ -9,6 +9,7 @@ public class ListaLetradosDesignaItem {
 	private String motivoRenuncia;
 	private String idPersona;
 	private String observaciones;
+	private String letradoTurno;
 	private Date fechaDesignacion;
 	private Date fechaSolRenuncia;
 	private Date fechaEfecRenuncia;
@@ -61,6 +62,12 @@ public class ListaLetradosDesignaItem {
 	}
 	public void setObservaciones(String observaciones) {
 		this.observaciones = observaciones;
+	}
+	public String getLetradoTurno() {
+		return letradoTurno;
+	}
+	public void setLetradoTurno(String letradoTurno) {
+		this.letradoTurno = letradoTurno;
 	}
 	
 

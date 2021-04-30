@@ -42,7 +42,7 @@ public interface ScsBajasTemporalesExtendsMapper extends CenBajastemporalesMappe
 				@Result(column = "VALIDADO", property = "validado", jdbcType = JdbcType.CHAR),
 				@Result(column = "ELIMINADO", property = "eliminado", jdbcType = JdbcType.DECIMAL),
 				@Result(column = "FECHAESTADO", property = "fechaestado", jdbcType = JdbcType.TIMESTAMP) })
-	    List<BajasTemporalesItem> busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem,Short idInstitucion,String fechadesde,String fechahasta);
+	    List<BajasTemporalesItem> busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem,Short idInstitucion);
 	 
 
 	@SelectProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "comboEstado")
