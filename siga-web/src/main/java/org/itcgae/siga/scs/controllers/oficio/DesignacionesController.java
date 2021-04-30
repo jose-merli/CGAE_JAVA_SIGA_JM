@@ -691,7 +691,7 @@ public class DesignacionesController {
 		if(item[9]!=null) letradoEntrante.setIdpersona(Long.parseLong(item[9]));
 		
 		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, request);
-		if (response.getError() == null)
+		if (response.getError().getCode().intValue() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);

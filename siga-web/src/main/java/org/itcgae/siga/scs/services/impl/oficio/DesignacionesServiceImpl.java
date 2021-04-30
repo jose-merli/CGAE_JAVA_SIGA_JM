@@ -4089,7 +4089,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							LOGGER.error(
 									"DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
-							error.setCode(500);
+							error.setCode(100);
 							error.setDescription(
 									"justiciaGratuita.oficio.designas.letrados.nocolaletrado");
 							updateResponseDTO.setError(error);
@@ -4135,10 +4135,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					}
 					if (response == 0) {
-						error.setCode(400);
-						error.setDescription("general.mensaje.error.bbdd");
-						updateResponseDTO.setStatus(SigaConstants.KO);
-					} else if(error.getCode()!=500) {
+						if(error.getCode()!=100) {
+							error.setCode(400);
+							error.setDescription("general.mensaje.error.bbdd");
+							updateResponseDTO.setStatus(SigaConstants.KO);
+						}
+					} else {
 						error.setCode(200);
 						error.setDescription("general.message.registro.actualizado");
 					}
@@ -4156,7 +4158,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					"updateLetradoDesigna() -> Salida del servicio");
 			
 		}
-		return new UpdateResponseDTO();
+		return updateResponseDTO;
 	}
 
 	public ComboDTO comboMotivosCambioActDesigna(HttpServletRequest request) {
