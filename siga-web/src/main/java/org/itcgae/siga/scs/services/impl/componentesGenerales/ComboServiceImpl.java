@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
+import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -1004,6 +1005,37 @@ public class ComboServiceImpl implements ComboService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				comboItems = scsDesignacionesExtendsMapper.comboModulos(idInstitucion);
+
+				comboDTO.setCombooItems(comboItems);
+
+			}
+		}
+
+		LOGGER.info("objetivo() -> Salida del servicio para obtener combo modulo");
+
+		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboDelitos(DesignaItem designaItem, HttpServletRequest request) {
+		LOGGER.info("modulo() -> Entrada al servicio para obtener combo modulos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				comboItems = scsDesignacionesExtendsMapper.comboDelitos(designaItem,idInstitucion);
 
 				comboDTO.setCombooItems(comboItems);
 

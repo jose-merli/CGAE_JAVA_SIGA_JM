@@ -47,6 +47,14 @@ public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlP
 	public String getDesignaLetradoPorFecha(AsuntosClaveJusticiableItem asuntoClave) {
 
 		SQL sql = new SQL();
+		SQL subquery = new SQL();
+
+		subquery.SELECT("MAX(LET2.FECHADESIGNA)");
+		subquery.FROM("SCS_DESIGNASLETRADO LET2");
+		subquery.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
+		subquery.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
+		subquery.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
+		subquery.WHERE("TRUNC(LET2.FECHADESIGNA) <= TO_DATE('" + asuntoClave.getFechaActuacion() + "', 'DD/MM/RRRR')");
 
 		sql.SELECT("COLEGIADO.NCOLEGIADO");
 		sql.SELECT("PERSONA.APELLIDOS1");
@@ -67,8 +75,10 @@ public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlP
 		sql.WHERE("DESIGNALETRADO.IDTURNO = '" + asuntoClave.getClave() + "'");
 		sql.WHERE("DESIGNALETRADO.ANIO = '" + asuntoClave.getAnio() + "'");
 		sql.WHERE("DESIGNALETRADO.NUMERO = '" + asuntoClave.getNumero() + "'");
-
-		sql.WHERE("DESIGNALETRADO.FECHARENUNCIA IS NULL");
+		sql.WHERE("TRUNC(DESIGNALETRADO.FECHADESIGNA) <= TO_DATE('" + asuntoClave.getFechaActuacion()
+				+ "', 'DD/MM/RRRR')");
+		sql.WHERE("( DESIGNALETRADO.FECHARENUNCIA IS NULL OR DESIGNALETRADO.FECHADESIGNA = ( " + subquery.toString()
+				+ " ))");
 
 		return sql.toString();
 	}

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
@@ -1564,6 +1565,20 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String comboDelitos(DesignaItem designaItem, Short idInstitucion) {
+
+		SQL sql = new SQL();
+		sql.SELECT("D.IDDELITO, F_SIGA_GETRECURSO(D.DESCRIPCION, 1) as DESCRIPCION ");
+		sql.FROM("SCS_DELITO D ");
+		sql.INNER_JOIN("SCS_DELITOSDESIGNA DD ON D.IDINSTITUCION = DD.IDINSTITUCION AND D.IDDELITO=DD.IDDELITO ");
+		sql.WHERE("DD.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("DD.ANIO = " + designaItem.getAno());
+		sql.WHERE("DD.NUMERO = " + designaItem.getNumero());
+		sql.WHERE("DD.IDTURNO = " + designaItem.getIdTurno());
+
+		return sql.toString();
+	}
 
 	public String comboProcedimientos(Short idInstitucion) {
 
@@ -2159,7 +2174,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	    	return sql.toString();
 	    }
 
-	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario, boolean anular) {
+	public String anularReactivarActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion, AdmUsuarios usuario, boolean anular) {
 		SQL sql = new SQL();
 		String anulReact = anular ? "1" : "0";
 
@@ -2240,7 +2255,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String eliminarActDesigna(ActuacionDesignaItem actuacionDesignaItem, String idInstitucion, AdmUsuarios usuario) {
+	public String eliminarActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion, AdmUsuarios usuario) {
 		SQL sql = new SQL();
 
 		sql.DELETE_FROM("SCS_ACTUACIONDESIGNA");
@@ -2971,6 +2986,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("( " + sql2.toString() + " )");
 		sql.WHERE("ROWNUM <= 3");
 		
+		return sql.toString();
+	}
+	
+	public String getNewIdDocumentacionAsi(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("NVL(MAX(DOC.IDDOCUMENTACIONASI),0) +1 AS ID");
+
+		sql.FROM("SCS_DOCUMENTACIONASI DOC");
+
+		sql.WHERE("DOC.IDINSTITUCION = '" + idInstitucion + "'");
+
 		return sql.toString();
 	}
 	
