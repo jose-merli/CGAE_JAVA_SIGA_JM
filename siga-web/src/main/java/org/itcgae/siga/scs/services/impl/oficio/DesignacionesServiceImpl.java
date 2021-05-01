@@ -3,11 +3,11 @@ package org.itcgae.siga.scs.services.impl.oficio;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.text.DateFormat;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,7 +73,6 @@ import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenParametros;
@@ -5063,13 +5062,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
-			DocumentoActDesignaItem documentoActDesignaItem, HttpServletRequest request) {
+			List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		ResponseEntity<InputStreamResource> res = null;
+		InputStream fileStream = null;
+		HttpHeaders headers = new HttpHeaders();
 
 		try {
 
@@ -5083,26 +5084,31 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.getDocumentosPorActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (usuarios != null && !usuarios.isEmpty()) {
+			if (usuarios != null && !usuarios.isEmpty() && !listaDocumentoActDesignaItem.isEmpty()) {
 
-//				String path = getDirectorioFichero(idInstitucion);
-//				path += File.separator + idInstitucion + "_" + documentoActDesignaItem.getIdFichero()
-//						+ documentoActDesignaItem.getExtension().toLowerCase();
-//				File file = new File(path);
-//
-//				InputStream fileStream = new FileInputStream(file);
-//				HttpHeaders headers = new HttpHeaders();
-//
-//				headers.setContentType(MediaType.parseMediaType("text/plain"));
-//				headers.setContentLength(file.length());
-				
-				InputStream fileStream = getZipFile(documentoActDesignaItem, idInstitucion);
-				
-				HttpHeaders headers = new HttpHeaders();
-				headers.setContentType(MediaType.parseMediaType("application/zip"));
-				headers.set("Content-Disposition", "attachment; filename=\"test.Zip\"");
-//				headers.setContentLength(file.length());
-				
+				if (listaDocumentoActDesignaItem.size() == 1) {
+
+					String path = getDirectorioFichero(idInstitucion);
+					path += File.separator + idInstitucion + "_" + listaDocumentoActDesignaItem.get(0).getIdFichero()
+							+ listaDocumentoActDesignaItem.get(0).getExtension().toLowerCase();
+
+					File file = new File(path);
+					fileStream = new FileInputStream(file);
+
+					String tipoMime = getMimeType(listaDocumentoActDesignaItem.get(0).getExtension());
+
+					headers.setContentType(MediaType.parseMediaType(tipoMime));
+					headers.set("Content-Disposition",
+							"attachment; filename=\"" + listaDocumentoActDesignaItem.get(0).getNombreFichero() + "\"");
+					headers.setContentLength(file.length());
+
+				} else {
+					fileStream = getZipFileDocumentosActDesigna(listaDocumentoActDesignaItem, idInstitucion);
+
+					headers.setContentType(MediaType.parseMediaType("application/zip"));
+					headers.set("Content-Disposition", "attachment; filename=\"documentos.zip\"");
+				}
+
 				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
 						HttpStatus.OK);
 			}
@@ -5115,42 +5121,77 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		return res;
 	}
-	
-	private InputStream getZipFile(DocumentoActDesignaItem documentoActDesignaItem, Short idInstitucion) {
 
-		ByteArrayOutputStream byteArrayOutputStream =null;
-		
+	private InputStream getZipFileDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
+			Short idInstitucion) {
+
+		ByteArrayOutputStream byteArrayOutputStream = null;
+
 		try {
+
 			byteArrayOutputStream = new ByteArrayOutputStream();
-	        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-	        ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-	        
-			zipOutputStream.putNextEntry(new ZipEntry(documentoActDesignaItem.getNombreFichero()));
-			
-	        String path = getDirectorioFichero(idInstitucion);
-			path += File.separator + idInstitucion + "_" + documentoActDesignaItem.getIdFichero()
-					+ documentoActDesignaItem.getExtension().toLowerCase();
-			File file = new File(path);
-	        FileInputStream fileInputStream = new FileInputStream(file);
-	        
-	        IOUtils.copy(fileInputStream, zipOutputStream);
-	        
-	        fileInputStream.close();
-            zipOutputStream.closeEntry();
-            
-            if (zipOutputStream != null) {
-                zipOutputStream.finish();
-                zipOutputStream.flush();
-                IOUtils.closeQuietly(zipOutputStream);
-            }
-            IOUtils.closeQuietly(bufferedOutputStream);
-            IOUtils.closeQuietly(byteArrayOutputStream);
-	        
+			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+			for (DocumentoActDesignaItem doc : listaDocumentoActDesignaItem) {
+
+				zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
+				String path = getDirectorioFichero(idInstitucion);
+				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + doc.getExtension().toLowerCase();
+				File file = new File(path);
+				FileInputStream fileInputStream = new FileInputStream(file);
+				IOUtils.copy(fileInputStream, zipOutputStream);
+				fileInputStream.close();
+			}
+
+			zipOutputStream.closeEntry();
+
+			if (zipOutputStream != null) {
+				zipOutputStream.finish();
+				zipOutputStream.flush();
+				IOUtils.closeQuietly(zipOutputStream);
+			}
+
+			IOUtils.closeQuietly(bufferedOutputStream);
+			IOUtils.closeQuietly(byteArrayOutputStream);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+	}
+
+	private String getMimeType(String extension) {
+
+		String mime = "";
+
+		switch (extension.toLowerCase()) {
+
+		case ".doc":
+			mime = "application/msword";
+			break;
+		case ".docx":
+			mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+			break;
+		case ".pdf":
+			mime = "application/pdf";
+			break;
+		case ".jpg":
+			mime = "image/jpeg";
+			break;
+		case ".png":
+			mime = "image/png";
+			break;
+		case ".rtf":
+			mime = "application/rtf";
+			break;
+		case ".txt":
+			mime = "text/plain";
+			break;
+		}
+
+		return mime;
 	}
 
 }

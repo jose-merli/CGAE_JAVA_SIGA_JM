@@ -185,7 +185,7 @@ public interface IDesignacionesService {
 	public DocumentoActDesignaDTO getDocumentosPorActDesigna(DocumentoActDesignaItem documentoActDesignaItem,
 			HttpServletRequest request);
 	
-	public ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(DocumentoActDesignaItem documentoActDesignaItem,
-			HttpServletRequest request);
+	public ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
+			List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request);
 	
 }

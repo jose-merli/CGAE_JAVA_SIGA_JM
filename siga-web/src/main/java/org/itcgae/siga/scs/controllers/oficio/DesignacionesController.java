@@ -902,9 +902,9 @@ public class DesignacionesController {
 	
 	@PostMapping(value = "/designas/descargarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
-			@RequestBody DocumentoActDesignaItem documentoActDesignaItem, HttpServletRequest request) {
-		ResponseEntity<InputStreamResource> response = designacionesService.descargarDocumentosActDesigna(documentoActDesignaItem,
-				request);
+			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
+		ResponseEntity<InputStreamResource> response = designacionesService
+				.descargarDocumentosActDesigna(listaDocumentoActDesignaItem, request);
 		return response;
 	}
 	
