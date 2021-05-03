@@ -2394,7 +2394,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int response = 0;
-		String numeroDesigna = "";
+		String codigoDesigna = "";
 		ScsDesigna designa = new ScsDesigna();
 
 		String token = request.getHeader("Authorization");
@@ -2426,7 +2426,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designa.setAnio(year);
 
 					// CALCULO CAMPO CODIGO (NUMERO EN FRONT)
-					String codigoDesigna = scsDesignacionesExtendsMapper
+					 codigoDesigna = scsDesignacionesExtendsMapper
 							.obtenerCodigoDesigna(String.valueOf(idInstitucion), String.valueOf(designaItem.getAno()));
 
 					if (codigoDesigna != null && !codigoDesigna.equals("")) {
@@ -2465,7 +2465,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					// Obtenemos el ultimo numero + 1
-					numeroDesigna = scsDesignacionesExtendsMapper.obtenerNumeroDesigna(String.valueOf(idInstitucion),
+					String numeroDesigna = scsDesignacionesExtendsMapper.obtenerNumeroDesigna(String.valueOf(idInstitucion),
 							String.valueOf(designaItem.getAno()));
 
 					if (numeroDesigna == null) {
@@ -2589,7 +2589,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			}
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		} else {
-			insertResponseDTO.setId(numeroDesigna);
+			insertResponseDTO.setId(codigoDesigna);
 			error.setCode(200);
 			error.setDescription("general.message.registro.insertado");
 		}
@@ -3089,9 +3089,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				letradoSeleccionado = new LetradoInscripcionItem();
 
-				letradoSeleccionado.setIdpersona(inscripcionTurno.getIdpersona());
-				letradoSeleccionado.setIdinstitucion(Short.valueOf(inscripcionTurno.getIdinstitucion().toString()));
-				letradoSeleccionado.setIdturno(inscripcionTurno.getIdturno());
+				letradoSeleccionado.setIdpersona(elem.getIdpersona());
+				letradoSeleccionado.setIdinstitucion(Short.valueOf(elem.getIdinstitucion().toString()));
+				letradoSeleccionado.setIdturno(elem.getIdturno());
 				letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
 				letradoSeleccionado.setSaltoocompensacion("C");
 				alLetradosCompensados.add(letradoSeleccionado);
