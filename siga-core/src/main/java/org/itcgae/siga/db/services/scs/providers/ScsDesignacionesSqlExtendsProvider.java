@@ -2741,7 +2741,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
 		sql.WHERE( " Trunc(Ins.Fechavalidacion) <= nvl('"+fecha+"',  Ins.Fechavalidacion)" );
 		sql.WHERE( "(Ins.Fechabaja Is Null Or    Trunc(Ins.Fechabaja) > nvl('"+fecha+"', '01/01/1900')) ");
-		sql.WHERE(" Ins.idpersona ='" + idPersona + "'");
+		sql.WHERE(" Ins.idpersona ='" + idPersona + "' and rownum <= 1");
 		
 		return sql.toString();
 		
@@ -2798,12 +2798,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					s_saltocompensacion = " ";
 			}
 
-			Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Format formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			String fechaBBDD2 = formatter.format(saltoCompensacion.getFechacumplimiento());
 
 			sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
 
-			sql.SET("FECHACUMPLIMIENTO = '" + fechaBBDD2 + "'");
+			sql.SET("FECHACUMPLIMIENTO = TO_DATE('" + fechaBBDD2 + "' , 'YYYY/MM/DD HH24:MI:SS') ");
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 			sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
 			if (saltoCompensacion.getIdguardia() != null) {
