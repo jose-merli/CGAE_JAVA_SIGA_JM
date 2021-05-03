@@ -10,6 +10,8 @@ public class BajasTemporalesItem {
 	public Date fechadesde;
 	public Date fechahasta;
 	public Date fechaalta;
+	public Date fechasolicituddesde;
+	public Date fechasolicitudhasta;
 	public String descripcion;
 	public String validado;
 	public Date fechaestado;
@@ -21,6 +23,18 @@ public class BajasTemporalesItem {
 	public Date fechabt;
 	public boolean historico;
 	
+	public Date getFechaaltadesde() {
+		return fechasolicituddesde;
+	}
+	public void setFechasolicituddesde(Date fechasolicituddesde) {
+		this.fechasolicituddesde = fechasolicituddesde;
+	}
+	public Date getFechaaltahasta() {
+		return fechasolicitudhasta;
+	}
+	public void setFechasolicitudhasta(Date fechasolicitudhasta) {
+		this.fechasolicitudhasta = fechasolicitudhasta;
+	}
 	public String getIdinstitucion() {
 		return idinstitucion;
 	}
