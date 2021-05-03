@@ -202,9 +202,9 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			sql.WHERE(condestados);
 		}
 		if(inscripcionesItem.getAfechade() != null) {
-			sql.WHERE("(ins.fechadenegacion is null AND ins.fechavalidacion is not null AND (ins.fechavalidacion <= TO_DATE('"+afechade+"','DD/MM/RRRR') OR (" + 
-					" ins.fechasolicitudbaja is not null and ins.fechasolicitudbaja <= TO_DATE('"+afechade+"','DD/MM/RRRR'))"
-							+ "AND ( ins.fechabaja is null or ins.fechabaja >= TO_DATE('"+afechade+"','DD/MM/RRRR'))))") ;
+			sql.WHERE("ins.fechadenegacion is null AND ins.fechavalidacion is not null AND (ins.fechavalidacion <= TO_DATE('"+afechade+"','DD/MM/RRRR') OR (" + 
+					" ins.fechasolicitudbaja is not null and ins.fechasolicitudbaja <= TO_DATE('"+afechade+"','DD/MM/RRRR')))"
+							+ "AND ( ins.fechabaja is null or ins.fechabaja >= TO_DATE('"+afechade+"','DD/MM/RRRR'))") ;
 		}
 		if(inscripcionesItem.getFechadesde() != null) {
 			sql.WHERE("ins.fechasolicitud >= TO_DATE('"+fechadesde+"','DD/MM/RRRR')");

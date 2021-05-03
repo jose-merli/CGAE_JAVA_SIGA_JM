@@ -17,6 +17,8 @@ public class DocumentoActDesignaItem {
 	private String nombreFichero;
 	private String asociado;
 	private String extension;
+	private String idPersona;
+	private String numColegiado;
 
 	/**
 	 * @return the idDocumentacionasi
@@ -228,6 +230,34 @@ public class DocumentoActDesignaItem {
 		this.extension = extension;
 	}
 
+	/**
+	 * @return the idPersona
+	 */
+	public String getIdPersona() {
+		return idPersona;
+	}
+
+	/**
+	 * @param idPersona the idPersona to set
+	 */
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+
+	/**
+	 * @return the numColegiado
+	 */
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+
+	/**
+	 * @param numColegiado the numColegiado to set
+	 */
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+
 	@Override
 	public String toString() {
 		return "DocumentoActDesignaItem [idDocumentacionasi=" + idDocumentacionasi + ", idTipoDocumento="
@@ -235,7 +265,8 @@ public class DocumentoActDesignaItem {
 				+ ", idInstitucion=" + idInstitucion + ", usuModificacion=" + usuModificacion + ", fechaModificacion="
 				+ fechaModificacion + ", fechaEntrada=" + fechaEntrada + ", anio=" + anio + ", numero=" + numero
 				+ ", idActuacion=" + idActuacion + ", observaciones=" + observaciones + ", nombreFichero="
-				+ nombreFichero + ", asociado=" + asociado + ", extension=" + extension + "]";
+				+ nombreFichero + ", asociado=" + asociado + ", extension=" + extension + ", idPersona=" + idPersona
+				+ ", numColegiado=" + numColegiado + "]";
 	}
 
 }

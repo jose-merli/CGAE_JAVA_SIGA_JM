@@ -126,9 +126,9 @@ public class DesignacionesController {
 	@RequestMapping(value = "/busquedaDesignaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<List<DesignaItem>> busquedaDesignas(@RequestBody DesignaItem item, HttpServletRequest request) {
 		List<DesignaItem> response = designacionesService.busquedaDesignas(item, request);
-		if(response == null || response.isEmpty()) {
-			response = designacionesService.busquedaNuevaDesigna(item, request);
-		}
+//		if(response == null || response.isEmpty()) {
+//			response = designacionesService.busquedaNuevaDesigna(item, request);
+//		}
 		if (response != null) {
 			return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
 		} else {
