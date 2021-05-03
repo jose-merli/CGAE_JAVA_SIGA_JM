@@ -531,6 +531,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	public List<DesignaItem> busquedaDesignas(DesignaItem designaItem, HttpServletRequest request) {
 		DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
+		List<DesignaItem> designasNuevas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
 
@@ -574,6 +575,33 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, idInstitucion,
 							tamMaximo);
+					
+					designasNuevas = scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem, idInstitucion,
+							tamMaximo);
+					
+					Map<String, DesignaItem> desginasBusqueda = new HashMap<String, DesignaItem>();
+					for(DesignaItem d: designas) {
+						int[] indice = new int[4];
+						indice[0] = d.getAno();
+						indice[1] = d.getNumero();
+						indice[2] = d.getIdTurno();
+						indice[3] = idInstitucion;
+						desginasBusqueda.put(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion, d);
+					}
+					for(DesignaItem d: designasNuevas) {
+						int[] indice = new int[4];
+						indice[0] = d.getAno();
+						indice[1] = d.getNumero();
+						indice[2] = d.getIdTurno();
+						indice[3] = idInstitucion;
+						if(!(desginasBusqueda.containsKey(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion))) {
+							desginasBusqueda.put(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion, d);
+						}
+					}
+					
+					designas = new ArrayList(desginasBusqueda.values());
+					
+					
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
 					LOGGER.info("DesignacionesServiceImpl.busquedaDesignas -> Salida del servicio");
