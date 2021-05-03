@@ -75,6 +75,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.GenFicheroKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
@@ -91,6 +92,7 @@ import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsDesignasletradoKey;
 import org.itcgae.siga.db.entities.ScsDocumentacionasi;
+import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -100,6 +102,7 @@ import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.entities.ScsTurnoKey;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
@@ -211,6 +214,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private ScsDocumentacionasiMapper scsDocumentacionasiMapper;
+	
+	@Autowired
+	private GenFicheroMapper genFicheroMapper;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -5192,6 +5198,99 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return mime;
+	}
+
+	@Override
+	public DeleteResponseDTO eliminarDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.eliminarDocumentosActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.eliminarDocumentosActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				for (DocumentoActDesignaItem doc : listaDocumentoActDesignaItem) {
+
+					String path = getDirectorioFichero(idInstitucion);
+					path += File.separator + idInstitucion + "_" + doc.getIdFichero()
+							+ doc.getExtension().toLowerCase();
+
+					File file = new File(path);
+
+					if (file.exists()) {
+						file.delete();
+					}
+
+					ScsDocumentacionasiKey scsDocumentacionasiKey = new ScsDocumentacionasiKey();
+
+					scsDocumentacionasiKey.setIddocumentacionasi(Integer.valueOf(doc.getIdDocumentacionasi()));
+					scsDocumentacionasiKey.setIdinstitucion(idInstitucion);
+
+					int response = scsDocumentacionasiMapper.deleteByPrimaryKey(scsDocumentacionasiKey);
+
+					if (response == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.eliminarDocumentosActDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la actuacion");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						deleteResponseDTO.setError(error);
+					}
+
+					GenFicheroKey genFicheroKey = new GenFicheroKey();
+
+					genFicheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
+					genFicheroKey.setIdinstitucion(idInstitucion);
+
+					int response2 = genFicheroMapper.deleteByPrimaryKey(genFicheroKey);
+
+					if (response2 == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response2 == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.eliminarDocumentosActDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la actuacion");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						deleteResponseDTO.setError(error);
+					}
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.eliminarDocumentosActDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la actuacion",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			deleteResponseDTO.setError(error);
+		}
+
+		return deleteResponseDTO;
 	}
 
 }

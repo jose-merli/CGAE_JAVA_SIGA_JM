@@ -188,4 +188,7 @@ public interface IDesignacionesService {
 	public ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
 			List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request);
 	
+	public DeleteResponseDTO eliminarDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
+			HttpServletRequest request);
+	
 }

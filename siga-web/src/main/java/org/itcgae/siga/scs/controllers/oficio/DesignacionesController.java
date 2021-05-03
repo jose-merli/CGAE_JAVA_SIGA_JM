@@ -908,4 +908,12 @@ public class DesignacionesController {
 		return response;
 	}
 	
+	@PostMapping(value = "/designas/eliminarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> eliminarDocumentosActDesigna(
+			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
+		DeleteResponseDTO response = designacionesService.eliminarDocumentosActDesigna(listaDocumentoActDesignaItem,
+				request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+	
 }

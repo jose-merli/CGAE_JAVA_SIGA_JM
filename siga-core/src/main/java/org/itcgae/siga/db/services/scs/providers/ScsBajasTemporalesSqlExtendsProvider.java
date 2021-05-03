@@ -47,8 +47,11 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		if(bajasTemporalesItem.getFechahasta() != null) {
 			sql.WHERE("bt.fechahasta <=TO_DATE('"+bajasTemporalesItem.getFechahasta()+"','DD/MM/RRRR')");
 		}
-		if(bajasTemporalesItem.getFechaalta() != null) {
-			sql.WHERE("bt.fechaalta >=TO_DATE('"+bajasTemporalesItem.getFechaalta()+"','DD/MM/RRRR')");
+		if(bajasTemporalesItem.getFechaaltadesde() != null) {
+			sql.WHERE("bt.fechaalta >=TO_DATE('"+bajasTemporalesItem.getFechaaltadesde()+"','DD/MM/RRRR')");
+		}
+		if(bajasTemporalesItem.getFechaaltahasta() != null) {
+			sql.WHERE("bt.fechaalta <=TO_DATE('"+bajasTemporalesItem.getFechaaltahasta()+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechabt() != null) {
 			sql.WHERE("bt.fechabt <=TO_DATE('"+bajasTemporalesItem.getFechabt()+"','DD/MM/RRRR')");

@@ -119,11 +119,6 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
-				String fechahasta = "";
-				String fechadesde = "";
-				
-				LOGGER.info(
-						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
 				
 						bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion);
 
