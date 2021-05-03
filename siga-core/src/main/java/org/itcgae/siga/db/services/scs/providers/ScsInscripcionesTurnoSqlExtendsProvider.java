@@ -202,14 +202,14 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			sql.WHERE(condestados);
 		}
 		if(inscripcionesItem.getAfechade() != null) {
-			sql.WHERE("((ins.fechavalidacion is not null and ins.fechavalidacion <= '"+afechade+"' and ins.fechasolicitudbaja is null)" + 
-					" OR (ins.fechasolicitudbaja is not null and ins.fechavalidacion <= '"+afechade+"'and ins.fechabaja"
-					+ " is null))") ;
+			sql.WHERE("ins.fechadenegacion is null AND ins.fechavalidacion is not null AND (ins.fechavalidacion <= TO_DATE('"+afechade+"','DD/MM/RRRR') OR (" + 
+					" ins.fechasolicitudbaja is not null and ins.fechasolicitudbaja <= TO_DATE('"+afechade+"','DD/MM/RRRR')))"
+							+ "AND ( ins.fechabaja is null or ins.fechabaja >= TO_DATE('"+afechade+"','DD/MM/RRRR'))") ;
 		}
 		if(inscripcionesItem.getFechadesde() != null) {
-			sql.WHERE("ins.fechasolicitud >= '"+fechadesde+"'");
+			sql.WHERE("ins.fechasolicitud >= TO_DATE('"+fechadesde+"','DD/MM/RRRR')");
 			if(inscripcionesItem.getFechahasta() != null)
-			sql.WHERE("ins.fechasolicitud <= '"+fechahasta+"'");
+			sql.WHERE("ins.fechasolicitud <= TO_DATE('"+fechahasta+"','DD/MM/RRRR')");
 		}
 		sql.ORDER_BY("fechasolicitud DESC");
 		if (tamMax != null) {
@@ -573,9 +573,9 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		
 		sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
 		
-		sql.SET("FECHAMODIFICACION = '"+dateFormat.format(new Date())+"'");
+		sql.SET("FECHAMODIFICACION = TO_DATE('"+dateFormat.format(new Date())+"','DD/MM/RRRR')");
 		sql.SET("MOTIVOS = 'Baja de colegiado en el turno'");
-		sql.SET("FECHACUMPLIMIENTO= '"+dateFormat.format(inscripcionesItem.getFechaActual())+"'");
+		sql.SET("FECHACUMPLIMIENTO= TO_DATE('"+dateFormat.format(inscripcionesItem.getFechaActual())+"','DD/MM/RRRR')");
 		sql.SET("USUMODIFICACION= '"+String.valueOf(usumodificacion) +"'");
 		
 		sql.WHERE("idturno ='"+inscripcionesItem.getIdturno()+"'");
