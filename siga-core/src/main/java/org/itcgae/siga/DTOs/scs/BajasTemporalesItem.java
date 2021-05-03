@@ -23,13 +23,13 @@ public class BajasTemporalesItem {
 	public Date fechabt;
 	public boolean historico;
 	
-	public Date getFechaaltadesde() {
+	public Date getFechasolicituddesde() {
 		return fechasolicituddesde;
 	}
 	public void setFechasolicituddesde(Date fechasolicituddesde) {
 		this.fechasolicituddesde = fechasolicituddesde;
 	}
-	public Date getFechaaltahasta() {
+	public Date getFechasolicitudhasta() {
 		return fechasolicitudhasta;
 	}
 	public void setFechasolicitudhasta(Date fechasolicitudhasta) {

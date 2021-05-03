@@ -11,6 +11,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 
 	public String busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Short idInstitucion) {
 		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		sql.SELECT("DISTINCT\r\n" + 
 				"    bt.idinstitucion,\r\n" + 
 				"    bt.idpersona,\r\n" + 
@@ -40,21 +41,19 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 			sql.WHERE("(bt.validado IS NULL OR bt.validado = 2)");
 		}
 		if(bajasTemporalesItem.getFechadesde() != null) {
-			sql.WHERE("bt.fechadesde >=TO_DATE('"+bajasTemporalesItem.getFechadesde()+"','DD/MM/RRRR')");
-		}else {
-			sql.WHERE("TO_CHAR(bt.fechabt,'YYYY') >= (TO_CHAR(sysdate,'YYYY') - 2)");
+			sql.WHERE("bt.fechadesde >=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechadesde())+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechahasta() != null) {
-			sql.WHERE("bt.fechahasta <=TO_DATE('"+bajasTemporalesItem.getFechahasta()+"','DD/MM/RRRR')");
+			sql.WHERE("bt.fechahasta <=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechahasta())+"','DD/MM/RRRR')");
 		}
-		if(bajasTemporalesItem.getFechaaltadesde() != null) {
-			sql.WHERE("bt.fechaalta >=TO_DATE('"+bajasTemporalesItem.getFechaaltadesde()+"','DD/MM/RRRR')");
+		if(bajasTemporalesItem.getFechasolicituddesde() != null) {
+			sql.WHERE("bt.fechaalta >=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechasolicituddesde())+"','DD/MM/RRRR')");
 		}
-		if(bajasTemporalesItem.getFechaaltahasta() != null) {
-			sql.WHERE("bt.fechaalta <=TO_DATE('"+bajasTemporalesItem.getFechaaltahasta()+"','DD/MM/RRRR')");
+		if(bajasTemporalesItem.getFechasolicitudhasta() != null) {
+			sql.WHERE("bt.fechaalta <=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechasolicitudhasta())+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechabt() != null) {
-			sql.WHERE("bt.fechabt <=TO_DATE('"+bajasTemporalesItem.getFechabt()+"','DD/MM/RRRR')");
+			sql.WHERE("bt.fechabt <=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechabt())+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getTipo() != null) {
 			sql.WHERE("bt.tipo = '"+bajasTemporalesItem.getTipo()+"'");
