@@ -33,7 +33,6 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
-import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -424,6 +423,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if(item.getNumProcedimiento()!=null && !item.getNumProcedimiento().trim().isEmpty()){
 						record.setNumeroprocedimiento(item.getNumProcedimiento());
 					}
+					if(item.getValidada()!=null && !item.getValidada().trim().isEmpty()){
+						record.setValidada(item.getValidada());
+					}
+					
 					
 					fecha = formatter.parse(item.getFecha());  
 					record.setFecha(fecha);
@@ -552,7 +555,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public List<DesignaItem> busquedaDesignas(DesignaItem designaItem, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+		//DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
 		List<DesignaItem> designasNuevas = null;
 		List<GenParametros> tamMax = null;
@@ -622,7 +625,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 					}
 					
-					designas = new ArrayList(desginasBusqueda.values());
+					designas = new ArrayList<DesignaItem>(desginasBusqueda.values());
 					
 					
 				} catch (Exception e) {
@@ -638,7 +641,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public List<DesignaItem> busquedaNuevaDesigna(DesignaItem designaItem, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+		//DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
@@ -696,7 +699,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public List<DesignaItem> busquedaProcedimientoDesignas(DesignaItem designaItem, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+		//DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
@@ -754,7 +757,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public List<DesignaItem> busquedaModuloDesignas(DesignaItem designaItem, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+		//DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
@@ -818,8 +821,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio servicio");
 		List<ListaInteresadoJusticiableItem> interesados = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+//		List<GenParametros> tamMax = null;
+//		Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -838,21 +841,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
@@ -1387,10 +1390,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					contrario.setIdprocurador(item.getIdprocurador());
 
-					List<FichaDatosColegialesItem> colegiadosSJCSItems = cenColegiadoExtendsMapper
-							.selectDatosColegiales(item.getIdprocurador().toString(), idInstitucion.toString());
+//					List<FichaDatosColegialesItem> colegiadosSJCSItems = cenColegiadoExtendsMapper
+//							.selectDatosColegiales(item.getIdprocurador().toString(), idInstitucion.toString());
 
-					FichaDatosColegialesItem procurador = colegiadosSJCSItems.get(0);
+//					FichaDatosColegialesItem procurador = colegiadosSJCSItems.get(0);
 //						contrario.set
 
 					contrario.setFechamodificacion(new Date());
@@ -1437,8 +1440,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			Boolean historico) {
 		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio servicio");
 		List<ListaContrarioJusticiableItem> contrarios = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+//		List<GenParametros> tamMax = null;
+//		Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1457,21 +1460,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
@@ -1706,7 +1709,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
 
-					if ((designaExistentes == null && designaExistentes.size() == 0)) {
+					if ((designaExistentes == null || designaExistentes.size() == 0)) {
 						error.setCode(400);
 						// TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
@@ -1813,7 +1816,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
 
-					if ((designaExistentes == null && designaExistentes.size() == 0)) {
+					if ((designaExistentes == null || designaExistentes.size() == 0)) {
 						error.setCode(400);
 						// TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
@@ -1955,7 +1958,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					List<ScsTurno> turnoExistente = scsTurnosExtendsMapper.selectByExample(example);
 
-					if ((turnoExistente == null && turnoExistente.size() == 0)) {
+					if ((turnoExistente == null || turnoExistente.size() == 0)) {
 						error.setCode(400);
 						// TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
@@ -1966,7 +1969,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					ScsTurno scsTurno = new ScsTurno();
 					scsTurno.setIdturno(designaItem.getIdTurno());
-					Integer a = new Integer(idInstitucion);
+//					Integer a = new Integer(idInstitucion);
 					scsTurno.setIdinstitucion(idInstitucion);
 
 					scsTurno.setIdpartidapresupuestaria(designaItem.getIdPartidaPresupuestaria());
@@ -2554,9 +2557,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setFechamodificacion(new Date());
 						designaLetrado.setUsumodificacion(usuario.getIdusuario());
 						designaLetrado.setManual((short) 1);
-						// TODO
-//						MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
-//						MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
 						designaLetrado.setLetradodelturno("1");
 
 						String idPersona = scsDesignacionesExtendsMapper
@@ -2651,7 +2651,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (usuarios != null && !usuarios.isEmpty()) {
 
-				List<Integer> responses = new ArrayList<>();
+//				List<Integer> responses = new ArrayList<>();
 
 				for (DesignaItem designa : item) {
 
@@ -2936,7 +2936,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						.getSaltos(idInstitucion.toString(), idTurno.toString(), null);
 				HashMap<Long, ArrayList<LetradoInscripcionItem>> personasConSaltos = this
 						.getSaltosHash(personasConSaltosList, idInstitucion, idTurno, null, usr);
-				for (Iterator iter = colaLetrados.iterator(); iter.hasNext();) {
+				for (Iterator<LetradoInscripcionItem> iter = colaLetrados.iterator(); iter.hasNext();) {
 					letradoTurno = (LetradoInscripcionItem) iter.next();
 					if (personasConSaltos.get(letradoTurno.getIdpersona()) != null) {
 						iter.remove();
@@ -3618,7 +3618,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		int existentes = 0;
+//		int existentes = 0;
 
 		if (null != idInstitucion) {
 
@@ -3691,7 +3691,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		int existentes = 0;
+//		int existentes = 0;
 
 		if (null != idInstitucion) {
 
@@ -3732,10 +3732,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public DesignaItem existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+	//	DesignaItem result = new DesignaItem();
 		DesignaItem designas = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+	//	List<GenParametros> tamMax = null;
+	//	Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -3754,21 +3754,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.getDatosAdicionales -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-			LOGGER.info(
-					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-			LOGGER.info(
-					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//			LOGGER.info(
+//					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//			LOGGER.info(
+//					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
@@ -3789,7 +3789,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public List<DesignaItem> getDatosAdicionales(DesignaItem designa, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+	//	DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
@@ -3877,10 +3877,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public ComboDTO getPartidaPresupuestariaDesigna(HttpServletRequest request, @RequestBody DesignaItem designaItem) {
-		DesignaItem result = new DesignaItem();
+	//	DesignaItem result = new DesignaItem();
 		ComboDTO comboDTO = new ComboDTO();
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+	//	List<GenParametros> tamMax = null;
+	//	Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -3899,11 +3899,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.getPartidaPresupuestariaDesigna -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("DesignacionesServiceImpl.getPartidaPresupuestariaDesigna -> Entrada a servicio ");
@@ -3928,8 +3928,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	public ScsDesigna busquedaDesignaActual(ScsDesigna item, HttpServletRequest request) {
 		LOGGER.info("DesignacionesServiceImpl.busquedaDesigna() -> Entrada al servicio servicio");
 		ScsDesigna designa = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+	//	List<GenParametros> tamMax = null;
+	//	Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -3948,21 +3948,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.busquedaDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
@@ -3993,8 +3993,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info(
 				"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada al servicio para buscar los letrados asociados a una designacion");
 		List<ListaLetradosDesignaItem> listaLetrados = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+	//	List<GenParametros> tamMax = null;
+	//	Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -4013,21 +4013,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
@@ -4521,9 +4521,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									record.setNig(actuacion.getNig());
 								}
 
-//								if (actuacion.getValidada() != null) {
-//									record.setValidada(getValidada).setNig(actuacion.getNig());
-//								}
+								if (actuacion.getValidada() != null) {
+									record.setValidada(actuacion.getValidada());
+								}
 
 								record.setFechamodificacion(new Date());
 								record.setIdinstitucion(Short.parseShort(actuacion.getIdInstitucion()));

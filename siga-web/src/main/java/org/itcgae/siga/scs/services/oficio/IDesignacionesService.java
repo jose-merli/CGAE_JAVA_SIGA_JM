@@ -156,7 +156,7 @@ public interface IDesignacionesService {
 
 	public ColegiadoItemDTO SearchAbogadoByIdPersona(String idPersona, HttpServletRequest request);
 
-	public RelacionesDTO busquedaRelaciones(List<String> procurador, HttpServletRequest request);
+	public RelacionesDTO busquedaRelaciones(List<String> relaciones, HttpServletRequest request);
 	
 	public ComboDTO getPartidaPresupuestariaDesigna(HttpServletRequest request, DesignaItem designaItem);
 	

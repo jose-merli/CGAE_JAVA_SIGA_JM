@@ -2550,9 +2550,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.DELETE_FROM("SCS_EJGDESIGNA");
 
-		sql.WHERE("NUMERODESIGNA = " + num);
+		sql.WHERE("NUMEROEJG = " + num);
 		sql.WHERE("IDTURNO = " + idTurno);
-		sql.WHERE("ANIODESIGNA = " + anio);
+		sql.WHERE("ANIOEJG = " + anio);
 		sql.WHERE("IDINSTITUCION = " + idinstitucion);
 
 		return sql.toString();
@@ -2934,17 +2934,17 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		
-		
-		sql2.SELECT("S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, F_SIGA_GETRECURSO(A.DESCRIPCION, 1) as IDESTADO, N.NOMBRE , N.APELLIDOS1 , N.APELLIDOS2");
+		//, F_SIGA_GETRECURSO(A.DESCRIPCION, 1) as IDESTADO
+		sql2.SELECT("S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, N.NOMBRE , N.APELLIDOS1 , N.APELLIDOS2");
 
 		sql2.FROM("SCS_COMUNICACIONES C");
 		sql2.INNER_JOIN("ENV_ENVIOS S on (s.idenvio = C.IDENVIOSALIDA)");
 		sql2.INNER_JOIN("ENV_TIPOENVIOS T on (T.IDTIPOENVIOS = S.IDTIPOENVIOS)");
-		sql2.INNER_JOIN("CEN_ESTADOSOLICITUD A on (A.IDESTADO = S.IDESTADO)");
+		//sql2.INNER_JOIN("CEN_ESTADOSOLICITUD A on (A.IDESTADO = S.IDESTADO)");
 		sql2.INNER_JOIN("ENV_DESTINATARIOS D on (D.IDENVIO = S.IDENVIO)");
 		sql2.INNER_JOIN("CEN_PERSONA N on (N.IDPERSONA = D.IDPERSONA)");
 		sql2.WHERE("C.DESIGNAANIO = " + anio);
-		sql2.WHERE("C.DESIGNAIDTURNO =" + idturno);
+		//sql2.WHERE("C.DESIGNAIDTURNO =" + idturno);
 		
 		if(idPersona == null) {
 			sql2.WHERE("C.DESIGNANUMERO =" + num);
@@ -2955,7 +2955,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.SELECT("*");
 		sql.FROM("( " + sql2.toString() + " )");
-		sql.WHERE("ROWNUM <= 201");
+		sql.WHERE("ROWNUM <= 200");
 
 		return sql.toString();
 	}
