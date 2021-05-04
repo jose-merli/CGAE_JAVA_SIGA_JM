@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.controllers.oficio;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -681,8 +682,12 @@ public class DesignacionesController {
 		letradoSaliente.setIdtipomotivo(Short.parseShort(item[5]));
 		if(item[6]!=null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-			String date = item[6].substring(0, 10);
-			letradoSaliente.setFechadesigna(formatter.parse(date));
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(Long.parseLong(item[6]));
+			letradoSaliente.setFechadesigna(formatter.parse(formatter.format(calendar.getTime()))); 
+//			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+//			String date = item[6].substring(0, 10);
+//			letradoSaliente.setFechadesigna(formatter.parse(date));
 		}
 		if(item[7]!=null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");

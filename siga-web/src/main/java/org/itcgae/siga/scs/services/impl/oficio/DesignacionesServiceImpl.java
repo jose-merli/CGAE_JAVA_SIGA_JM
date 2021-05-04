@@ -91,6 +91,7 @@ import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsDesignasletradoExample;
 import org.itcgae.siga.db.entities.ScsDesignasletradoKey;
 import org.itcgae.siga.db.entities.ScsDocumentacionasi;
 import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
@@ -4106,17 +4107,26 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 
-					ScsDesignasletradoKey key = new ScsDesignasletradoKey();
+//					ScsDesignasletradoKey key = new ScsDesignasletradoKey();
+//
+//					key.setIdinstitucion(idInstitucion);
+//					key.setAnio(designa.getAnio());
+//					key.setIdturno(designa.getIdturno());
+//					key.setNumero(designa.getNumero());
+//					key.setIdpersona(letradoSaliente.getIdpersona());
+//					key.setFechadesigna(letradoSaliente.getFechadesigna());
+//
+//
+//					ScsDesignasletrado designaVieja = scsDesignasletradoMapper.selectByPrimaryKey(key);
+					ScsDesignasletradoExample example = new ScsDesignasletradoExample();
 
-					key.setIdinstitucion(idInstitucion);
-					key.setAnio(designa.getAnio());
-					key.setIdturno(designa.getIdturno());
-					key.setNumero(designa.getNumero());
-					key.setIdpersona(letradoSaliente.getIdpersona());
-					key.setFechadesigna(letradoSaliente.getFechadesigna());
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(designa.getAnio()).
+					andIdturnoEqualTo(designa.getIdturno()).andNumeroEqualTo(designa.getNumero()).andIdpersonaEqualTo(letradoSaliente.getIdpersona()).
+					andFechadesignaGreaterThan(letradoSaliente.getFechadesigna());
 
+					List<ScsDesignasletrado> designas = scsDesignasletradoMapper.selectByExample(example);
 
-					ScsDesignasletrado designaVieja = scsDesignasletradoMapper.selectByPrimaryKey(key);
+					ScsDesignasletrado designaVieja = designas.get(0);
 					
 					ScsDesignasletrado designaNueva = new ScsDesignasletrado();
 					designaNueva.setIdinstitucion(idInstitucion);
@@ -4161,7 +4171,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if(response!=0 && letradoEntrante.getIdpersona()!=null) {
 						//Gestionamos el antiguo letrado
 						if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
-							response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
+//							response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
+							response = scsDesignasletradoMapper.deleteByExample(example);
 						}
 						else {
 							//ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
