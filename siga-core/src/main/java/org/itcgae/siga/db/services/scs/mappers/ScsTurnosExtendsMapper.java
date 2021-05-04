@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsTurnosSqlExtendsProvider;
@@ -202,6 +203,11 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 	    List<TurnosItem> busquedaColaGuardia(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
 
 	 
-
+	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="selectInscripcionTurnoByTurno")
+	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR, id = true),
+			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHASOLICITUD", property = "fechasolicitud", jdbcType = JdbcType.TIMESTAMP) })
+	    List<InscripcionTurnoItem> selectInscripcionTurnoByTurno(Short idInstitucion, String idTurno);
 	 
 }

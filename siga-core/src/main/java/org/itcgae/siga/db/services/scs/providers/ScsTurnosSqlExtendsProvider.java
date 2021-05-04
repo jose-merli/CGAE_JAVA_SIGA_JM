@@ -663,5 +663,18 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 
 		return sql.toString();
 	}
+	
+	public String selectInscripcionTurnoByTurno(Short idInstitucion, String idTurno) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDINSTITUCION,IDPERSONA, IDTURNO,FECHASOLICITUD");
+		sql.FROM("SCS_INSCRIPCIONTURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("FECHABAJA IS NULL");
+
+		return sql.toString();
+	}
 
 }

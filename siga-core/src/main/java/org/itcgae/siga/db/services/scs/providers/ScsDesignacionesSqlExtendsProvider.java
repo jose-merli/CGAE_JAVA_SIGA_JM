@@ -275,20 +275,21 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 			if (designaItem.getCodigo() != null && !designaItem.getCodigo().equalsIgnoreCase("")) {
 
-				if ((designaItem.getCodigo().indexOf(',') != -1) && (designaItem.getCodigo().indexOf('-') == 1)) {
+				if ((designaItem.getCodigo().indexOf(',') != -1) && (designaItem.getCodigo().indexOf('-') == -1)) {
 					String[] parts = designaItem.getCodigo().split(",");
 					sql += " AND (des.codigo = ";
 					for (int i = 0; i < parts.length; i++) {
 						if (i == parts.length - 1) {
 							sql += parts[i].trim() + ")";
+						}else {
+							sql += parts[i].trim() + " OR des.codigo = ";
 						}
-						sql += parts[i].trim() + " OR des.codigo = ";
 					}
 				} else if ((designaItem.getCodigo().indexOf('-') != -1)
 						&& (designaItem.getCodigo().indexOf(',') == -1)) {
 					String[] parts = designaItem.getCodigo().split("-");
 					if (parts.length == 2) {
-						sql += " des.codigo IN (" + parts[0] + "," + parts[1] + ")";
+						sql += " and des.codigo IN (" + parts[0] + "," + parts[1] + ")";
 					}
 				} else if ((designaItem.getCodigo().indexOf('-') == -1)
 						&& (designaItem.getCodigo().indexOf(',') == -1)) {
@@ -748,20 +749,21 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 			if (designaItem.getCodigo() != null && !designaItem.getCodigo().equalsIgnoreCase("")) {
 
-				if ((designaItem.getCodigo().indexOf(',') != -1) && (designaItem.getCodigo().indexOf('-') == 1)) {
+				if ((designaItem.getCodigo().indexOf(',') != -1) && (designaItem.getCodigo().indexOf('-') == -1)) {
 					String[] parts = designaItem.getCodigo().split(",");
 					sql += " AND (des.codigo = ";
 					for (int i = 0; i < parts.length; i++) {
 						if (i == parts.length - 1) {
 							sql += parts[i].trim() + ")";
+						}else {
+							sql += parts[i].trim() + " OR des.codigo = ";
 						}
-						sql += parts[i].trim() + " OR des.codigo = ";
 					}
 				} else if ((designaItem.getCodigo().indexOf('-') != -1)
 						&& (designaItem.getCodigo().indexOf(',') == -1)) {
 					String[] parts = designaItem.getCodigo().split("-");
 					if (parts.length == 2) {
-						sql += " des.codigo IN (" + parts[0] + "," + parts[1] + ")";
+						sql += " and des.codigo IN (" + parts[0] + "," + parts[1] + ")";
 					}
 				} else if ((designaItem.getCodigo().indexOf('-') == -1)
 						&& (designaItem.getCodigo().indexOf(',') == -1)) {

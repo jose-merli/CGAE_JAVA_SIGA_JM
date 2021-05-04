@@ -3,7 +3,6 @@ package org.itcgae.siga.scs.services.impl.oficio;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,10 +10,8 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-
 import org.itcgae.siga.DTO.scs.GuardiasDTO;
 import org.itcgae.siga.DTO.scs.GuardiasItem;
-
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
@@ -24,13 +21,13 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
@@ -39,11 +36,6 @@ import org.itcgae.siga.db.entities.ScsInscripcionturno;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
-import org.itcgae.siga.db.entities.ScsProcurador;
-import org.itcgae.siga.db.entities.ScsProcuradorExample;
-
-import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
-
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
@@ -92,7 +84,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 	
 	@Autowired
 	private ScsInscripcionesTurnoExtendsMapper scsInscripcionturnoExtendsMapper;
-
+	
 	@Override
 	public TurnosDTO busquedaTurnos(TurnosItem turnosItem, HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
@@ -161,7 +153,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
 
 				turnosItems = scsTurnosExtendsMapper.busquedaFichaTurnos(turnosItem, idInstitucion);
-
+				
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
 
@@ -203,7 +195,12 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
-
+					List<List<InscripcionTurnoItem>> inscripcionesTurno = new ArrayList<>();
+					List<InscripcionTurnoItem> inscripcion = new ArrayList<>();
+					List<List<GuardiasItem>> inscripcionesGuardiasTurno = new ArrayList<>();
+					List<GuardiasItem> inscripcionGuardia = new ArrayList<>();
+					List<GuardiasItem> guardiasConfiguradas = new ArrayList<>();
+					List<List<GuardiasItem>> guardiasConfiguradasTurno = new ArrayList<>();
 					for (TurnosItem turnosItem : turnosDTO.getTurnosItems()) {
 
 						ScsTurno turno = new ScsTurno();
@@ -227,12 +224,71 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 								"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Entrada a scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
 
 						response = scsTurnosExtendsMapper.updateByPrimaryKey(turno);
-
+						
+						inscripcion = scsTurnosExtendsMapper.selectInscripcionTurnoByTurno(idInstitucion, turnosItem.getIdturno());
+						if(inscripcion.size() != 0) {
+							inscripcionesTurno.add(inscripcion);
+						}
+						
+						inscripcionGuardia = scsGuardiasturnoExtendsMapper.selectGuardiaTurnoByTurno(idInstitucion, turnosItem.getIdturno());
+						if(inscripcionGuardia.size() != 0) {
+							inscripcionesGuardiasTurno.add(inscripcionGuardia);
+						}
+						
+						guardiasConfiguradas = scsGuardiasturnoExtendsMapper.selectGuardiaConfiguradasTurno(idInstitucion, turnosItem.getIdturno());
+						if(inscripcionGuardia.size() != 0) {
+							guardiasConfiguradasTurno.add(guardiasConfiguradas);
+						}
+						
 						LOGGER.info(
 								"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Salida de scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
-
 					}
 
+					//ELIMINAMOS LAS INSCRIPCIONES A LOS TURNOS
+					for(List<InscripcionTurnoItem> listaInscripcionesTurnos : inscripcionesTurno) {
+						for(InscripcionTurnoItem inscripcionTurnoAAnular : listaInscripcionesTurnos) {
+							ScsInscripcionturno turnoupdate = new ScsInscripcionturno();
+							turnoupdate.setIdinstitucion(inscripcionTurnoAAnular.getIdinstitucion());
+							turnoupdate.setIdturno(inscripcionTurnoAAnular.getIdturno());
+							turnoupdate.setIdpersona(inscripcionTurnoAAnular.getIdpersona());
+							turnoupdate.setFechasolicitud(inscripcionTurnoAAnular.getFechasolicitud());
+							turnoupdate.setFechabaja(new Date());
+							turnoupdate.setFechamodificacion(new Date());
+							turnoupdate.setUsumodificacion(0);
+							scsInscripcionturnoMapper.updateByPrimaryKey(turnoupdate);
+							
+						}
+					}
+					
+					//ELIMINAMOS LAS INSCRIPCIONES A LAS GUARDIAS DEL TURNO
+					for(List<GuardiasItem> listaInscripcionesGuardia : inscripcionesGuardiasTurno) {
+						for(GuardiasItem inscripcionGuardiaAAnular : listaInscripcionesGuardia) {
+							ScsInscripcionguardia guardiaupdate = new ScsInscripcionguardia();
+							guardiaupdate.setIdinstitucion(new Short(inscripcionGuardiaAAnular.getJurisdiccion()));
+							guardiaupdate.setIdturno(Integer.parseInt(inscripcionGuardiaAAnular.getIdTurno()));
+							guardiaupdate.setIdpersona(new Long(inscripcionGuardiaAAnular.getIdPersonaUltimo()));
+							guardiaupdate.setFechasuscripcion(inscripcionGuardiaAAnular.getFechabaja());
+							guardiaupdate.setIdguardia(Integer.parseInt(inscripcionGuardiaAAnular.getIdGuardia()));
+							guardiaupdate.setFechabaja(new Date());
+							guardiaupdate.setFechamodificacion(new Date());
+							guardiaupdate.setUsumodificacion(0);
+							scsInscripcionguardiaMapper.updateByPrimaryKey(guardiaupdate);
+							
+						}
+					}
+					
+//					//ELIMINAMOS LAS GUARDIAS CONFIGURADAS PARA EL TURNO
+//					for(List<GuardiasItem> listaInscripcionesGuardia : guardiasConfiguradasTurno) {
+//						for(GuardiasItem inscripcionGuardiaAAnular : listaInscripcionesGuardia) {
+//							ScsGuardiasturno guardiaupdate = new ScsGuardiasturno();
+//							guardiaupdate.setIdinstitucion(new Short(inscripcionGuardiaAAnular.getJurisdiccion()));
+//							guardiaupdate.setIdturno(Integer.parseInt(inscripcionGuardiaAAnular.getIdTurno()));
+//							guardiaupdate.setIdguardia(Integer.parseInt(inscripcionGuardiaAAnular.getIdGuardia()));
+//							scsGuardiasturnoMapper.deleteByPrimaryKey(guardiaupdate);
+//							
+//						}
+//					}
+//					
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
