@@ -181,7 +181,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "ANIOPROCEDIMIENTNO", property = "anioProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR), })
 	List<JustificacionExpressItem> busquedaJustificacionExpresPendientes(JustificacionExpressItem item,
-			String idInstitucion, String longitudCodEJG, String idPersona);
+			String idInstitucion, String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable);
 
 	/**
 	 * 
@@ -592,7 +592,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHA", property = "fechaCreacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAPROGRAMADA", property = "fechaProgramacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
-			//@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
 			})
 	List<ComunicacionesItem> busquedaComunicaciones(String num, String anio, String idturno, String idpersona);
 
