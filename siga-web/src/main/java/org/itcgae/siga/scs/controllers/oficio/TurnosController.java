@@ -188,6 +188,15 @@ public class TurnosController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/turnos/updateUltimoGuardias", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateUltimoGuardias(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
+		UpdateResponseDTO response = turnosService.updateUltimoGuardias(turnosItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@RequestMapping(value = "/turnos/updateConfiguracion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateConfiguracion(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
 		UpdateResponseDTO response = turnosService.updateConfiguracion(turnosItem, request);
