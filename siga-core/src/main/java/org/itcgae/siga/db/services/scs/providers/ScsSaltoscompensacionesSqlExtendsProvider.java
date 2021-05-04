@@ -328,7 +328,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 
 		sql.INSERT_INTO("SCS_SALTOSCOMPENSACIONES");
 
-		sql.VALUES("FECHA", "'" + saltoItem.getFecha() + "'");
+		sql.VALUES("FECHA", "TO_DATE('"+saltoItem.getFecha() + "','DD/MM/RRRR')");
 		sql.VALUES("FECHACUMPLIMIENTO", "NULL");
 		sql.VALUES("FECHAMODIFICACION", "SYSTIMESTAMP");
 		if (!UtilidadesString.esCadenaVacia(saltoItem.getIdGuardia())) {
