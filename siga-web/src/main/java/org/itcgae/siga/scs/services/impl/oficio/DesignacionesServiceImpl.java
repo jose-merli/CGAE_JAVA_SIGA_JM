@@ -4482,6 +4482,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						// guardamos las actuaciones
 						if (justificacion.getActuaciones() != null && justificacion.getActuaciones().size() > 0) {
 							for (ActuacionesJustificacionExpressItem actuacion : justificacion.getActuaciones()) {
+								if (actuacion.getValidada() != "1") {
 
 								ScsActuaciondesigna record = new ScsActuaciondesigna();
 
@@ -4534,8 +4535,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								record.setNumero(Long.parseLong(actuacion.getNumDesignacion()));
 								record.setIdturno(Integer.parseInt(actuacion.getIdTurno()));
 								record.setAnio(Short.parseShort(actuacion.getAnio()));
-
-								responseAct = scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
+								
+									responseAct = scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
+								
+								}
 							}
 						}
 					}
