@@ -1299,4 +1299,33 @@ public class ComboServiceImpl implements ComboService {
 
 		return comboDTO;
 	}
+
+	@Override
+	public ComboDTO comboTipoDocumentacionDesigna(HttpServletRequest request) {
+		LOGGER.info(
+				"comboTipoDocumentacionDesigna() -> Entrada al servicio para obtener el comboTipoDocumentacionDesigna");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> tiposDoc = new ArrayList<ComboItem>();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && !usuarios.isEmpty()) {
+
+				tiposDoc = scsDesignacionesExtendsMapper.comboTipoDocumentacionDesigna();
+
+				comboDTO.setCombooItems(tiposDoc);
+			}
+		}
+
+		LOGGER.info(
+				"comboTipoDocumentacionDesigna() -> Salida del servicio para obtener comboTipoDocumentacionDesigna");
+		return comboDTO;
+	}
 }

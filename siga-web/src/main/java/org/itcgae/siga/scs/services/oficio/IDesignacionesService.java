@@ -18,6 +18,8 @@ import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
+import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -190,5 +192,16 @@ public interface IDesignacionesService {
 	
 	public DeleteResponseDTO eliminarDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
 			HttpServletRequest request);
+	
+	public DocumentoDesignaDTO getDocumentosPorDesigna(DocumentoDesignaItem documentoDesignaItem,
+			HttpServletRequest request);
+	
+	public InsertResponseDTO subirDocumentoDesigna(MultipartHttpServletRequest request);
+	
+	public DeleteResponseDTO eliminarDocumentosDesigna(List<DocumentoDesignaItem> listaDocumentoDesignaItem,
+			HttpServletRequest request);
+	
+	public ResponseEntity<InputStreamResource> descargarDocumentosDesigna(
+			List<DocumentoDesignaItem> listaDocumentoDesignaItem, HttpServletRequest request);
 	
 }

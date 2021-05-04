@@ -33,7 +33,6 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
-import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -53,6 +52,8 @@ import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
+import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
@@ -93,6 +94,8 @@ import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsDesignasletradoKey;
 import org.itcgae.siga.db.entities.ScsDocumentacionasi;
 import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
+import org.itcgae.siga.db.entities.ScsDocumentaciondesigna;
+import org.itcgae.siga.db.entities.ScsDocumentaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -110,6 +113,7 @@ import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
+import org.itcgae.siga.db.mappers.ScsDocumentaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
@@ -217,6 +221,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private GenFicheroMapper genFicheroMapper;
+	
+	@Autowired
+	private ScsDocumentaciondesignaMapper scsDocumentaciondesignaMapper;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -548,7 +555,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public List<DesignaItem> busquedaDesignas(DesignaItem designaItem, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+		//DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
 		List<DesignaItem> designasNuevas = null;
 		List<GenParametros> tamMax = null;
@@ -618,7 +625,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 					}
 					
-					designas = new ArrayList(desginasBusqueda.values());
+					designas = new ArrayList<DesignaItem>(desginasBusqueda.values());
 					
 					
 				} catch (Exception e) {
@@ -634,7 +641,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public List<DesignaItem> busquedaNuevaDesigna(DesignaItem designaItem, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+		//DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
@@ -692,7 +699,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public List<DesignaItem> busquedaProcedimientoDesignas(DesignaItem designaItem, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+		//DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
@@ -750,7 +757,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public List<DesignaItem> busquedaModuloDesignas(DesignaItem designaItem, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+		//DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
@@ -814,8 +821,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio servicio");
 		List<ListaInteresadoJusticiableItem> interesados = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+//		List<GenParametros> tamMax = null;
+//		Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -834,21 +841,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
@@ -1383,10 +1390,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					contrario.setIdprocurador(item.getIdprocurador());
 
-					List<FichaDatosColegialesItem> colegiadosSJCSItems = cenColegiadoExtendsMapper
-							.selectDatosColegiales(item.getIdprocurador().toString(), idInstitucion.toString());
+//					List<FichaDatosColegialesItem> colegiadosSJCSItems = cenColegiadoExtendsMapper
+//							.selectDatosColegiales(item.getIdprocurador().toString(), idInstitucion.toString());
 
-					FichaDatosColegialesItem procurador = colegiadosSJCSItems.get(0);
+//					FichaDatosColegialesItem procurador = colegiadosSJCSItems.get(0);
 //						contrario.set
 
 					contrario.setFechamodificacion(new Date());
@@ -1433,8 +1440,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			Boolean historico) {
 		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio servicio");
 		List<ListaContrarioJusticiableItem> contrarios = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+//		List<GenParametros> tamMax = null;
+//		Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1453,21 +1460,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
@@ -1702,7 +1709,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
 
-					if ((designaExistentes == null && designaExistentes.size() == 0)) {
+					if ((designaExistentes == null || designaExistentes.size() == 0)) {
 						error.setCode(400);
 						// TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
@@ -1809,7 +1816,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
 
-					if ((designaExistentes == null && designaExistentes.size() == 0)) {
+					if ((designaExistentes == null || designaExistentes.size() == 0)) {
 						error.setCode(400);
 						// TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
@@ -1951,7 +1958,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					List<ScsTurno> turnoExistente = scsTurnosExtendsMapper.selectByExample(example);
 
-					if ((turnoExistente == null && turnoExistente.size() == 0)) {
+					if ((turnoExistente == null || turnoExistente.size() == 0)) {
 						error.setCode(400);
 						// TODO crear description
 						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
@@ -1962,7 +1969,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					ScsTurno scsTurno = new ScsTurno();
 					scsTurno.setIdturno(designaItem.getIdTurno());
-					Integer a = new Integer(idInstitucion);
+//					Integer a = new Integer(idInstitucion);
 					scsTurno.setIdinstitucion(idInstitucion);
 
 					scsTurno.setIdpartidapresupuestaria(designaItem.getIdPartidaPresupuestaria());
@@ -2647,7 +2654,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (usuarios != null && !usuarios.isEmpty()) {
 
-				List<Integer> responses = new ArrayList<>();
+//				List<Integer> responses = new ArrayList<>();
 
 				for (DesignaItem designa : item) {
 
@@ -2932,7 +2939,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						.getSaltos(idInstitucion.toString(), idTurno.toString(), null);
 				HashMap<Long, ArrayList<LetradoInscripcionItem>> personasConSaltos = this
 						.getSaltosHash(personasConSaltosList, idInstitucion, idTurno, null, usr);
-				for (Iterator iter = colaLetrados.iterator(); iter.hasNext();) {
+				for (Iterator<LetradoInscripcionItem> iter = colaLetrados.iterator(); iter.hasNext();) {
 					letradoTurno = (LetradoInscripcionItem) iter.next();
 					if (personasConSaltos.get(letradoTurno.getIdpersona()) != null) {
 						iter.remove();
@@ -3614,7 +3621,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		int existentes = 0;
+//		int existentes = 0;
 
 		if (null != idInstitucion) {
 
@@ -3687,7 +3694,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		int existentes = 0;
+//		int existentes = 0;
 
 		if (null != idInstitucion) {
 
@@ -3728,10 +3735,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public DesignaItem existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+	//	DesignaItem result = new DesignaItem();
 		DesignaItem designas = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+	//	List<GenParametros> tamMax = null;
+	//	Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -3750,21 +3757,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.getDatosAdicionales -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-			LOGGER.info(
-					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-			LOGGER.info(
-					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//			LOGGER.info(
+//					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//			LOGGER.info(
+//					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
@@ -3785,7 +3792,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public List<DesignaItem> getDatosAdicionales(DesignaItem designa, HttpServletRequest request) {
-		DesignaItem result = new DesignaItem();
+	//	DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
@@ -3873,10 +3880,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public ComboDTO getPartidaPresupuestariaDesigna(HttpServletRequest request, @RequestBody DesignaItem designaItem) {
-		DesignaItem result = new DesignaItem();
+	//	DesignaItem result = new DesignaItem();
 		ComboDTO comboDTO = new ComboDTO();
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+	//	List<GenParametros> tamMax = null;
+	//	Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -3895,11 +3902,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.getPartidaPresupuestariaDesigna -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("DesignacionesServiceImpl.getPartidaPresupuestariaDesigna -> Entrada a servicio ");
@@ -3924,8 +3931,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	public ScsDesigna busquedaDesignaActual(ScsDesigna item, HttpServletRequest request) {
 		LOGGER.info("DesignacionesServiceImpl.busquedaDesigna() -> Entrada al servicio servicio");
 		ScsDesigna designa = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+	//	List<GenParametros> tamMax = null;
+	//	Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -3944,21 +3951,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.busquedaDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
@@ -3989,8 +3996,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info(
 				"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada al servicio para buscar los letrados asociados a una designacion");
 		List<ListaLetradosDesignaItem> listaLetrados = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
+	//	List<GenParametros> tamMax = null;
+	//	Integer tamMaximo = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -4009,21 +4016,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-			if (tamMax != null) {
-				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-			} else {
-				tamMaximo = null;
-			}
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//			LOGGER.info(
+//					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+//			if (tamMax != null) {
+//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+//			} else {
+//				tamMaximo = null;
+//			}
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
@@ -4923,6 +4930,29 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return ficheroVo.getIdfichero();
 	}
 
+	private Long uploadFileDesigna(byte[] bytes, Integer idUsuario, Short idInstitucion, String nombreFichero,
+			String extension) {
+
+		FicheroVo ficheroVo = new FicheroVo();
+
+		String directorioFichero = getDirectorioFicheroDes(idInstitucion);
+		ficheroVo.setDirectorio(directorioFichero);
+		ficheroVo.setNombre(nombreFichero);
+		ficheroVo.setDescripcion("Fichero asociado a la designación " + ficheroVo.getNombre());
+
+		ficheroVo.setIdinstitucion(idInstitucion);
+		ficheroVo.setFichero(bytes);
+		ficheroVo.setExtension(extension.toLowerCase());
+
+		ficheroVo.setUsumodificacion(idUsuario);
+		ficheroVo.setFechamodificacion(new Date());
+		ficherosServiceImpl.insert(ficheroVo);
+
+		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
+
+		return ficheroVo.getIdfichero();
+	}
+
 	private String getDirectorioFichero(Short idInstitucion) {
 
 		// Extraemos el path para los ficheros
@@ -4944,6 +4974,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return directorioFichero.toString();
 	}
 
+	private String getDirectorioFicheroDes(Short idInstitucion) {
+
+		// Extraemos el path para los ficheros
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String path = genPropertiesPath.get(0).getValor();
+
+		StringBuffer directorioFichero = new StringBuffer(path);
+		directorioFichero.append(idInstitucion);
+		directorioFichero.append(File.separator);
+
+		// Extraemos el path concreto para actuaciones
+		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
+		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.designaciones");
+		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+
+		return directorioFichero.toString();
+	}
+
 	@Override
 	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request) {
 
@@ -4953,7 +5004,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		ObjectMapper objectMapper = new ObjectMapper();
-		boolean hayError = false;
 
 		try {
 
@@ -5121,7 +5171,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		Error error = new Error();
 		ResponseEntity<InputStreamResource> res = null;
 		InputStream fileStream = null;
 		HttpHeaders headers = new HttpHeaders();
@@ -5192,6 +5241,49 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
 				String path = getDirectorioFichero(idInstitucion);
 				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + doc.getExtension().toLowerCase();
+				File file = new File(path);
+				FileInputStream fileInputStream = new FileInputStream(file);
+				IOUtils.copy(fileInputStream, zipOutputStream);
+				fileInputStream.close();
+			}
+
+			zipOutputStream.closeEntry();
+
+			if (zipOutputStream != null) {
+				zipOutputStream.finish();
+				zipOutputStream.flush();
+				IOUtils.closeQuietly(zipOutputStream);
+			}
+
+			IOUtils.closeQuietly(bufferedOutputStream);
+			IOUtils.closeQuietly(byteArrayOutputStream);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+	}
+
+	private InputStream getZipFileDocumentosDesigna(List<DocumentoDesignaItem> listaDocumentoDesignaItem,
+			Short idInstitucion) {
+
+		ByteArrayOutputStream byteArrayOutputStream = null;
+
+		try {
+
+			byteArrayOutputStream = new ByteArrayOutputStream();
+			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+			for (DocumentoDesignaItem doc : listaDocumentoDesignaItem) {
+
+				zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
+				String extension = doc.getNombreFichero()
+						.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
+						.toLowerCase();
+				String path = getDirectorioFicheroDes(idInstitucion);
+				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
 				File file = new File(path);
 				FileInputStream fileInputStream = new FileInputStream(file);
 				IOUtils.copy(fileInputStream, zipOutputStream);
@@ -5339,6 +5431,340 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return deleteResponseDTO;
+	}
+
+	@Override
+	public DocumentoDesignaDTO getDocumentosPorDesigna(DocumentoDesignaItem documentoDesignaItem,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DocumentoDesignaDTO documentoDesignaDTO = new DocumentoDesignaDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDocumentosPorDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDocumentosPorDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				List<DocumentoDesignaItem> listaDocumentoActDesignaItem = scsDesignacionesExtendsMapper
+						.getDocumentosPorDesigna(documentoDesignaItem, idInstitucion);
+
+				documentoDesignaDTO.setListaDocumentoDesignaItem(listaDocumentoActDesignaItem);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.getDocumentosPorDesigna() -> Se ha producido un error en la búsqueda de documentos asociados a la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			documentoDesignaDTO.setError(error);
+		}
+
+		return documentoDesignaDTO;
+	}
+
+	@Override
+	public InsertResponseDTO subirDocumentoDesigna(MultipartHttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.subirDocumentoDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.subirDocumentoDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				Iterator<String> itr = request.getFileNames();
+
+				while (itr.hasNext()) {
+
+					MultipartFile file = request.getFile(itr.next());
+					String nombreFichero = file.getOriginalFilename().split(";")[0];
+					String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
+					DocumentoDesignaItem documentoDesignaItem = objectMapper.readValue(json,
+							DocumentoDesignaItem.class);
+					String extension = FilenameUtils.getExtension(nombreFichero);
+
+					Long idFile = uploadFileDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+							nombreFichero, extension);
+
+					MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionDes(idInstitucion);
+
+					ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
+
+					scsDocumentaciondesigna.setAnio(Short.valueOf(documentoDesignaItem.getAnio()));
+					scsDocumentaciondesigna.setNumero(Long.valueOf(documentoDesignaItem.getNumero()));
+					scsDocumentaciondesigna.setIdturno(Integer.valueOf(documentoDesignaItem.getIdTurno()));
+
+					if (!UtilidadesString.esCadenaVacia(documentoDesignaItem.getObservaciones())) {
+						scsDocumentaciondesigna.setObservaciones(documentoDesignaItem.getObservaciones());
+					}
+					scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(nuevoId.getIdMax().toString()));
+					scsDocumentaciondesigna.setNombrefichero(nombreFichero);
+					scsDocumentaciondesigna
+							.setIdtipodocumento(Short.valueOf(documentoDesignaItem.getIdTipodocumento()));
+					scsDocumentaciondesigna.setIdfichero(idFile);
+					scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
+					scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+					scsDocumentaciondesigna.setFechamodificacion(new Date());
+					scsDocumentaciondesigna.setFechaentrada(new Date());
+
+					int response = scsDocumentaciondesignaMapper.insertSelective(scsDocumentaciondesigna);
+
+					if (response == 1) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						insertResponseDTO.setError(error);
+					}
+
+				}
+
+				String documentos = request.getParameter("documentosActualizar");
+				List<DocumentoDesignaItem> listaDocumentos = objectMapper.readValue(documentos,
+						new TypeReference<List<DocumentoDesignaItem>>() {
+						});
+
+				if (listaDocumentos != null && !listaDocumentos.isEmpty()) {
+
+					for (DocumentoDesignaItem doc : listaDocumentos) {
+
+						ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
+
+						if (!UtilidadesString.esCadenaVacia(doc.getObservaciones())) {
+							scsDocumentaciondesigna.setObservaciones(doc.getObservaciones());
+						}
+						scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsDocumentaciondesigna.setFechamodificacion(new Date());
+						scsDocumentaciondesigna.setIdtipodocumento(Short.valueOf(doc.getIdTipodocumento()));
+						scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
+						scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(doc.getIdDocumentaciondes()));
+
+						int response2 = scsDocumentaciondesignaMapper
+								.updateByPrimaryKeySelective(scsDocumentaciondesigna);
+
+						if (response2 == 1) {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+
+						if (response2 == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
+							error.setCode(500);
+							error.setDescription("general.mensaje.error.bbdd");
+							insertResponseDTO.setError(error);
+						}
+
+					}
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			insertResponseDTO.setError(error);
+		}
+
+		return insertResponseDTO;
+	}
+
+	@Override
+	public DeleteResponseDTO eliminarDocumentosDesigna(List<DocumentoDesignaItem> listaDocumentoDesignaItem,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.eliminarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.eliminarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				for (DocumentoDesignaItem doc : listaDocumentoDesignaItem) {
+
+					String path = getDirectorioFicheroDes(idInstitucion);
+					path += File.separator + idInstitucion + "_" + doc.getIdFichero()
+							+ doc.getNombreFichero()
+									.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
+									.toLowerCase();
+
+					File file = new File(path);
+
+					if (file.exists()) {
+						file.delete();
+					}
+
+					ScsDocumentaciondesignaKey scsDocumentaciondesignaKey = new ScsDocumentaciondesignaKey();
+
+					scsDocumentaciondesignaKey.setIddocumentaciondes(Integer.valueOf(doc.getIdDocumentaciondes()));
+					scsDocumentaciondesignaKey.setIdinstitucion(idInstitucion);
+
+					int response = scsDocumentaciondesignaMapper.deleteByPrimaryKey(scsDocumentaciondesignaKey);
+
+					if (response == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.eliminarDocumentosDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la designación");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						deleteResponseDTO.setError(error);
+					}
+
+					GenFicheroKey genFicheroKey = new GenFicheroKey();
+
+					genFicheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
+					genFicheroKey.setIdinstitucion(idInstitucion);
+
+					int response2 = genFicheroMapper.deleteByPrimaryKey(genFicheroKey);
+
+					if (response2 == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response2 == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.eliminarDocumentosDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la designación");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						deleteResponseDTO.setError(error);
+					}
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.eliminarDocumentosDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			deleteResponseDTO.setError(error);
+		}
+
+		return deleteResponseDTO;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> descargarDocumentosDesigna(
+			List<DocumentoDesignaItem> listaDocumentoDesignaItem, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ResponseEntity<InputStreamResource> res = null;
+		InputStream fileStream = null;
+		HttpHeaders headers = new HttpHeaders();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.descargarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.descargarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty() && !listaDocumentoDesignaItem.isEmpty()) {
+
+				if (listaDocumentoDesignaItem.size() == 1) {
+
+					String extension = listaDocumentoDesignaItem.get(0).getNombreFichero()
+							.substring(listaDocumentoDesignaItem.get(0).getNombreFichero().lastIndexOf("."),
+									listaDocumentoDesignaItem.get(0).getNombreFichero().length())
+							.toLowerCase();
+					String path = getDirectorioFicheroDes(idInstitucion);
+					path += File.separator + idInstitucion + "_" + listaDocumentoDesignaItem.get(0).getIdFichero()
+							+ extension;
+
+					File file = new File(path);
+					fileStream = new FileInputStream(file);
+
+					String tipoMime = getMimeType(extension);
+
+					headers.setContentType(MediaType.parseMediaType(tipoMime));
+					headers.set("Content-Disposition",
+							"attachment; filename=\"" + listaDocumentoDesignaItem.get(0).getNombreFichero() + "\"");
+					headers.setContentLength(file.length());
+
+				} else {
+					fileStream = getZipFileDocumentosDesigna(listaDocumentoDesignaItem, idInstitucion);
+
+					headers.setContentType(MediaType.parseMediaType("application/zip"));
+					headers.set("Content-Disposition", "attachment; filename=\"documentos.zip\"");
+				}
+
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+						HttpStatus.OK);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.descargarDocumentosActDesigna() -> Se ha producido un error al descargar un archivo asociado a la actuacion",
+					e);
+		}
+
+		return res;
 	}
 
 }
