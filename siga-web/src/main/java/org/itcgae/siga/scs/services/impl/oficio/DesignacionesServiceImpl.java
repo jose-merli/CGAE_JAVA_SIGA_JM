@@ -416,6 +416,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if(item.getNumProcedimiento()!=null && !item.getNumProcedimiento().trim().isEmpty()){
 						record.setNumeroprocedimiento(item.getNumProcedimiento());
 					}
+					if(item.getValidada()!=null && !item.getValidada().trim().isEmpty()){
+						record.setValidada(item.getValidada());
+					}
+					
 					
 					fecha = formatter.parse(item.getFecha());  
 					record.setFecha(fecha);
@@ -4513,9 +4517,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									record.setNig(actuacion.getNig());
 								}
 
-//								if (actuacion.getValidada() != null) {
-//									record.setValidada(getValidada).setNig(actuacion.getNig());
-//								}
+								if (actuacion.getValidada() != null) {
+									record.setValidada(actuacion.getValidada());
+								}
 
 								record.setFechamodificacion(new Date());
 								record.setIdinstitucion(Short.parseShort(actuacion.getIdInstitucion()));
