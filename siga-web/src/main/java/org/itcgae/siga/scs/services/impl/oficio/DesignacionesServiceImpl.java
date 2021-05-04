@@ -2557,9 +2557,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setFechamodificacion(new Date());
 						designaLetrado.setUsumodificacion(usuario.getIdusuario());
 						designaLetrado.setManual((short) 1);
-						// TODO
-//						MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
-//						MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
 						designaLetrado.setLetradodelturno("1");
 
 						String idPersona = scsDesignacionesExtendsMapper
