@@ -1162,29 +1162,42 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	 * @return
 	 */
 	public String busquedaActuacionesJustificacionExpres(String idInstitucion, String idTurno, String anio,
-			String numero) {
+			String numero, JustificacionExpressItem item) {
 		StringBuilder sql = new StringBuilder();
 
-		sql.append("SELECT act.numero, ac.idacreditacion, ac.descripcion acreditacion, ac.idtipoacreditacion, "
-				+ "decode(to_char(acp.porcentaje), to_char(trunc(acp.porcentaje)), to_char(acp.porcentaje), "
-				+ "f_siga_formatonumero(to_char(acp.porcentaje), 2)) porcentaje, tac.descripcion tipo, "
-				+ "pro.nombre procedimiento, pro.codigo categoria, pro.idjurisdiccion, pro.complemento, pro.permitiraniadirletrado, "
-				+ "act.numeroasunto, act.idprocedimiento, act.idjuzgado, j.nombre nombreJuzgado, "
-				+ "to_char(act.fechajustificacion, 'dd/mm/yyyy') fechajustificacion, act.validada, act.idfacturacion, "
-				+ "act.numeroprocedimiento, act.anioprocedimiento, act.anio, act.idTurno, act.idInstitucion, "
-				+ "( "
-				+ "SELECT nombre || ' (' || fechadesde || '-' || fechahasta || ')' "
-				+ "FROM fcs_facturacionjg fjg "
-				+ "WHERE fjg.idinstitucion = act.idinstitucion AND fjg.idfacturacion = act.idfacturacion"
-				+ ") AS descripcionfacturacion, "
-				+ "act.docjustificacion, act.anulacion, acp.nig_numprocedimiento, act.nig, act.fecha, 0 permitireditarletrado "
-				+ "FROM scs_actuaciondesigna act, scs_procedimientos pro, scs_acreditacionprocedimiento acp, scs_acreditacion ac, "
-				+ "scs_tipoacreditacion tac, scs_juzgado j " 
-				+ "WHERE ac.idtipoacreditacion = tac.idtipoacreditacion AND act.idinstitucion = j.idinstitucion AND act.idjuzgado=j.idjuzgado "
-				+ "AND act.idacreditacion = ac.idacreditacion AND act.idacreditacion = acp.idacreditacion AND act.idinstitucion_proc = acp.idinstitucion "
-				+ "AND act.idprocedimiento = acp.idprocedimiento AND act.idinstitucion_proc = pro.idinstitucion AND act.idprocedimiento = pro.idprocedimiento "
-				+ "AND act.idinstitucion = "+ idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = " + anio + " AND act.numero = " + numero + " " 
-				+ "ORDER BY act.fechajustificacion, act.numeroasunto");
+		sql.append("SELECT act.numero, ac.idacreditacion, ac.descripcion acreditacion, ac.idtipoacreditacion, ");
+		sql.append( " decode(to_char(acp.porcentaje), to_char(trunc(acp.porcentaje)), to_char(acp.porcentaje), ");
+		sql.append( " f_siga_formatonumero(to_char(acp.porcentaje), 2)) porcentaje, tac.descripcion tipo, ");
+		sql.append( " pro.nombre procedimiento, pro.codigo categoria, pro.idjurisdiccion, pro.complemento, pro.permitiraniadirletrado, ");
+		sql.append( " act.numeroasunto, act.idprocedimiento, act.idjuzgado, j.nombre nombreJuzgado, ");
+		sql.append( " to_char(act.fechajustificacion, 'dd/mm/yyyy') fechajustificacion, act.validada, act.idfacturacion, ");
+		sql.append( " act.numeroprocedimiento, act.anioprocedimiento, act.anio, act.idTurno, act.idInstitucion, ");
+		sql.append( " ( ");
+		sql.append( " SELECT nombre || ' (' || fechadesde || '-' || fechahasta || ')' ");
+		sql.append( " FROM fcs_facturacionjg fjg ");
+		sql.append( " WHERE fjg.idinstitucion = act.idinstitucion AND fjg.idfacturacion = act.idfacturacion");
+		sql.append( " ) AS descripcionfacturacion, ");
+		sql.append( " act.docjustificacion, act.anulacion, acp.nig_numprocedimiento, act.nig, act.fecha, 0 permitireditarletrado ");
+		sql.append( " FROM scs_actuaciondesigna act, scs_procedimientos pro, scs_acreditacionprocedimiento acp, scs_acreditacion ac, ");
+		sql.append( " scs_tipoacreditacion tac, scs_juzgado j "); 
+		sql.append( " WHERE ac.idtipoacreditacion = tac.idtipoacreditacion AND act.idinstitucion = j.idinstitucion AND act.idjuzgado=j.idjuzgado ");
+		sql.append( " AND act.idacreditacion = ac.idacreditacion AND act.idacreditacion = acp.idacreditacion AND act.idinstitucion_proc = acp.idinstitucion ");
+		sql.append( " AND act.idprocedimiento = acp.idprocedimiento AND act.idinstitucion_proc = pro.idinstitucion AND act.idprocedimiento = pro.idprocedimiento ");
+		sql.append( " AND act.idinstitucion = "+ idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = " + anio + " AND act.numero = " + numero + " "); 
+		if (item.getJustificacionDesde() != null) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			String fecha = dateFormat.format(item.getJustificacionDesde());
+
+			sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) >= TO_DATE('" + fecha + "','DD/MM/YYYY')");
+		}
+
+		if (item.getJustificacionHasta() != null) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			String fecha = dateFormat.format(item.getJustificacionHasta());
+
+			sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
+		}
+		sql.append(  " ORDER BY act.fechajustificacion, act.numeroasunto");
 
 		return sql.toString();
 	}
@@ -1198,7 +1211,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	 * @return
 	 */
 	public String busquedaJustificacionExpres(JustificacionExpressItem item, String idInstitucion,
-			String longitudCodEJG, String idPersona) {
+			String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable) {
 
 		StringBuilder sql = new StringBuilder();
 
@@ -1276,15 +1289,57 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
 		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA ");
 
-		sql.append(" FROM SCS_DESIGNA D, SCS_DESIGNASLETRADO DL, SCS_JUZGADO J,  SCS_PROCEDIMIENTOS p ");
-
-		sql.append(" WHERE D.IDINSTITUCION = DL.IDINSTITUCION AND P.IDPROCEDIMIENTO = D.IDPROCEDIMIENTO AND P.IDINSTITUCION = D.IDINSTITUCION");
-		sql.append(" AND  D.IDJUZGADO=J.IDJUZGADO AND D.IDINSTITUCION_JUZG=J.IDINSTITUCION");
-		sql.append(" AND D.ANIO = DL.ANIO ");
-		sql.append(" AND D.NUMERO = DL.NUMERO ");
-		sql.append(" AND D.IDTURNO = DL.IDTURNO ");
-
-		sql.append(" AND D.IDINSTITUCION = " + idInstitucion);
+		sql.append(" FROM SCS_DESIGNA D join scs_designasletrado   dl ON d.idinstitucion = dl.idinstitucion "
+				+ "AND d.anio = dl.anio AND d.numero = dl.numero AND d.idturno = dl.idturno ");
+		sql.append("join scs_juzgado j ON  d.idjuzgado = j.idjuzgado\r\n" + 
+				"                AND d.idinstitucion_juzg = j.idinstitucion ");
+		sql.append("join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento\r\n" + 
+				"                AND p.idinstitucion = d.idinstitucion ");
+		if((item.getSinEJG()!= null && !item.getSinEJG().isEmpty())
+				|| (item.getConEJGNoFavorables()!= null && !item.getConEJGNoFavorables().isEmpty())
+				|| (item.getEjgSinResolucion()!= null && !item.getEjgSinResolucion().isEmpty())
+				|| (item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty())) {
+			sql.append("LEFT OUTER join scs_ejgdesigna ejd ON  d.anio = ejd.aniodesigna\r\n" + 
+					"                AND d.numero = ejd.numerodesigna\r\n" + 
+					"                AND d.idturno = ejd.idturno\r\n" + 
+					"                LEFT OUTER join scs_ejg ejg ON ejd.idinstitucion = ejg.idinstitucion\r\n" + 
+					"                AND ejd.idtipoejg = ejg.idtipoejg\r\n" + 
+					"                AND ejd.anioejg = ejg.anio\r\n" + 
+					"                AND ejd.numeroejg = ejg.numero ");
+		}
+		sql.append(" WHERE D.IDINSTITUCION = " + idInstitucion);
+		        
+		if(item.getSinEJG()!= null && !item.getSinEJG().isEmpty()) {
+			if(item.getSinEJG().equals("0")){
+				sql.append(" AND ejg.anio is not null ");
+			}else {
+				sql.append(" AND ejg.anio is null ");
+			}
+		}
+		if((item.getConEJGNoFavorables()!= null && !item.getConEJGNoFavorables().isEmpty())) {
+			if(item.getEjgSinResolucion().equals("0")) {
+				sql.append(" AND ejg.IDTIPODICTAMENEJG <> " + idDesfavorable);
+			}//else {
+			//	sql.append(" AND ejg.IDTIPODICTAMENEJG = " + idFavorable);
+			//}
+		}
+		if((item.getEjgSinResolucion()!= null && !item.getEjgSinResolucion().isEmpty())) {
+			if(item.getConEJGNoFavorables().equals("0")) {
+				sql.append(" AND ejg.anioresolucion is not null\r\n" + 
+						" and ejg.numeroresolucion is not null ");
+			}else {
+				sql.append(" AND ejg.anioresolucion IS NULL\r\n" + 
+						" AND ejg.numeroresolucion IS NULL ");
+			}
+		}
+		
+		if((item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty())) {
+			if(item.getResolucionPTECAJG().equals("0")) {
+				sql.append(" AND ejg.EJG.FECHARESOLUCIONCAJG IS NOT NULL");
+			}//else {
+			//	sql.append(" AND ejg.EJG.FECHARESOLUCIONCAJG IS NULL");
+			//}
+		}
 
 		if (item.getAnioDesignacion() != null && !item.getAnioDesignacion().trim().isEmpty()) {
 			sql.append(" AND D.ANIO = " + item.getAnioDesignacion().trim());
@@ -1424,14 +1479,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String fecha = dateFormat.format(item.getJustificacionDesde());
 
-				sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) >= '" + fecha + "'");
+				sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) >= TO_DATE('" + fecha + "','DD/MM/YYYY')");
 			}
 
 			if (item.getJustificacionHasta() != null) {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String fecha = dateFormat.format(item.getJustificacionHasta());
 
-				sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) <= '" + fecha + "'");
+				sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
 			}
 
 			sql.append(" )>0");
@@ -2529,7 +2584,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "	            ed.aniodesigna = "+anio+"\r\n"
 				+ "	            AND ed.numerodesigna = "+num+"\r\n"
 				+ "	            AND ed.idturno = "+idTurno+"\r\n"
-				+ "	            AND ed.idinstitucion = "+idinstitucion+"\r\n"
+				+ "	            ed.idinstitucion = "+idinstitucion+"\r\n"
 				+ "	            AND ed.idinstitucion = e.idinstitucion\r\n"
 				+ "	            AND ed.anioejg = e.anio\r\n"
 				+ "	            AND ed.numeroejg = e.numero\r\n"
@@ -2538,7 +2593,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.SELECT("*");
 		sql.FROM("( " + sql2.toString() + " )");
-		sql.WHERE("ROWNUM <= 201");
+		sql.WHERE("ROWNUM <= 200");
 		sql.ORDER_BY("sjcs,\r\n"
 				+ "	    idinstitucion,\r\n"
 				+ "	    anio DESC,\r\n"
@@ -2552,9 +2607,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.DELETE_FROM("SCS_EJGDESIGNA");
 
-		sql.WHERE("NUMERODESIGNA = " + num);
+		sql.WHERE("NUMEROEJG = " + num);
 		sql.WHERE("IDTURNO = " + idTurno);
-		sql.WHERE("ANIODESIGNA = " + anio);
+		sql.WHERE("ANIOEJG = " + anio);
 		sql.WHERE("IDINSTITUCION = " + idinstitucion);
 
 		return sql.toString();
@@ -2937,7 +2992,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql2 = new SQL();
 		
 		
-		sql2.SELECT("S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, F_SIGA_GETRECURSO(A.DESCRIPCION, 1) as IDESTADO, N.NOMBRE , N.APELLIDOS1 , N.APELLIDOS2");
+		sql2.SELECT("S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, N.NOMBRE, F_SIGA_GETRECURSO(A.DESCRIPCION, 1) as IDESTADO , N.APELLIDOS1 , N.APELLIDOS2");
 
 		sql2.FROM("SCS_COMUNICACIONES C");
 		sql2.INNER_JOIN("ENV_ENVIOS S on (s.idenvio = C.IDENVIOSALIDA)");
@@ -2957,7 +3012,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.SELECT("*");
 		sql.FROM("( " + sql2.toString() + " )");
-		sql.WHERE("ROWNUM <= 201");
+		sql.WHERE("ROWNUM <= 200");
 
 		return sql.toString();
 	}
