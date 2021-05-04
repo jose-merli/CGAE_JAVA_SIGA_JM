@@ -472,9 +472,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getListaLetradosDesigna")
-	@Results({ @Result(column = "FECHAdesigna", property = "fechaDesignacion", jdbcType = JdbcType.DATE),
-			@Result(column = "fecharenuncia", property = "fechaEfecRenuncia", jdbcType = JdbcType.DATE),
-			@Result(column = "FECHAREnunciasolicita", property = "fechaSolRenuncia", jdbcType = JdbcType.DATE),
+	@Results({ @Result(column = "FECHAdesigna", property = "fechaDesignacion", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "fecharenuncia", property = "fechaEfecRenuncia", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "FECHAREnunciasolicita", property = "fechaSolRenuncia", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "motivosrenuncia", property = "motivoRenuncia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ncolegiado", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idpersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
