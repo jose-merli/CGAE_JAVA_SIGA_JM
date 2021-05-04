@@ -4085,6 +4085,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente, ScsDesignasletrado letradoEntrante,
 			HttpServletRequest request) {
 		LOGGER.info(
@@ -4135,6 +4136,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 						LetradoInscripcionItem newLetrado = this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designa.getIdturno()), dateFormat.format(letradoSaliente.getFechadesigna()),  usuarios.get(0)); 
 
+						
 						if (newLetrado==null) {
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							LOGGER.error(
@@ -4148,7 +4150,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							letradoEntrante.setIdpersona(newLetrado.getIdpersona());
 							designaNueva.setIdpersona(newLetrado.getIdpersona());
 							
-							response = scsDesignasletradoMapper.insert(letradoEntrante);
+							response = scsDesignasletradoMapper.insert(designaNueva);
 						}						
 					}
 					else {
@@ -4166,6 +4168,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 							//if(usuarios.get(0).)oldLetrado.setFecharenuncia(letradoEntrante.getFechadesigna());
 							designaVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
+							//Si el usuario que realiza el cambio es un colegio se acepta automaticamente la renuncia
+							if(UserTokenUtils.getLetradoFromJWTToken(token)=="N")designaVieja.setFecharenuncia(letradoSaliente.getFecharenunciasolicita());
 							List<ComboItem> motivos = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion, usuarios.get(0).getIdlenguaje());
 							int i=0;
 							while(i<motivos.size() && designaVieja.getMotivosrenuncia() == null) {
@@ -4189,18 +4193,22 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							error.setCode(400);
 							error.setDescription("general.mensaje.error.bbdd");
 							updateResponseDTO.setStatus(SigaConstants.KO);
+							updateResponseDTO.setError(error);
 						}
 					} else {
 						error.setCode(200);
 						error.setDescription("general.message.registro.actualizado");
+						updateResponseDTO.setError(error);
 					}
 					
 				} catch (Exception e) {
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					updateResponseDTO.setError(error);
 					LOGGER.error(e.getMessage());
 					LOGGER.info("updateLetradoDesigna() -> Salida del servicio");
 				}
 				
-				updateResponseDTO.setError(error);
 				
 			}
 
