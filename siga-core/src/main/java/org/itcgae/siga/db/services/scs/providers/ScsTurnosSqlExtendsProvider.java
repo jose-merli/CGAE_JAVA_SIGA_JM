@@ -103,9 +103,9 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		}
 		if (turnosItem.getIdzubzona() != null && turnosItem.getIdzubzona() != "") {
 			String condturnos ="(";
-			for(int i = 0; i< turnosItem.getIdzona().split(",").length; i++) {
+			for(int i = 0; i< turnosItem.getIdzubzona().split(",").length; i++) {
 				if(i>0) condturnos+=" or ";
-				condturnos+="subzon.idsubzona ='"+turnosItem.getIdzona().split(",")[i]+"'";
+				condturnos+="subzon.idsubzona ='"+turnosItem.getIdzubzona().split(",")[i]+"'";
 			}
 			condturnos+=")";
 			sql.WHERE(condturnos);

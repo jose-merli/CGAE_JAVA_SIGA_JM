@@ -52,7 +52,11 @@ public class ScsSubzonaSqlExtendsProvider extends ScsSubzonaSqlProvider{
 		sql.INNER_JOIN("cen_partidojudicial parjud on parjud.idpartido = subpar.idpartido");
 		
 		sql.WHERE("sub.idinstitucion = '" + idInstitucion + "'");
-		sql.WHERE("sub.idzona = '" + idZona + "'");
+		if(idZona.contains(",")) {
+			sql.WHERE("sub.idzona IN (" + idZona + ")");
+		}else {
+			sql.WHERE("sub.idzona = '" + idZona + "'");
+		}
 		
 		if(idSubZona != null) {
 			sql.WHERE("sub.idsubzona = '" + idSubZona + "'");
