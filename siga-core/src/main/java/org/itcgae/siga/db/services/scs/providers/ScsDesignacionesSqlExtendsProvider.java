@@ -2527,7 +2527,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "	            ed.aniodesigna = "+anio+"\r\n"
 				+ "	            AND ed.numerodesigna = "+num+"\r\n"
 				+ "	            AND ed.idturno = "+idTurno+"\r\n"
-				+ "	            AND ed.idinstitucion = "+idinstitucion+"\r\n"
+				+ "	            ed.idinstitucion = "+idinstitucion+"\r\n"
 				+ "	            AND ed.idinstitucion = e.idinstitucion\r\n"
 				+ "	            AND ed.anioejg = e.anio\r\n"
 				+ "	            AND ed.numeroejg = e.numero\r\n"
@@ -2536,7 +2536,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.SELECT("*");
 		sql.FROM("( " + sql2.toString() + " )");
-		sql.WHERE("ROWNUM <= 201");
+		sql.WHERE("ROWNUM <= 200");
 		sql.ORDER_BY("sjcs,\r\n"
 				+ "	    idinstitucion,\r\n"
 				+ "	    anio DESC,\r\n"
@@ -2934,17 +2934,17 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		
-		//, F_SIGA_GETRECURSO(A.DESCRIPCION, 1) as IDESTADO
-		sql2.SELECT("S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, N.NOMBRE , N.APELLIDOS1 , N.APELLIDOS2");
+		
+		sql2.SELECT("S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, N.NOMBRE, F_SIGA_GETRECURSO(A.DESCRIPCION, 1) as IDESTADO , N.APELLIDOS1 , N.APELLIDOS2");
 
 		sql2.FROM("SCS_COMUNICACIONES C");
 		sql2.INNER_JOIN("ENV_ENVIOS S on (s.idenvio = C.IDENVIOSALIDA)");
 		sql2.INNER_JOIN("ENV_TIPOENVIOS T on (T.IDTIPOENVIOS = S.IDTIPOENVIOS)");
-		//sql2.INNER_JOIN("CEN_ESTADOSOLICITUD A on (A.IDESTADO = S.IDESTADO)");
+		sql2.INNER_JOIN("CEN_ESTADOSOLICITUD A on (A.IDESTADO = S.IDESTADO)");
 		sql2.INNER_JOIN("ENV_DESTINATARIOS D on (D.IDENVIO = S.IDENVIO)");
 		sql2.INNER_JOIN("CEN_PERSONA N on (N.IDPERSONA = D.IDPERSONA)");
 		sql2.WHERE("C.DESIGNAANIO = " + anio);
-		//sql2.WHERE("C.DESIGNAIDTURNO =" + idturno);
+		sql2.WHERE("C.DESIGNAIDTURNO =" + idturno);
 		
 		if(idPersona == null) {
 			sql2.WHERE("C.DESIGNANUMERO =" + num);
