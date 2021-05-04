@@ -301,8 +301,16 @@ public class WSCommons {
 
 		// Método genérico que recibe una peticion de un cliente de ws y comprueba si la
 		// IP del colegio se corresponde con la correcta
+		LOGGER.info("Se ha recibido una llamada desde la IP " + endpointReference + " para el colegio "
+				+ idInstitucion); 
 		String valor = obtenerValorParametroColegio(idInstitucion, nombreParametroIP);
-		if (valor == null || !endpointReference.equals(valor)) {
+		String[] valores = null;
+		if(valor != null) {
+			valores = valor.split(",");
+		}
+		//Para probar las sociedades
+		//valor = "127.0.0.1";
+		if (valores == null || !validarIPs(endpointReference, valores)) {
 			// Si no hemos encontrado el parámetro, o hemos encontrado más de uno hay que
 			// construir error si es solicitado y devolver excepcion
 			if (error != null) {
@@ -321,7 +329,8 @@ public class WSCommons {
 			ERROR_SERVER error) throws ValidationException {
 
 		String valor = obtenerValorParametroColegio(idInstitucion, nombreParametro);
-
+		//Solo para probar
+		//valor = "1";
 		if (valor == null || valor.equals("0")) {
 			// Si no hemos encontrado el parámetro, o hemos encontrado más de uno hay que
 			// construir error si es solicitado y devolver excepcion
@@ -607,7 +616,8 @@ public class WSCommons {
 								argResena.setStringValue(regSociedad.getResena());
 							}
 						}
-						sociedadActualizacion.setResena(argResena);
+						//sociedadActualizacion.setResena(argResena);
+						sociedadActualizacion.setResena(argResena.getStringValue());
 						if (null != regSociedad.getObjetoSocial()) {
 							if(regSociedad.getObjetoSocial().length()>=20){
 								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial().substring(0, 20));
@@ -722,7 +732,9 @@ public class WSCommons {
 						argDireccion.setPaginaWeb(regSociedad.getPaginaWeb());
 						argDireccion.setContactoArray(contactosArray);
 						argDireccion.setPublicar(Boolean.FALSE);
-						sociedadActualizacion.setDireccion(argDireccion);
+						if(validarDireccion(argDireccion)) {
+							sociedadActualizacion.setDireccion(argDireccion);
+						}
 						
 						//INSERTAMOS LOS DATOS DE LOS INTEGRANTES
 						DatosIntegrantesSearchDTO datosIntegrantesSearchDTO = new DatosIntegrantesSearchDTO();
@@ -746,7 +758,7 @@ public class WSCommons {
 											cargo.setFechaCargo(UtilidadesString.toCalendar(fechaCargo));
 										}
 									}
-									if(integrante.getSocio()=="1"){
+									if("1".equals(integrante.getSocio())){
 										integranteFisico.setSocio(Boolean.TRUE);
 									}else{
 										integranteFisico.setSocio(Boolean.FALSE);
@@ -1778,5 +1790,27 @@ public class WSCommons {
 			} catch (NamingException e) {
 				throw e;
 			}
+		}
+		
+		private boolean validarDireccion(Direccion argDireccion) {
+			boolean valido = true;
+			if(argDireccion.getDomicilio() == null && argDireccion.getCodigoPostal() == null && argDireccion.getProvincia().getCodigoProvincia() == null 
+					&& argDireccion.getProvincia().getDescripcionProvincia() == null && argDireccion.getPoblacion().getCodigoPoblacion() == null 
+					&& argDireccion.getPoblacion().getDescripcionPoblacion() == null) {
+				valido = false;
+			}
+			return valido;
+		}
+		
+		private boolean validarIPs(String endpointReference, String[] valores) {
+			boolean valid = false;
+			if(valores != null) {
+				for(int i = 0; i < valores.length; i++) {
+					if(valores[i].equals(endpointReference)) {
+						valid = true;
+					}
+				}
+			}
+			return valid;
 		}
 }
