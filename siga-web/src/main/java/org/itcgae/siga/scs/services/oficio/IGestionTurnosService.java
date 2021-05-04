@@ -39,6 +39,8 @@ public interface IGestionTurnosService {
 	public UpdateResponseDTO eliminateGuardia(GuardiasDTO guardiasDTO, HttpServletRequest request);
 
 	public UpdateResponseDTO updateUltimo(TurnosItem turnosItem, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateUltimoGuardias(TurnosItem turnosItem, HttpServletRequest request);
 
 	public Error guardartarjetaPesos2(HttpServletRequest request, TarjetaPesosDTO tarjetaPesos); 
 	

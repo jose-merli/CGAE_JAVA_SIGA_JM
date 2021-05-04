@@ -465,6 +465,71 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		}
 		return updateResponseDTO;
 	}
+	
+	/**
+	 * updateUltimoGuardias
+	 */
+	@Override
+	public UpdateResponseDTO updateUltimoGuardias(TurnosItem turnosItem, HttpServletRequest request) {
+		LOGGER.info("GestionTurnosServicesImpl.updateUltimoGuardias() ->  Entrada al servicio para modificar el ultimo de la cola de guardia");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 1;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info("GestionTurnosServicesImpl.updateUltimoGuardias() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info("GestionTurnosServicesImpl.updateUltimoGuardias() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					LOGGER.info("GestionTurnosServicesImpl.updateUltimoGuardias() -> Realizando el update....");
+
+					response = scsTurnosExtendsMapper.updateUltimoGuardias(turnosItem, idInstitucion);
+
+					LOGGER.info("GestionTurnosServicesImpl.updateUltimoGuardias() -> Update realizado");
+				}
+
+				catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.error("GestionTurnosServicesImpl.updateUltimoGuardias() -> Error realizando update: ", e);
+				}
+
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha modificado la partida presupuestaria");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la partida presupuestaria correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("GestionTurnosServicesImpl.updateUltimoGuardias() -> Salida del servicio");
+
+			}
+		}
+		return updateResponseDTO;
+	}
 
 	@Override
 	public UpdateResponseDTO updateConfiguracion(TurnosItem turnosItem, HttpServletRequest request) {
@@ -942,7 +1007,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				Date prueba = turnosItem.getFechaActual();
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String strDate = dateFormat.format(prueba);
-				if (turnosItem.getIdpersonaUltimo() != null) {
+				if (turnosItem.getIdpersona_ultimo() != null) {
 					turnosItems = scsTurnosExtendsMapper.busquedaColaOficio(turnosItem, strDate, busquedaOrden,
 							idInstitucion);
 				} else {
@@ -965,14 +1030,18 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 	@Override
 	public TurnosDTO busquedaColaGuardia(TurnosItem turnosItem, HttpServletRequest request) {
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
 		TurnosDTO turnosDTO = new TurnosDTO();
+		
 		List<TurnosItem> turnosItems = null;
 		List<ScsGuardiasturno> scsGuardiaLista = null;
 		String busquedaOrden = "";
+		
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -999,6 +1068,10 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 				ScsGuardiasturno guardiasItems = scsGuardiaLista.get(0);
 
+				if(guardiasItems.getIdpersonaUltimo()!=null){
+					turnosItem.setIdpersona_ultimo(String.valueOf(guardiasItems.getIdpersonaUltimo()));
+				}
+				
 				ComboDTO comboDTO = new ComboDTO();
 				List<ComboItem> comboItems = new ArrayList<ComboItem>();
 				comboItems = scsOrdenacioncolasExtendsMapper
