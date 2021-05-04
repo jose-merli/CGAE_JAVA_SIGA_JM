@@ -290,24 +290,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG", "0");
 						longitudCodEJG = parametros.getValor();
 					}
-
-					LOGGER.info(
-							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo justificaciones...");
-					// busqueda de designaciones segun los filtros (max 200)
-					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
-							idInstitucion.toString(), longitudCodEJG, idPersona);
-
-					LOGGER.info(
-							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo las actuaciones...");
-					// obtenemos las actuaciones
-
-					for (JustificacionExpressItem record : result) {
-						record.setActuaciones(scsDesignacionesExtendsMapper.busquedaActuacionesJustificacionExpres(
-								record.getIdInstitucion(), record.getIdTurno(), record.getAnioDesignacion(),
-								record.getNumDesignacion()));
-					}
-
-					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> tratando expedientes...");
+					
 					// obtenemos los estados para los expedientes
 
 					List<ScsTipodictamenejg> estadosExpedientes = scsTipodictamenejgExtendsMapper
@@ -323,6 +306,24 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 					}
 
+					LOGGER.info(
+							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo justificaciones...");
+					// busqueda de designaciones segun los filtros (max 200)
+					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
+							idInstitucion.toString(), longitudCodEJG, idPersona, idFavorable, idDesfavorable);
+
+					LOGGER.info(
+							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo las actuaciones...");
+					// obtenemos las actuaciones
+
+					for (JustificacionExpressItem record : result) {
+						record.setActuaciones(scsDesignacionesExtendsMapper.busquedaActuacionesJustificacionExpres(
+								record.getIdInstitucion(), record.getIdTurno(), record.getAnioDesignacion(),
+								record.getNumDesignacion()));
+					}
+
+					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> tratando expedientes...");
+					
 					// cogemos los expedientes devueltos de la consulta y los tratamos para el front
 					for (int i = 0; i < result.size(); i++) {
 						Map<String, String> expedientes = new HashMap<String, String>();
