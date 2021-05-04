@@ -181,7 +181,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "ANIOPROCEDIMIENTNO", property = "anioProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR), })
 	List<JustificacionExpressItem> busquedaJustificacionExpresPendientes(JustificacionExpressItem item,
-			String idInstitucion, String longitudCodEJG, String idPersona);
+			String idInstitucion, String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable);
 
 	/**
 	 * 
@@ -223,7 +223,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR), 
 			})
 	List<ActuacionesJustificacionExpressItem> busquedaActuacionesJustificacionExpres(String idInstitucion,
-			String idTurno, String anio, String numero);
+			String idTurno, String anio, String numero, JustificacionExpressItem item);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboModulos")
 	@Results({ @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
@@ -472,9 +472,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getListaLetradosDesigna")
-	@Results({ @Result(column = "FECHAdesigna", property = "fechaDesignacion", jdbcType = JdbcType.DATE),
-			@Result(column = "fecharenuncia", property = "fechaEfecRenuncia", jdbcType = JdbcType.DATE),
-			@Result(column = "FECHAREnunciasolicita", property = "fechaSolRenuncia", jdbcType = JdbcType.DATE),
+	@Results({ @Result(column = "FECHAdesigna", property = "fechaDesignacion", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "fecharenuncia", property = "fechaEfecRenuncia", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "FECHAREnunciasolicita", property = "fechaSolRenuncia", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "motivosrenuncia", property = "motivoRenuncia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ncolegiado", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idpersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),

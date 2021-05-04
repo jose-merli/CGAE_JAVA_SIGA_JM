@@ -10,11 +10,14 @@ import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.CargaMasivaDatosITItem;
+import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsGuardiasturnoSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsPrisionSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsTurnosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -91,4 +94,17 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	})
 	List<CargaMasivaDatosITItem> busquedaGuardiasCMO(String turnos, String guardias, Short idInstitucion);
 	
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="selectGuardiaTurnoByTurno")
+	 @Results({ @Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.DECIMAL),
+		 @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.DECIMAL),
+		 @Result(column = "IDPERSONA", property = "idPersonaUltimo", jdbcType = JdbcType.DECIMAL),
+		 @Result(column = "IDINSTITUCION", property = "jurisdiccion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "FECHASUSCIPCION", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP)})
+	    List<GuardiasItem> selectGuardiaTurnoByTurno(Short idInstitucion, String idTurno);
+	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="selectGuardiaConfiguradasTurno")
+	 @Results({ @Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.DECIMAL),
+		 @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.DECIMAL),
+		 @Result(column = "IDINSTITUCION", property = "jurisdiccion", jdbcType = JdbcType.DECIMAL)})
+	    List<GuardiasItem> selectGuardiaConfiguradasTurno(Short idInstitucion, String idTurno);
 }

@@ -1,9 +1,6 @@
 package org.itcgae.siga.DTOs.scs;
 
 import java.util.Date;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TurnosItem {
 
@@ -40,7 +37,6 @@ public class TurnosItem {
 	private String codigoext;
 	private String fechasolicitud_ultimo;
 	private String idsubzona;
-	private String idpersonaUltimo;
 	private String fechasolicitudUltimo;
 	private String visiblemovil;
 	private String idgrupofacturacion;
@@ -358,12 +354,6 @@ public class TurnosItem {
 	}
 	public void setIdsubzona(String idsubzona) {
 		this.idsubzona = idsubzona;
-	}
-	public String getIdpersonaUltimo() {
-		return idpersonaUltimo;
-	}
-	public void setIdpersonaUltimo(String idpersonaUltimo) {
-		this.idpersonaUltimo = idpersonaUltimo;
 	}
 	public String getIdgrupofacturacion() {
 		return idgrupofacturacion;

@@ -1,6 +1,8 @@
 
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.util.List;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
@@ -172,5 +174,30 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		
 		return sql.toString();
 	}
+	
+	public String selectGuardiaTurnoByTurno(Short idInstitucion, String idTurno) {
 
+		SQL sql = new SQL();
+
+		sql.SELECT("DISTINCT IDGUARDIA,FECHASUSCRIPCION, IDPERSONA, IDINSTITUCION, IDTURNO");
+		sql.FROM("SCS_INSCRIPCIONGUARDIA");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("FECHABAJA IS NULL");
+
+		return sql.toString();
+	}
+	
+	public String selectGuardiaConfiguradasTurno(Short idInstitucion, String idTurno) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("DISTINCT IDGUARDIA, IDTURNO, IDINSTITUCION");
+		sql.FROM("SCS_GUARDIASTURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("FECHABAJA IS NULL");
+
+		return sql.toString();
+	}
 }

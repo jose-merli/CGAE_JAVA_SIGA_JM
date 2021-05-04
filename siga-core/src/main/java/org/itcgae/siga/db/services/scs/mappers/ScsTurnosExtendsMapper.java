@@ -5,11 +5,16 @@ import java.util.List;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
+import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTurnosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -42,7 +47,7 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "IDSUBZONA", property = "idsubzona", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idpartidapresupuestaria", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "REQUISITOS", property = "requisitos", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPERSONA_ULTIMO", property = "idpersonaUltimo", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPERSONA_ULTIMO", property = "idpersona_ultimo", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ACTIVARRETRICCIONACREDIT", property = "activarretriccionacredit", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "LETRADOASISTENCIAS", property = "letradoasistencias", jdbcType = JdbcType.VARCHAR),
@@ -75,7 +80,7 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "IDSUBZONA", property = "idsubzona", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idpartidapresupuestaria", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "REQUISITOS", property = "requisitos", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPERSONA_ULTIMO", property = "idpersonaUltimo", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPERSONA_ULTIMO", property = "idpersona_ultimo", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ACTIVARRETRICCIONACREDIT", property = "activarretriccionacredit", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "LETRADOASISTENCIAS", property = "letradoasistencias", jdbcType = JdbcType.VARCHAR),
@@ -102,6 +107,16 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboTurnosBusqueda(Short idInstitucion, String pantalla);
 	
+	/**
+	 * updateUltimoGuardias
+	 * 
+	 * @param turnosItem
+	 * @param idInstitucion
+	 * @return
+	 */
+	@UpdateProvider(type = ScsTurnosSqlExtendsProvider.class, method = "updateUltimoGuardias")
+	int updateUltimoGuardias(TurnosItem turnosItem,Short idInstitucion);
+	
 	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="updateUltimo")
 	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
 			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR, id = true),
@@ -121,7 +136,7 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "IDSUBZONA", property = "idsubzona", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idpartidapresupuestaria", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "REQUISITOS", property = "requisitos", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPERSONA_ULTIMO", property = "idpersonaUltimo", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPERSONA_ULTIMO", property = "idpersona_ultimo", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ACTIVARRETRICCIONACREDIT", property = "activarretriccionacredit", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "LETRADOASISTENCIAS", property = "letradoasistencias", jdbcType = JdbcType.VARCHAR),
@@ -178,7 +193,7 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "IDSUBZONA", property = "idsubzona", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idpartidapresupuestaria", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "REQUISITOS", property = "requisitos", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPERSONA_ULTIMO", property = "idpersonaUltimo", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPERSONA_ULTIMO", property = "idpersona_ultimo", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ACTIVARRETRICCIONACREDIT", property = "activarretriccionacredit", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "LETRADOASISTENCIAS", property = "letradoasistencias", jdbcType = JdbcType.VARCHAR),
@@ -194,14 +209,27 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 	    List<TurnosItem> busquedaColaOficio2(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
 	 
 	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="busquedaColaGuardia")
-	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
-			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR, id = true),
-			@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "NOMBREGUARDIA", property = "nombreguardia", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
-	    List<TurnosItem> busquedaColaGuardia(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
+	 @Results({ 
+		@Result(column = "ORDEN_COLA", property = "orden", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGUARDIA", property = "idguardias", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREGUARDIA", property = "nombreguardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMEROCOLEGIADO", property = "numerocolegiado", jdbcType = JdbcType.VARCHAR), 
+		@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE) })
+	 List<TurnosItem> busquedaColaGuardia(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
 
 	 
-
+	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="selectInscripcionTurnoByTurno")
+	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR, id = true),
+			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHASOLICITUD", property = "fechasolicitud", jdbcType = JdbcType.TIMESTAMP) })
+	    List<InscripcionTurnoItem> selectInscripcionTurnoByTurno(Short idInstitucion, String idTurno);
 	 
 }

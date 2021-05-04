@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.controllers.oficio;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
+import org.itcgae.siga.DTOs.scs.CambioLetradoItem;
 import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
@@ -661,7 +663,10 @@ public class DesignacionesController {
 //     this.saliente.body.idPersona,  this.saliente.body.observaciones, this.saliente.body.motivoRenuncia, this.saliente.body.fechaDesigna, this.saliente.body.fechaSolRenuncia,
 //     this.entrante.body.fechaDesigna, this.entrante.body.idPersona]
 	@RequestMapping(value = "/designas/updateLetradoDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(@RequestBody String[] item, HttpServletRequest request) throws ParseException {
+	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(
+//			@RequestBody CambioLetradoItem item, 
+			@RequestBody String[] item,
+			HttpServletRequest request) throws ParseException {
 		
 		String anio = item[0].substring(1, 5);
 		
@@ -677,8 +682,12 @@ public class DesignacionesController {
 		letradoSaliente.setIdtipomotivo(Short.parseShort(item[5]));
 		if(item[6]!=null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-			String date = item[6].substring(0, 10);
-			letradoSaliente.setFechadesigna(formatter.parse(date));
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(Long.parseLong(item[6]));
+			letradoSaliente.setFechadesigna(formatter.parse(formatter.format(calendar.getTime()))); 
+//			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+//			String date = item[6].substring(0, 10);
+//			letradoSaliente.setFechadesigna(formatter.parse(date));
 		}
 		if(item[7]!=null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -694,6 +703,26 @@ public class DesignacionesController {
 			letradoEntrante.setFechadesigna(formatter.parse(date));
 		}
 		if(item[9]!=null) letradoEntrante.setIdpersona(Long.parseLong(item[9]));
+		
+//		String anio = item.getAno();
+//		
+//		ScsDesigna designa = new ScsDesigna();
+//		designa.setAnio(Short.parseShort(anio));
+//		designa.setIdturno(item.getIdTurno());
+//		designa.setNumero((long) item.getNumero());
+//		
+//		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+//		ScsDesignasletrado letradoSaliente = new ScsDesignasletrado();
+//		letradoSaliente.setIdpersona(Long.parseLong(item.getIdPersonaSaliente()));
+//		letradoSaliente.setObservaciones(item.getObservaciones());
+//		letradoSaliente.setIdtipomotivo(Short.parseShort(item.getMotivoRenuncia()));
+//		letradoSaliente.setFechadesigna(formatter.parse(item.getFechaDesignacionSaliente()));
+//		letradoSaliente.setFecharenunciasolicita(item.getFechaSolRenuncia());
+//		
+//		ScsDesignasletrado letradoEntrante = new ScsDesignasletrado();
+//		letradoEntrante.setIdpersona(Long.parseLong(item.getIdPersonaEntrante()));
+//		letradoSaliente.setFechadesigna(item.getFechaDesignacionEntrante());
+		
 		
 		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, request);
 		if (response.getError().getCode().intValue() == 200)

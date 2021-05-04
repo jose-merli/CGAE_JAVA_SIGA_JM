@@ -91,6 +91,7 @@ import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsDesignasletradoExample;
 import org.itcgae.siga.db.entities.ScsDesignasletradoKey;
 import org.itcgae.siga.db.entities.ScsDocumentacionasi;
 import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
@@ -290,24 +291,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODEJG", "0");
 						longitudCodEJG = parametros.getValor();
 					}
-
-					LOGGER.info(
-							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo justificaciones...");
-					// busqueda de designaciones segun los filtros (max 200)
-					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
-							idInstitucion.toString(), longitudCodEJG, idPersona);
-
-					LOGGER.info(
-							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo las actuaciones...");
-					// obtenemos las actuaciones
-
-					for (JustificacionExpressItem record : result) {
-						record.setActuaciones(scsDesignacionesExtendsMapper.busquedaActuacionesJustificacionExpres(
-								record.getIdInstitucion(), record.getIdTurno(), record.getAnioDesignacion(),
-								record.getNumDesignacion()));
-					}
-
-					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> tratando expedientes...");
+					
 					// obtenemos los estados para los expedientes
 
 					List<ScsTipodictamenejg> estadosExpedientes = scsTipodictamenejgExtendsMapper
@@ -323,6 +307,24 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 					}
 
+					LOGGER.info(
+							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo justificaciones...");
+					// busqueda de designaciones segun los filtros (max 200)
+					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
+							idInstitucion.toString(), longitudCodEJG, idPersona, idFavorable, idDesfavorable);
+
+					LOGGER.info(
+							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo las actuaciones...");
+					// obtenemos las actuaciones
+
+					for (JustificacionExpressItem record : result) {
+						record.setActuaciones(scsDesignacionesExtendsMapper.busquedaActuacionesJustificacionExpres(
+								record.getIdInstitucion(), record.getIdTurno(), record.getAnioDesignacion(),
+								record.getNumDesignacion(),item));
+					}
+
+					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> tratando expedientes...");
+					
 					// cogemos los expedientes devueltos de la consulta y los tratamos para el front
 					for (int i = 0; i < result.size(); i++) {
 						Map<String, String> expedientes = new HashMap<String, String>();
@@ -2557,9 +2559,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setFechamodificacion(new Date());
 						designaLetrado.setUsumodificacion(usuario.getIdusuario());
 						designaLetrado.setManual((short) 1);
-						// TODO
-//						MANUAL = 1, LETRADODELTURNO = 1 cuando el colegiado elegido manualmente por el usuario esté inscrito en el turno (en ese momento)
-//						MANUAL = 1, LETRADODELTURNO = 0 cuando el colegiado elegido manualmente por el usuario NO esté inscrito en el turno
 						designaLetrado.setLetradodelturno("1");
 
 						String idPersona = scsDesignacionesExtendsMapper
@@ -4088,6 +4087,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente, ScsDesignasletrado letradoEntrante,
 			HttpServletRequest request) {
 		LOGGER.info(
@@ -4108,17 +4108,26 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 
-					ScsDesignasletradoKey key = new ScsDesignasletradoKey();
+//					ScsDesignasletradoKey key = new ScsDesignasletradoKey();
+//
+//					key.setIdinstitucion(idInstitucion);
+//					key.setAnio(designa.getAnio());
+//					key.setIdturno(designa.getIdturno());
+//					key.setNumero(designa.getNumero());
+//					key.setIdpersona(letradoSaliente.getIdpersona());
+//					key.setFechadesigna(letradoSaliente.getFechadesigna());
+//
+//
+//					ScsDesignasletrado designaVieja = scsDesignasletradoMapper.selectByPrimaryKey(key);
+					ScsDesignasletradoExample example = new ScsDesignasletradoExample();
 
-					key.setIdinstitucion(idInstitucion);
-					key.setAnio(designa.getAnio());
-					key.setIdturno(designa.getIdturno());
-					key.setNumero(designa.getNumero());
-					key.setIdpersona(letradoSaliente.getIdpersona());
-					key.setFechadesigna(letradoSaliente.getFechadesigna());
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(designa.getAnio()).
+					andIdturnoEqualTo(designa.getIdturno()).andNumeroEqualTo(designa.getNumero()).andIdpersonaEqualTo(letradoSaliente.getIdpersona()).
+					andFechadesignaGreaterThanOrEqualTo(letradoSaliente.getFechadesigna());
 
+					List<ScsDesignasletrado> designas = scsDesignasletradoMapper.selectByExample(example);
 
-					ScsDesignasletrado designaVieja = scsDesignasletradoMapper.selectByPrimaryKey(key);
+					ScsDesignasletrado designaVieja = designas.get(0);
 					
 					ScsDesignasletrado designaNueva = new ScsDesignasletrado();
 					designaNueva.setIdinstitucion(idInstitucion);
@@ -4138,6 +4147,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 						LetradoInscripcionItem newLetrado = this.getLetradoTurno( idInstitucion.toString(), String.valueOf(designa.getIdturno()), dateFormat.format(letradoSaliente.getFechadesigna()),  usuarios.get(0)); 
 
+						
 						if (newLetrado==null) {
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							LOGGER.error(
@@ -4151,7 +4161,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							letradoEntrante.setIdpersona(newLetrado.getIdpersona());
 							designaNueva.setIdpersona(newLetrado.getIdpersona());
 							
-							response = scsDesignasletradoMapper.insert(letradoEntrante);
+							response = scsDesignasletradoMapper.insert(designaNueva);
 						}						
 					}
 					else {
@@ -4161,14 +4171,26 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 					if(response!=0 && letradoEntrante.getIdpersona()!=null) {
 						//Gestionamos el antiguo letrado
-						if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
+						if(designaVieja.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
+							ScsDesignasletradoKey key = new ScsDesignasletradoKey();
+							
+												key.setIdinstitucion(idInstitucion);
+												key.setAnio(designa.getAnio());
+												key.setIdturno(designa.getIdturno());
+												key.setNumero(designa.getNumero());
+												key.setIdpersona(letradoSaliente.getIdpersona());
+												key.setFechadesigna(letradoSaliente.getFechadesigna());
+							
 							response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
+//							response = scsDesignasletradoMapper.deleteByExample(example);
 						}
 						else {
 							//ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
 
 							//if(usuarios.get(0).)oldLetrado.setFecharenuncia(letradoEntrante.getFechadesigna());
 							designaVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
+							//Si el usuario que realiza el cambio es un colegio se acepta automaticamente la renuncia
+							if(UserTokenUtils.getLetradoFromJWTToken(token)=="N")designaVieja.setFecharenuncia(letradoSaliente.getFecharenunciasolicita());
 							List<ComboItem> motivos = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion, usuarios.get(0).getIdlenguaje());
 							int i=0;
 							while(i<motivos.size() && designaVieja.getMotivosrenuncia() == null) {
@@ -4192,18 +4214,22 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							error.setCode(400);
 							error.setDescription("general.mensaje.error.bbdd");
 							updateResponseDTO.setStatus(SigaConstants.KO);
+							updateResponseDTO.setError(error);
 						}
 					} else {
 						error.setCode(200);
 						error.setDescription("general.message.registro.actualizado");
+						updateResponseDTO.setError(error);
 					}
 					
 				} catch (Exception e) {
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					updateResponseDTO.setError(error);
 					LOGGER.error(e.getMessage());
 					LOGGER.info("updateLetradoDesigna() -> Salida del servicio");
 				}
 				
-				updateResponseDTO.setError(error);
 				
 			}
 

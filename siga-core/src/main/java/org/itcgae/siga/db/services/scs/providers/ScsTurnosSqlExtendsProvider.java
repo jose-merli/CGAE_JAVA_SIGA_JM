@@ -322,7 +322,7 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 				") consulta_total ");
 		
 		
-		if(turnosItem.getIdpersonaUltimo() != null) {
+		if(turnosItem.getIdpersona_ultimo() != null) {
 			sqls5.ORDER_BY(busquedaOrden+") consulta3 WHERE activo = 1)consulta4 WHERE idpersona = \r\n" + 
 					"( SELECT IDPERSONA_ULTIMO FROM SCS_TURNO\r\n" + 
 					"        where Idinstitucion = '"+idInstitucion+"'"+ 
@@ -419,6 +419,34 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 	return sql.toString();
 	
 }
+	
+	/**
+	 * updateUltimoGuardias
+	 * 
+	 * @param turnosItem
+	 * @param idInstitucion
+	 * @return
+	 */
+	public String updateUltimoGuardias(TurnosItem turnosItem,Short idInstitucion) {
+		SQL sql2 = new SQL();
+		sql2.SELECT("FECHASUSCRIPCION");
+		sql2.FROM("SCS_INSCRIPCIONGUARDIA");
+		sql2.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+		sql2.WHERE("IDPERSONA = '"+turnosItem.getIdpersona()+"'");
+		sql2.WHERE("IDTURNO = '"+turnosItem.getIdturno()+"'");
+		sql2.WHERE("FECHABAJA IS NULL");
+		sql2.WHERE("IDGUARDIA = '"+turnosItem.getIdguardias()+"'");
+
+		SQL sql = new SQL();
+		
+		sql.UPDATE("SCS_GUARDIASTURNO");
+		sql.SET("IDPERSONA_ULTIMO ='"+turnosItem.getIdpersona()+"',FECHASUSCRIPCION_ULTIMO = ("+sql2+")");
+		sql.WHERE("IDINSTITUCION ='"+idInstitucion+"'");
+		sql.WHERE("IDTURNO = '"+turnosItem.getIdturno()+"'");
+		sql.WHERE("IDGUARDIA = '"+turnosItem.getIdguardias()+"'");
+		
+		return sql.toString();
+	}
 
 	public String updateUltimo(TurnosItem turnosItem,Short idInstitucion) {
 		SQL sql = new SQL();
@@ -583,16 +611,39 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 				"AND Gua.Idturno = '"+turnosItem.getIdturno()+"'"+
 				"AND Gua.idguardia = '"+turnosItem.getIdcomboguardias()+"'");
 		
-		sqls3.SELECT(" * from(\r\n" + 
-				"SELECT tabla_nueva.* FROM tabla_nueva, tabla_nueva2\r\n" + 
-				"WHERE tabla_nueva.orden>tabla_nueva2.orden ORDER BY tabla_nueva.orden asc)\r\n" + 
-				"UNION ALL\r\n" + 
-				"SELECT * FROM (SELECT tabla_nueva.* FROM tabla_nueva, tabla_nueva2\r\n" + 
-				"WHERE tabla_nueva.orden<=tabla_nueva2.orden ORDER BY tabla_nueva.orden asc)\r\n" + 
-				") consulta_total");
+		sqls3.SELECT(" *\r\n"
+				+ "        FROM\r\n"
+				+ "            (\r\n"
+				+ "                SELECT\r\n"
+				+ "                    tabla_nueva.*\r\n"
+				+ "                FROM\r\n"
+				+ "                    tabla_nueva,\r\n"
+				+ "                    tabla_nueva2\r\n"
+				+ "                WHERE\r\n"
+				+ "                   tabla_nueva.orden > tabla_nueva2.orden\r\n"
+				+ "                ORDER BY\r\n"
+				+ "                    tabla_nueva.orden ASC\r\n"
+				+ "            )\r\n"
+				+ "        UNION ALL\r\n"
+				+ "        SELECT\r\n"
+				+ "            *\r\n"
+				+ "        FROM\r\n"
+				+ "            (\r\n"
+				+ "                SELECT\r\n"
+				+ "                    tabla_nueva.*\r\n"
+				+ "                FROM\r\n"
+				+ "                    tabla_nueva,\r\n"
+				+ "                    tabla_nueva2\r\n"
+				+ "                WHERE\r\n"
+				+ "                   tabla_nueva.orden <= tabla_nueva2.orden\r\n"
+				+ "                ORDER BY\r\n"
+				+ "                    tabla_nueva.orden ASC\r\n"
+				+ "            )\r\n"
+				+ "    ) consulta_total\r\n"
+				+ "");
 		
 		
-		if(turnosItem.getIdpersonaUltimo() != null) {
+		if(turnosItem.getIdpersona_ultimo() != null) {
 			if(busquedaOrden != null && busquedaOrden.length() > 0 ) {
 				sqls5.ORDER_BY(""+busquedaOrden+",numeroGrupo,\r\n" + 
 						"	ordengrupo, \r\n" + 
@@ -660,6 +711,19 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 		}
 
 		sql.ORDER_BY("NOMBRE");
+
+		return sql.toString();
+	}
+	
+	public String selectInscripcionTurnoByTurno(Short idInstitucion, String idTurno) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDINSTITUCION,IDPERSONA, IDTURNO,FECHASOLICITUD");
+		sql.FROM("SCS_INSCRIPCIONTURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+		sql.WHERE("FECHABAJA IS NULL");
 
 		return sql.toString();
 	}
