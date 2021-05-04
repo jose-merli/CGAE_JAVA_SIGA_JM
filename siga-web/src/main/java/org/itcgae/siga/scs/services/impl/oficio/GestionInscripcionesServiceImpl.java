@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.client.utils.DateUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.util.SSCellRange;
 import org.itcgae.siga.DTO.scs.GuardiasDTO;
@@ -43,6 +44,7 @@ import org.itcgae.siga.db.entities.ScsInscripcionguardia;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
 import org.itcgae.siga.db.entities.ScsInscripcionturno;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
+import org.itcgae.siga.db.entities.ScsInscripcionturnoKey;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
 import org.itcgae.siga.db.entities.ScsProcurador;
@@ -97,6 +99,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 	@Autowired
 	private ScsOrdenacionColasExtendsMapper scsOrdenacioncolasExtendsMapper;
+	
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -964,25 +967,36 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateSolicitarBaja() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateSolicitarBaja() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
 					for (InscripcionesItem inscripcionesItem : inscripcionesDTO.getInscripcionesItems()) {
 						
-                        ScsInscripcionturnoExample exampleinscripcion = new ScsInscripcionturnoExample();
-                        exampleinscripcion.createCriteria()
-                                .andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-                                .andIdinstitucionEqualTo(idInstitucion)
-                                .andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+                        ScsInscripcionturnoKey keyinscripcion = new ScsInscripcionturnoKey();
+
                         
-                        List<ScsInscripcionturno> inscripcionesturno = scsInscripcionturnoExtendsMapper.selectByExample(exampleinscripcion);
+                        keyinscripcion.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
+                        keyinscripcion.setIdinstitucion(idInstitucion);
+                        keyinscripcion.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
+                        keyinscripcion.setFechasolicitud( inscripcionesItem.getFechasolicitud());
+                       
+//                        ScsInscripcionturnoExample exampleinscripcion = new ScsInscripcionturnoExample();
+//                        exampleinscripcion.createCriteria()
+//                                .andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
+//                                .andIdinstitucionEqualTo(idInstitucion)
+//                                .andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
+//                        
+//                        List<ScsInscripcionturno> inscripcionesturno = scsInscripcionturnoExtendsMapper.selectByExample(exampleinscripcion);
+//                        ScsInscripcionturno inscripcionturno = inscripcionesturno.get(0);
+                        
+                        ScsInscripcionturno inscripcionturno = scsInscripcionturnoMapper.selectByPrimaryKey(keyinscripcion);
                         
                         ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
                         exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -992,9 +1006,9 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
                         
 												
 						LOGGER.info(
-								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
+								"updateSolicitarBaja() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
 						
-						ScsInscripcionturno inscripcionturno =inscripcionesturno.get(0);
+						
 						List<ScsInscripcionguardia> guardias = scsInscripcionguardiaMapper.selectByExample(exampleguardia);
 						
 						
@@ -1065,7 +1079,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 						
 						LOGGER.info(
-								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
+								"updateSolicitarBaja() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
 					}
 				}
 
