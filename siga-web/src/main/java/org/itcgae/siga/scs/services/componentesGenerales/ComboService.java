@@ -71,4 +71,6 @@ public interface ComboService {
 	public ComboDTO comboProcedimientosConModulo(HttpServletRequest request, String idModulo);
 	
 	public ComboDTO comboAcreditacionesPorModulo(HttpServletRequest request, String idModulo, String idTurno);
+	
+	public ComboDTO comboTipoDocumentacionDesigna(HttpServletRequest request);
 }

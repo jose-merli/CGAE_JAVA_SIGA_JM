@@ -22,6 +22,7 @@ import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoInscripcionItem;
@@ -77,7 +78,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "DELITOS", property = "delitos", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHARECEPCIONCOLEGIO", property = "fechaRecepcionColegio", jdbcType = JdbcType.DATE),
 			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAJUICIO", property = "fechaJuicio", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHAJUICIO", property = "fechaJuicio", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "DEFENSAJURIDICA", property = "defensaJuridica", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBREINTERESADO", property = "nombreInteresado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDO1", property = "apellido1Interesado", jdbcType = JdbcType.VARCHAR),
@@ -432,7 +433,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "DELITOS", property = "delitos", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHARECEPCIONCOLEGIO", property = "fechaRecepcionColegio", jdbcType = JdbcType.DATE),
 			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAJUICIO", property = "fechaJuicio", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHAJUICIO", property = "fechaJuicio", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "DEFENSAJURIDICA", property = "defensaJuridica", jdbcType = JdbcType.VARCHAR), })
 	List<DesignaItem> getDatosAdicionales(Short idInstitucion, Integer tamMaximo, DesignaItem designa);
 	
@@ -541,7 +542,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
 		    @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
 		    @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "FECHASOLICITUD", property = "fechasolicitud", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHASOLICITUD", property = "fechasolicitud", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.DATE),
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
@@ -626,7 +627,38 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHAENTRADA", property = "fechaEntrada", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 			})
 	List<DocumentoActDesignaItem> getDocumentosPorActDesigna(DocumentoActDesignaItem documentoActDesignaItem, Short idInstitucion);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDocumentosPorDesigna")
+	@Results({
+			@Result(column = "IDDOCUMENTACIONDES", property = "idDocumentaciondes", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPODOCUMENTO", property = "idTipodocumento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDFICHERO", property = "idFichero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDACTUACION", property = "idActuacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "USUMODIFICACION", property = "usuModificacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAENTRADA", property = "fechaEntrada", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+			})
+	List<DocumentoDesignaItem> getDocumentosPorDesigna(DocumentoDesignaItem documentoDesignaItem, Short idInstitucion);
 
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboTipoDocumentacionDesigna")
+	@Results({ @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPODOCUMENTODES", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> comboTipoDocumentacionDesigna();
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getNewIdDocumentacionDes")
+	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR), })
+	MaxIdDto getNewIdDocumentacionDes(Short idInstitucion);
 }

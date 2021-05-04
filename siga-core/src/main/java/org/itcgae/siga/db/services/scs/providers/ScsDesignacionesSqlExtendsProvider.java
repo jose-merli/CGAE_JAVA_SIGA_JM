@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -2740,7 +2741,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
 		sql.WHERE( " Trunc(Ins.Fechavalidacion) <= nvl('"+fecha+"',  Ins.Fechavalidacion)" );
 		sql.WHERE( "(Ins.Fechabaja Is Null Or    Trunc(Ins.Fechabaja) > nvl('"+fecha+"', '01/01/1900')) ");
-		sql.WHERE(" Ins.idpersona ='" + idPersona + "'");
+		sql.WHERE(" Ins.idpersona ='" + idPersona + "' and rownum <= 1");
 		
 		return sql.toString();
 		
@@ -2797,12 +2798,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					s_saltocompensacion = " ";
 			}
 
-			Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Format formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			String fechaBBDD2 = formatter.format(saltoCompensacion.getFechacumplimiento());
 
 			sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
 
-			sql.SET("FECHACUMPLIMIENTO = '" + fechaBBDD2 + "'");
+			sql.SET("FECHACUMPLIMIENTO = TO_DATE('" + fechaBBDD2 + "' , 'YYYY/MM/DD HH24:MI:SS') ");
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 			sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
 			if (saltoCompensacion.getIdguardia() != null) {
@@ -3017,19 +3018,83 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("DOC.FECHAENTRADA");
 		sql.SELECT("DOC.OBSERVACIONES");
 		sql.SELECT("DOC.NOMBREFICHERO");
+		sql.SELECT("COL.IDPERSONA");
+		sql.SELECT(
+				"NVL(DECODE(NVL(COL.COMUNITARIO,0),0, COL.NCOLEGIADO, COL.NCOMUNITARIO), COL.NCOLEGIADO) AS NUMCOLEGIADO");
 
 		sql.FROM("SCS_DOCUMENTACIONASI DOC");
 
 		sql.JOIN("SCS_TIPODOCUMENTOASI TIPODOC ON TIPODOC.IDTIPODOCUMENTOASI = DOC.IDTIPODOCUMENTO");
+		sql.JOIN("ADM_USUARIOS ADM ON ADM.IDUSUARIO = DOC.USUMODIFICACION AND ADM.IDINSTITUCION = DOC.IDINSTITUCION");
+		sql.JOIN("CEN_PERSONA P ON ADM.NIF = P.NIFCIF");
+		sql.JOIN("CEN_COLEGIADO COL ON P.IDPERSONA = COL.IDPERSONA AND COL.IDINSTITUCION = DOC.IDINSTITUCION");
 
 		sql.WHERE("DOC.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("DOC.NUMERO ='" + documentoActDesignaItem.getNumero() + "'");
 		sql.WHERE("DOC.ANIO ='" + documentoActDesignaItem.getAnio() + "'");
 		sql.WHERE("DOC.IDACTUACION ='" + documentoActDesignaItem.getIdActuacion() + "'");
-		
+
 		sql.ORDER_BY("DOC.FECHAENTRADA DESC");
 
 		return sql.toString();
 	}
+	
+	public String getDocumentosPorDesigna(DocumentoDesignaItem documentoDesignaItem, Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("DOCD.IDDOCUMENTACIONDES");
+		sql.SELECT("DOCD.IDTIPODOCUMENTO");
+		sql.SELECT("DOCD.IDFICHERO");
+		sql.SELECT("DOCD.IDINSTITUCION");
+		sql.SELECT("DOCD.IDTURNO");
+		sql.SELECT("DOCD.ANIO");
+		sql.SELECT("DOCD.NUMERO");
+		sql.SELECT("DOCD.IDACTUACION");
+		sql.SELECT("DOCD.USUMODIFICACION");
+		sql.SELECT("DOCD.FECHAMODIFICACION");
+		sql.SELECT("DOCD.FECHAENTRADA");
+		sql.SELECT("DOCD.OBSERVACIONES");
+		sql.SELECT("DOCD.NOMBREFICHERO");
+		sql.SELECT("COL.IDPERSONA");
+		sql.SELECT(
+				"NVL(DECODE(NVL(COL.COMUNITARIO,0),0, COL.NCOLEGIADO, COL.NCOMUNITARIO), COL.NCOLEGIADO) AS NUMCOLEGIADO");
+
+		sql.FROM("SCS_DOCUMENTACIONDESIGNA DOCD");
+
+		sql.JOIN("ADM_USUARIOS ADM ON ADM.IDUSUARIO = DOCD.USUMODIFICACION AND ADM.IDINSTITUCION = DOCD.IDINSTITUCION");
+		sql.JOIN("CEN_PERSONA P ON ADM.NIF = P.NIFCIF");
+		sql.JOIN("CEN_COLEGIADO COL ON P.IDPERSONA = COL.IDPERSONA AND COL.IDINSTITUCION = DOCD.IDINSTITUCION");
+
+		sql.WHERE("DOCD.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("DOCD.NUMERO ='" + documentoDesignaItem.getNumero() + "'");
+		sql.WHERE("DOCD.ANIO ='" + documentoDesignaItem.getAnio() + "'");
+		sql.WHERE("DOCD.IDTURNO ='" + documentoDesignaItem.getIdTurno() + "'");
+
+		return sql.toString();
+	}
+	
+	public String comboTipoDocumentacionDesigna() {
+		SQL sql = new SQL();
+		
+		sql.SELECT("E.IDTIPODOCUMENTODES");
+		sql.SELECT("F_SIGA_GETRECURSO(E.NOMBRE, 1) AS NOMBRE");
+		
+		sql.FROM("SCS_TIPODOCUMENTODES E");
+		
+		return sql.toString();
+	}
+	
+	public String getNewIdDocumentacionDes(Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("NVL(MAX(DOC.IDDOCUMENTACIONDES),0) +1 AS ID");
+		
+		sql.FROM("SCS_DOCUMENTACIONDESIGNA DOC");
+		
+		sql.WHERE("DOC.IDINSTITUCION = '" + idInstitucion + "'");
+		
+		return sql.toString();
+	}
+
 	
 }

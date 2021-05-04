@@ -92,10 +92,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	public BajasTemporalesDTO busquedaBajasTemporales(BajasTemporalesItem bajasTemporalesItem, HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
 
-		Error error = new Error();
-		
-		try {
-		
+		Error error = new Error();		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -103,39 +100,37 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 		List<BajasTemporalesItem> bajasTemporalesItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		
+		try {
+
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"busquedaBajasTemporales() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"busquedaBajasTemporales() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				
 				LOGGER.info(
-						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
+						"busquedaBajasTemporales() / scsBajasTemporalesExtendsMapper.busquedaBajasTemporales() -> Entrada a scsBajasTemporalesExtendsMapper para obtener las bajas temporales");
 				
-						bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion);
-
-				
+						bajasTemporalesItems = scsBajasTemporalesExtendsMapper.busquedaBajasTemporales(bajasTemporalesItem, idInstitucion);	
 				LOGGER.info(
-						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
+						"busquedaBajasTemporales() / scsBajasTemporalesExtendsMapper.busquedaBajasTemporales() -> Salida a scsBajasTemporalesExtendsMapper para obtener las bajas temporales");
 
 				if (bajasTemporalesItems != null) {
 					bajasTemporalesDTO.setBajasTemporalesItems(bajasTemporalesItems);
 				}
 			}
-
 		}
 		
-		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
-		
-		return bajasTemporalesDTO;
+		LOGGER.info("busquedaBajasTemporales() -> Salida del servicio para obtener las bajas temporales");
 		
 		} catch (Exception e) {
 			error.setCode(500);
@@ -143,6 +138,8 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 			LOGGER.error(e.getMessage());
 			return null;
 		}
+		
+		return bajasTemporalesDTO;
 	}
 	
 	@Override

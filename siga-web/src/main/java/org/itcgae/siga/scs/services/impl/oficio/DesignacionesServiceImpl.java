@@ -53,6 +53,8 @@ import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
+import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
@@ -93,6 +95,8 @@ import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsDesignasletradoKey;
 import org.itcgae.siga.db.entities.ScsDocumentacionasi;
 import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
+import org.itcgae.siga.db.entities.ScsDocumentaciondesigna;
+import org.itcgae.siga.db.entities.ScsDocumentaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -110,6 +114,7 @@ import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
+import org.itcgae.siga.db.mappers.ScsDocumentaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
@@ -217,6 +222,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private GenFicheroMapper genFicheroMapper;
+	
+	@Autowired
+	private ScsDocumentaciondesignaMapper scsDocumentaciondesignaMapper;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -389,46 +397,61 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					ScsActuaciondesigna record = new ScsActuaciondesigna();
 
-					if (item.getAnio() != null && !item.getAnio().trim().isEmpty()) {
-						record.setAnio(Short.parseShort(item.getAnio()));
-					}
-
-					if (item.getAnioProcedimiento() != null && !item.getAnioProcedimiento().trim().isEmpty()) {
+					if(item.getAnioProcedimiento() !=null && !item.getAnioProcedimiento().trim().isEmpty()){
 						record.setAnioprocedimiento(Short.parseShort(item.getAnioProcedimiento()));
 					}
-
-					if (item.getFecha() != null && !item.getFecha().trim().isEmpty()) {
-						fecha = formatter.parse(item.getFecha());
-						record.setFecha(fecha);
-					}
-
-					if (item.getFechaJustificacion() != null && !item.getFechaJustificacion().trim().isEmpty()) {
-						fecha = formatter.parse(item.getFechaJustificacion());
+					
+					if(item.getFechaJustificacion()!=null && !item.getFechaJustificacion().trim().isEmpty()){
+						fecha = formatter.parse(item.getFechaJustificacion());  
 						record.setFechajustificacion(fecha);
 					}
-
+					
+					//Idacreditacion, hecho asi por el front
+					if(item.getDescripcion()!=null && !item.getDescripcion().trim().isEmpty() && item.getDescripcion().indexOf(",")!=-1){
+						record.setIdacreditacion(Short.parseShort(item.getDescripcion().substring(0, item.getDescripcion().indexOf(","))));
+					}
+				
+					//idJuzgado, hecho asi por el front
+					if(item.getNombreJuzgado()!=null && !item.getNombreJuzgado().trim().isEmpty()){
+						record.setIdjuzgado(Long.parseLong(item.getNombreJuzgado()));
+						record.setIdinstitucionJuzg(idInstitucion);
+					}
+					
+					if(item.getNig()!=null && !item.getNig().trim().isEmpty()){
+						record.setNig(item.getNig());
+					}
+					
+					if(item.getNumProcedimiento()!=null && !item.getNumProcedimiento().trim().isEmpty()){
+						record.setNumeroprocedimiento(item.getNumProcedimiento());
+					}
+					
+					fecha = formatter.parse(item.getFecha());  
+					record.setFecha(fecha);
+					
+					record.setIdturno(Integer.parseInt(item.getIdTurno()));
+					record.setIdinstitucion(idInstitucion);
+					record.setAnio(Short.parseShort(item.getAnio()));
+					record.setNumero(Long.parseLong(item.getNumDesignacion()));
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
 					record.setFechamodificacion(new Date());
-
-					if (item.getIdAcreditacion() != null && !item.getIdAcreditacion().trim().isEmpty()) {
-						record.setIdacreditacion(Short.parseShort(item.getIdAcreditacion()));
-					}
-
-					if (item.getIdInstitucion() != null && !item.getIdInstitucion().trim().isEmpty()) {
-						record.setIdinstitucion(Short.parseShort(item.getIdInstitucion()));
-					}
-
-					if (item.getIdJuzgado() != null && !item.getIdJuzgado().trim().isEmpty()) {
-						record.setIdjuzgado(Long.parseLong(item.getIdJuzgado()));
-					}
-
-					if (item.getIdProcedimiento() != null && !item.getIdProcedimiento().trim().isEmpty()) {
-						record.setIdprocedimiento(item.getIdProcedimiento());
-					}
-
-					if (item.getIdTurno() != null && !item.getIdTurno().trim().isEmpty()) {
-						record.setIdturno(Integer.parseInt(item.getIdTurno()));
-					}
-
+					record.setAcuerdoextrajudicial((short) 0);
+					record.setAnulacion((short) 0);
+					record.setIdprocedimiento(item.getProcedimiento());//idprocedimiento, por el front
+					record.setIdinstitucionProc(idInstitucion);
+					
+					record.setUsucreacion(usuarios.get(0).getIdusuario());
+					record.setFechacreacion(new Date());
+					
+					//cogemos el numasunot
+					ActuacionDesignaItem actDesItem = new ActuacionDesignaItem();
+					
+					actDesItem.setIdTurno(item.getIdTurno());
+					actDesItem.setAnio(item.getAnio());
+					actDesItem.setNumero(item.getNumDesignacion());
+					
+					MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actDesItem, idInstitucion);
+					
+					record.setNumeroasunto(maxIdDto.getIdMax());
 					response = scsActuaciondesignaMapper.insertSelective(record);
 
 					LOGGER.info("DesignacionesServiceImpl.insertaJustificacionExpres() -> Insert finalizado");
@@ -531,6 +554,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	public List<DesignaItem> busquedaDesignas(DesignaItem designaItem, HttpServletRequest request) {
 		DesignaItem result = new DesignaItem();
 		List<DesignaItem> designas = null;
+		List<DesignaItem> designasNuevas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
 
@@ -574,6 +598,33 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, idInstitucion,
 							tamMaximo);
+					
+					designasNuevas = scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem, idInstitucion,
+							tamMaximo);
+					
+					Map<String, DesignaItem> desginasBusqueda = new HashMap<String, DesignaItem>();
+					for(DesignaItem d: designas) {
+						int[] indice = new int[4];
+						indice[0] = d.getAno();
+						indice[1] = d.getNumero();
+						indice[2] = d.getIdTurno();
+						indice[3] = idInstitucion;
+						desginasBusqueda.put(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion, d);
+					}
+					for(DesignaItem d: designasNuevas) {
+						int[] indice = new int[4];
+						indice[0] = d.getAno();
+						indice[1] = d.getNumero();
+						indice[2] = d.getIdTurno();
+						indice[3] = idInstitucion;
+						if(!(desginasBusqueda.containsKey(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion))) {
+							desginasBusqueda.put(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion, d);
+						}
+					}
+					
+					designas = new ArrayList(desginasBusqueda.values());
+					
+					
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
 					LOGGER.info("DesignacionesServiceImpl.busquedaDesignas -> Salida del servicio");
@@ -2366,7 +2417,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int response = 0;
-		String numeroDesigna = "";
+		String codigoDesigna = "";
 		ScsDesigna designa = new ScsDesigna();
 
 		String token = request.getHeader("Authorization");
@@ -2398,7 +2449,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designa.setAnio(year);
 
 					// CALCULO CAMPO CODIGO (NUMERO EN FRONT)
-					String codigoDesigna = scsDesignacionesExtendsMapper
+					 codigoDesigna = scsDesignacionesExtendsMapper
 							.obtenerCodigoDesigna(String.valueOf(idInstitucion), String.valueOf(designaItem.getAno()));
 
 					if (codigoDesigna != null && !codigoDesigna.equals("")) {
@@ -2437,7 +2488,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					// Obtenemos el ultimo numero + 1
-					numeroDesigna = scsDesignacionesExtendsMapper.obtenerNumeroDesigna(String.valueOf(idInstitucion),
+					String numeroDesigna = scsDesignacionesExtendsMapper.obtenerNumeroDesigna(String.valueOf(idInstitucion),
 							String.valueOf(designaItem.getAno()));
 
 					if (numeroDesigna == null) {
@@ -2548,6 +2599,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 					insertResponseDTO.setError(error);
+					LOGGER.error(e);
 					return insertResponseDTO;
 				}
 			}
@@ -2560,7 +2612,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			}
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		} else {
-			insertResponseDTO.setId(numeroDesigna);
+			insertResponseDTO.setId(codigoDesigna);
 			error.setCode(200);
 			error.setDescription("general.message.registro.insertado");
 		}
@@ -3033,15 +3085,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private List<LetradoInscripcionItem> getLogicaCompensaciones(String idInstitucion, String idTurno, String fechaForm)
 			throws Exception {
 
-		List<LetradoInscripcionItem> alLetradosCompensados;
+		List<LetradoInscripcionItem> compensaciones;
+		List<LetradoInscripcionItem> alLetradosCompensados = new ArrayList<LetradoInscripcionItem>();
+		
 		LetradoInscripcionItem letradoSeleccionado;
 		String idPersona;
 
-		alLetradosCompensados = scsDesignacionesExtendsMapper.getCompensaciones(idInstitucion, idTurno, fechaForm);
+		compensaciones = scsDesignacionesExtendsMapper.getCompensaciones(idInstitucion, idTurno, fechaForm);
 
 		try {
 
-			for (LetradoInscripcionItem elem : alLetradosCompensados) {
+			for (LetradoInscripcionItem elem : compensaciones) {
 
 				idPersona = elem.getIdpersona().toString();
 
@@ -3058,9 +3112,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				letradoSeleccionado = new LetradoInscripcionItem();
 
-				letradoSeleccionado.setIdpersona(inscripcionTurno.getIdpersona());
-				letradoSeleccionado.setIdinstitucion(Short.valueOf(inscripcionTurno.getIdinstitucion().toString()));
-				letradoSeleccionado.setIdturno(inscripcionTurno.getIdturno());
+				letradoSeleccionado.setIdpersona(elem.getIdpersona());
+				letradoSeleccionado.setIdinstitucion(Short.valueOf(elem.getIdinstitucion().toString()));
+				letradoSeleccionado.setIdturno(elem.getIdturno());
 				letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
 				letradoSeleccionado.setSaltoocompensacion("C");
 				alLetradosCompensados.add(letradoSeleccionado);
@@ -3181,9 +3235,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				if (comprobarRestriccionesLetradoCompensadoTurno(auxLetradoSeleccionado, diasGuardia, iterador, null,
 						hmBajasTemporales, idInstitucion, idTurno, idGuardia, idCalendarioGuardias, usuario)) {
 					letradoGuardia = auxLetradoSeleccionado;
-					LOGGER.info("Letrado encontrado. " + letradoGuardia.getPersona().getNombre() + " "
-							+ letradoGuardia.getPersona().getApellidos1() + " "
-							+ letradoGuardia.getPersona().getApellidos2());
+					LOGGER.info("Letrado encontrado. idPersona: " +letradoGuardia.getIdpersona());
 					break;
 				}
 			}
@@ -4875,6 +4927,29 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return ficheroVo.getIdfichero();
 	}
 
+	private Long uploadFileDesigna(byte[] bytes, Integer idUsuario, Short idInstitucion, String nombreFichero,
+			String extension) {
+
+		FicheroVo ficheroVo = new FicheroVo();
+
+		String directorioFichero = getDirectorioFicheroDes(idInstitucion);
+		ficheroVo.setDirectorio(directorioFichero);
+		ficheroVo.setNombre(nombreFichero);
+		ficheroVo.setDescripcion("Fichero asociado a la designación " + ficheroVo.getNombre());
+
+		ficheroVo.setIdinstitucion(idInstitucion);
+		ficheroVo.setFichero(bytes);
+		ficheroVo.setExtension(extension.toLowerCase());
+
+		ficheroVo.setUsumodificacion(idUsuario);
+		ficheroVo.setFechamodificacion(new Date());
+		ficherosServiceImpl.insert(ficheroVo);
+
+		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
+
+		return ficheroVo.getIdfichero();
+	}
+
 	private String getDirectorioFichero(Short idInstitucion) {
 
 		// Extraemos el path para los ficheros
@@ -4896,6 +4971,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return directorioFichero.toString();
 	}
 
+	private String getDirectorioFicheroDes(Short idInstitucion) {
+
+		// Extraemos el path para los ficheros
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String path = genPropertiesPath.get(0).getValor();
+
+		StringBuffer directorioFichero = new StringBuffer(path);
+		directorioFichero.append(idInstitucion);
+		directorioFichero.append(File.separator);
+
+		// Extraemos el path concreto para actuaciones
+		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
+		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.designaciones");
+		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+
+		return directorioFichero.toString();
+	}
+
 	@Override
 	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request) {
 
@@ -4905,7 +5001,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		ObjectMapper objectMapper = new ObjectMapper();
-		boolean hayError = false;
 
 		try {
 
@@ -5073,7 +5168,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		Error error = new Error();
 		ResponseEntity<InputStreamResource> res = null;
 		InputStream fileStream = null;
 		HttpHeaders headers = new HttpHeaders();
@@ -5144,6 +5238,49 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
 				String path = getDirectorioFichero(idInstitucion);
 				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + doc.getExtension().toLowerCase();
+				File file = new File(path);
+				FileInputStream fileInputStream = new FileInputStream(file);
+				IOUtils.copy(fileInputStream, zipOutputStream);
+				fileInputStream.close();
+			}
+
+			zipOutputStream.closeEntry();
+
+			if (zipOutputStream != null) {
+				zipOutputStream.finish();
+				zipOutputStream.flush();
+				IOUtils.closeQuietly(zipOutputStream);
+			}
+
+			IOUtils.closeQuietly(bufferedOutputStream);
+			IOUtils.closeQuietly(byteArrayOutputStream);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+	}
+
+	private InputStream getZipFileDocumentosDesigna(List<DocumentoDesignaItem> listaDocumentoDesignaItem,
+			Short idInstitucion) {
+
+		ByteArrayOutputStream byteArrayOutputStream = null;
+
+		try {
+
+			byteArrayOutputStream = new ByteArrayOutputStream();
+			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+			for (DocumentoDesignaItem doc : listaDocumentoDesignaItem) {
+
+				zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
+				String extension = doc.getNombreFichero()
+						.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
+						.toLowerCase();
+				String path = getDirectorioFicheroDes(idInstitucion);
+				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
 				File file = new File(path);
 				FileInputStream fileInputStream = new FileInputStream(file);
 				IOUtils.copy(fileInputStream, zipOutputStream);
@@ -5291,6 +5428,340 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return deleteResponseDTO;
+	}
+
+	@Override
+	public DocumentoDesignaDTO getDocumentosPorDesigna(DocumentoDesignaItem documentoDesignaItem,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DocumentoDesignaDTO documentoDesignaDTO = new DocumentoDesignaDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDocumentosPorDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDocumentosPorDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				List<DocumentoDesignaItem> listaDocumentoActDesignaItem = scsDesignacionesExtendsMapper
+						.getDocumentosPorDesigna(documentoDesignaItem, idInstitucion);
+
+				documentoDesignaDTO.setListaDocumentoDesignaItem(listaDocumentoActDesignaItem);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.getDocumentosPorDesigna() -> Se ha producido un error en la búsqueda de documentos asociados a la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			documentoDesignaDTO.setError(error);
+		}
+
+		return documentoDesignaDTO;
+	}
+
+	@Override
+	public InsertResponseDTO subirDocumentoDesigna(MultipartHttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.subirDocumentoDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.subirDocumentoDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				Iterator<String> itr = request.getFileNames();
+
+				while (itr.hasNext()) {
+
+					MultipartFile file = request.getFile(itr.next());
+					String nombreFichero = file.getOriginalFilename().split(";")[0];
+					String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
+					DocumentoDesignaItem documentoDesignaItem = objectMapper.readValue(json,
+							DocumentoDesignaItem.class);
+					String extension = FilenameUtils.getExtension(nombreFichero);
+
+					Long idFile = uploadFileDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+							nombreFichero, extension);
+
+					MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionDes(idInstitucion);
+
+					ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
+
+					scsDocumentaciondesigna.setAnio(Short.valueOf(documentoDesignaItem.getAnio()));
+					scsDocumentaciondesigna.setNumero(Long.valueOf(documentoDesignaItem.getNumero()));
+					scsDocumentaciondesigna.setIdturno(Integer.valueOf(documentoDesignaItem.getIdTurno()));
+
+					if (!UtilidadesString.esCadenaVacia(documentoDesignaItem.getObservaciones())) {
+						scsDocumentaciondesigna.setObservaciones(documentoDesignaItem.getObservaciones());
+					}
+					scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(nuevoId.getIdMax().toString()));
+					scsDocumentaciondesigna.setNombrefichero(nombreFichero);
+					scsDocumentaciondesigna
+							.setIdtipodocumento(Short.valueOf(documentoDesignaItem.getIdTipodocumento()));
+					scsDocumentaciondesigna.setIdfichero(idFile);
+					scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
+					scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+					scsDocumentaciondesigna.setFechamodificacion(new Date());
+					scsDocumentaciondesigna.setFechaentrada(new Date());
+
+					int response = scsDocumentaciondesignaMapper.insertSelective(scsDocumentaciondesigna);
+
+					if (response == 1) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						insertResponseDTO.setError(error);
+					}
+
+				}
+
+				String documentos = request.getParameter("documentosActualizar");
+				List<DocumentoDesignaItem> listaDocumentos = objectMapper.readValue(documentos,
+						new TypeReference<List<DocumentoDesignaItem>>() {
+						});
+
+				if (listaDocumentos != null && !listaDocumentos.isEmpty()) {
+
+					for (DocumentoDesignaItem doc : listaDocumentos) {
+
+						ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
+
+						if (!UtilidadesString.esCadenaVacia(doc.getObservaciones())) {
+							scsDocumentaciondesigna.setObservaciones(doc.getObservaciones());
+						}
+						scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsDocumentaciondesigna.setFechamodificacion(new Date());
+						scsDocumentaciondesigna.setIdtipodocumento(Short.valueOf(doc.getIdTipodocumento()));
+						scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
+						scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(doc.getIdDocumentaciondes()));
+
+						int response2 = scsDocumentaciondesignaMapper
+								.updateByPrimaryKeySelective(scsDocumentaciondesigna);
+
+						if (response2 == 1) {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+
+						if (response2 == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
+							error.setCode(500);
+							error.setDescription("general.mensaje.error.bbdd");
+							insertResponseDTO.setError(error);
+						}
+
+					}
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			insertResponseDTO.setError(error);
+		}
+
+		return insertResponseDTO;
+	}
+
+	@Override
+	public DeleteResponseDTO eliminarDocumentosDesigna(List<DocumentoDesignaItem> listaDocumentoDesignaItem,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.eliminarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.eliminarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				for (DocumentoDesignaItem doc : listaDocumentoDesignaItem) {
+
+					String path = getDirectorioFicheroDes(idInstitucion);
+					path += File.separator + idInstitucion + "_" + doc.getIdFichero()
+							+ doc.getNombreFichero()
+									.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
+									.toLowerCase();
+
+					File file = new File(path);
+
+					if (file.exists()) {
+						file.delete();
+					}
+
+					ScsDocumentaciondesignaKey scsDocumentaciondesignaKey = new ScsDocumentaciondesignaKey();
+
+					scsDocumentaciondesignaKey.setIddocumentaciondes(Integer.valueOf(doc.getIdDocumentaciondes()));
+					scsDocumentaciondesignaKey.setIdinstitucion(idInstitucion);
+
+					int response = scsDocumentaciondesignaMapper.deleteByPrimaryKey(scsDocumentaciondesignaKey);
+
+					if (response == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.eliminarDocumentosDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la designación");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						deleteResponseDTO.setError(error);
+					}
+
+					GenFicheroKey genFicheroKey = new GenFicheroKey();
+
+					genFicheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
+					genFicheroKey.setIdinstitucion(idInstitucion);
+
+					int response2 = genFicheroMapper.deleteByPrimaryKey(genFicheroKey);
+
+					if (response2 == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response2 == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.eliminarDocumentosDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la designación");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						deleteResponseDTO.setError(error);
+					}
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.eliminarDocumentosDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			deleteResponseDTO.setError(error);
+		}
+
+		return deleteResponseDTO;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> descargarDocumentosDesigna(
+			List<DocumentoDesignaItem> listaDocumentoDesignaItem, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ResponseEntity<InputStreamResource> res = null;
+		InputStream fileStream = null;
+		HttpHeaders headers = new HttpHeaders();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.descargarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.descargarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty() && !listaDocumentoDesignaItem.isEmpty()) {
+
+				if (listaDocumentoDesignaItem.size() == 1) {
+
+					String extension = listaDocumentoDesignaItem.get(0).getNombreFichero()
+							.substring(listaDocumentoDesignaItem.get(0).getNombreFichero().lastIndexOf("."),
+									listaDocumentoDesignaItem.get(0).getNombreFichero().length())
+							.toLowerCase();
+					String path = getDirectorioFicheroDes(idInstitucion);
+					path += File.separator + idInstitucion + "_" + listaDocumentoDesignaItem.get(0).getIdFichero()
+							+ extension;
+
+					File file = new File(path);
+					fileStream = new FileInputStream(file);
+
+					String tipoMime = getMimeType(extension);
+
+					headers.setContentType(MediaType.parseMediaType(tipoMime));
+					headers.set("Content-Disposition",
+							"attachment; filename=\"" + listaDocumentoDesignaItem.get(0).getNombreFichero() + "\"");
+					headers.setContentLength(file.length());
+
+				} else {
+					fileStream = getZipFileDocumentosDesigna(listaDocumentoDesignaItem, idInstitucion);
+
+					headers.setContentType(MediaType.parseMediaType("application/zip"));
+					headers.set("Content-Disposition", "attachment; filename=\"documentos.zip\"");
+				}
+
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+						HttpStatus.OK);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.descargarDocumentosActDesigna() -> Se ha producido un error al descargar un archivo asociado a la actuacion",
+					e);
+		}
+
+		return res;
 	}
 
 }
