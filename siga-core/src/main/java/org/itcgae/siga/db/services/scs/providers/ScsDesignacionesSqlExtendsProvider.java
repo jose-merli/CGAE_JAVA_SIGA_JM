@@ -1160,29 +1160,42 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	 * @return
 	 */
 	public String busquedaActuacionesJustificacionExpres(String idInstitucion, String idTurno, String anio,
-			String numero) {
+			String numero, JustificacionExpressItem item) {
 		StringBuilder sql = new StringBuilder();
 
-		sql.append("SELECT act.numero, ac.idacreditacion, ac.descripcion acreditacion, ac.idtipoacreditacion, "
-				+ "decode(to_char(acp.porcentaje), to_char(trunc(acp.porcentaje)), to_char(acp.porcentaje), "
-				+ "f_siga_formatonumero(to_char(acp.porcentaje), 2)) porcentaje, tac.descripcion tipo, "
-				+ "pro.nombre procedimiento, pro.codigo categoria, pro.idjurisdiccion, pro.complemento, pro.permitiraniadirletrado, "
-				+ "act.numeroasunto, act.idprocedimiento, act.idjuzgado, j.nombre nombreJuzgado, "
-				+ "to_char(act.fechajustificacion, 'dd/mm/yyyy') fechajustificacion, act.validada, act.idfacturacion, "
-				+ "act.numeroprocedimiento, act.anioprocedimiento, act.anio, act.idTurno, act.idInstitucion, "
-				+ "( "
-				+ "SELECT nombre || ' (' || fechadesde || '-' || fechahasta || ')' "
-				+ "FROM fcs_facturacionjg fjg "
-				+ "WHERE fjg.idinstitucion = act.idinstitucion AND fjg.idfacturacion = act.idfacturacion"
-				+ ") AS descripcionfacturacion, "
-				+ "act.docjustificacion, act.anulacion, acp.nig_numprocedimiento, act.nig, act.fecha, 0 permitireditarletrado "
-				+ "FROM scs_actuaciondesigna act, scs_procedimientos pro, scs_acreditacionprocedimiento acp, scs_acreditacion ac, "
-				+ "scs_tipoacreditacion tac, scs_juzgado j " 
-				+ "WHERE ac.idtipoacreditacion = tac.idtipoacreditacion AND act.idinstitucion = j.idinstitucion AND act.idjuzgado=j.idjuzgado "
-				+ "AND act.idacreditacion = ac.idacreditacion AND act.idacreditacion = acp.idacreditacion AND act.idinstitucion_proc = acp.idinstitucion "
-				+ "AND act.idprocedimiento = acp.idprocedimiento AND act.idinstitucion_proc = pro.idinstitucion AND act.idprocedimiento = pro.idprocedimiento "
-				+ "AND act.idinstitucion = "+ idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = " + anio + " AND act.numero = " + numero + " " 
-				+ "ORDER BY act.fechajustificacion, act.numeroasunto");
+		sql.append("SELECT act.numero, ac.idacreditacion, ac.descripcion acreditacion, ac.idtipoacreditacion, ");
+		sql.append( " decode(to_char(acp.porcentaje), to_char(trunc(acp.porcentaje)), to_char(acp.porcentaje), ");
+		sql.append( " f_siga_formatonumero(to_char(acp.porcentaje), 2)) porcentaje, tac.descripcion tipo, ");
+		sql.append( " pro.nombre procedimiento, pro.codigo categoria, pro.idjurisdiccion, pro.complemento, pro.permitiraniadirletrado, ");
+		sql.append( " act.numeroasunto, act.idprocedimiento, act.idjuzgado, j.nombre nombreJuzgado, ");
+		sql.append( " to_char(act.fechajustificacion, 'dd/mm/yyyy') fechajustificacion, act.validada, act.idfacturacion, ");
+		sql.append( " act.numeroprocedimiento, act.anioprocedimiento, act.anio, act.idTurno, act.idInstitucion, ");
+		sql.append( " ( ");
+		sql.append( " SELECT nombre || ' (' || fechadesde || '-' || fechahasta || ')' ");
+		sql.append( " FROM fcs_facturacionjg fjg ");
+		sql.append( " WHERE fjg.idinstitucion = act.idinstitucion AND fjg.idfacturacion = act.idfacturacion");
+		sql.append( " ) AS descripcionfacturacion, ");
+		sql.append( " act.docjustificacion, act.anulacion, acp.nig_numprocedimiento, act.nig, act.fecha, 0 permitireditarletrado ");
+		sql.append( " FROM scs_actuaciondesigna act, scs_procedimientos pro, scs_acreditacionprocedimiento acp, scs_acreditacion ac, ");
+		sql.append( " scs_tipoacreditacion tac, scs_juzgado j "); 
+		sql.append( " WHERE ac.idtipoacreditacion = tac.idtipoacreditacion AND act.idinstitucion = j.idinstitucion AND act.idjuzgado=j.idjuzgado ");
+		sql.append( " AND act.idacreditacion = ac.idacreditacion AND act.idacreditacion = acp.idacreditacion AND act.idinstitucion_proc = acp.idinstitucion ");
+		sql.append( " AND act.idprocedimiento = acp.idprocedimiento AND act.idinstitucion_proc = pro.idinstitucion AND act.idprocedimiento = pro.idprocedimiento ");
+		sql.append( " AND act.idinstitucion = "+ idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = " + anio + " AND act.numero = " + numero + " "); 
+		if (item.getJustificacionDesde() != null) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			String fecha = dateFormat.format(item.getJustificacionDesde());
+
+			sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) >= TO_DATE('" + fecha + "','DD/MM/YYYY')");
+		}
+
+		if (item.getJustificacionHasta() != null) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			String fecha = dateFormat.format(item.getJustificacionHasta());
+
+			sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
+		}
+		sql.append(  " ORDER BY act.fechajustificacion, act.numeroasunto");
 
 		return sql.toString();
 	}
@@ -1464,14 +1477,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String fecha = dateFormat.format(item.getJustificacionDesde());
 
-				sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) >= '" + fecha + "'");
+				sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) >= TO_DATE('" + fecha + "','DD/MM/YYYY')");
 			}
 
 			if (item.getJustificacionHasta() != null) {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String fecha = dateFormat.format(item.getJustificacionHasta());
 
-				sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) <= '" + fecha + "'");
+				sql.append(" AND TRUNC(ACT.FECHAJUSTIFICACION) <= TO_DATE('" + fecha + "','DD/MM/YYYY')");
 			}
 
 			sql.append(" )>0");

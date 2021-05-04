@@ -320,7 +320,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					for (JustificacionExpressItem record : result) {
 						record.setActuaciones(scsDesignacionesExtendsMapper.busquedaActuacionesJustificacionExpres(
 								record.getIdInstitucion(), record.getIdTurno(), record.getAnioDesignacion(),
-								record.getNumDesignacion()));
+								record.getNumDesignacion(),item));
 					}
 
 					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> tratando expedientes...");

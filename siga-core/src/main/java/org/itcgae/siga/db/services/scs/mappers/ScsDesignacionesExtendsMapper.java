@@ -223,7 +223,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR), 
 			})
 	List<ActuacionesJustificacionExpressItem> busquedaActuacionesJustificacionExpres(String idInstitucion,
-			String idTurno, String anio, String numero);
+			String idTurno, String anio, String numero, JustificacionExpressItem item);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboModulos")
 	@Results({ @Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
