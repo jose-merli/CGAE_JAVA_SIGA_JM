@@ -177,5 +177,11 @@ public class CombosGeneralesController {
 		ComboDTO response = comboService.comboAcreditacionesPorModulo(request, idModulo, idTurno);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/comboTipoDocumentacionDesigna")
+	public ResponseEntity<ComboDTO> comboTipoDocumentacionDesigna(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTipoDocumentacionDesigna(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 }
