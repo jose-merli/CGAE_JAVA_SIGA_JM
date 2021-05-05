@@ -78,7 +78,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EJG.GUARDIATURNO_IDTURNO as IDTURNO");
 		sql.SELECT("ejg.fechaapertura");
 		sql.SELECT("ejg.fechamodificacion");
-		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as NOMBREletrado");
+		sql.SELECT("(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as NOMBREletrado");
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
 		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre as NOMBRESOLICITANTE");
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
