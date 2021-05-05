@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
@@ -100,7 +101,7 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		return sql.toString();
 	}
 	
-	public String deleteBajasTemporales(BajasTemporalesItem bajasTemporalesItem) {
+	public String deleteBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Integer usuario) {
 		
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -108,6 +109,8 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		SQL sql = new SQL();
 		sql.UPDATE("cen_bajastemporales");
 		sql.SET("ELIMINADO = 1");
+		sql.SET("USUMODIFICACION = "+usuario);
+		sql.SET("FECHAMODIFICACION = "+new Date());
 		sql.WHERE("FECHABT = '"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"'");
 		sql.WHERE("IDPERSONA= "+ bajasTemporalesItem.getIdpersona());
 		sql.WHERE("IDINSTITUCION="+bajasTemporalesItem.getIdinstitucion());
@@ -115,12 +118,14 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		return sql.toString();
 	}
 	
-public String updateBajasTemporales(BajasTemporalesItem bajasTemporalesItem) {
+public String updateBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Integer usuario) {
 	
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		SQL sql = new SQL();
 		sql.UPDATE("cen_bajastemporales");
 		sql.SET("VALIDADO = '"+bajasTemporalesItem.getValidado()+"'");
+		sql.SET("USUMODIFICACION = "+usuario);
+		sql.SET("FECHAMODIFICACION = "+new Date());
 		sql.WHERE("FECHABT = '"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"'");
 		sql.WHERE("IDPERSONA= "+ bajasTemporalesItem.getIdpersona());
 		sql.WHERE("IDINSTITUCION="+bajasTemporalesItem.getIdinstitucion());
@@ -129,7 +134,7 @@ public String updateBajasTemporales(BajasTemporalesItem bajasTemporalesItem) {
 	
 	}
 
-public String saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem) {
+public String saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer usuario) {
 	
 	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	
@@ -148,6 +153,9 @@ public String saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem) {
 	if(bajasTemporalesItem.getDescripcion() != null) {
 		sql.SET("DESCRIPCION = '"+bajasTemporalesItem.getDescripcion()+"'");
 	}
+
+	sql.SET("USUMODIFICACION = "+usuario);
+	sql.SET("FECHAMODIFICACION = "+new Date());
 	
 	sql.WHERE("FECHABT = '"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"'");
 	sql.WHERE("IDPERSONA= "+ bajasTemporalesItem.getIdpersona());

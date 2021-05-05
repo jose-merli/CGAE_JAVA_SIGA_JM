@@ -867,6 +867,17 @@ public class DesignacionesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+
+	@RequestMapping(value = "/designas/guardarProcuradorEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.guardarProcuradorEJG(procuradorItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@RequestMapping(value = "/designas/compruebaProcurador",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ProcuradorDTO> compruebaProcurador(@RequestBody String procurador, HttpServletRequest request) {
 		ProcuradorDTO response = designacionesService.compruebaProcurador(procurador, request);

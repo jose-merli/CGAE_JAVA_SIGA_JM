@@ -173,7 +173,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 				try {
 					for(BajasTemporalesItem bti: bajasTemporalesItem) {
-						response = scsBajasTemporalesExtendsMapper.updateBajaTemporal(bti);
+						response = scsBajasTemporalesExtendsMapper.updateBajaTemporal(bti,usuarios.get(0).getIdusuario());
 					}
 				
 				}catch (Exception e) {
@@ -237,7 +237,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 					
 					for(BajasTemporalesItem bti: bajasTemporalesItem) {
 						bti.setEliminado("1");
-						response = scsBajasTemporalesExtendsMapper.eliminarBaja(bti);
+						response = scsBajasTemporalesExtendsMapper.eliminarBaja(bti,usuarios.get(0).getIdusuario());
 					}
 				}catch (Exception e) {
 					response = 0;
@@ -344,7 +344,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 							bjtmp.setIdinstitucion(String.valueOf(idInstitucion));
 						}
 							
-						response = scsBajasTemporalesExtendsMapper.saveBajaTemporal(bjtmp);
+						response = scsBajasTemporalesExtendsMapper.saveBajaTemporal(bjtmp,usuarios.get(0).getIdusuario());
 					}
 				}catch (Exception e) {
 					response = 0;

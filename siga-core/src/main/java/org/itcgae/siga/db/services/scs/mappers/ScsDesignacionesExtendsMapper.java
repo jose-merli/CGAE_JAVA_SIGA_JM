@@ -380,6 +380,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "guardarProcurador")
 	int guardarProcurador(ProcuradorItem procuradorItem);
 	
+	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "guardarProcuradorEJG")
+	int guardarProcuradorEJG(ProcuradorItem procuradorItem);
+	
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "actualizarProcurador")
 	int actualizarProcurador(ProcuradorItem procuradorItem);
 

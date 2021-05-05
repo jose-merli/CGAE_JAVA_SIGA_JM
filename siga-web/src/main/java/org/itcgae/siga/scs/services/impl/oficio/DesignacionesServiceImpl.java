@@ -3672,6 +3672,76 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				updateResponseDTO.setError(error);
 
 				LOGGER.info("guardarProcurador() -> Salida del servicio para guardar procuradores");
+			}
+		}
+		return updateResponseDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO guardarProcuradorEJG(List<String> procurador, HttpServletRequest request) {
+		LOGGER.info("guardarProcurador() ->  Entrada al servicio para guardar procuradores");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+//		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"guardarProcurador() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"guardarProcurador() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					ProcuradorItem procuradorItem = new ProcuradorItem();
+
+					procuradorItem.setFechaDesigna(procurador.get(0));
+					procuradorItem.setNumerodesignacion(procurador.get(1));
+					procuradorItem.setnColegiado(procurador.get(2));
+					procuradorItem.setNombre(procurador.get(3));
+					procuradorItem.setMotivosRenuncia(procurador.get(4));
+					procuradorItem.setObservaciones(procurador.get(5));
+					procuradorItem.setFecharenunciasolicita(procurador.get(6));
+					procuradorItem.setIdInstitucion(procurador.get(7));
+					procuradorItem.setNumero(procurador.get(8));
+					procuradorItem.setIdTurno(procurador.get(9));
+
+					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem);
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha guardado el procurador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha guardado el procurador correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("guardarProcurador() -> Salida del servicio para guardar procuradores");
 
 			}
 
