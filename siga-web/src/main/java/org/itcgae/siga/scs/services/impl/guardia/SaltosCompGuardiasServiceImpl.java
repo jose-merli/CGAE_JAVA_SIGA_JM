@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
@@ -123,6 +122,10 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 
 						for (SaltoCompGuardiaItem saltoComp : saltosComp) {
 
+//							List<LetradoGuardiaItem> listaLetradoGuardiaItem = scsGuardiasturnoExtendsMapper
+//									.searchLetradosGuardia(Short.toString(idInstitucion), saltoComp.getIdTurno(),
+//											saltoComp.getIdGuardia());
+
 							if (!UtilidadesString.esCadenaVacia(saltoComp.getGrupo())) {
 
 								List<SaltoCompGuardiaLetradoGrupoDTO> saltoCompLetradosGrupo = saltoscompensacionesMapper
@@ -130,27 +133,20 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 
 								if (saltoCompLetradosGrupo != null && !saltoCompLetradosGrupo.isEmpty()) {
 
-									List<String> letrados = new ArrayList<>();
+//									List<String> letrados = new ArrayList<>();
+//
+//									for (SaltoCompGuardiaLetradoGrupoDTO letrado : saltoCompLetradosGrupo) {
+//										letrados.add(letrado.getLetrado());
+//									}
 
-									for (SaltoCompGuardiaLetradoGrupoDTO letrado : saltoCompLetradosGrupo) {
-										letrados.add(letrado.getLetrado());
-									}
-
-									saltoComp.setLetradosGrupo(letrados);
+									saltoComp.setLetradosGrupo(saltoCompLetradosGrupo);
 								}
 
-								List<LetradoGuardiaItem> listaLetradoGuardiaItem = scsGuardiasturnoExtendsMapper
-										.searchLetradosGuardia(Short.toString(idInstitucion), saltoComp.getIdTurno(),
-												saltoComp.getIdGuardia());
-
-								saltoComp.setComboColegiados(transformToListComboItem(listaLetradoGuardiaItem, true));
+//								saltoComp.setComboColegiados(transformToListComboItem(listaLetradoGuardiaItem, true));
 
 							} else {
-								List<LetradoGuardiaItem> listaLetradoGuardiaItem = scsGuardiasturnoExtendsMapper
-										.searchLetradosGuardia(Short.toString(idInstitucion), saltoComp.getIdTurno(),
-												saltoComp.getIdGuardia());
 
-								saltoComp.setComboColegiados(transformToListComboItem(listaLetradoGuardiaItem, false));
+//								saltoComp.setComboColegiados(transformToListComboItem(listaLetradoGuardiaItem, false));
 							}
 
 							List<ComboItem> listaComboItem = scsGuardiasturnoExtendsMapper
@@ -537,18 +533,25 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 			ComboItem comboItem = new ComboItem();
 
 			if (isGrupo) {
-				stb.append("[" + letradoGuardiaItem.getNumeroGrupo() + "] ");
-				stb.append("(" + letradoGuardiaItem.getGrupo() + ") ");
-				stb.append(letradoGuardiaItem.getApellidos2() + " ");
+				stb.append(letradoGuardiaItem.getNumeroColegiado());
+				stb.append("/");
+				stb.append(letradoGuardiaItem.getGrupo());
+				stb.append(" ");
+				stb.append(letradoGuardiaItem.getApellidos2());
+				stb.append(" ");
 				stb.append(letradoGuardiaItem.getApellidos1());
-				stb.append(", " + letradoGuardiaItem.getNombre());
+				stb.append(", ");
+				stb.append(letradoGuardiaItem.getNombre());
 				comboItem.setLabel(stb.toString());
 				comboItem.setValue(letradoGuardiaItem.getGrupo());
 			} else {
-				stb.append("(" + letradoGuardiaItem.getNumeroColegiado() + ") ");
-				stb.append(letradoGuardiaItem.getApellidos2() + " ");
+				stb.append(letradoGuardiaItem.getNumeroColegiado());
+				stb.append(" ");
+				stb.append(letradoGuardiaItem.getApellidos2());
+				stb.append(" ");
 				stb.append(letradoGuardiaItem.getApellidos1());
-				stb.append(", " + letradoGuardiaItem.getNombre());
+				stb.append(", ");
+				stb.append(letradoGuardiaItem.getNombre());
 				comboItem.setLabel(stb.toString());
 				comboItem.setValue(letradoGuardiaItem.getNumeroColegiado());
 			}
