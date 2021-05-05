@@ -132,7 +132,7 @@ public interface IDesignacionesService {
 	
 	public ProcuradorDTO compruebaProcurador(String procurador, HttpServletRequest request);
 	
-	public ProcuradorDTO compruebaFechaProcurador(String procurador, HttpServletRequest request);
+	public ProcuradorDTO compruebaFechaProcurador(List<String> procurador, HttpServletRequest request);
 
 	ComboDTO comboTipoMotivo(HttpServletRequest request);
 
@@ -203,5 +203,7 @@ public interface IDesignacionesService {
 	
 	public ResponseEntity<InputStreamResource> descargarDocumentosDesigna(
 			List<DocumentoDesignaItem> listaDocumentoDesignaItem, HttpServletRequest request);
+
+	public UpdateResponseDTO actualizarProcurador(List<String> procuradorItem, HttpServletRequest request);
 	
 }
