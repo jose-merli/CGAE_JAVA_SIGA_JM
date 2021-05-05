@@ -161,7 +161,6 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	})
 	FichaPersonaItem getPersonaisColegiadoWithIdPersona(String idPersona, String idInstitucion);
 	
-
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getColegiadoByIdPersona")
 	@Results({
 		@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
@@ -172,13 +171,12 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 
 	})
 	FichaPersonaItem getColegiadoByIdPersona(String idPersona, Short idInstitucion);
-
+	
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "busquedaColegiadoExpress")//falta hacer query
 	@Results({
 		@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ColegiadoJGItem> busquedaColegiadoExpress(String colegiadoJGItem, String idInstitucion);
-
 }

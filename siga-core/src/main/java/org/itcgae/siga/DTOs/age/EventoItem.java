@@ -655,50 +655,9 @@ public class EventoItem {
 	
 	/**
 	 **/
-	public EventoItem anio(String anio) {
-		this.anio = anio;
-		return this;
-	}
-
-	@JsonProperty("anio")	
-	public String getAnio() {
-		return anio;
-	}
-
-	public void setAnio(String anio) {
-		this.anio = anio;
-	}
-	
-	/**
-	 **/
 	public EventoItem realEnd(Date realEnd) {
 		this.realEnd = realEnd;
 		return this;
-	}
-
-	@JsonProperty("realEnd")	
-	public Date getRealEnd() {
-		return realEnd;
-	}
-
-	public void setRealEnd(Date realEnd) {
-		this.realEnd = realEnd;
-	}
-	
-	/**
-	 **/
-	public EventoItem historico(boolean historico) {
-		this.historico = historico;
-		return this;
-	}
-
-	@JsonProperty("historico")
-	public boolean isHistorico() {
-		return historico;
-	}
-
-	public void setHistorico(boolean historico) {
-		this.historico = historico;
 	}
 	
 	/**
@@ -996,9 +955,48 @@ public class EventoItem {
 		} else if (!descripcionOld.equals(other.descripcionOld))
 			return false;
 		return true;
-	
+	}
+	private String toIndentedString(java.lang.Object o) {
+		if (o == null) {
+			return "null";
+		}
+		return o.toString().replace("\n", "\n    ");
 	}
 
+	public Date getRealEnd() {
+		return realEnd;
+	}
 
+	public void setRealEnd(Date realEnd) {
+		this.realEnd = realEnd;
+	}
+	
+	public EventoItem historico(boolean historico) {
+		this.historico = historico;
+		return this;
+	}
+
+	@JsonProperty("historico")
+	public boolean isHistorico() {
+		return historico;
+	}
+
+	public void setHistorico(boolean historico) {
+		this.historico = historico;
+	}
+	
+	public EventoItem anio(String anio) {
+		this.anio = anio;
+		return this;
+	}
+
+	@JsonProperty("anio")	
+	public String getAnio() {
+		return anio;
+	}
+
+	public void setAnio(String anio) {
+		this.anio = anio;
+	}
 	
 }

@@ -283,3 +283,4 @@ siga-core/target/
 .sonarlint/default/.sonartmp_4754965096649163948/sonarlint-slf4j-sonar-log714933638343291100.jar
 .sonarlint/
 siga-web/.sts4-cache/
+siga-core/.sts4-cache/classpath-data.json

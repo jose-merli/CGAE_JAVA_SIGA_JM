@@ -1,7 +1,6 @@
 package org.itcgae.siga.db.services.age.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.mappers.AgeCalendarioSqlProvider;
 
 public class AgeCalendarioSqlExtendsProvider extends AgeCalendarioSqlProvider {
@@ -53,8 +52,7 @@ public class AgeCalendarioSqlExtendsProvider extends AgeCalendarioSqlProvider {
 						+ perfiles + ")");
 
 		sql.INNER_JOIN("AGE_TIPOCALENDARIO TIPOCALENDAR ON TIPOCALENDAR.IDTIPOCALENDARIO = AGE.IDTIPOCALENDARIO");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOCALENDAR.DESCRIPCION AND rec.IDLENGUAJE = '"
-				+ idLenguaje + "')");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOCALENDAR.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
 
 		sql.WHERE("AGE.IDINSTITUCION = '" + String.valueOf(idInstitucion) + "'");
 
@@ -144,12 +142,9 @@ public class AgeCalendarioSqlExtendsProvider extends AgeCalendarioSqlProvider {
 		sql.LEFT_OUTER_JOIN("FOR_EVENTO_CURSO EC ON EC.IDEVENTO = EVENTO.IDEVENTO");
 
 		sql.INNER_JOIN("AGE_TIPOEVENTOS TIPOEVENTOS ON TIPOEVENTOS.IDTIPOEVENTO = EVENTO.IDTIPOEVENTO");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOEVENTOS.DESCRIPCION AND rec.IDLENGUAJE = '"
-				+ idLenguaje + "')");
-		sql.LEFT_OUTER_JOIN("AGE_ESTADOEVENTOS ESTADOEVENTOS ON ESTADOEVENTOS.IDESTADOEVENTO = EVENTO.IDESTADOEVENTO");
-		sql.LEFT_OUTER_JOIN(
-				"GEN_RECURSOS_CATALOGOS rec2 ON (rec2.IDRECURSO = ESTADOEVENTOS.DESCRIPCION AND rec2.IDLENGUAJE = '"
-						+ idLenguaje + "')");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOEVENTOS.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
+		sql.INNER_JOIN("AGE_ESTADOEVENTOS ESTADOEVENTOS ON ESTADOEVENTOS.IDESTADOEVENTO = EVENTO.IDESTADOEVENTO");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec2 ON (rec2.IDRECURSO = ESTADOEVENTOS.DESCRIPCION AND rec2.IDLENGUAJE = '" + idLenguaje +"')");
 
 		sql.WHERE("AGE.IDINSTITUCION = '" + String.valueOf(idInstitucion) + "'");
 		sql.WHERE("AGE.IDCALENDARIO = '" + idCalendario + "'");
@@ -165,8 +160,7 @@ public class AgeCalendarioSqlExtendsProvider extends AgeCalendarioSqlProvider {
 		return sql.toString();
 	}
 
-	public String getCalendarioEventosIsColegiado(Short idInstitucion, String perfiles, String idCalendario,
-			Long idPersona, String idLenguaje) {
+	public String getCalendarioEventosIsColegiado(Short idInstitucion, String perfiles, String idCalendario, Long idPersona, String idLenguaje) {
 
 		SQL sql = new SQL();
 
@@ -209,14 +203,9 @@ public class AgeCalendarioSqlExtendsProvider extends AgeCalendarioSqlProvider {
 		sql.INNER_JOIN("FOR_INSCRIPCION ins on eventoCurso.idCurso = ins.idCurso and ins.idestadoinscripcion = '3'");
 
 		sql.INNER_JOIN("AGE_TIPOEVENTOS TIPOEVENTOS ON TIPOEVENTOS.IDTIPOEVENTO = EVENTO.IDTIPOEVENTO");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOEVENTOS.DESCRIPCION AND rec.IDLENGUAJE = '"
-				+ idLenguaje + "')");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOEVENTOS.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
 		sql.INNER_JOIN("AGE_ESTADOEVENTOS ESTADOEVENTOS ON ESTADOEVENTOS.IDESTADOEVENTO = EVENTO.IDESTADOEVENTO");
-		sql.INNER_JOIN(
-				"GEN_RECURSOS_CATALOGOS rec2 ON (rec2.IDRECURSO = ESTADOEVENTOS.DESCRIPCION AND rec2.IDLENGUAJE = '"
-						+ idLenguaje + "')");
-		sql.LEFT_OUTER_JOIN(
-				"CEN_INSTITUCION CEN_INSTITUCION ON CEN_INSTITUCION.IDINSTITUCION = AGE_EVENTO.IDINSTITUCION");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec2 ON (rec2.IDRECURSO = ESTADOEVENTOS.DESCRIPCION AND rec2.IDLENGUAJE = '" + idLenguaje +"')");
 
 
 		 sql.WHERE("AGE.IDINSTITUCION = '" + String.valueOf(idInstitucion) + "'");

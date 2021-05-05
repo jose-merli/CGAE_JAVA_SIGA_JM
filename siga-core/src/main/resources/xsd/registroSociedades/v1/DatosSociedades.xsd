@@ -2,711 +2,782 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	xmlns="urn:registroSociedades.ws.sspp.itcgae.org" targetNamespace="urn:registroSociedades.ws.sspp.itcgae.org"
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:complexType name="ResponseListaSociedades" />
-	<xs:complexType name="ErrorType">
-		<xs:sequence>
-			<xs:element ref="error" />
-			<xs:element name="xmlError" type="xs:string" />
-		</xs:sequence>
-	</xs:complexType>
-	<!--Elemento Nombre -->
-	<xs:simpleType name="tipoNombre">
-		<xs:annotation>
-			<xs:documentation>Nombre Persona</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="50" />
-		</xs:restriction>
+	
+  <xs:complexType name="ResponseListaSociedades"/>
+  <xs:complexType name="ErrorType">
+    <xs:sequence>
+      <xs:element ref="error"/>
+      <xs:element name="xmlError" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--Elemento Nombre  -->
+  <xs:simpleType name="tipoNombre">
+    <xs:annotation>
+      <xs:documentation>Nombre Persona</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="200"/>
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!--Elemento Apellidos  -->
+  <xs:simpleType name="tipoApellidos">
+    <xs:annotation>
+      <xs:documentation>Apellidos de la Persona</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!--Elemento Sexo -->
+  <xs:simpleType name="tipoSexo">
+    <xs:annotation>
+      <xs:documentation>Sexo de la persona</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1"/>
+      <xs:enumeration value="H"/>
+      <xs:enumeration value="M"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tipoBoolean">
+    <xs:annotation>
+      <xs:documentation>Boolean: 0-false, 1-true</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1"/>
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="codigoColegio">
+    <xs:annotation>
+      <xs:documentation>Codigo del Colegio según TC del CGPJ</xs:documentation>
+    </xs:annotation>
+     <xs:simpleType>
+     	<xs:restriction base="xs:string">
+        	<xs:length value="6"/>
+        </xs:restriction>
+     </xs:simpleType>
+  </xs:element>
+  <xs:element name="numeroPeticion" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>Identificador de petición. El formato será: yyyyMMddHHmmssSSS</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:attribute name="publicar" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>Indica si se debe publicar el dato o no</xs:documentation>
+    </xs:annotation>
+  </xs:attribute>
+  <xs:attribute name="socio" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>Indica un integrante de la sociedad es socio o no</xs:documentation>
+    </xs:annotation>
+  </xs:attribute>
+  <xs:element name="versionEsquema" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>Indica la versión del xsd con la que se trabaja</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="colegio">
+    <xs:annotation>
+      <xs:documentation>Colegio del que se solicitan los cambios</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="codigoColegio"/>
+        <xs:element name="descripcionColegio" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Nombre o descripción del colegio</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="datosRegistro">
+    <xs:annotation>
+      <xs:documentation>Datos de la inscripción/Cancelación de la sociedad en el registro mercantil</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="fechaInscripcion" type="xs:date" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Fecha de registro</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="numeroRegistro" minOccurs="0" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Numero del registro</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="identificacionRegistro" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Identificacion del registro provincial</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="fechaCancelacion" type="xs:date" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Fecha de baja en el registro</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="string20MinLength3">
+	<xs:annotation>
+	<xs:documentation>Tipo string de longitud máxima de 20 y mínima 3</xs:documentation>
+	</xs:annotation>
+	<xs:restriction base="xs:string">
+	<xs:maxLength value="20"/>
+	<xs:minLength value="3"/>
+	</xs:restriction>
 	</xs:simpleType>
-	<!--Elemento Apellidos -->
-	<xs:simpleType name="tipoApellidos">
-		<xs:annotation>
-			<xs:documentation>Apellidos de la Persona</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="50" />
-		</xs:restriction>
-	</xs:simpleType>
-	<!--Elemento Sexo -->
-	<xs:simpleType name="tipoSexo">
-		<xs:annotation>
-			<xs:documentation>Sexo de la persona</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="1" />
-			<xs:enumeration value="H" />
-			<xs:enumeration value="M" />
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:simpleType name="tipoBoolean">
-		<xs:annotation>
-			<xs:documentation>Boolean: 0-false, 1-true</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="1" />
-			<xs:enumeration value="0" />
-			<xs:enumeration value="1" />
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:element name="codigoColegio" type="string6">
-		<xs:annotation>
-			<xs:documentation>Codigo del Colegio según TC del CGPJ
-			</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="numeroPeticion" type="xs:string">
-		<xs:annotation>
-			<xs:documentation>Identificador de petición. El formato será:
-				yyyyMMddHHmmssSSS</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:attribute name="publicar" type="xs:boolean">
-		<xs:annotation>
-			<xs:documentation>Indica si se debe publicar el dato o no
-			</xs:documentation>
-		</xs:annotation>
-	</xs:attribute>
-	<xs:attribute name="socio" type="xs:boolean">
-		<xs:annotation>
-			<xs:documentation>Indica un integrante de la sociedad es socio o no
-			</xs:documentation>
-		</xs:annotation>
-	</xs:attribute>
-	<xs:element name="versionEsquema" type="xs:string">
-		<xs:annotation>
-			<xs:documentation>Indica la versión del xsd con la que se trabaja
-			</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="colegio">
-		<xs:annotation>
-			<xs:documentation>Colegio del que se solicitan los cambios
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="codigoColegio" />
-				<xs:element name="descripcionColegio" type="xs:string"
-					minOccurs="0">
-					<xs:annotation>
-						<xs:documentation>Nombre o descripción del colegio
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="datosRegistro">
-		<xs:annotation>
-			<xs:documentation>Datos de la inscripción/Cancelación de la sociedad
-				en el registro mercantil</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="fechaInscripcion" type="xs:date">
-					<xs:annotation>
-						<xs:documentation>Fecha de registro</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="numeroRegistro" type="xs:string">
-					<xs:annotation>
-						<xs:documentation>Numero del registro</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="identificacionRegistro" type="xs:string">
-					<xs:annotation>
-						<xs:documentation>Identificacion del registro provincial
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="fechaCancelacion" type="xs:date"
-					minOccurs="0">
-					<xs:annotation>
-						<xs:documentation>Fecha de baja en el registro</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:simpleType name="string20">
-		<xs:annotation>
-			<xs:documentation>Tipo string de longitud máxima de 20
-			</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="20" />
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:simpleType name="string6">
-		<xs:annotation>
-			<xs:documentation>Tipo string de longitud máxima de 6
-			</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="6" />
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:simpleType name="string100">
-		<xs:annotation>
-			<xs:documentation>Tipo string de longitud máxima de 100
-			</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="100" />
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:element name="fechaDesde" type="xs:dateTime">
-		<xs:annotation>
-			<xs:documentation>Fecha desde la que se solicitan los cambios.
-			</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="fechaHasta" type="xs:dateTime">
-		<xs:annotation>
-			<xs:documentation>Fecha hasta donde se solicitan los cambios
-			</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="conPaginacion" type="xs:boolean">
-		<xs:annotation>
-			<xs:documentation>Indica si se desea paginacion o no
-			</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="numPagina" type="xs:short">
-		<xs:annotation>
-			<xs:documentation>Número de página que se envía</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="numTotalPaginas" type="xs:short">
-		<xs:annotation>
-			<xs:documentation>Número total de páginas que se envía con el mismo
-				número de petición</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="numElementosPagina" type="xs:short">
-		<xs:annotation>
-			<xs:documentation>Número de elementos por página</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="identificacion">
-		<xs:annotation>
-			<xs:documentation>Identificación de una persona</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:choice>
-				<xs:element name="NIF">
-					<xs:annotation>
-						<xs:documentation>NIF de la persona</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:length value="9" />
-							<xs:pattern value="\d{1,8}[A-Za-z]" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-				<xs:element name="NIE">
-					<xs:annotation>
-						<xs:documentation>NIE de la persona</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:length value="9" />
-							<xs:pattern value="[X-Zx-z]\d{1,7}[A-Za-z]" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-			</xs:choice>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="datosCargo">
-		<xs:annotation>
-			<xs:documentation>Información del cargo de un admninistrador o
-				respresentante</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="cargo">
-					<xs:annotation>
-						<xs:documentation>Cargo del administrador o representante
-						</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="string100" />
-					</xs:simpleType>
-				</xs:element>
-				<xs:element name="fechaCargo" type="xs:date">
-					<xs:annotation>
-						<xs:documentation>Fecha desde la que tiene el cargo
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="descCargo">
-					<xs:annotation>
-						<xs:documentation>descripción en texto del cargo
-						</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:maxLength value="1000" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="profesionalAbogado">
-		<xs:annotation>
-			<xs:documentation>Información del profesional cuando es abogado
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="colegio" />
-				<xs:element name="numColegiado">
-					<xs:annotation>
-						<xs:documentation>Número de Colegiado</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:maxLength value="6" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="profesional">
-		<xs:annotation>
-			<xs:documentation>Información del profesional cuando es abogado
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="profesion">
-					<xs:annotation>
-						<xs:documentation>Profesion del profesional</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="string20" />
-					</xs:simpleType>
-				</xs:element>
-				<xs:choice>
-					<xs:element ref="colegio" />
-					<xs:element name="nombreColegio" type="string100" />
-				</xs:choice>
-				<xs:element name="numColegiado">
-					<xs:annotation>
-						<xs:documentation>Número de Colegiado</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:maxLength value="6" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="datosProfesional">
-		<xs:annotation>
-			<xs:documentation>Información del profesional</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:choice>
-				<xs:element ref="profesionalAbogado" />
-				<xs:element ref="profesional" />
-			</xs:choice>
-		</xs:complexType>
-	</xs:element>
-	<xs:complexType name="datosPersona">
-		<xs:annotation>
-			<xs:documentation>Datos del integrante de la sociedad cuando este es
-				un apersona físisca</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="nombre" type="tipoNombre">
-				<xs:annotation>
-					<xs:documentation>Nombre del socio</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="apellido1" type="tipoApellidos">
-				<xs:annotation>
-					<xs:documentation>Primer apellido del socio</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="apellido2" type="tipoApellidos"
-				minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Segundo apellido del socio</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element ref="identificacion" />
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="datosEntidad">
-		<xs:annotation>
-			<xs:documentation>Datos de una entidad jurídica</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="CIF_NIF">
-				<xs:annotation>
-					<xs:documentation>CIF de la sociedad</xs:documentation>
-				</xs:annotation>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:length value="9" />
-						<xs:pattern value="[XYZxyz]?[0-9]{7,8}[a-zA-Z]" />
-						<xs:pattern value="[a-zA-Z][0-9]{7}[a-zA-Z0-9]" />
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
-			<xs:element name="denominacion">
-				<xs:annotation>
-					<xs:documentation>Denominación de la sociedad</xs:documentation>
-				</xs:annotation>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:maxLength value="500" />
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
-			<xs:element name="formaSocial" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Forma social de la denominación o razon social
-					</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:simpleContent>
-						<xs:extension base="string20" />
-					</xs:simpleContent>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:element name="integranteSociedad">
-		<xs:annotation>
-			<xs:documentation>Información de un integrante de la sociedad
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:choice>
-					<xs:element name="integranteFisico">
-						<xs:annotation>
-							<xs:documentation>Fecha de modificación del integrante
-							</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="datosPersona" type="datosPersona" />
-								<xs:element ref="datosProfesional" minOccurs="0" />
-								<xs:element ref="datosCargo" minOccurs="0" />
-							</xs:sequence>
-							<xs:attribute ref="socio" use="required" />
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="integranteJuridico">
-						<xs:annotation>
-							<xs:documentation>Integrantes de la sociedad de etipo Jurídico
-							</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="datosEntidad" type="datosEntidad" />
-								<xs:element ref="datosCargo" />
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-				</xs:choice>
-				<xs:element name="fechaModificacion" type="xs:dateTime">
-					<xs:annotation>
-						<xs:documentation>Fecha de modificación del integrante
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-			</xs:sequence>
-			<xs:attribute ref="publicar" use="required" />
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="error">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="codRetorno" type="xs:string">
-					<xs:annotation>
-						<xs:documentation>Código de error</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="descRetorno" type="xs:string">
-					<xs:annotation>
-						<xs:documentation>Descripción del error</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="contacto">
-		<xs:annotation>
-			<xs:documentation>Número de contacto de la sociedad
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:choice>
-				<xs:element name="telefono">
-					<xs:annotation>
-						<xs:documentation>Número de teléfono de la sociedad
-						</xs:documentation>
-					</xs:annotation>
-					<xs:complexType>
-						<xs:simpleContent>
-							<xs:extension base="string20">
-								<xs:attribute ref="publicar" use="required" />
-							</xs:extension>
-						</xs:simpleContent>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="telefonoMovil">
-					<xs:annotation>
-						<xs:documentation>Número de teléfono móvil de la sociedad
-						</xs:documentation>
-					</xs:annotation>
-					<xs:complexType>
-						<xs:simpleContent>
-							<xs:extension base="string20">
-								<xs:attribute ref="publicar" use="required" />
-							</xs:extension>
-						</xs:simpleContent>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="fax">
-					<xs:annotation>
-						<xs:documentation>Número de fax de la sociedad</xs:documentation>
-					</xs:annotation>
-					<xs:complexType>
-						<xs:simpleContent>
-							<xs:extension base="string20">
-								<xs:attribute ref="publicar" use="required" />
-							</xs:extension>
-						</xs:simpleContent>
-					</xs:complexType>
-				</xs:element>
-			</xs:choice>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="direccion">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="descTipoVia" minOccurs="0">
-					<xs:annotation>
-						<xs:documentation>Descripción del tipo de vía del domicilio
-						</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:maxLength value="15" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-				<xs:element name="domicilio">
-					<xs:annotation>
-						<xs:documentation>Domicilio de la sociedad</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:maxLength value="100" />
-							<xs:minLength value="3" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-				<xs:element name="codigoPostal">
-					<xs:annotation>
-						<xs:documentation>Código postal del domicilio de la sociedad
-						</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:maxLength value="5" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-				<xs:element name="provincia">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="codigoProvincia">
-								<xs:annotation>
-									<xs:documentation>Código de la provincia</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="100" />
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="descripcionProvincia" minOccurs="0">
-								<xs:annotation>
-									<xs:documentation>Descripción de la provincia
-									</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="100" />
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="poblacion">
-					<xs:complexType>
-						<xs:choice>
-							<xs:sequence>
-								<xs:element name="codigoPoblacion" type="xs:string">
-									<xs:annotation>
-										<xs:documentation>Código población</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-								<xs:element name="descripcionPoblacion" minOccurs="0">
-									<xs:annotation>
-										<xs:documentation>Descripción de la población
-										</xs:documentation>
-									</xs:annotation>
-									<xs:simpleType>
-										<xs:restriction base="xs:string">
-											<xs:maxLength value="100" />
-										</xs:restriction>
-									</xs:simpleType>
-								</xs:element>
-							</xs:sequence>
-							<xs:sequence>
-								<xs:element name="descripcion">
-									<xs:annotation>
-										<xs:documentation>Descripción de la población
-										</xs:documentation>
-									</xs:annotation>
-									<xs:simpleType>
-										<xs:restriction base="xs:string">
-											<xs:maxLength value="100" />
-										</xs:restriction>
-									</xs:simpleType>
-								</xs:element>
-							</xs:sequence>
-						</xs:choice>
-					</xs:complexType>
-				</xs:element>
-				<xs:element ref="contacto" minOccurs="1" maxOccurs="unbounded" />
-				<xs:element name="correoElectronico" minOccurs="0">
-					<xs:annotation>
-						<xs:documentation>Correo electrónico de la sociedad
-						</xs:documentation>
-					</xs:annotation>
-					<xs:complexType>
-						<xs:simpleContent>
-							<xs:extension base="string100">
-								<xs:attribute ref="publicar" use="required" />
-							</xs:extension>
-						</xs:simpleContent>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="paginaWeb" minOccurs="0">
-					<xs:annotation>
-						<xs:documentation>Pagina web de la sociedad</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:maxLength value="300" />
-							<xs:minLength value="5" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-			</xs:sequence>
-			<xs:attribute ref="publicar" use="required" />
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="registroSociedad">
-		<xs:complexType>
-			<xs:choice>
-				<xs:element ref="sociedadActualizacion" />
-				<xs:element ref="sociedadBaja" />
-			</xs:choice>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="sociedadBaja">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="CIF_NIF">
-					<xs:annotation>
-						<xs:documentation>CIF de la sociedad</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:length value="9" />
-							<xs:pattern value="[XYZxyz]?[0-9]{7,8}[a-zA-Z]" />
-							<xs:pattern value="[a-zA-Z][0-9]{7}[a-zA-Z0-9]" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-				<xs:element name="fechaBajaColegio" type="xs:date">
-					<xs:annotation>
-						<xs:documentation>Fecha de constitucion de la sociedad
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="sociedadActualizacion">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="datosSociedad" type="datosEntidad" />
-				<xs:element name="fechaConstitucion" type="xs:date">
-					<xs:annotation>
-						<xs:documentation>Fecha de constitucion de la sociedad
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="fechaAlta" type="xs:date">
-				  <xs:annotation>
-				    <xs:documentation>Fecha de alta de la sociedad en el colegio</xs:documentation>
-				  </xs:annotation>
-				</xs:element>
-				<xs:element name="fechaFin" type="xs:date" minOccurs="0">
-					<xs:annotation>
-						<xs:documentation>Fecha de fin de sociedad</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="resena">
-					<xs:annotation>
-						<xs:documentation>resena de la sociedad</xs:documentation>
-					</xs:annotation>
-					<xs:complexType>
-						<xs:simpleContent>
-							<xs:extension base="string100" />
-						</xs:simpleContent>
-					</xs:complexType>
-				</xs:element>
-				<xs:element ref="direccion" />
-				<xs:element name="objetoSocial" minOccurs="0">
-					<xs:annotation>
-						<xs:documentation>Objeto social de la sociedad</xs:documentation>
-					</xs:annotation>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:maxLength value="500" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:element>
-				<xs:element name="datosNotario" type="datosPersona">
-					<xs:annotation>
-						<xs:documentation>Datos del notario que inscribe la sociedad
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element ref="datosRegistro" />
-				<xs:element ref="integranteSociedad" minOccurs="1"
-					maxOccurs="unbounded" />
-			</xs:sequence>
-			<xs:attribute ref="publicar" use="required" />
-		</xs:complexType>
-	</xs:element>
+  <xs:simpleType name="string20MinLength9">
+    <xs:annotation>
+      <xs:documentation>Tipo string de longitud máxima de 20 y mínima 9</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="20"/>
+      <xs:minLength value="9"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="string20MinLength6">
+    <xs:annotation>
+      <xs:documentation>Tipo string de longitud máxima de 20 y mínima 6</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="20"/>
+      <xs:minLength value="6"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="string20">
+    <xs:annotation>
+      <xs:documentation>Tipo string de longitud máxima de 20</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="20"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="string6">
+    <xs:annotation>
+      <xs:documentation>Tipo string de longitud máxima de 6</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="6"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="string100">
+    <xs:annotation>
+      <xs:documentation>Tipo string de longitud máxima de 100</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="fechaDesde" type="xs:dateTime">
+    <xs:annotation>
+      <xs:documentation>Fecha desde la que se solicitan los cambios.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="fechaHasta" type="xs:dateTime">
+    <xs:annotation>
+      <xs:documentation>Fecha hasta donde se solicitan los cambios</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="conPaginacion" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>Indica si se desea paginacion o no</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="numPagina" type="xs:short">
+    <xs:annotation>
+      <xs:documentation>Número de página que se envía</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="numTotalPaginas" type="xs:short">
+    <xs:annotation>
+      <xs:documentation>Número total de páginas que se envía con el mismo número de petición</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="numElementosPagina" type="xs:short">
+    <xs:annotation>
+      <xs:documentation>Número de elementos por página</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="identificacion">
+    <xs:annotation>
+      <xs:documentation>Identificación de una persona</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="NIF">
+          <xs:annotation>
+            <xs:documentation>NIF de la persona</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:length value="9"/>
+              <xs:pattern value="\d{1,8}[A-Za-z]"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="NIE">
+          <xs:annotation>
+            <xs:documentation>NIE de la persona</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:length value="9"/>
+              <xs:pattern value="[X-Zx-z]\d{1,7}[A-Za-z]"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="datosCargo">
+    <xs:annotation>
+      <xs:documentation>Información del cargo de un admninistrador o respresentante</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="cargo">
+          <xs:annotation>
+            <xs:documentation>Cargo del administrador o representante</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+      			<xs:maxLength value="100"/>
+      			<xs:minLength value="1"/>
+    		</xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="fechaCargo" type="xs:date" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Fecha desde la que tiene el cargo</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="descCargo" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>descripción en texto del cargo</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:maxLength value="1000"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="profesionalAbogado">
+    <xs:annotation>
+      <xs:documentation>Información del profesional cuando es abogado</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="colegio"/>
+        <xs:element name="numColegiado">
+          <xs:annotation>
+            <xs:documentation>Número de Colegiado</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:maxLength value="6"/>
+              <xs:minLength value="1"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="profesionalAbogadoPropio">
+    <xs:annotation>
+      <xs:documentation>Información del profesional cuando es abogado del propio colegio</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="identificacion"/>
+        <xs:element ref="colegio"/>
+        <xs:element name="numColegiado">
+          <xs:annotation>
+            <xs:documentation>Número de Colegiado</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:maxLength value="6"/>
+              <xs:minLength value="1"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="profesional">
+    <xs:annotation>
+      <xs:documentation>Información del profesional cuando es abogado</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="profesion">
+          <xs:annotation>
+            <xs:documentation>Profesion del profesional</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="string20MinLength3"/>
+          </xs:simpleType>
+        </xs:element>
+        <xs:choice  minOccurs="0">
+          <xs:element ref="colegio"/>
+          <xs:element name="nombreColegio"  type="string100"/>
+        </xs:choice>
+        <xs:element name="numColegiado" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Número de Colegiado</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:maxLength value="6"/>
+              <xs:minLength value="3"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="datosProfesional">
+    <xs:annotation>
+      <xs:documentation>Información del profesional</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="profesionalAbogado"/>
+        <xs:element ref="profesionalAbogadoPropio"/>
+        <xs:element ref="profesional"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="datosPersona">
+    <xs:annotation>
+      <xs:documentation>Datos del integrante de la sociedad cuando este es un apersona físisca</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="nombre" type="tipoNombre">
+        <xs:annotation>
+          <xs:documentation>Nombre del socio</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="apellido1" type="tipoApellidos" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Primer apellido del socio</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="apellido2" type="tipoApellidos" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Segundo apellido del socio</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element ref="identificacion" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datosEntidad">
+    <xs:annotation>
+      <xs:documentation>Datos de una entidad jurídica</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="CIF_NIF">
+        <xs:annotation>
+          <xs:documentation>CIF de la sociedad</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="9"/>
+            <xs:pattern value="[XYZxyz]?[0-9]{7,8}[a-zA-Z]"/>
+            <xs:pattern value="[a-zA-Z][0-9]{7}[a-zA-Z0-9]"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="denominacion">
+        <xs:annotation>
+          <xs:documentation>Denominación de la sociedad</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="500"/>
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="formaSocial" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Forma social de la denominación o razon social</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="string20"/>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="integranteSociedad">
+    <xs:annotation>
+      <xs:documentation>Información de un integrante de la sociedad</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:element name="integranteFisico">
+            <xs:annotation>
+              <xs:documentation>Fecha de modificación del integrante</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="datosPersona" type="datosPersona"/>
+                <xs:element ref="datosProfesional" minOccurs="0"/>
+                <xs:element ref="datosCargo" minOccurs="0"/>
+              </xs:sequence>
+              <xs:attribute ref="socio" use="required"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="integranteJuridico">
+            <xs:annotation>
+              <xs:documentation>Integrantes de la sociedad de etipo Jurídico</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="datosEntidad" type="datosEntidad"/>
+                <xs:element ref="datosCargo"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+        <xs:element name="fechaModificacion" type="xs:dateTime">
+          <xs:annotation>
+            <xs:documentation>Fecha de modificación del integrante</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute ref="publicar" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="error">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="codRetorno" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Código de error</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="descRetorno" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Descripción del error</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="contacto">
+    <xs:annotation>
+      <xs:documentation>Número de contacto de la sociedad</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+         <xs:element name="telefono">
+          <xs:annotation>
+            <xs:documentation>Número de teléfono de la sociedad</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="string20MinLength6">
+                <xs:attribute ref="publicar" use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="telefonoMovil">
+          <xs:annotation>
+            <xs:documentation>Número de teléfono móvil de la sociedad</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="string20MinLength9">
+                <xs:attribute ref="publicar" use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="fax">
+          <xs:annotation>
+            <xs:documentation>Número de fax de la sociedad</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="string20MinLength6">
+                <xs:attribute ref="publicar" use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="direccion">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="descTipoVia" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Descripción del tipo de vía del domicilio</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:maxLength value="15"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="domicilio">
+          <xs:annotation>
+            <xs:documentation>Domicilio de la sociedad</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:maxLength value="100"/>
+              <xs:minLength value="3"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="codigoPostal">
+          <xs:annotation>
+            <xs:documentation>Código postal del domicilio de la sociedad</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:length value="5"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="provincia">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="codigoProvincia">
+                <xs:annotation>
+                  <xs:documentation>Código de la provincia</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:length value="2"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="descripcionProvincia" minOccurs="0">
+                <xs:annotation>
+                  <xs:documentation>Descripción de la provincia</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="poblacion">
+          <xs:complexType>
+            <xs:choice>
+              <xs:sequence>
+                <xs:element name="codigoPoblacion">
+                  <xs:annotation>
+                    <xs:documentation>Código población</xs:documentation>
+                  </xs:annotation>
+                   <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:length value="11"/>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:element>
+                <xs:element name="descripcionPoblacion" minOccurs="0">
+                  <xs:annotation>
+                    <xs:documentation>Descripción de la población</xs:documentation>
+                  </xs:annotation>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="100"/>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:element>
+              </xs:sequence>
+              <xs:sequence>
+                <xs:element name="descripcion">
+                  <xs:annotation>
+                    <xs:documentation>Descripción de la población</xs:documentation>
+                  </xs:annotation>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="100"/>
+                      <xs:minLength value="1"/>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:element>
+              </xs:sequence>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="contacto" minOccurs="1" maxOccurs="unbounded"/>
+        <xs:element name="correoElectronico" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Correo electrónico de la sociedad</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="string100">
+                <xs:attribute ref="publicar" use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="paginaWeb" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Pagina web de la sociedad</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:maxLength value="300"/>
+              <xs:minLength value="5"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute ref="publicar" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="registroSociedad">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="sociedadActualizacion"/>
+        <xs:element ref="sociedadBaja"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sociedadBaja">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="CIF_NIF">
+          <xs:annotation>
+            <xs:documentation>CIF de la sociedad</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:length value="9"/>
+              <xs:pattern value="[XYZxyz]?[0-9]{7,8}[a-zA-Z]"/>
+              <xs:pattern value="[a-zA-Z][0-9]{7}[a-zA-Z0-9]"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="fechaBajaColegio" type="xs:date">
+          <xs:annotation>
+            <xs:documentation>Fecha de constitucion de la sociedad</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sociedadActualizacion">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="datosSociedad" type="datosEntidad"/>
+        <xs:element name="fechaConstitucion" type="xs:date">
+          <xs:annotation>
+            <xs:documentation>Fecha de constitucion de la sociedad</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="fechaAlta" type="xs:date">
+          <xs:annotation>
+            <xs:documentation>Fecha de alta de la sociedad en el colegio</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="fechaFin" type="xs:date" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Fecha de fin de sociedad</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="resena">
+          <xs:annotation>
+            <xs:documentation>resena de la sociedad</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+          	<xs:restriction base="xs:string">
+      			<xs:maxLength value="100"/>
+      			<xs:minLength value="3"/>
+    		</xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element ref="direccion"/>
+        <xs:element name="objetoSocial" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Objeto social de la sociedad</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:maxLength value="500"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="datosNotario" type="datosPersona" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Datos del notario que inscribe la sociedad</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element minOccurs="0" ref="datosRegistro"/>
+        <xs:element ref="integranteSociedad" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute ref="publicar" use="required"/>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

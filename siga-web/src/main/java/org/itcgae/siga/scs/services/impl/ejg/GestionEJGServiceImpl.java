@@ -1583,4 +1583,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return responsedto;
 	}
 
+	@Override
+	public UpdateResponseDTO actualizaDatosGenerales(EjgItem datos, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

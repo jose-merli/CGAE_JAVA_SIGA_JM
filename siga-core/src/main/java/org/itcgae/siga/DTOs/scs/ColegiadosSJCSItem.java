@@ -1,5 +1,6 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,7 +16,7 @@ public class ColegiadosSJCSItem {
 	private String inscritoturno;
 	private String inscritoguardia;
 	private String guardiasPendientes;
-	private String idTurno;
+	private String[] idTurno;
 	private String idInstitucion;
 	private Long usuModificacion;
 	private Date fechaModificacion;
@@ -28,12 +29,14 @@ public class ColegiadosSJCSItem {
 	private String codigoExt;
 	private String email;
 	private String nombrePoblacion;
-	private String idGuardia;
+	private String[] idGuardia;
 	private String telefono;
 	private String abreviatura;
 	private String idPersona;
 	private String nComunitario;
 	private boolean residente;
+	private String tieneGuardia;
+	private String tieneTurno;
 
 	@JsonProperty("abreviatura")
 	public String getAbreviatura() {
@@ -108,20 +111,20 @@ public class ColegiadosSJCSItem {
 	}
 
 	@JsonProperty("idGuardia")
-	public String getIdGuardia() {
+	public String[] getIdGuardia() {
 		return idGuardia;
 	}
 
-	public void setIdGuardia(String idGuardia) {
+	public void setIdGuardia(String[] idGuardia) {
 		this.idGuardia = idGuardia;
 	}
 
 	@JsonProperty("idTurno")
-	public String getIdTurno() {
+	public String[] getIdTurno() {
 		return idTurno;
 	}
 
-	public void setIdTurno(String idTurno) {
+	public void setIdTurno(String[] idTurno) {
 		this.idTurno = idTurno;
 	}
 
@@ -374,6 +377,74 @@ public class ColegiadosSJCSItem {
 	public void setnComunitario(String nComunitario) {
 		this.nComunitario = nComunitario;
 	}
+	
+	
+
+	/**
+	 * @return the tieneGuardia
+	 */
+	public String getTieneGuardia() {
+		return tieneGuardia;
+	}
+
+	/**
+	 * @param tieneGuardia the tieneGuardia to set
+	 */
+	public void setTieneGuardia(String tieneGuardia) {
+		this.tieneGuardia = tieneGuardia;
+	}
+
+	/**
+	 * @return the tieneTurno
+	 */
+	public String getTieneTurno() {
+		return tieneTurno;
+	}
+
+	/**
+	 * @param tieneTurno the tieneTurno to set
+	 */
+	public void setTieneTurno(String tieneTurno) {
+		this.tieneTurno = tieneTurno;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("class PrisionItem {\n");
+
+		sb.append("    idProcurador: ").append(toIndentedString(idProcurador)).append("\n");
+		sb.append("    nombre: ").append(toIndentedString(nombre)).append("\n");
+		sb.append("    usuModificacion: ").append(toIndentedString(usuModificacion)).append("\n");
+		sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
+		sb.append("    codigoPostal: ").append(toIndentedString(codigoPostal)).append("\n");
+		sb.append("    idPoblacion: ").append(toIndentedString(idPoblacion)).append("\n");
+		sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
+		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
+		sb.append("    historico: ").append(toIndentedString(historico)).append("\n");
+		sb.append("    codigoExt: ").append(toIndentedString(codigoExt)).append("\n");
+		sb.append("    email: ").append(toIndentedString(email)).append("\n");
+		sb.append("    nombrePoblacion: ").append(toIndentedString(nombrePoblacion)).append("\n");
+		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
+		sb.append("    nComunitario: ").append(toIndentedString(nComunitario)).append("\n");
+		sb.append("    residente: ").append(toIndentedString(residente)).append("\n");
+		sb.append("    tieneGuardia: ").append(toIndentedString(tieneGuardia)).append("\n");
+		sb.append("    tieneTurno: ").append(toIndentedString(tieneTurno)).append("\n");
+
+		sb.append("}");
+		return sb.toString();
+	}
+
+	/**
+	 * Convert the given object to string with each line indented by 4 spaces
+	 * (except the first line).
+	 */
+	private String toIndentedString(java.lang.Object o) {
+		if (o == null) {
+			return "null";
+		}
+		return o.toString().replace("\n", "\n    ");
+	}
 
 	@Override
 	public int hashCode() {
@@ -390,13 +461,13 @@ public class ColegiadosSJCSItem {
 		result = prime * result + ((guardiasPendientes == null) ? 0 : guardiasPendientes.hashCode());
 		result = prime * result + (historico ? 1231 : 1237);
 		result = prime * result + ((idEstado == null) ? 0 : idEstado.hashCode());
-		result = prime * result + ((idGuardia == null) ? 0 : idGuardia.hashCode());
+		result = prime * result + Arrays.hashCode(idGuardia);
 		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
 		result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
 		result = prime * result + ((idPoblacion == null) ? 0 : idPoblacion.hashCode());
 		result = prime * result + ((idProcurador == null) ? 0 : idProcurador.hashCode());
 		result = prime * result + ((idProvincia == null) ? 0 : idProvincia.hashCode());
-		result = prime * result + ((idTurno == null) ? 0 : idTurno.hashCode());
+		result = prime * result + Arrays.hashCode(idTurno);
 		result = prime * result + ((inscritoguardia == null) ? 0 : inscritoguardia.hashCode());
 		result = prime * result + ((inscritoturno == null) ? 0 : inscritoturno.hashCode());
 		result = prime * result + ((nColegiado == null) ? 0 : nColegiado.hashCode());
@@ -406,6 +477,8 @@ public class ColegiadosSJCSItem {
 		result = prime * result + ((nombrePoblacion == null) ? 0 : nombrePoblacion.hashCode());
 		result = prime * result + (residente ? 1231 : 1237);
 		result = prime * result + ((telefono == null) ? 0 : telefono.hashCode());
+		result = prime * result + ((tieneGuardia == null) ? 0 : tieneGuardia.hashCode());
+		result = prime * result + ((tieneTurno == null) ? 0 : tieneTurno.hashCode());
 		result = prime * result + ((usuModificacion == null) ? 0 : usuModificacion.hashCode());
 		return result;
 	}
@@ -471,10 +544,7 @@ public class ColegiadosSJCSItem {
 				return false;
 		} else if (!idEstado.equals(other.idEstado))
 			return false;
-		if (idGuardia == null) {
-			if (other.idGuardia != null)
-				return false;
-		} else if (!idGuardia.equals(other.idGuardia))
+		if (!Arrays.equals(idGuardia, other.idGuardia))
 			return false;
 		if (idInstitucion == null) {
 			if (other.idInstitucion != null)
@@ -501,10 +571,7 @@ public class ColegiadosSJCSItem {
 				return false;
 		} else if (!idProvincia.equals(other.idProvincia))
 			return false;
-		if (idTurno == null) {
-			if (other.idTurno != null)
-				return false;
-		} else if (!idTurno.equals(other.idTurno))
+		if (!Arrays.equals(idTurno, other.idTurno))
 			return false;
 		if (inscritoguardia == null) {
 			if (other.inscritoguardia != null)
@@ -548,25 +615,21 @@ public class ColegiadosSJCSItem {
 				return false;
 		} else if (!telefono.equals(other.telefono))
 			return false;
+		if (tieneGuardia == null) {
+			if (other.tieneGuardia != null)
+				return false;
+		} else if (!tieneGuardia.equals(other.tieneGuardia))
+			return false;
+		if (tieneTurno == null) {
+			if (other.tieneTurno != null)
+				return false;
+		} else if (!tieneTurno.equals(other.tieneTurno))
+			return false;
 		if (usuModificacion == null) {
 			if (other.usuModificacion != null)
 				return false;
 		} else if (!usuModificacion.equals(other.usuModificacion))
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "ColegiadosSJCSItem [idProcurador=" + idProcurador + ", nombre=" + nombre + ", apellidos=" + apellidos
-				+ ", nColegiado=" + nColegiado + ", idEstado=" + idEstado + ", descripcion=" + descripcion
-				+ ", inscritoturno=" + inscritoturno + ", inscritoguardia=" + inscritoguardia + ", guardiasPendientes="
-				+ guardiasPendientes + ", idTurno=" + idTurno + ", idInstitucion=" + idInstitucion
-				+ ", usuModificacion=" + usuModificacion + ", fechaModificacion=" + fechaModificacion
-				+ ", codigoPostal=" + codigoPostal + ", idPoblacion=" + idPoblacion + ", idProvincia=" + idProvincia
-				+ ", historico=" + historico + ", fechaestado=" + fechaestado + ", nif=" + nif + ", codigoExt="
-				+ codigoExt + ", email=" + email + ", nombrePoblacion=" + nombrePoblacion + ", idGuardia=" + idGuardia
-				+ ", telefono=" + telefono + ", abreviatura=" + abreviatura + ", idPersona=" + idPersona
-				+ ", nComunitario=" + nComunitario + ", residente=" + residente + "]";
 	}
 }

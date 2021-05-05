@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.db.entities.ScsSubzonaExample;
 import org.itcgae.siga.db.mappers.ScsSubzonaSqlProvider;
 
 public class ScsSubzonaSqlExtendsProvider extends ScsSubzonaSqlProvider{
@@ -15,6 +16,24 @@ public class ScsSubzonaSqlExtendsProvider extends ScsSubzonaSqlProvider{
 
 		return sql.toString();
 	}
+	
+	public String getIdSubzona2(Short idInstitucion, String idZona) {
+		        SQL sql = new SQL();
+		        sql.SELECT("IDINSTITUCION");
+		        sql.SELECT("IDZONA");
+		        sql.SELECT("IDSUBZONA");
+		        sql.SELECT("NOMBRE");
+		        sql.SELECT("FECHAMODIFICACION");
+		        sql.SELECT("USUMODIFICACION");
+		        sql.SELECT("MUNICIPIOS");
+		        sql.SELECT("IDPARTIDO");
+		        sql.SELECT("FECHABAJA");
+		        sql.FROM("SCS_SUBZONA");
+		        sql.WHERE("((IDZONA IN ("+ idZona +" ) AND IDINSTITUCION = " + idInstitucion + " AND FECHABAJA IS NULL))");
+				sql.ORDER_BY("NOMBRE");
+		        
+		        return sql.toString();
+		    }
 	
 	public String searchSubzonas(String idZona, String idSubZona, Short idInstitucion) {
 		
@@ -33,7 +52,11 @@ public class ScsSubzonaSqlExtendsProvider extends ScsSubzonaSqlProvider{
 		sql.INNER_JOIN("cen_partidojudicial parjud on parjud.idpartido = subpar.idpartido");
 		
 		sql.WHERE("sub.idinstitucion = '" + idInstitucion + "'");
-		sql.WHERE("sub.idzona = '" + idZona + "'");
+		if(idZona.contains(",")) {
+			sql.WHERE("sub.idzona IN (" + idZona + ")");
+		}else {
+			sql.WHERE("sub.idzona = '" + idZona + "'");
+		}
 		
 		if(idSubZona != null) {
 			sql.WHERE("sub.idsubzona = '" + idSubZona + "'");

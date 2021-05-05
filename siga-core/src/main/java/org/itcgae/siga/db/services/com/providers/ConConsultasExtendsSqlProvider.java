@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 
 public class ConConsultasExtendsSqlProvider {
 	
