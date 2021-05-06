@@ -585,14 +585,9 @@ public class ComboServiceImpl implements ComboService {
 
 				for (ScsPartidapresupuestaria partida : partidas) {
 					ComboItem item = new ComboItem();
-										
-					if(!UtilidadesString.esCadenaVacia(importe) && "1".equals(importe)) {
-						item.setLabel(partida.getNombrepartida()+" - "+partida.getImportepartida().toString().replace('.', ',')+" €");
-					}else{
-						item.setLabel(partida.getNombrepartida());
-					}
-
+					item.setLabel(partida.getNombrepartida());
 					item.setValue(partida.getIdpartidapresupuestaria().toString());
+
 					comboItems.add(item);
 
 				}

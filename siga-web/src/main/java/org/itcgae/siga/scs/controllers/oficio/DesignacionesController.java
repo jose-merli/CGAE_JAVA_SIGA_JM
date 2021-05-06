@@ -882,6 +882,21 @@ public class DesignacionesController {
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/designas/compruebaFechaProcurador",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ProcuradorDTO> compruebaFechaProcurador(@RequestBody List<String> procurador, HttpServletRequest request) {
+		ProcuradorDTO response = designacionesService.compruebaFechaProcurador(procurador, request);
+		return new ResponseEntity<ProcuradorDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/designas/actualizarProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> actualizarProcurador(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.actualizarProcurador(procuradorItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 	@GetMapping("/comboPrisiones")
 	public ResponseEntity<ComboDTO> comboPrisiones(HttpServletRequest request) {
@@ -889,14 +904,12 @@ public class DesignacionesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-
 	@RequestMapping(value = "/designas/busquedaRelaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<RelacionesDTO> busquedaRelaciones(@RequestBody List<String> procurador, HttpServletRequest request) {
 		RelacionesDTO response = designacionesService.busquedaRelaciones(procurador, request);
 		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
 	}
 	
-
 	@PostMapping(value = "/designas/eliminarRelacion", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<DeleteResponseDTO> eliminarRelacion(
 			@RequestBody RelacionesItem listaRelaciones, HttpServletRequest request) {
