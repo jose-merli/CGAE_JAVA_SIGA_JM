@@ -1,12 +1,9 @@
 package org.itcgae.siga.scs.services.impl.oficio;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,24 +11,16 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesDTO;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
-import org.itcgae.siga.DTOs.scs.InscripcionesItem;
-import org.itcgae.siga.cen.services.impl.BusquedaColegiadosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBajastemporales;
 import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.ScsInscripcionguardia;
-import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
-import org.itcgae.siga.db.entities.ScsInscripcionturno;
-import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.mappers.CenBajastemporalesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsBajasTemporalesExtendsMapper;
@@ -47,16 +36,15 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 	@Autowired
 	private ScsBajasTemporalesExtendsMapper scsBajasTemporalesExtendsMapper;
+	
+    @Autowired
+    private CenBajastemporalesMapper cenBajastemporalesMapper;
+
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
-	@Autowired
-	private BusquedaColegiadosServiceImpl busquedaColegiadosServiceImpl;
-	
-	@Autowired
-	private CenBajastemporalesMapper cenBajastemporalesMapper;
-	
+
 	@Override
 	public ComboDTO comboEstado(HttpServletRequest request) {
 
@@ -143,7 +131,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	}
 	
 	@Override
-	public UpdateResponseDTO updateEstado(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request) {
+	public UpdateResponseDTO updateEstado(List<Object> bajasTemporalesItem, HttpServletRequest request) {
 		LOGGER.info("updateEstado() ->  Entrada al servicio para modificar nuevas bajas temporales");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -172,8 +160,38 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
-					for(BajasTemporalesItem bti: bajasTemporalesItem) {
-						response = scsBajasTemporalesExtendsMapper.updateBajaTemporal(bti,usuarios.get(0).getIdusuario());
+					String nombres[];
+					SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+					SimpleDateFormat format2=new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+					for(Object bti: bajasTemporalesItem) {
+						CenBajastemporales record = new CenBajastemporales();
+						java.util.LinkedHashMap bj = (java.util.LinkedHashMap)bti;
+						Set entrySet = bj.entrySet();
+						// Obtain an Iterator for the entries Set
+						Iterator it = entrySet.iterator();
+						while(it.hasNext()) {
+							nombres = it.next().toString().split("=");
+							
+							if(nombres[0].equals("validado") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+								record.setValidado(nombres[1]);
+							}
+							if(nombres[0].equals("fechabt")) {
+								Date fecha = format2.parse(nombres[1]);
+								record.setFechabt(fecha);
+							}
+							if(nombres[0].equals("idpersona")) {
+								record.setIdpersona(Long.valueOf(nombres[1]));
+							}
+							
+						}
+						
+						record.setIdinstitucion(idInstitucion); 
+						record.setUsumodificacion(usuarios.get(0).getIdusuario());
+						record.setFechamodificacion(new Date());
+						
+						response = cenBajastemporalesMapper.updateByPrimaryKeySelective(record);
+						
+						//response = scsBajasTemporalesExtendsMapper.updateBajaTemporal(bti,usuarios.get(0).getIdusuario());
 					}
 				
 				}catch (Exception e) {
@@ -236,8 +254,17 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				try {
 					
 					for(BajasTemporalesItem bti: bajasTemporalesItem) {
-						bti.setEliminado("1");
-						response = scsBajasTemporalesExtendsMapper.eliminarBaja(bti,usuarios.get(0).getIdusuario());
+						CenBajastemporales record = new CenBajastemporales();
+						
+						record.setEliminado(1);
+						record.setIdinstitucion(idInstitucion);
+						record.setFechabt(bti.getFechabt());
+						record.setIdpersona(Long.valueOf(bti.getIdpersona()));
+						record.setUsumodificacion(usuarios.get(0).getIdusuario());
+						record.setFechamodificacion(new Date());
+//						bti.setEliminado("1");
+						response = cenBajastemporalesMapper.updateByPrimaryKeySelective(record);
+						//response = scsBajasTemporalesExtendsMapper.eliminarBaja(bti,usuarios.get(0).getIdusuario());
 					}
 				}catch (Exception e) {
 					response = 0;
@@ -300,51 +327,58 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				try {
 					String nombres[];
 					SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
-					SimpleDateFormat format2=new SimpleDateFormat("dd/MM/yyyy");
+					SimpleDateFormat format2=new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 					for(Object bti: bajasTemporalesItem) {
-						BajasTemporalesItem bjtmp = new BajasTemporalesItem();
+						//BajasTemporalesItem bjtmp = new BajasTemporalesItem();
+						CenBajastemporales record = new CenBajastemporales();
 						java.util.LinkedHashMap bj = (java.util.LinkedHashMap)bti;
 						Set entrySet = bj.entrySet();
 						// Obtain an Iterator for the entries Set
 						Iterator it = entrySet.iterator();
 						while(it.hasNext()) {
 							nombres = it.next().toString().split("=");
-							if(nombres[0].equals("ncolegiado")) {
-								bjtmp.setNcolegiado(nombres[1]);
+							//if(nombres[0].equals("ncolegiado")) {
+							//	bjtmp.setNcolegiado(nombres[1]);
+							//}
+							//if(nombres[0].equals("nombre")) {
+							//	bjtmp.setNombre(nombres[1]);
+							//}
+							if(nombres[0].equals("tipo") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+								record.setTipo(nombres[1]);
 							}
-							if(nombres[0].equals("nombre")) {
-								bjtmp.setNombre(nombres[1]);
+							if(nombres[0].equals("descripcion") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+								record.setDescripcion(nombres[1]);
 							}
-							if(nombres[0].equals("tipo")) {
-								bjtmp.setTipo(nombres[1]);
+							if(nombres[0].equals("fechadesde") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+								Date fecha = format2.parse(nombres[1]);
+								record.setFechadesde(fecha);
 							}
-							if(nombres[0].equals("descripcion")) {
-								bjtmp.setDescripcion(nombres[1]);
+							if(nombres[0].equals("fechahasta") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+								record.setFechahasta(format2.parse(nombres[1]));
 							}
-							if(nombres[0].equals("fechadesde")) {
-								Date fecha = format.parse(nombres[1]);
-								bjtmp.setFechadesde(fecha);
+							if(nombres[0].equals("fechaalta") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+								record.setFechaalta(format2.parse(nombres[1]));
 							}
-							if(nombres[0].equals("fechahasta")) {
-								bjtmp.setFechahasta(format.parse(nombres[1]));
-							}
-							if(nombres[0].equals("fechaalta")) {
-								bjtmp.setFechaalta(format.parse(nombres[1]));
-							}
-							if(nombres[0].equals("validado")) {
-								bjtmp.setValidado(nombres[1]);
+							if(nombres[0].equals("validado") && nombres[1]!= null && nombres[1]!= "null" && !nombres[1].isEmpty()) {
+								record.setValidado(nombres[1]);
 							}
 							if(nombres[0].equals("fechabt")) {
-								bjtmp.setFechabt(format2.parse(nombres[1]));
+								Date fecha = format2.parse(nombres[1]);
+								record.setFechabt(fecha);
 							}
 							if(nombres[0].equals("idpersona")) {
-								bjtmp.setIdpersona(nombres[1]);
+								record.setIdpersona(Long.valueOf(nombres[1]));
 							}
 							
-							bjtmp.setIdinstitucion(String.valueOf(idInstitucion));
 						}
+						
+						record.setIdinstitucion(idInstitucion); 
+						record.setUsumodificacion(usuarios.get(0).getIdusuario());
+						record.setFechamodificacion(new Date());
+						
+						response = cenBajastemporalesMapper.updateByPrimaryKeySelective(record);
 							
-						response = scsBajasTemporalesExtendsMapper.saveBajaTemporal(bjtmp,usuarios.get(0).getIdusuario());
+						//response = scsBajasTemporalesExtendsMapper.saveBajaTemporal(bjtmp,usuarios.get(0).getIdusuario());
 					}
 				}catch (Exception e) {
 					response = 0;
@@ -407,7 +441,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				try {
 					String nombres[];
 					SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
-					SimpleDateFormat format2=new SimpleDateFormat("dd/mm/yyyy");
+					SimpleDateFormat format2=new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 					for(Object bti: bajasTemporalesItem) {
 						BajasTemporalesItem bjtmp = new BajasTemporalesItem();
 						java.util.LinkedHashMap bj = (java.util.LinkedHashMap)bti;
@@ -429,26 +463,23 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 								bjtmp.setDescripcion(nombres[1]);
 							}
 							if(nombres[0].equals("fechadesde")) {
-								Date fecha = format.parse(nombres[1]);
+								Date fecha = format2.parse(nombres[1]);
 								bjtmp.setFechadesde(fecha);
 							}
 							if(nombres[0].equals("fechahasta")) {
-								bjtmp.setFechahasta(format.parse(nombres[1]));
+								bjtmp.setFechahasta(format2.parse(nombres[1]));
 							}
 							if(nombres[0].equals("fechaalta")) {
-								bjtmp.setFechaalta(format.parse(nombres[1]));
+								bjtmp.setFechaalta(format2.parse(nombres[1]));
 							}
 							if(nombres[0].equals("validado")) {
 								bjtmp.setValidado(nombres[1]);
 							}
 							
-							if(nombres[0].equals("fechabt")) {
-								bjtmp.setFechabt(format.parse(nombres[1]));
-							}
-							
-							bjtmp.setIdinstitucion(String.valueOf(idInstitucion));
 						}
 						
+						bjtmp.setFechabt(new Date());
+						bjtmp.setIdinstitucion(String.valueOf(idInstitucion));
 						bjtmp.setIdpersona(scsBajasTemporalesExtendsMapper.persona(bjtmp));
 						
 						response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
