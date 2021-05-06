@@ -82,6 +82,7 @@ import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.ScsActuaciondesigna;
+import org.itcgae.siga.db.entities.ScsActuaciondesignaExample;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
@@ -100,6 +101,8 @@ import org.itcgae.siga.db.entities.ScsDocumentaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
+import org.itcgae.siga.db.entities.ScsProcedimientos;
+import org.itcgae.siga.db.entities.ScsProcedimientosKey;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.entities.ScsTurno;
@@ -116,6 +119,7 @@ import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
+import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -225,6 +229,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private ScsDocumentaciondesignaMapper scsDocumentaciondesignaMapper;
+	
+	@Autowired
+	private ScsProcedimientosMapper scsProcedimientosMapper;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -2211,6 +2218,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					"DesignacionesServiceImpl.guardarActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty()) {
+				
+				comprobacionesActDesigna(actuacionDesignaItem, idInstitucion);
 
 				MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actuacionDesignaItem,
 						idInstitucion);
@@ -5937,6 +5946,41 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return res;
+	}
+	
+	private void comprobacionesActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion) {
+
+		ScsActuaciondesignaExample actuaciondesignaexample = new ScsActuaciondesignaExample();
+		actuaciondesignaexample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+				.andIdturnoEqualTo(Integer.valueOf(actuacionDesignaItem.getIdTurno()))
+				.andAnioEqualTo(Short.valueOf(actuacionDesignaItem.getAnio()))
+				.andNumeroEqualTo(Long.valueOf(actuacionDesignaItem.getNumero()))
+				.andIdprocedimientoEqualTo(actuacionDesignaItem.getIdProcedimiento());
+		
+		List<ScsActuaciondesigna> listaActuaciones = scsActuaciondesignaMapper.selectByExample(actuaciondesignaexample);
+		
+		/* 
+		 * Tipos de Acreditaciones -> 
+		 * 
+		 * 1 -> Inicio
+		 * 2 -> Fin
+		 * 3 -> Completa
+		 */
+		
+//		ScsAcreditacionExample acreditacionexample = new ScsAcreditacionExample();
+//		acreditacionexample.createCriteria().andIdtipoacreditacionEqualTo();
+		
+		
+		ScsProcedimientosKey procedimientoskey = new ScsProcedimientosKey();
+		procedimientoskey.setIdinstitucion(idInstitucion);
+		procedimientoskey.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
+		
+		ScsProcedimientos procedimiento = scsProcedimientosMapper.selectByPrimaryKey(procedimientoskey); 
+		
+		if(procedimiento.getComplemento() != null && procedimiento.getComplemento().equals("1")) {
+			
+		}
+		
 	}
 
 }

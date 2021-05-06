@@ -2999,15 +2999,24 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
+		SQL sql3 = new SQL();
 
-		sql2.SELECT("DESCRIPCION");
-		sql2.SELECT("IDTIPOACREDITACION");
+		// Query para obtener los tipos de acreditaciones
+		sql3.SELECT("IDTIPOACREDITACION");
+		sql3.FROM("SCS_TIPOACREDITACION");
 
-		sql2.FROM("SCS_TIPOACREDITACION");
+		// Query para quedarnos con los tres primeros registros de los tipos de
+		// acreditaciones
+		sql2.SELECT("*");
+		sql2.FROM("( " + sql3.toString() + " )");
+		sql2.WHERE("ROWNUM <= 3");
 
-		sql.SELECT("*");
-		sql.FROM("( " + sql2.toString() + " )");
-		sql.WHERE("ROWNUM <= 3");
+		// Query principal
+		sql.SELECT("IDACREDITACION");
+		sql.SELECT("DESCRIPCION");
+		sql.FROM("SCS_ACREDITACION");
+		sql.WHERE("IDTIPOACREDITACION IN ( " + sql2.toString() + " )");
+		sql.WHERE("DESCRIPCION IN ('Inic.','Fin','Inic.-Fin')");
 
 		return sql.toString();
 	}
