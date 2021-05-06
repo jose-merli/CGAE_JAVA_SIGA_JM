@@ -22,11 +22,16 @@ import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ExpExpedienteKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.entities.ScsEstadoejgKey;
+import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -89,6 +94,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ScsEjgMapper scsEjgMapper;
+	
+	@Autowired
+	private ExpExpedienteMapper expExpedienteMapper;
 
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -197,15 +205,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 				LOGGER.info(
-						"busquedaEJG() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+						"unidadFamiliarEJG() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
 				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
 
 				LOGGER.info(
-						"busquedaEJG() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+						"unidadFamiliarEJG() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
 				LOGGER.info(
-						"busquedaEJG() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
+						"unidadFamiliarEJG() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
 				if (tamMax != null) {
 					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
 				} else {
@@ -845,7 +853,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return responsedto;
 	}
-/*
+
 	@Override
 	@Transactional
 	public UpdateResponseDTO actualizaDatosGenerales(EjgItem datos, HttpServletRequest request) {
@@ -860,67 +868,131 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
 
 		if (idInstitucion != null) {
-			LOGGER.debug(
+			LOGGER.info(
 					"GestionEJGServiceImpl.actualizaDatosGenerales() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug(
+			LOGGER.info(
 					"GestionEJGServiceImpl.actualizaDatosGenerales() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
+				LOGGER.info(
 						"GestionEJGServiceImpl.actualizaDatosGenerales() -> Entrada para actualizar los datos generales del ejg");
 
 				try {
-					for (int i = 0; datos.si > i; i++) {
+//					for (int i = 0; datos.get) > i; i++) {
 						response = 0;
-
-						// creamos el objeto para el update
-						record.setIdinstitucion(idInstitucion);
-						record.setFechaapertura(datos.getFechaApertura());
-						record.setAnio(Short.parseShort(datos.getAnnio()));
-						record.setNumero(Long.parseLong(datos.getNumero()));
 						
-						//Comprobar si estos 2 son las fechas de presentacion
-						record.setFechapresentacion(datos.getFechapresentacion());
-						record.setFechalimitepresentacion(datos.getFechalimitepresentacion());
+//						Clave primaria scsEstadoejg
+//						IDINSTITUCION
+//						IDTIPOEJG
+//						ANIO
+//						NUMERO
+//						IDESTADOPOREJG
+
+						// seleccionamos el objeto para el update
+						
+						ScsEjgKey ejgKey = new ScsEjgKey();
+						
+						ejgKey.setIdinstitucion(idInstitucion);
+						ejgKey.setAnio(Short.parseShort(datos.getAnnio()));
+						ejgKey.setNumero(Long.parseLong(datos.getNumero()));
+						ejgKey.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+//						key.setIdestadoporejg(Long.parseLong(datos.getEstadoEJG()));
+						
+						ScsEjgWithBLOBs ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+						
+						// Modificamos el objeto obtenido
+						
+						ejg.setFechaapertura(datos.getFechaApertura());
+						ejg.setFechapresentacion(datos.getFechapresentacion());
+						ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
+						ejg.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
+						
+						//Actualizamos la entrada en la BBDD
+						scsEjgMapper.updateByPrimaryKeySelective(ejg);
+						
+//						record.setIdinstitucion(idInstitucion);
+//						record.setFechaapertura(datos.getFechaApertura());
+//						record.setAnio(Short.parseShort(datos.getAnnio()));
+//						record.setNumero(Long.parseLong(datos.getNumero()));
+						
+						//Actualizar el expediente del que se extrae el tipo de expediente
+						//Clave primaria
+//						IDINSTITUCION
+//						IDINSTITUCION_TIPOEXPEDIENTE
+//						IDTIPOEXPEDIENTE
+//						NUMEROEXPEDIENTE
+//						ANIOEXPEDIENTE
+						
+						//Pendiente de completar. Falta determinar algunos campos y obterner los valores para seleccionar nuestro expediente
+						ExpExpedienteKey expKey = new ExpExpedienteKey();
+						
+						expKey.setIdinstitucion(idInstitucion);
+						expKey.setAnioexpediente(Short.parseShort(datos.getAnnio()));
+						expKey.setNumeroexpediente(Integer.parseInt(datos.getNumero()));
+						expKey.setIdtipoexpediente(Short.parseShort(datos.getTipoEJG()));
+						
+						expExpedienteMapper.selectByPrimaryKey(expKey);
+						
+						//Manejo de prestaciones
+						//Se comprueban las prestaciones rechazadas en la ficha.
+						//El proceso que se va a seguir sera comprobar si se recibe una lista prestaciones rechazadas 
+						//y despues  
+						
+						
+						//Seleccionamos todas las prestaciones rechazadas con un example
+						
+//						ScsEjgPrestacionRechazada expKey = new ScsEjgPrestacionRechazada();
+//						IDINSTITUCION
+//						ANIO
+//						NUMERO
+//						IDTIPOEJG
+//						IDPRESTACION
+						
+//						record.setFechapresentacion(datos.getFechapresentacion());
+//						record.setFechalimitepresentacion(datos.getFechalimitepresentacion());
 						//Falta el tipo de estado
-						record.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
-						record.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
+//						record.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+//						record.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
 						//Falta las prestaciones
 						//Falta el expediente
+						
+						
 
 						//response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
-					}
-
-					LOGGER.debug(
-							"GestionEJGServiceImpl.actualizaDatosGenerales() -> Salida del servicio para actualizar los datos generales del ejg");
-				} catch (Exception e) {
-					LOGGER.debug(
-							"GestionEJGServiceImpl.actualizaDatosGenerales() -> Se ha producido un error al actualizar los datos generales del ejg",
-							e);
-				} finally {
+						LOGGER.info(
+								"GestionEJGServiceImpl.actualizaDatosGenerales() -> Salida del servicio para actualizar los datos generales del ejg");
+					
+						
+					}catch (Exception e) {
+						LOGGER.info(
+								"GestionEJGServiceImpl.actualizaDatosGenerales() -> Se ha producido un error al actualizar los datos generales del ejg",
+								e);
+					} 
+				} 
+					
 					// respuesta si se actualiza correctamente
 					if (response >= 1) {
 						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug(
+						LOGGER.info(
 								"GestionEJGServiceImpl.actualizaDatosGenerales() -> OK. Datos Generales actualizados para el ejg");
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
+						LOGGER.info(
 								"GestionEJGServiceImpl.actualizaDatosGenerales() -> KO. No se ha actualizado ningún dato general del ejg");
 					}
-				}
+				
 			}
-		}
+		
 
 		LOGGER.info("GestionEJGServiceImpl.actualizaDatosGenerales() -> Salida del servicio.");
 
 		return responsedto;
-	}*/
+	}
 	/**
 	 * metodo para settear los datos del objeto para el insert o update
 	 * @param item
@@ -1583,10 +1655,5 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return responsedto;
 	}
 
-	@Override
-	public UpdateResponseDTO actualizaDatosGenerales(EjgItem datos, HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

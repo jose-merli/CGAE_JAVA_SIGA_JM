@@ -88,6 +88,9 @@ public class EjgItem {
 	private String fundamentoCalifDes;
 	private String iddictamen;
 
+	private String[] prestacion;
+	private String[] prestacionesRechazadas;
+	
 	private boolean requiereTurn;
 	private boolean bis;
 	private Date fechaPublicacion;
