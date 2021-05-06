@@ -33,7 +33,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.exp.mappers.ExpTipoexpedienteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsActacomisionExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionejgExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsExpedienteEconomicoExtendsMapper;
@@ -73,7 +73,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	private ScsEstadoejgExtendsMapper scsEstadoejgExtendsMapper;
 
 	@Autowired
-	private ScsDocumentacionejgExtendsMapper scsDocumentacionejgExtendsMapper;
+	private ScsDocumentacionEjgExtendsMapper scsDocumentacionejgExtendsMapper;
 
 	@Autowired
 	private ScsOrigencajgExtendsMapper scsOrigencajgExtendsMapper;

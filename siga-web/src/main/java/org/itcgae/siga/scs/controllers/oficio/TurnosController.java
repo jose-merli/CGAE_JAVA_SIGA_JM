@@ -74,7 +74,7 @@ public class TurnosController {
 	}
 	
 	@RequestMapping(value = "/combossjcs/comboPartidasPresupuestaria",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboPartidasPresupuestaria(String importe, HttpServletRequest request) {
+	ResponseEntity<ComboDTO> comboPartidasPresupuestaria(HttpServletRequest request, String importe) {
 		ComboDTO response = comboService.getComboPartidasPresupuestarias(request, importe);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
