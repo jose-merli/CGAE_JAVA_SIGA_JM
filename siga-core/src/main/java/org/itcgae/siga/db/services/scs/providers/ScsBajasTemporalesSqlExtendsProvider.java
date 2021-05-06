@@ -190,7 +190,7 @@ public String nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer
 	sql.VALUES("FECHAMODIFICACION", "TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"','DD/MM/RRRR')");
 	sql.VALUES("FECHAALTA", "'"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"'");
 	sql.VALUES("ELIMINADO", "0");
-	sql.VALUES("FECHABT","TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"','DD/MM/RRRR')");
+	sql.VALUES("FECHABT","SYSDATE");
 	sql.VALUES("IDPERSONA", bajasTemporalesItem.getIdpersona());
 	sql.VALUES("IDINSTITUCION",bajasTemporalesItem.getIdinstitucion());
 	sql.VALUES("USUMODIFICACION","'"+usuario+"'");
