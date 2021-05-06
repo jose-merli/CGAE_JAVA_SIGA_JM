@@ -110,8 +110,8 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		sql.UPDATE("cen_bajastemporales");
 		sql.SET("ELIMINADO = 1");
 		sql.SET("USUMODIFICACION = "+usuario);
-		sql.SET("FECHAMODIFICACION = "+new Date());
-		sql.WHERE("FECHABT = '"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"'");
+		sql.SET("FECHAMODIFICACION = SYSDATE ");
+		sql.WHERE("FECHABT = TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"','DD/MM/RRRR')");
 		sql.WHERE("IDPERSONA= "+ bajasTemporalesItem.getIdpersona());
 		sql.WHERE("IDINSTITUCION="+bajasTemporalesItem.getIdinstitucion());
 	
@@ -125,8 +125,8 @@ public String updateBajasTemporales(BajasTemporalesItem bajasTemporalesItem, Int
 		sql.UPDATE("cen_bajastemporales");
 		sql.SET("VALIDADO = '"+bajasTemporalesItem.getValidado()+"'");
 		sql.SET("USUMODIFICACION = "+usuario);
-		sql.SET("FECHAMODIFICACION = "+new Date());
-		sql.WHERE("FECHABT = '"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"'");
+		sql.SET("FECHAMODIFICACION = SYSDATE ");
+		sql.WHERE("FECHABT = TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"','DD/MM/RRRR')");
 		sql.WHERE("IDPERSONA= "+ bajasTemporalesItem.getIdpersona());
 		sql.WHERE("IDINSTITUCION="+bajasTemporalesItem.getIdinstitucion());
 	
@@ -142,10 +142,10 @@ public String saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer 
 	sql.UPDATE("cen_bajastemporales");
 	
 	if(bajasTemporalesItem.getFechadesde() != null) {
-		sql.SET("fechadesde = '"+dateFormat.format(bajasTemporalesItem.getFechadesde())+"'");
+		sql.SET("fechadesde = TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechadesde())+"','DD/MM/RRRR')");
 	}
 	if(bajasTemporalesItem.getFechahasta() != null) {
-		sql.SET("fechahasta = '"+dateFormat.format(bajasTemporalesItem.getFechahasta())+"'");
+		sql.SET("fechahasta = TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechahasta())+"','DD/MM/RRRR')");
 	}
 	if(bajasTemporalesItem.getTipo() != null) {
 		sql.SET("TIPO = '"+bajasTemporalesItem.getTipo()+"'");
@@ -155,9 +155,9 @@ public String saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer 
 	}
 
 	sql.SET("USUMODIFICACION = "+usuario);
-	sql.SET("FECHAMODIFICACION = "+new Date());
+	sql.SET("FECHAMODIFICACION = SYSDATE");
 	
-	sql.WHERE("FECHABT = '"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"'");
+	sql.WHERE("FECHABT = TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"','DD/MM/RRRR')");
 	sql.WHERE("IDPERSONA= "+ bajasTemporalesItem.getIdpersona());
 	sql.WHERE("IDINSTITUCION="+bajasTemporalesItem.getIdinstitucion());
 
@@ -173,10 +173,10 @@ public String nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer
 	sql.INSERT_INTO("cen_bajastemporales");
 	
 	if(bajasTemporalesItem.getFechadesde() != null) {
-		sql.VALUES("fechadesde","'"+dateFormat.format(bajasTemporalesItem.getFechadesde())+"'");
+		sql.VALUES("fechadesde","TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechadesde())+"','DD/MM/RRRR')");
 	}
 	if(bajasTemporalesItem.getFechahasta() != null) {
-		sql.VALUES("fechahasta","'"+dateFormat.format(bajasTemporalesItem.getFechahasta())+"'");
+		sql.VALUES("fechahasta","TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechahasta())+"','DD/MM/RRRR')");
 	}
 	if(bajasTemporalesItem.getTipo() != null) {
 		sql.VALUES("TIPO","'"+bajasTemporalesItem.getTipo()+"'");
@@ -186,11 +186,11 @@ public String nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer
 	}
 	
 	sql.VALUES("VALIDADO", "2");
-	sql.VALUES("FECHAESTADO", "'"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"'");
-	sql.VALUES("FECHAMODIFICACION", "'"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"'");
+	sql.VALUES("FECHAESTADO", "TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"','DD/MM/RRRR')");
+	sql.VALUES("FECHAMODIFICACION", "TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"','DD/MM/RRRR')");
 	sql.VALUES("FECHAALTA", "'"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"'");
 	sql.VALUES("ELIMINADO", "0");
-	sql.VALUES("FECHABT","'"+ dateFormat.format(bajasTemporalesItem.getFechabt())+"'");
+	sql.VALUES("FECHABT","SYSDATE");
 	sql.VALUES("IDPERSONA", bajasTemporalesItem.getIdpersona());
 	sql.VALUES("IDINSTITUCION",bajasTemporalesItem.getIdinstitucion());
 	sql.VALUES("USUMODIFICACION","'"+usuario+"'");
