@@ -179,8 +179,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		sql.INNER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = PER.IDPERSONA)");
 		sql.INNER_JOIN(
-				"CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION AND ESTADO.FECHAESTADO = ("
-						+ sql2.toString() + "))");
+				"CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION )");
 		if ((item.getIdGuardia() != null && item.getIdGuardia().length>0) || (item.getIdTurno() != null && item.getIdTurno().length > 0)) {
 			sql.INNER_JOIN(
 					"SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
@@ -207,6 +206,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		if (item.getIdEstado() != null && !item.getIdEstado().isEmpty()) {
 			sql.WHERE("ESTADO.IDESTADO = " + item.getIdEstado());
 		}
+		
+		sql.WHERE(" ESTADO.FECHAESTADO = (" + sql2.toString() + ")");
 
 		if (item.getnColegiado() != null && !item.getnColegiado().trim().isEmpty()) {
 			sql.WHERE("(COL.NCOLEGIADO = " + item.getnColegiado().trim() + " OR COL.NCOMUNITARIO = "
