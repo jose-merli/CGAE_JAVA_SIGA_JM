@@ -2995,7 +2995,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboAcreditacionesPorTipo() {
+	public String comboAcreditacionesPorTipo(Short idInstitucion, String idProcedimiento) {
 
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -3012,11 +3012,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.WHERE("ROWNUM <= 3");
 
 		// Query principal
-		sql.SELECT("IDACREDITACION");
-		sql.SELECT("DESCRIPCION");
-		sql.FROM("SCS_ACREDITACION");
-		sql.WHERE("IDTIPOACREDITACION IN ( " + sql2.toString() + " )");
-		sql.WHERE("DESCRIPCION IN ('Inic.','Fin','Inic.-Fin')");
+		sql.SELECT(
+				"ACRE.IDACREDITACION || ',' || DECODE(TO_CHAR(ACREP.NIG_NUMPROCEDIMIENTO), TO_CHAR(TRUNC(ACREP.NIG_NUMPROCEDIMIENTO)), TO_CHAR(ACREP.NIG_NUMPROCEDIMIENTO), F_SIGA_FORMATONUMERO(TO_CHAR(ACREP.NIG_NUMPROCEDIMIENTO), 0)) AS ID");
+		sql.SELECT(
+				"ACRE.DESCRIPCION || ' (' || DECODE(TO_CHAR(ACREP.PORCENTAJE), TO_CHAR(TRUNC(ACREP.PORCENTAJE) ), TO_CHAR(ACREP.PORCENTAJE), F_SIGA_FORMATONUMERO(TO_CHAR(ACREP.PORCENTAJE), 2)) || '%)' AS DESCRIPCION");
+		sql.FROM("SCS_ACREDITACIONPROCEDIMIENTO ACREP");
+		sql.JOIN("SCS_ACREDITACION ACRE ON ACRE.IDACREDITACION = ACREP.IDACREDITACION");
+		sql.WHERE("ACREP.IDPROCEDIMIENTO = '" + idProcedimiento + "'");
+		sql.WHERE("ACREP.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("ACRE.IDTIPOACREDITACION IN ( " + sql2.toString() + " )");
 
 		return sql.toString();
 	}
