@@ -52,7 +52,7 @@ public class BajasTemporalesController {
 	}
 
 	@RequestMapping(value = "/bajasTemporales/deleteBajaTemporal", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> deleteBaja(@RequestBody List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> deleteBaja(@RequestBody List<Object> bajasTemporalesItem, HttpServletRequest request) {
 		UpdateResponseDTO response = bajasTemporalesService.deleteBaja(bajasTemporalesItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);

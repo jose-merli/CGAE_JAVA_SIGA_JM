@@ -70,8 +70,13 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 		}else {
 			sql.WHERE("(bt.eliminado = 1 OR bt.eliminado = 0)");
 		}
-		sql.WHERE("ROWNUM <= 200");
-		return sql.toString();
+		sql.ORDER_BY("bt.fechadesde DESC");
+		
+		SQL sql2 = new SQL();
+		sql2.SELECT("*");
+		sql2.FROM("(" + sql.toString() + ")");
+		sql2.WHERE("ROWNUM <= 200");
+		return sql2.toString();
 	}
 	
 	public String comboEstado() {
