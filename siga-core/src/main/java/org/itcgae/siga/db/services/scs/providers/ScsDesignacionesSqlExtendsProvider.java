@@ -2275,7 +2275,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String guardarProcurador(ProcuradorItem procuradorItem) {
+	public String guardarProcurador(ProcuradorItem procuradorItem, String fecha) {
 
 		SQL sql = new SQL();
 		String [] part = procuradorItem.getNombre().split(",");
@@ -2286,9 +2286,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SET("fechadesigna ='" + procuradorItem.getFechaDesigna() + "'");
 		sql.SET("numerodesignacion ='" + procuradorItem.getNumerodesignacion() + "'");
 		sql.SET("motivosrenuncia ='" + procuradorItem.getMotivosRenuncia() + "'");
+		sql.SET("fecharenunciasolicita ='" + procuradorItem.getFecharenunciasolicita() + "'");
 
 		sql.WHERE("idinstitucion=" + procuradorItem.getIdInstitucion());
 		sql.WHERE("idprocurador=(SELECT IDPROCURADOR FROM SCS_PROCURADOR WHERE NCOLEGIADO = '"+procuradorItem.getnColegiado()+"' AND NOMBRE = '"+nombre+"')");
+		sql.WHERE("fecharenuncia ='"+fecha+"'");
 
 		return sql.toString();
 	}
