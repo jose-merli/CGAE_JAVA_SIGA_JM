@@ -20,14 +20,20 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBajastemporales;
-import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.ScsInscripcionguardia;
+import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
+import org.itcgae.siga.db.entities.ScsInscripcionturno;
+import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.mappers.CenBajastemporalesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsBajasTemporalesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionguardiaExtendsMapper;
 import org.itcgae.siga.scs.services.oficio.IGestionBajasTemporalesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporalesService {
@@ -43,6 +49,12 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private ScsInscripcionesTurnoExtendsMapper scsInscripcionesTurnoExtendsMapper;
+	
+	@Autowired
+	private ScsInscripcionguardiaExtendsMapper scsInscripcionguardiaExtendsMapper;
 
 
 	@Override
@@ -86,9 +98,6 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		BajasTemporalesDTO bajasTemporalesDTO = new BajasTemporalesDTO();
 		List<BajasTemporalesItem> bajasTemporalesItems = null;
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
-		
 		try {
 
 		if (idInstitucion != null) {
@@ -161,7 +170,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 				try {
 					String nombres[];
-					SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+					new SimpleDateFormat("yyyy-MM-dd");
 					SimpleDateFormat format2=new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 					for(Object bti: bajasTemporalesItem) {
 						CenBajastemporales record = new CenBajastemporales();
@@ -224,7 +233,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 		return updateResponseDTO;
 	}
 	@Override
-	public UpdateResponseDTO deleteBaja(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request) {
+	public UpdateResponseDTO deleteBaja(List<Object> bajasTemporalesItem, HttpServletRequest request) {
 		LOGGER.info("deleteBaja() ->  Entrada al servicio para eliminar bajas temporales");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -252,19 +261,30 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
-					
-					for(BajasTemporalesItem bti: bajasTemporalesItem) {
+					String nombres[];
+					new SimpleDateFormat("yyyy-MM-dd");
+					SimpleDateFormat format2=new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+					for(Object bti: bajasTemporalesItem) {
 						CenBajastemporales record = new CenBajastemporales();
-						
+						java.util.LinkedHashMap bj = (java.util.LinkedHashMap)bti;
+						Set entrySet = bj.entrySet();
+						// Obtain an Iterator for the entries Set
+						Iterator it = entrySet.iterator();
+						while(it.hasNext()) {
+							nombres = it.next().toString().split("=");
+							if(nombres[0].equals("fechabt")) {
+								Date fecha = format2.parse(nombres[1]);
+								record.setFechabt(fecha);
+							}
+							if(nombres[0].equals("idpersona")) {
+								record.setIdpersona(Long.valueOf(nombres[1]));
+							}
+						}
 						record.setEliminado(1);
 						record.setIdinstitucion(idInstitucion);
-						record.setFechabt(bti.getFechabt());
-						record.setIdpersona(Long.valueOf(bti.getIdpersona()));
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
 						record.setFechamodificacion(new Date());
-//						bti.setEliminado("1");
 						response = cenBajastemporalesMapper.updateByPrimaryKeySelective(record);
-						//response = scsBajasTemporalesExtendsMapper.eliminarBaja(bti,usuarios.get(0).getIdusuario());
 					}
 				}catch (Exception e) {
 					response = 0;
@@ -298,7 +318,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	
 	@Override
 	public UpdateResponseDTO saveBajaTemporal(List<Object> bajasTemporalesItem, HttpServletRequest request) {
-		LOGGER.info("deleteBaja() ->  Entrada al servicio para eliminar bajas temporales");
+		LOGGER.info("saveBajaTemporal() ->  Entrada al servicio para eliminar bajas temporales");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -315,18 +335,18 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info("deleteBaja() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("saveBajaTemporal() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"deleteBaja() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"saveBajaTemporal() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
 					String nombres[];
-					SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+					new SimpleDateFormat("yyyy-MM-dd");
 					SimpleDateFormat format2=new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 					for(Object bti: bajasTemporalesItem) {
 						//BajasTemporalesItem bjtmp = new BajasTemporalesItem();
@@ -401,7 +421,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 				updateResponseDTO.setError(error);
 
-				LOGGER.info("deleteBaja() -> Salida del servicio para eliminar bajas temporales");
+				LOGGER.info("saveBajaTemporal() -> Salida del servicio para eliminar bajas temporales");
 
 			}
 
@@ -411,8 +431,9 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 	}
 	
 	@Override
+	@Transactional
 	public InsertResponseDTO nuevaBajaTemporal(List<Object> bajasTemporalesItem, HttpServletRequest request) {
-		LOGGER.info("deleteBaja() ->  Entrada al servicio para eliminar bajas temporales");
+		LOGGER.info("nuevaBajaTemporal() ->  Entrada al servicio para eliminar bajas temporales");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -429,18 +450,18 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info("deleteBaja() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("nuevaBajaTemporal() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"deleteBaja() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"nuevaBajaTemporal() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
 					String nombres[];
-					SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+					new SimpleDateFormat("yyyy-MM-dd");
 					SimpleDateFormat format2=new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 					for(Object bti: bajasTemporalesItem) {
 						BajasTemporalesItem bjtmp = new BajasTemporalesItem();
@@ -480,9 +501,12 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						
 						bjtmp.setFechabt(new Date());
 						bjtmp.setIdinstitucion(String.valueOf(idInstitucion));
-						bjtmp.setIdpersona(scsBajasTemporalesExtendsMapper.persona(bjtmp));
-						
-						response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+						String idPersona = scsBajasTemporalesExtendsMapper.persona(bjtmp);
+						bjtmp.setIdpersona(idPersona);
+						Boolean correcto = eliminarTurnosGuardias(idInstitucion, Long.valueOf(idPersona),request);
+						if(correcto) {
+							response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
+						}
 					}
 				}catch (Exception e) {
 					response = 0;
@@ -505,13 +529,59 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 
 				insertResponseDTO.setError(error);
 
-				LOGGER.info("deleteBaja() -> Salida del servicio para eliminar bajas temporales");
+				LOGGER.info("nuevaBajaTemporal() -> Salida del servicio para eliminar bajas temporales");
 
 			}
 
 		}
 
 		return insertResponseDTO;
+	}
+
+	private Boolean eliminarTurnosGuardias(Short idInstitucion, Long idPersona, HttpServletRequest request) throws Exception {
+		Boolean resultado = false;
+		ScsInscripcionturnoExample inscripcionesExample = new ScsInscripcionturnoExample();
+		inscripcionesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(idPersona);		
+		List<ScsInscripcionturno> inscripciones = scsInscripcionesTurnoExtendsMapper.selectByExample(inscripcionesExample);
+		if(inscripciones.size() > 0) {
+			for(ScsInscripcionturno inscripcion : inscripciones) {
+				ScsInscripcionguardiaExample guardiasExample = new ScsInscripcionguardiaExample();
+					guardiasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(idPersona)
+							.andIdturnoEqualTo(inscripcion.getIdturno());
+				List<ScsInscripcionguardia> guardias = scsInscripcionguardiaExtendsMapper.selectByExample(guardiasExample);
+				if(guardias.size() > 0) {
+					for(ScsInscripcionguardia guardia : guardias) {
+						ScsInscripcionguardia record = new ScsInscripcionguardia();
+						record.setIdinstitucion(new Short(idInstitucion));
+						record.setIdturno(guardia.getIdturno());
+						record.setIdpersona(idPersona);
+						record.setFechasuscripcion(guardia.getFechabaja());
+						record.setIdguardia(guardia.getIdguardia());
+						record.setFechabaja(new Date());
+						record.setFechamodificacion(new Date());
+						record.setUsumodificacion(0);
+						if(scsInscripcionguardiaExtendsMapper.updateByPrimaryKeySelective(record)==0) {
+							resultado = true;
+						}else {
+							throw new Exception("Error al eliminar las guardias");
+						}
+					}
+				}
+				ScsInscripcionturno record = new ScsInscripcionturno();
+				record.setIdinstitucion(inscripcion.getIdinstitucion());
+				record.setIdturno(inscripcion.getIdturno());
+				record.setIdpersona(inscripcion.getIdpersona());
+				record.setFechasolicitud(inscripcion.getFechasolicitud());
+				record.setFechabaja(new Date());
+				record.setFechamodificacion(new Date());
+				record.setUsumodificacion(0);
+				if(scsInscripcionesTurnoExtendsMapper.updateByPrimaryKeySelective(record)==0)
+					resultado = true;
+			}
+		}
+		
+		return resultado;
+		
 	}
 	
 }

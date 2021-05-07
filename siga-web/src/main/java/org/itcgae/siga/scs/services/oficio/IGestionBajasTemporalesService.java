@@ -23,7 +23,7 @@ public interface IGestionBajasTemporalesService {
 
 	public UpdateResponseDTO updateEstado(List<Object> bajasTemporalesItem, HttpServletRequest request);
 
-	public UpdateResponseDTO deleteBaja(List<BajasTemporalesItem> bajasTemporalesItem, HttpServletRequest request);
+	public UpdateResponseDTO deleteBaja(List<Object> bajasTemporalesItem, HttpServletRequest request);
 	
 	public UpdateResponseDTO saveBajaTemporal(List<Object> bajasTemporalesItem, HttpServletRequest request);
 	
