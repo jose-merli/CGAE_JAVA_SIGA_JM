@@ -378,7 +378,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	List<ComboItem> comboTipoMotivo(Short idInstitucion, String idLenguaje);
 
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "guardarProcurador")
-	int guardarProcurador(ProcuradorItem procuradorItem);
+	int guardarProcurador(ProcuradorItem procuradorItem, String fecha);
 	
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "guardarProcuradorEJG")
 	int guardarProcuradorEJG(ProcuradorItem procuradorItem);

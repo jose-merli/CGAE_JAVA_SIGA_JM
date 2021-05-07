@@ -3647,6 +3647,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 
+					SimpleDateFormat format=new SimpleDateFormat("dd/MM/yyyy");
 					ProcuradorItem procuradorItem = new ProcuradorItem();
 
 					procuradorItem.setFechaDesigna(procurador.get(0));
@@ -3656,11 +3657,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procuradorItem.setMotivosRenuncia(procurador.get(4));
 					procuradorItem.setObservaciones(procurador.get(5));
 					procuradorItem.setFecharenunciasolicita(procurador.get(6));
-					procuradorItem.setIdInstitucion(procurador.get(7));
-					procuradorItem.setNumero(procurador.get(8));
-					procuradorItem.setIdTurno(procurador.get(9));
+					procuradorItem.setIdInstitucion(procurador.get(8));
 
-					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem);
+					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem,procurador.get(7));
 
 				} catch (Exception e) {
 					response = 0;
@@ -3730,7 +3729,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procuradorItem.setNumero(procurador.get(8));
 					procuradorItem.setIdTurno(procurador.get(9));
 
-					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem);
+					response = scsDesignacionesExtendsMapper.guardarProcuradorEJG(procuradorItem);
 
 				} catch (Exception e) {
 					response = 0;
@@ -3800,11 +3799,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procuradorItem.setMotivosRenuncia(procurador.get(4));
 					procuradorItem.setObservaciones(procurador.get(5));
 					procuradorItem.setFecharenunciasolicita(procurador.get(6));
-					procuradorItem.setIdInstitucion(procurador.get(7));
-					procuradorItem.setNumero(procurador.get(8));
-					procuradorItem.setIdTurno(procurador.get(9));
 
-					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem);
+					response = scsDesignacionesExtendsMapper.actualizarProcurador(procuradorItem);
 
 				} catch (Exception e) {
 					response = 0;
