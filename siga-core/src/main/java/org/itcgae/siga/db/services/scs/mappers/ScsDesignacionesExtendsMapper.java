@@ -378,7 +378,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	List<ComboItem> comboTipoMotivo(Short idInstitucion, String idLenguaje);
 
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "guardarProcurador")
-	int guardarProcurador(ProcuradorItem procuradorItem);
+	int guardarProcurador(ProcuradorItem procuradorItem, String fecha);
 	
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "guardarProcuradorEJG")
 	int guardarProcuradorEJG(ProcuradorItem procuradorItem);
@@ -625,8 +625,8 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboAcreditacionesPorTipo")
 	@Results({ @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDACREDITACION", property = "value", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> comboAcreditacionesPorTipo();
+			@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR) })
+	List<ComboItem> comboAcreditacionesPorTipo(Short idInstitucion, String idProcedimiento);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getNewIdDocumentacionAsi")
 	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR), })

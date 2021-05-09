@@ -503,10 +503,8 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						bjtmp.setIdinstitucion(String.valueOf(idInstitucion));
 						String idPersona = scsBajasTemporalesExtendsMapper.persona(bjtmp);
 						bjtmp.setIdpersona(idPersona);
-						Boolean correcto = eliminarTurnosGuardias(idInstitucion, Long.valueOf(idPersona),request);
-						if(correcto) {
-							response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
-						}
+						eliminarTurnosGuardias(idInstitucion, Long.valueOf(idPersona),request);
+						response = scsBajasTemporalesExtendsMapper.nuevaBaja(bjtmp,usuarios.get(0).getIdusuario());
 					}
 				}catch (Exception e) {
 					response = 0;
@@ -538,8 +536,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 		return insertResponseDTO;
 	}
 
-	private Boolean eliminarTurnosGuardias(Short idInstitucion, Long idPersona, HttpServletRequest request) throws Exception {
-		Boolean resultado = false;
+	private void eliminarTurnosGuardias(Short idInstitucion, Long idPersona, HttpServletRequest request) throws Exception {
 		ScsInscripcionturnoExample inscripcionesExample = new ScsInscripcionturnoExample();
 		inscripcionesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(idPersona);		
 		List<ScsInscripcionturno> inscripciones = scsInscripcionesTurnoExtendsMapper.selectByExample(inscripcionesExample);
@@ -560,9 +557,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						record.setFechabaja(new Date());
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(0);
-						if(scsInscripcionguardiaExtendsMapper.updateByPrimaryKeySelective(record)==0) {
-							resultado = true;
-						}else {
+						if(scsInscripcionguardiaExtendsMapper.updateByPrimaryKeySelective(record)!=0) {
 							throw new Exception("Error al eliminar las guardias");
 						}
 					}
@@ -575,12 +570,10 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				record.setFechabaja(new Date());
 				record.setFechamodificacion(new Date());
 				record.setUsumodificacion(0);
-				if(scsInscripcionesTurnoExtendsMapper.updateByPrimaryKeySelective(record)==0)
-					resultado = true;
+				if(scsInscripcionesTurnoExtendsMapper.updateByPrimaryKeySelective(record)!=0)
+					throw new Exception("Error al eliminar las guardias");
 			}
 		}
-		
-		return resultado;
 		
 	}
 	
