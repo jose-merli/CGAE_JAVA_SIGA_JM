@@ -430,6 +430,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.anio");
 		sql.SELECT("ejg.idinstitucion");
 		sql.SELECT("ejg.idtipoejg");
+		sql.SELECT("ejg.idtipoejgcolegio");
 		sql.SELECT("ejg.numero");
 		sql.SELECT("ejg.numejg numejg");
 		sql.SELECT("'E' || EJG.ANIO || '/' || EJG.NUMEJG AS NUMANIO");

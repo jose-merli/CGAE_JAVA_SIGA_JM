@@ -86,7 +86,7 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numejg", property = "numEjg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMANIO", property = "numAnnioProcedimiento", jdbcType = JdbcType.VARCHAR),
-		
+		@Result(column = "idtipoEJGColegio", property = "tipoEJGColegio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNOGUARDIA", property = "turnoDes", jdbcType = JdbcType.VARCHAR),

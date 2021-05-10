@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 
 public interface IGestionEJG {
 
@@ -70,5 +71,5 @@ public interface IGestionEJG {
 	
 	UpdateResponseDTO descargarDocumentacion(EjgItem datos, HttpServletRequest request);
 
-	List<String> searchPrestacionesRechazadas(EjgItem ejgItem, HttpServletRequest request);
+	List<ScsEjgPrestacionRechazada> searchPrestacionesRechazadas(EjgItem ejgItem, HttpServletRequest request);
 }

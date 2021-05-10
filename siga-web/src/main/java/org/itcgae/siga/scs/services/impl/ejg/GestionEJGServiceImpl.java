@@ -186,13 +186,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	}
 	
 	@Override
-	public List<String> searchPrestacionesRechazadas(EjgItem ejgItem, HttpServletRequest request) {
+	public List<ScsEjgPrestacionRechazada> searchPrestacionesRechazadas(EjgItem ejgItem, HttpServletRequest request) {
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		List<String> idsPrestRech = null;
-		List<ComboItem> comboItems = null;
+		List<ScsEjgPrestacionRechazada> idsPrestRech = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -953,11 +952,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						
 						ejg.setFechaapertura(datos.getFechaApertura());
 						ejg.setFechapresentacion(datos.getFechapresentacion());
-						if(datos.getFechalimitepresentacion()!=null)ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
+						ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
 						if(datos.getTipoEJGColegio()!=null)ejg.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
 						
 						//Actualizamos la entrada en la BBDD
-						scsEjgMapper.updateByPrimaryKeySelective(ejg);
+						response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
 						
 						//Actualizar el expediente del que se extrae el tipo de expediente
 						//Clave primaria
@@ -981,7 +980,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						if(newExp!= null) {
 							if(datos.getIdTipoExpediente()!=null)newExp.setIdtipoexpediente(Short.parseShort(datos.getIdTipoExpediente()));
 							
-							expExpedienteMapper.updateByPrimaryKeySelective(newExp);
+							response = expExpedienteMapper.updateByPrimaryKeySelective(newExp);
 
 						}
 						
@@ -1015,14 +1014,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							.andIdtipoejgEqualTo(preRe.getIdtipoejg());
 							
 							//Eliminamos las entradas existentes relacionadas si las hubiera.
-							scsEjgPrestacionRechazadaMapper.deleteByExample(examplePresRe);
+							response = scsEjgPrestacionRechazadaMapper.deleteByExample(examplePresRe);
 							
 							
 							
 							for(String idprestacion: datos.getPrestacionesRechazadas()) {
 								preRe.setIdprestacion(Short.parseShort(idprestacion));
 								
-								scsEjgPrestacionRechazadaMapper.insert(preRe);
+								response = scsEjgPrestacionRechazadaMapper.insert(preRe);
 							}
 							
 							

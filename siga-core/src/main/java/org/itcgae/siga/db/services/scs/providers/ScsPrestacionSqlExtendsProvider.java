@@ -29,7 +29,7 @@ public class ScsPrestacionSqlExtendsProvider extends ScsPrestacionSqlProvider {
 		sql.FROM("Scs_ejg_prestacion_rechazada");
 		
 		sql.WHERE("idinstitucion='"+idInstitucion.toString()+"' and anio='"+ejg.getAnnio()
-				+"' and numero='"+ejg.getNumEjg()+"' and idtipoejg='"+ejg.getTipoEJG()+"')");
+				+"' and numero='"+ejg.getNumero()+"' and idtipoejg='"+ejg.getTipoEJG()+"'");
 		
 		return sql.toString();
 	}

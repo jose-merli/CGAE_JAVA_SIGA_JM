@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
+import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,9 +133,9 @@ public class EjgController {
 	
 	//Prestaciones Rechazadas
 	@RequestMapping(value = "/gestion-ejg/searchPrestacionesRechazadas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<List<String>> searchPrestacionesRechazadas(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
-		List<String> response = gestionEJG.searchPrestacionesRechazadas(ejgItem, request);
-		return new ResponseEntity<List<String>>(response, HttpStatus.OK);
+	ResponseEntity<List<ScsEjgPrestacionRechazada>> searchPrestacionesRechazadas(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		List<ScsEjgPrestacionRechazada> response = gestionEJG.searchPrestacionesRechazadas(ejgItem, request);
+		return new ResponseEntity<List<ScsEjgPrestacionRechazada>>(response, HttpStatus.OK);
 	}
 
 	// datosEJG
