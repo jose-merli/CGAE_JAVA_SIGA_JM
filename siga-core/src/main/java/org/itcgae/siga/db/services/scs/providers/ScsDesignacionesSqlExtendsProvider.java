@@ -2747,6 +2747,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "            || decode(persona.apellidos2, NULL, '', ' ' || persona.apellidos2)\r\n"
 				+ "            || ', '\r\n" + "            || persona.nombre AS apellidosnombre");
 		sql.SELECT("SCS_DESIGNASLETRADO.IDPERSONA");
+		sql.SELECT("PERSONA.NIFCIF");
 		sql.SELECT("SCS_DESIGNASLETRADO.observaciones");
 		sql.FROM("SCS_DESIGNASLETRADO");
 		sql.JOIN(
@@ -2756,7 +2757,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("SCS_DESIGNASLETRADO.IDTURNO = '" + designa.getIdturno() + "'");
 		sql.WHERE("SCS_DESIGNASLETRADO.ANIO = '" + designa.getAnio() + "'");
 		sql.WHERE("SCS_DESIGNASLETRADO.IDINSTITUCION = '" + idInstitucion + "'");
-		sql.ORDER_BY("SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
+		sql.ORDER_BY("SCS_DESIGNASLETRADO.FECHADESIGNA, SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
 
 		return sql.toString();
 	}

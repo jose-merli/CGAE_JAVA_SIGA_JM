@@ -13,6 +13,7 @@ public class ListaLetradosDesignaItem {
 	private Date fechaDesignacion;
 	private Date fechaSolRenuncia;
 	private Date fechaEfecRenuncia;
+	private String nif;
 	
 	
 	public String getnColegiado() {
@@ -68,6 +69,12 @@ public class ListaLetradosDesignaItem {
 	}
 	public void setLetradoTurno(String letradoTurno) {
 		this.letradoTurno = letradoTurno;
+	}
+	public String getNif() {
+		return nif;
+	}
+	public void setNif(String nif) {
+		this.nif = nif;
 	}
 	
 

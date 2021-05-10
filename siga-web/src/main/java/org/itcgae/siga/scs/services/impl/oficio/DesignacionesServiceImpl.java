@@ -4320,7 +4320,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(designa.getAnio()).
 					andIdturnoEqualTo(designa.getIdturno()).andNumeroEqualTo(designa.getNumero()).andIdpersonaEqualTo(letradoSaliente.getIdpersona()).
-					andFechadesignaGreaterThanOrEqualTo(letradoSaliente.getFechadesigna());
+					andFechadesignaGreaterThanOrEqualTo(letradoSaliente.getFechadesigna()).andFecharenunciasolicitaIsNull();
 
 					List<ScsDesignasletrado> designas = scsDesignasletradoMapper.selectByExample(example);
 
