@@ -22,17 +22,21 @@ import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ExpExpediente;
 import org.itcgae.siga.db.entities.ExpExpedienteKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
+import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazadaExample;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.entities.ScsEstadoejgKey;
 import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
+import org.itcgae.siga.db.mappers.ScsEjgPrestacionRechazadaMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -97,6 +101,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	
 	@Autowired
 	private ExpExpedienteMapper expExpedienteMapper;
+	
+	@Autowired
+	private ScsEjgPrestacionRechazadaMapper scsEjgPrestacionRechazadaMapper;
 
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -176,6 +183,43 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		}
 		LOGGER.info("comboTipoEJG() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
+	}
+	
+	@Override
+	public List<String> searchPrestacionesRechazadas(EjgItem ejgItem, HttpServletRequest request) {
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<String> idsPrestRech = null;
+		List<ComboItem> comboItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"searchPrestacionesRechazadas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchPrestacionesRechazadas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"searchPrestacionesRechazadas() / scsPrestacionesExtendsMapper.prestacionesRechazadas() -> Entrada a scsTipofundamentosExtendsMapper para obtener los combo");
+
+				idsPrestRech = scsPrestacionesExtendsMapper.prestacionesRechazadas(ejgItem, idInstitucion);
+
+				LOGGER.info(
+						"searchPrestacionesRechazadas() / scsPrestacionesExtendsMapper.prestacionesRechazadas() -> Salida a scsTipofundamentosExtendsMapper para obtener los combo");
+
+			}
+
+		}
+		LOGGER.info("searchPrestacionesRechazadas() -> Salida del servicio para obtener las prestaciones rechazadas del ejg");
+		return idsPrestRech;
 	}
 
 	@Override
@@ -503,10 +547,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					"comboActaAnnio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
-						"comboActaAnnio() / scsActacomisionExtendsMapper.comboPrestaciones() -> Entrada a scsActacomisionExtendsMapper para obtener los combo");
+						"comboActaAnnio() / scsActacomisionExtendsMapper.getActaAnnio() -> Entrada a scsActacomisionExtendsMapper para obtener los combo");
 				comboItems = scsActacomisionExtendsMapper.getActaAnnio(idInstitucion.toString());
 				LOGGER.info(
-						"comboActaAnnio() / scsActacomisionExtendsMapper.comboPrestaciones() -> Salida a scsActacomisionExtendsMapper para obtener los combo");
+						"comboActaAnnio() / scsActacomisionExtendsMapper.getActaAnnio() -> Salida a scsActacomisionExtendsMapper para obtener los combo");
 				if (comboItems != null) {
 					comboDTO.setCombooItems(comboItems);
 				}
@@ -909,16 +953,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						
 						ejg.setFechaapertura(datos.getFechaApertura());
 						ejg.setFechapresentacion(datos.getFechapresentacion());
-						ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
-						ejg.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
+						if(datos.getFechalimitepresentacion()!=null)ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
+						if(datos.getTipoEJGColegio()!=null)ejg.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
 						
 						//Actualizamos la entrada en la BBDD
 						scsEjgMapper.updateByPrimaryKeySelective(ejg);
-						
-//						record.setIdinstitucion(idInstitucion);
-//						record.setFechaapertura(datos.getFechaApertura());
-//						record.setAnio(Short.parseShort(datos.getAnnio()));
-//						record.setNumero(Long.parseLong(datos.getNumero()));
 						
 						//Actualizar el expediente del que se extrae el tipo de expediente
 						//Clave primaria
@@ -935,35 +974,60 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						expKey.setAnioexpediente(Short.parseShort(datos.getAnnio()));
 						expKey.setNumeroexpediente(Integer.parseInt(datos.getNumero()));
 						expKey.setIdtipoexpediente(Short.parseShort(datos.getTipoEJG()));
+						if(datos.getIdInstTipoExp()!=null)expKey.setIdinstitucionTipoexpediente(Short.parseShort(datos.getIdInstTipoExp()));
 						
-						expExpedienteMapper.selectByPrimaryKey(expKey);
+						ExpExpediente newExp = expExpedienteMapper.selectByPrimaryKey(expKey);
+						
+						if(newExp!= null) {
+							if(datos.getIdTipoExpediente()!=null)newExp.setIdtipoexpediente(Short.parseShort(datos.getIdTipoExpediente()));
+							
+							expExpedienteMapper.updateByPrimaryKeySelective(newExp);
+
+						}
 						
 						//Manejo de prestaciones
 						//Se comprueban las prestaciones rechazadas en la ficha.
 						//El proceso que se va a seguir sera comprobar si se recibe una lista prestaciones rechazadas 
-						//y despues  
-						
-						
-						//Seleccionamos todas las prestaciones rechazadas con un example
-						
-//						ScsEjgPrestacionRechazada expKey = new ScsEjgPrestacionRechazada();
+						//en tal caso, eliminar las existentes y despues  recorrer las recibidas para i
+
+//						Clave primaria
 //						IDINSTITUCION
 //						ANIO
 //						NUMERO
 //						IDTIPOEJG
 //						IDPRESTACION
+						//Comprobar en el caso de que no se haga ningún cambio y con algún cambio.
+						if(datos.getPrestacionesRechazadas()!=null) {
+							ScsEjgPrestacionRechazada preRe = new ScsEjgPrestacionRechazada();
+							
+							preRe.setIdinstitucion(idInstitucion);
+							preRe.setAnio(Short.parseShort(datos.getAnnio()));
+							preRe.setNumero(Long.parseLong(datos.getNumero()));
+							preRe.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+							preRe.setUsumodificacion(usuarios.get(0).getIdusuario());
+							preRe.setFechamodificacion(new Date());
+							preRe.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+							
+							ScsEjgPrestacionRechazadaExample examplePresRe = new ScsEjgPrestacionRechazadaExample();
+							
+							examplePresRe.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(preRe.getAnio())
+							.andNumeroEqualTo(preRe.getNumero()).andIdtipoejgEqualTo(preRe.getIdtipoejg())
+							.andIdtipoejgEqualTo(preRe.getIdtipoejg());
+							
+							//Eliminamos las entradas existentes relacionadas si las hubiera.
+							scsEjgPrestacionRechazadaMapper.deleteByExample(examplePresRe);
+							
+							
+							
+							for(String idprestacion: datos.getPrestacionesRechazadas()) {
+								preRe.setIdprestacion(Short.parseShort(idprestacion));
+								
+								scsEjgPrestacionRechazadaMapper.insert(preRe);
+							}
+							
+							
+						}
 						
-//						record.setFechapresentacion(datos.getFechapresentacion());
-//						record.setFechalimitepresentacion(datos.getFechalimitepresentacion());
-						//Falta el tipo de estado
-//						record.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
-//						record.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
-						//Falta las prestaciones
-						//Falta el expediente
-						
-						
-
-						//response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
 						LOGGER.info(
 								"GestionEJGServiceImpl.actualizaDatosGenerales() -> Salida del servicio para actualizar los datos generales del ejg");
 					

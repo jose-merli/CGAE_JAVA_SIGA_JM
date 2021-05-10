@@ -466,6 +466,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EXPEDIENTE.anioexpediente");
 		sql.SELECT("EXPEDIENTE.numeroexpediente");
 		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE");
+		sql.SELECT("EXPEDIENTE.IDINSTITUCION_TIPOEXPEDIENTE");
 		// from
 		sql.FROM("scs_ejg ejg");
 		// joins

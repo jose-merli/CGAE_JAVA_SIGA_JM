@@ -81,6 +81,7 @@ public class EjgItem {
 	private String anioexpediente;
 	private String numeroexpediente;
 	private String idTipoExpediente;
+	private String idInstTipoExp;
 	private Date fechapresentacion;
 	private Date fechalimitepresentacion;
 	private boolean historico;
@@ -1448,5 +1449,29 @@ public class EjgItem {
 
 	public void seteidInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
+	}
+
+	public String getIdInstTipoExp() {
+		return idInstTipoExp;
+	}
+
+	public void setIdInstTipoExp(String idInstTipoExp) {
+		this.idInstTipoExp = idInstTipoExp;
+	}
+
+	public String[] getPrestacion() {
+		return prestacion;
+	}
+
+	public void setPrestacion(String[] prestacion) {
+		this.prestacion = prestacion;
+	}
+
+	public String[] getPrestacionesRechazadas() {
+		return prestacionesRechazadas;
+	}
+
+	public void setPrestacionesRechazadas(String[] prestacionesRechazadas) {
+		this.prestacionesRechazadas = prestacionesRechazadas;
 	}
 }

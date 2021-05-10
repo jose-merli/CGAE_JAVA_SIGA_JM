@@ -129,6 +129,13 @@ public class EjgController {
 		EjgDTO response = busquedaEJG.busquedaEJG(ejgItem, request);
 		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
 	}
+	
+	//Prestaciones Rechazadas
+	@RequestMapping(value = "/gestion-ejg/searchPrestacionesRechazadas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<String>> searchPrestacionesRechazadas(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		List<String> response = gestionEJG.searchPrestacionesRechazadas(ejgItem, request);
+		return new ResponseEntity<List<String>>(response, HttpStatus.OK);
+	}
 
 	// datosEJG
 	@RequestMapping(value = "/gestion-ejg/datosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
