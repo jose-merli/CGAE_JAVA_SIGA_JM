@@ -2224,84 +2224,91 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					"DesignacionesServiceImpl.guardarActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty()) {
-				
-				comprobacionesActDesigna(actuacionDesignaItem, idInstitucion);
 
-				MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actuacionDesignaItem,
-						idInstitucion);
+				Error errorComprobaciones = comprobacionesActDesigna(actuacionDesignaItem, idInstitucion, false);
 
-				actuacionDesignaItem.setNumeroAsunto(maxIdDto.getIdMax().toString());
+				if (errorComprobaciones.getCode().toString().equals("200")) {
 
-				int response = scsDesignacionesExtendsMapper.guardarActDesigna(actuacionDesignaItem,
-						Short.toString(idInstitucion), usuarios.get(0));
+					MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actuacionDesignaItem,
+							idInstitucion);
 
-				if (response == 1) {
-					insertResponseDTO.setStatus(SigaConstants.OK);
-					insertResponseDTO.setId(maxIdDto.getIdMax().toString());
-				}
+					actuacionDesignaItem.setNumeroAsunto(maxIdDto.getIdMax().toString());
 
-				if (response == 0) {
-					insertResponseDTO.setStatus(SigaConstants.KO);
-					LOGGER.error(
-							"DesignacionesServiceImpl.guardarActDesigna() -> Se ha producido un error al guardar la actuación asociada a la designación");
-					error.setCode(500);
-					error.setDescription("general.mensaje.error.bbdd");
-					insertResponseDTO.setError(error);
-				}
+					int response = scsDesignacionesExtendsMapper.guardarActDesigna(actuacionDesignaItem,
+							Short.toString(idInstitucion), usuarios.get(0));
 
-				ScsDesignaKey scsDesignaKey = new ScsDesignaKey();
-				scsDesignaKey.setIdturno(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
-				scsDesignaKey.setNumero(Long.valueOf(actuacionDesignaItem.getNumero()));
-				scsDesignaKey.setAnio(Short.valueOf(actuacionDesignaItem.getAnio()));
-				scsDesignaKey.setIdinstitucion(idInstitucion);
-
-				ScsDesigna scsDesigna = scsDesignaMapper.selectByPrimaryKey(scsDesignaKey);
-
-				if (scsDesigna != null) {
-
-					if (scsDesigna.getIdjuzgado() == null
-							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdJuzgado())) {
-						scsDesigna.setIdjuzgado(Long.valueOf(actuacionDesignaItem.getIdJuzgado()));
-					}
-
-					if (UtilidadesString.esCadenaVacia(scsDesigna.getIdprocedimiento())
-							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdProcedimiento())) {
-						scsDesigna.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
-					}
-
-					if (scsDesigna.getIdpretension() == null
-							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPretension())) {
-						scsDesigna.setIdpretension(Short.valueOf(actuacionDesignaItem.getIdPretension()));
-					}
-
-					if (UtilidadesString.esCadenaVacia(scsDesigna.getNumprocedimiento())
-							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNumProcedimiento())) {
-						scsDesigna.setNumprocedimiento(actuacionDesignaItem.getNumProcedimiento());
-					}
-
-					if (UtilidadesString.esCadenaVacia(scsDesigna.getNig())
-							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNig())) {
-						scsDesigna.setNig(actuacionDesignaItem.getNig());
-					}
-
-					scsDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
-					scsDesigna.setFechamodificacion(new Date());
-
-					int response2 = scsDesignaMapper.updateByPrimaryKeySelective(scsDesigna);
-
-					if (response2 == 1) {
+					if (response == 1) {
 						insertResponseDTO.setStatus(SigaConstants.OK);
+						insertResponseDTO.setId(maxIdDto.getIdMax().toString());
 					}
 
-					if (response2 == 0) {
+					if (response == 0) {
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"DesignacionesServiceImpl.guardarActDesigna() -> Se ha producido un error al actualizar los datos de la designación");
-						error.setCode(400);
+								"DesignacionesServiceImpl.guardarActDesigna() -> Se ha producido un error al guardar la actuación asociada a la designación");
+						error.setCode(500);
 						error.setDescription("general.mensaje.error.bbdd");
 						insertResponseDTO.setError(error);
 					}
 
+					ScsDesignaKey scsDesignaKey = new ScsDesignaKey();
+					scsDesignaKey.setIdturno(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
+					scsDesignaKey.setNumero(Long.valueOf(actuacionDesignaItem.getNumero()));
+					scsDesignaKey.setAnio(Short.valueOf(actuacionDesignaItem.getAnio()));
+					scsDesignaKey.setIdinstitucion(idInstitucion);
+
+					ScsDesigna scsDesigna = scsDesignaMapper.selectByPrimaryKey(scsDesignaKey);
+
+					if (scsDesigna != null) {
+
+						if (scsDesigna.getIdjuzgado() == null
+								&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdJuzgado())) {
+							scsDesigna.setIdjuzgado(Long.valueOf(actuacionDesignaItem.getIdJuzgado()));
+						}
+
+						if (UtilidadesString.esCadenaVacia(scsDesigna.getIdprocedimiento())
+								&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdProcedimiento())) {
+							scsDesigna.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
+						}
+
+						if (scsDesigna.getIdpretension() == null
+								&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPretension())) {
+							scsDesigna.setIdpretension(Short.valueOf(actuacionDesignaItem.getIdPretension()));
+						}
+
+						if (UtilidadesString.esCadenaVacia(scsDesigna.getNumprocedimiento())
+								&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNumProcedimiento())) {
+							scsDesigna.setNumprocedimiento(actuacionDesignaItem.getNumProcedimiento());
+						}
+
+						if (UtilidadesString.esCadenaVacia(scsDesigna.getNig())
+								&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNig())) {
+							scsDesigna.setNig(actuacionDesignaItem.getNig());
+						}
+
+						scsDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsDesigna.setFechamodificacion(new Date());
+
+						int response2 = scsDesignaMapper.updateByPrimaryKeySelective(scsDesigna);
+
+						if (response2 == 1) {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+
+						if (response2 == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"DesignacionesServiceImpl.guardarActDesigna() -> Se ha producido un error al actualizar los datos de la designación");
+							error.setCode(400);
+							error.setDescription("general.mensaje.error.bbdd");
+							insertResponseDTO.setError(error);
+						}
+
+					}
+
+				} else {
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					insertResponseDTO.setError(errorComprobaciones);
 				}
 
 			}
@@ -2343,76 +2350,85 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (usuarios != null && !usuarios.isEmpty()) {
 
-				int response = scsDesignacionesExtendsMapper.actualizarActDesigna(actuacionDesignaItem,
-						Short.toString(idInstitucion), usuarios.get(0));
+				Error errorComprobaciones = comprobacionesActDesigna(actuacionDesignaItem, idInstitucion, true);
 
-				if (response == 1) {
-					updateResponseDTO.setStatus(SigaConstants.OK);
-					updateResponseDTO.setId(actuacionDesignaItem.getNumeroAsunto());
-				}
+				if (errorComprobaciones.getCode().toString().equals("200")) {
 
-				if (response == 0) {
-					updateResponseDTO.setStatus(SigaConstants.KO);
-					LOGGER.error(
-							"DesignacionesServiceImpl.actualizarActDesigna() -> Se ha producido un error al actualizar la actuación asociada a la designación");
-					error.setCode(500);
-					error.setDescription("general.mensaje.error.bbdd");
-					updateResponseDTO.setError(error);
-				}
+					int response = scsDesignacionesExtendsMapper.actualizarActDesigna(actuacionDesignaItem,
+							Short.toString(idInstitucion), usuarios.get(0));
 
-				ScsDesignaKey scsDesignaKey = new ScsDesignaKey();
-				scsDesignaKey.setIdturno(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
-				scsDesignaKey.setNumero(Long.valueOf(actuacionDesignaItem.getNumero()));
-				scsDesignaKey.setAnio(Short.valueOf(actuacionDesignaItem.getAnio()));
-				scsDesignaKey.setIdinstitucion(idInstitucion);
-
-				ScsDesigna scsDesigna = scsDesignaMapper.selectByPrimaryKey(scsDesignaKey);
-
-				if (scsDesigna != null) {
-
-					if (scsDesigna.getIdjuzgado() == null
-							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdJuzgado())) {
-						scsDesigna.setIdjuzgado(Long.valueOf(actuacionDesignaItem.getIdJuzgado()));
-					}
-
-					if (UtilidadesString.esCadenaVacia(scsDesigna.getIdprocedimiento())
-							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdProcedimiento())) {
-						scsDesigna.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
-					}
-
-					if (scsDesigna.getIdpretension() == null
-							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPretension())) {
-						scsDesigna.setIdpretension(Short.valueOf(actuacionDesignaItem.getIdPretension()));
-					}
-
-					if (UtilidadesString.esCadenaVacia(scsDesigna.getNumprocedimiento())
-							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNumProcedimiento())) {
-						scsDesigna.setNumprocedimiento(actuacionDesignaItem.getNumProcedimiento());
-					}
-
-					if (UtilidadesString.esCadenaVacia(scsDesigna.getNig())
-							&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNig())) {
-						scsDesigna.setNig(actuacionDesignaItem.getNig());
-					}
-
-					scsDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
-					scsDesigna.setFechamodificacion(new Date());
-
-					int response2 = scsDesignaMapper.updateByPrimaryKeySelective(scsDesigna);
-
-					if (response2 == 1) {
+					if (response == 1) {
 						updateResponseDTO.setStatus(SigaConstants.OK);
+						updateResponseDTO.setId(actuacionDesignaItem.getNumeroAsunto());
 					}
 
-					if (response2 == 0) {
+					if (response == 0) {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"DesignacionesServiceImpl.guardarActDesigna() -> Se ha producido un error al actualizar los datos de la designación");
-						error.setCode(400);
+								"DesignacionesServiceImpl.actualizarActDesigna() -> Se ha producido un error al actualizar la actuación asociada a la designación");
+						error.setCode(500);
 						error.setDescription("general.mensaje.error.bbdd");
 						updateResponseDTO.setError(error);
 					}
 
+					ScsDesignaKey scsDesignaKey = new ScsDesignaKey();
+					scsDesignaKey.setIdturno(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
+					scsDesignaKey.setNumero(Long.valueOf(actuacionDesignaItem.getNumero()));
+					scsDesignaKey.setAnio(Short.valueOf(actuacionDesignaItem.getAnio()));
+					scsDesignaKey.setIdinstitucion(idInstitucion);
+
+					ScsDesigna scsDesigna = scsDesignaMapper.selectByPrimaryKey(scsDesignaKey);
+
+					if (scsDesigna != null) {
+
+						if (scsDesigna.getIdjuzgado() == null
+								&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdJuzgado())) {
+							scsDesigna.setIdjuzgado(Long.valueOf(actuacionDesignaItem.getIdJuzgado()));
+						}
+
+						if (UtilidadesString.esCadenaVacia(scsDesigna.getIdprocedimiento())
+								&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdProcedimiento())) {
+							scsDesigna.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
+						}
+
+						if (scsDesigna.getIdpretension() == null
+								&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPretension())) {
+							scsDesigna.setIdpretension(Short.valueOf(actuacionDesignaItem.getIdPretension()));
+						}
+
+						if (UtilidadesString.esCadenaVacia(scsDesigna.getNumprocedimiento())
+								&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNumProcedimiento())) {
+							scsDesigna.setNumprocedimiento(actuacionDesignaItem.getNumProcedimiento());
+						}
+
+						if (UtilidadesString.esCadenaVacia(scsDesigna.getNig())
+								&& !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNig())) {
+							scsDesigna.setNig(actuacionDesignaItem.getNig());
+						}
+
+						scsDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsDesigna.setFechamodificacion(new Date());
+
+						int response2 = scsDesignaMapper.updateByPrimaryKeySelective(scsDesigna);
+
+						if (response2 == 1) {
+							updateResponseDTO.setStatus(SigaConstants.OK);
+						}
+
+						if (response2 == 0) {
+							updateResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"DesignacionesServiceImpl.guardarActDesigna() -> Se ha producido un error al actualizar los datos de la designación");
+							error.setCode(400);
+							error.setDescription("general.mensaje.error.bbdd");
+							updateResponseDTO.setError(error);
+						}
+
+					}
+
+				} else {
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					updateResponseDTO.setError(errorComprobaciones);
 				}
 
 			}
@@ -3653,6 +3669,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 
+					SimpleDateFormat format=new SimpleDateFormat("dd/MM/yyyy");
 					ProcuradorItem procuradorItem = new ProcuradorItem();
 
 					procuradorItem.setFechaDesigna(procurador.get(0));
@@ -3662,11 +3679,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procuradorItem.setMotivosRenuncia(procurador.get(4));
 					procuradorItem.setObservaciones(procurador.get(5));
 					procuradorItem.setFecharenunciasolicita(procurador.get(6));
-					procuradorItem.setIdInstitucion(procurador.get(7));
-					procuradorItem.setNumero(procurador.get(8));
-					procuradorItem.setIdTurno(procurador.get(9));
+					procuradorItem.setIdInstitucion(procurador.get(8));
 
-					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem);
+					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem,procurador.get(7));
 
 				} catch (Exception e) {
 					response = 0;
@@ -3736,7 +3751,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procuradorItem.setNumero(procurador.get(8));
 					procuradorItem.setIdTurno(procurador.get(9));
 
-					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem);
+					response = scsDesignacionesExtendsMapper.guardarProcuradorEJG(procuradorItem);
 
 				} catch (Exception e) {
 					response = 0;
@@ -3806,11 +3821,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procuradorItem.setMotivosRenuncia(procurador.get(4));
 					procuradorItem.setObservaciones(procurador.get(5));
 					procuradorItem.setFecharenunciasolicita(procurador.get(6));
-					procuradorItem.setIdInstitucion(procurador.get(7));
-					procuradorItem.setNumero(procurador.get(8));
-					procuradorItem.setIdTurno(procurador.get(9));
 
-					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem);
+					response = scsDesignacionesExtendsMapper.actualizarProcurador(procuradorItem);
 
 				} catch (Exception e) {
 					response = 0;
@@ -5954,93 +5966,119 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return res;
 	}
 
-	private void comprobacionesActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion) {
+	private Error comprobacionesActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion,
+			boolean isActualizar) {
 
-		boolean insertar = false;
 		Error error = new Error();
 		String tipoUltima = "";
 		ScsAcreditacionExample acreditacionexample = new ScsAcreditacionExample();
 		ScsActuaciondesignaExample actuaciondesignaexample = new ScsActuaciondesignaExample();
 		List<ScsAcreditacion> acreditaciones = null;
+		String errorAcreditacion = "justiciaGratuita.oficio.designas.actuaciones.acreditacion.error";
 
-		ScsTurnoKey scsTurnoKey = new ScsTurnoKey();
-		scsTurnoKey.setIdinstitucion(idInstitucion);
-		scsTurnoKey.setIdturno(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
+		try {
 
-		ScsTurno scsTurno = scsTurnoMapper.selectByPrimaryKey(scsTurnoKey);
+			ScsTurnoKey scsTurnoKey = new ScsTurnoKey();
+			scsTurnoKey.setIdinstitucion(idInstitucion);
+			scsTurnoKey.setIdturno(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
 
-		if (scsTurno.getActivarretriccionacredit().toUpperCase().equals("1")
-				|| scsTurno.getActivarretriccionacredit().toUpperCase().equals("S")) {
+			ScsTurno scsTurno = scsTurnoMapper.selectByPrimaryKey(scsTurnoKey);
 
-			ScsProcedimientosKey procedimientoskey = new ScsProcedimientosKey();
-			procedimientoskey.setIdinstitucion(idInstitucion);
-			procedimientoskey.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
-			ScsProcedimientos procedimiento = scsProcedimientosMapper.selectByPrimaryKey(procedimientoskey);
+			if (scsTurno.getActivarretriccionacredit().toUpperCase().equals("1")
+					|| scsTurno.getActivarretriccionacredit().toUpperCase().equals("S")) {
 
-			// Obtenemos el tipo de acreditación que se quiere guardar
-			acreditacionexample = new ScsAcreditacionExample();
-			acreditacionexample.createCriteria()
-					.andIdacreditacionEqualTo(Short.valueOf(actuacionDesignaItem.getIdAcreditacion()));
-			acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
-			String tipoAacreditacionAInsertar = acreditaciones.get(0).getIdtipoacreditacion().toString();
+				ScsProcedimientosKey procedimientoskey = new ScsProcedimientosKey();
+				procedimientoskey.setIdinstitucion(idInstitucion);
+				procedimientoskey.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
+				ScsProcedimientos procedimiento = scsProcedimientosMapper.selectByPrimaryKey(procedimientoskey);
 
-			// Obtenemos las actuaciones relacionadas a la designa por modulo
-			actuaciondesignaexample = new ScsActuaciondesignaExample();
-			actuaciondesignaexample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-					.andIdturnoEqualTo(Integer.valueOf(actuacionDesignaItem.getIdTurno()))
-					.andAnioEqualTo(Short.valueOf(actuacionDesignaItem.getAnio()))
-					.andNumeroEqualTo(Long.valueOf(actuacionDesignaItem.getNumero()))
-					.andIdprocedimientoEqualTo(actuacionDesignaItem.getIdProcedimiento());
-			actuaciondesignaexample.setOrderByClause("NUMEROASUNTO ASC");
-
-			List<ScsActuaciondesigna> listaActuaciones = scsActuaciondesignaMapper
-					.selectByExample(actuaciondesignaexample);
-
-			if (!listaActuaciones.isEmpty()) {
-				acreditacionexample = new ScsAcreditacionExample();
-				acreditacionexample.createCriteria().andIdacreditacionEqualTo(
-						Short.valueOf(listaActuaciones.get(listaActuaciones.size() - 1).getIdacreditacion()));
-				acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
-				tipoUltima = acreditaciones.get(0).getIdtipoacreditacion().toString();
-			}
-
-			// Si se trata de la primera actuación, esta solo podrá ser de INICIO o COMPLETA
-			if (listaActuaciones.isEmpty() || ((tipoUltima.equals(SigaConstants.ACREDITACION_TIPO_FIN)
-					|| tipoUltima.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))
-					&& procedimiento.getComplemento() != null && procedimiento.getComplemento().equals("1"))) {
-
-				if (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
-						|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)) {
-					insertar = true;
-				} else {
-					error.setCode(500);
-					error.setDescription(
-							"Acreditación incorrecta. Compruebe las acreditaciones dadas de alta para ese procedimiento");
-				}
-
-			} else if (listaActuaciones.size() == 1) {
-
+				// Obtenemos el tipo de acreditación que se quiere guardar
 				acreditacionexample = new ScsAcreditacionExample();
 				acreditacionexample.createCriteria()
-						.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(0).getIdacreditacion()));
-
+						.andIdacreditacionEqualTo(Short.valueOf(actuacionDesignaItem.getIdAcreditacion()));
 				acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
-				String tipoAcreditacion = acreditaciones.get(0).getIdtipoacreditacion().toString();
+				String tipoAacreditacionAInsertar = acreditaciones.get(0).getIdtipoacreditacion().toString();
 
-				if (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
-						|| !(tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
-								&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN))) {
-					error.setCode(500);
-					error.setDescription(
-							"Acreditación incorrecta. Compruebe las acreditaciones dadas de alta para ese procedimiento");
-				} else {
-					insertar = true;
+				// Obtenemos las actuaciones relacionadas a la designa por modulo
+				actuaciondesignaexample = new ScsActuaciondesignaExample();
+				actuaciondesignaexample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(Integer.valueOf(actuacionDesignaItem.getIdTurno()))
+						.andAnioEqualTo(Short.valueOf(actuacionDesignaItem.getAnio()))
+						.andNumeroEqualTo(Long.valueOf(actuacionDesignaItem.getNumero()))
+						.andIdprocedimientoEqualTo(actuacionDesignaItem.getIdProcedimiento());
+				actuaciondesignaexample.setOrderByClause("NUMEROASUNTO ASC");
+
+				List<ScsActuaciondesigna> listaActuaciones = scsActuaciondesignaMapper
+						.selectByExample(actuaciondesignaexample);
+
+				if (!listaActuaciones.isEmpty()) {
+					acreditacionexample = new ScsAcreditacionExample();
+					acreditacionexample.createCriteria().andIdacreditacionEqualTo(
+							Short.valueOf(listaActuaciones.get(listaActuaciones.size() - 1).getIdacreditacion()));
+					acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
+					tipoUltima = acreditaciones.get(0).getIdtipoacreditacion().toString();
+				}
+
+				// Si se trata de la primera actuación, esta solo podrá ser de INICIO o COMPLETA
+				if (listaActuaciones.isEmpty() || ((tipoUltima.equals(SigaConstants.ACREDITACION_TIPO_FIN)
+						|| tipoUltima.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))
+						&& procedimiento.getComplemento() != null && procedimiento.getComplemento().equals("1"))) {
+
+					if (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+							|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)) {
+						error.setCode(200);
+					} else {
+						error.setCode(500);
+						error.setDescription(errorAcreditacion);
+					}
+
+				} else if (listaActuaciones.size() == 1) {
+
+					acreditacionexample = new ScsAcreditacionExample();
+					acreditacionexample.createCriteria()
+							.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(0).getIdacreditacion()));
+
+					acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
+					String tipoAcreditacion = acreditaciones.get(0).getIdtipoacreditacion().toString();
+
+					if ((tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA) && !isActualizar)
+							|| (!isActualizar && !(tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+									&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN)))) {
+						error.setCode(500);
+						error.setDescription(errorAcreditacion);
+					} else {
+						error.setCode(200);
+
+					}
+
+					if (isActualizar && ((tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+							&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+									|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)))
+							|| (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+									&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+											|| tipoAacreditacionAInsertar
+													.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))))) {
+						error.setCode(200);
+					} else {
+						error.setCode(500);
+						error.setDescription(errorAcreditacion);
+					}
 
 				}
+			} else {
+				error.setCode(200);
 			}
-		} else {
-			insertar = true;
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.comprobacionesActDesigna() -> Se ha producido un error al realizar las comprobaciones realacionadas a la actuación de la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
 		}
+
+		return error;
 	}
 
 }

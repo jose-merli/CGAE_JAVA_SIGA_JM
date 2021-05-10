@@ -1285,7 +1285,7 @@ public class ComboServiceImpl implements ComboService {
 				if (scsTurno.getActivarretriccionacredit().toUpperCase().equals("1")
 						|| scsTurno.getActivarretriccionacredit().toUpperCase().equals("S")) {
 
-					acreditaciones = scsDesignacionesExtendsMapper.comboAcreditacionesPorTipo();
+					acreditaciones = scsDesignacionesExtendsMapper.comboAcreditacionesPorTipo(idInstitucion, idModulo);
 				} else {
 					acreditaciones = scsDesignacionesExtendsMapper.comboAcreditacionesPorModulo(idInstitucion,
 							idModulo);

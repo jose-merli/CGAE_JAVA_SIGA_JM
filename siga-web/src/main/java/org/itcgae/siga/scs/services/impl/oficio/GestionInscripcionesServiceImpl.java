@@ -907,7 +907,11 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 						inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservacionessolicitud());
 						inscripcionturno.setFechasolicitud(new Date());
-						if(valid=="N")	inscripcionturno.setFechavalidacion(new Date());
+						if(inscripcionesItem.getEstadonombre().equals("NoPermisos") || inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
+							inscripcionturno.setFechavalidacion(null);
+						}else {
+							if(valid=="N")	inscripcionturno.setFechavalidacion(new Date());
+						}	
 						inscripcionturno.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 						inscripcionturno.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
 						inscripcionturno.setIdinstitucion(idInstitucion);
@@ -938,7 +942,11 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 							guardia.setObservacionessuscripcion(inscripcionesItem.getObservacionessolicitud());
 							guardia.setFechasuscripcion(new Date());
-							if(valid=="N")	guardia.setFechavalidacion(new Date());
+							if(inscripcionesItem.getEstadonombre().equals("NoPermisos") || inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
+								guardia.setFechavalidacion(null);
+							}else {
+								if(valid=="N")	guardia.setFechavalidacion(new Date());
+							}				
 							guardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 							guardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
 							guardia.setIdinstitucion(idInstitucion);
