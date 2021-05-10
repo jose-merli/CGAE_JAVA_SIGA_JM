@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
+import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -27,6 +28,7 @@ import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -89,6 +91,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ScsEjgMapper scsEjgMapper;
+	
+	@Autowired
+	ScsEejgPeticionesMapper scsEejgPeticionesMapper;
 
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -721,50 +726,66 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	@Override
 	@Transactional
 	public UpdateResponseDTO descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request) {
-		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		Error error = new Error(); 
+		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
 		int response = 0;
+		
+		UnidadFamiliarEJGItem unidadFamiliar = new UnidadFamiliarEJGItem();
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (idInstitucion != null) {
-			LOGGER.debug(
-					"GestionEJGServiceImpl.descargarExpedientesJG() -> Entrada para obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug(
-					"GestionEJGServiceImpl.descargarExpedientesJG() -> Salida de obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.descargarExpedientesJG() -> Entrada para cambiar los estados y la fecha de estado para los ejgs");
+				LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Generando fichero y creando la descarga...");
 
 				try {
-
-				} catch (Exception e) {
-
-				} finally {
-					// respuesta si se actualiza correctamente
-					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug(
-								"GestionEJGServiceImpl.descargarExpedientesJG() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
-					} else {
-						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.descargarExpedientesJG() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+					//recorremos la lista para generar el documento de cada uno de los ejgs
+					for(EjgItem ejg : datos) {
+						//creamos el objeto de la unidad familiar
+						unidadFamiliar = new UnidadFamiliarEJGItem();
+						
+						unidadFamiliar.setUf_idInstitucion(ejg.getidInstitucion());
+						unidadFamiliar.setUf_idPersona(ejg.getIdPersona());
+						unidadFamiliar.setUf_idTipoejg(ejg.getIdTipoExpediente());
+						unidadFamiliar.setUf_anio(ejg.getAnnio());
+						unidadFamiliar.setUf_numero(ejg.getNumero());
+						
+//						scsEejgPeticionesMapper.selectByPrimaryKey()
+						
 					}
+					
+					LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Acción realizada correctamente");
+				} catch (Exception e) {
+					LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Se ha producido un error: ", e);
+					response = 0;
 				}
 			}
 		}
+		
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("Se ha producido un error");
+			responseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("Acción realizada correctamente");
+		}
+
+		responseDTO.setError(error);
 
 		LOGGER.info("GestionEJGServiceImpl.descargarExpedientesJG() -> Salida del servicio.");
 
-		return responsedto;
+		return responseDTO;
 	}
 
 	
