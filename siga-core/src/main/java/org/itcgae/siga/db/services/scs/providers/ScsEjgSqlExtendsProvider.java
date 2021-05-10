@@ -78,7 +78,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EJG.GUARDIATURNO_IDTURNO as IDTURNO");
 		sql.SELECT("ejg.fechaapertura");
 		sql.SELECT("ejg.fechamodificacion");
-		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as NOMBREletrado");
+		sql.SELECT("(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as NOMBREletrado");
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
 		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre as NOMBRESOLICITANTE");
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
@@ -430,6 +430,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.anio");
 		sql.SELECT("ejg.idinstitucion");
 		sql.SELECT("ejg.idtipoejg");
+		sql.SELECT("ejg.idtipoejgcolegio");
 		sql.SELECT("ejg.numero");
 		sql.SELECT("ejg.numejg numejg");
 		sql.SELECT("'E' || EJG.ANIO || '/' || EJG.NUMEJG AS NUMANIO");
@@ -466,6 +467,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EXPEDIENTE.anioexpediente");
 		sql.SELECT("EXPEDIENTE.numeroexpediente");
 		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE");
+		sql.SELECT("EXPEDIENTE.IDINSTITUCION_TIPOEXPEDIENTE");
 		// from
 		sql.FROM("scs_ejg ejg");
 		// joins

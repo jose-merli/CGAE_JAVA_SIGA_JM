@@ -86,7 +86,7 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numejg", property = "numEjg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMANIO", property = "numAnnioProcedimiento", jdbcType = JdbcType.VARCHAR),
-		
+		@Result(column = "idtipoEJGColegio", property = "tipoEJGColegio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNOGUARDIA", property = "turnoDes", jdbcType = JdbcType.VARCHAR),
@@ -109,6 +109,7 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "anioexpediente", property = "anioexpediente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numeroexpediente", property = "numeroexpediente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipoexpediente", property = "idTipoExpediente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idInstitucion_TipoExpediente", property = "idInstTipoExp", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaauto", property = "fechaAuto", jdbcType = JdbcType.DATE),
 		@Result(column = "idtiporesolauto", property = "autoResolutorio", jdbcType = JdbcType.VARCHAR),
