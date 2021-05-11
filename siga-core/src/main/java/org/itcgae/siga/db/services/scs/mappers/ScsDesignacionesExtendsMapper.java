@@ -306,6 +306,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "USUJUSTIFICACION", property = "usuJustificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAUSUJUSTIFICACION", property = "fechaUsuJustificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "USUVALIDACION", property = "usuValidacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "VALIDARJUSTIFICACIONES", property = "validarJustificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAVALIDACION", property = "fechaValidacion", jdbcType = JdbcType.VARCHAR) })
 	List<ActuacionDesignaItem> busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			String idInstitucion);

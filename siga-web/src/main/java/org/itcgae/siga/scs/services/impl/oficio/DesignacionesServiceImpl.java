@@ -1920,6 +1920,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				List<ActuacionDesignaItem> listaActuacionDesignaItem = scsDesignacionesExtendsMapper
 						.busquedaActDesigna(actuacionDesignaRequestDTO, Short.toString(idInstitucion));
 
+				for(ActuacionDesignaItem actuacionModificacion: listaActuacionDesignaItem) {
+					if("S".equals(actuacionModificacion.getValidarJustificacion()) && Integer.parseInt(actuacionModificacion.getUsuCreacion()) == usuarios.get(0).getIdusuario() &&
+							Integer.parseInt(actuacionModificacion.getUsuModificacion()) == usuarios.get(0).getIdusuario()) {
+						actuacionModificacion.setPermiteModificacion(true);
+					}else {
+						actuacionModificacion.setPermiteModificacion(false);
+					}
+				}
+				
 				actuacionDedignaDTO.setActuacionesDesignaItems(listaActuacionDesignaItem);
 
 				LOGGER.info(
