@@ -382,7 +382,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				contador++;
 				codigosBind.put(new Integer(contador), designaItem.getNumProcedimiento().trim());
 //				sql += " AND des.numprocedimiento = " + designaItem.getNumProcedimiento();
-				sql += " AND regexp_like(des.numprocedimiento," + designaItem.getNumProcedimiento() + ") ";
+				sql += " AND regexp_like(des.numprocedimiento,'" + designaItem.getNumProcedimiento() + "') ";
 			}
 			if (designaItem.getNig() != null && !designaItem.getNig().equalsIgnoreCase("")) {
 				contador++;
@@ -1363,13 +1363,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.IDINSTITUCION = EJGDES.IDINSTITUCION ");
 		sql.append(" AND D.IDTURNO = EJGDES.IDTURNO ");
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
-		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA ");
+		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA, ");
+		sql.append(" DECODE(turno.VALIDARJUSTIFICACIONES,'S',1,'N',0) AS VALIDARJUSTIFICACIONES ");
 
 		sql.append(" FROM SCS_DESIGNA D join scs_designasletrado   dl ON d.idinstitucion = dl.idinstitucion "
 				+ "AND d.anio = dl.anio AND d.numero = dl.numero AND d.idturno = dl.idturno ");
-		sql.append("join scs_juzgado j ON  d.idjuzgado = j.idjuzgado\r\n"
+		sql.append(" JOIN scs_turno   turno        ON d.idinstitucion = turno.idinstitucion "
+                + " AND d.idturno = turno.idturno " );
+		sql.append(" join scs_juzgado j ON  d.idjuzgado = j.idjuzgado\r\n"
 				+ "                AND d.idinstitucion_juzg = j.idinstitucion ");
-		sql.append("join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento\r\n"
+		sql.append(" join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento\r\n"
 				+ "                AND p.idinstitucion = d.idinstitucion ");
 		if ((item.getSinEJG() != null && !item.getSinEJG().isEmpty())
 				|| (item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty())
@@ -2123,6 +2126,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT("ACT.FECHAUSUJUSTIFICACION");
 		sql2.SELECT("ACT.USUVALIDACION");
 		sql2.SELECT("ACT.FECHAVALIDACION");
+		sql2.SELECT("TUR.VALIDARJUSTIFICACIONES");
 
 		sql2.FROM("SCS_ACTUACIONDESIGNA ACT");
 
@@ -2131,6 +2135,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "LEFT JOIN SCS_JUZGADO JUZ ON JUZ.IDJUZGADO = ACT.IDJUZGADO AND JUZ.IDINSTITUCION = ACT.IDINSTITUCION "
 				+ "LEFT JOIN SCS_PROCEDIMIENTOS PRO ON PRO.IDPROCEDIMIENTO = ACT.IDPROCEDIMIENTO AND PRO.IDINSTITUCION = ACT.IDINSTITUCION AND PRO.IDINSTITUCION = ACT.IDINSTITUCION "
 				+ "LEFT JOIN CEN_COLEGIADO COL ON COL.IDPERSONA = ACT.IDPERSONACOLEGIADO AND COL.IDINSTITUCION = ACT.IDINSTITUCION "
+				+ "INNER JOIN SCS_TURNO TUR ON TUR.IDINSTITUCION = ACT.IDINSTITUCION AND TUR.IDTURNO = ACT.IDTURNO "
 				+ "LEFT JOIN CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
 
 		if (!actuacionDesignaRequestDTO.isHistorico()) {
@@ -2291,7 +2296,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
 
 		if (validar && !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
-			sql.SET("FECHAJUSTIFICACION = '" + actuacionDesignaItem.getFechaJustificacion() + "'");
+			sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
 		}
 
 		if (validar) {
@@ -2437,7 +2442,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.VALUES("IDTURNO", "'" + actuacionDesignaItem.getIdTurno() + "'");
 		sql.VALUES("ANIO", "'" + actuacionDesignaItem.getAnio() + "'");
 		sql.VALUES("NUMERO", "'" + actuacionDesignaItem.getNumero() + "'");
-		sql.VALUES("FECHA", "'" + actuacionDesignaItem.getFechaActuacion() + "'");
+		sql.VALUES("FECHA", "TO_DATE('" +  actuacionDesignaItem.getFechaActuacion() + "', 'DD/MM/RRRR')");
 		sql.VALUES("NUMEROASUNTO", "'" + actuacionDesignaItem.getNumeroAsunto() + "'");
 		sql.VALUES("ACUERDOEXTRAJUDICIAL", "'0'");
 		sql.VALUES("ANULACION", "'0'");
@@ -2508,7 +2513,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaActuacion())) {
-			sql.SET("FECHA = '" + actuacionDesignaItem.getFechaActuacion() + "'");
+			sql.SET("FECHA = TO_DATE('" +  actuacionDesignaItem.getFechaActuacion() + "', 'DD/MM/RRRR')");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPersonaColegiado())) {
@@ -2716,7 +2721,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.UPDATE("SCS_ACTUACIONDESIGNA");
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
-			sql.SET("FECHAJUSTIFICACION = '" + actuacionDesignaItem.getFechaJustificacion() + "'");
+			sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
 			sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 			sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
 		}

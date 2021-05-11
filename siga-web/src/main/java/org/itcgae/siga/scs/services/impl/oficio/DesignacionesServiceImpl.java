@@ -1920,6 +1920,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				List<ActuacionDesignaItem> listaActuacionDesignaItem = scsDesignacionesExtendsMapper
 						.busquedaActDesigna(actuacionDesignaRequestDTO, Short.toString(idInstitucion));
 
+				for(ActuacionDesignaItem actuacionModificacion: listaActuacionDesignaItem) {
+					if("S".equals(actuacionModificacion.getValidarJustificacion()) && Integer.parseInt(actuacionModificacion.getUsuCreacion()) == usuarios.get(0).getIdusuario() &&
+							Integer.parseInt(actuacionModificacion.getUsuModificacion()) == usuarios.get(0).getIdusuario()) {
+						actuacionModificacion.setPermiteModificacion(true);
+					}else {
+						actuacionModificacion.setPermiteModificacion(false);
+					}
+				}
+				
 				actuacionDedignaDTO.setActuacionesDesignaItems(listaActuacionDesignaItem);
 
 				LOGGER.info(
@@ -6046,23 +6055,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				} else if (listaActuaciones.size() == 2) {
 
+					ScsActuaciondesigna actuacionAnterior = listaActuaciones.get(listaActuaciones.size() - 1);
 					acreditacionexample = new ScsAcreditacionExample();
-
-					boolean isPrimera = listaActuaciones.get(0).getNumeroasunto().toString()
-							.equals(actuacionDesignaItem.getNumeroAsunto());
-
-					acreditacionexample = new ScsAcreditacionExample();
-
-					if (isPrimera) {
-						acreditacionexample.createCriteria()
-								.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(0).getIdacreditacion()));
-					} else {
-						acreditacionexample.createCriteria()
-								.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(1).getIdacreditacion()));
-					}
-
+					acreditacionexample.createCriteria()
+							.andIdacreditacionEqualTo(Short.valueOf(actuacionAnterior.getIdacreditacion()));
 					acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
-					String tipoAcreditacion = acreditaciones.get(0).getIdtipoacreditacion().toString();
+					String tipoAcreditacionActAnterior = acreditaciones.get(0).getIdtipoacreditacion().toString();
+					String tipoAcreditacionNoUltima = "";
 
 					if (!isActualizar) {
 						error.setCode(500);
@@ -6071,15 +6070,35 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					if (isActualizar) {
 
-						if ((isPrimera && tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
-								&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO))
-								|| (!isPrimera && tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_FIN)
-										&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN))) {
+						int index = IntStream
+								.range(0, listaActuaciones.size()).filter(actInd -> listaActuaciones.get(actInd)
+										.getNumeroasunto().toString().equals(actuacionDesignaItem.getNumeroAsunto()))
+								.findFirst().getAsInt();
+
+						boolean isUltima = index == (listaActuaciones.size() - 1);
+						
+						if(!isUltima) {
+							acreditacionexample = new ScsAcreditacionExample();
+							acreditacionexample.createCriteria()
+									.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(index).getIdacreditacion()));
+							acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
+							tipoAcreditacionNoUltima = acreditaciones.get(0).getIdtipoacreditacion().toString();
+						}
+
+						if ((isUltima && ((tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+								&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO))
+								|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))
+								|| (tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+										&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO))
+										|| tipoAacreditacionAInsertar
+												.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))))
+								|| (!isUltima && (tipoAcreditacionNoUltima.equals(tipoAacreditacionAInsertar)))) {
 							error.setCode(200);
 						} else {
 							error.setCode(500);
 							error.setDescription(errorAcreditacion);
 						}
+
 					}
 
 				}
@@ -6192,13 +6211,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				} else if (listaActuaciones.size() > 1) {
 
-					acreditacionexample = new ScsAcreditacionExample();
 					ScsActuaciondesigna actuacionAnterior = listaActuaciones.get(listaActuaciones.size() - 1);
 					acreditacionexample = new ScsAcreditacionExample();
 					acreditacionexample.createCriteria()
 							.andIdacreditacionEqualTo(Short.valueOf(actuacionAnterior.getIdacreditacion()));
 					acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
 					String tipoAcreditacionActAnterior = acreditaciones.get(0).getIdtipoacreditacion().toString();
+					String tipoAcreditacionNoUltima = "";
 
 					if (!isActualizar) {
 
@@ -6226,14 +6245,25 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								.findFirst().getAsInt();
 
 						boolean isUltima = index == (listaActuaciones.size() - 1);
+						
+						if(!isUltima) {
+							acreditacionexample = new ScsAcreditacionExample();
+							acreditacionexample.createCriteria()
+									.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(index).getIdacreditacion()));
+							acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
+							tipoAcreditacionNoUltima = acreditaciones.get(0).getIdtipoacreditacion().toString();
+						}
 
-						if (isUltima && ((tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
-								&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO))
-								|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))
-								|| (tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+						if (isUltima
+								&& ((tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
 										&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO))
-										|| tipoAacreditacionAInsertar
-												.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)))) {
+										|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))
+										|| (tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+												&& (tipoAacreditacionAInsertar
+														.equals(SigaConstants.ACREDITACION_TIPO_INICIO))
+												|| tipoAacreditacionAInsertar
+														.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)))
+								|| (!isUltima && (tipoAcreditacionNoUltima.equals(tipoAacreditacionAInsertar)))) {
 							error.setCode(200);
 						} else {
 							error.setCode(500);
