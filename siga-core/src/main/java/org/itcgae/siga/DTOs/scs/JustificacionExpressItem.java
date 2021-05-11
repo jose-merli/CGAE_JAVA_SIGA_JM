@@ -46,6 +46,7 @@ public class JustificacionExpressItem {
 	private String idPersona;
 	private String idProcedimiento;
 	private String procedimiento;
+	private String validarjustificaciones;
 	private Map<String, String> expedientes;
 	private List<ActuacionesJustificacionExpressItem> actuaciones;	
 	
@@ -645,5 +646,13 @@ public class JustificacionExpressItem {
 	 */
 	public void setProcedimiento(String procedimiento) {
 		this.procedimiento = procedimiento;
+	}
+
+	public String getValidarjustificaciones() {
+		return validarjustificaciones;
+	}
+
+	public void setValidarjustificaciones(String validarjustificaciones) {
+		this.validarjustificaciones = validarjustificaciones;
 	}
 }
