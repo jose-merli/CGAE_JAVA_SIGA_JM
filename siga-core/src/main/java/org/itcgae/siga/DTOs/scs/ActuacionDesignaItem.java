@@ -39,7 +39,9 @@ public class ActuacionDesignaItem {
 	private String fechaUsuJustificacion;
 	private String usuValidacion;
 	private String fechaValidacion;
-
+	private boolean permiteModificacion;
+	private String validarJustificacion; 
+	
 	/**
 	 * @return the fechaActuacion
 	 */
@@ -556,6 +558,22 @@ public class ActuacionDesignaItem {
 	 */
 	public void setFechaValidacion(String fechaValidacion) {
 		this.fechaValidacion = fechaValidacion;
+	}
+	
+	public boolean isPermiteModificacion() {
+		return permiteModificacion;
+	}
+
+	public void setPermiteModificacion(boolean permiteModificacion) {
+		this.permiteModificacion = permiteModificacion;
+	}
+	
+	public String getValidarJustificacion() {
+		return validarJustificacion;
+	}
+
+	public void setValidarJustificacion(String validarJustificacion) {
+		this.validarJustificacion = validarJustificacion;
 	}
 
 	@Override
