@@ -2293,7 +2293,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
 
 		if (validar && !UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
-			sql.SET("FECHAJUSTIFICACION = '" + actuacionDesignaItem.getFechaJustificacion() + "'");
+			sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
 		}
 
 		if (validar) {
@@ -2439,7 +2439,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.VALUES("IDTURNO", "'" + actuacionDesignaItem.getIdTurno() + "'");
 		sql.VALUES("ANIO", "'" + actuacionDesignaItem.getAnio() + "'");
 		sql.VALUES("NUMERO", "'" + actuacionDesignaItem.getNumero() + "'");
-		sql.VALUES("FECHA", "'" + actuacionDesignaItem.getFechaActuacion() + "'");
+		sql.VALUES("FECHA", "TO_DATE('" +  actuacionDesignaItem.getFechaActuacion() + "', 'DD/MM/RRRR')");
 		sql.VALUES("NUMEROASUNTO", "'" + actuacionDesignaItem.getNumeroAsunto() + "'");
 		sql.VALUES("ACUERDOEXTRAJUDICIAL", "'0'");
 		sql.VALUES("ANULACION", "'0'");
@@ -2510,7 +2510,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaActuacion())) {
-			sql.SET("FECHA = '" + actuacionDesignaItem.getFechaActuacion() + "'");
+			sql.SET("FECHA = TO_DATE('" +  actuacionDesignaItem.getFechaActuacion() + "', 'DD/MM/RRRR')");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPersonaColegiado())) {
@@ -2718,7 +2718,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.UPDATE("SCS_ACTUACIONDESIGNA");
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
-			sql.SET("FECHAJUSTIFICACION = '" + actuacionDesignaItem.getFechaJustificacion() + "'");
+			sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
 			sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 			sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
 		}
