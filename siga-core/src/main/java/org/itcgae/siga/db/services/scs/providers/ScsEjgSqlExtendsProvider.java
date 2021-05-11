@@ -82,8 +82,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
 		sql.SELECT("(CASE WHEN perjg.nombre is  NULL THEN '' ELSE perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre END) as NOMBRESOLICITANTE");
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
-
-//		sql.SELECT("perjg.NIF");
+		sql.SELECT("ejg.idpersonajg");		
+		sql.SELECT("perjg.NIF");
 //		sql.SELECT("perjg.correoelectronico");
 //		sql.SELECT("perjg.fechanacimiento");
 
