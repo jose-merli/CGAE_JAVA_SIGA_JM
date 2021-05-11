@@ -54,6 +54,7 @@ public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlP
 		subquery.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
 		subquery.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
 		subquery.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
+		subquery.WHERE("DESIGNALETRADO.IDTURNO = LET2.IDTURNO");
 		subquery.WHERE("TRUNC(LET2.FECHADESIGNA) <= TO_DATE('" + asuntoClave.getFechaActuacion() + "', 'DD/MM/RRRR')");
 
 		sql.SELECT("COLEGIADO.NCOLEGIADO");
@@ -77,7 +78,7 @@ public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlP
 		sql.WHERE("DESIGNALETRADO.NUMERO = '" + asuntoClave.getNumero() + "'");
 		sql.WHERE("TRUNC(DESIGNALETRADO.FECHADESIGNA) <= TO_DATE('" + asuntoClave.getFechaActuacion()
 				+ "', 'DD/MM/RRRR')");
-		sql.WHERE("( DESIGNALETRADO.FECHARENUNCIA IS NULL OR DESIGNALETRADO.FECHADESIGNA = ( " + subquery.toString()
+		sql.WHERE("( DESIGNALETRADO.FECHADESIGNA = ( " + subquery.toString()
 				+ " ))");
 
 		return sql.toString();

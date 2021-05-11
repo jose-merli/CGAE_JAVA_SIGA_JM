@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -2225,7 +2226,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (usuarios != null && !usuarios.isEmpty()) {
 
-				Error errorComprobaciones = comprobacionesActDesigna(actuacionDesignaItem, idInstitucion, false);
+				Error errorComprobaciones = null;
+
+				// Comprobamos si el módulo tiene activado el check de "Amite múltiples (columna
+				// "complemento" en la tabla) para ver si acepta varias acreditaciones
+				ScsProcedimientosKey procedimientoskey = new ScsProcedimientosKey();
+				procedimientoskey.setIdinstitucion(idInstitucion);
+				procedimientoskey.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
+				ScsProcedimientos procedimiento = scsProcedimientosMapper.selectByPrimaryKey(procedimientoskey);
+
+				if (procedimiento.getComplemento() != null && procedimiento.getComplemento().equals("1")) {
+					errorComprobaciones = comprobacionesActDesignaMultiples(actuacionDesignaItem, idInstitucion, false);
+				} else {
+					errorComprobaciones = comprobacionesActDesigna(actuacionDesignaItem, idInstitucion, false);
+				}
 
 				if (errorComprobaciones.getCode().toString().equals("200")) {
 
@@ -2350,7 +2364,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (usuarios != null && !usuarios.isEmpty()) {
 
-				Error errorComprobaciones = comprobacionesActDesigna(actuacionDesignaItem, idInstitucion, true);
+				Error errorComprobaciones = null;
+
+				// Comprobamos si el módulo tiene activado el check de "Amite múltiples (columna
+				// "complemento" en la tabla) para ver si acepta varias acreditaciones
+				ScsProcedimientosKey procedimientoskey = new ScsProcedimientosKey();
+				procedimientoskey.setIdinstitucion(idInstitucion);
+				procedimientoskey.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
+				ScsProcedimientos procedimiento = scsProcedimientosMapper.selectByPrimaryKey(procedimientoskey);
+
+				if (procedimiento.getComplemento() != null && procedimiento.getComplemento().equals("1")) {
+					errorComprobaciones = comprobacionesActDesignaMultiples(actuacionDesignaItem, idInstitucion, true);
+				} else {
+					errorComprobaciones = comprobacionesActDesigna(actuacionDesignaItem, idInstitucion, true);
+				}
 
 				if (errorComprobaciones.getCode().toString().equals("200")) {
 
@@ -4247,7 +4274,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(designa.getAnio()).
 					andIdturnoEqualTo(designa.getIdturno()).andNumeroEqualTo(designa.getNumero()).andIdpersonaEqualTo(letradoSaliente.getIdpersona()).
-					andFechadesignaGreaterThanOrEqualTo(letradoSaliente.getFechadesigna());
+					andFechadesignaGreaterThanOrEqualTo(letradoSaliente.getFechadesigna()).andFecharenunciasolicitaIsNull();
 
 					List<ScsDesignasletrado> designas = scsDesignasletradoMapper.selectByExample(example);
 
@@ -5924,14 +5951,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			boolean isActualizar) {
 
 		Error error = new Error();
-		String tipoUltima = "";
 		ScsAcreditacionExample acreditacionexample = new ScsAcreditacionExample();
 		ScsActuaciondesignaExample actuaciondesignaexample = new ScsActuaciondesignaExample();
 		List<ScsAcreditacion> acreditaciones = null;
 		String errorAcreditacion = "justiciaGratuita.oficio.designas.actuaciones.acreditacion.error";
 
 		try {
-
+			// Comprobamos si el turno tiene activa las restricciones para las
+			// acreditaciones
 			ScsTurnoKey scsTurnoKey = new ScsTurnoKey();
 			scsTurnoKey.setIdinstitucion(idInstitucion);
 			scsTurnoKey.setIdturno(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
@@ -5940,11 +5967,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (scsTurno.getActivarretriccionacredit().toUpperCase().equals("1")
 					|| scsTurno.getActivarretriccionacredit().toUpperCase().equals("S")) {
-
-				ScsProcedimientosKey procedimientoskey = new ScsProcedimientosKey();
-				procedimientoskey.setIdinstitucion(idInstitucion);
-				procedimientoskey.setIdprocedimiento(actuacionDesignaItem.getIdProcedimiento());
-				ScsProcedimientos procedimiento = scsProcedimientosMapper.selectByPrimaryKey(procedimientoskey);
 
 				// Obtenemos el tipo de acreditación que se quiere guardar
 				acreditacionexample = new ScsAcreditacionExample();
@@ -5965,18 +5987,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				List<ScsActuaciondesigna> listaActuaciones = scsActuaciondesignaMapper
 						.selectByExample(actuaciondesignaexample);
 
-				if (!listaActuaciones.isEmpty()) {
-					acreditacionexample = new ScsAcreditacionExample();
-					acreditacionexample.createCriteria().andIdacreditacionEqualTo(
-							Short.valueOf(listaActuaciones.get(listaActuaciones.size() - 1).getIdacreditacion()));
-					acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
-					tipoUltima = acreditaciones.get(0).getIdtipoacreditacion().toString();
-				}
-
-				// Si se trata de la primera actuación, esta solo podrá ser de INICIO o COMPLETA
-				if (listaActuaciones.isEmpty() || ((tipoUltima.equals(SigaConstants.ACREDITACION_TIPO_FIN)
-						|| tipoUltima.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))
-						&& procedimiento.getComplemento() != null && procedimiento.getComplemento().equals("1"))) {
+				// Si se trata de la primera actuación, esta solo podrá ser de INICIO o
+				// COMPLETA, a no ser que tenga activado el check "Admite múltiples"
+				if (listaActuaciones.isEmpty()) {
 
 					if (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
 							|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)) {
@@ -5995,27 +6008,73 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
 					String tipoAcreditacion = acreditaciones.get(0).getIdtipoacreditacion().toString();
 
-					if ((tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA) && !isActualizar)
-							|| (!isActualizar && !(tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
-									&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN)))) {
-						error.setCode(500);
-						error.setDescription(errorAcreditacion);
-					} else {
-						error.setCode(200);
+					if (!isActualizar) {
+
+						if (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+								|| !(tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+										&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN))) {
+							error.setCode(500);
+							error.setDescription(errorAcreditacion);
+						} else {
+							error.setCode(200);
+
+						}
 
 					}
 
-					if (isActualizar && ((tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
-							&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
-									|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)))
-							|| (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
-									&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
-											|| tipoAacreditacionAInsertar
-													.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))))) {
-						error.setCode(200);
+					if (isActualizar) {
+
+						if (((tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+								&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+										|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)))
+								|| (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+										&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+												|| tipoAacreditacionAInsertar
+														.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))))) {
+							error.setCode(200);
+						} else {
+							error.setCode(500);
+							error.setDescription(errorAcreditacion);
+						}
+
+					}
+
+				} else if (listaActuaciones.size() == 2) {
+
+					acreditacionexample = new ScsAcreditacionExample();
+
+					boolean isPrimera = listaActuaciones.get(0).getNumeroasunto().toString()
+							.equals(actuacionDesignaItem.getNumeroAsunto());
+
+					acreditacionexample = new ScsAcreditacionExample();
+
+					if (isPrimera) {
+						acreditacionexample.createCriteria()
+								.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(0).getIdacreditacion()));
 					} else {
+						acreditacionexample.createCriteria()
+								.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(1).getIdacreditacion()));
+					}
+
+					acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
+					String tipoAcreditacion = acreditaciones.get(0).getIdtipoacreditacion().toString();
+
+					if (!isActualizar) {
 						error.setCode(500);
 						error.setDescription(errorAcreditacion);
+					}
+
+					if (isActualizar) {
+
+						if ((isPrimera && tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+								&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO))
+								|| (!isPrimera && tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_FIN)
+										&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN))) {
+							error.setCode(200);
+						} else {
+							error.setCode(500);
+							error.setDescription(errorAcreditacion);
+						}
 					}
 
 				}
@@ -6026,6 +6085,167 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		} catch (Exception e) {
 			LOGGER.error(
 					"DesignacionesServiceImpl.comprobacionesActDesigna() -> Se ha producido un error al realizar las comprobaciones realacionadas a la actuación de la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+		}
+
+		return error;
+	}
+
+	private Error comprobacionesActDesignaMultiples(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion,
+			boolean isActualizar) {
+
+		Error error = new Error();
+		ScsActuaciondesignaExample actuaciondesignaexample = new ScsActuaciondesignaExample();
+		ScsAcreditacionExample acreditacionexample = new ScsAcreditacionExample();
+		List<ScsAcreditacion> acreditaciones = null;
+		String errorAcreditacion = "justiciaGratuita.oficio.designas.actuaciones.acreditacion.error";
+
+		try {
+
+			// Comprobamos si el turno tiene activa las restricciones para las
+			// acreditaciones
+			ScsTurnoKey scsTurnoKey = new ScsTurnoKey();
+			scsTurnoKey.setIdinstitucion(idInstitucion);
+			scsTurnoKey.setIdturno(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
+
+			ScsTurno scsTurno = scsTurnoMapper.selectByPrimaryKey(scsTurnoKey);
+
+			if (scsTurno.getActivarretriccionacredit().toUpperCase().equals("1")
+					|| scsTurno.getActivarretriccionacredit().toUpperCase().equals("S")) {
+
+				// Obtenemos el tipo de acreditación que se quiere guardar
+				acreditacionexample = new ScsAcreditacionExample();
+				acreditacionexample.createCriteria()
+						.andIdacreditacionEqualTo(Short.valueOf(actuacionDesignaItem.getIdAcreditacion()));
+				acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
+				String tipoAacreditacionAInsertar = acreditaciones.get(0).getIdtipoacreditacion().toString();
+
+				// Obtenemos las actuaciones relacionadas a la designa por modulo
+				actuaciondesignaexample = new ScsActuaciondesignaExample();
+				actuaciondesignaexample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(Integer.valueOf(actuacionDesignaItem.getIdTurno()))
+						.andAnioEqualTo(Short.valueOf(actuacionDesignaItem.getAnio()))
+						.andNumeroEqualTo(Long.valueOf(actuacionDesignaItem.getNumero()))
+						.andIdprocedimientoEqualTo(actuacionDesignaItem.getIdProcedimiento());
+				actuaciondesignaexample.setOrderByClause("NUMEROASUNTO ASC");
+
+				List<ScsActuaciondesigna> listaActuaciones = scsActuaciondesignaMapper
+						.selectByExample(actuaciondesignaexample);
+
+				if (listaActuaciones.isEmpty()) {
+
+					if (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+							|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)) {
+						error.setCode(200);
+					} else {
+						error.setCode(500);
+						error.setDescription(errorAcreditacion);
+					}
+
+				} else if (listaActuaciones.size() == 1) {
+
+					acreditacionexample = new ScsAcreditacionExample();
+					acreditacionexample.createCriteria()
+							.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(0).getIdacreditacion()));
+
+					acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
+					String tipoAcreditacion = acreditaciones.get(0).getIdtipoacreditacion().toString();
+
+					if (!isActualizar) {
+
+						if (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+								|| !(tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+										&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN))) {
+							error.setCode(500);
+							error.setDescription(errorAcreditacion);
+						} else {
+							error.setCode(200);
+
+						}
+
+					}
+
+					if (isActualizar) {
+
+						if (((tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+								&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+										|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)))
+								|| (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+										&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+												|| tipoAacreditacionAInsertar
+														.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))))) {
+							error.setCode(200);
+						} else {
+							error.setCode(500);
+							error.setDescription(errorAcreditacion);
+						}
+
+					}
+
+				} else if (listaActuaciones.size() > 1) {
+
+					acreditacionexample = new ScsAcreditacionExample();
+					ScsActuaciondesigna actuacionAnterior = listaActuaciones.get(listaActuaciones.size() - 1);
+					acreditacionexample = new ScsAcreditacionExample();
+					acreditacionexample.createCriteria()
+							.andIdacreditacionEqualTo(Short.valueOf(actuacionAnterior.getIdacreditacion()));
+					acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
+					String tipoAcreditacionActAnterior = acreditaciones.get(0).getIdtipoacreditacion().toString();
+
+					if (!isActualizar) {
+
+						if ((tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_FIN)
+								&& !(tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+										|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)))
+								|| (tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+										&& !(tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN)))
+								|| (tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+										&& !(tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+												|| tipoAacreditacionAInsertar
+														.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)))) {
+							error.setCode(500);
+							error.setDescription(errorAcreditacion);
+						} else {
+							error.setCode(200);
+						}
+					}
+
+					if (isActualizar) {
+
+						int index = IntStream
+								.range(0, listaActuaciones.size()).filter(actInd -> listaActuaciones.get(actInd)
+										.getNumeroasunto().toString().equals(actuacionDesignaItem.getNumeroAsunto()))
+								.findFirst().getAsInt();
+
+						boolean isUltima = index == (listaActuaciones.size() - 1);
+
+						if (isUltima && ((tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+								&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO))
+								|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA))
+								|| (tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
+										&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO))
+										|| tipoAacreditacionAInsertar
+												.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)))) {
+							error.setCode(200);
+						} else {
+							error.setCode(500);
+							error.setDescription(errorAcreditacion);
+						}
+
+					}
+
+				}
+
+			} else {
+				error.setCode(200);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.comprobacionesActDesignaMultiples() -> Se ha producido un error al realizar las comprobaciones realacionadas a la actuación de la designación",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
