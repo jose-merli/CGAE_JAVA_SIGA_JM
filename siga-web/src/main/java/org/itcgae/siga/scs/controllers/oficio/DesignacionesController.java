@@ -646,6 +646,11 @@ public class DesignacionesController {
 		designa.setAnio((short) Integer.parseInt(ano));
 		designa.setIdturno(Integer.parseInt(item[1]));
 		designa.setNumero((long) Integer.parseInt(item[2]));
+		if(item.length == 4) {
+			designa.setNumprocedimiento(item[3]);
+		}else {
+			designa.setNumprocedimiento(null);
+		}
 		List<ListaLetradosDesignaItem> response = designacionesService.busquedaLetradosDesigna(designa, request);
 		if (response != null) {
 			return new ResponseEntity<List<ListaLetradosDesignaItem>>(response, HttpStatus.OK);

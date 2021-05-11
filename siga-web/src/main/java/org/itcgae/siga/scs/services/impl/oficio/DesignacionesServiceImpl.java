@@ -4185,59 +4185,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-//			GenParametrosExample genParametrosExample = new GenParametrosExample();
-//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-//			LOGGER.info(
-//					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-//			LOGGER.info(
-//					"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-//			if (tamMax != null) {
-//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-//			} else {
-//				tamMaximo = null;
-//			}
-
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
 						"DesignacionesServiceImpl.busquedaLetradosDesigna() -> Entrada a servicio para la busqueda de letrados de la designacion");
 
 				try {
 
-//						ScsDesignasletradoExample example = new ScsDesignasletradoExample();
-//						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(item.getAnio())
-//						.andIdturnoEqualTo(item.getIdturno()).andNumeroEqualTo(item.getNumero());
-//						
-//						List<ScsDesignasletrado> letrados = scsDesignasletradoMapper.selectByExample(example);
-
-//						int i = 0;
-					// Buscamos las columnas de la tabla que no podemos extraer de latabla
-					// designasletado
-					// Nº COlegiado y nombre y apellido
-//						for (ScsDesignasletrado letrado: letrados) {
-
-//							listaLetrados.add(new ListaLetradosDesignaItem());
-
 					listaLetrados = scsDesignacionesExtendsMapper.getListaLetradosDesigna(item, idInstitucion);
-//							listaLetrados.get(i).setFechaDesignacion(letrado.getFechadesigna());
-//							listaLetrados.get(i).setFechaSolRenuncia(letrado.getFecharenunciasolicita());
-//							listaLetrados.get(i).setFechaEfecRenuncia(letrado.getFecharenuncia());
-//							listaLetrados.get(i).setMotivoRenuncia(letrado.getMotivosrenuncia());
-//							
-//							CenColegiadoKey key = new CenColegiadoKey();
-//							key.setIdinstitucion(idInstitucion);
-//							key.setIdpersona(letrado.getIdpersona());
-//							
-//							CenColegiado colegiado = cenColegiadoMapper.selectByPrimaryKey(key);
-//							colegiado.getNcolegiado();
-//							colegiado.getn
-//							
-//							
-//							i++;
-//						}
 					// Repasamos las fechas obtenidas
 					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 					for (ListaLetradosDesignaItem letrado : listaLetrados) {
