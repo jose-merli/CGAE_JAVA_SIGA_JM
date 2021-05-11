@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.impl.ejg;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -895,13 +896,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					
 					ceros+=numEJG;
 					
-					record.setNumejg(numEJG);
+					record.setNumejg(ceros);
 					
 					// Repetimos el proceso con numero
 					
 					String numero = scsEjgExtendsMapper.getNumero(record.getIdtipoejg(), record.getAnio(), record.getIdinstitucion());
 					
-					numCeros = Integer.parseInt(longitudEJG) - numEJG.length();
+					numCeros = Integer.parseInt(longitudEJG) - numero.length();
 					
 					ceros ="";
 					for(int i=0; i<numCeros; i++) {
@@ -910,7 +911,18 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					
 					ceros+=numero;
 					
-					record.setNumero(Long.parseLong(numero));
+					record.setNumero(Long.parseLong(ceros));
+					
+					//Determinamos el origen de apertura ya que, aunque no sea una clave primaria,
+					//no se permita que tenga valor null. Por ahora se introducira el valor de idinstitucion. Preguntar mas tarde.
+					record.setOrigenapertura("M");
+					
+					//Sucede lo mismo
+					record.setTipoletrado("M");
+					record.setFechacreacion(new Date());
+					record.setFechamodificacion(new Date());
+					record.setUsucreacion(usuarios.get(0).getIdusuario());
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
 					
 					response = scsEjgMapper.insertSelective(record);
 					
@@ -920,7 +932,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					
 					// respuesta si se actualiza correctamente
 					if (response >= 1) {
-						List<EjgItem> list = null;
+						List<EjgItem> list = new ArrayList<>();
 						
 						EjgItem item = new EjgItem();
 						
@@ -1008,6 +1020,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						ejg.setFechapresentacion(datos.getFechapresentacion());
 						ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
 						if(datos.getTipoEJGColegio()!=null)ejg.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
+						ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						ejg.setFechamodificacion(new Date());
 						
 						//Actualizamos la entrada en la BBDD
 						response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
@@ -1033,6 +1047,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						
 						if(newExp!= null) {
 							if(datos.getIdTipoExpediente()!=null)newExp.setIdtipoexpediente(Short.parseShort(datos.getIdTipoExpediente()));
+							newExp.setUsumodificacion(usuarios.get(0).getIdusuario());
+							newExp.setFechamodificacion(new Date());
 							
 							response = expExpedienteMapper.updateByPrimaryKeySelective(newExp);
 

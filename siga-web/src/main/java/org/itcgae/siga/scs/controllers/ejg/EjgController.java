@@ -217,9 +217,9 @@ public class EjgController {
 
 	//insertaDatosGenerales
 	@RequestMapping(value = "/gestion-ejg/insertaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> insertaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
-		InsertResponseDTO response = gestionEJG.insertaDatosGenerales(datos, request);
-		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	ResponseEntity<EjgDTO> insertaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
+		EjgDTO response = gestionEJG.insertaDatosGenerales(datos, request);
+		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
 	}
 	
 	//actualizaDatosGenerales
