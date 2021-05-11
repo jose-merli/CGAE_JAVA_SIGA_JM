@@ -382,7 +382,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				contador++;
 				codigosBind.put(new Integer(contador), designaItem.getNumProcedimiento().trim());
 //				sql += " AND des.numprocedimiento = " + designaItem.getNumProcedimiento();
-				sql += " AND regexp_like(des.numprocedimiento," + designaItem.getNumProcedimiento() + ") ";
+				sql += " AND regexp_like(des.numprocedimiento,'" + designaItem.getNumProcedimiento() + "') ";
 			}
 			if (designaItem.getNig() != null && !designaItem.getNig().equalsIgnoreCase("")) {
 				contador++;
