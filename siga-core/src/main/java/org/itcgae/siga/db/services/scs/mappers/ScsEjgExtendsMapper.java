@@ -188,4 +188,7 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getNumeroEJG")
 	String getNumeroEJG(short idTipoEJG, short anio, short idInstitucion);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getNumero")
+	String getNumero(short idTipoEJG, short anio, short idInstitucion);
 }

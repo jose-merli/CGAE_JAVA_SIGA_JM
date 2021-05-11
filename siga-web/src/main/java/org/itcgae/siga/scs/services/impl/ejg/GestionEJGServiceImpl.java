@@ -822,9 +822,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	
 	@Override
 	@Transactional
-	public InsertResponseDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request) {
-		InsertResponseDTO responsedto = new InsertResponseDTO();
+	public EjgDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request) {
+		EjgDTO ejgdto = new EjgDTO();
 		int response = 0;
+		Error error = new Error();
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -862,39 +863,71 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					
 					//numejg
 					
-					String numero = scsEjgExtendsMapper.getNumeroEJG(record.getIdtipoejg(), record.getAnio(), record.getIdinstitucion());
+					String numEJG = scsEjgExtendsMapper.getNumeroEJG(record.getIdtipoejg(), record.getAnio(), record.getIdinstitucion());
 					
-					int numCeros = Integer.parseInt(longitudEJG) - numero.length();
+					int numCeros = Integer.parseInt(longitudEJG) - numEJG.length();
 					
-					String numEJG ="";
+					String ceros ="";
 					for(int i=0; i<numCeros; i++) {
-						numEJG += "0";
+						ceros += "0";
 					}
 					
-					numEJG+=numero;
+					ceros+=numEJG;
 					
 					record.setNumejg(numEJG);
+					
+					// Repetimos el proceso con numero
+					
+					String numero = scsEjgExtendsMapper.getNumero(record.getIdtipoejg(), record.getAnio(), record.getIdinstitucion());
+					
+					numCeros = Integer.parseInt(longitudEJG) - numEJG.length();
+					
+					ceros ="";
+					for(int i=0; i<numCeros; i++) {
+						ceros += "0";
+					}
+					
+					ceros+=numero;
+					
 					record.setNumero(Long.parseLong(numero));
 					
 					response = scsEjgMapper.insertSelective(record);
+					
 				} catch (Exception e) {
 					LOGGER.error("GestionEJGServiceImpl.insertaDatosGenerales(). ERROR: al hacer el insert de datos generales. ", e);
 				} finally {
+					
 					// respuesta si se actualiza correctamente
 					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
+						List<EjgItem> list = null;
+						
+						EjgItem item = new EjgItem();
+						
+						item.seteidInstitucion(idInstitucion.toString());
+						item.setAnnio(datos.getAnnio());
+						item.setNumEjg(record.getNumejg());
+						item.setNumero(record.getNumero().toString());
+						item.setTipoEJG(datos.getTipoEJG());
+						
+						list.add(item);
+						
+						ejgdto.setEjgItems(list);
+//						responsedto.setStatus(SigaConstants.OK);
+						error.setCode(200);
 						LOGGER.debug("GestionEJGServiceImpl.insertaDatosGenerales() -> OK. Datos generales insertados");
 					} else {
-						responsedto.setStatus(SigaConstants.KO);
+//						responsedto.setStatus(SigaConstants.KO);
+						error.setCode(400);
 						LOGGER.error("GestionEJGServiceImpl.insertaDatosGenerales() -> KO. No se ha insertado los datos generales");
 					}
+					ejgdto.setError(error);
 				}
 			}
 		}
 
 		LOGGER.info("GestionEJGServiceImpl.insertaDatosGenerales() -> Salida del servicio.");
 
-		return responsedto;
+		return ejgdto;
 	}
 
 	@Override
