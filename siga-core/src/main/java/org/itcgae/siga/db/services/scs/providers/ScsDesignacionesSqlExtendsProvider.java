@@ -67,12 +67,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			String fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
-			sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') >= TO_DATE('" + fecha + "','DD/MM/RRRR')");
+			sql.WHERE("EJG.FECHAAPERTURA >= TO_DATE('" + fecha + "','DD/MM/RRRR')");
 		}
 		if (asuntosJusticiableItem.getFechaAperturaHasta() != null) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			String fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaHasta());
-			sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') <= TO_DATE('" + fecha + "','DD/MM/RRRR')");
+			sql.WHERE("EJG.FECHAAPERTURA <= TO_DATE('" + fecha + "','DD/MM/RRRR')");
 		}
 
 		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
@@ -474,11 +474,21 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					|| (designaItem.getFechaEntradaFin() != null
 							&& !designaItem.getFechaEntradaFin().toString().equalsIgnoreCase(""))) {
 
-				DateFormat formatter1 = new SimpleDateFormat("dd/MM/yy");
-				String fechaEntradaInicio = formatter1.format(designaItem.getFechaEntradaInicio());
-				String fechaEntradaFin = formatter1.format(designaItem.getFechaEntradaFin());
-
-				sql += " and des.fechaentrada between '" + fechaEntradaInicio + "' and '" + fechaEntradaFin + "' ";
+				DateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy");
+				String fechaEntradaInicio ="";
+				String fechaEntradaFin =""; 
+				if(designaItem.getFechaEntradaInicio()!= null)
+					fechaEntradaInicio = formatter1.format(designaItem.getFechaEntradaInicio());
+				if(designaItem.getFechaEntradaFin()!= null)
+					fechaEntradaFin = formatter1.format(designaItem.getFechaEntradaFin());
+				if(designaItem.getFechaEntradaInicio()!= null && designaItem.getFechaEntradaFin()!= null) {
+					sql += " and des.fechaentrada between TO_DATE('" + fechaEntradaInicio + "','DD/MM/RRRR') and TO_DATE('" + fechaEntradaFin +"','DD/MM/RRRR') ";
+				}else if(designaItem.getFechaEntradaInicio()!= null) {
+					sql += " and des.fechaentrada >=  TO_DATE('" + fechaEntradaInicio +"','DD/MM/RRRR') ";
+				}else {
+					sql += " and des.fechaentrada <=  TO_DATE('" + fechaEntradaFin +"','DD/MM/RRRR') ";
+				}
+				
 
 			}
 			if ((designaItem.getFechaJustificacionDesde() != null
@@ -487,12 +497,20 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					|| (designaItem.getFechaJustificacionHasta() != null
 							&& designaItem.getFechaJustificacionHasta().toString() != null
 							&& !designaItem.getFechaJustificacionHasta().toString().equalsIgnoreCase(""))) {
-				DateFormat formatter1 = new SimpleDateFormat("dd/MM/yy");
-				String fechaEntradaInicio = formatter1.format(designaItem.getFechaJustificacionDesde());
-				String fechaEntradaFin = formatter1.format(designaItem.getFechaJustificacionHasta());
-
-				sql += " and act.fechaJustificacion between '" + fechaEntradaInicio + "' and '" + fechaEntradaFin
-						+ "' ";
+				DateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy");
+				String fechaJustificacionDesde ="";
+				String fechaJustificacionHasta =""; 
+				if(designaItem.getFechaJustificacionDesde()!= null)
+					fechaJustificacionDesde = formatter1.format(designaItem.getFechaJustificacionDesde());
+				if(designaItem.getFechaJustificacionHasta()!= null)
+					fechaJustificacionHasta = formatter1.format(designaItem.getFechaJustificacionHasta());
+				if(designaItem.getFechaJustificacionDesde()!= null && designaItem.getFechaJustificacionHasta()!= null) {
+					sql += " and act.fechaJustificacion between TO_DATE('" + fechaJustificacionDesde + "','DD/MM/RRRR') and TO_DATE('" + fechaJustificacionHasta +"','DD/MM/RRRR') ";
+				}else if(designaItem.getFechaJustificacionDesde()!= null) {
+					sql += " and act.fechaJustificacion >=  TO_DATE('" + fechaJustificacionDesde +"','DD/MM/RRRR') ";
+				}else {
+					sql += " and act.fechaJustificacion <=  TO_DATE('" + fechaJustificacionHasta +"','DD/MM/RRRR') ";
+				}
 
 			}
 			if (designaItem.getIdTipoDesignaColegios() != null
@@ -994,11 +1012,21 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					|| (designaItem.getFechaEntradaFin() != null
 							&& !designaItem.getFechaEntradaFin().toString().equalsIgnoreCase(""))) {
 
-				DateFormat formatter1 = new SimpleDateFormat("dd/MM/yy");
-				String fechaEntradaInicio = formatter1.format(designaItem.getFechaEntradaInicio());
-				String fechaEntradaFin = formatter1.format(designaItem.getFechaEntradaFin());
-
-				sql += " and des.fechaentrada between '" + fechaEntradaInicio + "' and '" + fechaEntradaFin + "' ";
+				DateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy");
+				String fechaEntradaInicio ="";
+				String fechaEntradaFin =""; 
+				if(designaItem.getFechaEntradaInicio()!= null)
+					fechaEntradaInicio = formatter1.format(designaItem.getFechaEntradaInicio());
+				if(designaItem.getFechaEntradaFin()!= null)
+					fechaEntradaFin = formatter1.format(designaItem.getFechaEntradaFin());
+				if(designaItem.getFechaEntradaInicio()!= null && designaItem.getFechaEntradaFin()!= null) {
+					sql += " and des.fechaentrada between TO_DATE('" + fechaEntradaInicio + "','DD/MM/RRRR') and TO_DATE('" + fechaEntradaFin +"','DD/MM/RRRR') ";
+				}else if(designaItem.getFechaEntradaInicio()!= null) {
+					sql += " and des.fechaentrada >=  TO_DATE('" + fechaEntradaInicio +"','DD/MM/RRRR') ";
+				}else {
+					sql += " and des.fechaentrada <=  TO_DATE('" + fechaEntradaFin +"','DD/MM/RRRR') ";
+				}
+				
 
 			}
 			if ((designaItem.getFechaJustificacionDesde() != null
@@ -1007,12 +1035,20 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					|| (designaItem.getFechaJustificacionHasta() != null
 							&& designaItem.getFechaJustificacionHasta().toString() != null
 							&& !designaItem.getFechaJustificacionHasta().toString().equalsIgnoreCase(""))) {
-				DateFormat formatter1 = new SimpleDateFormat("dd/MM/yy");
-				String fechaEntradaInicio = formatter1.format(designaItem.getFechaJustificacionDesde());
-				String fechaEntradaFin = formatter1.format(designaItem.getFechaJustificacionHasta());
-
-				sql += " and act.fechaJustificacion between '" + fechaEntradaInicio + "' and '" + fechaEntradaFin
-						+ "' ";
+				DateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy");
+				String fechaJustificacionDesde ="";
+				String fechaJustificacionHasta =""; 
+				if(designaItem.getFechaJustificacionDesde()!= null)
+					fechaJustificacionDesde = formatter1.format(designaItem.getFechaJustificacionDesde());
+				if(designaItem.getFechaJustificacionHasta()!= null)
+					fechaJustificacionHasta = formatter1.format(designaItem.getFechaJustificacionHasta());
+				if(designaItem.getFechaJustificacionDesde()!= null && designaItem.getFechaJustificacionHasta()!= null) {
+					sql += " and act.fechaJustificacion between TO_DATE('" + fechaJustificacionDesde + "','DD/MM/RRRR') and TO_DATE('" + fechaJustificacionHasta +"','DD/MM/RRRR') ";
+				}else if(designaItem.getFechaJustificacionDesde()!= null) {
+					sql += " and act.fechaJustificacion >=  TO_DATE('" + fechaJustificacionDesde +"','DD/MM/RRRR') ";
+				}else {
+					sql += " and act.fechaJustificacion <=  TO_DATE('" + fechaJustificacionHasta +"','DD/MM/RRRR') ";
+				}
 
 			}
 			if (designaItem.getIdTipoDesignaColegios() != null
@@ -1574,7 +1610,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			String fecha = dateFormat.format(item.getDesignacionDesde());
 
-			sql.append("AND TRUNC(D.FECHAENTRADA) >= '" + fecha + "'");
+			sql.append("AND TRUNC(D.FECHAENTRADA) >= TO_DATE('" + fecha + "', 'DD/MM/RRRR')");
 		} else {
 			sql.append(" AND TRUNC(D.FECHAENTRADA) > TO_DATE('01/01/1950', 'DD/MM/RRRR')");
 		}
@@ -1583,7 +1619,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			String fecha = dateFormat.format(item.getDesignacionHasta());
 
-			sql.append("AND D.FECHAENTRADA <= '" + fecha + "'");
+			sql.append("AND D.FECHAENTRADA <= TO_DATE('" + fecha + "', 'DD/MM/RRRR')");
 		}
 
 		// nombre y apellidos
@@ -2069,7 +2105,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.VALUES("numerodesignacion", "'" + procuradorItem.getNumerodesignacion() + "'");
 		}
 		if (procuradorItem.getFechaDesigna() != null) {
-			sql.VALUES("fechadesigna", "'" + procuradorItem.getFechaDesigna() + "'");
+			String fecha = dateFormat.format(procuradorItem.getFechaDesigna());
+			sql.VALUES("fechadesigna", "TO_DATE('" + fecha + "','DD/MM/RRRR')");
 		}
 		if (procuradorItem.getMotivosRenuncia() != null) {
 			sql.VALUES("motivorenuncia", "'" + procuradorItem.getMotivosRenuncia() + "'");
@@ -2079,7 +2116,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}
 
 		sql.VALUES("usumodificacion", "'" + usuario + "'");
-		sql.VALUES("fechamodificacion", "'" + procuradorItem.getFechaModificacion() + "'");
+		sql.VALUES("fechamodificacion", "SYSDATE");
 
 		return sql.toString();
 
@@ -2333,13 +2370,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String compruebaFechaProcurador(String fecha, String numAnio) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fechaFormat = dateFormat.format(fecha);
 
 		sql2.SELECT(
 				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
 
 		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
 		sql2.WHERE("dp.numerodesignacion = '" + numAnio + "'");
-		sql2.WHERE("dp.fechadesigna ='" + fecha + "'");
+		sql2.WHERE("dp.fechadesigna = TO_DATE('" + fechaFormat + "','DD/MM/RRRR')");
 		sql2.WHERE("dp.idprocurador = p.idprocurador");
 		sql2.WHERE("dp.idinstitucion = p.idinstitucion");
 		sql2.ORDER_BY("dp.FECHADESIGNA DESC");
@@ -2356,17 +2396,21 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 		String [] part = procuradorItem.getNombre().split(",");
 		String nombre =part[1].substring(1);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fechaFormat = dateFormat.format(fecha);
+		String fechaDesigna = dateFormat.format(procuradorItem.getFechaDesigna());
+		String fechaRenuncia = dateFormat.format(procuradorItem.getFecharenunciasolicita());
 		
 		sql.UPDATE("scs_designaprocurador");
 
-		sql.SET("fechadesigna ='" + procuradorItem.getFechaDesigna() + "'");
+		sql.SET("fechadesigna = TO_DATE('" + fechaDesigna + "','DD/MM/RRRR')");
 		sql.SET("numerodesignacion ='" + procuradorItem.getNumerodesignacion() + "'");
 		sql.SET("motivosrenuncia ='" + procuradorItem.getMotivosRenuncia() + "'");
-		sql.SET("fecharenunciasolicita ='" + procuradorItem.getFecharenunciasolicita() + "'");
+		sql.SET("fecharenunciasolicita = TO_DATE('" + fechaRenuncia + "','DD/MM/RRRR')");
 
 		sql.WHERE("idinstitucion=" + procuradorItem.getIdInstitucion());
 		sql.WHERE("idprocurador=(SELECT IDPROCURADOR FROM SCS_PROCURADOR WHERE NCOLEGIADO = '"+procuradorItem.getnColegiado()+"' AND NOMBRE = '"+nombre+"')");
-		sql.WHERE("fecharenuncia ='"+fecha+"'");
+		sql.WHERE("fecharenuncia =TO_DATE('"+fechaFormat+"','DD/MM/RRRR')");
 
 		return sql.toString();
 	}
@@ -2374,9 +2418,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String guardarProcuradorEJG(ProcuradorItem procuradorItem) {
 
 		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fechaDesigna = dateFormat.format(procuradorItem.getFechaDesigna());
+
 		sql.UPDATE("SCS_EJGDESIGNA");
 
-		sql.SET("fechadesigna ='" + procuradorItem.getFechaDesigna() + "'");
+		sql.SET("fechadesigna =TO_DATE('" + fechaDesigna + "','DD/MM/RRRR')");
 		sql.SET("numerodesignacion ='" + procuradorItem.getNumerodesignacion() + "'");
 		sql.SET("motivosrenuncia ='" + procuradorItem.getMotivosRenuncia() + "'");
 
@@ -2389,9 +2436,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String actualizarProcurador(ProcuradorItem procuradorItem) {
 
 		SQL sql2 = new SQL();
-		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fechaDesigna = dateFormat.format(procuradorItem.getFechaDesigna());
+
 		sql2.DELETE_FROM("scs_designaprocurador");
-		sql2.WHERE("fechadesigna ='" + procuradorItem.getFechaDesigna() + "'");
+		sql2.WHERE("fechadesigna = TO_DATE('" + fechaDesigna + "','DD/MM/RRRR')");
 		sql2.WHERE("numerodesignacion ='" + procuradorItem.getNumerodesignacion() + "'");
 
 		return sql2.toString();
@@ -2400,6 +2449,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String insertaProcurador(ProcuradorItem procuradorItem) {
 
 		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fechaDesigna = dateFormat.format(procuradorItem.getFechaDesigna());
 		sql.INSERT_INTO("scs_designaprocurador");
 
 		sql.SET("idinstitucion ='" + procuradorItem.getIdInstitucion() + "'");
@@ -2408,7 +2459,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SET("idprocurador ='" + procuradorItem.getIdProcurador() + "'");
 		sql.SET("idinstitucion_proc ='" + procuradorItem.getIdColProcurador() + "'");
 		sql.SET("idturno ='" + procuradorItem.getIdTurno() + "'");
-		sql.SET("fechadesigna ='" + procuradorItem.getFechaDesigna() + "'");
+		sql.SET("fechadesigna = TO_DATE('" + fechaDesigna + "','DD/MM/RRRR')");
 		sql.SET("numerodesignacion ='" + procuradorItem.getNumerodesignacion() + "'");
 		sql.SET("motivosrenuncia ='" + procuradorItem.getMotivosRenuncia() + "'");
 
@@ -2848,6 +2899,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String getInscripcionTurnoActiva(String idInstitucion, String idTurno, String idPersona, String fecha) {
 
 		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fechaFormat = dateFormat.format(fecha);
+		
 
 		sql.SELECT(
 				" Ins.Idinstitucion,Ins.Idturno, Per.Idpersona,Ins.fechasolicitud,TO_CHAR(TRUNC(Ins.fechavalidacion),'DD/MM/YYYY') As Fechavalidacion,"
@@ -2861,8 +2915,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" Tur.Idinstitucion ='" + idInstitucion + "'");
 		sql.WHERE(" Tur.Idturno ='" + idTurno + "'");
 		sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
-		sql.WHERE(" Trunc(Ins.Fechavalidacion) <= nvl('" + fecha + "',  Ins.Fechavalidacion)");
-		sql.WHERE("(Ins.Fechabaja Is Null Or    Trunc(Ins.Fechabaja) > nvl('" + fecha + "', '01/01/1900')) ");
+		sql.WHERE(" Trunc(Ins.Fechavalidacion) <= nvl(TO_DATE('" + fechaFormat + "','DD/MM/YYYY'),  Ins.Fechavalidacion)");
+		sql.WHERE("(Ins.Fechabaja Is Null Or    Trunc(Ins.Fechabaja) > TO_DATE(nvl('" + fechaFormat + "', '01/01/1900')','DD/MM/YYYY')) ");
 		sql.WHERE(" Ins.idpersona ='" + idPersona + "' and rownum <= 1");
 
 		return sql.toString();
@@ -2876,7 +2930,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		String sFechaSolicitudUltimo = (fechaSolicitudUltimo == null || fechaSolicitudUltimo.equals("")) ? "null"
 				: fechaSolicitudUltimo.toString();
 
-		Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Format formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		String fechaBBDD2 = formatter.format(fechaSolicitudUltimo);
 
 		SQL sql = new SQL();
