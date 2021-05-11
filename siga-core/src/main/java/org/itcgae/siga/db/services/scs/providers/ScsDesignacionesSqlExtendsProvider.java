@@ -2760,7 +2760,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if(designa.getNumprocedimiento() != null) {
 			sql.WHERE("SCS_DESIGNASLETRADO.IDPERSONA = '" + designa.getNumprocedimiento() + "'");
 		}
-		sql.ORDER_BY("SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
+		sql.ORDER_BY("SCS_DESIGNASLETRADO.FECHADESIGNA DESC, SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
 
 		return sql.toString();
 	}

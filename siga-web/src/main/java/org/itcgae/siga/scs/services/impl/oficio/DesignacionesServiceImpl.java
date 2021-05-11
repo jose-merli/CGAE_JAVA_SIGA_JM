@@ -4277,8 +4277,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					andFechadesignaGreaterThanOrEqualTo(letradoSaliente.getFechadesigna()).andFecharenunciasolicitaIsNull();
 
 					List<ScsDesignasletrado> designas = scsDesignasletradoMapper.selectByExample(example);
-
-					ScsDesignasletrado designaVieja = designas.get(0);
+					
+					ScsDesignasletrado designaVieja = new ScsDesignasletrado();
+					if(designas.size() != 0) {
+						designaVieja = designas.get(0);
+					}
 					
 					ScsDesignasletrado designaNueva = new ScsDesignasletrado();
 					designaNueva.setIdinstitucion(idInstitucion);
@@ -4322,18 +4325,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 					if(response!=0 && letradoEntrante.getIdpersona()!=null) {
 						//Gestionamos el antiguo letrado
-						if(designaVieja.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
-							ScsDesignasletradoKey key = new ScsDesignasletradoKey();
-							
-												key.setIdinstitucion(idInstitucion);
-												key.setAnio(designa.getAnio());
-												key.setIdturno(designa.getIdturno());
-												key.setNumero(designa.getNumero());
-												key.setIdpersona(letradoSaliente.getIdpersona());
-												key.setFechadesigna(letradoSaliente.getFechadesigna());
-							
-							response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
-//							response = scsDesignasletradoMapper.deleteByExample(example);
+						if(designaVieja.getFechadesigna() != null) {
+							if(designaVieja.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
+								ScsDesignasletradoKey key = new ScsDesignasletradoKey();
+								
+													key.setIdinstitucion(idInstitucion);
+													key.setAnio(designa.getAnio());
+													key.setIdturno(designa.getIdturno());
+													key.setNumero(designa.getNumero());
+													key.setIdpersona(letradoSaliente.getIdpersona());
+													key.setFechadesigna(letradoSaliente.getFechadesigna());
+								
+								response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
+	//							response = scsDesignasletradoMapper.deleteByExample(example);
+							}
 						}
 						else {
 							//ScsDesignasletrado oldLetrado = scsDesignasletradoMapper.selectByPrimaryKey(key);
