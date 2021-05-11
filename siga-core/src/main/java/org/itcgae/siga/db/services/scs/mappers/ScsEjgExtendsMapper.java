@@ -60,7 +60,10 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.BOOLEAN),
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idPersona", property = "idPersona", jdbcType = JdbcType.VARCHAR), })
+			@Result(column = "idPersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "tieneguardias", property = "tieneGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "guardiaspendientes", property = "guardiasPendientes", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "tieneturno", property = "tieneTurno", jdbcType = JdbcType.VARCHAR)})
 	List<ColegiadosSJCSItem> busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje, Integer tamMaximo);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "tieneGuardias")

@@ -1363,13 +1363,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND D.IDINSTITUCION = EJGDES.IDINSTITUCION ");
 		sql.append(" AND D.IDTURNO = EJGDES.IDTURNO ");
 		sql.append(" AND D.ANIO = EJGDES.ANIODESIGNA ");
-		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA ");
+		sql.append(" AND D.NUMERO = EJGDES.NUMERODESIGNA) AS NUM_TIPO_RESOLUCION_DESIGNA, ");
+		sql.append(" DECODE(turno.VALIDARJUSTIFICACIONES,'S',1,'N',0) AS VALIDARJUSTIFICACIONES ");
 
 		sql.append(" FROM SCS_DESIGNA D join scs_designasletrado   dl ON d.idinstitucion = dl.idinstitucion "
 				+ "AND d.anio = dl.anio AND d.numero = dl.numero AND d.idturno = dl.idturno ");
-		sql.append("join scs_juzgado j ON  d.idjuzgado = j.idjuzgado\r\n"
+		sql.append(" JOIN scs_turno   turno        ON d.idinstitucion = turno.idinstitucion "
+                + " AND d.idturno = turno.idturno " );
+		sql.append(" join scs_juzgado j ON  d.idjuzgado = j.idjuzgado\r\n"
 				+ "                AND d.idinstitucion_juzg = j.idinstitucion ");
-		sql.append("join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento\r\n"
+		sql.append(" join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento\r\n"
 				+ "                AND p.idinstitucion = d.idinstitucion ");
 		if ((item.getSinEJG() != null && !item.getSinEJG().isEmpty())
 				|| (item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty())

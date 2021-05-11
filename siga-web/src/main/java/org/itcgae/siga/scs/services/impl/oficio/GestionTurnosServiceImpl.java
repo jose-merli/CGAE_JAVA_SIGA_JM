@@ -254,7 +254,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 							turnoupdate.setFechasolicitud(inscripcionTurnoAAnular.getFechasolicitud());
 							turnoupdate.setFechabaja(new Date());
 							turnoupdate.setFechamodificacion(new Date());
-							turnoupdate.setUsumodificacion(0);
+							turnoupdate.setUsumodificacion(usuarios.get(0).getIdusuario());
 							scsInscripcionturnoMapper.updateByPrimaryKey(turnoupdate);
 							
 						}
@@ -269,26 +269,32 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 							guardiaupdate.setIdpersona(new Long(inscripcionGuardiaAAnular.getIdPersonaUltimo()));
 							guardiaupdate.setFechasuscripcion(inscripcionGuardiaAAnular.getFechabaja());
 							guardiaupdate.setIdguardia(Integer.parseInt(inscripcionGuardiaAAnular.getIdGuardia()));
-							guardiaupdate.setFechabaja(new Date());
-							guardiaupdate.setFechamodificacion(new Date());
-							guardiaupdate.setUsumodificacion(0);
-							scsInscripcionguardiaMapper.updateByPrimaryKey(guardiaupdate);
+							
+							ScsInscripcionguardia guardiaActualUpdate = scsInscripcionguardiaMapper.selectByPrimaryKey(guardiaupdate);
+							
+							guardiaActualUpdate.setFechabaja(new Date());
+							guardiaActualUpdate.setFechamodificacion(new Date());
+							guardiaActualUpdate.setUsumodificacion(usuarios.get(0).getIdusuario());
+							scsInscripcionguardiaMapper.updateByPrimaryKey(guardiaActualUpdate);
 							
 						}
 					}
 					
 //					//ELIMINAMOS LAS GUARDIAS CONFIGURADAS PARA EL TURNO
-//					for(List<GuardiasItem> listaInscripcionesGuardia : guardiasConfiguradasTurno) {
-//						for(GuardiasItem inscripcionGuardiaAAnular : listaInscripcionesGuardia) {
-//							ScsGuardiasturno guardiaupdate = new ScsGuardiasturno();
-//							guardiaupdate.setIdinstitucion(new Short(inscripcionGuardiaAAnular.getJurisdiccion()));
-//							guardiaupdate.setIdturno(Integer.parseInt(inscripcionGuardiaAAnular.getIdTurno()));
-//							guardiaupdate.setIdguardia(Integer.parseInt(inscripcionGuardiaAAnular.getIdGuardia()));
-//							scsGuardiasturnoMapper.deleteByPrimaryKey(guardiaupdate);
-//							
-//						}
-//					}
-//					
+					for(List<GuardiasItem> listaInscripcionesGuardia : guardiasConfiguradasTurno) {
+						for(GuardiasItem inscripcionGuardiaAAnular : listaInscripcionesGuardia) {
+							ScsGuardiasturno guardiaupdate = new ScsGuardiasturno();
+							guardiaupdate.setIdinstitucion(new Short(inscripcionGuardiaAAnular.getJurisdiccion()));
+							guardiaupdate.setIdturno(Integer.parseInt(inscripcionGuardiaAAnular.getIdTurno()));
+							guardiaupdate.setIdguardia(Integer.parseInt(inscripcionGuardiaAAnular.getIdGuardia()));
+							ScsGuardiasturno guardiaTurnoActual = scsGuardiasturnoMapper.selectByPrimaryKey(guardiaupdate);
+							guardiaTurnoActual.setFechabaja(new Date());
+							guardiaTurnoActual.setUsumodificacion(usuarios.get(0).getIdusuario());
+							scsGuardiasturnoMapper.updateByPrimaryKey(guardiaTurnoActual);
+							
+						}
+					}
+					
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);

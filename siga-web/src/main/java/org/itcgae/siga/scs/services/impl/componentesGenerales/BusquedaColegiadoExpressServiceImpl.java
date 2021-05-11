@@ -164,13 +164,13 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 					responsedto.setColegiadosSJCSItem(colegiadosSJCSItemList);
 					
 					
-					for(int x=0;x<colegiadosSJCSItemList.size();x++) {
+					/*for(int x=0;x<colegiadosSJCSItemList.size();x++) {
 						List<ColegiadosSJCSItem> tieneTurno=scsEjgExtendsMapper.tieneTurnos(colegiadosSJCSItemList.get(x).getIdInstitucion(), colegiadosSJCSItemList.get(x).getIdPersona());
 //						List<String> tieneGuardia = null;
 						List<List<String>> tieneGuardia = new ArrayList<List<String>>();
 						List<String> guardiasPendientes = new ArrayList<String>();
 						
-						if(tieneTurno != null) {
+						if(tieneTurno != null && !tieneTurno.isEmpty()) {
 							colegiadosSJCSItemList.get(x).setTieneTurno("Si");
 
 							for(int z = 0; z<tieneTurno.size();z++) {
@@ -194,7 +194,7 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 						}else {
 							colegiadosSJCSItemList.get(x).setTieneGuardia("No");
 						}
-					}
+					}*/
 
 				} catch (Exception e) {
 					LOGGER.error(
