@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.db.mappers.CajgRemesaMapper;
 import org.itcgae.siga.db.services.cajg.providers.CajgRemesaSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsJuzgadoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface CajgRemesaExtendsMapper {
+public interface CajgRemesaExtendsMapper extends CajgRemesaMapper{
 
 	@SelectProvider(type = CajgRemesaSqlExtendsProvider.class, method = "comboRemesa")
 	@Results({ 

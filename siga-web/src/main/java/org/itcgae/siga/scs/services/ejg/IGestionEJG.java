@@ -43,8 +43,6 @@ public interface IGestionEJG {
 	
 	UpdateResponseDTO cambioEstadoMasivo(List<EjgItem> datos, HttpServletRequest request);
 	
-	UpdateResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request);
-	
 	UpdateResponseDTO descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request);
 	
 	EjgDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request);

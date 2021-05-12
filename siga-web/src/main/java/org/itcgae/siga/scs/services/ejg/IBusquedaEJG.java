@@ -1,7 +1,11 @@
 package org.itcgae.siga.scs.services.ejg;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
@@ -39,4 +43,6 @@ public interface IBusquedaEJG {
 	ComboDTO comboTurnosTipo(HttpServletRequest request, String idtipoturno);
 
 	ComboDTO comboRemesa(HttpServletRequest request);
+
+	InsertResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request);
 }

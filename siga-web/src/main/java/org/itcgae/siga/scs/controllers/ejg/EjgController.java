@@ -236,11 +236,11 @@ public class EjgController {
 	}
 
 	// añadirRemesa
-	@RequestMapping(value = "/gestion-ejg/anadirExpedienteARemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> anadirExpedienteARemesa(@RequestBody List<EjgItem> datos,
+	@RequestMapping(value = "/filtros-ejg/anadirExpedienteARemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> anadirExpedienteARemesa(@RequestBody List<EjgItem> datos,
 			HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.anadirExpedienteARemesa(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		InsertResponseDTO response = busquedaEJG.anadirExpedienteARemesa(datos, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 
 	// descargarEEJ

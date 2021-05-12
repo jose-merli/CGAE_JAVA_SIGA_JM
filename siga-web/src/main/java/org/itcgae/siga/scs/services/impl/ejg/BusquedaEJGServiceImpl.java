@@ -2,11 +2,14 @@ package org.itcgae.siga.scs.services.impl.ejg;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -15,14 +18,19 @@ import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CajgEjgremesa;
+import org.itcgae.siga.db.entities.CajgRemesa;
+import org.itcgae.siga.db.entities.CajgRemesaKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsTiposentidoauto;
 import org.itcgae.siga.db.entities.ScsTiposentidoautoExample;
+import org.itcgae.siga.db.mappers.CajgEjgremesaMapper;
 import org.itcgae.siga.db.mappers.CajgRemesaMapper;
 import org.itcgae.siga.db.mappers.ScsTiposentidoautoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cajg.mappers.CajgEjgremesaExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgRemesaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
@@ -42,6 +50,7 @@ import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServic
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BusquedaEJGServiceImpl implements IBusquedaEJG {
@@ -80,6 +89,12 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	@Autowired
 	private CajgRemesaExtendsMapper cajgRemesaExtendsMapper;
+	@Autowired
+	private CajgRemesaMapper cajgRemesaMapper;
+	@Autowired
+	private CajgEjgremesaMapper cajgEjgremesaMapper;
+	@Autowired
+	private CajgEjgremesaExtendsMapper cajgEjgremesaExtendsMapper;
 
 	@Override
 	public ComboDTO comboTipoEJG(HttpServletRequest request) {
@@ -120,6 +135,97 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 		}
 		LOGGER.info("comboTipoEJG() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
+	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request) {
+		InsertResponseDTO responsedto = new InsertResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			LOGGER.debug(
+					"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug(
+					"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> Entrada para cambiar los estados y la fecha de estado para los ejgs");
+
+				try {
+					
+					//Buscamos la descripcion de la remesa seleccionada en el modal
+					
+					CajgRemesaKey key = new CajgRemesaKey();
+					
+					key.setIdinstitucion(idInstitucion);
+					key.setIdremesa(Long.parseLong(datos.get(0).getNumRegRemesa()));
+					
+					CajgRemesa remesaSelected = cajgRemesaMapper.selectByPrimaryKey(key);
+					
+					CajgEjgremesa item = new CajgEjgremesa();
+					
+					//Rellenamos los datos comunes a todos los elementos
+					item.setIdinstitucion(idInstitucion);
+					item.setIdremesa(remesaSelected.getIdremesa());
+					item.setFechamodificacion(new Date());
+					item.setUsumodificacion(usuarios.get(0).getIdusuario());
+					item.setIdinstitucionremesa(remesaSelected.getIdinstitucion());
+					
+					for(EjgItem dato : datos) {
+						item.setAnio(Short.parseShort(dato.getAnnio()));
+						item.setNumero(Long.parseLong(dato.getNumero()));
+						item.setIdtipoejg(Short.parseShort(dato.getTipoEJG()));
+						//IDEJGREMESA, clave primaria, no parece que tenga relacion con ningún atributo 
+						//de la tabla SCS_EJG y que se determina de forma incremental.
+						//Por ahora se asignará su valor sumando uno al valor más alto de ese atributo.
+						String idEjgRemesa = cajgEjgremesaExtendsMapper.getIdEjgRemesa();
+						item.setIdejgremesa(Long.parseLong(idEjgRemesa));
+						
+						//Riesgo de que el valor proveniente de la remesa sea nulo.
+						//En lugar de importar el valor del IDINTERCAMBIO de la tabla CAJG_REMESA,
+						//se introducira el valor mas alto de ese atributo con el mismo atributo más uno.
+						String numeroIntercambio = cajgEjgremesaExtendsMapper.getNumeroIntercambio(idInstitucion);
+						item.setNumerointercambio(Integer.parseInt(numeroIntercambio));
+//						if(remesaSelected.getIdintercambio()!=null)item.setNumerointercambio(remesaSelected.getIdintercambio().intValue());
+//						else item.setNumerointercambio(1);
+					
+						response = cajgEjgremesaMapper.insert(item);
+					}
+					
+				} catch (Exception e) {
+					LOGGER.debug("BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> Se ha producido un error: ", e);
+					response = 0;
+
+				} finally {
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug(
+								"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> OK. Asignacion realizada adecuadamente");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> KO. No se ha realizado la asignacion adecuadamente");
+					}
+				}
+			}
+		}
+
+		LOGGER.info("BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> Salida del servicio.");
+
+		return responsedto;
 	}
 
 	@Override

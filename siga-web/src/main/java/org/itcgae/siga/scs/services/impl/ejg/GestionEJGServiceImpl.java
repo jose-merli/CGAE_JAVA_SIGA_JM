@@ -24,6 +24,7 @@ import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CajgRemesa;
 import org.itcgae.siga.db.entities.ExpExpediente;
 import org.itcgae.siga.db.entities.ExpExpedienteKey;
 import org.itcgae.siga.db.entities.GenParametros;
@@ -37,6 +38,7 @@ import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.entities.ScsEstadoejgKey;
+import org.itcgae.siga.db.mappers.CajgRemesaMapper;
 import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgPrestacionRechazadaMapper;
@@ -725,55 +727,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return responsedto;
 	}
 
-	@Override
-	@Transactional
-	public UpdateResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request) {
-		UpdateResponseDTO responsedto = new UpdateResponseDTO();
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		if (idInstitucion != null) {
-
-			LOGGER.debug(
-					"GestionEJGServiceImpl.anadirExpedienteARemesa() -> Entrada para obtener información del usuario logeado");
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.debug(
-					"GestionEJGServiceImpl.anadirExpedienteARemesa() -> Salida de obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.anadirExpedienteARemesa() -> Entrada para cambiar los estados y la fecha de estado para los ejgs");
-
-				try {
-
-				} catch (Exception e) {
-
-				} finally {
-					// respuesta si se actualiza correctamente
-					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug(
-								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> OK. Asignacion realizada adecuadamente");
-					} else {
-						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> KO. No se ha realizado la asignacion adecuadamente");
-					}
-				}
-			}
-		}
-
-		LOGGER.info("GestionEJGServiceImpl.anadirExpedienteARemesa() -> Salida del servicio.");
-
-		return responsedto;
-	}
+	
 
 	@Override
 	@Transactional
