@@ -1,8 +1,10 @@
 package org.itcgae.siga.scs.services.impl.ejg;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,27 +21,34 @@ import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
-import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
+import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ExpExpediente;
 import org.itcgae.siga.db.entities.ExpExpedienteKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEejgPeticiones;
+import org.itcgae.siga.db.entities.ScsEejgPeticionesExample;
 import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazadaExample;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
-import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
-import org.itcgae.siga.db.entities.ScsEstadoejgKey;
+import org.itcgae.siga.db.entities.ScsParentesco;
+import org.itcgae.siga.db.entities.ScsParentescoKey;
+import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
+import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
 import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
+import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgPrestacionRechazadaMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
+import org.itcgae.siga.db.mappers.ScsParentescoMapper;
+import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.exp.mappers.ExpTipoexpedienteExtendsMapper;
@@ -51,6 +60,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsExpedienteEconomicoExtendsMapp
 import org.itcgae.siga.db.services.scs.mappers.ScsOrigencajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrestacionExtendsMapper;
+import org.itcgae.siga.scs.services.ejg.IEEJGServices;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -102,13 +112,22 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	private ScsEjgMapper scsEjgMapper;
 	
 	@Autowired
-	ScsEejgPeticionesMapper scsEejgPeticionesMapper;
+	private ScsEejgPeticionesMapper scsEejgPeticionesMapper;
 
 	@Autowired
 	private ExpExpedienteMapper expExpedienteMapper;
 	
 	@Autowired
 	private ScsEjgPrestacionRechazadaMapper scsEjgPrestacionRechazadaMapper;
+	
+	@Autowired
+	private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
+	
+	@Autowired
+	private ScsParentescoMapper scsParentescoMapper;
+	
+	@Autowired
+	private IEEJGServices eejgService;
 
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -781,12 +800,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
 		int response = 0;
 		
-		UnidadFamiliarEJGItem unidadFamiliar = new UnidadFamiliarEJGItem();
-
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		
+		String salida;
+		
 		if (idInstitucion != null) {
 			LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Entrada para obtener información del usuario logeado");
 
@@ -800,18 +819,74 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Generando fichero y creando la descarga...");
 
 				try {
-					//recorremos la lista para generar el documento de cada uno de los ejgs
+					//recorremos la lista para generar el documento de cada uno de los ejgs 
 					for(EjgItem ejg : datos) {
+											
+						//obtenemos la peticion y el idXML
+						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la petición...");
+						
+						ScsEejgPeticionesExample scsEejgPeticionesExample = new ScsEejgPeticionesExample();
+						
+						scsEejgPeticionesExample.createCriteria().andAnioEqualTo(Short.parseShort(ejg.getidInstitucion()))
+						.andIdpersonaEqualTo(Long.parseLong(ejg.getIdPersona())).andAnioEqualTo(Short.parseShort(ejg.getAnnio()))
+						.andIdtipoejgEqualTo(Short.parseShort(ejg.getIdTipoExpediente())).andNumeroEqualTo(Long.parseLong(ejg.getNumEjg()));
+						
+						List<ScsEejgPeticiones> peticiones = scsEejgPeticionesMapper.selectByExample(scsEejgPeticionesExample);
+						
+						if(peticiones==null || peticiones.size()>0) {
+							throw new Exception("No existe peticiones para el ejg seleccionado");
+						}
+						
 						//creamos el objeto de la unidad familiar
-						unidadFamiliar = new UnidadFamiliarEJGItem();
+						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la unidad familiar...");
+						ScsUnidadfamiliarejg uFamiliar = null;
 						
-						unidadFamiliar.setUf_idInstitucion(ejg.getidInstitucion());
-						unidadFamiliar.setUf_idPersona(ejg.getIdPersona());
-						unidadFamiliar.setUf_idTipoejg(ejg.getIdTipoExpediente());
-						unidadFamiliar.setUf_anio(ejg.getAnnio());
-						unidadFamiliar.setUf_numero(ejg.getNumero());
+						ScsUnidadfamiliarejgKey key = new ScsUnidadfamiliarejgKey();
 						
-//						scsEejgPeticionesMapper.selectByPrimaryKey()
+						key.setIdinstitucion(Short.parseShort(ejg.getidInstitucion()));
+						key.setIdpersona(Long.parseLong(ejg.getIdPersona()));
+						key.setIdtipoejg(Short.parseShort(ejg.getIdTipoExpediente()));
+						key.setAnio(Short.parseShort(ejg.getAnnio()));
+						key.setNumero(Long.parseLong(ejg.getNumeroexpediente())); //NUMEJG
+						
+						uFamiliar = scsUnidadfamiliarejgMapper.selectByPrimaryKey(key);
+						
+						//comprobamos el parentesco, si no tiene, se le pone solicitante 
+						ScsParentesco parentesco = null;
+						
+						if(uFamiliar!=null && uFamiliar.getIdparentesco()!=null){
+							ScsParentescoKey keyParentesco = new ScsParentescoKey();
+							
+							keyParentesco.setIdinstitucion(Short.parseShort(ejg.getidInstitucion()));
+							keyParentesco.setIdparentesco(uFamiliar.getIdparentesco());
+							
+							parentesco = scsParentescoMapper.selectByPrimaryKey(keyParentesco);
+						}else {
+							String literalSolicitante = UtilidadesString.getMensajeIdioma(usuarios.get(0).getIdlenguaje(), "gratuita.busquedaEJG.literal.solicitante"); 
+									
+							parentesco.setDescripcion(literalSolicitante);
+						}
+						
+						//obtenemos los datos del fichero
+						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos para el informe...");
+						Map<Integer, Map<String, String>> mapInformeEejg = eejgService.getDatosInformeEejg(ejg, peticiones.get(0));
+						
+						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo el informe...");
+						File fichero = eejgService.getInformeEejg(mapInformeEejg, ejg.getidInstitucion());
+						
+						if(fichero!= null){
+							response=1;
+							
+							request.setAttribute("nombreFichero", fichero.getName());
+							request.setAttribute("rutaFichero", fichero.getAbsolutePath());			
+							request.setAttribute("borrarFichero", "true");			
+							request.setAttribute("generacionOK","OK");
+							
+							salida= "descarga";
+						}else{
+							throw new Exception("ERROR al generar fichero");
+						}
+						
 						
 					}
 					
@@ -839,8 +914,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return responseDTO;
 	}
 
-	
-	
 	@Override
 	@Transactional
 	public InsertResponseDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request) {
@@ -1669,7 +1742,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return responsedto;
 	}
 	
-
 	@Override
 	@Transactional
 	public UpdateResponseDTO borrarRelacion(List<EjgItem> datos, HttpServletRequest request) {
@@ -1738,6 +1810,4 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return responsedto;
 	}
-
-
 }
