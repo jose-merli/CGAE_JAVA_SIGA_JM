@@ -1228,7 +1228,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.LEFT_OUTER_JOIN("scs_inscripcionturno INSCRIPCIONTURNO ON INSCRIPCIONTURNO.IDPERSONA = COLEGIADO.IDPERSONA AND COLEGIADO.IDINSTITUCION = INSCRIPCIONTURNO.IDINSTITUCION");
 		sql.LEFT_OUTER_JOIN("SCS_INSCRIPCIONGUARDIA INSCRIPCIONGUARDIA ON INSCRIPCIONGUARDIA.IDPERSONA = COLEGIADO.IDPERSONA AND COLEGIADO.IDINSTITUCION = INSCRIPCIONGUARDIA.IDINSTITUCION");
 		sql.WHERE("COLEGIADO.IDINSTITUCION = '"+idInstitucion+"'");
-		if(colegiadosSJCSItem.getnColegiado() != null && colegiadosSJCSItem.getnColegiado() != "")sql.WHERE("COLEGIADO.NCOLEGIADO = '"+ colegiadosSJCSItem.getnColegiado()+"'");			
+		if(colegiadosSJCSItem.getnColegiado() != null && colegiadosSJCSItem.getnColegiado() != "")sql.WHERE("NVL(COLEGIADO.NCOLEGIADO, COLEGIADO.NCOMUNITARIO) = '"+ colegiadosSJCSItem.getnColegiado()+"'");			
 		if(colegiadosSJCSItem.getIdTurno() != null) { 
 			sql.WHERE("INSCRIPCIONTURNO.IDTURNO = '"+colegiadosSJCSItem.getIdTurno()+"'");
 			if(colegiadosSJCSItem.getIdGuardia() != null)sql.WHERE("(INSCRIPCIONGUARDIA.IDTURNO = '"+colegiadosSJCSItem.getIdTurno()+"'  AND INSCRIPCIONGUARDIA.IDGUARDIA = '"+colegiadosSJCSItem.getIdGuardia()+"')");
