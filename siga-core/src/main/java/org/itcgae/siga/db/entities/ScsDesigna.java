@@ -992,4 +992,5 @@ public class ScsDesigna extends ScsDesignaKey {
     public void setFactconvenio(Short factconvenio) {
         this.factconvenio = factconvenio;
     }
+
 }

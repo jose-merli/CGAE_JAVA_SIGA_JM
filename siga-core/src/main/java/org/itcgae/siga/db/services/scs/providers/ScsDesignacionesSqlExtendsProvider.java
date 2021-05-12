@@ -1287,7 +1287,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	 * @return
 	 */
 	public String busquedaJustificacionExpres(JustificacionExpressItem item, String idInstitucion,
-			String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable) {
+			String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable, String fechaDesde, String fechaHasta) {
 
 		StringBuilder sql = new StringBuilder();
 
@@ -1327,11 +1327,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" D.NUMPROCEDIMIENTO, ");
 		sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
 		sql.append(" D.NIG, ");
-
 		sql.append(
-				" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION AND D.ANIO = SDL.ANIO AND "
+				" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION" );
+		if (fechaDesde != null) {
+			sql.append(" AND TO_CHAR(SDL.FECHADESIGNA , 'dd-MM-yyyy') >=  '" + fechaDesde + "'" );
+		}
+		if (fechaHasta != null) {
+			sql.append(" AND TO_CHAR(SDL.FECHADESIGNA , 'dd-MM-yyyy') <=  '" + fechaHasta + "'" );
+		}
+		sql.append(" AND D.ANIO = SDL.ANIO AND "
 						+ "D.NUMERO = SDL.NUMERO AND D.IDTURNO = SDL.IDTURNO) AS CAMBIOLETRADO, ");
-
 		sql.append(" (SELECT MIN(CASE WHEN (EJG.FECHARESOLUCIONCAJG IS NOT NULL ");
 		sql.append(" AND ((EJG.IDTIPORATIFICACIONEJG IN (3,5,6,7) ");
 		sql.append(" AND EJG.IDTIPORESOLAUTO IS NOT NULL ");
@@ -1730,6 +1735,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_JUZGADOPROCEDIMIENTO JUZGADO");
 		sql.WHERE("JUZGADO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("JUZGADO.IDJUZGADO = " + idJuzgado);
+
+		return sql.toString();
+	}
+	
+	public String getProcedimientosJuzgados2(Short idInstitucion) {
+
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT JUZGADO.IDPROCEDIMIENTO");
+		sql.FROM("SCS_JUZGADOPROCEDIMIENTO JUZGADO");
+		sql.WHERE("JUZGADO.IDINSTITUCION = " + idInstitucion);
 
 		return sql.toString();
 	}

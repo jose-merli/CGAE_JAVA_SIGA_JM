@@ -70,6 +70,7 @@ import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.Converter;
 import org.itcgae.siga.commons.utils.Puntero;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -320,12 +321,19 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							idDesfavorable = tipoDictamen.getIdtipodictamenejg().toString();
 						}
 					}
-
+					String fechaDesde = null;
+					String fechaHasta = null;
+					if (item.getDesignacionDesde() != null) {
+						fechaDesde = Converter.dateToString(item.getDesignacionDesde());
+					}
+					if (item.getDesignacionHasta() != null) {
+						fechaHasta = Converter.dateToString(item.getDesignacionHasta());
+					}
 					LOGGER.info(
 							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo justificaciones...");
 					// busqueda de designaciones segun los filtros (max 200)
 					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
-							idInstitucion.toString(), longitudCodEJG, idPersona, idFavorable, idDesfavorable);
+							idInstitucion.toString(), longitudCodEJG, idPersona, idFavorable, idDesfavorable, fechaDesde, fechaHasta);
 
 					LOGGER.info(
 							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo las actuaciones...");
@@ -4662,7 +4670,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //						if(justificacion.getEstado()!=null && justificacion.getEstado().trim().isEmpty()){
 //							recordJust.setEstado(justificacion.getEstado());
 //						}
-//						
+						if (justificacion.getProcedimiento() != null && !justificacion.getProcedimiento().trim().isEmpty()) {
+							recordJust.setIdprocedimiento(justificacion.getProcedimiento());
+						}
+						
+						if (justificacion.getNumProcedimiento() != null && !justificacion.getNumProcedimiento().trim().isEmpty()) {
+							recordJust.setNumprocedimiento(justificacion.getNumProcedimiento());
+						}
+						
 						responseDesig = scsDesignaMapper.updateByPrimaryKeySelective(recordJust);
 
 						// guardamos las actuaciones
@@ -4682,7 +4697,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									record.setFecha(fecha);
 								}
 
-								if (actuacion.getFechaJustificacion() != null
+								if (actuacion.getFechaJustificacion() != null && actuacion.getFechaJustificacion() != "false" && actuacion.getFechaJustificacion() != "true"
 										&& !actuacion.getFechaJustificacion().trim().isEmpty()) {
 									fecha = formatter.parse(actuacion.getFechaJustificacion());
 									record.setFechajustificacion(fecha);

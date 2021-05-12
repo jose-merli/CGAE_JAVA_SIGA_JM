@@ -66,6 +66,8 @@ public interface ComboService {
 	
 	public ComboDTO comboModulosConJuzgado(HttpServletRequest request, String idJuzgado);
 	
+	public ComboDTO comboAllModulos(HttpServletRequest request);
+	
 	public ComboDTO comboModulosConProcedimientos(HttpServletRequest request, String idPretension);
 	
 	public ComboDTO comboProcedimientosConModulo(HttpServletRequest request, String idModulo);
