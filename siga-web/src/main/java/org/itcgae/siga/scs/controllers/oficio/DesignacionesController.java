@@ -714,9 +714,16 @@ public class DesignacionesController {
 		
 		if(item[8]!=null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			String date = item[8].substring(0, 10);
-			letradoEntrante.setFechadesigna(formatter.parse(date));
+			SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+			if(item[8].length() != 10) {
+				String date = item[8].substring(0, 10);
+				letradoEntrante.setFechadesigna(formatter.parse(date));
+			}else {
+				String date = item[8].substring(0, 10);
+				letradoEntrante.setFechadesigna(format.parse(date));
+			}
 		}
+		
 		if(item[9]!=null) letradoEntrante.setIdpersona(Long.parseLong(item[9]));
 		
 //		String anio = item.getAno();

@@ -42,19 +42,19 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 			sql.WHERE("(bt.validado IS NULL OR bt.validado = 2)");
 		}
 		if(bajasTemporalesItem.getFechadesde() != null) {
-			sql.WHERE("bt.fechadesde >=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechadesde())+"','DD/MM/RRRR')");
+			sql.WHERE("TRUNC(bt.fechadesde) >=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechadesde())+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechahasta() != null) {
-			sql.WHERE("bt.fechahasta <=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechahasta())+"','DD/MM/RRRR')");
+			sql.WHERE("TRUNC(bt.fechahasta) <=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechahasta())+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechasolicituddesde() != null) {
-			sql.WHERE("bt.fechaalta >=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechasolicituddesde())+"','DD/MM/RRRR')");
+			sql.WHERE("TRUNC(bt.fechaalta) >=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechasolicituddesde())+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechasolicitudhasta() != null) {
-			sql.WHERE("bt.fechaalta <=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechasolicitudhasta())+"','DD/MM/RRRR')");
+			sql.WHERE("TRUNC(bt.fechaalta) <=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechasolicitudhasta())+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getFechabt() != null) {
-			sql.WHERE("bt.fechabt <=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechabt())+"','DD/MM/RRRR')");
+			sql.WHERE("TRUNC(bt.fechabt) <=TO_DATE('"+dateFormat.format(bajasTemporalesItem.getFechabt())+"','DD/MM/RRRR')");
 		}
 		if(bajasTemporalesItem.getTipo() != null) {
 			sql.WHERE("bt.tipo = '"+bajasTemporalesItem.getTipo()+"'");

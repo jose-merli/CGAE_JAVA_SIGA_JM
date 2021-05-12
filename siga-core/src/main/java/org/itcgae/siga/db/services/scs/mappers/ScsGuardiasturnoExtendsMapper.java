@@ -99,7 +99,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		 @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.DECIMAL),
 		 @Result(column = "IDPERSONA", property = "idPersonaUltimo", jdbcType = JdbcType.DECIMAL),
 		 @Result(column = "IDINSTITUCION", property = "jurisdiccion", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "FECHASUSCIPCION", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP)})
+			@Result(column = "FECHASUSCRIPCION", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP)})
 	    List<GuardiasItem> selectGuardiaTurnoByTurno(Short idInstitucion, String idTurno);
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="selectGuardiaConfiguradasTurno")
