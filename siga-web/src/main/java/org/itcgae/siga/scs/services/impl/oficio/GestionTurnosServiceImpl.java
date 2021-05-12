@@ -385,10 +385,21 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						scsTurno.setIdgrupofacturacion(Short.parseShort(turnosItem.getIdgrupofacturacion()));
 						scsTurno.setIdarea(Short.parseShort(turnosItem.getIdarea()));
 						scsTurno.setIdmateria(Short.parseShort(turnosItem.getIdmateria()));
-						scsTurno.setIdjurisdiccion(Short.parseShort(turnosItem.getIdjurisdiccion()));
 						scsTurno.setIdzona(Short.parseShort(turnosItem.getIdzona()));
 						scsTurno.setIdsubzona(Short.parseShort(turnosItem.getIdsubzona()));
+						
+						if(turnosItem.getIdjurisdiccion() != null){
+							scsTurno.setIdjurisdiccion(Short.parseShort(turnosItem.getIdjurisdiccion()));
+						}else {
+							scsTurno.setIdjurisdiccion(null);
+						}
+						
+						if(turnosItem.getIdtipoturno() != null) {
 						scsTurno.setIdtipoturno(Short.parseShort(turnosItem.getIdtipoturno()));
+						}else {
+							scsTurno.setIdtipoturno(null);
+						}
+						
 						scsTurno.setFechamodificacion(new Date());
 						scsTurno.setDescripcion(turnosItem.getDescripcion());
 						scsTurno.setRequisitos(turnosItem.getRequisitos());
@@ -407,12 +418,15 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Entrada a scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
 
-						response = scsTurnosExtendsMapper.updateByPrimaryKeySelective(scsTurno);
+						response = scsTurnosExtendsMapper.updateByPrimaryKey(scsTurno);
+//								updateByPrimaryKeySelective(scsTurno);
 
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
 					}
 				} catch (Exception e) {
+					LOGGER.error(
+							"GestionTurnosServicesImpl.updateDatosGenerales() " + e.getMessage());
 					response = 0;
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");

@@ -1326,7 +1326,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	 * @return
 	 */
 	public String busquedaJustificacionExpres(JustificacionExpressItem item, String idInstitucion,
-			String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable) {
+			String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable, String fechaDesde, String fechaHasta) {
 
 		StringBuilder sql = new StringBuilder();
 
@@ -1366,11 +1366,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" D.NUMPROCEDIMIENTO, ");
 		sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
 		sql.append(" D.NIG, ");
-
 		sql.append(
-				" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION AND D.ANIO = SDL.ANIO AND "
+				" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION" );
+		if (fechaDesde != null) {
+			sql.append(" AND TO_CHAR(SDL.FECHADESIGNA , 'dd-MM-yyyy') >=  '" + fechaDesde + "'" );
+		}
+		if (fechaHasta != null) {
+			sql.append(" AND TO_CHAR(SDL.FECHADESIGNA , 'dd-MM-yyyy') <=  '" + fechaHasta + "'" );
+		}
+		sql.append(" AND D.ANIO = SDL.ANIO AND "
 						+ "D.NUMERO = SDL.NUMERO AND D.IDTURNO = SDL.IDTURNO) AS CAMBIOLETRADO, ");
-
 		sql.append(" (SELECT MIN(CASE WHEN (EJG.FECHARESOLUCIONCAJG IS NOT NULL ");
 		sql.append(" AND ((EJG.IDTIPORATIFICACIONEJG IN (3,5,6,7) ");
 		sql.append(" AND EJG.IDTIPORESOLAUTO IS NOT NULL ");
@@ -1769,6 +1774,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_JUZGADOPROCEDIMIENTO JUZGADO");
 		sql.WHERE("JUZGADO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("JUZGADO.IDJUZGADO = " + idJuzgado);
+
+		return sql.toString();
+	}
+	
+	public String getProcedimientosJuzgados2(Short idInstitucion) {
+
+		SQL sql = new SQL();
+		sql.SELECT("DISTINCT JUZGADO.IDPROCEDIMIENTO");
+		sql.FROM("SCS_JUZGADOPROCEDIMIENTO JUZGADO");
+		sql.WHERE("JUZGADO.IDINSTITUCION = " + idInstitucion);
 
 		return sql.toString();
 	}
@@ -2171,7 +2186,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.FROM("SCS_ACTUACIONDESIGNA ACT");
 
 		sql2.JOIN("SCS_ACREDITACION ACR ON ACR.IDACREDITACION = ACT.IDACREDITACION "
-				+ "LEFT JOIN FCS_FACTURACIONJG FAC ON FAC.IDFACTURACION = ACT.IDFACTURACION and fac.idinstitucion = act.idinstitucion "
+				+ "LEFT JOIN FCS_FACTURACIONJG FAC ON FAC.IDFACTURACION = ACT.IDFACTURACION AND FAC.IDINSTITUCION = ACT.IDINSTITUCION "
 				+ "LEFT JOIN SCS_JUZGADO JUZ ON JUZ.IDJUZGADO = ACT.IDJUZGADO AND JUZ.IDINSTITUCION = ACT.IDINSTITUCION "
 				+ "LEFT JOIN SCS_PROCEDIMIENTOS PRO ON PRO.IDPROCEDIMIENTO = ACT.IDPROCEDIMIENTO AND PRO.IDINSTITUCION = ACT.IDINSTITUCION AND PRO.IDINSTITUCION = ACT.IDINSTITUCION "
 				+ "LEFT JOIN CEN_COLEGIADO COL ON COL.IDPERSONA = ACT.IDPERSONACOLEGIADO AND COL.IDINSTITUCION = ACT.IDINSTITUCION "
@@ -2634,7 +2649,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String existeDesginaJuzgadoProcedimiento(Short idInstitucion, DesignaItem designa) {
 
 		SQL sql = new SQL();
-		sql.SELECT("count(*) as num");
+		sql.SELECT("count(1) as num");
 		sql.FROM("SCS_DESIGNA");
 		sql.WHERE("IDJUZGADO = '" + designa.getIdJuzgado() + "'");
 		sql.WHERE("NUMPROCEDIMIENTO = '" + designa.getNumProcedimiento() + "'");
@@ -3058,9 +3073,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				fecha = "'" + fecha.trim() + "'";
 
 			String consulta = "Select " + "       (case when Ins.Fechavalidacion Is Not Null "
-					+ "              And Trunc(Ins.Fechavalidacion) <= nvl(" + fecha + ",  Ins.Fechavalidacion) "
-					+ "              And (Ins.Fechabaja Is Null Or " + "                   Trunc(Ins.Fechabaja) > nvl("
-					+ fecha + ", '01/01/1900')) " + "             then '1' " + "             else '0' "
+					+ "              And Trunc(Ins.Fechavalidacion) <= TO_DATE(nvl(" + fecha + ",  Ins.Fechavalidacion),'DD/MM/YYYY') "
+					+ "              And (Ins.Fechabaja Is Null Or " + " Trunc(Ins.Fechabaja) > TO_DATE(nvl(" + fecha + ", '01/01/1900'),'DD/MM/YYYY')) "
+					+ "             then '1' " + "             else '0' "
 					+ "        end) Activo, " + " Ins.Idinstitucion," + "       Ins.Idturno, "
 					+ " TO_CHAR(TRUNC(Ins.fechavalidacion),'DD/MM/YYYY') AS fechavalidacion, "
 					+ "   TO_CHAR(trunc(Ins.fechabaja),'DD/MM/YYYY') AS fechabaja, "
