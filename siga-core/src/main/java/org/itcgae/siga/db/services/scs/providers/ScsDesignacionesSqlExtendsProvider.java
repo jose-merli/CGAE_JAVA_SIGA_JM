@@ -3058,9 +3058,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				fecha = "'" + fecha.trim() + "'";
 
 			String consulta = "Select " + "       (case when Ins.Fechavalidacion Is Not Null "
-					+ "              And Trunc(Ins.Fechavalidacion) <= nvl(" + fecha + ",  Ins.Fechavalidacion) "
-					+ "              And (Ins.Fechabaja Is Null Or " + "                   Trunc(Ins.Fechabaja) > nvl("
-					+ fecha + ", '01/01/1900')) " + "             then '1' " + "             else '0' "
+					+ "              And Trunc(Ins.Fechavalidacion) <= TO_DATE(nvl(" + fecha + ",  Ins.Fechavalidacion),'DD/MM/YYYY') "
+					+ "              And (Ins.Fechabaja Is Null Or " + " Trunc(Ins.Fechabaja) > TO_DATE(nvl(" + fecha + ", '01/01/1900'),'DD/MM/YYYY')) "
+					+ "             then '1' " + "             else '0' "
 					+ "        end) Activo, " + " Ins.Idinstitucion," + "       Ins.Idturno, "
 					+ " TO_CHAR(TRUNC(Ins.fechavalidacion),'DD/MM/YYYY') AS fechavalidacion, "
 					+ "   TO_CHAR(trunc(Ins.fechabaja),'DD/MM/YYYY') AS fechabaja, "
