@@ -121,6 +121,12 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				LOGGER.info(
 						"busquedaBajasTemporales() / scsBajasTemporalesExtendsMapper.busquedaBajasTemporales() -> Salida a scsBajasTemporalesExtendsMapper para obtener las bajas temporales");
 
+				if((bajasTemporalesItems != null) && (bajasTemporalesItems.size()) >= 200) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					bajasTemporalesDTO.setError(error);
+				}
+				
 				if (bajasTemporalesItems != null) {
 					bajasTemporalesDTO.setBajasTemporalesItems(bajasTemporalesItems);
 				}
