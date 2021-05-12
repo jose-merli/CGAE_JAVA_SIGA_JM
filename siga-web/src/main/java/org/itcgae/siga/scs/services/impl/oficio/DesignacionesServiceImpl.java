@@ -2531,24 +2531,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					 codigoDesigna = scsDesignacionesExtendsMapper
 							.obtenerCodigoDesigna(String.valueOf(idInstitucion), String.valueOf(designaItem.getAno()));
 
-					if (codigoDesigna != null && !codigoDesigna.equals("")) {
-						designa.setCodigo(codigoDesigna);
-					} else {
-						codigoDesigna = "1";
-						designa.setCodigo(codigoDesigna);
-
-					}
-					
-					designa.setFechaentrada(new Date());
-					designa.setFechamodificacion(new Date());
-					designa.setUsumodificacion(usuario.getIdusuario());
-					designa.setEstado("V");
-					designa.setFechaestado(new Date());
-					designa.setFechaalta(new Date());
-					// CALCULO CAMPO NUMERO
-
 					// Limitacion campo numero en updateDesigna
-
 					// Obtenemos el parametro de limite para el campo CODIGO en BBDD
 					StringDTO parametros = new StringDTO();
 					Integer longitudDesigna;
@@ -2565,25 +2548,40 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								"0");
 						longitudDesigna = Integer.parseInt(parametros.getValor());
 					}
+					
+					if (codigoDesigna == null || codigoDesigna.isEmpty()) {
+						codigoDesigna = "1";
+					}
+					
+					// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+					while (codigoDesigna.length() < longitudDesigna) {
+						codigoDesigna = "0" + codigoDesigna;
+					}
+					designa.setCodigo(codigoDesigna);
+					
+					designa.setFechaentrada(new Date());
+					designa.setFechamodificacion(new Date());
+					designa.setUsumodificacion(usuario.getIdusuario());
+					designa.setEstado("V");
+					designa.setFechaestado(new Date());
+					designa.setFechaalta(new Date());
+					// CALCULO CAMPO NUMERO
+
+					// Limitacion campo numero en updateDesigna
 
 					// Obtenemos el ultimo numero + 1
 					String numeroDesigna = scsDesignacionesExtendsMapper.obtenerNumeroDesigna(String.valueOf(idInstitucion),
 							String.valueOf(designaItem.getAno()));
 
-					if (numeroDesigna == null) {
+					if (numeroDesigna == null || numeroDesigna.isEmpty()) {
 						numeroDesigna = "1";
-						// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
-						while (numeroDesigna.length() < longitudDesigna) {
-							numeroDesigna = "0" + numeroDesigna;
-						}
-						designa.setNumero(Long.parseLong(numeroDesigna));
-					} else {
-						// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
-						while (numeroDesigna.length() < longitudDesigna) {
-							numeroDesigna = "0" + numeroDesigna;
-						}
-						designa.setNumero(Long.parseLong(numeroDesigna));
-					}
+					} 
+
+					// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+					/*while (numeroDesigna.length() < longitudDesigna) {
+						numeroDesigna = "0" + numeroDesigna;
+					}*/
+					designa.setNumero(Long.parseLong(numeroDesigna));
 
 					if (designaItem.getIdTipoDesignaColegio() != 0) {
 						designa.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
