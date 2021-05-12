@@ -2597,6 +2597,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						LetradoInscripcionItem letradoAlgoritmoSeleccion = this.getLetradoTurno(
 								idInstitucion.toString(), String.valueOf(designaItem.getIdTurno()), fechaform, usuario);
 
+						if(letradoAlgoritmoSeleccion == null ) {
+							response = 0;
+							error.setCode(404);
+							error.setDescription("general.mensaje.error.bbdd");
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setError(error);
+							LOGGER.info("No se ha encontrado letrado en la cola");
+							return insertResponseDTO;
+						}
+						
+						
 //						//Anotamos log
 						short mes = (short) cal.get(Calendar.MONTH);
 						short dia = (short) cal.get(Calendar.DAY_OF_MONTH);
