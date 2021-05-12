@@ -75,6 +75,12 @@ public class EjgController {
 		ComboDTO response = busquedaEJG.comboRenuncia(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/filtros-ejg/comboRemesa", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboRemesa(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboRemesa(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/filtros-ejg/comboCreadoDesde", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboCreadoDesde(HttpServletRequest request) {
@@ -217,9 +223,9 @@ public class EjgController {
 
 	//insertaDatosGenerales
 	@RequestMapping(value = "/gestion-ejg/insertaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> insertaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
-		InsertResponseDTO response = gestionEJG.insertaDatosGenerales(datos, request);
-		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	ResponseEntity<EjgDTO> insertaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
+		EjgDTO response = gestionEJG.insertaDatosGenerales(datos, request);
+		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
 	}
 	
 	//actualizaDatosGenerales

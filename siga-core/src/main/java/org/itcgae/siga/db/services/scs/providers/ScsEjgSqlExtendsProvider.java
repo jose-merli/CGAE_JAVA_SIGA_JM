@@ -73,17 +73,17 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.numero");
 		sql.SELECT("ejg.numejg numejg");
 		sql.SELECT("'E' || EJG.ANIO || '/' || EJG.NUMEJG AS NUMANIO");
-		sql.SELECT("TURNO.NOMBRE || '/' || GUARDIA.NOMBRE AS TURNOGUARDIA");
+		sql.SELECT("(CASE WHEN TURNO.NOMBRE is  NULL THEN '' ELSE TURNO.NOMBRE || '/' || GUARDIA.NOMBRE END) AS TURNOGUARDIA");
 		sql.SELECT("TURNO.ABREVIATURA AS TURNO");
 		sql.SELECT("EJG.GUARDIATURNO_IDTURNO as IDTURNO");
 		sql.SELECT("ejg.fechaapertura");
 		sql.SELECT("ejg.fechamodificacion");
 		sql.SELECT("(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as NOMBREletrado");
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
-		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre as NOMBRESOLICITANTE");
+		sql.SELECT("(CASE WHEN perjg.nombre is  NULL THEN '' ELSE perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre END) as NOMBRESOLICITANTE");
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
-
-//		sql.SELECT("perjg.NIF");
+		sql.SELECT("ejg.idpersonajg");		
+		sql.SELECT("perjg.NIF");
 //		sql.SELECT("perjg.correoelectronico");
 //		sql.SELECT("perjg.fechanacimiento");
 
@@ -854,10 +854,22 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 
+	public String getNumero(short idTipoEJG, short anio, short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("NVL(MAX(NUMERO) +1 ,1)");
+		sql.FROM("SCS_EJG");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("ANIO = " + anio);
+		sql.WHERE("IDTIPOEJG = " + idTipoEJG);
+
+		return sql.toString();
+	}
+	
 	public String getNumeroEJG(short idTipoEJG, short anio, short idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("NVL(MAX(NUMERO) +1,1)");
+		sql.SELECT("NVL(MAX(NUMEJG)+1 ,1) ");
 		sql.FROM("SCS_EJG");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("ANIO = " + anio);

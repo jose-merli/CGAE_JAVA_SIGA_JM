@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.ejg;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -778,11 +779,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					if (response >= 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
-								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> OK. Asignacion realizada adecuadamente");
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> KO. No se ha realizado la asignacion adecuadamente");
 					}
 				}
 			}
@@ -916,9 +917,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	@Transactional
-	public InsertResponseDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request) {
-		InsertResponseDTO responsedto = new InsertResponseDTO();
+	public EjgDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request) {
+		EjgDTO ejgdto = new EjgDTO();
 		int response = 0;
+		Error error = new Error();
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -956,39 +958,82 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					
 					//numejg
 					
-					String numero = scsEjgExtendsMapper.getNumeroEJG(record.getIdtipoejg(), record.getAnio(), record.getIdinstitucion());
+					String numEJG = scsEjgExtendsMapper.getNumeroEJG(record.getIdtipoejg(), record.getAnio(), record.getIdinstitucion());
 					
-					int numCeros = Integer.parseInt(longitudEJG) - numero.length();
+					int numCeros = Integer.parseInt(longitudEJG) - numEJG.length();
 					
-					String numEJG ="";
+					String ceros ="";
 					for(int i=0; i<numCeros; i++) {
-						numEJG += "0";
+						ceros += "0";
 					}
 					
-					numEJG+=numero;
+					ceros+=numEJG;
 					
-					record.setNumejg(numEJG);
-					record.setNumero(Long.parseLong(numero));
+					record.setNumejg(ceros);
+					
+					// Repetimos el proceso con numero
+					
+					String numero = scsEjgExtendsMapper.getNumero(record.getIdtipoejg(), record.getAnio(), record.getIdinstitucion());
+					
+					numCeros = Integer.parseInt(longitudEJG) - numero.length();
+					
+					ceros ="";
+					for(int i=0; i<numCeros; i++) {
+						ceros += "0";
+					}
+					
+					ceros+=numero;
+					
+					record.setNumero(Long.parseLong(ceros));
+					
+					//Determinamos el origen de apertura ya que, aunque no sea una clave primaria,
+					//no se permita que tenga valor null. Por ahora se introducira el valor de idinstitucion. Preguntar mas tarde.
+					record.setOrigenapertura("M");
+					
+					//Sucede lo mismo
+					record.setTipoletrado("M");
+					record.setFechacreacion(new Date());
+					record.setFechamodificacion(new Date());
+					record.setUsucreacion(usuarios.get(0).getIdusuario());
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
 					
 					response = scsEjgMapper.insertSelective(record);
+					
 				} catch (Exception e) {
 					LOGGER.error("GestionEJGServiceImpl.insertaDatosGenerales(). ERROR: al hacer el insert de datos generales. ", e);
 				} finally {
+					
 					// respuesta si se actualiza correctamente
 					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
+						List<EjgItem> list = new ArrayList<>();
+						
+						EjgItem item = new EjgItem();
+						
+						item.seteidInstitucion(idInstitucion.toString());
+						item.setAnnio(datos.getAnnio());
+						item.setNumEjg(record.getNumejg());
+						item.setNumero(record.getNumero().toString());
+						item.setTipoEJG(datos.getTipoEJG());
+						
+						list.add(item);
+						
+						ejgdto.setEjgItems(list);
+//						responsedto.setStatus(SigaConstants.OK);
+						error.setCode(200);
 						LOGGER.debug("GestionEJGServiceImpl.insertaDatosGenerales() -> OK. Datos generales insertados");
 					} else {
-						responsedto.setStatus(SigaConstants.KO);
+//						responsedto.setStatus(SigaConstants.KO);
+						error.setCode(400);
 						LOGGER.error("GestionEJGServiceImpl.insertaDatosGenerales() -> KO. No se ha insertado los datos generales");
 					}
+					ejgdto.setError(error);
 				}
 			}
 		}
 
 		LOGGER.info("GestionEJGServiceImpl.insertaDatosGenerales() -> Salida del servicio.");
 
-		return responsedto;
+		return ejgdto;
 	}
 
 	@Override
@@ -1048,6 +1093,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						ejg.setFechapresentacion(datos.getFechapresentacion());
 						ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
 						if(datos.getTipoEJGColegio()!=null)ejg.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
+						ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
+						ejg.setFechamodificacion(new Date());
 						
 						//Actualizamos la entrada en la BBDD
 						response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
@@ -1073,6 +1120,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						
 						if(newExp!= null) {
 							if(datos.getIdTipoExpediente()!=null)newExp.setIdtipoexpediente(Short.parseShort(datos.getIdTipoExpediente()));
+							newExp.setUsumodificacion(usuarios.get(0).getIdusuario());
+							newExp.setFechamodificacion(new Date());
 							
 							response = expExpedienteMapper.updateByPrimaryKeySelective(newExp);
 

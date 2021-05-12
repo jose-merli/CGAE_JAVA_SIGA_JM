@@ -47,7 +47,7 @@ public interface IGestionEJG {
 	
 	UpdateResponseDTO descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request);
 	
-	InsertResponseDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request);
+	EjgDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request);
 	
 	UpdateResponseDTO actualizaDatosGenerales(EjgItem datos, HttpServletRequest request);
 
