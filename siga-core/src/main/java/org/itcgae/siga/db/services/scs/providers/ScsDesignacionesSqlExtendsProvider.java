@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
@@ -27,6 +28,8 @@ import org.itcgae.siga.db.mappers.ScsDesignaSqlProvider;
 
 public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
+	private Logger LOGGER = Logger.getLogger(ScsDesignacionesSqlExtendsProvider.class);
+	
 	public String searchClaveDesignaciones(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax) {
 		SQL sql = new SQL();
 		SQL sqlOrder = new SQL();
@@ -2900,24 +2903,31 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		SQL sql = new SQL();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String fechaFormat = dateFormat.format(fecha);
 		
+		try {
+		//	String fechaFormat = dateFormat.format(fecha);
+			
 
-		sql.SELECT(
-				" Ins.Idinstitucion,Ins.Idturno, Per.Idpersona,Ins.fechasolicitud,TO_CHAR(TRUNC(Ins.fechavalidacion),'DD/MM/YYYY') As Fechavalidacion,"
-						+ "TO_CHAR(trunc(Ins.fechabaja),'DD/MM/YYYY') As Fechabaja,Per.Nombre,Per.Apellidos1,Decode(Per.Apellidos2, Null, '', ' ' || Per.Apellidos2) apellidos2,"
-						+ " Per.Apellidos1 || Decode(Per.Apellidos2, Null, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,  Decode(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO, Per.Fechanacimiento FECHANACIMIENTO,"
-						+ "  Ins.Fechavalidacion AS ANTIGUEDADCOLA ");
+			sql.SELECT(
+					" Ins.Idinstitucion,Ins.Idturno, Per.Idpersona,Ins.fechasolicitud,TO_CHAR(TRUNC(Ins.fechavalidacion),'DD/MM/YYYY') As Fechavalidacion,"
+							+ "TO_CHAR(trunc(Ins.fechabaja),'DD/MM/YYYY') As Fechabaja,Per.Nombre,Per.Apellidos1,Decode(Per.Apellidos2, Null, '', ' ' || Per.Apellidos2) apellidos2,"
+							+ " Per.Apellidos1 || Decode(Per.Apellidos2, Null, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,  Decode(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO, Per.Fechanacimiento FECHANACIMIENTO,"
+							+ "  Ins.Fechavalidacion AS ANTIGUEDADCOLA ");
 
-		sql.FROM(
-				" Scs_Turno              Tur, Cen_Colegiado          Col, Cen_Persona            Per,Scs_Inscripcionturno   Ins");
-		sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
-		sql.WHERE(" Tur.Idinstitucion ='" + idInstitucion + "'");
-		sql.WHERE(" Tur.Idturno ='" + idTurno + "'");
-		sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
-		sql.WHERE(" Trunc(Ins.Fechavalidacion) <= nvl(TO_DATE('" + fechaFormat + "','DD/MM/YYYY'),  Ins.Fechavalidacion)");
-		sql.WHERE("(Ins.Fechabaja Is Null Or    Trunc(Ins.Fechabaja) > TO_DATE(nvl('" + fechaFormat + "', '01/01/1900')','DD/MM/YYYY')) ");
-		sql.WHERE(" Ins.idpersona ='" + idPersona + "' and rownum <= 1");
+			sql.FROM(
+					" Scs_Turno              Tur, Cen_Colegiado          Col, Cen_Persona            Per,Scs_Inscripcionturno   Ins");
+			sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
+			sql.WHERE(" Tur.Idinstitucion ='" + idInstitucion + "'");
+			sql.WHERE(" Tur.Idturno ='" + idTurno + "'");
+			sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
+			sql.WHERE(" Trunc(Ins.Fechavalidacion) <= nvl(TO_DATE('" + fecha + "','DD/MM/YYYY'),  Ins.Fechavalidacion)");
+			sql.WHERE("(Ins.Fechabaja Is Null Or    Trunc(Ins.Fechabaja) > TO_DATE(nvl('" + fecha + "', '01/01/1900'),'DD/MM/YYYY')) ");
+			sql.WHERE(" Ins.idpersona ='" + idPersona + "' and rownum <= 1");
+			
+		}catch (Exception e) {
+			LOGGER.error(e);
+		}
+	
 
 		return sql.toString();
 
