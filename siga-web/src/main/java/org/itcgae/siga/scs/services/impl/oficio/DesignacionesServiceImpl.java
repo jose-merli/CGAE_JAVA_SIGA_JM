@@ -4297,7 +4297,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designaNueva.setAnio(designa.getAnio());
 					designaNueva.setIdturno(designa.getIdturno());
 					designaNueva.setNumero(designa.getNumero());
-					designaNueva.setFechadesigna(letradoEntrante.getFechadesigna());
+					designaNueva.setFechadesigna(letradoSaliente.getFechadesigna());
 					designaNueva.setFechamodificacion(new Date());
 					designaNueva.setManual((short) 0);
 					designaNueva.setLetradodelturno("S");
