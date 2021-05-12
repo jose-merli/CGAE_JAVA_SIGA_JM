@@ -760,11 +760,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					if (response >= 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
-								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> OK. Asignacion realizada adecuadamente");
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+								"GestionEJGServiceImpl.cambiarEstadoEJGs() -> KO. No se ha realizado la asignacion adecuadamente");
 					}
 				}
 			}

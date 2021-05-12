@@ -75,6 +75,12 @@ public class EjgController {
 		ComboDTO response = busquedaEJG.comboRenuncia(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/filtros-ejg/comboRemesa", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboRemesa(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboRemesa(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/filtros-ejg/comboCreadoDesde", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboCreadoDesde(HttpServletRequest request) {

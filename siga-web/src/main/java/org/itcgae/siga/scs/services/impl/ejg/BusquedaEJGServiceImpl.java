@@ -19,9 +19,11 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsTiposentidoauto;
 import org.itcgae.siga.db.entities.ScsTiposentidoautoExample;
+import org.itcgae.siga.db.mappers.CajgRemesaMapper;
 import org.itcgae.siga.db.mappers.ScsTiposentidoautoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cajg.mappers.CajgRemesaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsFundamentoscalificacionExtendsMapper;
@@ -76,6 +78,8 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 	private ScsTurnosExtendsMapper scsTurnosextendsMapper;
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	@Autowired
+	private CajgRemesaExtendsMapper cajgRemesaExtendsMapper;
 
 	@Override
 	public ComboDTO comboTipoEJG(HttpServletRequest request) {
@@ -617,6 +621,46 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 			}
 		}
 		LOGGER.info("comboTipoEJG() -> Salida del servicio para obtener los tipos ejg");
+		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboRemesa(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"comboRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"comboRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboRemesa() / cajgRemesaExtendsMapper.comboRemesa() -> Entrada a cajgRemesaExtendsMapper para obtener los combo");
+
+				comboItems = cajgRemesaExtendsMapper.comboRemesa(idInstitucion);
+
+				LOGGER.info(
+						"comboRemesa() / cajgRemesaExtendsMapper.comboRemesa() -> Salida a cajgRemesaExtendsMapper para obtener los combo");
+
+				if (comboItems != null) {
+					comboDTO.setCombooItems(comboItems);
+				}
+			}
+		}
+		LOGGER.info("comboRemesa() -> Salida del servicio para obtener las remesas");
 		return comboDTO;
 	}
 

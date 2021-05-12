@@ -37,4 +37,6 @@ public interface IBusquedaEJG {
 	ComboDTO comboPonente(HttpServletRequest request);
 
 	ComboDTO comboTurnosTipo(HttpServletRequest request, String idtipoturno);
+
+	ComboDTO comboRemesa(HttpServletRequest request);
 }
