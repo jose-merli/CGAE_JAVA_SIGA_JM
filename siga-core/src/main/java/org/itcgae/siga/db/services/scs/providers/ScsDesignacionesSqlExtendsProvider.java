@@ -1910,7 +1910,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("DISTINCT IDPRETENSION, F_SIGA_GETRECURSO(DESCRIPCION, 1) AS DESCRIPCION ");
 		sql.FROM("SCS_PRETENSION ");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
-		sql.WHERE("IDPROCEDIMIENTO IN " + inSQL);
+		sql.WHERE("IDPRETENSION IN " + inSQL);
 
 		return sql.toString();
 	}
