@@ -4940,7 +4940,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					ScsDesignaExample example = new ScsDesignaExample();
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 							.andIdturnoEqualTo(designaItem.getIdTurno()).andAnioEqualTo((short) designaItem.getAno())
-							.andCodigoEqualTo(String.valueOf(designaItem.getCodigo()));
+							.andNumeroEqualTo(Long.valueOf(designaItem.getNumero()));
 
 					List<ScsDesigna> designaExistentes = scsDesignacionesExtendsMapper.selectByExample(example);
 
