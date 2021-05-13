@@ -3339,9 +3339,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				auxLetradoSeleccionado = (LetradoInscripcionItem) alLetradosOrdenados.get(punteroLetrado.getValor());
 				// vale
 				if (comprobarRestriccionesLetradoColaTurno(auxLetradoSeleccionado, diasGuardia, hmPersonasConSaltos,
-						hmBajasTemporales, idInstitucion, idTurno, idGuardia, idCalendarioGuardias, usuario))
+						hmBajasTemporales, idInstitucion, idTurno, idGuardia, idCalendarioGuardias, usuario)) {
 					letradoGuardia = auxLetradoSeleccionado;
-				if (letradoGuardia.getInscripcionTurno() != null) {
+				}
+				
+				if (letradoGuardia != null && letradoGuardia.getInscripcionTurno() != null) {
 					LOGGER.info("Letrado encontrado. " + letradoGuardia.getInscripcionTurno().getNombre() + " "
 							+ letradoGuardia.getInscripcionTurno().getApellidos1() + " "
 							+ letradoGuardia.getInscripcionTurno().getApellidos2());
