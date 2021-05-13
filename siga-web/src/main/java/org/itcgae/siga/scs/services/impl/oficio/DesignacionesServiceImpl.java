@@ -4784,7 +4784,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ComunicacionesDTO comunicacionesDTO = new ComunicacionesDTO();
-		List<ComunicacionesItem> comunicacionesItem = null;
+		List<ComunicacionesItem> comunicacionesItem = new ArrayList<ComunicacionesItem>();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -4809,11 +4809,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				String idTurno = comunicaciones.get(1);
 				String isLetrado = comunicaciones.get(2);
 
-				if (isLetrado.equals("false")) {
+				if (isLetrado != null && isLetrado.equals("false")) {
 					String idpersona = null;
 					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
 							idpersona);
-				} else {
+				} else if(comunicaciones.size() > 3){
 					String idpersona = comunicaciones.get(3);
 					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
 							idpersona);
