@@ -88,6 +88,8 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 	@Override
 	public TurnosDTO busquedaTurnos(TurnosItem turnosItem, HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
+		
+		Error error = new Error();	
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -116,6 +118,13 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				LOGGER.info(
 						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
 
+
+				if((turnosItems != null) && (turnosItems.size()) >= 200) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					turnosDTO.setError(error);
+				}
+				
 				if (turnosItems != null) {
 					turnosDTO.setTurnosItems(turnosItems);
 				}

@@ -857,22 +857,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						}
 					}
 					sql += " AND des.IDPROCEDIMIENTO IN (" + estadoIN + " )";
-	
-   
-																					 
-												 
-																				 
-			
-						  
-																  
-													
-													   
-												
-			  
-													   
-	   
-	  
-															  
+											  
 				}
 
 			}

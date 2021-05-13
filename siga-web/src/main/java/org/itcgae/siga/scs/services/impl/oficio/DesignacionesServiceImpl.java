@@ -579,6 +579,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Override
 	public List<DesignaItem> busquedaDesignas(DesignaItem designaItem, HttpServletRequest request) {
 		//DesignaItem result = new DesignaItem();
+		Error error = new Error();	
 		List<DesignaItem> designas = null;
 		List<DesignaItem> designasNuevas = null;
 		List<GenParametros> tamMax = null;
@@ -649,6 +650,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 					
 					designas = new ArrayList<DesignaItem>(desginasBusqueda.values());
+					
+					if((designas != null) && (designas.size()) >= 200) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						//designaDTO.setError(error);
+					}
 					
 					
 				} catch (Exception e) {
