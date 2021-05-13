@@ -4963,8 +4963,34 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					ScsDesigna scsDesigna = designaExistentes.get(0);
+					// Limitacion campo numero en updateDesigna
+					// Obtenemos el parametro de limite para el campo CODIGO en BBDD
+					StringDTO parametros = new StringDTO();
+					Integer longitudDesigna;
+					String codigoDesigna = designaItem.getCodigo();
 
-					scsDesigna.setCodigo(String.valueOf(designaItem.getNumero()));
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
+							idInstitucion.toString());
+
+					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+					// la institucion 0
+					if (parametros != null && parametros.getValor() != null) {
+						longitudDesigna = Integer.parseInt(parametros.getValor());
+					} else {
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
+								"0");
+						longitudDesigna = Integer.parseInt(parametros.getValor());
+					}
+					
+					if (codigoDesigna != null || !codigoDesigna.isEmpty()) {
+					
+					// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+					while (codigoDesigna.length() < longitudDesigna) {
+						codigoDesigna = "0" + codigoDesigna;
+					}
+
+					scsDesigna.setCodigo(codigoDesigna);
+					scsDesigna.setFechaalta(designaItem.getFechaAlta());
 
 					scsDesigna.setFechamodificacion(new Date());
 					scsDesigna.setUsumodificacion(usuario.getIdusuario());
@@ -4984,7 +5010,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					LOGGER.info(
 							"updateDesigna() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
-
+					}
 
 				} catch (Exception e) {
 					error.setCode(400);
