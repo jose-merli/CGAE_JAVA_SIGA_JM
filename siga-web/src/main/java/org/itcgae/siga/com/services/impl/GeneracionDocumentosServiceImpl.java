@@ -34,7 +34,9 @@ import org.itcgae.siga.com.documentos.DataMailMergeDataSource;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.FoUtils;
 import org.itcgae.siga.commons.utils.SIGAHelper;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -731,5 +733,138 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
         writer.close();
         
     }
+
+	@Override
+	public DatosDocumentoItem generarFO(String plantilla, String rutaTmp, String nombreFicheroSalida,
+			HashMap<String, Object> hDatosFinal) throws IOException, Exception {
+		DatosDocumentoItem documento = new DatosDocumentoItem();
+		// 1. obteniendo plantilla FO
+		
+		File plantillaFO = new File(plantilla);
+		LOGGER.debug("*********** rutaFicheroFO: " + plantilla);
+
+		// 2. generando intermedio FOP a partir de plantilla y datos
+		// 2.1. obteniendo ruta para fichero intermedio FOP
+		String rutaFicheroFOP = rutaTmp 
+				+ nombreFicheroSalida + ".fo";
+		File ficheroFOP = new File(rutaFicheroFOP);
+
+		// 2.2. obteniendo texto de plantilla FO
+		String sPlantillaFO = UtilidadesString.getFileContent(plantillaFO);
+		
+		// 2.3. generando intermedio FOP, reemplazando los datos en la plantilla
+		//String content = reemplazarDatos(request, sPlantillaFO);
+		UtilidadesString.setFileContent(ficheroFOP, sPlantillaFO);
+
+		// 3. generando PDF final
+		// 3.1. obteniendo ruta para fichero PDF final
+		
+		File ficheroPDF = new File(nombreFicheroSalida);
+		LOGGER.debug("*********** rutaFicheroPDF: " + nombreFicheroSalida);
+
+		// 3.2. convirtiendo FOP a PDF
+//					Plantilla plantilla = new Plantilla(this.usuario);
+		FoUtils.convertFO2PDF(ficheroFOP, ficheroPDF,	rutaTmp);
+
+		// 3.3. borrando fichero intermedio FOP generado
+		ficheroFOP.delete();
+
+		// devolviendo el fichero PDF generado
+		try {
+			documento.setDatos(Files.readAllBytes(ficheroPDF.toPath()));
+			documento.setFileName(nombreFicheroSalida);
+			documento.setPathDocumento(rutaTmp);
+		} catch (IOException e) {
+			LOGGER.error("Error al devolver el fichero generado");
+			e.printStackTrace();
+		}
+		return documento;
+	}
+	
+	/*private void convertFO2PDF(File ficheroFOP, File ficheroPDF, String rutaTmp) {
+		// ¡OJO, Muy importante! 
+				// 1. Este metodo ha de ser sincronizado para que solo se ejecute de forma atomica.
+				//    Esto es por culpa de la configuración que se establece a nivel global (org.apache.fop.configuration.Configuration)
+				// 2. Y ha de ser estatico (de clase) para que funcione de verdad; 
+				//    Si no lo fuera, en cada instancia (objeto) creado de MasterReport se podria ejecutar este metodo sin sincronizacion con las demas instancias. 
+				//    De hecho, esto es lo que pasaba: se mezclaban las imagenes de un FO con las de otro.
+			    	OutputStream out = null;
+			    	FileOutputStream fileOut = null;
+			    	
+			        try {
+			        	    		
+			        	LOGGER.debug(">>> baseDir:" + rutaTmp);
+			        	
+			            org.apache.fop.configuration.Configuration.put("baseDir", rutaTmp);
+			            org.apache.fop.configuration.Configuration.put("fontBaseDir", SIGAReferences.getReference(SIGAReferences.RESOURCE_FILES.FOP_DIR.getFileName()));
+//			            new Options(new File(ClsConstants.FOP_CONFIG_FILE));
+			            new Options(SIGAReferences.getInputReference(SIGAReferences.RESOURCE_FILES.FOP));
+
+			            LOGGER.debug(">>> org.apache.fop.configuration.Configuration");
+			            // Construct driver and setup output format
+			            Driver driver = new Driver();
+			            Logger logger = new ConsoleLogger(ConsoleLogger.LEVEL_ERROR);
+			    		driver.setLogger(logger);
+			    		MessageHandler.setScreenLogger(logger);
+
+			            LOGGER.debug(">>> Driver driver");
+			            
+			            driver.setRenderer(Driver.RENDER_PDF);
+			            LOGGER.debug(">>> driver.setRenderer");
+			            
+			    		LOGGER.debug("CONVERT: driver creado.");
+			            
+			            // Setup output stream.  Note: Using BufferedOutputStream
+			            // for performance reasons (helpful with FileOutputStreams).
+			            fileOut = new FileOutputStream(ficheroPDF);
+			            out = new BufferedOutputStream(fileOut);
+			            driver.setOutputStream(out);
+
+			    		LOGGER.debug("CONVERT: stream creado.");
+
+			            // Setup JAXP using identity transformer
+			            TransformerFactory factory = TransformerFactory.newInstance();
+			            //System.out.println(factory.getClass().getName());
+			            
+			            Transformer transformer = factory.newTransformer(); // identity transformer
+
+			    		LOGGER.debug("CONVERT: transformer creado.");
+			            
+			            // Setup input stream
+			            Source src = new StreamSource(ficheroFOP);
+			            //Source src = new StreamSource(foFormateado);
+
+			    		LOGGER.debug("CONVERT: source creado.");
+
+			            // Resulting SAX events (the generated FO) must be piped through to FOP
+			            Result res = new SAXResult(driver.getContentHandler());
+
+			    		LOGGER.debug("CONVERT: result creado.");
+
+			            // Start XSLT transformation and FOP processing
+			            transformer.transform(src, res);
+			            
+			    		LOGGER.debug("CONVERT: PDF creado.");
+			            
+			            //Borramos la cache de ficheros:
+			            org.apache.fop.image.FopImageFactory.resetCache();
+			    		LOGGER.debug("CONVERT: cache borrada. TODO OK.");
+			    		LOGGER.debug("CONVERT: El fichero se almacenara en "+ficheroPDF);
+
+			        } 
+			        catch (Exception e) {
+			        	
+			        	    LOGGER.debugError("Error transformando PDF desde FOP - Fichero:"+rutaTmp+" - Mensaje:" +e.getLocalizedMessage(),e,3);
+			        
+			            throw new ClsExceptions (e, "Error transformando PDF desde FOP - Fichero:"+rutaTmp+" - Mensaje:" +e.getLocalizedMessage());
+			        } 
+			        finally {
+			        	try {
+				            out.close();
+				            fileOut.close();
+			        	} catch (Exception e) {}
+			        }
+		
+	}*/
 
 }
