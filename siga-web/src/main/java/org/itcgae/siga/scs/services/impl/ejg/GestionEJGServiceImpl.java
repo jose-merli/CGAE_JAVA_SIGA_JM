@@ -789,13 +789,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						
 						ScsEejgPeticionesExample scsEejgPeticionesExample = new ScsEejgPeticionesExample();
 						
-						scsEejgPeticionesExample.createCriteria().andAnioEqualTo(Short.parseShort(ejg.getidInstitucion()))
+						scsEejgPeticionesExample.createCriteria().andIdinstitucionEqualTo(Short.parseShort(ejg.getidInstitucion()))
 						.andIdpersonaEqualTo(idPersona).andAnioEqualTo(Short.parseShort(ejg.getAnnio()))
 						.andIdtipoejgEqualTo(Short.parseShort(ejg.getTipoEJG())).andNumeroEqualTo(Long.parseLong(ejg.getNumEjg()));
 						
 						List<ScsEejgPeticiones> peticiones = scsEejgPeticionesMapper.selectByExample(scsEejgPeticionesExample);
 						
-						if(peticiones==null || peticiones.size()>0) {
+						if(peticiones==null || peticiones.size()<=0) {
 							throw new Exception("No existe peticiones para el ejg seleccionado");
 						}
 						
@@ -806,15 +806,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						ScsUnidadfamiliarejgKey key = new ScsUnidadfamiliarejgKey();
 						
 						key.setIdinstitucion(Short.parseShort(ejg.getidInstitucion()));
-						key.setIdpersona(Long.parseLong(ejg.getIdPersona()));
+						key.setIdpersona(idPersona);
 						key.setIdtipoejg(Short.parseShort(ejg.getTipoEJG()));
 						key.setAnio(Short.parseShort(ejg.getAnnio()));
-						key.setNumero(Long.parseLong(ejg.getNumEjg())); //NUMEJG
+						key.setNumero(Long.parseLong(ejg.getNumero())); //NUMEJG
 						
 						uFamiliar = scsUnidadfamiliarejgMapper.selectByPrimaryKey(key);
 						
 						//comprobamos el parentesco, si no tiene, se le pone solicitante 
-						ScsParentesco parentesco = null;
+						ScsParentesco parentesco = new ScsParentesco();
 						
 						if(uFamiliar!=null && uFamiliar.getIdparentesco()!=null){
 							ScsParentescoKey keyParentesco = new ScsParentescoKey();
@@ -824,9 +824,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							
 							parentesco = scsParentescoMapper.selectByPrimaryKey(keyParentesco);
 						}else {
-							String literalSolicitante = UtilidadesString.getMensajeIdioma(usuarios.get(0).getIdlenguaje(), "gratuita.busquedaEJG.literal.solicitante"); 
-									
-							parentesco.setDescripcion(literalSolicitante);
+							if(usuarios.get(0).getIdlenguaje().equals("2")) {
+								parentesco.setDescripcion("Sol·licitant");
+							}else {
+								parentesco.setDescripcion("Solicitante");
+							}
 						}
 						
 						//obtenemos los datos del fichero
