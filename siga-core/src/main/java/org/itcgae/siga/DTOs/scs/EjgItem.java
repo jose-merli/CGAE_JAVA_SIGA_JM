@@ -78,9 +78,7 @@ public class EjgItem {
 
 	private String turnoDes;
 	private String nombreApeSolicitante;
-	private String anioexpediente;
-	private String numeroexpediente;
-	private String idTipoExpediente;
+	
 	private String idInstTipoExp;
 	private Date fechapresentacion;
 	private Date fechalimitepresentacion;
@@ -1067,38 +1065,6 @@ public class EjgItem {
 
 	/**
 	 **/
-	public EjgItem anioexpediente(String anioexpediente) {
-		this.anioexpediente = anioexpediente;
-		return this;
-	}
-
-	@JsonProperty("anioexpediente")
-	public String getAnioexpediente() {
-		return anioexpediente;
-	}
-
-	public void setAnioexpediente(String anioexpediente) {
-		this.anioexpediente = anioexpediente;
-	}
-
-	/**
-	 **/
-	public EjgItem numeroexpediente(String numeroexpediente) {
-		this.numeroexpediente = numeroexpediente;
-		return this;
-	}
-
-	@JsonProperty("numeroexpediente")
-	public String getNumeroexpediente() {
-		return numeroexpediente;
-	}
-
-	public void setNumeroexpediente(String numeroexpediente) {
-		this.numeroexpediente = numeroexpediente;
-	}
-
-	/**
-	 **/
 	public EjgItem fechapresentacion(Date fechapresentacion) {
 		this.fechapresentacion = fechapresentacion;
 		return this;
@@ -1384,22 +1350,6 @@ public class EjgItem {
 
 	public void setFechaAuto(Date fechaAuto) {
 		this.fechaAuto = fechaAuto;
-	}
-
-	/**
-	 **/
-	public EjgItem idTipoExpediente(String idTipoExpediente) {
-		this.idTipoExpediente = idTipoExpediente;
-		return this;
-	}
-
-	@JsonProperty("idTipoExpediente")
-	public String getIdTipoExpediente() {
-		return idTipoExpediente;
-	}
-
-	public void setIdTipoExpediente(String idTipoExpediente) {
-		this.idTipoExpediente = idTipoExpediente;
 	}
 	
 	/**

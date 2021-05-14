@@ -39,16 +39,18 @@ import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazadaExample;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
-import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.entities.ScsParentesco;
 import org.itcgae.siga.db.entities.ScsParentescoKey;
+import org.itcgae.siga.db.entities.ScsPersonajgExample;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
 import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
+import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgPrestacionRechazadaMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.mappers.ScsParentescoMapper;
+import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -129,6 +131,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	
 	@Autowired
 	private IEEJGServices eejgService;
+	
+	@Autowired
+	private ScsPersonajgMapper scsPersonajgMapper;
 
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -819,8 +824,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		String salida;
-		
 		if (idInstitucion != null) {
 			LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Entrada para obtener información del usuario logeado");
 
@@ -836,15 +839,22 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				try {
 					//recorremos la lista para generar el documento de cada uno de los ejgs 
 					for(EjgItem ejg : datos) {
-											
+
+						//obtenemos la id de la persona
+						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la persona...");
+						ScsPersonajgExample personaExample = new ScsPersonajgExample();
+						personaExample.createCriteria().andNifEqualTo(ejg.getNif());
+						
+						Long idPersona = scsPersonajgMapper.selectByExample(personaExample).get(0).getIdpersona();
+						
 						//obtenemos la peticion y el idXML
 						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la petición...");
 						
 						ScsEejgPeticionesExample scsEejgPeticionesExample = new ScsEejgPeticionesExample();
 						
 						scsEejgPeticionesExample.createCriteria().andAnioEqualTo(Short.parseShort(ejg.getidInstitucion()))
-						.andIdpersonaEqualTo(Long.parseLong(ejg.getIdPersona())).andAnioEqualTo(Short.parseShort(ejg.getAnnio()))
-						.andIdtipoejgEqualTo(Short.parseShort(ejg.getIdTipoExpediente())).andNumeroEqualTo(Long.parseLong(ejg.getNumEjg()));
+						.andIdpersonaEqualTo(idPersona).andAnioEqualTo(Short.parseShort(ejg.getAnnio()))
+						.andIdtipoejgEqualTo(Short.parseShort(ejg.getTipoEJG())).andNumeroEqualTo(Long.parseLong(ejg.getNumEjg()));
 						
 						List<ScsEejgPeticiones> peticiones = scsEejgPeticionesMapper.selectByExample(scsEejgPeticionesExample);
 						
@@ -860,9 +870,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						
 						key.setIdinstitucion(Short.parseShort(ejg.getidInstitucion()));
 						key.setIdpersona(Long.parseLong(ejg.getIdPersona()));
-						key.setIdtipoejg(Short.parseShort(ejg.getIdTipoExpediente()));
+						key.setIdtipoejg(Short.parseShort(ejg.getTipoEJG()));
 						key.setAnio(Short.parseShort(ejg.getAnnio()));
-						key.setNumero(Long.parseLong(ejg.getNumeroexpediente())); //NUMEJG
+						key.setNumero(Long.parseLong(ejg.getNumEjg())); //NUMEJG
 						
 						uFamiliar = scsUnidadfamiliarejgMapper.selectByPrimaryKey(key);
 						
@@ -892,12 +902,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						if(fichero!= null){
 							response=1;
 							
-							request.setAttribute("nombreFichero", fichero.getName());
-							request.setAttribute("rutaFichero", fichero.getAbsolutePath());			
-							request.setAttribute("borrarFichero", "true");			
-							request.setAttribute("generacionOK","OK");
-							
-							salida= "descarga";
+//							request.setAttribute("nombreFichero", fichero.getName());
+//							request.setAttribute("rutaFichero", fichero.getAbsolutePath());			
+//							request.setAttribute("borrarFichero", "true");			
+//							request.setAttribute("generacionOK","OK");
+//							
+//							salida= "descarga";
 						}else{
 							throw new Exception("ERROR al generar fichero");
 						}

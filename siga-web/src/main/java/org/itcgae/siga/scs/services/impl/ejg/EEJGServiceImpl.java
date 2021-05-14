@@ -252,7 +252,7 @@ public class EEJGServiceImpl implements IEEJGServices {
 			// obtenemos los datos del ejg
 			key.setAnio(Short.parseShort(item.getAnnio()));
 			key.setIdinstitucion(Short.parseShort(item.getidInstitucion()));
-			key.setIdtipoejg(Short.parseShort(item.getIdTipoExpediente()));
+			key.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
 			key.setNumero(Long.parseLong(item.getNumEjg()));
 
 			scsEjg = scsEjgMapper.selectByPrimaryKey(key);
