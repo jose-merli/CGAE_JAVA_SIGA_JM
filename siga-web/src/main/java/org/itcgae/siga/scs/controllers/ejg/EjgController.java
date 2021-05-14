@@ -251,16 +251,12 @@ public class EjgController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
-	/*
-	 * //guardarDatosGenerales
-	 * 
-	 * @RequestMapping(value = "/gestion-ejg/guardarDatosGenerales", method =
-	 * RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	 * ResponseEntity<UpdateResponseDTO> guardarDatosGenerales(@RequestBody
-	 * List<EjgItem> datos, HttpServletRequest request) { UpdateResponseDTO response
-	 * = gestionEJG.guardarDatosGenerales(datos, request); return new
-	 * ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK); }
-	 */
+	//Actualixar turno, guardia y letrado
+		@RequestMapping(value = "/gestion-ejg/guardarServiciosTramitacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> guardarServiciosTramitacion(@RequestBody EjgItem datos, HttpServletRequest request) {
+			UpdateResponseDTO response = gestionEJG.guardarServiciosTramitacion(datos, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}
 
 	// borrarEstado
 	@RequestMapping(value = "/gestion-ejg/borrarEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

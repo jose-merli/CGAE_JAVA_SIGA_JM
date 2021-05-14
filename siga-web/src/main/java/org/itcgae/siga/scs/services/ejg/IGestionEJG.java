@@ -70,4 +70,6 @@ public interface IGestionEJG {
 	UpdateResponseDTO descargarDocumentacion(EjgItem datos, HttpServletRequest request);
 
 	List<ScsEjgPrestacionRechazada> searchPrestacionesRechazadas(EjgItem ejgItem, HttpServletRequest request);
+
+	UpdateResponseDTO guardarServiciosTramitacion(EjgItem datos, HttpServletRequest request);
 }

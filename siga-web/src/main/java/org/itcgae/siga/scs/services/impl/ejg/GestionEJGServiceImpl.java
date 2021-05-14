@@ -32,6 +32,7 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsEejgPeticiones;
 import org.itcgae.siga.db.entities.ScsEejgPeticionesExample;
+import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazadaExample;
@@ -209,6 +210,68 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return comboDTO;
 	}
 	
+	@Override
+	public UpdateResponseDTO guardarServiciosTramitacion(EjgItem datos, HttpServletRequest request) {
+
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		int response = 0;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"guardarServiciosTramitacion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"guardarServiciosTramitacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				try {
+					
+					//Seleccionamos el EJG que vamos a actualizar
+					ScsEjgKey key = new ScsEjgKey();
+					
+					key.setIdinstitucion(idInstitucion);
+					key.setAnio(Short.parseShort(datos.getAnnio()));
+					key.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+					key.setNumero(Long.parseLong(datos.getNumero()));
+					
+					ScsEjgWithBLOBs ejg = scsEjgMapper.selectByPrimaryKey(key);
+					
+					//Una vez tenemos el EJG, introducimos la informacion seleccionada en la tarjeta
+					
+					//Por ahora suponemos que los valores de id no pueden ser nulos.
+					ejg.setGuardiaturnoIdguardia(Integer.parseInt(datos.getIdGuardia()));
+					ejg.setGuardiaturnoIdturno(Integer.parseInt(datos.getIdTurno()));
+					ejg.setIdpersona(Long.parseLong(datos.getIdPersona()));
+					
+					LOGGER.info(
+							"guardarServiciosTramitacion() / scsEjgMapper.updateByPrimaryKeySelective() -> Entrada a scsEjgMapper para actualizar el ejg");
+
+					response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
+
+					LOGGER.info(
+							"guardarServiciosTramitacion() / scsEjgMapper.updateByPrimaryKeySelective() -> Salida a scsEjgMapper para actualizar el ejg");
+
+				} catch (Exception e) {
+					
+				}
+			}
+
+		}
+		LOGGER.info(
+				"guardarServiciosTramitacion() -> Salida del servicio para actualizar turno, guardia y letrado asociados a un EJG.");
+		return responsedto;
+	}
+
 	@Override
 	public List<ScsEjgPrestacionRechazada> searchPrestacionesRechazadas(EjgItem ejgItem, HttpServletRequest request) {
 		
@@ -1070,7 +1133,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						ExpExpediente newExp = expExpedienteMapper.selectByPrimaryKey(expKey);
 						
 						if(newExp!= null) {
-							if(datos.getIdTipoExpediente()!=null)newExp.setIdtipoexpediente(Short.parseShort(datos.getIdTipoExpediente()));
+							if(datos.getTipoEJG()!=null)newExp.setIdtipoexpediente(Short.parseShort(datos.getTipoEJG()));
 							newExp.setUsumodificacion(usuarios.get(0).getIdusuario());
 							newExp.setFechamodificacion(new Date());
 							

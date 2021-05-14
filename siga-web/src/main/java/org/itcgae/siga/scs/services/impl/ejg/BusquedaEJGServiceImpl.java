@@ -142,6 +142,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 	public InsertResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request) {
 		InsertResponseDTO responsedto = new InsertResponseDTO();
 		int response = 0;
+		Error error = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -216,6 +217,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 								"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> OK. Asignacion realizada adecuadamente");
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
+						responsedto.setId("500");
 						LOGGER.error(
 								"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> KO. No se ha realizado la asignacion adecuadamente");
 					}

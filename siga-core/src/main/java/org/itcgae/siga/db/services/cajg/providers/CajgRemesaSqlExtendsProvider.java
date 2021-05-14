@@ -15,8 +15,6 @@ public class CajgRemesaSqlExtendsProvider extends CajgRemesaSqlProvider{
 		sql.INNER_JOIN("CAJG_REMESAESTADOS ESTADOS ON ESTADOS.IDREMESA = REMESA.IDREMESA "
 				+ "AND ESTADOS.IDINSTITUCION = REMESA.IDINSTITUCION");
 		sql.WHERE("REMESA.idinstitucion = "+ idInstitucion+ " AND ESTADOS.IDESTADO IN (1,2)");
-		//HAY QUE TENER EN CUENTA E INVESTIGAR LAS REMESAS QUE PERMITEN LA INCLUSION
-		//DE EJGS
 	
 		return sql.toString();
 	}
