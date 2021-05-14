@@ -985,6 +985,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 		LOGGER.info("searchCV() -> Entrada al servicio para obtener datos curriculares");
 
+		Error error = new Error();		
 		CargaMasivaDTO cargaMasivaDTO = new CargaMasivaDTO();
 		List<CargaMasivaItem> cargaMasivaItemList = new ArrayList<CargaMasivaItem>();
 
@@ -994,6 +995,12 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 			cargaMasivaItemList = cenCargaMasivaExtendsMapper.selectEtiquetas(idInstitucion, cargaMasivaItem);
 			cargaMasivaDTO.setCargaMasivaItem(cargaMasivaItemList);
+			
+			if((cargaMasivaItemList != null) && (cargaMasivaItemList.size()) >= 200) {
+				error.setCode(200);
+				error.setDescription("La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+				cargaMasivaDTO.setError(error);
+			}
 
 			if (cargaMasivaItemList == null || cargaMasivaItemList.size() == 0) {
 
