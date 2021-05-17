@@ -407,7 +407,7 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 	sql.INNER_JOIN("cen_persona per ON per.IDPERSONA = ins.IDPERSONA");
 	sql.INNER_JOIN("cen_colegiado col ON col.idpersona = per.IDPERSONA and col.IDINSTITUCION = ins.IDINSTITUCION and col.IDPERSONA = ins.IDPERSONA");
 	sql.INNER_JOIN("scs_turno tur ON tur.IDTURNO = ins.IDTURNO and tur.IDINSTITUCION = col.IDINSTITUCION");
-	sql.WHERE("(ins.fechabaja is null AND Ins.Fechavalidacion IS NOT NULL AND tur.Idinstitucion = '"+idInstitucion+"'AND tur.Idturno = '"+turnosItem.getIdturno()+"')");
+	sql.WHERE("(ins.fechabaja IS NULL AND Ins.Fechavalidacion IS NOT NULL AND Ins.Fechavalidacion <= '"+strDate+"' AND tur.Idinstitucion = '"+idInstitucion+"'AND tur.Idturno = '"+turnosItem.getIdturno()+"')");
 	sql.ORDER_BY("/*aqui debemos de consultar primero el orden que vamos a ordenar.*/\r\n" +busquedaOrden+
 			"          ) consulta ) consulta2)\r\n" + 
 			"SELECT * from(\r\n" + 
