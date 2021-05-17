@@ -119,6 +119,7 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "fechapublicacion", property = "fechaPublicacion", jdbcType = JdbcType.DATE),
 		@Result(column = "bisresolucion", property = "bis", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "turnadoratificacion", property = "requiereTurn", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numerodesigna", property = "", jdbcType = JdbcType.VARCHAR)
 	})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
 	
@@ -153,6 +154,7 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 	     @Result(column = "turnadoratificacion", property = "turnadoRatificacion", jdbcType = JdbcType.VARCHAR),
 	     @Result(column = "requierenotificarproc", property = "requiereNotificarProc", jdbcType = JdbcType.VARCHAR),
 	     @Result(column = "notascajg", property = "notasCAJG", jdbcType = JdbcType.VARCHAR),
+	     
 	})
 	ResolucionEJGItem getResolucion(EjgItem ejgItem, String idInstitucion, String idLenguaje);
 	

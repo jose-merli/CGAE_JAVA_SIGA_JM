@@ -452,9 +452,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.fechapublicacion");
 		sql.SELECT("ejg.bisresolucion");
 		sql.SELECT("ejg.turnadoratificacion");
-		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as nombreletrado");
+		sql.SELECT("(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as nombreletrado");
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
-		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre as NOMBRESOLICITANTE");
+		sql.SELECT("(CASE WHEN perjg.nombre is  NULL THEN '' ELSE perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre END) as NOMBRESOLICITANTE");
 		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 as APESOLICITANTE");
 		sql.SELECT("perjg.nombre as SOLONOMBRESOLIC");
 		sql.SELECT("perjg.NIF");
@@ -463,11 +463,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("rectiporesolucion.descripcion AS resolucion");
 		sql.SELECT("rectiporesolauto.descripcion AS resolauto");
 		sql.SELECT(
-				"personadesigna.apellidos1 || ' ' || personadesigna.apellidos2 || ', ' || personadesigna.nombre AS nombreletradodesigna");
+				"(CASE WHEN personadesigna.nombre is  NULL THEN '' ELSE personadesigna.apellidos1 || ' ' || personadesigna.apellidos2 || ', ' || personadesigna.nombre END) AS nombreletradodesigna");
 		sql.SELECT("EXPEDIENTE.anioexpediente");
 		sql.SELECT("EXPEDIENTE.numeroexpediente");
 		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE");
 		sql.SELECT("EXPEDIENTE.IDINSTITUCION_TIPOEXPEDIENTE");
+		sql.SELECT("ejgd.numerodesigna");
 		// from
 		sql.FROM("scs_ejg ejg");
 		// joins

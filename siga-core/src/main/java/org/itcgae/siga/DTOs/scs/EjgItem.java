@@ -102,6 +102,8 @@ public class EjgItem {
 	private Date fechaEstadoNew;
 	private String estadoNew;
 	
+	private String numDesigna;
+	
 
 	/**
 	 **/
@@ -1423,5 +1425,13 @@ public class EjgItem {
 
 	public void setPrestacionesRechazadas(String[] prestacionesRechazadas) {
 		this.prestacionesRechazadas = prestacionesRechazadas;
+	}
+
+	public String getNumDesigna() {
+		return numDesigna;
+	}
+
+	public void setNumDesigna(String numDesigna) {
+		this.numDesigna = numDesigna;
 	}
 }
