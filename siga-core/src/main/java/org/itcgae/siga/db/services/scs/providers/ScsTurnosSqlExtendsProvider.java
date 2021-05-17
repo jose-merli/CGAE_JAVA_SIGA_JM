@@ -471,8 +471,7 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 		sql4.SELECT("(CASE\r\n" + 
 				"		WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
 				"		AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
-				"		AND (Ins.Fechabaja IS NULL\r\n" + 
-				"		OR TRUNC(Ins.Fechabaja) > NVL('"+strDate+"', '01/01/1900')) THEN '1'\r\n" + 
+				"		THEN '1'\r\n" + 
 				"		ELSE '0'\r\n" + 
 				"	END) Activo,\r\n" + 
 				"	Ins.Idinstitucion,\r\n" + 
@@ -527,7 +526,6 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 		sql4.INNER_JOIN("scs_guardiasturno gua ON gua.idturno = ins.idturno and gua.idguardia = ins.idguardia and gua.IDINSTITUCION = ins.IDINSTITUCION");
 		sql4.LEFT_OUTER_JOIN("scs_grupoguardiacolegiado gru ON gru.IDINSTITUCION = ins.IDINSTITUCION and gru.IDTURNO = ins.IDTURNO and gru.IDGUARDIA = ins.IDGUARDIA and gru.IDPERSONA = per.IDPERSONA and gru.FECHASUSCRIPCION = ins.FECHASUSCRIPCION");
 		sql4.LEFT_OUTER_JOIN("scs_grupoguardia grg ON grg.IDGRUPOGUARDIA = gru.IDGRUPOGUARDIA");
-		sql4.WHERE("ins.fechabaja is null");
 		sql4.WHERE("Ins.Fechavalidacion IS NOT NULL "+
 				"AND Gua.Idinstitucion = '"+idInstitucion+"'" + 
 				"AND Gua.Idturno = '"+turnosItem.getIdturno()+"'"+
@@ -550,8 +548,7 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 				"	(CASE\r\n" + 
 				"		WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
 				"		AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
-				"		AND (Ins.Fechabaja IS NULL\r\n" + 
-				"		OR TRUNC(Ins.Fechabaja) > NVL('"+strDate+"', '01/01/1900')) THEN '1'\r\n" + 
+				"		THEN '1'\r\n" + 
 				"		ELSE '0'\r\n" + 
 				"	END) Activo,\r\n" + 
 				"	Ins.Idinstitucion,\r\n" + 
