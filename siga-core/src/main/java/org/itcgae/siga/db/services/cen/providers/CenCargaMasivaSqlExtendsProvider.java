@@ -27,7 +27,8 @@ public class CenCargaMasivaSqlExtendsProvider extends CenCargamasivaSqlProvider 
 		if (cargaMasivaItem.getFechaCarga() != null && cargaMasivaItem.getFechaCarga() != "") {
 			sql.WHERE("ca.fechacarga>= TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/RRRR') and ca.fechacarga< (TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/YYYY')+1)");
 		}
-		
+
+		sql.WHERE(" rownum <= 200");
 		sql.ORDER_BY("ca.fechacarga desc");
 		
 		return sql.toString();
