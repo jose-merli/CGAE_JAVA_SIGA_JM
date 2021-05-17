@@ -180,7 +180,7 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO updateDesigna(DesignaItem designaItem, HttpServletRequest request);
 
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente,
-			ScsDesignasletrado letradoEntrante, HttpServletRequest request);
+			ScsDesignasletrado letradoEntrante, Boolean checkCompensacion , Boolean checkSaltoEntrante , HttpServletRequest request);
 	
 	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request);
 	

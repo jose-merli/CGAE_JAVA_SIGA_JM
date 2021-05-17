@@ -3278,4 +3278,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
+	
+	public String comprobarCodigoDesigna(String idInstitucion, String anio, String idTurno,  String codigo) {
+		SQL sql = new SQL();
+
+		sql.SELECT("CODIGO");
+		sql.FROM("SCS_DESIGNA");
+		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
+		sql.WHERE(" ANIO ='" + anio + "'");
+		sql.WHERE(" CODIGO ='" + codigo + "'");
+
+		return sql.toString();
+	}
 }

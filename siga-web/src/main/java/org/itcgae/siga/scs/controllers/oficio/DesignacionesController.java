@@ -195,6 +195,8 @@ public class DesignacionesController {
 		UpdateResponseDTO response = designacionesService.updateDesigna(designaItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else if (response.getError().getCode() == 400)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.BAD_REQUEST);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -719,10 +721,22 @@ public class DesignacionesController {
 			}
 		}
 		
-		if(item[9]!=null) letradoEntrante.setIdpersona(Long.parseLong(item[9]));
+		if(item[9]!=null) {
+			letradoEntrante.setIdpersona(Long.parseLong(item[9]));
+		}
 	
+		Boolean checkCompensacionSaliente = false;
+		if(item[10] != null) {
+			 checkCompensacionSaliente = Boolean.parseBoolean(item[10]);
+		}
 		
-		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, request);
+		Boolean checkSaltoEntrante = false;
+		if(item[11] != null) {
+			 checkSaltoEntrante = Boolean.parseBoolean(item[11]);
+			
+		}
+		
+		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, checkCompensacionSaliente ,checkSaltoEntrante, request  );
 		if (response.getError().getCode().intValue() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
