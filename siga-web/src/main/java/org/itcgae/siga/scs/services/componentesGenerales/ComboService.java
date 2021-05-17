@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
+import org.itcgae.siga.DTOs.scs.DesignaItem;
 
 public interface ComboService {
 	
@@ -31,7 +32,11 @@ public interface ComboService {
 	
 	public ComboDTO comboGuardias(HttpServletRequest request, String idTurno);
 	
+	public ComboDTO comboGuardiasNoGrupo(HttpServletRequest request, String idTurno);
+	
 	public ComboColaOrdenadaDTO ordenCola(HttpServletRequest request, String idordenacioncolas);
+
+	public ComboDTO comboGuardiasUpdate(HttpServletRequest request, String idTurno);
 
 	public ComboDTO comboEstadoEjg(HttpServletRequest request);
 
@@ -52,4 +57,28 @@ public interface ComboService {
 	public ComboDTO comboEstados(HttpServletRequest request);
 
 	public ComboDTO comboConjuntoGuardias(HttpServletRequest request);
+	
+	public ComboDTO comboJuzgadoDesignaciones(HttpServletRequest request);
+	
+	public ComboDTO comboJuzgadoPorInstitucion(String idInstitucion, HttpServletRequest request);
+	
+	public ComboDTO comboModulo(HttpServletRequest request);
+	
+	public ComboDTO comboDelitos(DesignaItem designaItem, HttpServletRequest request);
+	
+	public ComboDTO comboProcedimientos(HttpServletRequest request);
+	
+	public ComboDTO comboProcedimientosConJuzgado(HttpServletRequest request, String idJuzgado);
+	
+	public ComboDTO comboModulosConJuzgado(HttpServletRequest request, String idJuzgado);
+	
+	public ComboDTO comboAllModulos(HttpServletRequest request);
+	
+	public ComboDTO comboModulosConProcedimientos(HttpServletRequest request, String idPretension);
+	
+	public ComboDTO comboProcedimientosConModulo(HttpServletRequest request, String idModulo);
+	
+	public ComboDTO comboAcreditacionesPorModulo(HttpServletRequest request, String idModulo, String idTurno);
+	
+	public ComboDTO comboTipoDocumentacionDesigna(HttpServletRequest request);
 }

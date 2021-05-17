@@ -15,7 +15,8 @@ public class AsuntosClaveJusticiableItem {
 	private String clave;
 	private String rol;
 	private String tipo;
-	
+	private String fechaActuacion;
+
 	/**
 	 **/
 	public AsuntosClaveJusticiableItem idPersona(String idPersona) {
@@ -31,7 +32,7 @@ public class AsuntosClaveJusticiableItem {
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
-	
+
 	/**
 	 **/
 	public AsuntosClaveJusticiableItem idInstitucion(String idInstitucion) {
@@ -150,7 +151,7 @@ public class AsuntosClaveJusticiableItem {
 		this.tipo = tipo;
 		return this;
 	}
-	
+
 	@JsonProperty("tipo")
 	public String getTipo() {
 		return tipo;
@@ -158,6 +159,20 @@ public class AsuntosClaveJusticiableItem {
 
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
+	}
+
+	/**
+	 * @return the fechaActuacion
+	 */
+	public String getFechaActuacion() {
+		return fechaActuacion;
+	}
+
+	/**
+	 * @param fechaActuacion the fechaActuacion to set
+	 */
+	public void setFechaActuacion(String fechaActuacion) {
+		this.fechaActuacion = fechaActuacion;
 	}
 
 	@Override
@@ -235,10 +250,9 @@ public class AsuntosClaveJusticiableItem {
 
 	@Override
 	public String toString() {
-		return "AsuntosClaveJusticiableItem [idPersona=" + idPersona + ", idInstitucion=" + idInstitucion + ", anio=" + anio
-				+ ", nombre=" + nombre + ", numero=" + numero + ", fechaModificacion=" + fechaModificacion + ", clave="
-				+ clave + ", rol=" + rol + ", tipo=" + tipo + "]";
+		return "AsuntosClaveJusticiableItem [idPersona=" + idPersona + ", idInstitucion=" + idInstitucion + ", anio="
+				+ anio + ", nombre=" + nombre + ", numero=" + numero + ", fechaModificacion=" + fechaModificacion
+				+ ", clave=" + clave + ", rol=" + rol + ", tipo=" + tipo + ", fechaActuacion=" + fechaActuacion + "]";
 	}
 
-	
 }

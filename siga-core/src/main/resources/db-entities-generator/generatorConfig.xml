@@ -9,8 +9,8 @@
 			driverClass="oracle.jdbc.OracleDriver"
 			userId="uscgae"
 			password="uscgae" />
-			
-			
+
+
 		<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
 		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
 		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER"/>
@@ -41,6 +41,8 @@
 		<table schema="USCGAE" tableName="ENV_DOCUMENTOS">
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
 		</table>
+	
 
 	</context>
+	
 </generatorConfiguration>

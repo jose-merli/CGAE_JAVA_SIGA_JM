@@ -144,8 +144,8 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		//sqlPrincipal.FROM(sql.toString());
 		
 		sqlPrincipal.FROM( "(" + sql.toString() + ") DIRECCIONES");
-		
 		sqlPrincipal.ORDER_BY("ordenlist");
+		
 		
 		return sqlPrincipal.toString();
 	}

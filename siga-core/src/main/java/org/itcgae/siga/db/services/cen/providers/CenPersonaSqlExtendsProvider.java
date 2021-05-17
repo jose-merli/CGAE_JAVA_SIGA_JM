@@ -511,10 +511,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		return sql.toString();
 	}
-	
-
 	public String getColegiadoByIdPersona(String idPersona, Short idInstitucion) {
-		
 		SQL sql = new SQL();
 
 		sql.SELECT("COLEGIADO.NCOLEGIADO");
@@ -527,26 +524,18 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.INNER_JOIN("CEN_COLEGIADO COLEGIADO ON PERSONA.IDPERSONA = COLEGIADO.IDPERSONA AND CLIENTE.IDINSTITUCION = COLEGIADO.IDINSTITUCION");
 		sql.WHERE("CLIENTE.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("PERSONA.IDPERSONA = '" + idPersona + "'");
-
 		return sql.toString();
-
 	}
-
 	public String busquedaColegiadoExpress(String colegiadoJGItem, String idInstitucion) {
 		SQL sql = new SQL();
-
 		sql.SELECT("DECODE(COLEGIADO.COMUNITARIO,0,COLEGIADO.NCOLEGIADO,COLEGIADO.NCOMUNITARIO) AS NCOLEGIADO");
 		sql.SELECT("COLEGIADO.IDPERSONA");
 		sql.SELECT("(PERSONA.APELLIDOS1 || ' ' || PERSONA.APELLIDOS2 || ' ' || PERSONA.NOMBRE) AS NOMBRE");
-		
 		sql.FROM("CEN_PERSONA PERSONA");
 		sql.INNER_JOIN("CEN_CLIENTE CLIENTE ON PERSONA.IDPERSONA = CLIENTE.IDPERSONA");
 		sql.INNER_JOIN("CEN_COLEGIADO COLEGIADO ON PERSONA.IDPERSONA = COLEGIADO.IDPERSONA AND CLIENTE.IDINSTITUCION = COLEGIADO.IDINSTITUCION");
-		
 		sql.WHERE("CLIENTE.idinstitucion = '"+idInstitucion+"'");
 		sql.WHERE("(colegiado.comunitario = 0 and COLEGIADO.ncolegiado = '"+colegiadoJGItem+"') OR (colegiado.comunitario = 1 and COLEGIADO.NCOMUNITARIO = '"+colegiadoJGItem+"')");
-
-
 		return sql.toString();
 	}
 }

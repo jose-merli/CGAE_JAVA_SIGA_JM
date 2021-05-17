@@ -113,7 +113,7 @@ public class SociedadesServerSeviceImpl implements ISociedadesServerSevice {
 		respuesta.setNumeroPeticion(peticion.getNumeroPeticion());
 		respuesta.setColegio(peticion.getColegio());
 		respuesta.setNumPagina(peticion.getNumPagina());
-
+		respuesta.setNumTotalPaginas(respuesta.getNumTotalPaginas());
 		respuesta.setRegistroSociedadArray(respuestaCarga);
 		
 		try {

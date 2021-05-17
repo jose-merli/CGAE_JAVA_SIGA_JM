@@ -1206,10 +1206,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		return sql.toString();
 	}
-	
 	public String busquedaColegiadosSJCS(String idInstitucion, ColegiadosSJCSItem colegiadosSJCSItem) {
 		SQL sql = new SQL();
-		
 		sql.SELECT("COLEGIADO.IDPERSONA,INSTITUCION.ABREVIATURA,COLEGIADO.idinstitucion");
 		sql.SELECT("DECODE(COLEGIADO.COMUNITARIO,0,COLEGIADO.NCOLEGIADO,COLEGIADO.NCOMUNITARIO) AS NCOLEGIADO");
 		sql.SELECT("PERSONA.NIFCIF");
@@ -1230,7 +1228,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.LEFT_OUTER_JOIN("scs_inscripcionturno INSCRIPCIONTURNO ON INSCRIPCIONTURNO.IDPERSONA = COLEGIADO.IDPERSONA AND COLEGIADO.IDINSTITUCION = INSCRIPCIONTURNO.IDINSTITUCION");
 		sql.LEFT_OUTER_JOIN("SCS_INSCRIPCIONGUARDIA INSCRIPCIONGUARDIA ON INSCRIPCIONGUARDIA.IDPERSONA = COLEGIADO.IDPERSONA AND COLEGIADO.IDINSTITUCION = INSCRIPCIONGUARDIA.IDINSTITUCION");
 		sql.WHERE("COLEGIADO.IDINSTITUCION = '"+idInstitucion+"'");
-		if(colegiadosSJCSItem.getnColegiado() != null && colegiadosSJCSItem.getnColegiado() != "")sql.WHERE("COLEGIADO.NCOLEGIADO = '"+ colegiadosSJCSItem.getnColegiado()+"'");			
+		if(colegiadosSJCSItem.getnColegiado() != null && colegiadosSJCSItem.getnColegiado() != "")sql.WHERE("NVL(COLEGIADO.NCOLEGIADO, COLEGIADO.NCOMUNITARIO) = '"+ colegiadosSJCSItem.getnColegiado()+"'");			
 		if(colegiadosSJCSItem.getIdTurno() != null) { 
 			sql.WHERE("INSCRIPCIONTURNO.IDTURNO = '"+colegiadosSJCSItem.getIdTurno()+"'");
 			if(colegiadosSJCSItem.getIdGuardia() != null)sql.WHERE("(INSCRIPCIONGUARDIA.IDTURNO = '"+colegiadosSJCSItem.getIdTurno()+"'  AND INSCRIPCIONGUARDIA.IDGUARDIA = '"+colegiadosSJCSItem.getIdGuardia()+"')");
@@ -1242,23 +1240,13 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			String columna = "REPLACE(CONCAT(PERSONA.apellidos1,PERSONA.apellidos2), ' ', '')";
 			String cadena = colegiadosSJCSItem.getApellidos();
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));	
-			
-			
-			//sql.WHERE("(TRANSLATE(LOWER( REPLACE(CONCAT(PERSONA.apellidos1,PERSONA.apellidos2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"+colegiadosSJCSItem.getApellidos()+"%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 		}
 		if (colegiadosSJCSItem.getNombre() != null && colegiadosSJCSItem.getNombre() != "") {
-			
 			String columna = "PERSONA.NOMBRE";
 			String cadena = colegiadosSJCSItem.getNombre();
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));	
-			
-			//sql.WHERE("(TRANSLATE(LOWER( PERSONA.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"+colegiadosSJCSItem.getNombre()+"%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 		}
-		
-		
 		sql.GROUP_BY("COLEGIADO.IDPERSONA,INSTITUCION.ABREVIATURA,COLEGIADO.idinstitucion, COLEGIADO.COMUNITARIO,COLEGIADO.NCOLEGIADO,COLEGIADO.NCOMUNITARIO, PERSONA.NIFCIF,RECURSO.DESCRIPCION, PERSONA.APELLIDOS1  ,PERSONA.APELLIDOS2 ,PERSONA.NOMBRE,DIRECCION.TELEFONO1");
-		
 		return sql.toString();
-	}
-	
+	}	
 }

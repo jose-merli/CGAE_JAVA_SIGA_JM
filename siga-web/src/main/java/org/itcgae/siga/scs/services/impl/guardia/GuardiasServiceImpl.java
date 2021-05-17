@@ -160,7 +160,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				LOGGER.info("searchGuardias() -> Entrada para obtener las guardias");
 
-				List<GuardiasItem> guardias = scsGuardiasturnoExtendsMapper.searchGuardias(guardiasItem,
+				List<GuardiasItem> guardias = scsGuardiasturnoExtendsMapper.searchGuardias2(guardiasItem,
 						idInstitucion.toString(), usuarios.get(0).getIdlenguaje(), tamMaximo);
 
 				guardias = guardias.stream().map(it -> {

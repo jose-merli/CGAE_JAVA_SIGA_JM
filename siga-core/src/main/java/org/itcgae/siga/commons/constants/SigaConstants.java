@@ -110,13 +110,13 @@ public class SigaConstants {
 	
 	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
 	public static final long ID_OBJETIVO_DESTINATARIOS = 1;
-	
-	// Tipos de Cambio ColaCambioLetrado
 	public static final int COLA_CAMBIO_LETRADO_APROBACION_COLEGIACION = 10;
 	public static final int COLA_CAMBIO_LETRADO_ACTIVACION_RESIDENCIA  = 20;
 	public static final int COLA_CAMBIO_LETRADO_MODIFICACION_DIRECCION = 30;
 	public static final int COLA_CAMBIO_LETRADO_BORRADO_DIRECCION = 40;
 	public static final int COLA_CAMBIO_LETRADO_LOPD = 50;
+	
+	// Tipos de Cambio ColaCambioLetrado
 	
 	//estados envio
 	public static final Short ENVIO_PENDIENTE_MANUAL = 1;
@@ -215,7 +215,6 @@ public class SigaConstants {
 			return mensajeError;
 		}
 	}
-	
 	public static enum ECOM_CEN_ROLES {
 		ABOGADO("ABO","ABOGADO","Abogado")
 		,NOEJERCIENTE("CNE","COLEGIADO_NO_EJERCIENTE","Colegiado No Ejerciente")
@@ -235,11 +234,9 @@ public class SigaConstants {
 		,SECRETARIO("SEC","SECRETARIO","Secretario")
 		,VICEDECANO("VICDEC","VICEDECANO","Vicedecano")
 		,SIGAADMIN("SAD","SIGA-Admin","SIGA-Admin");
-		
 		private String codigo = null;
 		private String recurso = null;
 		private String descripcion = null;
-		
 		private ECOM_CEN_ROLES(String codigo, String recurso, String descripcion) {
 			this.codigo = codigo;
 			this.recurso = recurso;
@@ -254,9 +251,7 @@ public class SigaConstants {
 		public String getDescripcion() {
 			return descripcion;
 		}
-		
 	}
-	
 	public static String getTipoUsuario(String rol) {
 		if (rol.equalsIgnoreCase(ECOM_CEN_ROLES.PERSONAL.getDescripcion()) ||
 				rol.equalsIgnoreCase(ECOM_CEN_ROLES.PERSONAL.getRecurso())) {
@@ -314,7 +309,6 @@ public class SigaConstants {
 			return ECOM_CEN_ROLES.SIGAADMIN.getCodigo();
 		}return "";
 	}
-	
     // Tipo direcciones que tienen logica asociada
 	public static final int TIPO_DIRECCION_CENSOWEB		= 3;
 	public static final int TIPO_DIRECCION_DESPACHO		= 2;
@@ -869,8 +863,41 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final List<String> CAMPOSLOGCV = Arrays.asList(COLEGIADONUMERO,PERSONANIF,PERSONANOMBRE,C_IDPERSONA,
 			C_FECHAINICIO ,C_FECHAFIN,C_CREDITOS,FECHAVERIFICACION,C_DESCRIPCION
 			,TIPOCVCOD,TIPOCVNOMBRE,C_IDTIPOCV,SUBTIPOCV1COD,SUBTIPOCV1NOMBRE,C_IDTIPOCVSUBTIPO1,SUBTIPOCV2COD,SUBTIPOCV2NOMBRE,C_IDTIPOCVSUBTIPO2,ERRORES);
+	public static String EVENTO_TIPO_FIESTA_NACIONAL = "Fiesta Nacional";
 
-
+	
+	//CARGA MASIVA INSCRIPCIONES
+	public static final String IT_TURNO = "TURNO";
+	public static final String IT_GUARDIA = "GUARDIA";
+	public static final String IT_NCOLEGIADO = "Nº COLEGIADO";
+	public static final String IT_FECHAEFECTIVA = "FECHA EFECTIVA";
+	public static final String IT_TIPO = "TIPO";
+	public static final String IT_GRUPO= "GRUPO";
+	public static final String IT_ORDEN = "ORDEN";
+	
+	public static final String nombreFicheroModeloIT = "PlantillaMasivaDatosIT";
+	
+	public static final List<String> CAMPOSMODEL_IT = Arrays.asList(IT_TURNO,IT_GUARDIA,IT_NCOLEGIADO,IT_FECHAEFECTIVA,
+			IT_TIPO,IT_GRUPO,IT_ORDEN);
+	public static final List<String> CAMPOSLOGIT = Arrays.asList(IT_TURNO,IT_GUARDIA,IT_NCOLEGIADO,IT_FECHAEFECTIVA,
+			IT_TIPO,IT_GRUPO,IT_ORDEN,ERRORES);
+	
+	//CARGA MASIVA BAJAS TEMPORALES
+		
+	public static final String BT_NCOLEGIADO = "Nº COLEGIADO";
+	public static final String BT_NIF = "NIF";
+	public static final String BT_TIPO = "TIPO SOLICITUD";
+	public static final String BT_MOTIVO= "MOTIVO";
+	public static final String BT_FECHAI = "FECHA INICIO";
+	public static final String BT_FECHAF = "FECHA FIN";
+		
+	public static final String nombreFicheroModeloBT = "PlantillaMasivaDatosBT";
+	
+	public static final List<String> CAMPOSMODEL_BT = Arrays.asList(BT_NCOLEGIADO,BT_NIF,BT_TIPO,BT_MOTIVO,
+			BT_FECHAI,BT_FECHAF);
+	public static final List<String> CAMPOSLOGBT = Arrays.asList(BT_NCOLEGIADO,BT_NIF,BT_TIPO,BT_MOTIVO,
+			BT_FECHAI,BT_FECHAF,ERRORES);
+	
 	//AGENDA
 	public static final long CALENDARIO_GENERAL = 1; 
 	public static final long CALENDARIO_LABORAL = 2;
@@ -971,12 +998,6 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	
 	
-	public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";
-	
-
-	public static String EVENTO_TIPO_FIESTA_NACIONAL = "Fiesta Nacional";
-	public static String EVENTO_TIPO_FIESTA_LOCAL = "Fiesta Local";
-	public static String EVENTO_TIPO_FIESTA_AUTONOMICA = "Fiesta Autonómica";
 	
 	public static String EVENTO_TIPO_FESTIVO = "9";
 
@@ -1003,7 +1024,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String SCS_CONTRARIO_ASISTENCIA = "5";
 	public static final String SCS_SOLICITANTE_DESIGNACION = "6";
 	public static final String SCS_SOLICITANTE_ASISTENCIA = "7";
-
+    public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";
 	public static final String ROL_SOLICITANTE_EJG = "SE";
 	public static final String ROL_SOLICITANTE_ASISTENCIA = "SA";
 	public static final String ROL_SOLICITANTE_DESIGNACION = "SD";
@@ -1076,5 +1097,11 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String EJG = "EJG";
 
 
+	public static String SIGAFRONT_VERSION = "202105042300";
+	public static String SIGAWEB_VERSION = "1.0.72_0";
+	
+	public static final String ACREDITACION_TIPO_INICIO = "1";
+	public static final String ACREDITACION_TIPO_FIN = "2";
+	public static final String ACREDITACION_TIPO_COMPLETA = "3";
 	
 }

@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaLetradoGrupoDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -35,6 +36,21 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 	List<SaltoCompGuardiaItem> searchSaltosCompensaciones(SaltoCompGuardiaItem saltoItem, String idInstitucion,
 			Integer tamMax);
 
+	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "searchSaltosYCompensacionesOficio")
+	@Results({ @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NOMBRE_TURNO", property = "turno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDSALTOSTURNO", property = "idSaltosTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "COLEGIADO_GRUPO", property = "colegiadoGrupo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "SALTOOCOMPENSACION", property = "saltoCompensacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAUSO", property = "fechaUso", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHA_ANULACION", property = "fechaAnulacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR) })
+	List<SaltoCompGuardiaItem> searchSaltosYCompensacionesOficio(SaltoCompGuardiaItem saltoItem, String idInstitucion,
+			Integer tamMax);
+
 	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "searchLetrados")
 	@Results({ @Result(column = "NUMEROGRUPO", property = "numeroGrupo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "COLEGIADO", property = "colegiado", jdbcType = JdbcType.VARCHAR),
@@ -42,6 +58,30 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 			@Result(column = "COLEGIADOGRUPO", property = "colegiadoGrupo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR), })
 	List<SaltoCompGuardiaLetradoGrupoDTO> searchLetrados(SaltoCompGuardiaItem saltoItem, String idInstitucion);
+
+	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "searchLetradosGuardia")
+	@Results({ @Result(column = "ACTIVO", property = "activo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ALFABETICOAPELLIDOS", property = "alfabeticoApellidos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDGRUPOGUARDIACOLEGIADO", property = "idGrupoGuardiaColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "GRUPO", property = "grupo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROGRUPO", property = "numeroGrupo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ORDENGRUPO", property = "ordenGrupo", jdbcType = JdbcType.VARCHAR) })
+	List<LetradoGuardiaItem> searchLetradosGuardia(String idInstitucion, String idTurno, String idGuardia,
+			boolean grupo);
+
+	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "searchLetradosTurno")
+	@Results({ @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ALFABETICOAPELLIDOS", property = "alfabeticoApellidos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR) })
+	List<LetradoGuardiaItem> searchLetradosTurno(String idTurno, String idInstitucion);
 
 	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "selectNuevoIdSaltosCompensaciones")
 	@Results({ @Result(column = "IDSALTOSTURNO", property = "idMax", jdbcType = JdbcType.VARCHAR), })

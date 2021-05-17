@@ -54,6 +54,7 @@ public class AgeCalendarioSqlExtendsProvider extends AgeCalendarioSqlProvider {
 		sql.INNER_JOIN("AGE_TIPOCALENDARIO TIPOCALENDAR ON TIPOCALENDAR.IDTIPOCALENDARIO = AGE.IDTIPOCALENDARIO");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOCALENDAR.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
 		
+
 		sql.WHERE("AGE.IDINSTITUCION = '" + String.valueOf(idInstitucion) + "'");
 
 		sql.GROUP_BY(

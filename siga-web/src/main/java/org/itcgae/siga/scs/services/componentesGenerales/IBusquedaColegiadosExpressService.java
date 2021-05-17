@@ -10,8 +10,8 @@ import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 public interface IBusquedaColegiadosExpressService {
 
 	public ColegiadoJGDTO busquedaColegiadosExpress(String colegiadoJGItem, HttpServletRequest requestc);
-
+	
 	ColegiadosSJCSDTO busquedaColegiadoEJG(ColegiadosSJCSItem datos, HttpServletRequest request);
-
+	
 	ComboDTO comboTurnos(String pantalla, HttpServletRequest request);
 }

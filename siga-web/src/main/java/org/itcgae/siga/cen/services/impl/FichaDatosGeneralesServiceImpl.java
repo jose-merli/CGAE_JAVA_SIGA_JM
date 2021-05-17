@@ -825,14 +825,31 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		LOGGER.info(
-				"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
-		comboEtiquetasItems = cenGruposclienteClienteExtendsMapper
-				.selectGruposPersonaJuridica(colegiadoItem.getIdPersona(), String.valueOf(idInstitucion));
-		LOGGER.info(
-				"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			if(null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
+				comboEtiquetasItems = cenGruposclienteClienteExtendsMapper
+						.selectGruposPersonaJuridicaLenguaje(colegiadoItem.getIdPersona(), String.valueOf(idInstitucion), usuario.getIdlenguaje());
+				LOGGER.info(
+						"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
+			}
+			else {
+				LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		}
 
 		Date date = new Date();
 		Date fechaBaja;
@@ -864,6 +881,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				} else {
 					comboEtiquetasItem.setColor("#f70000");
 				}
+			}
+			
+			if(comboEtiquetasItem.getLabel().contains("#")) {
+				comboEtiquetasItem.setLabel(comboEtiquetasItem.getLabel().split("#")[0]);
 			}
 		}
 

@@ -221,6 +221,14 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		return sql.toString();
 	}
 	
+		
+		
+
+		
+		// Colegio
+	
+		// Consejo
+		
 	public String searchFestivos(EventoItem eventoItem, Short idInstitucion) {
 		SQL sql = new SQL();
 		
