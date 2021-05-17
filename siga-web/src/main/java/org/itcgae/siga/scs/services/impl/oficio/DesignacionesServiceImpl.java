@@ -252,6 +252,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	public List<JustificacionExpressItem> busquedaJustificacionExpres(JustificacionExpressItem item,
 			HttpServletRequest request) {
 		List<JustificacionExpressItem> result = null;
+		Error error = new Error();	
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -372,6 +373,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						if (expedientes.size() > 0) {
 							result.get(i).setExpedientes(expedientes);
 						}
+					}
+
+					if((result != null) && (result.size()) >= 200) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						result.get(0).setError(error);
 					}
 
 					LOGGER.info("DesignacionesServiceImpl.busquedaJustificacionExpres -> Salida del servicio");
@@ -654,12 +661,19 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 					}
 					
-					designas = new ArrayList<DesignaItem>(desginasBusqueda.values());
+					designas = new ArrayList<DesignaItem>(desginasBusqueda.values());		
+					
+					if(designas.size() > 200) {
+						int z = 0;
+						for(int x = 200;  x<=designas.size()-1; z++) {
+							designas.remove(x);
+						}
+					}
 					
 					if((designas != null) && (designas.size()) >= 200) {
 						error.setCode(200);
 						error.setDescription("La consulta devuelve más de 200 resultados, pero se muestran sólo los 200 más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
-						//designaDTO.setError(error);
+						designas.get(0).setError(error);
 					}
 					
 					
