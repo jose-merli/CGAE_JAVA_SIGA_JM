@@ -68,6 +68,7 @@ import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
+import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
@@ -137,6 +138,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipodictamenejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
+import org.itcgae.siga.scs.services.oficio.ISaltosCompOficioService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -239,6 +241,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private ScsAcreditacionMapper scsAcreditacionMapper;
+	
+	@Autowired
+	private ISaltosCompOficioService saltosCompOficioService;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -4274,7 +4279,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Override
 	@Transactional
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente,
-			ScsDesignasletrado letradoEntrante, HttpServletRequest request) {
+			ScsDesignasletrado letradoEntrante, Boolean checkCompensacionSaliente , Boolean checkSaltoEntrante , HttpServletRequest request) {
 		LOGGER.info(
 				"updateLetradoDesigna() -> Entrada al servicio para actualizar el letrado asociado a la designación");
 		String token = request.getHeader("Authorization");
@@ -4283,6 +4288,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 0;
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY");
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -4338,40 +4344,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						} else {
 							letradoEntrante.setIdpersona(newLetrado.getIdpersona());
 							designaLetradoNueva.setIdpersona(newLetrado.getIdpersona());
-
-							response = scsDesignasletradoMapper.insert(designaLetradoNueva);
 						}
+						
 					} else {
 						designaLetradoNueva.setIdpersona(letradoEntrante.getIdpersona());
-
-						response = scsDesignasletradoMapper.insert(designaLetradoNueva);
 					}
+					
+					//Creamos designa nueva para letradoEntrante
+					response = scsDesignasletradoMapper.insert(designaLetradoNueva);
 
+					//Actualizamos LetradoSaliente
 					if (response != 0 && letradoEntrante.getIdpersona() != null) {
-						
-						// Gestionamos el antiguo letrado
-//						if (designaLetradoVieja.getFechadesigna() != null) {
-//							
-//							if (designaLetradoVieja.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
-//								ScsDesignasletradoKey key = new ScsDesignasletradoKey();
-//
-//								key.setIdinstitucion(idInstitucion);
-//								key.setAnio(designa.getAnio());
-//								key.setIdturno(designa.getIdturno());
-//								key.setNumero(designa.getNumero());
-//								key.setIdpersona(letradoSaliente.getIdpersona());
-//								key.setFechadesigna(letradoSaliente.getFechadesigna());
-//
-//								response = scsDesignasletradoMapper.deleteByPrimaryKey(key);
-//							}
-//							
-//						} else {
-
-							designaLetradoVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
-							// Si el usuario que realiza el cambio es un colegio se acepta automaticamente
-							// la renuncia
-							if (UserTokenUtils.getLetradoFromJWTToken(token) == "N")
-								designaLetradoVieja.setFecharenuncia(letradoSaliente.getFecharenunciasolicita());
 							List<ComboItem> motivos = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion,
 									usuarios.get(0).getIdlenguaje());
 							int i = 0;
@@ -4386,12 +4369,47 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							designaLetradoVieja.setUsumodificacion(usuarios.get(0).getIdusuario());
 							designaLetradoVieja.setFechamodificacion(new Date());
 							designaLetradoVieja.setLetradodelturno("N");
+							designaLetradoVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
 							designaLetradoVieja.setFecharenuncia(letradoEntrante.getFechadesigna());
-
+							// Si el usuario que realiza el cambio es un colegio se acepta automaticamente
+							// la renuncia
+							if (UserTokenUtils.getLetradoFromJWTToken(token) == "N") {
+								designaLetradoVieja.setFecharenuncia(letradoSaliente.getFecharenunciasolicita());
+							}
+							
 							response = scsDesignasletradoMapper.updateByPrimaryKeySelective(designaLetradoVieja);
 						}
+					
+					//Creamos salto y/o compensacion si han marcado el/los check
+					
+					List<SaltoCompGuardiaItem> listaSaltoItem = new ArrayList<SaltoCompGuardiaItem>();
+						
+					if(checkCompensacionSaliente) {
+						SaltoCompGuardiaItem compensacion = new SaltoCompGuardiaItem();
+						compensacion.setIdPersona(designaLetradoVieja.getIdpersona().toString());
+						compensacion.setIdTurno(designa.getIdturno().toString());
+						compensacion.setSaltoCompensacion("C");
+						String fecha = sdf.format(new Date());
+						compensacion.setFecha(fecha);
+						compensacion.setMotivo(designaLetradoVieja.getMotivosrenuncia());
+						listaSaltoItem.add(compensacion);
+						
+						}
+					
+					if(checkSaltoEntrante) {
+						SaltoCompGuardiaItem salto = new SaltoCompGuardiaItem();
+						String fecha = sdf.format(new Date());
+						salto.setFecha(fecha);
+						salto.setIdPersona(designaLetradoNueva.getIdpersona().toString());
+						salto.setIdTurno(designa.getIdturno().toString());						
+						salto.setMotivo("");
+						salto.setSaltoCompensacion("S");
+						listaSaltoItem.add(salto);
+					}
+					
+					//Introducimos el salto y/o compensacion
+					saltosCompOficioService.guardarSaltosCompensaciones(listaSaltoItem, request);
 
-//					}
 					
 					if (response == 0) {
 						if (error.getCode() != 100) {
@@ -4963,39 +4981,61 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					ScsDesigna scsDesigna = designaExistentes.get(0);
-					// Limitacion campo numero en updateDesigna
-					// Obtenemos el parametro de limite para el campo CODIGO en BBDD
-					StringDTO parametros = new StringDTO();
-					Integer longitudDesigna;
-					String codigoDesigna = designaItem.getCodigo();
+			
+					//Gestionamos el campo Numero de Front. OJO CAMPO NUMERO EN FRONT = CODIGO EN BBDD!!!!! Se manda en el DesignaItem.codigo
+					if(!StringUtils.isEmpty(designaItem.getCodigo())) {
+						// Limitacion campo numero en updateDesigna
+						// Obtenemos el parametro de limite para el campo CODIGO en BBDD. 
+						StringDTO parametros = new StringDTO();
+						Integer longitudDesigna;
+						String codigoDesigna = String.valueOf( designaItem.getCodigo());
 
-					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
-							idInstitucion.toString());
-
-					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
-					// la institucion 0
-					if (parametros != null && parametros.getValor() != null) {
-						longitudDesigna = Integer.parseInt(parametros.getValor());
-					} else {
+						//Comprobamos si existe el valor de codigo designa en el campo codigo de BBDD.
+						String codigoBBDD = scsDesignacionesExtendsMapper.comprobarCodigoDesigna(String.valueOf( idInstitucion), String.valueOf(designaItem.getAno()), String.valueOf(designaItem.getIdTurno()), designaItem.getCodigo());
+						
+						if(codigoBBDD != null && !scsDesigna.getCodigo().equals(designaItem.getCodigo()) ) {
+							error.setCode(400);
+							// TODO crear description
+							error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
+							updateResponseDTO.setStatus(SigaConstants.KO);
+							updateResponseDTO.setError(error);
+							return updateResponseDTO;
+						}
+						
 						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
-								"0");
-						longitudDesigna = Integer.parseInt(parametros.getValor());
-					}
-					
-					if (codigoDesigna != null || !codigoDesigna.isEmpty()) {
-					
-					// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
-					while (codigoDesigna.length() < longitudDesigna) {
-						codigoDesigna = "0" + codigoDesigna;
-					}
+								idInstitucion.toString());
 
-					scsDesigna.setCodigo(codigoDesigna);
+						// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+						// la institucion 0
+						if (parametros != null && parametros.getValor() != null) {
+							longitudDesigna = Integer.parseInt(parametros.getValor());
+						} else {
+							parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
+									"0");
+							longitudDesigna = Integer.parseInt(parametros.getValor());
+						}
+						
+						if (codigoDesigna != null || !codigoDesigna.isEmpty()) {
+						
+						// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+						while (codigoDesigna.length() < longitudDesigna) {
+							codigoDesigna = "0" + codigoDesigna;
+						}
+
+						scsDesigna.setCodigo(codigoDesigna);
+						
+						
+					}
+					
 					scsDesigna.setFechaalta(designaItem.getFechaAlta());
 
 					scsDesigna.setFechamodificacion(new Date());
 					scsDesigna.setUsumodificacion(usuario.getIdusuario());
 
-					scsDesigna.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
+					if( designaItem.getIdTipoDesignaColegio() != 0) {
+						scsDesigna.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
+					}
+					
 					scsDesigna.setArt27(designaItem.getArt27());
 
 					// DesignaLetrado
@@ -5013,7 +5053,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 				} catch (Exception e) {
-					error.setCode(400);
+				   LOGGER.error(e);
+				   error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}

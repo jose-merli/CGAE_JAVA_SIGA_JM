@@ -688,4 +688,11 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getNewIdDocumentacionDes")
 	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR), })
 	MaxIdDto getNewIdDocumentacionDes(Short idInstitucion);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comprobarCodigoDesigna")
+	@Results({ 
+			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+	})
+	String comprobarCodigoDesigna(String idInstitucion, String anio, String idTurno,  String codigo);
+	
 }
