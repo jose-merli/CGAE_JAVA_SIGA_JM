@@ -220,19 +220,31 @@ public class EjgController {
 		UpdateResponseDTO response = gestionEJG.cambioEstadoMasivo(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+	
+//	if (response.getError().getCode() == 200)
+//		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+//	else
+//		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 	//insertaDatosGenerales
 	@RequestMapping(value = "/gestion-ejg/insertaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EjgDTO> insertaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
 		EjgDTO response = gestionEJG.insertaDatosGenerales(datos, request);
-		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
+		if (response != null) {
+			return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
+		}
+		else
+			return new ResponseEntity<EjgDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	//actualizaDatosGenerales
 	@RequestMapping(value = "/gestion-ejg/actualizaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> actualizaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.actualizaDatosGenerales(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	// añadirRemesa

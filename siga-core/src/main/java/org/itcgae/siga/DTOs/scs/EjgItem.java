@@ -24,6 +24,10 @@ public class EjgItem {
 	private Date fechaEstadoHast;
 	private Date fechaLimiteDesd;
 	private Date fechaLimiteHast;
+	
+	private String anioexpInsos;
+	private String numeroexpInsos;
+	private String idTipoExpInsos;
 
 	private String[] dictamen;
 	private String dictamenSing;
@@ -1433,5 +1437,29 @@ public class EjgItem {
 
 	public void setNumDesigna(String numDesigna) {
 		this.numDesigna = numDesigna;
+	}
+
+	public String getAnioexpInsos() {
+		return anioexpInsos;
+	}
+
+	public void setAnioexpInsos(String anioexpInsos) {
+		this.anioexpInsos = anioexpInsos;
+	}
+
+	public String getNumeroexpInsos() {
+		return numeroexpInsos;
+	}
+
+	public void setNumeroexpInsos(String numeroexpInsos) {
+		this.numeroexpInsos = numeroexpInsos;
+	}
+
+	public String getIdTipoExpInsos() {
+		return idTipoExpInsos;
+	}
+
+	public void setIdTipoExpInsos(String idTipoExpInsos) {
+		this.idTipoExpInsos = idTipoExpInsos;
 	}
 }

@@ -464,9 +464,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("rectiporesolauto.descripcion AS resolauto");
 		sql.SELECT(
 				"(CASE WHEN personadesigna.nombre is  NULL THEN '' ELSE personadesigna.apellidos1 || ' ' || personadesigna.apellidos2 || ', ' || personadesigna.nombre END) AS nombreletradodesigna");
-		sql.SELECT("EXPEDIENTE.anioexpediente");
-		sql.SELECT("EXPEDIENTE.numeroexpediente");
-		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE");
+		sql.SELECT("EXPEDIENTE.anioexpediente AS anioexpediente");
+		sql.SELECT("EXPEDIENTE.numeroexpediente AS numeroexpediente");
+		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE AS IDTIPOEXPEDIENTE");
 		sql.SELECT("EXPEDIENTE.IDINSTITUCION_TIPOEXPEDIENTE");
 		sql.SELECT("ejgd.numerodesigna");
 		// from
@@ -862,7 +862,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.FROM("SCS_EJG");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("ANIO = " + anio);
-		sql.WHERE("IDTIPOEJG = " + idTipoEJG);
+		//sql.WHERE("IDTIPOEJG = " + idTipoEJG);
 
 		return sql.toString();
 	}
@@ -874,7 +874,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.FROM("SCS_EJG");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("ANIO = " + anio);
-		sql.WHERE("IDTIPOEJG = " + idTipoEJG);
+		//sql.WHERE("IDTIPOEJG = " + idTipoEJG);
 
 		return sql.toString();
 	}
