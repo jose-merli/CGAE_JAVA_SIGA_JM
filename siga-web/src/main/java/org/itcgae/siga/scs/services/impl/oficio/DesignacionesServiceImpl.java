@@ -74,6 +74,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
 import org.itcgae.siga.commons.utils.Puntero;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
+import org.itcgae.siga.commons.utils.UtilOficio;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -244,6 +245,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private ISaltosCompOficioService saltosCompOficioService;
+	
+	@Autowired
+	private UtilOficio utilOficio;
 
 	/**
 	 * busquedaJustificacionExpres
@@ -1798,13 +1802,30 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						scsDesigna.setFechafin(designaItem.getFechaFin());
 
 					}
+					//VALIDAMOS EL NIG
+					
+					LOGGER.info(
+							"updateDetalleDesigna() / Validamos el NIG Entrada");
+					
+//					UtilOficio utilOficio= new UtilOficio();
+
+					boolean nigValido = utilOficio.validaNIG(designaItem.getNig(), request);	
+					
+					LOGGER.info(
+							"updateDetalleDesigna() / Validamos el NIG Salida");
+
 
 					LOGGER.info("updateDatosAdicionales() / scsDesignacionesExtendsMapper -> Salida ");
 
 					LOGGER.info(
 							"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update()-> Entrada a scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
-
-					scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+					if(nigValido == true) {
+						scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+					}else {
+						error.setCode(400);
+						error.setDescription("justiciaGratuita.oficio.designa.NIGInvalido");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+					}
 
 					LOGGER.info(
 							"updateDatosAdicionales() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
