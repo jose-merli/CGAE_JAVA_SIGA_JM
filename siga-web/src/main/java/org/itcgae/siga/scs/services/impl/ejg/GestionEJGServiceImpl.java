@@ -1013,7 +1013,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					record.setNumero(Long.parseLong(ceros));
 					
 					//Determinamos el origen de apertura ya que, aunque no sea una clave primaria,
-					//no se permita que tenga valor null. Por ahora se introducira el valor de idinstitucion. Preguntar mas tarde.
+					//no se permita que tenga valor null. 
 					record.setOrigenapertura("M");
 					
 					//Sucede lo mismo
@@ -1023,13 +1023,48 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					record.setUsucreacion(usuarios.get(0).getIdusuario());
 					record.setUsumodificacion(usuarios.get(0).getIdusuario());
 					
-					response = scsEjgMapper.insertSelective(record);
+					//Campos opcionales
+					record.setFechapresentacion(datos.getFechapresentacion());
+					record.setFechalimitepresentacion(datos.getFechalimitepresentacion());
+					if(datos.getTipoEJGColegio()!=null)record.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
+					
+					//Campo de prestaciones
+					if(datos.getPrestacionesRechazadas()!=null) {
+						ScsEjgPrestacionRechazada preRe = new ScsEjgPrestacionRechazada();
+						
+						preRe.setIdinstitucion(idInstitucion);
+						preRe.setAnio(Short.parseShort(datos.getAnnio()));
+						preRe.setNumero(record.getNumero());
+						preRe.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+						preRe.setUsumodificacion(usuarios.get(0).getIdusuario());
+						preRe.setFechamodificacion(new Date());
+						preRe.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+						
+						for(String idprestacion: datos.getPrestacionesRechazadas()) {
+							preRe.setIdprestacion(Short.parseShort(idprestacion));
+							
+							response = scsEjgPrestacionRechazadaMapper.insert(preRe);
+						}
+					}
+					else response = 1;
+					
+//					IDINSTITUCION
+//					ANIO
+//					NUMEJG
+//					SUFIJO
+//					Restriccion problematica.
+					LOGGER.info(record.getIdinstitucion());
+					LOGGER.info(record.getAnio());
+					LOGGER.info(record.getNumejg());
+					LOGGER.info(record.getSufijo());
+							
+					if(response == 1) response = scsEjgMapper.insert(record);
 					
 				} catch (Exception e) {
 					LOGGER.error("GestionEJGServiceImpl.insertaDatosGenerales(). ERROR: al hacer el insert de datos generales. ", e);
-				} finally {
-					
-					// respuesta si se actualiza correctamente
+					response=0;
+				} 
+					// respuesta si se actualiza correctamente para que se rellene el campo de numero
 					if (response >= 1) {
 						List<EjgItem> list = new ArrayList<>();
 						
@@ -1040,6 +1075,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						item.setNumEjg(record.getNumejg());
 						item.setNumero(record.getNumero().toString());
 						item.setTipoEJG(datos.getTipoEJG());
+						
+						//Campos opcionales
+						item.setFechapresentacion(datos.getFechapresentacion());
+						item.setFechalimitepresentacion(datos.getFechalimitepresentacion());
+						item.setTipoEJGColegio(datos.getTipoEJGColegio());
+						item.setIdTipoExpInsos(datos.getIdTipoExpInsos());
 						
 						list.add(item);
 						
@@ -1053,7 +1094,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						LOGGER.error("GestionEJGServiceImpl.insertaDatosGenerales() -> KO. No se ha insertado los datos generales");
 					}
 					ejgdto.setError(error);
-				}
+				
 			}
 		}
 
@@ -1204,6 +1245,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						LOGGER.info(
 								"GestionEJGServiceImpl.actualizaDatosGenerales() -> Se ha producido un error al actualizar los datos generales del ejg",
 								e);
+						response=0;
 					} 
 				} 
 					
