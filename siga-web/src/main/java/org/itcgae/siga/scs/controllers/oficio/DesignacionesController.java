@@ -220,6 +220,8 @@ public class DesignacionesController {
 		UpdateResponseDTO response = designacionesService.updateDetalleDesigna(designaItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else if (response.getError().getCode() == 400)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.BAD_REQUEST);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
