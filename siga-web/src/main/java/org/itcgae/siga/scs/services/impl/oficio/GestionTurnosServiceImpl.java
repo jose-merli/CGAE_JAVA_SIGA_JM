@@ -880,7 +880,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 	@Override
 	public InsertResponseDTO createTurnos(TurnosItem turnosItem, HttpServletRequest request) {
-		LOGGER.info("createModules() ->  Entrada al servicio para insertar modulos");
+		LOGGER.info("createTurnos() ->  Entrada al servicio para insertar turnos");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -897,13 +897,13 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"createTurnos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			AdmUsuarios usuario = usuarios.get(0);
 			
 			LOGGER.info(
-					"createModules() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"createTurnos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() >= 0) {
 				try {
@@ -955,10 +955,14 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						turno.setIdgrupofacturacion(Short.parseShort(turnosItem.getIdgrupofacturacion()));
 						turno.setIdarea(Short.parseShort(turnosItem.getIdarea()));
 						turno.setIdmateria(Short.parseShort(turnosItem.getIdmateria()));
-						turno.setIdjurisdiccion(Short.parseShort(turnosItem.getIdjurisdiccion()));
+						if(turnosItem.getIdjurisdiccion() != null){
+							turno.setIdjurisdiccion(Short.parseShort(turnosItem.getIdjurisdiccion()));
+						}
 						turno.setIdzona(Short.parseShort(turnosItem.getIdzona()));
 						turno.setIdsubzona(Short.parseShort(turnosItem.getIdsubzona()));
-						turno.setIdtipoturno(Short.parseShort(turnosItem.getIdtipoturno()));
+						if(turnosItem.getIdtipoturno() != null){
+							turno.setIdtipoturno(Short.parseShort(turnosItem.getIdtipoturno()));
+						}
 						turno.setFechamodificacion(new Date());
 						turno.setDescripcion(turnosItem.getDescripcion());
 						turno.setRequisitos(turnosItem.getRequisitos());
@@ -974,16 +978,19 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						turno.setVisibilidad("1");
 
 						LOGGER.info(
-								"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
+								"createTurnos() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
 
 						response = scsTurnosExtendsMapper.insert(turno);
 
 						LOGGER.info(
-								"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
+								"createTurnos() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
 
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(
+							"createTurnos()" + e.getMessage());
+
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
