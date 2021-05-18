@@ -18,6 +18,8 @@ import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
 import org.itcgae.siga.DTOs.scs.DeleteCalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.IncompatibilidadesDTO;
@@ -29,6 +31,7 @@ import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +40,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/guardia")
@@ -205,6 +209,35 @@ public class GuardiaController {
 	@PostMapping(value = "/eliminarCalendariosProgramados", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> deleteCalendariosProgramados(@RequestBody DeleteCalendariosProgDatosEntradaItem deleteCalBody, HttpServletRequest request){
 		DeleteResponseDTO response= guardiasService.deleteCalendariosProgramados(deleteCalBody, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+	@PostMapping(value = "/designas/subirDocumentoActDesigna", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<InsertResponseDTO> subirDocumentoActDesigna(MultipartHttpServletRequest request) {
+		InsertResponseDTO response = guardiasService.subirDocumentoActDesigna(request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/getDocumentosPorActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DocumentoActDesignaDTO> getDocumentosPorActDesigna(
+			@RequestBody DocumentoActDesignaItem documentoActDesignaItem, HttpServletRequest request) {
+		DocumentoActDesignaDTO response = guardiasService.getDocumentosPorActDesigna(documentoActDesignaItem,
+				request);
+		return new ResponseEntity<DocumentoActDesignaDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/descargarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
+			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
+		ResponseEntity<InputStreamResource> response = guardiasService
+				.descargarDocumentosActDesigna(listaDocumentoActDesignaItem, request);
+		return response;
+	}
+	
+	@PostMapping(value = "/designas/eliminarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> eliminarDocumentosActDesigna(
+			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
+		DeleteResponseDTO response = guardiasService.eliminarDocumentosActDesigna(listaDocumentoActDesignaItem,
+				request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	

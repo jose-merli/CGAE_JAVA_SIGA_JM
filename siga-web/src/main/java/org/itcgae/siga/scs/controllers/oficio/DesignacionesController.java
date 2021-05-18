@@ -939,36 +939,6 @@ public class DesignacionesController {
 		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping(value = "/designas/subirDocumentoActDesigna", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<InsertResponseDTO> subirDocumentoActDesigna(MultipartHttpServletRequest request) {
-		InsertResponseDTO response = designacionesService.subirDocumentoActDesigna(request);
-		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-	}
-	
-	@PostMapping(value = "/designas/getDocumentosPorActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DocumentoActDesignaDTO> getDocumentosPorActDesigna(
-			@RequestBody DocumentoActDesignaItem documentoActDesignaItem, HttpServletRequest request) {
-		DocumentoActDesignaDTO response = designacionesService.getDocumentosPorActDesigna(documentoActDesignaItem,
-				request);
-		return new ResponseEntity<DocumentoActDesignaDTO>(response, HttpStatus.OK);
-	}
-	
-	@PostMapping(value = "/designas/descargarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
-			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
-		ResponseEntity<InputStreamResource> response = designacionesService
-				.descargarDocumentosActDesigna(listaDocumentoActDesignaItem, request);
-		return response;
-	}
-	
-	@PostMapping(value = "/designas/eliminarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> eliminarDocumentosActDesigna(
-			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
-		DeleteResponseDTO response = designacionesService.eliminarDocumentosActDesigna(listaDocumentoActDesignaItem,
-				request);
-		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-	}
-	
 	@PostMapping(value = "/designas/getDocumentosPorDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DocumentoDesignaDTO> getDocumentosPorDesigna(
 			@RequestBody DocumentoDesignaItem documentoDesignaItem, HttpServletRequest request) {

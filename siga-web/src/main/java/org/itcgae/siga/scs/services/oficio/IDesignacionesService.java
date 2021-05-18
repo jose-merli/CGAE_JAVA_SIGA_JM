@@ -182,16 +182,6 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente,
 			ScsDesignasletrado letradoEntrante, HttpServletRequest request);
 	
-	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request);
-	
-	public DocumentoActDesignaDTO getDocumentosPorActDesigna(DocumentoActDesignaItem documentoActDesignaItem,
-			HttpServletRequest request);
-	
-	public ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
-			List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request);
-	
-	public DeleteResponseDTO eliminarDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
-			HttpServletRequest request);
 	
 	public DocumentoDesignaDTO getDocumentosPorDesigna(DocumentoDesignaItem documentoDesignaItem,
 			HttpServletRequest request);
