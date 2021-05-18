@@ -2606,7 +2606,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 					designa.setCodigo(codigoDesigna);
 					
-					designa.setFechaentrada(new Date());
+					//Fecha entrada es el que se muestra en el form. Que nos llega en el campo Fecha Alta.
+					designa.setFechaentrada(designaItem.getFechaAlta());
 					designa.setFechamodificacion(new Date());
 					designa.setUsumodificacion(usuario.getIdusuario());
 					designa.setEstado("V");
@@ -5062,7 +5063,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 					}
 					
-					scsDesigna.setFechaalta(designaItem.getFechaAlta());
+					//Fecha entrada es el que varia con la fecha del form. El dato nos llega en fechaAlta.
+					scsDesigna.setFechaentrada(designaItem.getFechaAlta());
 
 					scsDesigna.setFechamodificacion(new Date());
 					scsDesigna.setUsumodificacion(usuario.getIdusuario());
