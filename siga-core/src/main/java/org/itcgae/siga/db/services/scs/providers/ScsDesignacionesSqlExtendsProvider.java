@@ -3223,6 +3223,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.SELECT("DOCD.IDDOCUMENTACIONDES");
 		sql.SELECT("DOCD.IDTIPODOCUMENTO");
+		sql.SELECT(
+				"(SELECT F_SIGA_GETRECURSO(E.NOMBRE, 1) FROM SCS_TIPODOCUMENTODES E WHERE E.IDTIPODOCUMENTODES = DOCD.IDTIPODOCUMENTO) AS NOMBRETIPODOCUMENTO");
 		sql.SELECT("DOCD.IDFICHERO");
 		sql.SELECT("DOCD.IDINSTITUCION");
 		sql.SELECT("DOCD.IDTURNO");
@@ -3238,8 +3240,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.FROM("SCS_DOCUMENTACIONDESIGNA DOCD");
 
+		sql.JOIN("SCS_TIPODOCUMENTODES TIPODOC ON TIPODOC.IDTIPODOCUMENTODES = DOCD.IDTIPODOCUMENTO");
 		sql.JOIN("ADM_USUARIOS ADM ON ADM.IDUSUARIO = DOCD.USUMODIFICACION AND ADM.IDINSTITUCION = DOCD.IDINSTITUCION");
 		sql.JOIN("CEN_PERSONA P ON ADM.NIF = P.NIFCIF");
+		
+		if(!UtilidadesString.esCadenaVacia(documentoDesignaItem.getIdActuacion())) {
+			sql.WHERE("DOCD.IDACTUACION = '" + documentoDesignaItem.getIdActuacion() + "'");
+		}
 
 		sql.WHERE("DOCD.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("DOCD.NUMERO ='" + documentoDesignaItem.getNumero() + "'");

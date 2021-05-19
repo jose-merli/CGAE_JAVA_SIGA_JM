@@ -5781,6 +5781,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
 					scsDocumentaciondesigna.setFechamodificacion(new Date());
 					scsDocumentaciondesigna.setFechaentrada(new Date());
+					
+					if(!UtilidadesString.esCadenaVacia(documentoDesignaItem.getIdActuacion())) {
+						scsDocumentaciondesigna.setIdactuacion(Long.valueOf(documentoDesignaItem.getIdActuacion()));
+						scsDocumentaciondesigna.setIdtipodocumento(Short.valueOf("1"));
+					}
 
 					int response = scsDocumentaciondesignaMapper.insertSelective(scsDocumentaciondesigna);
 
@@ -5813,9 +5818,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						if (!UtilidadesString.esCadenaVacia(doc.getObservaciones())) {
 							scsDocumentaciondesigna.setObservaciones(doc.getObservaciones());
 						}
+						
 						scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
 						scsDocumentaciondesigna.setFechamodificacion(new Date());
-						scsDocumentaciondesigna.setIdtipodocumento(Short.valueOf(doc.getIdTipodocumento()));
 						scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
 						scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(doc.getIdDocumentaciondes()));
 

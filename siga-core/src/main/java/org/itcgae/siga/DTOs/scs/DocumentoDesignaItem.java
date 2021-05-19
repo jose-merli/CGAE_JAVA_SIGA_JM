@@ -4,6 +4,7 @@ public class DocumentoDesignaItem {
 
 	private String idDocumentaciondes;
 	private String idTipodocumento;
+	private String nombreTipoDocumento;
 	private String idFichero;
 	private String idInstitucion;
 	private String idTurno;
@@ -43,6 +44,20 @@ public class DocumentoDesignaItem {
 	 */
 	public void setIdTipodocumento(String idTipodocumento) {
 		this.idTipodocumento = idTipodocumento;
+	}
+
+	/**
+	 * @return the nombreTipoDocumento
+	 */
+	public String getNombreTipoDocumento() {
+		return nombreTipoDocumento;
+	}
+
+	/**
+	 * @param nombreTipoDocumento the nombreTipoDocumento to set
+	 */
+	public void setNombreTipoDocumento(String nombreTipoDocumento) {
+		this.nombreTipoDocumento = nombreTipoDocumento;
 	}
 
 	/**
@@ -216,10 +231,11 @@ public class DocumentoDesignaItem {
 	@Override
 	public String toString() {
 		return "DocumentoDesignaItem [idDocumentaciondes=" + idDocumentaciondes + ", idTipodocumento=" + idTipodocumento
-				+ ", idFichero=" + idFichero + ", idInstitucion=" + idInstitucion + ", idTurno=" + idTurno + ", anio="
-				+ anio + ", numero=" + numero + ", idActuacion=" + idActuacion + ", usuModificacion=" + usuModificacion
-				+ ", fechaModificacion=" + fechaModificacion + ", fechaEntrada=" + fechaEntrada + ", observaciones="
-				+ observaciones + ", nombreFichero=" + nombreFichero + ", idPersona=" + idPersona + "]";
+				+ ", nombreTipoDocumento=" + nombreTipoDocumento + ", idFichero=" + idFichero + ", idInstitucion="
+				+ idInstitucion + ", idTurno=" + idTurno + ", anio=" + anio + ", numero=" + numero + ", idActuacion="
+				+ idActuacion + ", usuModificacion=" + usuModificacion + ", fechaModificacion=" + fechaModificacion
+				+ ", fechaEntrada=" + fechaEntrada + ", observaciones=" + observaciones + ", nombreFichero="
+				+ nombreFichero + ", idPersona=" + idPersona + "]";
 	}
 
 }
