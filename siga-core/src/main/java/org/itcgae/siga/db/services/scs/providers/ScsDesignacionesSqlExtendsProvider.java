@@ -1398,9 +1398,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "AND d.anio = dl.anio AND d.numero = dl.numero AND d.idturno = dl.idturno ");
 		sql.append(" JOIN scs_turno   turno        ON d.idinstitucion = turno.idinstitucion "
                 + " AND d.idturno = turno.idturno " );
-		sql.append(" join scs_juzgado j ON  d.idjuzgado = j.idjuzgado\r\n"
+		sql.append(" LEFT OUTER join scs_juzgado j ON  d.idjuzgado = j.idjuzgado\r\n"
 				+ "                AND d.idinstitucion_juzg = j.idinstitucion ");
-		sql.append(" join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento\r\n"
+		sql.append(" LEFT OUTER join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento\r\n"
 				+ "                AND p.idinstitucion = d.idinstitucion ");
 		if ((item.getSinEJG() != null && !item.getSinEJG().isEmpty())
 				|| (item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty())
