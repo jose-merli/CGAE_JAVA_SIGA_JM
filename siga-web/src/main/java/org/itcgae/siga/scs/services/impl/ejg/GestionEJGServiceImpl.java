@@ -253,7 +253,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					
 					//Una vez tenemos el EJG, introducimos la informacion seleccionada en la tarjeta
 					
-					//Por ahora suponemos que los valores de id no pueden ser nulos.
 					ejg.setGuardiaturnoIdguardia(Integer.parseInt(datos.getIdGuardia()));
 					ejg.setGuardiaturnoIdturno(Integer.parseInt(datos.getIdTurno()));
 					ejg.setIdpersona(Long.parseLong(datos.getIdPersona()));

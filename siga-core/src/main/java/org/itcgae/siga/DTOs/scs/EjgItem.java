@@ -19,6 +19,7 @@ public class EjgItem {
 	private Date fechaApertura;
 	private Date fechaModificacion;
 	private String idPersona;
+	private String idPersonajg;
 	private String estadoEJG;
 	private Date fechaEstadoDesd;
 	private Date fechaEstadoHast;
@@ -1461,5 +1462,13 @@ public class EjgItem {
 
 	public void setIdTipoExpInsos(String idTipoExpInsos) {
 		this.idTipoExpInsos = idTipoExpInsos;
+	}
+
+	public String getIdPersonajg() {
+		return idPersonajg;
+	}
+
+	public void setIdPersonajg(String idPersonajg) {
+		this.idPersonajg = idPersonajg;
 	}
 }

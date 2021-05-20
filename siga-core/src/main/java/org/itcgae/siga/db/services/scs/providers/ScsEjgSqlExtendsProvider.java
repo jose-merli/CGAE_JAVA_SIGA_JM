@@ -427,6 +427,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		// select
 		sql.SELECT("EJG.IDPERSONA"); // IDpERSONA
+		sql.SELECT("EJG.IDPERSONAjg");
 		sql.SELECT("ejg.anio");
 		sql.SELECT("ejg.idinstitucion");
 		sql.SELECT("ejg.idtipoejg");
