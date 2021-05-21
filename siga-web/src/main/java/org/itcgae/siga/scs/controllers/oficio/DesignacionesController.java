@@ -988,4 +988,15 @@ public class DesignacionesController {
 		return response;
 	}
 	
+	@PostMapping(value = "/designas/asociarEjgDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> asociarEjgDesigna(
+			@RequestBody List<String> designaItem, HttpServletRequest request) {
+		InsertResponseDTO response = designacionesService
+				.asociarEjgDesigna(designaItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 }

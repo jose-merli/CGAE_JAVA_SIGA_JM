@@ -54,6 +54,7 @@ import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
@@ -97,6 +98,7 @@ import org.itcgae.siga.db.entities.ScsDocumentacionasi;
 import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesigna;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesignaKey;
+import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -115,6 +117,7 @@ import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentaciondesignaMapper;
+import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
@@ -226,6 +229,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Autowired
 	private ScsDocumentaciondesignaMapper scsDocumentaciondesignaMapper;
 
+	@Autowired
+	private ScsEjgdesignaMapper scsEjgdesignaMapper;
 	/**
 	 * busquedaJustificacionExpres
 	 */
@@ -5867,6 +5872,92 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return res;
+	}
+
+	@Override
+	public InsertResponseDTO asociarEjgDesigna(List<String> item, HttpServletRequest request) {
+		InsertResponseDTO responseDTO = new InsertResponseDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		int response = 0;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.asociarEjgDesigna() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.asociarEjgDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.asociarEjgDesigna() -> Entrada a servicio para insertar las justificaciones express");
+
+				try {
+					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Haciendo el insert...");
+					
+					//Transformamos la lista de valores en objetos para mejor comprension
+					//item = [newDesigna.ano.toString(), this.datosEJG.annio, this.datosEJG.tipoEJG, 
+					//newDesigna.idTurno.toString(), newDesigna.numero.toString(), this.datosEJG.numero]
+					//Designacion a asociar
+					DesignaItem designaItem = new DesignaItem();
+
+					designaItem.setAno(Integer.parseInt(item.get(0)));
+					designaItem.setIdTurno(Integer.parseInt(item.get(3)));
+					designaItem.setNumero(Integer.parseInt(item.get(4)));
+					
+					//EJG a asociar
+					EjgItem ejg = new EjgItem();
+					
+					ejg.setAnnio(item.get(1));
+					ejg.setTipoEJG(item.get(2));
+					ejg.setNumero(item.get(5));
+					
+					//Objeto que vamos a insertar en la base de datos
+					ScsEjgdesigna record = new ScsEjgdesigna();
+					
+					record.setFechamodificacion(new Date());
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
+					record.setIdinstitucion(idInstitucion);
+					record.setIdturno(designaItem.getIdTurno());
+					record.setAniodesigna( (short) designaItem.getAno());
+					record.setAnioejg(Short.parseShort(ejg.getAnnio()));
+					record.setIdtipoejg(Short.parseShort(ejg.getTipoEJG()));
+					record.setNumerodesigna((long) designaItem.getNumero());
+					record.setNumeroejg(Long.parseLong(ejg.getNumero()));
+					
+					response = scsEjgdesignaMapper.insert(record);
+
+					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");
+				} catch (Exception e) {
+					LOGGER.error("DesignacionesServiceImpl.asociarEjgDesigna() -> Se ha producido un error ",
+							e);
+					response = 0;
+				}
+
+				LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Saliendo del servicio... ");
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
+			responseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.insertado");
+		}
+
+		responseDTO.setError(error);
+
+		return responseDTO;
 	}
 
 }

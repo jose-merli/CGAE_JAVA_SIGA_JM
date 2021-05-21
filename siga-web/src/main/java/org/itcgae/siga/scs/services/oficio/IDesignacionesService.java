@@ -205,5 +205,7 @@ public interface IDesignacionesService {
 			List<DocumentoDesignaItem> listaDocumentoDesignaItem, HttpServletRequest request);
 
 	public UpdateResponseDTO actualizarProcurador(List<String> procuradorItem, HttpServletRequest request);
+
+	public InsertResponseDTO asociarEjgDesigna(List<String> item, HttpServletRequest request);
 	
 }
