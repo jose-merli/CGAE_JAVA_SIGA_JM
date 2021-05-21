@@ -63,7 +63,7 @@ public class UtilOficio {
 							&& (parametro.getIdInstitucion().equals(parametro.getIdInstitucion()) 
 									|| parametro.getIdInstitucion().equals("0"))) {
 						valorParametroNIG = parametro.getValor();
-						if(! nig.isEmpty()) {
+						if(!UtilidadesString.esCadenaVacia(nig)) {
 							nigValido = nig.matches(valorParametroNIG);
 						}else {
 							nigValido = true;

@@ -2575,6 +2575,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservaciones())) {
 			sql.SET("OBSERVACIONES = '" + actuacionDesignaItem.getObservaciones() + "'");
+		} else {
+			sql.SET("OBSERVACIONES = NULL");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getTalonario())) {
@@ -2587,10 +2589,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNig())) {
 			sql.SET("NIG = '" + actuacionDesignaItem.getNig() + "'");
+		} else {
+			sql.SET("NIG = NULL");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getNumProcedimiento())) {
 			sql.SET("NUMEROPROCEDIMIENTO = '" + actuacionDesignaItem.getNumProcedimiento() + "'");
+		} else {
+			sql.SET("NUMEROPROCEDIMIENTO = NULL");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdJuzgado())) {
@@ -2599,6 +2605,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdMotivoCambio())) {
 			sql.SET("ID_MOTIVO_CAMBIO = '" + actuacionDesignaItem.getIdMotivoCambio() + "'");
+		} else {
+			sql.SET("ID_MOTIVO_CAMBIO = NULL");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdProcedimiento())) {
@@ -2607,6 +2615,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPretension())) {
 			sql.SET("IDPRETENSION = '" + actuacionDesignaItem.getIdPretension() + "'");
+		} else {
+			sql.SET("IDPRETENSION = NULL");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdAcreditacion())) {
@@ -2615,6 +2625,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPrision())) {
 			sql.SET("IDPRISION = '" + actuacionDesignaItem.getIdPrision() + "'");
+		}else {
+			sql.SET("IDPRISION = NULL");
 		}
 
 		sql.SET("FECHAMODIFICACION = SYSDATE");
