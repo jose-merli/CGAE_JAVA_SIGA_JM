@@ -396,7 +396,11 @@ public class JustificacionExpressItem {
 	 * @param cliente the cliente to set
 	 */
 	public void setCliente(String cliente) {
-		this.cliente = cliente;
+		if(cliente == null ) {
+			this.cliente = " ";
+		}else {
+			this.cliente = cliente;
+		}
 	}
 
 	/**
