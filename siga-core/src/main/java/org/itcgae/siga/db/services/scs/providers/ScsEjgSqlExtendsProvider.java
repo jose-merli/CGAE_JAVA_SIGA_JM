@@ -855,11 +855,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				"            'Sí'\r\n" + 
 				"    END AS tieneturno FROM ( " + sql.toString() + ")");
 
-		if (tamMaximo != null) {
-			Integer tamMaxNumber = tamMaximo + 1;
-			sql3.WHERE("rownum <= " + tamMaxNumber);
-
-		}
+//		if (tamMaximo != null) {
+//			Integer tamMaxNumber = tamMaximo + 1;
+//			sql3.WHERE("rownum <= " + tamMaxNumber);
+//
+//		}
 
 		return sql3.toString();
 	}
