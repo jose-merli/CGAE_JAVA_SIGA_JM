@@ -4,6 +4,7 @@ public class DocumentoDesignaItem {
 
 	private String idDocumentaciondes;
 	private String idTipodocumento;
+	private String nombreTipoDocumento;
 	private String idFichero;
 	private String idInstitucion;
 	private String idTurno;
@@ -16,7 +17,6 @@ public class DocumentoDesignaItem {
 	private String observaciones;
 	private String nombreFichero;
 	private String idPersona;
-	private String numColegiado;
 
 	/**
 	 * @return the idDocumentaciondes
@@ -44,6 +44,20 @@ public class DocumentoDesignaItem {
 	 */
 	public void setIdTipodocumento(String idTipodocumento) {
 		this.idTipodocumento = idTipodocumento;
+	}
+
+	/**
+	 * @return the nombreTipoDocumento
+	 */
+	public String getNombreTipoDocumento() {
+		return nombreTipoDocumento;
+	}
+
+	/**
+	 * @param nombreTipoDocumento the nombreTipoDocumento to set
+	 */
+	public void setNombreTipoDocumento(String nombreTipoDocumento) {
+		this.nombreTipoDocumento = nombreTipoDocumento;
 	}
 
 	/**
@@ -214,28 +228,14 @@ public class DocumentoDesignaItem {
 		this.idPersona = idPersona;
 	}
 
-	/**
-	 * @return the numColegiado
-	 */
-	public String getNumColegiado() {
-		return numColegiado;
-	}
-
-	/**
-	 * @param numColegiado the numColegiado to set
-	 */
-	public void setNumColegiado(String numColegiado) {
-		this.numColegiado = numColegiado;
-	}
-
 	@Override
 	public String toString() {
 		return "DocumentoDesignaItem [idDocumentaciondes=" + idDocumentaciondes + ", idTipodocumento=" + idTipodocumento
-				+ ", idFichero=" + idFichero + ", idInstitucion=" + idInstitucion + ", idTurno=" + idTurno + ", anio="
-				+ anio + ", numero=" + numero + ", idActuacion=" + idActuacion + ", usuModificacion=" + usuModificacion
-				+ ", fechaModificacion=" + fechaModificacion + ", fechaEntrada=" + fechaEntrada + ", observaciones="
-				+ observaciones + ", nombreFichero=" + nombreFichero + ", idPersona=" + idPersona + ", numColegiado="
-				+ numColegiado + "]";
+				+ ", nombreTipoDocumento=" + nombreTipoDocumento + ", idFichero=" + idFichero + ", idInstitucion="
+				+ idInstitucion + ", idTurno=" + idTurno + ", anio=" + anio + ", numero=" + numero + ", idActuacion="
+				+ idActuacion + ", usuModificacion=" + usuModificacion + ", fechaModificacion=" + fechaModificacion
+				+ ", fechaEntrada=" + fechaEntrada + ", observaciones=" + observaciones + ", nombreFichero="
+				+ nombreFichero + ", idPersona=" + idPersona + "]";
 	}
 
 }

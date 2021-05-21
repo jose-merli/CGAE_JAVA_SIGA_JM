@@ -180,7 +180,7 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO updateDesigna(DesignaItem designaItem, HttpServletRequest request);
 
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente,
-			ScsDesignasletrado letradoEntrante, HttpServletRequest request);
+			ScsDesignasletrado letradoEntrante, Boolean checkCompensacion , Boolean checkSaltoEntrante , HttpServletRequest request);
 	
 	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request);
 	
@@ -207,5 +207,7 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO actualizarProcurador(List<String> procuradorItem, HttpServletRequest request);
 
 	public InsertResponseDTO asociarEjgDesigna(List<String> item, HttpServletRequest request);
+	
+	public UpdateResponseDTO guardarProcuradorEJG(List<String> procurador, HttpServletRequest request);
 	
 }

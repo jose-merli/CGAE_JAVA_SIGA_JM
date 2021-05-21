@@ -162,18 +162,20 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 	ResolucionEJGItem getResolucion(EjgItem ejgItem, String idInstitucion, String idLenguaje);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "busquedaColegiadoEJG")
-	@Results({ 
-		 @Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "NCOMUNITARIO", property = "nComunitario", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "ESTADO", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.BOOLEAN),
-		 @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
-		 @Result(column = "idPersona", property = "idPersona", jdbcType = JdbcType.VARCHAR), })
+	@Results({ @Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOMUNITARIO", property = "nComunitario", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADO", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.BOOLEAN),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idPersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "tieneguardias", property = "tieneGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "guardiaspendientes", property = "guardiasPendientes", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "tieneturno", property = "tieneTurno", jdbcType = JdbcType.VARCHAR)})
 	List<ColegiadosSJCSItem> busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje, Integer tamMaximo);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "tieneGuardias")

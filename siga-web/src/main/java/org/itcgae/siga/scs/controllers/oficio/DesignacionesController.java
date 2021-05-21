@@ -18,7 +18,6 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
-import org.itcgae.siga.DTOs.scs.CambioLetradoItem;
 import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
@@ -196,6 +195,8 @@ public class DesignacionesController {
 		UpdateResponseDTO response = designacionesService.updateDesigna(designaItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else if (response.getError().getCode() == 400)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.BAD_REQUEST);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -219,6 +220,8 @@ public class DesignacionesController {
 		UpdateResponseDTO response = designacionesService.updateDetalleDesigna(designaItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else if (response.getError().getCode() == 400)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.BAD_REQUEST);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -289,6 +292,16 @@ public class DesignacionesController {
 	ResponseEntity<ComboDTO> comboModulosConJuzgado(HttpServletRequest request, @RequestBody String idJuzgado) {
 
 		ComboDTO response = comboService.comboModulosConJuzgado(request, idJuzgado);
+		if (response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/comboAllModulos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboAllModulos(HttpServletRequest request) {
+
+		ComboDTO response = comboService.comboAllModulos(request);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
@@ -646,6 +659,11 @@ public class DesignacionesController {
 		designa.setAnio((short) Integer.parseInt(ano));
 		designa.setIdturno(Integer.parseInt(item[1]));
 		designa.setNumero((long) Integer.parseInt(item[2]));
+		if(item.length == 4) {
+			designa.setNumprocedimiento(item[3]);
+		}else {
+			designa.setNumprocedimiento(null);
+		}
 		List<ListaLetradosDesignaItem> response = designacionesService.busquedaLetradosDesigna(designa, request);
 		if (response != null) {
 			return new ResponseEntity<List<ListaLetradosDesignaItem>>(response, HttpStatus.OK);
@@ -664,7 +682,6 @@ public class DesignacionesController {
 //     this.entrante.body.fechaDesigna, this.entrante.body.idPersona]
 	@RequestMapping(value = "/designas/updateLetradoDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(
-//			@RequestBody CambioLetradoItem item, 
 			@RequestBody String[] item,
 			HttpServletRequest request) throws ParseException {
 		
@@ -685,9 +702,6 @@ public class DesignacionesController {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(Long.parseLong(item[6]));
 			letradoSaliente.setFechadesigna(formatter.parse(formatter.format(calendar.getTime()))); 
-//			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-//			String date = item[6].substring(0, 10);
-//			letradoSaliente.setFechadesigna(formatter.parse(date));
 		}
 		if(item[7]!=null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -699,32 +713,32 @@ public class DesignacionesController {
 		
 		if(item[8]!=null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			String date = item[8].substring(0, 10);
-			letradoEntrante.setFechadesigna(formatter.parse(date));
+			SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+			if(item[8].length() != 10) {
+				String date = item[8].substring(0, 10);
+				letradoEntrante.setFechadesigna(formatter.parse(date));
+			}else {
+				String date = item[8].substring(0, 10);
+				letradoEntrante.setFechadesigna(format.parse(date));
+			}
 		}
-		if(item[9]!=null) letradoEntrante.setIdpersona(Long.parseLong(item[9]));
 		
-//		String anio = item.getAno();
-//		
-//		ScsDesigna designa = new ScsDesigna();
-//		designa.setAnio(Short.parseShort(anio));
-//		designa.setIdturno(item.getIdTurno());
-//		designa.setNumero((long) item.getNumero());
-//		
-//		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-//		ScsDesignasletrado letradoSaliente = new ScsDesignasletrado();
-//		letradoSaliente.setIdpersona(Long.parseLong(item.getIdPersonaSaliente()));
-//		letradoSaliente.setObservaciones(item.getObservaciones());
-//		letradoSaliente.setIdtipomotivo(Short.parseShort(item.getMotivoRenuncia()));
-//		letradoSaliente.setFechadesigna(formatter.parse(item.getFechaDesignacionSaliente()));
-//		letradoSaliente.setFecharenunciasolicita(item.getFechaSolRenuncia());
-//		
-//		ScsDesignasletrado letradoEntrante = new ScsDesignasletrado();
-//		letradoEntrante.setIdpersona(Long.parseLong(item.getIdPersonaEntrante()));
-//		letradoSaliente.setFechadesigna(item.getFechaDesignacionEntrante());
+		if(item[9]!=null) {
+			letradoEntrante.setIdpersona(Long.parseLong(item[9]));
+		}
+	
+		Boolean checkCompensacionSaliente = false;
+		if(item[10] != null) {
+			 checkCompensacionSaliente = Boolean.parseBoolean(item[10]);
+		}
 		
+		Boolean checkSaltoEntrante = false;
+		if(item[11] != null) {
+			 checkSaltoEntrante = Boolean.parseBoolean(item[11]);
+			
+		}
 		
-		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, request);
+		UpdateResponseDTO response = designacionesService.updateLetradoDesigna(designa, letradoSaliente, letradoEntrante, checkCompensacionSaliente ,checkSaltoEntrante, request  );
 		if (response.getError().getCode().intValue() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
@@ -861,6 +875,17 @@ public class DesignacionesController {
 
 	ResponseEntity<UpdateResponseDTO> guardarProcurador(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.guardarProcurador(procuradorItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+
+	@RequestMapping(value = "/designas/guardarProcuradorEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.guardarProcuradorEJG(procuradorItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else

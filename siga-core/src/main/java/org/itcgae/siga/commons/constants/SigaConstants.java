@@ -1087,4 +1087,9 @@ public class SigaConstants {
 	//EEJG
 	public static String EEJG_IDSISTEMA ="";
 	public static String EEJG_URLWS ="";
+	
+	public static final String ACREDITACION_TIPO_INICIO = "1";
+	public static final String ACREDITACION_TIPO_FIN = "2";
+	public static final String ACREDITACION_TIPO_COMPLETA = "3";
+	
 }

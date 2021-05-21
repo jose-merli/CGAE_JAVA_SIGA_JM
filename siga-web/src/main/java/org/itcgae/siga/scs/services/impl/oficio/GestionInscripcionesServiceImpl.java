@@ -699,22 +699,6 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									"updateCambiarFecha()  -> Entrada a GestionInscripcionesServiceImpl");
 								
 								if(inscripcionesItem.getEstadonombre().equals("Alta") || inscripcionesItem.getEstadonombre().equals("Pendiente de Baja") ) {
-									// Falta comprobar que la fecha cumplimentada  sea igual o anterior a la fecha efectiva de alta 
-									// a todas las inscripciones de guardia de ese turno y ese colegiado.
-									
-									
-//									if(!guardias.isEmpty()){
-//										response = 0;
-//										error.setCode(400);
-//										error.setDescription("oficio.busquedaInscripcion.cambioFecha.validacionErrorTurno");
-//										updateResponseDTO.setStatus(SigaConstants.KO);
-//										break;
-//									}
-//									InscripcionesItem insSave = inscripcionesItem;
-//									insSave.setIdturno(null);
-//									insSave.setEstado(null);
-//									List<InscripcionesItem> checkColegiado = scsInscripcionturnoExtendsMapper.busquedaInscripciones(inscripcionesItem,
-//											idInstitucion, null, null, null, null);
 									int ccindex = 0;
 									int cc = 0;
 									while(ccindex<guardias.size() && cc==0) {
@@ -734,7 +718,11 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 											|| inscripcionesItem.getFechaActual().equals(inscripcionturno.getFechavalidacion()) 
 											|| response != 0) {
 										inscripcionturno.setFechavalidacion(inscripcionesItem.getFechaActual());
-										inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
+										if(inscripcionesItem.getEstadonombre().equals("Alta") ) {
+											inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
+										}else if(inscripcionesItem.getEstadonombre().equals("Pendiente de Baja")) {
+											inscripcionturno.setObservacionesvalbaja(inscripcionesItem.getObservaciones());
+										}
 										inscripcionturno.setFechamodificacion(new Date());
 										inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
 
@@ -751,25 +739,6 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 								}
 								
 								else if(inscripcionesItem.getEstadonombre().equals("Baja")) {
-									// Falta comprobar que la fecha cumplimentada  sea igual o anterior a la fecha efectiva de baja 
-									// a todas las inscripciones de guardia de ese turno y ese colegiado.
-//									ScsInscripcionturnoExample exampleinscripcionB = new ScsInscripcionturnoExample();
-//									exampleinscripcionB.createCriteria()
-//											.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-//											.andIdinstitucionEqualTo(idInstitucion)
-//											.andFechabajaLessThan(inscripcionesItem.getFechaActual());
-//									if(!scsInscripcionturnoExtendsMapper.selectByExample(exampleinscripcionB).isEmpty()){
-//										response = 0;
-//										error.setCode(400);
-//										error.setDescription("oficio.busquedaInscripcion.cambioFecha.bajaErrorTurno");
-//										updateResponseDTO.setStatus(SigaConstants.KO);
-//										break;
-//									}
-//									InscripcionesItem insSave = inscripcionesItem;
-//									insSave.setIdturno(null);
-//									insSave.setEstado(null);
-//									List<InscripcionesItem> checkColegiado = scsInscripcionturnoExtendsMapper.busquedaInscripciones(inscripcionesItem,
-//											idInstitucion, null, null, null, null);
 									int ccindex = 0;
 									int cc = 0;
 									while(ccindex<guardias.size() && cc==0) {
@@ -786,11 +755,11 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									
 									//Final comprobación
 									
-									if(inscripcionesItem.getFechaActual().before(inscripcionesItem.getFechabaja()) 
+									if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechabaja()) 
 											|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechabaja()) 
 											|| response != 0) {
 										inscripcionturno.setFechabaja(inscripcionesItem.getFechaActual());
-										inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
+										inscripcionturno.setObservacionesbaja(inscripcionesItem.getObservaciones());
 
 										inscripcionturno.setFechamodificacion(new Date());
 										inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -907,7 +876,11 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 						inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservacionessolicitud());
 						inscripcionturno.setFechasolicitud(new Date());
-						if(valid=="N")	inscripcionturno.setFechavalidacion(new Date());
+						if(inscripcionesItem.getEstadonombre().equals("NoPermisos") || inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
+							inscripcionturno.setFechavalidacion(null);
+						}else {
+							if(valid=="N")	inscripcionturno.setFechavalidacion(new Date());
+						}	
 						inscripcionturno.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 						inscripcionturno.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
 						inscripcionturno.setIdinstitucion(idInstitucion);
@@ -938,7 +911,11 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 							guardia.setObservacionessuscripcion(inscripcionesItem.getObservacionessolicitud());
 							guardia.setFechasuscripcion(new Date());
-							if(valid=="N")	guardia.setFechavalidacion(new Date());
+							if(inscripcionesItem.getEstadonombre().equals("NoPermisos") || inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
+								guardia.setFechavalidacion(null);
+							}else {
+								if(valid=="N")	guardia.setFechavalidacion(new Date());
+							}				
 							guardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 							guardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
 							guardia.setIdinstitucion(idInstitucion);

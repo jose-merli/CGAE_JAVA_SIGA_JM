@@ -157,7 +157,8 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 			
 		}
 		if(inscripcionesItem.getNcolegiado() != null) {
-			sql.WHERE("(col.ncolegiado ='"+inscripcionesItem.getNcolegiado()+"')");
+			sql.WHERE("(col.ncolegiado ='"+inscripcionesItem.getNcolegiado()+
+					"' OR col.ncomunitario = '" + inscripcionesItem.getNcolegiado()+ "')");
 		}
 		sql.WHERE("ins.fechasolicitud = (\r\n" + 
 				"        SELECT\r\n" + 

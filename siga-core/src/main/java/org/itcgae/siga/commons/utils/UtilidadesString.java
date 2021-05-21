@@ -7,6 +7,13 @@
 package org.itcgae.siga.commons.utils;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -331,5 +338,46 @@ public class UtilidadesString {
 			}
 		} else
 			return null;
+	}
+
+	public static String getFileContent(File plantillaFO) throws IOException, Exception {
+			String content =null;
+		
+			if (!plantillaFO.exists()){
+				throw new IOException("El fichero "+plantillaFO.getName()+" no existe");
+			}
+			InputStream is= null;
+			try {
+				is=new FileInputStream(plantillaFO);
+				int nBytes = is.available();
+				byte buffer[] = new byte[nBytes];
+				is.read(buffer, 0, nBytes);
+				content = new String(buffer);
+				is.close();
+				return content;
+			} catch (IOException e) {
+			    try {
+			        is.close();
+			    } catch (Exception eee) {}
+				throw new Exception("Error en la lectura del fichero", e);			    
+			}
+	}
+
+	public static void setFileContent(File ficheroFOP, String sPlantillaFO) throws Exception {
+		try {
+			StringReader is= new StringReader(sPlantillaFO);
+			OutputStream os = new FileOutputStream(ficheroFOP);
+			int car;
+			while ((car=is.read())!=-1){
+				os.write(car);
+			}
+			os.flush();
+			os.close();
+			is.close();
+			
+		}catch (IOException e) {
+			throw new Exception("Error al insertar contenido en fichero",e);			    
+		}
+		
 	}
 }

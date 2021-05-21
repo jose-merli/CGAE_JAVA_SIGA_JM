@@ -671,6 +671,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							String nombrePlantilla = "";
 							Long idPlantillaGenerar = null;
 							boolean esExcel = false;
+							boolean esFO = false;
 							
 							LOGGER.info("Rendimiento inicio ejecucion consultas " );
 							
@@ -786,6 +787,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
 									nombrePlantilla = plantillaDoc.getPlantilla();
 									idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
+									if(nombrePlantilla.substring(nombrePlantilla.lastIndexOf(".")).equals(".fo")) {
+										esFO = true;
+									}
 								}else if(listaPlantilla != null && listaPlantilla.size() > 1){
 									LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
 									throw new BusinessException("Exiten multiples plantillas asociada al informe en el idioma del usuario");
@@ -885,7 +889,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 														listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 														hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-														nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+														nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO);
 											}														
 										}
 											
@@ -905,7 +909,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 										listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 										hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-										nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+										nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO);
 							}
 						
 							
@@ -988,6 +992,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			String nombrePlantilla = "";
 			Long idPlantillaGenerar = null;
 			boolean esExcel = false;
+			boolean esFO = false;
 			//Obtenemos el nombre de la plantilla
 			if(plantilla.getIdPlantillas() != null){
 				
@@ -1015,6 +1020,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
 					nombrePlantilla = plantillaDoc.getPlantilla();
 					idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
+					if(nombrePlantilla.substring(nombrePlantilla.lastIndexOf(".")).equals("fo")) {
+						esFO = true;
+					}
 				}else if(listaPlantilla != null && listaPlantilla.size() > 1){
 					LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
 					throw new BusinessException("Exiten multiples plantillas asociada al informe en el idioma del usuario");
@@ -1212,7 +1220,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 											listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 											hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-											nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+											nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas, esFO);
 								}														
 							}
 								
@@ -1232,7 +1240,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
-							nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas);
+							nombrePlantilla, esEnvio, esExcel, esDestinatario,consultasDestinatarioEjecutadas,esFO);
 				}
 			
 //				if (ejecutarConsulta) {
@@ -2395,7 +2403,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 	}
 	
-	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario, boolean consultasDestinatarioEjecutadas) {
+	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario, boolean consultasDestinatarioEjecutadas, boolean esFO) {
 		
 		LOGGER.debug("Obtenemos la ruta temporal del fichero de salida");
 		String rutaTmp = getRutaFicheroSalida(dialogo.getIdInstitucion());
@@ -2516,7 +2524,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.error("Error al generar el fichero excel ", e);
 					throw new BusinessException("No se ha podido generar el fichero Excel", e);
 				}
-			}else {
+			}else if(esFO){
+				try {
+					docGenerado = _generacionDocService.generarFO(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, hDatosFinal);
+				} catch (Exception e) {
+					LOGGER.error("Error al generar el fichero excel ", e);
+					throw new BusinessException("No se ha podido generar el fichero Excel", e);
+				}
+			}else{
 				existePlantilla(filePlantilla);
 				
 				try {

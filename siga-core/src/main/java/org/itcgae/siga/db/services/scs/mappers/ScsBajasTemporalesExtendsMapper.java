@@ -60,13 +60,13 @@ public interface ScsBajasTemporalesExtendsMapper extends CenBajastemporalesMappe
 	})
 	List<ComboItem> checkNifColegiado(String nif, Short idInstitucion);
 	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "deleteBajasTemporales")
-	int eliminarBaja(BajasTemporalesItem bajasTemporalesItem);
+	int eliminarBaja(BajasTemporalesItem bajasTemporalesItem, Integer usuario);
 	
 	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "updateBajasTemporales")
-	int updateBajaTemporal(BajasTemporalesItem bajasTemporalesItem);
+	int updateBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer usuario);
 	
 	@UpdateProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "saveBajaTemporal")
-	int saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem);
+	int saveBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer usuario);
 	
 	@InsertProvider(type = ScsBajasTemporalesSqlExtendsProvider.class, method = "nuevaBajaTemporal")
 	int nuevaBaja(BajasTemporalesItem bajasTemporalesItem, Integer usuario);
