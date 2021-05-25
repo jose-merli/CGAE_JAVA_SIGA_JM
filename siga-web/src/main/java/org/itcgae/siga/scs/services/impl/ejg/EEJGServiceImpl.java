@@ -9,25 +9,28 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.log4j.Logger;
-import org.apache.poi.openxml4j.opc.internal.FileHelper;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.utils.ReadProperties;
 import org.itcgae.siga.commons.utils.SIGAReferences;
-import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ScsEejgPeticiones;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.scs.services.ejg.IEEJGServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import com.sis.firma.core.B64.Base64CODEC;
+
 
 @Service
 public class EEJGServiceImpl implements IEEJGServices {
@@ -39,6 +42,12 @@ public class EEJGServiceImpl implements IEEJGServices {
 
 	@Autowired
 	private IPFDService pfdService;
+	
+	@Autowired
+	private GenPropertiesMapper propertiesMapper;
+	
+	@Autowired
+	private Base64CODEC base64;
 
 	@Override
 	public File getInformeEejg(Map<Integer, Map<String, String>> mapInformes, String idInstitucion) throws Exception {
@@ -186,12 +195,11 @@ public class EEJGServiceImpl implements IEEJGServices {
 	private File generarInformeEejg(String contenidoPDF, Map<String, String> mapParameters, String idInstitucion) throws Exception {
 		File fileFirmado = null;
 
-		File rutaTmp = null;
+//		File rutaTmp = null;
 		try {
-			String idioma = mapParameters.get("idioma");
+//			String idioma = mapParameters.get("idioma");
 
-			ReadProperties rp = new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
-			String idiomaExt = idioma.substring(0, 2).toUpperCase();
+//			String idiomaExt = idioma.substring(0, 2).toUpperCase();
 			
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			String fecha = format.format(new Date());
@@ -199,15 +207,37 @@ public class EEJGServiceImpl implements IEEJGServices {
 			fecha = fecha.replaceAll("/", "");
 			fecha = fecha.replaceAll(":", "");
 			fecha = fecha.replaceAll(" ", "_");
-
-			String directorioPlantillas = rp.returnProperty("sjcs.directorioFisicoPlantillaInformeEejg");
-			String directorioEspecificoInforme = rp.returnProperty("sjcs.directorioPlantillaInformeEejg");
-			String directorioSalida = rp.returnProperty("sjcs.directorioFisicoSalidaInformeEejg");
 			
-			// Directorios y nombres de trabajo
-			String plantillaNombre = "InformeEejg_" + idiomaExt + ".xsl";
-			String plantillaRuta = directorioPlantillas + directorioEspecificoInforme + System.getProperty("file.separator")
-					+ idInstitucion;
+//			String directorioPlantillas = "";
+			String directorioEspecificoInforme= "";
+			String directorioSalida = "";
+			
+			for(int i=0; i<2; i++) {
+				GenPropertiesKey key = new GenPropertiesKey();
+				String parametro = "";
+				
+				if(i==0) {
+					parametro="sjcs.directorioPlantillaInformeEejg";
+				}else if(i==1){
+					parametro="sjcs.directorioFisicoSalidaInformeEejg";
+				}
+				
+				key.setParametro(parametro);
+				key.setFichero("SIGA");
+				
+				GenProperties properties = propertiesMapper.selectByPrimaryKey(key);
+				
+				if(i==0) {
+					directorioEspecificoInforme =  properties.getValor();
+				}else if(i==1){
+					directorioSalida =  properties.getValor();
+				}
+			}
+			
+//			 Directorios y nombres de trabajo
+//			String plantillaNombre = "InformeEejg_" + idiomaExt + ".xsl";
+//			String plantillaRuta = directorioPlantillas + directorioEspecificoInforme + System.getProperty("file.separator")
+//					+ idInstitucion;
 			
 			String numEjg = mapParameters.get("numEjg");
 			String numEjgListado = UtilidadesString.replaceAllIgnoreCase(numEjg, "-", "/");
@@ -229,7 +259,7 @@ public class EEJGServiceImpl implements IEEJGServices {
 			fileFirmado = new File(pdfRuta + pdfNombre);
 
 			// Realizamos la decodificacion para su correcta visualización
-//			Base64CODEC.decodeToFile(contenidoPDF, pdfRuta + pdfNombre);
+			//base64.decodeToFile(contenidoPDF, pdfRuta + pdfNombre);
 
 		}catch (Exception e) {
 			throw new Exception("Error al generar el informe", e);

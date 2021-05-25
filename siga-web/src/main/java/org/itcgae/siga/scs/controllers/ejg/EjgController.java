@@ -18,6 +18,7 @@ import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.itcgae.siga.DTOs.gen.Error;
 
 @RestController
 @RequestMapping(value = "/ejg")
@@ -257,10 +259,11 @@ public class EjgController {
 
 	// descargarEEJ
 	@RequestMapping(value = "/gestion-ejg/descargarExpedientesJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> descargarExpedientesJG(@RequestBody List<EjgItem> datos,
+	ResponseEntity<InputStreamResource>  descargarExpedientesJG(@RequestBody List<EjgItem> datos,
 			HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.descargarExpedientesJG(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		ResponseEntity<InputStreamResource> response = gestionEJG.descargarExpedientesJG(datos, request);
+		
+			return response;
 	}
 
 	//Actualixar turno, guardia y letrado

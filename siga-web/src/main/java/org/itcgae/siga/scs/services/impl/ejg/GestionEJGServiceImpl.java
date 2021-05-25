@@ -1,6 +1,8 @@
 package org.itcgae.siga.scs.services.impl.ejg;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -68,6 +70,11 @@ import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -814,14 +821,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request) {
-		Error error = new Error(); 
-		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
-		int response = 0;
-		
+	public ResponseEntity<InputStreamResource> descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ResponseEntity<InputStreamResource> response = null;
+		InputStream fileStream = null;
+		HttpHeaders headers = new HttpHeaders();
 		
 		if (idInstitucion != null) {
 			LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Entrada para obtener información del usuario logeado");
@@ -837,12 +844,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 					//recorremos la lista para generar el documento de cada uno de los ejgs 
-					for(EjgItem ejg : datos) {
+//					for(EjgItem ejg : datos) {
 
 						//obtenemos la id de la persona
 						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la persona...");
 						ScsPersonajgExample personaExample = new ScsPersonajgExample();
-						personaExample.createCriteria().andNifEqualTo(ejg.getNif());
+						personaExample.createCriteria().andNifEqualTo(datos.get(0).getNif());
 						
 						Long idPersona = scsPersonajgMapper.selectByExample(personaExample).get(0).getIdpersona();
 						
@@ -851,14 +858,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						
 						ScsEejgPeticionesExample scsEejgPeticionesExample = new ScsEejgPeticionesExample();
 						
-						scsEejgPeticionesExample.createCriteria().andIdinstitucionEqualTo(Short.parseShort(ejg.getidInstitucion()))
-						.andIdpersonaEqualTo(idPersona).andAnioEqualTo(Short.parseShort(ejg.getAnnio()))
-						.andIdtipoejgEqualTo(Short.parseShort(ejg.getTipoEJG())).andNumeroEqualTo(Long.parseLong(ejg.getNumEjg()));
+						scsEejgPeticionesExample.createCriteria().andIdinstitucionEqualTo(Short.parseShort(datos.get(0).getidInstitucion()))
+						.andIdpersonaEqualTo(idPersona).andAnioEqualTo(Short.parseShort(datos.get(0).getAnnio()))
+						.andIdtipoejgEqualTo(Short.parseShort(datos.get(0).getTipoEJG())).andNumeroEqualTo(Long.parseLong(datos.get(0).getNumEjg()));
 						
 						List<ScsEejgPeticiones> peticiones = scsEejgPeticionesMapper.selectByExample(scsEejgPeticionesExample);
 						
 						if(peticiones==null || peticiones.size()<=0) {
-							throw new Exception("No existe peticiones para el ejg seleccionado");
+							throw new Exception("noExiste");
 						}
 						
 						//creamos el objeto de la unidad familiar
@@ -867,11 +874,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						
 						ScsUnidadfamiliarejgKey key = new ScsUnidadfamiliarejgKey();
 						
-						key.setIdinstitucion(Short.parseShort(ejg.getidInstitucion()));
+						key.setIdinstitucion(Short.parseShort(datos.get(0).getidInstitucion()));
 						key.setIdpersona(idPersona);
-						key.setIdtipoejg(Short.parseShort(ejg.getTipoEJG()));
-						key.setAnio(Short.parseShort(ejg.getAnnio()));
-						key.setNumero(Long.parseLong(ejg.getNumero())); //NUMEJG
+						key.setIdtipoejg(Short.parseShort(datos.get(0).getTipoEJG()));
+						key.setAnio(Short.parseShort(datos.get(0).getAnnio()));
+						key.setNumero(Long.parseLong(datos.get(0).getNumero())); //NUMEJG
 						
 						uFamiliar = scsUnidadfamiliarejgMapper.selectByPrimaryKey(key);
 						
@@ -881,7 +888,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						if(uFamiliar!=null && uFamiliar.getIdparentesco()!=null){
 							ScsParentescoKey keyParentesco = new ScsParentescoKey();
 							
-							keyParentesco.setIdinstitucion(Short.parseShort(ejg.getidInstitucion()));
+							keyParentesco.setIdinstitucion(Short.parseShort(datos.get(0).getidInstitucion()));
 							keyParentesco.setIdparentesco(uFamiliar.getIdparentesco());
 							
 							parentesco = scsParentescoMapper.selectByPrimaryKey(keyParentesco);
@@ -895,49 +902,49 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						
 						//obtenemos los datos del fichero
 						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos para el informe...");
-						Map<Integer, Map<String, String>> mapInformeEejg = eejgService.getDatosInformeEejg(ejg, peticiones.get(0));
+						Map<Integer, Map<String, String>> mapInformeEejg = eejgService.getDatosInformeEejg(datos.get(0), peticiones.get(0));
 						
 						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo el informe...");
-						File fichero = eejgService.getInformeEejg(mapInformeEejg, ejg.getidInstitucion());
+						File fichero = eejgService.getInformeEejg(mapInformeEejg, datos.get(0).getidInstitucion());
 						
 						if(fichero!= null){
-							response=1;
-							
 //							request.setAttribute("nombreFichero", fichero.getName());
 //							request.setAttribute("rutaFichero", fichero.getAbsolutePath());			
 //							request.setAttribute("borrarFichero", "true");			
 //							request.setAttribute("generacionOK","OK");
-//							
-//							salida= "descarga";
+							
+							fileStream = new FileInputStream(fichero);
+
+							String tipoMime = "application/pdf";
+							headers.setContentType(MediaType.parseMediaType(tipoMime));
+							headers.set("Content-Disposition",
+									"attachment; filename=\"" + fichero.getName() + "\"");
+							headers.setContentLength(fichero.length());
+
+							response = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+								HttpStatus.OK);
 						}else{
 							throw new Exception("ERROR al generar fichero");
 						}
-						
-						
-					}
+//					}
 					
 					LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Acción realizada correctamente");
 				} catch (Exception e) {
-					LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Se ha producido un error: ", e);
-					response = 0;
+					if("noExiste".equals(e.getMessage())) {
+						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() ->", e);
+//						response = new ResponseEntity<InputStreamResource>("noExiste", headers,
+//								HttpStatus.BAD_REQUEST);
+					}else{
+						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Se ha producido un error: ", e);
+//						response = new ResponseEntity<InputStreamResource>("error", headers,
+//								HttpStatus.BAD_REQUEST);
+					}
 				}
 			}
 		}
-		
-		if (response == 0) {
-			error.setCode(400);
-			error.setDescription("Se ha producido un error");
-			responseDTO.setStatus(SigaConstants.KO);
-		} else {
-			error.setCode(200);
-			error.setDescription("Acción realizada correctamente");
-		}
-
-		responseDTO.setError(error);
 
 		LOGGER.info("GestionEJGServiceImpl.descargarExpedientesJG() -> Salida del servicio.");
-
-		return responseDTO;
+		return response;
 	}
 
 	@Override

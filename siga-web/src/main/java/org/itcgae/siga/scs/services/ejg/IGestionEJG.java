@@ -14,8 +14,10 @@ import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
-import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
+import org.itcgae.siga.DTOs.gen.Error;
 
 public interface IGestionEJG {
 
@@ -43,7 +45,7 @@ public interface IGestionEJG {
 	
 	UpdateResponseDTO cambioEstadoMasivo(List<EjgItem> datos, HttpServletRequest request);
 	
-	UpdateResponseDTO descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request);
+	ResponseEntity<InputStreamResource> descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request);
 	
 	EjgDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request);
 	
