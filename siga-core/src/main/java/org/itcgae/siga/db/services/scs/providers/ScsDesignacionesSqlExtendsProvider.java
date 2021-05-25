@@ -32,9 +32,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	
 	public String searchClaveDesignaciones(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax) {
 		SQL sql = new SQL();
-		SQL sqlOrder = new SQL();
 
-		sqlOrder.SELECT("*");
 		sql.SELECT(
 				"DESIGNA.idinstitucion, DESIGNA.anio,DESIGNA.numero,to_char(DESIGNA.idturno)  as clave, '' as rol, 'D' as tipo");
 		sql.FROM("SCS_DESIGNA DESIGNA");
@@ -55,17 +53,33 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if (asuntosJusticiableItem.getAnio() != null && asuntosJusticiableItem.getAnio() != "") {
 			sql.WHERE("DESIGNA.ANIO = " + asuntosJusticiableItem.getAnio());
 		}
-		if (asuntosJusticiableItem.getNumero() != null) {
-			sql.WHERE("DESIGNA.NUMERO = " + asuntosJusticiableItem.getNumero());
+		//El "numero" que se introduce y se muestra en el front hace referencia en realidad
+		//al atributo "codigo" de la tabla y numero es un atributo interno con el que el usuario no interacciona.
+		//Mismo comportamiento que numero y numero ejg en los EJGs. 
+		if (asuntosJusticiableItem.getNumero() != null && asuntosJusticiableItem.getNumero() != "") {
+			sql.WHERE("DESIGNA.CODIGO = " + asuntosJusticiableItem.getNumero());
 		}
 		if (asuntosJusticiableItem.getIdTurno() != null) {
 			sql.WHERE("DESIGNA.IDTURNO = " + asuntosJusticiableItem.getIdTurno());
 		}
-		if (asuntosJusticiableItem.getIdGuardia() != null) {
-			sql.WHERE("DESIGNA.IDGUARDIA = " + asuntosJusticiableItem.getIdGuardia());
-		}
+		
+		//Por ashora se comenta esta condicion ya que no se observa que la tabla scs_designa
+		//tenga un atributo asociado a las guardias
+//		if (asuntosJusticiableItem.getIdGuardia() != null) {
+//			sql.WHERE("DESIGNA.IDGUARDIA = " + asuntosJusticiableItem.getIdGuardia());
+//		}
+		
 		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
 			sql.WHERE("DESIGNALETRADO.IDPERSONA = " + asuntosJusticiableItem.getIdPersonaColegiado());
+		}
+		//Declaramos las tablas necesarias para comprobar la fecha de apertura de los EJGS relacionados 
+		//en caso de que se rellene uno de los campos de fecha apertura
+		if (asuntosJusticiableItem.getFechaAperturaDesde() != null || asuntosJusticiableItem.getFechaAperturaHasta() != null) {
+			sql.INNER_JOIN("scs_EJGDESIGNA EJGDESIGNA ON  EJGDESIGNA.idinstitucion = DESIGNA.idinstitucion  and EJGDESIGNA.idturno = DESIGNA.idturno "+
+                    "and EJGDESIGNA.anioDESIGNA = DESIGNA.anio and EJGDESIGNA.numeroDESIGNA = DESIGNA.numero");
+			sql.INNER_JOIN("scs_EJG EJG ON  EJG.idinstitucion = DESIGNA.idinstitucion  and EJGDESIGNA.idTIPOEJG = EJG.idTIPOEJG "+
+                    "and EJG.anio = EJGDESIGNA.anioEJG and EJG.numero = EJGDESIGNA.numeroEJG ");
+			
 		}
 		if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -78,14 +92,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.WHERE("EJG.FECHAAPERTURA <= TO_DATE('" + fecha + "','DD/MM/RRRR')");
 		}
 
-		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
+		//Se comenta esta condicion ya que no tiene sentido buscar por apellidos y nombre una vez se ha introducido 
+		//supuestamente su idPersona
+		//if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
 			if (asuntosJusticiableItem.getApellidos() != null)
 				sql.WHERE(UtilidadesString.filtroTextoBusquedas("REPLACE(CONCAT(apellido1,apellido2), ' ', '')",
 						asuntosJusticiableItem.getApellidos().replaceAll("\\s+", "")));
 			if (asuntosJusticiableItem.getNombre() != null)
 				sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE", asuntosJusticiableItem.getNombre()));
 
-		}
+		//}
 		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
 
 			sql.WHERE("( DESIGNALETRADO.fecharenuncia is null or\r\n" + "           DESIGNALETRADO.Fechadesigna =\r\n"
@@ -121,14 +137,21 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.WHERE("DESIGNA.IDJUZGADO  = " + asuntosJusticiableItem.getIdJuzgado());
 		}
 
-		sqlOrder.FROM("(" + sql + " )");
+//		SQL sqlOrder = new SQL();
+
+//		sqlOrder.SELECT("*");
+//		sqlOrder.FROM("(" + sql + " )");
+//		if (tamMax != null) {
+//			Integer tamMaxNumber = tamMax + 1;
+//			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+//		}
 		if (tamMax != null) {
 			Integer tamMaxNumber = tamMax + 1;
-			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+			sql.WHERE("rownum <= " + tamMaxNumber);
 		}
 
-		return sqlOrder.toString();
-		// return sql.toString();
+//		return sqlOrder.toString();
+		return sql.toString();
 	}
 
 	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMax) throws Exception {

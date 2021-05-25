@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -70,6 +71,7 @@ import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
@@ -6088,8 +6090,19 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					DesignaItem designaItem = new DesignaItem();
 
 					designaItem.setAno(Integer.parseInt(item.get(0)));
-					designaItem.setIdTurno(Integer.parseInt(item.get(3)));
-					designaItem.setNumero(Integer.parseInt(item.get(4)));
+					//Comprobamos si se ha enviado el nombre del turno desde 
+					//la busqueda de asuntos en lugar de el id desde la ficha de designacion.
+//					contains("[a-zA-Z]+")   .matches("[0-9]+")
+					if(item.get(3).matches("[0-9]+") && item.get(3).length() >2) {
+						designaItem.setIdTurno(Integer.parseInt(item.get(3)));
+					}
+					else {
+						TurnosItem turnosItem = new TurnosItem();
+						turnosItem.setNombre(item.get(3));
+						List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
+						designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
+						designaItem.setNumero(Integer.parseInt(item.get(4)));
+					}
 					
 					//EJG a asociar
 					EjgItem ejg = new EjgItem();
