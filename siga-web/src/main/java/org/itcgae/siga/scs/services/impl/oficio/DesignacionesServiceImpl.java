@@ -6111,8 +6111,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if (!isActualizar) {
 
 						if (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
-								|| !(tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
-										&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN))) {
+								|| (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+										&& !tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN))) {
 							error.setCode(500);
 							error.setDescription(errorAcreditacion);
 						} else {
@@ -6162,11 +6162,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								.findFirst().getAsInt();
 
 						boolean isUltima = index == (listaActuaciones.size() - 1);
-						
-						if(!isUltima) {
+
+						if (!isUltima) {
 							acreditacionexample = new ScsAcreditacionExample();
-							acreditacionexample.createCriteria()
-									.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(index).getIdacreditacion()));
+							acreditacionexample.createCriteria().andIdacreditacionEqualTo(
+									Short.valueOf(listaActuaciones.get(index).getIdacreditacion()));
 							acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
 							tipoAcreditacionNoUltima = acreditaciones.get(0).getIdtipoacreditacion().toString();
 						}
@@ -6266,14 +6266,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					if (!isActualizar) {
 
-						if (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
-								|| !(tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
-										&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN))) {
+						if (tipoAcreditacion.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+								&& !tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN)) {
 							error.setCode(500);
 							error.setDescription(errorAcreditacion);
 						} else {
 							error.setCode(200);
-
 						}
 
 					}
@@ -6308,18 +6306,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if (!isActualizar) {
 
 						if ((tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_FIN)
-								&& !(tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+								&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
 										|| tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)))
 								|| (tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
-										&& !(tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN)))
+										&& tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_FIN))
 								|| (tipoAcreditacionActAnterior.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)
-										&& !(tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
+										&& (tipoAacreditacionAInsertar.equals(SigaConstants.ACREDITACION_TIPO_INICIO)
 												|| tipoAacreditacionAInsertar
 														.equals(SigaConstants.ACREDITACION_TIPO_COMPLETA)))) {
+							error.setCode(200);
+						} else {
 							error.setCode(500);
 							error.setDescription(errorAcreditacion);
-						} else {
-							error.setCode(200);
 						}
 					}
 
@@ -6331,11 +6329,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								.findFirst().getAsInt();
 
 						boolean isUltima = index == (listaActuaciones.size() - 1);
-						
-						if(!isUltima) {
+
+						if (!isUltima) {
 							acreditacionexample = new ScsAcreditacionExample();
-							acreditacionexample.createCriteria()
-									.andIdacreditacionEqualTo(Short.valueOf(listaActuaciones.get(index).getIdacreditacion()));
+							acreditacionexample.createCriteria().andIdacreditacionEqualTo(
+									Short.valueOf(listaActuaciones.get(index).getIdacreditacion()));
 							acreditaciones = scsAcreditacionMapper.selectByExample(acreditacionexample);
 							tipoAcreditacionNoUltima = acreditaciones.get(0).getIdtipoacreditacion().toString();
 						}
