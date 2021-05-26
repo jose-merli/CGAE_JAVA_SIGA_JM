@@ -243,8 +243,9 @@ public class EEJGServiceImpl implements IEEJGServices {
 			String numEjgListado = UtilidadesString.replaceAllIgnoreCase(numEjg, "-", "/");
 			mapParameters.put("numEjg", numEjgListado);
 
-			String pdfNombre = "eejg" + "_" + idInstitucion + "_" + numEjg + "_" + mapParameters.get("nif") + "_"
-					+ fecha + ".pdf";
+			String pdfNombre = "eejg_2005_2018-01200_45837302G_20210525_131611.pdf";
+//			String pdfNombre = "eejg" + "_" + idInstitucion + "_" + numEjg + "_" + mapParameters.get("nif") + "_"
+//					+ fecha + ".pdf";
 			String pdfRuta = directorioSalida + directorioEspecificoInforme + System.getProperty("file.separator") + idInstitucion;
 
 			File rutaPDF = new File(pdfRuta);
