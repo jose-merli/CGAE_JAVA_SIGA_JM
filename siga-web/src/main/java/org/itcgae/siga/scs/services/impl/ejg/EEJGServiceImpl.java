@@ -29,7 +29,7 @@ import org.itcgae.siga.scs.services.ejg.IEEJGServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sis.firma.core.B64.Base64CODEC;
+//import com.sis.firma.core.B64.Base64CODEC;
 
 
 @Service
@@ -46,8 +46,8 @@ public class EEJGServiceImpl implements IEEJGServices {
 	@Autowired
 	private GenPropertiesMapper propertiesMapper;
 	
-	@Autowired
-	private Base64CODEC base64;
+	//@Autowired 
+//	//private Base64CODEC base64;
 
 	@Override
 	public File getInformeEejg(Map<Integer, Map<String, String>> mapInformes, String idInstitucion) throws Exception {
@@ -243,8 +243,9 @@ public class EEJGServiceImpl implements IEEJGServices {
 			String numEjgListado = UtilidadesString.replaceAllIgnoreCase(numEjg, "-", "/");
 			mapParameters.put("numEjg", numEjgListado);
 
-			String pdfNombre = "eejg" + "_" + idInstitucion + "_" + numEjg + "_" + mapParameters.get("nif") + "_"
-					+ fecha + ".pdf";
+			String pdfNombre = "eejg_2005_2018-01200_45837302G_20210525_131611.pdf";
+//			String pdfNombre = "eejg" + "_" + idInstitucion + "_" + numEjg + "_" + mapParameters.get("nif") + "_"
+//					+ fecha + ".pdf";
 			String pdfRuta = directorioSalida + directorioEspecificoInforme + System.getProperty("file.separator") + idInstitucion;
 
 			File rutaPDF = new File(pdfRuta);
