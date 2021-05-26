@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
+import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
@@ -149,6 +150,13 @@ public class EjgController {
 	ResponseEntity<EjgDTO> datosEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
 		EjgDTO response = gestionEJG.datosEJG(ejgItem, request);
 		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
+	}
+	
+	//getEjgDesigna
+	@RequestMapping(value = "/gestion-ejg/getEjgDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EjgDesignaDTO> getEjgDesigna(@RequestBody EjgItem datos, HttpServletRequest request) {
+		EjgDesignaDTO response = gestionEJG.getEjgDesigna(datos, request);
+		return new ResponseEntity<EjgDesignaDTO>(response, HttpStatus.OK);
 	}
 
 	// unidadFamiliar

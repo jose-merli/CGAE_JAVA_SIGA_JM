@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
+import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
@@ -37,6 +38,8 @@ import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazadaExample;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
+import org.itcgae.siga.db.entities.ScsEjgdesigna;
+import org.itcgae.siga.db.entities.ScsEjgdesignaExample;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.entities.ScsParentesco;
@@ -48,6 +51,7 @@ import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
 import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgPrestacionRechazadaMapper;
+import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.mappers.ScsParentescoMapper;
 import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
@@ -128,6 +132,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	
 	@Autowired
 	private ScsParentescoMapper scsParentescoMapper;
+	
+	@Autowired
+	private ScsEjgdesignaMapper scsEjgdesignaMapper;
 	
 	@Autowired
 	private IEEJGServices eejgService;
@@ -1100,6 +1107,53 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("GestionEJGServiceImpl.insertaDatosGenerales() -> Salida del servicio.");
 
 		return ejgdto;
+	}
+	
+	@Override
+	public EjgDesignaDTO getEjgDesigna(EjgItem datos, HttpServletRequest request) {
+	
+		LOGGER.info("getEjgDesigna() -> Entrada al servicio para obtener el colegiado");
+		EjgDesignaDTO ejgDesignaDTO = new EjgDesignaDTO();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getEjgDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getEjgDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if (null != usuarios && usuarios.size() > 0) {
+				
+				LOGGER.info(
+						"getEjgDesigna() / scsEjgdesignaMapper.selectByExample() -> Entrada a scsEjgExtendsMapper para obtener asociaciones con designaciones del EJG.");
+
+				ScsEjgdesignaExample example = new ScsEjgdesignaExample();
+				
+				example.createCriteria().andAniodesignaEqualTo(Short.parseShort(datos.getAnnio())).andIdinstitucionEqualTo(idInstitucion)
+				.andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG())).andNumeroejgEqualTo(Long.parseLong(datos.getNumero()));
+				
+				List<ScsEjgdesigna> ejgDesignas = scsEjgdesignaMapper.selectByExample(example);
+
+				ejgDesignaDTO.setScsEjgdesignas(ejgDesignas);
+				
+				LOGGER.info(
+						"getEjgDesigna() / scsEjgdesignaMapper.selectByExample() -> Salida de scsEjgExtendsMapper para obtener asociaciones con designaciones del EJG.");
+				
+			} else {
+				LOGGER.warn(
+						"getEjgDesigna() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("getEjgDesigna() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("getLabel() -> Salida del servicio para obtener las asociaciones con designaciones del EJG.");
+		return ejgDesignaDTO;
 	}
 
 	@Override
