@@ -386,6 +386,67 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
 		return unidadFamiliarEJGDTO;
 	}
+	
+	@Override
+	public InsertResponseDTO insertFamiliarEJG(List<String> item, HttpServletRequest request) {
+		LOGGER.info("insertFamiliarEJG() -> Entrada al servicio para obtener unidad Familiar");
+		InsertResponseDTO responsedto = new InsertResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			LOGGER.debug("GestionEJGServiceImpl.insertFamiliarEJG() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.insertFamiliarEJG() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Entrada para insertar en la unidad familiar del ejg");
+
+				try {
+					//[ejg.idInstitucion,  justiciable.idpersona, ejg.annio, ejg.tipoEJG, ejg.numero]
+					ScsUnidadfamiliarejg familiar = new ScsUnidadfamiliarejg();
+					
+					familiar.setIdinstitucion(idInstitucion);
+					familiar.setIdpersona(Long.parseLong(item.get(1)));
+					familiar.setAnio(Short.parseShort(item.get(2)));
+					familiar.setIdtipoejg(Short.parseShort(item.get(3)));
+					familiar.setNumero(Long.parseLong(item.get(4)));
+					
+					familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
+					familiar.setFechamodificacion(new Date());
+					
+					familiar.setSolicitante((short) 0);
+					
+					response = scsUnidadfamiliarejgMapper.insert(familiar);
+					
+					LOGGER.debug(
+							"GestionEJGServiceImpl.insertFamiliarEJG() -> Salida del servicio para insertar en la unidad familiar para los ejgs");
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.insertFamiliarEJG() -> Se ha producido un error al insertar en la unidad familiar de los ejgs. ",
+							e);
+				} 
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug(
+								"GestionEJGServiceImpl.insertFamiliarEJG() -> OK.");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"GestionEJGServiceImpl.insertFamiliarEJG() -> KO.");
+					}
+			}
+		}
+		return responsedto;
+	}
 
 	@Override
 	public ExpedienteEconomicoDTO getExpedientesEconomicos(EjgItem ejgItem, HttpServletRequest request) {
@@ -542,11 +603,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				}
 
 				LOGGER.info(
-						"getDocumentos() / setUnidadFamiliarEJGItems.getExpedientesEconomicos() -> Entrada a scsEjgExtendsMapper para obtener la documentación de EJG");
+						"getDocumentos() / setEjgDocItemsItems.getExpedientesEconomicos() -> Entrada a scsEjgExtendsMapper para obtener la documentación de EJG");
 				ejgDocumentacionDTO.setEjgDocItems(scsDocumentacionejgExtendsMapper.getDocumentacion(ejgItem,
 						idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
 				LOGGER.info(
-						"getDocumentos() / setUnidadFamiliarEJGItems.getExpedientesEconomicos() -> Salida de scsEjgExtendsMapper para obtener la documentación de EJG");
+						"getDocumentos() / setEjgDocItemsItems.getExpedientesEconomicos() -> Salida de scsEjgExtendsMapper para obtener la documentación de EJG");
 			} else {
 				LOGGER.warn(
 						"getDocumentos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -1138,6 +1199,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.info(
 						"getEjgDesigna() / scsEjgdesignaMapper.selectByExample() -> Entrada a scsEjgExtendsMapper para obtener asociaciones con designaciones del EJG.");
 
+				try {
 				ScsEjgdesignaExample example = new ScsEjgdesignaExample();
 				
 				example.createCriteria().andAniodesignaEqualTo(Short.parseShort(datos.getAnnio())).andIdinstitucionEqualTo(idInstitucion)
@@ -1149,7 +1211,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				
 				LOGGER.info(
 						"getEjgDesigna() / scsEjgdesignaMapper.selectByExample() -> Salida de scsEjgExtendsMapper para obtener asociaciones con designaciones del EJG.");
-				
+				} catch (Exception e) {
+					LOGGER.debug(
+							"getEjgDesigna() -> Se ha producido un error al obtener asociaciones con designaciones del EJG. ",
+							e);
+				}
 			} else {
 				LOGGER.warn(
 						"getEjgDesigna() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "

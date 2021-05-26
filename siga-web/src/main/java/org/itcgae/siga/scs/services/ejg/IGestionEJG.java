@@ -77,4 +77,6 @@ public interface IGestionEJG {
 	UpdateResponseDTO guardarServiciosTramitacion(EjgItem datos, HttpServletRequest request);
 
 	EjgDesignaDTO getEjgDesigna(EjgItem datos, HttpServletRequest request);
+
+	InsertResponseDTO insertFamiliarEJG(List<String> item, HttpServletRequest request);
 }
