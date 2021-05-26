@@ -1300,13 +1300,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 //						NUMEROEXPEDIENTE
 //						ANIOEXPEDIENTE
 						
-						//Pendiente de completar. Falta determinar algunos campos y obterner los valores para seleccionar nuestro expediente
 						ExpExpedienteKey expKey = new ExpExpedienteKey();
 						
 						expKey.setIdinstitucion(idInstitucion);
-						expKey.setAnioexpediente(Short.parseShort(datos.getAnnio()));
-						expKey.setNumeroexpediente(Integer.parseInt(datos.getNumero()));
-						expKey.setIdtipoexpediente(Short.parseShort(datos.getTipoEJG()));
+						if(datos.getAnioexpInsos()!=null)expKey.setAnioexpediente(Short.parseShort(datos.getAnioexpInsos()));
+						if(datos.getNumeroexpInsos()!=null)expKey.setNumeroexpediente(Integer.parseInt(datos.getNumeroexpInsos()));
+						if(datos.getIdTipoExpInsos()!=null)expKey.setIdtipoexpediente(Short.parseShort(datos.getIdTipoExpInsos()));
 						if(datos.getIdInstTipoExp()!=null)expKey.setIdinstitucionTipoexpediente(Short.parseShort(datos.getIdInstTipoExp()));
 						
 						ExpExpediente newExp = expExpedienteMapper.selectByPrimaryKey(expKey);
@@ -1349,10 +1348,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							.andNumeroEqualTo(preRe.getNumero()).andIdtipoejgEqualTo(preRe.getIdtipoejg())
 							.andIdtipoejgEqualTo(preRe.getIdtipoejg());
 							
+							List<ScsEjgPrestacionRechazada> rechazadas = scsEjgPrestacionRechazadaMapper.selectByExample(examplePresRe);
+
 							//Eliminamos las entradas existentes relacionadas si las hubiera.
+							
 							response = scsEjgPrestacionRechazadaMapper.deleteByExample(examplePresRe);
 							
-							
+							if(rechazadas.isEmpty()) response = 1;
 							
 							for(String idprestacion: datos.getPrestacionesRechazadas()) {
 								preRe.setIdprestacion(Short.parseShort(idprestacion));

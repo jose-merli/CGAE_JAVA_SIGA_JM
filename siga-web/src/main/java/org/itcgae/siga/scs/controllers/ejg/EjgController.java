@@ -168,6 +168,7 @@ public class EjgController {
 		return new ResponseEntity<UnidadFamiliarEJGDTO>(response, HttpStatus.OK);
 	}
 	
+	//Insertar familiar
 	@RequestMapping(value = "/gestion-ejg/insertFamiliarEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> insertFamiliar(@RequestBody List<String> datos, HttpServletRequest request) {
 		InsertResponseDTO response = gestionEJG.insertFamiliarEJG(datos, request);
@@ -262,7 +263,11 @@ public class EjgController {
 	@RequestMapping(value = "/gestion-ejg/actualizaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> actualizaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.actualizaDatosGenerales(datos, request);
-		if (response.getError().getCode() == 200)
+//		if (response.getError().getCode() == 200)
+//			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+//		else
+//			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
