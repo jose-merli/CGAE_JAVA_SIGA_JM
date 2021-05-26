@@ -1573,21 +1573,36 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 					for (int i = 0; datos.size() > i; i++) {
-						ScsUnidadfamiliarejg record = new ScsUnidadfamiliarejg();
+						
 						response = 0;
 
-						// creamos el objeto para el insert
-						record.setIdinstitucion(idInstitucion);
-						record.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
-						record.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
-						record.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
+						// seleccionamos el objeto por key
+						ScsUnidadfamiliarejgKey key = new ScsUnidadfamiliarejgKey();
+						
+						key.setIdinstitucion(idInstitucion);
+						key.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
+						key.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
+						key.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
+						key.setIdpersona(Long.parseLong(datos.get(i).getUf_idPersona()));
+						
+						ScsUnidadfamiliarejg record = scsUnidadfamiliarejgMapper.selectByPrimaryKey(key);
+						
+						//Modificamos el objeto
+						
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
-						record.setIdpersona(Long.parseLong(datos.get(i).getUf_idPersona()));
-						if(datos.get(i).getFechaBaja()==null)record.setFechabaja(new Date());
-						else record.setFechabaja(null);
+						
+						//Según se elimine o se active.
+						if(datos.get(i).getFechaBaja()==null) {
+							record.setFechabaja(new Date());
+							response = scsUnidadfamiliarejgMapper.updateByPrimaryKeySelective(record);
+						}
+						else {
+							record.setFechabaja(null);
+							response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(record);
+						}
 
-						response = scsUnidadfamiliarejgMapper.updateByPrimaryKeySelective(record);
+						
 					}
 					LOGGER.debug(
 							"GestionEJGServiceImpl.borrarFamiliar() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
