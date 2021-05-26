@@ -25,6 +25,7 @@ import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
+import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -1548,7 +1549,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO borrarFamiliar(List<EjgItem> datos, HttpServletRequest request) {
+	public UpdateResponseDTO borrarFamiliar(List<UnidadFamiliarEJGItem> datos, HttpServletRequest request) {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
 
@@ -1572,22 +1573,21 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 					for (int i = 0; datos.size() > i; i++) {
-						ScsEstadoejg record = new ScsEstadoejg();
+						ScsUnidadfamiliarejg record = new ScsUnidadfamiliarejg();
 						response = 0;
 
 						// creamos el objeto para el insert
 						record.setIdinstitucion(idInstitucion);
-						record.setIdtipoejg(Short.parseShort(datos.get(i).getTipoEJG()));
-						record.setAnio(Short.parseShort(datos.get(i).getAnnio()));
-						record.setNumero(Long.parseLong(datos.get(i).getNumero()));
-						record.setIdestadoejg(Short.parseShort(datos.get(i).getEstadoNew()));
-						record.setFechainicio(datos.get(i).getFechaEstadoNew());
+						record.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
+						record.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
+						record.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
-						record.setAutomatico("0");
-						record.setFechabaja(new Date());
+						record.setIdpersona(Long.parseLong(datos.get(i).getUf_idPersona()));
+						if(datos.get(i).getFechaBaja()==null)record.setFechabaja(new Date());
+						else record.setFechabaja(null);
 
-						response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
+						response = scsUnidadfamiliarejgMapper.updateByPrimaryKeySelective(record);
 					}
 					LOGGER.debug(
 							"GestionEJGServiceImpl.borrarFamiliar() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
