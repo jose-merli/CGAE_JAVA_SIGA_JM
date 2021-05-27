@@ -1305,8 +1305,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if (item.getSinEJG() != null && !item.getSinEJG().isEmpty()) {
 			if (item.getSinEJG().equals("0")) {
 				sql.append(" AND ejg.anio is not null ");
-			} else {
-				sql.append(" AND ejg.anio is null ");
 			}
 		}
 		if ((item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty())) {
