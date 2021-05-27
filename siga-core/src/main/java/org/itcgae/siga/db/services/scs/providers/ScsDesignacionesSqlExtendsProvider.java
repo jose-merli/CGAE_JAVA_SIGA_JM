@@ -1618,11 +1618,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String comboDelitos(DesignaItem designaItem, Short idInstitucion) {
 
 		SQL sql = new SQL();
-		sql.SELECT("D.IDDELITO, F_SIGA_GETRECURSO(D.DESCRIPCION, 1) as DESCRIPCION ");
-		sql.FROM("SCS_DELITO D ");
-		sql.INNER_JOIN("SCS_DELITOSDESIGNA DD ON D.IDINSTITUCION = DD.IDINSTITUCION AND D.IDDELITO=DD.IDDELITO ");
+		sql.SELECT("D.IDDELITO");
+		sql.SELECT("F_SIGA_GETRECURSO(D.DESCRIPCION, 1) as DESCRIPCION");
+		sql.FROM("SCS_DELITO D");
+		sql.INNER_JOIN("SCS_DELITOSDESIGNA DD ON D.IDINSTITUCION = DD.IDINSTITUCION AND D.IDDELITO = DD.IDDELITO");
 		sql.WHERE("DD.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("DD.NUMERO = " + designaItem.getNumero());
 		sql.WHERE("DD.IDTURNO = " + designaItem.getIdTurno());
+		sql.WHERE("DD.ANIO = " + designaItem.getAno());
 
 		return sql.toString();
 	}
