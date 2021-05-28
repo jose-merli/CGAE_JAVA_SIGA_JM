@@ -6,6 +6,7 @@ public class RelacionesItem {
 	private String anio;
 	private String numero;
 	private String idletrado;
+	private String letrado;
 	private String idturno;
 	private String idturnodesigna;
 	private String idtipo;
@@ -41,6 +42,12 @@ public class RelacionesItem {
 	}
 	public void setIdletrado(String idletrado) {
 		this.idletrado = idletrado;
+	}
+	public String getLetrado() {
+		return letrado;
+	}
+	public void setLetrado(String letrado) {
+		this.letrado = letrado;
 	}
 	public String getIdturno() {
 		return idturno;
@@ -91,6 +98,7 @@ public class RelacionesItem {
 		result = prime * result + ((idtipo == null) ? 0 : idtipo.hashCode());
 		result = prime * result + ((idturno == null) ? 0 : idturno.hashCode());
 		result = prime * result + ((idturnodesigna == null) ? 0 : idturnodesigna.hashCode());
+		result = prime * result + ((letrado == null) ? 0 : letrado.hashCode());
 		result = prime * result + ((numero == null) ? 0 : numero.hashCode());
 		result = prime * result + ((sjcs == null) ? 0 : sjcs.hashCode());
 		return result;
@@ -149,6 +157,11 @@ public class RelacionesItem {
 				return false;
 		} else if (!idturnodesigna.equals(other.idturnodesigna))
 			return false;
+		if (letrado == null) {
+			if (other.letrado != null)
+				return false;
+		} else if (!letrado.equals(other.letrado))
+			return false;
 		if (numero == null) {
 			if (other.numero != null)
 				return false;
@@ -164,8 +177,9 @@ public class RelacionesItem {
 	@Override
 	public String toString() {
 		return "RelacionesItem [sjcs=" + sjcs + ", idinstitucion=" + idinstitucion + ", anio=" + anio + ", numero="
-				+ numero + ", idletrado=" + idletrado + ", idturno=" + idturno + ", idturnodesigna=" + idturnodesigna
-				+ ", idtipo=" + idtipo + ", codigo=" + codigo + ", desturno=" + desturno + ", destipo=" + destipo + "]";
+				+ numero + ", idletrado=" + idletrado + ", letrado=" + letrado + ", idturno=" + idturno
+				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", desturno="
+				+ desturno + ", destipo=" + destipo + "]";
 	}
 	
 	/**
