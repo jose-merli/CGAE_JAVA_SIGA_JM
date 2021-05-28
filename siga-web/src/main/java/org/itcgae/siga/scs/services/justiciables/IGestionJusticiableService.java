@@ -42,5 +42,11 @@ public interface IGestionJusticiableService {
 
 	public UpdateResponseDTO associateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request);
 
-	public UpdateResponseDTO disassociateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request);	
+	public UpdateResponseDTO disassociateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request);
+
+	public ComboDTO getGruposLaborales(HttpServletRequest request);
+
+	public ComboDTO getParentesco(HttpServletRequest request);
+
+	public ComboDTO getTiposIngresos(HttpServletRequest request);	
 }

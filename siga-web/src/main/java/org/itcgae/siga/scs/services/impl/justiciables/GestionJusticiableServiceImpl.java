@@ -58,10 +58,14 @@ import org.itcgae.siga.db.services.scs.mappers.ScsDesignasLetradoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsMinusvaliaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsParentescoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsPonenteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProfesionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTelefonosPersonaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTipoGrupoLaboralExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTipoIngresoExtendsMapper;
 import org.itcgae.siga.scs.services.justiciables.IGestionJusticiableService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +121,15 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 	@Autowired
 	private ScsSojExtendsMapper scsSojExtendsMapper;
+	
+	@Autowired
+	private ScsTipoGrupoLaboralExtendsMapper scsTipoGrupoLaboralExtendsMapper;
+	
+	@Autowired
+	private ScsParentescoExtendsMapper scsParentescoExtendsMapper;
+	
+	@Autowired
+	private ScsTipoIngresoExtendsMapper scsTipoIngresoExtendsMapper;
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
@@ -170,6 +183,126 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		}
 		LOGGER.info("getMinusvalia() -> Salida del servicio para obtener combo minusvalias");
+		return combo;
+	}
+	
+	@Override
+	public ComboDTO getGruposLaborales(HttpServletRequest request) {
+		LOGGER.info("getGruposLaborales() -> Entrada al servicio para obtener grupos laborales");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO combo = new ComboDTO();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getGruposLaborales() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getGruposLaborales() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"getGruposLaborales() / scsTipoGrupoLaboralExtendsMapper.getGruposLaborales() -> Entrada a scsTipoGrupoLaboralExtendsMapper para obtener grupos laborales");
+
+				List<ComboItem> comboItems = scsTipoGrupoLaboralExtendsMapper.getGruposLaborales(idInstitucion, usuarios.get(0).getIdlenguaje());
+
+				LOGGER.info(
+						"getGruposLaborales() / scsTipoGrupoLaboralExtendsMapper.getGruposLaborales() -> Salida a scsTipoGrupoLaboralExtendsMapper para obtener grupos laborales");
+
+				combo.setCombooItems(comboItems);
+			}
+
+		}
+		LOGGER.info("getGruposLaborales() -> Salida del servicio para obtener combo grupos laborales");
+		return combo;
+	}
+	
+	@Override
+	public ComboDTO getParentesco(HttpServletRequest request) {
+		LOGGER.info("getParentesco() -> Entrada al servicio para obtener combo parentesco");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO combo = new ComboDTO();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getParentesco() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getParentesco() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"getParentesco() / scsParentescoExtendsMapper.getParentesco() -> Entrada a scsParentescoExtendsMapper para obtener combo parentesco");
+
+				List<ComboItem> comboItems = scsParentescoExtendsMapper.getParentesco(idInstitucion, usuarios.get(0).getIdlenguaje());
+
+				LOGGER.info(
+						"getParentesco() / scsParentescoExtendsMapper.getParentesco() -> Salida a scsParentescoExtendsMapper para obtener combo parentesco");
+
+				combo.setCombooItems(comboItems);
+			}
+
+		}
+		LOGGER.info("getParentesco() -> Salida del servicio para obtener combo parentesco");
+		return combo;
+	}
+	
+	@Override
+	public ComboDTO getTiposIngresos(HttpServletRequest request) {
+		LOGGER.info("getTipoIngresos() -> Entrada al servicio para obtener combo tipoIngresos");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO combo = new ComboDTO();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getTipoIngresos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getTipoIngresos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"getTipoIngresos() / scsParentescoExtendsMapper.getParentesco() -> Entrada a scsParentescoExtendsMapper para obtener combo tipoIngresos");
+
+				List<ComboItem> comboItems = scsTipoIngresoExtendsMapper.getTiposIngresos(usuarios.get(0).getIdlenguaje());
+
+				LOGGER.info(
+						"getTipoIngresos() / scsParentescoExtendsMapper.getParentesco() -> Salida a scsParentescoExtendsMapper para obtener combo tipoIngresos");
+
+				combo.setCombooItems(comboItems);
+			}
+
+		}
+		LOGGER.info("getTipoIngresos() -> Salida del servicio para obtener combo tipoIngresos");
 		return combo;
 	}
 
@@ -1122,9 +1255,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					LOGGER.error(e);
 					error.setDescription("general.mensaje.error.bbdd");
 				}
-
 			}
-
 		}
 		LOGGER.info("searchAsuntosJusticiable() -> Salida del servicio para obtener los asuntos de un justiciable");
 		return asuntosJusticiableDTO;

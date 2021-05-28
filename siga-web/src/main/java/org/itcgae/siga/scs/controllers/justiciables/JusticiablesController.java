@@ -57,6 +57,24 @@ public class JusticiablesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/gestionJusticiables/comboGruposLaborales", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getGrupoLaboral(HttpServletRequest request) {
+		ComboDTO response = gestionJusticiableService.getGruposLaborales(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/gestionJusticiables/comboParentesco", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getParentesco(HttpServletRequest request) {
+		ComboDTO response = gestionJusticiableService.getParentesco(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/gestionJusticiables/comboTiposIngresos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTipoIngresos(HttpServletRequest request) {
+		ComboDTO response = gestionJusticiableService.getTiposIngresos(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/gestionJusticiables/comboProfesiones", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getProfesiones(HttpServletRequest request) {
 		ComboDTO response = gestionJusticiableService.getProfesiones(request);
