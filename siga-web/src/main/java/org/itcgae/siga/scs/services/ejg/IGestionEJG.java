@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -18,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.itcgae.siga.DTOs.gen.Error;
 
 public interface IGestionEJG {
@@ -76,5 +78,7 @@ public interface IGestionEJG {
 
 	UpdateResponseDTO guardarServiciosTramitacion(EjgItem datos, HttpServletRequest request);
 
-	EjgDesignaDTO getEjgDesigna(EjgItem datos, HttpServletRequest request);
+	EjgDesignaDTO getEjgDesigna(EjgItem datos, HttpServletRequest request); 
+	
+	ComunicacionesDTO getComunicaciones(List<String> item, HttpServletRequest request);
 }

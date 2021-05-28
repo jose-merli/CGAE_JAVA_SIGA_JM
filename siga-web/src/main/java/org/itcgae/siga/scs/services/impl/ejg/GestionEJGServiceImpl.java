@@ -17,6 +17,8 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
+import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -1986,5 +1988,58 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio.");
 
 		return responsedto;
+	}
+	
+	public ComunicacionesDTO getComunicaciones(List<String> item, HttpServletRequest request) {
+		
+		LOGGER.info("GestionEJGServiceImpl.getComunicaciones() -> Entrada al servicio para obtener comunicaciones");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComunicacionesDTO comunicacionesDTO = new ComunicacionesDTO();
+		List<ComunicacionesItem> comunicacionesItem = new ArrayList<ComunicacionesItem>();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"busquedaComunicaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"busquedaComunicaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.debug(
+						"busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Entrada a scsDesignacionesExtendsMapper para obtener las comunicaciones");
+				
+				String anioEJG = item.get(0);
+				String numEJG = item.get(1);
+				String idTipoEJG = item.get(2);
+
+				comunicacionesItem = scsEjgExtendsMapper.getComunicaciones(anioEJG, numEJG, idTipoEJG, idInstitucion);
+
+				LOGGER.info(
+						"busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Salida a scsDesignacionesExtendsMapper para obtener las comunicaciones");
+
+				for (int x = 0; x < comunicacionesItem.size(); x++) {
+					comunicacionesItem.get(x)
+							.setDestinatario(comunicacionesItem.get(x).getNombre() + ", "
+									+ comunicacionesItem.get(x).getApellido1() + " "
+									+ comunicacionesItem.get(x).getApellido2());
+				}
+
+				if (comunicacionesItem != null) {
+					comunicacionesDTO.setComunicacionesItem(comunicacionesItem);
+				}
+			}
+
+		}
+		LOGGER.info("busquedaComunicaciones() -> Salida del servicio para obtener comunicaciones");
+		return comunicacionesDTO;
 	}
 }

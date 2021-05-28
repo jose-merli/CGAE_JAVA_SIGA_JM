@@ -1,11 +1,13 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
+import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
@@ -926,5 +928,30 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		//sql.WHERE("IDTIPOEJG = " + idTipoEJG);
 
 		return sql.toString();
+	}
+	
+	public String getComunicaciones(String anio, String num, String idTipoEJG, Short idInstitucion){
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT(
+				"S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, N.NOMBRE, F_SIGA_GETRECURSO(A.NOMBRE, 1) as ESTADO , N.APELLIDOS1 , N.APELLIDOS2");
+
+		sql2.FROM("SCS_COMUNICACIONES C");
+		sql2.INNER_JOIN("ENV_ENVIOS S on (s.idenvio = C.IDENVIOSALIDA)");
+		sql2.INNER_JOIN("ENV_TIPOENVIOS T on (T.IDTIPOENVIOS = S.IDTIPOENVIOS)");
+		sql2.INNER_JOIN("env_estadoenvio A on (A.IDESTADO = S.IDESTADO)");
+		sql2.INNER_JOIN("ENV_DESTINATARIOS D on (D.IDENVIO = S.IDENVIO)");
+		sql2.INNER_JOIN("CEN_PERSONA N on (N.IDPERSONA = D.IDPERSONA)");
+		sql2.WHERE("C.EJGANIO = " + anio);
+		sql2.WHERE("C.EJGNUMERO =" + num);
+		sql2.WHERE("C.EJGIDTIPO =" + idTipoEJG);
+		sql2.WHERE("C.IDINSTITUCION = "+idInstitucion);
+
+		sql.SELECT("*");
+		sql.FROM("( " + sql2.toString() + " )");
+		sql.WHERE("ROWNUM <= 200");
+
+		return sql.toString();		
 	}
 }
