@@ -46,7 +46,7 @@ public class EEJGServiceImpl implements IEEJGServices {
 	@Autowired
 	private GenPropertiesMapper propertiesMapper;
 	
-	//@Autowired 
+	//@Autowired
 //	//private Base64CODEC base64;
 
 	@Override

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -373,5 +374,10 @@ public class EjgController {
 		UpdateResponseDTO response = gestionEJG.borrarRelacion(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
-
+	
+	@RequestMapping(value = "/gestion-ejg/getComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComunicacionesDTO> getComunicaciones(@RequestBody List<String> item, HttpServletRequest request) {
+		ComunicacionesDTO response = gestionEJG.getComunicaciones(item, request);
+		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
+	}
 }

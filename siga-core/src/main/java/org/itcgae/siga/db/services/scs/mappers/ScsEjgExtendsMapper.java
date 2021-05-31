@@ -11,9 +11,11 @@ import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosEjgItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
+import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsEjgSqlExtendsProvider;
 
 public interface ScsEjgExtendsMapper extends ScsEjgMapper {
@@ -198,4 +200,17 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getNumero")
 	String getNumero(short idTipoEJG, short anio, short idInstitucion);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getComunicaciones")
+	@Results({
+			@Result(column = "DESCRIPCION", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHA", property = "fechaCreacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAPROGRAMADA", property = "fechaProgramacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
+			})
+	List<ComunicacionesItem> getComunicaciones(String num, String anio, String idTipoEJG, Short idInstitucion);
 }
