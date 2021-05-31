@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.Date;
+
 public class RelacionesItem {
 	private String sjcs;
 	private String idinstitucion;
@@ -11,8 +13,16 @@ public class RelacionesItem {
 	private String idturnodesigna;
 	private String idtipo;
 	private String codigo;
-	private String desturno;
+	private String descturno;
 	private String destipo;
+	private String interesado;
+	private String dictamen;
+	private Date fechadictamen;
+	private String resolucion;
+	private Date fecharesolucion;
+	private String centrodetencion;
+	
+	
 	public String getSjcs() {
 		return sjcs;
 	}
@@ -73,11 +83,11 @@ public class RelacionesItem {
 	public void setCodigo(String codigo) {
 		this.codigo = codigo;
 	}
-	public String getDesturno() {
-		return desturno;
+	public String getDescturno() {
+		return descturno;
 	}
-	public void setDesturno(String desturno) {
-		this.desturno = desturno;
+	public void setDescturno(String descturno) {
+		this.descturno = descturno;
 	}
 	public String getDestipo() {
 		return destipo;
@@ -85,21 +95,63 @@ public class RelacionesItem {
 	public void setDestipo(String destipo) {
 		this.destipo = destipo;
 	}
+	public String getInteresado() {
+		return interesado;
+	}
+	public void setInteresado(String interesado) {
+		this.interesado = interesado;
+	}
+	public String getDictamen() {
+		return dictamen;
+	}
+	public void setDictamen(String dictamen) {
+		this.dictamen = dictamen;
+	}
+	public Date getFechadictamen() {
+		return fechadictamen;
+	}
+	public void setFechadictamen(Date fechadictamen) {
+		this.fechadictamen = fechadictamen;
+	}
+	public String getResolucion() {
+		return resolucion;
+	}
+	public void setResolucion(String resolucion) {
+		this.resolucion = resolucion;
+	}
+	public Date getFecharesolucion() {
+		return fecharesolucion;
+	}
+	public void setFecharesolucion(Date fecharesolucion) {
+		this.fecharesolucion = fecharesolucion;
+	}
+	public String getCentrodetencion() {
+		return centrodetencion;
+	}
+	public void setCentrodetencion(String centrodetencion) {
+		this.centrodetencion = centrodetencion;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((anio == null) ? 0 : anio.hashCode());
+		result = prime * result + ((centrodetencion == null) ? 0 : centrodetencion.hashCode());
 		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
 		result = prime * result + ((destipo == null) ? 0 : destipo.hashCode());
-		result = prime * result + ((desturno == null) ? 0 : desturno.hashCode());
+		result = prime * result + ((descturno == null) ? 0 : descturno.hashCode());
+		result = prime * result + ((dictamen == null) ? 0 : dictamen.hashCode());
+		result = prime * result + ((fechadictamen == null) ? 0 : fechadictamen.hashCode());
+		result = prime * result + ((fecharesolucion == null) ? 0 : fecharesolucion.hashCode());
 		result = prime * result + ((idinstitucion == null) ? 0 : idinstitucion.hashCode());
 		result = prime * result + ((idletrado == null) ? 0 : idletrado.hashCode());
 		result = prime * result + ((idtipo == null) ? 0 : idtipo.hashCode());
 		result = prime * result + ((idturno == null) ? 0 : idturno.hashCode());
 		result = prime * result + ((idturnodesigna == null) ? 0 : idturnodesigna.hashCode());
+		result = prime * result + ((interesado == null) ? 0 : interesado.hashCode());
 		result = prime * result + ((letrado == null) ? 0 : letrado.hashCode());
 		result = prime * result + ((numero == null) ? 0 : numero.hashCode());
+		result = prime * result + ((resolucion == null) ? 0 : resolucion.hashCode());
 		result = prime * result + ((sjcs == null) ? 0 : sjcs.hashCode());
 		return result;
 	}
@@ -117,6 +169,11 @@ public class RelacionesItem {
 				return false;
 		} else if (!anio.equals(other.anio))
 			return false;
+		if (centrodetencion == null) {
+			if (other.centrodetencion != null)
+				return false;
+		} else if (!centrodetencion.equals(other.centrodetencion))
+			return false;
 		if (codigo == null) {
 			if (other.codigo != null)
 				return false;
@@ -127,10 +184,25 @@ public class RelacionesItem {
 				return false;
 		} else if (!destipo.equals(other.destipo))
 			return false;
-		if (desturno == null) {
-			if (other.desturno != null)
+		if (descturno == null) {
+			if (other.descturno != null)
 				return false;
-		} else if (!desturno.equals(other.desturno))
+		} else if (!descturno.equals(other.descturno))
+			return false;
+		if (dictamen == null) {
+			if (other.dictamen != null)
+				return false;
+		} else if (!dictamen.equals(other.dictamen))
+			return false;
+		if (fechadictamen == null) {
+			if (other.fechadictamen != null)
+				return false;
+		} else if (!fechadictamen.equals(other.fechadictamen))
+			return false;
+		if (fecharesolucion == null) {
+			if (other.fecharesolucion != null)
+				return false;
+		} else if (!fecharesolucion.equals(other.fecharesolucion))
 			return false;
 		if (idinstitucion == null) {
 			if (other.idinstitucion != null)
@@ -157,6 +229,11 @@ public class RelacionesItem {
 				return false;
 		} else if (!idturnodesigna.equals(other.idturnodesigna))
 			return false;
+		if (interesado == null) {
+			if (other.interesado != null)
+				return false;
+		} else if (!interesado.equals(other.interesado))
+			return false;
 		if (letrado == null) {
 			if (other.letrado != null)
 				return false;
@@ -166,6 +243,11 @@ public class RelacionesItem {
 			if (other.numero != null)
 				return false;
 		} else if (!numero.equals(other.numero))
+			return false;
+		if (resolucion == null) {
+			if (other.resolucion != null)
+				return false;
+		} else if (!resolucion.equals(other.resolucion))
 			return false;
 		if (sjcs == null) {
 			if (other.sjcs != null)
@@ -178,8 +260,10 @@ public class RelacionesItem {
 	public String toString() {
 		return "RelacionesItem [sjcs=" + sjcs + ", idinstitucion=" + idinstitucion + ", anio=" + anio + ", numero="
 				+ numero + ", idletrado=" + idletrado + ", letrado=" + letrado + ", idturno=" + idturno
-				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", desturno="
-				+ desturno + ", destipo=" + destipo + "]";
+				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", descturno="
+				+ descturno + ", destipo=" + destipo + ", interesado=" + interesado + ", dictamen=" + dictamen
+				+ ", fechadictamen=" + fechadictamen + ", resolucion=" + resolucion + ", fecharesolucion="
+				+ fecharesolucion + ", centrodetencion=" + centrodetencion + "]";
 	}
 	
 	/**
