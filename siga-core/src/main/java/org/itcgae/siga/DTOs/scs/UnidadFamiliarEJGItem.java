@@ -1,6 +1,8 @@
 package org.itcgae.siga.DTOs.scs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class UnidadFamiliarEJGItem {
@@ -26,7 +28,26 @@ public class UnidadFamiliarEJGItem {
     private Date fechaSolicitud;
     private String fechaBaja;
     
-
+    private Short circunsExcep;
+    private Short incapacitado;
+    
+    private Short idParentesco;
+    private Short idTipoGrupoLab;
+    private Short idTipoIngreso;
+    
+    private String descrIngrAnuales;
+    private String bienesInmu;
+    private String bienesMu;
+    private String otrosBienes;
+    
+    private BigDecimal impIngrAnuales;
+    private BigDecimal impBienesInmu;
+    private BigDecimal impBienesMu;
+    private BigDecimal impOtrosBienes;
+    
+    private String observaciones;
+    
+    
 	/**
 	 **/
 	public UnidadFamiliarEJGItem uf_idTipoejg(String uf_idTipoejg) {
@@ -254,6 +275,119 @@ public class UnidadFamiliarEJGItem {
 	public void setFechaBaja(String fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
+
+	public Short getCircunsExcep() {
+		return circunsExcep;
+	}
+
+	public void setCircunsExcep(Short circunsExcep) {
+		this.circunsExcep = circunsExcep;
+	}
+
+	public Short getIncapacitado() {
+		return incapacitado;
+	}
+
+	public void setIncapacitado(Short incapacitado) {
+		this.incapacitado = incapacitado;
+	}
+
+	public Short getIdParentesco() {
+		return idParentesco;
+	}
+
+	public void setIdParentesco(Short idParentesco) {
+		this.idParentesco = idParentesco;
+	}
+
+	public Short getIdTipoGrupoLab() {
+		return idTipoGrupoLab;
+	}
+
+	public void setIdTipoGrupoLab(Short idTipoGrupoLab) {
+		this.idTipoGrupoLab = idTipoGrupoLab;
+	}
+
+	public Short getIdTipoIngreso() {
+		return idTipoIngreso;
+	}
+
+	public void setIdTipoIngreso(Short idTipoIngreso) {
+		this.idTipoIngreso = idTipoIngreso;
+	}
+
+	public String getDescrIngrAnuales() {
+		return descrIngrAnuales;
+	}
+
+	public void setDescrIngrAnuales(String descrIngrAnuales) {
+		this.descrIngrAnuales = descrIngrAnuales;
+	}
+
+	public String getBienesInmu() {
+		return bienesInmu;
+	}
+
+	public void setBienesInmu(String bienesInmu) {
+		this.bienesInmu = bienesInmu;
+	}
+
+	public String getBienesMu() {
+		return bienesMu;
+	}
+
+	public void setBienesMu(String bienesMu) {
+		this.bienesMu = bienesMu;
+	}
+
+	public String getOtrosBienes() {
+		return otrosBienes;
+	}
+
+	public void setOtrosBienes(String otrosBienes) {
+		this.otrosBienes = otrosBienes;
+	}
+
+	public BigDecimal getImpIngrAnuales() {
+		return impIngrAnuales;
+	}
+
+	public void setImpIngrAnuales(BigDecimal impIngrAnuales) {
+		this.impIngrAnuales = impIngrAnuales;
+	}
+
+	public BigDecimal getImpBienesInmu() {
+		return impBienesInmu;
+	}
+
+	public void setImpBienesInmu(BigDecimal impBienesInmu) {
+		this.impBienesInmu = impBienesInmu;
+	}
+
+	public BigDecimal getImpBienesMu() {
+		return impBienesMu;
+	}
+
+	public void setImpBienesMu(BigDecimal impBienesMu) {
+		this.impBienesMu = impBienesMu;
+	}
+
+	public BigDecimal getImpOtrosBienes() {
+		return impOtrosBienes;
+	}
+
+	public void setImpOtrosBienes(BigDecimal impOtrosBienes) {
+		this.impOtrosBienes = impOtrosBienes;
+	}
+
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
+
 	/**
 	 **/
 	public UnidadFamiliarEJGItem uf_idInstitucion(String uf_idInstitucion) {

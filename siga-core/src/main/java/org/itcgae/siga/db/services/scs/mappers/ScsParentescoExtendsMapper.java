@@ -8,18 +8,8 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.db.mappers.ScsJuzgadoMapper;
-import org.itcgae.siga.db.mappers.ScsTipogrupolaboralMapper;
-import org.itcgae.siga.db.mappers.ScsTiporesolucionMapper;
-import org.itcgae.siga.db.services.scs.providers.ScsJuzgadoSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsMinusvaliaSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsParentescoSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsTipoGrupoLaboralSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsTipofundamentosSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsTiporesolucionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 

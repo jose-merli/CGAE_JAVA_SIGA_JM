@@ -80,7 +80,22 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 		@Result(column = "descripcion", property = "pd_descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechasolicitud", property = "fechaSolicitud", jdbcType = JdbcType.DATE),
-		@Result(column = "fechabaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "fechabaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BIENESINMUEBLES", property = "bienesInmu", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BIENESMUEBLES", property = "bienesMu", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CIRCUNSTANCIAS_EXCEPCIONALES", property = "circunsExcep", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCIONINGRESOSANUALES", property = "descrIngrAnuales", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPARENTESCO", property = "idParentesco", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOGRUPOLAB", property = "idTipoGrupoLab", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOINGRESO", property = "idTipoIngreso", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IMPORTEBIENESINMUEBLES", property = "impBienesInmu", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IMPORTEBIENESMUEBLES", property = "impBienesMu", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IMPORTEINGRESOSANUALES", property = "impIngrAnuales", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IMPORTEOTROSBIENES", property = "impOtrosBienes", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "INCAPACITADO", property = "incapacitado", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OTROSBIENES", property = "otrosBienes", jdbcType = JdbcType.VARCHAR)
+		
 
 	})
 	List<UnidadFamiliarEJGItem> unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);

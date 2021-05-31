@@ -661,6 +661,9 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 		return sql.toString();
 	}
+	
+	
+	
 	public String unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		SQL sql = new SQL();
 		sql.SELECT("uf.idinstitucion," + 
@@ -679,7 +682,21 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 					" uf.encalidadde," + 
 					" pd.descripcion," + 
 					" eejg_p.estado," + 
-					" eejg_p.fechasolicitud");
+					" eejg_p.fechasolicitud,"
+					+ " uf.BIENESINMUEBLES,\r\n"
+					+ "	uf.BIENESMUEBLES,\r\n"
+					+ "	uf.CIRCUNSTANCIAS_EXCEPCIONALES,\r\n"
+					+ "	uf.DESCRIPCIONINGRESOSANUALES,\r\n"
+					+ "	uf.IDPARENTESCO,\r\n"
+					+ "	uf.IDTIPOGRUPOLAB,\r\n"
+					+ "	uf.IDTIPOINGRESO,\r\n"
+					+ "	uf.IMPORTEBIENESINMUEBLES,\r\n"
+					+ "	uf.IMPORTEBIENESMUEBLES,\r\n"
+					+ "	uf.IMPORTEINGRESOSANUALES,\r\n"
+					+ "	uf.IMPORTEOTROSBIENES,\r\n"
+					+ "	uf.INCAPACITADO,\r\n"
+					+ "	uf.OBSERVACIONES,\r\n"
+					+ "	uf.OTROSBIENES");
 		
 		sql.FROM("scs_unidadfamiliarejg uf");
 		

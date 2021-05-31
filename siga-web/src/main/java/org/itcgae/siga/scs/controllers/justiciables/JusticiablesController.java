@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.DTOs.scs.JusticiableDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
+import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.scs.services.justiciables.IBusquedaJusticiablesService;
 import org.itcgae.siga.scs.services.justiciables.IGestionJusticiableService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +120,16 @@ public class JusticiablesController {
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 
+	}
+	
+	@RequestMapping(value = "/gestionJusticiables/updateUnidadFamiliar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateUnidadFamiliar(@RequestBody UnidadFamiliarEJGItem unidadFamiliarItem, HttpServletRequest request) {
+
+		UpdateResponseDTO response = gestionJusticiableService.updateUnidadFamiliar(unidadFamiliarItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "/gestionJusticiables/updateDatosSolicitudJusticiable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

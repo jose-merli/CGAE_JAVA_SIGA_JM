@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.impl.justiciables;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import org.itcgae.siga.DTOs.scs.JusticiableDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoItem;
+import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -46,6 +48,9 @@ import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsTelefonospersona;
 import org.itcgae.siga.db.entities.ScsTelefonospersonaExample;
 import org.itcgae.siga.db.entities.ScsTelefonospersonaKey;
+import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
+import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
+import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -79,6 +84,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
 
 	@Autowired
 	private ScsMinusvaliaExtendsMapper scsMinusvaliaExtendsMapper;
@@ -2402,6 +2410,98 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info(
 				"getJusticiableByIdPersona() -> Salida del servicio para obtener el representante del justiciable por idpersona");
 		return justiciableDTO;
+	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO updateUnidadFamiliar(UnidadFamiliarEJGItem datos, HttpServletRequest request) {
+		LOGGER.info("updateUnidadFamiliar() ->  Entrada al servicio para modificar un justiciable");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateUnidadFamiliar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateUnidadFamiliar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					//Seleccionamos el familiar que vamos a modificar
+					ScsUnidadfamiliarejgKey key = new ScsUnidadfamiliarejgKey();
+
+					key.setAnio(Short.parseShort(datos.getUf_anio()));
+					key.setIdinstitucion(idInstitucion);
+					key.setIdpersona(Long.parseLong(datos.getUf_idPersona()));
+					key.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));	
+					key.setNumero(Long.parseLong(datos.getUf_numero()));
+
+					ScsUnidadfamiliarejg familiar = scsUnidadfamiliarejgMapper.selectByPrimaryKey(key);
+
+					//Modificamos el familiar
+
+					if(datos.getIncapacitado() != null) familiar.setSolicitante(Short.parseShort(datos.getUf_solicitante()));
+					if(datos.getIncapacitado() != null) familiar.setIncapacitado(datos.getIncapacitado());
+					if(datos.getCircunsExcep() != null) familiar.setCircunstanciasExcepcionales(datos.getCircunsExcep());
+
+					familiar.setIdtipogrupolab(datos.getIdTipoGrupoLab());
+					familiar.setIdparentesco(datos.getIdParentesco());
+					
+					familiar.setIdtipoingreso(datos.getIdTipoIngreso());
+					familiar.setDescripcioningresosanuales(datos.getDescrIngrAnuales());
+					familiar.setImporteingresosanuales(datos.getImpIngrAnuales());
+					familiar.setBienesinmuebles(datos.getBienesInmu());
+					familiar.setImportebienesinmuebles(datos.getImpBienesInmu());
+					familiar.setBienesmuebles(datos.getBienesMu());
+					familiar.setImportebienesmuebles(datos.getImpBienesMu());
+					familiar.setOtrosbienes(datos.getOtrosBienes());
+					familiar.setImporteotrosbienes(datos.getImpOtrosBienes());		
+
+					familiar.setObservaciones(datos.getObservaciones());
+
+					familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
+					familiar.setFechamodificacion(new Date());
+
+					//Actualizamos la entrada
+					response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(familiar);					
+
+				} catch (Exception e) {
+					LOGGER.error(e);
+					error.setCode(500);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if(response==0) {
+					error.setCode(500);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+				else {
+					error.setCode(200);
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
+				
+				updateResponseDTO.setError(error);
+			}
+
+		}
+		return updateResponseDTO;
 	}
 
 }

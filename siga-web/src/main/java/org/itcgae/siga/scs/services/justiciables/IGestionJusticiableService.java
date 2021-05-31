@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.DTOs.scs.JusticiableDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
+import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 
 public interface IGestionJusticiableService {
 	
@@ -48,5 +49,7 @@ public interface IGestionJusticiableService {
 
 	public ComboDTO getParentesco(HttpServletRequest request);
 
-	public ComboDTO getTiposIngresos(HttpServletRequest request);	
+	public ComboDTO getTiposIngresos(HttpServletRequest request);
+
+	public UpdateResponseDTO updateUnidadFamiliar(UnidadFamiliarEJGItem unidadFamiliarEJGItem, HttpServletRequest request);	
 }
