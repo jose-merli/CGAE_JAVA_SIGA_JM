@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.FiltroAsistenciaItem;
+import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaItem;
 import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsAsistenciaSqlExtendsProvider;
 import org.itcgae.siga.DTOs.scs.AsuntosAsistenciaItem;
@@ -44,5 +46,24 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 		@Result(column = "IDPERSONACOLEGIADO", property = "idPersonaColegiado", jdbcType = JdbcType.VARCHAR)
 	})
 	AsuntosAsistenciaItem getAsuntoTipoAsistencia(AsuntosClaveJusticiableItem asuntoClave, String idLenguaje);
+	
+	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "searchAsistencias")
+	@Results({ 
+		@Result(column = "anio", property = "anio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),	
+		@Result(column = "numeroasunto", property = "numeroAsunto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaActuacion", property = "fchaActuacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "delito", property = "idDelito", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "lugar", property = "lugar", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ejganio", property = "ejgAnio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ejgnumero", property = "ejgNumero", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellido1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellido2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nif", property = "nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "sexo", property = "sexo", jdbcType = JdbcType.VARCHAR)
+	})
+	List<TarjetaAsistenciaItem> searchAsistencias(FiltroAsistenciaItem filtro, Short idInstitucion);
 
 }

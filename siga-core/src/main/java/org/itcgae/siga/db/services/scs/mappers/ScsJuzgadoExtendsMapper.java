@@ -71,4 +71,11 @@ public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 	})
 	List<JuzgadoItem> comboJuzgadoDesignaciones(Short idLenguaje, Short idInstitucion);
 	
+	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "getJuzgadosByIdTurno")
+	@Results({
+		@Result(column = "idjuzgado", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> getJuzgadosByIdTurno(Short idInstitucion, String idTurno);
+	
 }

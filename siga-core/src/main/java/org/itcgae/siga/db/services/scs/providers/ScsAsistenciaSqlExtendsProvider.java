@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.FiltroAsistenciaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsAsistenciaSqlProvider;
 
@@ -120,6 +121,98 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 			sql.WHERE("ASISTENCIA.idturno = '" + asuntoClave.getClave() + "'");
 		}
 
+		return sql.toString();
+	}
+	
+	public String searchAsistencias(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("scs_asistencia.anio");
+		sql.SELECT("scs_asistencia.numero");
+		sql.SELECT("scs_asistencia.fechahora");
+		sql.SELECT("scs_asistencia.observaciones");
+		sql.SELECT("scs_asistencia.incidencias");
+		sql.SELECT("scs_asistencia.ejganio");
+		sql.SELECT("scs_asistencia.ejgnumero");
+		sql.SELECT("scs_asistencia.fechaanulacion");
+		sql.SELECT("scs_asistencia.motivosanulacion");
+		sql.SELECT("scs_asistencia.delitosimputados");
+		sql.SELECT("scs_asistencia.contrarios");
+		sql.SELECT("scs_asistencia.datosdefensajuridica");
+		sql.SELECT("scs_asistencia.fechacierre");
+		sql.SELECT("scs_asistencia.idtipoasistencia");
+		sql.SELECT("scs_asistencia.idtipoasistenciacolegio");
+		sql.SELECT("scs_asistencia.idturno");
+		sql.SELECT("scs_asistencia.idguardia");
+		sql.SELECT("scs_asistencia.idpersonacolegiado");
+		sql.SELECT("scs_asistencia.idpersonajg");
+		sql.SELECT("scs_asistencia.fechamodificacion");
+		sql.SELECT("scs_asistencia.usumodificacion");
+		sql.SELECT("scs_asistencia.designa_anio");
+		sql.SELECT("scs_asistencia.designa_numero");
+		sql.SELECT("scs_asistencia.designa_turno");
+		sql.SELECT("scs_asistencia.facturado");
+		sql.SELECT("scs_asistencia.pagado");
+		sql.SELECT("scs_asistencia.idfacturacion");
+		sql.SELECT("scs_asistencia.numerodiligencia");
+		sql.SELECT("scs_asistencia.comisaria");
+		sql.SELECT("scs_asistencia.comisariaidinstitucion");
+		sql.SELECT("scs_asistencia.numeroprocedimiento");
+		sql.SELECT("scs_asistencia.juzgado");
+		sql.SELECT("scs_asistencia.juzgadoidinstitucion");
+		sql.SELECT("scs_asistencia.idestadoasistencia");
+		sql.SELECT("scs_asistencia.ejgidtipoejg");
+		sql.SELECT("scs_asistencia.nig");
+		sql.SELECT("scs_asistencia.idpretension");
+		sql.SELECT("scs_asistencia.fechaestadoasistencia");
+		sql.SELECT("scs_asistencia.fechasolicitud");
+		sql.SELECT("scs_asistencia.idorigenasistencia");
+		sql.SELECT("scs_asistencia.idmovimiento");
+		sql.SELECT("to_char(fechahora, 'hh24')      hora");
+		sql.SELECT("to_char(fechahora, 'mi')        minuto");
+		sql.SELECT("nombre");
+		sql.SELECT("apellido1");
+		sql.SELECT("apellido2");
+		sql.SELECT("nif");
+		sql.SELECT("sexo");
+		sql.SELECT("aa.fecha fechaActuacion");
+		sql.SELECT("aa.numeroasunto");
+		sql.SELECT("aa.lugar");
+		sql.SELECT("d.iddelito as delito");
+		sql.FROM("scs_asistencia");
+		sql.INNER_JOIN("scs_personajg p on p.idpersona = scs_asistencia.idpersonajg AND p.idinstitucion = scs_asistencia.idinstitucion");
+		sql.INNER_JOIN("scs_actuacionasistencia aa on aa.idinstitucion = scs_asistencia.idinstitucion AND aa.anio = scs_asistencia.anio AND aa.numero = scs_asistencia.numero");
+		sql.LEFT_OUTER_JOIN("scs_delitosasistencia da on scs_asistencia.anio = da.anio and scs_asistencia.numero = da.numero and scs_asistencia.idinstitucion = da.idinstitucion");
+		sql.LEFT_OUTER_JOIN("scs_delito d on da.iddelito = d.iddelito and da.idinstitucion = d.idinstitucion");
+		sql.WHERE("scs_asistencia.idinstitucion = " + idInstitucion);
+		sql.AND();
+		sql.WHERE("scs_asistencia.idturno = '" + filtroAsistenciaItem.getIdTurno() + "'");
+		sql.AND();
+		sql.WHERE("scs_asistencia.idguardia = '" + filtroAsistenciaItem.getIdGuardia() + "'");
+		sql.AND();
+		sql.WHERE("scs_asistencia.idpersonacolegiado = '" + filtroAsistenciaItem.getIdLetradoGuardia() + "'");
+		sql.AND();
+		sql.WHERE("trunc(scs_asistencia.fechahora) = '"+filtroAsistenciaItem.getDiaGuardia() + "'");
+		sql.AND();
+		sql.WHERE("EXISTS ("
+				+ "        SELECT"
+				+ "            1"
+				+ "        FROM"
+				+ "            scs_actuacionasistencia aa"
+				+ "        WHERE"
+				+ "                aa.idinstitucion = scs_asistencia.idinstitucion"
+				+ "            AND aa.anio = scs_asistencia.anio"
+				+ "            AND aa.numero = scs_asistencia.numero"
+				+ "    )");
+		sql.AND();
+		sql.WHERE("scs_asistencia.idtipoasistencia = '" + filtroAsistenciaItem.getIdTipoAsistencia() + "'");
+		if(!"".equals(filtroAsistenciaItem.getIdTipoAsistenciaColegiado()) 
+				&& filtroAsistenciaItem.getIdTipoAsistenciaColegiado() != null) {
+			sql.AND();
+			sql.WHERE("scs_asistencia.idtipoasistenciacolegio = '" + filtroAsistenciaItem.getIdTipoAsistenciaColegiado() + "'");
+		}
+		
 		return sql.toString();
 	}
 

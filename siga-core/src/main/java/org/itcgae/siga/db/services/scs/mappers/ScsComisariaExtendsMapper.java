@@ -53,4 +53,11 @@ public interface ScsComisariaExtendsMapper extends ScsComisariaMapper{
 	})
 	List<ComboItem> comboComisaria(Short idLenguaje, Short idInstitucion);
 	
+	@SelectProvider(type = ScsComisariaSqlExtendsProvider.class, method = "getComisariasByIdTurno")
+	@Results({
+		@Result(column = "idcomisaria", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> getComisariasByIdTurno(Short idInstitucion, String idTurno);
+	
 }
