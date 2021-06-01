@@ -344,7 +344,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				// 1.1 Comprobamos que existe en tabla cen_cliente
 				CenCliente cenCliente = new CenCliente();
 				CenClienteKey key = new CenClienteKey();
-				key.setIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getColegio()));
+				key.setIdinstitucion(idInstitucion);
 				key.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
 				cenCliente = cenClienteMapper.selectByPrimaryKey(key);
 
@@ -352,6 +352,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				if (null == cenCliente) {
 					CenCliente record = new CenCliente();
 					record = rellenarInsertCenCliente(tarjetaIntegrantesCreateDTO, usuario);
+					record.setIdinstitucion(idInstitucion);
 					responseCenCliente = cenClienteMapper.insertSelective(record);
 				}
 
