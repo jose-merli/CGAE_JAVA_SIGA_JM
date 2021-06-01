@@ -102,6 +102,7 @@ import org.itcgae.siga.db.entities.ScsDesignasletradoExample;
 import org.itcgae.siga.db.entities.ScsDocumentacionasi;
 import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesigna;
+import org.itcgae.siga.db.entities.ScsDocumentaciondesignaExample;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
@@ -2229,6 +2230,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				List<Integer> responses = new ArrayList<>();
 
 				for (ActuacionDesignaItem actuacionDesignaItem : listaActuacionDesignaItem) {
+
+					LOGGER.info(
+							"DesignacionesServiceImpl.eliminarActDesigna() --> Se eliminan los documentos asociados a la actuación");
+
+					ScsDocumentaciondesignaExample documentaciondesignaExample = new ScsDocumentaciondesignaExample();
+					documentaciondesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdturnoEqualTo(Integer.valueOf(actuacionDesignaItem.getIdTurno()))
+							.andAnioEqualTo(Short.valueOf(actuacionDesignaItem.getAnio()))
+							.andNumeroEqualTo(Long.valueOf(actuacionDesignaItem.getNumero()))
+							.andIdactuacionEqualTo(Long.valueOf(actuacionDesignaItem.getNumeroAsunto()));
+
+					scsDocumentaciondesignaMapper.deleteByExample(documentaciondesignaExample);
 
 					int response = scsDesignacionesExtendsMapper.eliminarActDesigna(actuacionDesignaItem, idInstitucion,
 							usuarios.get(0));
