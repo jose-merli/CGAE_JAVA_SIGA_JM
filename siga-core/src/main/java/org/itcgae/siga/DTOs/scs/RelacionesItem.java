@@ -21,6 +21,8 @@ public class RelacionesItem {
 	private String resolucion;
 	private Date fecharesolucion;
 	private String centrodetencion;
+	private Date fechaasunto;
+	private String dilnigproc;
 	
 	
 	public String getSjcs() {
@@ -131,6 +133,19 @@ public class RelacionesItem {
 	public void setCentrodetencion(String centrodetencion) {
 		this.centrodetencion = centrodetencion;
 	}
+	
+	public Date getFechaasunto() {
+		return fechaasunto;
+	}
+	public void setFechaasunto(Date fechaasunto) {
+		this.fechaasunto = fechaasunto;
+	}
+	public String getDilnigproc() {
+		return dilnigproc;
+	}
+	public void setDilnigproc(String dilnigproc) {
+		this.dilnigproc = dilnigproc;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -138,9 +153,11 @@ public class RelacionesItem {
 		result = prime * result + ((anio == null) ? 0 : anio.hashCode());
 		result = prime * result + ((centrodetencion == null) ? 0 : centrodetencion.hashCode());
 		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
-		result = prime * result + ((destipo == null) ? 0 : destipo.hashCode());
 		result = prime * result + ((descturno == null) ? 0 : descturno.hashCode());
+		result = prime * result + ((destipo == null) ? 0 : destipo.hashCode());
 		result = prime * result + ((dictamen == null) ? 0 : dictamen.hashCode());
+		result = prime * result + ((dilnigproc == null) ? 0 : dilnigproc.hashCode());
+		result = prime * result + ((fechaasunto == null) ? 0 : fechaasunto.hashCode());
 		result = prime * result + ((fechadictamen == null) ? 0 : fechadictamen.hashCode());
 		result = prime * result + ((fecharesolucion == null) ? 0 : fecharesolucion.hashCode());
 		result = prime * result + ((idinstitucion == null) ? 0 : idinstitucion.hashCode());
@@ -179,20 +196,30 @@ public class RelacionesItem {
 				return false;
 		} else if (!codigo.equals(other.codigo))
 			return false;
-		if (destipo == null) {
-			if (other.destipo != null)
-				return false;
-		} else if (!destipo.equals(other.destipo))
-			return false;
 		if (descturno == null) {
 			if (other.descturno != null)
 				return false;
 		} else if (!descturno.equals(other.descturno))
 			return false;
+		if (destipo == null) {
+			if (other.destipo != null)
+				return false;
+		} else if (!destipo.equals(other.destipo))
+			return false;
 		if (dictamen == null) {
 			if (other.dictamen != null)
 				return false;
 		} else if (!dictamen.equals(other.dictamen))
+			return false;
+		if (dilnigproc == null) {
+			if (other.dilnigproc != null)
+				return false;
+		} else if (!dilnigproc.equals(other.dilnigproc))
+			return false;
+		if (fechaasunto == null) {
+			if (other.fechaasunto != null)
+				return false;
+		} else if (!fechaasunto.equals(other.fechaasunto))
 			return false;
 		if (fechadictamen == null) {
 			if (other.fechadictamen != null)
@@ -263,7 +290,8 @@ public class RelacionesItem {
 				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", descturno="
 				+ descturno + ", destipo=" + destipo + ", interesado=" + interesado + ", dictamen=" + dictamen
 				+ ", fechadictamen=" + fechadictamen + ", resolucion=" + resolucion + ", fecharesolucion="
-				+ fecharesolucion + ", centrodetencion=" + centrodetencion + "]";
+				+ fecharesolucion + ", centrodetencion=" + centrodetencion + ", fechaasunto=" + fechaasunto
+				+ ", dilnigproc=" + dilnigproc + "]";
 	}
 	
 	/**
