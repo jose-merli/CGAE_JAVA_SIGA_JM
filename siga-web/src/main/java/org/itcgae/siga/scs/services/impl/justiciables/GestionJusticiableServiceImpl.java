@@ -1,6 +1,5 @@
 package org.itcgae.siga.scs.services.impl.justiciables;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +64,6 @@ import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsMinusvaliaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsParentescoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsPonenteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProfesionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTelefonosPersonaExtendsMapper;

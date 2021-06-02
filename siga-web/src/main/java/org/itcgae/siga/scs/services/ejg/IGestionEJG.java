@@ -20,8 +20,6 @@ import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.itcgae.siga.DTOs.gen.Error;
 
 public interface IGestionEJG {
 
@@ -79,7 +77,7 @@ public interface IGestionEJG {
 
 	EjgDesignaDTO getEjgDesigna(EjgItem datos, HttpServletRequest request); 
 	
-	ComunicacionesDTO getComunicaciones(List<String> item, HttpServletRequest request);
+	ComunicacionesDTO getComunicaciones(EjgItem item, HttpServletRequest request);
 
 	InsertResponseDTO insertFamiliarEJG(List<String> item, HttpServletRequest request);
 

@@ -376,7 +376,7 @@ public class EjgController {
 	}
 	
 	@RequestMapping(value = "/gestion-ejg/getComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComunicacionesDTO> getComunicaciones(@RequestBody List<String> item, HttpServletRequest request) {
+	ResponseEntity<ComunicacionesDTO> getComunicaciones(@RequestBody EjgItem item, HttpServletRequest request) {
 		ComunicacionesDTO response = gestionEJG.getComunicaciones(item, request);
 		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
 	}
