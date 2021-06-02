@@ -26,12 +26,15 @@ import org.itcgae.siga.DTOs.scs.AsuntosEjgItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosSOJItem;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.DTOs.scs.JusticiableDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoItem;
+import org.itcgae.siga.DTOs.scs.ScsUnidadfamiliarejgDTO;
+import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -48,6 +51,7 @@ import org.itcgae.siga.db.entities.ScsTelefonospersona;
 import org.itcgae.siga.db.entities.ScsTelefonospersonaExample;
 import org.itcgae.siga.db.entities.ScsTelefonospersonaKey;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
+import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -2453,7 +2457,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 					//Modificamos el familiar
 
-					if(datos.getIncapacitado() != null) familiar.setSolicitante(Short.parseShort(datos.getUf_solicitante()));
+					if(datos.getUf_solicitante() != null) {
+						familiar.setSolicitante(Short.parseShort(datos.getUf_solicitante()));
+						if(datos.getUf_solicitante().equals("1"))familiar.setEncalidadde("SOLICITANTE");
+						else familiar.setEncalidadde(null);
+					}
 					if(datos.getIncapacitado() != null) familiar.setIncapacitado(datos.getIncapacitado());
 					if(datos.getCircunsExcep() != null) familiar.setCircunstanciasExcepcionales(datos.getCircunsExcep());
 
@@ -2500,6 +2508,62 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		}
 		return updateResponseDTO;
+	}
+	
+	@Override
+	public ScsUnidadfamiliarejgDTO getSolicitante(EjgItem datos, HttpServletRequest request) {
+		LOGGER.info("getSolicitante() ->  Entrada al servicio para obtener el solicitante");
+
+		ScsUnidadfamiliarejgDTO solicitante = new ScsUnidadfamiliarejgDTO();
+		
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getSolicitante() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getSolicitante() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					//Buscamos aquella entrada que es la solicitante principal de nuestro ejg
+					ScsUnidadfamiliarejgExample example = new ScsUnidadfamiliarejgExample();
+
+					example.createCriteria().andAnioEqualTo(Short.parseShort(datos.getAnnio())).andIdinstitucionEqualTo(idInstitucion).
+					andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG())).andNumeroEqualTo(Long.parseLong(datos.getNumero())).
+					andSolicitanteEqualTo((short) 1);
+
+					//Actualizamos la entrada
+					solicitante.setunidadFamiliarItems(scsUnidadfamiliarejgMapper.selectByExample(example));					
+
+				} catch (Exception e) {
+					LOGGER.error(e);
+					error.setCode(500);
+					error.setDescription("general.mensaje.error.bbdd");
+				}
+
+				if(error.getCode()==null) {
+					error.setCode(200);
+				}
+				
+				solicitante.setError(error);
+			}
+
+		}
+		return solicitante;
 	}
 
 }

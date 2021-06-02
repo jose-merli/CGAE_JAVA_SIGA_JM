@@ -6,11 +6,13 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.JusticiableBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.DTOs.scs.JusticiableDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
+import org.itcgae.siga.DTOs.scs.ScsUnidadfamiliarejgDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.scs.services.justiciables.IBusquedaJusticiablesService;
 import org.itcgae.siga.scs.services.justiciables.IGestionJusticiableService;
@@ -130,6 +132,16 @@ public class JusticiablesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "/gestionJusticiables/getSolicitante", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ScsUnidadfamiliarejgDTO> getSolicitante(@RequestBody EjgItem unidadFamiliarItem, HttpServletRequest request) {
+
+		ScsUnidadfamiliarejgDTO response = gestionJusticiableService.getSolicitante(unidadFamiliarItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<ScsUnidadfamiliarejgDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ScsUnidadfamiliarejgDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "/gestionJusticiables/updateDatosSolicitudJusticiable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
