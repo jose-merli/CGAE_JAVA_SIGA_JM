@@ -16,6 +16,8 @@ public class RelacionesItem {
 	private String descturno;
 	private String destipo;
 	private String interesado;
+	private String impugnacion;
+	private Date fechaimpugnacion;
 	private String dictamen;
 	private Date fechadictamen;
 	private String resolucion;
@@ -103,6 +105,19 @@ public class RelacionesItem {
 	public void setInteresado(String interesado) {
 		this.interesado = interesado;
 	}
+	
+	public String getImpugnacion() {
+		return impugnacion;
+	}
+	public void setImpugnacion(String impugnacion) {
+		this.impugnacion = impugnacion;
+	}
+	public Date getFechaimpugnacion() {
+		return fechaimpugnacion;
+	}
+	public void setFechaimpugnacion(Date fechaimpugnacion) {
+		this.fechaimpugnacion = fechaimpugnacion;
+	}
 	public String getDictamen() {
 		return dictamen;
 	}
@@ -159,12 +174,14 @@ public class RelacionesItem {
 		result = prime * result + ((dilnigproc == null) ? 0 : dilnigproc.hashCode());
 		result = prime * result + ((fechaasunto == null) ? 0 : fechaasunto.hashCode());
 		result = prime * result + ((fechadictamen == null) ? 0 : fechadictamen.hashCode());
+		result = prime * result + ((fechaimpugnacion == null) ? 0 : fechaimpugnacion.hashCode());
 		result = prime * result + ((fecharesolucion == null) ? 0 : fecharesolucion.hashCode());
 		result = prime * result + ((idinstitucion == null) ? 0 : idinstitucion.hashCode());
 		result = prime * result + ((idletrado == null) ? 0 : idletrado.hashCode());
 		result = prime * result + ((idtipo == null) ? 0 : idtipo.hashCode());
 		result = prime * result + ((idturno == null) ? 0 : idturno.hashCode());
 		result = prime * result + ((idturnodesigna == null) ? 0 : idturnodesigna.hashCode());
+		result = prime * result + ((impugnacion == null) ? 0 : impugnacion.hashCode());
 		result = prime * result + ((interesado == null) ? 0 : interesado.hashCode());
 		result = prime * result + ((letrado == null) ? 0 : letrado.hashCode());
 		result = prime * result + ((numero == null) ? 0 : numero.hashCode());
@@ -226,6 +243,11 @@ public class RelacionesItem {
 				return false;
 		} else if (!fechadictamen.equals(other.fechadictamen))
 			return false;
+		if (fechaimpugnacion == null) {
+			if (other.fechaimpugnacion != null)
+				return false;
+		} else if (!fechaimpugnacion.equals(other.fechaimpugnacion))
+			return false;
 		if (fecharesolucion == null) {
 			if (other.fecharesolucion != null)
 				return false;
@@ -255,6 +277,11 @@ public class RelacionesItem {
 			if (other.idturnodesigna != null)
 				return false;
 		} else if (!idturnodesigna.equals(other.idturnodesigna))
+			return false;
+		if (impugnacion == null) {
+			if (other.impugnacion != null)
+				return false;
+		} else if (!impugnacion.equals(other.impugnacion))
 			return false;
 		if (interesado == null) {
 			if (other.interesado != null)
@@ -288,10 +315,11 @@ public class RelacionesItem {
 		return "RelacionesItem [sjcs=" + sjcs + ", idinstitucion=" + idinstitucion + ", anio=" + anio + ", numero="
 				+ numero + ", idletrado=" + idletrado + ", letrado=" + letrado + ", idturno=" + idturno
 				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", descturno="
-				+ descturno + ", destipo=" + destipo + ", interesado=" + interesado + ", dictamen=" + dictamen
-				+ ", fechadictamen=" + fechadictamen + ", resolucion=" + resolucion + ", fecharesolucion="
-				+ fecharesolucion + ", centrodetencion=" + centrodetencion + ", fechaasunto=" + fechaasunto
-				+ ", dilnigproc=" + dilnigproc + "]";
+				+ descturno + ", destipo=" + destipo + ", interesado=" + interesado + ", impugnacion=" + impugnacion
+				+ ", fechaimpugnacion=" + fechaimpugnacion + ", dictamen=" + dictamen + ", fechadictamen="
+				+ fechadictamen + ", resolucion=" + resolucion + ", fecharesolucion=" + fecharesolucion
+				+ ", centrodetencion=" + centrodetencion + ", fechaasunto=" + fechaasunto + ", dilnigproc=" + dilnigproc
+				+ "]";
 	}
 	
 	/**

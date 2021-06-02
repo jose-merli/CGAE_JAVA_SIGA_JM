@@ -2628,9 +2628,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                   ELSE\r\n"
 				+ "                   ', '\r\n"
 				+ "                END || perjg.nombre interesado");
+		sql2.SELECT( "null impugnacion");
+        sql2.SELECT(" null fechaimpugnacion");
 		sql2.SELECT(" null dictamen");
 		sql2.SELECT(" null fechadictamen");
-		sql2.SELECT(" null resolucion");
+		sql2.SELECT(" 'Sin resolución' resolucion");
 		sql2.SELECT(" null fecharesolucion");
 		sql2.SELECT(" f_siga_getrecurso(com.nombre,1) centrodetencion");
 		sql2.SELECT(" fechahora fechaasunto");
@@ -2697,6 +2699,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                   ELSE\r\n"
 				+ "                   ', '\r\n"
 				+ "                END || perjg.nombre interesado");
+		sql5.SELECT(" imp.descripcion impugnacion");
+		sql5.SELECT(" fechaauto fechaimpugnacion");
 		sql5.SELECT(" f_siga_getrecurso(dic.descripcion,1) dictamen");
 		sql5.SELECT(" fechadictamen");
 		sql5.SELECT(" f_siga_getrecurso(res.descripcion,1) resolucion");
@@ -2716,6 +2720,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql5.JOIN(" scs_personajg perjg on perjg.idpersona = e.idpersonajg and e.idinstitucion = perjg.idinstitucion");
 		sql5.LEFT_OUTER_JOIN(" scs_tipodictamenejg dic on e.idtipodictamenejg = dic.idtipodictamenejg and e.idinstitucion = dic.idinstitucion");
 		sql5.LEFT_OUTER_JOIN(" scs_tiporesolucion res on e.IDTIPORATIFICACIONEJG = res.idtiporesolucion");
+		sql5.LEFT_OUTER_JOIN(" scs_tiporesolauto imp ON e.idtiporesolauto = imp.idtiporesolauto");
 		sql5.WHERE(" ed.aniodesigna = " + designaAnio);
 		sql5.WHERE(" ed.numerodesigna = " + designaNumero);
 		sql5.WHERE(" ed.idturno = " + designaTurno);
