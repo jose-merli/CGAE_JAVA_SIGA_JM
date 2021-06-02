@@ -236,7 +236,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			sql2.WHERE("COL.TIPO = '" + busquedaJuridicaSearchDTO.getTipo() + "'");
 		}
 		else {
-			sql2.WHERE("COL.TIPO IN('0','A','B','C','D','E','F','G','H','J','P','Q','R','S','U','V')");
+			//sql2.WHERE("COL.TIPO IN('0','A','B','C','D','E','F','G','H','J','P','Q','R','S','U','V')");
 		}
 		
 
