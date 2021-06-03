@@ -1319,8 +1319,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if (item.getSinEJG() != null && !item.getSinEJG().isEmpty()) {
 			if (item.getSinEJG().equals("0")) {
 				sql.append(" AND ejg.anio is not null ");
-			} else {
-				sql.append(" AND ejg.anio is null ");
 			}
 		}
 		if ((item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty())) {
@@ -1632,11 +1630,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String comboDelitos(DesignaItem designaItem, Short idInstitucion) {
 
 		SQL sql = new SQL();
-		sql.SELECT("D.IDDELITO, F_SIGA_GETRECURSO(D.DESCRIPCION, 1) as DESCRIPCION ");
-		sql.FROM("SCS_DELITO D ");
-		sql.INNER_JOIN("SCS_DELITOSDESIGNA DD ON D.IDINSTITUCION = DD.IDINSTITUCION AND D.IDDELITO=DD.IDDELITO ");
+		sql.SELECT("D.IDDELITO");
+		sql.SELECT("F_SIGA_GETRECURSO(D.DESCRIPCION, 1) as DESCRIPCION");
+		sql.FROM("SCS_DELITO D");
+		sql.INNER_JOIN("SCS_DELITOSDESIGNA DD ON D.IDINSTITUCION = DD.IDINSTITUCION AND D.IDDELITO = DD.IDDELITO");
 		sql.WHERE("DD.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("DD.NUMERO = " + designaItem.getNumero());
 		sql.WHERE("DD.IDTURNO = " + designaItem.getIdTurno());
+		sql.WHERE("DD.ANIO = " + designaItem.getAno());
 
 		return sql.toString();
 	}
@@ -2582,54 +2583,170 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String busquedaRelaciones(String anio, String num, String idTurno, String idinstitucion) {
+	public String busquedaRelaciones(String idInstitucion, String designaAnio, String designaNumero, String designaTurno) {
+		//Consulta padre que engloba al resto para usar un where general, etc.
 		SQL sql = new SQL();
+		
+		//Primera consulta
 		SQL sql2 = new SQL();
-
-		sql2.SELECT("TRIM('ASISTENCIA') sjcs,\r\n" + "	            idinstitucion        idinstitucion,\r\n"
-				+ "	            anio                 anio,\r\n" + "	            numero               numero,\r\n"
-				+ "	            idpersonacolegiado   idletrado,\r\n" + "	            to_char(idturno) idturno,\r\n"
-				+ "	            to_char(designa_turno) idturnodesigna,\r\n"
-				+ "	            to_char(idtipoasistencia) idtipo,\r\n" + "	            to_char(numero) codigo, (\r\n"
-				+ "	                SELECT\r\n" + "	                    abreviatura\r\n"
-				+ "	                FROM\r\n" + "	                    scs_turno\r\n" + "	                WHERE\r\n"
-				+ "	                    idturno = scs_asistencia.idturno\r\n"
-				+ "	                    AND idinstitucion = scs_asistencia.idinstitucion\r\n"
-				+ "	            ) des_turno,\r\n" + "	            (\r\n" + "	                SELECT\r\n"
-				+ "	                    f_siga_getrecurso(descripcion, 1)\r\n" + "	                FROM\r\n"
-				+ "	                    scs_tipoasistencia\r\n" + "	                WHERE\r\n"
-				+ "	                    scs_tipoasistencia.idtipoasistencia = scs_asistencia.idtipoasistencia\r\n"
-				+ "	            ) des_tipo\r\n" + "	        FROM\r\n" + "	            scs_asistencia\r\n"
-				+ "	        WHERE\r\n" + "	            designa_anio = 2020\r\n"
-				+ "	            AND designa_numero = 1\r\n" + "	            AND designa_turno = 4024\r\n"
-				+ "	            AND idinstitucion = 2005\r\n" + "	        UNION\r\n" + "	        SELECT\r\n"
-				+ "	            TRIM('EJG') sjcs,\r\n" + "	            e.idinstitucion   idinstitucion,\r\n"
-				+ "	            e.anio            anio,\r\n" + "	            e.numero          numero,\r\n"
-				+ "	            e.idpersona       idletrado,\r\n"
-				+ "	            to_char(e.guardiaturno_idturno) idturno,\r\n"
-				+ "	            to_char(ed.idturno) idturnodesigna,\r\n"
-				+ "	            to_char(e.idtipoejg) idtipo,\r\n" + "	            lpad(e.numejg, 5, 0) codigo,\r\n"
-				+ "	            (\r\n" + "	                SELECT\r\n" + "	                    abreviatura\r\n"
-				+ "	                FROM\r\n" + "	                    scs_turno\r\n" + "	                WHERE\r\n"
-				+ "	                    idturno = e.guardiaturno_idturno\r\n"
-				+ "	                    AND idinstitucion = e.idinstitucion\r\n" + "	            ) des_turno,\r\n"
-				+ "	            (\r\n" + "	                SELECT\r\n"
-				+ "	                    f_siga_getrecurso(descripcion, 1)\r\n" + "	                FROM\r\n"
-				+ "	                    scs_tipoejg\r\n" + "	                WHERE\r\n"
-				+ "	                    scs_tipoejg.idtipoejg = e.idtipoejg\r\n" + "	            ) des_tipo\r\n"
-				+ "	        FROM\r\n" + "	            scs_ejg          e,\r\n"
-				+ "	            scs_ejgdesigna   ed\r\n" + "	        WHERE\r\n" + "	            ed.aniodesigna = "
-				+ anio + "\r\n" + "	            AND ed.numerodesigna = " + num + "\r\n"
-				+ "	            AND ed.idturno = " + idTurno + "\r\n" + "	            AND ed.idinstitucion = "
-				+ idinstitucion + "\r\n" + "	            AND ed.idinstitucion = e.idinstitucion\r\n"
-				+ "	            AND ed.anioejg = e.anio\r\n" + "	            AND ed.numeroejg = e.numero\r\n"
-				+ "	            AND ed.idtipoejg = e.idtipoejg\r\n"
-				+ "	            AND ed.idinstitucion = e.idinstitucion\r\n");
-
-		sql.SELECT("*");
-		sql.FROM("( " + sql2.toString() + " )");
-		sql.WHERE("ROWNUM <= 200");
-		sql.ORDER_BY("sjcs,\r\n" + "	    idinstitucion,\r\n" + "	    anio DESC,\r\n" + "	    codigo DESC ");
+		sql2.SELECT(" substr(\r\n"
+				+ "                TRIM('ASISTENCIA'),\r\n"
+				+ "                1,\r\n"
+				+ "                1\r\n"
+				+ "            )\r\n"
+				+ "             || anio\r\n"
+				+ "             || '/'\r\n"
+				+ "             || TO_CHAR(numero) sjcs");
+		sql2.SELECT(" asi.idinstitucion");
+		sql2.SELECT(" anio");
+		sql2.SELECT(" numero");
+		sql2.SELECT(" idpersonacolegiado idletrado");
+		sql2.SELECT(" cen_persona.apellidos2\r\n"
+				+ "             || ' '\r\n"
+				+ "             || cen_persona.apellidos1\r\n"
+				+ "             || ','\r\n"
+				+ "             || cen_persona.nombre letrado");
+		sql2.SELECT(" TO_CHAR(idturno) idturno");
+		sql2.SELECT(" TO_CHAR(designa_turno) idturnodesigna");
+		sql2.SELECT(" TO_CHAR(idtipoasistencia) idtipo");
+		sql2.SELECT(" TO_CHAR(numero) codigo");
+		
+		//Subconsulta sql2
+		SQL sql3= new SQL();
+		sql3.SELECT(" nombre");
+		sql3.FROM(" SCS_GUARDIASTURNO");
+		sql3.WHERE(" idturno = asi.idturno");
+		sql3.WHERE(" idturno = asi.idturno\r\n"
+				+ "                        AND\r\n"
+				+ "                            idinstitucion = asi.idinstitucion\r\n"
+				+ "                        AND idguardia = asi.IDGUARDIA");
+		sql2.SELECT(" (" + sql3.toString() + ")" + "desc_turno");
+		
+		//Subconsulta sql2
+		SQL sql4 = new SQL();
+		sql4.SELECT(" f_siga_getrecurso(\r\n"
+				+ "                        descripcion,\r\n"
+				+ "                        1\r\n"
+				+ "                    )");
+		sql4.FROM(" scs_tipoasistencia");
+		sql4.WHERE(" idturno = asi.idturno");
+		sql4.WHERE(" idturno = asi.idturno\r\n"
+				+ "                        AND\r\n"
+				+ "                            scs_tipoasistencia.idtipoasistencia = asi.idtipoasistencia");
+		sql2.SELECT("(" + sql4.toString() + ")" + "des_tipo");
+		
+		sql2.SELECT(" perjg.apellido1\r\n"
+				+ "               ||  \r\n"
+				+ "                CASE WHEN perjg.apellido2 is not null then \r\n"
+				+ "                     ' ' || perjg.apellido2 || ', '\r\n"
+				+ "                   ELSE\r\n"
+				+ "                   ', '\r\n"
+				+ "                END || perjg.nombre interesado");
+		sql2.SELECT( "null impugnacion");
+        sql2.SELECT(" null fechaimpugnacion");
+		sql2.SELECT(" null dictamen");
+		sql2.SELECT(" null fechadictamen");
+		sql2.SELECT(" 'Sin resolución' resolucion");
+		sql2.SELECT(" null fecharesolucion");
+		sql2.SELECT(" f_siga_getrecurso(com.nombre,1) centrodetencion");
+		sql2.SELECT(" fechahora fechaasunto");
+		sql2.SELECT(" NVL(numerodiligencia,'Sin número') || ' - ' || NVL(nig,'Sin número') || ' - ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
+		sql2.FROM(" scs_asistencia asi");
+		sql2.JOIN(" cen_persona ON cen_persona.idpersona = asi.idpersonacolegiado");
+		sql2.JOIN(" scs_personajg perjg on perjg.idpersona = asi.idpersonajg and asi.idinstitucion = perjg.idinstitucion");
+		sql2.LEFT_OUTER_JOIN(" scs_comisaria com on asi.comisaria = com.idcomisaria and asi.comisariaidinstitucion = com.idinstitucion");
+		sql2.WHERE(" designa_anio = " + designaAnio);
+		sql2.WHERE(" designa_numero = " + designaNumero);
+		sql2.WHERE(" designa_turno = " + designaTurno );
+		sql2.WHERE(" asi.idinstitucion = " + idInstitucion);
+		
+		//Segunda consulta
+		SQL sql5 = new SQL();
+		sql5.SELECT(" substr(\r\n"
+				+ "                TRIM('EJG'),\r\n"
+				+ "                1,\r\n"
+				+ "                1\r\n"
+				+ "            )\r\n"
+				+ "             || anio\r\n"
+				+ "             || '/'\r\n"
+				+ "             || TO_CHAR(numero) sjcs");
+		sql5.SELECT(" e.idinstitucion");
+		sql5.SELECT(" e.anio");
+		sql5.SELECT(" e.numero");
+		sql5.SELECT(" e.idpersona idletrado");
+		sql5.SELECT(" cen_persona.apellidos2\r\n"
+				+ "             || ' '\r\n"
+				+ "             || cen_persona.apellidos1\r\n"
+				+ "             || ','\r\n"
+				+ "             || cen_persona.nombre letrado");
+		sql5.SELECT(" TO_CHAR(e.guardiaturno_idturno) idturno");
+		sql5.SELECT(" TO_CHAR(ed.idturno) idturnodesigna");
+		sql5.SELECT(" TO_CHAR(e.idtipoejg) idtipo");
+		sql5.SELECT(" lpad(\r\n"
+				+ "                e.numejg,\r\n"
+				+ "                5,\r\n"
+				+ "                0\r\n"
+				+ "            ) codigo");
+		
+		//Subconsulta sql5
+		SQL sql6 = new SQL();
+		sql6.SELECT(" abreviatura");
+		sql6.FROM(" scs_turno");
+		sql6.WHERE(" idturno = e.guardiaturno_idturno");
+		sql6.WHERE(" idinstitucion = e.idinstitucion");
+		sql5.SELECT(" (" + sql6.toString() + ")" + "des_turno");
+		
+		//Subconsulta sql5
+		SQL sql7 = new SQL();
+		sql7.SELECT(" f_siga_getrecurso(\r\n"
+				+ "                        descripcion,\r\n"
+				+ "                        1\r\n"
+				+ "                    )");
+		sql7.FROM(" scs_tipoejg");
+		sql7.WHERE(" scs_tipoejg.idtipoejg = e.idtipoejg");
+		sql5.SELECT(" (" + sql7.toString() + ")" + "des_tipo");
+		
+		sql5.SELECT(" perjg.apellido1\r\n"
+				+ "               ||  \r\n"
+				+ "                CASE WHEN perjg.apellido2 is not null then \r\n"
+				+ "                     ' ' || perjg.apellido2 || ', '\r\n"
+				+ "                   ELSE\r\n"
+				+ "                   ', '\r\n"
+				+ "                END || perjg.nombre interesado");
+		sql5.SELECT(" imp.descripcion impugnacion");
+		sql5.SELECT(" fechaauto fechaimpugnacion");
+		sql5.SELECT(" f_siga_getrecurso(dic.descripcion,1) dictamen");
+		sql5.SELECT(" fechadictamen");
+		sql5.SELECT(" f_siga_getrecurso(res.descripcion,1) resolucion");
+		sql5.SELECT(" e.FECHARESOLUCIONCAJG fecharesolucion");
+		sql5.SELECT(" null centrodetencion");
+		sql5.SELECT(" fechaapertura fechaasunto");
+		sql5.SELECT(" NVL(numerodiligencia,'Sin número') || ' - ' || NVL(nig,'Sin número') || ' - ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
+		sql5.FROM(" scs_ejg e");
+		sql5.JOIN(" scs_ejgdesigna ed on ed.idinstitucion = e.idinstitucion\r\n"
+				+ "                AND\r\n"
+				+ "                    ed.anioejg = e.anio\r\n"
+				+ "                AND\r\n"
+				+ "                    ed.numeroejg = e.numero\r\n"
+				+ "                AND\r\n"
+				+ "                    ed.idtipoejg = e.idtipoejg");
+		sql5.JOIN(" cen_persona on cen_persona.idpersona = e.idpersona");
+		sql5.JOIN(" scs_personajg perjg on perjg.idpersona = e.idpersonajg and e.idinstitucion = perjg.idinstitucion");
+		sql5.LEFT_OUTER_JOIN(" scs_tipodictamenejg dic on e.idtipodictamenejg = dic.idtipodictamenejg and e.idinstitucion = dic.idinstitucion");
+		sql5.LEFT_OUTER_JOIN(" scs_tiporesolucion res on e.IDTIPORATIFICACIONEJG = res.idtiporesolucion");
+		sql5.LEFT_OUTER_JOIN(" scs_tiporesolauto imp ON e.idtiporesolauto = imp.idtiporesolauto");
+		sql5.WHERE(" ed.aniodesigna = " + designaAnio);
+		sql5.WHERE(" ed.numerodesigna = " + designaNumero);
+		sql5.WHERE(" ed.idturno = " + designaTurno);
+		sql5.WHERE(" ed.idinstitucion = " +  idInstitucion);
+		
+		sql.SELECT(" *");
+		sql.FROM("( " + sql2.toString() + "UNION " + sql5.toString() +" )");
+		sql.WHERE(" ROWNUM <= 200");
+		sql.ORDER_BY(" sjcs");
+		sql.ORDER_BY(" idinstitucion");
+		sql.ORDER_BY(" anio DESC");
+		sql.ORDER_BY(" codigo DESC");
 
 		return sql.toString();
 	}
@@ -2689,10 +2806,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
 			sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 			sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
+		} else {
+			sql.SET("FECHAJUSTIFICACION = NULL");
+			sql.SET("USUJUSTIFICACION = NULL");
+			sql.SET("FECHAUSUJUSTIFICACION = NULL");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservacionesJusti())) {
 			sql.SET("OBSERVACIONESJUSTIFICACION = '" + actuacionDesignaItem.getObservacionesJusti() + "'");
+		} else {
+			sql.SET("OBSERVACIONESJUSTIFICACION = NULL");
 		}
 
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
