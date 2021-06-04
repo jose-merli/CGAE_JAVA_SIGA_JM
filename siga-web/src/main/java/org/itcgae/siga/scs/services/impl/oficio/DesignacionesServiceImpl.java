@@ -260,7 +260,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired 
 	private ITarjetaDatosDireccionesService tarjetaDatosDireccionesService;
-
+	
 	/**
 	 * busquedaJustificacionExpres
 	 */
@@ -3030,11 +3030,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						unLetrado.getIdturno().toString(), unLetrado.getIdpersona().toString(),
 						unLetrado.getInscripcionTurno().getFechasolicitud(), usuario);
 
-			}else {
-				//Marcar compensacion como usada
-				
 			}
-
+			
 		} catch (Exception e) {
 			LOGGER.error(e);
 			throw new Exception(e);
