@@ -3720,7 +3720,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				String num = procurador.get(0);
 				String idinstitucion = procurador.get(1);
 				String idturno = procurador.get(2);
-				procuradorItemList = scsDesignacionesExtendsMapper.busquedaProcurador(num, idinstitucion, idturno);
+				String anio = procurador.get(3).split("/")[0].substring(1);
+				procuradorItemList = scsDesignacionesExtendsMapper.busquedaProcurador(num, idinstitucion, idturno, anio);
 
 				LOGGER.info(
 						"busquedaProcurador() / scsProcuradorExtendsMapper.busquedaProcurador() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
