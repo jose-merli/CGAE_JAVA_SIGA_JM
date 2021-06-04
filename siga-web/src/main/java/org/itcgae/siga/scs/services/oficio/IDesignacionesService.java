@@ -210,4 +210,7 @@ public interface IDesignacionesService {
 	
 	public String busquedaJuzgadoDesignas(Integer idJuzgado, HttpServletRequest request);
 	
+	public UpdateResponseDTO actualizarPartidaPresupuestariaActDesigna(ActuacionDesignaItem actuacionDesignaItem,
+			HttpServletRequest request);
+	
 }

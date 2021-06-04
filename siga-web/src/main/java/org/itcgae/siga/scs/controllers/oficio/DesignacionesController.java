@@ -1026,4 +1026,12 @@ public class DesignacionesController {
 		return response;
 	}
 	
+	@PostMapping(value = "/designas/actualizarPartidaPresupuestariaActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> actualizarPartidaPresupuestariaActDesigna(
+			@RequestBody ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService
+				.actualizarPartidaPresupuestariaActDesigna(actuacionDesignaItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
 }

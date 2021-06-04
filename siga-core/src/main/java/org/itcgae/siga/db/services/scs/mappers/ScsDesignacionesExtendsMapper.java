@@ -308,7 +308,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHAUSUJUSTIFICACION", property = "fechaUsuJustificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "USUVALIDACION", property = "usuValidacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "VALIDARJUSTIFICACIONES", property = "validarJustificacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAVALIDACION", property = "fechaValidacion", jdbcType = JdbcType.VARCHAR) })
+			@Result(column = "FECHAVALIDACION", property = "fechaValidacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREPARTIDA", property = "partidaPresupuestaria", jdbcType = JdbcType.VARCHAR)})
 	List<ActuacionDesignaItem> busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			String idInstitucion);
 
@@ -721,4 +723,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@Results({ @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR) })
 	String busquedaJuzgadoDesignas(Integer idJuzgado, Short idInstitucion, Integer tamMaximo);
 	
+	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "actualizarPartidaPresupuestariaActDesigna")
+	int actualizarPartidaPresupuestariaActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion,
+			AdmUsuarios usuario);
 }

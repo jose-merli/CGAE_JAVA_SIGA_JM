@@ -2350,10 +2350,25 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					if (nigValido) {
+
 						MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actuacionDesignaItem,
 								idInstitucion);
 
 						actuacionDesignaItem.setNumeroAsunto(maxIdDto.getIdMax().toString());
+
+						// Marcamos por defecto la partida presupuestaria del turno
+						DesignaItem designaItem = new DesignaItem();
+						designaItem.setIdTurno(Integer.parseInt(actuacionDesignaItem.getIdTurno()));
+						designaItem.setAno(Integer.parseInt(actuacionDesignaItem.getAnio()));
+						designaItem.setNumero(Integer.parseInt(actuacionDesignaItem.getNumero()));
+
+						List<ComboItem> listaPartidasPresupuestarias = scsDesignacionesExtendsMapper
+								.getPartidaPresupuestariaDesigna(idInstitucion, designaItem);
+
+						if (!listaPartidasPresupuestarias.isEmpty()) {
+							actuacionDesignaItem
+									.setIdPartidaPresupuestaria(listaPartidasPresupuestarias.get(0).getValue());
+						}
 
 						int response = scsDesignacionesExtendsMapper.guardarActDesigna(actuacionDesignaItem,
 								Short.toString(idInstitucion), usuarios.get(0));
@@ -6520,6 +6535,61 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return designas;
+	}
+
+	@Override
+	public UpdateResponseDTO actualizarPartidaPresupuestariaActDesigna(ActuacionDesignaItem actuacionDesignaItem,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.actualizarPartidaPresupuestariaActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.actualizarPartidaPresupuestariaActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				int response = scsDesignacionesExtendsMapper.actualizarPartidaPresupuestariaActDesigna(
+						actuacionDesignaItem, idInstitucion, usuarios.get(0));
+
+				if (response == 1) {
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
+
+				if (response == 0) {
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.error(
+							"DesignacionesServiceImpl.actualizarPartidaPresupuestariaActDesigna() -> Se ha producido un error al altualizar la partidapresupuestaria de la actuación");
+					error.setCode(500);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setError(error);
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.actualizarPartidaPresupuestariaActDesigna() -> Se ha producido un error al altualizar la partidapresupuestaria de la actuación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			updateResponseDTO.setError(error);
+		}
+
+		return updateResponseDTO;
 	}
 
 }
