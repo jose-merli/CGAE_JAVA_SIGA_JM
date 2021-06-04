@@ -1953,19 +1953,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return resultV;
 	}
 
-	public String busquedaProcurador(String num, String idinstitucion, String idturno) {
+	public String busquedaProcurador(String num, String idinstitucion, String idturno, String anio) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 
 		sql2.SELECT(
 				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
 
-		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
+		sql2.FROM("SCS_DESIGNAPROCURADOR dp");
+		sql2.INNER_JOIN("SCS_PROCURADOR p on dp.idprocurador = p.idprocurador and dp.idinstitucion = p.idinstitucion");
 		sql2.WHERE("dp.idinstitucion = " + idinstitucion);
 		sql2.WHERE("dp.idturno = " + idturno);
 		sql2.WHERE("dp.numero =" + num);
-		sql2.WHERE("dp.idprocurador = p.idprocurador");
-		sql2.WHERE("dp.idinstitucion = p.idinstitucion");
+		sql2.WHERE("dp.anio=" + anio);
 		sql2.ORDER_BY("dp.FECHADESIGNA DESC");
 
 		sql.SELECT("*");
@@ -2337,11 +2337,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String actualizarProcurador(ProcuradorItem procuradorItem) {
 
 		SQL sql2 = new SQL();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String fechaDesigna = dateFormat.format(procuradorItem.getFechaDesigna());
 
 		sql2.DELETE_FROM("scs_designaprocurador");
-		sql2.WHERE("fechadesigna = TO_DATE('" + fechaDesigna + "','DD/MM/RRRR')");
+		sql2.WHERE("fechadesigna = TO_DATE('" + procuradorItem.getFechaDesigna() + "','DD/MM/YYYY')");
 		sql2.WHERE("numerodesignacion ='" + procuradorItem.getNumerodesignacion() + "'");
 
 		return sql2.toString();
