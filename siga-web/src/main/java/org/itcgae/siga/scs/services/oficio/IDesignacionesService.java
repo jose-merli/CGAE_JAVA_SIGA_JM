@@ -82,7 +82,7 @@ public interface IDesignacionesService {
 
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
 	
-	public List<DesignaItem> busquedaNuevaDesigna(@RequestBody DesignaItem item, HttpServletRequest request);
+	public List<DesignaItem> busquedaNuevaDesigna(@RequestBody DesignaItem item, HttpServletRequest request, boolean isNoColegiado);
 
 	public List<DesignaItem> busquedaProcedimientoDesignas(DesignaItem item, HttpServletRequest request);
 
@@ -207,5 +207,7 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO actualizarProcurador(List<String> procuradorItem, HttpServletRequest request);
 
 	UpdateResponseDTO guardarProcuradorEJG(List<String> procurador, HttpServletRequest request);
+	
+	public String busquedaJuzgadoDesignas(Integer idJuzgado, HttpServletRequest request);
 	
 }
