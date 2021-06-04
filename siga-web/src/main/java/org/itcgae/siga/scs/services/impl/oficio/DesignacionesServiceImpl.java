@@ -260,7 +260,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired 
 	private ITarjetaDatosDireccionesService tarjetaDatosDireccionesService;
-
+	
 	/**
 	 * busquedaJustificacionExpres
 	 */
@@ -3045,11 +3045,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						unLetrado.getIdturno().toString(), unLetrado.getIdpersona().toString(),
 						unLetrado.getInscripcionTurno().getFechasolicitud(), usuario);
 
-			}else {
-				//Marcar compensacion como usada
-				
 			}
-
+			
 		} catch (Exception e) {
 			LOGGER.error(e);
 			throw new Exception(e);
@@ -3735,7 +3732,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				String num = procurador.get(0);
 				String idinstitucion = procurador.get(1);
 				String idturno = procurador.get(2);
-				procuradorItemList = scsDesignacionesExtendsMapper.busquedaProcurador(num, idinstitucion, idturno);
+				String anio = procurador.get(3).split("/")[0].substring(1);
+				procuradorItemList = scsDesignacionesExtendsMapper.busquedaProcurador(num, idinstitucion, idturno, anio);
 
 				LOGGER.info(
 						"busquedaProcurador() / scsProcuradorExtendsMapper.busquedaProcurador() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
@@ -3904,7 +3902,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 
-					SimpleDateFormat format=new SimpleDateFormat("dd/MM/yyyy");
 					ProcuradorItem procuradorItem = new ProcuradorItem();
 
 					procuradorItem.setFechaDesigna(procurador.get(0));
@@ -3915,7 +3912,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procuradorItem.setObservaciones(procurador.get(5));
 					procuradorItem.setFecharenunciasolicita(procurador.get(6));
 					procuradorItem.setIdInstitucion(procurador.get(8));
-
+					procuradorItem.setNumero(procurador.get(9));
+					procuradorItem.setIdTurno(procurador.get(10));
+					
 					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem,procurador.get(7));
 
 				} catch (Exception e) {
