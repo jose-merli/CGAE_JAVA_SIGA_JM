@@ -2260,15 +2260,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String fechaFormat = dateFormat.format(fecha);
-
 		sql2.SELECT(
 				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
 
 		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
 		sql2.WHERE("dp.numerodesignacion = '" + numAnio + "'");
-		sql2.WHERE("dp.fechadesigna = TO_DATE('" + fechaFormat + "','DD/MM/RRRR')");
+		sql2.WHERE("dp.fechadesigna = TO_DATE('" + fecha + "','DD/MM/YYYY')");
 		sql2.WHERE("dp.idprocurador = p.idprocurador");
 		sql2.WHERE("dp.idinstitucion = p.idinstitucion");
 		sql2.ORDER_BY("dp.FECHADESIGNA DESC");
@@ -2285,21 +2282,22 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 		String [] part = procuradorItem.getNombre().split(",");
 		String nombre =part[1].substring(1);
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String fechaFormat = dateFormat.format(fecha);
-		String fechaDesigna = dateFormat.format(procuradorItem.getFechaDesigna());
-		String fechaRenuncia = dateFormat.format(procuradorItem.getFecharenunciasolicita());
 		
 		sql.UPDATE("scs_designaprocurador");
 
-		sql.SET("fechadesigna = TO_DATE('" + fechaDesigna + "','DD/MM/RRRR')");
+		sql.SET("fechadesigna = TO_DATE('" + procuradorItem.getFechaDesigna() + "','DD/MM/YYYY')");
 		sql.SET("numerodesignacion ='" + procuradorItem.getNumerodesignacion() + "'");
 		sql.SET("motivosrenuncia ='" + procuradorItem.getMotivosRenuncia() + "'");
-		sql.SET("fecharenunciasolicita = TO_DATE('" + fechaRenuncia + "','DD/MM/RRRR')");
+		sql.SET("fecharenunciasolicita = TO_DATE('" + procuradorItem.getFecharenunciasolicita() + "','DD/MM/YYYY')");
+		sql.SET("observaciones='"+procuradorItem.getObservaciones()+"'");
 
 		sql.WHERE("idinstitucion=" + procuradorItem.getIdInstitucion());
 		sql.WHERE("idprocurador=(SELECT IDPROCURADOR FROM SCS_PROCURADOR WHERE NCOLEGIADO = '"+procuradorItem.getnColegiado()+"' AND NOMBRE = '"+nombre+"')");
-		sql.WHERE("fecharenuncia =TO_DATE('"+fechaFormat+"','DD/MM/RRRR')");
+		if(fecha != null) {
+			sql.WHERE("fecharenuncia =TO_DATE('"+fecha+"','DD/MM/YYYY')");
+		}
+		sql.WHERE("idturno="+procuradorItem.getIdTurno());
+		sql.WHERE("numero="+procuradorItem.getNumero());
 
 		return sql.toString();
 	}

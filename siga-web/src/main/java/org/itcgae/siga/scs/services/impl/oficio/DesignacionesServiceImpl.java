@@ -3812,7 +3812,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 
-					SimpleDateFormat format=new SimpleDateFormat("dd/MM/yyyy");
 					ProcuradorItem procuradorItem = new ProcuradorItem();
 
 					procuradorItem.setFechaDesigna(procurador.get(0));
@@ -3823,7 +3822,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procuradorItem.setObservaciones(procurador.get(5));
 					procuradorItem.setFecharenunciasolicita(procurador.get(6));
 					procuradorItem.setIdInstitucion(procurador.get(8));
-
+					procuradorItem.setNumero(procurador.get(9));
+					procuradorItem.setIdTurno(procurador.get(10));
+					
 					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem,procurador.get(7));
 
 				} catch (Exception e) {
