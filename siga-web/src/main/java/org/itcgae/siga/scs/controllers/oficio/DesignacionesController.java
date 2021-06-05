@@ -143,7 +143,7 @@ public class DesignacionesController {
 	
 	@RequestMapping(value = "/busquedaNuevaDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<List<DesignaItem>> busquedaNuevaDesigna(@RequestBody DesignaItem item, HttpServletRequest request) {
-		List<DesignaItem> response = designacionesService.busquedaNuevaDesigna(item, request);
+		List<DesignaItem> response = designacionesService.busquedaNuevaDesigna(item, request, false);
 		if (response != null) {
 			return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
 		} else {
@@ -174,6 +174,19 @@ public class DesignacionesController {
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@RequestMapping(value = "/busquedaJuzgadoDesignas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<String> busquedaJuzgadoDesignas(@RequestBody Integer idJuzgado,
+			HttpServletRequest request) {
+		String response = designacionesService.busquedaJuzgadoDesignas(idJuzgado, request);
+		if (response != null) {
+			return new ResponseEntity<String>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>(new String(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 
 	// FIN Busqueda designaciones
 
@@ -1011,6 +1024,14 @@ public class DesignacionesController {
 		ResponseEntity<InputStreamResource> response = designacionesService
 				.descargarDocumentosDesigna(listaDocumentoDesignaItem, request);
 		return response;
+	}
+	
+	@PostMapping(value = "/designas/actualizarPartidaPresupuestariaActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> actualizarPartidaPresupuestariaActDesigna(
+			@RequestBody ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService
+				.actualizarPartidaPresupuestariaActDesigna(actuacionDesignaItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 }
