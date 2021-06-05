@@ -1142,7 +1142,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			String numero, JustificacionExpressItem item) {
 		StringBuilder sql = new StringBuilder();
 
-		sql.append("SELECT act.numero, ac.idacreditacion, ac.descripcion acreditacion, ac.idtipoacreditacion, ");
+		sql.append("SELECT act.facturado, act.numero, ac.idacreditacion, ac.descripcion acreditacion, ac.idtipoacreditacion, ");
 		sql.append(" decode(to_char(acp.porcentaje), to_char(trunc(acp.porcentaje)), to_char(acp.porcentaje), ");
 		sql.append(" f_siga_formatonumero(to_char(acp.porcentaje), 2)) porcentaje, tac.descripcion tipo, ");
 		sql.append(
@@ -1235,6 +1235,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" D.IDPROCEDIMIENTO, ");
 		sql.append(" D.NUMPROCEDIMIENTO, ");
 		sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
+		sql.append(" P.CODIGO CATEGORIA, ");
 		sql.append(" D.NIG, ");
 		sql.append(
 				" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION" );
@@ -1606,7 +1607,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String comboModulos(Short idInstitucion) {
 
 		SQL sql = new SQL();
-		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE ");
+		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE, MODULO.CODIGO ");
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 
