@@ -49,7 +49,7 @@ public class FoUtils
     public static void convertFO2PDF( File fo, File pdf, String resourceDir )
         throws TransformerException, SAXException, IOException
     {
-        /*try ( OutputStream out = new BufferedOutputStream( new FileOutputStream( pdf ) ) )
+        try ( OutputStream out = new BufferedOutputStream( new FileOutputStream( pdf ) ) )
         {
             URI baseURI = getBaseURI( fo, resourceDir );
             FopFactory fopFactory = new FopFactoryBuilder( baseURI ).build();
@@ -64,8 +64,9 @@ public class FoUtils
         catch ( FOPException | TransformerConfigurationException | IOException e )
         {
             throw new TransformerException( e );
-        }*/
-    	// Step 1: Construct a FopFactory by specifying a reference to the configuration file
+        }
+        /*
+        // Step 1: Construct a FopFactory by specifying a reference to the configuration file
     	// (reuse if you plan to render multiple documents!)
     	FopFactory fopFactory = FopFactory.newInstance(ResourceUtils.getFile("classpath:fopConf/fop.xconf"));
 
@@ -94,7 +95,7 @@ public class FoUtils
     	} finally {
     	    //Clean-up
     	    out.close();
-    	}
+    	}*/
     }
 
 
