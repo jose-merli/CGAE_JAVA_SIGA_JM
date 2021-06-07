@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosEjgItem;
@@ -201,16 +202,50 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getNumero")
 	String getNumero(short idTipoEJG, short anio, short idInstitucion);
 	
+	/**
+	 * getIdEnvio
+	 * 
+	 * @param num
+	 * @param anio
+	 * @param idInstitucion
+	 * @return
+	 */
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getIdEnvio")
+	@Results({})
+	String getIdEnvio(String num, String anio, Short idInstitucion);
+	
+	/**
+	 * getComunicaciones
+	 * 
+	 * @param idEnvio
+	 * @param idInstitucion
+	 * @param idLenguaje
+	 * @return
+	 */
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getComunicaciones")
-	@Results({
-			@Result(column = "DESCRIPCION", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHA", property = "fechaCreacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAPROGRAMADA", property = "fechaProgramacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
-			})
-	List<ComunicacionesItem> getComunicaciones(String num, String anio, String idTipoEJG, Short idInstitucion);
+		@Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+		    @Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC),
+	        @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "FECHACREACION", property = "fechaCreacion", jdbcType = JdbcType.DATE),
+	        @Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
+	        @Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
+	        @Result(column = "IDMODELOCOMUNICACION", property = "idModeloComunicacion", jdbcType = JdbcType.NUMERIC),
+	        @Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "NOMBREMODELO", property = "modeloComunicacion", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "NOMBREPLANTILLA", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "IDPLANTILLA", property = "idPlantilla", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "FECHAPROGRAMADA", property = "fechaProgramada", jdbcType = JdbcType.DATE),
+	        @Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+	        @Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "CUERPO", property = "cuerpo", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "IDGRUPO", property = "idGrupo", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "CSV", property = "csv", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "DESTINATARIO", property = "destinatario", jdbcType = JdbcType.VARCHAR)
+	})
+	List<EnviosMasivosItem> getComunicaciones(String idEnvio, Short idInstitucion, String idLenguaje);
 }
