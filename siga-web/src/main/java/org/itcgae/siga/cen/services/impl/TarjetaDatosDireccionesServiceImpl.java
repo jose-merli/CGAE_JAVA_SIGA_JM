@@ -134,7 +134,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		if(!datosDireccionesSearchDTO.getIdInstitucion().isEmpty()) {
+		if(null != datosDireccionesSearchDTO.getIdInstitucion() && !datosDireccionesSearchDTO.getIdInstitucion().isEmpty()) {
 			idInstitucion = Short.valueOf(datosDireccionesSearchDTO.getIdInstitucion());
 		}
 		if (null != idInstitucion) {
