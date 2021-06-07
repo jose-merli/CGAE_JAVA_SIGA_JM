@@ -2812,7 +2812,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.FROM("SCS_ACTUADESIG_MOTCAMBIO");
 
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		//sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("NOMBRE ASC");
 
 		return sql.toString();
 	}
