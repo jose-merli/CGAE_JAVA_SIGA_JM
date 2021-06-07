@@ -2349,10 +2349,25 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					if (nigValido) {
+
 						MaxIdDto maxIdDto = scsDesignacionesExtendsMapper.getNewIdActuDesigna(actuacionDesignaItem,
 								idInstitucion);
 
 						actuacionDesignaItem.setNumeroAsunto(maxIdDto.getIdMax().toString());
+
+						// Marcamos por defecto la partida presupuestaria del turno
+						DesignaItem designaItem = new DesignaItem();
+						designaItem.setIdTurno(Integer.parseInt(actuacionDesignaItem.getIdTurno()));
+						designaItem.setAno(Integer.parseInt(actuacionDesignaItem.getAnio()));
+						designaItem.setNumero(Integer.parseInt(actuacionDesignaItem.getNumero()));
+
+						List<ComboItem> listaPartidasPresupuestarias = scsDesignacionesExtendsMapper
+								.getPartidaPresupuestariaDesigna(idInstitucion, designaItem);
+
+						if (!listaPartidasPresupuestarias.isEmpty()) {
+							actuacionDesignaItem
+									.setIdPartidaPresupuestaria(listaPartidasPresupuestarias.get(0).getValue());
+						}
 
 						int response = scsDesignacionesExtendsMapper.guardarActDesigna(actuacionDesignaItem,
 								Short.toString(idInstitucion), usuarios.get(0));
@@ -4847,18 +4862,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							recordJust.setIdjuzgado(Long.parseLong(justificacion.getIdJuzgado()));
 						}
 
-						if (justificacion.getNig() != null && !justificacion.getNig().trim().isEmpty()) {
+						if (justificacion.getNig() != null && !justificacion.getNig().isEmpty()) {
 							recordJust.setNig(justificacion.getNig());
 						}
-//						
-//						if(justificacion.getEstado()!=null && justificacion.getEstado().trim().isEmpty()){
-//							recordJust.setEstado(justificacion.getEstado());
-//						}
-						if (justificacion.getProcedimiento() != null && !justificacion.getProcedimiento().trim().isEmpty()) {
+						
+						if(justificacion.getEstado()!=null && !justificacion.getEstado().isEmpty()){
+							recordJust.setEstado(justificacion.getEstado());
+						}
+						if (justificacion.getProcedimiento() != null && !justificacion.getProcedimiento().isEmpty()) {
 							recordJust.setIdprocedimiento(justificacion.getProcedimiento());
 						}
 						
-						if (justificacion.getNumProcedimiento() != null && !justificacion.getNumProcedimiento().trim().isEmpty()) {
+						if (justificacion.getNumProcedimiento() != null && !justificacion.getNumProcedimiento().isEmpty()) {
 							recordJust.setNumprocedimiento(justificacion.getNumProcedimiento());
 						}
 						
@@ -4872,45 +4887,45 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								ScsActuaciondesigna record = new ScsActuaciondesigna();
 
 								if (actuacion.getAnioProcedimiento() != null
-										&& !actuacion.getAnioProcedimiento().trim().isEmpty()) {
+										&& !actuacion.getAnioProcedimiento().isEmpty()) {
 									record.setAnioprocedimiento(Short.parseShort(actuacion.getAnioProcedimiento()));
 								}
 
-								if (actuacion.getFecha() != null && !actuacion.getFecha().trim().isEmpty()) {
+								if (actuacion.getFecha() != null && !actuacion.getFecha().isEmpty()) {
 									fecha = formatter.parse(actuacion.getFecha());
 									record.setFecha(fecha);
 								}
 
 								if (actuacion.getFechaJustificacion() != null && actuacion.getFechaJustificacion() != "false" && actuacion.getFechaJustificacion() != "true"
-										&& !actuacion.getFechaJustificacion().trim().isEmpty()) {
+										&& !actuacion.getFechaJustificacion().isEmpty()) {
 									fecha = formatter.parse(actuacion.getFechaJustificacion());
 									record.setFechajustificacion(fecha);
 								}
 
 								if (actuacion.getIdAcreditacion() != null
-										&& !actuacion.getIdAcreditacion().trim().isEmpty()) {
+										&& !actuacion.getIdAcreditacion().isEmpty()) {
 									record.setIdacreditacion(Short.parseShort(actuacion.getIdAcreditacion()));
 								}
 
-								if (actuacion.getIdJuzgado() != null && !actuacion.getIdJuzgado().trim().isEmpty()) {
+								if (actuacion.getIdJuzgado() != null && !actuacion.getIdJuzgado().isEmpty()) {
 									record.setIdjuzgado(Long.parseLong(actuacion.getIdJuzgado()));
 								}
 
 								if (actuacion.getIdProcedimiento() != null
-										&& !actuacion.getIdProcedimiento().trim().isEmpty()) {
+										&& !actuacion.getIdProcedimiento().isEmpty()) {
 									record.setIdprocedimiento(actuacion.getIdProcedimiento());
 								}
 
 								if (actuacion.getNumProcedimiento() != null
-										&& !actuacion.getNumProcedimiento().trim().isEmpty()) {
+										&& !actuacion.getNumProcedimiento().isEmpty()) {
 									record.setNumeroprocedimiento(actuacion.getNumProcedimiento());
 								}
 
-								if (actuacion.getNig() != null && !actuacion.getNig().trim().isEmpty()) {
+								if (actuacion.getNig() != null && !actuacion.getNig().isEmpty()) {
 									record.setNig(actuacion.getNig());
 								}
 
-								if (actuacion.getValidada() != null) {
+								if (actuacion.getValidada() != null && !actuacion.getValidada().isEmpty()) {
 									record.setValidada(actuacion.getValidada());
 								}
 
@@ -6518,6 +6533,61 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return designas;
+	}
+
+	@Override
+	public UpdateResponseDTO actualizarPartidaPresupuestariaActDesigna(ActuacionDesignaItem actuacionDesignaItem,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.actualizarPartidaPresupuestariaActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.actualizarPartidaPresupuestariaActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				int response = scsDesignacionesExtendsMapper.actualizarPartidaPresupuestariaActDesigna(
+						actuacionDesignaItem, idInstitucion, usuarios.get(0));
+
+				if (response == 1) {
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
+
+				if (response == 0) {
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.error(
+							"DesignacionesServiceImpl.actualizarPartidaPresupuestariaActDesigna() -> Se ha producido un error al altualizar la partidapresupuestaria de la actuación");
+					error.setCode(500);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setError(error);
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.actualizarPartidaPresupuestariaActDesigna() -> Se ha producido un error al altualizar la partidapresupuestaria de la actuación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			updateResponseDTO.setError(error);
+		}
+
+		return updateResponseDTO;
 	}
 
 }

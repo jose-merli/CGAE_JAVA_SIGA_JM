@@ -8,13 +8,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
@@ -30,6 +33,8 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
+import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.com.documentos.DataMailMergeDataSource;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.com.services.IPFDService;
@@ -37,6 +42,8 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.FoUtils;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.services.scs.mappers.ScsSaltoscompensacionesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,6 +61,12 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 	@Autowired
 	private IPFDService pfdService;
+	
+	@Autowired
+	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
+	
+	@Autowired
+	private ScsSaltoscompensacionesExtendsMapper scsSaltoscompensacionesExtendsMapper;
 
 	@Override
 	public Document sustituyeDocumento(Document doc, HashMap<String, Object> dato) throws Exception {
@@ -736,135 +749,232 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 	@Override
 	public DatosDocumentoItem generarFO(String plantilla, String rutaTmp, String nombreFicheroSalida,
-			HashMap<String, Object> hDatosFinal) throws IOException, Exception {
+			List<Map<String, Object>> hDatosFinal) throws IOException, Exception {
 		DatosDocumentoItem documento = new DatosDocumentoItem();
-		// 1. obteniendo plantilla FO
-		
-		File plantillaFO = new File(plantilla);
-		LOGGER.debug("*********** rutaFicheroFO: " + plantilla);
-
-		// 2. generando intermedio FOP a partir de plantilla y datos
-		// 2.1. obteniendo ruta para fichero intermedio FOP
-		String rutaFicheroFOP = rutaTmp 
-				+ nombreFicheroSalida + ".fo";
-		File ficheroFOP = new File(rutaFicheroFOP);
-
-		// 2.2. obteniendo texto de plantilla FO
-		String sPlantillaFO = UtilidadesString.getFileContent(plantillaFO);
-		
-		// 2.3. generando intermedio FOP, reemplazando los datos en la plantilla
-		//String content = reemplazarDatos(request, sPlantillaFO);
-		UtilidadesString.setFileContent(ficheroFOP, sPlantillaFO);
-
-		// 3. generando PDF final
-		// 3.1. obteniendo ruta para fichero PDF final
-		
-		File ficheroPDF = new File(nombreFicheroSalida);
-		LOGGER.debug("*********** rutaFicheroPDF: " + nombreFicheroSalida);
-
-		// 3.2. convirtiendo FOP a PDF
-//					Plantilla plantilla = new Plantilla(this.usuario);
-		FoUtils.convertFO2PDF(ficheroFOP, ficheroPDF,	rutaTmp);
-
-		// 3.3. borrando fichero intermedio FOP generado
-		ficheroFOP.delete();
-
-		// devolviendo el fichero PDF generado
-		try {
-			documento.setDatos(Files.readAllBytes(ficheroPDF.toPath()));
-			documento.setFileName(nombreFicheroSalida);
-			documento.setPathDocumento(rutaTmp);
-		} catch (IOException e) {
-			LOGGER.error("Error al devolver el fichero generado");
-			e.printStackTrace();
+		if(hDatosFinal != null && hDatosFinal.size() > 0) {
+			// 1. obteniendo plantilla FO
+			
+			File plantillaFO = new File(plantilla);
+			LOGGER.debug("*********** rutaFicheroFO: " + plantilla);
+	
+			// 2. generando intermedio FOP a partir de plantilla y datos
+			// 2.1. obteniendo ruta para fichero intermedio FOP
+			String rutaFicheroFOP = rutaTmp 
+					+ nombreFicheroSalida + ".fo";
+			File ficheroFOP = new File(rutaFicheroFOP);
+	
+			// 2.2. obteniendo texto de plantilla FO
+			String sPlantillaFO = UtilidadesString.getFileContent(plantillaFO);
+			
+			// 2.3. generando intermedio FOP, reemplazando los datos en la plantilla
+			String content = reemplazarDatos(hDatosFinal, sPlantillaFO);
+			UtilidadesString.setFileContent(ficheroFOP, content);
+	
+			// 3. generando PDF final
+			// 3.1. obteniendo ruta para fichero PDF final
+			
+			File ficheroPDF = new File(rutaTmp+nombreFicheroSalida);
+			LOGGER.debug("*********** rutaFicheroPDF: " + nombreFicheroSalida);
+	
+			// 3.2. convirtiendo FOP a PDF
+	//					Plantilla plantilla = new Plantilla(this.usuario);
+			FoUtils.convertFO2PDF(ficheroFOP, ficheroPDF,	rutaTmp);
+	
+			// 3.3. borrando fichero intermedio FOP generado
+			ficheroFOP.delete();
+	
+			// devolviendo el fichero PDF generado
+			try {
+				documento.setDatos(Files.readAllBytes(ficheroPDF.toPath()));
+				documento.setFileName(nombreFicheroSalida);
+				documento.setPathDocumento(rutaTmp);
+			} catch (IOException e) {
+				LOGGER.error("Error al devolver el fichero generado");
+				e.printStackTrace();
+			}
+		} else {
+			documento = null;
 		}
 		return documento;
 	}
 	
-	/*private void convertFO2PDF(File ficheroFOP, File ficheroPDF, String rutaTmp) {
-		// ¡OJO, Muy importante! 
-				// 1. Este metodo ha de ser sincronizado para que solo se ejecute de forma atomica.
-				//    Esto es por culpa de la configuración que se establece a nivel global (org.apache.fop.configuration.Configuration)
-				// 2. Y ha de ser estatico (de clase) para que funcione de verdad; 
-				//    Si no lo fuera, en cada instancia (objeto) creado de MasterReport se podria ejecutar este metodo sin sincronizacion con las demas instancias. 
-				//    De hecho, esto es lo que pasaba: se mezclaban las imagenes de un FO con las de otro.
-			    	OutputStream out = null;
-			    	FileOutputStream fileOut = null;
-			    	
-			        try {
-			        	    		
-			        	LOGGER.debug(">>> baseDir:" + rutaTmp);
-			        	
-			            org.apache.fop.configuration.Configuration.put("baseDir", rutaTmp);
-			            org.apache.fop.configuration.Configuration.put("fontBaseDir", SIGAReferences.getReference(SIGAReferences.RESOURCE_FILES.FOP_DIR.getFileName()));
-//			            new Options(new File(ClsConstants.FOP_CONFIG_FILE));
-			            new Options(SIGAReferences.getInputReference(SIGAReferences.RESOURCE_FILES.FOP));
-
-			            LOGGER.debug(">>> org.apache.fop.configuration.Configuration");
-			            // Construct driver and setup output format
-			            Driver driver = new Driver();
-			            Logger logger = new ConsoleLogger(ConsoleLogger.LEVEL_ERROR);
-			    		driver.setLogger(logger);
-			    		MessageHandler.setScreenLogger(logger);
-
-			            LOGGER.debug(">>> Driver driver");
-			            
-			            driver.setRenderer(Driver.RENDER_PDF);
-			            LOGGER.debug(">>> driver.setRenderer");
-			            
-			    		LOGGER.debug("CONVERT: driver creado.");
-			            
-			            // Setup output stream.  Note: Using BufferedOutputStream
-			            // for performance reasons (helpful with FileOutputStreams).
-			            fileOut = new FileOutputStream(ficheroPDF);
-			            out = new BufferedOutputStream(fileOut);
-			            driver.setOutputStream(out);
-
-			    		LOGGER.debug("CONVERT: stream creado.");
-
-			            // Setup JAXP using identity transformer
-			            TransformerFactory factory = TransformerFactory.newInstance();
-			            //System.out.println(factory.getClass().getName());
-			            
-			            Transformer transformer = factory.newTransformer(); // identity transformer
-
-			    		LOGGER.debug("CONVERT: transformer creado.");
-			            
-			            // Setup input stream
-			            Source src = new StreamSource(ficheroFOP);
-			            //Source src = new StreamSource(foFormateado);
-
-			    		LOGGER.debug("CONVERT: source creado.");
-
-			            // Resulting SAX events (the generated FO) must be piped through to FOP
-			            Result res = new SAXResult(driver.getContentHandler());
-
-			    		LOGGER.debug("CONVERT: result creado.");
-
-			            // Start XSLT transformation and FOP processing
-			            transformer.transform(src, res);
-			            
-			    		LOGGER.debug("CONVERT: PDF creado.");
-			            
-			            //Borramos la cache de ficheros:
-			            org.apache.fop.image.FopImageFactory.resetCache();
-			    		LOGGER.debug("CONVERT: cache borrada. TODO OK.");
-			    		LOGGER.debug("CONVERT: El fichero se almacenara en "+ficheroPDF);
-
-			        } 
-			        catch (Exception e) {
-			        	
-			        	    LOGGER.debugError("Error transformando PDF desde FOP - Fichero:"+rutaTmp+" - Mensaje:" +e.getLocalizedMessage(),e,3);
-			        
-			            throw new ClsExceptions (e, "Error transformando PDF desde FOP - Fichero:"+rutaTmp+" - Mensaje:" +e.getLocalizedMessage());
-			        } 
-			        finally {
-			        	try {
-				            out.close();
-				            fileOut.close();
-			        	} catch (Exception e) {}
-			        }
+	protected String reemplazarDatos(List<Map<String, Object>> hDatosFinal, String plantillaFO) throws Exception{
 		
-	}*/
+		Hashtable htDatos = new Hashtable<>();
+		String institucion = hDatosFinal.get(0).get("IDINSTITUCION").toString();
+		String turno = hDatosFinal.get(0).get("IDTURNO").toString();
+		
+		//Cargar último letrado
+		List<TurnosItem> turnosItems = scsTurnosExtendsMapper.busquedaUltimoLetrado(turno, Short.valueOf(institucion));
+		if(turnosItems!= null && !turnosItems.isEmpty()) {
+			String nombreTurno =turnosItems.get(0).getNombre();
+			htDatos.put("NCOLEGIADO", turnosItems.get(0).getNumerocolegiado());
+			htDatos.put("APELLIDO1", turnosItems.get(0).getApellido1());
+			htDatos.put("APELLIDO2", turnosItems.get(0).getApellido2());
+			htDatos.put("NOMBRE", turnosItems.get(0).getNombrepersona());
+			htDatos.put("NOMBRE_TURNO", nombreTurno);
+		}
+		htDatos.put("FECHA_GENERACION",  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+		htDatos.put("FECHA_CONSULTA", "Muestra todas las inscripciones");//(fecha!=null&&!fecha.trim().equals(""))?fecha:"Muestra todas las inscripciones");
+		
+		//Cargar listado de letrados en cola
+		Vector vLetradosEnCola = new Vector();
+		for(Map<String, Object> letradoTurno:hDatosFinal){
+			Hashtable row = new Hashtable();
+			Hashtable htRow = new Hashtable();
+			
+			htRow.put("IDPERSONA", letradoTurno.get("IDPERSONA").toString());
+			htRow.put("APELLIDOS1", letradoTurno.get("APELLIDOS1").toString());
+			if(letradoTurno.get("APELLIDOS2") != null)
+				htRow.put("APELLIDOS2", letradoTurno.get("APELLIDOS2").toString());
+			else
+				htRow.put("APELLIDOS2", " ");
+			htRow.put("NOMBRE", letradoTurno.get("NOMBRE").toString());
+			htRow.put("NCOLEGIADO", letradoTurno.get("NCOLEGIADO").toString());
+			if(letradoTurno.get("FECHAVALIDACION")!=null)
+				htRow.put("FECHAVALIDACION", letradoTurno.get("FECHAVALIDACION").toString());
+			else
+				htRow.put("FECHAVALIDACION", "");
+			if(letradoTurno.get("FECHABAJA")!=null)
+				htRow.put("FECHABAJA", letradoTurno.get("FECHABAJA").toString());
+			else
+				htRow.put("FECHABAJA", "");
+
+			vLetradosEnCola.add(htRow);
+			
+		}
+				
+		plantillaFO = this.reemplazaRegistros(plantillaFO, vLetradosEnCola, htDatos, "LETRADOS");
+		
+		
+		//Cargar listado de compensaciones
+		List<LetradoGuardiaItem> lCompensaciones= scsSaltoscompensacionesExtendsMapper.searchSaltosOCompensacionesOficio(institucion, turno,null, "C");
+		
+		
+		plantillaFO = this.reemplazaRegistrosSyC(plantillaFO, lCompensaciones, htDatos, "COMPENSACIONES");
+		
+		//Cargar listado de saltos
+		List<LetradoGuardiaItem> lSaltos = scsSaltoscompensacionesExtendsMapper.searchSaltosOCompensacionesOficio(institucion, turno,null, "S");
+		plantillaFO = this.reemplazaRegistrosSyC(plantillaFO, lSaltos, htDatos, "SALTOS");
+				
+		
+		plantillaFO = this.reemplazaVariables(htDatos, plantillaFO);
+		
+		return plantillaFO;
+	}
+	
+	public String reemplazaRegistrosSyC(String plantillaFO, List<LetradoGuardiaItem> lCompensaciones, Hashtable htDatos, String delim){
+		String CTR="%%"; 
+		String plantilla=plantillaFO;
+		String delimIni=CTR+"INI_"+delim+CTR;
+		String delimFin=CTR+"FIN_"+delim+CTR;
+		String sAux="";
+		 
+		 // RGG 09/07/2008
+//		 if (lCompensaciones==null || lCompensaciones.isEmpty()) {
+//		 	LOGGER.debug("No hay registros");
+//			 // cuando no existen datos se busca la marca INI_TODO_xxx para sustituirla por NADA.
+//		     // Estas marcas deben estas fuera de las que pretendemos cambiar con datos.
+//			 delimIni=CTR+"INI_TODO_"+delim+CTR;
+//			 delimFin=CTR+"FIN_TODO_"+delim+CTR;
+//			 sAux="";
+//		 } else {
+		 	
+		     String delimTodoIni=CTR+"INI_TODO_"+delim+CTR;
+		     String delimTodoFin=CTR+"FIN_TODO_"+delim+CTR;
+		    
+		     String auxAux=UtilidadesString.encuentraEntreMarcas(plantilla, delimTodoIni, delimTodoFin);
+		    
+		     plantilla=UtilidadesString.reemplazaEntreMarcasCon(plantilla, delimTodoIni, delimTodoFin,auxAux);
+		    
+		     //if(lCompensaciones!=null && !lCompensaciones.isEmpty()){
+		     	
+				 String plantillaRegistro=UtilidadesString.encuentraEntreMarcas(plantilla, delimIni, delimFin);
+				 int size=lCompensaciones.size();
+				 LOGGER.debug("TAMAÑO DEL VECTOR PARA REEMPLAZAR DATOS: "+size);
+				 if(lCompensaciones == null || lCompensaciones.size() == 0){
+					 Hashtable row= new Hashtable();
+					 row.put("NCOLEGIADO", " ");
+					 row.put("APELLIDOS1", " ");
+					 row.put("APELLIDOS2", " ");
+					 row.put("NOMBRE", " ");
+					 row.put("NUMERO", " ");
+					 
+					 sAux+=UtilidadesString.reemplazaParametros(plantillaRegistro,CTR, row);
+				 }
+					 
+				 for(LetradoGuardiaItem elemento: lCompensaciones){
+					 Hashtable row= new Hashtable();
+					 row.put("NCOLEGIADO", elemento.getNumeroColegiado());
+					 row.put("APELLIDOS1", elemento.getApellidos1());
+					 row.put("APELLIDOS2", elemento.getApellidos2());
+					 row.put("NOMBRE", elemento.getNombre());
+					 row.put("NUMERO", elemento.getNumeroGrupo());
+			
+					 sAux+=UtilidadesString.reemplazaParametros(plantillaRegistro,CTR, row);
+			
+				 }
+			 //}
+//		 }	 
+		 
+	     plantilla=UtilidadesString.reemplazaEntreMarcasCon(plantilla, delimIni, delimFin,sAux);
+	     
+		 return plantilla;
+	 }
+	
+	public String reemplazaRegistros(String plantillaFO, Vector registros, Hashtable htDatos, String delim){
+		String CTR="%%"; 
+		String plantilla=plantillaFO;
+		String delimIni=CTR+"INI_"+delim+CTR;
+		String delimFin=CTR+"FIN_"+delim+CTR;
+		String sAux="";
+		 
+		 // RGG 09/07/2008
+		 if (registros==null || registros.isEmpty()) {
+		 	LOGGER.debug("No hay registros");
+			 // cuando no existen datos se busca la marca INI_TODO_xxx para sustituirla por NADA.
+		     // Estas marcas deben estas fuera de las que pretendemos cambiar con datos.
+			 delimIni=CTR+"INI_TODO_"+delim+CTR;
+			 delimFin=CTR+"FIN_TODO_"+delim+CTR;
+			 sAux="";
+		 } else {
+		 	
+		     String delimTodoIni=CTR+"INI_TODO_"+delim+CTR;
+		     String delimTodoFin=CTR+"FIN_TODO_"+delim+CTR;
+		    
+		     String auxAux=UtilidadesString.encuentraEntreMarcas(plantilla, delimTodoIni, delimTodoFin);
+		    
+		     plantilla=UtilidadesString.reemplazaEntreMarcasCon(plantilla, delimTodoIni, delimTodoFin,auxAux);
+		    
+		     if(registros!=null && !registros.isEmpty()){
+		     	
+				 String plantillaRegistro=UtilidadesString.encuentraEntreMarcas(plantilla, delimIni, delimFin);
+				 int size=registros.size();
+				 LOGGER.debug("TAMAÑO DEL VECTOR PARA REEMPLAZAR DATOS: "+size);
+				 for(int i=0;i<size;i++){
+					 Object rObj=registros.elementAt(i);
+					 Hashtable row=null;
+					 if(rObj instanceof Row){
+						 row=(Hashtable)registros.elementAt(i);
+					 }else{
+						 row=(Hashtable)rObj;
+					 }
+					 //ClsLogging.writeFileLog("MASTERREPORT: REGISTRO: "+i,10);
+			
+					 sAux+=UtilidadesString.reemplazaParametros(plantillaRegistro,CTR, row);
+			
+				 }
+			 }
+		 }	 
+		 
+	     plantilla=UtilidadesString.reemplazaEntreMarcasCon(plantilla, delimIni, delimFin,sAux);
+	     
+		 return plantilla;
+	 }
+	
+	public String reemplazaVariables(Hashtable htDatos, String plantillaFO){
+		String CTR="%%"; 
+		return UtilidadesString.reemplazaParametros(plantillaFO,CTR, htDatos);
+	 }
 
 }

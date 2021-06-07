@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -20,7 +21,10 @@ import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FopFactoryBuilder;
-import org.apache.fop.apps.MimeConstants;
+//import org.apache.fop.apps.MimeConstants;
+import org.apache.xmlgraphics.util.MimeConstants;
+import org.springframework.util.ResourceUtils;
+import org.xml.sax.SAXException;
 
 public class FoUtils
 {
@@ -38,10 +42,12 @@ public class FoUtils
      * If null, defaults to the parent directory of fo.
      * @param documentModel the document model to add PDF metadatas like author, title and keywords, could be null.
      * @throws javax.xml.transform.TransformerException In case of a conversion problem.
+     * @throws IOException 
+     * @throws SAXException 
      * @since 1.1.1
      */
     public static void convertFO2PDF( File fo, File pdf, String resourceDir )
-        throws TransformerException
+        throws TransformerException, SAXException, IOException
     {
         try ( OutputStream out = new BufferedOutputStream( new FileOutputStream( pdf ) ) )
         {
@@ -59,6 +65,37 @@ public class FoUtils
         {
             throw new TransformerException( e );
         }
+        /*
+        // Step 1: Construct a FopFactory by specifying a reference to the configuration file
+    	// (reuse if you plan to render multiple documents!)
+    	FopFactory fopFactory = FopFactory.newInstance(ResourceUtils.getFile("classpath:fopConf/fop.xconf"));
+
+    	// Step 2: Set up output stream.
+    	// Note: Using BufferedOutputStream for performance reasons (helpful with FileOutputStreams).
+    	OutputStream out = new BufferedOutputStream(new FileOutputStream(pdf));
+
+    	try {
+    	    // Step 3: Construct fop with desired output format
+    	    Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
+
+    	    // Step 4: Setup JAXP using identity transformer
+    	    TransformerFactory factory = TransformerFactory.newInstance();
+    	    Transformer transformer = factory.newTransformer(); // identity transformer
+
+    	    // Step 5: Setup input and output for XSLT transformation
+    	    // Setup input stream
+    	    Source src = new StreamSource(fo);
+
+    	    // Resulting SAX events (the generated FO) must be piped through to FOP
+    	    Result res = new SAXResult(fop.getDefaultHandler());
+
+    	    // Step 6: Start XSLT transformation and FOP processing
+    	    transformer.transform(src, res);
+
+    	} finally {
+    	    //Clean-up
+    	    out.close();
+    	}*/
     }
 
 

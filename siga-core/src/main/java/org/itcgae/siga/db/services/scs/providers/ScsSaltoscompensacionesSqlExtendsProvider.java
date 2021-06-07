@@ -499,5 +499,50 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 
 		return sql.toString();
 	}
+	
+	public String searchSaltosOCompensacionesOficio(String idInstitucion, String idTurno, String idGuardia, String saltoocompensacion) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+
+		sql2.SELECT("IDPERSONA, count(1) NUMERO ");
+		
+		// Los siguientes minimos se usan para ordenar en la lista de saltos/compensaciones (SCs). 
+		// el orden principal es por cantidad de saltos/compensaciones de forma descendente.
+		// Sin embargo, como ayuda, también se añade el orden por fecha y orden de creacion. Pero este orden solo será válido si cada colegiado tiene 1 unico SC. En caso contrario, el orden no se garantiza.
+		sql2.SELECT("min(FECHA) MINFECHA, min(IDSALTOSTURNO) MINSALTO");
+		sql2.FROM("SCS_SALTOSCOMPENSACIONES");
+		sql2.WHERE("idinstitucion = " + idInstitucion);
+		if(idTurno != null)
+			sql2.WHERE("idturno =" + idTurno);
+		if(idGuardia != null) {
+			sql2.WHERE("idguardia = " + idGuardia);
+		} else {
+			sql2.WHERE("idguardia IS NULL");
+		}
+		
+		if (saltoocompensacion != " ") {
+			sql2.WHERE("SALTOOCOMPENSACION = '" + saltoocompensacion + "'");
+		}
+		sql2.WHERE("FECHACUMPLIMIENTO IS NULL ");
+		sql2.GROUP_BY("IDPERSONA");
+		
+		sql.SELECT("decode(C.COMUNITARIO,'1', C.NCOMUNITARIO,NCOLEGIADO) NCOLEGIADO");
+		sql.SELECT("P.NOMBRE");
+		sql.SELECT("P.APELLIDOS1");
+		sql.SELECT("P.APELLIDOS2");
+		sql.SELECT("SC.NUMERO");
+		sql.FROM("CEN_COLEGIADO C");
+		sql.FROM("CEN_PERSONA P");
+		sql.FROM("(" + sql2 +") SC");
+
+		sql.WHERE("SC.IDPERSONA = " + "C.IDPERSONA");
+		sql.WHERE("SC.IDPERSONA = P.IDPERSONA");
+		sql.WHERE("C.IDINSTITUCION = " + idInstitucion);
+	
+		// El orden principal es por cantidad. Los siguientes campos de orden son solo orientativos (ver origen arriba) 
+		sql.ORDER_BY("SC.NUMERO desc, SC.MINFECHA, SC.MINSALTO");
+
+		return sql.toString();
+	}
 
 }

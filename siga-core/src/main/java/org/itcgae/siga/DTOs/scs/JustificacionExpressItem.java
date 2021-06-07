@@ -51,6 +51,7 @@ public class JustificacionExpressItem {
 	private String validarjustificaciones;
 	private Map<String, String> expedientes;
 	private List<ActuacionesJustificacionExpressItem> actuaciones;	 
+	private String categoriaProcedimiento;
 	private Error error = null;
 	
 	/**
@@ -679,5 +680,12 @@ public class JustificacionExpressItem {
 
 	public void setValidarjustificaciones(String validarjustificaciones) {
 		this.validarjustificaciones = validarjustificaciones;
+	}
+	public String getCategoriaProcedimiento() {
+		return categoriaProcedimiento;
+	}
+
+	public void setCategoriaProcedimiento(String categoriaProcedimiento) {
+		this.categoriaProcedimiento = categoriaProcedimiento;
 	}
 }
