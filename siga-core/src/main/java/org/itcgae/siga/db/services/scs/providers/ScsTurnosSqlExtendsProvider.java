@@ -185,6 +185,24 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		sql.FROM("scs_ordenacioncolas");
 		return sql.toString();
 	}
+	
+	public String busquedaUltimoLetrado(String idTurno,Short idInstitucion) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT("col.ncolegiado NUMEROCOLEGIADO");
+		sql.SELECT("per.nombre NOMBREPERSONA");
+		sql.SELECT("per.apellidos1 APELLIDOS1");
+		sql.SELECT("per.apellidos2 APELLIDOS2");
+		sql.SELECT("tur.nombre NOMBRETURNO");
+		sql.FROM("scs_turno tur");
+		sql.JOIN("cen_colegiado col on tur.idinstitucion = col.idinstitucion and tur.idpersona_ultimo = col.idpersona");
+		sql.JOIN("cen_persona per on tur.idpersona_ultimo = per.idpersona");
+		sql.WHERE("tur.idinstitucion = "+idInstitucion);
+		sql.WHERE("tur.idturno = "+idTurno);
+
+		return sql.toString();
+	}
 
 	public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String busquedaOrden, Short idInstitucion) {
 

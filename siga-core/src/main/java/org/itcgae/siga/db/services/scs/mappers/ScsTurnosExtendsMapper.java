@@ -150,6 +150,16 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
 	    List<TurnosItem> updateUltimo(TurnosItem turnosItem,Short idInstitucion);
 	 
+	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="busquedaUltimoLetrado")
+	 @Results({ 
+		 	@Result(column = "NOMBREPERSONA", property = "nombrepersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROCOLEGIADO", property = "numerocolegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRETURNO", property = "nombre", jdbcType = JdbcType.VARCHAR)
+			 })
+	    List<TurnosItem> busquedaUltimoLetrado(String idTurno,Short idInstitucion);
+	 
 	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="busquedaColaOficio")
 	 @Results({ 
 		 	@Result(column = "AUX", property = "idmateria", jdbcType = JdbcType.DECIMAL),
