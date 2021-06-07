@@ -140,7 +140,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
-			sql = "select distinct des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
+			sql = "select distinct F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
 					+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
 					+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 					+ "  des.fechaestado fechaestado,colegiado.ncolegiado,juzgado.nombre as nombrejuzgado, "
@@ -380,6 +380,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 				}
 			}
+			
+			if(designaItem.getIdActuacionesV()!=null && !designaItem.getIdActuacionesV().trim().isEmpty()){
+				if("SINACTUACIONES".equalsIgnoreCase(designaItem.getIdActuacionesV().trim())){
+					sql += (" AND F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) IS NULL ");
+				}else{
+				    sql += (" AND UPPER(F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO))=UPPER('"+designaItem.getIdActuacionesV()+"')");
+				}
+			}
 
 			if (designaItem.getDocumentacionActuacion() != null
 					&& !designaItem.getDocumentacionActuacion().equalsIgnoreCase("")) {
@@ -604,7 +612,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		try {
 			
 			if(isNoColegiado) {
-				sql = "select des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
+				sql = "select DISTINCT F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada, des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
 						+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
 						+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 						+ "  des.fechaestado fechaestado," + " turno.nombre,  "
@@ -857,6 +865,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 				}
 			}
+			
+			if(designaItem.getIdActuacionesV()!=null && !designaItem.getIdActuacionesV().trim().isEmpty()){
+				if("SINACTUACIONES".equalsIgnoreCase(designaItem.getIdActuacionesV().trim())){
+					sql += (" AND F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) IS NULL ");
+				}else{
+				    sql += (" AND UPPER(F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO))=UPPER('"+designaItem.getIdActuacionesV()+"')");
+				}
+			}
+
 
 			if (designaItem.getDocumentacionActuacion() != null
 					&& !designaItem.getDocumentacionActuacion().equalsIgnoreCase("")) {
