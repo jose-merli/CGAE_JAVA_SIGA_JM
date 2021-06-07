@@ -4849,7 +4849,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						recordJust.setFechamodificacion(new Date());
 						recordJust.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-						if (justificacion.getIdJuzgado() != null) {
+						if (justificacion.getIdJuzgado() != null  && !justificacion.getIdJuzgado().isEmpty()) {
 							recordJust.setIdjuzgado(Long.parseLong(justificacion.getIdJuzgado()));
 						}
 

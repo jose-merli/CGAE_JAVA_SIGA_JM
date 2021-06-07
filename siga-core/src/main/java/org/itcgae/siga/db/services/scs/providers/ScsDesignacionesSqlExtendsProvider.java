@@ -619,7 +619,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						   
 						+ " persona.nombre as nombrepersona, persona.APELLIDOS1 as apellido1persona, persona.APELLIDOS2 as apellido2persona ";
 			}else {
-				sql = "select des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
+				sql = "select  DISTINCT F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
 						+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
 						+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 						+ "  des.fechaestado fechaestado,colegiado.ncolegiado," + " turno.nombre, "
@@ -2876,7 +2876,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if(designa.getNumprocedimiento() != null) {
 			sql.WHERE("SCS_DESIGNASLETRADO.IDPERSONA = '" + designa.getNumprocedimiento() + "'");
 		}
-		sql.ORDER_BY("SCS_DESIGNASLETRADO.FECHADESIGNA DESC, SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
+		sql.ORDER_BY("scs_designasletrado.fechadesigna DESC, scs_designasletrado.fecharenunciasolicita DESC NULLS FIRST, SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
 
 		return sql.toString();
 	}
