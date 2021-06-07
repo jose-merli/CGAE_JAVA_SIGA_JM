@@ -134,6 +134,12 @@ public class EjgController {
 		ComboDTO response = busquedaEJG.comboTurnosTipo(request, idTurno);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/gestion-ejg/comboSituaciones", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboSituaciones(HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboSituaciones(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 	// busqueda
 	@RequestMapping(value = "/filtros-ejg/busquedaEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -179,8 +185,6 @@ public class EjgController {
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
-	
 
 	// Expedientes Económicos
 	@RequestMapping(value = "/gestion-ejg/getExpedientesEconomicos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -292,12 +296,12 @@ public class EjgController {
 			return response;
 	}
 
-	//Actualixar turno, guardia y letrado
-		@RequestMapping(value = "/gestion-ejg/guardarServiciosTramitacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<UpdateResponseDTO> guardarServiciosTramitacion(@RequestBody EjgItem datos, HttpServletRequest request) {
-			UpdateResponseDTO response = gestionEJG.guardarServiciosTramitacion(datos, request);
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		}
+	//Actualizar turno, guardia y letrado
+	@RequestMapping(value = "/gestion-ejg/guardarServiciosTramitacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> guardarServiciosTramitacion(@RequestBody EjgItem datos, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionEJG.guardarServiciosTramitacion(datos, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
 
 	// borrarEstado
 	@RequestMapping(value = "/gestion-ejg/borrarEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
