@@ -92,6 +92,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ART27", property = "art27", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "VALIDADA", property = "validada", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)})
 	List<DesignaItem> busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo);
 	
@@ -127,6 +128,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ART27", property = "art27", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "VALIDADA", property = "validada", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)})
 	List<DesignaItem> busquedaNuevaDesigna(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo, boolean isNoColegiado);
 
@@ -637,7 +639,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHA", property = "fechaCreacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAPROGRAMADA", property = "fechaProgramacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "IDESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
 			})
 	List<ComunicacionesItem> busquedaComunicaciones(String num, String anio, String idturno, String idpersona);
 
@@ -730,5 +732,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "actualizarPartidaPresupuestariaActDesigna")
 	int actualizarPartidaPresupuestariaActDesigna(ActuacionDesignaItem actuacionDesignaItem, Short idInstitucion,
+			AdmUsuarios usuario);
+
+	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "actualizarPartidaPresupuestariaDesigna")
+	int actualizarPartidaPresupuestariaDesigna(DesignaItem designaItem, Short idInstitucion,
 			AdmUsuarios usuario);
 }

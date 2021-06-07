@@ -653,40 +653,39 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				try {
 					designas = scsDesignacionesExtendsMapper.busquedaDesignaciones(designaItem, idInstitucion,
 							tamMaximo);
-					
-					designasNuevas = scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem, idInstitucion,
-							tamMaximo, false);
-					
-					List<DesignaItem> designasNuevasNoColegiado = null;
-					designasNuevasNoColegiado = scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem, idInstitucion,
-							tamMaximo, true);
-					
-					for(DesignaItem designaNoColegiado: designasNuevasNoColegiado) {
-						designasNuevas.add(designaNoColegiado);
-					}
-					
-					Map<String, DesignaItem> desginasBusqueda = new HashMap<String, DesignaItem>();
-					for(DesignaItem d: designas) {
-						int[] indice = new int[4];
-						indice[0] = d.getAno();
-						indice[1] = d.getNumero();
-						indice[2] = d.getIdTurno();
-						indice[3] = idInstitucion;
-						desginasBusqueda.put(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion, d);
-					}
-					for(DesignaItem d: designasNuevas) {
-						int[] indice = new int[4];
-						indice[0] = d.getAno();
-						indice[1] = d.getNumero();
-						indice[2] = d.getIdTurno();
-						indice[3] = idInstitucion;
-						if(!(desginasBusqueda.containsKey(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion))) {
+						designasNuevas = scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem, idInstitucion,
+								tamMaximo, false);
+
+						List<DesignaItem> designasNuevasNoColegiado = null;
+						designasNuevasNoColegiado = scsDesignacionesExtendsMapper.busquedaNuevaDesigna(designaItem, idInstitucion,
+								tamMaximo, true);
+
+						for(DesignaItem designaNoColegiado: designasNuevasNoColegiado) {
+							designasNuevas.add(designaNoColegiado);
+						}
+
+						Map<String, DesignaItem> desginasBusqueda = new HashMap<String, DesignaItem>();
+						for(DesignaItem d: designas) {
+							int[] indice = new int[4];
+							indice[0] = d.getAno();
+							indice[1] = d.getNumero();
+							indice[2] = d.getIdTurno();
+							indice[3] = idInstitucion;
 							desginasBusqueda.put(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion, d);
 						}
-					}
-					
-					designas = new ArrayList<DesignaItem>(desginasBusqueda.values());		
-					
+						for(DesignaItem d: designasNuevas) {
+							int[] indice = new int[4];
+							indice[0] = d.getAno();
+							indice[1] = d.getNumero();
+							indice[2] = d.getIdTurno();
+							indice[3] = idInstitucion;
+							if(!(desginasBusqueda.containsKey(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion))) {
+								desginasBusqueda.put(d.getAno()+""+d.getNumero()+""+d.getIdTurno()+""+idInstitucion, d);
+							}
+						}
+
+						designas = new ArrayList<DesignaItem>(desginasBusqueda.values());		
+						
 					if(designas.size() > 200) {
 						int z = 0;
 						for(int x = 200;  x<=designas.size()-1; z++) {
@@ -2055,51 +2054,33 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 
-					LOGGER.info("updatePartidaPresupuestaria()-> Entrada a scsDesignacionesExtendsMapper ");
-					ScsTurnoExample example = new ScsTurnoExample();
-					example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdturnoEqualTo(designaItem.getIdTurno());
+					int response = scsDesignacionesExtendsMapper.actualizarPartidaPresupuestariaDesigna(designaItem,
+							idInstitucion, usuarios.get(0));
 
-					List<ScsTurno> turnoExistente = scsTurnosExtendsMapper.selectByExample(example);
-
-					if ((turnoExistente == null || turnoExistente.size() == 0)) {
-						error.setCode(400);
-						// TODO crear description
-						error.setDescription("justiciaGratuita.oficio.designa.yaexiste");
-						updateResponseDTO.setStatus(SigaConstants.KO);
+					if (response == 1) {
+						error.setCode(200);
+						updateResponseDTO.setStatus(SigaConstants.OK);
 						updateResponseDTO.setError(error);
-						return updateResponseDTO;
 					}
 
-					ScsTurno scsTurno = new ScsTurno();
-					scsTurno.setIdturno(designaItem.getIdTurno());
-//					Integer a = new Integer(idInstitucion);
-					scsTurno.setIdinstitucion(idInstitucion);
-
-					scsTurno.setIdpartidapresupuestaria(designaItem.getIdPartidaPresupuestaria());
-
-					LOGGER.info("updatePartidaPresupuestaria() / scsDesignacionesExtendsMapper -> Salida ");
-
-					LOGGER.info(
-							"updatePartidaPresupuestaria() / scsDesignacionesExtendsMapper.update()-> Entrada a scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
-
-					scsTurnosExtendsMapper.updateByPrimaryKeySelective(scsTurno);
-
-					LOGGER.info(
-							"updatePartidaPresupuestaria() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
+					if (response == 0) {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.updatePartidaPresupuestaria() -> Se ha producido un error al altualizar la partidapresupuestaria de la designación");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						updateResponseDTO.setError(error);
+					}
 
 				} catch (Exception e) {
-					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-					updateResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.error(
+							"DesignacionesServiceImpl.updatePartidaPresupuestaria() -> Se ha producido un error al altualizar la partidapresupuestaria de la designación",
+							e);
+					error.setCode(500);
+					error.setDescription("general.mensaje.error.bbdd");
+					error.setMessage(e.getMessage());
+					updateResponseDTO.setError(error);
 				}
-
-				if (error.getCode() == null) {
-					error.setCode(200);
-					error.setDescription("Se ha modificado la designacion  correctamente");
-				}
-
-				updateResponseDTO.setError(error);
 
 				LOGGER.info(
 						"updatePartidaPresupuestaria() -> Salida del servicio para actualizar una partida presupuestaria");
@@ -2357,17 +2338,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						actuacionDesignaItem.setNumeroAsunto(maxIdDto.getIdMax().toString());
 
 						// Marcamos por defecto la partida presupuestaria del turno
-						DesignaItem designaItem = new DesignaItem();
-						designaItem.setIdTurno(Integer.parseInt(actuacionDesignaItem.getIdTurno()));
-						designaItem.setAno(Integer.parseInt(actuacionDesignaItem.getAnio()));
-						designaItem.setNumero(Integer.parseInt(actuacionDesignaItem.getNumero()));
+						ScsTurnoExample scsTurnoExample = new ScsTurnoExample();
+						scsTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdturnoEqualTo(Integer.valueOf(actuacionDesignaItem.getIdTurno()));
 
-						List<ComboItem> listaPartidasPresupuestarias = scsDesignacionesExtendsMapper
-								.getPartidaPresupuestariaDesigna(idInstitucion, designaItem);
+						List<ScsTurno> listaTurnos = scsTurnoMapper.selectByExample(scsTurnoExample);
 
-						if (!listaPartidasPresupuestarias.isEmpty()) {
-							actuacionDesignaItem
-									.setIdPartidaPresupuestaria(listaPartidasPresupuestarias.get(0).getValue());
+						if (!listaTurnos.isEmpty() && null != listaTurnos.get(0).getIdpartidapresupuestaria()) {
+							actuacionDesignaItem.setIdPartidaPresupuestaria(
+									listaTurnos.get(0).getIdpartidapresupuestaria().toString());
 						}
 
 						int response = scsDesignacionesExtendsMapper.guardarActDesigna(actuacionDesignaItem,
@@ -2839,7 +2818,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setIdpersona(Long.parseLong(idPersona));
 
 					}
+					
+					// Marcamos por defecto la partida presupuestaria del turno
+					ScsTurnoExample scsTurnoExample = new ScsTurnoExample();
+					scsTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdturnoEqualTo(designa.getIdturno());
 
+					List<ScsTurno> listaTurnos = scsTurnoMapper.selectByExample(scsTurnoExample);
+
+					if (!listaTurnos.isEmpty() && null != listaTurnos.get(0).getIdpartidapresupuestaria()) {
+						designa.setIdpartidapresupuestaria(listaTurnos.get(0).getIdpartidapresupuestaria());
+					}
+					
 					LOGGER.info(
 							"createDesigna() / scsDesignaMapper.insert() -> Entrada a scsDesignaMapper para insertar la designacion");
 
@@ -4859,7 +4849,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						recordJust.setFechamodificacion(new Date());
 						recordJust.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-						if (justificacion.getIdJuzgado() != null) {
+						if (justificacion.getIdJuzgado() != null  && !justificacion.getIdJuzgado().isEmpty()) {
 							recordJust.setIdjuzgado(Long.parseLong(justificacion.getIdJuzgado()));
 						}
 

@@ -136,8 +136,8 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"    ins.observacionesvalbaja,\r\n" + 
 				"    ins.fechadenegacion,\r\n" + 
 				"    ins.observacionesdenegacion,\r\n" + 
-				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado,"
-				+ "DECODE(tur.GUARDIAS, 0, 'Obligatorias', DECODE(tur.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" + 
+				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado," +
+				"    DECODE(tur.GUARDIAS, 0, 'Obligatorias', DECODE(tur.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" +
 				"FROM\r\n" + 
 				"    scs_inscripcionturno ins\r\n" + 
 				"    JOIN cen_colegiado col ON col.idpersona = ins.idpersona\r\n" + 
