@@ -787,7 +787,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
 									nombrePlantilla = plantillaDoc.getPlantilla();
 									idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
-									if(nombrePlantilla.substring(nombrePlantilla.lastIndexOf(".")).equals(".fo")) {
+									if(nombrePlantilla.lastIndexOf(".") > -1 
+											&& nombrePlantilla.substring(nombrePlantilla.lastIndexOf(".")).equals(".fo")) {
 										esFO = true;
 									}
 								}else if(listaPlantilla != null && listaPlantilla.size() > 1){
