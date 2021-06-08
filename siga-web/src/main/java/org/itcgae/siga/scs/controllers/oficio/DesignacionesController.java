@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
@@ -963,9 +964,9 @@ public class DesignacionesController {
 	}
 
 	@RequestMapping(value = "/designas/busquedaComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComunicacionesDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
-		ComunicacionesDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
-		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
+	ResponseEntity<EnviosMasivosDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
+		EnviosMasivosDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
+		return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/designas/subirDocumentoActDesigna", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
