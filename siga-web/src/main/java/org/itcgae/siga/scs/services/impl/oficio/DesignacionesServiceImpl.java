@@ -3729,6 +3729,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						"busquedaProcurador() / scsProcuradorExtendsMapper.busquedaProcurador() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
 
 				if (procuradorItemList != null) {
+					if(!procuradorItemList.isEmpty()) {
+						procuradorItemList.get(0).setNumeroTotalProcuradores(String.valueOf(procuradorItemList.size()));
+					}
 					procuradorDTO.setProcuradorItems(procuradorItemList);
 				}
 			}

@@ -37,7 +37,7 @@ public class ProcuradorItem {
 		private String observaciones;
 		private String motivosRenuncia;
 		private String fecharenunciasolicita;
-		
+		private String numeroTotalProcuradores;
 		
 		
 		
@@ -476,6 +476,20 @@ public class ProcuradorItem {
 		 */
 		public void setFecharenunciasolicita(String fecharenunciasolicita) {
 			this.fecharenunciasolicita = fecharenunciasolicita;
+		}
+
+		/**
+		 * @return the numeroTotalProcuradores
+		 */
+		public String getNumeroTotalProcuradores() {
+			return numeroTotalProcuradores;
+		}
+
+		/**
+		 * @param numeroTotalProcuradores the numeroTotalProcuradores to set
+		 */
+		public void setNumeroTotalProcuradores(String numeroTotalProcuradores) {
+			this.numeroTotalProcuradores = numeroTotalProcuradores;
 		}
 
 		@Override
