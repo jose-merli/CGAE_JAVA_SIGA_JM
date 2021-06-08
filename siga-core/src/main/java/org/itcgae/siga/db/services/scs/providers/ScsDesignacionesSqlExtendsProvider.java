@@ -2208,7 +2208,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("SCS_DEFENDIDOSDESIGNA.idpersona");
 		sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
 		sql.SELECT("persona.nif");
-		sql.SELECT("persona.direccion");
+		sql.SELECT("F_SIGA_getRecurso(tv.descripcion,'1') ||' '|| persona.direccion || ' ' || persona.numerodir || ' ' || persona.pisodir || ' ' || persona.puertadir || ' ' || pobl.nombre ||' ' || persona.codigopostal || ' ' || prov.nombre  as direccion");
 		sql.SELECT("    CASE\r\n" + "        WHEN nombrerepresentante IS NOT NULL THEN\r\n"
 				+ "            nombrerepresentante\r\n" + "        ELSE\r\n" + "            ''\r\n"
 				+ "    END AS representante\r\n");
@@ -2218,6 +2218,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_DEFENDIDOSDESIGNA");
 		sql.JOIN(
 				"scs_personajg persona ON persona.idpersona = scs_DEFENDIDOSDESIGNA.idpersona AND persona.idinstitucion = scs_DEFENDIDOSDESIGNA.idinstitucion");
+		sql.LEFT_OUTER_JOIN("cen_tipovia tv on persona.idtipovia = tv.idtipovia and tv.idinstitucion = persona.idinstitucion"
+				, "cen_provincias prov on persona.idprovincia = prov.idprovincia and prov.idpais = persona.idpais"
+				, "cen_poblaciones pobl on persona.idpoblacion = pobl.idprovincia and pobl.idprovincia = prov.idprovincia");
 		sql.WHERE("            ( scs_DEFENDIDOSDESIGNA.anio = " + item.getAno() + "\r\n"
 				+ "              AND scs_DEFENDIDOSDESIGNA.numero = " + item.getNumero() + "\r\n"
 				+ "              AND scs_DEFENDIDOSDESIGNA.idinstitucion = " + idInstitucion + "\r\n"
@@ -2877,7 +2880,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if(designa.getNumprocedimiento() != null) {
 			sql.WHERE("SCS_DESIGNASLETRADO.IDPERSONA = '" + designa.getNumprocedimiento() + "'");
 		}
-		sql.ORDER_BY("scs_designasletrado.fechadesigna DESC, scs_designasletrado.fecharenunciasolicita DESC NULLS FIRST, SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
+		sql.ORDER_BY("scs_designasletrado.fechadesigna DESC, scs_designasletrado.fecharenuncia DESC NULLS FIRST, scs_designasletrado.fecharenunciasolicita DESC NULLS FIRST, SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
 
 		return sql.toString();
 	}
