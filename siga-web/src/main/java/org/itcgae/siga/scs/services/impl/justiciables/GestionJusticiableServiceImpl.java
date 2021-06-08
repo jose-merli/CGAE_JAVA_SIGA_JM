@@ -2465,24 +2465,28 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 					if(datos.getUf_solicitante() != null) {
 						familiar.setSolicitante(Short.parseShort(datos.getUf_solicitante()));
+						
+						//El criterio que se aplica actualmente es que el solicitante principal de un ejg su vuelve nula si
+						//se quita la condicion de solicitante
+						ScsEjgKey ejgKey = new ScsEjgKey();
+						
+						ejgKey.setAnio(Short.parseShort(datos.getUf_anio()));
+						ejgKey.setIdinstitucion(idInstitucion);
+						ejgKey.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));
+						ejgKey.setNumero(Long.parseLong(datos.getUf_numero()));
+						
+						ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+						
 						if(datos.getUf_solicitante().equals("1")) {
 							familiar.setEncalidadde("SOLICITANTE");
 							
-							//Modificamos el ejg asociado en el caso que se trate de un solicitante
-							//El criterio que se aplica actualmente es que el solicitante principal de un ejg se mantendra asignado
-							//al ejg hasta que se asigne uno nuevo aunque el anterior se actualice y no sea el solicitante principal.
-							ScsEjgKey ejgKey = new ScsEjgKey();
-							
-							ejgKey.setAnio(Short.parseShort(datos.getUf_anio()));
-							ejgKey.setIdinstitucion(idInstitucion);
-							ejgKey.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));
-							ejgKey.setNumero(Long.parseLong(datos.getUf_numero()));
-							
-							ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
-							
 							ejg.setIdpersonajg(Long.parseLong(datos.getUf_idPersona()));
 						}
-						else familiar.setEncalidadde(null);
+						else {
+							familiar.setEncalidadde(null);
+							
+							ejg.setIdpersonajg(null);
+						}
 					}
 					if(datos.getIncapacitado() != null) familiar.setIncapacitado(datos.getIncapacitado());
 					if(datos.getCircunsExcep() != null) familiar.setCircunstanciasExcepcionales(datos.getCircunsExcep());

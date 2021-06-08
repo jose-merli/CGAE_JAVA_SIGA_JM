@@ -84,4 +84,6 @@ public interface IGestionEJG {
 	UpdateResponseDTO borrarFamiliar(List<UnidadFamiliarEJGItem> datos, HttpServletRequest request);
 
 	ComboDTO comboSituaciones(HttpServletRequest request);
+
+	ComboDTO comboCDetenciones(HttpServletRequest request);
 }

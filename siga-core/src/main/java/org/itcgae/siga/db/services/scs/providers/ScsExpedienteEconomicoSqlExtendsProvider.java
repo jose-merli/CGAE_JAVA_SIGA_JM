@@ -14,6 +14,7 @@ public class ScsExpedienteEconomicoSqlExtendsProvider extends ScsEejgPeticionesS
 					" u.descripcion as solicitadopor," + 
 					" grcatalogos.descripcion as estado," + 
 					" eejg.csv");
+		sql.SELECT("eejg.csv, eejg.apellido1 || ' ' || eejg.apellido2 || ', ' || eejg.nombre || ' ' || eejg.nif as justiciable");
 		
 		sql.FROM("scs_eejg_peticiones eejg");
 		

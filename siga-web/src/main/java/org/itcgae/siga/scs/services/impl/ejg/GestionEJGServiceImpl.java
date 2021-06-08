@@ -39,6 +39,7 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsEejgPeticiones;
 import org.itcgae.siga.db.entities.ScsEejgPeticionesExample;
+import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazadaExample;
@@ -65,6 +66,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.exp.mappers.ExpTipoexpedienteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsActacomisionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
@@ -75,6 +77,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsPrestacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSituacionExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IEEJGServices;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
+import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,6 +155,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private IEEJGServices eejgService;
+	
+	@Autowired
+	private ScsComisariaExtendsMapper scsComisariaExtendsMapper;
 
 	@Autowired
 	private ScsPersonajgMapper scsPersonajgMapper;
@@ -273,6 +279,46 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		}
 		LOGGER.info("comboSituaciones() -> Salida del servicio para obtener las situaciones");
+		return comboDTO;
+	}
+	
+	@Override
+	public ComboDTO comboCDetenciones(HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"comboCDetenciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"comboCDetenciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboCDetenciones() / scsComisariaExtendsMapper.comboCDetenciones() -> Entrada a scsComisariaExtendsMapper para obtener el combo de centros de detencion");
+
+				comboItems = scsComisariaExtendsMapper.comboCDetenciones(idInstitucion);
+
+				LOGGER.info(
+						"comboCDetenciones() / scsComisariaExtendsMapper.comboCDetenciones() -> Salida a scsComisariaExtendsMapper para obtener el combo de centros de detencion");
+
+				if (comboItems != null) {
+					comboDTO.setCombooItems(comboItems);
+				}
+			}
+
+		}
+		LOGGER.info("comboCDetenciones() -> Salida del servicio para obtener los centros de detencion");
 		return comboDTO;
 	}
 
@@ -549,12 +595,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
 				LOGGER.info(
 						"getExpedientesEconomicos() / getExpedientesEconomicos.getExpedientesEconomicos() -> Salida de scsEjgExtendsMapper para obtener Expedienets Económicos");
-				if ((scsExpedienteEconomicoExtendsMapper.getExpedientesEconomicos(ejgItem, idInstitucion.toString(),
-						tamMaximo, usuarios.get(0).getIdlenguaje().toString())) != null
+				if (expedienteEconomicoDTO.getExpEconItems() != null
 						&& tamMaximo != null
-						&& (scsExpedienteEconomicoExtendsMapper.getExpedientesEconomicos(ejgItem,
-								idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()))
-										.size() > tamMaximo) {
+						&& expedienteEconomicoDTO.getExpEconItems().size() > tamMaximo) {
 					error.setCode(200);
 					error.setDescription("La consulta devuelve más de " + tamMaximo
 							+ " resultados, pero se muestran sólo los " + tamMaximo
@@ -1670,6 +1713,23 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						// Según se elimine o se active.
 						if (datos.get(i).getFechaBaja() == null) {
 							record.setFechabaja(new Date());
+							
+							//Se elimina su propiedad como solicitante principal
+							if(record.getSolicitante().equals("1")) {
+								record.setSolicitante((short)0);
+								
+								//Actualizamos el ejg correspondientemente para que no lo considere su solicitante principal
+								ScsEjgKey ejgKey = new ScsEjgKey();
+								
+								ejgKey.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
+								ejgKey.setIdinstitucion(idInstitucion);
+								ejgKey.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
+								ejgKey.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
+								
+								ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+								
+								ejg.setIdpersonajg(null);
+							}
 							response = scsUnidadfamiliarejgMapper.updateByPrimaryKeySelective(record);
 						} else {
 							record.setFechabaja(null);
