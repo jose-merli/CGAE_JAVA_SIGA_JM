@@ -4714,7 +4714,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				String[] parts = relaciones.get(0).split("/");
 				String anio = parts[0].substring(1);
-				String num = parts[1];
+				String num = relaciones.get(3);
 				String idTurno = relaciones.get(1);
 				String idinstitucion = relaciones.get(2);
 				relacionesItem = scsDesignacionesExtendsMapper.busquedaRelaciones(anio, num, idTurno, idinstitucion);

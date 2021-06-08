@@ -2605,7 +2605,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String busquedaRelaciones(String idInstitucion, String designaAnio, String designaNumero, String designaTurno) {
+	public String busquedaRelaciones(String designaAnio, String designaNumero, String designaTurno, String idInstitucion) {
 		//Consulta padre que engloba al resto para usar un where general, etc.
 		SQL sql = new SQL();
 		
