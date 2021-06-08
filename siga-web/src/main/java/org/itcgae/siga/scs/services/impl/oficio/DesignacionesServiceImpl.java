@@ -4480,7 +4480,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designaLetradoNueva.setAnio(designa.getAnio());
 					designaLetradoNueva.setIdturno(designa.getIdturno());
 					designaLetradoNueva.setNumero(designa.getNumero());
-					designaLetradoNueva.setFechadesigna(letradoSaliente.getFechadesigna());
+					designaLetradoNueva.setFechadesigna(letradoEntrante.getFechadesigna());
 					designaLetradoNueva.setFechamodificacion(new Date());
 					designaLetradoNueva.setManual((short) 0);
 					designaLetradoNueva.setLetradodelturno("S");
@@ -4512,7 +4512,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 					
 					//Creamos designa nueva para letradoEntrante
-					response = scsDesignasletradoMapper.insert(designaLetradoNueva);
+					response = scsDesignasletradoMapper.insertSelective(designaLetradoNueva);
 
 					//Actualizamos LetradoSaliente
 					if (response != 0 && letradoEntrante.getIdpersona() != null) {
@@ -4587,6 +4587,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				} catch (Exception e) {
 					error.setDescription("general.mensaje.error.bbdd");
+					error.code(500);
 					updateResponseDTO.setStatus(SigaConstants.KO);
 					updateResponseDTO.setError(error);
 					LOGGER.error(e.getMessage());
