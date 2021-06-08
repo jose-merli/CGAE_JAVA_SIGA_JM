@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -153,7 +155,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ScsPersonajgMapper scsPersonajgMapper;
-
+	
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
 		LOGGER.info("datosEJG() -> Entrada al servicio para obtener el colegiado");
@@ -2145,15 +2147,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	/**
 	 * getComunicaciones
 	 */
-	public ComunicacionesDTO getComunicaciones(EjgItem item, HttpServletRequest request) {
+	public EnviosMasivosDTO getComunicaciones(EjgItem item, HttpServletRequest request) {
 
 		LOGGER.info("GestionEJGServiceImpl.getComunicaciones() -> Entrada al servicio para obtener comunicaciones");
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ComunicacionesDTO comunicacionesDTO = new ComunicacionesDTO();
-		List<ComunicacionesItem> comunicacionesItem = new ArrayList<ComunicacionesItem>();
+		EnviosMasivosDTO enviosMasivosDTO = new EnviosMasivosDTO();
+		List<EnviosMasivosItem> enviosMasivosItem = new ArrayList<EnviosMasivosItem>();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -2172,25 +2174,28 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.debug(
 						"busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Entrada a scsDesignacionesExtendsMapper para obtener las comunicaciones");
 
-				comunicacionesItem = scsEjgExtendsMapper.getComunicaciones(item.getAnnio(), item.getNumero(), item.getTipoEJG(), idInstitucion);
+				//obtenemos el idEnvio
+				
+				int numEJG = Integer.parseInt(item.getNumEjg());//se convierte a int para quitar los 0 de delante si los hubiera
+				
+				String idEnvio = scsEjgExtendsMapper.getIdEnvio(item.getAnnio(), Integer.toString(numEJG), idInstitucion);
+				
+				//obtenemos los datos de la comunicacion para el idEnvio
+				if(idEnvio!=null) {
+					enviosMasivosItem = scsEjgExtendsMapper.getComunicaciones(idEnvio, idInstitucion, usuarios.get(0).getIdlenguaje());
+				}
 
 				LOGGER.info(
 						"busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Salida a scsDesignacionesExtendsMapper para obtener las comunicaciones");
 
-				for (int x = 0; x < comunicacionesItem.size(); x++) {
-					comunicacionesItem.get(x)
-							.setDestinatario(comunicacionesItem.get(x).getNombre() + ", "
-									+ comunicacionesItem.get(x).getApellido1() + " "
-									+ comunicacionesItem.get(x).getApellido2());
-				}
-
-				if (comunicacionesItem != null) {
-					comunicacionesDTO.setComunicacionesItem(comunicacionesItem);
+				if (enviosMasivosItem != null) {
+					enviosMasivosDTO.setEnviosMasivosItem(enviosMasivosItem);
 				}
 			}
 
 		}
 		LOGGER.info("busquedaComunicaciones() -> Salida del servicio para obtener comunicaciones");
-		return comunicacionesDTO;
+		
+		return enviosMasivosDTO;
 	}
 }

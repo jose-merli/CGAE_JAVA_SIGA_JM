@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.itcgae.siga.DTOs.gen.Error;
 
 @RestController
 @RequestMapping(value = "/ejg")
@@ -379,9 +378,10 @@ public class EjgController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	//getComunicaciones
 	@RequestMapping(value = "/gestion-ejg/getComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComunicacionesDTO> getComunicaciones(@RequestBody EjgItem item, HttpServletRequest request) {
-		ComunicacionesDTO response = gestionEJG.getComunicaciones(item, request);
-		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
+	ResponseEntity<EnviosMasivosDTO> getComunicaciones(@RequestBody EjgItem item, HttpServletRequest request) {
+		EnviosMasivosDTO response = gestionEJG.getComunicaciones(item, request);
+		return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
 	}
 }

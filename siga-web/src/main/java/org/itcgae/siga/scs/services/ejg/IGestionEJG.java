@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -77,7 +77,7 @@ public interface IGestionEJG {
 
 	EjgDesignaDTO getEjgDesigna(EjgItem datos, HttpServletRequest request); 
 	
-	ComunicacionesDTO getComunicaciones(EjgItem item, HttpServletRequest request);
+	EnviosMasivosDTO getComunicaciones(EjgItem item, HttpServletRequest request);
 
 	InsertResponseDTO insertFamiliarEJG(List<String> item, HttpServletRequest request);
 
