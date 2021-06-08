@@ -36,10 +36,13 @@ import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -51,8 +54,6 @@ import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.CenPersonaItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
-import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
-import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
@@ -159,7 +160,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -179,9 +180,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
-
-	@Autowired
-	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
 
 	@Autowired
 	private ScsContrariosdesignaMapper scsContrariosDesignaMapper;
@@ -4960,14 +4958,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
-	public ComunicacionesDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request) {
+	public EnviosMasivosDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request) {
 		LOGGER.info("busquedaComunicaciones() -> Entrada al servicio para obtener comunicaciones");
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ComunicacionesDTO comunicacionesDTO = new ComunicacionesDTO();
-		List<ComunicacionesItem> comunicacionesItem = new ArrayList<ComunicacionesItem>();
+		EnviosMasivosDTO enviosMasivosDTO = new EnviosMasivosDTO();
+		List<EnviosMasivosItem> enviosMasivosItem = new ArrayList<EnviosMasivosItem>();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -4990,36 +4988,37 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				String anio = parts[0].substring(1);
 				String num = parts[1];
 				String idTurno = comunicaciones.get(1);
-				String isLetrado = comunicaciones.get(2);
+//		 		String isLetrado = comunicaciones.get(2);
 
-				if (isLetrado != null && isLetrado.equals("false")) {
-					String idpersona = null;
-					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
-							idpersona);
-				} else if(comunicaciones.size() > 3){
-					String idpersona = comunicaciones.get(3);
-					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
-							idpersona);
-				}
+				enviosMasivosItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(num, anio, idTurno, idInstitucion, usuarios.get(0).getIdlenguaje());
+//				if (isLetrado != null && isLetrado.equals("false")) {
+//					String idpersona = null;
+//					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
+//							idpersona);
+//				} else if(comunicaciones.size() > 3){
+//					String idpersona = comunicaciones.get(3);
+//					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
+//							idpersona);
+//				}
 
 				LOGGER.info(
 						"busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Salida a scsDesignacionesExtendsMapper para obtener las comunicaciones");
 
-				for (int x = 0; x < comunicacionesItem.size(); x++) {
-					comunicacionesItem.get(x)
-							.setDestinatario(comunicacionesItem.get(x).getNombre() + ", "
-									+ comunicacionesItem.get(x).getApellido1() + " "
-									+ comunicacionesItem.get(x).getApellido2());
-				}
+//				for (int x = 0; x < comunicacionesItem.size(); x++) {
+//					comunicacionesItem.get(x)
+//							.setDestinatario(comunicacionesItem.get(x).getNombre() + ", "
+//									+ comunicacionesItem.get(x).getApellido1() + " "
+//									+ comunicacionesItem.get(x).getApellido2());
+//				}
 
-				if (comunicacionesItem != null) {
-					comunicacionesDTO.setComunicacionesItem(comunicacionesItem);
+				if (enviosMasivosItem != null) {
+					enviosMasivosDTO.setEnviosMasivosItem(enviosMasivosItem);
 				}
 			}
 
 		}
 		LOGGER.info("busquedaComunicaciones() -> Salida del servicio para obtener comunicaciones");
-		return comunicacionesDTO;
+		return enviosMasivosDTO;
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ComboItem2;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
@@ -631,17 +632,25 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaComunicaciones")
-	@Results({
-			@Result(column = "DESCRIPCION", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHA", property = "fechaCreacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAPROGRAMADA", property = "fechaProgramacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
+		  @Results({
+			  @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+              @Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC),
+              @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "FECHA", property = "fechaCreacion", jdbcType = JdbcType.DATE),
+              @Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
+              @Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
+              @Result(column = "NOMBREPLANTILLA", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "IDPLANTILLA", property = "idPlantilla", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "FECHAPROGRAMADA", property = "fechaProgramada", jdbcType = JdbcType.DATE),
+              @Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+              @Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "CUERPO", property = "cuerpo", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "DESTINATARIO", property = "destinatario", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR)
 			})
-	List<ComunicacionesItem> busquedaComunicaciones(String num, String anio, String idturno, String idpersona);
+	List<EnviosMasivosItem> busquedaComunicaciones(String num, String anio, String idturno, Short idInstitucion, String idLenguaje);
 
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerIdPersonaByNumCol")
