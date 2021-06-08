@@ -695,7 +695,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 //				sql += " and l.idpersona = " + String.valueOf(designaItem.getNumColegiado()) + " ";
 			}
-			if (designaItem.getNumColegiado() != null && !(String.valueOf(designaItem.getNumColegiado())).equals("")) {
+			if (designaItem.getNumColegiado() != null && !(String.valueOf(designaItem.getNumColegiado())).equals("")
+					&& !isNoColegiado) {
 				sql += " and colegiado.ncolegiado = " + String.valueOf(designaItem.getNumColegiado()) + " ";
 			}
 
