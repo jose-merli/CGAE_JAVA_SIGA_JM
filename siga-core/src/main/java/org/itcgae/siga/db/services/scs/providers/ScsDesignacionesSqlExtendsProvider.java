@@ -544,7 +544,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						for (int i = 0; i < designaItem.getIdAcreditacion().length; i++) {
 							String turno = designaItem.getIdAcreditacion()[i];
 
-							if (i == designaItem.getIdTurnos().length - 1) {
+							if (i == designaItem.getIdAcreditacion().length - 1) {
 								turnoIN = turnoIN + turno;
 							} else {
 								turnoIN = turnoIN + turno + " ,";
@@ -2359,7 +2359,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("idinstitucion=" + procuradorItem.getIdInstitucion());
 		sql.WHERE("idprocurador=(SELECT IDPROCURADOR FROM SCS_PROCURADOR WHERE NCOLEGIADO = '"+procuradorItem.getnColegiado()+"' AND NOMBRE = '"+nombre+"')");
 		if(fecha != null) {
-			sql.WHERE("fecharenuncia =TO_DATE('"+fecha+"','DD/MM/YYYY')");
+			sql.WHERE("TRUNC(fecharenuncia) =TO_DATE('"+fecha+"','DD/MM/YYYY')");
 		}
 		sql.WHERE("idturno="+procuradorItem.getIdTurno());
 		sql.WHERE("numero="+procuradorItem.getNumero());
@@ -3224,12 +3224,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT("nvl(camposenviosasunto.valor, plantilla.asunto) AS asunto");
 		sql2.SELECT("nvl(camposenvioscuerpo.valor, plantilla.cuerpo) AS cuerpo");
 		sql2.FROM("env_envios e");
-		sql2.JOIN("env_destinatarios dest on (dest.idenvio=e.idenvio and dest.idinstitucion =e.idinstitucion)");
-		sql2.JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '"+idInstitucion+"' AND plantilla.idplantillaenvios = e.idplantillaenvios"
+		sql2.LEFT_OUTER_JOIN("env_destinatarios dest on (dest.idenvio=e.idenvio and dest.idinstitucion =e.idinstitucion)");
+		sql2.LEFT_OUTER_JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '"+idInstitucion+"' AND plantilla.idplantillaenvios = e.idplantillaenvios"
 				+ " AND plantilla.idtipoenvios = e.idtipoenvios)");
-		sql2.JOIN("env_camposenvios camposenviosasunto ON (e.idenvio = camposenviosasunto.idenvio AND camposenviosasunto.idinstitucion = e.idinstitucion"
+		sql2.LEFT_OUTER_JOIN("env_camposenvios camposenviosasunto ON (e.idenvio = camposenviosasunto.idenvio AND camposenviosasunto.idinstitucion = e.idinstitucion"
 				+ " AND camposenviosasunto.idcampo = 1)");
-		sql2.JOIN("env_camposenvios camposenvioscuerpo ON (e.idenvio = camposenvioscuerpo.idenvio AND camposenvioscuerpo.idinstitucion = e.idinstitucion"
+		sql2.LEFT_OUTER_JOIN("env_camposenvios camposenvioscuerpo ON (e.idenvio = camposenvioscuerpo.idenvio AND camposenvioscuerpo.idinstitucion = e.idinstitucion"
 				+ " AND camposenvioscuerpo.idcampo = 2)");
 		
 		sql2.WHERE("e.fechabaja IS NULL");
@@ -3237,31 +3237,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		sql.SELECT("*");
 		sql.FROM("("+sql2.toString()+")");
-		
-		
-//		SQL sql2 = new SQL();
-//
-//		sql2.SELECT(
-//				"S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, N.NOMBRE, F_SIGA_GETRECURSO(A.NOMBRE, 1) as IDESTADO , N.APELLIDOS1 , N.APELLIDOS2");
-//
-//		sql2.FROM("SCS_COMUNICACIONES C");
-//		sql2.INNER_JOIN("ENV_ENVIOS S on (s.idenvio = C.IDENVIOSALIDA)");
-//		sql2.INNER_JOIN("ENV_TIPOENVIOS T on (T.IDTIPOENVIOS = S.IDTIPOENVIOS)");
-//		sql2.INNER_JOIN("env_estadoenvio A on (A.IDESTADO = S.IDESTADO)");
-//		sql2.INNER_JOIN("ENV_DESTINATARIOS D on (D.IDENVIO = S.IDENVIO)");
-//		sql2.INNER_JOIN("CEN_PERSONA N on (N.IDPERSONA = D.IDPERSONA)");
-//		sql2.WHERE("C.DESIGNAANIO = " + anio);
-//		sql2.WHERE("C.DESIGNAIDTURNO =" + idturno);
-//
-//		if (idPersona == null) {
-//			sql2.WHERE("C.DESIGNANUMERO =" + num);
-//		} else {
-//			sql2.WHERE("(C.DESIGNANUMERO =" + num + " OR (D.IDPERSONA =" + idPersona + " AND S.IDESTADO = 2))");
-//		}
-//
-//		sql.SELECT("*");
-//		sql.FROM("( " + sql2.toString() + " )");
-//		sql.WHERE("ROWNUM <= 200");
 
 		return sql.toString();
 	}
@@ -3273,6 +3248,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("CEN_COLEGIADO");
 		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
 		sql.WHERE(" NCOLEGIADO ='" + numColegiado + "'");
+
+		return sql.toString();
+	}
+	public String obtenerIdPersonaByNumComunitario(String idInstitucion, String numColegiado) {
+		SQL sql = new SQL();
+
+		sql.SELECT("IDPERSONA ");
+		sql.FROM("CEN_COLEGIADO");
+		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
+		sql.WHERE(" NCOMUNITARIO ='" + numColegiado + "'");
 
 		return sql.toString();
 	}

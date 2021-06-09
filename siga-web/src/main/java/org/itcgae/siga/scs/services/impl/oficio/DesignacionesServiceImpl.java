@@ -2780,16 +2780,31 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setUsumodificacion(usuario.getIdusuario());
 						designaLetrado.setManual((short) 1);
 						designaLetrado.setLetradodelturno("1");
-
-						String idPersona = scsDesignacionesExtendsMapper
-								.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
-
-						if(idPersona == null || idPersona == "") {
+						
+						String idPersona = null;
+						
+						if(idInstitucion == designaItem.getIdInstitucion() || designaItem.getIdInstitucion() == 0){
 							idPersona = scsDesignacionesExtendsMapper
-									.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
-							idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(idInstitucion.toString(), idPersona);
-							
+									.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
+
+							if(idPersona == null || idPersona == "") {
+								idPersona = scsDesignacionesExtendsMapper
+										.obtenerIdPersonaByNumComunitario(designa.getIdinstitucion().toString(), numeroColegiado);
+							}
+//
+//							if(idPersona == null || idPersona == "") {
+//								idPersona = scsDesignacionesExtendsMapper
+//										.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
+//								idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
+//
+//							}
+						}else {
+								idPersona = scsDesignacionesExtendsMapper
+										.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
+								idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
 						}
+
+						
 						InsertResponseDTO responseNColegiado = new InsertResponseDTO();
 						if(idPersona == null || idPersona == "") {
 							NoColegiadoItem noColegiadoItem = new NoColegiadoItem();
