@@ -284,6 +284,9 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService {
 						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_envPlantillaEnviosExtendsMapper.updateByPrimaryKeyWithBLOBs(plantilla);
 						respuesta.setMessage(plantilla.getIdplantillaenvios().toString());
+						if (plantilla.getIdpersona() != null) {
+							respuesta.setDescription(String.valueOf(plantilla.getIdpersona()));
+						}
 					} else {
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
 						NewIdDTO id = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();

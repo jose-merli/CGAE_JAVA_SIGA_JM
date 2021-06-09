@@ -69,7 +69,8 @@ public interface EnvPlantillaEnviosExtendsMapper extends EnvPlantillasenviosMapp
 	
 	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "getTipoEnvioPlantilla")
 	@Results({@Result(column = "DESCRIPCION", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idtipoEnvios", property = "idTipoEnvios", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "idtipoEnvios", property = "idTipoEnvios", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)
 	})
 	List<PlantillaEnvioItem> getTipoEnvioPlantilla(Short idInstitucion, String idPlantilla, String idLenguaje);
 	

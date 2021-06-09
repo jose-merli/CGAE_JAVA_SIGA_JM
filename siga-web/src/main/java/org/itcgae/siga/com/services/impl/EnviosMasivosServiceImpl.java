@@ -1673,7 +1673,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 				plantilla.setCuerpo(plant.getCuerpo());
 				plantilla.setAsunto(plant.getAsunto());
-
+				if (plant.getIdpersona() != null) {
+					plantilla.setIdPersona(String.valueOf(plant.getIdpersona()));
+				};
 			}
 		}
 
