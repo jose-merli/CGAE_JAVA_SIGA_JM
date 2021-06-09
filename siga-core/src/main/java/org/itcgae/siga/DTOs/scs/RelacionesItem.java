@@ -14,7 +14,7 @@ public class RelacionesItem {
 	private String idturnodesigna;
 	private String idtipo;
 	private String codigo;
-	private String desturno;
+	private String descturno;
 	private String destipo;
 	private Date fechaDesignacion;
 	private String datosinteres;
@@ -118,11 +118,11 @@ public class RelacionesItem {
 		this.codigo = codigo;
 	}
 
-	public String getDesturno() {
-		return desturno;
+	public String getDescturno() {
+		return descturno;
 	}
-	public void setDesturno(String desturno) {
-		this.desturno = desturno;
+	public void setDescturno(String descturno) {
+		this.descturno = descturno;
 	}
 
 	public String getDestipo() {
@@ -208,6 +208,7 @@ public class RelacionesItem {
 	public void setDilnigproc(String dilnigproc) {
 		this.dilnigproc = dilnigproc;
 	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -215,7 +216,7 @@ public class RelacionesItem {
 		result = prime * result + ((anio == null) ? 0 : anio.hashCode());
 		result = prime * result + ((centrodetencion == null) ? 0 : centrodetencion.hashCode());
 		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
-		result = prime * result + ((desturno == null) ? 0 : desturno.hashCode());
+		result = prime * result + ((descturno == null) ? 0 : descturno.hashCode());
 		result = prime * result + ((destipo == null) ? 0 : destipo.hashCode());
 		result = prime * result + ((dictamen == null) ? 0 : dictamen.hashCode());
 		result = prime * result + ((dilnigproc == null) ? 0 : dilnigproc.hashCode());
@@ -265,10 +266,10 @@ public class RelacionesItem {
 				return false;
 		} else if (!codigo.equals(other.codigo))
 			return false;
-		if (desturno == null) {
-			if (other.desturno != null)
+		if (descturno == null) {
+			if (other.descturno != null)
 				return false;
-		} else if (!desturno.equals(other.desturno))
+		} else if (!descturno.equals(other.descturno))
 			return false;
 		if (destipo == null) {
 			if (other.destipo != null)
@@ -388,8 +389,8 @@ public class RelacionesItem {
 	public String toString() {
 		return "RelacionesItem [sjcs=" + sjcs + ", idinstitucion=" + idinstitucion + ", anio=" + anio + ", numero="
 				+ numero + ", idletrado=" + idletrado + ", letrado=" + letrado + ", idturno=" + idturno
-				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", desturno="
-				+ desturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
+				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", descturno="
+				+ descturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
 				+ fechaDesignacion + ", datosinteres=" + datosinteres +", idsjcs=" + idsjcs +"]";
 	}
 
@@ -403,5 +404,7 @@ public class RelacionesItem {
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
+
+	
 
 }

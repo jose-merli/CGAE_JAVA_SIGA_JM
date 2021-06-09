@@ -231,7 +231,7 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPO", property = "idtipo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DES_TURNO", property = "desturno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DES_TURNO", property = "descturno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DES_TIPO", property = "destipo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DATOSINTERES", property = "datosinteres", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDSJCS", property = "idsjcs", jdbcType = JdbcType.VARCHAR),
