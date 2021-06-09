@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
+import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
@@ -82,6 +83,8 @@ public interface IGestionEJG {
 	InsertResponseDTO insertFamiliarEJG(List<String> item, HttpServletRequest request);
 
 	UpdateResponseDTO borrarFamiliar(List<UnidadFamiliarEJGItem> datos, HttpServletRequest request);
+	
+	RelacionesDTO getRelacionesEJG(EjgItem item, HttpServletRequest request);
 
 	ComboDTO comboSituaciones(HttpServletRequest request);
 
