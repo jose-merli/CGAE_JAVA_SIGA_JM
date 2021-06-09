@@ -35,6 +35,14 @@ public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
               })
               List<ComboItem> comboEstadoEjg(Short idLenguaje);
               
+              
+              @SelectProvider(type = ScsEstadoejgSqlExtendsProvider.class, method = "comboEstadoEjgComision")
+              @Results({
+                  @Result(column = "IDESTADOEJG", property = "value", jdbcType = JdbcType.VARCHAR),
+                  @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+              })
+              List<ComboItem> comboEstadoEjgComision(Short idLenguaje);
+              
             @SelectProvider(type = ScsEstadoejgSqlExtendsProvider.class, method = "getEstados")
           	@Results({ 
           		@Result(column = "fechainicio", property = "fechaInicio", jdbcType = JdbcType.DATE),

@@ -71,4 +71,17 @@ public class ScsTipofundamentosSqlExtendsProvider extends ScsTipofundamentos{
 		return sql.toString();
 	}
 	
+	public String comboFundamentoJuridComision(String idLenguaje, String idInstitucion, String resolucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("fundamento.idfundamento");
+		sql.SELECT("catalogoFundamento.descripcion");
+//		sql.SELECT("fundamento.IDTIPORESOLUCION");
+		sql.FROM("SCS_TIPOFUNDAMENTOS fundamento");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoFundamento on catalogoFundamento.idrecurso = fundamento.DESCRIPCION and catalogoFundamento.idlenguaje ="+idLenguaje);
+		sql.WHERE("fundamento.fecha_baja is null AND fundamento.IDINSTITUCION =" + idInstitucion + " AND fundamento.IDTIPORESOLUCION =" +resolucion);
+		sql.ORDER_BY("catalogoFundamento.descripcion");
+		return sql.toString();
+	}
+	
 }

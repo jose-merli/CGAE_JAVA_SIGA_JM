@@ -20,5 +20,12 @@ public interface ScsPonenteExtendsMapper extends ScsPonenteMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> comboPonente(String idLenguaje, String idInstitucion);
+
+	@SelectProvider(type = ScsPonenteSqlExtendsProvider.class, method = "comboPonenteComision")
+	@Results({ 
+		@Result(column = "IDPONENTE", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> comboPonenteComision(String idlenguaje, String string);
 	
 }

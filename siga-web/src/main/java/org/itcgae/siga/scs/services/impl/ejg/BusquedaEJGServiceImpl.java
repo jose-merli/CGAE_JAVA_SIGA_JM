@@ -32,6 +32,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgEjgremesaExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgRemesaExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsFundamentoscalificacionExtendsMapper;
@@ -95,6 +96,10 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 	private CajgEjgremesaMapper cajgEjgremesaMapper;
 	@Autowired
 	private CajgEjgremesaExtendsMapper cajgEjgremesaExtendsMapper;
+	@Autowired
+	private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
+	
+	
 
 	@Override
 	public ComboDTO comboTipoEJG(HttpServletRequest request) {
@@ -891,5 +896,170 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 		}
 		LOGGER.info("comboTurnosTipo() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboTipoColegioEjgComision(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+				// Conseguimos información del usuario logeado
+				String token = request.getHeader("Authorization");
+				String dni = UserTokenUtils.getDniFromJWTToken(token);
+				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+				ComboDTO comboDTO = new ComboDTO();
+				List<ComboItem> comboItems = null;
+
+				if (idInstitucion != null) {
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					LOGGER.info(
+							"comboTipoColegioEjgComision() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+					LOGGER.info(
+							"comboTipoColegioEjgComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					if (usuarios != null && usuarios.size() > 0) {
+
+						LOGGER.info(
+								"comboTipoColegioEjgComision() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
+
+						comboItems = scsEstadoEjgextendsMapper.comboEstadoEjgComision(Short.valueOf(usuarios.get(0).getIdlenguaje()));
+
+						LOGGER.info(
+								"comboTipoColegioEjgComision() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
+
+						if (comboItems != null) {
+							comboDTO.setCombooItems(comboItems);
+						}
+					}
+
+				}
+				LOGGER.info("comboTipoColegioEjgComision() -> Salida del servicio para obtener los tipos ejg");
+				return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboEstadoEJGComision(HttpServletRequest request, String resolucion) {
+		// TODO Auto-generated method stub
+				// Conseguimos información del usuario logeado
+				String token = request.getHeader("Authorization");
+				String dni = UserTokenUtils.getDniFromJWTToken(token);
+				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+				ComboDTO comboDTO = new ComboDTO();
+				List<ComboItem> comboItems = null;
+
+				if (idInstitucion != null) {
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					LOGGER.info(
+							"comboEstadoEJGComision() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+					LOGGER.info(
+							"comboEstadoEJGComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					if (usuarios != null && usuarios.size() > 0) {
+
+						LOGGER.info(
+								"comboEstadoEJGComision() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
+
+						comboItems = scsEstadoEjgextendsMapper.comboEstadoEjgComision(Short.valueOf(usuarios.get(0).getIdlenguaje()));
+
+						LOGGER.info(
+								"comboEstadoEJGComision() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
+
+						if (comboItems != null) {
+							comboDTO.setCombooItems(comboItems);
+						}
+					}
+
+				}
+				LOGGER.info("comboEstadoEJGComision() -> Salida del servicio para obtener los tipos ejg");
+				return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboPonenteComision(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+				// Conseguimos información del usuario logeado
+				String token = request.getHeader("Authorization");
+				String dni = UserTokenUtils.getDniFromJWTToken(token);
+				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+				ComboDTO comboDTO = new ComboDTO();
+				List<ComboItem> comboItems = null;
+
+				if (idInstitucion != null) {
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					LOGGER.info(
+							"comboPonente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+					LOGGER.info(
+							"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					if (usuarios != null && usuarios.size() > 0) {
+
+						LOGGER.info(
+								"comboPonenteComision() / scsPonenteextendsMapper.getResoluciones() -> Entrada a scsImpugnacionEjgextendsMapper para obtener los combo");
+
+						comboItems = scsPonenteextendsMapper.comboPonenteComision(usuarios.get(0).getIdlenguaje(),
+								idInstitucion.toString());
+
+						LOGGER.info(
+								"comboPonenteComision() / scsPonenteextendsMapper.getResoluciones() -> Salida a scsImpugnacionEjgextendsMapper para obtener los combo");
+
+						if (comboItems != null) {
+							comboDTO.setCombooItems(comboItems);
+						}
+					}
+				}
+				LOGGER.info("comboPonenteComision() -> Salida del servicio para obtener los tipos ejg");
+				return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboFundamentoJuridComision(HttpServletRequest request, String resolucion) {
+		// TODO Auto-generated method stub
+				// Conseguimos información del usuario logeado
+				String token = request.getHeader("Authorization");
+				String dni = UserTokenUtils.getDniFromJWTToken(token);
+				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+				ComboDTO comboDTO = new ComboDTO();
+				List<ComboItem> comboItems = null;
+
+				if (idInstitucion != null) {
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					LOGGER.info(
+							"comboFundamentoJuridComision() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+					LOGGER.info(
+							"comboFundamentoJuridComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					if (usuarios != null && usuarios.size() > 0) {
+
+						LOGGER.info(
+								"comboFundamentoJuridComision() / scsTipofundamentosSqlExtendsMapper.ComboFundamentoJurid() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener combo");
+
+						comboItems = scsTipofundamentosExtendsMapper.comboFundamentoJuridComision(usuarios.get(0).getIdlenguaje(),
+								idInstitucion.toString(), resolucion);
+
+						LOGGER.info(
+								"comboFundamentoJuridComision() / scsTipofundamentosSqlExtendsMapper.ComboFundamentoJurid() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener combo");
+
+						if (comboItems != null) {
+							comboDTO.setCombooItems(comboItems);
+						}
+					}
+
+				}
+				LOGGER.info("comboFundamentoJuridComision() -> Salida del servicio para obtener combo");
+				return comboDTO;
 	}
 }

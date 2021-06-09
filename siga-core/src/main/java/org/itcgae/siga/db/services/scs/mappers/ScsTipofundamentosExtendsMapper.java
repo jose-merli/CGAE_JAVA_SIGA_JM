@@ -52,6 +52,14 @@ public interface ScsTipofundamentosExtendsMapper extends ScsTipofundamentosMappe
 
 	})
 	List<ComboItem> comboFundamentoJurid(String idlenguaje, String string, String resolucion);
+
+	@SelectProvider(type = ScsTipofundamentosSqlExtendsProvider.class, method = "comboFundamentoJuridComision")
+	@Results({ 
+		@Result(column = "IDFUNDAMENTO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+
+	})
+	List<ComboItem> comboFundamentoJuridComision(String idlenguaje, String string, String resolucion);
 	
 	
 }

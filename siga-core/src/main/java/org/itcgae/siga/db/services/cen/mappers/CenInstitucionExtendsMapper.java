@@ -86,7 +86,13 @@ public interface CenInstitucionExtendsMapper extends CenInstitucionMapper {
 	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
 		 		@Result(column = "ABREVIATURA", property = "label", jdbcType = JdbcType.VARCHAR)
 			})
-	List<ComboItem> comboColegiosModelo(Short idInstitucionUser); 
+	List<ComboItem> comboColegiosModelo(Short idInstitucionUser);
+	
+	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getComboColegiosComision")
+	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
+		 		@Result(column = "ABREVIATURA", property = "label", jdbcType = JdbcType.VARCHAR)
+			})
+	List<ComboItem> comboColegiosModeloComision(String idInstitucion); 
 	
 	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getComboInstitucionesCol")
 	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),

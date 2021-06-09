@@ -50,6 +50,12 @@ public class EjgController {
 		ComboDTO response = busquedaEJG.comboTipoColegioEjg(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/filtros-ejg/comboTipoEJGColegioComision", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboTipoColegioEjgConsolidado(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboTipoColegioEjgComision(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/filtros-ejg/comboFundamentoCalif", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen) {
@@ -98,10 +104,22 @@ public class EjgController {
 		ComboDTO response = busquedaEJG.ComboFundamentoJurid(request, resolucion);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/filtros-ejg/comboFundamentoJuridComision", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboFundamentoJuridComision(HttpServletRequest request, String resolucion) {
+		ComboDTO response = busquedaEJG.comboFundamentoJuridComision(request, resolucion);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/filtros-ejg/comboEstadoEJG", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboEstadoEJG(HttpServletRequest request, String resolucion) {
 		ComboDTO response = busquedaEJG.comboEstadoEJG(request, resolucion);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-ejg/comboEstadoEJGComision", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboEstadoEJGComision(HttpServletRequest request, String resolucion) {
+		ComboDTO response = busquedaEJG.comboEstadoEJGComision(request, resolucion);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
@@ -120,6 +138,12 @@ public class EjgController {
 	@RequestMapping(value = "/filtros-ejg/comboPonente", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboPonente(HttpServletRequest request) {
 		ComboDTO response = busquedaEJG.comboPonente(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-ejg/comboPonenteComision", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboPonenteComision(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboPonenteComision(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
