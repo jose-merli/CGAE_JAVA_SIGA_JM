@@ -1389,6 +1389,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	    sqlPrincipal.ORDER_BY("codigo DESC");
 	    
 		return sqlPrincipal.toString();
+	}
 		
 	/**
 	 * 
