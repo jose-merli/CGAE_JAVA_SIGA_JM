@@ -1108,6 +1108,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" D.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("D.ANIO = '" + designaItem.getAno() + "'");
 		sql.WHERE("D.NUMERO = '" + designaItem.getNumero() + "'");
+		sql.WHERE("P.FECHABAJA IS NOT NULL");
+		sql.WHERE("P.FECHA_BAJA IS NOT NULL");
 
 		return sql.toString();
 
@@ -1667,6 +1669,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT(" DISTINCT IDPRETENSION, F_SIGA_GETRECURSO(DESCRIPCION, 1) AS NOMBRE");
 		sql.FROM("SCS_PRETENSION");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("FECHABAJA IS NOT NULL");
+		sql.WHERE("FECHA_BAJA IS NOT NULL");
 
 		return sql.toString();
 	}
@@ -1730,6 +1734,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_PRETENSION ");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("IDPRETENSION IN " + inSQL);
+		sql.WHERE("FECHABAJA IS NOT NULL");
+		sql.WHERE("FECHA_BAJA IS NOT NULL");
 
 		return sql.toString();
 	}
@@ -1815,6 +1821,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_PRETENSION ");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("IDPRETENSION IN " + inSQL);
+		sql.WHERE("FECHABAJA IS NOT NULL");
+		sql.WHERE("FECHA_BAJA IS NOT NULL");
 
 		return sql.toString();
 	}
