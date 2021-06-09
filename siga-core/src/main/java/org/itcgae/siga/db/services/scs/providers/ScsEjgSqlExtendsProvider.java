@@ -1368,7 +1368,6 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	    
 		return sqlPrincipal.toString();
 	}
-		
 	/**
 	 * 
 	 * @param anio
