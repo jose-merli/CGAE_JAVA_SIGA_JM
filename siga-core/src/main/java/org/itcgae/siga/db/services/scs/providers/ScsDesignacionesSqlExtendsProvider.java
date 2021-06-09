@@ -2345,7 +2345,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("idinstitucion=" + procuradorItem.getIdInstitucion());
 		sql.WHERE("idprocurador=(SELECT IDPROCURADOR FROM SCS_PROCURADOR WHERE NCOLEGIADO = '"+procuradorItem.getnColegiado()+"' AND NOMBRE = '"+nombre+"')");
 		if(fecha != null) {
-			sql.WHERE("fecharenuncia =TO_DATE('"+fecha+"','DD/MM/YYYY')");
+			sql.WHERE("TRUNC(fecharenuncia) =TO_DATE('"+fecha+"','DD/MM/YYYY')");
 		}
 		sql.WHERE("idturno="+procuradorItem.getIdTurno());
 		sql.WHERE("numero="+procuradorItem.getNumero());
