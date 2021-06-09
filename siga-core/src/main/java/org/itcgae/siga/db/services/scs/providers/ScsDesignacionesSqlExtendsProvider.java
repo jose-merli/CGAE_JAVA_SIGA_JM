@@ -1108,6 +1108,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" D.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("D.ANIO = '" + designaItem.getAno() + "'");
 		sql.WHERE("D.NUMERO = '" + designaItem.getNumero() + "'");
+		sql.WHERE("P.FECHABAJA IS NULL");
+		sql.WHERE("P.FECHA_BAJA IS NULL");
 
 		return sql.toString();
 
@@ -1129,6 +1131,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" DES.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("DES.ANIO = '" + designaItem.getAno() + "'");
 		sql.WHERE("DES.NUMERO = '" + designaItem.getNumero() + "'");
+		sql.WHERE("procd.FECHABAJA IS NULL");
 
 		return sql.toString();
 
@@ -1642,6 +1645,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE, MODULO.CODIGO ");
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("FECHABAJA IS NULL");
 
 		return sql.toString();
 	}
@@ -1667,6 +1671,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT(" DISTINCT IDPRETENSION, F_SIGA_GETRECURSO(DESCRIPCION, 1) AS NOMBRE");
 		sql.FROM("SCS_PRETENSION");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("FECHABAJA IS NULL");
+		sql.WHERE("FECHA_BAJA IS NULL");
 
 		return sql.toString();
 	}
@@ -1730,6 +1736,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_PRETENSION ");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("IDPRETENSION IN " + inSQL);
+		sql.WHERE("FECHABAJA IS NULL");
+		sql.WHERE("FECHA_BAJA IS NULL");
 
 		return sql.toString();
 	}
@@ -1751,6 +1759,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO ");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("MODULO.IDPROCEDIMIENTO IN " + inSQL);
+		sql.WHERE("FECHABAJA IS NULL");
 
 		return sql.toString();
 	}
@@ -1783,6 +1792,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO ");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("MODULO.IDPROCEDIMIENTO IN " + inSQL);
+		sql.WHERE("FECHABAJA IS NULL");
 
 		return sql.toString();
 	}
@@ -1815,6 +1825,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_PRETENSION ");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("IDPRETENSION IN " + inSQL);
+		sql.WHERE("FECHABAJA IS NULL");
+		sql.WHERE("FECHA_BAJA IS NULL");
 
 		return sql.toString();
 	}
@@ -2333,7 +2345,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("idinstitucion=" + procuradorItem.getIdInstitucion());
 		sql.WHERE("idprocurador=(SELECT IDPROCURADOR FROM SCS_PROCURADOR WHERE NCOLEGIADO = '"+procuradorItem.getnColegiado()+"' AND NOMBRE = '"+nombre+"')");
 		if(fecha != null) {
-			sql.WHERE("fecharenuncia =TO_DATE('"+fecha+"','DD/MM/YYYY')");
+			sql.WHERE("TRUNC(fecharenuncia) =TO_DATE('"+fecha+"','DD/MM/YYYY')");
 		}
 		sql.WHERE("idturno="+procuradorItem.getIdTurno());
 		sql.WHERE("numero="+procuradorItem.getNumero());
@@ -2608,7 +2620,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String busquedaRelaciones(String idInstitucion, String designaAnio, String designaNumero, String designaTurno) {
+	public String busquedaRelaciones(String designaAnio, String designaNumero, String designaTurno, String idInstitucion) {
 		//Consulta padre que engloba al resto para usar un where general, etc.
 		SQL sql = new SQL();
 		
@@ -3162,31 +3174,55 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}
 	}
 
-	public String busquedaComunicaciones(String anio, String num, String idturno, String idPersona) {
+	public String busquedaComunicaciones(String num, String anio, String idturno, Short idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
-
-		sql2.SELECT(
-				"S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, N.NOMBRE, F_SIGA_GETRECURSO(A.NOMBRE, 1) as IDESTADO , N.APELLIDOS1 , N.APELLIDOS2");
-
-		sql2.FROM("SCS_COMUNICACIONES C");
-		sql2.INNER_JOIN("ENV_ENVIOS S on (s.idenvio = C.IDENVIOSALIDA)");
-		sql2.INNER_JOIN("ENV_TIPOENVIOS T on (T.IDTIPOENVIOS = S.IDTIPOENVIOS)");
-		sql2.INNER_JOIN("env_estadoenvio A on (A.IDESTADO = S.IDESTADO)");
-		sql2.INNER_JOIN("ENV_DESTINATARIOS D on (D.IDENVIO = S.IDENVIO)");
-		sql2.INNER_JOIN("CEN_PERSONA N on (N.IDPERSONA = D.IDPERSONA)");
-		sql2.WHERE("C.DESIGNAANIO = " + anio);
-		sql2.WHERE("C.DESIGNAIDTURNO =" + idturno);
-
-		if (idPersona == null) {
-			sql2.WHERE("C.DESIGNANUMERO =" + num);
-		} else {
-			sql2.WHERE("(C.DESIGNANUMERO =" + num + " OR (D.IDPERSONA =" + idPersona + " AND S.IDESTADO = 2))");
-		}
-
+		SQL sql3 = new SQL();
+		SQL sqlTipoEnvio = new SQL();
+		SQL sqlEstadosEnvio = new SQL();
+		
+        //subquery tipo envio
+        sqlTipoEnvio.SELECT("cat.descripcion");
+        sqlTipoEnvio.FROM("env_tipoenvios");
+        sqlTipoEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = env_tipoenvios.nombre)");
+        sqlTipoEnvio.WHERE("env_tipoenvios.idtipoenvios = e.idtipoenvios");
+        sqlTipoEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
+        
+        //subquery estadosEnvios
+        sqlEstadosEnvio.SELECT("cat.descripcion");
+        sqlEstadosEnvio.FROM("env_estadoenvio estado");
+        sqlEstadosEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = estado.nombre)");
+        sqlEstadosEnvio.WHERE("estado.idestado = e.idestado");
+        sqlEstadosEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
+		
+		sql3.SELECT("c.idenviosalida");
+        sql3.SELECT("c.idinstitucion");
+        sql3.FROM("scs_comunicaciones c");
+		sql3.WHERE("c.idinstitucion = '"+idInstitucion+"'");
+		sql3.WHERE("c.designaanio = "+anio);
+		sql3.WHERE("c.designaidturno = "+idturno);
+		sql3.WHERE("c.designanumero = '"+num+"'");
+        
+		sql2.SELECT("e.*");
+		sql2.SELECT("(dest.nombre || ' ' || dest.apellidos1 || ' ' || dest.apellidos2) AS destinatario");
+		sql2.SELECT("("+sqlTipoEnvio.toString()+") as tipoenvio");
+		sql2.SELECT("("+sqlEstadosEnvio.toString()+") as estadoenvio");
+		sql2.SELECT("nvl(camposenviosasunto.valor, plantilla.asunto) AS asunto");
+		sql2.SELECT("nvl(camposenvioscuerpo.valor, plantilla.cuerpo) AS cuerpo");
+		sql2.FROM("env_envios e");
+		sql2.LEFT_OUTER_JOIN("env_destinatarios dest on (dest.idenvio=e.idenvio and dest.idinstitucion =e.idinstitucion)");
+		sql2.LEFT_OUTER_JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '"+idInstitucion+"' AND plantilla.idplantillaenvios = e.idplantillaenvios"
+				+ " AND plantilla.idtipoenvios = e.idtipoenvios)");
+		sql2.LEFT_OUTER_JOIN("env_camposenvios camposenviosasunto ON (e.idenvio = camposenviosasunto.idenvio AND camposenviosasunto.idinstitucion = e.idinstitucion"
+				+ " AND camposenviosasunto.idcampo = 1)");
+		sql2.LEFT_OUTER_JOIN("env_camposenvios camposenvioscuerpo ON (e.idenvio = camposenvioscuerpo.idenvio AND camposenvioscuerpo.idinstitucion = e.idinstitucion"
+				+ " AND camposenvioscuerpo.idcampo = 2)");
+		
+		sql2.WHERE("e.fechabaja IS NULL");
+		sql2.WHERE("(e.idenvio,e.idinstitucion) IN ("+sql3.toString()+")");
+		
 		sql.SELECT("*");
-		sql.FROM("( " + sql2.toString() + " )");
-		sql.WHERE("ROWNUM <= 200");
+		sql.FROM("("+sql2.toString()+")");
 
 		return sql.toString();
 	}
@@ -3395,6 +3431,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("IDJUZGADO = '" + idJuzgado + "'");
+		sql.WHERE("FECHABAJA IS NULL");
 
 		return sql.toString();
 

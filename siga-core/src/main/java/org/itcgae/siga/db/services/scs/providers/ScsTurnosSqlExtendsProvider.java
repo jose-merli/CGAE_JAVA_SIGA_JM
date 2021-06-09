@@ -488,7 +488,7 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 		
 		sql4.SELECT("(CASE\r\n" + 
 				"		WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-				"		AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
+				"		AND TRUNC(Ins.Fechavalidacion) <= NVL(TO_DATE('"+strDate+"','DD/MM/RRRR'), Ins.Fechavalidacion)\r\n" + 
 				"		THEN '1'\r\n" + 
 				"		ELSE '0'\r\n" + 
 				"	END) Activo,\r\n" + 
@@ -565,7 +565,7 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 		sqls5.SELECT("consulta4.* from(SELECT ROWNUM AS orden,consulta3.* FROM (SELECT \r\n" + 
 				"	(CASE\r\n" + 
 				"		WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-				"		AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
+				"		AND TRUNC(Ins.Fechavalidacion) <= NVL(TO_DATE('"+strDate+"','DD/MM/RRRR'), Ins.Fechavalidacion)\r\n" + 
 				"		THEN '1'\r\n" + 
 				"		ELSE '0'\r\n" + 
 				"	END) Activo,\r\n" + 
