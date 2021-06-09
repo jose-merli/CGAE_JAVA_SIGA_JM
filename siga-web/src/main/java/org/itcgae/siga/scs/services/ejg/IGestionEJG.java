@@ -88,4 +88,6 @@ public interface IGestionEJG {
 	ComboDTO comboCDetenciones(HttpServletRequest request);
 
 	ComboDTO comboTipoencalidad(HttpServletRequest request);
+
+	UpdateResponseDTO updateDatosJuridicos(EjgItem datos, HttpServletRequest request);
 }

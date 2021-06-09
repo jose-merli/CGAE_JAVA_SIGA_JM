@@ -398,4 +398,15 @@ public class EjgController {
 		EnviosMasivosDTO response = gestionEJG.getComunicaciones(item, request);
 		return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
 	}
+	
+	// updateDatosJuridicos
+		@RequestMapping(value = "/gestion-ejg/updateDatosJuridicos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> updateDatosJuridicos(@RequestBody EjgItem datos,
+				HttpServletRequest request) {
+			UpdateResponseDTO response = gestionEJG.updateDatosJuridicos(datos, request);
+			if (response.getStatus().equals("OK"))
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 }

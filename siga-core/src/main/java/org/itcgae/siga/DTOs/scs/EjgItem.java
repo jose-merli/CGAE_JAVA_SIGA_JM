@@ -53,6 +53,9 @@ public class EjgItem {
 	private String numAnnioProcedimiento;
 	private String procedimiento;
 	private String nig;
+	private Short idsituacion;
+	private String numerodiligencia;
+	private Long comisaria;
 
 	private String annioCAJG;
 	private String numCAJG;
@@ -1470,5 +1473,29 @@ public class EjgItem {
 
 	public void setIdPersonajg(String idPersonajg) {
 		this.idPersonajg = idPersonajg;
+	}
+
+	public Short getIdsituacion() {
+		return idsituacion;
+	}
+
+	public void setIdsituacion(Short idsituacion) {
+		this.idsituacion = idsituacion;
+	}
+
+	public String getNumerodiligencia() {
+		return numerodiligencia;
+	}
+
+	public void setNumerodiligencia(String numerodiligencia) {
+		this.numerodiligencia = numerodiligencia;
+	}
+
+	public Long getComisaria() {
+		return comisaria;
+	}
+
+	public void setComisaria(Long comisaria) {
+		this.comisaria = comisaria;
 	}
 }

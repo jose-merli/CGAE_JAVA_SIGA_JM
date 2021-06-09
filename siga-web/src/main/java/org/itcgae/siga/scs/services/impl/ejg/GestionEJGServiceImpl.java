@@ -2248,6 +2248,79 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return responsedto;
 	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO updateDatosJuridicos(EjgItem datos, HttpServletRequest request) {
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.borrarRelacion() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.borrarRelacion() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.borrarRelacion() -> Entrada para cambiar los datos generales del ejg");
+
+				try {
+					ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
+						response = 0;
+
+						// Preparamos las variables para buscar la tabla a actualizar
+						record.setIdinstitucion(idInstitucion);
+						record.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+						record.setAnio(Short.parseShort(datos.getAnnio()));
+						record.setNumero(Long.parseLong(datos.getNumero()));
+						
+						record.setFechamodificacion(new Date());
+						record.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
+						// Preparamos las variables de la tabla a actualizar
+						record.setIdrenuncia(Short.parseShort(datos.getRenuncia()));
+						record.setIdpreceptivo(Short.parseShort(datos.getPerceptivo()));
+						record.setIdsituacion(datos.getIdsituacion());
+						record.setNumerodiligencia(datos.getNumerodiligencia());
+						record.setComisaria(datos.getComisaria());
+						record.setCalidad(datos.getCalidad());
+						
+						response = scsEjgMapper.updateByPrimaryKeySelective(record);
+					
+					LOGGER.debug(
+							"GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.borrarRelacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							e);
+				} finally {
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug(
+								"GestionEJGServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"GestionEJGServiceImpl.borrarRelacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+					}
+				}
+			}
+		}
+
+		LOGGER.info("GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio.");
+
+		return responsedto;
+	}
 
 	/**
 	 * getComunicaciones
