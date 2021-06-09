@@ -14,7 +14,7 @@ public class RelacionesItem {
 	private String idturnodesigna;
 	private String idtipo;
 	private String codigo;
-	private String descturno;
+	private String desturno;
 	private String destipo;
 	private Date fechaDesignacion;
 	private String datosinteres;
@@ -118,11 +118,11 @@ public class RelacionesItem {
 		this.codigo = codigo;
 	}
 
-	public String getDescturno() {
-		return descturno;
+	public String getDesturno() {
+		return desturno;
 	}
-	public void setDescturno(String descturno) {
-		this.descturno = descturno;
+	public void setDesturno(String desturno) {
+		this.desturno = desturno;
 	}
 
 	public String getDestipo() {
@@ -215,7 +215,7 @@ public class RelacionesItem {
 		result = prime * result + ((anio == null) ? 0 : anio.hashCode());
 		result = prime * result + ((centrodetencion == null) ? 0 : centrodetencion.hashCode());
 		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
-		result = prime * result + ((descturno == null) ? 0 : descturno.hashCode());
+		result = prime * result + ((desturno == null) ? 0 : desturno.hashCode());
 		result = prime * result + ((destipo == null) ? 0 : destipo.hashCode());
 		result = prime * result + ((dictamen == null) ? 0 : dictamen.hashCode());
 		result = prime * result + ((dilnigproc == null) ? 0 : dilnigproc.hashCode());
@@ -265,10 +265,10 @@ public class RelacionesItem {
 				return false;
 		} else if (!codigo.equals(other.codigo))
 			return false;
-		if (descturno == null) {
-			if (other.descturno != null)
+		if (desturno == null) {
+			if (other.desturno != null)
 				return false;
-		} else if (!descturno.equals(other.descturno))
+		} else if (!desturno.equals(other.desturno))
 			return false;
 		if (destipo == null) {
 			if (other.destipo != null)
@@ -388,8 +388,8 @@ public class RelacionesItem {
 	public String toString() {
 		return "RelacionesItem [sjcs=" + sjcs + ", idinstitucion=" + idinstitucion + ", anio=" + anio + ", numero="
 				+ numero + ", idletrado=" + idletrado + ", letrado=" + letrado + ", idturno=" + idturno
-				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", descturno="
-				+ descturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
+				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", desturno="
+				+ desturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
 				+ fechaDesignacion + ", datosinteres=" + datosinteres +", idsjcs=" + idsjcs +"]";
 	}
 
