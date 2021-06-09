@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
@@ -213,4 +214,24 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
 			})
 	List<ComunicacionesItem> getComunicaciones(String num, String anio, String idTipoEJG, Short idInstitucion);
+	
+
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getRelacionesEJG")
+	@Results({ @Result(column = "SJCS", property = "sjcs", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDLETRADO", property = "idletrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "INTERESADO", property = "interesado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPO", property = "idtipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DES_TURNO", property = "desturno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DES_TIPO", property = "destipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DATOSINTERES", property = "datosinteres", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDSJCS", property = "idsjcs", jdbcType = JdbcType.VARCHAR),
+		
+	})
+	List<RelacionesItem> getRelacionesEJG(EjgItem item);
 }

@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
+import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
@@ -379,5 +380,12 @@ public class EjgController {
 	ResponseEntity<ComunicacionesDTO> getComunicaciones(@RequestBody List<String> item, HttpServletRequest request) {
 		ComunicacionesDTO response = gestionEJG.getComunicaciones(item, request);
 		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
+	}
+	
+	//getRelacionesEJG
+	@RequestMapping(value = "/gestion-ejg/getRelaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<RelacionesDTO> getRelacionesEJG(@RequestBody EjgItem item, HttpServletRequest request) {
+		RelacionesDTO response = gestionEJG.getRelacionesEJG(item, request);
+		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
 	}
 }
