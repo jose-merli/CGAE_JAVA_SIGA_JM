@@ -65,6 +65,7 @@ import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaItem;
 import org.itcgae.siga.DTOs.scs.LetradoInscripcionItem;
+import org.itcgae.siga.DTOs.scs.ListDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
@@ -100,6 +101,8 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
+import org.itcgae.siga.db.entities.ScsDelitosdesigna;
+import org.itcgae.siga.db.entities.ScsDelitosdesignaExample;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
@@ -127,6 +130,7 @@ import org.itcgae.siga.db.mappers.ScsAcreditacionMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
+import org.itcgae.siga.db.mappers.ScsDelitosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
@@ -258,6 +262,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired 
 	private ITarjetaDatosDireccionesService tarjetaDatosDireccionesService;
+	
+	@Autowired 
+	private ScsDelitosdesignaMapper scsDelitosdesignaMapper;
 	
 	/**
 	 * busquedaJustificacionExpres
@@ -1819,9 +1826,34 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							scsDesigna.setIdpretension(idPretension);
 						}
 						scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
-						scsDesigna.setDelitos(designaItem.getDelitos());
 						scsDesigna.setFechaestado(designaItem.getFechaEstado());
 						scsDesigna.setFechafin(designaItem.getFechaFin());
+						
+						ScsDelitosdesignaExample scsDelitosdesignaExample = new ScsDelitosdesignaExample();
+						scsDelitosdesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andNumeroEqualTo(Long.valueOf(designaItem.getNumero()))
+								.andIdturnoEqualTo(Integer.valueOf(designaItem.getIdTurno()))
+								.andAnioEqualTo(Integer.valueOf(designaItem.getAno()).shortValue());
+
+						scsDelitosdesignaMapper.deleteByExample(scsDelitosdesignaExample);
+
+						if (!UtilidadesString.esCadenaVacia(designaItem.getDelitos())) {
+
+							String[] listaDelitos = designaItem.getDelitos().split(",");
+
+							ScsDelitosdesigna scsDelitosdesigna = new ScsDelitosdesigna();
+							scsDelitosdesigna.setIdinstitucion(idInstitucion);
+							scsDelitosdesigna.setNumero(Long.valueOf(designaItem.getNumero()));
+							scsDelitosdesigna.setIdturno(Integer.valueOf(designaItem.getIdTurno()));
+							scsDelitosdesigna.setAnio(Integer.valueOf(designaItem.getAno()).shortValue());
+							scsDelitosdesigna.setFechamodificacion(new Date());
+							scsDelitosdesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+							for (String delito : listaDelitos) {
+								scsDelitosdesigna.setIddelito(Short.valueOf(delito));
+								scsDelitosdesignaMapper.insertSelective(scsDelitosdesigna);
+							}
+						}
 
 					}
 					//VALIDAMOS EL NIG
@@ -6582,6 +6614,46 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return updateResponseDTO;
+	}
+	
+	@Override
+	public ListDTO getDelitos(DesignaItem designaItem, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ListDTO listDTO = new ListDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDelitos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDelitos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				List<String> listaDelitos = scsDesignacionesExtendsMapper.getDelitos(idInstitucion, designaItem);
+				listDTO.setLista(listaDelitos);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.getDelitos() -> Se ha producido un error al tratar de obtener los delitos de la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			listDTO.setError(error);
+		}
+
+		return listDTO;
 	}
 
 }

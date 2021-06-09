@@ -1652,15 +1652,29 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 	public String comboDelitos(DesignaItem designaItem, Short idInstitucion) {
 
+		SQL sql3 = new SQL();
+		sql3.SELECT("*");
+		sql3.FROM("SCS_DELITOSDESIGNA");
+		sql3.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql3.WHERE("NUMERO = '" + designaItem.getNumero() + "'");
+		sql3.WHERE("IDTURNO = '" + designaItem.getIdTurno() + "'");
+		sql3.WHERE("ANIO = '" + designaItem.getAno() + "'");
+
+		SQL sql2 = new SQL();
+		sql2.SELECT("D.IDDELITO");
+		sql2.SELECT("F_SIGA_GETRECURSO(D.DESCRIPCION, 1) AS DESCRIPCION");
+		sql2.SELECT("DD.NUMERO");
+		sql2.FROM("SCS_DELITO D");
+		sql2.LEFT_OUTER_JOIN(
+				"( " + sql3.toString() + ") DD ON D.IDINSTITUCION = DD.IDINSTITUCION AND D.IDDELITO = DD.IDDELITO");
+		sql2.WHERE("D.IDINSTITUCION = " + idInstitucion);
+		sql2.ORDER_BY("DD.NUMERO NULLS LAST");
+		sql2.ORDER_BY("DESCRIPCION ASC");
+
 		SQL sql = new SQL();
-		sql.SELECT("D.IDDELITO");
-		sql.SELECT("F_SIGA_GETRECURSO(D.DESCRIPCION, 1) as DESCRIPCION");
-		sql.FROM("SCS_DELITO D");
-		sql.INNER_JOIN("SCS_DELITOSDESIGNA DD ON D.IDINSTITUCION = DD.IDINSTITUCION AND D.IDDELITO = DD.IDDELITO");
-		sql.WHERE("DD.IDINSTITUCION = " + idInstitucion);
-		sql.WHERE("DD.NUMERO = " + designaItem.getNumero());
-		sql.WHERE("DD.IDTURNO = " + designaItem.getIdTurno());
-		sql.WHERE("DD.ANIO = " + designaItem.getAno());
+		sql.SELECT("IDDELITO");
+		sql.SELECT("DESCRIPCION");
+		sql.FROM("( " + sql2.toString() + ")");
 
 		return sql.toString();
 	}
@@ -3501,5 +3515,20 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		return sql.toString();
 
+	}
+	
+	public String getDelitos(Short idInstitucion, DesignaItem designaItem) {
+		SQL sql = new SQL();
+
+		sql.SELECT("IDDELITO");
+
+		sql.FROM("SCS_DELITOSDESIGNA");
+
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDTURNO = '" + designaItem.getIdTurno() + "'");
+		sql.WHERE("ANIO = '" + designaItem.getAno() + "'");
+		sql.WHERE("NUMERO = '" + designaItem.getNumero() + "'");
+
+		return sql.toString();
 	}
 }

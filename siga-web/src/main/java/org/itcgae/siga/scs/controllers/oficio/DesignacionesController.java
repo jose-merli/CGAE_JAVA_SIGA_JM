@@ -27,6 +27,7 @@ import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
+import org.itcgae.siga.DTOs.scs.ListDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
@@ -1033,6 +1034,12 @@ public class DesignacionesController {
 		UpdateResponseDTO response = designacionesService
 				.actualizarPartidaPresupuestariaActDesigna(actuacionDesignaItem, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/getDelitos", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ListDTO> getDelitos(@RequestBody DesignaItem designaItem, HttpServletRequest request) {
+		ListDTO response = designacionesService.getDelitos(designaItem, request);
+		return new ResponseEntity<ListDTO>(response, HttpStatus.OK);
 	}
 	
 }

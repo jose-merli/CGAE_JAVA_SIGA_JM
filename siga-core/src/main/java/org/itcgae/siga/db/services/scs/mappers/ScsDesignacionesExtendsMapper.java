@@ -746,4 +746,10 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "actualizarPartidaPresupuestariaDesigna")
 	int actualizarPartidaPresupuestariaDesigna(DesignaItem designaItem, Short idInstitucion,
 			AdmUsuarios usuario);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDelitos")
+	@Results({ 
+			@Result(column = "IDDELITO", property = "idDelito", jdbcType = JdbcType.VARCHAR),
+	})
+	List<String> getDelitos(Short idInstitucion, DesignaItem designaItem);
 }
