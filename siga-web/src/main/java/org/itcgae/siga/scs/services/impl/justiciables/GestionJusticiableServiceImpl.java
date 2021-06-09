@@ -1,6 +1,5 @@
 package org.itcgae.siga.scs.services.impl.justiciables;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +44,8 @@ import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenPoblacionesExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgExample;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -54,6 +55,7 @@ import org.itcgae.siga.db.entities.ScsTelefonospersonaKey;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
+import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -69,7 +71,6 @@ import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsMinusvaliaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsParentescoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsPonenteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProfesionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTelefonosPersonaExtendsMapper;
@@ -142,6 +143,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	
 	@Autowired
 	private ScsTipoIngresoExtendsMapper scsTipoIngresoExtendsMapper;
+	
+	@Autowired
+	private ScsEjgMapper scsEjgMapper;
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
@@ -2447,22 +2451,42 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				try {
 
 					//Seleccionamos el familiar que vamos a modificar
-					ScsUnidadfamiliarejgKey key = new ScsUnidadfamiliarejgKey();
+					ScsUnidadfamiliarejgKey uniKey = new ScsUnidadfamiliarejgKey();
 
-					key.setAnio(Short.parseShort(datos.getUf_anio()));
-					key.setIdinstitucion(idInstitucion);
-					key.setIdpersona(Long.parseLong(datos.getUf_idPersona()));
-					key.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));	
-					key.setNumero(Long.parseLong(datos.getUf_numero()));
+					uniKey.setAnio(Short.parseShort(datos.getUf_anio()));
+					uniKey.setIdinstitucion(idInstitucion);
+					uniKey.setIdpersona(Long.parseLong(datos.getUf_idPersona()));
+					uniKey.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));	
+					uniKey.setNumero(Long.parseLong(datos.getUf_numero()));
 
-					ScsUnidadfamiliarejg familiar = scsUnidadfamiliarejgMapper.selectByPrimaryKey(key);
+					ScsUnidadfamiliarejg familiar = scsUnidadfamiliarejgMapper.selectByPrimaryKey(uniKey);
 
 					//Modificamos el familiar
 
 					if(datos.getUf_solicitante() != null) {
 						familiar.setSolicitante(Short.parseShort(datos.getUf_solicitante()));
-						if(datos.getUf_solicitante().equals("1"))familiar.setEncalidadde("SOLICITANTE");
-						else familiar.setEncalidadde(null);
+						
+						//El criterio que se aplica actualmente es que el solicitante principal de un ejg su vuelve nula si
+						//se quita la condicion de solicitante
+						ScsEjgKey ejgKey = new ScsEjgKey();
+						
+						ejgKey.setAnio(Short.parseShort(datos.getUf_anio()));
+						ejgKey.setIdinstitucion(idInstitucion);
+						ejgKey.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));
+						ejgKey.setNumero(Long.parseLong(datos.getUf_numero()));
+						
+						ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+						
+						if(datos.getUf_solicitante().equals("1")) {
+							familiar.setEncalidadde("SOLICITANTE");
+							
+							ejg.setIdpersonajg(Long.parseLong(datos.getUf_idPersona()));
+						}
+						else {
+							familiar.setEncalidadde(null);
+							
+							ejg.setIdpersonajg(null);
+						}
 					}
 					if(datos.getIncapacitado() != null) familiar.setIncapacitado(datos.getIncapacitado());
 					if(datos.getCircunsExcep() != null) familiar.setCircunstanciasExcepcionales(datos.getCircunsExcep());
@@ -2486,8 +2510,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					familiar.setFechamodificacion(new Date());
 
 					//Actualizamos la entrada
-					response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(familiar);					
-
+					response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(familiar);		
+					
+					
+					
 				} catch (Exception e) {
 					LOGGER.error(e);
 					error.setCode(500);

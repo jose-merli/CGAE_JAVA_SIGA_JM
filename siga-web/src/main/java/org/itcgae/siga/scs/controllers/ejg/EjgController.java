@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.itcgae.siga.DTOs.gen.Error;
 
 @RestController
 @RequestMapping(value = "/ejg")
@@ -135,6 +134,12 @@ public class EjgController {
 		ComboDTO response = busquedaEJG.comboTurnosTipo(request, idTurno);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/gestion-ejg/comboSituaciones", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboSituaciones(HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboSituaciones(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 	// busqueda
 	@RequestMapping(value = "/filtros-ejg/busquedaEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -180,8 +185,6 @@ public class EjgController {
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
-	
 
 	// Expedientes Económicos
 	@RequestMapping(value = "/gestion-ejg/getExpedientesEconomicos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -239,6 +242,20 @@ public class EjgController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
+	// Combo Centros de detencion
+	@RequestMapping(value = "/gestion-ejg/comboCDetencion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboCDetencion(HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboCDetenciones(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	// Combo Tipo en calidad
+	@RequestMapping(value = "/gestion-ejg/comboTipoencalidad", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboTipoencalidad(HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboTipoencalidad(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
 	// cambiarEstadoEJGs
 	@RequestMapping(value = "/gestion-ejg/cambioEstadoMasivo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> cambioEstadoMasivo(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
@@ -293,12 +310,12 @@ public class EjgController {
 			return response;
 	}
 
-	//Actualixar turno, guardia y letrado
-		@RequestMapping(value = "/gestion-ejg/guardarServiciosTramitacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<UpdateResponseDTO> guardarServiciosTramitacion(@RequestBody EjgItem datos, HttpServletRequest request) {
-			UpdateResponseDTO response = gestionEJG.guardarServiciosTramitacion(datos, request);
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		}
+	//Actualizar turno, guardia y letrado
+	@RequestMapping(value = "/gestion-ejg/guardarServiciosTramitacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> guardarServiciosTramitacion(@RequestBody EjgItem datos, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionEJG.guardarServiciosTramitacion(datos, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
 
 	// borrarEstado
 	@RequestMapping(value = "/gestion-ejg/borrarEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -376,10 +393,11 @@ public class EjgController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	//getComunicaciones
 	@RequestMapping(value = "/gestion-ejg/getComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComunicacionesDTO> getComunicaciones(@RequestBody List<String> item, HttpServletRequest request) {
-		ComunicacionesDTO response = gestionEJG.getComunicaciones(item, request);
-		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
+	ResponseEntity<EnviosMasivosDTO> getComunicaciones(@RequestBody EjgItem item, HttpServletRequest request) {
+		EnviosMasivosDTO response = gestionEJG.getComunicaciones(item, request);
+		return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
 	}
 	
 	//getRelacionesEJG
@@ -388,4 +406,14 @@ public class EjgController {
 		RelacionesDTO response = gestionEJG.getRelacionesEJG(item, request);
 		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
 	}
+	// updateDatosJuridicos
+		@RequestMapping(value = "/gestion-ejg/updateDatosJuridicos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> updateDatosJuridicos(@RequestBody EjgItem datos,
+				HttpServletRequest request) {
+			UpdateResponseDTO response = gestionEJG.updateDatosJuridicos(datos, request);
+			if (response.getStatus().equals("OK"))
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 }

@@ -472,6 +472,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE AS IDTIPOEXPEDIENTE");
 		sql.SELECT("EXPEDIENTE.IDINSTITUCION_TIPOEXPEDIENTE");
 		sql.SELECT("ejgd.numerodesigna");
+		sql.SELECT("ejg.idsituacion");
+		sql.SELECT("ejg.numerodiligencia");
+		sql.SELECT("ejg.comisaria");
 		// from
 		sql.FROM("scs_ejg ejg");
 		// joins
@@ -930,27 +933,86 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 	
-	public String getComunicaciones(String anio, String num, String idTipoEJG, Short idInstitucion){
+	/**
+	 * 
+	 * @param idEnvio
+	 * @param idInstitucion
+	 * @param idLenguaje
+	 * @return
+	 */
+	public String getComunicaciones(String idEnvio, Short idInstitucion, String idLenguaje){
 		SQL sql = new SQL();
-		SQL sql2 = new SQL();
-
-		sql2.SELECT(
-				"S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, N.NOMBRE, F_SIGA_GETRECURSO(A.NOMBRE, 1) as ESTADO , N.APELLIDOS1 , N.APELLIDOS2");
-
-		sql2.FROM("SCS_COMUNICACIONES C");
-		sql2.INNER_JOIN("ENV_ENVIOS S on (s.idenvio = C.IDENVIOSALIDA)");
-		sql2.INNER_JOIN("ENV_TIPOENVIOS T on (T.IDTIPOENVIOS = S.IDTIPOENVIOS)");
-		sql2.INNER_JOIN("env_estadoenvio A on (A.IDESTADO = S.IDESTADO)");
-		sql2.INNER_JOIN("ENV_DESTINATARIOS D on (D.IDENVIO = S.IDENVIO)");
-		sql2.INNER_JOIN("CEN_PERSONA N on (N.IDPERSONA = D.IDPERSONA)");
-		sql2.WHERE("C.EJGANIO = " + anio);
-		sql2.WHERE("C.EJGNUMERO =" + num);
-		sql2.WHERE("C.EJGIDTIPO =" + idTipoEJG);
-		sql2.WHERE("C.IDINSTITUCION = "+idInstitucion);
-
-		sql.SELECT("*");
-		sql.FROM("( " + sql2.toString() + " )");
-		sql.WHERE("ROWNUM <= 200");
+		SQL sqlPlantillas = new SQL();
+		SQL sqlTipoEnvio = new SQL();
+		SQL sqlEstadosEnvio = new SQL();
+		SQL sqlModelos = new SQL();
+		
+		//subquery plantillas
+		sqlPlantillas.SELECT("nombre");
+		sqlPlantillas.FROM("env_plantillasenvios");
+		sqlPlantillas.WHERE("idinstitucion = '"+idInstitucion+"'");
+		sqlPlantillas.WHERE("idplantillaenvios = envio.idplantillaenvios");
+		sqlPlantillas.WHERE(" idtipoenvios = envio.idtipoenvios");
+		
+		//subquery tipo envio
+		sqlTipoEnvio.SELECT("cat.descripcion");
+		sqlTipoEnvio.FROM("env_tipoenvios");
+		sqlTipoEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = env_tipoenvios.nombre)");
+		sqlTipoEnvio.WHERE("env_tipoenvios.idtipoenvios = envio.idtipoenvios");
+		sqlTipoEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
+		
+		//subquery estadosEnvios
+		sqlEstadosEnvio.SELECT("cat.descripcion");
+		sqlEstadosEnvio.FROM("env_estadoenvio estado");
+		sqlEstadosEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = estado.nombre)");
+		sqlEstadosEnvio.WHERE("estado.idestado = envio.idestado");
+		sqlEstadosEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
+		
+		//subquery modelos
+		sqlModelos.SELECT("nombre");
+		sqlModelos.FROM("mod_modelocomunicacion");
+		sqlModelos.WHERE("idmodelocomunicacion = envio.idmodelocomunicacion");
+		
+		//query principal
+		sql.SELECT("envio.idinstitucion");
+		sql.SELECT("envio.idenvio");
+		sql.SELECT("envio.descripcion");
+		sql.SELECT("envio.fecha AS fechacreacion");
+		sql.SELECT("envio.idplantillaenvios");
+		sql.SELECT("envio.idestado");
+		sql.SELECT("envio.idtipoenvios");
+		sql.SELECT("("+sqlPlantillas.toString()+") AS nombreplantilla");
+		sql.SELECT("envio.idplantilla");
+		sql.SELECT("envio.fechaprogramada");
+		sql.SELECT("envio.fechabaja");
+		sql.SELECT("envio.idmodelocomunicacion");
+		sql.SELECT("envio.csv");
+		sql.SELECT("nvl(camposenviosasunto.valor, plantilla.asunto) AS asunto");
+		sql.SELECT("nvl(camposenvioscuerpo.valor, plantilla.cuerpo) AS cuerpo");
+		sql.SELECT("("+sqlTipoEnvio.toString()+") AS tipoenvio");
+		sql.SELECT("("+sqlEstadosEnvio.toString()+") AS estadoenvio");
+		sql.SELECT("envio.idmodelocomunicacion");
+		sql.SELECT("clase.idclasecomunicacion");
+		sql.SELECT("clase.nombre AS nombreclase");
+		sql.SELECT("("+sqlModelos.toString()+") AS nombremodelo");
+		sql.SELECT("(dest.nombre || ' ' || dest.apellidos1 || ' ' || dest.apellidos2) AS destinatario");
+		
+		sql.FROM("env_envios envio");
+		sql.JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '"+idInstitucion+"' AND plantilla.idplantillaenvios = envio.idplantillaenvios "
+				+ "AND plantilla.idtipoenvios = envio.idtipoenvios)");
+		sql.JOIN("env_destinatarios dest ON (dest.idenvio = envio.idenvio AND dest.idinstitucion = envio.idinstitucion)");
+		sql.LEFT_OUTER_JOIN("env_camposenvios camposenviosasunto ON (envio.idenvio = camposenviosasunto.idenvio AND camposenviosasunto.idinstitucion = envio.idinstitucion "
+	    		+ "AND camposenviosasunto.idcampo = 1)");
+		sql.LEFT_OUTER_JOIN("env_camposenvios camposenvioscuerpo ON (envio.idenvio = camposenvioscuerpo.idenvio AND camposenvioscuerpo.idinstitucion = envio.idinstitucion "
+				+ "AND camposenvioscuerpo.idcampo = 2)");
+	    sql.LEFT_OUTER_JOIN("cen_colegiado colegiado ON (colegiado.idpersona = dest.idpersona AND colegiado.idinstitucion = envio.idinstitucion)");
+	    sql.LEFT_OUTER_JOIN("mod_modelocomunicacion modelo ON (modelo.idmodelocomunicacion = envio.idmodelocomunicacion)");
+	    sql.LEFT_OUTER_JOIN("mod_clasecomunicaciones clase ON (clase.idclasecomunicacion = modelo.idclasecomunicacion)");
+	    
+	    sql.WHERE("envio.idinstitucion = '"+idInstitucion+"'");
+	    sql.WHERE("envio.idenvio = "+idEnvio);
+	    
+	    sql.ORDER_BY("envio.idenvio DESC");
 
 		return sql.toString();		
 	}
@@ -1328,5 +1390,32 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	    
 		return sqlPrincipal.toString();
 		
+	/**
+	 * 
+	 * @param anio
+	 * @param numEJG
+	 * @param idTipoEJG
+	 * @param idInstitucion
+	 * @return
+	 */
+	public String getIdEnvio(String anio, String numEJG, Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("cc1.idenvio");
+		
+		sql.FROM("env_valorcampoclave cc1");
+		sql.JOIN("env_envios cc2 ON (cc1.idinstitucion = cc2.idinstitucion AND cc1.idenvio = cc2.idenvio)"); 
+		sql.JOIN("env_valorcampoclave cc3 ON (cc1.idenvio = cc3.idenvio)");
+		
+		sql.WHERE("cc1.idinstitucion = "+idInstitucion);
+		sql.WHERE("cc1.idtipoinforme = 'EJG'");
+		sql.WHERE("cc1.campo = 'numero'");
+		sql.WHERE("cc1.valor = '"+numEJG+"'");
+		sql.WHERE("cc3.campo = 'anio'");
+		sql.WHERE("cc3.valor = '"+anio+"'");
+		
+		sql.GROUP_BY("cc1.idenvio");
+		
+		return sql.toString();
 	}
 }
