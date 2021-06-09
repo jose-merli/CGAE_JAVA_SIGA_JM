@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItem2;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
@@ -974,7 +975,7 @@ public class ComboServiceImpl implements ComboService {
 				for (JuzgadoItem j : juzgadosItems) {
 					ComboItem comboItem = new ComboItem();
 					comboItem.setValue(j.getIdJuzgado());
-					comboItem.setLabel(j.getCodigoExt2() + ": " + j.getNombre() + "(" + j.getNombrePoblacion() + ")");
+					comboItem.setLabel(j.getCodigoExt2() + ": " + j.getNombre() + " (" + j.getNombrePoblacion() + ")");
 					comboItems.add(comboItem);
 				}
 
@@ -992,6 +993,7 @@ public class ComboServiceImpl implements ComboService {
 
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<ComboItem2> comboItems2 = new ArrayList<ComboItem2>();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1005,8 +1007,20 @@ public class ComboServiceImpl implements ComboService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = scsDesignacionesExtendsMapper.comboModulos(idInstitucion);
+				comboItems2 = scsDesignacionesExtendsMapper.comboModulos(idInstitucion);
 
+				for (ComboItem2 item : comboItems2) {
+					String label = "";
+					if (idInstitucion != 2005) {
+						label = item.getLabel1() + ' ' + item.getLabel2();
+					}else {
+						label = item.getLabel2();
+					}
+					ComboItem combo = new ComboItem();
+					combo.setLabel(label);
+					combo.setValue(item.getValue());
+					comboItems.add(combo);
+				}
 				comboDTO.setCombooItems(comboItems);
 
 			}
@@ -1138,6 +1152,7 @@ public class ComboServiceImpl implements ComboService {
 
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<ComboItem2> comboItems2 = new ArrayList<ComboItem2>();
 		List<ComboItem> procedimientosJuzgados = new ArrayList<ComboItem>();
 
 		// Conseguimos información del usuario logeado
@@ -1162,6 +1177,18 @@ public class ComboServiceImpl implements ComboService {
 					}
 
 					comboItems = scsDesignacionesExtendsMapper.comboModulosConJuzgado(idInstitucion, idPretensiones);
+					for (ComboItem2 item : comboItems2) {
+						String label = "";
+						if (idInstitucion != 2005) {
+							label = item.getLabel1() + ' ' + item.getLabel2();
+						}else {
+							label = item.getLabel2();
+						}
+						ComboItem combo = new ComboItem();
+						combo.setLabel(label);
+						combo.setValue(item.getValue());
+						comboItems.add(combo);
+					}
 				}
 
 				comboDTO.setCombooItems(comboItems);

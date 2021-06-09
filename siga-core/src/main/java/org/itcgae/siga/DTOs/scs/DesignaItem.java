@@ -91,7 +91,7 @@ public class DesignaItem {
 	private String nombreColegiado;
 	private String apellido1Colegiado;
 	private String apellido2Colegiado;
-	private int idPartidaPresupuestaria;
+	private String idPartidaPresupuestaria;
 	private String nombrePartida;
 	private String validada;
 	private int existeDesignaJuzgadoProcedimiento;
@@ -936,10 +936,10 @@ public class DesignaItem {
 		this.idModulo = idModulo;
 	}
 	
-	public int getIdPartidaPresupuestaria() {
+	public String getIdPartidaPresupuestaria() {
 		return idPartidaPresupuestaria;
 	}
-	public void setIdPartidaPresupuestaria(int idPartidaPresupuestaria) {
+	public void setIdPartidaPresupuestaria(String idPartidaPresupuestaria) {
 		this.idPartidaPresupuestaria = idPartidaPresupuestaria;
 	}
 	

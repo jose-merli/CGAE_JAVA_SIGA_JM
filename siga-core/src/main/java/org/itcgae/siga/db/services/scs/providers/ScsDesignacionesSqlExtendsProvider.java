@@ -163,7 +163,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
-			sql = "select des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
+			sql = "select distinct F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
 					+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
 					+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 					+ "  des.fechaestado fechaestado,colegiado.ncolegiado,juzgado.nombre as nombrejuzgado, "
@@ -403,6 +403,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 				}
 			}
+			
+			if(designaItem.getIdActuacionesV()!=null && !designaItem.getIdActuacionesV().trim().isEmpty()){
+				if("SINACTUACIONES".equalsIgnoreCase(designaItem.getIdActuacionesV().trim())){
+					sql += (" AND F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) IS NULL ");
+				}else{
+				    sql += (" AND UPPER(F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO))=UPPER('"+designaItem.getIdActuacionesV()+"')");
+				}
+			}
 
 			if (designaItem.getDocumentacionActuacion() != null
 					&& !designaItem.getDocumentacionActuacion().equalsIgnoreCase("")) {
@@ -616,7 +624,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql;
 	}
 
-	public String busquedaNuevaDesigna(DesignaItem designaItem, Short idInstitucion, Integer tamMax) throws Exception {
+	public String busquedaNuevaDesigna(DesignaItem designaItem, Short idInstitucion, Integer tamMax, boolean isNoColegiado) throws Exception {
 		String sql = "";
 
 		Hashtable codigosBind = new Hashtable();
@@ -625,15 +633,30 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
 		try {
-			sql = "select des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
-					+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
-					+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
-					+ "  des.fechaestado fechaestado,colegiado.ncolegiado," + " turno.nombre,"
-					   
-					+ " persona.nombre as nombrepersona, persona.APELLIDOS1 as apellido1persona, persona.APELLIDOS2 as apellido2persona ";
+			
+			if(isNoColegiado) {
+				sql = "select DISTINCT F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada, des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
+						+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
+						+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
+						+ "  des.fechaestado fechaestado," + " turno.nombre,  "
+						   
+						+ " persona.nombre as nombrepersona, persona.APELLIDOS1 as apellido1persona, persona.APELLIDOS2 as apellido2persona ";
+			}else {
+				sql = "select  DISTINCT F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, persona.idpersona, des.idpretension, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
+						+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
+						+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
+						+ "  des.fechaestado fechaestado,colegiado.ncolegiado," + " turno.nombre, "
+						   
+						+ " persona.nombre as nombrepersona, persona.APELLIDOS1 as apellido1persona, persona.APELLIDOS2 as apellido2persona ";
+			}
 																			  
-			sql += " from scs_designa des, cen_persona persona ," + " SCS_DESIGNASLETRADO l ,"
-					+ "  CEN_COLEGIADO colegiado," + " scs_turno turno";
+			if(isNoColegiado) {
+				sql += " from scs_designa des, cen_persona persona ," + " SCS_DESIGNASLETRADO l ,"
+						+ " scs_turno turno ";
+			}else {
+				sql += " from scs_designa des, cen_persona persona ," + " SCS_DESIGNASLETRADO l ,"
+						+ "  CEN_COLEGIADO colegiado," + " scs_turno turno ";
+			}
 																					
 
 			boolean tiene_juzg = designaItem.getNombreJuzgadoActu() != null
@@ -671,21 +694,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			}
 
 			if (idInstitucion != null) {
-				sql += " where l.anio=des.anio and l.numero=des.numero and l.idinstitucion = des.idinstitucion and l.idturno=des.idturno"
-						+ " and persona.idpersona=l.idpersona"
-						+ " and colegiado.IDINSTITUCION = des.IDINSTITUCION and colegiado.IDPERSONA =persona.idpersona"
-						+ " and des.idturno=turno.idturno and des.IDINSTITUCION=turno.IDINSTITUCION ";
-																							  
-												  
-																																  
-																							 
+				if(isNoColegiado) {
+					sql += " where l.anio=des.anio and l.numero=des.numero and l.idinstitucion = des.idinstitucion and l.idturno=des.idturno"
+							+ " and persona.idpersona=l.idpersona"
+							+ " and des.idturno=turno.idturno and des.IDINSTITUCION=turno.IDINSTITUCION ";
+				}else {
+					sql += " where l.anio=des.anio and l.numero=des.numero and l.idinstitucion = des.idinstitucion and l.idturno=des.idturno"
+							+ " and persona.idpersona=l.idpersona"
+							+ " and colegiado.IDINSTITUCION = des.IDINSTITUCION and colegiado.IDPERSONA =persona.idpersona"
+							+ " and des.idturno=turno.idturno and des.IDINSTITUCION=turno.IDINSTITUCION ";
+				}
+				
 			}
 										
-																												 
-	  
-
-   
-
 			if (String.valueOf(designaItem.getNumColegiado()) != null
 					&& !(String.valueOf(designaItem.getNumColegiado())).equals("")) {
 				sql += " and (l.Fechadesigna is null or";
@@ -697,7 +718,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 //				sql += " and l.idpersona = " + String.valueOf(designaItem.getNumColegiado()) + " ";
 			}
-			if (designaItem.getNumColegiado() != null && !(String.valueOf(designaItem.getNumColegiado())).equals("")) {
+			if (designaItem.getNumColegiado() != null && !(String.valueOf(designaItem.getNumColegiado())).equals("")
+					&& !isNoColegiado) {
 				sql += " and colegiado.ncolegiado = " + String.valueOf(designaItem.getNumColegiado()) + " ";
 			}
 
@@ -867,6 +889,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 				}
 			}
+			
+			if(designaItem.getIdActuacionesV()!=null && !designaItem.getIdActuacionesV().trim().isEmpty()){
+				if("SINACTUACIONES".equalsIgnoreCase(designaItem.getIdActuacionesV().trim())){
+					sql += (" AND F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) IS NULL ");
+				}else{
+				    sql += (" AND UPPER(F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO))=UPPER('"+designaItem.getIdActuacionesV()+"')");
+				}
+			}
+
 
 			if (designaItem.getDocumentacionActuacion() != null
 					&& !designaItem.getDocumentacionActuacion().equalsIgnoreCase("")) {
@@ -1082,6 +1113,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}
 
 		return sql;
+		
 	}
 
 	public String busquedaProcedimientoDesignas(DesignaItem designaItem, Short idInstitucion, Integer tamMax)
@@ -1165,7 +1197,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			String numero, JustificacionExpressItem item) {
 		StringBuilder sql = new StringBuilder();
 
-		sql.append("SELECT act.numero, ac.idacreditacion, ac.descripcion acreditacion, ac.idtipoacreditacion, ");
+		sql.append("SELECT act.facturado, act.numero, ac.idacreditacion, ac.descripcion acreditacion, ac.idtipoacreditacion, ");
 		sql.append(" decode(to_char(acp.porcentaje), to_char(trunc(acp.porcentaje)), to_char(acp.porcentaje), ");
 		sql.append(" f_siga_formatonumero(to_char(acp.porcentaje), 2)) porcentaje, tac.descripcion tipo, ");
 		sql.append(
@@ -1258,6 +1290,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" D.IDPROCEDIMIENTO, ");
 		sql.append(" D.NUMPROCEDIMIENTO, ");
 		sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
+		sql.append(" P.CODIGO CATEGORIA, ");
 		sql.append(" D.NIG, ");
 		sql.append(
 				" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION" );
@@ -1629,7 +1662,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String comboModulos(Short idInstitucion) {
 
 		SQL sql = new SQL();
-		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE ");
+		sql.SELECT("MODULO.IDPROCEDIMIENTO, MODULO.NOMBRE, MODULO.CODIGO ");
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 
@@ -1962,19 +1995,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return resultV;
 	}
 
-	public String busquedaProcurador(String num, String idinstitucion, String idturno) {
+	public String busquedaProcurador(String num, String idinstitucion, String idturno, String anio) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 
 		sql2.SELECT(
 				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
 
-		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
+		sql2.FROM("SCS_DESIGNAPROCURADOR dp");
+		sql2.INNER_JOIN("SCS_PROCURADOR p on dp.idprocurador = p.idprocurador and dp.idinstitucion = p.idinstitucion");
 		sql2.WHERE("dp.idinstitucion = " + idinstitucion);
 		sql2.WHERE("dp.idturno = " + idturno);
 		sql2.WHERE("dp.numero =" + num);
-		sql2.WHERE("dp.idprocurador = p.idprocurador");
-		sql2.WHERE("dp.idinstitucion = p.idinstitucion");
+		sql2.WHERE("dp.anio=" + anio);
 		sql2.ORDER_BY("dp.FECHADESIGNA DESC");
 
 		sql.SELECT("*");
@@ -2076,6 +2109,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT("ACT.USUVALIDACION");
 		sql2.SELECT("ACT.FECHAVALIDACION");
 		sql2.SELECT("TUR.VALIDARJUSTIFICACIONES");
+		sql2.SELECT("ACT.IDPARTIDAPRESUPUESTARIA");
+		sql2.SELECT("PAR.NOMBREPARTIDA");
 
 		sql2.FROM("SCS_ACTUACIONDESIGNA ACT");
 
@@ -2085,7 +2120,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "LEFT JOIN SCS_PROCEDIMIENTOS PRO ON PRO.IDPROCEDIMIENTO = ACT.IDPROCEDIMIENTO AND PRO.IDINSTITUCION = ACT.IDINSTITUCION AND PRO.IDINSTITUCION = ACT.IDINSTITUCION "
 				+ "LEFT JOIN CEN_COLEGIADO COL ON COL.IDPERSONA = ACT.IDPERSONACOLEGIADO AND COL.IDINSTITUCION = ACT.IDINSTITUCION "
 				+ "INNER JOIN SCS_TURNO TUR ON TUR.IDINSTITUCION = ACT.IDINSTITUCION AND TUR.IDTURNO = ACT.IDTURNO "
-				+ "LEFT JOIN CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
+				+ "LEFT JOIN CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA "
+				+ "LEFT JOIN SCS_PARTIDAPRESUPUESTARIA PAR ON PAR.IDINSTITUCION = ACT.IDINSTITUCION AND PAR.IDPARTIDAPRESUPUESTARIA = ACT.IDPARTIDAPRESUPUESTARIA");
 
 		if (!actuacionDesignaRequestDTO.isHistorico()) {
 			sql2.WHERE("ACT.ANULACION = 0");
@@ -2195,7 +2231,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("SCS_DEFENDIDOSDESIGNA.idpersona");
 		sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
 		sql.SELECT("persona.nif");
-		sql.SELECT("persona.direccion");
+		sql.SELECT("F_SIGA_getRecurso(tv.descripcion,'1') ||' '|| persona.direccion || ' ' || persona.numerodir || ' ' || persona.pisodir || ' ' || persona.puertadir || ' ' || pobl.nombre ||' ' || persona.codigopostal || ' ' || prov.nombre  as direccion");
 		sql.SELECT("    CASE\r\n" + "        WHEN nombrerepresentante IS NOT NULL THEN\r\n"
 				+ "            nombrerepresentante\r\n" + "        ELSE\r\n" + "            ''\r\n"
 				+ "    END AS representante\r\n");
@@ -2205,6 +2241,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_DEFENDIDOSDESIGNA");
 		sql.JOIN(
 				"scs_personajg persona ON persona.idpersona = scs_DEFENDIDOSDESIGNA.idpersona AND persona.idinstitucion = scs_DEFENDIDOSDESIGNA.idinstitucion");
+		sql.LEFT_OUTER_JOIN("cen_tipovia tv on persona.idtipovia = tv.idtipovia and tv.idinstitucion = persona.idinstitucion"
+				, "cen_provincias prov on persona.idprovincia = prov.idprovincia and prov.idpais = persona.idpais"
+				, "cen_poblaciones pobl on persona.idpoblacion = pobl.idprovincia and pobl.idprovincia = prov.idprovincia");
 		sql.WHERE("            ( scs_DEFENDIDOSDESIGNA.anio = " + item.getAno() + "\r\n"
 				+ "              AND scs_DEFENDIDOSDESIGNA.numero = " + item.getNumero() + "\r\n"
 				+ "              AND scs_DEFENDIDOSDESIGNA.idinstitucion = " + idInstitucion + "\r\n"
@@ -2283,15 +2322,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String fechaFormat = dateFormat.format(fecha);
-
 		sql2.SELECT(
 				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
 
 		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
 		sql2.WHERE("dp.numerodesignacion = '" + numAnio + "'");
-		sql2.WHERE("dp.fechadesigna = TO_DATE('" + fechaFormat + "','DD/MM/RRRR')");
+		sql2.WHERE("dp.fechadesigna = TO_DATE('" + fecha + "','DD/MM/YYYY')");
 		sql2.WHERE("dp.idprocurador = p.idprocurador");
 		sql2.WHERE("dp.idinstitucion = p.idinstitucion");
 		sql2.ORDER_BY("dp.FECHADESIGNA DESC");
@@ -2308,21 +2344,22 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 		String [] part = procuradorItem.getNombre().split(",");
 		String nombre =part[1].substring(1);
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String fechaFormat = dateFormat.format(fecha);
-		String fechaDesigna = dateFormat.format(procuradorItem.getFechaDesigna());
-		String fechaRenuncia = dateFormat.format(procuradorItem.getFecharenunciasolicita());
 		
 		sql.UPDATE("scs_designaprocurador");
 
-		sql.SET("fechadesigna = TO_DATE('" + fechaDesigna + "','DD/MM/RRRR')");
+		sql.SET("fechadesigna = TO_DATE('" + procuradorItem.getFechaDesigna() + "','DD/MM/YYYY')");
 		sql.SET("numerodesignacion ='" + procuradorItem.getNumerodesignacion() + "'");
 		sql.SET("motivosrenuncia ='" + procuradorItem.getMotivosRenuncia() + "'");
-		sql.SET("fecharenunciasolicita = TO_DATE('" + fechaRenuncia + "','DD/MM/RRRR')");
+		sql.SET("fecharenunciasolicita = TO_DATE('" + procuradorItem.getFecharenunciasolicita() + "','DD/MM/YYYY')");
+		sql.SET("observaciones='"+procuradorItem.getObservaciones()+"'");
 
 		sql.WHERE("idinstitucion=" + procuradorItem.getIdInstitucion());
 		sql.WHERE("idprocurador=(SELECT IDPROCURADOR FROM SCS_PROCURADOR WHERE NCOLEGIADO = '"+procuradorItem.getnColegiado()+"' AND NOMBRE = '"+nombre+"')");
-		sql.WHERE("fecharenuncia =TO_DATE('"+fechaFormat+"','DD/MM/RRRR')");
+		if(fecha != null) {
+			sql.WHERE("fecharenuncia =TO_DATE('"+fecha+"','DD/MM/YYYY')");
+		}
+		sql.WHERE("idturno="+procuradorItem.getIdTurno());
+		sql.WHERE("numero="+procuradorItem.getNumero());
 
 		return sql.toString();
 	}
@@ -2348,11 +2385,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String actualizarProcurador(ProcuradorItem procuradorItem) {
 
 		SQL sql2 = new SQL();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		String fechaDesigna = dateFormat.format(procuradorItem.getFechaDesigna());
 
 		sql2.DELETE_FROM("scs_designaprocurador");
-		sql2.WHERE("fechadesigna = TO_DATE('" + fechaDesigna + "','DD/MM/RRRR')");
+		sql2.WHERE("fechadesigna = TO_DATE('" + procuradorItem.getFechaDesigna() + "','DD/MM/YYYY')");
 		sql2.WHERE("numerodesignacion ='" + procuradorItem.getNumerodesignacion() + "'");
 
 		return sql2.toString();
@@ -2458,6 +2493,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPrision())) {
 			sql.VALUES("IDPRISION", "'" + actuacionDesignaItem.getIdPrision() + "'");
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPartidaPresupuestaria())) {
+			sql.VALUES("IDPARTIDAPRESUPUESTARIA", "'" + actuacionDesignaItem.getIdPartidaPresupuestaria() + "'");
 		}
 
 		return sql.toString();
@@ -2592,13 +2631,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String busquedaRelaciones(String idInstitucion, String designaAnio, String designaNumero, String designaTurno) {
-		//COnsulta padre que engloba al resto para usar un where general, etc.
+	public String busquedaRelaciones(String designaAnio, String designaNumero, String designaTurno, String idInstitucion) {
+		//Consulta padre que engloba al resto para usar un where general, etc.
 		SQL sql = new SQL();
 		
 		//Primera consulta
 		SQL sql2 = new SQL();
-		sql2.SELECT("substr(\r\n"
+		sql2.SELECT(" substr(\r\n"
 				+ "                TRIM('ASISTENCIA'),\r\n"
 				+ "                1,\r\n"
 				+ "                1\r\n"
@@ -2606,51 +2645,72 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "             || anio\r\n"
 				+ "             || '/'\r\n"
 				+ "             || TO_CHAR(numero) sjcs");
-		sql2.SELECT("idinstitucion");
-		sql2.SELECT("anio");
-		sql2.SELECT("numero");
-		sql2.SELECT("idpersonacolegiado idletrado");
-		sql2.SELECT("cen_persona.apellidos2\r\n"
+		sql2.SELECT(" asi.idinstitucion");
+		sql2.SELECT(" anio");
+		sql2.SELECT(" numero");
+		sql2.SELECT(" idpersonacolegiado idletrado");
+		sql2.SELECT(" cen_persona.apellidos2\r\n"
 				+ "             || ' '\r\n"
 				+ "             || cen_persona.apellidos1\r\n"
 				+ "             || ','\r\n"
 				+ "             || cen_persona.nombre letrado");
-		sql2.SELECT("TO_CHAR(idturno) idturno");
-		sql2.SELECT("TO_CHAR(designa_turno) idturnodesigna");
-		sql2.SELECT("TO_CHAR(idtipoasistencia) idtipo");
-		sql2.SELECT("TO_CHAR(numero) codigo");
+		sql2.SELECT(" TO_CHAR(idturno) idturno");
+		sql2.SELECT(" TO_CHAR(designa_turno) idturnodesigna");
+		sql2.SELECT(" TO_CHAR(idtipoasistencia) idtipo");
+		sql2.SELECT(" TO_CHAR(numero) codigo");
 		
 		//Subconsulta sql2
 		SQL sql3= new SQL();
-		sql3.SELECT("abreviatura");
-		sql3.FROM("scs_turno");
-		sql3.WHERE("idturno = scs_asistencia.idturno");
-		sql3.WHERE("idinstitucion = scs_asistencia.idinstitucion");
-		sql2.SELECT("(" + sql3.toString() + ")" + "desc_turno");
+		sql3.SELECT(" nombre");
+		sql3.FROM(" SCS_GUARDIASTURNO");
+		sql3.WHERE(" idturno = asi.idturno");
+		sql3.WHERE(" idturno = asi.idturno\r\n"
+				+ "                        AND\r\n"
+				+ "                            idinstitucion = asi.idinstitucion\r\n"
+				+ "                        AND idguardia = asi.IDGUARDIA");
+		sql2.SELECT(" (" + sql3.toString() + ")" + "desc_turno");
 		
 		//Subconsulta sql2
 		SQL sql4 = new SQL();
-		sql4.SELECT("f_siga_getrecurso(\r\n"
+		sql4.SELECT(" f_siga_getrecurso(\r\n"
 				+ "                        descripcion,\r\n"
 				+ "                        1\r\n"
 				+ "                    )");
-		sql4.FROM("scs_tipoasistencia");
-		sql4.WHERE("idturno = scs_asistencia.idturno");
-		sql4.WHERE("scs_tipoasistencia.idtipoasistencia = scs_asistencia.idtipoasistencia");
+		sql4.FROM(" scs_tipoasistencia");
+		sql4.WHERE(" idturno = asi.idturno");
+		sql4.WHERE(" idturno = asi.idturno\r\n"
+				+ "                        AND\r\n"
+				+ "                            scs_tipoasistencia.idtipoasistencia = asi.idtipoasistencia");
 		sql2.SELECT("(" + sql4.toString() + ")" + "des_tipo");
-
-		sql2.FROM("scs_asistencia");
-		sql2.FROM("cen_persona");
 		
-		sql2.WHERE("cen_persona.idpersona = scs_asistencia.idpersonacolegiado");
-		sql2.WHERE("designa_anio = " + designaAnio);
-		sql2.WHERE("designa_numero = " + designaNumero);
-		sql2.WHERE("designa_turno = " + designaTurno );
-		sql2.WHERE("idinstitucion = " + idInstitucion);
+		sql2.SELECT(" perjg.apellido1\r\n"
+				+ "               ||  \r\n"
+				+ "                CASE WHEN perjg.apellido2 is not null then \r\n"
+				+ "                     ' ' || perjg.apellido2 || ', '\r\n"
+				+ "                   ELSE\r\n"
+				+ "                   ', '\r\n"
+				+ "                END || perjg.nombre interesado");
+		sql2.SELECT( "null impugnacion");
+        sql2.SELECT(" null fechaimpugnacion");
+		sql2.SELECT(" null dictamen");
+		sql2.SELECT(" null fechadictamen");
+		sql2.SELECT(" 'Sin resolución' resolucion");
+		sql2.SELECT(" null fecharesolucion");
+		sql2.SELECT(" f_siga_getrecurso(com.nombre,1) centrodetencion");
+		sql2.SELECT(" fechahora fechaasunto");
+		sql2.SELECT(" NVL(numerodiligencia,'Sin número') || ' - ' || NVL(nig,'Sin número') || ' - ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
+		sql2.FROM(" scs_asistencia asi");
+		sql2.JOIN(" cen_persona ON cen_persona.idpersona = asi.idpersonacolegiado");
+		sql2.JOIN(" scs_personajg perjg on perjg.idpersona = asi.idpersonajg and asi.idinstitucion = perjg.idinstitucion");
+		sql2.LEFT_OUTER_JOIN(" scs_comisaria com on asi.comisaria = com.idcomisaria and asi.comisariaidinstitucion = com.idinstitucion");
+		sql2.WHERE(" designa_anio = " + designaAnio);
+		sql2.WHERE(" designa_numero = " + designaNumero);
+		sql2.WHERE(" designa_turno = " + designaTurno );
+		sql2.WHERE(" asi.idinstitucion = " + idInstitucion);
 		
 		//Segunda consulta
 		SQL sql5 = new SQL();
-		sql5.SELECT("substr(\r\n"
+		sql5.SELECT(" substr(\r\n"
 				+ "                TRIM('EJG'),\r\n"
 				+ "                1,\r\n"
 				+ "                1\r\n"
@@ -2658,19 +2718,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "             || anio\r\n"
 				+ "             || '/'\r\n"
 				+ "             || TO_CHAR(numero) sjcs");
-		sql5.SELECT("e.idinstitucion");
-		sql5.SELECT("e.anio");
-		sql5.SELECT("e.numero");
-		sql5.SELECT("e.idpersona idletrado");
-		sql5.SELECT("cen_persona.apellidos2\r\n"
+		sql5.SELECT(" e.idinstitucion");
+		sql5.SELECT(" e.anio");
+		sql5.SELECT(" e.numero");
+		sql5.SELECT(" e.idpersona idletrado");
+		sql5.SELECT(" cen_persona.apellidos2\r\n"
 				+ "             || ' '\r\n"
 				+ "             || cen_persona.apellidos1\r\n"
 				+ "             || ','\r\n"
 				+ "             || cen_persona.nombre letrado");
-		sql5.SELECT("TO_CHAR(e.guardiaturno_idturno) idturno");
-		sql5.SELECT("TO_CHAR(ed.idturno) idturnodesigna");
-		sql5.SELECT("TO_CHAR(e.idtipoejg) idtipo");
-		sql5.SELECT("lpad(\r\n"
+		sql5.SELECT(" TO_CHAR(e.guardiaturno_idturno) idturno");
+		sql5.SELECT(" TO_CHAR(ed.idturno) idturnodesigna");
+		sql5.SELECT(" TO_CHAR(e.idtipoejg) idtipo");
+		sql5.SELECT(" lpad(\r\n"
 				+ "                e.numejg,\r\n"
 				+ "                5,\r\n"
 				+ "                0\r\n"
@@ -2678,43 +2738,63 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		//Subconsulta sql5
 		SQL sql6 = new SQL();
-		sql6.SELECT("abreviatura");
-		sql6.FROM("scs_turno");
-		sql6.WHERE("idturno = e.guardiaturno_idturno");
-		sql6.WHERE("idinstitucion = e.idinstitucion");
-		sql5.SELECT("(" + sql6.toString() + ")" + "des_turno");
+		sql6.SELECT(" abreviatura");
+		sql6.FROM(" scs_turno");
+		sql6.WHERE(" idturno = e.guardiaturno_idturno");
+		sql6.WHERE(" idinstitucion = e.idinstitucion");
+		sql5.SELECT(" (" + sql6.toString() + ")" + "des_turno");
 		
 		//Subconsulta sql5
 		SQL sql7 = new SQL();
-		sql7.SELECT("f_siga_getrecurso(\r\n"
+		sql7.SELECT(" f_siga_getrecurso(\r\n"
 				+ "                        descripcion,\r\n"
 				+ "                        1\r\n"
 				+ "                    )");
-		sql7.FROM("scs_tipoejg");
-		sql7.WHERE("scs_tipoejg.idtipoejg = e.idtipoejg");
-		sql5.SELECT("(" + sql7.toString() + ")" + "des_tipo");
+		sql7.FROM(" scs_tipoejg");
+		sql7.WHERE(" scs_tipoejg.idtipoejg = e.idtipoejg");
+		sql5.SELECT(" (" + sql7.toString() + ")" + "des_tipo");
 		
-		sql5.FROM("scs_ejg e");
-		sql5.FROM("scs_ejgdesigna ed");
-		sql5.FROM("cen_persona");
-		sql5.WHERE("cen_persona.idpersona = e.idpersona");
-		sql5.WHERE("ed.aniodesigna = " + designaAnio);
+		sql5.SELECT(" perjg.apellido1\r\n"
+				+ "               ||  \r\n"
+				+ "                CASE WHEN perjg.apellido2 is not null then \r\n"
+				+ "                     ' ' || perjg.apellido2 || ', '\r\n"
+				+ "                   ELSE\r\n"
+				+ "                   ', '\r\n"
+				+ "                END || perjg.nombre interesado");
+		sql5.SELECT(" imp.descripcion impugnacion");
+		sql5.SELECT(" fechaauto fechaimpugnacion");
+		sql5.SELECT(" f_siga_getrecurso(dic.descripcion,1) dictamen");
+		sql5.SELECT(" fechadictamen");
+		sql5.SELECT(" f_siga_getrecurso(res.descripcion,1) resolucion");
+		sql5.SELECT(" e.FECHARESOLUCIONCAJG fecharesolucion");
+		sql5.SELECT(" null centrodetencion");
+		sql5.SELECT(" fechaapertura fechaasunto");
+		sql5.SELECT(" NVL(numerodiligencia,'Sin número') || ' - ' || NVL(nig,'Sin número') || ' - ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
+		sql5.FROM(" scs_ejg e");
+		sql5.JOIN(" scs_ejgdesigna ed on ed.idinstitucion = e.idinstitucion\r\n"
+				+ "                AND\r\n"
+				+ "                    ed.anioejg = e.anio\r\n"
+				+ "                AND\r\n"
+				+ "                    ed.numeroejg = e.numero\r\n"
+				+ "                AND\r\n"
+				+ "                    ed.idtipoejg = e.idtipoejg");
+		sql5.JOIN(" cen_persona on cen_persona.idpersona = e.idpersona");
+		sql5.JOIN(" scs_personajg perjg on perjg.idpersona = e.idpersonajg and e.idinstitucion = perjg.idinstitucion");
+		sql5.LEFT_OUTER_JOIN(" scs_tipodictamenejg dic on e.idtipodictamenejg = dic.idtipodictamenejg and e.idinstitucion = dic.idinstitucion");
+		sql5.LEFT_OUTER_JOIN(" scs_tiporesolucion res on e.IDTIPORATIFICACIONEJG = res.idtiporesolucion");
+		sql5.LEFT_OUTER_JOIN(" scs_tiporesolauto imp ON e.idtiporesolauto = imp.idtiporesolauto");
+		sql5.WHERE(" ed.aniodesigna = " + designaAnio);
 		sql5.WHERE(" ed.numerodesigna = " + designaNumero);
 		sql5.WHERE(" ed.idturno = " + designaTurno);
-		sql5.WHERE("ed.idinstitucion = " +  idInstitucion);
-		sql5.WHERE("ed.idinstitucion = e.idinstitucion");
-		sql5.WHERE("ed.anioejg = e.anio");
-		sql5.WHERE("ed.numeroejg = e.numero");
-		sql5.WHERE("ed.idtipoejg = e.idtipoejg");
-		sql5.WHERE("ed.idinstitucion = e.idinstitucion");
+		sql5.WHERE(" ed.idinstitucion = " +  idInstitucion);
 		
-		sql.SELECT("*");
+		sql.SELECT(" *");
 		sql.FROM("( " + sql2.toString() + "UNION " + sql5.toString() +" )");
-		sql.WHERE("ROWNUM <= 200");
-		sql.ORDER_BY("sjcs");
-		sql.ORDER_BY("idinstitucion");
-		sql.ORDER_BY("anio DESC");
-		sql.ORDER_BY("codigo DESC");
+		sql.WHERE(" ROWNUM <= 200");
+		sql.ORDER_BY(" sjcs");
+		sql.ORDER_BY(" idinstitucion");
+		sql.ORDER_BY(" anio DESC");
+		sql.ORDER_BY(" codigo DESC");
 
 		return sql.toString();
 	}
@@ -2735,11 +2815,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String getPartidaPresupuestariaDesigna(Short idInstitucion, DesignaItem designaItem) {
 		SQL sql = new SQL();
 
-		sql.SELECT("P.idpartidapresupuestaria, nombrepartida ");
-		sql.INNER_JOIN("SCS_TURNO T ON T.IDINSTITUCION = D.IDINSTITUCION AND T.IDTURNO = D.IDTURNO");
-		sql.INNER_JOIN(
-				"SCS_PARTIDAPRESUPUESTARIA P ON T.IDINSTITUCION = P.IDINSTITUCION AND T.idpartidapresupuestaria = P.idpartidapresupuestaria");
-		sql.FROM("SCS_DESIGNA  D");
+		sql.SELECT("D.IDPARTIDAPRESUPUESTARIA");
+		sql.SELECT("PAR.NOMBREPARTIDA");
+
+		sql.FROM("SCS_DESIGNA  D "
+				+ "LEFT JOIN SCS_PARTIDAPRESUPUESTARIA PAR ON PAR.IDINSTITUCION = D.IDINSTITUCION AND PAR.IDPARTIDAPRESUPUESTARIA = D.IDPARTIDAPRESUPUESTARIA");
+
 		sql.WHERE("D.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("D.ANIO = '" + designaItem.getAno() + "'");
 		sql.WHERE("D.IDTURNO = '" + designaItem.getIdTurno() + "'");
@@ -2758,7 +2839,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.FROM("SCS_ACTUADESIG_MOTCAMBIO");
 
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		//sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("NOMBRE ASC");
 
 		return sql.toString();
 	}
@@ -2774,10 +2856,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
 			sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 			sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
+		} else {
+			sql.SET("FECHAJUSTIFICACION = NULL");
+			sql.SET("USUJUSTIFICACION = NULL");
+			sql.SET("FECHAUSUJUSTIFICACION = NULL");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservacionesJusti())) {
 			sql.SET("OBSERVACIONESJUSTIFICACION = '" + actuacionDesignaItem.getObservacionesJusti() + "'");
+		} else {
+			sql.SET("OBSERVACIONESJUSTIFICACION = NULL");
 		}
 
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
@@ -2815,7 +2903,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if(designa.getNumprocedimiento() != null) {
 			sql.WHERE("SCS_DESIGNASLETRADO.IDPERSONA = '" + designa.getNumprocedimiento() + "'");
 		}
-		sql.ORDER_BY("SCS_DESIGNASLETRADO.FECHADESIGNA DESC, SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
+		sql.ORDER_BY("scs_designasletrado.fechadesigna DESC, scs_designasletrado.fecharenuncia DESC NULLS FIRST, scs_designasletrado.fecharenunciasolicita DESC NULLS FIRST, SCS_DESIGNASLETRADO.LETRADODELTURNO DESC");
 
 		return sql.toString();
 	}
@@ -3097,31 +3185,80 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}
 	}
 
-	public String busquedaComunicaciones(String anio, String num, String idturno, String idPersona) {
+	public String busquedaComunicaciones(String num, String anio, String idturno, Short idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
-
-		sql2.SELECT(
-				"S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, N.NOMBRE, F_SIGA_GETRECURSO(A.NOMBRE, 1) as IDESTADO , N.APELLIDOS1 , N.APELLIDOS2");
-
-		sql2.FROM("SCS_COMUNICACIONES C");
-		sql2.INNER_JOIN("ENV_ENVIOS S on (s.idenvio = C.IDENVIOSALIDA)");
-		sql2.INNER_JOIN("ENV_TIPOENVIOS T on (T.IDTIPOENVIOS = S.IDTIPOENVIOS)");
-		sql2.INNER_JOIN("env_estadoenvio A on (A.IDESTADO = S.IDESTADO)");
-		sql2.INNER_JOIN("ENV_DESTINATARIOS D on (D.IDENVIO = S.IDENVIO)");
-		sql2.INNER_JOIN("CEN_PERSONA N on (N.IDPERSONA = D.IDPERSONA)");
-		sql2.WHERE("C.DESIGNAANIO = " + anio);
-		sql2.WHERE("C.DESIGNAIDTURNO =" + idturno);
-
-		if (idPersona == null) {
-			sql2.WHERE("C.DESIGNANUMERO =" + num);
-		} else {
-			sql2.WHERE("(C.DESIGNANUMERO =" + num + " OR (D.IDPERSONA =" + idPersona + " AND S.IDESTADO = 2))");
-		}
-
+		SQL sql3 = new SQL();
+		SQL sqlTipoEnvio = new SQL();
+		SQL sqlEstadosEnvio = new SQL();
+		
+        //subquery tipo envio
+        sqlTipoEnvio.SELECT("cat.descripcion");
+        sqlTipoEnvio.FROM("env_tipoenvios");
+        sqlTipoEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = env_tipoenvios.nombre)");
+        sqlTipoEnvio.WHERE("env_tipoenvios.idtipoenvios = e.idtipoenvios");
+        sqlTipoEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
+        
+        //subquery estadosEnvios
+        sqlEstadosEnvio.SELECT("cat.descripcion");
+        sqlEstadosEnvio.FROM("env_estadoenvio estado");
+        sqlEstadosEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = estado.nombre)");
+        sqlEstadosEnvio.WHERE("estado.idestado = e.idestado");
+        sqlEstadosEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
+		
+		sql3.SELECT("c.idenviosalida");
+        sql3.SELECT("c.idinstitucion");
+        sql3.FROM("scs_comunicaciones c");
+		sql3.WHERE("c.idinstitucion = '"+idInstitucion+"'");
+		sql3.WHERE("c.designaanio = "+anio);
+		sql3.WHERE("c.designaidturno = "+idturno);
+		sql3.WHERE("c.designanumero = '"+num+"'");
+        
+		sql2.SELECT("e.*");
+		sql2.SELECT("(dest.nombre || ' ' || dest.apellidos1 || ' ' || dest.apellidos2) AS destinatario");
+		sql2.SELECT("("+sqlTipoEnvio.toString()+") as tipoenvio");
+		sql2.SELECT("("+sqlEstadosEnvio.toString()+") as estadoenvio");
+		sql2.SELECT("nvl(camposenviosasunto.valor, plantilla.asunto) AS asunto");
+		sql2.SELECT("nvl(camposenvioscuerpo.valor, plantilla.cuerpo) AS cuerpo");
+		sql2.FROM("env_envios e");
+		sql2.JOIN("env_destinatarios dest on (dest.idenvio=e.idenvio and dest.idinstitucion =e.idinstitucion)");
+		sql2.JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '"+idInstitucion+"' AND plantilla.idplantillaenvios = e.idplantillaenvios"
+				+ " AND plantilla.idtipoenvios = e.idtipoenvios)");
+		sql2.JOIN("env_camposenvios camposenviosasunto ON (e.idenvio = camposenviosasunto.idenvio AND camposenviosasunto.idinstitucion = e.idinstitucion"
+				+ " AND camposenviosasunto.idcampo = 1)");
+		sql2.JOIN("env_camposenvios camposenvioscuerpo ON (e.idenvio = camposenvioscuerpo.idenvio AND camposenvioscuerpo.idinstitucion = e.idinstitucion"
+				+ " AND camposenvioscuerpo.idcampo = 2)");
+		
+		sql2.WHERE("e.fechabaja IS NULL");
+		sql2.WHERE("(e.idenvio,e.idinstitucion) IN ("+sql3.toString()+")");
+		
 		sql.SELECT("*");
-		sql.FROM("( " + sql2.toString() + " )");
-		sql.WHERE("ROWNUM <= 200");
+		sql.FROM("("+sql2.toString()+")");
+		
+		
+//		SQL sql2 = new SQL();
+//
+//		sql2.SELECT(
+//				"S.DESCRIPCION, S.FECHA, S.FECHAPROGRAMADA, F_SIGA_GETRECURSO(T.NOMBRE, 1) as TIPOENVIO, N.NOMBRE, F_SIGA_GETRECURSO(A.NOMBRE, 1) as IDESTADO , N.APELLIDOS1 , N.APELLIDOS2");
+//
+//		sql2.FROM("SCS_COMUNICACIONES C");
+//		sql2.INNER_JOIN("ENV_ENVIOS S on (s.idenvio = C.IDENVIOSALIDA)");
+//		sql2.INNER_JOIN("ENV_TIPOENVIOS T on (T.IDTIPOENVIOS = S.IDTIPOENVIOS)");
+//		sql2.INNER_JOIN("env_estadoenvio A on (A.IDESTADO = S.IDESTADO)");
+//		sql2.INNER_JOIN("ENV_DESTINATARIOS D on (D.IDENVIO = S.IDENVIO)");
+//		sql2.INNER_JOIN("CEN_PERSONA N on (N.IDPERSONA = D.IDPERSONA)");
+//		sql2.WHERE("C.DESIGNAANIO = " + anio);
+//		sql2.WHERE("C.DESIGNAIDTURNO =" + idturno);
+//
+//		if (idPersona == null) {
+//			sql2.WHERE("C.DESIGNANUMERO =" + num);
+//		} else {
+//			sql2.WHERE("(C.DESIGNANUMERO =" + num + " OR (D.IDPERSONA =" + idPersona + " AND S.IDESTADO = 2))");
+//		}
+//
+//		sql.SELECT("*");
+//		sql.FROM("( " + sql2.toString() + " )");
+//		sql.WHERE("ROWNUM <= 200");
 
 		return sql.toString();
 	}
@@ -3133,6 +3270,27 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("CEN_COLEGIADO");
 		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
 		sql.WHERE(" NCOLEGIADO ='" + numColegiado + "'");
+
+		return sql.toString();
+	}
+	
+	public String obtenerIdPersonaByNumColNColegiado(String nif) {
+		SQL sql = new SQL();
+
+		sql.SELECT("IDPERSONA ");
+		sql.FROM("CEN_PERSONA");
+		sql.WHERE(" NIFCIF ='" + nif + "'");
+
+		return sql.toString();
+	}
+	
+	public String obtenerNumNoColegiado(String idInstitucion, String idPersona) {
+		SQL sql = new SQL();
+
+		sql.SELECT("*");
+		sql.FROM("CEN_NOCOLEGIADO");
+		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
+		sql.WHERE(" IDPERSONA ='" + idPersona + "'");
 
 		return sql.toString();
 	}
@@ -3287,5 +3445,71 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" CODIGO ='" + codigo + "'");
 
 		return sql.toString();
+	}
+	
+	public String busquedaJuzgadoDesignas(Integer idJuzgado, Short idInstitucion, Integer tamMax)
+			throws Exception {
+		SQL sql = new SQL();
+
+		sql.SELECT("NOMBRE");
+
+		sql.FROM("SCS_JUZGADO");
+
+		sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDJUZGADO = '" + idJuzgado + "'");
+
+		return sql.toString();
+
+	}
+	
+	public String actualizarPartidaPresupuestariaActDesigna(ActuacionDesignaItem actuacionDesignaItem,
+			Short idInstitucion, AdmUsuarios usuario) {
+
+		SQL sql = new SQL();
+
+		sql.UPDATE("SCS_ACTUACIONDESIGNA");
+
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getIdPartidaPresupuestaria())) {
+			sql.SET("IDPARTIDAPRESUPUESTARIA = '" + actuacionDesignaItem.getIdPartidaPresupuestaria() + "'");
+		} else {
+			sql.SET("IDPARTIDAPRESUPUESTARIA = NULL");
+		}
+		
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+
+		sql.WHERE("NUMERO = '" + actuacionDesignaItem.getNumero() + "'");
+		sql.WHERE("IDTURNO = '" + actuacionDesignaItem.getIdTurno() + "'");
+		sql.WHERE("ANIO = '" + actuacionDesignaItem.getAnio() + "'");
+		sql.WHERE("NUMEROASUNTO = '" + actuacionDesignaItem.getNumeroAsunto() + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+
+	}
+
+	public String actualizarPartidaPresupuestariaDesigna(DesignaItem designaItem, Short idInstitucion,
+			AdmUsuarios usuario) {
+
+		SQL sql = new SQL();
+
+		sql.UPDATE("SCS_DESIGNA");
+
+		if (!UtilidadesString.esCadenaVacia(designaItem.getIdPartidaPresupuestaria())) {
+			sql.SET("IDPARTIDAPRESUPUESTARIA = '" + designaItem.getIdPartidaPresupuestaria() + "'");
+		} else {
+			sql.SET("IDPARTIDAPRESUPUESTARIA = NULL");
+		}
+		
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+
+		sql.WHERE("NUMERO = '" + designaItem.getNumero() + "'");
+		sql.WHERE("IDTURNO = '" + designaItem.getIdTurno() + "'");
+		sql.WHERE("ANIO = '" + designaItem.getAno() + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+
 	}
 }

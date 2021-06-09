@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.oficio;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,6 +27,7 @@ import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
@@ -1183,9 +1185,24 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				String strDate = dateFormat.format(prueba);
 				turnosItems = scsTurnosExtendsMapper.busquedaColaGuardia(turnosItem, strDate, busquedaOrden,
 						idInstitucion);
+				
+				turnosItems = turnosItems.stream().map(item ->{
+					DateFormat dateFormatBBDD = new SimpleDateFormat("yyyy-MM-dd");
+					try {
+						if(!UtilidadesString.esCadenaVacia(item.getFechavalidacion())) {
+							item.setFechavalidacion(dateFormat.format(dateFormatBBDD.parse(item.getFechavalidacion())));
+						}
+						if(!UtilidadesString.esCadenaVacia(item.getFechabajaguardia())) {
+							item.setFechabajaguardia(dateFormat.format(dateFormatBBDD.parse(item.getFechabajaguardia())));
+						}
+					} catch (ParseException e) {
+						LOGGER.error("busquedaColaGuardias() -> Error al parsear la fechavalidacion y/o fechabajaguardia");
+					}
+					return item;
+					}).collect(Collectors.toList());
 
 				LOGGER.info(
-						"busquedaColaOficio()  -> Salida a scsOrdenacioncolasExtendsMapper para obtener orden colas");
+						"busquedaColaGuardias()  -> Salida a scsOrdenacioncolasExtendsMapper para obtener orden colas");
 
 				if (turnosItems != null) {
 					turnosDTO.setTurnosItems(turnosItems);
