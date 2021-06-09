@@ -20,8 +20,6 @@ public class RelacionesItem {
 	private String datosinteres;
 	private String idsjcs;
 	
-
-	private String interesado;
 	private String impugnacion;
 	private Date fechaimpugnacion;
 	private String dictamen;
@@ -120,12 +118,6 @@ public class RelacionesItem {
 		this.codigo = codigo;
 	}
 
-	public String getDesturno() {
-		return desturno;
-	}
-
-	public void setDesturno(String desturno) {
-		this.desturno = desturno;
 	public String getDescturno() {
 		return descturno;
 	}
@@ -154,17 +146,6 @@ public class RelacionesItem {
 	public void setDatosinteres(String datosinteres) {
 		this.datosinteres = datosinteres;
 	}
-
-	
-	
-	public String getInteresado() {
-		return interesado;
-	}
-
-	public void setInteresado(String interesado) {
-		this.interesado = interesado;
-	}
-
 	public String getInteresado() {
 		return interesado;
 	}
@@ -407,15 +388,9 @@ public class RelacionesItem {
 	public String toString() {
 		return "RelacionesItem [sjcs=" + sjcs + ", idinstitucion=" + idinstitucion + ", anio=" + anio + ", numero="
 				+ numero + ", idletrado=" + idletrado + ", letrado=" + letrado + ", idturno=" + idturno
-				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", desturno="
-				+ desturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
-				+ fechaDesignacion + ", datosinteres=" + datosinteres +", idsjcs=" + idsjcs +"]";
 				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", descturno="
-				+ descturno + ", destipo=" + destipo + ", interesado=" + interesado + ", impugnacion=" + impugnacion
-				+ ", fechaimpugnacion=" + fechaimpugnacion + ", dictamen=" + dictamen + ", fechadictamen="
-				+ fechadictamen + ", resolucion=" + resolucion + ", fecharesolucion=" + fecharesolucion
-				+ ", centrodetencion=" + centrodetencion + ", fechaasunto=" + fechaasunto + ", dilnigproc=" + dilnigproc
-				+ "]";
+				+ descturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
+				+ fechaDesignacion + ", datosinteres=" + datosinteres +", idsjcs=" + idsjcs +"]";
 	}
 
 	/**
