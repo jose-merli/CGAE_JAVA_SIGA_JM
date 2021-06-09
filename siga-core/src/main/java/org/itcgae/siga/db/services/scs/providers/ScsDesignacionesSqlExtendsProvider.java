@@ -544,7 +544,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 						for (int i = 0; i < designaItem.getIdAcreditacion().length; i++) {
 							String turno = designaItem.getIdAcreditacion()[i];
 
-							if (i == designaItem.getIdTurnos().length - 1) {
+							if (i == designaItem.getIdAcreditacion().length - 1) {
 								turnoIN = turnoIN + turno;
 							} else {
 								turnoIN = turnoIN + turno + " ,";
@@ -3198,6 +3198,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("CEN_COLEGIADO");
 		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
 		sql.WHERE(" NCOLEGIADO ='" + numColegiado + "'");
+
+		return sql.toString();
+	}
+	public String obtenerIdPersonaByNumComunitario(String idInstitucion, String numColegiado) {
+		SQL sql = new SQL();
+
+		sql.SELECT("IDPERSONA ");
+		sql.FROM("CEN_COLEGIADO");
+		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
+		sql.WHERE(" NCOMUNITARIO ='" + numColegiado + "'");
 
 		return sql.toString();
 	}

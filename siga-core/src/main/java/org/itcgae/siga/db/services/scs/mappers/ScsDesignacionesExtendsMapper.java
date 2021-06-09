@@ -650,6 +650,12 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	})
 	String obtenerIdPersonaByNumCol(String idInstitucion, String numColegiado);
 	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerIdPersonaByNumComunitario")
+	@Results({ 
+			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+	})
+	String obtenerIdPersonaByNumComunitario(String idInstitucion, String numColegiado);
+	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerIdPersonaByNumColNColegiado")
 	@Results({ 
 			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
