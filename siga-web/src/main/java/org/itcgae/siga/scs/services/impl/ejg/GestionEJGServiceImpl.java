@@ -2370,16 +2370,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.debug(
 						"busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Entrada a scsDesignacionesExtendsMapper para obtener las comunicaciones");
 
-				//obtenemos el idEnvio
-				
-				int numEJG = Integer.parseInt(item.getNumEjg());//se convierte a int para quitar los 0 de delante si los hubiera
-				
-				String idEnvio = scsEjgExtendsMapper.getIdEnvio(item.getAnnio(), Integer.toString(numEJG), idInstitucion);
-				
-				//obtenemos los datos de la comunicacion para el idEnvio
-				if(idEnvio!=null) {
-					enviosMasivosItem = scsEjgExtendsMapper.getComunicaciones(idEnvio, idInstitucion, usuarios.get(0).getIdlenguaje());
-				}
+				//obtenemos los datos de la comunicacion
+				enviosMasivosItem = scsEjgExtendsMapper.getComunicaciones(item.getNumEjg(), item.getAnnio(), item.getTipoEJG(), idInstitucion, usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Salida a scsDesignacionesExtendsMapper para obtener las comunicaciones");
