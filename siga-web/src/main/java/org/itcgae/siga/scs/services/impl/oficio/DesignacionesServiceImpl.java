@@ -266,6 +266,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired 
 	private ITarjetaDatosDireccionesService tarjetaDatosDireccionesService;
+
+	@Autowired
+	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
 	
 	/**
 	 * busquedaJustificacionExpres
