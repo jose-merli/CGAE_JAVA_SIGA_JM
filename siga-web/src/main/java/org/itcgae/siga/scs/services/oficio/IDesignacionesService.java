@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
@@ -82,7 +83,7 @@ public interface IDesignacionesService {
 
 	public List<DesignaItem> busquedaDesignas(DesignaItem item, HttpServletRequest request);
 	
-	public List<DesignaItem> busquedaNuevaDesigna(@RequestBody DesignaItem item, HttpServletRequest request);
+	public List<DesignaItem> busquedaNuevaDesigna(@RequestBody DesignaItem item, HttpServletRequest request, boolean isNoColegiado);
 
 	public List<DesignaItem> busquedaProcedimientoDesignas(DesignaItem item, HttpServletRequest request);
 
@@ -170,7 +171,7 @@ public interface IDesignacionesService {
 			
 	public DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request);
 	
-	public ComunicacionesDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request);
+	public EnviosMasivosDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request);
 
 	public ActuacionDesignaItem getHistorioAccionesActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			HttpServletRequest request);
@@ -209,5 +210,10 @@ public interface IDesignacionesService {
 	public InsertResponseDTO asociarEjgDesigna(List<String> item, HttpServletRequest request);
 	
 	public UpdateResponseDTO guardarProcuradorEJG(List<String> procurador, HttpServletRequest request);
+	
+	public String busquedaJuzgadoDesignas(Integer idJuzgado, HttpServletRequest request);
+	
+	public UpdateResponseDTO actualizarPartidaPresupuestariaActDesigna(ActuacionDesignaItem actuacionDesignaItem,
+			HttpServletRequest request);
 	
 }

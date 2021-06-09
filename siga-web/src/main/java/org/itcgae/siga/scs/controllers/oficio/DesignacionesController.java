@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
@@ -143,7 +144,7 @@ public class DesignacionesController {
 	
 	@RequestMapping(value = "/busquedaNuevaDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<List<DesignaItem>> busquedaNuevaDesigna(@RequestBody DesignaItem item, HttpServletRequest request) {
-		List<DesignaItem> response = designacionesService.busquedaNuevaDesigna(item, request);
+		List<DesignaItem> response = designacionesService.busquedaNuevaDesigna(item, request, false);
 		if (response != null) {
 			return new ResponseEntity<List<DesignaItem>>(response, HttpStatus.OK);
 		} else {
@@ -174,6 +175,19 @@ public class DesignacionesController {
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@RequestMapping(value = "/busquedaJuzgadoDesignas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<String> busquedaJuzgadoDesignas(@RequestBody Integer idJuzgado,
+			HttpServletRequest request) {
+		String response = designacionesService.busquedaJuzgadoDesignas(idJuzgado, request);
+		if (response != null) {
+			return new ResponseEntity<String>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>(new String(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 
 	// FIN Busqueda designaciones
 
@@ -950,9 +964,9 @@ public class DesignacionesController {
 	}
 
 	@RequestMapping(value = "/designas/busquedaComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComunicacionesDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
-		ComunicacionesDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
-		return new ResponseEntity<ComunicacionesDTO>(response, HttpStatus.OK);
+	ResponseEntity<EnviosMasivosDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
+		EnviosMasivosDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
+		return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/designas/subirDocumentoActDesigna", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -1014,14 +1028,20 @@ public class DesignacionesController {
 	}
 	
 	@PostMapping(value = "/designas/asociarEjgDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> asociarEjgDesigna(
-			@RequestBody List<String> designaItem, HttpServletRequest request) {
-		InsertResponseDTO response = designacionesService
-				.asociarEjgDesigna(designaItem, request);
+	ResponseEntity<InsertResponseDTO> asociarEjgDesigna(@RequestBody List<String> designaItem, HttpServletRequest request) {
+		InsertResponseDTO response = designacionesService.asociarEjgDesigna(designaItem, request);
+
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/designas/actualizarPartidaPresupuestariaActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> actualizarPartidaPresupuestariaActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.actualizarPartidaPresupuestariaActDesigna(actuacionDesignaItem, request);
+		
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 }

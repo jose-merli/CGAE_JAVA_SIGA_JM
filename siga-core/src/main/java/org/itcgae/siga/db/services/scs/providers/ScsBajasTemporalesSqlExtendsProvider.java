@@ -66,10 +66,10 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 			sql.WHERE("(col.ncolegiado = '"+bajasTemporalesItem.getNcolegiado()+"' OR col.ncomunitario = '"+bajasTemporalesItem.getNcolegiado()+"')");
 		}
 		if(!bajasTemporalesItem.isHistorico()) {
-			sql.WHERE("bt.eliminado = 0");
-		}else {
-			sql.WHERE("(bt.eliminado = 1 OR bt.eliminado = 0)");
+			//sql.WHERE("bt.eliminado = 0");
+			sql.WHERE("NVL(bt.eliminado,0) = 0");
 		}
+		
 		sql.ORDER_BY("bt.fechadesde DESC");
 		
 		SQL sql2 = new SQL();

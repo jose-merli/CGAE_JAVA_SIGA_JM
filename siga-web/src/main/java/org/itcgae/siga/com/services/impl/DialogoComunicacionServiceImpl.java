@@ -787,7 +787,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
 									nombrePlantilla = plantillaDoc.getPlantilla();
 									idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
-									if(nombrePlantilla.substring(nombrePlantilla.lastIndexOf(".")).equals(".fo")) {
+									if(nombrePlantilla.lastIndexOf(".") > -1 
+											&& nombrePlantilla.substring(nombrePlantilla.lastIndexOf(".")).equals(".fo")) {
 										esFO = true;
 									}
 								}else if(listaPlantilla != null && listaPlantilla.size() > 1){
@@ -2441,7 +2442,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		}
 
 		consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
-		
+		List<Map<String, Object>> resultDatos = null;
 		for(ConsultaItem consultaDatosDatos:consultasItemDatos){
 			consultasItemFinal.add(consultaDatosDatos);
 		}		
@@ -2456,7 +2457,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio, Long.parseLong(consultaDatos.getIdConsulta()),consultaEjecutarDatos,usuario.getIdinstitucion(), SigaConstants.OBJETIVO.DATOS.getCodigo(), Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
 			}
 			
-			List<Map<String, Object>> resultDatos;
+			resultDatos = null;
 			try {
 								
 				resultDatos = _consultasService.ejecutarConsultaConClavesLog(consultaEjecutarDatos, usuario, Long.valueOf(modelosComunicacionItem.getIdModeloComunicacion()), Long.valueOf(consultaDatos.getIdConsulta()),Short.valueOf(consultaDatos.getIdInstitucion()),consultaDatos.getDescripcion());		
@@ -2526,7 +2527,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}
 			}else if(esFO){
 				try {
-					docGenerado = _generacionDocService.generarFO(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, hDatosFinal);
+					docGenerado = _generacionDocService.generarFO(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, resultDatos);
 				} catch (Exception e) {
 					LOGGER.error("Error al generar el fichero excel ", e);
 					throw new BusinessException("No se ha podido generar el fichero Excel", e);

@@ -19,7 +19,7 @@ public interface IGeneracionDocumentosService {
 	public DatosDocumentoItem generarExcel(String string, String pathFicheroSalida, String nombreFicheroSalida,	List<List<Map<String, Object>>> listaDatosExcel, ArrayList<String> nombresConsultasDatos) throws Exception;
 
 	public DatosDocumentoItem generarFO(String plantilla, String rutaTmp, String nombreFicheroSalida,
-			HashMap<String, Object> hDatosFinal) throws IOException, Exception;
+			List<Map<String, Object>> resultDatos) throws IOException, Exception;
 	
 	
 }
