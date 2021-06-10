@@ -4556,35 +4556,45 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetradoNueva.setIdpersona(letradoEntrante.getIdpersona());
 					}
 					
-					//Creamos designa nueva para letradoEntrante
-					response = scsDesignasletradoMapper.insertSelective(designaLetradoNueva);
-
-					//Actualizamos LetradoSaliente
-					if (response != 0 && letradoEntrante.getIdpersona() != null) {
-							List<ComboItem> motivos = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion,
-									usuarios.get(0).getIdlenguaje());
-							int i = 0;
-							while (i < motivos.size() && designaLetradoVieja.getMotivosrenuncia() == null) {
-								if (motivos.get(i).getValue().equals(letradoSaliente.getIdtipomotivo().toString())) {
-									designaLetradoVieja.setMotivosrenuncia(motivos.get(i).getLabel());
-								}
-								i++;
-							}
-							designaLetradoVieja.setObservaciones(letradoSaliente.getObservaciones());
-							designaLetradoVieja.setIdtipomotivo(letradoSaliente.getIdtipomotivo());
-							designaLetradoVieja.setUsumodificacion(usuarios.get(0).getIdusuario());
-							designaLetradoVieja.setFechamodificacion(new Date());
-							designaLetradoVieja.setLetradodelturno("N");
-							designaLetradoVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
-							designaLetradoVieja.setFecharenuncia(letradoEntrante.getFechadesigna());
-							// Si el usuario que realiza el cambio es un colegio se acepta automaticamente
-							// la renuncia
-							if (UserTokenUtils.getLetradoFromJWTToken(token) == "N") {
-								designaLetradoVieja.setFecharenuncia(letradoSaliente.getFecharenunciasolicita());
-							}
-							
-							response = scsDesignasletradoMapper.updateByPrimaryKeySelective(designaLetradoVieja);
+					if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())){
+						Long idPersonaDesignaVieja = designaLetradoVieja.getIdpersona();
+//						designaLetradoNueva = designaLetradoVieja;
+						designaLetradoNueva.setIdpersona(idPersonaDesignaVieja);
+						response = scsDesignasletradoMapper.deleteByPrimaryKey(designaLetradoVieja);
+						if(response == 1) {
+							response = scsDesignasletradoMapper.insertSelective(designaLetradoNueva);
 						}
+					}else {
+						//Creamos designa nueva para letradoEntrante
+						response = scsDesignasletradoMapper.insertSelective(designaLetradoNueva);
+
+						//Actualizamos LetradoSaliente
+						if (response != 0 && letradoEntrante.getIdpersona() != null) {
+								List<ComboItem> motivos = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion,
+										usuarios.get(0).getIdlenguaje());
+								int i = 0;
+								while (i < motivos.size() && designaLetradoVieja.getMotivosrenuncia() == null) {
+									if (motivos.get(i).getValue().equals(letradoSaliente.getIdtipomotivo().toString())) {
+										designaLetradoVieja.setMotivosrenuncia(motivos.get(i).getLabel());
+									}
+									i++;
+								}
+								designaLetradoVieja.setObservaciones(letradoSaliente.getObservaciones());
+								designaLetradoVieja.setIdtipomotivo(letradoSaliente.getIdtipomotivo());
+								designaLetradoVieja.setUsumodificacion(usuarios.get(0).getIdusuario());
+								designaLetradoVieja.setFechamodificacion(new Date());
+								designaLetradoVieja.setLetradodelturno("N");
+								designaLetradoVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
+								designaLetradoVieja.setFecharenuncia(letradoEntrante.getFechadesigna());
+								// Si el usuario que realiza el cambio es un colegio se acepta automaticamente
+								// la renuncia
+								if (UserTokenUtils.getLetradoFromJWTToken(token) == "N") {
+									designaLetradoVieja.setFecharenuncia(letradoSaliente.getFecharenunciasolicita());
+								}
+								
+								response = scsDesignasletradoMapper.updateByPrimaryKeySelective(designaLetradoVieja);
+							}
+					}
 					
 					//Creamos salto y/o compensacion si han marcado el/los check
 					
