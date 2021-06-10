@@ -14,10 +14,13 @@ import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
+import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
+import org.itcgae.siga.db.entities.ScsContrariosdesigna;
+import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -93,4 +96,11 @@ public interface IGestionEJG {
 	ComboDTO comboTipoencalidad(HttpServletRequest request);
 
 	UpdateResponseDTO updateDatosJuridicos(EjgItem datos, HttpServletRequest request);
+
+	List<ListaContrarioJusticiableItem> busquedaListaContrariosEJG(EjgItem item, HttpServletRequest request,
+			Boolean historico);
+
+	InsertResponseDTO insertContrarioEJG(ScsContrariosejg item, HttpServletRequest request);
+
+	UpdateResponseDTO deleteContrarioEJG(ScsContrariosejg item, HttpServletRequest request);
 }

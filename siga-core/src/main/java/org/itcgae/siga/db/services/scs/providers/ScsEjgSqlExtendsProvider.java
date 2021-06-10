@@ -935,84 +935,62 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	
 	/**
 	 * 
-	 * @param idEnvio
+	 * @param num
+	 * @param anio
+	 * @param idturno
 	 * @param idInstitucion
 	 * @param idLenguaje
 	 * @return
 	 */
-	public String getComunicaciones(String idEnvio, Short idInstitucion, String idLenguaje){
+	public String getComunicaciones(String num, String anio, String idTipo, Short idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
-		SQL sqlPlantillas = new SQL();
+		SQL sql2 = new SQL();
+		SQL sql3 = new SQL();
 		SQL sqlTipoEnvio = new SQL();
 		SQL sqlEstadosEnvio = new SQL();
-		SQL sqlModelos = new SQL();
 		
-		//subquery plantillas
-		sqlPlantillas.SELECT("nombre");
-		sqlPlantillas.FROM("env_plantillasenvios");
-		sqlPlantillas.WHERE("idinstitucion = '"+idInstitucion+"'");
-		sqlPlantillas.WHERE("idplantillaenvios = envio.idplantillaenvios");
-		sqlPlantillas.WHERE(" idtipoenvios = envio.idtipoenvios");
+        //subquery tipo envio
+        sqlTipoEnvio.SELECT("cat.descripcion");
+        sqlTipoEnvio.FROM("env_tipoenvios");
+        sqlTipoEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = env_tipoenvios.nombre)");
+        sqlTipoEnvio.WHERE("env_tipoenvios.idtipoenvios = e.idtipoenvios");
+        sqlTipoEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
+        
+        //subquery estadosEnvios
+        sqlEstadosEnvio.SELECT("cat.descripcion");
+        sqlEstadosEnvio.FROM("env_estadoenvio estado");
+        sqlEstadosEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = estado.nombre)");
+        sqlEstadosEnvio.WHERE("estado.idestado = e.idestado");
+        sqlEstadosEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
 		
-		//subquery tipo envio
-		sqlTipoEnvio.SELECT("cat.descripcion");
-		sqlTipoEnvio.FROM("env_tipoenvios");
-		sqlTipoEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = env_tipoenvios.nombre)");
-		sqlTipoEnvio.WHERE("env_tipoenvios.idtipoenvios = envio.idtipoenvios");
-		sqlTipoEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
+		sql3.SELECT("c.idenviosalida");
+        sql3.SELECT("c.idinstitucion");
+        sql3.FROM("scs_comunicaciones c");
+		sql3.WHERE("c.idinstitucion = '"+idInstitucion+"'");
+		sql3.WHERE("c.ejganio = "+anio);
+		sql3.WHERE("c.ejgidtipo = "+idTipo);
+		sql3.WHERE("c.ejgnumero = '"+num+"'");
+        
+		sql2.SELECT("e.*");
+		sql2.SELECT("(dest.nombre || ' ' || dest.apellidos1 || ' ' || dest.apellidos2) AS destinatario");
+		sql2.SELECT("("+sqlTipoEnvio.toString()+") as tipoenvio");
+		sql2.SELECT("("+sqlEstadosEnvio.toString()+") as estadoenvio");
+		sql2.SELECT("nvl(camposenviosasunto.valor, plantilla.asunto) AS asunto");
+		sql2.SELECT("nvl(camposenvioscuerpo.valor, plantilla.cuerpo) AS cuerpo");
+		sql2.FROM("env_envios e");
+		sql2.LEFT_OUTER_JOIN("env_destinatarios dest on (dest.idenvio=e.idenvio and dest.idinstitucion =e.idinstitucion)");
+		sql2.LEFT_OUTER_JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '"+idInstitucion+"' AND plantilla.idplantillaenvios = e.idplantillaenvios"
+				+ " AND plantilla.idtipoenvios = e.idtipoenvios)");
+		sql2.LEFT_OUTER_JOIN("env_camposenvios camposenviosasunto ON (e.idenvio = camposenviosasunto.idenvio AND camposenviosasunto.idinstitucion = e.idinstitucion"
+				+ " AND camposenviosasunto.idcampo = 1)");
+		sql2.LEFT_OUTER_JOIN("env_camposenvios camposenvioscuerpo ON (e.idenvio = camposenvioscuerpo.idenvio AND camposenvioscuerpo.idinstitucion = e.idinstitucion"
+				+ " AND camposenvioscuerpo.idcampo = 2)");
 		
-		//subquery estadosEnvios
-		sqlEstadosEnvio.SELECT("cat.descripcion");
-		sqlEstadosEnvio.FROM("env_estadoenvio estado");
-		sqlEstadosEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = estado.nombre)");
-		sqlEstadosEnvio.WHERE("estado.idestado = envio.idestado");
-		sqlEstadosEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
+		sql2.WHERE("e.fechabaja IS NULL");
+		sql2.WHERE("(e.idenvio,e.idinstitucion) IN ("+sql3.toString()+")");
 		
-		//subquery modelos
-		sqlModelos.SELECT("nombre");
-		sqlModelos.FROM("mod_modelocomunicacion");
-		sqlModelos.WHERE("idmodelocomunicacion = envio.idmodelocomunicacion");
-		
-		//query principal
-		sql.SELECT("envio.idinstitucion");
-		sql.SELECT("envio.idenvio");
-		sql.SELECT("envio.descripcion");
-		sql.SELECT("envio.fecha AS fechacreacion");
-		sql.SELECT("envio.idplantillaenvios");
-		sql.SELECT("envio.idestado");
-		sql.SELECT("envio.idtipoenvios");
-		sql.SELECT("("+sqlPlantillas.toString()+") AS nombreplantilla");
-		sql.SELECT("envio.idplantilla");
-		sql.SELECT("envio.fechaprogramada");
-		sql.SELECT("envio.fechabaja");
-		sql.SELECT("envio.idmodelocomunicacion");
-		sql.SELECT("envio.csv");
-		sql.SELECT("nvl(camposenviosasunto.valor, plantilla.asunto) AS asunto");
-		sql.SELECT("nvl(camposenvioscuerpo.valor, plantilla.cuerpo) AS cuerpo");
-		sql.SELECT("("+sqlTipoEnvio.toString()+") AS tipoenvio");
-		sql.SELECT("("+sqlEstadosEnvio.toString()+") AS estadoenvio");
-		sql.SELECT("envio.idmodelocomunicacion");
-		sql.SELECT("clase.idclasecomunicacion");
-		sql.SELECT("clase.nombre AS nombreclase");
-		sql.SELECT("("+sqlModelos.toString()+") AS nombremodelo");
-		sql.SELECT("(dest.nombre || ' ' || dest.apellidos1 || ' ' || dest.apellidos2) AS destinatario");
-		
-		sql.FROM("env_envios envio");
-		sql.JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '"+idInstitucion+"' AND plantilla.idplantillaenvios = envio.idplantillaenvios "
-				+ "AND plantilla.idtipoenvios = envio.idtipoenvios)");
-		sql.JOIN("env_destinatarios dest ON (dest.idenvio = envio.idenvio AND dest.idinstitucion = envio.idinstitucion)");
-		sql.LEFT_OUTER_JOIN("env_camposenvios camposenviosasunto ON (envio.idenvio = camposenviosasunto.idenvio AND camposenviosasunto.idinstitucion = envio.idinstitucion "
-	    		+ "AND camposenviosasunto.idcampo = 1)");
-		sql.LEFT_OUTER_JOIN("env_camposenvios camposenvioscuerpo ON (envio.idenvio = camposenvioscuerpo.idenvio AND camposenvioscuerpo.idinstitucion = envio.idinstitucion "
-				+ "AND camposenvioscuerpo.idcampo = 2)");
-	    sql.LEFT_OUTER_JOIN("cen_colegiado colegiado ON (colegiado.idpersona = dest.idpersona AND colegiado.idinstitucion = envio.idinstitucion)");
-	    sql.LEFT_OUTER_JOIN("mod_modelocomunicacion modelo ON (modelo.idmodelocomunicacion = envio.idmodelocomunicacion)");
-	    sql.LEFT_OUTER_JOIN("mod_clasecomunicaciones clase ON (clase.idclasecomunicacion = modelo.idclasecomunicacion)");
-	    
-	    sql.WHERE("envio.idinstitucion = '"+idInstitucion+"'");
-	    sql.WHERE("envio.idenvio = "+idEnvio);
-	    
-	    sql.ORDER_BY("envio.idenvio DESC");
+		sql.SELECT("*");
+		sql.FROM("("+sql2.toString()+")");
 
 		return sql.toString();		
 	}
