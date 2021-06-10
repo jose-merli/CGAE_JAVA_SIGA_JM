@@ -2114,6 +2114,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT("TUR.VALIDARJUSTIFICACIONES");
 		sql2.SELECT("ACT.IDPARTIDAPRESUPUESTARIA");
 		sql2.SELECT("PAR.NOMBREPARTIDA");
+		sql2.SELECT("ACT.IDINSTITUCION");
 
 		sql2.FROM("SCS_ACTUACIONDESIGNA ACT");
 

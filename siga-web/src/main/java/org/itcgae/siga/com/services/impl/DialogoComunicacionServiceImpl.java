@@ -3,11 +3,13 @@ package org.itcgae.siga.com.services.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.DatosDireccionLetradoOficio;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionItem;
@@ -51,6 +55,7 @@ import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.ConConsulta;
@@ -70,6 +75,7 @@ import org.itcgae.siga.db.entities.ModClasecomunicaciones;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
+import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
@@ -88,6 +94,7 @@ import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvConsultasEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
@@ -210,6 +217,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Autowired
 	private ConEjecucionMapper _conEjecucionMapper;
+	
+	@Autowired
+	private CenDireccionesExtendsMapper cenDireccionesMapper;
 	
 	
 	static int numeroFicheros = 1; 
@@ -2538,6 +2548,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				try {
 					doc = new Document(rutaPlantilla + nombrePlantilla);
 				
+					if(modelosComunicacionItem.getIdClaseComunicacion().equals("9")) { //Carta de Acreditación de Oficio
+						HashMap<String, Object> ht = completarDatosAcreditación(hDatosFinal,dialogo.getIdInstitucion());
+						hDatosFinal = new HashMap<String,Object>();
+						hDatosFinal.put("row", ht);
+					}
 					
 					doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);																			
 					
@@ -2576,5 +2591,184 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}
 			}																		
 		}																															
+	}
+
+
+
+	private HashMap<String, Object> completarDatosAcreditación(HashMap<String, Object> hDatosFinal, String idInstitucion) throws Exception {
+		HashMap<String, Object> total = new HashMap<String, Object>();
+		
+		if (hDatosFinal.size() > 0) {
+			HashMap<String, Object> registroGeneral =  (HashMap<String, Object>) hDatosFinal.get("row");
+			//Parseamos los ejg
+			String expedientes= (String)registroGeneral.get("DESIGNA_LISTA_EXPEDIENTES");
+			if(expedientes != null && !"".equalsIgnoreCase(expedientes)){
+				if (expedientes != null && expedientes.indexOf("##") > -1) {
+					String[] ejgs = expedientes.split(",");
+					String salida = "";
+					Boolean favorable;
+					String idTipoRatificacion="";
+					String fechaResolucionCAJG ="";
+					for (String ejg:ejgs) {
+						favorable = Boolean.FALSE;
+						String[] ejgDoc = ejg.split("##");	
+						//Obtenemos los datos del ejg para comprobar si tiene resolución favorable y sólo sacar aquellos que así lo son.
+						 idTipoRatificacion = ejgDoc[6];
+						 fechaResolucionCAJG = ejgDoc[7];
+						if((fechaResolucionCAJG != null && !"".equalsIgnoreCase(fechaResolucionCAJG) && idTipoRatificacion!=null && !"".equalsIgnoreCase(idTipoRatificacion) 
+								&& (idTipoRatificacion.equalsIgnoreCase("1") || idTipoRatificacion.equalsIgnoreCase("2")|| idTipoRatificacion.equalsIgnoreCase("8")
+										|| idTipoRatificacion.equalsIgnoreCase("10")|| idTipoRatificacion.equalsIgnoreCase("9")|| idTipoRatificacion.equalsIgnoreCase("11"))) 
+										|| (" ".equalsIgnoreCase(fechaResolucionCAJG) && " ".equalsIgnoreCase(idTipoRatificacion))){
+							//Comprobamos el tipo de resolución
+							
+								favorable=Boolean.TRUE;
+							
+						}
+						if(favorable)
+							salida+=", " + ejgDoc[0].trim();				
+					}
+					expedientes=salida;
+					if (expedientes.length() > 2){
+						expedientes = expedientes.substring(1);
+					}
+					registroGeneral.put("DESIGNA_LISTA_EXPEDIENTES", expedientes);
+				}
+			}
+			total.putAll(registroGeneral);
+			
+			BigDecimal idPersonaAux  = (BigDecimal) registroGeneral.get("DESIGNA_LETRADO");
+			String idPersona = idPersonaAux.toString();
+			String nombre_designa_letrado = obtenerNombreApellidos(idPersona);
+			
+			idPersonaAux  = (BigDecimal) registroGeneral.get("ACTUACION_ID_LETRADO");
+			String idPersonaActuacion  = idPersonaAux.toString();
+			String nombre_dest = obtenerNombreApellidos(idPersonaActuacion);
+			
+			
+			List<DatosDireccionLetradoOficio> designaLetrado = cenDireccionesMapper.getDireccionLetradoSalidaOficio(idPersona, idInstitucion);
+			DatosDireccionLetradoOficio registro2=  designaLetrado.get(0);
+			total.put("DOMICILIO_DESPACHO_LETRADO", registro2.getDomicilio_letrado());
+			total.put("CP_DESPACHO_LETRADO", registro2.getCp_letrado());
+			total.put("IDPOBLACION_DESPACHO_LETRADO", registro2.getIdpoblacion_letrado());
+			total.put("POBLACION_DESPACHO_LETRADO", registro2.getPoblacion_letrado());
+			total.put("IDPROVINCIA_DESPACHO_LETRADO", registro2.getIdprovincia_letrado());
+			total.put("TELEFONO1_DESPACHO_LETRADO", registro2.getTelefono1_letrado());
+			total.put("TELEFONO2_DESPACHO_LETRADO", registro2.getTelefono2_letrado());
+			total.put("FAX1_DESPACHO_LETRADO", registro2.getFax1_letrado());
+			total.put("FAX2_DESPACHO_LETRADO", registro2.getFax2_letrado());
+			total.put("EMAIL_DESPACHO_LETRADO", registro2.getEmail_letrado());
+			total.put("MOVIL_DESPACHO_LETRADO", registro2.getMovil_letrado());
+			
+			List<DatosDireccionLetradoOficio>  designaLetradoGuardia = cenDireccionesMapper.getDireccionPersonalSalidaOficio(idPersona, idInstitucion);
+			DatosDireccionLetradoOficio  registro3=  designaLetradoGuardia.get(0);
+			total.put("DOMICILIO_GUARDIA_LETRADO", registro3.getDomicilio_letrado());
+			total.put("CP_GUARDIA_LETRADO", registro3.getCp_letrado());
+			total.put("IDPOBLACION_GUARDIA_LETRADO", registro3.getIdpoblacion_letrado());
+			total.put("POBLACION_GUARDIA_LETRADO", registro3.getPoblacion_letrado());
+			total.put("IDPROVINCIA_GUARDIA_LETRADO", registro3.getIdprovincia_letrado());
+			total.put("TELEFONO1_GUARDIA_LETRADO", registro3.getTelefono1_letrado());
+			total.put("TELEFONO2_GUARDIA_LETRADO", registro3.getTelefono2_letrado());
+			total.put("FAX1_GUARDIA_LETRADO", registro3.getFax1_letrado());
+			total.put("FAX2_GUARDIA_LETRADO", registro3.getFax2_letrado());
+			total.put("EMAIL_GUARDIA_LETRADO", registro3.getEmail_letrado());
+			total.put("MOVIL_GUARDIA_LETRADO", registro3.getMovil_letrado());
+			
+			/*Hashtable letrado =  obtenerLetrado(registro2, registro3);
+			letrado.put("NOMBRE_LETRADO", nombre_designa_letrado);
+			
+			// Obtenemos el numero de colegiado
+			Hashtable<String,Object> hCenColegiado = admCenColegiado.obtenerDatosColegiado(idInstitucion, idPersona, usrBean.getLanguage());
+			String nColegiado = "";
+			if (hCenColegiado!=null && hCenColegiado.size()>0) {
+				nColegiado =  UtilidadesHash.getString(hCenColegiado, "NCOLEGIADO_LETRADO");
+				letrado.put("NCOLEGIADO_LETRADO", nColegiado);
+			}			    
+			total.putAll(letrado);
+			
+			
+			//Destinatario
+			List<DatosDireccionLetradoOficio> destinatario = cenDireccionesMapper.getDireccionLetradoSalidaOficio(idPersonaActuacion, idInstitucion);
+			DatosDireccionLetradoOficio registroDestinatario=  designaLetrado.get(0);
+			
+			List<DatosDireccionLetradoOficio>  destinatarioGuardia = cenDireccionesMapper.getDireccionPersonalSalidaOficio(idPersonaActuacion, idInstitucion);
+			DatosDireccionLetradoOficio  registroDestinatarioGuardia=  designaLetradoGuardia.get(0);
+			
+			Hashtable infoDestinatario = obtenerDestinatario(registroDestinatario, registroDestinatarioGuardia);
+			infoDestinatario.put("NOMBRE_DEST", nombre_dest);
+			registro2.put("PROVINCIA_DEST", helperInformes.getNombreProvinciaSalida((String)registro2.get("ID_PROVINCIA_DEST"),"PROVINCIA_DEST"));
+			total.putAll(infoDestinatario);
+			
+			
+			Vector regionDefendido = scsDesignaAdm.getVectorDefendidosDesigna(idInstitucion,numero,idTurno, anio,"","", longitudNumEjg);
+			htDatosInforme.put("row", total);
+			if (regionDefendido != null)
+				htDatosInforme.put("defendido", regionDefendido); //region del defendido
+			
+			
+			Vector listaInteresadosFavorablesEJG = scsEJGAdm.getDatosEjgResolucionFavorable(idInstitucion, anio, numero, idTurno);
+			Hashtable listadoEjgFavorableHashtable = new Hashtable();
+			//Si existen interesados los ponemos en forma de lista
+			if(listaInteresadosFavorablesEJG != null && listaInteresadosFavorablesEJG.size()>0){
+				String listaInteresadosFavorablesEJGString="";
+				//Si sólo hay uno lo mostramos en la lista.
+				if(listaInteresadosFavorablesEJG.size() == 1){
+					Hashtable nombreInteresado=  (Hashtable)listaInteresadosFavorablesEJG.get(0);
+					listaInteresadosFavorablesEJGString = nombreInteresado.get("NOMBRE")+ " "+nombreInteresado.get("APELLIDO1")+" "+nombreInteresado.get("APELLIDO2");
+					
+					
+				}else{
+					//Si hay más de uno construimos la lista
+					int tam = listaInteresadosFavorablesEJG.size();
+					
+					for(int i=0;i<listaInteresadosFavorablesEJG.size();i++){
+						Hashtable nombreInteresado=  (Hashtable)listaInteresadosFavorablesEJG.get(i);
+						if((tam-1)-i ==0){
+							//Es el úlimo elemento no se pone coma
+							listaInteresadosFavorablesEJGString += nombreInteresado.get("NOMBRE")+ " "+nombreInteresado.get("APELLIDO1")+" "+nombreInteresado.get("APELLIDO2");
+						}else{
+							//No es el último elemento se pone coma
+							listaInteresadosFavorablesEJGString += nombreInteresado.get("NOMBRE")+ " "+nombreInteresado.get("APELLIDO1")+" "+nombreInteresado.get("APELLIDO2")+", ";
+						}
+					}
+				}
+				listadoEjgFavorableHashtable.put("DESIGNA_LISTA_INTERESADOS", listaInteresadosFavorablesEJGString);
+				total.putAll(listadoEjgFavorableHashtable);
+			}else{
+				listadoEjgFavorableHashtable.put("DESIGNA_LISTA_INTERESADOS", "");
+				total.putAll(listadoEjgFavorableHashtable);
+			}
+			*/
+		
+		}
+		return total;
+		
+	}
+
+
+
+	private String obtenerNombreApellidos(String idPersona) throws Exception {
+String nombre = "";		
+		
+		try {
+			// Obtiene la persona
+			CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona));
+						
+			if (persona!=null) {
+
+				nombre = persona.getNombre();
+				if (persona.getApellidos1()!=null && !persona.getApellidos1().equals("#NA")){
+					nombre += " " + persona.getApellidos1();
+				}
+				
+				if (persona.getApellidos2()!=null && !persona.getApellidos2().equals("#NA")){
+					nombre += " " + persona.getApellidos2();
+				}
+			}
+			
+		} catch(Exception e) {
+			throw new Exception ("Error al obtener el nombre y apellidos",e);
+		}
+		
+		return nombre;
 	}
 }
