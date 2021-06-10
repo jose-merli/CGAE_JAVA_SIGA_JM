@@ -463,9 +463,9 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"FROM (SELECT ROWNUM AS orden,consulta.* \r\n" + 
 				"FROM (SELECT (CASE\r\n" + 
 				"				WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-				"				AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
+				"				AND TRUNC(Ins.Fechavalidacion) <= NVL(TO_DATE('"+strDate+"', 'DD/MM/YYYY'), Ins.Fechavalidacion)\r\n" + 
 				"				AND (Ins.Fechabaja IS NULL\r\n" + 
-				"				OR TRUNC(Ins.Fechabaja) > NVL('"+strDate+"', '01/01/1900')) THEN '1'\r\n" + 
+				"				OR TRUNC(Ins.Fechabaja) > NVL(TO_DATE('"+strDate+"', 'DD/MM/YYYY'), TO_DATE('01/01/1900', 'DD/MM/YYYY))) THEN '1'\r\n" + 
 				"				ELSE '0'\r\n" + 
 				"				END) Activo,\r\n" + 
 				"				Ins.Idinstitucion,\r\n" + 
