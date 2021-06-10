@@ -21,7 +21,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosDesignaItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
-import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
+import org.itcgae.siga.DTOs.scs.DatosCartaAcreditacionItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
@@ -760,4 +760,45 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDDELITO", property = "idDelito", jdbcType = JdbcType.VARCHAR),
 	})
 	List<String> getDelitos(Short idInstitucion, DesignaItem designaItem);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDefendidosDesigna")
+	@Results({
+			@Result(column = "idinstitucion", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idturno", property = "idturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "anio", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idpersonainteresado", property = "idpersonainteresado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre_defendido", property = "nombre_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "domicilio_defendido", property = "domicilio_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "cp_defendido", property = "cp_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "poblacion_defendido", property = "poblacion_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "provincia_defendido", property = "provincia_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre_pais", property = "nombre_pais", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "obs_defendido", property = "obs_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "telefono1_defendido", property = "telefono1_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "lista_telefonos_interesado", property = "lista_telefonos_interesado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nif_defendido", property = "nif_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "sexo_defendido", property = "sexo_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "sexo_defendido_descripcion", property = "sexo_defendido_descripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "o_a_defendido", property = "o_a_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "el_la_defendido", property = "el_la_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idlenguaje_defendido", property = "idlenguaje_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "anio_ejg", property = "anio_ejg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numero_ejg", property = "numero_ejg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fecharesolucioncajg", property = "fecharesolucioncajg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "count_ejg", property = "count_ejg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "calidad_defendido", property = "calidad_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idtipoencalidad", property = "idtipoencalidad", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idrepresentantejg", property = "idrepresentantejg", jdbcType = JdbcType.VARCHAR)
+		})
+	List<DatosCartaAcreditacionItem> getDefendidosDesigna (String idInstitucion, String numero, String idTurno, String anio, String idPersonaJG, String idPersona, String longitudNumEjg);
+
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDatosEjgResolucionFavorable")
+	@Results({
+			@Result(column = "Nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "Apellido1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "Apellido2", property = "apellido2", jdbcType = JdbcType.VARCHAR)
+		})
+	List<DatosCartaAcreditacionItem> getDatosEjgResolucionFavorable(String idInstitucion, String idTurno, String anio,
+			String numero);
 }

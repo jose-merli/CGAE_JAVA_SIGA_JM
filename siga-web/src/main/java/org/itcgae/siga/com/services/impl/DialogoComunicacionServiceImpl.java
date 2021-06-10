@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.DatosDireccionLetradoOficio;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionItem;
@@ -47,6 +45,7 @@ import org.itcgae.siga.DTOs.com.TipoEnvioItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.DatosCartaAcreditacionItem;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
@@ -55,7 +54,8 @@ import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.ConConsulta;
@@ -75,11 +75,11 @@ import org.itcgae.siga.db.entities.ModClasecomunicaciones;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
-import org.itcgae.siga.db.mappers.CenDireccionesMapper;
+import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
+import org.itcgae.siga.db.entities.ScsDefendidosdesignaExample;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
-import org.itcgae.siga.db.mappers.ConEjecucionMapper;
 import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
@@ -89,11 +89,11 @@ import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
-import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvConsultasEnvioExtendsMapper;
@@ -107,6 +107,8 @@ import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExte
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaEnvioConsultaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModRelPlantillaSufijoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDefendidosdesignasExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -148,9 +150,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Autowired
 	private ModPlantillaDocumentoConsultaExtendsMapper _modPlantillaDocumentoConsultaExtendsMapper;
-	
-	@Autowired
-	private ModModeloPlantillaenvioMapper _modModeloPlantillaenvioMapper;
 	
 	@Autowired
 	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
@@ -216,11 +215,16 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	private ModClasecomunicacionesExtendsMapper _modClasecomunicacionesExtendsMapper;
 	
 	@Autowired
-	private ConEjecucionMapper _conEjecucionMapper;
-	
-	@Autowired
 	private CenDireccionesExtendsMapper cenDireccionesMapper;
 	
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoMapper;
+	
+	@Autowired
+	private ScsDesignacionesExtendsMapper designacionesMapper;
+	
+	@Autowired
+	private ScsDefendidosdesignasExtendsMapper defendidosMapper;
 	
 	static int numeroFicheros = 1; 
 	
@@ -372,8 +376,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			
 			List<DatosDocumentoItem> listaFicheros = null;
 			GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
-			Error error = new Error();
-	
+			
 			if (null != idInstitucion) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -2549,9 +2552,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					doc = new Document(rutaPlantilla + nombrePlantilla);
 				
 					if(modelosComunicacionItem.getIdClaseComunicacion().equals("9")) { //Carta de Acreditación de Oficio
-						HashMap<String, Object> ht = completarDatosAcreditación(hDatosFinal,dialogo.getIdInstitucion());
-						hDatosFinal = new HashMap<String,Object>();
-						hDatosFinal.put("row", ht);
+						hDatosFinal = completarDatosAcreditación(hDatosFinal,mapaClave);
+						
 					}
 					
 					doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);																			
@@ -2595,8 +2597,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 
 
-	private HashMap<String, Object> completarDatosAcreditación(HashMap<String, Object> hDatosFinal, String idInstitucion) throws Exception {
+	private HashMap<String, Object> completarDatosAcreditación(HashMap<String, Object> hDatosFinal, HashMap<String, String> mapaClave) throws Exception {
 		HashMap<String, Object> total = new HashMap<String, Object>();
+		String longitudNumEjg = "5";
+		String idInstitucion = mapaClave.get("idInstitucion");
+		String idTurno = mapaClave.get("idTurno");
+		String numero = mapaClave.get("num");
+		String anio = mapaClave.get("anio");
+		//String numeroAsunto = mapaClave.get("numeroAsunto");
 		
 		if (hDatosFinal.size() > 0) {
 			HashMap<String, Object> registroGeneral =  (HashMap<String, Object>) hDatosFinal.get("row");
@@ -2652,6 +2660,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			total.put("IDPOBLACION_DESPACHO_LETRADO", registro2.getIdpoblacion_letrado());
 			total.put("POBLACION_DESPACHO_LETRADO", registro2.getPoblacion_letrado());
 			total.put("IDPROVINCIA_DESPACHO_LETRADO", registro2.getIdprovincia_letrado());
+			total.put("PROVINCIA_DESPACHO_LETRADO", registro2.getProvincia_letrado());
 			total.put("TELEFONO1_DESPACHO_LETRADO", registro2.getTelefono1_letrado());
 			total.put("TELEFONO2_DESPACHO_LETRADO", registro2.getTelefono2_letrado());
 			total.put("FAX1_DESPACHO_LETRADO", registro2.getFax1_letrado());
@@ -2666,6 +2675,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			total.put("IDPOBLACION_GUARDIA_LETRADO", registro3.getIdpoblacion_letrado());
 			total.put("POBLACION_GUARDIA_LETRADO", registro3.getPoblacion_letrado());
 			total.put("IDPROVINCIA_GUARDIA_LETRADO", registro3.getIdprovincia_letrado());
+			total.put("PROVINCIA_GUARDIA_LETRADO", registro3.getProvincia_letrado());
 			total.put("TELEFONO1_GUARDIA_LETRADO", registro3.getTelefono1_letrado());
 			total.put("TELEFONO2_GUARDIA_LETRADO", registro3.getTelefono2_letrado());
 			total.put("FAX1_GUARDIA_LETRADO", registro3.getFax1_letrado());
@@ -2673,47 +2683,81 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			total.put("EMAIL_GUARDIA_LETRADO", registro3.getEmail_letrado());
 			total.put("MOVIL_GUARDIA_LETRADO", registro3.getMovil_letrado());
 			
-			/*Hashtable letrado =  obtenerLetrado(registro2, registro3);
+			HashMap<String, Object> letrado =  obtenerLetrado(registro2, registro3);
 			letrado.put("NOMBRE_LETRADO", nombre_designa_letrado);
 			
 			// Obtenemos el numero de colegiado
-			Hashtable<String,Object> hCenColegiado = admCenColegiado.obtenerDatosColegiado(idInstitucion, idPersona, usrBean.getLanguage());
-			String nColegiado = "";
-			if (hCenColegiado!=null && hCenColegiado.size()>0) {
-				nColegiado =  UtilidadesHash.getString(hCenColegiado, "NCOLEGIADO_LETRADO");
-				letrado.put("NCOLEGIADO_LETRADO", nColegiado);
+			CenColegiadoKey colegiadoKey = new CenColegiadoKey();
+			colegiadoKey.setIdinstitucion(Short.valueOf(idInstitucion));
+			colegiadoKey.setIdpersona(Long.valueOf(idPersona));
+			CenColegiado cenColegiado = cenColegiadoMapper.selectByPrimaryKey(colegiadoKey);
+			
+			if (cenColegiado!=null) {
+				if(cenColegiado.getComunitario()!= null && cenColegiado.getComunitario().equals("1")) {
+					letrado.put("NCOLEGIADO_LETRADO", cenColegiado.getNcomunitario());
+				}else if(cenColegiado.getNcolegiado()!= null)
+					letrado.put("NCOLEGIADO_LETRADO", cenColegiado.getNcolegiado());
 			}			    
 			total.putAll(letrado);
 			
 			
 			//Destinatario
 			List<DatosDireccionLetradoOficio> destinatario = cenDireccionesMapper.getDireccionLetradoSalidaOficio(idPersonaActuacion, idInstitucion);
-			DatosDireccionLetradoOficio registroDestinatario=  designaLetrado.get(0);
+			DatosDireccionLetradoOficio registroDestinatario=  destinatario.get(0);
 			
 			List<DatosDireccionLetradoOficio>  destinatarioGuardia = cenDireccionesMapper.getDireccionPersonalSalidaOficio(idPersonaActuacion, idInstitucion);
-			DatosDireccionLetradoOficio  registroDestinatarioGuardia=  designaLetradoGuardia.get(0);
+			DatosDireccionLetradoOficio  registroDestinatarioGuardia=  destinatarioGuardia.get(0);
 			
-			Hashtable infoDestinatario = obtenerDestinatario(registroDestinatario, registroDestinatarioGuardia);
+			HashMap<String, Object> infoDestinatario = obtenerDestinatario(registroDestinatario, registroDestinatarioGuardia);
 			infoDestinatario.put("NOMBRE_DEST", nombre_dest);
-			registro2.put("PROVINCIA_DEST", helperInformes.getNombreProvinciaSalida((String)registro2.get("ID_PROVINCIA_DEST"),"PROVINCIA_DEST"));
 			total.putAll(infoDestinatario);
 			
 			
-			Vector regionDefendido = scsDesignaAdm.getVectorDefendidosDesigna(idInstitucion,numero,idTurno, anio,"","", longitudNumEjg);
-			htDatosInforme.put("row", total);
-			if (regionDefendido != null)
-				htDatosInforme.put("defendido", regionDefendido); //region del defendido
+			List<DatosCartaAcreditacionItem> regionDefendido = designacionesMapper.getDefendidosDesigna(idInstitucion,numero,idTurno, anio,"","", longitudNumEjg);
+			hDatosFinal = new HashMap<String,Object>();
+			hDatosFinal.put("row", total);
+			if (regionDefendido != null && !regionDefendido.isEmpty()) {
+				HashMap<String,Object> mRegionDefendido = new HashMap<String,Object>();
+				mRegionDefendido.put("IDINSTITUCION",regionDefendido.get(0).getIdinstitucion());
+				mRegionDefendido.put("IDTURNO",regionDefendido.get(0).getIdturno());
+				mRegionDefendido.put("ANIO",regionDefendido.get(0).getAnio());
+				mRegionDefendido.put("NUMERO",regionDefendido.get(0).getNumero());
+				mRegionDefendido.put("IDPERSONAINTERESADO",regionDefendido.get(0).getIdpersonainteresado());
+				mRegionDefendido.put("NOMBRE_DEFENDIDO",regionDefendido.get(0).getNombre_defendido());
+				mRegionDefendido.put("DOMICILIO_DEFENDIDO",regionDefendido.get(0).getDomicilio_defendido());
+				mRegionDefendido.put("CP_DEFENDIDO",regionDefendido.get(0).getCp_defendido());
+				mRegionDefendido.put("POBLACION_DEFENDIDO",regionDefendido.get(0).getPoblacion_defendido());
+				mRegionDefendido.put("PROVINCIA_DEFENDIDO",regionDefendido.get(0).getProvincia_defendido());
+				mRegionDefendido.put("NOMBRE_PAIS",regionDefendido.get(0).getNombre_pais());
+				mRegionDefendido.put("OBS_DEFENDIDO",regionDefendido.get(0).getObs_defendido());
+				mRegionDefendido.put("TELEFONO1_DEFENDIDO",regionDefendido.get(0).getTelefono1_defendido());
+				mRegionDefendido.put("LISTA_TELEFONOS_INTERESADO",regionDefendido.get(0).getLista_telefonos_interesado());
+				mRegionDefendido.put("NIF_DEFENDIDO",regionDefendido.get(0).getNif_defendido());
+				mRegionDefendido.put("SEXO_DEFENDIDO",regionDefendido.get(0).getSexo_defendido());
+				mRegionDefendido.put("SEXO_DEFENDIDO_DESCRIPCION",regionDefendido.get(0).getSexo_defendido_descripcion());
+				mRegionDefendido.put("O_A_DEFENDIDO",regionDefendido.get(0).getO_a_defendido());
+				mRegionDefendido.put("EL_LA_DEFENDIDO",regionDefendido.get(0).getEl_la_defendido());
+				mRegionDefendido.put("IDLENGUAJE_DEFENDIDO",regionDefendido.get(0).getIdlenguaje_defendido());
+				mRegionDefendido.put("ANIO_EJG",regionDefendido.get(0).getAnio_ejg());
+				mRegionDefendido.put("NUMERO_EJG",regionDefendido.get(0).getNumero_ejg());
+				mRegionDefendido.put("FECHARESOLUCIONCAJG",regionDefendido.get(0).getFecharesolucioncajg());
+				mRegionDefendido.put("COUNT_EJG",regionDefendido.get(0).getCount_ejg());
+				mRegionDefendido.put("CALIDAD_DEFENDIDO",regionDefendido.get(0).getCalidad_defendido());
+				mRegionDefendido.put("IDTIPOENCALIDAD",regionDefendido.get(0).getIdtipoencalidad());
+				mRegionDefendido.put("IDREPRESENTANTEJG",regionDefendido.get(0).getIdrepresentantejg());
+				hDatosFinal.put("defendido", mRegionDefendido); //region del defendido
+			}
 			
 			
-			Vector listaInteresadosFavorablesEJG = scsEJGAdm.getDatosEjgResolucionFavorable(idInstitucion, anio, numero, idTurno);
-			Hashtable listadoEjgFavorableHashtable = new Hashtable();
+			List<DatosCartaAcreditacionItem> listaInteresadosFavorablesEJG = getDatosEjgResolucionFavorable(idInstitucion, anio, numero, idTurno);
+			HashMap<String,Object> listadoEjgFavorableHashMap = new HashMap<String,Object>();
 			//Si existen interesados los ponemos en forma de lista
 			if(listaInteresadosFavorablesEJG != null && listaInteresadosFavorablesEJG.size()>0){
 				String listaInteresadosFavorablesEJGString="";
 				//Si sólo hay uno lo mostramos en la lista.
 				if(listaInteresadosFavorablesEJG.size() == 1){
-					Hashtable nombreInteresado=  (Hashtable)listaInteresadosFavorablesEJG.get(0);
-					listaInteresadosFavorablesEJGString = nombreInteresado.get("NOMBRE")+ " "+nombreInteresado.get("APELLIDO1")+" "+nombreInteresado.get("APELLIDO2");
+					listaInteresadosFavorablesEJGString = listaInteresadosFavorablesEJG.get(0).getNombre() + " "+
+							listaInteresadosFavorablesEJG.get(0).getApellido1() + " " + listaInteresadosFavorablesEJG.get(0).getApellido2();
 					
 					
 				}else{
@@ -2721,33 +2765,158 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					int tam = listaInteresadosFavorablesEJG.size();
 					
 					for(int i=0;i<listaInteresadosFavorablesEJG.size();i++){
-						Hashtable nombreInteresado=  (Hashtable)listaInteresadosFavorablesEJG.get(i);
 						if((tam-1)-i ==0){
 							//Es el úlimo elemento no se pone coma
-							listaInteresadosFavorablesEJGString += nombreInteresado.get("NOMBRE")+ " "+nombreInteresado.get("APELLIDO1")+" "+nombreInteresado.get("APELLIDO2");
+							listaInteresadosFavorablesEJGString = listaInteresadosFavorablesEJG.get(i).getNombre() + " "+
+									listaInteresadosFavorablesEJG.get(i).getApellido1() + " " + listaInteresadosFavorablesEJG.get(i).getApellido2();
 						}else{
 							//No es el último elemento se pone coma
-							listaInteresadosFavorablesEJGString += nombreInteresado.get("NOMBRE")+ " "+nombreInteresado.get("APELLIDO1")+" "+nombreInteresado.get("APELLIDO2")+", ";
+							listaInteresadosFavorablesEJGString = listaInteresadosFavorablesEJG.get(i).getNombre() + " "+
+									listaInteresadosFavorablesEJG.get(i).getApellido1() + " " + listaInteresadosFavorablesEJG.get(i).getApellido2() + ", ";
 						}
 					}
 				}
-				listadoEjgFavorableHashtable.put("DESIGNA_LISTA_INTERESADOS", listaInteresadosFavorablesEJGString);
-				total.putAll(listadoEjgFavorableHashtable);
+				listadoEjgFavorableHashMap.put("DESIGNA_LISTA_INTERESADOS", listaInteresadosFavorablesEJGString);
+				total.putAll(listadoEjgFavorableHashMap);
 			}else{
-				listadoEjgFavorableHashtable.put("DESIGNA_LISTA_INTERESADOS", "");
-				total.putAll(listadoEjgFavorableHashtable);
+				listadoEjgFavorableHashMap.put("DESIGNA_LISTA_INTERESADOS", "");
+				total.putAll(listadoEjgFavorableHashMap);
 			}
-			*/
 		
 		}
-		return total;
+		return hDatosFinal;
 		
+	}
+	
+	
+
+private List<DatosCartaAcreditacionItem> getDatosEjgResolucionFavorable(String idInstitucion, String anio, String numero,
+			String idTurno) {
+		try {
+			List<DatosCartaAcreditacionItem> v = null;
+			
+			ScsDefendidosdesignaExample example = new ScsDefendidosdesignaExample();
+			example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).
+				andIdturnoEqualTo(Integer.valueOf(idTurno)).andAnioEqualTo(Short.valueOf(anio)).
+				andNumeroEqualTo(Long.valueOf(numero));
+			List<ScsDefendidosdesigna> defendidos = defendidosMapper.selectByExample(example);
+			
+			if(defendidos != null && !defendidos.isEmpty()) {
+				
+				v = designacionesMapper.getDatosEjgResolucionFavorable(idInstitucion,idTurno,anio,numero);
+							 
+			}		
+			
+			if(v != null && v.size()>0){
+				return v;
+			}else{
+				return null;
+			}
+			
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	
+	return new ArrayList<DatosCartaAcreditacionItem>();
 	}
 
 
 
+public HashMap<String, Object> obtenerLetrado(DatosDireccionLetradoOficio despacho, DatosDireccionLetradoOficio Guardia){
+		
+		HashMap<String, Object> letrado = new HashMap<String, Object>();
+	
+		if (despacho.getDomicilio_letrado()!=null) {
+			letrado.put("DOMICILIO_LETRADO", despacho.getDomicilio_letrado());
+		}
+		if (despacho.getCp_letrado()!=null) {
+			letrado.put("CP_LETRADO", despacho.getCp_letrado());
+		}
+		if (despacho.getIdpoblacion_letrado()!=null) {
+			letrado.put("ID_POBLACION_LETRADO", despacho.getIdpoblacion_letrado());
+		}
+		if (despacho.getPoblacion_letrado()!=null) {
+			letrado.put("POBLACION_LETRADO", despacho.getPoblacion_letrado());
+		}
+		if (despacho.getIdprovincia_letrado()!=null) {
+			letrado.put("ID_PROVINCIA_LETRADO", despacho.getIdprovincia_letrado());
+		}
+		if (despacho.getProvincia_letrado()!=null) {
+			letrado.put("PROVINCIA_LETRADO", despacho.getProvincia_letrado());
+		}
+		if (despacho.getTelefono1_letrado()!=null) {
+			letrado.put("TELEFONODESPACHO_LET", despacho.getTelefono1_letrado());
+		}
+		if (despacho.getFax1_letrado()!=null) {
+			letrado.put("FAX_LETRADO", despacho.getFax1_letrado());
+		}
+		if (despacho.getEmail_letrado()!=null) {
+			letrado.put("EMAIL_LETRADO", despacho.getEmail_letrado());
+		}
+		if (despacho.getMovil_letrado()!=null) {
+			letrado.put("MOVILDESPACHO_LET", despacho.getMovil_letrado());
+		}
+		if (Guardia.getTelefono1_letrado()!=null) {
+			letrado.put("TELEFONO1_LETRADO", Guardia.getTelefono1_letrado());
+		}
+		if (Guardia.getTelefono2_letrado()!=null) {
+			letrado.put("TELEFONO2_LETRADO", Guardia.getTelefono2_letrado());
+		}
+		if (Guardia.getMovil_letrado()!=null) {
+			letrado.put("MOVIL_LETRADO", Guardia.getMovil_letrado());
+		}
+		return letrado;
+
+	}
+
+public HashMap<String, Object> obtenerDestinatario(DatosDireccionLetradoOficio despacho, DatosDireccionLetradoOficio Guardia){
+	
+	HashMap<String, Object> destinatario = new HashMap<String, Object>();
+
+	if (despacho.getDomicilio_letrado()!=null) {
+		destinatario.put("DOMICILIO_DEST", despacho.getDomicilio_letrado());
+	}
+	if (despacho.getCp_letrado()!=null) {
+		destinatario.put("CP_DEST", despacho.getCp_letrado());
+	}
+	if (despacho.getIdpoblacion_letrado()!=null) {
+		destinatario.put("ID_POBLACION_DEST", despacho.getIdpoblacion_letrado());
+	}
+	if (despacho.getPoblacion_letrado()!=null) {
+		destinatario.put("POBLACION_DEST", despacho.getPoblacion_letrado());
+	}
+	if (despacho.getIdprovincia_letrado()!=null) {
+		destinatario.put("ID_PROVINCIA_DEST", despacho.getIdprovincia_letrado());
+	}
+	if (despacho.getProvincia_letrado()!=null) {
+		destinatario.put("PROVINCIA_DEST", despacho.getProvincia_letrado());
+	}
+	if (despacho.getTelefono1_letrado()!=null) {
+		destinatario.put("TELEFONO_DEST", despacho.getTelefono1_letrado());
+	}
+	if (despacho.getFax1_letrado()!=null) {
+		destinatario.put("FAX_DEST", despacho.getFax1_letrado());
+	}
+	if (despacho.getEmail_letrado()!=null) {
+		destinatario.put("EMAIL_DEST", despacho.getEmail_letrado());
+	}
+	if (despacho.getMovil_letrado()!=null) {
+		destinatario.put("MOVIL_DEST", despacho.getMovil_letrado());
+	}
+	if (Guardia.getTelefono1_letrado()!=null) {
+		destinatario.put("TELEFONO1_DEST", Guardia.getTelefono1_letrado());
+	}
+	if (Guardia.getTelefono2_letrado()!=null) {
+		destinatario.put("TELEFONO2_DEST", Guardia.getTelefono2_letrado());
+	}
+	
+	return destinatario;
+
+}
+
 	private String obtenerNombreApellidos(String idPersona) throws Exception {
-String nombre = "";		
+		String nombre = "";		
 		
 		try {
 			// Obtiene la persona

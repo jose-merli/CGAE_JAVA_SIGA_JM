@@ -3524,4 +3524,234 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String getDefendidosDesigna (String idInstitucion, String numero, String idTurno, String anio, String idPersonaJG, String idPersona, String longitudNumEjg) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("def.idinstitucion,\r\n" + 
+				"	    def.idturno,\r\n" + 
+				"	    def.anio,\r\n" + 
+				"	    def.numero,\r\n" + 
+				"	    perjg.idpersona           idpersonainteresado,\r\n" + 
+				"	    perjg.nombre\r\n" + 
+				"	    || ' '\r\n" + 
+				"	    || perjg.apellido1\r\n" + 
+				"	    || ' '\r\n" + 
+				"	    || perjg.apellido2 AS nombre_defendido,\r\n" + 
+				"	    decode(perjg.direccion, NULL, NULL,((\r\n" + 
+				"	        SELECT\r\n" + 
+				"	            (upper(substr(f_siga_getrecurso(tv.descripcion, 1), 1, 1)))\r\n" + 
+				"	            ||(lower(substr(f_siga_getrecurso(tv.descripcion, 1), 2)))\r\n" + 
+				"	        FROM\r\n" + 
+				"	            cen_tipovia tv\r\n" + 
+				"	        WHERE\r\n" + 
+				"	            tv.idtipovia = perjg.idtipovia\r\n" + 
+				"	            AND tv.idinstitucion = perjg.idinstitucion\r\n" + 
+				"	    )\r\n" + 
+				"	                                        || ' '\r\n" + 
+				"	                                        || perjg.direccion\r\n" + 
+				"	                                        || ' '\r\n" + 
+				"	                                        || perjg.numerodir\r\n" + 
+				"	                                        || ' '\r\n" + 
+				"	                                        || perjg.escaleradir\r\n" + 
+				"	                                        || ' '\r\n" + 
+				"	                                        || perjg.pisodir\r\n" + 
+				"	                                        || ' '\r\n" + 
+				"	                                        || perjg.puertadir)) AS domicilio_defendido,\r\n" + 
+				"	    perjg.codigopostal        AS cp_defendido,\r\n" + 
+				"	    pob.nombre                AS poblacion_defendido,\r\n" + 
+				"	    prov.nombre               AS provincia_defendido,\r\n" + 
+				"	    pais.nombre               AS nombre_pais,\r\n" + 
+				"	    perjg.observaciones       AS obs_defendido,\r\n" + 
+				"	    (\r\n" + 
+				"	        SELECT\r\n" + 
+				"	            tel2.numerotelefono\r\n" + 
+				"	        FROM\r\n" + 
+				"	            scs_telefonospersona tel2\r\n" + 
+				"	        WHERE\r\n" + 
+				"	            tel2.idinstitucion = perjg.idinstitucion\r\n" + 
+				"	            AND tel2.idpersona = perjg.idpersona\r\n" + 
+				"	            AND ROWNUM < 2\r\n" + 
+				"	    ) AS telefono1_defendido,\r\n" + 
+				"	    replace((\r\n" + 
+				"	        SELECT\r\n" + 
+				"	            wmsys.wm_concat(ltel.nombretelefono\r\n" + 
+				"	                            || ':'\r\n" + 
+				"	                            || ltel.numerotelefono)\r\n" + 
+				"	        FROM\r\n" + 
+				"	            scs_telefonospersona ltel\r\n" + 
+				"	        WHERE\r\n" + 
+				"	            ltel.idinstitucion = perjg.idinstitucion\r\n" + 
+				"	            AND ltel.idpersona = perjg.idpersona\r\n" + 
+				"	    ), ',', ', ') AS lista_telefonos_interesado,\r\n" + 
+				"	    perjg.nif                 AS nif_defendido,\r\n" + 
+				"	    decode(perjg.sexo, NULL, NULL, 'M', 'gratuita.personaEJG.sexo.mujer',\r\n" + 
+				"	           'gratuita.personaEJG.sexo.hombre') AS sexo_defendido,\r\n" + 
+				"	    decode(perjg.sexo, NULL, NULL, 'M', f_siga_getrecurso_etiqueta('gratuita.personaEJG.sexo.mujer', 1), f_siga_getrecurso_etiqueta\r\n" + 
+				"	    ('gratuita.personaEJG.sexo.hombre', 1)) AS sexo_defendido_descripcion,\r\n" + 
+				"	    decode(perjg.sexo, 'H', 'o', 'a') AS o_a_defendido,\r\n" + 
+				"	    decode(perjg.sexo, 'H', 'el', 'la') AS el_la_defendido,\r\n" + 
+				"	    perjg.idlenguaje          AS idlenguaje_defendido,\r\n" + 
+				"	    (\r\n" + 
+				"	        SELECT\r\n" + 
+				"	            ejg.anio\r\n" + 
+				"	        FROM\r\n" + 
+				"	            scs_ejg                 ejg,\r\n" + 
+				"	            scs_ejgdesigna          ejgdes,\r\n" + 
+				"	            scs_unidadfamiliarejg   ufa\r\n" + 
+				"	        WHERE\r\n" + 
+				"	            def.idinstitucion = ejgdes.idinstitucion\r\n" + 
+				"	            AND def.idturno = ejgdes.idturno\r\n" + 
+				"	            AND def.anio = ejgdes.aniodesigna\r\n" + 
+				"	            AND def.numero = ejgdes.numerodesigna\r\n" + 
+				"	            AND ejgdes.idinstitucion = ejg.idinstitucion\r\n" + 
+				"	            AND ejgdes.idtipoejg = ejg.idtipoejg\r\n" + 
+				"	            AND ejgdes.anioejg = ejg.anio\r\n" + 
+				"	            AND ejgdes.numeroejg = ejg.numero\r\n" + 
+				"	            AND ejg.idinstitucion = ufa.idinstitucion\r\n" + 
+				"	            AND ejg.idtipoejg = ufa.idtipoejg\r\n" + 
+				"	            AND ejg.anio = ufa.anio\r\n" + 
+				"	            AND ejg.numero = ufa.numero\r\n" + 
+				"	            AND def.idinstitucion = ufa.idinstitucion\r\n" + 
+				"	            AND def.idpersona = ufa.idpersona\r\n" + 
+				"	            AND ROWNUM = 1\r\n" + 
+				"	    ) AS anio_ejg,\r\n" + 
+				"	    (\r\n" + 
+				"	        SELECT\r\n" + 
+				"	            ( ejg.anio\r\n" + 
+				"	              || '/'\r\n" + 
+				"	              || lpad(ejg.numejg, 5, 0) )\r\n" + 
+				"	        FROM\r\n" + 
+				"	            scs_ejg                 ejg,\r\n" + 
+				"	            scs_ejgdesigna          ejgdes,\r\n" + 
+				"	            scs_unidadfamiliarejg   ufa\r\n" + 
+				"	        WHERE\r\n" + 
+				"	            def.idinstitucion = ejgdes.idinstitucion\r\n" + 
+				"	            AND def.idturno = ejgdes.idturno\r\n" + 
+				"	            AND def.anio = ejgdes.aniodesigna\r\n" + 
+				"	            AND def.numero = ejgdes.numerodesigna\r\n" + 
+				"	            AND ejgdes.idinstitucion = ejg.idinstitucion\r\n" + 
+				"	            AND ejgdes.idtipoejg = ejg.idtipoejg\r\n" + 
+				"	            AND ejgdes.anioejg = ejg.anio\r\n" + 
+				"	            AND ejgdes.numeroejg = ejg.numero\r\n" + 
+				"	            AND ejg.idinstitucion = ufa.idinstitucion\r\n" + 
+				"	            AND ejg.idtipoejg = ufa.idtipoejg\r\n" + 
+				"	            AND ejg.anio = ufa.anio\r\n" + 
+				"	            AND ejg.numero = ufa.numero\r\n" + 
+				"	            AND def.idinstitucion = ufa.idinstitucion\r\n" + 
+				"	            AND def.idpersona = ufa.idpersona\r\n" + 
+				"	            AND ROWNUM = 1\r\n" + 
+				"	    ) AS numero_ejg,\r\n" + 
+				"	    (\r\n" + 
+				"	        SELECT\r\n" + 
+				"	            to_char(ejg.fecharesolucioncajg, 'dd/mm/yyyy')\r\n" + 
+				"	        FROM\r\n" + 
+				"	            scs_ejg                 ejg,\r\n" + 
+				"	            scs_ejgdesigna          ejgdes,\r\n" + 
+				"	            scs_unidadfamiliarejg   ufa\r\n" + 
+				"	        WHERE\r\n" + 
+				"	            def.idinstitucion = ejgdes.idinstitucion\r\n" + 
+				"	            AND def.idturno = ejgdes.idturno\r\n" + 
+				"	            AND def.anio = ejgdes.aniodesigna\r\n" + 
+				"	            AND def.numero = ejgdes.numerodesigna\r\n" + 
+				"	            AND ejgdes.idinstitucion = ejg.idinstitucion\r\n" + 
+				"	            AND ejgdes.idtipoejg = ejg.idtipoejg\r\n" + 
+				"	            AND ejgdes.anioejg = ejg.anio\r\n" + 
+				"	            AND ejgdes.numeroejg = ejg.numero\r\n" + 
+				"	            AND ejg.idinstitucion = ufa.idinstitucion\r\n" + 
+				"	            AND ejg.idtipoejg = ufa.idtipoejg\r\n" + 
+				"	            AND ejg.anio = ufa.anio\r\n" + 
+				"	            AND ejg.numero = ufa.numero\r\n" + 
+				"	            AND def.idinstitucion = ufa.idinstitucion\r\n" + 
+				"	            AND def.idpersona = ufa.idpersona\r\n" + 
+				"	            AND ROWNUM = 1\r\n" + 
+				"	    ) AS fecharesolucioncajg,\r\n" + 
+				"	    (\r\n" + 
+				"	        SELECT\r\n" + 
+				"	            COUNT(1)\r\n" + 
+				"	        FROM\r\n" + 
+				"	            scs_ejgdesigna ejgdes\r\n" + 
+				"	        WHERE\r\n" + 
+				"	            ejgdes.idinstitucion = " +  idInstitucion + "\r\n" + 
+				"	            AND ejgdes.idturno = " + idTurno + "\r\n" + 
+				"	            AND ejgdes.aniodesigna = " + anio + "\r\n" + 
+				"	            AND ejgdes.numerodesigna = " + numero + "\r\n" + 
+				"	    ) count_ejg,\r\n" + 
+				"	    cal.descripcion           AS calidad_defendido,\r\n" + 
+				"	    cal.idtipoencalidad,\r\n" + 
+				"	    perjg.idrepresentantejg   idrepresentantejg");
+	sql.FROM(" scs_defendidosdesigna   def,\r\n" + 
+			"	    scs_personajg           perjg,\r\n" + 
+			"	    scs_tipoencalidad       cal,\r\n" + 
+			"	    cen_poblaciones         pob,\r\n" + 
+			"	    cen_provincias          prov,\r\n" + 
+			"	    cen_pais                pais");
+	sql.WHERE("	    perjg.idinstitucion = def.idinstitucion\r\n" + 
+			"	    AND perjg.idpersona = def.idpersona\r\n" + 
+			"	    AND cal.idtipoencalidad (+) = def.idtipoencalidad\r\n" + 
+			"	    AND cal.idinstitucion (+) = def.idinstitucion\r\n" + 
+			"	    AND perjg.idpoblacion = pob.idpoblacion (+)\r\n" + 
+			"	    AND perjg.idprovincia = prov.idprovincia (+)\r\n" + 
+			"	    AND perjg.idpais = pais.idpais (+)\r\n" + 
+			"	    AND def.idinstitucion = " + idInstitucion +"\r\n" + 
+			"	    AND def.idturno = " + idTurno +" \r\n" + 
+			"	    AND def.anio = " + anio + "\r\n" + 
+			"	    AND def.numero = " + numero + "\r\n" + 
+			"");
+	if (idPersonaJG != null && !idPersonaJG.trim().equals("")) {
+		sql.WHERE(" PERJG.IDPERSONA = " + idPersonaJG +" ");
+	}
+	sql.ORDER_BY("perjg.idpersona");
+		
+		return sql.toString();
+	}
+	
+	public String getDatosEjgResolucionFavorable (String idInstitucion, String numero, String idTurno, String anio) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql.SELECT(" Per.Nombre");
+		sql.SELECT(" Per.Apellido1");
+		sql.SELECT(" Nvl(Per.Apellido2, '') Apellido2 ");
+		sql2.FROM("  Scs_Ejgdesigna Ejgdes, Scs_Ejg Ejg, Scs_Personajg Per ");
+		sql2.WHERE(" Ejgdes.Idinstitucion = Ejg.Idinstitucion ");
+		sql2.WHERE(" Ejgdes.Idtipoejg = Ejg.Idtipoejg ");
+		sql2.WHERE(" Ejgdes.Anioejg = Ejg.Anio ");
+		sql2.WHERE(" Ejgdes.Numeroejg = Ejg.Numero ");
+		sql2.WHERE(" Ejg.Idinstitucion = Per.Idinstitucion ");
+		sql2.WHERE(" Ejg.Idpersonajg = Per.Idpersona ");
+		sql2.WHERE(" Ejgdes.Idinstitucion = " + idInstitucion);
+		sql2.WHERE(" Ejgdes.Idturno = " + idTurno);
+		sql2.WHERE(" Ejgdes.Aniodesigna= " + anio);
+		sql2.WHERE(" Ejgdes.Numerodesigna  = " + numero);
+		sql2.WHERE(" ( (EJG.Fecharesolucioncajg is not null and EJG.Idtiporatificacionejg in (1, 2, 8, 10, 9, 11)) "+
+				"  OR (EJG.Idtiporatificacionejg is null and EJG.Fecharesolucioncajg is null)) ");
+		
+		sql.SELECT(" Per.Nombre");
+		sql.SELECT(" Per.Apellido1");
+		sql.SELECT(" Nvl(Per.Apellido2, '') Apellido2 ");
+		sql.FROM("  From Scs_Ejgdesigna        Ejgdes, " +
+				" Scs_Unidadfamiliarejg Uniejg, "+
+				" Scs_Personajg         Per, "+
+				" Scs_Ejg Ejg ");
+		sql.WHERE(" Ejgdes.Idinstitucion = Uniejg.Idinstitucion ");
+		sql.WHERE(" Ejgdes.Idtipoejg = Uniejg.Idtipoejg ");
+		sql.WHERE(" Ejgdes.Anioejg = Uniejg.Anio ");
+		sql.WHERE(" Ejgdes.Numeroejg = Uniejg.Numero ");
+		sql.WHERE(" Uniejg.Idinstitucion = Per.Idinstitucion ");
+		sql.WHERE(" Uniejg.Idpersona = Per.Idpersona ");
+		sql.WHERE(" Ejgdes.Idinstitucion = " + idInstitucion);
+		sql.WHERE(" Ejgdes.Idturno = " + idTurno);
+		sql.WHERE(" Ejgdes.Aniodesigna = " + anio);
+		sql.WHERE(" Ejgdes.Numerodesigna = " + numero);
+		sql.WHERE("  Ejgdes.Idinstitucion = Ejg.Idinstitucion ");
+		sql.WHERE(" Ejgdes.Idtipoejg = Ejg.Idtipoejg ");
+		sql.WHERE(" Ejgdes.Anioejg = Ejg.Anio ");
+		sql.WHERE(" Ejgdes.Numeroejg = Ejg.Numero ");
+		sql.WHERE(" ( (EJG.Fecharesolucioncajg is not null and EJG.Idtiporatificacionejg in (1, 2, 8, 10, 9, 11)) "+
+				" OR (EJG.Idtiporatificacionejg is null and EJG.Fecharesolucioncajg is null))  Union " + sql2);
+		sql.ORDER_BY(" Apellido1, Apellido2, Nombre ");
+	
+		return sql.toString();
+	}
 }
