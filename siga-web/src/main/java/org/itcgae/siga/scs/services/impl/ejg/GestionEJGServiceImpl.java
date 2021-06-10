@@ -28,6 +28,7 @@ import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
+import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
@@ -2432,10 +2433,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	}
 	
 	@Override
-	public List<ListaContrarioJusticiableItem> busquedaListaContrariosEJG(EjgItem item, HttpServletRequest request,
+	public List<ListaContrarioEJGJusticiableItem> busquedaListaContrariosEJG(EjgItem item, HttpServletRequest request,
 			Boolean historico) {
 		LOGGER.info("GestionEJGServiceImpl.busquedaListaContrariosEJG() -> Entrada al servicio servicio");
-		List<ListaContrarioJusticiableItem> contrarios = null;
+		List<ListaContrarioEJGJusticiableItem> contrarios = null;
 //		List<GenParametros> tamMax = null;
 //		Integer tamMaximo = null;
 
@@ -2523,8 +2524,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					ScsContrariosejgKey key = new ScsContrariosejgKey();
 					key.setAnio(item.getAnio());
 					key.setNumero(item.getNumero());
-					key.setIdinstitucion(item.getIdinstitucion());
+					key.setIdinstitucion(Short.parseShort(idInstitucion.toString()));
 					key.setIdpersona(item.getIdpersona());
+					key.setIdtipoejg(item.getIdtipoejg());
 
 					ScsContrariosejg contrario = scsContrariosejgMapper.selectByPrimaryKey(key);
 
@@ -2564,6 +2566,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		} else {
 			error.setCode(200);
 			error.setDescription("general.message.registro.actualizado");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);
@@ -2605,8 +2608,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					ScsContrariosejg contrario = new ScsContrariosejg();
 					contrario.setAnio(item.getAnio());
 					contrario.setNumero(item.getNumero());
-					contrario.setIdinstitucion(item.getIdinstitucion());
+					contrario.setIdinstitucion(Short.parseShort(idInstitucion.toString()));
 					contrario.setIdpersona(item.getIdpersona());
+					contrario.setIdtipoejg(item.getIdtipoejg());
 					contrario.setFechamodificacion(new Date());
 					contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
 
@@ -2665,5 +2669,263 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("insertContrario() -> Salida del servicio para insertar contrarios");
 
 		return insertResponseDTO;
+	}
+	
+
+	@Override
+	public UpdateResponseDTO updateRepresentanteContrarioEJG(ScsContrariosejg item, HttpServletRequest request) {
+		LOGGER.info("updateRepresentanteContrarioEJG() ->  Entrada al servicio para eliminar contrarios");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateRepresentanteContrarioEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateRepresentanteContrarioEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					// for(ScsContrariosdesigna item: items) {
+
+					ScsContrariosejgKey key = new ScsContrariosejgKey();
+					key.setAnio(item.getAnio());
+					key.setNumero(item.getNumero());
+					key.setIdtipoejg(item.getIdtipoejg());
+					key.setIdinstitucion(Short.parseShort(idInstitucion.toString()));
+					key.setIdpersona(item.getIdpersona());
+
+					ScsContrariosejg contrario = scsContrariosejgMapper.selectByPrimaryKey(key);
+
+					contrario.setNombrerepresentanteejg(item.getNombrerepresentanteejg());
+
+					contrario.setFechamodificacion(new Date());
+					contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					LOGGER.info(
+							"updateRepresentanteContrarioEJG() / scsContrariosejgMapper.updateByPrimaryKey() -> Entrada a scsContrariosejgMapper para actualizar el representante de un contrario ejg.");
+
+					response = scsContrariosejgMapper.updateByPrimaryKey(contrario);
+
+					LOGGER.info(
+							"updateRepresentanteContrarioEJG() / scsContrariosejgMapper.updateByPrimaryKey() -> Salida de scsContrariosejgMapper para actualizar el representante de un contrario ejg.");
+
+					// }
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription(e.getMessage());
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("updateRepresentanteContrarioEJG() -> Salida del servicio para actualizar el representante de un contrario ejg");
+
+		return updateResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO updateAbogadoContrarioEJG(ScsContrariosejg item, HttpServletRequest request) {
+		LOGGER.info("updateAbogadoContrarioEJG() ->  Entrada al servicio para eliminar contrarios");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateAbogadoContrarioEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateAbogadoContrarioEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					// for(ScsContrariosdesigna item: items) {
+
+					ScsContrariosejgKey key = new ScsContrariosejgKey();
+					key.setAnio(item.getAnio());
+					key.setNumero(item.getNumero());
+					key.setIdtipoejg(item.getIdtipoejg());
+					key.setIdinstitucion(Short.parseShort(idInstitucion.toString()));
+					key.setIdpersona(item.getIdpersona());
+
+					ScsContrariosejg contrario = scsContrariosejgMapper.selectByPrimaryKey(key);
+
+					contrario.setIdabogadocontrarioejg(item.getIdabogadocontrarioejg());
+					contrario.setNombreabogadocontrarioejg(item.getNombreabogadocontrarioejg());
+
+					contrario.setFechamodificacion(new Date());
+					contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+//						List<ColegiadoItem> colegiadosItems = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(idInstitucion, contrario.getIdabogadocontrario().toString());
+//						
+//						FichaDatosColegialesItem abogado = colegiadosItems.get(0);
+
+//						contrario.set
+
+					LOGGER.info(
+							"updateAbogadoContrarioEJG() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Entrada a scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
+
+					response = scsContrariosejgMapper.updateByPrimaryKey(contrario);
+
+					LOGGER.info(
+							"updateAbogadoContrarioEJG() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Salida de scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
+
+					// }
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription(e.getMessage());
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("updateAbogadoContrarioEJG() -> Salida del servicio para eliminar contrarios");
+
+		return updateResponseDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO updateProcuradorContrarioEJG(ScsContrariosejg item, HttpServletRequest request) {
+		LOGGER.info("updateProcuradorContrarioEJG() ->  Entrada al servicio para eliminar contrarios");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateProcuradorContrarioEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateProcuradorContrarioEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					// for(ScsContrariosdesigna item: items) {
+
+					ScsContrariosejgKey key = new ScsContrariosejgKey();
+					key.setAnio(item.getAnio());
+					key.setNumero(item.getNumero());
+					key.setIdtipoejg(item.getIdtipoejg());
+					key.setIdinstitucion(Short.parseShort(idInstitucion.toString()));
+					key.setIdpersona(item.getIdpersona());
+
+					ScsContrariosejg contrario = scsContrariosejgMapper.selectByPrimaryKey(key);
+
+					contrario.setIdprocurador(item.getIdprocurador());
+
+//					List<FichaDatosColegialesItem> colegiadosSJCSItems = cenColegiadoExtendsMapper
+//							.selectDatosColegiales(item.getIdprocurador().toString(), idInstitucion.toString());
+
+//					FichaDatosColegialesItem procurador = colegiadosSJCSItems.get(0);
+//						contrario.set
+
+					contrario.setFechamodificacion(new Date());
+					contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					LOGGER.info(
+							"updateProcuradorContrarioEJG() / scsContrariosejgMapper.updateByPrimaryKey() -> Entrada a scsContrariosejgMapper para actualizar el representante de un interesado.");
+
+					response = scsContrariosejgMapper.updateByPrimaryKey(contrario);
+
+					LOGGER.info(
+							"updateProcuradorContrarioEJG() / scsContrariosejgMapper.updateByPrimaryKey() -> Salida de scsContrariosejgMapper para actualizar el representante de un interesado.");
+
+					// }
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription(e.getMessage());
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("updateProcuradorContrarioEJG() -> Salida del servicio para eliminar contrarios");
+
+		return updateResponseDTO;
 	}
 }
