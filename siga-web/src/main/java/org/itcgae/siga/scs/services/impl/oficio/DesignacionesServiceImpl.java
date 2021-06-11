@@ -4945,7 +4945,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			}
 		}
 
-		if (responseDesig == 0 || responseAct == 0) {
+		if (responseDesig == 0) {
 			error.setCode(400);
 			error.setDescription("general.mensaje.error.bbdd");
 			responseDTO.setStatus(SigaConstants.KO);
