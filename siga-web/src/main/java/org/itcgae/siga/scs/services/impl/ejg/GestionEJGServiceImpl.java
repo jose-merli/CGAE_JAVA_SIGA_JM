@@ -27,6 +27,7 @@ import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
+import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
@@ -1661,7 +1662,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO borrarEstado(List<EjgItem> datos, HttpServletRequest request) {
+	public UpdateResponseDTO borrarEstado(List<EstadoEjgItem> datos, HttpServletRequest request) {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
 
@@ -1684,42 +1685,33 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						"GestionEJGServiceImpl.borrarEstado() -> Entrada para cambiar los datos generales del ejg");
 
 				try {
-					for (int i = 0; datos.size() > i; i++) {
-						ScsEstadoejg record = new ScsEstadoejg();
+					for (EstadoEjgItem item : datos) {
 						response = 0;
-
-						// creamos el objeto para el insert
+						
+						ScsEstadoejg record = new ScsEstadoejg();
 						record.setIdinstitucion(idInstitucion);
-						record.setIdtipoejg(Short.parseShort(datos.get(i).getTipoEJG()));
-						record.setAnio(Short.parseShort(datos.get(i).getAnnio()));
-						record.setNumero(Long.parseLong(datos.get(i).getNumero()));
-						record.setIdestadoejg(Short.parseShort(datos.get(i).getEstadoNew()));
-						record.setFechainicio(datos.get(i).getFechaEstadoNew());
-						record.setFechamodificacion(new Date());
-						record.setUsumodificacion(usuarios.get(0).getIdusuario());
-						record.setAutomatico("0");
+						record.setIdtipoejg(Short.parseShort(item.getIdtipoejg()));
+						record.setAnio(Short.parseShort(item.getAnio()));
+						record.setNumero(Long.parseLong(item.getNumero()));
+						record.setIdestadoporejg(Long.parseLong(item.getIdestadoporejg()));
 						record.setFechabaja(new Date());
-
+						record.setFechamodificacion(new Date());
+						record.setUsumodificacion(usuarios.get(0).getIdusuario());;
 						response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
+						
+						if (response != 1) {
+							responsedto.setStatus(SigaConstants.KO);
+							LOGGER.error("GestionEJGServiceImpl.borrarEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+							throw new Exception("ERROR: no se ha podido ");
+						}else {
+							responsedto.setStatus(SigaConstants.OK);
+						}
 					}
 					LOGGER.debug(
 							"GestionEJGServiceImpl.cambiarEstadoEJGs() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
 				} catch (Exception e) {
-					LOGGER.debug(
-							"GestionEJGServiceImpl.borrarEstado() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
-							e);
-				} finally {
-					// respuesta si se actualiza correctamente
-					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug(
-								"GestionEJGServiceImpl.borrarEstado() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
-					} else {
-						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
-					}
-				}
+					
+				} 
 			}
 		}
 
