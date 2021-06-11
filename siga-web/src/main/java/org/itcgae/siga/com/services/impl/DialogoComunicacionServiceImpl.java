@@ -1291,8 +1291,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						if(hashMapRow != null && hashMapRow.get(campo) != null){
 							identificacion = hashMapRow.get(campo);
 						}else{
-							if(mapaClave != null && mapaClave.get(campo) != null) {
-								identificacion = mapaClave.get(campo);
+							if(mapaClave != null && (mapaClave.get(campo) != null || mapaClave.get(campo.toLowerCase()) != null)) {
+								if(mapaClave.get(campo) != null)
+									identificacion = mapaClave.get(campo);
+								else
+									identificacion = mapaClave.get(campo.toLowerCase());
 							}else {
 								identificacion = SigaConstants.CAMPO_IDENTIFICACION;
 							}
