@@ -1653,6 +1653,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM("SCS_PROCEDIMIENTOS MODULO");
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("FECHABAJA IS NULL");
+		sql.ORDER_BY("MODULO.NOMBRE");
 
 		return sql.toString();
 	}
@@ -1694,6 +1695,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("FECHABAJA IS NULL");
 		sql.WHERE("FECHA_BAJA IS NULL");
+		sql.ORDER_BY("NOMBRE");
 
 		return sql.toString();
 	}
@@ -1759,6 +1761,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("IDPRETENSION IN " + inSQL);
 		sql.WHERE("FECHABAJA IS NULL");
 		sql.WHERE("FECHA_BAJA IS NULL");
+		sql.ORDER_BY("DESCRIPCION");
 
 		return sql.toString();
 	}
@@ -1781,6 +1784,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("MODULO.IDPROCEDIMIENTO IN " + inSQL);
 		sql.WHERE("FECHABAJA IS NULL");
+		sql.ORDER_BY("MODULO.NOMBRE");
 
 		return sql.toString();
 	}
@@ -1814,6 +1818,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("MODULO.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("MODULO.IDPROCEDIMIENTO IN " + inSQL);
 		sql.WHERE("FECHABAJA IS NULL");
+		sql.ORDER_BY("MODULO.NOMBRE");
 
 		return sql.toString();
 	}
@@ -1848,6 +1853,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE("IDPRETENSION IN " + inSQL);
 		sql.WHERE("FECHABAJA IS NULL");
 		sql.WHERE("FECHA_BAJA IS NULL");
+		sql.ORDER_BY("DESCRIPCION");
 
 		return sql.toString();
 	}
