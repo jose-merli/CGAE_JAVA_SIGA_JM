@@ -225,8 +225,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					etiquetaUpdateDTO.setIdPersona(colegiadoItem.getIdPersona());
 
 					// 1. Etiquetas asociadas a la sociedad
-					gruposPersona = cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica(
-							etiquetaUpdateDTO.getIdPersona(), String.valueOf(usuario.getIdinstitucion()));
+					gruposPersona = cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridicaLenguaje(
+							etiquetaUpdateDTO.getIdPersona(), String.valueOf(usuario.getIdinstitucion()), usuario.getIdlenguaje());
 
 					List<String[]> gruposPerJuridicaAntiguos = new  ArrayList<String[]>();
 					List<String[]> gruposPerJuridicaAnterior = new ArrayList<String[]>();
@@ -235,7 +235,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 
 					for (int i = 0; i < gruposPersona.size(); i++) {
-						
 						String[] a = {
 								gruposPersona.get(i).getIdGrupo(),
 								gruposPersona.get(i).getIdInstitucion()
@@ -244,8 +243,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						gruposPerJuridicaAntiguos.add(a);
 						gruposPerJuridicaAnterior.add(a);
 					}
-
 					// 2. Recorremos las etiquetas
+					//En colegiadoItem.getEtiquetas() no vienen las idInstitucion 2000 y las intenta borrar
 					for (ComboEtiquetasItem etiqueta : colegiadoItem.getEtiquetas()) {
 						String[] a = {
 								etiqueta.getIdGrupo(),
