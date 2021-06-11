@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ComboItem2;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
@@ -20,7 +21,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosDesignaItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
-import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
+import org.itcgae.siga.DTOs.scs.DatosCartaAcreditacionItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
@@ -317,7 +318,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "VALIDARJUSTIFICACIONES", property = "validarJustificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAVALIDACION", property = "fechaValidacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBREPARTIDA", property = "partidaPresupuestaria", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "NOMBREPARTIDA", property = "partidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+	})
 	List<ActuacionDesignaItem> busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO,
 			String idInstitucion);
 
@@ -631,17 +634,25 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaComunicaciones")
-	@Results({
-			@Result(column = "DESCRIPCION", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHA", property = "fechaCreacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAPROGRAMADA", property = "fechaProgramacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDESTADO", property = "estado", jdbcType = JdbcType.VARCHAR)
+		  @Results({
+			  @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+              @Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC),
+              @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "FECHA", property = "fechaCreacion", jdbcType = JdbcType.DATE),
+              @Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
+              @Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
+              @Result(column = "NOMBREPLANTILLA", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "IDPLANTILLA", property = "idPlantilla", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "FECHAPROGRAMADA", property = "fechaProgramada", jdbcType = JdbcType.DATE),
+              @Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+              @Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "CUERPO", property = "cuerpo", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "DESTINATARIO", property = "destinatario", jdbcType = JdbcType.VARCHAR),
+              @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR)
 			})
-	List<ComunicacionesItem> busquedaComunicaciones(String num, String anio, String idturno, String idpersona);
+	List<EnviosMasivosItem> busquedaComunicaciones(String num, String anio, String idturno, Short idInstitucion, String idLenguaje);
 
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerIdPersonaByNumCol")
@@ -649,6 +660,12 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
 	})
 	String obtenerIdPersonaByNumCol(String idInstitucion, String numColegiado);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerIdPersonaByNumComunitario")
+	@Results({ 
+			@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+	})
+	String obtenerIdPersonaByNumComunitario(String idInstitucion, String numColegiado);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerIdPersonaByNumColNColegiado")
 	@Results({ 
@@ -737,4 +754,51 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "actualizarPartidaPresupuestariaDesigna")
 	int actualizarPartidaPresupuestariaDesigna(DesignaItem designaItem, Short idInstitucion,
 			AdmUsuarios usuario);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDelitos")
+	@Results({ 
+			@Result(column = "IDDELITO", property = "idDelito", jdbcType = JdbcType.VARCHAR),
+	})
+	List<String> getDelitos(Short idInstitucion, DesignaItem designaItem);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDefendidosDesigna")
+	@Results({
+			@Result(column = "idinstitucion", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idturno", property = "idturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "anio", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idpersonainteresado", property = "idpersonainteresado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre_defendido", property = "nombre_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "domicilio_defendido", property = "domicilio_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "cp_defendido", property = "cp_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "poblacion_defendido", property = "poblacion_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "provincia_defendido", property = "provincia_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombre_pais", property = "nombre_pais", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "obs_defendido", property = "obs_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "telefono1_defendido", property = "telefono1_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "lista_telefonos_interesado", property = "lista_telefonos_interesado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nif_defendido", property = "nif_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "sexo_defendido", property = "sexo_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "sexo_defendido_descripcion", property = "sexo_defendido_descripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "o_a_defendido", property = "o_a_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "el_la_defendido", property = "el_la_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idlenguaje_defendido", property = "idlenguaje_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "anio_ejg", property = "anio_ejg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numero_ejg", property = "numero_ejg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fecharesolucioncajg", property = "fecharesolucioncajg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "count_ejg", property = "count_ejg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "calidad_defendido", property = "calidad_defendido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idtipoencalidad", property = "idtipoencalidad", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idrepresentantejg", property = "idrepresentantejg", jdbcType = JdbcType.VARCHAR)
+		})
+	List<DatosCartaAcreditacionItem> getDefendidosDesigna (String idInstitucion, String numero, String idTurno, String anio, String idPersonaJG, String idPersona, String longitudNumEjg);
+
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDatosEjgResolucionFavorable")
+	@Results({
+			@Result(column = "Nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "Apellido1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "Apellido2", property = "apellido2", jdbcType = JdbcType.VARCHAR)
+		})
+	List<DatosCartaAcreditacionItem> getDatosEjgResolucionFavorable(String idInstitucion, String idTurno, String anio,
+			String numero);
 }

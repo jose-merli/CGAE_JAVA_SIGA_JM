@@ -45,6 +45,7 @@ public class ActuacionDesignaItem {
 	private String nombreModulo;
 	private String idPartidaPresupuestaria;
 	private String partidaPresupuestaria;
+	private String idInstitucion;
 
 	/**
 	 * @return the fechaActuacion
@@ -643,6 +644,14 @@ public class ActuacionDesignaItem {
 				+ ", validarJustificacion=" + validarJustificacion + ", nombreProcedimiento=" + nombreProcedimiento
 				+ ", nombreModulo=" + nombreModulo + ", idPartidaPresupuestaria=" + idPartidaPresupuestaria
 				+ ", partidaPresupuestaria=" + partidaPresupuestaria + "]";
+	}
+
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 
 }

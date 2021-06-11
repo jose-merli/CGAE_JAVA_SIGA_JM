@@ -36,10 +36,13 @@ import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -51,8 +54,6 @@ import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.CenPersonaItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
-import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
-import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
@@ -64,6 +65,7 @@ import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaItem;
 import org.itcgae.siga.DTOs.scs.LetradoInscripcionItem;
+import org.itcgae.siga.DTOs.scs.ListDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
@@ -99,6 +101,8 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
+import org.itcgae.siga.db.entities.ScsDelitosdesigna;
+import org.itcgae.siga.db.entities.ScsDelitosdesignaExample;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
@@ -126,6 +130,7 @@ import org.itcgae.siga.db.mappers.ScsAcreditacionMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
+import org.itcgae.siga.db.mappers.ScsDelitosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
@@ -159,7 +164,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -179,9 +184,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
-
-	@Autowired
-	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
 
 	@Autowired
 	private ScsContrariosdesignaMapper scsContrariosDesignaMapper;
@@ -260,6 +262,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired 
 	private ITarjetaDatosDireccionesService tarjetaDatosDireccionesService;
+	
+	@Autowired 
+	private ScsDelitosdesignaMapper scsDelitosdesignaMapper;
 	
 	/**
 	 * busquedaJustificacionExpres
@@ -1821,9 +1826,34 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							scsDesigna.setIdpretension(idPretension);
 						}
 						scsDesigna.setIdprocedimiento(designaItem.getIdProcedimiento());
-						scsDesigna.setDelitos(designaItem.getDelitos());
 						scsDesigna.setFechaestado(designaItem.getFechaEstado());
 						scsDesigna.setFechafin(designaItem.getFechaFin());
+						
+						ScsDelitosdesignaExample scsDelitosdesignaExample = new ScsDelitosdesignaExample();
+						scsDelitosdesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andNumeroEqualTo(Long.valueOf(designaItem.getNumero()))
+								.andIdturnoEqualTo(Integer.valueOf(designaItem.getIdTurno()))
+								.andAnioEqualTo(Integer.valueOf(designaItem.getAno()).shortValue());
+
+						scsDelitosdesignaMapper.deleteByExample(scsDelitosdesignaExample);
+
+						if (!UtilidadesString.esCadenaVacia(designaItem.getDelitos())) {
+
+							String[] listaDelitos = designaItem.getDelitos().split(",");
+
+							ScsDelitosdesigna scsDelitosdesigna = new ScsDelitosdesigna();
+							scsDelitosdesigna.setIdinstitucion(idInstitucion);
+							scsDelitosdesigna.setNumero(Long.valueOf(designaItem.getNumero()));
+							scsDelitosdesigna.setIdturno(Integer.valueOf(designaItem.getIdTurno()));
+							scsDelitosdesigna.setAnio(Integer.valueOf(designaItem.getAno()).shortValue());
+							scsDelitosdesigna.setFechamodificacion(new Date());
+							scsDelitosdesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+							for (String delito : listaDelitos) {
+								scsDelitosdesigna.setIddelito(Short.valueOf(delito));
+								scsDelitosdesignaMapper.insertSelective(scsDelitosdesigna);
+							}
+						}
 
 					}
 					//VALIDAMOS EL NIG
@@ -2750,16 +2780,31 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetrado.setUsumodificacion(usuario.getIdusuario());
 						designaLetrado.setManual((short) 1);
 						designaLetrado.setLetradodelturno("1");
-
-						String idPersona = scsDesignacionesExtendsMapper
-								.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
-
-						if(idPersona == null || idPersona == "") {
+						
+						String idPersona = null;
+						
+						if(idInstitucion == designaItem.getIdInstitucion() || designaItem.getIdInstitucion() == 0){
 							idPersona = scsDesignacionesExtendsMapper
-									.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
-							idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(idInstitucion.toString(), idPersona);
-							
+									.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
+
+							if(idPersona == null || idPersona == "") {
+								idPersona = scsDesignacionesExtendsMapper
+										.obtenerIdPersonaByNumComunitario(designa.getIdinstitucion().toString(), numeroColegiado);
+							}
+//
+//							if(idPersona == null || idPersona == "") {
+//								idPersona = scsDesignacionesExtendsMapper
+//										.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
+//								idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
+//
+//							}
+						}else {
+								idPersona = scsDesignacionesExtendsMapper
+										.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
+								idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
 						}
+
+						
 						InsertResponseDTO responseNColegiado = new InsertResponseDTO();
 						if(idPersona == null || idPersona == "") {
 							NoColegiadoItem noColegiadoItem = new NoColegiadoItem();
@@ -3729,6 +3774,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						"busquedaProcurador() / scsProcuradorExtendsMapper.busquedaProcurador() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores");
 
 				if (procuradorItemList != null) {
+					if(!procuradorItemList.isEmpty()) {
+						procuradorItemList.get(0).setNumeroTotalProcuradores(String.valueOf(procuradorItemList.size()));
+					}
 					procuradorDTO.setProcuradorItems(procuradorItemList);
 				}
 			}
@@ -4477,7 +4525,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designaLetradoNueva.setAnio(designa.getAnio());
 					designaLetradoNueva.setIdturno(designa.getIdturno());
 					designaLetradoNueva.setNumero(designa.getNumero());
-					designaLetradoNueva.setFechadesigna(letradoSaliente.getFechadesigna());
+					designaLetradoNueva.setFechadesigna(letradoEntrante.getFechadesigna());
 					designaLetradoNueva.setFechamodificacion(new Date());
 					designaLetradoNueva.setManual((short) 0);
 					designaLetradoNueva.setLetradodelturno("S");
@@ -4508,35 +4556,45 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetradoNueva.setIdpersona(letradoEntrante.getIdpersona());
 					}
 					
-					//Creamos designa nueva para letradoEntrante
-					response = scsDesignasletradoMapper.insert(designaLetradoNueva);
-
-					//Actualizamos LetradoSaliente
-					if (response != 0 && letradoEntrante.getIdpersona() != null) {
-							List<ComboItem> motivos = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion,
-									usuarios.get(0).getIdlenguaje());
-							int i = 0;
-							while (i < motivos.size() && designaLetradoVieja.getMotivosrenuncia() == null) {
-								if (motivos.get(i).getValue().equals(letradoSaliente.getIdtipomotivo().toString())) {
-									designaLetradoVieja.setMotivosrenuncia(motivos.get(i).getLabel());
-								}
-								i++;
-							}
-							designaLetradoVieja.setObservaciones(letradoSaliente.getObservaciones());
-							designaLetradoVieja.setIdtipomotivo(letradoSaliente.getIdtipomotivo());
-							designaLetradoVieja.setUsumodificacion(usuarios.get(0).getIdusuario());
-							designaLetradoVieja.setFechamodificacion(new Date());
-							designaLetradoVieja.setLetradodelturno("N");
-							designaLetradoVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
-							designaLetradoVieja.setFecharenuncia(letradoEntrante.getFechadesigna());
-							// Si el usuario que realiza el cambio es un colegio se acepta automaticamente
-							// la renuncia
-							if (UserTokenUtils.getLetradoFromJWTToken(token) == "N") {
-								designaLetradoVieja.setFecharenuncia(letradoSaliente.getFecharenunciasolicita());
-							}
-							
-							response = scsDesignasletradoMapper.updateByPrimaryKeySelective(designaLetradoVieja);
+					if(letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())){
+						Long idPersonaDesignaVieja = designaLetradoVieja.getIdpersona();
+//						designaLetradoNueva = designaLetradoVieja;
+						designaLetradoNueva.setIdpersona(idPersonaDesignaVieja);
+						response = scsDesignasletradoMapper.deleteByPrimaryKey(designaLetradoVieja);
+						if(response == 1) {
+							response = scsDesignasletradoMapper.insertSelective(designaLetradoNueva);
 						}
+					}else {
+						//Creamos designa nueva para letradoEntrante
+						response = scsDesignasletradoMapper.insertSelective(designaLetradoNueva);
+
+						//Actualizamos LetradoSaliente
+						if (response != 0 && letradoEntrante.getIdpersona() != null) {
+								List<ComboItem> motivos = scsDesignacionesExtendsMapper.comboTipoMotivo(idInstitucion,
+										usuarios.get(0).getIdlenguaje());
+								int i = 0;
+								while (i < motivos.size() && designaLetradoVieja.getMotivosrenuncia() == null) {
+									if (motivos.get(i).getValue().equals(letradoSaliente.getIdtipomotivo().toString())) {
+										designaLetradoVieja.setMotivosrenuncia(motivos.get(i).getLabel());
+									}
+									i++;
+								}
+								designaLetradoVieja.setObservaciones(letradoSaliente.getObservaciones());
+								designaLetradoVieja.setIdtipomotivo(letradoSaliente.getIdtipomotivo());
+								designaLetradoVieja.setUsumodificacion(usuarios.get(0).getIdusuario());
+								designaLetradoVieja.setFechamodificacion(new Date());
+								designaLetradoVieja.setLetradodelturno("N");
+								designaLetradoVieja.setFecharenunciasolicita(letradoSaliente.getFecharenunciasolicita());
+								designaLetradoVieja.setFecharenuncia(letradoEntrante.getFechadesigna());
+								// Si el usuario que realiza el cambio es un colegio se acepta automaticamente
+								// la renuncia
+								if (UserTokenUtils.getLetradoFromJWTToken(token) == "N") {
+									designaLetradoVieja.setFecharenuncia(letradoSaliente.getFecharenunciasolicita());
+								}
+								
+								response = scsDesignasletradoMapper.updateByPrimaryKeySelective(designaLetradoVieja);
+							}
+					}
 					
 					//Creamos salto y/o compensacion si han marcado el/los check
 					
@@ -4584,6 +4642,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				} catch (Exception e) {
 					error.setDescription("general.mensaje.error.bbdd");
+					error.code(500);
 					updateResponseDTO.setStatus(SigaConstants.KO);
 					updateResponseDTO.setError(error);
 					LOGGER.error(e.getMessage());
@@ -4714,7 +4773,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				String[] parts = relaciones.get(0).split("/");
 				String anio = parts[0].substring(1);
-				String num = parts[1];
+				String num = relaciones.get(3);
 				String idTurno = relaciones.get(1);
 				String idinstitucion = relaciones.get(2);
 				relacionesItem = scsDesignacionesExtendsMapper.busquedaRelaciones(anio, num, idTurno, idinstitucion);
@@ -4960,14 +5019,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
-	public ComunicacionesDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request) {
+	public EnviosMasivosDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request) {
 		LOGGER.info("busquedaComunicaciones() -> Entrada al servicio para obtener comunicaciones");
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ComunicacionesDTO comunicacionesDTO = new ComunicacionesDTO();
-		List<ComunicacionesItem> comunicacionesItem = new ArrayList<ComunicacionesItem>();
+		EnviosMasivosDTO enviosMasivosDTO = new EnviosMasivosDTO();
+		List<EnviosMasivosItem> enviosMasivosItem = new ArrayList<EnviosMasivosItem>();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -4990,36 +5049,37 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				String anio = parts[0].substring(1);
 				String num = parts[1];
 				String idTurno = comunicaciones.get(1);
-				String isLetrado = comunicaciones.get(2);
+//		 		String isLetrado = comunicaciones.get(2);
 
-				if (isLetrado != null && isLetrado.equals("false")) {
-					String idpersona = null;
-					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
-							idpersona);
-				} else if(comunicaciones.size() > 3){
-					String idpersona = comunicaciones.get(3);
-					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
-							idpersona);
-				}
+				enviosMasivosItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(num, anio, idTurno, idInstitucion, usuarios.get(0).getIdlenguaje());
+//				if (isLetrado != null && isLetrado.equals("false")) {
+//					String idpersona = null;
+//					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
+//							idpersona);
+//				} else if(comunicaciones.size() > 3){
+//					String idpersona = comunicaciones.get(3);
+//					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
+//							idpersona);
+//				}
 
 				LOGGER.info(
 						"busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Salida a scsDesignacionesExtendsMapper para obtener las comunicaciones");
 
-				for (int x = 0; x < comunicacionesItem.size(); x++) {
-					comunicacionesItem.get(x)
-							.setDestinatario(comunicacionesItem.get(x).getNombre() + ", "
-									+ comunicacionesItem.get(x).getApellido1() + " "
-									+ comunicacionesItem.get(x).getApellido2());
-				}
+//				for (int x = 0; x < comunicacionesItem.size(); x++) {
+//					comunicacionesItem.get(x)
+//							.setDestinatario(comunicacionesItem.get(x).getNombre() + ", "
+//									+ comunicacionesItem.get(x).getApellido1() + " "
+//									+ comunicacionesItem.get(x).getApellido2());
+//				}
 
-				if (comunicacionesItem != null) {
-					comunicacionesDTO.setComunicacionesItem(comunicacionesItem);
+				if (enviosMasivosItem != null) {
+					enviosMasivosDTO.setEnviosMasivosItem(enviosMasivosItem);
 				}
 			}
 
 		}
 		LOGGER.info("busquedaComunicaciones() -> Salida del servicio para obtener comunicaciones");
-		return comunicacionesDTO;
+		return enviosMasivosDTO;
 	}
 
 	@Override
@@ -6579,6 +6639,46 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return updateResponseDTO;
+	}
+	
+	@Override
+	public ListDTO getDelitos(DesignaItem designaItem, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ListDTO listDTO = new ListDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDelitos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDelitos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				List<String> listaDelitos = scsDesignacionesExtendsMapper.getDelitos(idInstitucion, designaItem);
+				listDTO.setLista(listaDelitos);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.getDelitos() -> Se ha producido un error al tratar de obtener los delitos de la designación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			listDTO.setError(error);
+		}
+
+		return listDTO;
 	}
 
 }
