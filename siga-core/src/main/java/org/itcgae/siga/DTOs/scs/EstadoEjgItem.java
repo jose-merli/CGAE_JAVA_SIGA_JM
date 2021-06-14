@@ -22,6 +22,7 @@ public class EstadoEjgItem {
 	private String idestadoporejg;
 	private String propietariocomision;
 	private Date fechabaja;
+	private String idinstitucion;
 	
 
 	
@@ -208,6 +209,13 @@ public class EstadoEjgItem {
 	public void setFechabaja(Date fechabaja) {
 		this.fechabaja = fechabaja;
 	}
+	public String getIdinstitucion() {
+		return idinstitucion;
+	}
+
+	public void setIdinstitucion(String idinstitucion) {
+		this.idinstitucion = idinstitucion;
+	}
 
 
 	@Override
@@ -226,6 +234,7 @@ public class EstadoEjgItem {
 		result = prime * result + ((idtipoejg == null) ? 0 : idtipoejg.hashCode());
 		result = prime * result + ((propietariocomision == null) ? 0 : propietariocomision.hashCode());
 		result = prime * result + ((fechabaja == null) ? 0 : fechabaja.hashCode());
+		result = prime * result + ((idinstitucion == null) ? 0 : idinstitucion.hashCode());
 		return result;
 	}
 
@@ -294,6 +303,11 @@ public class EstadoEjgItem {
 				return false;
 		} else if (!fechabaja.equals(other.fechabaja))
 			return false;
+		if (idinstitucion == null) {
+			if (other.idinstitucion != null)
+				return false;
+		} else if (!idinstitucion.equals(other.idinstitucion))
+			return false;
 		return true;
 
 	}
@@ -304,7 +318,9 @@ public class EstadoEjgItem {
 				+ ", fechaInicio=" + fechaInicio + ", descripcion=" + descripcion + ", idtipoejg=" + idtipoejg + 
 				", anio=" + anio + ", numero=" + numero + ", usumodificacion=" + usumodificacion + 
 				", idestadoporejg=" + idestadoporejg + " propietariocomision=" + propietariocomision + 
-				", fechabaja=" + fechabaja + "]";
+				", fechabaja=" + fechabaja +", idinstitucion=" + idinstitucion + "]";
 	}
+
+
 	
 }
