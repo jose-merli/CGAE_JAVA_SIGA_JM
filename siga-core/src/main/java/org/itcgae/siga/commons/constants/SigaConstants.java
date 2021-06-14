@@ -1095,8 +1095,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String EJG = "EJG";
 
 
-	public static String SIGAFRONT_VERSION = "202105042300";
-	public static String SIGAWEB_VERSION = "1.0.72_0";
+	public static String SIGAFRONT_VERSION = "202106111700";
+	public static String SIGAWEB_VERSION = "1.0.72_3";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";
