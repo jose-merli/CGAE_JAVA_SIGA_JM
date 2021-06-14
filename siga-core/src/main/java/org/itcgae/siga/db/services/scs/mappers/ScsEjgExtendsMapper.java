@@ -127,7 +127,10 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "IDPERSONAjg", property = "idPersonajg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idsituacion", property = "idsituacion", jdbcType = JdbcType.INTEGER),
 		@Result(column = "numerodiligencia", property = "numerodiligencia", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "comisaria", property = "comisaria", jdbcType = JdbcType.INTEGER)
+		@Result(column = "comisaria", property = "comisaria", jdbcType = JdbcType.INTEGER),
+		@Result(column = "idpreceptivo", property = "perceptivo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "calidad", property = "calidad", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idrenuncia", property = "renuncia", jdbcType = JdbcType.VARCHAR)
 	})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
 	

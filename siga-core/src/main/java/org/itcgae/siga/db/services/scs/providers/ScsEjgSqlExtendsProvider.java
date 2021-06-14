@@ -475,6 +475,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.idsituacion");
 		sql.SELECT("ejg.numerodiligencia");
 		sql.SELECT("ejg.comisaria");
+		sql.SELECT("ejg.idpreceptivo");
+		sql.SELECT("ejg.calidad");
+		sql.SELECT("ejg.idrenuncia");
 		// from
 		sql.FROM("scs_ejg ejg");
 		// joins

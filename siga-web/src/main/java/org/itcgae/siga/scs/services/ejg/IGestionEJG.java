@@ -13,7 +13,9 @@ import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
+import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
+import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
@@ -57,7 +59,7 @@ public interface IGestionEJG {
 	
 	UpdateResponseDTO actualizaDatosGenerales(EjgItem datos, HttpServletRequest request);
 
-	UpdateResponseDTO borrarEstado(List<EjgItem> datos, HttpServletRequest request);
+	UpdateResponseDTO borrarEstado(List<EstadoEjgItem> datos, HttpServletRequest request);
 
 	InsertResponseDTO nuevoEstado(List<EjgItem> datos, HttpServletRequest request);
 
@@ -97,10 +99,16 @@ public interface IGestionEJG {
 
 	UpdateResponseDTO updateDatosJuridicos(EjgItem datos, HttpServletRequest request);
 
-	List<ListaContrarioJusticiableItem> busquedaListaContrariosEJG(EjgItem item, HttpServletRequest request,
+	List<ListaContrarioEJGJusticiableItem> busquedaListaContrariosEJG(EjgItem item, HttpServletRequest request,
 			Boolean historico);
 
 	InsertResponseDTO insertContrarioEJG(ScsContrariosejg item, HttpServletRequest request);
 
 	UpdateResponseDTO deleteContrarioEJG(ScsContrariosejg item, HttpServletRequest request);
+
+	UpdateResponseDTO updateAbogadoContrarioEJG(ScsContrariosejg item, HttpServletRequest request);
+
+	UpdateResponseDTO updateProcuradorContrarioEJG(ScsContrariosejg item, HttpServletRequest request);
+
+	UpdateResponseDTO updateRepresentanteContrarioEJG(ScsContrariosejg item, HttpServletRequest request);
 }

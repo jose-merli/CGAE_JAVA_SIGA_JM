@@ -14,12 +14,16 @@ import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
+import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
+import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
+import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_CARGAS;
+import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
@@ -322,9 +326,14 @@ public class EjgController {
 
 	// borrarEstado
 	@RequestMapping(value = "/gestion-ejg/borrarEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> borrarEstado(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> borrarEstado(@RequestBody List<EstadoEjgItem> datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.borrarEstado(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		
+		if (response.getStatus().equals("OK"))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	
 	}
 
 	// borrarFamiliar
@@ -422,10 +431,16 @@ public class EjgController {
 	}
 
 	// delete ContrarioEJG
+	// this.selectedDatos.idPersona, this.selectedDatos.anio,  this.selectedDatos.numero, this.selectedDatos.tipoEJG
 	@RequestMapping(value = "/gestion-ejg/deleteContrarioEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> deleteContrarioEJG(@RequestBody ScsContrariosejg datos,
+	ResponseEntity<UpdateResponseDTO> deleteContrarioEJG(@RequestBody String[] item,
 			HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.deleteContrarioEJG(datos, request);
+		ScsContrariosejg contrario = new ScsContrariosejg();
+		contrario.setIdpersona(Long.parseLong(item[0]));
+		contrario.setAnio(Short.parseShort(item[1]));
+		contrario.setIdtipoejg(Short.parseShort(item[3]));
+		contrario.setNumero(Long.parseLong(item[2]));
+		UpdateResponseDTO response = gestionEJG.deleteContrarioEJG(contrario, request);
 		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
@@ -433,40 +448,90 @@ public class EjgController {
 	}
 	
 	// [this.ejg.numero.toString(), this.ejg.annio, this.ejg.tipoEJG, this.historicoContrario]
-		@RequestMapping(value = "/gestion-ejg/busquedaListaContrariosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<List<ListaContrarioJusticiableItem>> busquedaListaContrariosEJG(@RequestBody String[] item,
-				HttpServletRequest request) {
-			EjgItem ejg = new EjgItem();
-			String ano = item[1].substring(1, 5);
-			ejg.setAnnio(ano);
-			ejg.setNumero(item[0]);
-			ejg.setTipoEJG(item[2]);
-			List<ListaContrarioJusticiableItem> response = gestionEJG.busquedaListaContrariosEJG(ejg, request,
-					Boolean.parseBoolean(item[3]));
-			if (response != null) {
-				return new ResponseEntity<List<ListaContrarioJusticiableItem>>(response, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<List<ListaContrarioJusticiableItem>>(
-						new ArrayList<ListaContrarioJusticiableItem>(), HttpStatus.OK);
-			}
+	@RequestMapping(value = "/gestion-ejg/busquedaListaContrariosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<ListaContrarioEJGJusticiableItem>> busquedaListaContrariosEJG(@RequestBody String[] item,
+			HttpServletRequest request) {
+		EjgItem ejg = new EjgItem();
+		ejg.setAnnio(item[1]);
+		ejg.setNumero(item[0]);
+		ejg.setTipoEJG(item[2]);
+		List<ListaContrarioEJGJusticiableItem> response = gestionEJG.busquedaListaContrariosEJG(ejg, request,
+				Boolean.parseBoolean(item[3]));
+		if (response != null) {
+			return new ResponseEntity<List<ListaContrarioEJGJusticiableItem>>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<List<ListaContrarioEJGJusticiableItem>>(
+					new ArrayList<ListaContrarioEJGJusticiableItem>(), HttpStatus.OK);
 		}
-		
-		//Insertar contrario EJG
-		// [ ejg.idInstitucion, justiciable.idPersona, ejg.anio,
-		// ejg.numero]
-		@RequestMapping(value = "/gestion-ejg/insertContrarioEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<InsertResponseDTO> insertContrarioEJG(@RequestBody String[] item, HttpServletRequest request) {
-			String anio = item[2].substring(1, 5);
-			ScsContrariosejg contrario = new ScsContrariosejg();
-			contrario.setIdinstitucion(Short.parseShort(item[0]));
-			contrario.setIdpersona(Long.parseLong(item[1]));
-			contrario.setAnio(Short.parseShort(anio));
-			contrario.setNumero(Long.parseLong(item[3]));
-			InsertResponseDTO response = gestionEJG.insertContrarioEJG(contrario, request);
-			if (response.getError().getCode() == 200)
-				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-			else
-				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
-		}
+	//Insertar contrario EJG
+	// [ justiciable.idpersona, ejg.annio, ejg.tipoEJG, ejg.numero]
+	@RequestMapping(value = "/gestion-ejg/insertContrarioEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> insertContrarioEJG(@RequestBody String[] item, HttpServletRequest request) {
+		ScsContrariosejg contrario = new ScsContrariosejg();
+		contrario.setIdpersona(Long.parseLong(item[0]));
+		contrario.setAnio(Short.parseShort(item[1]));
+		contrario.setNumero(Long.parseLong(item[3]));
+		contrario.setIdtipoejg(Short.parseShort(item[2]));
+		InsertResponseDTO response = gestionEJG.insertContrarioEJG(contrario, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+
+	//[ sessionStorage.getItem("personaDesigna"), ejg.annio, ejg.numero, ejg.tipoEJG, this.generalBody.apellidos.concat(",", this.generalBody.nombre)]
+	@RequestMapping(value = "/gestion-ejg/updateRepresentanteContrarioEJGEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateRepresentanteContrarioEJG(@RequestBody String[] item, HttpServletRequest request) {
+		ScsContrariosejg contrario = new ScsContrariosejg();
+		contrario.setIdpersona(Long.parseLong(item[0]));
+		contrario.setAnio(Short.parseShort(item[1]));
+		contrario.setIdtipoejg(Short.parseShort(item[3]));
+		contrario.setNumero(Long.parseLong(item[2]));
+		contrario.setNombrerepresentanteejg(item[4]);
+		UpdateResponseDTO response = gestionEJG.updateRepresentanteContrarioEJG(contrario, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+
+	//[ sessionStorage.getItem("personaDesigna"), ejg.annio, ejg.numero, ejg.tipoEJG, this.generalBody.nombre]
+	@RequestMapping(value = "/gestion-ejg/updateProcuradorContrarioEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateProcuradorContrarioEJG(@RequestBody String[] item, HttpServletRequest request) {
+		ScsContrariosejg contrario = new ScsContrariosejg();
+		contrario.setIdpersona(Long.parseLong(item[0]));
+		contrario.setAnio(Short.parseShort(item[1]));
+		contrario.setIdtipoejg(Short.parseShort(item[3]));
+		contrario.setNumero(Long.parseLong(item[2]));
+		contrario.setIdprocurador(Long.parseLong(item[4]));
+		UpdateResponseDTO response = gestionEJG.updateProcuradorContrarioEJG(contrario, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+
+	//[ sessionStorage.getItem("personaDesigna"), ejg.annio, ejg.numero, ejg.tipoEJG, this.generalBody.idPersona, this.generalBody.nombre]
+	@RequestMapping(value = "/gestion-ejg/updateAbogadoContrarioEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateAbogadoContrario(@RequestBody String[] item, HttpServletRequest request) {
+
+		ScsContrariosejg contrario = new ScsContrariosejg();
+		contrario.setIdpersona(Long.parseLong(item[0]));
+		contrario.setAnio(Short.parseShort(item[1]));
+		contrario.setIdtipoejg(Short.parseShort(item[3]));
+		contrario.setNumero(Long.parseLong(item[2]));
+		contrario.setIdabogadocontrarioejg(Long.parseLong(item[4]));
+		contrario.setNombreabogadocontrarioejg(item[5]);
+		UpdateResponseDTO response = gestionEJG.updateAbogadoContrarioEJG(contrario, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
 }
