@@ -3,8 +3,11 @@ package org.itcgae.siga.scs.services.impl.ejg;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +32,9 @@ import org.itcgae.siga.scs.services.ejg.IEEJGServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-//import com.sis.firma.core.B64.Base64CODEC;
-
-
 @Service
 public class EEJGServiceImpl implements IEEJGServices {
-	
+
 	private static Logger LOGGER = Logger.getLogger(EEJGServiceImpl.class);
 
 	@Autowired
@@ -42,92 +42,88 @@ public class EEJGServiceImpl implements IEEJGServices {
 
 	@Autowired
 	private IPFDService pfdService;
-	
+
 	@Autowired
 	private GenPropertiesMapper propertiesMapper;
-	
-	//@Autowired
-//	//private Base64CODEC base64;
 
 	@Override
 	public File getInformeEejg(Map<Integer, Map<String, String>> mapInformes, String idInstitucion) throws Exception {
 		File file = null;
 		List<File> file2zip = null;
 		String nombreZip = null;
-		List<String> lNumEjg = null; 
+		List<String> lNumEjg = null;
 		String numEjg = null;
 		String csv = "";
 		String fecha = null;
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		
+
 		try {
-			//obtenemos los datos del fichero desde bd
-			
-			for (Map.Entry<Integer, Map<String, String>> entrada: mapInformes.entrySet()){
+			// obtenemos los datos del fichero desde bd
+
+			for (Map.Entry<Integer, Map<String, String>> entrada : mapInformes.entrySet()) {
 				Map<String, String> mapParameters = entrada.getValue();
-				numEjg = mapParameters.get("numEjg") ;
-				
+				numEjg = mapParameters.get("numEjg");
+
 				csv = mapParameters.get("csv");
-				if(csv != null && !csv.equals("")){
+				if (csv != null && !csv.equals("")) {
 					String contenidoPDF = null;
-					
-					//LLamamos al servico de EEJG para obtener el PDF a traves de la PFD
+
+					// LLamamos al servico de EEJG para obtener el PDF a traves de la PFD
 					contenidoPDF = pfdService.obtenerDocumentoFirmado(csv);
-				
-					//generamos el informe
+
+					// generamos el informe
 					file = generarInformeEejg(contenidoPDF, mapParameters, idInstitucion);
 				} else {
-					continue; 
+					continue;
 				}
-				
-				if(mapInformes.entrySet().size()>1){
-					
-					if(file2zip==null){
-						
-						
+
+				if (mapInformes.entrySet().size() > 1) {
+
+					if (file2zip == null) {
+
 						fecha = format.format(new Date());
-						fecha = fecha.replaceAll("/","");
-						fecha = fecha.replaceAll(":","");
-						fecha = fecha.replaceAll(" ","_");
-						
+						fecha = fecha.replaceAll("/", "");
+						fecha = fecha.replaceAll(":", "");
+						fecha = fecha.replaceAll(" ", "_");
+
 						lNumEjg = new ArrayList<String>();
 						file2zip = new ArrayList<File>();
-						
+
 						numEjg = UtilidadesString.replaceAllIgnoreCase(numEjg, "/", "-");
-						nombreZip = "eejg"+ "_" + idInstitucion + "_" +numEjg + "_" + fecha;
-						
-						if(!lNumEjg.contains(numEjg)){
+						nombreZip = "eejg" + "_" + idInstitucion + "_" + numEjg + "_" + fecha;
+
+						if (!lNumEjg.contains(numEjg)) {
 							lNumEjg.add(numEjg);
 						}
 					}
 
 					file2zip.add(file);
 				}
-				
+
 			}
-			
-			if(file2zip!=null){
-				ReadProperties rp= new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
+
+			if (file2zip != null) {
+				ReadProperties rp = new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
 				String directorioEspecificoInforme = rp.returnProperty("sjcs.directorioPlantillaInformeEejg");
 				String directorioSalida = rp.returnProperty("sjcs.directorioFisicoSalidaInformeEejg");
-				
-				if(lNumEjg.size()>1)
-					nombreZip = "eejg"+ "_" + idInstitucion + "_"+ fecha; 
-				
-				String rutaZip = directorioSalida + directorioEspecificoInforme + System.getProperty("file.separator") + idInstitucion
-						+ System.getProperty("file.separator") + nombreZip;
-				
+
+				if (lNumEjg.size() > 1)
+					nombreZip = "eejg" + "_" + idInstitucion + "_" + fecha;
+
+				String rutaZip = directorioSalida + directorioEspecificoInforme + System.getProperty("file.separator")
+						+ idInstitucion + System.getProperty("file.separator") + nombreZip;
+
 				File zip = doZip(file2zip, rutaZip);
-				
+
 				return zip;
-			}else{
+			} else {
 				return file;
-				
+
 			}
-		}catch(Exception e) {
+		} catch (Exception e) {
 			LOGGER.error("EEJGServiceImpl.getInformeEejg(). ERROR: ", e);
 		}
-		
+
 		return file;
 	}
 
@@ -137,54 +133,53 @@ public class EEJGServiceImpl implements IEEJGServices {
 	 * @param rutaFinal
 	 * @return
 	 */
-	private static File doZip(List<File> array, String rutaFinal){
-		File ficZip=null;
+	private static File doZip(List<File> array, String rutaFinal) {
+		File ficZip = null;
 		byte[] buffer = new byte[8192];
 		int leidos;
 		ZipOutputStream outTemp = null;
-		
+
 		try {
-			if ((array!=null) && (array.size()>0)) {
-				
-				ficZip = new File(rutaFinal+".zip");
+			if ((array != null) && (array.size() > 0)) {
+
+				ficZip = new File(rutaFinal + ".zip");
 				outTemp = new ZipOutputStream(new FileOutputStream(ficZip));
-				
-				for (int i=0; i<array.size(); i++)
-				{
-					File auxFile = (File)array.get(i);
+
+				for (int i = 0; i < array.size(); i++) {
+					File auxFile = (File) array.get(i);
 					if (auxFile.exists()) {
 						ZipEntry ze = new ZipEntry(auxFile.getName());
 						outTemp.putNextEntry(ze);
-						FileInputStream fis=new FileInputStream(auxFile);
-						
+						FileInputStream fis = new FileInputStream(auxFile);
+
 						buffer = new byte[8192];
-						
-						while ((leidos = fis.read(buffer, 0, buffer.length)) > 0)
-						{
+
+						while ((leidos = fis.read(buffer, 0, buffer.length)) > 0) {
 							outTemp.write(buffer, 0, leidos);
 						}
-						
+
 						outTemp.flush();
 						fis.close();
 						outTemp.closeEntry();
 						auxFile.delete();
 					}
 				}
-				
+
 				outTemp.close();
 			}
-		 
+
 		} catch (Exception e) {
 			LOGGER.error("Error al crear fichero zip. ", e);
 		} finally {
-		    try {
-		        outTemp.close();
-		    } catch (Exception eee) {}
+			try {
+				outTemp.close();
+			} catch (Exception eee) {
+			}
 		}
-		
+
 		return ficZip;
 	}
-	
+
 	/**
 	 * 
 	 * @param contenidoPDF
@@ -192,7 +187,8 @@ public class EEJGServiceImpl implements IEEJGServices {
 	 * @return
 	 * @throws Exception
 	 */
-	private File generarInformeEejg(String contenidoPDF, Map<String, String> mapParameters, String idInstitucion) throws Exception {
+	private File generarInformeEejg(String contenidoPDF, Map<String, String> mapParameters, String idInstitucion)
+			throws Exception {
 		File fileFirmado = null;
 
 //		File rutaTmp = null;
@@ -200,74 +196,69 @@ public class EEJGServiceImpl implements IEEJGServices {
 //			String idioma = mapParameters.get("idioma");
 
 //			String idiomaExt = idioma.substring(0, 2).toUpperCase();
-			
+
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			String fecha = format.format(new Date());
-			
+
 			fecha = fecha.replaceAll("/", "");
 			fecha = fecha.replaceAll(":", "");
 			fecha = fecha.replaceAll(" ", "_");
-			
+
 //			String directorioPlantillas = "";
-			String directorioEspecificoInforme= "";
+			String directorioEspecificoInforme = "";
 			String directorioSalida = "";
-			
-			for(int i=0; i<2; i++) {
+
+			for (int i = 0; i < 2; i++) {
 				GenPropertiesKey key = new GenPropertiesKey();
 				String parametro = "";
-				
-				if(i==0) {
-					parametro="sjcs.directorioPlantillaInformeEejg";
-				}else if(i==1){
-					parametro="sjcs.directorioFisicoSalidaInformeEejg";
+
+				if (i == 0) {
+					parametro = "sjcs.directorioPlantillaInformeEejg";
+				} else if (i == 1) {
+					parametro = "sjcs.directorioFisicoSalidaInformeEejg";
 				}
-				
+
 				key.setParametro(parametro);
 				key.setFichero("SIGA");
-				
+
 				GenProperties properties = propertiesMapper.selectByPrimaryKey(key);
-				
-				if(i==0) {
-					directorioEspecificoInforme =  properties.getValor();
-				}else if(i==1){
-					directorioSalida =  properties.getValor();
+
+				if (i == 0) {
+					directorioEspecificoInforme = properties.getValor();
+				} else if (i == 1) {
+					directorioSalida = properties.getValor();
 				}
 			}
-			
-//			 Directorios y nombres de trabajo
-//			String plantillaNombre = "InformeEejg_" + idiomaExt + ".xsl";
-//			String plantillaRuta = directorioPlantillas + directorioEspecificoInforme + System.getProperty("file.separator")
-//					+ idInstitucion;
-			
+
 			String numEjg = mapParameters.get("numEjg");
 			String numEjgListado = UtilidadesString.replaceAllIgnoreCase(numEjg, "-", "/");
 			mapParameters.put("numEjg", numEjgListado);
 
-			String pdfNombre = "eejg_2005_2018-01200_45837302G_20210525_131611.pdf";
-//			String pdfNombre = "eejg" + "_" + idInstitucion + "_" + numEjg + "_" + mapParameters.get("nif") + "_"
-//					+ fecha + ".pdf";
-			String pdfRuta = directorioSalida + directorioEspecificoInforme + System.getProperty("file.separator") + idInstitucion;
+			String pdfNombre = "eejg" + "_" + idInstitucion + "_" + numEjg + "_" + mapParameters.get("nif") + "_"
+					+ fecha + ".pdf";
+			String pdfRuta = directorioSalida + directorioEspecificoInforme + System.getProperty("file.separator")
+					+ idInstitucion;
 
 			File rutaPDF = new File(pdfRuta);
 			rutaPDF.mkdirs();
-			
+
 			if (!rutaPDF.canWrite()) {
 				throw new Exception("Error plantilla");
 			}
 
 			// Nos creamos el fichero PDF que se va a mostrar al usuario
 			pdfRuta += System.getProperty("file.separator");
-			fileFirmado = new File(pdfRuta + pdfNombre);
+			//fileFirmado = new File(pdfRuta + pdfNombre);
+			
+			pfdService.createFile(Base64.getDecoder().decode(contenidoPDF.getBytes()), pdfRuta, pdfNombre);
 
-			// Realizamos la decodificacion para su correcta visualización
-			//base64.decodeToFile(contenidoPDF, pdfRuta + pdfNombre);
-
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw new Exception("Error al generar el informe", e);
 		}
 
 		return fileFirmado;
 	}
+
 
 	@Override
 	public Map<Integer, Map<String, String>> getDatosInformeEejg(EjgItem item, ScsEejgPeticiones peticion)

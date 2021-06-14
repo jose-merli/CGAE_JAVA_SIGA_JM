@@ -180,9 +180,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	
 	@Autowired
 	private ScsContrariosejgMapper scsContrariosejgMapper;
-
-	@Autowired
-	private ScsPersonajgMapper scsPersonajgMapper;
 	
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -1073,22 +1070,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					// recorremos la lista para generar el documento de cada uno de los ejgs
 //					for(EjgItem ejg : datos) {
 
-					// obtenemos la id de la persona
-					LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la persona...");
-					ScsPersonajgExample personaExample = new ScsPersonajgExample();
-					personaExample.createCriteria().andNifEqualTo(datos.get(0).getNif());
-
-					Long idPersona = scsPersonajgMapper.selectByExample(personaExample).get(0).getIdpersona();
-
 					// obtenemos la peticion y el idXML
-					LOGGER.debug(
-							"GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la petición...");
+					LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la petición...");
 
 					ScsEejgPeticionesExample scsEejgPeticionesExample = new ScsEejgPeticionesExample();
 
 					scsEejgPeticionesExample.createCriteria()
 							.andIdinstitucionEqualTo(Short.parseShort(datos.get(0).getidInstitucion()))
-							.andIdpersonaEqualTo(idPersona).andAnioEqualTo(Short.parseShort(datos.get(0).getAnnio()))
+							.andIdpersonaEqualTo(Long.parseLong(datos.get(0).getIdPersonajg())).andAnioEqualTo(Short.parseShort(datos.get(0).getAnnio()))
 							.andIdtipoejgEqualTo(Short.parseShort(datos.get(0).getTipoEJG()))
 							.andNumeroEqualTo(Long.parseLong(datos.get(0).getNumEjg()));
 
@@ -1107,7 +1096,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					ScsUnidadfamiliarejgKey key = new ScsUnidadfamiliarejgKey();
 
 					key.setIdinstitucion(Short.parseShort(datos.get(0).getidInstitucion()));
-					key.setIdpersona(idPersona);
+					key.setIdpersona(Long.parseLong(datos.get(0).getIdPersonajg()));
 					key.setIdtipoejg(Short.parseShort(datos.get(0).getTipoEJG()));
 					key.setAnio(Short.parseShort(datos.get(0).getAnnio()));
 					key.setNumero(Long.parseLong(datos.get(0).getNumero())); // NUMEJG
