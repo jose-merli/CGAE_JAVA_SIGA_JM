@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDTO;
 import org.itcgae.siga.DTOs.scs.FacturacionDeleteDTO;
@@ -59,6 +61,8 @@ import org.itcgae.siga.db.entities.FcsHistoricoTipoactuacionExample;
 import org.itcgae.siga.db.entities.FcsHistoricoTipoasistcolegioExample;
 import org.itcgae.siga.db.entities.FcsMovimientosvarios;
 import org.itcgae.siga.db.entities.FcsMovimientosvariosExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.ScsActuacionasistencia;
 import org.itcgae.siga.db.entities.ScsActuacionasistenciaExample;
 import org.itcgae.siga.db.entities.ScsAsistencia;
@@ -202,32 +206,82 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		FacturacionDTO facturaciones = new FacturacionDTO();
-		
-		if(null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-	            
-	        if(null != usuarios && usuarios.size() > 0) {
-	        	AdmUsuarios usuario = usuarios.get(0);
-	            usuario.setIdinstitucion(idInstitucion);
-	                
-	            LOGGER.info("buscarFacturaciones() / fcsFacturacionJGExtendsMapper.buscarFacturaciones() -> Entrada a fcsFacturacionJGExtendsMapper para obtener las facturaciones");
-	            List<FacturacionItem> facturacionItems = fcsFacturacionJGExtendsMapper.buscarFacturaciones(facturacionItem, idInstitucion.toString());
-	            facturaciones.setFacturacionItem(facturacionItems);
-	            LOGGER.info("buscarFacturaciones() / fcsFacturacionJGExtendsMapper.buscarFacturaciones() -> Salida a fcsFacturacionJGExtendsMapper para obtener las facturaciones");
-	        }else {
-	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
-	        }
-	    }else {
-	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
-	    }
-	        
-	    LOGGER.info("getLabel() -> Salida del servicio para obtener las facturaciones");
-	    
-	    return facturaciones;	
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		Error error = new Error();
+
+		try {
+
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.buscarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.buscarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+					usuario.setIdinstitucion(idInstitucion);
+
+					GenParametrosExample genParametrosExample = new GenParametrosExample();
+					genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+							.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+					genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.buscarFacturaciones() / genParametrosMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+					tamMax = genParametrosMapper.selectByExample(genParametrosExample);
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.buscarFacturaciones() / genParametrosMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+					if (tamMax != null) {
+						tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+					} else {
+						tamMaximo = null;
+					}
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.buscarFacturaciones() / fcsFacturacionJGExtendsMapper.buscarFacturaciones() -> Entrada a fcsFacturacionJGExtendsMapper para obtener las facturaciones");
+					List<FacturacionItem> facturacionItems = fcsFacturacionJGExtendsMapper
+							.buscarFacturaciones(facturacionItem, idInstitucion.toString(), tamMaximo);
+
+					if (null != facturacionItems && facturacionItems.size() > tamMaximo) {
+						facturacionItems.remove(facturacionItems.size() - 1);
+						error.setCode(200);
+						error.setDescription("general.message.consulta.resultados");
+					}
+
+					facturaciones.setFacturacionItem(facturacionItems);
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.buscarFacturaciones() / fcsFacturacionJGExtendsMapper.buscarFacturaciones() -> Salida a fcsFacturacionJGExtendsMapper para obtener las facturaciones");
+				} else {
+					LOGGER.warn(
+							"FacturacionSJCSServicesImpl.buscarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
+			} else {
+				LOGGER.warn("FacturacionSJCSServicesImpl.buscarFacturaciones() -> idInstitucion del token nula");
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionSJCSServicesImpl.buscarFacturaciones() -> Se ha producido un error al buscar las facturaciones",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		facturaciones.setError(error);
+		LOGGER.info(
+				"FacturacionSJCSServicesImpl.buscarFacturaciones() -> Salida del servicio para obtener las facturaciones");
+
+		return facturaciones;
 	}
 	
 	@Override
@@ -1265,33 +1319,81 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		PagosjgDTO pagos = new PagosjgDTO();
 		String idLenguaje = "";
-		
-		if(null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-	            
-	        if(null != usuarios && usuarios.size() > 0) {
-	        	AdmUsuarios usuario = usuarios.get(0);
-	            usuario.setIdinstitucion(idInstitucion);
-	            idLenguaje=usuario.getIdlenguaje();    
-	                
-	            LOGGER.info("buscarPagos() / fcsFacturacionJGExtendsMapper.buscarPagos() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los pagos");
-	            List<PagosjgItem> pagosItems = fcsFacturacionJGExtendsMapper.buscarPagos(pagosItem, idInstitucion.toString(), idLenguaje);
-	            pagos.setPagosjgItem(pagosItems);
-	            LOGGER.info("buscarPagos() / fcsFacturacionJGExtendsMapper.buscarPagos() -> Salida a fcsFacturacionJGExtendsMapper para obtener los pagos");
-	        }else {
-	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
-	        }
-	    }else {
-	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
-	    }
-	        
-	    LOGGER.info("getLabel() -> Salida del servicio para obtener las facturaciones");
-	    
-	    return pagos;	
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		Error error = new Error();
+
+		try {
+
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.buscarPagos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.buscarPagos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+					usuario.setIdinstitucion(idInstitucion);
+					idLenguaje = usuario.getIdlenguaje();
+
+					GenParametrosExample genParametrosExample = new GenParametrosExample();
+					genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+							.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+					genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.buscarPagos() / genParametrosMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+					tamMax = genParametrosMapper.selectByExample(genParametrosExample);
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.buscarPagos() / genParametrosMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+					if (tamMax != null) {
+						tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+					} else {
+						tamMaximo = null;
+					}
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.buscarPagos() / fcsFacturacionJGExtendsMapper.buscarPagos() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los pagos");
+					List<PagosjgItem> pagosItems = fcsFacturacionJGExtendsMapper.buscarPagos(pagosItem,
+							idInstitucion.toString(), idLenguaje, tamMaximo);
+
+					if (null != pagosItems && pagosItems.size() > tamMaximo) {
+						pagosItems.remove(pagosItems.size() - 1);
+						error.setCode(200);
+						error.setDescription("general.message.consulta.resultados");
+					}
+
+					pagos.setPagosjgItem(pagosItems);
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.buscarPagos() / fcsFacturacionJGExtendsMapper.buscarPagos() -> Salida a fcsFacturacionJGExtendsMapper para obtener los pagos");
+				} else {
+					LOGGER.warn(
+							"FacturacionSJCSServicesImpl.buscarPagos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
+			} else {
+				LOGGER.warn("FacturacionSJCSServicesImpl.buscarPagos() -> idInstitucion del token nula");
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("FacturacionSJCSServicesImpl.buscarPagos() -> Se ha producido un error al buscar los pagos",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		pagos.setError(error);
+		LOGGER.info("FacturacionSJCSServicesImpl.buscarPagos() -> Salida del servicio para obtener los pagos");
+
+		return pagos;
 	}
 	
 	@Override
