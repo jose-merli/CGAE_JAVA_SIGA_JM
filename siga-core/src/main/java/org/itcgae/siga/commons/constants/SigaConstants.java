@@ -1100,6 +1100,9 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final int HITO_GENERAL_GUARDIA=20;
 	public static final int HITO_GENERAL_SOJ=30;
 	public static final int HITO_GENERAL_EJG=40;
+	public static final String GUARDIA = "GUARDIA";
+	public static final String OFICIO = "OFICIO";
+	public static final String EJG = "EJG";
 
 	// si es facturacion o pago
 	public static final String FACTURACION_SJCS="F";

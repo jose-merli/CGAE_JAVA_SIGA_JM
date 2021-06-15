@@ -6,9 +6,10 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosEjgItem;
+import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsEjgSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -47,5 +48,22 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper{
             @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR) 
     })
     List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo);
+    
+    @SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "busquedaColegiadoEJG")
+	@Results({ @Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOMUNITARIO", property = "nComunitario", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADO", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.BOOLEAN),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idPersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "tieneguardias", property = "tieneGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "guardiaspendientes", property = "guardiasPendientes", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "tieneturno", property = "tieneTurno", jdbcType = JdbcType.VARCHAR)})
+	List<ColegiadosSJCSItem> busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje, Integer tamMaximo);
 
 }

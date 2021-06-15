@@ -13,7 +13,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		
 		sql.FROM("SCS_GUARDIASTURNO");
 		
-		sql.WHERE("IDTURNO = '"+idTurno+"'");
+		sql.WHERE("IDTURNO IN (" + idTurno + ")");
 		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
 		sql.ORDER_BY("nombre");
 		

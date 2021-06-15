@@ -101,4 +101,9 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper{
 		@Results({ @Result(column = "IDORDENACIONCOLAS", property = "newId", jdbcType = JdbcType.VARCHAR)
 		})
 		NewIdDTO getIdOrdenacion(Short idInstitucion);
+	 
+		@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "comboTurnosBusqueda")
+		@Results({ @Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),
+				@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR) })
+		List<ComboItem> comboTurnosBusqueda(Short idInstitucion, String pantalla);
 }

@@ -176,9 +176,8 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "busquedaColegiadoExpress")//falta hacer query
 	@Results({
 		@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ColegiadoJGItem> busquedaColegiadoExpress(String colegiadoJGItem, String idInstitucion);
-
 }
