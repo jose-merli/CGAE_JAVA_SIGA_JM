@@ -154,7 +154,6 @@
 <!-- 		    <version>3.1.0</version> -->
 <!-- 		    <scope>system</scope> -->
 <!-- 		    <systemPath>C:\\Users\\Jesus\\.m2\\repository\\org\\redabogacia\\plataforma-firma-core\\plataformaFirmaCore\\3.1.0\\plataformaFirmaCore.jar</systemPath> -->
-<!--		    <systemPath>${project.basedir}/src/main/resources/Name_Your_JAR.jar</systemPath> -->
 <!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.redabogacia.jdom-b9</groupId>

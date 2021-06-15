@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
+import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
@@ -60,7 +61,7 @@ public interface IGestionEJG {
 	
 	UpdateResponseDTO actualizaDatosGenerales(EjgItem datos, HttpServletRequest request);
 
-	UpdateResponseDTO borrarEstado(List<EjgItem> datos, HttpServletRequest request);
+	UpdateResponseDTO borrarEstado(List<EstadoEjgItem> datos, HttpServletRequest request);
 
 	InsertResponseDTO nuevoEstado(List<EjgItem> datos, HttpServletRequest request);
 

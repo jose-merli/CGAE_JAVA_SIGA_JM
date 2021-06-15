@@ -3,6 +3,7 @@ package org.itcgae.siga.com.services.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 
@@ -13,7 +14,6 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
-import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.ws.client.ClientPFD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class PFDServiceImpl implements IPFDService {
 
 	
 	@Override
-	public String firmarPDF(File fichero) throws BusinessException {
+	public String firmarPDF(File fichero) throws Exception {
 		FirmaCorporativaPDFTO request = FirmaCorporativaPDFTO.Factory.newInstance();
 		
 
@@ -100,10 +100,10 @@ public class PFDServiceImpl implements IPFDService {
 				base64File = Base64.getEncoder().encodeToString(bytesData);
 			} catch (FileNotFoundException e) {
 				LOGGER.error("Fichero a firmar no encontrado", e);
-				throw new BusinessException("Fichero a firmar no encontrado");
+				throw new Exception("Fichero a firmar no encontrado");
 			} catch (IOException e) {
 				LOGGER.error("Error al leer el fichero a firmar ", e);
-				throw new BusinessException("Error al leer el fichero a firmar");
+				throw new Exception("Error al leer el fichero a firmar");
 			}
 		}
 		
@@ -148,25 +148,25 @@ public class PFDServiceImpl implements IPFDService {
 						base64File = responseDoc.getFirmaCorporativaPDFResponse().getFirmaB64();
 					}else{
 						LOGGER.error("PFDServiceImpl.firmarPDF :: Error al firmar el documento :: " + resultado);
-						throw new BusinessException("PFDServiceImpl.firmarPDF :: Error al firmar el documento :: " + resultado);
+						throw new Exception("PFDServiceImpl.firmarPDF :: Error al firmar el documento :: " + resultado);
 					}					
 				}else{
 					LOGGER.error("PFDServiceImpl.firmarPDF :: Error al firmar el documento :: Respuesta nula");
-					throw new BusinessException("PFDServiceImpl.firmarPDF :: Error al enviar a firmar un documento");
+					throw new Exception("PFDServiceImpl.firmarPDF :: Error al enviar a firmar un documento");
 				}
 			} catch (Exception e) {
 				LOGGER.error("PFDServiceImpl.firmarPDF :: Error al enviar a firmar un documento ", e);
-				throw new BusinessException("PFDServiceImpl.firmarPDF :: Error al enviar a firmar un documento");
+				throw new Exception("PFDServiceImpl.firmarPDF :: Error al enviar a firmar un documento");
 			}
 		}else{
-			throw new BusinessException("PFDServiceImpl.firmarPDF :: Error al obtener el fichero a firmar");
+			throw new Exception("PFDServiceImpl.firmarPDF :: Error al obtener el fichero a firmar");
 		}
 		
 		return base64File;
 	}
 	
 	@Override
-	public String obtenerDocumentoFirmado(String csv) throws BusinessException {
+	public String obtenerDocumentoFirmado(String csv) throws Exception {
 		SolicitudDocumentoTO solicitud = SolicitudDocumentoTO.Factory.newInstance();
 		String documentoBase64 = "";
 		
@@ -212,19 +212,55 @@ public class PFDServiceImpl implements IPFDService {
 					documentoBase64 = responseDoc.getObtenerDocumentoResponse().getDocumento().getFirmab64();
 				}else{
 					LOGGER.error("PFDServiceImpl.obtenerDocumentoFirmado :: Error al obtener el documento firmado :: " + resultado);
-					throw new BusinessException("PFDServiceImpl.firmarPDF :: Error al obtener el documento firmado :: " + resultado);
+					throw new Exception("PFDServiceImpl.firmarPDF :: Error al obtener el documento firmado :: " + resultado);
 				}
 			}else{
 				LOGGER.error("PFDServiceImpl.obtenerDocumentoFirmado :: Error al obtener el documento firmado :: Respuesta nula");
-				throw new BusinessException("PFDServiceImpl.obtenerDocumentoFirmado :: Error al obtener el documento firmado :: Respuesta nula");
+				throw new Exception("PFDServiceImpl.obtenerDocumentoFirmado :: Error al obtener el documento firmado :: Respuesta nula");
 			}
 			
 		} catch (Exception e) {
 			LOGGER.error("Error al enviar a firmar un documento ", e);
-			throw new BusinessException("Error al enviar a firmar un documento");
+			throw new Exception("Error al enviar a firmar un documento");
 		}
 		
 		return documentoBase64;
+	}
+	
+	@Override
+	public byte[] getBytes(String file) throws Exception{
+		FileInputStream inputStream =  new FileInputStream(file);
+		byte [] bytes = new byte[inputStream.available()];
+		inputStream.read(bytes);
+		inputStream.close();
+		
+		return bytes;
+	}
+	
+	@Override
+	public File createFile(byte[] bytes,String path,String fileName) throws Exception{
+		LOGGER.info("bytes"+bytes);
+		LOGGER.info("path"+path);
+		LOGGER.info("fileName"+fileName);
+		File returnFile = null;
+		try{	
+    		File file = new File(path);
+    		if(!file.exists())
+    			file.mkdirs();
+			returnFile=new File(path+File.separator+fileName.toString());
+			boolean isCreado = returnFile.createNewFile();
+			LOGGER.info("isCreado"+isCreado);
+			FileOutputStream fileOutputStream  = new FileOutputStream(returnFile);	
+			fileOutputStream.write(bytes);
+			fileOutputStream.flush();
+			fileOutputStream.close();
+			LOGGER.info("isCreado"+isCreado);
+		} catch (Exception e) {
+			LOGGER.debug("Se ha producido un error al createFile"+e.toString());
+			throw new Exception("Se ha producido un error al createFile");
+		}
+		
+		return returnFile;
 	}
 
 }

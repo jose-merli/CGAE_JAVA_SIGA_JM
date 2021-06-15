@@ -59,7 +59,13 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
         		" estado.idestadoejg," + 
         		" recursos.descripcion," + 
         		" estado.observaciones," + 
-        		" estado.automatico," + 
+        		" estado.automatico," +
+        		" estado.anio,"+
+        		" estado.IDINSTITUCION,"+
+        		" estado.IDTIPOEJG,"+
+        		" estado.numero,"+
+        		" estado.FECHABAJA,"+
+        		"estado.IDESTADOPOREJG,"+
         		" maestro.visiblecomision," + 
         		" persona.nombre," + 
         		" persona.apellidos1," + 

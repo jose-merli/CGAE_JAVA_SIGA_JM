@@ -44,7 +44,15 @@ public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
           		@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
           		@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR),
           		@Result(column = "visiblecomision", property = "propietario", jdbcType = JdbcType.VARCHAR),
-          		@Result(column = "usuariomod", property = "user", jdbcType = JdbcType.VARCHAR)
+          		@Result(column = "usuariomod", property = "user", jdbcType = JdbcType.VARCHAR),
+          		@Result(column = "idinstitucion", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+          		@Result(column = "idtipoejg", property = "idtipoejg", jdbcType = JdbcType.VARCHAR),
+          		@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
+          		@Result(column = "fechabaja", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
+          		@Result(column = "anio", property = "anio", jdbcType = JdbcType.VARCHAR),
+          		@Result(column = "idestadoporejg", property = "idestadoporejg", jdbcType = JdbcType.VARCHAR),
+          		
+          		
 
           	})
           	List<EstadoEjgItem> getEstados(EjgItem ejgItem, String idInstitucion, String idLenguaje);

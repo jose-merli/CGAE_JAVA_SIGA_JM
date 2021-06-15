@@ -1081,12 +1081,11 @@ public class SigaConstants {
 	public static final String FACTURACION_COMPLETA = "C";
 	public static final String FACTURACION_PARCIAL = "P";
 
-	public static String SIGAFRONT_VERSION = "202105042300";
-	public static String SIGAWEB_VERSION = "1.0.72_0";
-
 	//EEJG
 	public static String EEJG_IDSISTEMA ="";
 	public static String EEJG_URLWS ="";
+	public static String SIGAFRONT_VERSION = "202106111700";
+	public static String SIGAWEB_VERSION = "1.0.72_3";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";

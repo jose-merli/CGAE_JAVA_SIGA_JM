@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.DatosDireccionLetradoOficio;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
@@ -153,11 +154,38 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 	
 	
 	
+	@SelectProvider(type = CenDireccionesSqlExtendsProvider.class, method = "getDireccionLetradoSalidaOficio")
+	@Results({ @Result(column = "domicilio_despacho_letrado", property = "domicilio_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "cp_despacho_letrado", property = "cp_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idpoblacion_despacho_letrado", property = "idpoblacion_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "poblacion_despacho_letrado", property = "poblacion_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idprovincia_despacho_letrado", property = "idprovincia_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "telefono1_despacho_letrado", property = "telefono1_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "telefono2_despacho_letrado", property = "telefono2_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fax1_despacho_letrado", property = "fax1_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fax2_despacho_letrado", property = "fax2_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "email_despacho_letrado", property = "email_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "movil_despacho_letrado", property = "movil_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "provincia_despacho_letrado", property = "provincia_letrado", jdbcType = JdbcType.VARCHAR)
+	})
+	List<DatosDireccionLetradoOficio> getDireccionLetradoSalidaOficio(String idPersona, String idInstitucion);
 	
 	
-	
-	
-	
+	@SelectProvider(type = CenDireccionesSqlExtendsProvider.class, method = "getDireccionPersonalSalidaOficio")
+	@Results({ @Result(column = "domicilio_guardia_letrado", property = "domicilio_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "cp_guardia_letrado", property = "cp_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idpoblacion_guardia_letrado", property = "idpoblacion_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "poblacion_guardia_letrado", property = "poblacion_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idprovincia_guardia_letrado", property = "idprovincia_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "telefono1_guardia_letrado", property = "telefono1_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "telefono2_guardia_letrado", property = "telefono2_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fax1_guardia_letrado", property = "fax1_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fax2_guardia_letrado", property = "fax2_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "email_guardia_letrado", property = "email_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "movil_guardia_letrado", property = "movil_letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "provincia_guardia_letrado", property = "provincia_letrado", jdbcType = JdbcType.VARCHAR)
+	})
+	List<DatosDireccionLetradoOficio> getDireccionPersonalSalidaOficio(String idPersona, String idInstitucion);
 	
 	
 	
