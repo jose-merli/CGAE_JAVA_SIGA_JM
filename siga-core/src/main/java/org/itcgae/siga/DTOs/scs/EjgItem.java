@@ -45,6 +45,7 @@ public class EjgItem {
 	private Date fechaImpugnacionDesd;
 	private Date fechaImpugnacionHast;
 
+	//Defensa juridica
 	private String juzgado;
 	private String asunto;
 	private String calidad;
@@ -56,6 +57,9 @@ public class EjgItem {
 	private Short idsituacion;
 	private String numerodiligencia;
 	private Long comisaria;
+	private String delitos;
+	private Short idPretension;
+	private String observaciones;
 
 	private String annioCAJG;
 	private String numCAJG;
@@ -111,6 +115,9 @@ public class EjgItem {
 	private String estadoNew;
 	
 	private String numDesigna;
+	
+	private String idProcurador;
+	private Short idInstitucionProc;
 	
 
 	/**
@@ -1497,5 +1504,45 @@ public class EjgItem {
 
 	public void setComisaria(Long comisaria) {
 		this.comisaria = comisaria;
+	}
+
+	public String getDelitos() {
+		return delitos;
+	}
+
+	public void setDelitos(String delitos) {
+		this.delitos = delitos;
+	}
+
+	public String getIdProcurador() {
+		return idProcurador;
+	}
+
+	public void setIdProcurador(String idProcurador) {
+		this.idProcurador = idProcurador;
+	}
+
+	public Short getIdInstitucionProc() {
+		return idInstitucionProc;
+	}
+
+	public void setIdInstitucionProc(Short idInstitucionProc) {
+		this.idInstitucionProc = idInstitucionProc;
+	}
+
+	public Short getIdPretension() {
+		return idPretension;
+	}
+
+	public void setIdPretension(Short idPretension) {
+		this.idPretension = idPretension;
+	}
+
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
 	}
 }

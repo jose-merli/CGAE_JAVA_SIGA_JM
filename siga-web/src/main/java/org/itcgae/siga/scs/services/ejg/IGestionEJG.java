@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -16,6 +17,7 @@ import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
@@ -110,4 +112,16 @@ public interface IGestionEJG {
 	UpdateResponseDTO updateProcuradorContrarioEJG(ScsContrariosejg item, HttpServletRequest request);
 
 	UpdateResponseDTO updateRepresentanteContrarioEJG(ScsContrariosejg item, HttpServletRequest request);
+
+	ProcuradorDTO busquedaProcuradorEJG(EjgItem ejg, HttpServletRequest request);
+
+	UpdateResponseDTO guardarProcuradorEJG(EjgItem item, HttpServletRequest request);
+
+	UpdateResponseDTO nuevoProcuradorEJG(EjgItem ejgItem, HttpServletRequest request);
+
+	ComboDTO comboDelitos(HttpServletRequest request);
+
+	DelitosEjgDTO getDelitosEjg(EjgItem item, HttpServletRequest request);
+
+	InsertResponseDTO actualizarDelitosEJG(EjgItem item, HttpServletRequest request);
 }
