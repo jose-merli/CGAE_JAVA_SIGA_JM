@@ -13,9 +13,11 @@ import org.itcgae.siga.DTOs.scs.AsuntosEjgItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsEjgSqlExtendsProvider;
 
 public interface ScsEjgExtendsMapper extends ScsEjgMapper {
@@ -130,7 +132,13 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "comisaria", property = "comisaria", jdbcType = JdbcType.INTEGER),
 		@Result(column = "idpreceptivo", property = "perceptivo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "calidad", property = "calidad", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "idrenuncia", property = "renuncia", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "idrenuncia", property = "renuncia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "juzgado", property = "juzgado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nig", property = "nig", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "delitos", property = "delitos", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idprocurador", property = "idProcurador", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idinstitucion_proc", property = "idInstitucionProc", jdbcType = JdbcType.INTEGER),
+		@Result(column = "idPretension", property = "idPretension", jdbcType = JdbcType.INTEGER)
 	})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
 	
@@ -254,5 +262,19 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
         @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR)
 		})
 	 List<EnviosMasivosItem> getComunicaciones(String num, String anio, String idTipo, Short idInstitucion, String idLenguaje);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "busquedaProcuradorEJG")
+	@Results({ @Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "NUMERODESIGNACION", property = "numerodesignacion", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "FECHADESIGNA", property = "fechaDesigna", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "MOTIVOSRENUNCIA", property = "motivosRenuncia", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) 
+	})
+	List<ProcuradorItem> busquedaProcuradorEJG(String idinstitucion);//String num,  String idturno, String anio
 
 }

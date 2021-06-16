@@ -478,6 +478,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.idpreceptivo");
 		sql.SELECT("ejg.calidad");
 		sql.SELECT("ejg.idrenuncia");
+		sql.SELECT("ejg.nig");
+		sql.SELECT("ejg.juzgado");
+		sql.SELECT("ejg.delitos");
+		sql.SELECT("ejg.idprocurador");
+		sql.SELECT("ejg.idinstitucion_proc");
+		
 		// from
 		sql.FROM("scs_ejg ejg");
 		// joins
@@ -1399,4 +1405,19 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		
 		return sql.toString();
 	}
+	
+	public String busquedaProcuradorEJG(String idinstitucion) {//String idProcurador, 
+		SQL sql = new SQL();
+
+		sql.SELECT(
+				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, p.fechabaja, p.idprocurador");//dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita
+
+		sql.FROM("SCS_PROCURADOR p");//SCS_DESIGNAPROCURADOR dp
+		//sql2.INNER_JOIN(" on p.idprocurador = ejg.idprocurador and p.idinstitucion = ejg.idinstitucion ");
+		sql.WHERE("p.idinstitucion = " + idinstitucion);
+		//sql.WHERE("p.idprocurador = " + idProcurador);
+
+		return sql.toString();
+	}
+	
 }
