@@ -235,6 +235,7 @@ public class EstadoEjgItem {
 		result = prime * result + ((propietariocomision == null) ? 0 : propietariocomision.hashCode());
 		result = prime * result + ((fechabaja == null) ? 0 : fechabaja.hashCode());
 		result = prime * result + ((idinstitucion == null) ? 0 : idinstitucion.hashCode());
+		result = prime * result + ((observaciones == null) ? 0 : observaciones.hashCode());
 		return result;
 	}
 
@@ -308,6 +309,11 @@ public class EstadoEjgItem {
 				return false;
 		} else if (!idinstitucion.equals(other.idinstitucion))
 			return false;
+		if (observaciones == null) {
+			if (other.observaciones != null)
+				return false;
+		} else if (!observaciones.equals(other.observaciones))
+			return false;
 		return true;
 
 	}
@@ -318,7 +324,7 @@ public class EstadoEjgItem {
 				+ ", fechaInicio=" + fechaInicio + ", descripcion=" + descripcion + ", idtipoejg=" + idtipoejg + 
 				", anio=" + anio + ", numero=" + numero + ", usumodificacion=" + usumodificacion + 
 				", idestadoporejg=" + idestadoporejg + " propietariocomision=" + propietariocomision + 
-				", fechabaja=" + fechabaja +", idinstitucion=" + idinstitucion + "]";
+				", fechabaja=" + fechabaja +", idinstitucion=" + idinstitucion + ", observaciones=" + observaciones + "]";
 	}
 
 

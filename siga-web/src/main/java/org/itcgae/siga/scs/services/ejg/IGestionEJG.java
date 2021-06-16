@@ -63,7 +63,7 @@ public interface IGestionEJG {
 
 	UpdateResponseDTO borrarEstado(List<EstadoEjgItem> datos, HttpServletRequest request);
 
-	InsertResponseDTO nuevoEstado(List<EjgItem> datos, HttpServletRequest request);
+	InsertResponseDTO nuevoEstado(EstadoEjgItem datos, HttpServletRequest request);
 
 	UpdateResponseDTO borrarRelacion(List<EjgItem> datos, HttpServletRequest request);
 
