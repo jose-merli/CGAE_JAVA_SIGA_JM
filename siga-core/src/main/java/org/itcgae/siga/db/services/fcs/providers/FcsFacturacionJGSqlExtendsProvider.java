@@ -55,7 +55,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 				+ "WHERE EST2.IDINSTITUCION = EST.IDINSTITUCION AND EST2.IDFACTURACION = EST.IDFACTURACION)");
 		// FILTRO ESTADOS FACTURACIÓN
 		if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdEstado())) {
-			sql2.WHERE("EST.IDESTADOFACTURACION = " + facturacionItem.getIdEstado());
+			sql2.WHERE("EST.IDESTADOFACTURACION IN ( " + facturacionItem.getIdEstado() + " )");
 		}
 
 		// FILTRO NOMBRE
@@ -65,7 +65,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		// FILTRO POR PARTIDA PRESUPUESTARIA
 		if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdPartidaPresupuestaria())) {
-			sql2.WHERE("FAC.IDPARTIDAPRESUPUESTARIA = " + facturacionItem.getIdPartidaPresupuestaria());
+			sql2.WHERE("FAC.IDPARTIDAPRESUPUESTARIA IN ( " + facturacionItem.getIdPartidaPresupuestaria() + " )");
 		}
 
 		// FILTRO POR CONCEPTOS DE FACTURACIÓN Y POR GRUPOS DE FACTURACIÓN Y PARTIDA
@@ -82,11 +82,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 			// FILTRO POR CONCEPTOS DE FACTURACION
 			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdConcepto())) {
-				sql3.WHERE("HIT.IDHITOGENERAL = " + facturacionItem.getIdConcepto());
+				sql3.WHERE("HIT.IDHITOGENERAL IN ( " + facturacionItem.getIdConcepto() + " )");
 			}
 			// FILTRO POR GRUPO FACTURACION
 			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdFacturacion())) {
-				sql3.WHERE("HIT.IDGRUPOFACTURACION = " + facturacionItem.getIdFacturacion());
+				sql3.WHERE("HIT.IDGRUPOFACTURACION IN ( " + facturacionItem.getIdFacturacion() + " )");
 			}
 
 			sql2.WHERE("EXISTS (" + sql3.toString() + ")");
@@ -434,7 +434,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.WHERE("fac.idinstitucion = " + idInstitucion);
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdFacturacion())) {
-			sql.WHERE("fac.idfacturacion = " + cartasFacturacionPagosItem.getIdFacturacion());
+			sql.WHERE("fac.idfacturacion IN ( " + cartasFacturacionPagosItem.getIdFacturacion() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {
@@ -442,15 +442,15 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno())) {
-			sql.WHERE("grupo.IDGRUPOFACTURACION =" + cartasFacturacionPagosItem.getIdTurno());
+			sql.WHERE("grupo.IDGRUPOFACTURACION IN ( " + cartasFacturacionPagosItem.getIdTurno() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdConcepto())) {
-			sql.WHERE("grupo.IDHITOGENERAL =" + cartasFacturacionPagosItem.getIdConcepto());
+			sql.WHERE("grupo.IDHITOGENERAL IN ( " + cartasFacturacionPagosItem.getIdConcepto() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPartidaPresupuestaria())) {
-			sql.WHERE("fac.IDPARTIDAPRESUPUESTARIA =" + cartasFacturacionPagosItem.getIdPartidaPresupuestaria());
+			sql.WHERE("fac.IDPARTIDAPRESUPUESTARIA IN ( " + cartasFacturacionPagosItem.getIdPartidaPresupuestaria() + " )");
 		}
 
 		sql.GROUP_BY(
@@ -600,20 +600,20 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sqlPagoacolegiados.WHERE("pc.idinstitucion = " + idInstitucion);
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPago())) {
-			sqlPagoacolegiados.WHERE("pc.idpagosjg = " + cartasFacturacionPagosItem.getIdPago());
+			sqlPagoacolegiados.WHERE("pc.idpagosjg IN ( " + cartasFacturacionPagosItem.getIdPago() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno())) {
-			sqlPagoacolegiados.WHERE("grupo.IDGRUPOFACTURACION = " + cartasFacturacionPagosItem.getIdTurno());
+			sqlPagoacolegiados.WHERE("grupo.IDGRUPOFACTURACION IN ( " + cartasFacturacionPagosItem.getIdTurno() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdConcepto())) {
-			sqlPagoacolegiados.WHERE("grupo.IDHITOGENERAL =" + cartasFacturacionPagosItem.getIdConcepto());
+			sqlPagoacolegiados.WHERE("grupo.IDHITOGENERAL IN ( " + cartasFacturacionPagosItem.getIdConcepto() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPartidaPresupuestaria())) {
 			sqlPagoacolegiados
-					.WHERE("fac.IDPARTIDAPRESUPUESTARIA =" + cartasFacturacionPagosItem.getIdPartidaPresupuestaria());
+					.WHERE("fac.IDPARTIDAPRESUPUESTARIA IN ( " + cartasFacturacionPagosItem.getIdPartidaPresupuestaria() + " )");
 		}
 
 		sqlPagoacolegiados.WHERE("pc.idperorigen = nvl(NULL, pc.idperorigen)");
@@ -827,7 +827,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		// FILTRO ESTADOS FACTURACIÓN
 		if (!UtilidadesString.esCadenaVacia(pagosItem.getIdEstado())) {
-			sql2.WHERE("EST.IDESTADOPAGOSJG = " + pagosItem.getIdEstado());
+			sql2.WHERE("EST.IDESTADOPAGOSJG IN ( " + pagosItem.getIdEstado() + " )");
 		}
 
 		// FILTRO NOMBRE
@@ -837,7 +837,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		// FILTRO PARTIDA PRESUPUESTARIA
 		if (!UtilidadesString.esCadenaVacia(pagosItem.getIdPartidaPresupuestaria())) {
-			sql2.WHERE("PAGO.IDPARTIDAPRESUPUESTARIA = " + pagosItem.getIdPartidaPresupuestaria());
+			sql2.WHERE("PAGO.IDPARTIDAPRESUPUESTARIA IN ( " + pagosItem.getIdPartidaPresupuestaria() + " )");
 		}
 
 		// FILTRO POR CONCEPTOS DE FACTURACIÓN Y POR GRUPOS DE FACTURACIÓN
@@ -852,11 +852,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 			// FILTRO POR CONCEPTOS DE FACTURACION
 			if (!UtilidadesString.esCadenaVacia(pagosItem.getIdConcepto())) {
-				sql5.WHERE("HIT.IDHITOGENERAL = " + pagosItem.getIdConcepto());
+				sql5.WHERE("HIT.IDHITOGENERAL IN ( " + pagosItem.getIdConcepto() + " )");
 			}
 			// FILTRO POR GRUPO FACTURACION
 			if (!UtilidadesString.esCadenaVacia(pagosItem.getIdFacturacion())) {
-				sql5.WHERE("HIT.IDGRUPOFACTURACION = " + pagosItem.getIdGrupo());
+				sql5.WHERE("HIT.IDGRUPOFACTURACION IN ( " + pagosItem.getIdFacturacion() + " )");
 			}
 
 			sql2.WHERE("EXISTS (" + sql5.toString() + ")");
