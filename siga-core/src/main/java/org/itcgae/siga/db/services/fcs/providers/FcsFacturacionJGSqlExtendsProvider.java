@@ -434,7 +434,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.WHERE("fac.idinstitucion = " + idInstitucion);
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdFacturacion())) {
-			sql.WHERE("fac.idfacturacion = " + cartasFacturacionPagosItem.getIdFacturacion());
+			sql.WHERE("fac.idfacturacion IN ( " + cartasFacturacionPagosItem.getIdFacturacion() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPersona())) {
@@ -442,15 +442,15 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno())) {
-			sql.WHERE("grupo.IDGRUPOFACTURACION =" + cartasFacturacionPagosItem.getIdTurno());
+			sql.WHERE("grupo.IDGRUPOFACTURACION IN ( " + cartasFacturacionPagosItem.getIdTurno() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdConcepto())) {
-			sql.WHERE("grupo.IDHITOGENERAL =" + cartasFacturacionPagosItem.getIdConcepto());
+			sql.WHERE("grupo.IDHITOGENERAL IN ( " + cartasFacturacionPagosItem.getIdConcepto() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPartidaPresupuestaria())) {
-			sql.WHERE("fac.IDPARTIDAPRESUPUESTARIA =" + cartasFacturacionPagosItem.getIdPartidaPresupuestaria());
+			sql.WHERE("fac.IDPARTIDAPRESUPUESTARIA IN ( " + cartasFacturacionPagosItem.getIdPartidaPresupuestaria() + " )");
 		}
 
 		sql.GROUP_BY(
@@ -600,20 +600,20 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sqlPagoacolegiados.WHERE("pc.idinstitucion = " + idInstitucion);
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPago())) {
-			sqlPagoacolegiados.WHERE("pc.idpagosjg = " + cartasFacturacionPagosItem.getIdPago());
+			sqlPagoacolegiados.WHERE("pc.idpagosjg IN ( " + cartasFacturacionPagosItem.getIdPago() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdTurno())) {
-			sqlPagoacolegiados.WHERE("grupo.IDGRUPOFACTURACION = " + cartasFacturacionPagosItem.getIdTurno());
+			sqlPagoacolegiados.WHERE("grupo.IDGRUPOFACTURACION IN ( " + cartasFacturacionPagosItem.getIdTurno() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdConcepto())) {
-			sqlPagoacolegiados.WHERE("grupo.IDHITOGENERAL =" + cartasFacturacionPagosItem.getIdConcepto());
+			sqlPagoacolegiados.WHERE("grupo.IDHITOGENERAL IN ( " + cartasFacturacionPagosItem.getIdConcepto() + " )");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdPartidaPresupuestaria())) {
 			sqlPagoacolegiados
-					.WHERE("fac.IDPARTIDAPRESUPUESTARIA =" + cartasFacturacionPagosItem.getIdPartidaPresupuestaria());
+					.WHERE("fac.IDPARTIDAPRESUPUESTARIA IN ( " + cartasFacturacionPagosItem.getIdPartidaPresupuestaria() + " )");
 		}
 
 		sqlPagoacolegiados.WHERE("pc.idperorigen = nvl(NULL, pc.idperorigen)");
