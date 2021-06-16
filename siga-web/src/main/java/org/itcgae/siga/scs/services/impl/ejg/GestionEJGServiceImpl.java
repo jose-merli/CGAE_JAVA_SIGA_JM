@@ -618,6 +618,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					familiar.setSolicitante((short) 0);
 
 					response = scsUnidadfamiliarejgMapper.insert(familiar);
+					
+					if (response != 1) {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error("GestionEJGServiceImpl.borrarEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+						throw new Exception("ERROR: no se ha podido ");
+					}else {
+						responsedto.setStatus(SigaConstants.OK);
+					}
 
 					LOGGER.debug(
 							"GestionEJGServiceImpl.insertFamiliarEJG() -> Salida del servicio para insertar en la unidad familiar para los ejgs");
@@ -625,14 +633,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					LOGGER.debug(
 							"GestionEJGServiceImpl.insertFamiliarEJG() -> Se ha producido un error al insertar en la unidad familiar de los ejgs. ",
 							e);
-				}
-				// respuesta si se actualiza correctamente
-				if (response >= 1) {
-					responsedto.setStatus(SigaConstants.OK);
-					LOGGER.debug("GestionEJGServiceImpl.insertFamiliarEJG() -> OK.");
-				} else {
-					responsedto.setStatus(SigaConstants.KO);
-					LOGGER.error("GestionEJGServiceImpl.insertFamiliarEJG() -> KO.");
 				}
 			}
 		}
@@ -1671,7 +1671,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						record.setIdestadoporejg(Long.parseLong(item.getIdestadoporejg()));
 						record.setFechabaja(new Date());
 						record.setFechamodificacion(new Date());
-						record.setUsumodificacion(usuarios.get(0).getIdusuario());;
+						record.setUsumodificacion(usuarios.get(0).getIdusuario());
 						response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
 						
 						if (response != 1) {
@@ -1795,7 +1795,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	@Transactional
-	public InsertResponseDTO nuevoEstado(List<EjgItem> datos, HttpServletRequest request) {
+	public InsertResponseDTO nuevoEstado(EstadoEjgItem datos, HttpServletRequest request) {
 		InsertResponseDTO responsedto = new InsertResponseDTO();
 		int response = 0;
 
@@ -1816,23 +1816,25 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Entrada para cambiar los datos generales del ejg");
 
 				try {
-					for (int i = 0; datos.size() > i; i++) {
+					
 						ScsEstadoejg record = new ScsEstadoejg();
 						response = 0;
 
 						// creamos el objeto para el insert
-						record.setIdinstitucion(idInstitucion);
-						record.setIdtipoejg(Short.parseShort(datos.get(i).getTipoEJG()));
-						record.setAnio(Short.parseShort(datos.get(i).getAnnio()));
-						record.setNumero(Long.parseLong(datos.get(i).getNumero()));
-						record.setIdestadoejg(Short.parseShort(datos.get(i).getEstadoEJG()));
-						record.setFechainicio(new Date());
+						record.setIdinstitucion(Short.parseShort(datos.getIdinstitucion()));
+						record.setAnio(Short.parseShort(datos.getAnio()));
+						record.setNumero(Long.parseLong(datos.getNumero()));
+						record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
+						record.setFechainicio(datos.getFechaInicio());
+						record.setObservaciones(datos.getObservaciones());
+						
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
-						record.setAutomatico("0");
 
 						response = scsEstadoejgMapper.insertSelective(record);
-					}
+						
+						
+					
 					LOGGER.debug(
 							"GestionEJGServiceImpl.nuevoEstado() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
 				} catch (Exception e) {
@@ -1841,7 +1843,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							e);
 				} finally {
 					// respuesta si se actualiza correctamente
-					if (response >= 1) {
+					if (response == 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
 								"GestionEJGServiceImpl.nuevoEstado() -> OK. Estado y fecha actualizados para los ejgs seleccionados");

@@ -358,9 +358,12 @@ public class EjgController {
 
 	// nuevoEstado
 	@RequestMapping(value = "/gestion-ejg/nuevoEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> nuevoEstado(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
+	ResponseEntity<InsertResponseDTO> nuevoEstado(@RequestBody EstadoEjgItem datos, HttpServletRequest request) {
 		InsertResponseDTO response = gestionEJG.nuevoEstado(datos, request);
-		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		if (response.getStatus().equals("OK"))
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	// guardarImpugnacion

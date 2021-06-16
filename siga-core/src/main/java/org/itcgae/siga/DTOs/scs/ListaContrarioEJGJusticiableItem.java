@@ -19,6 +19,8 @@ public class ListaContrarioEJGJusticiableItem {
 	private Date fechaBaja;
 	private String idabogadocontrario;
 	private String idprocurador;
+	private String direccion;
+	private String rol;
 	
 	public String getIdPersona() {
 		return idPersona;
@@ -103,6 +105,18 @@ public class ListaContrarioEJGJusticiableItem {
 	}
 	public void setIdtipoejg(String idtipoejg) {
 		this.idtipoejg = idtipoejg;
+	}
+	public String getDireccion() {
+		return direccion;
+	}
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+	public String getRol() {
+		return rol;
+	}
+	public void setRol(String rol) {
+		this.rol = rol;
 	}
 
 }
