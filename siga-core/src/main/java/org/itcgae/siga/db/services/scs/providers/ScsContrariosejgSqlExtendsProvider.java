@@ -19,6 +19,7 @@ public class ScsContrariosejgSqlExtendsProvider extends ScsContrariosejgSqlProvi
 		sql.SELECT("t1.idpersona");
 		sql.SELECT("t1.idtipoejg");
 		sql.SELECT("t1.fechabaja");
+		sql.SELECT("t1.direccion");
 		sql.SELECT("CASE\r\n" + "        WHEN t1.idabogadocontrarioejg IS NOT NULL THEN\r\n" 
 				+ "            (\r\n"
 				+ "                SELECT\r\n" 
@@ -63,6 +64,7 @@ public class ScsContrariosejgSqlExtendsProvider extends ScsContrariosejgSqlProvi
 				+ "            scs_contrariosejg.idabogadocontrarioejg,\r\n"
 				+ "            scs_contrariosejg.idprocurador,\r\n"
 				+ "            scs_contrariosejg.IDINSTITUCION_PROCU\r\n" 
+				+ "            persona.direccion\r\n" 
 				+ "        FROM\r\n"
 				+ "            scs_contrariosejg\r\n"
 				+ "            JOIN scs_personajg persona ON persona.idpersona = scs_contrariosejg.idpersona\r\n"
