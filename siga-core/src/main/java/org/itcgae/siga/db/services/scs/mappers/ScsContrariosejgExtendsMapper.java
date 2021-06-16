@@ -28,6 +28,7 @@ public interface ScsContrariosejgExtendsMapper extends ScsContrariosejgMapper{
 			@Result(column = "APELLIDOSNOMBRE", property = "apellidosnombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idabogadocontrarioejg", property = "idabogadocontrario", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idprocurador", property = "idprocurador", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "direccion", property = "direccion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE) })
 	List<ListaContrarioEJGJusticiableItem> busquedaListaContrariosEJG(EjgItem item, Short idInstitucion,
 			Boolean historico);
