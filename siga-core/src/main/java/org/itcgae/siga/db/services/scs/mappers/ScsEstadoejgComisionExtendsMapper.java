@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
+public interface ScsEstadoejgComisionExtendsMapper extends ScsEstadoejgMapper{
 
           @SelectProvider(type = ScsEstadoejgSqlExtendsProvider.class, method = "getEstadoEjg")
           @Results({ 

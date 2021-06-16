@@ -12,9 +12,9 @@ import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 
-public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
-
-	public String busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
+public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
+	
+	public String busquedaEJGComision(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		String dictamenCad = "";
 		boolean indiferente = false;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");

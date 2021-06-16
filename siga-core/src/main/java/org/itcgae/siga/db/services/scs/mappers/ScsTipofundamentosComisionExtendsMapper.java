@@ -7,19 +7,26 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.scs.FundamentoResolucionItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.FundamentoResolucionItem;
 import org.itcgae.siga.db.mappers.ScsTipofundamentosMapper;
-import org.itcgae.siga.db.services.scs.providers.ScsEjgSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsFundamentoscalificacionSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsTipofundamentosComisionSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTipofundamentosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface ScsTipofundamentosExtendsMapper extends ScsTipofundamentosMapper{
+public interface ScsTipofundamentosComisionExtendsMapper extends ScsTipofundamentosMapper{
 
+	@SelectProvider(type = ScsTipofundamentosComisionSqlExtendsProvider.class, method = "comboFundamentoJuridComision")
+	@Results({ 
+		@Result(column = "IDFUNDAMENTO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+
+	})
+	List<ComboItem> comboFundamentoJuridComision(String idlenguaje, String string, String resolucion);
+	
 	@SelectProvider(type = ScsTipofundamentosSqlExtendsProvider.class, method = "searchFundamentosResolucion")
 	@Results({
 		@Result(column = "IDFUNDAMENTO", property = "idFundamento", jdbcType = JdbcType.VARCHAR),

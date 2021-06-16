@@ -439,15 +439,5 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		return sql.toString();
 	}
 	
-	public String getComboColegiosComision(String idInstitucion) {
-		SQL sql = new SQL();
-		sql.SELECT("IDINSTITUCION, ABREVIATURA");
-		sql.SELECT("ABREVIATURA as NOMBRE");
-		sql.FROM("CEN_INSTITUCION");
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
-		sql.ORDER_BY("NOMBRE");
-		return sql.toString();
-	}
-	
     
 }

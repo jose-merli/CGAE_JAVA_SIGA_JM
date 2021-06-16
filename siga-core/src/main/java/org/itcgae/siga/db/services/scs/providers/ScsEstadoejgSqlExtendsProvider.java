@@ -51,18 +51,6 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboEstadoEjgComision(Short idLenguaje) {
-		SQL sql = new SQL();
-
-		sql.SELECT("estado.IDESTADOEJG");
-		sql.SELECT("cat.descripcion");
-		sql.FROM("SCS_MAESTROESTADOSEJG estado");
-		sql.INNER_JOIN("gen_recursos_catalogos cat on cat.IDRECURSO = estado.descripcion and cat.idlenguaje = '"
-				+ idLenguaje + " and visiblecomision = 1'");
-		sql.WHERE("estado.fecha_baja is null");
-		sql.ORDER_BY("cat.descripcion");
-		return sql.toString();
-	}
 
 	public String getEstados(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
