@@ -16,11 +16,6 @@ public class ScsPonenteComisionSqlExtendsProvider extends ScsPonenteSqlProvider{
 		//sql.WHERE("SCS_PONENTE.FECHA_BAJA IS NULL AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE ='"+idLenguaje+"'' and SCS_PONENTE.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("SCS_PONENTE.FECHA_BAJA IS NULL AND SCS_PONENTE.IDINSTITUCION = '"+ idInstitucion +"' AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE ='"+idLenguaje+"'");
 		sql.ORDER_BY("GEN_RECURSOS_CATALOGOS.DESCRIPCION");
-		
-		LOGGER.info(
-				"*****************************************************comboPonenteComision***************************************************");
-		LOGGER.info(
-				sql.toString());
 		return sql.toString();
 	}
 }
