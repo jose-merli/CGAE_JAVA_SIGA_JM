@@ -102,6 +102,8 @@ import org.itcgae.siga.db.entities.ScsActuaciondesignaExample;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
+import org.itcgae.siga.db.entities.ScsContrariosejg;
+import org.itcgae.siga.db.entities.ScsContrariosejgExample;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
 import org.itcgae.siga.db.entities.ScsDelitosdesigna;
@@ -109,6 +111,7 @@ import org.itcgae.siga.db.entities.ScsDelitosdesignaExample;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
+import org.itcgae.siga.db.entities.ScsDesignaprocurador;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsDesignasletradoExample;
 import org.itcgae.siga.db.entities.ScsDocumentacionasi;
@@ -116,6 +119,9 @@ import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesigna;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesignaExample;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesignaKey;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
@@ -133,12 +139,15 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsAcreditacionMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
+import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
+import org.itcgae.siga.db.mappers.ScsDesignaprocuradorMapper;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentaciondesignaMapper;
+import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
@@ -240,6 +249,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
+	
+	@Autowired
+	private ScsContrariosejgMapper scsContrariosejgMapper;
 
 	@Autowired
 	private ScsDocumentacionasiMapper scsDocumentacionasiMapper;
@@ -251,6 +263,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private ScsDocumentaciondesignaMapper scsDocumentaciondesignaMapper;
 	
 	@Autowired
+	private ScsEjgMapper scsEjgMapper;
+	
+	@Autowired
 	private ScsProcedimientosMapper scsProcedimientosMapper;
 	
 	@Autowired
@@ -258,6 +273,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private ISaltosCompOficioService saltosCompOficioService;
+	
+	@Autowired
+	private ScsDesignaprocuradorMapper scsDesignaProcuradorMapper;
 	
 	@Autowired
 	private UtilOficio utilOficio;
@@ -6637,6 +6655,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 	
 	@Override
+	@Transactional
 	public String busquedaJuzgadoDesignas(Integer idJuzgado, HttpServletRequest request) {
 		//DesignaItem result = new DesignaItem();
 		String designas = null;
@@ -6787,6 +6806,193 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return listDTO;
+	}
+	
+	@Override
+	public InsertResponseDTO getPreDesignaEJG(ScsEjgdesigna item,
+			HttpServletRequest request) {
+		InsertResponseDTO responseDTO = new InsertResponseDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		int response1 = 1, response3 = 1;
+		int response2 = 1;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.extraerPreDesignaEJG() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.extraerPreDesignaEJG() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.extraerPreDesignaEJG() -> Entrada a servicio para insertar las justificaciones express");
+
+				try {
+					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Haciendo el insert...");
+
+					//Tareas:
+					//1. Se debe modificar los atributos asociados con predesignacion en la designa.
+					
+					ScsEjgKey ejgKey = new ScsEjgKey();
+					
+					ejgKey.setIdinstitucion(idInstitucion);
+					ejgKey.setAnio(item.getAnioejg());
+					ejgKey.setIdtipoejg(item.getIdtipoejg());
+					ejgKey.setNumero(item.getNumeroejg());
+					
+					ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+					
+					ScsDesignaKey designaKey = new ScsDesignaKey();
+					
+					designaKey.setIdinstitucion(idInstitucion);
+					designaKey.setIdturno(item.getIdturno());
+					designaKey.setAnio(item.getAniodesigna());
+					designaKey.setNumero(item.getNumerodesigna());
+					
+					ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
+					
+//					PRE
+//					numAnnioProcedimiento = this.designa.ano;
+//				    nig = this.designa.nig;
+//				    observaciones = this.designa.observaciones;
+//				    calidad = this.designa.idCalidad;
+//				    idPretension = this.designa.idPretension;
+//				    juzgado = this.designa.idJuzgado;
+					if(ejg.getNumeroprocedimiento()!=null)designa.setAnio(Short.parseShort(ejg.getNumeroprocedimiento()));
+					designa.setNig(ejg.getNig());
+					designa.setObservaciones(ejg.getObservaciones());
+					//designa.set (No existe campo calidad en ScsDesigna)
+					designa.setIdpretension(ejg.getIdpretension());
+					designa.setIdjuzgado(ejg.getJuzgado());
+					
+					designa.setUsumodificacion(usuarios.get(0).getIdusuario());
+					designa.setFechamodificacion(new Date());
+					
+					response1 = scsDesignaMapper.updateByPrimaryKeySelective(designa);
+					
+					//2. Se debe insertar los contrarios seleccionados en EJG.
+					
+					//Obtenemos los contrarios ejg a introducir
+					
+					ScsContrariosejgExample contrariosEjgExample = new ScsContrariosejgExample();
+					
+					contrariosEjgExample.createCriteria().andAnioEqualTo(item.getAnioejg())
+					.andNumeroEqualTo(item.getNumeroejg()).andIdinstitucionEqualTo(idInstitucion)
+					.andIdtipoejgEqualTo(item.getIdtipoejg());
+					
+					List<ScsContrariosejg> contrariosEjg = scsContrariosejgMapper.selectByExample(contrariosEjgExample);
+									
+					
+					ScsContrariosdesigna contrariosDesigna = new ScsContrariosdesigna();
+					contrariosDesigna.setAnio(item.getAniodesigna());
+					contrariosDesigna.setNumero(item.getNumerodesigna());
+					contrariosDesigna.setIdturno(item.getIdturno());
+					contrariosDesigna.setIdinstitucion(item.getIdinstitucion());
+					
+					contrariosDesigna.setFechamodificacion(new Date());
+					contrariosDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					LOGGER.info(
+							"extraerPreDesignaEJG() / scsPersonajgExtendsMapper.selectByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables de los contrarios ejg");
+
+					for(ScsContrariosejg contrarioEjg: contrariosEjg) {
+						
+						ScsPersonajgKey scsPersonajgkey = new ScsPersonajgKey();
+						scsPersonajgkey.setIdpersona(Long.valueOf(contrarioEjg.getIdpersona()));
+						scsPersonajgkey.setIdinstitucion(idInstitucion);
+
+						ScsPersonajg personajg = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajgkey);
+
+						LOGGER.info(
+								"extraerPreDesignaEJG() / scsPersonajgExtendsMapper.selectByPrimaryKey() -> Salida de scsPersonajgExtendsMapper para obtener justiciables de los contrarios ejg");
+
+						// Se comprueba si tiene representante y se busca.
+						if (personajg.getIdrepresentantejg() != null) {
+
+							scsPersonajgkey.setIdpersona(personajg.getIdrepresentantejg());
+
+							ScsPersonajg representante = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajgkey);
+
+							contrariosDesigna.setNombrerepresentante(representante.getApellido1() + " " + representante.getApellido2()
+							+ ", " + representante.getNombre());
+						}
+						
+						LOGGER.info(
+								"extraerPreDesignaEJG() / ScsContrariosdesignaMapper.insert() -> Entrada a ScsContrariosdesignaMapper para insertar los contrarios ejg");
+
+						//Se le van asignando los distintos valores de IdPersona correspondientes
+						contrariosDesigna.setIdpersona(Long.valueOf(contrarioEjg.getIdpersona()));
+						
+						//Hacemos esto junto a la iniciacion response2 = 1 para evitar que si un contrario se introduce erroneamente,
+						//pase desapercibido al insertar bien el siguiente.
+						if(response2==1) response2 = scsContrariosdesignaMapper.insert(contrariosDesigna);
+						else {}
+						
+					}
+					
+					//3. Se debe introducir el procurador seleccionado en el EJG.
+					
+					//Se comprueba que hay un procurador definido en el ejg para prevenir inserciones fallidas
+					if(ejg.getIdprocurador()!=null) {
+					
+					ScsDesignaprocurador procDesigna = new ScsDesignaprocurador();
+					
+//					IDINSTITUCION
+//					IDTURNO
+//					NUMERO
+//					ANIO
+//					IDINSTITUCION_PROC
+//					IDPROCURADOR
+//					FECHADESIGNA
+					
+					procDesigna.setIdinstitucion(idInstitucion);
+					procDesigna.setIdturno(designa.getIdturno());
+					procDesigna.setNumero(Long.parseLong(ejg.getNumerodesignaproc()));
+					procDesigna.setAnio(designa.getAnio());
+					
+					procDesigna.setIdinstitucionProc(ejg.getIdinstitucionProc());
+					procDesigna.setIdprocurador(ejg.getIdprocurador());
+					procDesigna.setFechadesigna(ejg.getFechaDesProc());		
+					
+					//FECHA_DES_PROC		
+					
+					response3 = scsDesignaProcuradorMapper.insert(procDesigna);
+					
+					}
+					
+					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Inserts finalizados");
+				} catch (Exception e) {
+					LOGGER.error("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Se ha producido un error ",
+							e);
+					response2 = 0;
+				}
+
+				LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Saliendo del servicio... ");
+			}
+		}
+
+		if (response1 == 0 || response2==0  || response3 == 0) {
+			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
+			responseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.insertado");
+			responseDTO.setStatus(SigaConstants.OK);
+		}
+
+		responseDTO.setError(error);
+
+		return responseDTO;
 	}
 
 }

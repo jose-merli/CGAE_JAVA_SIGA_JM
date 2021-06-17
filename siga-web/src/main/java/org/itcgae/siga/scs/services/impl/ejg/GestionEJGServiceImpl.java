@@ -3000,7 +3000,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						"busquedaProcuradorEJG() / scsEjgExtendsMapper.busquedaProcuradorEJG() -> Entrada a scsEjgExtendsMapper para obtener los procuradores");
 
 				
-				procuradorItemList = scsEjgExtendsMapper.busquedaProcuradorEJG(idInstitucion.toString());
+				procuradorItemList = scsEjgExtendsMapper.busquedaProcuradorEJG(ejg.getIdProcurador(), idInstitucion.toString());
 
 				LOGGER.info(
 						"busquedaProcuradorEJG() / scsEjgExtendsMapper.busquedaProcuradorEJG -> Salida a scsEjgExtendsMapper para obtener los procuradores");
@@ -3058,7 +3058,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					ejg.setIdprocurador(Long.parseLong(item.getIdProcurador()));
 					ejg.setIdinstitucionProc(item.getIdInstitucionProc());
-
+					ejg.setFechaDesProc(item.getFechaDesProc());
+					ejg.setNumerodesignaproc(item.getNumDesigna());
+					
+					
 					ejg.setFechamodificacion(new Date());
 					ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
 

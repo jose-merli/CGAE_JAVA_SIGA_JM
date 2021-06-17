@@ -138,7 +138,8 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 		@Result(column = "delitos", property = "delitos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idprocurador", property = "idProcurador", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idinstitucion_proc", property = "idInstitucionProc", jdbcType = JdbcType.INTEGER),
-		@Result(column = "idPretension", property = "idPretension", jdbcType = JdbcType.INTEGER)
+		@Result(column = "idPretension", property = "idPretension", jdbcType = JdbcType.INTEGER),
+		@Result(column = "fechadesproc", property = "fechaDesProc", jdbcType = JdbcType.DATE)
 	})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
 	
@@ -275,6 +276,6 @@ List<AsuntosClaveJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem a
 //			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
 //			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) 
 	})
-	List<ProcuradorItem> busquedaProcuradorEJG(String idinstitucion);//String num,  String idturno, String anio
+	List<ProcuradorItem> busquedaProcuradorEJG(String idProcurador, String idinstitucion);//String num,  String idturno, String anio
 
 }
