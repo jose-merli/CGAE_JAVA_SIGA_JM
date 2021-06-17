@@ -16,6 +16,7 @@ public class ScsContrariosejgSqlExtendsProvider extends ScsContrariosejgSqlProvi
 		sql.SELECT("t1.nif");
 		sql.SELECT("t1.idabogadocontrarioejg");
 		sql.SELECT("t1.idprocurador");
+		sql.SELECT("t1.IDINSTITUCION_PROCU");
 		sql.SELECT("t1.idpersona");
 		sql.SELECT("t1.idtipoejg");
 		sql.SELECT("t1.fechabaja");
@@ -63,7 +64,7 @@ public class ScsContrariosejgSqlExtendsProvider extends ScsContrariosejgSqlProvi
 				+ "            || ', '\r\n" + "            || persona.nombre AS apellidosnombre,\r\n"
 				+ "            scs_contrariosejg.idabogadocontrarioejg,\r\n"
 				+ "            scs_contrariosejg.idprocurador,\r\n"
-				+ "            scs_contrariosejg.IDINSTITUCION_PROCU\r\n" 
+				+ "            scs_contrariosejg.IDINSTITUCION_PROCU,\r\n" 
 				+ "            persona.direccion\r\n" 
 				+ "        FROM\r\n"
 				+ "            scs_contrariosejg\r\n"

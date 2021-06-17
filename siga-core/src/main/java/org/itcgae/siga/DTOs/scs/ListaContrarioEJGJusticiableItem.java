@@ -13,6 +13,7 @@ public class ListaContrarioEJGJusticiableItem {
 	private String idtipoejg;
 	private String abogado;
 	private String procurador;
+	private String idInstitucionProc;
 	private String apellidosnombre;
 	private String idPersona;
 	private String representante;
@@ -117,6 +118,12 @@ public class ListaContrarioEJGJusticiableItem {
 	}
 	public void setRol(String rol) {
 		this.rol = rol;
+	}
+	public String getIdInstitucionProc() {
+		return idInstitucionProc;
+	}
+	public void setIdInstitucionProc(String idInstitucionProc) {
+		this.idInstitucionProc = idInstitucionProc;
 	}
 
 }

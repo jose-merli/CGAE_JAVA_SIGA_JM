@@ -1882,55 +1882,93 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	}
 
 	@Override
-	@Transactional
-	public UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request) {
-		UpdateResponseDTO responsedto = new UpdateResponseDTO();
-		int response = 0;
+    @Transactional
+    public UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request) {
+        UpdateResponseDTO responsedto = new UpdateResponseDTO();
+        int response = 0;
+        
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
+        
+        if (idInstitucion != null) {
+            LOGGER.debug(
+                    "GestionEJGServiceImpl.guardarImpugnacion() -> Entrada para obtener información del usuario logeado");
+            
+            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+            LOGGER.debug(
+                    "GestionEJGServiceImpl.guardarImpugnacion() -> Salida de obtener información del usuario logeado");
 
-		ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
+            if (usuarios != null && usuarios.size() > 0) {
+                LOGGER.debug(
+                        "GestionEJGServiceImpl.guardarImpugnacion() -> Entrada para cambiar los datos generales del ejg");
+                try {
 
-		if (idInstitucion != null) {
-			LOGGER.debug(
-					"GestionEJGServiceImpl.guardarImpugnacion() -> Entrada para obtener información del usuario logeado");
+                    ScsEjgKey scsEjgKey = new ScsEjgKey();
+                    
+                    scsEjgKey.setAnio(Short.valueOf(datos.getAnnio()));
+                    scsEjgKey.setIdinstitucion(idInstitucion);
+                    scsEjgKey.setIdtipoejg(Short.valueOf(datos.getTipoEJG()));
+                    scsEjgKey.setNumero(Long.valueOf(datos.getNumero()));
+                    
+                    ScsEjgWithBLOBs scsEjgWithBLOBs = scsEjgMapper.selectByPrimaryKey(scsEjgKey);
+                    if(scsEjgWithBLOBs != null) {
+                        scsEjgWithBLOBs.setFechaauto(datos.getFechaAuto());
+                        if(datos.getAutoResolutorio() != null) {
+                            scsEjgWithBLOBs.setIdtiporesolauto(Short.valueOf(datos.getAutoResolutorio()));
+                        }
+                        if(datos.getSentidoAuto() != null) {
+                            scsEjgWithBLOBs.setIdtiposentidoauto(Short.valueOf(datos.getSentidoAuto()));
+                        }
+                        scsEjgWithBLOBs.setObservacionimpugnacion(datos.getObservacionesImpugnacion());
+                        //front -> numero impugnacion;
+                        scsEjgWithBLOBs.setNumeroresolucion(datos.getnImpugnacion());
+                        scsEjgWithBLOBs.setFechapublicacion(datos.getFechaPublicacion());
+                        if(datos.getBis()) {
+                            scsEjgWithBLOBs.setBisresolucion("1");    
+                        }
+                        if(datos.isRequiereTurn()) {
+                            scsEjgWithBLOBs.setTurnadoratificacion("1");
+                        }
+                    }
+                    
+                    
+                response = scsEjgMapper.updateByPrimaryKeySelective(scsEjgWithBLOBs);
+                    
+                } catch (Exception e) {
 
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                    LOGGER.error(e);
+                    LOGGER.error(
+                            "GestionEJGServiceImpl.guardarImpugnacion() -> Se ha producido un error al actualizar la Impugnacion",
+                            e);
+                    error.setCode(500);
+                    error.setDescription("general.mensaje.error.bbdd");
+                    error.setMessage(e.getMessage());
+                    responsedto.setError(error);
+                    
+                } finally {
+                    // respuesta si se actualiza correctamente
+                    if (response >= 1) {
+                        responsedto.setStatus(SigaConstants.OK);
+                        LOGGER.debug(
+                                "GestionEJGServiceImpl.guardarImpugnacion() -> OK.  Impugnacion");
+                    } else {
+                        responsedto.setStatus(SigaConstants.KO);
+                        LOGGER.error(
+                                "GestionEJGServiceImpl.guardarImpugnacion() -> KO. Se ha producido un error al actualizar la Impugnacion");
+                    }
+                }
+            }
+        }
+        LOGGER.info("GestionEJGServiceImpl.guardarImpugnacion() -> Salida del servicio.");
 
-			LOGGER.debug(
-					"GestionEJGServiceImpl.guardarImpugnacion() -> Salida de obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.guardarImpugnacion() -> Entrada para cambiar los datos generales del ejg");
-
-				try {
-
-				} catch (Exception e) {
-
-				} finally {
-					// respuesta si se actualiza correctamente
-					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug(
-								"GestionEJGServiceImpl.guardarImpugnacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
-					} else {
-						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.guardarImpugnacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
-					}
-				}
-			}
-		}
-
-		LOGGER.info("GestionEJGServiceImpl.guardarImpugnacion() -> Salida del servicio.");
-
-		return responsedto;
-	}
+        return responsedto;
+    }
 
 	@Override
 	@Transactional
@@ -2268,17 +2306,17 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		if (idInstitucion != null) {
 			LOGGER.debug(
-					"GestionEJGServiceImpl.borrarRelacion() -> Entrada para obtener información del usuario logeado");
+					"GestionEJGServiceImpl.updateDatosJuridicos() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug("GestionEJGServiceImpl.borrarRelacion() -> Salida de obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.updateDatosJuridicos() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.debug(
-						"GestionEJGServiceImpl.borrarRelacion() -> Entrada para cambiar los datos generales del ejg");
+						"GestionEJGServiceImpl.updateDatosJuridicos() -> Entrada para cambiar los datos generales del ejg");
 
 				try {
 					ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
@@ -2303,7 +2341,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						record.setComisaria(datos.getComisaria());
 						record.setCalidad(datos.getCalidad());
 						
-						//
+						// Datos pre-designacion
 						record.setNumeroprocedimiento(dni);
 						record.setAnioprocedimiento(idInstitucion);
 						record.setNig(datos.getNig());
@@ -2316,21 +2354,21 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						response = scsEjgMapper.updateByPrimaryKeySelective(record);
 					
 					LOGGER.debug(
-							"GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+							"GestionEJGServiceImpl.updateDatosJuridicos() -> Salida del servicio para cambiar los datos juridicos para el ejg");
 				} catch (Exception e) {
 					LOGGER.debug(
-							"GestionEJGServiceImpl.borrarRelacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							"GestionEJGServiceImpl.updateDatosJuridicos() -> Se ha producido un error al actualizar los datos juridicos para el ejg. ",
 							e);
 				} finally {
 					// respuesta si se actualiza correctamente
 					if (response >= 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
-								"GestionEJGServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+								"GestionEJGServiceImpl.updateDatosJuridicos() -> OK. Datos juridicos del ejg actualizados");
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"GestionEJGServiceImpl.borrarRelacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+								"GestionEJGServiceImpl.updateDatosJuridicos() -> KO. No se ha actualizado ningúno de los datos juridicos para el ejg");
 					}
 				}
 			}
@@ -2606,11 +2644,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				try {
 
 					ScsContrariosejg contrario = new ScsContrariosejg();
+					
 					contrario.setAnio(item.getAnio());
 					contrario.setNumero(item.getNumero());
 					contrario.setIdinstitucion(Short.parseShort(idInstitucion.toString()));
 					contrario.setIdpersona(item.getIdpersona());
 					contrario.setIdtipoejg(item.getIdtipoejg());
+					
 					contrario.setFechamodificacion(new Date());
 					contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
 
@@ -2662,6 +2702,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		} else {
 			error.setCode(200);
 			error.setDescription("general.message.registro.actualizado");
+			insertResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		insertResponseDTO.setError(error);
@@ -3224,7 +3265,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					if (item.getDelitos().isEmpty())
 						response = 1;
 
-					String[] idDelitos = item.getDelitos().split(" ");
+					String[] idDelitos = item.getDelitos().split(",");
 					for (String idDelito : idDelitos) {
 						delitos.setIddelito(Short.parseShort(idDelito));
 

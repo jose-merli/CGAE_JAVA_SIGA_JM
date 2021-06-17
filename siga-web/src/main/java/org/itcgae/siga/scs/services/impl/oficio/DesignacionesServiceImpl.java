@@ -6961,9 +6961,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					
 					procDesigna.setIdinstitucionProc(ejg.getIdinstitucionProc());
 					procDesigna.setIdprocurador(ejg.getIdprocurador());
-					procDesigna.setFechadesigna(ejg.getFechaDesProc());		
+					procDesigna.setFechadesigna(ejg.getFechaDesProc());	
 					
-					//FECHA_DES_PROC		
+					procDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+					procDesigna.setFechamodificacion(new Date());						
 					
 					response3 = scsDesignaProcuradorMapper.insert(procDesigna);
 					
