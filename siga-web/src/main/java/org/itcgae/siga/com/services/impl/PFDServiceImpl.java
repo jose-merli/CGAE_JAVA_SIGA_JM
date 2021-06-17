@@ -2,10 +2,7 @@ package org.itcgae.siga.com.services.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Base64;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.com.services.IPFDService;
@@ -18,12 +15,6 @@ import org.itcgae.siga.ws.client.ClientPFD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pfd.ws.firma.FirmaCorporativaPDFTO;
-import com.pfd.ws.firma.SelloFirmaPDFTO;
-import com.pfd.ws.service.FirmaCorporativaPDFDocument;
-import com.pfd.ws.service.FirmaCorporativaPDFDocument.FirmaCorporativaPDF;
-import com.pfd.ws.service.FirmaCorporativaPDFResponseDocument;
-import com.pfd.ws.service.FirmaCorporativaPDFResponseDocument.FirmaCorporativaPDFResponse;
 import com.pfd.ws.service.ObtenerDocumentoDocument;
 import com.pfd.ws.service.ObtenerDocumentoDocument.ObtenerDocumento;
 import com.pfd.ws.service.ObtenerDocumentoResponseDocument;
@@ -44,126 +35,6 @@ public class PFDServiceImpl implements IPFDService {
 	
 	@Autowired	
 	GenParametrosMapper _genParametrosMapper;
-
-	
-	@Override
-	public String firmarPDF(File fichero) throws Exception {
-		FirmaCorporativaPDFTO request = FirmaCorporativaPDFTO.Factory.newInstance();
-		
-
-		GenParametrosKey keyParam = new GenParametrosKey();
-
-		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
-		keyParam.setModulo(SigaConstants.MODULO_GEN);
-		keyParam.setParametro(SigaConstants.PFD_FIRMA_LOCATION);
-		
-		GenParametros param = _genParametrosMapper.selectByPrimaryKey(keyParam);
-
-		String firmaLocation = param.getValor();
-		
-		keyParam = new GenParametrosKey();
-
-		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
-		keyParam.setModulo(SigaConstants.MODULO_GEN);		
-		keyParam.setParametro(SigaConstants.PFD_FIRMA_VISIBLE);
-		
-		param = _genParametrosMapper.selectByPrimaryKey(keyParam);
-		
-		String firmaVisible = param.getValor();
-		
-		keyParam = new GenParametrosKey();
-
-		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
-		keyParam.setModulo(SigaConstants.MODULO_GEN);
-		keyParam.setParametro(SigaConstants.PFD_IDCLIENTE);
-		
-		param = _genParametrosMapper.selectByPrimaryKey(keyParam);
-		String idClientePFD = param.getValor();
-		
-		keyParam = new GenParametrosKey();
-
-		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
-		keyParam.setModulo(SigaConstants.MODULO_GEN);		
-		keyParam.setParametro(SigaConstants.PFD_FIRMA_RAZON);		
-
-		param = _genParametrosMapper.selectByPrimaryKey(keyParam);
-		String razon = param.getValor();
-		
-		request.setIdCliente(idClientePFD);
-		String base64File = "";
-		String csv = "";
-		
-		if(fichero != null){
-			try (FileInputStream inFile = new FileInputStream(fichero)) {
-				byte bytesData[] = new byte[(int) fichero.length()];
-				inFile.read(bytesData);
-				base64File = Base64.getEncoder().encodeToString(bytesData);
-			} catch (FileNotFoundException e) {
-				LOGGER.error("Fichero a firmar no encontrado", e);
-				throw new Exception("Fichero a firmar no encontrado");
-			} catch (IOException e) {
-				LOGGER.error("Error al leer el fichero a firmar ", e);
-				throw new Exception("Error al leer el fichero a firmar");
-			}
-		}
-		
-		if(base64File != null && !"".equals(base64File)){
-			request.setPdfB64(base64File);
-			
-			SelloFirmaPDFTO sello = SelloFirmaPDFTO.Factory.newInstance();
-			
-			sello.setLocalidad(firmaLocation);
-			sello.setRazon(razon);
-			sello.setVisible(Integer.parseInt(firmaVisible));
-			
-			request.setSelloFirma(sello);
-			//request.setIdColegio(AppConstants.IDCOLEGIOCGAE);
-			
-			FirmaCorporativaPDFDocument requestDoc = FirmaCorporativaPDFDocument.Factory.newInstance();
-			
-			FirmaCorporativaPDF firma = FirmaCorporativaPDF.Factory.newInstance();
-			firma.setFirmaCorporativaPDFRequest(request);
-			
-			requestDoc.setFirmaCorporativaPDF(firma);
-			
-			FirmaCorporativaPDFResponseDocument response = null;
-			try {
-				
-				keyParam = new GenParametrosKey();
-
-				keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
-				keyParam.setModulo(SigaConstants.MODULO_GEN);
-				keyParam.setParametro(SigaConstants.PFD_URLWS);
-				
-				param = _genParametrosMapper.selectByPrimaryKey(keyParam);
-				String uriService = param.getValor();
-				
-				response = clientPFD.firmarPDF(uriService, requestDoc);
-				if(response != null){
-					FirmaCorporativaPDFResponse responseDoc = response.getFirmaCorporativaPDFResponse();
-					String resultado = responseDoc.getFirmaCorporativaPDFResponse().getResultado();
-					
-					if(SigaConstants.FIRMA_OK.equalsIgnoreCase(resultado)){
-						LOGGER.debug("PFDServiceImpl.firmarPDF :: Documento firmado correctamente");
-						base64File = responseDoc.getFirmaCorporativaPDFResponse().getFirmaB64();
-					}else{
-						LOGGER.error("PFDServiceImpl.firmarPDF :: Error al firmar el documento :: " + resultado);
-						throw new Exception("PFDServiceImpl.firmarPDF :: Error al firmar el documento :: " + resultado);
-					}					
-				}else{
-					LOGGER.error("PFDServiceImpl.firmarPDF :: Error al firmar el documento :: Respuesta nula");
-					throw new Exception("PFDServiceImpl.firmarPDF :: Error al enviar a firmar un documento");
-				}
-			} catch (Exception e) {
-				LOGGER.error("PFDServiceImpl.firmarPDF :: Error al enviar a firmar un documento ", e);
-				throw new Exception("PFDServiceImpl.firmarPDF :: Error al enviar a firmar un documento");
-			}
-		}else{
-			throw new Exception("PFDServiceImpl.firmarPDF :: Error al obtener el fichero a firmar");
-		}
-		
-		return base64File;
-	}
 	
 	@Override
 	public String obtenerDocumentoFirmado(String csv) throws Exception {
@@ -181,7 +52,7 @@ public class PFDServiceImpl implements IPFDService {
 		
 		solicitud.setIdAppCliente(idClientePFD);
 //		solicitud.setIdValidacion(csv);
-		solicitud.setIdValidacion("DEM-JKTYO-NERK0-LNGBQ-CLB1Z");
+		solicitud.setIdValidacion("DEM-JKTYO-NERK0-LNGBQ-CLB1Z");//cambiar esto por el csv del fichero, solo para que funcione en local
 		
 		ObtenerDocumento doc = ObtenerDocumento.Factory.newInstance();
 		doc.setObtenerDocumentoRequest(solicitud);
@@ -238,23 +109,20 @@ public class PFDServiceImpl implements IPFDService {
 	}
 	
 	@Override
-	public File createFile(byte[] bytes,String path,String fileName) throws Exception{
-		LOGGER.info("bytes"+bytes);
-		LOGGER.info("path"+path);
-		LOGGER.info("fileName"+fileName);
+	public File createTempFile(byte[] bytes,String fileName) throws Exception{
 		File returnFile = null;
+		
 		try{	
-    		File file = new File(path);
-    		if(!file.exists())
-    			file.mkdirs();
-			returnFile=new File(path+File.separator+fileName.toString());
-			boolean isCreado = returnFile.createNewFile();
-			LOGGER.info("isCreado"+isCreado);
+			returnFile = new File(fileName);
+    		
 			FileOutputStream fileOutputStream  = new FileOutputStream(returnFile);	
+			
 			fileOutputStream.write(bytes);
 			fileOutputStream.flush();
 			fileOutputStream.close();
-			LOGGER.info("isCreado"+isCreado);
+			
+			returnFile.deleteOnExit();
+
 		} catch (Exception e) {
 			LOGGER.debug("Se ha producido un error al createFile"+e.toString());
 			throw new Exception("Se ha producido un error al createFile");
