@@ -35,6 +35,7 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -218,5 +219,7 @@ public interface IDesignacionesService {
 			HttpServletRequest request);
 	
 	public ListDTO getDelitos(DesignaItem designaItem, HttpServletRequest request);
+
+	InsertResponseDTO getPreDesignaEJG(ScsEjgdesigna item, HttpServletRequest request);
 	
 }

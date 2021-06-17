@@ -115,6 +115,7 @@ public class EjgItem {
 	private String estadoNew;
 	
 	private String numDesigna;
+	private Date fechaDesProc;
 	
 	private String idProcurador;
 	private Short idInstitucionProc;
@@ -1544,5 +1545,13 @@ public class EjgItem {
 
 	public void setObservaciones(String observaciones) {
 		this.observaciones = observaciones;
+	}
+
+	public Date getFechaDesProc() {
+		return fechaDesProc;
+	}
+
+	public void setFechaDesProc(Date fechaDesProc) {
+		this.fechaDesProc = fechaDesProc;
 	}
 }

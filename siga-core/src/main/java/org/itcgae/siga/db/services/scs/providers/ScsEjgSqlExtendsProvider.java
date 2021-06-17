@@ -483,6 +483,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.delitos");
 		sql.SELECT("ejg.idprocurador");
 		sql.SELECT("ejg.idinstitucion_proc");
+		sql.SELECT("ejg.fechadesproc");
 		
 		// from
 		sql.FROM("scs_ejg ejg");
@@ -533,9 +534,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.WHERE("ejg.idinstitucion = " + idInstitucion);
 		if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 			sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
-		if (ejgItem.getNumEjg() != null && ejgItem.getNumEjg() != "")
-			sql.WHERE("EJG.NUMEJG =" + ejgItem.getNumEjg());
+//		if (ejgItem.getNumEjg() != null && ejgItem.getNumEjg() != "")
+//			sql.WHERE("EJG.NUMEJG =" + ejgItem.getNumEjg());
 //				sql.WHERE ("EJG.NUMEJG ='09039'");
+		if (ejgItem.getNumero() != null && ejgItem.getNumero() != "")
+			sql.WHERE("EJG.NUMERO =" + ejgItem.getNumero());
 
 		if (ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
 			sql.WHERE("ejg.IDTIPOEJG = " + ejgItem.getTipoEJG());
@@ -1406,7 +1409,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 	
-	public String busquedaProcuradorEJG(String idinstitucion) {//String idProcurador, 
+	public String busquedaProcuradorEJG(String idProcurador, String idinstitucion) {//String idProcurador, 
 		SQL sql = new SQL();
 
 		sql.SELECT(
@@ -1415,7 +1418,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.FROM("SCS_PROCURADOR p");//SCS_DESIGNAPROCURADOR dp
 		//sql2.INNER_JOIN(" on p.idprocurador = ejg.idprocurador and p.idinstitucion = ejg.idinstitucion ");
 		sql.WHERE("p.idinstitucion = " + idinstitucion);
-		//sql.WHERE("p.idprocurador = " + idProcurador);
+		sql.WHERE("p.idprocurador = " + idProcurador);
 
 		return sql.toString();
 	}

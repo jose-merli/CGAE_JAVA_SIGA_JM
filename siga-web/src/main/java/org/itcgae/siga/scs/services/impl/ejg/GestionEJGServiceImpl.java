@@ -1821,18 +1821,38 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						response = 0;
 
 						// creamos el objeto para el insert
-						record.setIdinstitucion(Short.parseShort(datos.getIdinstitucion()));
+						record.setIdinstitucion(idInstitucion);
 						record.setAnio(Short.parseShort(datos.getAnio()));
 						record.setNumero(Long.parseLong(datos.getNumero()));
+						
 						record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
 						record.setFechainicio(datos.getFechaInicio());
 						record.setObservaciones(datos.getObservaciones());
 						
+						record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
+						
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
+						
+						// obtenemos el maximo de idestadoporejg
+						ScsEstadoejgExample example = new ScsEstadoejgExample();
+						example.setOrderByClause("IDESTADOPOREJG DESC");
+						example.createCriteria()
+								.andAnioEqualTo(Short.parseShort(datos.getAnio()))
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdtipoejgEqualTo(Short.parseShort(datos.getIdtipoejg()))
+								.andNumeroEqualTo(Long.parseLong(datos.getNumero()));
+
+						List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
+
+						// damos el varlo al idestadoporejg + 1
+						if (listEjg.size() > 0) {
+							record.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
+						} else {
+							record.setIdestadoporejg(Long.parseLong("0"));
+						}
 
 						response = scsEstadoejgMapper.insertSelective(record);
-						
 						
 					
 					LOGGER.debug(
@@ -2937,7 +2957,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						"busquedaProcuradorEJG() / scsEjgExtendsMapper.busquedaProcuradorEJG() -> Entrada a scsEjgExtendsMapper para obtener los procuradores");
 
 				
-				procuradorItemList = scsEjgExtendsMapper.busquedaProcuradorEJG(idInstitucion.toString());
+				procuradorItemList = scsEjgExtendsMapper.busquedaProcuradorEJG(ejg.getIdProcurador(), idInstitucion.toString());
 
 				LOGGER.info(
 						"busquedaProcuradorEJG() / scsEjgExtendsMapper.busquedaProcuradorEJG -> Salida a scsEjgExtendsMapper para obtener los procuradores");
@@ -2995,7 +3015,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					ejg.setIdprocurador(Long.parseLong(item.getIdProcurador()));
 					ejg.setIdinstitucionProc(item.getIdInstitucionProc());
-
+					ejg.setFechaDesProc(item.getFechaDesProc());
+					ejg.setNumerodesignaproc(item.getNumDesigna());
+					
+					
 					ejg.setFechamodificacion(new Date());
 					ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
 
