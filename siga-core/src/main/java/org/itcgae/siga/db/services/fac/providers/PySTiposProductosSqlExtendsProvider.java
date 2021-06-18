@@ -6,7 +6,7 @@ import org.itcgae.siga.db.mappers.PysProductosSqlProvider;
 
 public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider{
 
-	public String searchTiposProductos(String idioma, String institucion) {
+	public String searchTiposProductos(String idioma, Short institucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("pp.IDTIPOPRODUCTO");
@@ -17,7 +17,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		
 		sql.FROM("PYS_PRODUCTOS pp");
 		
-		sql.JOIN("YS_TIPOSPRODUCTOS tp ON pp.IDTIPOPRODUCTO = tp.IDTIPOPRODUCTO");
+		sql.JOIN("PYS_TIPOSPRODUCTOS tp ON pp.IDTIPOPRODUCTO = tp.IDTIPOPRODUCTO");
 		
 		sql.WHERE("pp.IDINSTITUCION = '" + institucion + "'");
 		//pp.FECHABAJA IS NULL te devuelve los no eliminados (los que no tienen historico) 

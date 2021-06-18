@@ -25,6 +25,6 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE)
 		}) 
-	List<TiposProductosItem> searchTiposProductos(String idioma, String institucion);
+	List<TiposProductosItem> searchTiposProductos(String idioma, Short institucion);
 	
 }

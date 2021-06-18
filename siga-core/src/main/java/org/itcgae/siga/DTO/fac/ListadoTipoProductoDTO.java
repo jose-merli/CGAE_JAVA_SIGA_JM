@@ -7,11 +7,10 @@ import org.itcgae.siga.DTOs.gen.Error;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TiposProductosDTO {
+public class ListadoTipoProductoDTO {
 	private List<TiposProductosItem> tiposProductosItems = new ArrayList<TiposProductosItem>();
 	private Error error = null;
 	
-	@JsonProperty("tiposProductosItems")
 	public List<TiposProductosItem> getTiposProductosItems() {
 		return tiposProductosItems;
 	}
@@ -20,7 +19,6 @@ public class TiposProductosDTO {
 		this.tiposProductosItems = tiposProductosItems;
 	}
 	
-	@JsonProperty("error")
 	public Error getError() {
 		return error;
 	}
@@ -46,7 +44,7 @@ public class TiposProductosDTO {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TiposProductosDTO other = (TiposProductosDTO) obj;
+		ListadoTipoProductoDTO other = (ListadoTipoProductoDTO) obj;
 		if (error == null) {
 			if (other.error != null)
 				return false;

@@ -1,74 +1,88 @@
 package org.itcgae.siga.fac.services.impl;
 
 import java.util.List;
-import org.apache.log4j.Logger;
+
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.fac.TiposProductosDTO;
-import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
-import org.itcgae.siga.DTOs.cen.SolModificacionItem;
-import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
-import org.itcgae.siga.cen.services.impl.SolicitudModificacionServiceImpl;
+import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
+import org.itcgae.siga.DTO.fac.TiposProductosItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.PySTiposProductosExtendsMapper;
+import org.itcgae.siga.fac.services.ITiposProductosService;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public class TiposProductosServiceImpl {
-	
+@Service
+public class TiposProductosServiceImpl implements ITiposProductosService {
+
 	private Logger LOGGER = Logger.getLogger(TiposProductosServiceImpl.class);
 
-//	@Override
-//	public TiposProductosDTO searchTiposProductos(String idioma, String institucion) {
-//		LOGGER.info(
-//				"searchModificationRequest() -> Entrada al servicio para recuperar las solicitudes de modificación");
-//
-//		// Conseguimos información del usuario logeado
-//		String token = request.getHeader("Authorization");
-//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-//		SolModificacionDTO solModificacionDTO = new SolModificacionDTO();
-//		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
-//		if (idInstitucion != null) {
-//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-//			LOGGER.info(
-//					"searchModificationRequest() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-//			List<AdmUsuarios> usuarios = _admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-//			LOGGER.info(
-//					"searchModificationRequest() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//			if (usuarios != null && usuarios.size() > 0) {
-//
-//				AdmUsuarios usuario = usuarios.get(0);
-//				LOGGER.info(
-//						"datosSolicitudSearch() / cenEstadoSolicitudExtendsMapper.selectTipoSolicitud() -> Entrada a cenEstadoSolicitudExtendsMapper para obtener los estados de solicitud");
-//				if (letrado.equalsIgnoreCase("S")) {
-//					CenPersonaExample example = new CenPersonaExample();
-//					example.createCriteria().andNifcifEqualTo(usuario.getNif());
-//					List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(example );
-//					if (null != cenPersona && cenPersona.size()>0) {
-//						List<SolModificacionItem> solModificacionItems = cenTiposModificacionesExtendsMapper
-//								.searchModificationRequest(solicitudModificacionSearchDTO, usuario.getIdlenguaje(),
-//										String.valueOf(idInstitucion),cenPersona.get(0).getIdpersona());
-//						solModificacionDTO.setSolModificacionItems(solModificacionItems);
-//					}
-//
-//				}else{
-//					List<SolModificacionItem> solModificacionItems = cenTiposModificacionesExtendsMapper
-//							.searchModificationRequest(solicitudModificacionSearchDTO, usuario.getIdlenguaje(),
-//									String.valueOf(idInstitucion),null);
-//					solModificacionDTO.setSolModificacionItems(solModificacionItems);
-//				}
-//
-//			}
-//		}
-//
-//		LOGGER.info(
-//				"searchModificationRequest() -> Salida del servicio para recuperar las solicitudes de modificación");
-//
-//		return tiposProductosDTO;
-//	}
+	@Autowired
+	private PySTiposProductosExtendsMapper pysTiposProductosExtendsMapper;
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+
+	@Override
+	public ListadoTipoProductoDTO searchTiposProductos(HttpServletRequest request) {
+		ListadoTipoProductoDTO listadoTipoProductoDTO = new ListadoTipoProductoDTO();
+		Error error = new Error();
+
+		LOGGER.info("searchTiposProductos() -> Entrada al servicio para recuperar el listado de productos");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"searchTiposProductos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchTiposProductos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"searchTiposProductos() / pysTiposProductosExtendsMapper.searchTiposProductos() -> Entrada a pysTiposProductosExtendsMapper para obtener el listado de productos");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<TiposProductosItem> listaProductos = pysTiposProductosExtendsMapper
+							.searchTiposProductos(idioma, idInstitucion);
+
+					LOGGER.info(
+							"searchTiposProductos() / pysTiposProductosExtendsMapper.searchTiposProductos() -> Salida de pysTiposProductosExtendsMapper para obtener el listado de productos");
+
+					if (listaProductos != null && listaProductos.size() > 0) {
+						listadoTipoProductoDTO.setTiposProductosItems(listaProductos);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposProductosServiceImpl.searchTiposProductos() -> Se ha producido un error al obtener el listado de productos",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		listadoTipoProductoDTO.setError(error);
+
+		LOGGER.info("searchTiposProductos() -> Salida del servicio para obtener el listado de productos");
+
+		return listadoTipoProductoDTO;
+	}
+
 }

@@ -13,7 +13,6 @@ public class TiposProductosItem {
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechabaja;
 	
-	@JsonProperty("idtipoproducto")
 	public int getIdtipoproducto() {
 		return idtipoproducto;
 	}
@@ -22,7 +21,6 @@ public class TiposProductosItem {
 		this.idtipoproducto = idtipoproducto;
 	}
 	
-	@JsonProperty("descripciontipo")
 	public String getDescripciontipo() {
 		return descripciontipo;
 	}
@@ -31,7 +29,6 @@ public class TiposProductosItem {
 		this.descripciontipo = descripciontipo;
 	}
 	
-	@JsonProperty("idproducto")
 	public int getIdproducto() {
 		return idproducto;
 	}
@@ -40,7 +37,6 @@ public class TiposProductosItem {
 		this.idproducto = idproducto;
 	}
 	
-	@JsonProperty("descripcion")
 	public String getDescripcion() {
 		return descripcion;
 	}
@@ -49,7 +45,6 @@ public class TiposProductosItem {
 		this.descripcion = descripcion;
 	}
 	
-	@JsonProperty("fechabaja")
 	public Date getFechabaja() {
 		return fechabaja;
 	}
