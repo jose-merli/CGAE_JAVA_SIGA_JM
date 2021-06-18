@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsEjgComisionSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsGuardiasturnoSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsPrisionSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTurnosSqlExtendsProvider;
@@ -35,6 +36,11 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		})
 	List<CargaMasivaDatosITItem> searchNombreTurnoGuardia(String idInstitucion, String nombreGuardia);
 	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboGuardias")
+	@Results({ @Result(column = "IDGUARDIA", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
+	List<ComboItem> comboGuardias(String idTurno, String idInstitucion);
+	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "searchGuardias")
 	@Results({ 
 		@Result(column = "turno", property = "turno", jdbcType = JdbcType.VARCHAR),
@@ -54,12 +60,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	List<GuardiasItem> searchGuardias(TurnosItem turnosItem , String idInstitucion, String idLenguaje);
 	
 
-	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboGuardias")
-	@Results({
-		@Result(column = "IDGUARDIA", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
-	})
-	List<ComboItem> comboGuardias(String idTurno, String idInstitucion);
+	
 	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboGuardiasNoGrupo")
 	@Results({

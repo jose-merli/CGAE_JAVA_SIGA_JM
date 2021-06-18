@@ -9,7 +9,7 @@ import org.itcgae.siga.DTOs.scs.FundamentosCalificacionDTO;
 import org.itcgae.siga.DTOs.scs.FundamentosCalificacionItem;
 
 
-public interface IBusquedaFundamentosCalificacionServiceComision {
+public interface IBusquedaFundamentosComisionCalificacionService {
 
 	public ComboDTO comboDictamen(HttpServletRequest request);
 	public FundamentosCalificacionDTO searchFundamentos(FundamentosCalificacionItem fundamentosCalificacionItem, HttpServletRequest request);

@@ -5,22 +5,23 @@ import org.itcgae.siga.db.mappers.ScsTiporesolucionSqlProvider;
 
 public class ScsTiporesolucionSqlExtendsProvider extends ScsTiporesolucionSqlProvider{
 
-	public String getResoluciones(String idLenguaje) {
-		
+	
+	public String getResoluciones(String idLenguaje, String idInstitucion) {
+
 		SQL sql = new SQL();
-		
+
 		sql.SELECT("tiporesolucion.idtiporesolucion");
 		sql.SELECT("catalogoResolucion.descripcion");
-	
+
 		sql.FROM("SCS_TIPORESOLUCION tiporesolucion");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS catalogoResolucion on catalogoResolucion.idrecurso = tiporesolucion.DESCRIPCION and catalogoResolucion.idlenguaje = "+idLenguaje);
+		sql.INNER_JOIN(
+				"GEN_RECURSOS_CATALOGOS catalogoResolucion on catalogoResolucion.idrecurso = tiporesolucion.DESCRIPCION and catalogoResolucion.idlenguaje = "
+						+ idLenguaje);
 
 		sql.WHERE("tiporesolucion.fechabaja is null");
 		sql.WHERE("tiporesolucion.fecha_baja is null");
 
 		sql.ORDER_BY("catalogoResolucion.descripcion");
-	
 		return sql.toString();
 	}
-	
 }

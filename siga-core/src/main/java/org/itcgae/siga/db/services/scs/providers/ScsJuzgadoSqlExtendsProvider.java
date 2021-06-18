@@ -4,12 +4,12 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.db.mappers.ScsJuzgadoSqlProvider;
 
-public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
+public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider {
 
 	public String searchCourt(JuzgadoItem juzgadoItem, Short idInstitucion) {
-		
+
 		SQL sql = new SQL();
-		
+
 		sql.SELECT("juzgado.idinstitucion");
 		sql.SELECT("juzgado.idjuzgado");
 		sql.SELECT("juzgado.nombre");
@@ -38,72 +38,72 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 		sql.FROM("SCS_JUZGADO juzgado");
 		sql.LEFT_OUTER_JOIN("CEN_PROVINCIAS PROVINCIAS ON PROVINCIAS.IDPROVINCIA = juzgado.IDPROVINCIA");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES POBLACION ON POBLACION.IDPOBLACION = juzgado.IDPOBLACION");
-		if(idInstitucion != 2000) {
+		if (idInstitucion != 2000) {
 			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 		}
-		if(juzgadoItem.getNombre() != null && juzgadoItem.getNombre() != "") {
-			sql.WHERE("UPPER(juzgado.nombre) like UPPER('%"+ juzgadoItem.getNombre() + "%')");
+		if (juzgadoItem.getNombre() != null && juzgadoItem.getNombre() != "") {
+			sql.WHERE("UPPER(juzgado.nombre) like UPPER('%" + juzgadoItem.getNombre() + "%')");
 		}
-		
-		if(juzgadoItem.getCodigoExt() != null && juzgadoItem.getCodigoExt() != "") {
-			sql.WHERE("UPPER(juzgado.codigoext) like UPPER('%"+ juzgadoItem.getCodigoExt() + "%')");
+
+		if (juzgadoItem.getCodigoExt() != null && juzgadoItem.getCodigoExt() != "") {
+			sql.WHERE("UPPER(juzgado.codigoext) like UPPER('%" + juzgadoItem.getCodigoExt() + "%')");
 		}
-		
-		if(juzgadoItem.getIdPoblacion() != null && juzgadoItem.getIdPoblacion() != "") {
-			sql.WHERE("juzgado.idpoblacion = '"+ juzgadoItem.getIdPoblacion() + "'");
+
+		if (juzgadoItem.getIdPoblacion() != null && juzgadoItem.getIdPoblacion() != "") {
+			sql.WHERE("juzgado.idpoblacion = '" + juzgadoItem.getIdPoblacion() + "'");
 		}
-		
-		if(juzgadoItem.getIdProvincia() != null && juzgadoItem.getIdProvincia() != "") {
-			sql.WHERE("juzgado.idprovincia = '"+ juzgadoItem.getIdProvincia() + "'");
+
+		if (juzgadoItem.getIdProvincia() != null && juzgadoItem.getIdProvincia() != "") {
+			sql.WHERE("juzgado.idprovincia = '" + juzgadoItem.getIdProvincia() + "'");
 		}
-		
-		if(!juzgadoItem.getHistorico()) {
+
+		if (!juzgadoItem.getHistorico()) {
 			sql.WHERE("fechabaja is null");
 		}
-		
+
 		sql.ORDER_BY("juzgado.nombre");
-	
+
 		return sql.toString();
 	}
-	
+
 	public String getIdJuzgado(Short idInstitucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("MAX(IDJUZGADO) AS IDJUZGADO");
 		sql.FROM("SCS_JUZGADO");
-		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
-		
-		return sql.toString();
-	}
-	public String comboJuzgados(Short idInstitucion) {
-		SQL sql = new SQL();
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 
-		sql.SELECT("IDJUZGADO");
-		sql.SELECT("DECODE(CODIGOEXT2,NULL,NOMBRE, CODIGOEXT2 || '-' || NOMBRE) AS DESCRIPCION");
-		sql.FROM("SCS_JUZGADO");
-		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
-		
 		return sql.toString();
 	}
-	
+
 	public String comboJuzgado(Short idLenguaje, Short idInstitucion) {
 
 		SQL sql = new SQL();
-	 
+
 		sql.SELECT("juzgado.IDJUZGADO");
 		sql.SELECT("juzgado.NOMBRE");
 		sql.FROM("SCS_JUZGADO juzgado");
 		sql.WHERE("juzgado.fechabaja is null");
 		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
 		sql.ORDER_BY("juzgado.NOMBRE");
-	
+
 		return sql.toString();
 	}
-	
+
+	public String comboJuzgados(String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("IDJUZGADO");
+		sql.SELECT("DECODE(CODIGOEXT2,NULL,NOMBRE, CODIGOEXT2 || '-' || NOMBRE) AS DESCRIPCION");
+		sql.FROM("SCS_JUZGADO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		return sql.toString();
+	}
+
 	public String comboJuzgadoDesignaciones(Short idLenguaje, Short idInstitucion) {
 
 		SQL sql = new SQL();
-	
+
 		sql.SELECT("juzgado.CODIGOEXT2");
 		sql.SELECT("juzgado.NOMBRE");
 		sql.SELECT("P.NOMBRE AS NOMBREPOBLACION");
@@ -114,8 +114,8 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 		sql.WHERE("juzgado.CODIGOEXT2 is not null");
 		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
 		sql.ORDER_BY("juzgado.NOMBRE");
-	
+
 		return sql.toString();
 	}
-	
+
 }

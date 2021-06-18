@@ -9,25 +9,31 @@ import org.itcgae.siga.DTOs.scs.EjgItem;
 
 public interface IBusquedaEJGComision {
 
-	ComboDTO comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen);
+	ComboDTO comboFundamentoCalificacion(String idInstitucion, HttpServletRequest request, String[] list_dictamen);
 
-	ComboDTO getLabelColegiosCol(HttpServletRequest request);
+	ComboDTO getLabelColegiosCol(HttpServletRequest request, String idInstitucion);
 
-	ComboDTO comboPonente(HttpServletRequest request);
+	ComboDTO comboPonente(String idInstitucion, HttpServletRequest request);
 
-	ComboDTO comboFundamentoJurid(HttpServletRequest request, String resolucion);
+	ComboDTO comboFundamentoJurid(String idInstitucion,HttpServletRequest request, String resolucion);
 
 	EjgDTO busquedaEJG(EjgItem ejgItem, HttpServletRequest request);
 
-	ComboDTO comboTipoEJG(HttpServletRequest request);
+	ComboDTO comboDictamen(String idInstitucion, HttpServletRequest request);
 
-	ComboDTO comboEstadoEJG(HttpServletRequest request, String resolucion);
+	ComboDTO comboEstadoEJG(String idInstitucion, HttpServletRequest request, String resolucion);
 
-	ComboDTO comboResolucion(HttpServletRequest request);
+	ComboDTO comboResolucion(String idInstitucion, HttpServletRequest request);
 
-	ComboDTO comboJuzgados(HttpServletRequest request);
+	ComboDTO comboJuzgados(String idInstitucion, HttpServletRequest request);
 
-	ComboDTO comboTurnosTipo(HttpServletRequest request, String idTurno);
+	ComboDTO comboTurnosTipo(String idInstitucion, HttpServletRequest request, String idTurno);
+
+	ComboDTO comboGuardias(String idInstitucion, HttpServletRequest request, String idTurno);
+
+	ComboDTO comboTipoColegioEjg(String idInstitucion, HttpServletRequest request);
+
+	
 
 	
 }
