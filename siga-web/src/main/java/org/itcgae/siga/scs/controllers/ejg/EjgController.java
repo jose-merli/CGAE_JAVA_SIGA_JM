@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
@@ -598,6 +599,12 @@ public class EjgController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/gestion-ejg/busquedaProcuradores",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ProcuradorDTO> busquedaProcuradores(@RequestBody ProcuradorItem procuradorItem, HttpServletRequest request) {
+		ProcuradorDTO response = gestionEJG.busquedaProcuradores(procuradorItem, request);
+		return new ResponseEntity<ProcuradorDTO>(response, HttpStatus.OK);
 	}
 	
 }

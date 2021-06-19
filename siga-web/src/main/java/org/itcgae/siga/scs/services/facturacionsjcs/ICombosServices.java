@@ -10,6 +10,7 @@ public interface ICombosServices {
 	public ComboDTO comboFactConceptos(HttpServletRequest request);
 	public ComboDTO comboFactColegio(HttpServletRequest request);
 	public ComboDTO comboPagosColegio(HttpServletRequest request);
+	public ComboDTO comboColegiosProcuradores(HttpServletRequest request);
 
 	
 }

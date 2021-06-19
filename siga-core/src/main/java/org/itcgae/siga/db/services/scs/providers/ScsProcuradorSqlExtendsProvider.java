@@ -28,6 +28,7 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 		sql.SELECT("procurador.fechabaja");
 		sql.SELECT("procurador.ncolegiado");
 		sql.SELECT("procurador.idcolprocurador");
+		sql.SELECT("CEN_COLEGIOPROCURADOR.NOMBRE AS nombreColProcurador");
 		sql.SELECT("procurador.codigo");
 		sql.SELECT("procurador.email");
 		sql.SELECT("POBLACION.NOMBRE AS NOMBREPOBLACION");
@@ -36,8 +37,9 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 		sql.FROM("SCS_PROCURADOR procurador");
 		sql.LEFT_OUTER_JOIN("CEN_PROVINCIAS PROVINCIAS ON PROVINCIAS.IDPROVINCIA = procurador.IDPROVINCIA");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES POBLACION ON POBLACION.IDPOBLACION = procurador.IDPOBLACION");
+		sql.JOIN("CEN_COLEGIOPROCURADOR ON CEN_COLEGIOPROCURADOR.IDCOLPROCURADOR = PROCURADOR.IDCOLPROCURADOR");
 		if(idInstitucion != 2000) {
-			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
+			sql.WHERE("procurador.idinstitucion = '" + idInstitucion + "'");
 		}
 
 
@@ -71,11 +73,13 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 			sql.AND();
 			sql.WHERE("UPPER(procurador.codigo) like UPPER('%" + procuradorItem.getCodigoExt() + "%')");
 		}
+		
+		if(procuradorItem.getIdColProcurador() != null) sql.WHERE("UPPER(procurador.idColProcurador) like UPPER('%"+procuradorItem.getIdColProcurador()+"%')");
 
 		if (!procuradorItem.getHistorico()) {
 			sql.AND();
 
-			sql.WHERE("fechabaja is null");
+			sql.WHERE("procurador.fechabaja is null");
 		}
 
 		sql.ORDER_BY("procurador.nombre");

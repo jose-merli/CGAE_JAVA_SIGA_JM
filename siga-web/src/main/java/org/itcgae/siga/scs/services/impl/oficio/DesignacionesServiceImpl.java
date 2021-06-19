@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -121,7 +120,6 @@ import org.itcgae.siga.db.entities.ScsDocumentaciondesignaExample;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgKey;
-import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPersonajg;
@@ -6266,6 +6264,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					DesignaItem designaItem = new DesignaItem();
 
 					designaItem.setAno(Integer.parseInt(item.get(0)));
+					designaItem.setNumero(Integer.parseInt(item.get(4)));
 					//Comprobamos si se ha enviado el nombre del turno desde 
 					//la busqueda de asuntos en lugar de el id desde la ficha de designacion.
 //					contains("[a-zA-Z]+")   .matches("[0-9]+")
@@ -6277,9 +6276,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						turnosItem.setNombre(item.get(3));
 						List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
 						designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
-						designaItem.setNumero(Integer.parseInt(item.get(4)));
 					}
-					
+						
 					//EJG a asociar
 					EjgItem ejg = new EjgItem();
 					
@@ -6837,11 +6835,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						"DesignacionesServiceImpl.extraerPreDesignaEJG() -> Entrada a servicio para insertar las justificaciones express");
 
 				try {
-					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Haciendo el insert...");
+					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Iniciando los inserts...");
 
 					//Tareas:
 					//1. Se debe modificar los atributos asociados con predesignacion en la designa.
 					
+					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Saliendo a la actualizacion de algunos datos juridicos de designa");
 					ScsEjgKey ejgKey = new ScsEjgKey();
 					
 					ejgKey.setIdinstitucion(idInstitucion);
@@ -6879,7 +6878,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					
 					response1 = scsDesignaMapper.updateByPrimaryKeySelective(designa);
 					
+					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Saliendo de la actualizacion de algunos datos juridicos de designa");
+					
 					//2. Se debe insertar los contrarios seleccionados en EJG.
+					
+					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Entrando a los inserts para los contrarios de designa");
 					
 					//Obtenemos los contrarios ejg a introducir
 					
@@ -6939,10 +6942,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 					}
 					
+					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Saliendo de los inserts para los contrarios de designa");
+					
 					//3. Se debe introducir el procurador seleccionado en el EJG.
 					
 					//Se comprueba que hay un procurador definido en el ejg para prevenir inserciones fallidas
 					if(ejg.getIdprocurador()!=null) {
+						
+					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Iniciando los inserts...");
 					
 					ScsDesignaprocurador procDesigna = new ScsDesignaprocurador();
 					
@@ -6967,6 +6974,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procDesigna.setFechamodificacion(new Date());						
 					
 					response3 = scsDesignaProcuradorMapper.insert(procDesigna);
+					
+					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Iniciando los inserts...");
 					
 					}
 					

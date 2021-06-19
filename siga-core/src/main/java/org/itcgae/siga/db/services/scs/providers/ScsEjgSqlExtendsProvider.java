@@ -472,6 +472,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE AS IDTIPOEXPEDIENTE");
 		sql.SELECT("EXPEDIENTE.IDINSTITUCION_TIPOEXPEDIENTE");
 		sql.SELECT("ejgd.numerodesigna");
+		//Defensa juridica
 		sql.SELECT("ejg.idsituacion");
 		sql.SELECT("ejg.numerodiligencia");
 		sql.SELECT("ejg.comisaria");
@@ -481,10 +482,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.nig");
 		sql.SELECT("ejg.juzgado");
 		sql.SELECT("ejg.delitos");
+		sql.SELECT("ejg.idpretension");
+		//Procurador asociado
 		sql.SELECT("ejg.idprocurador");
 		sql.SELECT("ejg.idinstitucion_proc");
-		sql.SELECT("ejg.idpretension");
 		sql.SELECT("ejg.fecha_des_proc");
+		sql.SELECT("ejg.numerodesignaproc");
 		
 		// from
 		sql.FROM("scs_ejg ejg");

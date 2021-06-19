@@ -85,6 +85,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsExpedienteEconomicoExtendsMapp
 import org.itcgae.siga.db.services.scs.mappers.ScsOrigencajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrestacionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsProcuradorExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSituacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoencalidadExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IEEJGServices;
@@ -116,6 +117,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	
 	@Autowired
 	private ScsSituacionExtendsMapper scsSituacionesExtendsMapper;
+	
+	@Autowired
+	private ScsProcuradorExtendsMapper scsProcuradorExtendsMapper;
 
 	@Autowired
 	private ScsPersonajgExtendsMapper scsPersonajgExtendsMapper;
@@ -3054,10 +3058,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					ejg.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
 					ejg.setIdinstitucion(Short.parseShort(idInstitucion.toString()));
 
-					ejg.setIdprocurador(Long.parseLong(item.getIdProcurador()));
+					if(item.getIdProcurador()!=null)ejg.setIdprocurador(Long.parseLong(item.getIdProcurador()));
 					ejg.setIdinstitucionProc(item.getIdInstitucionProc());
 					ejg.setFechaDesProc(item.getFechaDesProc());
-					ejg.setNumerodesignaproc(item.getNumDesigna());
+					ejg.setNumerodesignaproc(item.getNumerodesignaproc());
 					
 					
 					ejg.setFechamodificacion(new Date());
@@ -3292,5 +3296,46 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return responsedto;
 	}
 	
+	@Override
+	public ProcuradorDTO busquedaProcuradores(ProcuradorItem procuradorItem, HttpServletRequest request) {
+		LOGGER.info("busquedaProcuradores() -> Entrada al servicio para obtener procuradores de la pantalla de buscador general");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ProcuradorDTO procuradorDTO = new ProcuradorDTO();
+		List<ProcuradorItem> procuradorItemList = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"busquedaProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"busquedaProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"busquedaProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Entrada a scsProcuradorExtendsMapper para obtener los procuradores de la pantalla de buscador general");
+
+				procuradorItemList = scsProcuradorExtendsMapper.searchProcuradores(procuradorItem, idInstitucion);
+				
+				LOGGER.info(
+						"busquedaProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores de la pantalla de buscador general");
+
+				if (procuradorItemList != null) {
+					procuradorDTO.setProcuradorItems(procuradorItemList);
+				}
+			}
+
+		}
+		LOGGER.info("busquedaProcuradores() -> Salida del servicio para obtener los procuradores de la pantalla de buscador general");
+		return procuradorDTO;
+	}
 	
 }

@@ -18,6 +18,7 @@ import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
+import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
@@ -123,4 +124,6 @@ public interface IGestionEJG {
 	DelitosEjgDTO getDelitosEjg(EjgItem item, HttpServletRequest request);
 
 	InsertResponseDTO actualizarDelitosEJG(EjgItem item, HttpServletRequest request);
+
+	ProcuradorDTO busquedaProcuradores(ProcuradorItem procuradorItem, HttpServletRequest request);
 }

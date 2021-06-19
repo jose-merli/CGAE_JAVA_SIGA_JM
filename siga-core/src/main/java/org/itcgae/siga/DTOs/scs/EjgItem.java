@@ -115,10 +115,12 @@ public class EjgItem {
 	private String estadoNew;
 	
 	private String numDesigna;
-	private Date fechaDesProc;
 	
+	//Procurador asociado
+	private Date fechaDesProc;
 	private String idProcurador;
 	private Short idInstitucionProc;
+	private String numerodesignaproc;
 	
 
 	/**
@@ -1553,5 +1555,13 @@ public class EjgItem {
 
 	public void setFechaDesProc(Date fechaDesProc) {
 		this.fechaDesProc = fechaDesProc;
+	}
+
+	public String getNumerodesignaproc() {
+		return numerodesignaproc;
+	}
+
+	public void setNumerodesignaproc(String numerodesignaproc) {
+		this.numerodesignaproc = numerodesignaproc;
 	}
 }

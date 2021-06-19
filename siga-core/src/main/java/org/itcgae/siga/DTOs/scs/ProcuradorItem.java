@@ -13,6 +13,7 @@ public class ProcuradorItem {
 		private String apellido2;
 		private String nColegiado;
 		private String idColProcurador;
+		private String nombreColProcurador;
 		private String domicilio;
 		private String idInstitucion;
 		private Long usuModificacion;
@@ -383,16 +384,16 @@ public class ProcuradorItem {
 		/**
 		 * @return the fechabaja
 		 */
-		public Date getFechabaja() {
-			return fechabaja;
-		}
+//		public Date getFechabaja() {
+//			return fechabaja;
+//		}
 
 		/**
 		 * @param fechabaja the fechabaja to set
 		 */
-		public void setFechabaja(Date fechabaja) {
-			this.fechabaja = fechabaja;
-		}
+//		public void setFechabaja(Date fechabaja) {
+//			this.fechabaja = fechabaja;
+//		}
 
 		/**
 		 * @return the numero
@@ -567,5 +568,13 @@ public class ProcuradorItem {
 				return "null";
 			}
 			return o.toString().replace("\n", "\n    ");
+		}
+
+		public String getNombreColProcurador() {
+			return nombreColProcurador;
+		}
+
+		public void setNombreColProcurador(String nombreColProcurador) {
+			this.nombreColProcurador = nombreColProcurador;
 		}
 	}
