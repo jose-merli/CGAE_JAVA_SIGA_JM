@@ -1884,6 +1884,77 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return responsedto;
 	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO editarEstado(EstadoEjgItem datos, HttpServletRequest request) {
+		UpdateResponseDTO  responsedto = new UpdateResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Entrada para cambiar los datos generales del ejg");
+
+				try {
+					
+						ScsEstadoejg record = new ScsEstadoejg();
+						response = 0;
+
+						record.setIdinstitucion(idInstitucion);
+						record.setAnio(Short.parseShort(datos.getAnio()));
+						record.setNumero(Long.parseLong(datos.getNumero()));
+						
+						record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
+						record.setFechainicio(datos.getFechaInicio());
+						record.setObservaciones(datos.getObservaciones());
+						
+						record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
+						
+						record.setFechamodificacion(new Date());
+						record.setUsumodificacion(usuarios.get(0).getIdusuario());
+						record.setIdestadoporejg(Long.parseLong(datos.getIdestadoporejg()));
+						
+
+						response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
+						
+					
+					LOGGER.debug(
+							"GestionEJGServiceImpl.nuevoEstado() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.nuevoEstado() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							e);
+				} finally {
+					// respuesta si se actualiza correctamente
+					if (response == 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug(
+								"GestionEJGServiceImpl.nuevoEstado() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"GestionEJGServiceImpl.nuevoEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+					}
+				}
+			}
+		}
+
+		LOGGER.info("GestionEJGServiceImpl.borrarEstado() -> Salida del servicio.");
+
+		return responsedto;
+	}
 
 	@Override
     @Transactional
