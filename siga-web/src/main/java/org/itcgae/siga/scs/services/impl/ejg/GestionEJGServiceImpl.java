@@ -1114,10 +1114,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	
 						scsEejgPeticionesExample.createCriteria()
 								.andIdinstitucionEqualTo(Short.parseShort(ejg.getidInstitucion()))
-								.andIdpersonaEqualTo(Long.parseLong(ejg.getIdPersonajg()))
 								.andAnioEqualTo(Short.parseShort(ejg.getAnnio()))
 								.andIdtipoejgEqualTo(Short.parseShort(ejg.getTipoEJG()))
-								.andNumeroEqualTo(Long.parseLong(ejg.getNumEjg()));
+								.andNumeroEqualTo(Long.parseLong(ejg.getNumEjg())).andCsvIsNotNull();
 	
 						List<ScsEejgPeticiones> peticiones = scsEejgPeticionesMapper.selectByExample(scsEejgPeticionesExample);
 	
