@@ -27,18 +27,22 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	@Results({ @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHADESDE", property = "fechaDesde", jdbcType = JdbcType.DATE),
-			@Result(column = "FECHAHASTA", property = "fechaHasta", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHADESDE", property = "fechaDesde", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "FECHAHASTA", property = "fechaHasta", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "REGULARIZACION", property = "regularizacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESESTADO", property = "desEstado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IMPORTEPAGADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR) })
 	List<FacturacionItem> buscarFacturaciones(FacturacionItem facturacionItem, String idInstitucion, Integer tamMax);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getNumeroFacturacionesNoCerradas")
+	@Results({ @Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.INTEGER) })
+	Integer getNumeroFacturacionesNoCerradas(FacturacionItem facturacionItem, Short idInstitucion);
 	
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "datosFacturacion")
 	@Results({ 
@@ -54,12 +58,11 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	List<FacturacionItem> datosFacturacion(String idFacturacion, String idInstitucion);
 	
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "historicoFacturacion")
-	@Results({ 
-		@Result(column = "idestadofacturacion", property = "idEstado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "descripcion", property = "desEstado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "fechaestado", property = "fechaEstado", jdbcType = JdbcType.DATE)
-	})
+	@Results({ @Result(column = "IDESTADOFACTURACION", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "desEstado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "USUARIO", property = "nombreUsuModificacion", jdbcType = JdbcType.VARCHAR) })
 	List<FacturacionItem> historicoFacturacion(String idFacturacion, String idLenguaje, String idInstitucion);
 	
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "numApuntes")

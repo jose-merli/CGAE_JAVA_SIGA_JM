@@ -18,7 +18,7 @@ public interface IFacturacionSJCSServices {
 
 	public FacturacionDTO buscarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request);
 	
-	public FacturacionDeleteDTO eliminarFacturaciones(int idFactura, HttpServletRequest request);
+	public FacturacionDeleteDTO eliminarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request);
 	
 	public FacturacionDTO datosFacturacion(String idFacturacion, HttpServletRequest request);
 	

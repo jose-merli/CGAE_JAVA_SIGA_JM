@@ -29,7 +29,8 @@ public class FacturacionItem {
 	private String idGrupoOld;
 	private String idConceptoOld;
 	private String observaciones;
-	
+	private String nombreUsuModificacion;
+
 	@JsonProperty("idGrupo")
 	public String getIdGrupo() {
 		return idGrupo;
@@ -56,7 +57,7 @@ public class FacturacionItem {
 	public void setDescConcepto(String descConcepto) {
 		this.descConcepto = descConcepto;
 	}
-	
+
 	@JsonProperty("visible")
 	public String getVisible() {
 		return visible;
@@ -74,7 +75,7 @@ public class FacturacionItem {
 	public void setprevision(String prevision) {
 		this.prevision = prevision;
 	}
-	
+
 	@JsonProperty("importePendiente")
 	public String getImportePendiente() {
 		return importePendiente;
@@ -97,47 +98,47 @@ public class FacturacionItem {
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}
-	
+
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
-	
+
 	@JsonProperty("abreviatura")
 	public String getAbreviatura() {
 		return abreviatura;
 	}
-	
+
 	public void setAbreviatura(String abreviatura) {
 		this.abreviatura = abreviatura;
 	}
-	
+
 	@JsonProperty("idFacturacion")
 	public String getIdFacturacion() {
 		return idFacturacion;
 	}
-	
+
 	public void setIdFacturacion(String idFacturacion) {
 		this.idFacturacion = idFacturacion;
 	}
-	
+
 	@JsonProperty("idConcepto")
 	public String getIdConcepto() {
 		return idConcepto;
 	}
-	
+
 	public void setIdConcepto(String idConcepto) {
 		this.idConcepto = idConcepto;
 	}
-	
+
 	@JsonProperty("fechaDesde")
 	public Date getFechaDesde() {
 		return fechaDesde;
 	}
-	
+
 	public void setFechaDesde(Date fechaDesde) {
 		this.fechaDesde = fechaDesde;
 	}
-	
+
 	@JsonProperty("fechaHasta")
 	public Date getFechaHasta() {
 		return fechaHasta;
@@ -146,66 +147,66 @@ public class FacturacionItem {
 	public void setFechaHasta(Date fechaHasta) {
 		this.fechaHasta = fechaHasta;
 	}
-	
+
 	@JsonProperty("nombre")
 	public String getNombre() {
 		return nombre;
 	}
-	
+
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	
+
 	@JsonProperty("regularizacion")
 	public String getRegularizacion() {
 		return regularizacion;
 	}
-	
+
 	public void setRegularizacion(String regularizacion) {
 		this.regularizacion = regularizacion;
 	}
-	
+
 	@JsonProperty("desEstado")
 	public String getDesEstado() {
 		return desEstado;
 	}
-	
+
 	public void setDesEstado(String desEstado) {
 		this.desEstado = desEstado;
 	}
-	
+
 	@JsonProperty("idEstado")
 	public String getIdEstado() {
 		return idEstado;
 	}
-	
+
 	public void setIdEstado(String idEstado) {
 		this.idEstado = idEstado;
 	}
-	
+
 	@JsonProperty("fechaEstado")
 	public Date getFechaEstado() {
 		return fechaEstado;
 	}
-	
+
 	public void setFechaEstado(Date fechaEstado) {
 		this.fechaEstado = fechaEstado;
 	}
-	
+
 	@JsonProperty("importeTotal")
 	public String getImporteTotal() {
 		return importeTotal;
 	}
-	
+
 	public void setImporteTotal(String importeTotal) {
 		this.importeTotal = importeTotal;
 	}
-	
+
 	@JsonProperty("importePagado")
 	public String getImportePagado() {
 		return importePagado;
 	}
-	
+
 	public void setImportePagado(String importePagado) {
 		this.importePagado = importePagado;
 	}
@@ -227,7 +228,7 @@ public class FacturacionItem {
 	public void setIdGrupoOld(String idGrupoOld) {
 		this.idGrupoOld = idGrupoOld;
 	}
-	
+
 	@JsonProperty("observaciones")
 	public String getObservaciones() {
 		return observaciones;
@@ -235,6 +236,20 @@ public class FacturacionItem {
 
 	public void setObservaciones(String observaciones) {
 		this.observaciones = observaciones;
+	}
+
+	/**
+	 * @return the nombreUsuModificacion
+	 */
+	public String getNombreUsuModificacion() {
+		return nombreUsuModificacion;
+	}
+
+	/**
+	 * @param nombreUsuModificacion the nombreUsuModificacion to set
+	 */
+	public void setNombreUsuModificacion(String nombreUsuModificacion) {
+		this.nombreUsuModificacion = nombreUsuModificacion;
 	}
 
 	@Override
@@ -260,6 +275,7 @@ public class FacturacionItem {
 		result = prime * result + ((importePendiente == null) ? 0 : importePendiente.hashCode());
 		result = prime * result + ((importeTotal == null) ? 0 : importeTotal.hashCode());
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
+		result = prime * result + ((nombreUsuModificacion == null) ? 0 : nombreUsuModificacion.hashCode());
 		result = prime * result + ((observaciones == null) ? 0 : observaciones.hashCode());
 		result = prime * result + ((prevision == null) ? 0 : prevision.hashCode());
 		result = prime * result + ((regularizacion == null) ? 0 : regularizacion.hashCode());
@@ -371,6 +387,11 @@ public class FacturacionItem {
 				return false;
 		} else if (!nombre.equals(other.nombre))
 			return false;
+		if (nombreUsuModificacion == null) {
+			if (other.nombreUsuModificacion != null)
+				return false;
+		} else if (!nombreUsuModificacion.equals(other.nombreUsuModificacion))
+			return false;
 		if (observaciones == null) {
 			if (other.observaciones != null)
 				return false;
@@ -404,6 +425,6 @@ public class FacturacionItem {
 				+ ", importePendiente=" + importePendiente + ", prevision=" + prevision + ", visible=" + visible
 				+ ", idGrupo=" + idGrupo + ", descGrupo=" + descGrupo + ", descConcepto=" + descConcepto
 				+ ", idGrupoOld=" + idGrupoOld + ", idConceptoOld=" + idConceptoOld + ", observaciones=" + observaciones
-				+ "]";
+				+ ", nombreUsuModificacion=" + nombreUsuModificacion + "]";
 	}
 }

@@ -286,50 +286,69 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	
 	@Override
 	@Transactional
-	public FacturacionDeleteDTO eliminarFacturaciones(int idFactura, HttpServletRequest request) {
+	public FacturacionDeleteDTO eliminarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		FacturacionDeleteDTO facturacionesDelete = new FacturacionDeleteDTO();
+		Error error = new Error();
 		int response = 0;
-		
-		if(null != idInstitucion) {
+
+		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-	            
-	        if(null != usuarios && usuarios.size() > 0) {
-	        	AdmUsuarios usuario = usuarios.get(0);
-	            usuario.setIdinstitucion(idInstitucion);
-	                
-	            LOGGER.info("eliminaFacturaciones() / FacturacionServicesImpl.eliminarFacturaciones() -> Entrada a eliminafacturacion para eliminar la facturacion de las tablas relacionadas");
-	            response = eliminaTablasFacturacion(idFactura, idInstitucion.toString());
-	            
-	            if(response > 0)
-	            	response = updateTablasFacturacion(idFactura,idInstitucion.toString());
-	            
-	            if(response > 0)
-	            	response = eliminaFacturacionjg(idFactura,idInstitucion.toString());
-	            
-	            if (response > 0){
-	            	facturacionesDelete.setStatus(SigaConstants.OK);
-	            }else{
-	            	facturacionesDelete.setStatus(SigaConstants.KO);
-	            }
-	           
-	            LOGGER.info("eliminaFacturaciones() / FacturacionServicesImpl.eliminarFacturaciones() -> Salida a eliminafacturacion para eliminar la facturacion de las tablas relacionadas");
-	        }else {
-	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
-	        }
-	    }else {
-	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
-	    }
-	        
-	    LOGGER.info("getLabel() -> Salida del servicio para eliminar las facturaciones");
-	    
-	    return facturacionesDelete;	
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"FacturacionSJCSServicesImpl.eliminarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"FacturacionSJCSServicesImpl.eliminarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
+
+				if (checkDeleteFacturacion(facturacionItem, idInstitucion)) {
+
+					int idFactura = Integer.valueOf(facturacionItem.getIdFacturacion());
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.eliminarFacturaciones() / eliminaTablasFacturacion() -> Entrada a eliminafacturacion para eliminar la facturacion de las tablas relacionadas");
+					response = eliminaTablasFacturacion(idFactura, idInstitucion.toString());
+
+					if (response > 0)
+						response = updateTablasFacturacion(idFactura, idInstitucion.toString());
+
+					if (response > 0)
+						response = eliminaFacturacionjg(idFactura, idInstitucion.toString());
+
+					if (response > 0) {
+						facturacionesDelete.setStatus(SigaConstants.OK);
+					} else {
+						facturacionesDelete.setStatus(SigaConstants.KO);
+					}
+				} else {
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
+					facturacionesDelete.setStatus(SigaConstants.KO);
+					error.setDescription("facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorEliminar");
+				}
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida a eliminafacturacion para eliminar la facturacion de las tablas relacionadas");
+			} else {
+				LOGGER.warn(
+						"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("FacturacionSJCSServicesImpl.eliminarFacturaciones() -> idInstitucion del token nula");
+		}
+
+		facturacionesDelete.setError(error);
+
+		LOGGER.info(
+				"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida del servicio para eliminar las facturaciones");
+
+		return facturacionesDelete;
 	}
 
 	private int eliminaTablasFacturacion(int idFactura, String idInstitucion) {
@@ -478,6 +497,33 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 			return 0;
 		}
 		
+	}
+	
+	private boolean checkDeleteFacturacion(FacturacionItem facturacionItem, Short idInstitucion) {
+
+		LOGGER.info("Inicio de checkDeleteFacturacion() -> Se comprueba si la facturación se puede eliminar");
+
+		boolean response = true;
+
+		try {
+			Integer numero = fcsFacturacionJGExtendsMapper.getNumeroFacturacionesNoCerradas(facturacionItem,
+					idInstitucion);
+
+			// Se comprueba que la facturación no se encuentra en estado "cerrada (idEstado
+			// = 30)" y que no exista una facturación con fecha de ejecución posterior a la
+			// fecha de ejecución de la facturación que se quiere eliminar
+			if (facturacionItem.getIdEstado().equals("30") || null == numero || numero > 0) {
+				response = false;
+			}
+		} catch (Exception e) {
+			LOGGER.error("Se ha producido un error al realizar los comprobaciones de eliminación de la facturación: "
+					+ facturacionItem.getIdFacturacion() + " del colegio " + idInstitucion, e);
+			response = false;
+		}
+
+		LOGGER.info("Inicio de checkDeleteFacturacion() -> La facturación se puede eliminar: " + response);
+
+		return response;
 	}
 
 	@Override

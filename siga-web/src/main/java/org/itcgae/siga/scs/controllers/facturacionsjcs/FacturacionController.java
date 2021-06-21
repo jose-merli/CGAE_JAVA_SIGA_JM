@@ -37,12 +37,13 @@ public class FacturacionController {
 		return new ResponseEntity<FacturacionDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/facturacionsjcs/eliminarFacturacion", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<FacturacionDeleteDTO> eliminarFacturaciones(@RequestBody int idFactura, HttpServletRequest request){
-		FacturacionDeleteDTO response = facturacionServices.eliminarFacturaciones(idFactura, request);
+	@RequestMapping(value = "/facturacionsjcs/eliminarFacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FacturacionDeleteDTO> eliminarFacturaciones(@RequestBody FacturacionItem facturacionItem,
+			HttpServletRequest request) {
+		FacturacionDeleteDTO response = facturacionServices.eliminarFacturaciones(facturacionItem, request);
 		if (response.getStatus() == SigaConstants.OK) {
 			return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.OK);
-		}else {
+		} else {
 			return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

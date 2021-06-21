@@ -122,6 +122,27 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		return query.toString();
 	}
+	
+	public String getNumeroFacturacionesNoCerradas(FacturacionItem facturacionItem, Short idInstitucion) {
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		String fecha = dateFormat.format(facturacionItem.getFechaEstado());
+
+		SQL sql = new SQL();
+
+		sql.SELECT("COUNT(FAC.IDFACTURACION) AS NUMERO");
+
+		sql.FROM("FCS_FACTURACIONJG FAC");
+		sql.INNER_JOIN(
+				"FCS_FACT_ESTADOSFACTURACION EST ON FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION");
+
+		sql.WHERE("EST.IDESTADOFACTURACION <> 30");
+		sql.WHERE("EST.IDFACTURACION = '" + facturacionItem.getIdFacturacion() + "'");
+		sql.WHERE("EST.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("EST.FECHAESTADO > TO_DATE('" + fecha + "' , 'DD/MM/YYYY HH24:MI:SS')");
+
+		return sql.toString();
+	}
 
 	public String datosFacturacion(String idFacturacion, String idInstitucion) {
 		SQL sql = new SQL();
@@ -148,17 +169,24 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 	public String historicoFacturacion(String idFacturacion, String lenguaje, String idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("est.idestadofacturacion");
-		sql.SELECT("rec.descripcion descripcion");
-		sql.SELECT("est.fechaestado fechaestado");
-		sql.SELECT("est.observaciones");
-		sql.FROM("fcs_fact_estadosfacturacion est");
-		sql.JOIN("fcs_estadosfacturacion estados on (est.idestadofacturacion = estados.idestadofacturacion)");
-		sql.JOIN("gen_recursos_catalogos rec on (estados.descripcion = rec.idrecurso)");
-		sql.WHERE("est.idinstitucion = '" + idInstitucion + "'");
-		sql.WHERE("est.idfacturacion = '" + idFacturacion + "'");
-		sql.WHERE("rec.idlenguaje = '" + lenguaje + "'");
-		sql.ORDER_BY("fechaestado DESC");
+		sql.SELECT("EST.IDESTADOFACTURACION");
+		sql.SELECT("REC.DESCRIPCION DESCRIPCION");
+		sql.SELECT("EST.FECHAESTADO FECHAESTADO");
+		sql.SELECT("EST.OBSERVACIONES");
+		sql.SELECT(
+				"(CASE WHEN PER.NOMBRE IS NOT NULL THEN PER.APELLIDOS2 || ' ' || PER.APELLIDOS1 || ', ' || PER.NOMBRE ELSE NULL END) AS USUARIO");
+
+		sql.FROM("FCS_FACT_ESTADOSFACTURACION EST "
+				+ "JOIN FCS_FACTURACIONJG FAC ON (FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION) "
+				+ "LEFT JOIN ADM_USUARIOS AU ON (AU.IDINSTITUCION = EST.IDINSTITUCION AND AU.IDUSUARIO = FAC.USUMODIFICACION) "
+				+ "LEFT JOIN CEN_PERSONA PER ON (AU.NIF = PER.NIFCIF) "
+				+ "JOIN FCS_ESTADOSFACTURACION ESTADOS ON (EST.IDESTADOFACTURACION = ESTADOS.IDESTADOFACTURACION) "
+				+ "JOIN GEN_RECURSOS_CATALOGOS REC ON (ESTADOS.DESCRIPCION = REC.IDRECURSO)");
+
+		sql.WHERE("EST.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("EST.IDFACTURACION = '" + idFacturacion + "'");
+		sql.WHERE("REC.IDLENGUAJE = '" + lenguaje + "'");
+		sql.ORDER_BY("FECHAESTADO DESC");
 
 		return sql.toString();
 	}
