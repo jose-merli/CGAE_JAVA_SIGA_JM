@@ -7,8 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
+import org.itcgae.siga.DTO.fac.ProductoDTO;
 import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -83,6 +85,68 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		LOGGER.info("searchTiposProductos() -> Salida del servicio para obtener el listado de productos");
 
 		return listadoTipoProductoDTO;
+	}
+	
+	@Override
+	public ProductoDTO activarDesactivarProducto(ListadoTipoProductoDTO listadoProductos, HttpServletRequest request) {
+		ProductoDTO productoDTO = new ProductoDTO();
+		Error error = new Error();
+		int status = 0;
+		
+
+		LOGGER.info("activarDesactivarProducto() -> Entrada al servicio para activar/desactivar productos");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"activarDesactivarProducto() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"activarDesactivarProducto() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"activarDesactivarProducto() / pysTiposProductosExtendsMapper.activarDesactivarProducto() -> Entrada a pysTiposProductosExtendsMapper para activar/desactivar productos");
+
+					status = pysTiposProductosExtendsMapper
+							.activarDesactivarProducto(usuarios.get(0), idInstitucion, listadoProductos.getTiposProductosItems());
+					
+					if(status == 0) {
+						productoDTO.setStatus(SigaConstants.KO);
+					}else if(status == 1) {
+						productoDTO.setStatus(SigaConstants.OK);
+					}
+					
+
+					LOGGER.info(
+							"activarDesactivarProducto() / pysTiposProductosExtendsMapper.activarDesactivarProducto() -> Salida de pysTiposProductosExtendsMapper para activar/desactivar productos");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposProductosServiceImpl.activarDesactivarProducto() -> Se ha producido un error al activar/desactivar productos",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		
+		productoDTO.setError(error);
+
+		LOGGER.info("activarDesactivarProducto() -> Salida del servicio para activar/desactivar productos");
+
+		return productoDTO;
 	}
 
 }
