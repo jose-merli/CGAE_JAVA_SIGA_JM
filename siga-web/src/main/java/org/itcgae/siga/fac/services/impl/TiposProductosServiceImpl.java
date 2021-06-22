@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
 import org.itcgae.siga.DTO.fac.ProductoDTO;
 import org.itcgae.siga.DTO.fac.TiposProductosItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -85,6 +87,120 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		LOGGER.info("searchTiposProductos() -> Salida del servicio para obtener el listado de productos");
 
 		return listadoTipoProductoDTO;
+	}
+	
+	@Override
+	public ListadoTipoProductoDTO searchTiposProductosHistorico(HttpServletRequest request) {
+		ListadoTipoProductoDTO listadoTipoProductoDTO = new ListadoTipoProductoDTO();
+		Error error = new Error();
+
+		LOGGER.info("searchTiposProductosHistorico() -> Entrada al servicio para recuperar el listado de productos historico");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"searchTiposProductosHistorico() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchTiposProductosHistorico() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"searchTiposProductosHistorico() / pysTiposProductosExtendsMapper.searchTiposProductosHistorico() -> Entrada a pysTiposProductosExtendsMapper para obtener el listado de productos historico");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<TiposProductosItem> listaProductos = pysTiposProductosExtendsMapper
+							.searchTiposProductosHistorico(idioma, idInstitucion);
+
+					LOGGER.info(
+							"searchTiposProductosHistorico() / pysTiposProductosExtendsMapper.searchTiposProductosHistorico() -> Salida de pysTiposProductosExtendsMapper para obtener el listado de productos historico");
+
+					if (listaProductos != null && listaProductos.size() > 0) {
+						listadoTipoProductoDTO.setTiposProductosItems(listaProductos);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposProductosServiceImpl.searchTiposProductosHistorico() -> Se ha producido un error al obtener el listado de productos historico",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		listadoTipoProductoDTO.setError(error);
+
+		LOGGER.info("searchTiposProductosHistorico() -> Salida del servicio para obtener el listado de productos historico");
+
+		return listadoTipoProductoDTO;
+	}
+	
+	@Override
+	public ComboDTO comboTiposProductos(HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.info("comboTiposProductos() -> Entrada al servicio para recuperar el combo de tipos de productos");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"comboTiposProductos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchTiposProductos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"comboTiposProductos() / pysTiposProductosExtendsMapper.comboTiposProductos() -> Entrada a pysTiposProductosExtendsMapper para recuperar el combo de tipos de productos");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboTiposProductos = pysTiposProductosExtendsMapper
+							.comboTiposProductos(idioma);
+
+					LOGGER.info(
+							"searchTiposProductos() / pysTiposProductosExtendsMapper.comboTiposProductos() -> Salida de pysTiposProductosExtendsMapper para recuperar el combo de tipos de productos");
+
+					if (listaComboTiposProductos != null && listaComboTiposProductos.size() > 0) {
+						comboDTO.setCombooItems(listaComboTiposProductos);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposProductosServiceImpl.comboTiposProductos() -> Se ha producido un error al recuperar el combo de tipos de productos",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboTiposProductos() -> Salida del servicio para recuperar el combo de tipos de productos");
+
+		return comboDTO;
 	}
 	
 	@Override
