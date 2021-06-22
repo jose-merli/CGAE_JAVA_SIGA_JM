@@ -6291,12 +6291,48 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuarios.get(0).getIdusuario());
 					record.setIdinstitucion(idInstitucion);
-					record.setIdturno(designaItem.getIdTurno());
-					record.setAniodesigna( (short) designaItem.getAno());
 					record.setAnioejg(Short.parseShort(ejg.getAnnio()));
 					record.setIdtipoejg(Short.parseShort(ejg.getTipoEJG()));
-					record.setNumerodesigna((long) designaItem.getNumero());
 					record.setNumeroejg(Long.parseLong(ejg.getNumero()));
+					record.setIdturno(designaItem.getIdTurno());
+					record.setAniodesigna( (short) designaItem.getAno());
+					//record.setNumerodesigna((long) designaItem.getNumero());
+					
+					//Debido a que no podemos obtener el numero de la designacion sino su codigo,
+					//tendremos que realizar una busqueda extra para poder extraer el numero de la designacion.
+					
+					//Replicamos el codigo que se utiliza para obtener el codigo para determinar 
+					//la longitud a utilizar a la hora de la busqueda.
+					
+					Integer longitudDesigna;
+					String codigoDesigna = Integer.toString(designaItem.getNumero());
+
+					StringDTO parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
+							idInstitucion.toString());
+
+					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+					// la institucion 0
+					if (parametros != null && parametros.getValor() != null) {
+						longitudDesigna = Integer.parseInt(parametros.getValor());
+					} else {
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
+								"0");
+						longitudDesigna = Integer.parseInt(parametros.getValor());
+					}
+					
+					// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+					while (codigoDesigna.length() < longitudDesigna) {
+						codigoDesigna = "0" + codigoDesigna;
+					}
+					
+					ScsDesignaExample designaExample = new ScsDesignaExample();
+					
+					designaExample.createCriteria().andAnioEqualTo((short) designaItem.getAno()).andIdinstitucionEqualTo(idInstitucion)
+					.andIdturnoEqualTo(designaItem.getIdTurno()).andCodigoEqualTo(codigoDesigna);			
+					
+					List<ScsDesigna> designasCodigo = scsDesignaMapper.selectByExample(designaExample);				
+					
+					record.setNumerodesigna((long) designasCodigo.get(0).getNumero());
 					
 					response = scsEjgdesignaMapper.insert(record);
 
@@ -6963,7 +6999,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					
 					procDesigna.setIdinstitucion(idInstitucion);
 					procDesigna.setIdturno(designa.getIdturno());
-					procDesigna.setNumero(Long.parseLong(ejg.getNumerodesignaproc()));
+					procDesigna.setNumero(designa.getNumero());
+					procDesigna.setNumerodesignacion(ejg.getNumerodesignaproc());
+//					procDesigna.setNumero(Long.parseLong(ejg.getNumerodesignaproc()));
+//					procDesigna.setNumerodesignacion(Long.toString(designa.getNumero()));
 					procDesigna.setAnio(designa.getAnio());
 					
 					procDesigna.setIdinstitucionProc(ejg.getIdinstitucionProc());
