@@ -1024,6 +1024,6 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
 	
 	public static String SIGAFRONT_VERSION = "202106251500";
-	public static String SIGAWEB_VERSION = "1.0.71_4";
+	public static String SIGAWEB_VERSION = "1.0.71_5";
 	
 }
