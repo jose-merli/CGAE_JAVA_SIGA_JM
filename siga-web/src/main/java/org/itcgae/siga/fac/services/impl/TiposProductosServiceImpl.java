@@ -1,20 +1,27 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.util.Date;
 import java.util.List;
 
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.ibatis.annotations.Insert;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
 import org.itcgae.siga.DTO.fac.ProductoDTO;
 import org.itcgae.siga.DTO.fac.TiposProductosItem;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.PysProductos;
+import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
+import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTiposProductosExtendsMapper;
 import org.itcgae.siga.fac.services.ITiposProductosService;
@@ -29,6 +36,8 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 
 	@Autowired
 	private PySTiposProductosExtendsMapper pysTiposProductosExtendsMapper;
+	@Autowired
+	private PysProductosMapper pysProductosMapper;
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
@@ -201,6 +210,80 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		LOGGER.info("comboTiposProductos() -> Salida del servicio para recuperar el combo de tipos de productos");
 
 		return comboDTO;
+	}
+	
+	@Override
+	public InsertResponseDTO crearProducto(ListadoTipoProductoDTO listadoProductos, HttpServletRequest request) {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int status = 0;
+		
+
+		LOGGER.info("crearProducto() -> Entrada al servicio para crear un producto");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"crearProducto() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"crearProducto() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"crearProducto() / pysTiposProductosExtendsMapper.crearProducto() -> Entrada a pysTiposProductosExtendsMapper para crear un producto");
+
+					NewIdDTO idOrdenacion = pysTiposProductosExtendsMapper.getIndiceMaxProducto(listadoProductos.getTiposProductosItems(), idInstitucion);
+					PysProductos producto = new PysProductos();
+			
+					
+					producto.setIdinstitucion(idInstitucion);
+					producto.setIdtipoproducto(Short.parseShort(String.valueOf(listadoProductos.getTiposProductosItems().get(0).getIdtipoproducto())));
+					producto.setIdproducto(Long.parseLong(idOrdenacion.getNewId().toString()));
+					producto.setDescripcion(listadoProductos.getTiposProductosItems().get(0).getDescripcion());
+					producto.setFechamodificacion(new Date());
+					producto.setUsumodificacion(usuarios.get(0).getIdusuario());
+					producto.setFechabaja(null);
+					
+					
+					status = pysProductosMapper.insert(producto);
+					
+					if(status == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+					}else if(status == 1) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+					
+
+					LOGGER.info(
+							"crearProducto() / pysTiposProductosExtendsMapper.crearProducto() -> Salida de pysTiposProductosExtendsMapper para crear un producto");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposProductosServiceImpl.crearProducto() -> Se ha producido un error al crear un producto",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("crearProducto() -> Salida del servicio para crear un producto");
+
+		return insertResponseDTO;
 	}
 	
 	@Override

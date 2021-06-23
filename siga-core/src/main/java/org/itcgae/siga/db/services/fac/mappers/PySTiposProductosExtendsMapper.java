@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.PysProductosMapper;
@@ -41,6 +42,12 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		}) 
 	List<TiposProductosItem> searchTiposProductosHistorico(String idioma, Short idInstitucion);
 	
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "getIndiceMaxProducto")
+	@Results({ 
+		@Result(column = "IDPRODUCTO", property = "newId", jdbcType = JdbcType.NUMERIC)
+		}) 
+	NewIdDTO getIndiceMaxProducto(List<TiposProductosItem> listadoProductos, Short idInstitucion);
+	
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "comboTiposProductos")
 	@Results({ 
 		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
@@ -50,5 +57,6 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 	
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "activarDesactivarProducto")
 	int activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, List<TiposProductosItem> listadoProductos);
+	
 	
 }

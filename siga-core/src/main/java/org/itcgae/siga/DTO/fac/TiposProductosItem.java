@@ -7,9 +7,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TiposProductosItem {
 	private int idtipoproducto;
-	private String descripciontipo;
 	private int idproducto;
 	private String descripcion;
+	@JsonFormat(pattern = "dd/MM/yyyy")
+	private Date fechamodificacion;
+	private String usumodificacion;
+	private int idinstitucion;
+	private String descripciontipo;
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechabaja;
 	
@@ -53,6 +57,30 @@ public class TiposProductosItem {
 		this.fechabaja = fechabaja;
 	}
 	
+	public Date getFechamodificacion() {
+		return fechamodificacion;
+	}
+
+	public void setFechamodificacion(Date fechamodificacion) {
+		this.fechamodificacion = fechamodificacion;
+	}
+
+	public String getUsumodificacion() {
+		return usumodificacion;
+	}
+
+	public void setUsumodificacion(String usumodificacion) {
+		this.usumodificacion = usumodificacion;
+	}
+
+	public int getIdinstitucion() {
+		return idinstitucion;
+	}
+
+	public void setIdinstitucion(int idinstitucion) {
+		this.idinstitucion = idinstitucion;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -60,8 +88,11 @@ public class TiposProductosItem {
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
 		result = prime * result + ((descripciontipo == null) ? 0 : descripciontipo.hashCode());
 		result = prime * result + ((fechabaja == null) ? 0 : fechabaja.hashCode());
+		result = prime * result + ((fechamodificacion == null) ? 0 : fechamodificacion.hashCode());
+		result = prime * result + idinstitucion;
 		result = prime * result + idproducto;
 		result = prime * result + idtipoproducto;
+		result = prime * result + ((usumodificacion == null) ? 0 : usumodificacion.hashCode());
 		return result;
 	}
 	@Override
@@ -88,17 +119,31 @@ public class TiposProductosItem {
 				return false;
 		} else if (!fechabaja.equals(other.fechabaja))
 			return false;
+		if (fechamodificacion == null) {
+			if (other.fechamodificacion != null)
+				return false;
+		} else if (!fechamodificacion.equals(other.fechamodificacion))
+			return false;
+		if (idinstitucion != other.idinstitucion)
+			return false;
 		if (idproducto != other.idproducto)
 			return false;
 		if (idtipoproducto != other.idtipoproducto)
+			return false;
+		if (usumodificacion == null) {
+			if (other.usumodificacion != null)
+				return false;
+		} else if (!usumodificacion.equals(other.usumodificacion))
 			return false;
 		return true;
 	}
 	
 	@Override
 	public String toString() {
-		return "TiposProductosItem [idtipoproducto=" + idtipoproducto + ", descripciontipo=" + descripciontipo
-				+ ", idproducto=" + idproducto + ", descripcion=" + descripcion + ", fechabaja=" + fechabaja + "]";
+		return "TiposProductosItem [idtipoproducto=" + idtipoproducto + ", idproducto=" + idproducto + ", descripcion="
+				+ descripcion + ", fechamodificacion=" + fechamodificacion + ", usumodificacion=" + usumodificacion
+				+ ", idinstitucion=" + idinstitucion + ", descripciontipo=" + descripciontipo + ", fechabaja="
+				+ fechabaja + "]";
 	}
 	
 }
