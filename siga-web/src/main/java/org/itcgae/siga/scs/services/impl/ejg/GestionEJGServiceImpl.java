@@ -114,10 +114,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ScsPrestacionExtendsMapper scsPrestacionesExtendsMapper;
-	
+
 	@Autowired
 	private ScsSituacionExtendsMapper scsSituacionesExtendsMapper;
-	
+
 	@Autowired
 	private ScsProcuradorExtendsMapper scsProcuradorExtendsMapper;
 
@@ -126,7 +126,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
-	
+
 	@Autowired
 	private ScsTipoencalidadExtendsMapper scsTipoencalidadExtendsMapper;
 
@@ -150,13 +150,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ScsDelitoExtendsMapper scsDelitoExtendsMapper;
-	
+
 	@Autowired
 	private ScsEstadoejgMapper scsEstadoejgMapper;
 
 	@Autowired
 	private ScsEjgMapper scsEjgMapper;
-	
+
 	@Autowired
 	private ScsDelitosejgMapper scsDelitosejgMapper;
 
@@ -177,16 +177,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private IEEJGServices eejgService;
-	
+
 	@Autowired
 	private ScsComisariaExtendsMapper scsComisariaExtendsMapper;
-	
+
 	@Autowired
 	private ScsContrariosejgExtendsMapper scsContrariosejgExtendsMapper;
-	
+
 	@Autowired
 	private ScsContrariosejgMapper scsContrariosejgMapper;
-	
+
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
 		LOGGER.info("datosEJG() -> Entrada al servicio para obtener el colegiado");
@@ -266,7 +266,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("comboPrestaciones() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboTipoencalidad(HttpServletRequest request) {
 		// TODO Auto-generated method stub
@@ -293,7 +293,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.info(
 						"comboTipoencalidad() / scsTiporesolucionExtendsMapper.comboTipoEnCalidadDe() -> Entrada a scsTipofundamentosExtendsMapper para obtener los combo");
 
-				comboItems = scsTipoencalidadExtendsMapper.comboTipoencalidad(usuarios.get(0).getIdlenguaje().toString(),idInstitucion);
+				comboItems = scsTipoencalidadExtendsMapper
+						.comboTipoencalidad(usuarios.get(0).getIdlenguaje().toString(), idInstitucion);
 
 				LOGGER.info(
 						"comboTipoencalidad() / scsTiporesolucionExtendsMapper.comboTipoEnCalidadDe() -> Salida a scsTipofundamentosExtendsMapper para obtener los combo");
@@ -307,7 +308,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("comboTipoencalidad() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboSituaciones(HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
@@ -347,7 +348,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("comboSituaciones() -> Salida del servicio para obtener las situaciones");
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboCDetenciones(HttpServletRequest request) {
 		// Conseguimos información del usuario logeado
@@ -387,7 +388,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("comboCDetenciones() -> Salida del servicio para obtener los centros de detencion");
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO comboDelitos(HttpServletRequest request) {
 		LOGGER.info("comboDelitos() -> Entrada al servicio para obtener combo delitos");
@@ -622,12 +623,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					familiar.setSolicitante((short) 0);
 
 					response = scsUnidadfamiliarejgMapper.insert(familiar);
-					
+
 					if (response != 1) {
 						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error("GestionEJGServiceImpl.borrarEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+						LOGGER.error(
+								"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
 						throw new Exception("ERROR: no se ha podido ");
-					}else {
+					} else {
 						responsedto.setStatus(SigaConstants.OK);
 					}
 
@@ -692,8 +694,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						ejgItem, idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
 				LOGGER.info(
 						"getExpedientesEconomicos() / getExpedientesEconomicos.getExpedientesEconomicos() -> Salida de scsEjgExtendsMapper para obtener Expedienets Económicos");
-				if (expedienteEconomicoDTO.getExpEconItems() != null
-						&& tamMaximo != null
+				if (expedienteEconomicoDTO.getExpEconItems() != null && tamMaximo != null
 						&& expedienteEconomicoDTO.getExpEconItems().size() > tamMaximo) {
 					error.setCode(200);
 					error.setDescription("La consulta devuelve más de " + tamMaximo
@@ -1106,44 +1107,49 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 					// recorremos la lista para generar el documento de cada uno de los ejgs
-					for(EjgItem ejg : datos) {
+					for (EjgItem ejg : datos) {
 						// obtenemos la peticion y el idXML
-						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la petición...");
-	
+						LOGGER.debug(
+								"GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la petición...");
+
 						ScsEejgPeticionesExample scsEejgPeticionesExample = new ScsEejgPeticionesExample();
-	
+
 						scsEejgPeticionesExample.createCriteria()
 								.andIdinstitucionEqualTo(Short.parseShort(ejg.getidInstitucion()))
 								.andAnioEqualTo(Short.parseShort(ejg.getAnnio()))
 								.andIdtipoejgEqualTo(Short.parseShort(ejg.getTipoEJG()))
 								.andNumeroEqualTo(Long.parseLong(ejg.getNumEjg())).andCsvIsNotNull();
-	
-						List<ScsEejgPeticiones> peticiones = scsEejgPeticionesMapper.selectByExample(scsEejgPeticionesExample);
-	
+
+						List<ScsEejgPeticiones> peticiones = scsEejgPeticionesMapper
+								.selectByExample(scsEejgPeticionesExample);
+
 						if (peticiones != null && peticiones.size() > 0) {
-	
+
 							// obtenemos los datos del fichero
-							LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos para el informe...");
-							Map<Integer, Map<String, String>> mapInformeEejg = eejgService.getDatosInformeEejg(ejg,peticiones.get(0));
-		
+							LOGGER.debug(
+									"GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos para el informe...");
+							Map<Integer, Map<String, String>> mapInformeEejg = eejgService.getDatosInformeEejg(ejg,
+									peticiones.get(0));
+
 							LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo el informe...");
-							DatosDocumentoItem documento = eejgService.getInformeEejg(mapInformeEejg, ejg.getidInstitucion());
-							
+							DatosDocumentoItem documento = eejgService.getInformeEejg(mapInformeEejg,
+									ejg.getidInstitucion());
+
 							ficheros.add(documento);
 						}
 					}
-	
+
 					fichero = WSCommons.zipBytes(ficheros, new File("downloads.zip"));
-					
+
 					String tipoMime = "application/zip";
 					headers.setContentType(MediaType.parseMediaType(tipoMime));
 					headers.set("Content-Disposition", "attachment; filename=\"" + fichero.getName() + "\"");
 					headers.setContentLength(fichero.length());
 
-                    InputStream fileStream = new FileInputStream(fichero);	
-					response = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
+					InputStream fileStream = new FileInputStream(fichero);
+					response = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+							HttpStatus.OK);
 
-						
 					LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Acción realizada correctamente");
 				} catch (Exception e) {
 					if ("noExiste".equals(e.getMessage())) {
@@ -1665,7 +1671,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				try {
 					for (EstadoEjgItem item : datos) {
 						response = 0;
-						
+
 						ScsEstadoejg record = new ScsEstadoejg();
 						record.setIdinstitucion(idInstitucion);
 						record.setIdtipoejg(Short.parseShort(item.getIdtipoejg()));
@@ -1676,20 +1682,21 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
 						response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
-						
+
 						if (response != 1) {
 							responsedto.setStatus(SigaConstants.KO);
-							LOGGER.error("GestionEJGServiceImpl.borrarEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+							LOGGER.error(
+									"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
 							throw new Exception("ERROR: no se ha podido ");
-						}else {
+						} else {
 							responsedto.setStatus(SigaConstants.OK);
 						}
 					}
 					LOGGER.debug(
 							"GestionEJGServiceImpl.cambiarEstadoEJGs() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
 				} catch (Exception e) {
-					
-				} 
+
+				}
 			}
 		}
 
@@ -1746,21 +1753,22 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						// Según se elimine o se active.
 						if (datos.get(i).getFechaBaja() == null) {
 							record.setFechabaja(new Date());
-							
-							//Se elimina su propiedad como solicitante principal
-							if(record.getSolicitante().equals("1")) {
-								record.setSolicitante((short)0);
-								
-								//Actualizamos el ejg correspondientemente para que no lo considere su solicitante principal
+
+							// Se elimina su propiedad como solicitante principal
+							if (record.getSolicitante().equals("1")) {
+								record.setSolicitante((short) 0);
+
+								// Actualizamos el ejg correspondientemente para que no lo considere su
+								// solicitante principal
 								ScsEjgKey ejgKey = new ScsEjgKey();
-								
+
 								ejgKey.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
 								ejgKey.setIdinstitucion(idInstitucion);
 								ejgKey.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
 								ejgKey.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
-								
+
 								ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
-								
+
 								ejg.setIdpersonajg(null);
 							}
 							response = scsUnidadfamiliarejgMapper.updateByPrimaryKeySelective(record);
@@ -1819,45 +1827,43 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Entrada para cambiar los datos generales del ejg");
 
 				try {
-					
-						ScsEstadoejg record = new ScsEstadoejg();
-						response = 0;
 
-						// creamos el objeto para el insert
-						record.setIdinstitucion(idInstitucion);
-						record.setAnio(Short.parseShort(datos.getAnio()));
-						record.setNumero(Long.parseLong(datos.getNumero()));
-						
-						record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
-						record.setFechainicio(datos.getFechaInicio());
-						record.setObservaciones(datos.getObservaciones());
-						
-						record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
-						
-						record.setFechamodificacion(new Date());
-						record.setUsumodificacion(usuarios.get(0).getIdusuario());
-						
-						// obtenemos el maximo de idestadoporejg
-						ScsEstadoejgExample example = new ScsEstadoejgExample();
-						example.setOrderByClause("IDESTADOPOREJG DESC");
-						example.createCriteria()
-								.andAnioEqualTo(Short.parseShort(datos.getAnio()))
-								.andIdinstitucionEqualTo(idInstitucion)
-								.andIdtipoejgEqualTo(Short.parseShort(datos.getIdtipoejg()))
-								.andNumeroEqualTo(Long.parseLong(datos.getNumero()));
+					ScsEstadoejg record = new ScsEstadoejg();
+					response = 0;
 
-						List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
+					// creamos el objeto para el insert
+					record.setIdinstitucion(idInstitucion);
+					record.setAnio(Short.parseShort(datos.getAnio()));
+					record.setNumero(Long.parseLong(datos.getNumero()));
 
-						// damos el varlo al idestadoporejg + 1
-						if (listEjg.size() > 0) {
-							record.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
-						} else {
-							record.setIdestadoporejg(Long.parseLong("0"));
-						}
+					record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
+					record.setFechainicio(datos.getFechaInicio());
+					record.setObservaciones(datos.getObservaciones());
 
-						response = scsEstadoejgMapper.insertSelective(record);
-						
-					
+					record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
+
+					record.setFechamodificacion(new Date());
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					// obtenemos el maximo de idestadoporejg
+					ScsEstadoejgExample example = new ScsEstadoejgExample();
+					example.setOrderByClause("IDESTADOPOREJG DESC");
+					example.createCriteria().andAnioEqualTo(Short.parseShort(datos.getAnio()))
+							.andIdinstitucionEqualTo(idInstitucion)
+							.andIdtipoejgEqualTo(Short.parseShort(datos.getIdtipoejg()))
+							.andNumeroEqualTo(Long.parseLong(datos.getNumero()));
+
+					List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
+
+					// damos el varlo al idestadoporejg + 1
+					if (listEjg.size() > 0) {
+						record.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
+					} else {
+						record.setIdestadoporejg(Long.parseLong("0"));
+					}
+
+					response = scsEstadoejgMapper.insertSelective(record);
+
 					LOGGER.debug(
 							"GestionEJGServiceImpl.nuevoEstado() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
 				} catch (Exception e) {
@@ -1883,11 +1889,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return responsedto;
 	}
-	
+
 	@Override
 	@Transactional
 	public UpdateResponseDTO editarEstado(EstadoEjgItem datos, HttpServletRequest request) {
-		UpdateResponseDTO  responsedto = new UpdateResponseDTO();
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
 
 		String token = request.getHeader("Authorization");
@@ -1907,28 +1913,26 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Entrada para cambiar los datos generales del ejg");
 
 				try {
-					
-						ScsEstadoejg record = new ScsEstadoejg();
-						response = 0;
 
-						record.setIdinstitucion(idInstitucion);
-						record.setAnio(Short.parseShort(datos.getAnio()));
-						record.setNumero(Long.parseLong(datos.getNumero()));
-						
-						record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
-						record.setFechainicio(datos.getFechaInicio());
-						record.setObservaciones(datos.getObservaciones());
-						
-						record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
-						
-						record.setFechamodificacion(new Date());
-						record.setUsumodificacion(usuarios.get(0).getIdusuario());
-						record.setIdestadoporejg(Long.parseLong(datos.getIdestadoporejg()));
-						
+					ScsEstadoejg record = new ScsEstadoejg();
+					response = 0;
 
-						response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
-						
-					
+					record.setIdinstitucion(idInstitucion);
+					record.setAnio(Short.parseShort(datos.getAnio()));
+					record.setNumero(Long.parseLong(datos.getNumero()));
+
+					record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
+					record.setFechainicio(datos.getFechaInicio());
+					record.setObservaciones(datos.getObservaciones());
+
+					record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
+
+					record.setFechamodificacion(new Date());
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
+					record.setIdestadoporejg(Long.parseLong(datos.getIdestadoporejg()));
+
+					response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
+
 					LOGGER.debug(
 							"GestionEJGServiceImpl.nuevoEstado() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
 				} catch (Exception e) {
@@ -1956,93 +1960,91 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	}
 
 	@Override
-    @Transactional
-    public UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request) {
-        UpdateResponseDTO responsedto = new UpdateResponseDTO();
-        int response = 0;
-        
-        String token = request.getHeader("Authorization");
-        String dni = UserTokenUtils.getDniFromJWTToken(token);
-        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-        Error error = new Error();
-        ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
-        
-        if (idInstitucion != null) {
-            LOGGER.debug(
-                    "GestionEJGServiceImpl.guardarImpugnacion() -> Entrada para obtener información del usuario logeado");
-            
-            AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-            exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-            List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	@Transactional
+	public UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request) {
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		int response = 0;
 
-            LOGGER.debug(
-                    "GestionEJGServiceImpl.guardarImpugnacion() -> Salida de obtener información del usuario logeado");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
 
-            if (usuarios != null && usuarios.size() > 0) {
-                LOGGER.debug(
-                        "GestionEJGServiceImpl.guardarImpugnacion() -> Entrada para cambiar los datos generales del ejg");
-                try {
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.guardarImpugnacion() -> Entrada para obtener información del usuario logeado");
 
-                    ScsEjgKey scsEjgKey = new ScsEjgKey();
-                    
-                    scsEjgKey.setAnio(Short.valueOf(datos.getAnnio()));
-                    scsEjgKey.setIdinstitucion(idInstitucion);
-                    scsEjgKey.setIdtipoejg(Short.valueOf(datos.getTipoEJG()));
-                    scsEjgKey.setNumero(Long.valueOf(datos.getNumero()));
-                    
-                    ScsEjgWithBLOBs scsEjgWithBLOBs = scsEjgMapper.selectByPrimaryKey(scsEjgKey);
-                    if(scsEjgWithBLOBs != null) {
-                        scsEjgWithBLOBs.setFechaauto(datos.getFechaAuto());
-                        if(datos.getAutoResolutorio() != null) {
-                            scsEjgWithBLOBs.setIdtiporesolauto(Short.valueOf(datos.getAutoResolutorio()));
-                        }
-                        if(datos.getSentidoAuto() != null) {
-                            scsEjgWithBLOBs.setIdtiposentidoauto(Short.valueOf(datos.getSentidoAuto()));
-                        }
-                        scsEjgWithBLOBs.setObservacionimpugnacion(datos.getObservacionesImpugnacion());
-                        //front -> numero impugnacion;
-                        scsEjgWithBLOBs.setNumeroresolucion(datos.getnImpugnacion());
-                        scsEjgWithBLOBs.setFechapublicacion(datos.getFechaPublicacion());
-                        if(datos.getBis()) {
-                            scsEjgWithBLOBs.setBisresolucion("1");    
-                        }
-                        if(datos.isRequiereTurn()) {
-                            scsEjgWithBLOBs.setTurnadoratificacion("1");
-                        }
-                    }
-                    
-                    
-                response = scsEjgMapper.updateByPrimaryKeySelective(scsEjgWithBLOBs);
-                    
-                } catch (Exception e) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-                    LOGGER.error(e);
-                    LOGGER.error(
-                            "GestionEJGServiceImpl.guardarImpugnacion() -> Se ha producido un error al actualizar la Impugnacion",
-                            e);
-                    error.setCode(500);
-                    error.setDescription("general.mensaje.error.bbdd");
-                    error.setMessage(e.getMessage());
-                    responsedto.setError(error);
-                    
-                } finally {
-                    // respuesta si se actualiza correctamente
-                    if (response >= 1) {
-                        responsedto.setStatus(SigaConstants.OK);
-                        LOGGER.debug(
-                                "GestionEJGServiceImpl.guardarImpugnacion() -> OK.  Impugnacion");
-                    } else {
-                        responsedto.setStatus(SigaConstants.KO);
-                        LOGGER.error(
-                                "GestionEJGServiceImpl.guardarImpugnacion() -> KO. Se ha producido un error al actualizar la Impugnacion");
-                    }
-                }
-            }
-        }
-        LOGGER.info("GestionEJGServiceImpl.guardarImpugnacion() -> Salida del servicio.");
+			LOGGER.debug(
+					"GestionEJGServiceImpl.guardarImpugnacion() -> Salida de obtener información del usuario logeado");
 
-        return responsedto;
-    }
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.guardarImpugnacion() -> Entrada para cambiar los datos generales del ejg");
+				try {
+
+					ScsEjgKey scsEjgKey = new ScsEjgKey();
+
+					scsEjgKey.setAnio(Short.valueOf(datos.getAnnio()));
+					scsEjgKey.setIdinstitucion(idInstitucion);
+					scsEjgKey.setIdtipoejg(Short.valueOf(datos.getTipoEJG()));
+					scsEjgKey.setNumero(Long.valueOf(datos.getNumero()));
+
+					ScsEjgWithBLOBs scsEjgWithBLOBs = scsEjgMapper.selectByPrimaryKey(scsEjgKey);
+					if (scsEjgWithBLOBs != null) {
+						scsEjgWithBLOBs.setFechaauto(datos.getFechaAuto());
+						if (datos.getAutoResolutorio() != null) {
+							scsEjgWithBLOBs.setIdtiporesolauto(Short.valueOf(datos.getAutoResolutorio()));
+						}
+						if (datos.getSentidoAuto() != null) {
+							scsEjgWithBLOBs.setIdtiposentidoauto(Short.valueOf(datos.getSentidoAuto()));
+						}
+						scsEjgWithBLOBs.setObservacionimpugnacion(datos.getObservacionesImpugnacion());
+						// front -> numero impugnacion;
+						scsEjgWithBLOBs.setNumeroresolucion(datos.getnImpugnacion());
+						scsEjgWithBLOBs.setFechapublicacion(datos.getFechaPublicacion());
+						if (datos.getBis()) {
+							scsEjgWithBLOBs.setBisresolucion("1");
+						}
+						if (datos.isRequiereTurn()) {
+							scsEjgWithBLOBs.setTurnadoratificacion("1");
+						}
+					}
+
+					response = scsEjgMapper.updateByPrimaryKeySelective(scsEjgWithBLOBs);
+
+				} catch (Exception e) {
+
+					LOGGER.error(e);
+					LOGGER.error(
+							"GestionEJGServiceImpl.guardarImpugnacion() -> Se ha producido un error al actualizar la Impugnacion",
+							e);
+					error.setCode(500);
+					error.setDescription("general.mensaje.error.bbdd");
+					error.setMessage(e.getMessage());
+					responsedto.setError(error);
+
+				} finally {
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug("GestionEJGServiceImpl.guardarImpugnacion() -> OK.  Impugnacion");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"GestionEJGServiceImpl.guardarImpugnacion() -> KO. Se ha producido un error al actualizar la Impugnacion");
+					}
+				}
+			}
+		}
+		LOGGER.info("GestionEJGServiceImpl.guardarImpugnacion() -> Salida del servicio.");
+
+		return responsedto;
+	}
 
 	@Override
 	@Transactional
@@ -2367,7 +2369,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return responsedto;
 	}
-	
+
 	@Override
 	@Transactional
 	public UpdateResponseDTO updateDatosJuridicos(EjgItem datos, HttpServletRequest request) {
@@ -2386,7 +2388,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug("GestionEJGServiceImpl.updateDatosJuridicos() -> Salida de obtener información del usuario logeado");
+			LOGGER.debug(
+					"GestionEJGServiceImpl.updateDatosJuridicos() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.debug(
@@ -2394,39 +2397,45 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 					ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
-						response = 0;
+					response = 0;
 
-						// Preparamos las variables para buscar la tabla a actualizar
-						record.setIdinstitucion(idInstitucion);
-						record.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
-						record.setAnio(Short.parseShort(datos.getAnnio()));
-						record.setNumero(Long.parseLong(datos.getNumero()));
-						
-						record.setFechamodificacion(new Date());
-						record.setUsumodificacion(usuarios.get(0).getIdusuario());
-						
-						// Preparamos las variables de la tabla a actualizar
-						if(datos.getRenuncia()!=null)record.setIdrenuncia(Short.parseShort(datos.getRenuncia()));
-						else record.setIdrenuncia(null);
-						if(datos.getPerceptivo()!=null)record.setIdpreceptivo(Short.parseShort(datos.getPerceptivo()));
-						else record.setIdpreceptivo(null);
-						record.setIdsituacion(datos.getIdsituacion());
-						record.setNumerodiligencia(datos.getNumerodiligencia());
-						record.setComisaria(datos.getComisaria());
-						record.setCalidad(datos.getCalidad());
-						
-						// Datos pre-designacion
-						record.setNumeroprocedimiento(dni);
-						record.setAnioprocedimiento(idInstitucion);
-						record.setNig(datos.getNig());
-						if(datos.getJuzgado()!=null)record.setJuzgado(Long.parseLong(datos.getJuzgado()));
-						else record.setJuzgado(null);
-						record.setIdpretension(datos.getIdPretension());
-						record.setObservaciones(datos.getObservaciones());
-						record.setDelitos(datos.getDelitos());
-						
-						response = scsEjgMapper.updateByPrimaryKeySelective(record);
-					
+					// Preparamos las variables para buscar la tabla a actualizar
+					record.setIdinstitucion(idInstitucion);
+					record.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+					record.setAnio(Short.parseShort(datos.getAnnio()));
+					record.setNumero(Long.parseLong(datos.getNumero()));
+
+					record.setFechamodificacion(new Date());
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					// Preparamos las variables de la tabla a actualizar
+					if (datos.getRenuncia() != null)
+						record.setIdrenuncia(Short.parseShort(datos.getRenuncia()));
+					else
+						record.setIdrenuncia(null);
+					if (datos.getPerceptivo() != null)
+						record.setIdpreceptivo(Short.parseShort(datos.getPerceptivo()));
+					else
+						record.setIdpreceptivo(null);
+					record.setIdsituacion(datos.getIdsituacion());
+					record.setNumerodiligencia(datos.getNumerodiligencia());
+					record.setComisaria(datos.getComisaria());
+					record.setCalidad(datos.getCalidad());
+
+					// Datos pre-designacion
+					record.setNumeroprocedimiento(dni);
+					record.setAnioprocedimiento(idInstitucion);
+					record.setNig(datos.getNig());
+					if (datos.getJuzgado() != null)
+						record.setJuzgado(Long.parseLong(datos.getJuzgado()));
+					else
+						record.setJuzgado(null);
+					record.setIdpretension(datos.getIdPretension());
+					record.setObservaciones(datos.getObservaciones());
+					record.setDelitos(datos.getDelitos());
+
+					response = scsEjgMapper.updateByPrimaryKeySelective(record);
+
 					LOGGER.debug(
 							"GestionEJGServiceImpl.updateDatosJuridicos() -> Salida del servicio para cambiar los datos juridicos para el ejg");
 				} catch (Exception e) {
@@ -2483,8 +2492,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.debug(
 						"busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Entrada a scsDesignacionesExtendsMapper para obtener las comunicaciones");
 
-				//obtenemos los datos de la comunicacion
-				enviosMasivosItem = scsEjgExtendsMapper.getComunicaciones(item.getNumEjg(), item.getAnnio(), item.getTipoEJG(), idInstitucion, usuarios.get(0).getIdlenguaje());
+				// obtenemos los datos de la comunicacion
+				enviosMasivosItem = scsEjgExtendsMapper.getComunicaciones(item.getNumEjg(), item.getAnnio(),
+						item.getTipoEJG(), idInstitucion, usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Salida a scsDesignacionesExtendsMapper para obtener las comunicaciones");
@@ -2496,7 +2506,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		}
 		LOGGER.info("busquedaComunicaciones() -> Salida del servicio para obtener comunicaciones");
-		
+
 		return enviosMasivosDTO;
 	}
 
@@ -2528,13 +2538,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				relacionesItem = scsEjgExtendsMapper.getRelacionesEJG(item);
 
-				
-				
 				LOGGER.info(
 						"busquedaRelaciones() / scsDesignacionesExtendsMapper.busquedaRelaciones() -> Salida a scsDesignacionesExtendsMapper para obtener las relaciones");
 
 				if (relacionesItem != null) {
-					
+
 					relacionesDTO.setRelacionesItem(relacionesItem);
 				}
 			}
@@ -2543,7 +2551,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("getRelacionesEJG()) -> Salida del servicio para obtener relaciones");
 		return relacionesDTO;
 	}
-	
+
 	@Override
 	public List<ListaContrarioEJGJusticiableItem> busquedaListaContrariosEJG(EjgItem item, HttpServletRequest request,
 			Boolean historico) {
@@ -2590,7 +2598,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						"GestionEJGServiceImpl.busquedaListaContrariosEJG -> Entrada a servicio para la busqueda de contrarios en EJG");
 
 				try {
-					contrarios = scsContrariosejgExtendsMapper.busquedaListaContrariosEJG(item, idInstitucion, historico);
+					contrarios = scsContrariosejgExtendsMapper.busquedaListaContrariosEJG(item, idInstitucion,
+							historico);
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
 					LOGGER.info("GestionEJGServiceImpl.busquedaListaContrariosEJG -> Salida del servicio");
@@ -2718,13 +2727,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				try {
 
 					ScsContrariosejg contrario = new ScsContrariosejg();
-					
+
 					contrario.setAnio(item.getAnio());
 					contrario.setNumero(item.getNumero());
 					contrario.setIdinstitucion(Short.parseShort(idInstitucion.toString()));
 					contrario.setIdpersona(item.getIdpersona());
 					contrario.setIdtipoejg(item.getIdtipoejg());
-					
+
 					contrario.setFechamodificacion(new Date());
 					contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
 
@@ -2747,8 +2756,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 						ScsPersonajg representante = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajgkey);
 
-						contrario.setNombrerepresentanteejg(representante.getApellido1() + " " + representante.getApellido2()
-								+ ", " + representante.getNombre());
+						contrario.setNombrerepresentanteejg(representante.getApellido1() + " "
+								+ representante.getApellido2() + ", " + representante.getNombre());
 					}
 
 					LOGGER.info(
@@ -2785,7 +2794,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return insertResponseDTO;
 	}
-	
 
 	@Override
 	public UpdateResponseDTO updateRepresentanteContrarioEJG(ScsContrariosejg item, HttpServletRequest request) {
@@ -2862,7 +2870,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("updateRepresentanteContrarioEJG() -> Salida del servicio para actualizar el representante de un contrario ejg");
+		LOGGER.info(
+				"updateRepresentanteContrarioEJG() -> Salida del servicio para actualizar el representante de un contrario ejg");
 
 		return updateResponseDTO;
 	}
@@ -2955,7 +2964,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	public UpdateResponseDTO updateProcuradorContrarioEJG(ScsContrariosejg item, HttpServletRequest request) {
 		LOGGER.info("updateProcuradorContrarioEJG() ->  Entrada al servicio para eliminar contrarios");
@@ -3043,7 +3052,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	public ProcuradorDTO busquedaProcuradorEJG(EjgItem ejg, HttpServletRequest request) {
 		LOGGER.info("busquedaProcuradorEJG() -> Entrada al servicio para obtener procuradores");
@@ -3071,14 +3080,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.info(
 						"busquedaProcuradorEJG() / scsEjgExtendsMapper.busquedaProcuradorEJG() -> Entrada a scsEjgExtendsMapper para obtener los procuradores");
 
-				
-				procuradorItemList = scsEjgExtendsMapper.busquedaProcuradorEJG(ejg.getIdProcurador(), idInstitucion.toString());
+				procuradorItemList = scsEjgExtendsMapper.busquedaProcuradorEJG(ejg.getIdProcurador(),
+						idInstitucion.toString());
 
 				LOGGER.info(
 						"busquedaProcuradorEJG() / scsEjgExtendsMapper.busquedaProcuradorEJG -> Salida a scsEjgExtendsMapper para obtener los procuradores");
 
 				if (procuradorItemList != null) {
-					if(!procuradorItemList.isEmpty()) {
+					if (!procuradorItemList.isEmpty()) {
 						procuradorItemList.get(0).setNumeroTotalProcuradores(String.valueOf(procuradorItemList.size()));
 					}
 					procuradorDTO.setProcuradorItems(procuradorItemList);
@@ -3089,8 +3098,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("busquedaProcuradorEJG() -> Salida del servicio para obtener procuradores");
 		return procuradorDTO;
 	}
-	
-	
+
 	@Override
 	public UpdateResponseDTO guardarProcuradorEJG(EjgItem item, HttpServletRequest request) {
 		LOGGER.info("guardarProcuradorEJG() ->  Entrada al servicio para guardar procurador EJG");
@@ -3120,20 +3128,20 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 
-
-					//Introducimos los atributos claves para seleccionar el ejg que queremos actualizar
+					// Introducimos los atributos claves para seleccionar el ejg que queremos
+					// actualizar
 					ScsEjgWithBLOBs ejg = new ScsEjgWithBLOBs();
 					ejg.setAnio(Short.parseShort(item.getAnnio()));
 					ejg.setNumero(Long.parseLong(item.getNumero()));
 					ejg.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
 					ejg.setIdinstitucion(Short.parseShort(idInstitucion.toString()));
 
-					if(item.getIdProcurador()!=null)ejg.setIdprocurador(Long.parseLong(item.getIdProcurador()));
+					if (item.getIdProcurador() != null)
+						ejg.setIdprocurador(Long.parseLong(item.getIdProcurador()));
 					ejg.setIdinstitucionProc(item.getIdInstitucionProc());
 					ejg.setFechaDesProc(item.getFechaDesProc());
 					ejg.setNumerodesignaproc(item.getNumerodesignaproc());
-					
-					
+
 					ejg.setFechamodificacion(new Date());
 					ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
 
@@ -3171,7 +3179,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	public UpdateResponseDTO nuevoProcuradorEJG(EjgItem ejgItem, HttpServletRequest request) {
 		LOGGER.info("nuevoProcuradorEJG() ->  Entrada al servicio para insertar un procurador ejg");
@@ -3200,22 +3208,22 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					"nuevoProcuradorEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				
-				//Creamos el objeto a actualizar
-				
+
+				// Creamos el objeto a actualizar
+
 				ScsEjgWithBLOBs ejg = new ScsEjgWithBLOBs();
-				
+
 				ejg.setAnio(Short.parseShort(ejgItem.getAnnio()));
 				ejg.setNumero(Long.parseLong(ejgItem.getNumero()));
 				ejg.setIdtipoejg(Short.parseShort(ejgItem.getTipoEJG()));
 				ejg.setIdinstitucion(idInstitucion);
-				
+
 				ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
 				ejg.setFechamodificacion(new Date());
-				
-				ejg.setIdprocurador(Long.parseLong(ejgItem.getIdProcurador()));	
+
+				ejg.setIdprocurador(Long.parseLong(ejgItem.getIdProcurador()));
 				ejg.setIdinstitucionProc(ejgItem.getIdInstitucionProc());
-				
+
 				response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
 
 				if (response == 0 && error.getDescription() == null) {
@@ -3238,7 +3246,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return updateResponseDTO;
 	}
-	
+
 	public DelitosEjgDTO getDelitosEjg(EjgItem item, HttpServletRequest request) {
 
 		LOGGER.info("GestionEJGServiceImpl.getDelitosEjg() -> Entrada al servicio para obtener delitos ejg");
@@ -3266,14 +3274,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.debug(
 						"getDelitosEjg() / scsDelitosejgMapper.selectByExample() -> Entrada a scsDelitosejgMapper para obtener los delitos ejg");
 
-				//Obtenemos los delitos ejg que esten asignados a nuestro EJG
-				
+				// Obtenemos los delitos ejg que esten asignados a nuestro EJG
+
 				ScsDelitosejgExample example = new ScsDelitosejgExample();
-				
+
 				example.createCriteria().andAnioEqualTo(Short.parseShort(item.getAnnio()))
-				.andIdinstitucionEqualTo(idInstitucion).andNumeroEqualTo(Long.parseLong(item.getNumero()))
-				.andIdtipoejgEqualTo(Short.parseShort(item.getTipoEJG()));
-				
+						.andIdinstitucionEqualTo(idInstitucion).andNumeroEqualTo(Long.parseLong(item.getNumero()))
+						.andIdtipoejgEqualTo(Short.parseShort(item.getTipoEJG()));
+
 				delitosEjgItem = scsDelitosejgMapper.selectByExample(example);
 
 				LOGGER.info(
@@ -3286,10 +3294,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		}
 		LOGGER.info("getDelitosEjg() -> Salida del servicio para obtener delitos ejg");
-		
+
 		return delitosEjgDTO;
 	}
-	
+
 	@Override
 	@Transactional
 	public InsertResponseDTO actualizarDelitosEJG(EjgItem item, HttpServletRequest request) {
@@ -3313,12 +3321,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					"GestionEJGServiceImpl.actualizarDelitosEJG() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.actualizarDelitosEJG() -> Entrada para insertar delitos ejg");
+				LOGGER.debug("GestionEJGServiceImpl.actualizarDelitosEJG() -> Entrada para insertar delitos ejg");
 
 				try {
 					ScsDelitosejg delitos = new ScsDelitosejg();
-					
+
 					delitos.setIdinstitucion(idInstitucion);
 					delitos.setAnio(Short.parseShort(item.getAnnio()));
 					delitos.setNumero(Long.parseLong(item.getNumero()));
@@ -3328,9 +3335,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					ScsDelitosejgExample oldDelitos = new ScsDelitosejgExample();
 
-					oldDelitos.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andAnioEqualTo(delitos.getAnio()).andNumeroEqualTo(delitos.getNumero())
-							.andIdtipoejgEqualTo(delitos.getIdtipoejg());
+					oldDelitos.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(delitos.getAnio())
+							.andNumeroEqualTo(delitos.getNumero()).andIdtipoejgEqualTo(delitos.getIdtipoejg());
 
 					// Eliminamos las entradas existentes relacionadas si las hubiera.
 
@@ -3365,10 +3371,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		}
 		return responsedto;
 	}
-	
+
 	@Override
 	public ProcuradorDTO busquedaProcuradores(ProcuradorItem procuradorItem, HttpServletRequest request) {
-		LOGGER.info("busquedaProcuradores() -> Entrada al servicio para obtener procuradores de la pantalla de buscador general");
+		LOGGER.info(
+				"busquedaProcuradores() -> Entrada al servicio para obtener procuradores de la pantalla de buscador general");
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -3394,7 +3401,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						"busquedaProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Entrada a scsProcuradorExtendsMapper para obtener los procuradores de la pantalla de buscador general");
 
 				procuradorItemList = scsProcuradorExtendsMapper.searchProcuradores(procuradorItem, idInstitucion);
-				
+
 				LOGGER.info(
 						"busquedaProcuradores() / scsProcuradorExtendsMapper.searchProcuradores() -> Salida a scsProcuradorExtendsMapper para obtener los procuradores de la pantalla de buscador general");
 
@@ -3404,8 +3411,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			}
 
 		}
-		LOGGER.info("busquedaProcuradores() -> Salida del servicio para obtener los procuradores de la pantalla de buscador general");
+		LOGGER.info(
+				"busquedaProcuradores() -> Salida del servicio para obtener los procuradores de la pantalla de buscador general");
 		return procuradorDTO;
 	}
-	
+
 }

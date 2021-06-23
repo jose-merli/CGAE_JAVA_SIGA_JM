@@ -1,13 +1,11 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
-import org.itcgae.siga.DTOs.scs.ComunicacionesItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
@@ -75,16 +73,19 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.numero");
 		sql.SELECT("ejg.numejg numejg");
 		sql.SELECT("'E' || EJG.ANIO || '/' || EJG.NUMEJG AS NUMANIO");
-		sql.SELECT("(CASE WHEN TURNO.NOMBRE is  NULL THEN '' ELSE TURNO.NOMBRE || '/' || GUARDIA.NOMBRE END) AS TURNOGUARDIA");
+		sql.SELECT(
+				"(CASE WHEN TURNO.NOMBRE is  NULL THEN '' ELSE TURNO.NOMBRE || '/' || GUARDIA.NOMBRE END) AS TURNOGUARDIA");
 		sql.SELECT("TURNO.ABREVIATURA AS TURNO");
 		sql.SELECT("EJG.GUARDIATURNO_IDTURNO as IDTURNO");
 		sql.SELECT("ejg.fechaapertura");
 		sql.SELECT("ejg.fechamodificacion");
-		sql.SELECT("(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as NOMBREletrado");
+		sql.SELECT(
+				"(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as NOMBREletrado");
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
-		sql.SELECT("(CASE WHEN perjg.nombre is  NULL THEN '' ELSE perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre END) as NOMBRESOLICITANTE");
+		sql.SELECT(
+				"(CASE WHEN perjg.nombre is  NULL THEN '' ELSE perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre END) as NOMBRESOLICITANTE");
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
-		sql.SELECT("ejg.idpersonajg");		
+		sql.SELECT("ejg.idpersonajg");
 		sql.SELECT("perjg.NIF");
 //		sql.SELECT("perjg.correoelectronico");
 //		sql.SELECT("perjg.fechanacimiento");
@@ -455,9 +456,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.fechapublicacion");
 		sql.SELECT("ejg.bisresolucion");
 		sql.SELECT("ejg.turnadoratificacion");
-		sql.SELECT("(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as nombreletrado");
+		sql.SELECT(
+				"(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as nombreletrado");
 		sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
-		sql.SELECT("(CASE WHEN perjg.nombre is  NULL THEN '' ELSE perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre END) as NOMBRESOLICITANTE");
+		sql.SELECT(
+				"(CASE WHEN perjg.nombre is  NULL THEN '' ELSE perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre END) as NOMBRESOLICITANTE");
 		sql.SELECT("perjg.apellido1 || ' ' || perjg.apellido2 as APESOLICITANTE");
 		sql.SELECT("perjg.nombre as SOLONOMBRESOLIC");
 		sql.SELECT("perjg.NIF");
@@ -472,7 +475,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EXPEDIENTE.IDTIPOEXPEDIENTE AS IDTIPOEXPEDIENTE");
 		sql.SELECT("EXPEDIENTE.IDINSTITUCION_TIPOEXPEDIENTE");
 		sql.SELECT("ejgd.numerodesigna");
-		//Defensa juridica
+		// Defensa juridica
 		sql.SELECT("ejg.idsituacion");
 		sql.SELECT("ejg.numerodiligencia");
 		sql.SELECT("ejg.comisaria");
@@ -483,12 +486,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.juzgado");
 		sql.SELECT("ejg.delitos");
 		sql.SELECT("ejg.idpretension");
-		//Procurador asociado
+		// Procurador asociado
 		sql.SELECT("ejg.idprocurador");
 		sql.SELECT("ejg.idinstitucion_proc");
 		sql.SELECT("ejg.fecha_des_proc");
 		sql.SELECT("ejg.numerodesignaproc");
-		
+
 		// from
 		sql.FROM("scs_ejg ejg");
 		// joins
@@ -628,72 +631,150 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 
-	public String searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax) {
+	/**
+	 * 
+	 * @param asuntosJusticiableItem
+	 * @param tamMax
+	 * @param idLenguaje
+	 * @return
+	 */
+	public String searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax,
+			String idLenguaje) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fecha;
+
 		SQL sql = new SQL();
-		SQL sqlOrder = new SQL();
 
-		sqlOrder.SELECT("*");
-		sql.SELECT("EJG.idinstitucion, EJG.anio,EJG.numero,to_char(EJG.IDTIPOEJG) AS clave, '' as rol, 'E' as tipo");
-		sql.FROM("SCS_EJG EJG");
-		sql.INNER_JOIN(
-				"SCS_PERSONAJG PERSONA ON (EJG.IDPERSONAJG = PERSONA.IDPERSONA AND PERSONA.IDINSTITUCION = EJG.IDINSTITUCION)");
-		sql.INNER_JOIN(
-				"SCS_ESTADOEJG ESTADO ON (ESTADO.IDINSTITUCION = EJG.IDINSTITUCION AND ESTADO.IDTIPOEJG = EJG.IDTIPOEJG AND ESTADO.ANIO = "
-						+ "EJG.ANIO AND ESTADO.NUMERO = EJG.NUMERO AND ESTADO.FECHABAJA IS NULL AND ESTADO.FECHAINICIO = (SELECT MAX(FECHAINICIO) FROM SCS_ESTADOEJG ESTADO2 WHERE (ESTADO.IDINSTITUCION = ESTADO2.IDINSTITUCION"
-						+ " AND ESTADO.IDTIPOEJG = ESTADO2.IDTIPOEJG AND ESTADO.ANIO = ESTADO2.ANIO AND ESTADO.NUMERO = ESTADO2.NUMERO AND ESTADO2.FECHABAJA IS NULL)))");
-		sql.WHERE("EJG.idinstitucion = " + asuntosJusticiableItem.getIdInstitucion());
+		sql.SELECT("ejg.idinstitucion, ejg.anio, ejg.numero, ( 'E' || ejg.anio || '/' || ejg.numejg) asunto,"
+				+ "(nvl(t.abreviatura,'') || '/' || nvl(g.nombre,'')) turnoguardia,ejg.idtipoejg,"
+				+ "f_siga_getrecurso(nvl(te.descripcion,'')," + idLenguaje + ") tipoejg,"
+				+ "(nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
+				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1, '') || ' ' || nvl(per.apellidos2,'')) letrado,"
+				+ "ejg.fechaapertura, nvl(ejg.numeroprocedimiento,'') numeroprocedimiento, nvl(ejg.nig,'') nig");
 
-		if (asuntosJusticiableItem.getAnio() != null && asuntosJusticiableItem.getAnio() != "") {
-			sql.WHERE("EJG.ANIO = " + asuntosJusticiableItem.getAnio());
+		sql.FROM("scs_ejg ejg");
+
+		sql.JOIN("scs_tipoejg te ON (te.idtipoejg = ejg.idtipoejg)");
+		sql.LEFT_OUTER_JOIN(
+				"scs_personajg pjg ON (pjg.idpersona = ejg.idpersonajg AND pjg.idinstitucion = ejg.idinstitucion)");
+		sql.LEFT_OUTER_JOIN(
+				"scs_turno t ON (t.idturno = ejg.guardiaturno_idturno AND t.idinstitucion = ejg.idinstitucion)");
+		sql.LEFT_OUTER_JOIN(
+				"scs_guardiasturno g ON (ejg.guardiaturno_idturno = g.idturno AND ejg.idinstitucion = g.idinstitucion "
+						+ "AND ejg.guardiaturno_idguardia = g.idguardia)");
+		sql.LEFT_OUTER_JOIN("cen_persona per ON (ejg.idpersona = per.idpersona)");
+
+		sql.WHERE("ejg.idinstitucion = " + asuntosJusticiableItem.getIdInstitucion());
+
+		if (asuntosJusticiableItem.getAnio() != null && !asuntosJusticiableItem.getAnio().trim().isEmpty()) {
+			sql.WHERE("ejg.anio = " + asuntosJusticiableItem.getAnio().trim());
 		}
-		if (asuntosJusticiableItem.getNumero() != null) {
-			sql.WHERE("EJG.NUMERO = " + asuntosJusticiableItem.getNumero());
+
+		if (asuntosJusticiableItem.getNumero() != null && !asuntosJusticiableItem.getNumero().trim().isEmpty()) {
+			sql.WHERE("ejg.numejg = " + asuntosJusticiableItem.getNumero().trim());
 		}
+
+		if (asuntosJusticiableItem.getIdTipoEjg() != null && !asuntosJusticiableItem.getIdTipoEjg().trim().isEmpty()) {
+			sql.WHERE("ejg.idtipoejg = " + asuntosJusticiableItem.getIdTipoEjg().trim());
+		}
+
+		if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
+			fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
+			sql.WHERE("ejg.fechaapertura >= TO_DATE('" + fecha + "','DD/MM/RRRR')");
+		}
+
+		if (asuntosJusticiableItem.getFechaAperturaHasta() != null) {
+			fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaHasta());
+			sql.WHERE("ejg.fechaapertura <= TO_DATE('" + fecha + "','DD/MM/RRRR')");
+		}
+
+		if (asuntosJusticiableItem.getNif() != null && !asuntosJusticiableItem.getNif().trim().isEmpty()) {
+			sql.WHERE("perjg.nif = '%" + asuntosJusticiableItem.getNif().trim() + "%'");
+		}
+
+		if (asuntosJusticiableItem.getNombre() != null && !asuntosJusticiableItem.getNombre().trim().isEmpty()) {
+			sql.WHERE("perjg.nombre LIKE upper('%" + asuntosJusticiableItem.getNombre().trim() + "%')");
+		}
+
+		if (asuntosJusticiableItem.getApellidos() != null && !asuntosJusticiableItem.getApellidos().trim().isEmpty()) {
+			sql.WHERE("(perjg.apellido1 || ' ' || perjg.apellido2) LIKE upper('%"
+					+ asuntosJusticiableItem.getApellidos().trim() + "%')");
+		}
+
 		if (asuntosJusticiableItem.getIdTurno() != null) {
-			sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + asuntosJusticiableItem.getIdTurno());
+			sql.WHERE("ejg.guardiaturno_idturno = " + asuntosJusticiableItem.getIdTurno());
 		}
 		if (asuntosJusticiableItem.getIdGuardia() != null) {
-			sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + asuntosJusticiableItem.getIdGuardia());
+			sql.WHERE("ejg.guardiaturno_idguardia = " + asuntosJusticiableItem.getIdGuardia());
 		}
-		if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-			String fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
-			sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') >= TO_DATE('" + fecha + "','DD/MM/RRRR')");
-		}
-		if (asuntosJusticiableItem.getFechaAperturaHasta() != null) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-			String fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaHasta());
-			sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') <= TO_DATE('" + fecha + "','DD/MM/RRRR')");
-		}
-
-		if (asuntosJusticiableItem.getApellidos() != null && asuntosJusticiableItem.getApellidos() != "")
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("REPLACE(CONCAT(apellido1,apellido2), ' ', '')",
-					asuntosJusticiableItem.getApellidos().replaceAll("\\s+", "")));
-		if (asuntosJusticiableItem.getNombre() != null && asuntosJusticiableItem.getNombre() != "")
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE", asuntosJusticiableItem.getNombre()));
-
 		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
-			sql.WHERE("EJG.IDPERSONA = " + asuntosJusticiableItem.getIdPersonaColegiado());
-		}
-		if (asuntosJusticiableItem.getNif() != null && asuntosJusticiableItem.getNif() != "") {
-			sql.WHERE("upper(PERSONA.NIF) like upper('%" + asuntosJusticiableItem.getNif() + "%')");
-		}
-		if (asuntosJusticiableItem.getIdTipoEjg() != null) {
-			sql.WHERE("EJG.IDTIPOEJG = " + asuntosJusticiableItem.getIdTipoEjg());
-		}
-		if (asuntosJusticiableItem.getIdTipoEjColegio() != null) {
-			sql.WHERE("EJG.IDTIPOEJGCOLEGIO = " + asuntosJusticiableItem.getIdTipoEjColegio());
-		}
-		if (asuntosJusticiableItem.getIdEstadoPorEjg() != null) {
-			sql.WHERE("ESTADO.IDESTADOPOREJG = " + asuntosJusticiableItem.getIdEstadoPorEjg());
-		}
-		sqlOrder.FROM("(" + sql + " )");
-		if (tamMax != null) {
-			Integer tamMaxNumber = tamMax + 1;
-			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+			sql.WHERE("ejg.idpersona = " + asuntosJusticiableItem.getIdPersonaColegiado());
 		}
 
-		return sqlOrder.toString();
+		sql.WHERE("ROWNUM <= " + tamMax);
+
+		sql.ORDER_BY("ejg.anio desc, ejg.numero DESC");
+
+		/*
+		 * SQL sqlOrder = new SQL();
+		 * 
+		 * sqlOrder.SELECT("*"); sql.
+		 * SELECT("EJG.idinstitucion, EJG.anio,EJG.numero,to_char(EJG.IDTIPOEJG) AS clave, '' as rol, 'E' as tipo"
+		 * ); sql.FROM("SCS_EJG EJG"); sql.INNER_JOIN(
+		 * "SCS_PERSONAJG PERSONA ON (EJG.IDPERSONAJG = PERSONA.IDPERSONA AND PERSONA.IDINSTITUCION = EJG.IDINSTITUCION)"
+		 * ); sql.INNER_JOIN(
+		 * "SCS_ESTADOEJG ESTADO ON (ESTADO.IDINSTITUCION = EJG.IDINSTITUCION AND ESTADO.IDTIPOEJG = EJG.IDTIPOEJG AND ESTADO.ANIO = "
+		 * +
+		 * "EJG.ANIO AND ESTADO.NUMERO = EJG.NUMERO AND ESTADO.FECHABAJA IS NULL AND ESTADO.FECHAINICIO = (SELECT MAX(FECHAINICIO) FROM SCS_ESTADOEJG ESTADO2 WHERE (ESTADO.IDINSTITUCION = ESTADO2.IDINSTITUCION"
+		 * +
+		 * " AND ESTADO.IDTIPOEJG = ESTADO2.IDTIPOEJG AND ESTADO.ANIO = ESTADO2.ANIO AND ESTADO.NUMERO = ESTADO2.NUMERO AND ESTADO2.FECHABAJA IS NULL)))"
+		 * ); sql.WHERE("EJG.idinstitucion = " +
+		 * asuntosJusticiableItem.getIdInstitucion());
+		 * 
+		 * if (asuntosJusticiableItem.getAnio() != null &&
+		 * asuntosJusticiableItem.getAnio() != "") { sql.WHERE("EJG.ANIO = " +
+		 * asuntosJusticiableItem.getAnio()); } if (asuntosJusticiableItem.getNumero()
+		 * != null) { sql.WHERE("EJG.NUMERO = " + asuntosJusticiableItem.getNumero()); }
+		 * 
+		 * if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
+		 * SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); String
+		 * fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
+		 * sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') >= TO_DATE('" + fecha +
+		 * "','DD/MM/RRRR')"); } if (asuntosJusticiableItem.getFechaAperturaHasta() !=
+		 * null) { SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		 * String fecha =
+		 * dateFormat.format(asuntosJusticiableItem.getFechaAperturaHasta());
+		 * sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') <= TO_DATE('" + fecha +
+		 * "','DD/MM/RRRR')"); }
+		 * 
+		 * if (asuntosJusticiableItem.getApellidos() != null &&
+		 * asuntosJusticiableItem.getApellidos() != "") sql.WHERE(UtilidadesString.
+		 * filtroTextoBusquedas("REPLACE(CONCAT(apellido1,apellido2), ' ', '')",
+		 * asuntosJusticiableItem.getApellidos().replaceAll("\\s+", ""))); if
+		 * (asuntosJusticiableItem.getNombre() != null &&
+		 * asuntosJusticiableItem.getNombre() != "")
+		 * sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE",
+		 * asuntosJusticiableItem.getNombre()));
+		 * 
+		 * if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
+		 * sql.WHERE("EJG.IDPERSONA = " +
+		 * asuntosJusticiableItem.getIdPersonaColegiado()); } if
+		 * (asuntosJusticiableItem.getNif() != null && asuntosJusticiableItem.getNif()
+		 * != "") { sql.WHERE("upper(PERSONA.NIF) like upper('%" +
+		 * asuntosJusticiableItem.getNif() + "%')"); } if
+		 * (asuntosJusticiableItem.getIdTipoEjg() != null) {
+		 * sql.WHERE("EJG.IDTIPOEJG = " + asuntosJusticiableItem.getIdTipoEjg()); } if
+		 * (asuntosJusticiableItem.getIdTipoEjColegio() != null) {
+		 * sql.WHERE("EJG.IDTIPOEJGCOLEGIO = " +
+		 * asuntosJusticiableItem.getIdTipoEjColegio()); } if
+		 * (asuntosJusticiableItem.getIdEstadoPorEjg() != null) {
+		 * sql.WHERE("ESTADO.IDESTADOPOREJG = " +
+		 * asuntosJusticiableItem.getIdEstadoPorEjg()); } sqlOrder.FROM("(" + sql +
+		 * " )"); if (tamMax != null) { Integer tamMaxNumber = tamMax + 1;
+		 * sqlOrder.WHERE("rownum <= " + tamMaxNumber); }
+		 */
+
+		return sql.toString();
 	}
 
 	public String getDictamen(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
@@ -770,39 +851,38 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT(
 				"PER.NIFCIF NIF,PER.IDPERSONA, PER.NOMBRE NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2) APELLIDOS, NVL(col.ncolegiado, col.ncomunitario) NCOLEGIADO, "
 						+ "COL.NCOMUNITARIO NCOMUNITARIO, ESTADO.IDESTADO IDESTADO,COL.IDINSTITUCION IDINSTITUCION, INS.ABREVIATURA ABREVIATURA, "
-						+ "F_SIGA_GETRECURSO(TIPOESTADO.DESCRIPCION, " + idLenguaje + ") ESTADO, COL.SITUACIONRESIDENTE RESIDENTE,\r\n" + 
-								"            COUNT(tur.idturno) sumaturnos,\r\n" + 
-								"            COUNT(guar.idguardia) tieneguardias,\r\n" + 
-								"            SUM(nvl(guarpend.pendiente, 0)) AS guardiaspendientes");
+						+ "F_SIGA_GETRECURSO(TIPOESTADO.DESCRIPCION, " + idLenguaje
+						+ ") ESTADO, COL.SITUACIONRESIDENTE RESIDENTE,\r\n"
+						+ "            COUNT(tur.idturno) sumaturnos,\r\n"
+						+ "            COUNT(guar.idguardia) tieneguardias,\r\n"
+						+ "            SUM(nvl(guarpend.pendiente, 0)) AS guardiaspendientes");
 
 		sql.FROM("CEN_PERSONA PER");
 
 		sql.INNER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = PER.IDPERSONA)");
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION )");
-		if ((item.getIdGuardia() != null && item.getIdGuardia().length>0) || (item.getIdTurno() != null && item.getIdTurno().length > 0)) {
+		if ((item.getIdGuardia() != null && item.getIdGuardia().length > 0)
+				|| (item.getIdTurno() != null && item.getIdTurno().length > 0)) {
 			sql.INNER_JOIN(
 					"SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
 		}
 
 		sql.INNER_JOIN("CEN_ESTADOCOLEGIAL TIPOESTADO ON (TIPOESTADO.IDESTADO=ESTADO.IDESTADO)");
 		sql.INNER_JOIN("CEN_INSTITUCION INS ON (INS.IDINSTITUCION=COL.IDINSTITUCION)");
-		sql.LEFT_OUTER_JOIN("scs_inscripcionturno        tur ON ( tur.idinstitucion = col.idinstitucion\r\n" + 
-				"                                                          AND tur.idpersona = col.idpersona )\r\n"); 
-		sql.LEFT_OUTER_JOIN("scs_inscripcionguardia      guar ON ( guar.idinstitucion = tur.idinstitucion\r\n" + 
-				"                                                             AND guar.idpersona = tur.idpersona\r\n" + 
-				"                                                             AND guar.idturno = tur.idturno )\r\n");
-		sql.LEFT_OUTER_JOIN(" (SELECT\r\n" + 
-				"                    guardiain.*,\r\n" + 
-				"                    1 AS pendiente\r\n" + 
-				"                FROM\r\n" + 
-				"                    scs_inscripcionguardia guardiain\r\n" + 
-				"                WHERE\r\n" + 
-				"                    ( fechavalidacion IS NULL )\r\n" + 
-				"            ) guarpend ON ( guarpend.idinstitucion = guar.idinstitucion\r\n" + 
-				"                            AND guarpend.idpersona = guar.idpersona\r\n" + 
-				"                            AND guarpend.idturno = guar.idturno\r\n" + 
-				"                            AND guarpend.idguardia = guar.idguardia )");
+		sql.LEFT_OUTER_JOIN("scs_inscripcionturno        tur ON ( tur.idinstitucion = col.idinstitucion\r\n"
+				+ "                                                          AND tur.idpersona = col.idpersona )\r\n");
+		sql.LEFT_OUTER_JOIN("scs_inscripcionguardia      guar ON ( guar.idinstitucion = tur.idinstitucion\r\n"
+				+ "                                                             AND guar.idpersona = tur.idpersona\r\n"
+				+ "                                                             AND guar.idturno = tur.idturno )\r\n");
+		sql.LEFT_OUTER_JOIN(
+				" (SELECT\r\n" + "                    guardiain.*,\r\n" + "                    1 AS pendiente\r\n"
+						+ "                FROM\r\n" + "                    scs_inscripcionguardia guardiain\r\n"
+						+ "                WHERE\r\n" + "                    ( fechavalidacion IS NULL )\r\n"
+						+ "            ) guarpend ON ( guarpend.idinstitucion = guar.idinstitucion\r\n"
+						+ "                            AND guarpend.idpersona = guar.idpersona\r\n"
+						+ "                            AND guarpend.idturno = guar.idturno\r\n"
+						+ "                            AND guarpend.idguardia = guar.idguardia )");
 
 		// CONDICIONES WHERE
 		if (item.getIdInstitucion() != null && !item.getIdInstitucion().isEmpty()) {
@@ -821,7 +901,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		if (item.getIdEstado() != null && !item.getIdEstado().isEmpty()) {
 			sql.WHERE("ESTADO.IDESTADO = " + item.getIdEstado());
 		}
-		
+
 		sql.WHERE(" ESTADO.FECHAESTADO = (" + sql2.toString() + ")");
 
 		if (item.getnColegiado() != null && !item.getnColegiado().trim().isEmpty()) {
@@ -856,25 +936,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		// Se realiza esta consulta para poder aplicar el filtro del número máximo de
 		// registros
-		sql3.SELECT("nif,\r\n" + 
-				"    idpersona,\r\n" + 
-				"    nombre,\r\n" + 
-				"    apellidos,\r\n" + 
-				"    ncolegiado,\r\n" + 
-				"    ncomunitario,\r\n" + 
-				"    idestado,\r\n" + 
-				"    idinstitucion,\r\n" + 
-				"    abreviatura,\r\n" + 
-				"    estado,\r\n" + 
-				"    residente,\r\n" + 
-				"    tieneguardias,\r\n" + 
-				"    guardiaspendientes,\r\n" + 
-				"    CASE sumaturnos\r\n" + 
-				"        WHEN 0 THEN\r\n" + 
-				"            'No'\r\n" + 
-				"        ELSE\r\n" + 
-				"            'Sí'\r\n" + 
-				"    END AS tieneturno FROM ( " + sql.toString() + ")");
+		sql3.SELECT("nif,\r\n" + "    idpersona,\r\n" + "    nombre,\r\n" + "    apellidos,\r\n" + "    ncolegiado,\r\n"
+				+ "    ncomunitario,\r\n" + "    idestado,\r\n" + "    idinstitucion,\r\n" + "    abreviatura,\r\n"
+				+ "    estado,\r\n" + "    residente,\r\n" + "    tieneguardias,\r\n" + "    guardiaspendientes,\r\n"
+				+ "    CASE sumaturnos\r\n" + "        WHEN 0 THEN\r\n" + "            'No'\r\n" + "        ELSE\r\n"
+				+ "            'Sí'\r\n" + "    END AS tieneturno FROM ( " + sql.toString() + ")");
 
 //		if (tamMaximo != null) {
 //			Integer tamMaxNumber = tamMaximo + 1;
@@ -932,11 +998,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.FROM("SCS_EJG");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("ANIO = " + anio);
-		//sql.WHERE("IDTIPOEJG = " + idTipoEJG);
+		// sql.WHERE("IDTIPOEJG = " + idTipoEJG);
 
 		return sql.toString();
 	}
-	
+
 	public String getNumeroEJG(short idTipoEJG, short anio, short idInstitucion) {
 		SQL sql = new SQL();
 
@@ -944,11 +1010,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.FROM("SCS_EJG");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("ANIO = " + anio);
-		//sql.WHERE("IDTIPOEJG = " + idTipoEJG);
+		// sql.WHERE("IDTIPOEJG = " + idTipoEJG);
 
 		return sql.toString();
 	}
-	
+
 	/**
 	 * 
 	 * @param num
@@ -964,56 +1030,60 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL sql3 = new SQL();
 		SQL sqlTipoEnvio = new SQL();
 		SQL sqlEstadosEnvio = new SQL();
-		
-        //subquery tipo envio
-        sqlTipoEnvio.SELECT("cat.descripcion");
-        sqlTipoEnvio.FROM("env_tipoenvios");
-        sqlTipoEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = env_tipoenvios.nombre)");
-        sqlTipoEnvio.WHERE("env_tipoenvios.idtipoenvios = e.idtipoenvios");
-        sqlTipoEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
-        
-        //subquery estadosEnvios
-        sqlEstadosEnvio.SELECT("cat.descripcion");
-        sqlEstadosEnvio.FROM("env_estadoenvio estado");
-        sqlEstadosEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = estado.nombre)");
-        sqlEstadosEnvio.WHERE("estado.idestado = e.idestado");
-        sqlEstadosEnvio.WHERE("cat.idlenguaje = '"+idLenguaje+"'");
-		
+
+		// subquery tipo envio
+		sqlTipoEnvio.SELECT("cat.descripcion");
+		sqlTipoEnvio.FROM("env_tipoenvios");
+		sqlTipoEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = env_tipoenvios.nombre)");
+		sqlTipoEnvio.WHERE("env_tipoenvios.idtipoenvios = e.idtipoenvios");
+		sqlTipoEnvio.WHERE("cat.idlenguaje = '" + idLenguaje + "'");
+
+		// subquery estadosEnvios
+		sqlEstadosEnvio.SELECT("cat.descripcion");
+		sqlEstadosEnvio.FROM("env_estadoenvio estado");
+		sqlEstadosEnvio.LEFT_OUTER_JOIN("gen_recursos_catalogos cat ON (cat.idrecurso = estado.nombre)");
+		sqlEstadosEnvio.WHERE("estado.idestado = e.idestado");
+		sqlEstadosEnvio.WHERE("cat.idlenguaje = '" + idLenguaje + "'");
+
 		sql3.SELECT("c.idenviosalida");
-        sql3.SELECT("c.idinstitucion");
-        sql3.FROM("scs_comunicaciones c");
-		sql3.WHERE("c.idinstitucion = '"+idInstitucion+"'");
-		sql3.WHERE("c.ejganio = "+anio);
-		sql3.WHERE("c.ejgidtipo = "+idTipo);
-		sql3.WHERE("c.ejgnumero = '"+num+"'");
-        
+		sql3.SELECT("c.idinstitucion");
+		sql3.FROM("scs_comunicaciones c");
+		sql3.WHERE("c.idinstitucion = '" + idInstitucion + "'");
+		sql3.WHERE("c.ejganio = " + anio);
+		sql3.WHERE("c.ejgidtipo = " + idTipo);
+		sql3.WHERE("c.ejgnumero = '" + num + "'");
+
 		sql2.SELECT("e.*");
 		sql2.SELECT("(dest.nombre || ' ' || dest.apellidos1 || ' ' || dest.apellidos2) AS destinatario");
-		sql2.SELECT("("+sqlTipoEnvio.toString()+") as tipoenvio");
-		sql2.SELECT("("+sqlEstadosEnvio.toString()+") as estadoenvio");
+		sql2.SELECT("(" + sqlTipoEnvio.toString() + ") as tipoenvio");
+		sql2.SELECT("(" + sqlEstadosEnvio.toString() + ") as estadoenvio");
 		sql2.SELECT("nvl(camposenviosasunto.valor, plantilla.asunto) AS asunto");
 		sql2.SELECT("nvl(camposenvioscuerpo.valor, plantilla.cuerpo) AS cuerpo");
 		sql2.FROM("env_envios e");
-		sql2.LEFT_OUTER_JOIN("env_destinatarios dest on (dest.idenvio=e.idenvio and dest.idinstitucion =e.idinstitucion)");
-		sql2.LEFT_OUTER_JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '"+idInstitucion+"' AND plantilla.idplantillaenvios = e.idplantillaenvios"
+		sql2.LEFT_OUTER_JOIN(
+				"env_destinatarios dest on (dest.idenvio=e.idenvio and dest.idinstitucion =e.idinstitucion)");
+		sql2.LEFT_OUTER_JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '" + idInstitucion
+				+ "' AND plantilla.idplantillaenvios = e.idplantillaenvios"
 				+ " AND plantilla.idtipoenvios = e.idtipoenvios)");
-		sql2.LEFT_OUTER_JOIN("env_camposenvios camposenviosasunto ON (e.idenvio = camposenviosasunto.idenvio AND camposenviosasunto.idinstitucion = e.idinstitucion"
-				+ " AND camposenviosasunto.idcampo = 1)");
-		sql2.LEFT_OUTER_JOIN("env_camposenvios camposenvioscuerpo ON (e.idenvio = camposenvioscuerpo.idenvio AND camposenvioscuerpo.idinstitucion = e.idinstitucion"
-				+ " AND camposenvioscuerpo.idcampo = 2)");
-		
-		sql2.WHERE("e.fechabaja IS NULL");
-		sql2.WHERE("(e.idenvio,e.idinstitucion) IN ("+sql3.toString()+")");
-		
-		sql.SELECT("*");
-		sql.FROM("("+sql2.toString()+")");
+		sql2.LEFT_OUTER_JOIN(
+				"env_camposenvios camposenviosasunto ON (e.idenvio = camposenviosasunto.idenvio AND camposenviosasunto.idinstitucion = e.idinstitucion"
+						+ " AND camposenviosasunto.idcampo = 1)");
+		sql2.LEFT_OUTER_JOIN(
+				"env_camposenvios camposenvioscuerpo ON (e.idenvio = camposenvioscuerpo.idenvio AND camposenvioscuerpo.idinstitucion = e.idinstitucion"
+						+ " AND camposenvioscuerpo.idcampo = 2)");
 
-		return sql.toString();		
+		sql2.WHERE("e.fechabaja IS NULL");
+		sql2.WHERE("(e.idenvio,e.idinstitucion) IN (" + sql3.toString() + ")");
+
+		sql.SELECT("*");
+		sql.FROM("(" + sql2.toString() + ")");
+
+		return sql.toString();
 	}
-	
+
 	public String getRelacionesEJG(EjgItem item) {
 		SQL sqlPrincipal = new SQL();
-		
+
 		SQL sqlAsistencia = new SQL();
 		SQL sqlAsistencia_1 = new SQL();
 		SQL sqlAsistencia_2 = new SQL();
@@ -1023,15 +1093,15 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL sqlAsisDatosInteres_1 = new SQL();
 		SQL sqlAsisDatosInteres_2 = new SQL();
 		SQL sqlAsisDatosInteres_3 = new SQL();
-		
+
 		SQL sqlSOJ = new SQL();
 		SQL sqlSOJ_1 = new SQL();
 		SQL sqlSOJ_2 = new SQL();
 		SQL sqlSOJ_3 = new SQL();
 		SQL sqlSOJ_4 = new SQL();
 		SQL sqlSOJ_5 = new SQL();
-		
-		SQL sqlDesigna = new SQL(); 
+
+		SQL sqlDesigna = new SQL();
 		SQL sqlDesigna_1 = new SQL();
 		SQL sqlDesigna_2 = new SQL();
 		SQL sqlDesigna_3 = new SQL();
@@ -1039,351 +1109,296 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL sqlDesigna_5 = new SQL();
 		SQL sqlDesigna_6 = new SQL();
 		SQL sqlDesigna_7 = new SQL();
-		
+
 		SQL sqlExpediente = new SQL();
 		SQL sqlExpediente_1 = new SQL();
 		SQL sqlExpediente_2 = new SQL();
 		SQL sqlExpediente_3 = new SQL();
-		
-		
-		//consulta para obtener letrado en consulta de asistencia
-		sqlAsistencia_1.SELECT("cen_persona.apellidos2\r\n"
-				+ "             || ' '\r\n"
-				+ "             || cen_persona.apellidos1\r\n"
-				+ "             || ','\r\n"
-				+ "             || cen_persona.nombre");
-		sqlAsistencia_1.FROM("scs_asistencia "
-				+ "JOIN cen_persona ON cen_persona.idpersona = scs_asistencia.idpersonacolegiado");
+
+		// consulta para obtener letrado en consulta de asistencia
+		sqlAsistencia_1.SELECT(
+				"cen_persona.apellidos2\r\n" + "             || ' '\r\n" + "             || cen_persona.apellidos1\r\n"
+						+ "             || ','\r\n" + "             || cen_persona.nombre");
+		sqlAsistencia_1.FROM(
+				"scs_asistencia " + "JOIN cen_persona ON cen_persona.idpersona = scs_asistencia.idpersonacolegiado");
 		sqlAsistencia_1.WHERE("ejganio =" + item.getAnnio());
 		sqlAsistencia_1.WHERE("ejgnumero =" + item.getNumEjg());
 		sqlAsistencia_1.WHERE("ejgidtipoejg =" + item.getTipoEJG());
 		sqlAsistencia_1.WHERE("idinstitucion =" + item.getidInstitucion());
-		
-		//consulta para obtener la des_turno en consulta asistencia
+
+		// consulta para obtener la des_turno en consulta asistencia
 		sqlAsistencia_2.SELECT("abreviatura");
 		sqlAsistencia_2.FROM("scs_turno");
 		sqlAsistencia_2.WHERE("idturno = scs_asistencia.idturno");
 		sqlAsistencia_2.WHERE("idinstitucion = scs_asistencia.idinstitucion");
-		
-		//consulta para obtener la des_tipo en consulta asistencia
+
+		// consulta para obtener la des_tipo en consulta asistencia
 		sqlAsistencia_3.SELECT("f_siga_getrecurso( s.descripcion, 1)");
 		sqlAsistencia_3.FROM("scs_tipoasistenciacolegio s");
 		sqlAsistencia_3.WHERE("scs_asistencia.idinstitucion = s.idinstitucion");
 		sqlAsistencia_3.WHERE("scs_asistencia.idtipoasistenciacolegio = s.idtipoasistenciacolegio");
-		
-		
-		//consulta para obtener el interesado en consulta asistencia
-		sqlAsistencia_4.SELECT("scs_personajg.apellido1\r\n"
-				+ "                     || CASE\r\n"
+
+		// consulta para obtener el interesado en consulta asistencia
+		sqlAsistencia_4.SELECT("scs_personajg.apellido1\r\n" + "                     || CASE\r\n"
 				+ "                            WHEN scs_personajg.apellido2 IS NOT NULL THEN ' '\r\n"
 				+ "                             || scs_personajg.apellido2\r\n"
-				+ "                             || ','\r\n"
-				+ "                            ELSE ','\r\n"
-				+ "                        END\r\n"
-				+ "                     || scs_personajg.nombre");
-		sqlAsistencia_4.FROM("scs_asistencia\r\n"
-				+ "                    JOIN scs_personajg ON\r\n"
+				+ "                             || ','\r\n" + "                            ELSE ','\r\n"
+				+ "                        END\r\n" + "                     || scs_personajg.nombre");
+		sqlAsistencia_4.FROM("scs_asistencia\r\n" + "                    JOIN scs_personajg ON\r\n"
 				+ "                        scs_personajg.idpersona = scs_asistencia.idpersonajg\r\n"
 				+ "                    AND\r\n"
 				+ "                        scs_personajg.idinstitucion = scs_asistencia.idinstitucion");
 		sqlAsistencia_4.WHERE("scs_asistencia.idinstitucion = " + item.getidInstitucion());
 		sqlAsistencia_4.WHERE("scs_asistencia.anio = " + item.getAnnio());
 		sqlAsistencia_4.WHERE("scs_asistencia.numero =" + item.getNumEjg());
-		
-		//Subconsulta de datos de interes. Centro detencion.
+
+		// Subconsulta de datos de interes. Centro detencion.
 		sqlAsisDatosInteres_1.SELECT("'Comisaria: '||scs_comisaria.nombre");
-		sqlAsisDatosInteres_1.FROM("scs_asistencia\r\n"
-				+ "                    JOIN scs_comisaria ON\r\n"
+		sqlAsisDatosInteres_1.FROM("scs_asistencia\r\n" + "                    JOIN scs_comisaria ON\r\n"
 				+ "                        scs_comisaria.idcomisaria = scs_asistencia.comisaria\r\n"
 				+ "                    AND\r\n"
 				+ "                        scs_comisaria.idinstitucion = scs_asistencia.idinstitucion");
 		sqlAsisDatosInteres_1.WHERE("scs_asistencia.idinstitucion = " + item.getidInstitucion());
 		sqlAsisDatosInteres_1.WHERE("scs_asistencia.anio = " + item.getAnnio());
 		sqlAsisDatosInteres_1.WHERE("scs_asistencia.numero =" + item.getNumEjg());
-		
-		//Subconsulta de datos de interes. Incidencias.
+
+		// Subconsulta de datos de interes. Incidencias.
 		sqlAsisDatosInteres_2.SELECT("'Incidencias: ' || incidencias");
 		sqlAsisDatosInteres_2.FROM("scs_asistencia");
 		sqlAsisDatosInteres_2.WHERE("scs_asistencia.idinstitucion = " + item.getidInstitucion());
 		sqlAsisDatosInteres_2.WHERE("scs_asistencia.anio = " + item.getAnnio());
 		sqlAsisDatosInteres_2.WHERE("scs_asistencia.numero =" + item.getNumEjg());
-		
-		//Subconsulta de datos de interes. Juzgado.
+
+		// Subconsulta de datos de interes. Juzgado.
 		sqlAsisDatosInteres_3.SELECT("'Juzgado: ' || scs_juzgado.nombre");
-		sqlAsisDatosInteres_3.FROM("scs_asistencia\r\n"
-				+ "                    JOIN scs_juzgado ON\r\n"
+		sqlAsisDatosInteres_3.FROM("scs_asistencia\r\n" + "                    JOIN scs_juzgado ON\r\n"
 				+ "                        scs_juzgado.idjuzgado = scs_asistencia.juzgado\r\n"
 				+ "                    AND\r\n"
 				+ "                        scs_juzgado.idinstitucion = scs_asistencia.idinstitucion");
 		sqlAsisDatosInteres_3.WHERE("scs_asistencia.idinstitucion = " + item.getidInstitucion());
 		sqlAsisDatosInteres_3.WHERE("scs_asistencia.anio = " + item.getAnnio());
 		sqlAsisDatosInteres_3.WHERE("scs_asistencia.numero =" + item.getTipoEJG());
-		
-		//consulta de datos de interes. Incluye las 3 subconsultas anteriores. Genera una cola columna con los datos obtenidos concatenados.
-		sqlAsistencia_5 = "(" + sqlAsisDatosInteres_1.toString() + ")|| '<br>'||(" + sqlAsisDatosInteres_2.toString() + ")|| '<br>'||(" + sqlAsisDatosInteres_3.toString() + ")";
-		
-		//consulta para obtener la relacion de asistencias con los datos de las consultas anteriores.
-		sqlAsistencia.SELECT("TRIM('ASISTENCIA') sjcs,\r\n"
-				+ "			TO_CHAR('A'||anio||'/'||numero) idsjcs,\r\n"
-				+ "            idinstitucion idinstitucion,\r\n"
-				+ "            anio anio,\r\n"
-				+ "            numero numero,\r\n"
-				+ "            idpersonacolegiado idletrado,"
-				+ "("+sqlAsistencia_1.toString()+") letrado,"
-				+ "TO_CHAR(idturno) idturno,\r\n"
-				+ "            TO_CHAR(idtipoasistencia) idtipo,\r\n"
-				+ "            TO_CHAR(numero) codigo,"
-				+ "("+sqlAsistencia_2.toString()+") des_turno,"
-				+ "("+sqlAsistencia_3.toString()+") des_tipo,"
-				+ "("+sqlAsistencia_4.toString()+") interesado,"
-				+ "("+sqlAsistencia_5.toString()+") datosinteres");
-		
+
+		// consulta de datos de interes. Incluye las 3 subconsultas anteriores. Genera
+		// una cola columna con los datos obtenidos concatenados.
+		sqlAsistencia_5 = "(" + sqlAsisDatosInteres_1.toString() + ")|| '<br>'||(" + sqlAsisDatosInteres_2.toString()
+				+ ")|| '<br>'||(" + sqlAsisDatosInteres_3.toString() + ")";
+
+		// consulta para obtener la relacion de asistencias con los datos de las
+		// consultas anteriores.
+		sqlAsistencia.SELECT("TRIM('ASISTENCIA') sjcs,\r\n" + "			TO_CHAR('A'||anio||'/'||numero) idsjcs,\r\n"
+				+ "            idinstitucion idinstitucion,\r\n" + "            anio anio,\r\n"
+				+ "            numero numero,\r\n" + "            idpersonacolegiado idletrado," + "("
+				+ sqlAsistencia_1.toString() + ") letrado," + "TO_CHAR(idturno) idturno,\r\n"
+				+ "            TO_CHAR(idtipoasistencia) idtipo,\r\n" + "            TO_CHAR(numero) codigo," + "("
+				+ sqlAsistencia_2.toString() + ") des_turno," + "(" + sqlAsistencia_3.toString() + ") des_tipo," + "("
+				+ sqlAsistencia_4.toString() + ") interesado," + "(" + sqlAsistencia_5.toString() + ") datosinteres");
+
 		sqlAsistencia.FROM("scs_asistencia");
 		sqlAsistencia.WHERE("ejganio = " + item.getAnnio());
 		sqlAsistencia.WHERE("ejgnumero = " + item.getNumEjg());
 		sqlAsistencia.WHERE("ejgidtipoejg =  " + item.getTipoEJG());
 		sqlAsistencia.WHERE("idinstitucion =" + item.getidInstitucion());
-		
-		//consulta para obtener letrado en consulta de SOJ
-				sqlSOJ_1.SELECT("cen_persona.apellidos2\r\n"
-						+ "             || ' '\r\n"
-						+ "             || cen_persona.apellidos1\r\n"
-						+ "             || ','\r\n"
-						+ "             || cen_persona.nombre ");
-				sqlSOJ_1.FROM("scs_soj "
-						+ "JOIN cen_persona ON cen_persona.idpersona = scs_soj.idpersona");
-				sqlSOJ_1.WHERE("ejganio =" + item.getAnnio());
-				sqlSOJ_1.WHERE("ejgnumero =" + item.getNumEjg());
-				sqlSOJ_1.WHERE("ejgidtipoejg =" + item.getTipoEJG());
-				sqlSOJ_1.WHERE("idinstitucion =" + item.getidInstitucion());
-				
-				//consulta para obtener la des_turno en consulta SOJ
-				sqlSOJ_2.SELECT("abreviatura");
-				sqlSOJ_2.FROM("scs_turno");
-				sqlSOJ_2.WHERE("idturno = scs_soj.idturno");
-				sqlSOJ_2.WHERE("idinstitucion = scs_soj.idinstitucion");
-				
-				//consulta para obtener la des_tipo en consulta SOJ
-				sqlSOJ_3.SELECT(" f_siga_getrecurso( descripcion, 1) AS descripcion");
-				sqlSOJ_3.FROM("scs_tiposoj");
-				sqlSOJ_3.WHERE("scs_tiposoj.idtiposoj = scs_soj.idtiposoj");
-				
-				//consulta para obtener el interesado en consulta SOJ
-				sqlSOJ_4.SELECT("scs_personajg.apellido1\r\n"
-						+ "                     || CASE\r\n"
-						+ "                            WHEN scs_personajg.apellido2 IS NOT NULL THEN ' '\r\n"
-						+ "                             || scs_personajg.apellido2\r\n"
-						+ "                             || ','\r\n"
-						+ "                            ELSE ','\r\n"
-						+ "                        END\r\n"
-						+ "                     || scs_personajg.nombre");
-				sqlSOJ_4.FROM("scs_soj\r\n"
-						+ "                JOIN scs_personajg ON\r\n"
-						+ "                        scs_personajg.idpersona = scs_soj.idpersona\r\n"
-						+ "                    AND\r\n"
-						+ "                        scs_personajg.idinstitucion = scs_soj.idinstitucion");
-				sqlSOJ_4.WHERE("scs_soj.idinstitucion = " + item.getidInstitucion());
-				sqlSOJ_4.WHERE("scs_soj.anio = " + item.getAnnio());
-				sqlSOJ_4.WHERE("scs_soj.numero =" + item.getNumEjg());
-				
-				//datos de interes de la consulta SOJ
-				sqlSOJ_5.SELECT("'Estado: ' ||estado");
-				sqlSOJ_5.FROM("scs_soj");
-				sqlSOJ_5.WHERE("ejganio = " + item.getAnnio());
-				sqlSOJ_5.WHERE("ejgnumero = " + item.getNumEjg());
-				sqlSOJ_5.WHERE("ejgidtipoejg =" + item.getTipoEJG());
-				sqlSOJ_5.WHERE("idinstitucion = " + item.getidInstitucion());
-		
-		//consulta para obtener la relacion de SOJ con los datos de las consultas anteriores.
-				sqlSOJ.SELECT("TRIM('SOJ') sjcs,\r\n"
-						+ "TO_CHAR('S'||anio||'/'||numero) idsjcs,\r\n"
-						+ "            idinstitucion idinstitucion,\r\n"
-						+ "            anio anio,\r\n"
-						+ "            numero numero,\r\n"
-						+ "            scs_soj.idpersona idletrado,"
-						+ "("+sqlSOJ_1.toString()+") letrado,"
-						+ "TO_CHAR(idturno) idturno,\r\n"
-						+ "            TO_CHAR(idtiposoj) idtipo,\r\n"
-						+ "            numsoj codigo,"
-						+ "("+sqlSOJ_2.toString()+") des_turno,"
-						+ "("+sqlSOJ_3.toString()+") des_tipo,"
-						+ "("+sqlSOJ_4.toString()+") interesado,"
-						+ "( "+sqlSOJ_5.toString()+") datosinteres");
-				
-				sqlSOJ.FROM("scs_soj");
-				sqlSOJ.WHERE("ejganio = " + item.getAnnio());
-				sqlSOJ.WHERE("ejgnumero = " + item.getNumEjg());
-				sqlSOJ.WHERE("ejgidtipoejg =  " + item.getTipoEJG());
-				sqlSOJ.WHERE("idinstitucion =" + item.getidInstitucion());
-		
-	
-				//consulta para obtener letrado en consulta de DESIGNA
-				sqlDesigna_1.SELECT("cen_persona.apellidos2\r\n"
-						+ "             || ' '\r\n"
-						+ "             || cen_persona.apellidos1\r\n"
-						+ "             || ','\r\n"
-						+ "             || cen_persona.nombre ");
-				sqlDesigna_1.FROM("scs_ejg ejg\r\n"
-						+ "             JOIN cen_persona ON cen_persona.idpersona = ejg.idpersona");
-				sqlDesigna_1.WHERE("ejg.anio =" + item.getAnnio());
-				sqlDesigna_1.WHERE("ejg.numero =" + item.getNumEjg());
-				sqlDesigna_1.WHERE("ejg.idtipoejg =" + item.getTipoEJG());
-				sqlDesigna_1.WHERE("ejg.idinstitucion =" + item.getidInstitucion());
-				
-				//consulta para obtener el idtipo en consulta DESIGNA
-				sqlDesigna_2.SELECT("TO_CHAR(idtipodesignacolegio)");
-				sqlDesigna_2.FROM("scs_designa");
-				sqlDesigna_2.WHERE("anio = ejgd.aniodesigna");
-				sqlDesigna_2.WHERE("numero = ejgd.numerodesigna");
-				sqlDesigna_2.WHERE("idturno = ejgd.idturno");
-				sqlDesigna_2.WHERE("idinstitucion = ejgd.idinstitucion");
-				
-				//consulta para obtener el codigo en consulta Designa
-				sqlDesigna_3.SELECT(" codigo");
-				sqlDesigna_3.FROM("scs_designa");
-				sqlDesigna_3.WHERE("anio = ejgd.aniodesigna");
-				sqlDesigna_3.WHERE("numero = ejgd.numerodesigna");
-				sqlDesigna_3.WHERE("idturno = ejgd.idturno");
-				sqlDesigna_3.WHERE("idinstitucion = ejgd.idinstitucion");
-				
-				//consulta para obtener el des_turno en consulta Designa
-				sqlDesigna_4.SELECT("abreviatura");
-				sqlDesigna_4.FROM("scs_turno");
-				sqlDesigna_4.WHERE("idturno = ejgd.idturno ");
-				sqlDesigna_4.WHERE("idinstitucion = ejg.idinstitucion ");
-				
-				//consulta para obtener el des_tipo en consulta Designa
-				sqlDesigna_5.SELECT("f_siga_getrecurso(descripcion, 1)");
-				sqlDesigna_5.FROM(" scs_designa a, scs_tipodesignacolegio b");
-				sqlDesigna_5.WHERE("a.anio = ejgd.aniodesigna ");
-				sqlDesigna_5.WHERE("a.numero = ejgd.numerodesigna ");
-				sqlDesigna_5.WHERE("a.idturno = ejgd.idturno");
-				sqlDesigna_5.WHERE("a.idinstitucion =  " + item.getidInstitucion());
-				sqlDesigna_5.WHERE("a.idinstitucion = b.idinstitucion");
-				sqlDesigna_5.WHERE("a.idtipodesignacolegio = b.idtipodesignacolegio");
-				
-				
-				//consulta para obtener el interesado en consulta asistencia
-				sqlDesigna_6.SELECT("scs_personajg.apellido1\r\n"
-						+ "                     || CASE\r\n"
-						+ "                            WHEN scs_personajg.apellido2 IS NOT NULL THEN ' '\r\n"
-						+ "                             || scs_personajg.apellido2\r\n"
-						+ "                             || ','\r\n"
-						+ "                            ELSE ','\r\n"
-						+ "                        END\r\n"
-						+ "                     || scs_personajg.nombre");
-				sqlDesigna_6.FROM("scs_ejg\r\n"
-						+ "                JOIN scs_personajg ON\r\n"
-						+ "                        scs_personajg.idpersona = scs_ejg.idpersona\r\n"
-						+ "                    AND\r\n"
-						+ "                        scs_personajg.idinstitucion = scs_ejg.idinstitucion");
-				sqlDesigna_6.WHERE("scs_ejg.idinstitucion = " + item.getidInstitucion());
-				sqlDesigna_6.WHERE("scs_ejg.anio = " + item.getAnnio());
-				sqlDesigna_6.WHERE("scs_ejg.numero =" + item.getNumEjg());
-				
-				
-				//datos de interes de la consulta DESIGNA
-				sqlDesigna_7.SELECT("'Juzgado: ' || scs_juzgado.nombre");
-				sqlDesigna_7.FROM("scs_ejg\r\n"
-						+ "                    JOIN scs_juzgado ON\r\n"
-						+ "                        scs_juzgado.idjuzgado = scs_ejg.juzgado\r\n"
-						+ "                    AND\r\n"
-						+ "                        scs_juzgado.idinstitucion = scs_ejg.idinstitucion");
-				sqlDesigna_7.WHERE("scs_ejg.anio = " + item.getAnnio());
-				sqlDesigna_7.WHERE("scs_ejg.numero = " + item.getNumEjg());
-				sqlDesigna_7.WHERE("scs_ejg.idinstitucion = " + item.getidInstitucion());
-				
-		
-		//consulta para obtener la relacion de DESIGNA con los datos de las consultas anteriores.
-				sqlDesigna.SELECT("TRIM('DESIGNACIÓN') sjcs,\r\n"
-						+ "TO_CHAR('D' || ejg.anio || '/' || ejg.numero) idsjcs,\r\n"
-						+ "            ejg.idinstitucion idinstitucion,\r\n"
-						+ "            ejgd.aniodesigna anio,\r\n"
-						+ "            ejgd.numerodesigna numero,\r\n"
-						+ "            ejg.idpersona idletrado,"
-						+ "("+sqlDesigna_1.toString()+") letrado,"
-						+ "TO_CHAR(ejgd.idturno) idturno,"
-						+ "("+sqlDesigna_2.toString()+") idtipo,"
-						+ "("+sqlDesigna_3.toString()+") codigo,"
-						+ "("+sqlDesigna_4.toString()+") des_turno,"
-						+ "("+sqlDesigna_5.toString()+") des_tipo,"
-						+ "("+sqlDesigna_6.toString()+") interesado,"
-						+ "("+sqlDesigna_7.toString()+") datosinteres");
-				
-				sqlDesigna.FROM("scs_ejg ejg,\r\n"
-						+ "             scs_ejgdesigna ejgd");
-				sqlDesigna.WHERE("ejg.anio = " + item.getAnnio());
-				sqlDesigna.WHERE("ejg.numero = " + item.getNumEjg());
-				sqlDesigna.WHERE("ejg.idtipoejg =  " + item.getTipoEJG());
-				sqlDesigna.WHERE("ejg.idinstitucion =" + item.getidInstitucion());
-				sqlDesigna.WHERE("ejgd.anioejg = ejg.anio");
-				sqlDesigna.WHERE("ejgd.numeroejg = ejg.numero  ");
-				sqlDesigna.WHERE("ejgd.idtipoejg = ejg.idtipoejg ");
-				sqlDesigna.WHERE("ejgd.idinstitucion = ejg.idinstitucion");
-				
-				//consulta para obtener letrado en consulta de expediente
-				sqlExpediente_1.SELECT("cen_persona.apellidos2\r\n"
-						+ "             || ' '\r\n"
-						+ "             || cen_persona.apellidos1\r\n"
-						+ "             || ','\r\n"
-						+ "             || cen_persona.nombre");
-				sqlExpediente_1.FROM("exp_expediente e\r\n"
-						+ "            JOIN cen_persona ON cen_persona.idpersona = e.idpersona");
-				sqlExpediente_1.WHERE("anioejg =" + item.getAnnio());
-				sqlExpediente_1.WHERE("numeroejg =" + item.getNumEjg());
-				sqlExpediente_1.WHERE("idtipoejg =" + item.getTipoEJG());
-				sqlExpediente_1.WHERE("idinstitucion =" + item.getidInstitucion());
-				
-				//consulta para obtener el des_tipo en consulta Expediente
-				sqlExpediente_2.SELECT("nombre");
-				sqlExpediente_2.FROM(" exp_tipoexpediente te,\r\n"
-						+ "            exp_expediente");
-				sqlExpediente_2.WHERE("te.IDTIPOEXPEDIENTE=exp_expediente.IDTIPOEXPEDIENTE ");
-				sqlExpediente_2.WHERE("exp_expediente.anioejg =" + item.getAnnio());
-				sqlExpediente_2.WHERE("exp_expediente.numeroejg =" + item.getNumEjg());
-				sqlExpediente_2.WHERE("exp_expediente.idtipoejg =" + item.getTipoEJG());
-				sqlExpediente_2.WHERE("exp_expediente.idinstitucion =" + item.getidInstitucion());
-				
-				//datos de interes de la consulta Expedientes
-				sqlExpediente_3.SELECT("'Resolucion: ' || descripcionresolucion");
-				sqlExpediente_3.FROM("exp_expediente");
-				sqlExpediente_3.WHERE("anioejg =" + item.getAnnio());
-				sqlExpediente_3.WHERE("numeroejg =" + item.getNumEjg());
-				sqlExpediente_3.WHERE("idtipoejg =" + item.getTipoEJG());
-				sqlExpediente_3.WHERE("idinstitucion =" + item.getidInstitucion());
-				
-				//sentencia expediente
-				sqlExpediente.SELECT("TRIM('EXPEDIENTE') sjcs,\r\n"
-						+ "    TO_CHAR('X'||anioejg||'/'||numeroexpediente) idsjcs,\r\n"
-						+ "    idinstitucion idinstitucion,\r\n"
-						+ "    anioejg anio,\r\n"
-						+ "    numeroexpediente numero,\r\n"
-						+ "     idpersona idletrado, "
-						+ "("+sqlExpediente_1.toString()+") letrado,"
-								+ "NULL  idturno, \r\n"
-								+ "    TO_CHAR(idtipoexpediente) idtipo,\r\n"
-								+ "    TO_CHAR(numeroexpediente) codigo,\r\n"
-								+ "    NULL des_turno,"
-								+ "("+sqlExpediente_2.toString()+") des_tipo,"
-								+ "NULL interesado,"
-								+ "("+sqlExpediente_3.toString()+") datosinteres");
-				sqlExpediente.FROM("exp_expediente e");
-				sqlExpediente.WHERE("numeroejg = "+ item.getNumEjg());
-				sqlExpediente.WHERE("idtipoejg = " + item.getTipoEJG());
-				sqlExpediente.WHERE("anioejg = " +item.getAnnio());
-				sqlExpediente.WHERE("idinstitucion = "+ item.getidInstitucion());
-				
-	    //Sentencia principal.
+
+		// consulta para obtener letrado en consulta de SOJ
+		sqlSOJ_1.SELECT(
+				"cen_persona.apellidos2\r\n" + "             || ' '\r\n" + "             || cen_persona.apellidos1\r\n"
+						+ "             || ','\r\n" + "             || cen_persona.nombre ");
+		sqlSOJ_1.FROM("scs_soj " + "JOIN cen_persona ON cen_persona.idpersona = scs_soj.idpersona");
+		sqlSOJ_1.WHERE("ejganio =" + item.getAnnio());
+		sqlSOJ_1.WHERE("ejgnumero =" + item.getNumEjg());
+		sqlSOJ_1.WHERE("ejgidtipoejg =" + item.getTipoEJG());
+		sqlSOJ_1.WHERE("idinstitucion =" + item.getidInstitucion());
+
+		// consulta para obtener la des_turno en consulta SOJ
+		sqlSOJ_2.SELECT("abreviatura");
+		sqlSOJ_2.FROM("scs_turno");
+		sqlSOJ_2.WHERE("idturno = scs_soj.idturno");
+		sqlSOJ_2.WHERE("idinstitucion = scs_soj.idinstitucion");
+
+		// consulta para obtener la des_tipo en consulta SOJ
+		sqlSOJ_3.SELECT(" f_siga_getrecurso( descripcion, 1) AS descripcion");
+		sqlSOJ_3.FROM("scs_tiposoj");
+		sqlSOJ_3.WHERE("scs_tiposoj.idtiposoj = scs_soj.idtiposoj");
+
+		// consulta para obtener el interesado en consulta SOJ
+		sqlSOJ_4.SELECT("scs_personajg.apellido1\r\n" + "                     || CASE\r\n"
+				+ "                            WHEN scs_personajg.apellido2 IS NOT NULL THEN ' '\r\n"
+				+ "                             || scs_personajg.apellido2\r\n"
+				+ "                             || ','\r\n" + "                            ELSE ','\r\n"
+				+ "                        END\r\n" + "                     || scs_personajg.nombre");
+		sqlSOJ_4.FROM("scs_soj\r\n" + "                JOIN scs_personajg ON\r\n"
+				+ "                        scs_personajg.idpersona = scs_soj.idpersona\r\n"
+				+ "                    AND\r\n"
+				+ "                        scs_personajg.idinstitucion = scs_soj.idinstitucion");
+		sqlSOJ_4.WHERE("scs_soj.idinstitucion = " + item.getidInstitucion());
+		sqlSOJ_4.WHERE("scs_soj.anio = " + item.getAnnio());
+		sqlSOJ_4.WHERE("scs_soj.numero =" + item.getNumEjg());
+
+		// datos de interes de la consulta SOJ
+		sqlSOJ_5.SELECT("'Estado: ' ||estado");
+		sqlSOJ_5.FROM("scs_soj");
+		sqlSOJ_5.WHERE("ejganio = " + item.getAnnio());
+		sqlSOJ_5.WHERE("ejgnumero = " + item.getNumEjg());
+		sqlSOJ_5.WHERE("ejgidtipoejg =" + item.getTipoEJG());
+		sqlSOJ_5.WHERE("idinstitucion = " + item.getidInstitucion());
+
+		// consulta para obtener la relacion de SOJ con los datos de las consultas
+		// anteriores.
+		sqlSOJ.SELECT("TRIM('SOJ') sjcs,\r\n" + "TO_CHAR('S'||anio||'/'||numero) idsjcs,\r\n"
+				+ "            idinstitucion idinstitucion,\r\n" + "            anio anio,\r\n"
+				+ "            numero numero,\r\n" + "            scs_soj.idpersona idletrado," + "("
+				+ sqlSOJ_1.toString() + ") letrado," + "TO_CHAR(idturno) idturno,\r\n"
+				+ "            TO_CHAR(idtiposoj) idtipo,\r\n" + "            numsoj codigo," + "("
+				+ sqlSOJ_2.toString() + ") des_turno," + "(" + sqlSOJ_3.toString() + ") des_tipo," + "("
+				+ sqlSOJ_4.toString() + ") interesado," + "( " + sqlSOJ_5.toString() + ") datosinteres");
+
+		sqlSOJ.FROM("scs_soj");
+		sqlSOJ.WHERE("ejganio = " + item.getAnnio());
+		sqlSOJ.WHERE("ejgnumero = " + item.getNumEjg());
+		sqlSOJ.WHERE("ejgidtipoejg =  " + item.getTipoEJG());
+		sqlSOJ.WHERE("idinstitucion =" + item.getidInstitucion());
+
+		// consulta para obtener letrado en consulta de DESIGNA
+		sqlDesigna_1.SELECT(
+				"cen_persona.apellidos2\r\n" + "             || ' '\r\n" + "             || cen_persona.apellidos1\r\n"
+						+ "             || ','\r\n" + "             || cen_persona.nombre ");
+		sqlDesigna_1.FROM("scs_ejg ejg\r\n" + "             JOIN cen_persona ON cen_persona.idpersona = ejg.idpersona");
+		sqlDesigna_1.WHERE("ejg.anio =" + item.getAnnio());
+		sqlDesigna_1.WHERE("ejg.numero =" + item.getNumEjg());
+		sqlDesigna_1.WHERE("ejg.idtipoejg =" + item.getTipoEJG());
+		sqlDesigna_1.WHERE("ejg.idinstitucion =" + item.getidInstitucion());
+
+		// consulta para obtener el idtipo en consulta DESIGNA
+		sqlDesigna_2.SELECT("TO_CHAR(idtipodesignacolegio)");
+		sqlDesigna_2.FROM("scs_designa");
+		sqlDesigna_2.WHERE("anio = ejgd.aniodesigna");
+		sqlDesigna_2.WHERE("numero = ejgd.numerodesigna");
+		sqlDesigna_2.WHERE("idturno = ejgd.idturno");
+		sqlDesigna_2.WHERE("idinstitucion = ejgd.idinstitucion");
+
+		// consulta para obtener el codigo en consulta Designa
+		sqlDesigna_3.SELECT(" codigo");
+		sqlDesigna_3.FROM("scs_designa");
+		sqlDesigna_3.WHERE("anio = ejgd.aniodesigna");
+		sqlDesigna_3.WHERE("numero = ejgd.numerodesigna");
+		sqlDesigna_3.WHERE("idturno = ejgd.idturno");
+		sqlDesigna_3.WHERE("idinstitucion = ejgd.idinstitucion");
+
+		// consulta para obtener el des_turno en consulta Designa
+		sqlDesigna_4.SELECT("abreviatura");
+		sqlDesigna_4.FROM("scs_turno");
+		sqlDesigna_4.WHERE("idturno = ejgd.idturno ");
+		sqlDesigna_4.WHERE("idinstitucion = ejg.idinstitucion ");
+
+		// consulta para obtener el des_tipo en consulta Designa
+		sqlDesigna_5.SELECT("f_siga_getrecurso(descripcion, 1)");
+		sqlDesigna_5.FROM(" scs_designa a, scs_tipodesignacolegio b");
+		sqlDesigna_5.WHERE("a.anio = ejgd.aniodesigna ");
+		sqlDesigna_5.WHERE("a.numero = ejgd.numerodesigna ");
+		sqlDesigna_5.WHERE("a.idturno = ejgd.idturno");
+		sqlDesigna_5.WHERE("a.idinstitucion =  " + item.getidInstitucion());
+		sqlDesigna_5.WHERE("a.idinstitucion = b.idinstitucion");
+		sqlDesigna_5.WHERE("a.idtipodesignacolegio = b.idtipodesignacolegio");
+
+		// consulta para obtener el interesado en consulta asistencia
+		sqlDesigna_6.SELECT("scs_personajg.apellido1\r\n" + "                     || CASE\r\n"
+				+ "                            WHEN scs_personajg.apellido2 IS NOT NULL THEN ' '\r\n"
+				+ "                             || scs_personajg.apellido2\r\n"
+				+ "                             || ','\r\n" + "                            ELSE ','\r\n"
+				+ "                        END\r\n" + "                     || scs_personajg.nombre");
+		sqlDesigna_6.FROM("scs_ejg\r\n" + "                JOIN scs_personajg ON\r\n"
+				+ "                        scs_personajg.idpersona = scs_ejg.idpersona\r\n"
+				+ "                    AND\r\n"
+				+ "                        scs_personajg.idinstitucion = scs_ejg.idinstitucion");
+		sqlDesigna_6.WHERE("scs_ejg.idinstitucion = " + item.getidInstitucion());
+		sqlDesigna_6.WHERE("scs_ejg.anio = " + item.getAnnio());
+		sqlDesigna_6.WHERE("scs_ejg.numero =" + item.getNumEjg());
+
+		// datos de interes de la consulta DESIGNA
+		sqlDesigna_7.SELECT("'Juzgado: ' || scs_juzgado.nombre");
+		sqlDesigna_7.FROM("scs_ejg\r\n" + "                    JOIN scs_juzgado ON\r\n"
+				+ "                        scs_juzgado.idjuzgado = scs_ejg.juzgado\r\n" + "                    AND\r\n"
+				+ "                        scs_juzgado.idinstitucion = scs_ejg.idinstitucion");
+		sqlDesigna_7.WHERE("scs_ejg.anio = " + item.getAnnio());
+		sqlDesigna_7.WHERE("scs_ejg.numero = " + item.getNumEjg());
+		sqlDesigna_7.WHERE("scs_ejg.idinstitucion = " + item.getidInstitucion());
+
+		// consulta para obtener la relacion de DESIGNA con los datos de las consultas
+		// anteriores.
+		sqlDesigna.SELECT("TRIM('DESIGNACIÓN') sjcs,\r\n" + "TO_CHAR('D' || ejg.anio || '/' || ejg.numero) idsjcs,\r\n"
+				+ "            ejg.idinstitucion idinstitucion,\r\n" + "            ejgd.aniodesigna anio,\r\n"
+				+ "            ejgd.numerodesigna numero,\r\n" + "            ejg.idpersona idletrado," + "("
+				+ sqlDesigna_1.toString() + ") letrado," + "TO_CHAR(ejgd.idturno) idturno," + "("
+				+ sqlDesigna_2.toString() + ") idtipo," + "(" + sqlDesigna_3.toString() + ") codigo," + "("
+				+ sqlDesigna_4.toString() + ") des_turno," + "(" + sqlDesigna_5.toString() + ") des_tipo," + "("
+				+ sqlDesigna_6.toString() + ") interesado," + "(" + sqlDesigna_7.toString() + ") datosinteres");
+
+		sqlDesigna.FROM("scs_ejg ejg,\r\n" + "             scs_ejgdesigna ejgd");
+		sqlDesigna.WHERE("ejg.anio = " + item.getAnnio());
+		sqlDesigna.WHERE("ejg.numero = " + item.getNumEjg());
+		sqlDesigna.WHERE("ejg.idtipoejg =  " + item.getTipoEJG());
+		sqlDesigna.WHERE("ejg.idinstitucion =" + item.getidInstitucion());
+		sqlDesigna.WHERE("ejgd.anioejg = ejg.anio");
+		sqlDesigna.WHERE("ejgd.numeroejg = ejg.numero  ");
+		sqlDesigna.WHERE("ejgd.idtipoejg = ejg.idtipoejg ");
+		sqlDesigna.WHERE("ejgd.idinstitucion = ejg.idinstitucion");
+
+		// consulta para obtener letrado en consulta de expediente
+		sqlExpediente_1.SELECT(
+				"cen_persona.apellidos2\r\n" + "             || ' '\r\n" + "             || cen_persona.apellidos1\r\n"
+						+ "             || ','\r\n" + "             || cen_persona.nombre");
+		sqlExpediente_1
+				.FROM("exp_expediente e\r\n" + "            JOIN cen_persona ON cen_persona.idpersona = e.idpersona");
+		sqlExpediente_1.WHERE("anioejg =" + item.getAnnio());
+		sqlExpediente_1.WHERE("numeroejg =" + item.getNumEjg());
+		sqlExpediente_1.WHERE("idtipoejg =" + item.getTipoEJG());
+		sqlExpediente_1.WHERE("idinstitucion =" + item.getidInstitucion());
+
+		// consulta para obtener el des_tipo en consulta Expediente
+		sqlExpediente_2.SELECT("nombre");
+		sqlExpediente_2.FROM(" exp_tipoexpediente te,\r\n" + "            exp_expediente");
+		sqlExpediente_2.WHERE("te.IDTIPOEXPEDIENTE=exp_expediente.IDTIPOEXPEDIENTE ");
+		sqlExpediente_2.WHERE("exp_expediente.anioejg =" + item.getAnnio());
+		sqlExpediente_2.WHERE("exp_expediente.numeroejg =" + item.getNumEjg());
+		sqlExpediente_2.WHERE("exp_expediente.idtipoejg =" + item.getTipoEJG());
+		sqlExpediente_2.WHERE("exp_expediente.idinstitucion =" + item.getidInstitucion());
+
+		// datos de interes de la consulta Expedientes
+		sqlExpediente_3.SELECT("'Resolucion: ' || descripcionresolucion");
+		sqlExpediente_3.FROM("exp_expediente");
+		sqlExpediente_3.WHERE("anioejg =" + item.getAnnio());
+		sqlExpediente_3.WHERE("numeroejg =" + item.getNumEjg());
+		sqlExpediente_3.WHERE("idtipoejg =" + item.getTipoEJG());
+		sqlExpediente_3.WHERE("idinstitucion =" + item.getidInstitucion());
+
+		// sentencia expediente
+		sqlExpediente.SELECT("TRIM('EXPEDIENTE') sjcs,\r\n"
+				+ "    TO_CHAR('X'||anioejg||'/'||numeroexpediente) idsjcs,\r\n"
+				+ "    idinstitucion idinstitucion,\r\n" + "    anioejg anio,\r\n" + "    numeroexpediente numero,\r\n"
+				+ "     idpersona idletrado, " + "(" + sqlExpediente_1.toString() + ") letrado," + "NULL  idturno, \r\n"
+				+ "    TO_CHAR(idtipoexpediente) idtipo,\r\n" + "    TO_CHAR(numeroexpediente) codigo,\r\n"
+				+ "    NULL des_turno," + "(" + sqlExpediente_2.toString() + ") des_tipo," + "NULL interesado," + "("
+				+ sqlExpediente_3.toString() + ") datosinteres");
+		sqlExpediente.FROM("exp_expediente e");
+		sqlExpediente.WHERE("numeroejg = " + item.getNumEjg());
+		sqlExpediente.WHERE("idtipoejg = " + item.getTipoEJG());
+		sqlExpediente.WHERE("anioejg = " + item.getAnnio());
+		sqlExpediente.WHERE("idinstitucion = " + item.getidInstitucion());
+
+		// Sentencia principal.
 		sqlPrincipal.SELECT("*");
-	    sqlPrincipal.FROM("(" + sqlAsistencia.toString() + " UNION " + sqlSOJ.toString()+ " UNION " + sqlDesigna.toString() + " UNION " + sqlExpediente.toString() +")");
-	    sqlPrincipal.WHERE("ROWNUM <= 200");
-	    sqlPrincipal.ORDER_BY("sjcs");
-	    sqlPrincipal.ORDER_BY("idinstitucion");
-	    sqlPrincipal.ORDER_BY("anio DESC");
-	    sqlPrincipal.ORDER_BY("codigo DESC");
-	    
+		sqlPrincipal.FROM("(" + sqlAsistencia.toString() + " UNION " + sqlSOJ.toString() + " UNION "
+				+ sqlDesigna.toString() + " UNION " + sqlExpediente.toString() + ")");
+		sqlPrincipal.WHERE("ROWNUM <= 200");
+		sqlPrincipal.ORDER_BY("sjcs");
+		sqlPrincipal.ORDER_BY("idinstitucion");
+		sqlPrincipal.ORDER_BY("anio DESC");
+		sqlPrincipal.ORDER_BY("codigo DESC");
+
 		return sqlPrincipal.toString();
 	}
+
 	/**
 	 * 
 	 * @param anio
@@ -1396,35 +1411,39 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL sql = new SQL();
 
 		sql.SELECT("cc1.idenvio");
-		
+
 		sql.FROM("env_valorcampoclave cc1");
-		sql.JOIN("env_envios cc2 ON (cc1.idinstitucion = cc2.idinstitucion AND cc1.idenvio = cc2.idenvio)"); 
+		sql.JOIN("env_envios cc2 ON (cc1.idinstitucion = cc2.idinstitucion AND cc1.idenvio = cc2.idenvio)");
 		sql.JOIN("env_valorcampoclave cc3 ON (cc1.idenvio = cc3.idenvio)");
-		
-		sql.WHERE("cc1.idinstitucion = "+idInstitucion);
+
+		sql.WHERE("cc1.idinstitucion = " + idInstitucion);
 		sql.WHERE("cc1.idtipoinforme = 'EJG'");
 		sql.WHERE("cc1.campo = 'numero'");
-		sql.WHERE("cc1.valor = '"+numEJG+"'");
+		sql.WHERE("cc1.valor = '" + numEJG + "'");
 		sql.WHERE("cc3.campo = 'anio'");
-		sql.WHERE("cc3.valor = '"+anio+"'");
-		
+		sql.WHERE("cc3.valor = '" + anio + "'");
+
 		sql.GROUP_BY("cc1.idenvio");
-		
+
 		return sql.toString();
 	}
-	
-	public String busquedaProcuradorEJG(String idProcurador, String idinstitucion) {//String idProcurador, 
+
+	public String busquedaProcuradorEJG(String idProcurador, String idinstitucion) {// String idProcurador,
 		SQL sql = new SQL();
 
-		sql.SELECT(
-				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, p.fechabaja, p.idprocurador");//dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita
+		sql.SELECT("p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, p.fechabaja, p.idprocurador");// dp.numerodesignacion,
+																										// dp.fechadesigna,
+																										// dp.observaciones,
+																										// dp.motivosrenuncia,dp.fecharenuncia,
+																										// dp.fecharenunciasolicita
 
-		sql.FROM("SCS_PROCURADOR p");//SCS_DESIGNAPROCURADOR dp
-		//sql2.INNER_JOIN(" on p.idprocurador = ejg.idprocurador and p.idinstitucion = ejg.idinstitucion ");
+		sql.FROM("SCS_PROCURADOR p");// SCS_DESIGNAPROCURADOR dp
+		// sql2.INNER_JOIN(" on p.idprocurador = ejg.idprocurador and p.idinstitucion =
+		// ejg.idinstitucion ");
 		sql.WHERE("p.idinstitucion = " + idinstitucion);
 		sql.WHERE("p.idprocurador = " + idProcurador);
 
 		return sql.toString();
 	}
-	
+
 }

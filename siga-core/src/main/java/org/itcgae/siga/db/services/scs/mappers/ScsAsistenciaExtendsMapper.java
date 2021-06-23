@@ -19,14 +19,19 @@ import org.springframework.stereotype.Service;
 public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 
 	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "searchClaveAsistencia")
-	@Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.DATE),
-			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR), 
-			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR) 
+	@Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TURNOGUARDIA", property = "turnoGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "INTERESADO", property = "interesado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAHORA", property = "fecha", jdbcType = JdbcType.DATE),
+		@Result(column = "NUMEROPROCEDIMIENTO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOASISTENCIA", property = "idTipoAsistencia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR) 
 	})
-	List<AsuntosClaveJusticiableItem> searchClaveAsistencia(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo);
+	List<AsuntosJusticiableItem> searchClaveAsistencia(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo, String idLenguaje);
 	
 
 	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "getAsuntoTipoAsistencia")

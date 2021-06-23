@@ -17,10 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/gestionJusticiables")
 public class BusquedaAsuntosController {
 	
-	
 	@Autowired
 	private BusquedaAsuntosService busquedaAsuntosService;
-	
 	
 	@PostMapping("/busquedaClaveAsuntosEJG")
 	public ResponseEntity<AsuntosJusticiableDTO> searchClaveAsuntosEJG(HttpServletRequest request, @RequestBody AsuntosJusticiableItem asuntosJusticiableItem) {
