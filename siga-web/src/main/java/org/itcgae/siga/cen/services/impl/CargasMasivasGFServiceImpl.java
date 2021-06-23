@@ -429,7 +429,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 		Hashtable<Long, String> personaHashtable = new Hashtable<Long, String>();
 		List<String> clavesStrings = new ArrayList<String>();
-		CenGruposcliente cenGruposCliente = null;
+		String cenGruposCliente = null;
 		Short idInstitucion = usuario.getIdinstitucion();
 		String idLenguaje = usuario.getIdlenguaje();
 
@@ -550,16 +550,17 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 									.selectByExample(cen);
 							
 							if (gruposCliente != null && gruposCliente.size() > 0) {
-								cenGruposCliente = gruposCliente.get(0);
-								genRecursosCatalogosKey.setIdrecurso(cenGruposCliente.getNombre());
+								//cenGruposCliente = gruposCliente.get(0);
+								
+								genRecursosCatalogosKey.setIdrecurso(gruposCliente.get(0).getNombre());
 								recursosCatalogos = genRecursosCatalogosMapper
 										.selectByPrimaryKey(genRecursosCatalogosKey);
-								cenGruposCliente.setNombre(recursosCatalogos.getDescripcion());
+								cenGruposCliente = recursosCatalogos.getDescripcion();
 
-								if (cenGruposCliente.getNombre() != null) {
-									cargaMasivaDatosGFVo.setIdGrupo(cenGruposCliente.getIdgrupo());
-									cargaMasivaDatosGFVo.setIdInstitucionGrupo(cenGruposCliente.getIdinstitucion());
-									cargaMasivaDatosGFVo.setNombreGrupo(cenGruposCliente.getNombre());
+								if (cenGruposCliente != null) {
+									cargaMasivaDatosGFVo.setIdGrupo(gruposCliente.get(0).getIdgrupo());
+									cargaMasivaDatosGFVo.setIdInstitucionGrupo(gruposCliente.get(0).getIdinstitucion());
+									cargaMasivaDatosGFVo.setNombreGrupo(cenGruposCliente);
 
 								} else {
 									cargaMasivaDatosGFVo.setNombreGrupo("Error");
@@ -690,7 +691,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 							}else {
 								cargaMasivaDatosGFVo.setIdGrupo(cenGruposclienteCliente.getIdgrupo());
 								cargaMasivaDatosGFVo.setIdInstitucionGrupo(cenGruposclienteCliente.getIdinstitucion());
-								cargaMasivaDatosGFVo.setNombreGrupo(cenGruposCliente.getNombre());
+								cargaMasivaDatosGFVo.setNombreGrupo(cenGruposCliente);
 							}
 						
 						}
