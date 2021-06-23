@@ -11,19 +11,17 @@ public interface IBusquedaEJGComision {
 
 	ComboDTO comboFundamentoCalificacion(String idInstitucion, HttpServletRequest request, String[] list_dictamen);
 
-	ComboDTO getLabelColegiosCol(HttpServletRequest request, String idInstitucion);
+	ComboDTO getLabelColegiosCol(HttpServletRequest request);
 
-	ComboDTO comboPonente(String idInstitucion, HttpServletRequest request);
+	ComboDTO comboPonente(HttpServletRequest request);
 
-	ComboDTO comboFundamentoJurid(String idInstitucion,HttpServletRequest request, String resolucion);
+	ComboDTO comboFundamentoJurid(HttpServletRequest request, String resolucion);
 
 	EjgDTO busquedaEJG(EjgItem ejgItem, HttpServletRequest request);
 
 	ComboDTO comboDictamen(String idInstitucion, HttpServletRequest request);
 
 	ComboDTO comboEstadoEJG(String idInstitucion, HttpServletRequest request, String resolucion);
-
-	ComboDTO comboResolucion(String idInstitucion, HttpServletRequest request);
 
 	ComboDTO comboJuzgados(String idInstitucion, HttpServletRequest request);
 
@@ -33,6 +31,9 @@ public interface IBusquedaEJGComision {
 
 	ComboDTO comboTipoColegioEjg(String idInstitucion, HttpServletRequest request);
 
+	ComboDTO comboAnioActa(String idInstitucion, HttpServletRequest request);
+
+	ComboDTO comboResolucion(String idInstitucion, HttpServletRequest request);
 	
 
 	

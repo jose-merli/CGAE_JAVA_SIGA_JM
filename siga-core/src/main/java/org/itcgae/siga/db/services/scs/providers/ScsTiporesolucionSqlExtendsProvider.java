@@ -6,7 +6,7 @@ import org.itcgae.siga.db.mappers.ScsTiporesolucionSqlProvider;
 public class ScsTiporesolucionSqlExtendsProvider extends ScsTiporesolucionSqlProvider{
 
 	
-	public String getResoluciones(String idLenguaje, String idInstitucion) {
+	public String getResoluciones(String idLenguaje) {
 
 		SQL sql = new SQL();
 

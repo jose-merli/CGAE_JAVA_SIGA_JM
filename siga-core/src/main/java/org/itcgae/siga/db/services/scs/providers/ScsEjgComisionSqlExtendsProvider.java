@@ -10,19 +10,51 @@ import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 
 public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 	private Logger LOGGER = Logger.getLogger(ScsEjgComisionSqlExtendsProvider.class);
-	
-	
-	public String comboTipoEjgColegio(Short idLenguaje, String idInstitucion) {
-		 
+
+	public String comboAnioActa(String idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("to_clob(IDINSTITUCION ||',' || ANIOACTA || ',' || IDACTA) as value");
+		sql.SELECT("anioacta||'/'||numeroacta as DESCRIPCION");
+		sql.FROM("SCS_ACTACOMISION");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("FECHARESOLUCION IS NULL");
+		sql.ORDER_BY("IDINSTITUCION,ANIOACTA,IDACTA");
+
+		LOGGER.info(sql.toString());
+
+		return sql.toString();
+	}
+
+	public String comboResolucion(Short idLenguaje, String idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("tiporesolucion.idtiporesolucion as VALUE");
+		sql.SELECT("catalogoResolucion.descripcion AS DESCRIPCION");
+		sql.FROM("SCS_TIPORESOLUCION tiporesolucion");
+		sql.INNER_JOIN(
+				"GEN_RECURSOS_CATALOGOS catalogoResolucion on catalogoResolucion.idrecurso = tiporesolucion.DESCRIPCION and catalogoResolucion.idlenguaje = "
+						+ idLenguaje);
+
+		sql.WHERE("tiporesolucion.fechabaja is null");
+		sql.WHERE("tiporesolucion.fecha_baja is null");
+
+		sql.ORDER_BY("catalogoResolucion.descripcion");
+		return sql.toString();
+	}
+
+	public String comboTipoEjgColegioComision(Short idLenguaje, String idInstitucion) {
+
 		SQL sql = new SQL();
 
 		sql.SELECT("tipoejg.IDTIPOEJGCOLEGIO");
 		sql.SELECT("cat.descripcion");
 		sql.FROM("SCS_TIPOEJGCOLEGIO tipoejg");
-		sql.INNER_JOIN(
-				"gen_recursos_catalogos cat on cat.IDRECURSO = tipoejg.descripcion and cat.idlenguaje = '"
-						+ idLenguaje + "'");
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.INNER_JOIN("gen_recursos_catalogos cat on cat.IDRECURSO = tipoejg.descripcion and cat.idlenguaje = '"
+				+ idLenguaje + "'");
+		sql.WHERE("tipoejg.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("tipoejg.fecha_baja is null");
 		sql.ORDER_BY("cat.descripcion");
 
@@ -61,7 +93,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboEstadoEjgComision(Short idLenguaje, String idInstitucion) {
+	public String comboEstadoEjg(Short idLenguaje, String idInstitucion, String resolucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("estado.IDESTADOEJG");
@@ -70,7 +102,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.INNER_JOIN("gen_recursos_catalogos cat on cat.IDRECURSO = estado.descripcion and cat.idlenguaje = '"
 				+ idLenguaje + "'");
 		sql.WHERE("estado.fecha_baja is null");
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("VISIBLECOMISION = 1");
 		sql.ORDER_BY("cat.descripcion");
 		LOGGER.info("*******************comboEstadoEjgComision********************" + sql.toString());
 
@@ -100,27 +132,6 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.FROM("SCS_JUZGADO");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		LOGGER.info("*******************comboJuzgadosComision********************" + sql.toString());
-		return sql.toString();
-	}
-
-	public String getResolucionesComision(String idLenguaje, String idInstitucion) {
-
-		SQL sql = new SQL();
-
-		sql.SELECT("tiporesolucion.idtiporesolucion");
-		sql.SELECT("catalogoResolucion.descripcion");
-
-		sql.FROM("SCS_TIPORESOLUCION tiporesolucion");
-		sql.INNER_JOIN(
-				"GEN_RECURSOS_CATALOGOS catalogoResolucion on catalogoResolucion.idrecurso = tiporesolucion.DESCRIPCION and catalogoResolucion.idlenguaje = "
-						+ idLenguaje);
-
-		sql.WHERE("tiporesolucion.fechabaja is null");
-		sql.WHERE("tiporesolucion.fecha_baja is null");
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
-
-		sql.ORDER_BY("catalogoResolucion.descripcion");
-		LOGGER.info("*******************getResolucionesComision********************" + sql.toString());
 		return sql.toString();
 	}
 
@@ -160,7 +171,8 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 	public String comboPonenteComision(String idLenguaje, String idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("SCS_PONENTE.IDPONENTE, GEN_RECURSOS_CATALOGOS.DESCRIPCION");
+		sql.SELECT("SCS_PONENTE.IDPONENTE as CLAVE");
+		sql.SELECT("GEN_RECURSOS_CATALOGOS.DESCRIPCION as DESCRIPCION");
 		sql.FROM("SCS_PONENTE");
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS ON SCS_PONENTE.NOMBRE = GEN_RECURSOS_CATALOGOS.IDRECURSO");
 		sql.WHERE("SCS_PONENTE.FECHA_BAJA IS NULL AND SCS_PONENTE.IDINSTITUCION = '" + idInstitucion
@@ -170,7 +182,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboFundamentoJuridComision(String idLenguaje, String idInstitucion, String resolucion) {
+	public String comboFundamentoJuridComision(Short idLenguaje, String idInstitucion, String resolucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("fundamento.idfundamento");
@@ -194,7 +206,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.FROM("CEN_INSTITUCION INT");
 		sql.WHERE(
 				"INT.IDCOMISION IN (SELECT INTCOM.IDCOMISION FROM CEN_INSTITUCION INTCOM WHERE INTCOM.IDINSTITUCION = IDINSTITUCION AND INTCOM.IDINSTITUCION = '"
-						+ idInstitucion + "') AND INT.IDTIPOINSTITUCION =3");
+						+ idInstitucion + "') AND INT.IDTIPOINSTITUCION =3 AND FECHABAJA IS NULL");
 		LOGGER.info("*******************comboColegioEjgComision********************" + sql.toString());
 		return sql.toString();
 	}
