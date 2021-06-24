@@ -38,9 +38,9 @@ public interface IFacturacionSJCSServices {
 	
 	public FacturacionDTO conceptosFacturacion(String idFacturacion, HttpServletRequest request);
 	
-	public InsertResponseDTO saveConceptosFac(FacturacionItem facturacionItem, HttpServletRequest request);
+	public InsertResponseDTO saveConceptosFac(List<FacturacionItem> listaFacturacionItem, HttpServletRequest request);
 	
-	public UpdateResponseDTO updateConceptosFac(FacturacionItem facturacionItem, HttpServletRequest request);
+	public UpdateResponseDTO updateConceptosFac(List<FacturacionItem> listaFacturacionItem, HttpServletRequest request);
 	
 	public DeleteResponseDTO deleteConceptosFac(List<FacturacionItem> facturacionDTO, HttpServletRequest request);
 	
