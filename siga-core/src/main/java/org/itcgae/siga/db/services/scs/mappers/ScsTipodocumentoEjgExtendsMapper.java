@@ -7,9 +7,11 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.DocumentacionEjgItem;
 import org.itcgae.siga.db.mappers.ScsTipodocumentoejgMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsPresentadorSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTipodocumentoejgSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,13 @@ public interface ScsTipodocumentoEjgExtendsMapper extends ScsTipodocumentoejgMap
 	@Results({ @Result(column = "IDTIPODOCUMENTOEJG", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})
 	NewIdDTO getIdTipoDocumentoEjg(Short idInstitucion);
+	
+	@SelectProvider(type = ScsTipodocumentoejgSqlExtendsProvider.class, method = "comboTipoDocumentacion")
+	@Results({ 
+		@Result(column = "IDTIPODOCUMENTOEJG", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> comboTipoDocumentacion(String idLenguaje, Short idInstitucion);
 	
 	
 	

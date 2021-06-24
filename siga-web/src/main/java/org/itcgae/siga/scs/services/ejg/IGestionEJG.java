@@ -4,14 +4,17 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
+import org.itcgae.siga.DTOs.scs.DocumentoEjgItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
+import org.itcgae.siga.DTOs.scs.EjgDocumentacionItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
@@ -27,6 +30,8 @@ import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IGestionEJG {
 
@@ -128,4 +133,21 @@ public interface IGestionEJG {
 	InsertResponseDTO actualizarDelitosEJG(EjgItem item, HttpServletRequest request);
 
 	ProcuradorDTO busquedaProcuradores(ProcuradorItem procuradorItem, HttpServletRequest request);
+
+	ComboDTO comboPresentadores(HttpServletRequest request);
+
+	ComboDTO comboTipoDocumentacion(HttpServletRequest request);
+
+	ComboDTO comboDocumentos(HttpServletRequest request);
+
+	InsertResponseDTO subirDocumentoEjg(MultipartHttpServletRequest request);
+
+	InsertResponseDTO crearDocumentacionEjg(EjgDocumentacionItem documentacionEjgItem, HttpServletRequest request);
+
+	UpdateResponseDTO actualizarDocumentacionEjg(EjgDocumentacionItem documentoEjgItem, HttpServletRequest request);
+
+	DeleteResponseDTO eliminarDocumentosEjg(List<EjgDocumentacionItem> listadocumentoEjgItem,
+			HttpServletRequest request);
+
+	InsertResponseDTO uploadDocumentoEjg(MultipartFile file, HttpServletRequest request);
 }
