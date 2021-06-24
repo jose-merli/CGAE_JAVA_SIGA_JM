@@ -1,6 +1,8 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasSqlProvider;
 
 public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasSqlProvider{
@@ -54,13 +56,12 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
         sql.AND();
         sql.WHERE("gc.idturno = '"+idTurno+"'");
         sql.AND();
-        sql.WHERE("'"+guardiaDia+"' BETWEEN trunc(gc.fechainicio) AND trunc(gc.fechafin)");
+        sql.WHERE("TO_DATE('"+guardiaDia+"', 'DD/MM/YYYY') BETWEEN trunc(gc.fechainicio) AND trunc(gc.fechafin)");
         sql.ORDER_BY("posicion,nombre");
 
 
         return sql.toString();
     }
-    
     
 }
 

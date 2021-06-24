@@ -14,9 +14,10 @@ public class TarjetaAsistenciaItem {
 	private String ejgAnio;
 	private String ejgAnioNumero;
 	private String fchaActuacion;
+	private String fchaJustificacion;
 	private String lugar;
 	private String numeroAsunto;
-	private String nombre, sexo, apellido1, apellido2, nif;
+	private String nombre, sexo, apellido1, apellido2, nif, comisariaJuzgado;
 	
 	public String getAnio() {
 		return anio;
@@ -132,6 +133,30 @@ public class TarjetaAsistenciaItem {
 	 */
 	public void setIdDelito(String idDelito) {
 		this.idDelito = idDelito;
+	}
+	/**
+	 * @return the fchaJustificacion
+	 */
+	public String getFchaJustificacion() {
+		return fchaJustificacion;
+	}
+	/**
+	 * @param fchaJustificacion the fchaJustificacion to set
+	 */
+	public void setFchaJustificacion(String fchaJustificacion) {
+		this.fchaJustificacion = fchaJustificacion;
+	}
+	/**
+	 * @return the comisariaJuzgado
+	 */
+	public String getComisariaJuzgado() {
+		return comisariaJuzgado;
+	}
+	/**
+	 * @param comisariaJuzgado the comisariaJuzgado to set
+	 */
+	public void setComisariaJuzgado(String comisariaJuzgado) {
+		this.comisariaJuzgado = comisariaJuzgado;
 	}
 	@Override
 	public int hashCode() {

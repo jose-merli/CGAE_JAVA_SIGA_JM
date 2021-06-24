@@ -8,6 +8,8 @@ public class ActuacionAsistenciaItem {
 	private String fechaActuacion;
 	private String lugar;
 	private String numeroAsunto;
+	private String fechaJustificacion;
+	private String comisariaJuzgado;
 	
 	public String getLugar() {
 		return lugar;
@@ -26,6 +28,30 @@ public class ActuacionAsistenciaItem {
 	}
 	public void setNumeroAsunto(String numeroAsunto) {
 		this.numeroAsunto = numeroAsunto;
+	}
+	/**
+	 * @return the fchaJustificacion
+	 */
+	public String getFechaJustificacion() {
+		return fechaJustificacion;
+	}
+	/**
+	 * @param fchaJustificacion the fchaJustificacion to set
+	 */
+	public void setFechaJustificacion(String fchaJustificacion) {
+		this.fechaJustificacion = fchaJustificacion;
+	}
+	/**
+	 * @return the comisariaJuzgado
+	 */
+	public String getComisariaJuzgado() {
+		return comisariaJuzgado;
+	}
+	/**
+	 * @param comisariaJuzgado the comisariaJuzgado to set
+	 */
+	public void setComisariaJuzgado(String comisariaJuzgado) {
+		this.comisariaJuzgado = comisariaJuzgado;
 	}
 	@Override
 	public int hashCode() {

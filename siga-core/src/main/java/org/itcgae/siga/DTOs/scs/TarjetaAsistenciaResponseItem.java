@@ -16,6 +16,7 @@ public class TarjetaAsistenciaResponseItem {
 	private String ejgAnioNumero;
 	private List<ActuacionAsistenciaItem> actuaciones;
 	private String nombre, sexo, apellido1, apellido2, nif;
+	private FiltroAsistenciaItem filtro;
 	
 	/**
 	 * @return the anio
@@ -197,6 +198,18 @@ public class TarjetaAsistenciaResponseItem {
 	 */
 	public void setObservaciones(String observaciones) {
 		this.observaciones = observaciones;
+	}
+	/**
+	 * @return the filtro
+	 */
+	public FiltroAsistenciaItem getFiltro() {
+		return filtro;
+	}
+	/**
+	 * @param filtro the filtro to set
+	 */
+	public void setFiltro(FiltroAsistenciaItem filtro) {
+		this.filtro = filtro;
 	}
 	@Override
 	public int hashCode() {

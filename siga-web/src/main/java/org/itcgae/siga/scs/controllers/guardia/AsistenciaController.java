@@ -1,11 +1,14 @@
 package org.itcgae.siga.scs.controllers.guardia;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.FiltroAsistenciaItem;
-import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaDTO;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseDTO;
+import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
 import org.itcgae.siga.scs.services.guardia.AsistenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -101,6 +103,15 @@ public class AsistenciaController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-	
+	@PostMapping(value = "/guardarAsistencias", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> guardarAsistencias(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias) {
+		DeleteResponseDTO response = null;
+		try {
+			response = asistenciaService.guardarAsistencias(request, asistencias);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
 	
 }

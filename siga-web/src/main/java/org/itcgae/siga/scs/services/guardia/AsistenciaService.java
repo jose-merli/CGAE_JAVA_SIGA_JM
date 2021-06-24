@@ -1,11 +1,14 @@
 package org.itcgae.siga.scs.services.guardia;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.FiltroAsistenciaItem;
-import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaDTO;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseDTO;
+import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
 
 public interface AsistenciaService {
 	
@@ -20,4 +23,6 @@ public interface AsistenciaService {
 	public ComboDTO getJuzgados (HttpServletRequest request, String idTurno);
 	
 	public ComboDTO getComisarias (HttpServletRequest request, String idTurno);
+	
+	public DeleteResponseDTO guardarAsistencias(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
 }

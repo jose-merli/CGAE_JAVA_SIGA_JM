@@ -7,6 +7,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.FiltroAsistenciaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.ScsActuacionasistencia;
 import org.itcgae.siga.db.mappers.ScsAsistenciaSqlProvider;
 
 public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
@@ -176,15 +177,24 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.SELECT("apellido2");
 		sql.SELECT("nif");
 		sql.SELECT("sexo");
+		sql.SELECT("aa.fechajustificacion");
 		sql.SELECT("aa.fecha fechaActuacion");
 		sql.SELECT("aa.numeroasunto");
-		sql.SELECT("aa.lugar");
-		sql.SELECT("d.iddelito as delito");
+		sql.SELECT("case"
+				+ "    when aa.idcomisaria is not null"
+				+ "    then aa.idcomisaria"
+				+ "    when aa.idjuzgado is not null"
+				+ "    then aa.idjuzgado"
+				+ "    else null end lugar");
+		sql.SELECT("case"
+				+ "    when aa.idcomisaria is not null"
+				+ "    then 'C'"
+				+ "    when aa.idjuzgado is not null"
+				+ "    then 'J'"
+				+ "    else '' end comisariaJuzgado");
 		sql.FROM("scs_asistencia");
 		sql.INNER_JOIN("scs_personajg p on p.idpersona = scs_asistencia.idpersonajg AND p.idinstitucion = scs_asistencia.idinstitucion");
 		sql.INNER_JOIN("scs_actuacionasistencia aa on aa.idinstitucion = scs_asistencia.idinstitucion AND aa.anio = scs_asistencia.anio AND aa.numero = scs_asistencia.numero");
-		sql.LEFT_OUTER_JOIN("scs_delitosasistencia da on scs_asistencia.anio = da.anio and scs_asistencia.numero = da.numero and scs_asistencia.idinstitucion = da.idinstitucion");
-		sql.LEFT_OUTER_JOIN("scs_delito d on da.iddelito = d.iddelito and da.idinstitucion = d.idinstitucion");
 		sql.WHERE("scs_asistencia.idinstitucion = " + idInstitucion);
 		sql.AND();
 		sql.WHERE("scs_asistencia.idturno = '" + filtroAsistenciaItem.getIdTurno() + "'");
@@ -212,8 +222,75 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 			sql.AND();
 			sql.WHERE("scs_asistencia.idtipoasistenciacolegio = '" + filtroAsistenciaItem.getIdTipoAsistenciaColegiado() + "'");
 		}
+		sql.ORDER_BY("scs_asistencia.anio","scs_asistencia.numero","aa.idactuacion");
 		
 		return sql.toString();
+	}
+	
+	public String getNextNumeroAsistencia(String anio, Short idInstitucion) {
+		 SQL sql = new SQL();
+		 //SELECT nvl(MAX(NUMERO)+1,1) NUMERO FROM SCS_ASISTENCIA WHERE IDINSTITUCION = 2005 AND ANIO = 2018
+		 
+		 sql.SELECT("nvl(MAX(NUMERO)+1,1) NUMERO");
+		 sql.FROM("SCS_ASISTENCIA");
+		 sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'",
+				 "ANIO = '" + anio + "'");
+		 
+		 return sql.toString();
+	}
+	
+	public String updateAsistenciaExpress(ScsActuacionasistencia record) {
+		SQL sql = new SQL();
+        sql.UPDATE("SCS_ACTUACIONASISTENCIA");
+        
+        if (record.getFecha() != null) {
+            sql.SET("FECHA = #{fecha,jdbcType=TIMESTAMP}");
+        }
+
+        if (record.getFechamodificacion() != null) {
+            sql.SET("FECHAMODIFICACION = #{fechamodificacion,jdbcType=TIMESTAMP}");
+        }
+        
+        if (record.getUsumodificacion() != null) {
+            sql.SET("USUMODIFICACION = #{usumodificacion,jdbcType=DECIMAL}");
+        }
+        
+        if (record.getFechajustificacion() != null) {
+            sql.SET("FECHAJUSTIFICACION = #{fechajustificacion,jdbcType=TIMESTAMP}");
+        }
+             
+        if (record.getNumeroasunto() != null) {
+            sql.SET("NUMEROASUNTO = #{numeroasunto,jdbcType=VARCHAR}");
+        }
+        
+        if (record.getIdcomisaria() != null) {
+            sql.SET("IDCOMISARIA = #{idcomisaria,jdbcType=DECIMAL}");
+            sql.SET("IDINSTITUCION_COMIS = #{idinstitucionComis,jdbcType=DECIMAL}");
+            sql.SET("IDINSTITUCION_JUZG = NULL");
+            sql.SET("IDJUZGADO = NULL");
+        }else if (record.getIdjuzgado() != null) {
+            sql.SET("IDINSTITUCION_JUZG = #{idinstitucionJuzg,jdbcType=DECIMAL}");
+            sql.SET("IDJUZGADO = #{idjuzgado,jdbcType=DECIMAL}");
+            sql.SET("IDCOMISARIA = NULL");
+            sql.SET("IDINSTITUCION_COMIS = NULL");
+        }else {
+        	sql.SET("IDINSTITUCION_JUZG = NULL");
+            sql.SET("IDJUZGADO = NULL");
+            sql.SET("IDCOMISARIA = NULL");
+            sql.SET("IDINSTITUCION_COMIS = NULL");
+        }
+        
+        if (record.getIdtipoasistencia() != null) {
+            sql.SET("IDTIPOASISTENCIA = #{idtipoasistencia,jdbcType=DECIMAL}");
+        }
+        
+        
+        sql.WHERE("IDINSTITUCION = #{idinstitucion,jdbcType=DECIMAL}");
+        sql.WHERE("ANIO = #{anio,jdbcType=DECIMAL}");
+        sql.WHERE("NUMERO = #{numero,jdbcType=DECIMAL}");
+        sql.WHERE("IDACTUACION = #{idactuacion,jdbcType=DECIMAL}");
+        
+        return sql.toString();
 	}
 
 }

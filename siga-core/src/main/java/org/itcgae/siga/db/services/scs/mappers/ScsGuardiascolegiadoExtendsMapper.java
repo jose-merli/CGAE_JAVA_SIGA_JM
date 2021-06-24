@@ -11,6 +11,8 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
 import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsGuardiascolegiadoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
