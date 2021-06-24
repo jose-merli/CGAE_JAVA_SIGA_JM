@@ -12,8 +12,11 @@ import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
@@ -21,10 +24,10 @@ import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.scs.services.componentesGenerales.BusquedaAsuntosService;
+import org.itcgae.siga.scs.services.impl.justiciables.GestionJusticiableServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.itcgae.siga.scs.services.impl.justiciables.GestionJusticiableServiceImpl;
 
 @Service
 public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
@@ -50,6 +53,9 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	@Autowired
+	private CenColegiadoMapper cenColegiadoMapper;
 
 	@Override
 	public AsuntosJusticiableDTO searchClaveAsuntosEJG(HttpServletRequest request,
@@ -59,7 +65,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AsuntosJusticiableDTO asuntosJusticiableDTO = new AsuntosJusticiableDTO();
-		List<AsuntosClaveJusticiableItem> asuntosClaveJusticiableItems = null;
+		List<AsuntosJusticiableItem> asuntosJusticiableItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
 
@@ -99,30 +105,83 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				if (tamMax != null) {
 					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
 				} else {
-					tamMaximo = null;
+					tamMaximo = 200;
 				}
 
+				//buscamos la idpersona del colegiado
+				if(asuntosJusticiableItem.getnColegiado()!=null && !asuntosJusticiableItem.getnColegiado().trim().isEmpty()) {
+					String idPersonaColegiado = getIdPersonaColegiado(asuntosJusticiableItem.getnColegiado(), asuntosJusticiableItem.getIdInstitucion());
+					
+					if(!idPersonaColegiado.isEmpty()) {
+						asuntosJusticiableItem.setIdPersonaColegiado(idPersonaColegiado);
+					}
+				}
+				
 				LOGGER.info(
 						"searchClaveAsuntosEJG() / scsEjgExtendsMapper.searchClaveAsuntosEJG() -> Entrada a scsEjgExtendsMapper para obtener los AsuntosEJG");
 
-				asuntosClaveJusticiableItems = scsEjgExtendsMapper.searchClaveAsuntosEJG(asuntosJusticiableItem,
-						tamMaximo);
+				asuntosJusticiableItems = scsEjgExtendsMapper.searchClaveAsuntosEJG(asuntosJusticiableItem,
+						tamMaximo, usuarios.get(0).getIdlenguaje());
 
-				LOGGER.info(
-						"searchClaveAsuntosEJG() / scsEjgExtendsMapper.searchClaveAsuntosEJG() -> Salida a scsEjgExtendsMapper para obtener los AsuntosEJG");
+				LOGGER.info("searchClaveAsuntosEJG() / scsEjgExtendsMapper.searchClaveAsuntosEJG() -> Salida a scsEjgExtendsMapper para obtener los AsuntosEJG");
 
-				if (asuntosClaveJusticiableItems != null) {
-					asuntosJusticiableDTO = gestionJusticiableServiceImpl
-							.searchAsuntosConClave(asuntosClaveJusticiableItems, false, request);
+				if (asuntosJusticiableItems != null && asuntosJusticiableItems.size()>0) {					
+					//vamos a crear los datos de interes
+					for(AsuntosJusticiableItem data : asuntosJusticiableItems) {
+						String datoInteres = "";
+						
+						if(data.getTipo()!=null && !data.getTipo().isEmpty()) {
+							datoInteres+="<b>Tipo: </b>"+data.getTipo();
+						}
+						
+						if(data.getNumProcedimiento()!=null && !data.getNumProcedimiento().isEmpty()) {
+							if(!datoInteres.isEmpty()) {
+								datoInteres+="<p>";
+							}
+							
+							datoInteres+="<b>Núm. Procedimiento: </b>"+data.getNumProcedimiento();
+						}
+						
+						if(data.getNig()!=null && !data.getNig().isEmpty()) {
+							if(!datoInteres.isEmpty()) {
+								datoInteres+="<p>";
+							}
+							
+							datoInteres+="<p><b>NIG: </b>"+data.getNig();
+						}
+						
+						data.setDatosInteres(datoInteres);						
+					}
+					
+					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 				}
 			}
-
 		}
+		
 		LOGGER.info("searchClaveAsuntosEJG() -> Salida del servicio para obtener los Asistencias");
 		return asuntosJusticiableDTO;
-
 	}
 
+	private String getIdPersonaColegiado(String nColegiado, String idInstitucion) {
+		String result = "";
+		
+		CenColegiadoExample example = new CenColegiadoExample();
+		
+		example.createCriteria().andIdinstitucionEqualTo(Short.parseShort(idInstitucion))
+		.andNcolegiadoEqualTo(nColegiado);
+		
+		example.or().andIdinstitucionEqualTo(Short.parseShort(idInstitucion))
+		.andNcomunitarioEqualTo(nColegiado);
+		
+		List<CenColegiado> colegiado = cenColegiadoMapper.selectByExample(example);
+		
+		if(colegiado.size()>0) {
+			result = colegiado.get(0).getIdpersona().toString();
+		}
+		
+		return result;
+	}
+	
 	@Override
 	public AsuntosJusticiableDTO searchClaveAsuntosAsistencias(HttpServletRequest request,
 			AsuntosJusticiableItem asuntosJusticiableItem) {
@@ -131,7 +190,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AsuntosJusticiableDTO asuntosJusticiableDTO = new AsuntosJusticiableDTO();
-		List<AsuntosClaveJusticiableItem> asuntosClaveJusticiableItems = null;
+		List<AsuntosJusticiableItem> asuntosJusticiableItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
 
@@ -171,23 +230,51 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				if (tamMax != null) {
 					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
 				} else {
-					tamMaximo = null;
+					tamMaximo = 200;
+				}
+				
+				//buscamos la idpersona del colegiado
+				if(asuntosJusticiableItem.getnColegiado()!=null && !asuntosJusticiableItem.getnColegiado().trim().isEmpty()) {
+					String idPersonaColegiado = getIdPersonaColegiado(asuntosJusticiableItem.getnColegiado(), asuntosJusticiableItem.getIdInstitucion());
+					
+					if(!idPersonaColegiado.isEmpty()) {
+						asuntosJusticiableItem.setIdPersonaColegiado(idPersonaColegiado);
+					}
 				}
 
 				LOGGER.info(
 						"searchClaveAsuntosAsistencias() / scsAsistenciaExtendsMapper.searchClaveAsuntosAsistencias() -> Entrada a cenTiposolicitudSqlExtendsMapper para obtener los Asistencias");
 				asuntosJusticiableItem.setIdInstitucion(idInstitucion.toString());
-				asuntosClaveJusticiableItems = scsAsistenciaExtendsMapper.searchClaveAsistencia(asuntosJusticiableItem,
-						tamMaximo);
+				asuntosJusticiableItems = scsAsistenciaExtendsMapper.searchClaveAsistencia(asuntosJusticiableItem,
+						tamMaximo, usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"searchClaveAsuntosAsistencias() / scsAsistenciaExtendsMapper.searchClaveAsuntosAsistencias() -> Salida a cenTiposolicitudSqlExtendsMapper para obtener los Asistencias");
 
-				if (asuntosClaveJusticiableItems != null) {
-					asuntosJusticiableDTO = gestionJusticiableServiceImpl
-							.searchAsuntosConClave(asuntosClaveJusticiableItems, false, request);
-
+				if (asuntosJusticiableItems != null && asuntosJusticiableItems.size()>0) {					
+					//vamos a crear los datos de interes
+					for(AsuntosJusticiableItem data : asuntosJusticiableItems) {
+						String datoInteres = "";
+						
+						if(data.getTipo()!=null && !data.getTipo().isEmpty()) {
+							datoInteres+="<b>Tipo: </b>"+data.getTipo();
+						}
+						
+						if(data.getNumProcedimiento()!=null && !data.getNumProcedimiento().isEmpty()) {
+							if(!datoInteres.isEmpty()) {
+								datoInteres+="<p>";
+							}
+							
+							datoInteres+="<b>Núm. Procedimiento: </b>"+data.getNumProcedimiento();
+						}
+						
+						data.setDatosInteres(datoInteres);						
+					}
+					
+					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 				}
+//					asuntosJusticiableDTO = gestionJusticiableServiceImpl
+//							.searchAsuntosConClave(asuntosJusticiableItems, false, request);
 			}
 
 		}

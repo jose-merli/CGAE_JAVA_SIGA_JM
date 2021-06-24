@@ -42,6 +42,7 @@ public class AsuntosJusticiableItem {
 	private String juzgado;
 	private Date fechaAperturaDesde;
 	private Date fechaAperturaHasta;
+	private String nColegiado;
 
 	/**
 	 **/
@@ -407,89 +408,20 @@ public class AsuntosJusticiableItem {
 	public void setDatosInteres(String datosInteres) {
 		this.datosInteres = datosInteres;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((asunto == null) ? 0 : asunto.hashCode());
-		result = prime * result + ((datosInteres == null) ? 0 : datosInteres.hashCode());
-		result = prime * result + ((fecha == null) ? 0 : fecha.hashCode());
-		result = prime * result + ((fechaModificacion == null) ? 0 : fechaModificacion.hashCode());
-		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
-		result = prime * result + ((interesado == null) ? 0 : interesado.hashCode());
-		result = prime * result + ((letrado == null) ? 0 : letrado.hashCode());
-		result = prime * result + ((rol == null) ? 0 : rol.hashCode());
-		result = prime * result + ((turnoGuardia == null) ? 0 : turnoGuardia.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		AsuntosJusticiableItem other = (AsuntosJusticiableItem) obj;
-		if (asunto == null) {
-			if (other.asunto != null)
-				return false;
-		} else if (!asunto.equals(other.asunto))
-			return false;
-		if (datosInteres == null) {
-			if (other.datosInteres != null)
-				return false;
-		} else if (!datosInteres.equals(other.datosInteres))
-			return false;
-		if (fecha == null) {
-			if (other.fecha != null)
-				return false;
-		} else if (!fecha.equals(other.fecha))
-			return false;
-		if (fechaModificacion == null) {
-			if (other.fechaModificacion != null)
-				return false;
-		} else if (!fechaModificacion.equals(other.fechaModificacion))
-			return false;
-		if (idInstitucion == null) {
-			if (other.idInstitucion != null)
-				return false;
-		} else if (!idInstitucion.equals(other.idInstitucion))
-			return false;
-		if (interesado == null) {
-			if (other.interesado != null)
-				return false;
-		} else if (!interesado.equals(other.interesado))
-			return false;
-		if (letrado == null) {
-			if (other.letrado != null)
-				return false;
-		} else if (!letrado.equals(other.letrado))
-			return false;
-		if (rol == null) {
-			if (other.rol != null)
-				return false;
-		} else if (!rol.equals(other.rol))
-			return false;
-		if (turnoGuardia == null) {
-			if (other.turnoGuardia != null)
-				return false;
-		} else if (!turnoGuardia.equals(other.turnoGuardia))
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "AsuntosJusticiableItem [idInstitucion=" + idInstitucion + ", asunto="
-				+ asunto + ", turnoGuardia=" + turnoGuardia + ", letrado=" + letrado + ", fechaModificacion="
-				+ fechaModificacion + ", fecha=" + fecha + ", interesado=" + interesado + ", rol=" + rol
-				+ ", datosInteres=" + datosInteres + "]";
-	}
-
 	
-	
+	/**
+	 **/
+	public AsuntosJusticiableItem nColegiado(String nColegiado) {
+		this.nColegiado = nColegiado;
+		return this;
+	}
 
+	@JsonProperty("nColegiado")
+	public String getnColegiado() {
+		return nColegiado;
+	}
+
+	public void setnColegiado(String nColegiado) {
+		this.nColegiado = nColegiado;
+	}
 }

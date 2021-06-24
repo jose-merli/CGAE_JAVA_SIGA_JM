@@ -59,6 +59,8 @@ public interface IGestionEJG {
 	
 	UpdateResponseDTO cambioEstadoMasivo(List<EjgItem> datos, HttpServletRequest request);
 	
+	UpdateResponseDTO editarEstado(EstadoEjgItem datos, HttpServletRequest request);
+	
 	ResponseEntity<InputStreamResource> descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request);
 	
 	EjgDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request);

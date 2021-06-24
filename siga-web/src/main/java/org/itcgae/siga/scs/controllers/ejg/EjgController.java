@@ -364,6 +364,17 @@ public class EjgController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	
 	}
+	//editarEstado
+	@RequestMapping(value = "/gestion-ejg/editarEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> editarEstado(@RequestBody EstadoEjgItem datos, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionEJG.editarEstado(datos, request);
+		
+		if (response.getStatus().equals("OK"))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	
+	}
 
 	// borrarFamiliar
 	@RequestMapping(value = "/gestion-ejg/borrarFamiliar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
