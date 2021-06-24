@@ -1,11 +1,7 @@
 package org.itcgae.siga.scs.services.impl.ejg;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,13 +9,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -33,10 +26,6 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
-import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
-import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
-import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
-import org.itcgae.siga.DTOs.scs.DocumentoEjgItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -56,12 +45,10 @@ import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ExpExpediente;
 import org.itcgae.siga.db.entities.ExpExpedienteKey;
-import org.itcgae.siga.db.entities.GenFichero;
 import org.itcgae.siga.db.entities.GenFicheroKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
@@ -71,14 +58,9 @@ import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsContrariosejgKey;
 import org.itcgae.siga.db.entities.ScsDelitosejg;
 import org.itcgae.siga.db.entities.ScsDelitosejgExample;
-import org.itcgae.siga.db.entities.ScsDocumentacionasi;
-import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
 import org.itcgae.siga.db.entities.ScsDocumentacionejg;
 import org.itcgae.siga.db.entities.ScsDocumentacionejgKey;
-import org.itcgae.siga.db.entities.ScsDocumentoejg;
-import org.itcgae.siga.db.entities.ScsDocumentacionejg;
 import org.itcgae.siga.db.entities.ScsEejgPeticiones;
-import org.itcgae.siga.db.entities.ScsEejgPeticionesExample;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
@@ -99,7 +81,6 @@ import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionejgMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentoejgMapper;
-import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgPrestacionRechazadaMapper;
 import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
@@ -114,6 +95,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsContrariosejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDelitoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentoejgExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEejgPeticionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsExpedienteEconomicoExtendsMapper;
@@ -140,9 +122,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class GestionEJGServiceImpl implements IGestionEJG {
@@ -224,7 +203,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	private ScsDelitosejgMapper scsDelitosejgMapper;
 
 	@Autowired
-	private ScsEejgPeticionesMapper scsEejgPeticionesMapper;
+	private ScsEejgPeticionesExtendsMapper scsEejgPeticionesExtendsMapper;
 
 	@Autowired
 	private ExpExpedienteMapper expExpedienteMapper;
@@ -723,8 +702,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				LOGGER.info(
 						"unidadFamiliarEJG() / scsPersonajgExtendsMapper.unidadFamiliarEJG() -> Entrada a scsEjgExtendsMapper para obtener Unidad Familiar");
+				
 				unidadFamiliarEJGDTO.setUnidadFamiliarEJGItems(scsPersonajgExtendsMapper.unidadFamiliarEJG(ejgItem,
 						idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
+				
 				LOGGER.info(
 						"unidadFamiliarEJG() / scsPersonajgExtendsMapper.unidadFamiliarEJG() -> Salida de scsEjgExtendsMapper para obtener Unidad Familiar");
 			} else {
@@ -1239,7 +1220,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	@Transactional
-	public ResponseEntity<InputStreamResource> descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request) {
+	public ResponseEntity<InputStreamResource> descargarExpedientesJG(List<EjgItem> itemEJG, HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -1266,34 +1247,29 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 					// recorremos la lista para generar el documento de cada uno de los ejgs
-					for (EjgItem ejg : datos) {
-						// obtenemos la peticion y el idXML
-						LOGGER.debug(
-								"GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la petición...");
-
-						ScsEejgPeticionesExample scsEejgPeticionesExample = new ScsEejgPeticionesExample();
-
-						scsEejgPeticionesExample.createCriteria()
-						.andIdinstitucionEqualTo(Short.parseShort(ejg.getidInstitucion()))
-						.andIdpersonaEqualTo(Long.parseLong(ejg.getIdPersonajg()))
-						.andAnioEqualTo(Short.parseShort(ejg.getAnnio()))
-						.andIdtipoejgEqualTo(Short.parseShort(ejg.getTipoEJG()))
-						.andNumeroEqualTo(Long.parseLong(ejg.getNumEjg()));
-
-						List<ScsEejgPeticiones> peticiones = scsEejgPeticionesMapper.selectByExample(scsEejgPeticionesExample);
-
-						if (peticiones != null && peticiones.size() > 0) {
-
-							// obtenemos los datos del fichero
-							LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos para el informe...");
-							Map<Integer, Map<String, String>> mapInformeEejg = eejgService.getDatosInformeEejg(ejg,peticiones.get(0));
-
-							LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo el informe...");
-							DatosDocumentoItem documento = eejgService.getInformeEejg(mapInformeEejg, ejg.getidInstitucion());
-
-							ficheros.add(documento);
-						}
-					}
+					if(itemEJG!=null) {
+						for (EjgItem ejg : itemEJG) {
+							// obtenemos la peticion y el idXML
+							LOGGER.debug(
+									"GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos de la petición...");
+	
+							List<ScsEejgPeticiones> peticiones = scsEejgPeticionesExtendsMapper.getPeticionesPorEJG(ejg);	
+	
+						if (peticiones != null && peticiones.size() > 0) {	
+	
+							for(ScsEejgPeticiones peticion : peticiones){	
+								// obtenemos los datos del fichero	
+								LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos para el informe...");	
+								Map<Integer, Map<String, String>> mapInformeEejg = eejgService.getDatosInformeEejg(ejg,peticion);	
+		
+								LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo el informe...");	
+								DatosDocumentoItem documento = eejgService.getInformeEejg(mapInformeEejg, ejg.getidInstitucion());	
+		
+								ficheros.add(documento);	
+							}	
+						}	
+				
+					}	}
 
 					fichero = WSCommons.zipBytes(ficheros, new File("downloads.zip"));
 

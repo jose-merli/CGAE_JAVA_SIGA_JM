@@ -177,8 +177,8 @@ public class PFDServiceImpl implements IPFDService {
 		String idClientePFD = param.getValor();
 
 		solicitud.setIdAppCliente(idClientePFD);
-//		solicitud.setIdValidacion(csv);
-		solicitud.setIdValidacion("DEM-JKTYO-NERK0-LNGBQ-CLB1Z");// cambiar esto por el csv del fichero, solo para que
+		solicitud.setIdValidacion(csv);
+//		solicitud.setIdValidacion("DEM-JKTYO-NERK0-LNGBQ-CLB1Z");// cambiar esto por el csv del fichero, solo para que
 																	// funcione en local
 
 		ObtenerDocumento doc = ObtenerDocumento.Factory.newInstance();
