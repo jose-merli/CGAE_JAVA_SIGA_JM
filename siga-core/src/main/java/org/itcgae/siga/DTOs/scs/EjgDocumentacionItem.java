@@ -8,13 +8,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class EjgDocumentacionItem {
 	private Date flimite_presentacion;
 	private String presentador;
-	private String documentoDesc;
+	private Short idDocumento;
+	private Long idDocumentacion;
 	private String regEntrada;
 	private String regSalida;
 	private Date f_presentacion;
 	private String propietario;	
 	private String parentesco;
+	private String idTipoDocumento;
+	private String descripcionDoc;
 	private String presentador_persona; //nombrem apellido1, apellido2 de personajg
+	private String idTipoEjg;
+	private String anio;
+	private String numero;
+	private String idFichero;
+	private String nombreFichero;
 
    
 	 /**
@@ -46,19 +54,7 @@ public class EjgDocumentacionItem {
 		this.presentador = presentador;
 	}
 	 /**
-	   * 
-	 **/
-	  public EjgDocumentacionItem documentoDesc(String documentoDesc) {
-	    this.documentoDesc = documentoDesc;
-	    return this;
-	  }	  
-	  @JsonProperty("documentoDesc")
-	public String getDocumentoDesc() {
-		return documentoDesc;
-	}
-	public void setDocumentoDesc(String documentoDesc) {
-		this.documentoDesc = documentoDesc;
-	}
+	 
 	 /**
 	   * 
 	 **/
@@ -142,6 +138,60 @@ public class EjgDocumentacionItem {
 	}
 	public void setPresentador_persona(String presentador_persona) {
 		this.presentador_persona = presentador_persona;
+	}
+	public String getIdTipoDocumento() {
+		return idTipoDocumento;
+	}
+	public void setIdTipoDocumento(String idTipoDocumento) {
+		this.idTipoDocumento = idTipoDocumento;
+	}
+	public Short getIdDocumento() {
+		return idDocumento;
+	}
+	public void setIdDocumento(Short idDocumento) {
+		this.idDocumento = idDocumento;
+	}
+	public String getDescripcionDoc() {
+		return descripcionDoc;
+	}
+	public void setDescripcionDoc(String descripcionDoc) {
+		this.descripcionDoc = descripcionDoc;
+	}
+	public Long getIdDocumentacion() {
+		return idDocumentacion;
+	}
+	public void setIdDocumentacion(Long idDocumentacion) {
+		this.idDocumentacion = idDocumentacion;
+	}
+	public String getIdTipoEjg() {
+		return idTipoEjg;
+	}
+	public void setIdTipoEjg(String idTipoEjg) {
+		this.idTipoEjg = idTipoEjg;
+	}
+	public String getAnio() {
+		return anio;
+	}
+	public void setAnio(String anio) {
+		this.anio = anio;
+	}
+	public String getNumero() {
+		return numero;
+	}
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
+	public String getIdFichero() {
+		return idFichero;
+	}
+	public void setIdFichero(String idFichero) {
+		this.idFichero = idFichero;
+	}
+	public String getNombreFichero() {
+		return nombreFichero;
+	}
+	public void setNombreFichero(String nombreFichero) {
+		this.nombreFichero = nombreFichero;
 	}
 	
 

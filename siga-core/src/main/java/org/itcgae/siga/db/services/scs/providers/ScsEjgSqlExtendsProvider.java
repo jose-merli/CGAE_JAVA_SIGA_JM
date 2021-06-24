@@ -1427,4 +1427,16 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 	
+	public String getNewIdDocumentacionEjg(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("NVL(MAX(DOC.IDDOCUMENTACION),0) +1 AS ID");
+
+		sql.FROM("SCS_DOCUMENTACIONEJG DOC");
+
+		sql.WHERE("DOC.IDINSTITUCION = '" + idInstitucion + "'");
+
+		return sql.toString();
+	}
+	
 }

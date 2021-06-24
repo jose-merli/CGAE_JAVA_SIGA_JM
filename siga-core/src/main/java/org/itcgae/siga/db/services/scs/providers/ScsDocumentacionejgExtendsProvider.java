@@ -7,19 +7,14 @@ import org.itcgae.siga.db.mappers.ScsDocumentacionejgSqlProvider;
 public class ScsDocumentacionejgExtendsProvider extends ScsDocumentacionejgSqlProvider {
 	public String getDocumentacion(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		SQL sql = new SQL();
-		sql.SELECT("doc.fechalimite," + 
-				" doc.documentacion," + 
-				" doc.regentrada," + 
-				" doc.regsalida," + 
-				" doc.fechaentrega," + 
-				" doc.comisionajg," + 
+		sql.SELECT("doc.*," + 
 				" catalogo.descripcion as presentadores," + 
 				" familiar.solicitante," + 
 				" catalogo2.descripcion as parentesco," + 
 //				" persona.nombre," + 
 //				" persona.apellido1," + 
 //				" persona.apellido2");
-				"persona.apellido1 || ' ' || persona.apellido2 || ', ' || persona.nombre as nombrecompleto");
+				"(CASE WHEN persona.nombre is  NULL THEN '' ELSE persona.apellido1 || ' ' || persona.apellido2 || ', ' || persona.nombre END)as nombrecompleto");
 		
 		sql.FROM("scs_documentacionejg doc");
 		
@@ -32,8 +27,8 @@ public class ScsDocumentacionejgExtendsProvider extends ScsDocumentacionejgSqlPr
 
 		if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 			sql.WHERE("doc.anio = '" + ejgItem.getAnnio() + "'");
-		if(ejgItem.getNumEjg() != null && ejgItem.getNumEjg() != "")
-			sql.WHERE("doc.numero = '" + ejgItem.getNumEjg() + "'");
+		if(ejgItem.getNumEjg() != null && ejgItem.getNumero() != "")
+			sql.WHERE("doc.numero = '" + ejgItem.getNumero() + "'");
 //			sql.WHERE("doc.numero = '16347'");
 
 		if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")

@@ -5,14 +5,17 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
+import org.itcgae.siga.DTOs.scs.DocumentoEjgItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
+import org.itcgae.siga.DTOs.scs.EjgDocumentacionItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
@@ -37,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/ejg")
@@ -267,12 +271,26 @@ public class EjgController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
-	// Combo Tipo en calidad
-	@RequestMapping(value = "/gestion-ejg/comboTipoencalidad", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboTipoencalidad(HttpServletRequest request) {
-		ComboDTO response = gestionEJG.comboTipoencalidad(request);
+	// Combo presentador
+	@RequestMapping(value = "/gestion-ejg/comboPresentadores", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboPresentador(HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboPresentadores(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	// Combo presentador
+		@RequestMapping(value = "/gestion-ejg/comboTipoDocumentacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<ComboDTO> comboTipoDocumentacion(HttpServletRequest request) {
+			ComboDTO response = gestionEJG.comboTipoDocumentacion(request);
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		}
+		
+		// Combo presentador
+		@RequestMapping(value = "/gestion-ejg/comboDocumentos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<ComboDTO> comboDocumento(HttpServletRequest request) {
+			ComboDTO response = gestionEJG.comboDocumentos(request);
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		}
 
 	// cambiarEstadoEJGs
 	@RequestMapping(value = "/gestion-ejg/cambioEstadoMasivo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -607,4 +625,36 @@ public class EjgController {
 		return new ResponseEntity<ProcuradorDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/gestion-ejg/subirDocumentoEjg",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> subirDocumentoEjg(MultipartHttpServletRequest request) {
+		InsertResponseDTO response = gestionEJG.subirDocumentoEjg(request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/gestion-ejg/crearDocumentacionEjg",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> crearDocumentacionEjg(@RequestBody EjgDocumentacionItem documentoEjgItem, HttpServletRequest request) {
+		InsertResponseDTO response = gestionEJG.crearDocumentacionEjg(documentoEjgItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/gestion-ejg/actualizarDocumentacionEjg",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> actualizarDocumentacionEjg(@RequestBody EjgDocumentacionItem documentoEjgItem, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionEJG.actualizarDocumentacionEjg(documentoEjgItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/gestion-ejg/eliminarDocumentosEjg",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> eliminarDocumentosEjg(@RequestBody List<EjgDocumentacionItem> documentosEjgItem, HttpServletRequest request) {
+		DeleteResponseDTO response = gestionEJG.eliminarDocumentosEjg(documentosEjgItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }
