@@ -48,14 +48,19 @@ import org.springframework.stereotype.Service;
 public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "searchClaveDesignaciones")
-	@Results({ @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.DATE),
-			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR) })
-	List<AsuntosClaveJusticiableItem> searchClaveDesignaciones(AsuntosJusticiableItem asuntosJusticiableItem,
-			Integer tamMaximo);
+	@Results({@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TURNOGUARDIA", property = "turnoGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "INTERESADO", property = "interesado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAENTRADA", property = "fecha", jdbcType = JdbcType.DATE),
+		@Result(column = "NUMEROPROCEDIMIENTO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADO", property = "idEstadoDesigna", jdbcType = JdbcType.VARCHAR) })
+	List<AsuntosJusticiableItem> searchClaveDesignaciones(AsuntosJusticiableItem asuntosJusticiableItem,
+			Integer tamMaximo, String idLenguaje);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaDesignaciones")
 	@Results({ @Result(column = "ANIO", property = "ano", jdbcType = JdbcType.NUMERIC),

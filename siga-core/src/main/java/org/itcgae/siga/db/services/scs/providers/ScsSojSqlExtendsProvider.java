@@ -11,72 +11,135 @@ import org.itcgae.siga.db.mappers.ScsSojSqlProvider;
 public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 
 	public String searchClaveSoj(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fecha;
 		SQL sql = new SQL();
-		SQL sqlOrder = new SQL();
-
-		sqlOrder.SELECT("*");
-		sql.SELECT("SOJ.idinstitucion, SOJ.anio,SOJ.numero,to_char(SOJ.IDTIPOSOJ) AS clave, '' as rol, 'S' as tipo");
-		sql.FROM("SCS_SOJ SOJ");
-		// El Join con la tabla de scs_personaJG, solo realizará si nos viene informado
-		// alguno de los datos del solicitante(Nif, nombre o apellidos).
-		if (asuntosJusticiableItem.getNombre() != null || asuntosJusticiableItem.getApellidos() != null
-				|| asuntosJusticiableItem.getNif() != null) {
-			sql.INNER_JOIN(
-					"SCS_PERSONAJG PERSONA ON (SOJ.IDPERSONAJG = PERSONA.IDPERSONA AND PERSONA.IDINSTITUCION = SOJ.IDINSTITUCION)");
-		}
-		sql.WHERE("SOJ.idinstitucion =" + asuntosJusticiableItem.getIdInstitucion());
-
-		if (asuntosJusticiableItem.getAnio() != null && asuntosJusticiableItem.getAnio() != "") {
-			sql.WHERE("SOJ.ANIO = " + asuntosJusticiableItem.getAnio());
-		}
-		if (asuntosJusticiableItem.getNumero() != null) {
-			sql.WHERE("SOJ.NUMERO = " + asuntosJusticiableItem.getNumero());
-		}
-		if (asuntosJusticiableItem.getIdTurno() != null) {
-			sql.WHERE("SOJ.IDTURNO = " + asuntosJusticiableItem.getIdTurno());
-		}
-		if (asuntosJusticiableItem.getIdGuardia() != null) {
-			sql.WHERE("SOJ.IDGUARDIA = " + asuntosJusticiableItem.getIdGuardia());
-		}
-
-		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
-			sql.WHERE("SOJ.IDPERSONA = " + asuntosJusticiableItem.getIdPersonaColegiado());
-		}
-		if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-			String fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
-			sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') >= TO_DATE('" + fecha + "','DD/MM/RRRR')");
-		}
-		if (asuntosJusticiableItem.getFechaAperturaHasta() != null) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-			String fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaHasta());
-			sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') <= TO_DATE('" + fecha + "','DD/MM/RRRR')");
-		}
-
-		if (asuntosJusticiableItem.getNif() != null  && asuntosJusticiableItem.getNif() != "") {
-            sql.WHERE("upper(PERSONA.NIF) like upper('%"+asuntosJusticiableItem.getNif()+"%')");
-		}
-
-		if ((asuntosJusticiableItem.getNombre() != null  && asuntosJusticiableItem.getNombre() != "")|| (asuntosJusticiableItem.getApellidos() != null && asuntosJusticiableItem.getApellidos() != "")
-				|| (asuntosJusticiableItem.getNif() != null  && asuntosJusticiableItem.getNif() != "")) {
-			if (asuntosJusticiableItem.getApellidos() != null)
-				sql.WHERE(UtilidadesString.filtroTextoBusquedas("REPLACE(CONCAT(apellido1,apellido2), ' ', '')",
-						asuntosJusticiableItem.getApellidos().replaceAll("\\s+", "")));
-			if (asuntosJusticiableItem.getNombre() != null)
-				sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE", asuntosJusticiableItem.getNombre()));
-		}
-
-		if (asuntosJusticiableItem.getIdTipoSoj() != null) {
-			sql.WHERE("SOJ.IDTIPOSOJ = " + asuntosJusticiableItem.getIdTipoSoj());
-		}
-
-		sqlOrder.FROM("(" + sql + " )");
-		if (tamMax != null) {
-			Integer tamMaxNumber = tamMax + 1;
-			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
-		}
-		return sqlOrder.toString();
-		// return sql.toString();
+		
+		sql.SELECT("soj.idinstitucion,\r\n"
+				+ "    soj.anio,\r\n"
+				+ "    soj.numero,\r\n"
+				+ "    soj.numsoj codigo,\r\n"
+				+ "    t.abreviatura turno,\r\n"
+				+ "    g.nombre guardia,\r\n"
+				+ "    f_siga_getrecurso(\r\n"
+				+ "        ts.descripcion,\r\n"
+				+ "        $$IDLENGUAJE$$\r\n"
+				+ "    ) tiposoj,\r\n"
+				+ "    ( pjg.nombre\r\n"
+				+ "     || ' '\r\n"
+				+ "     || pjg.apellido1\r\n"
+				+ "     || ' '\r\n"
+				+ "     || pjg.apellido2 ) solicitante\r\n");
+		sql.FROM("    scs_soj soj\r\n");
+		sql.JOIN("scs_personajg pjg ON (\r\n"
+				+ "            pjg.idpersona = soj.idpersonajg\r\n"
+				+ "        AND\r\n"
+				+ "            pjg.idinstitucion = soj.idinstitucion\r\n"
+				+ "    )\r\n");
+		sql.JOIN("scs_turno t ON (\r\n"
+				+ "            t.idturno = soj.idturno\r\n"
+				+ "        AND\r\n"
+				+ "            t.idinstitucion = soj.idinstitucion\r\n"
+				+ "    )\r\n");
+		sql.JOIN("scs_guardiasturno g ON (\r\n"
+				+ "            soj.idturno = g.idturno\r\n"
+				+ "        AND\r\n"
+				+ "            soj.idinstitucion = g.idinstitucion\r\n"
+				+ "        AND\r\n"
+				+ "            soj.idguardia = g.idguardia\r\n"
+				+ "    )\r\n");
+		sql.JOIN("scs_tiposoj ts ON (\r\n"
+				+ "        ts.idtiposoj = soj.idtiposoj\r\n"
+				+ "    )\r\n");
+		
+		sql.WHERE("soj.idinstitucion ="+asuntosJusticiableItem.getIdInstitucion()+" soj.anio = "+asuntosJusticiableItem.getAnio());
+//				+ "    AND\r\n"
+//				+ "        soj.numero = $$NUM SOJ$$\r\n"
+//				+ "    AND\r\n"
+//				+ "        TO_CHAR(soj.fechaapertura ,'DD/MM/RRRR') >= TO_DATE($$FECHAAPERTURADESDE$$,'DD/MM/RRRR')\r\n"
+//				+ "    AND\r\n"
+//				+ "        TO_CHAR(soj.fechaapertura ,'DD/MM/RRRR') >= TO_DATE($$FECHAAPERTURAHASTA$$,'DD/MM/RRRR')\r\n"
+//				+ "    AND\r\n"
+//				+ "        soj.idtiposoj = $$ID TIPO SOJ$$\r\n"
+//				+ "    AND\r\n"
+//				+ "        soj.idturno = $$IDTURNO$$\r\n"
+//				+ "    AND\r\n"
+//				+ "        soj.idguardia = $$IDGUARDIA$$\r\n"
+//				+ "    AND\r\n"
+//				+ "        soj.idpersona = $$ID PERSONA COLEGIADO$$ --(HAY QUE UNA BUSQUEDA PRIMERO DEL NCOLEGIADO PARA SABER LA IDPERSONA)\r\n"
+//				+ "    AND\r\n"
+//				+ "        
+//				+ "    AND\r\n"
+//				+ "        upper(pjg.nombre) LIKE upper(\"'%\"+$$NOMBRE INTERESADO$$+\"%'\")\r\n"
+//				+ "    AND\r\n"
+//				+ "        upper( (pjg.apellido1 || ' ' || pjg.apellido2) ) LIKE upper(\"'%\"+$$APELLIDOS INTERESADO$$+\"%'\")\r\n"
+//				+ "    AND\r\n"
+//				+ "        upper(pjg.nif) LIKE upper(\"'%\"+$$NIF INTERESADO$$+\"%'\")"
+//		SQL sqlOrder = new SQL();
+//
+//		sqlOrder.SELECT("*");
+//		sql.SELECT("SOJ.idinstitucion, SOJ.anio,SOJ.numero,to_char(SOJ.IDTIPOSOJ) AS clave, '' as rol, 'S' as tipo");
+//		sql.FROM("SCS_SOJ SOJ");
+//		// El Join con la tabla de scs_personaJG, solo realizará si nos viene informado
+//		// alguno de los datos del solicitante(Nif, nombre o apellidos).
+//		if (asuntosJusticiableItem.getNombre() != null || asuntosJusticiableItem.getApellidos() != null
+//				|| asuntosJusticiableItem.getNif() != null) {
+//			sql.INNER_JOIN(
+//					"SCS_PERSONAJG PERSONA ON (SOJ.IDPERSONAJG = PERSONA.IDPERSONA AND PERSONA.IDINSTITUCION = SOJ.IDINSTITUCION)");
+//		}
+//		sql.WHERE("SOJ.idinstitucion =" + asuntosJusticiableItem.getIdInstitucion());
+//
+//		if (asuntosJusticiableItem.getAnio() != null && asuntosJusticiableItem.getAnio() != "") {
+//			sql.WHERE("SOJ.ANIO = " + asuntosJusticiableItem.getAnio());
+//		}
+//		if (asuntosJusticiableItem.getNumero() != null) {
+//			sql.WHERE("SOJ.NUMERO = " + asuntosJusticiableItem.getNumero());
+//		}
+//		if (asuntosJusticiableItem.getIdTurno() != null) {
+//			sql.WHERE("SOJ.IDTURNO = " + asuntosJusticiableItem.getIdTurno());
+//		}
+//		if (asuntosJusticiableItem.getIdGuardia() != null) {
+//			sql.WHERE("SOJ.IDGUARDIA = " + asuntosJusticiableItem.getIdGuardia());
+//		}
+//
+//		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
+//			sql.WHERE("SOJ.IDPERSONA = " + asuntosJusticiableItem.getIdPersonaColegiado());
+//		}
+//		if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
+//			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//			String fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
+//			sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') >= TO_DATE('" + fecha + "','DD/MM/RRRR')");
+//		}
+//		if (asuntosJusticiableItem.getFechaAperturaHasta() != null) {
+//			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//			String fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaHasta());
+//			sql.WHERE("TO_CHAR(EJG.FECHAAPERTURA,'DD/MM/RRRR') <= TO_DATE('" + fecha + "','DD/MM/RRRR')");
+//		}
+//
+//		if (asuntosJusticiableItem.getNif() != null  && asuntosJusticiableItem.getNif() != "") {
+//            sql.WHERE("upper(PERSONA.NIF) like upper('%"+asuntosJusticiableItem.getNif()+"%')");
+//		}
+//
+//		if ((asuntosJusticiableItem.getNombre() != null  && asuntosJusticiableItem.getNombre() != "")|| (asuntosJusticiableItem.getApellidos() != null && asuntosJusticiableItem.getApellidos() != "")
+//				|| (asuntosJusticiableItem.getNif() != null  && asuntosJusticiableItem.getNif() != "")) {
+//			if (asuntosJusticiableItem.getApellidos() != null)
+//				sql.WHERE(UtilidadesString.filtroTextoBusquedas("REPLACE(CONCAT(apellido1,apellido2), ' ', '')",
+//						asuntosJusticiableItem.getApellidos().replaceAll("\\s+", "")));
+//			if (asuntosJusticiableItem.getNombre() != null)
+//				sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE", asuntosJusticiableItem.getNombre()));
+//		}
+//
+//		if (asuntosJusticiableItem.getIdTipoSoj() != null) {
+//			sql.WHERE("SOJ.IDTIPOSOJ = " + asuntosJusticiableItem.getIdTipoSoj());
+//		}
+//
+//		sqlOrder.FROM("(" + sql + " )");
+//		if (tamMax != null) {
+//			Integer tamMaxNumber = tamMax + 1;
+//			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+//		}
+//		return sqlOrder.toString();
+		 return sql.toString();
 	}
 
 	public String getAsuntoTipoSoj(AsuntosClaveJusticiableItem asuntoClave, String idLenguaje) {
