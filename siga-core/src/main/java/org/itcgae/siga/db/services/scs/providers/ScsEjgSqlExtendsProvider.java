@@ -689,15 +689,15 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		}
 
 		if (asuntosJusticiableItem.getNif() != null && !asuntosJusticiableItem.getNif().trim().isEmpty()) {
-			sql.WHERE("perjg.nif = '%" + asuntosJusticiableItem.getNif().trim() + "%'");
+			sql.WHERE("pjg.nif = '%" + asuntosJusticiableItem.getNif().trim() + "%'");
 		}
 
 		if (asuntosJusticiableItem.getNombre() != null && !asuntosJusticiableItem.getNombre().trim().isEmpty()) {
-			sql.WHERE("perjg.nombre LIKE upper('%" + asuntosJusticiableItem.getNombre().trim() + "%')");
+			sql.WHERE("pjg.nombre LIKE upper('%" + asuntosJusticiableItem.getNombre().trim() + "%')");
 		}
 
 		if (asuntosJusticiableItem.getApellidos() != null && !asuntosJusticiableItem.getApellidos().trim().isEmpty()) {
-			sql.WHERE("(perjg.apellido1 || ' ' || perjg.apellido2) LIKE upper('%"
+			sql.WHERE("(pjg.apellido1 || ' ' || pjg.apellido2) LIKE upper('%"
 					+ asuntosJusticiableItem.getApellidos().trim() + "%')");
 		}
 

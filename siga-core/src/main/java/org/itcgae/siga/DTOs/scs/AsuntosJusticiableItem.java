@@ -43,6 +43,7 @@ public class AsuntosJusticiableItem {
 	private Date fechaAperturaDesde;
 	private Date fechaAperturaHasta;
 	private String nColegiado;
+	private String estado;
 
 	/**
 	 **/
@@ -423,5 +424,14 @@ public class AsuntosJusticiableItem {
 
 	public void setnColegiado(String nColegiado) {
 		this.nColegiado = nColegiado;
+	}
+
+	@JsonProperty("estado")
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
 	}
 }

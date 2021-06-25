@@ -19,9 +19,11 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.SELECT("a.idinstitucion, a.anio, a.numero, ('A' ||a.anio || '/' || a.numero) asunto,"
 				+ "(nvl(t.abreviatura,'') || '/' || nvl(g.nombre,'')) turnoguardia,"
 				+ "f_siga_getrecurso(nvl(ta.descripcion,''),"+idLenguaje+") tipoasistencia,"
-				+ "(nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) solicitante,"
+				+ "(nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado,"
-				+ "a.fechahora, NVL(a.numeroprocedimiento,'') numeroprocedimiento");
+				+ "a.fechahora, NVL(a.numeroprocedimiento,'') numeroprocedimiento,"
+				+ "a.comisaria centrodetencion,"
+				+ "a.juzgado");
 		
 		sql.FROM("scs_asistencia a");
 	    sql.JOIN("scs_tipoasistencia ta ON (ta.idtipoasistencia = a.idtipoasistencia)");
@@ -39,7 +41,10 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 	    if(asuntosJusticiableItem.getNumero() != null && !asuntosJusticiableItem.getNumero().trim().isEmpty()) {
 	    	sql.WHERE("a.numero = "+asuntosJusticiableItem.getNumero());
 	    }
-	    
+	    if(asuntosJusticiableItem.getIdTipoAsistencia() != null && !asuntosJusticiableItem.getIdTipoAsistencia().trim().isEmpty()) {
+	    	sql.WHERE("a.idtipoasistencia = "+asuntosJusticiableItem.getIdTipoAsistencia());
+	    }
+	   
 	    if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
 			fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
 			sql.WHERE("TO_CHAR(a.fechahora,'DD/MM/RRRR') >= TO_DATE('" + fecha + "','DD/MM/RRRR')");
@@ -51,21 +56,30 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		}
 
 		if (asuntosJusticiableItem.getNif() != null && !asuntosJusticiableItem.getNif().trim().isEmpty()) {
-			sql.WHERE("perjg.nif = '%" + asuntosJusticiableItem.getNif().trim() + "%'");
+			sql.WHERE("pjg.nif = '%" + asuntosJusticiableItem.getNif().trim() + "%'");
 		}
 
 		if (asuntosJusticiableItem.getNombre() != null && !asuntosJusticiableItem.getNombre().trim().isEmpty()) {
-			sql.WHERE("perjg.nombre LIKE upper('%" + asuntosJusticiableItem.getNombre().trim() + "%')");
+			sql.WHERE("pjg.nombre LIKE upper('%" + asuntosJusticiableItem.getNombre().trim() + "%')");
 		}
 
 		if (asuntosJusticiableItem.getApellidos() != null && !asuntosJusticiableItem.getApellidos().trim().isEmpty()) {
-			sql.WHERE("(perjg.apellido1 || ' ' || perjg.apellido2) LIKE upper('%"
+			sql.WHERE("(pjg.apellido1 || ' ' || pjg.apellido2) LIKE upper('%"
 					+ asuntosJusticiableItem.getApellidos().trim() + "%')");
 		}
-
-		if (asuntosJusticiableItem.getIdTurno() != null) {
-			sql.WHERE("a.idturno = " + asuntosJusticiableItem.getIdTurno());
+		if (asuntosJusticiableItem.getNumeroDiligencia() != null && !asuntosJusticiableItem.getNumeroDiligencia().trim().isEmpty()) {
+			sql.WHERE("a.numerodiligencia = "+ asuntosJusticiableItem.getNumeroDiligencia().trim());
 		}
+		if (asuntosJusticiableItem.getComisaria() != null) {
+			sql.WHERE("a.comisaria   = " + asuntosJusticiableItem.getComisaria());
+		}
+		if (asuntosJusticiableItem.getIdJuzgado() != null) {
+			sql.WHERE("a.juzgado  = " + asuntosJusticiableItem.getIdJuzgado());
+		}
+		if (asuntosJusticiableItem.getNumeroDiligencia() != null) {
+			sql.WHERE("a.juzgado  = " + asuntosJusticiableItem.getIdJuzgado());
+		}
+		
 		if (asuntosJusticiableItem.getIdGuardia() != null) {
 			sql.WHERE("a.idguardia = " + asuntosJusticiableItem.getIdGuardia());
 		}
@@ -75,7 +89,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		
 		sql.WHERE("ROWNUM <= " + tamMax);
 
-		sql.ORDER_BY("ejg.anio desc, ejg.numero DESC");
+		sql.ORDER_BY("a.anio desc, a.numero DESC");
 		
 //		SQL sqlOrder = new SQL();
 //

@@ -10,49 +10,79 @@ import org.itcgae.siga.db.mappers.ScsSojSqlProvider;
 
 public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 
-	public String searchClaveSoj(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax) {
+	public String searchClaveSoj(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax, String idLenguaje) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		String fecha;
 		SQL sql = new SQL();
-		
-		sql.SELECT("soj.idinstitucion,\r\n"
-				+ "    soj.anio,\r\n"
-				+ "    soj.numero,\r\n"
-				+ "    soj.numsoj codigo,\r\n"
-				+ "    t.abreviatura turno,\r\n"
-				+ "    g.nombre guardia,\r\n"
-				+ "    f_siga_getrecurso(\r\n"
-				+ "        ts.descripcion,\r\n"
-				+ "        $$IDLENGUAJE$$\r\n"
-				+ "    ) tiposoj,\r\n"
-				+ "    ( pjg.nombre\r\n"
-				+ "     || ' '\r\n"
-				+ "     || pjg.apellido1\r\n"
-				+ "     || ' '\r\n"
-				+ "     || pjg.apellido2 ) solicitante\r\n");
+
+		sql.SELECT("soj.idinstitucion," 
+				+ "    soj.anio," 
+				+ "    soj.numero," 
+				+ "    soj.numsoj codigo,"
+				+ "    soj.estado," 
+				+ "		soj.fechaapertura,"
+				+ "(nvl(t.abreviatura,'') || '/' || nvl(g.nombre,'')) turnoguardia,"
+				+ "('S' || soj.anio || '/' || soj.numero) asunto," + "    f_siga_getrecurso(ts.descripcion,"
+				+ idLenguaje + "" 
+				+ "    ) tiposoj," 
+				+ "		soj.idtiposoj,"
+				+ "    (nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
+				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado");
 		sql.FROM("    scs_soj soj\r\n");
-		sql.JOIN("scs_personajg pjg ON (\r\n"
-				+ "            pjg.idpersona = soj.idpersonajg\r\n"
-				+ "        AND\r\n"
-				+ "            pjg.idinstitucion = soj.idinstitucion\r\n"
-				+ "    )\r\n");
-		sql.JOIN("scs_turno t ON (\r\n"
-				+ "            t.idturno = soj.idturno\r\n"
-				+ "        AND\r\n"
-				+ "            t.idinstitucion = soj.idinstitucion\r\n"
-				+ "    )\r\n");
-		sql.JOIN("scs_guardiasturno g ON (\r\n"
-				+ "            soj.idturno = g.idturno\r\n"
-				+ "        AND\r\n"
-				+ "            soj.idinstitucion = g.idinstitucion\r\n"
-				+ "        AND\r\n"
-				+ "            soj.idguardia = g.idguardia\r\n"
-				+ "    )\r\n");
-		sql.JOIN("scs_tiposoj ts ON (\r\n"
-				+ "        ts.idtiposoj = soj.idtiposoj\r\n"
-				+ "    )\r\n");
-		
-		sql.WHERE("soj.idinstitucion ="+asuntosJusticiableItem.getIdInstitucion()+" soj.anio = "+asuntosJusticiableItem.getAnio());
+		sql.JOIN("scs_personajg pjg ON ( pjg.idpersona = soj.idpersonajg AND pjg.idinstitucion = soj.idinstitucion)");
+		sql.LEFT_OUTER_JOIN("cen_persona per ON (soj.idpersona = per.idpersona)");
+		sql.JOIN("scs_turno t ON ( t.idturno = soj.idturno AND t.idinstitucion = soj.idinstitucion)");
+		sql.JOIN(
+				"scs_guardiasturno g ON ( soj.idturno = g.idturno AND soj.idinstitucion = g.idinstitucion AND soj.idguardia = g.idguardia)");
+		sql.JOIN("scs_tiposoj ts ON ( ts.idtiposoj = soj.idtiposoj )");
+
+		if (asuntosJusticiableItem.getAnio() != null && !asuntosJusticiableItem.getAnio().trim().isEmpty()) {
+			sql.WHERE("soj.anio = " + asuntosJusticiableItem.getAnio().trim());
+		}
+
+		if (asuntosJusticiableItem.getNumero() != null && !asuntosJusticiableItem.getNumero().trim().isEmpty()) {
+			sql.WHERE("soj.numero = " + asuntosJusticiableItem.getNumero().trim());
+		}
+
+		if (asuntosJusticiableItem.getIdTipoEjg() != null && !asuntosJusticiableItem.getIdTipoEjg().trim().isEmpty()) {
+			sql.WHERE("soj.idtipoejg = " + asuntosJusticiableItem.getIdTipoEjg().trim());
+		}
+
+		if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
+			fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
+			sql.WHERE("soj.fechaapertura >= TO_DATE('" + fecha + "','DD/MM/RRRR')");
+		}
+
+		if (asuntosJusticiableItem.getFechaAperturaHasta() != null) {
+			fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaHasta());
+			sql.WHERE("soj.fechaapertura <= TO_DATE('" + fecha + "','DD/MM/RRRR')");
+		}
+
+		if (asuntosJusticiableItem.getNif() != null && !asuntosJusticiableItem.getNif().trim().isEmpty()) {
+			sql.WHERE("pjg.nif = '%" + asuntosJusticiableItem.getNif().trim() + "%'");
+		}
+
+		if (asuntosJusticiableItem.getNombre() != null && !asuntosJusticiableItem.getNombre().trim().isEmpty()) {
+			sql.WHERE("pjg.nombre LIKE upper('%" + asuntosJusticiableItem.getNombre().trim() + "%')");
+		}
+
+		if (asuntosJusticiableItem.getApellidos() != null && !asuntosJusticiableItem.getApellidos().trim().isEmpty()) {
+			sql.WHERE("(pjg.apellido1 || ' ' || pjg.apellido2) LIKE upper('%"
+					+ asuntosJusticiableItem.getApellidos().trim() + "%')");
+		}
+
+		if (asuntosJusticiableItem.getIdTurno() != null) {
+			sql.WHERE("soj.guardiaturno_idturno = " + asuntosJusticiableItem.getIdTurno());
+		}
+		if (asuntosJusticiableItem.getIdGuardia() != null) {
+			sql.WHERE("soj.guardiaturno_idguardia = " + asuntosJusticiableItem.getIdGuardia());
+		}
+		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
+			sql.WHERE("soj.idpersona = " + asuntosJusticiableItem.getIdPersonaColegiado());
+		}
+		sql.WHERE("ROWNUM <= " + tamMax);
+
+		sql.ORDER_BY("soj.anio desc, soj.numero DESC");
 //				+ "    AND\r\n"
 //				+ "        soj.numero = $$NUM SOJ$$\r\n"
 //				+ "    AND\r\n"
@@ -139,7 +169,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 //			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
 //		}
 //		return sqlOrder.toString();
-		 return sql.toString();
+		return sql.toString();
 	}
 
 	public String getAsuntoTipoSoj(AsuntosClaveJusticiableItem asuntoClave, String idLenguaje) {
