@@ -549,7 +549,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	}
 
 	@Override
-	public ComboDTO comboDocumentos(HttpServletRequest request) {
+	public ComboDTO comboDocumentos(String idTipoDocumentacion, HttpServletRequest request) {
 		LOGGER.info("comboDocumento() -> Entrada al servicio para obtener combo documento");
 
 		ComboDTO comboDTO = new ComboDTO();
@@ -567,7 +567,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = scsDocumentoejgExtendsMapper.comboDocumentos(usuarios.get(0).getIdlenguaje(), idInstitucion);
+				comboItems = scsDocumentoejgExtendsMapper.comboDocumentos(usuarios.get(0).getIdlenguaje(), idInstitucion, idTipoDocumentacion);
 
 				comboDTO.setCombooItems(comboItems);
 
@@ -955,11 +955,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				}
 
 				LOGGER.info(
-						"getDocumentos() / setEjgDocItemsItems.getExpedientesEconomicos() -> Entrada a scsEjgExtendsMapper para obtener la documentación de EJG");
+						"getDocumentos() / scsDocumentacionejgExtendsMappe.getDocumentos() -> Entrada a scsEjgExtendsMapper para obtener la documentación de EJG");
 				ejgDocumentacionDTO.setEjgDocItems(scsDocumentacionejgExtendsMapper.getDocumentacion(ejgItem,
 						idInstitucion.toString(), tamMaximo, usuarios.get(0).getIdlenguaje().toString()));
 				LOGGER.info(
-						"getDocumentos() / setEjgDocItemsItems.getExpedientesEconomicos() -> Salida de scsEjgExtendsMapper para obtener la documentación de EJG");
+						"getDocumentos() / scsDocumentacionejgExtendsMappe.getDocumentos() -> Salida de scsEjgExtendsMapper para obtener la documentación de EJG");
 			} else {
 				LOGGER.warn(
 						"getDocumentos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -2407,57 +2407,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO descargarDocumentacion(EjgItem datos, HttpServletRequest request) {
-		UpdateResponseDTO responsedto = new UpdateResponseDTO();
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
-
-		if (idInstitucion != null) {
-			LOGGER.debug(
-					"GestionEJGServiceImpl.descargarDocumentacion() -> Entrada para obtener información del usuario logeado");
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.debug(
-					"GestionEJGServiceImpl.descargarDocumentacion() -> Salida de obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.descargarDocumentacion() -> Entrada para cambiar los datos generales del ejg");
-
-				try {
-
-				} catch (Exception e) {
-
-				} finally {
-					// respuesta si se actualiza correctamente
-					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug(
-								"GestionEJGServiceImpl.descargarDocumentacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
-					} else {
-						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.descargarDocumentacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
-					}
-				}
-			}
-		}
-
-		LOGGER.info("GestionEJGServiceImpl.descargarDocumentacion() -> Salida del servicio.");
-
-		return responsedto;
-	}
-
-	@Override
-	@Transactional
 	public UpdateResponseDTO borrarRelacion(List<EjgItem> datos, HttpServletRequest request) {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
@@ -3616,92 +3565,50 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return directorioFichero.toString();
 	}
 
-	//	@Override
-	//	public DocumentoActDesignaDTO getDocumentosPorEjg(DocumentoActDesignaItem documentoActDesignaItem,
-	//			HttpServletRequest request) {
-	//
-	//		String token = request.getHeader("Authorization");
-	//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-	//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-	//		DocumentoActDesignaDTO documentoActDesignaDTO = new DocumentoActDesignaDTO();
-	//		Error error = new Error();
-	//
-	//		try {
-	//
-	//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-	//			LOGGER.info(
-	//					"DesignacionesServiceImpl.getDocumentosPorActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	//			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	//
-	//			LOGGER.info(
-	//					"DesignacionesServiceImpl.getDocumentosPorActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	//			if (usuarios != null && !usuarios.isEmpty()) {
-	//
-	//				List<DocumentoActDesignaItem> listaDocumentoActDesignaItem = scsDesignacionesExtendsMapper
-	//						.getDocumentosPorActDesigna(documentoActDesignaItem, idInstitucion);
-	//
-	//				documentoActDesignaDTO.setListaDocumentoActDesignaItem(listaDocumentoActDesignaItem);
-	//			}
-	//
-	//		} catch (Exception e) {
-	//			LOGGER.error(
-	//					"DesignacionesServiceImpl.getDocumentosPorActDesigna() -> Se ha producido un error en la búsqueda de documentos asociados a la actuacion",
-	//					e);
-	//			error.setCode(500);
-	//			error.setDescription("general.mensaje.error.bbdd");
-	//			error.setMessage(e.getMessage());
-	//			documentoActDesignaDTO.setError(error);
-	//		}
-	//
-	//		return documentoActDesignaDTO;
-	//	}
+	private InputStream getZipFileDocumentosEjg(List<EjgDocumentacionItem> listadocumentoEjgItem,
+			Short idInstitucion) {
 
-	//	private InputStream getZipFileDocumentosDesigna(List<documentoEjgItem> listadocumentoEjgItem,
-	//			Short idInstitucion) {
-	//
-	//		ByteArrayOutputStream byteArrayOutputStream = null;
-	//
-	//		try {
-	//
-	//			byteArrayOutputStream = new ByteArrayOutputStream();
-	//			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-	//			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-	//
-	//			for (documentoEjgItem doc : listadocumentoEjgItem) {
-	//
-	//				zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
-	//				String extension = doc.getNombreFichero()
-	//						.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
-	//						.toLowerCase();
-	//				String path = getDirectorioFicheroDes(idInstitucion);
-	//				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
-	//				File file = new File(path);
-	//				FileInputStream fileInputStream = new FileInputStream(file);
-	//				IOUtils.copy(fileInputStream, zipOutputStream);
-	//				fileInputStream.close();
-	//			}
-	//
-	//			zipOutputStream.closeEntry();
-	//
-	//			if (zipOutputStream != null) {
-	//				zipOutputStream.finish();
-	//				zipOutputStream.flush();
-	//				IOUtils.closeQuietly(zipOutputStream);
-	//			}
-	//
-	//			IOUtils.closeQuietly(bufferedOutputStream);
-	//			IOUtils.closeQuietly(byteArrayOutputStream);
-	//
-	//		} catch (IOException e) {
-	//			e.printStackTrace();
-	//		}
-	//
-	//		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-	//	}
-	//
+		ByteArrayOutputStream byteArrayOutputStream = null;
+
+		try {
+
+			byteArrayOutputStream = new ByteArrayOutputStream();
+			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+			for (EjgDocumentacionItem doc : listadocumentoEjgItem) {
+				if(doc.getNombreFichero()!=null) {
+					zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
+					String extension = doc.getNombreFichero()
+							.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
+							.toLowerCase();
+					String path = getDirectorioFicheroEjg(idInstitucion);
+					path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
+					File file = new File(path);
+					FileInputStream fileInputStream = new FileInputStream(file);
+					IOUtils.copy(fileInputStream, zipOutputStream);
+					fileInputStream.close();
+				}
+			}
+
+			zipOutputStream.closeEntry();
+
+			if (zipOutputStream != null) {
+				zipOutputStream.finish();
+				zipOutputStream.flush();
+				IOUtils.closeQuietly(zipOutputStream);
+			}
+
+			IOUtils.closeQuietly(bufferedOutputStream);
+			IOUtils.closeQuietly(byteArrayOutputStream);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+	}
+
 	private String getMimeType(String extension) {
 
 		String mime = "";
@@ -3733,283 +3640,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return mime;
 	}
-	//
-	//	@Override
-	//	public DeleteResponseDTO eliminarDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
-	//			HttpServletRequest request) {
-	//
-	//		String token = request.getHeader("Authorization");
-	//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-	//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-	//		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-	//		Error error = new Error();
-	//
-	//		try {
-	//
-	//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-	//			LOGGER.info(
-	//					"DesignacionesServiceImpl.eliminarDocumentosActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	//			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	//
-	//			LOGGER.info(
-	//					"DesignacionesServiceImpl.eliminarDocumentosActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	//			if (usuarios != null && !usuarios.isEmpty()) {
-	//
-	//				for (DocumentoActDesignaItem doc : listaDocumentoActDesignaItem) {
-	//
-	//					String path = getDirectorioFichero(idInstitucion);
-	//					path += File.separator + idInstitucion + "_" + doc.getIdFichero()
-	//							+ doc.getExtension().toLowerCase();
-	//
-	//					File file = new File(path);
-	//
-	//					if (file.exists()) {
-	//						file.delete();
-	//					}
-	//
-	//					ScsDocumentacionasiKey scsDocumentacionasiKey = new ScsDocumentacionasiKey();
-	//
-	//					scsDocumentacionasiKey.setIddocumentacionasi(Integer.valueOf(doc.getIdDocumentacionasi()));
-	//					scsDocumentacionasiKey.setIdinstitucion(idInstitucion);
-	//
-	//					int response = scsDocumentacionasiMapper.deleteByPrimaryKey(scsDocumentacionasiKey);
-	//
-	//					if (response == 1) {
-	//						deleteResponseDTO.setStatus(SigaConstants.OK);
-	//					}
-	//
-	//					if (response == 0) {
-	//						deleteResponseDTO.setStatus(SigaConstants.KO);
-	//						LOGGER.error(
-	//								"DesignacionesServiceImpl.eliminarDocumentosActDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la actuacion");
-	//						error.setCode(500);
-	//						error.setDescription("general.mensaje.error.bbdd");
-	//						deleteResponseDTO.setError(error);
-	//					}
-	//
-	//					GenFicheroKey genFicheroKey = new GenFicheroKey();
-	//
-	//					genFicheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
-	//					genFicheroKey.setIdinstitucion(idInstitucion);
-	//
-	//					int response2 = genFicheroMapper.deleteByPrimaryKey(genFicheroKey);
-	//
-	//					if (response2 == 1) {
-	//						deleteResponseDTO.setStatus(SigaConstants.OK);
-	//					}
-	//
-	//					if (response2 == 0) {
-	//						deleteResponseDTO.setStatus(SigaConstants.KO);
-	//						LOGGER.error(
-	//								"DesignacionesServiceImpl.eliminarDocumentosActDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la actuacion");
-	//						error.setCode(500);
-	//						error.setDescription("general.mensaje.error.bbdd");
-	//						deleteResponseDTO.setError(error);
-	//					}
-	//
-	//				}
-	//
-	//			}
-	//
-	//		} catch (Exception e) {
-	//			LOGGER.error(
-	//					"DesignacionesServiceImpl.eliminarDocumentosActDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la actuacion",
-	//					e);
-	//			error.setCode(500);
-	//			error.setDescription("general.mensaje.error.bbdd");
-	//			error.setMessage(e.getMessage());
-	//			deleteResponseDTO.setError(error);
-	//		}
-	//
-	//		return deleteResponseDTO;
-	//	}
-	//
-	//	@Override
-	//	public DocumentoDesignaDTO getDocumentosPorDesigna(documentoEjgItem documentoEjgItem,
-	//			HttpServletRequest request) {
-	//
-	//		String token = request.getHeader("Authorization");
-	//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-	//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-	//		DocumentoDesignaDTO documentoDesignaDTO = new DocumentoDesignaDTO();
-	//		Error error = new Error();
-	//
-	//		try {
-	//
-	//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-	//			LOGGER.info(
-	//					"DesignacionesServiceImpl.getDocumentosPorDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	//			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	//
-	//			LOGGER.info(
-	//					"DesignacionesServiceImpl.getDocumentosPorDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	//			if (usuarios != null && !usuarios.isEmpty()) {
-	//
-	//				List<DocumentoEjgItem> listaDocumentoActDesignaItem = scsEjgExtendsMapper
-	//						.getDocumentosPorDesigna(documentoEjgItem, idInstitucion);
-	//
-	//				documentoDesignaDTO.setListadocumentoEjgItem(listaDocumentoActDesignaItem);
-	//			}
-	//
-	//		} catch (Exception e) {
-	//			LOGGER.error(
-	//					"DesignacionesServiceImpl.getDocumentosPorDesigna() -> Se ha producido un error en la búsqueda de documentos asociados a la designación",
-	//					e);
-	//			error.setCode(500);
-	//			error.setDescription("general.mensaje.error.bbdd");
-	//			error.setMessage(e.getMessage());
-	//			documentoDesignaDTO.setError(error);
-	//		}
-	//
-	//		return documentoDesignaDTO;
-	//	}
-	//
-	//	@Override
-	//	public InsertResponseDTO subirDocumentoEjg(MultipartHttpServletRequest request) {
-	//
-	//		String token = request.getHeader("Authorization");
-	//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-	//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-	//		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-	//		Error error = new Error();
-	//		ObjectMapper objectMapper = new ObjectMapper();
-	//		int response = 1;
-	//
-	//		try {
-	//
-	//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-	//			LOGGER.info(
-	//					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	//			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	//
-	//			LOGGER.info(
-	//					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	//			if (usuarios != null && !usuarios.isEmpty()) {
-	//
-	//				Iterator<String> itr = request.getFileNames();
-	//
-	////				while (itr.hasNext()) {
-	//
-	////					MultipartFile file = request.getFile(itr.next());
-	////					String nombreFichero = file.getOriginalFilename().split(";")[0];
-	////					String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
-	////					DocumentoEjgItem documentoEjgItem = objectMapper.readValue(json,
-	////							DocumentoEjgItem.class);
-	////					String extension = FilenameUtils.getExtension(nombreFichero);
-	////
-	////					Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-	////							nombreFichero, extension);
-	//
-	//					MaxIdDto nuevoId = scsEjgExtendsMapper.getNewIdDocumentacionEjg(idInstitucion);
-	//
-	//					ScsDocumentacionejg scsDocumentacionejg = new ScsDocumentacionejg();
-	//
-	//					scsDocumentacionejg.setAnio(Short.valueOf(documentoEjgItem.getAnio()));
-	//					scsDocumentacionejg.setNumero(Long.valueOf(documentoEjgItem.getNumero()));
-	//					scsDocumentacionejg.setIdtipoejg(Short.valueOf(documentoEjgItem.getIdTipoEjg()));
-	//
-	//					scsDocumentacionejg.setIddocumentacion(Integer.valueOf(nuevoId.getIdMax().toString()));
-	//					scsDocumentacionejg
-	//							.setIdtipodocumento(Short.valueOf(documentoEjgItem.getIdTipodocumento()));
-	//					scsDocumentacionejg.setIdfichero(idFile);
-	//					scsDocumentacionejg.setIdinstitucion(idInstitucion);
-	//					scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
-	//					scsDocumentacionejg.setFechamodificacion(new Date());
-	//					scsDocumentacionejg.setFechaentrega(new Date());
-	//					
-	//					if(documentoEjgItem.getIdDocumento()==-1) {
-	//						
-	//						List<ComboItem> comboItems = scsDocumentoejgExtendsMapper.comboDocumentos(usuarios.get(0).getIdlenguaje(), idInstitucion);
-	//						for(ComboItem item: comboItems) {
-	//							scsDocumentacionejg.setIddocumento(Short.valueOf(item.getValue()));
-	//							
-	//							if(response==1)response = scsDocumentacionejgMapper.insertSelective(scsDocumentacionejg);
-	//						}
-	//					}
-	//					else {
-	//						scsDocumentacionejg.setIddocumento(documentoEjgItem.getIdDocumento());
-	//						response = scsDocumentacionejgMapper.insertSelective(scsDocumentacionejg);
-	//					}
-	//					
-	//
-	//					if (response == 1) {
-	//						insertResponseDTO.setStatus(SigaConstants.OK);
-	//					}
-	//
-	//					if (response == 0) {
-	//						insertResponseDTO.setStatus(SigaConstants.KO);
-	//						LOGGER.error(
-	//								"GestionEJGServiceImpl.subirDocumentoEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg");
-	//						error.setCode(500);
-	//						error.setDescription("general.mensaje.error.bbdd");
-	//						insertResponseDTO.setError(error);
-	//					}
-	//
-	////				}
-	//
-	//				String documentos = request.getParameter("documentosActualizar");
-	//				List<DocumentoEjgItem> listaDocumentos = objectMapper.readValue(documentos,
-	//						new TypeReference<List<DocumentoEjgItem>>() {
-	//						});
-	//
-	//				if (listaDocumentos != null && !listaDocumentos.isEmpty()) {
-	//
-	//					for (DocumentoEjgItem doc : listaDocumentos) {
-	//
-	//						ScsDocumentacionejg scsDocumentacionejg = new ScsDocumentacionejg();
-	//						
-	//						scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
-	//						scsDocumentacionejg.setFechamodificacion(new Date());
-	//						scsDocumentacionejg.setIdinstitucion(idInstitucion);
-	//						scsDocumentacionejg.setIddocumento((short)doc.getidDocumentacionejg());
-	//
-	//						int response2 = scsDocumentacionejgMapper
-	//								.updateByPrimaryKeySelective(scsDocumentacionejg);
-	//
-	//						if (response2 == 1) {
-	//							insertResponseDTO.setStatus(SigaConstants.OK);
-	//							error.setCode(200);
-	//							//error.setDescription("general.mensaje.error.bbdd");
-	//							insertResponseDTO.setError(error);
-	//							
-	//						}
-	//
-	//						if (response2 == 0) {
-	//							insertResponseDTO.setStatus(SigaConstants.KO);
-	//							LOGGER.error(
-	//									"GestionEJGServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente al ejg");
-	//							error.setCode(500);
-	//							error.setDescription("general.mensaje.error.bbdd");
-	//							insertResponseDTO.setError(error);
-	//						}
-	//
-	//					}
-	//
-	//				}
-	//
-	//			}
-	//
-	//		} catch (Exception e) {
-	//			LOGGER.error(
-	//					"GestionEJGServiceImpl.subirDocumentoEjg() -> Se ha producido un error al subir un fichero perteneciente a la designación",
-	//					e);
-	//			error.setCode(500);
-	//			error.setDescription("general.mensaje.error.bbdd");
-	//			error.setMessage(e.getMessage());
-	//			insertResponseDTO.setError(error);
-	//		}
-	//
-	//		return insertResponseDTO;
-	//	}
 
 	@Override
 	@Transactional
@@ -4027,12 +3657,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			LOGGER.info(
-					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"GestionEJGServiceImpl.crearDocumentacionEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"GestionEJGServiceImpl.crearDocumentacionEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty()) {
 
@@ -4054,7 +3684,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				scsDocumentacionejg.setRegsalida(documentacionEjgItem.getRegSalida());
 				scsDocumentacionejg.setIdmaestropresentador(Short.valueOf(documentacionEjgItem.getPresentador()));
 				scsDocumentacionejg.setDocumentacion(documentacionEjgItem.getDescripcionDoc());
-				//scsDocumentacionejg.setIdfichero(idFile);
+
 				scsDocumentacionejg.setIdinstitucion(idInstitucion);
 				scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
 				scsDocumentacionejg.setFechamodificacion(new Date());
@@ -4062,7 +3692,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				if(documentacionEjgItem.getIdDocumento()==-1) {
 
-					List<ComboItem> comboItems = scsDocumentoejgExtendsMapper.comboDocumentos(usuarios.get(0).getIdlenguaje(), idInstitucion);
+					List<ComboItem> comboItems = scsDocumentoejgExtendsMapper.comboDocumentos(usuarios.get(0).getIdlenguaje(), idInstitucion, String.valueOf(documentacionEjgItem.getIdTipoDocumento()));
 					for(ComboItem item: comboItems) {
 						scsDocumentacionejg.setIddocumento(Short.valueOf(item.getValue()));
 
@@ -4082,62 +3712,23 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				if (response == 1) {
 					insertResponseDTO.setStatus(SigaConstants.OK);
 					error.setCode(200);
-					//error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setError(error);
 				}
 
 				if (response == 0) {
 					insertResponseDTO.setStatus(SigaConstants.KO);
 					LOGGER.error(
-							"GestionEJGServiceImpl.subirDocumentoEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg");
+							"GestionEJGServiceImpl.crearDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg");
 					error.setCode(500);
 					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setError(error);
 				}
 
-				//				}
-
-				//				String documentos = request.getParameter("documentosActualizar");
-				//				List<DocumentoEjgItem> listaDocumentos = objectMapper.readValue(documentos,
-				//						new TypeReference<List<DocumentoEjgItem>>() {
-				//						});
-				//
-				//				if (listaDocumentos != null && !listaDocumentos.isEmpty()) {
-				//
-				//					for (DocumentoEjgItem doc : listaDocumentos) {
-				//
-				//						ScsDocumentacionejg scsDocumentacionejg = new ScsDocumentacionejg();
-				//						
-				//						scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
-				//						scsDocumentacionejg.setFechamodificacion(new Date());
-				//						scsDocumentacionejg.setIdinstitucion(idInstitucion);
-				//						scsDocumentacionejg.setIddocumento((short)doc.getidDocumentacionejg());
-				//
-				//						int response2 = scsDocumentacionejgMapper
-				//								.updateByPrimaryKeySelective(scsDocumentacionejg);
-				//
-				//						if (response2 == 1) {
-				//							insertResponseDTO.setStatus(SigaConstants.OK);
-				//						}
-				//
-				//						if (response2 == 0) {
-				//							insertResponseDTO.setStatus(SigaConstants.KO);
-				//							LOGGER.error(
-				//									"GestionEJGServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente al ejg");
-				//							error.setCode(500);
-				//							error.setDescription("general.mensaje.error.bbdd");
-				//							insertResponseDTO.setError(error);
-				//						}
-				//
-				//					}
-				//
-				//				}
-
 			}
 
 		} catch (Exception e) {
 			LOGGER.error(
-					"GestionEJGServiceImpl.subirDocumentoEjg() -> Se ha producido un error al subir un fichero perteneciente a la designación",
+					"GestionEJGServiceImpl.crearDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -4163,12 +3754,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			LOGGER.info(
-					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"GestionEJGServiceImpl.actualizarDocumentacionEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"GestionEJGServiceImpl.actualizarDocumentacionEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty()) {
 
@@ -4193,14 +3784,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		} catch (Exception e) {
 			LOGGER.error(
-					"GestionEJGServiceImpl.subirDocumentoEjg() -> Se ha producido un error al subir un fichero perteneciente a la designación",
+					"GestionEJGServiceImpl.actualizarDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
 			error.setMessage(e.getMessage());
 			updateResponseDTO.setError(error);
 		}
-		
+
 		if (response == 1) {
 			updateResponseDTO.setStatus(SigaConstants.OK);
 			error.setCode(200);
@@ -4211,7 +3802,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
 			LOGGER.error(
-					"GestionEJGServiceImpl.subirDocumentoEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg");
+					"GestionEJGServiceImpl.actualizarDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg");
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
 			updateResponseDTO.setError(error);
@@ -4221,7 +3812,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	}
 
 	@Override
-	public DeleteResponseDTO eliminarDocumentosEjg(List<EjgDocumentacionItem> listadocumentoEjgItem,
+	@Transactional
+	public DeleteResponseDTO eliminarDocumentacionEjg(List<EjgDocumentacionItem> listadocumentoEjgItem,
 			HttpServletRequest request) {
 
 		String token = request.getHeader("Authorization");
@@ -4237,16 +3829,25 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			LOGGER.info(
-					"DesignacionesServiceImpl.eliminarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"DesignacionesServiceImpl.eliminarDocumentacionDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"DesignacionesServiceImpl.eliminarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"DesignacionesServiceImpl.eliminarDocumentacionDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty()) {
 
 				for (EjgDocumentacionItem doc : listadocumentoEjgItem) {
+
+					//Eliminacion de la entrada en la tabla
+					ScsDocumentacionejgKey scsDocumentacionejgKey = new ScsDocumentacionejgKey();
+
+					scsDocumentacionejgKey.setIddocumentacion(doc.getIdDocumentacion().intValue());
+					scsDocumentacionejgKey.setIdinstitucion(idInstitucion);
+
+					if(response2==1)response = scsDocumentacionejgMapper.deleteByPrimaryKey(scsDocumentacionejgKey);
+					else response = 0;
 
 					//Eliminacion fisica del fichero asociado
 					if(doc.getIdFichero()!=null) {
@@ -4262,21 +3863,16 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							file.delete();
 						}
 
+						//Eliminacion de su registro en la BBDD
 						GenFicheroKey genFicheroKey = new GenFicheroKey();
 
 						genFicheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
 						genFicheroKey.setIdinstitucion(idInstitucion);
 
-						response2 = genFicheroMapper.deleteByPrimaryKey(genFicheroKey);
+						//Gestion de respuesta para que no se siga ejecutando cuando hay errores
+						if(response==1)response2 = genFicheroMapper.deleteByPrimaryKey(genFicheroKey);
+						else response2 = 0;
 					}
-
-					//Eliminacion de la entrada en la tabla
-					ScsDocumentacionejgKey scsDocumentacionejgKey = new ScsDocumentacionejgKey();
-
-					scsDocumentacionejgKey.setIddocumentacion(doc.getIdDocumentacion().intValue());
-					scsDocumentacionejgKey.setIdinstitucion(idInstitucion);
-
-					response = scsDocumentacionejgMapper.deleteByPrimaryKey(scsDocumentacionejgKey);
 
 				}
 
@@ -4284,7 +3880,103 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		} catch (Exception e) {
 			LOGGER.error(
-					"DesignacionesServiceImpl.eliminarDocumentosDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la designación",
+					"DesignacionesServiceImpl.eliminarDocumentacionDesigna() -> Se ha producido un error en la eliminación dedocumentacion de ejg",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			deleteResponseDTO.setError(error);
+			response=0;
+			response2=0;
+		}
+
+		if (response2 == 1 && response==1) {
+			deleteResponseDTO.setStatus(SigaConstants.OK);
+			error.setCode(200);
+			deleteResponseDTO.setError(error);
+		}
+		else {
+			deleteResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.error(
+					"DesignacionesServiceImpl.eliminarDocumentacionDesigna() -> Se ha producido un error en la eliminación de documentacion de ejg");
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			deleteResponseDTO.setError(error);
+		}
+
+		return deleteResponseDTO;
+	}
+
+	@Override
+	@Transactional
+	public DeleteResponseDTO eliminarDocumentosEjg(EjgDocumentacionItem doc,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+
+		int response = 0, response2 = 0;
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"GestionEJGServiceImpl.eliminarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"GestionEJGServiceImpl.eliminarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				//Seleccionamos la documentacion del fichero
+				ScsDocumentacionejgKey scsDocumentacionejgKey = new ScsDocumentacionejgKey();
+
+				scsDocumentacionejgKey.setIddocumentacion(doc.getIdDocumentacion().intValue());
+				scsDocumentacionejgKey.setIdinstitucion(idInstitucion);
+
+				ScsDocumentacionejg scsDocumentacionejg = scsDocumentacionejgMapper.selectByPrimaryKey(scsDocumentacionejgKey);
+
+				//Modificamos la entrada en la tabla
+				scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
+				scsDocumentacionejg.setFechamodificacion(new Date());
+				scsDocumentacionejg.setIdfichero(null);
+				scsDocumentacionejg.setNombrefichero(null);
+
+				response = scsDocumentacionejgMapper.updateByPrimaryKey(scsDocumentacionejg);
+
+				//Eliminacion fisica del fichero asociado
+				String path = getDirectorioFicheroEjg(idInstitucion);
+				path += File.separator + idInstitucion + "_" + doc.getIdFichero()
+				+ doc.getNombreFichero()
+				.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
+				.toLowerCase();
+
+				File file = new File(path);
+
+				if (file.exists()) {
+					file.delete();
+				}
+
+				//Eliminacion de su registro en la BBDD
+				GenFicheroKey genFicheroKey = new GenFicheroKey();
+
+				genFicheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
+				genFicheroKey.setIdinstitucion(idInstitucion);
+
+				if(response==1)response2 = genFicheroMapper.deleteByPrimaryKey(genFicheroKey);
+
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.eliminarDocumentosnDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la documentacion de ejg",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -4300,71 +3992,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		else {
 			deleteResponseDTO.setStatus(SigaConstants.KO);
 			LOGGER.error(
-					"DesignacionesServiceImpl.eliminarDocumentosDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la designación");
+					"DesignacionesServiceImpl.eliminarDocumentosDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la documentacion de ejg");
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
 			deleteResponseDTO.setError(error);
 		}
 
 		return deleteResponseDTO;
-	}
-
-	@Override
-	public InsertResponseDTO uploadDocumentoEjg(MultipartFile file, HttpServletRequest request) {
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		Error error = new Error();
-		int response = 1;
-
-		try {
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			LOGGER.info(
-					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"GestionEJGServiceImpl.subirDocumentoEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (usuarios != null && !usuarios.isEmpty()) {
-				String nombreFichero = file.getOriginalFilename().split(";")[0];
-				String extension = FilenameUtils.getExtension(nombreFichero);
-
-				//Subimos el fichero y se crea la referencia en la base de datos (GEN_FICHERO)
-				Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-						nombreFichero, extension);
-			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"GestionEJGServiceImpl.subirDocumentoEjg() -> Se ha producido un error al subir un fichero perteneciente a la designación",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			error.setMessage(e.getMessage());
-			insertResponseDTO.setError(error);
-		}
-		if (response == 1) {
-			insertResponseDTO.setStatus(SigaConstants.OK);
-			error.setCode(200);
-			//error.setDescription("general.mensaje.error.bbdd");
-			insertResponseDTO.setError(error);
-
-		}
-
-		if (response == 0) {
-			insertResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.error(
-					"GestionEJGServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente al ejg");
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			insertResponseDTO.setError(error);
-		}
-
-		return insertResponseDTO;
 	}
 
 	@Override
@@ -4378,7 +4012,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		int response = 1;
 
 		try {
-			
+
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			LOGGER.info(
@@ -4393,11 +4027,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				Iterator<String> itr = request.getFileNames();
 
-				String idDocumentacion = request.getParameter("idPersona");
-
 				MultipartFile file = request.getFile(itr.next());
 				String nombreFichero = file.getOriginalFilename().split(";")[0];
 				String extension = FilenameUtils.getExtension(nombreFichero);
+
+				String idDocumentacion = request.getParameter("idPersona");
 
 				Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
 						nombreFichero, extension);
@@ -4411,6 +4045,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				scsDocumentacionejg.setIdinstitucion(idInstitucion);
 				scsDocumentacionejg.setIdfichero(idFile);
 				scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDocumentacion));
+				scsDocumentacionejg.setNombrefichero(nombreFichero);
 
 
 				response = scsDocumentacionejgMapper
@@ -4446,69 +4081,71 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return insertResponseDTO;
 	}
 
-	//	@Override
-	//	public ResponseEntity<InputStreamResource> descargarDocumentosDesigna(
-	//			List<documentoEjgItem> listadocumentoEjgItem, HttpServletRequest request) {
-	//
-	//		String token = request.getHeader("Authorization");
-	//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-	//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-	//		ResponseEntity<InputStreamResource> res = null;
-	//		InputStream fileStream = null;
-	//		HttpHeaders headers = new HttpHeaders();
-	//
-	//		try {
-	//
-	//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-	//			LOGGER.info(
-	//					"DesignacionesServiceImpl.descargarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	//			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	//
-	//			LOGGER.info(
-	//					"DesignacionesServiceImpl.descargarDocumentosDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	//			if (usuarios != null && !usuarios.isEmpty() && !listadocumentoEjgItem.isEmpty()) {
-	//
-	//				if (listadocumentoEjgItem.size() == 1) {
-	//
-	//					String extension = listadocumentoEjgItem.get(0).getNombreFichero()
-	//							.substring(listadocumentoEjgItem.get(0).getNombreFichero().lastIndexOf("."),
-	//									listadocumentoEjgItem.get(0).getNombreFichero().length())
-	//							.toLowerCase();
-	//					String path = getDirectorioFicheroDes(idInstitucion);
-	//					path += File.separator + idInstitucion + "_" + listadocumentoEjgItem.get(0).getIdFichero()
-	//							+ extension;
-	//
-	//					File file = new File(path);
-	//					fileStream = new FileInputStream(file);
-	//
-	//					String tipoMime = getMimeType(extension);
-	//
-	//					headers.setContentType(MediaType.parseMediaType(tipoMime));
-	//					headers.set("Content-Disposition",
-	//							"attachment; filename=\"" + listadocumentoEjgItem.get(0).getNombreFichero() + "\"");
-	//					headers.setContentLength(file.length());
-	//
-	//				} else {
-	//					fileStream = getZipFileDocumentosDesigna(listadocumentoEjgItem, idInstitucion);
-	//
-	//					headers.setContentType(MediaType.parseMediaType("application/zip"));
-	//					headers.set("Content-Disposition", "attachment; filename=\"documentos.zip\"");
-	//				}
-	//
-	//				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
-	//						HttpStatus.OK);
-	//			}
-	//
-	//		} catch (Exception e) {
-	//			LOGGER.error(
-	//					"DesignacionesServiceImpl.descargarDocumentosActDesigna() -> Se ha producido un error al descargar un archivo asociado a la actuacion",
-	//					e);
-	//		}
-	//
-	//		return res;
-	//	}
+	@Override
+	public ResponseEntity<InputStreamResource> descargarDocumentosEjg(
+			List<EjgDocumentacionItem> listadocumentoEjgItem, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ResponseEntity<InputStreamResource> res = null;
+		InputStream fileStream = null;
+		HttpHeaders headers = new HttpHeaders();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"GestionEJGServiceImpl.descargarDocumentosEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"GestionEJGServiceImpl.descargarDocumentosEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty() && !listadocumentoEjgItem.isEmpty()) {
+
+				if (listadocumentoEjgItem.size() == 1) {
+
+					String extension = listadocumentoEjgItem.get(0).getNombreFichero()
+							.substring(listadocumentoEjgItem.get(0).getNombreFichero().lastIndexOf("."),
+									listadocumentoEjgItem.get(0).getNombreFichero().length())
+							.toLowerCase();
+					String path = getDirectorioFicheroEjg(idInstitucion);
+					path += File.separator + idInstitucion + "_" + listadocumentoEjgItem.get(0).getIdFichero()
+							+ extension;
+
+					File file = new File(path);
+					fileStream = new FileInputStream(file);
+
+					String tipoMime = getMimeType(extension);
+
+					headers.setContentType(MediaType.parseMediaType(tipoMime));
+					headers.set("Content-Disposition",
+							"attachment; filename=\"" + listadocumentoEjgItem.get(0).getNombreFichero() + "\"");
+					headers.setContentLength(file.length());
+
+				} else {
+					fileStream = getZipFileDocumentosEjg(listadocumentoEjgItem, idInstitucion);
+
+					headers.setContentType(MediaType.parseMediaType("application/zip"));
+					headers.set("Content-Disposition", "attachment; filename=\"documentosEJG.zip\"");
+				}
+
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+						HttpStatus.OK);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg",
+					e);
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return res;
+	}
 
 }

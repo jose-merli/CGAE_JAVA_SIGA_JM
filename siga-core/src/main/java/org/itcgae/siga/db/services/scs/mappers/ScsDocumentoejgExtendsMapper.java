@@ -45,6 +45,6 @@ public interface ScsDocumentoejgExtendsMapper extends ScsDocumentoejgMapper{
 		@Result(column = "IDDOCUMENTOEJG", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> comboDocumentos(String idLenguaje, Short idInstitucion);
+	List<ComboItem> comboDocumentos(String idLenguaje, Short idInstitucion, String idTipoDocumentacion);
 
 }
