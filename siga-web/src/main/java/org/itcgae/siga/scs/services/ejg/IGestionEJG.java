@@ -83,8 +83,6 @@ public interface IGestionEJG {
 	
 	UpdateResponseDTO descargarInformeCalificacion(EjgItem datos, HttpServletRequest request);
 	
-	UpdateResponseDTO descargarDocumentacion(EjgItem datos, HttpServletRequest request);
-
 	List<ScsEjgPrestacionRechazada> searchPrestacionesRechazadas(EjgItem ejgItem, HttpServletRequest request);
 
 	UpdateResponseDTO guardarServiciosTramitacion(EjgItem datos, HttpServletRequest request);
@@ -138,7 +136,7 @@ public interface IGestionEJG {
 
 	ComboDTO comboTipoDocumentacion(HttpServletRequest request);
 
-	ComboDTO comboDocumentos(HttpServletRequest request);
+	ComboDTO comboDocumentos(String idTipoDocumentacion, HttpServletRequest request);
 
 	InsertResponseDTO subirDocumentoEjg(MultipartHttpServletRequest request);
 
@@ -146,8 +144,11 @@ public interface IGestionEJG {
 
 	UpdateResponseDTO actualizarDocumentacionEjg(EjgDocumentacionItem documentoEjgItem, HttpServletRequest request);
 
-	DeleteResponseDTO eliminarDocumentosEjg(List<EjgDocumentacionItem> listadocumentoEjgItem,
+	DeleteResponseDTO eliminarDocumentosEjg(EjgDocumentacionItem doc, HttpServletRequest request);
+
+	DeleteResponseDTO eliminarDocumentacionEjg(List<EjgDocumentacionItem> listadocumentoEjgItem,
 			HttpServletRequest request);
 
-	InsertResponseDTO uploadDocumentoEjg(MultipartFile file, HttpServletRequest request);
+	ResponseEntity<InputStreamResource> descargarDocumentosEjg(List<EjgDocumentacionItem> listadocumentoEjgItem,
+			HttpServletRequest request);
 }

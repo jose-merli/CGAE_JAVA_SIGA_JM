@@ -61,6 +61,10 @@ public interface ScsDocumentacionEjgExtendsMapper extends ScsTipodocumentoejgMap
 		@Result(column = "idtipodocumento", property = "idTipoDocumento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "iddocumento", property = "idDocumento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "iddocumentacion", property = "idDocumentacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idMaestroPresentador", property = "idMaestroPresentador", jdbcType = JdbcType.INTEGER),
+		@Result(column = "idFichero", property = "idFichero", jdbcType = JdbcType.INTEGER),
+		@Result(column = "nombreFichero", property = "nombreFichero", jdbcType = JdbcType.INTEGER),
+		@Result(column = "labelDocumento", property = "labelDocumento", jdbcType = JdbcType.VARCHAR),
 	})
 	List<EjgDocumentacionItem> getDocumentacion(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
 	

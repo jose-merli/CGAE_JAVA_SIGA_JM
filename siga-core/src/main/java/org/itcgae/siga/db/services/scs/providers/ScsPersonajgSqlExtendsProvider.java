@@ -716,6 +716,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 //			sql.WHERE("pjgP.idpersona = '" + ejgItem.getIdPersona() + "'");
 //		sql.WHERE("pjgP.idinstitucion = uf.idinstitucion ");
 
+		sql.WHERE("eejg_p.fechaconsulta=(SELECT MAX(p2.FECHACONSULTA) from scs_eejg_peticiones p2 where eejg_p.nif=p2.nif)");
 		if (tamMaximo != null) {
 			Integer tamMaxNumber = tamMaximo + 1;
 			sql.WHERE("rownum <= " + tamMaxNumber);

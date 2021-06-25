@@ -6,9 +6,11 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EjgDocumentacionItem {
+	//Bean utiilzado en la tarjeta de documentacion de la ficha EJG
 	private Date flimite_presentacion;
 	private String presentador;
 	private Short idDocumento;
+	private String labelDocumento;
 	private Long idDocumentacion;
 	private String regEntrada;
 	private String regSalida;
@@ -23,6 +25,7 @@ public class EjgDocumentacionItem {
 	private String numero;
 	private String idFichero;
 	private String nombreFichero;
+	private Short idMaestroPresentador;
 
    
 	 /**
@@ -192,6 +195,18 @@ public class EjgDocumentacionItem {
 	}
 	public void setNombreFichero(String nombreFichero) {
 		this.nombreFichero = nombreFichero;
+	}
+	public Short getIdMaestroPresentador() {
+		return idMaestroPresentador;
+	}
+	public void setIdMaestroPresentador(Short idMaestroPresentador) {
+		this.idMaestroPresentador = idMaestroPresentador;
+	}
+	public String getLabelDocumento() {
+		return labelDocumento;
+	}
+	public void setLabelDocumento(String labelDocumento) {
+		this.labelDocumento = labelDocumento;
 	}
 	
 
