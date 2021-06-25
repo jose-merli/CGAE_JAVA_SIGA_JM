@@ -466,31 +466,24 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				if (asuntosJusticiableItems != null && asuntosJusticiableItems.size()>0) {					
 					//vamos a crear los datos de interes
-//					for(AsuntosJusticiableItem data : asuntosJusticiableItems) {
-//						String datoInteres = "";
-//						
-//						if(data.getTipo()!=null && !data.getTipo().isEmpty()) {
-//							datoInteres+="<b>Tipo: </b>"+data.getTipo();
-//						}
-//						
-//						if(data.getNumProcedimiento()!=null && !data.getNumProcedimiento().isEmpty()) {
-//							if(!datoInteres.isEmpty()) {
-//								datoInteres+="<p>";
-//							}
-//							
-//							datoInteres+="<b>Núm. Procedimiento: </b>"+data.getNumProcedimiento();
-//						}
-//						
-//						if (data.getNig() != null && !data.getNig().isEmpty()) {
-//							if (!datoInteres.isEmpty()) {
-//								datoInteres += "<p>";
-//							}
-//
-//							datoInteres += "<p><b>NIG: </b>" + data.getNig();
-//						}
-//						
-//						data.setDatosInteres(datoInteres);						
-//					}
+			for(AsuntosJusticiableItem data : asuntosJusticiableItems) {
+						String datoInteres = "";
+						
+						if(data.getTipo()!=null && !data.getTipo().isEmpty()) {
+							datoInteres+="<b>Tipo: </b>"+data.getTipo();
+						}
+						
+						if(data.getEstado()!=null && !data.getEstado().isEmpty()) {
+							if(!datoInteres.isEmpty()) {
+								datoInteres+="<p>";
+							}
+							
+							datoInteres+="<b>Estado: </b>"+data.getEstado();
+						}
+						
+						
+						data.setDatosInteres(datoInteres);						
+					}
 					
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 				}

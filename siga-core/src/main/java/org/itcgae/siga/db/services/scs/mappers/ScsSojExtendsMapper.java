@@ -28,8 +28,10 @@ public interface ScsSojExtendsMapper extends ScsSojMapper{
 		@Result(column = "FECHAAPERTURA", property = "fecha", jdbcType = JdbcType.DATE),
 		@Result(column = "NUMEROPROCEDIMIENTO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDTIPOEJG", property = "idTipoEjg", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "TIPOEJG", property = "tipo", jdbcType = JdbcType.VARCHAR) 
+		@Result(column = "IDTIPOSOJ", property = "idTipoSoj", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOSOJ", property = "tipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+		
 	})
 	List<AsuntosJusticiableItem> searchClaveSoj(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo, String idLenguaje);
 	
