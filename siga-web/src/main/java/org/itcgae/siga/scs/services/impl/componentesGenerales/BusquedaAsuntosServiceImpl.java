@@ -263,13 +263,23 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						if (data.getTipo() != null && !data.getTipo().isEmpty()) {
 							datoInteres += "<b>Tipo: </b>" + data.getTipo();
 						}
+						if (data.getIdEstadoDesigna() != null && !data.getIdEstadoDesigna().isEmpty()) {
+							datoInteres += "<b>Tipo: </b>" + data.getIdEstadoDesigna();
+						}
 
-						if (data.getNumProcedimiento() != null && !data.getNumProcedimiento().isEmpty()) {
+						if (data.getNumeroProcedimiento() != null && !data.getNumeroProcedimiento().isEmpty()) {
 							if (!datoInteres.isEmpty()) {
 								datoInteres += "<p>";
 							}
 
-							datoInteres += "<b>Núm. Procedimiento: </b>" + data.getNumProcedimiento();
+							datoInteres += "<b>Núm. Procedimiento: </b>" + data.getNumeroProcedimiento();
+						}
+						if (data.getNumeroDiligencia() != null && !data.getNumeroDiligencia().isEmpty()) {
+							if (!datoInteres.isEmpty()) {
+								datoInteres += "<p>";
+							}
+
+							datoInteres += "<b>Núm. Diligencia: </b>" + data.getNumeroDiligencia();
 						}
 
 						data.setDatosInteres(datoInteres);
@@ -361,24 +371,38 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					for(AsuntosJusticiableItem data : asuntosJusticiableItems) {
 						String datoInteres = "";
 						
-						if(data.getIdEstadoDesigna()!=null && !data.getIdEstadoDesigna().isEmpty()) {
-							datoInteres+="<b>Estado: </b>"+data.getTipo();
+						if (data.getTipo() != null && !data.getTipo().isEmpty()) {
+							datoInteres += "<b>Tipo: </b>" + data.getTipo();
 						}
-						
-						if(data.getNumProcedimiento()!=null && !data.getNumProcedimiento().isEmpty()) {
-							if(!datoInteres.isEmpty()) {
-								datoInteres+="<p>";
+
+						if (data.getNumeroProcedimiento() != null && !data.getNumeroProcedimiento().isEmpty()) {
+							if (!datoInteres.isEmpty()) {
+								datoInteres += "<p>";
 							}
-							
-							datoInteres+="<b>Núm. Procedimiento: </b>"+data.getNumProcedimiento();
+
+							datoInteres += "<b>Núm. Procedimiento: </b>" + data.getNumeroProcedimiento();
 						}
-						
+
+						if (data.getJuzgado() != null && !data.getJuzgado().isEmpty()) {
+							if (!datoInteres.isEmpty()) {
+								datoInteres += "<p>";
+							}
+
+							datoInteres += "<p><b>Juzgado: </b>" + data.getJuzgado();
+						}
 						if (data.getNig() != null && !data.getNig().isEmpty()) {
 							if (!datoInteres.isEmpty()) {
 								datoInteres += "<p>";
 							}
 
 							datoInteres += "<p><b>NIG: </b>" + data.getNig();
+						}
+						if (data.getIdTipoDesigna() != null && !data.getIdTipoDesigna().isEmpty()) {
+							if (!datoInteres.isEmpty()) {
+								datoInteres += "<p>";
+							}
+
+							datoInteres += "<p><b>Tipo: </b>" + data.getIdTipoDesigna();
 						}
 						
 						data.setDatosInteres(datoInteres);						

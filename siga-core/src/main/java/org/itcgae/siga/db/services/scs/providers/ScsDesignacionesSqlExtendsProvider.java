@@ -36,16 +36,135 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT("des.idinstitucion,des.anio,des.numero,des.fechaentrada,"
-				+ "('D' || des.anio || '/' || des.codigo) asunto,"
-				+ "(nvl(turno.abreviatura, '') || '/') turnoguardia,"
-				+ "(nvl(per.nombre, '') || ' ' || nvl(per.apellido1,'') || ' ' || nvl(per.apellido2, '')) solicitante,"
-				+ "(nvl(persona.nombre,'') || ' ' || nvl(persona.apellidos1, '') || ' ' || nvl(persona.apellidos2,'')) letrado,"
-				+ "NVL(des.nig,'') nig, NVL(des.numprocedimiento,'') numprocedimiento, NVL(des.estado,'') estado");
+		sql.SELECT("designaciones.idinstitucion,"
+				+ "    designaciones.anio,"
+				+ "    designaciones.numero,"
+				+ "    ( 'D' || designaciones.anio || '/' || designaciones.numero) asunto,"
+				+ "    ( nvl( turno.abreviatura, '' ) || '/') turnoguardia,"
+				+ "    ( nvl( persona.nombre, '' ) || ' ' || nvl( persona.apellidos1, '' ) || ' ' || nvl( persona.apellidos2, '' ) ) letrado,"
+				+ "    ( nvl( per.nombre, '' ) || ' ' || nvl( per.apellido1, '' ) || ' ' || nvl( per.apellido2, '' ) ) interesado,"
+				+ "    NVL(designaciones.nig, '') nig,"
+				+ "    NVL(designaciones.numprocedimiento, '') numeroprocedimiento,"
+				+ "    NVL(designaciones.estado, '') estado,"
+				+ "    designaciones.fechaentrada,"
+				+ "    f_siga_getrecurso(juzgado.nombre," + idLenguaje + ") juzgado,"
+				+ "f_siga_getrecurso(td.descripcion,"+idLenguaje+") tipodesigna");
 		
-		sql.FROM("scs_designa des,cen_persona persona,scs_designasletrado l,cen_colegiado colegiado,scs_turno turno,scs_juzgado juzgado"
-				+ "scs_defendidosdesigna ded,scs_personajg per");
 		
+		sql.FROM("scs_designa designaciones");
+		sql.JOIN("scs_tipodesignacolegio td ON (td.IDTIPODESIGNACOLEGIO = designaciones.IDTIPODESIGNACOLEGIO)");
+		sql.JOIN("scs_designasletrado designaLetrado ON"
+				+ "    (designaLetrado.anio = designaciones.anio"
+				+ "        AND designaLetrado.numero = designaciones.numero"
+				+ "        AND designaLetrado.idinstitucion = designaciones.idinstitucion"
+				+ "        AND designaLetrado.idturno = designaciones.idturno)");
+		sql.JOIN("cen_persona persona ON"
+				+ "    (persona.idpersona = designaLetrado.idpersona)");
+		
+		sql.JOIN("cen_colegiado colegiado ON"
+				+ "    (colegiado.idinstitucion = designaciones.idinstitucion"
+				+ "        AND colegiado.idpersona = persona.idpersona)");
+		sql.JOIN("scs_turno turno ON"
+				+ "    (designaciones.idturno = turno.idturno"
+				+ "        AND designaciones.idinstitucion = turno.idinstitucion)");
+		sql.JOIN("scs_juzgado juzgado ON"
+				+ "    (designaciones.idjuzgado = juzgado.idjuzgado"
+				+ "        AND designaciones.idinstitucion = juzgado.idinstitucion)");
+		sql.JOIN("scs_defendidosdesigna defendidoDesigna ON"
+				+ "    (defendidoDesigna.anio = designaciones.anio"
+				+ "        AND defendidoDesigna.numero = designaciones.numero"
+				+ "        AND defendidoDesigna.idinstitucion = designaciones.idinstitucion"
+				+ "        AND defendidoDesigna.idturno = designaciones.idturno)");
+		sql.JOIN("scs_personajg per ON"
+				+ "    (defendidoDesigna.idinstitucion = per.idinstitucion\r\n"
+				+ "        AND defendidoDesigna.idpersona = per.idpersona)");
+		
+		sql.WHERE("designaciones.idinstitucion = "+asuntosJusticiableItem.getIdInstitucion());
+		sql.WHERE("( designaLetrado.fechadesigna IS NULL"
+				+ "        OR designaLetrado.fechadesigna = ("
+				+ "        SELECT"
+				+ "            MAX(let2.fechadesigna)"
+				+ "        FROM\r\n"
+				+ "            scs_designasletrado let2"
+				+ "        WHERE"
+				+ "            designaLetrado.idinstitucion = let2.idinstitucion"
+				+ "            AND designaLetrado.idturno = let2.idturno"
+				+ "            AND designaLetrado.anio = let2.anio"
+				+ "            AND designaLetrado.numero = let2.numero"
+				+ "            AND trunc(let2.fechadesigna) <= trunc(SYSDATE) ) )");
+		if (asuntosJusticiableItem.getAnio() != null && !asuntosJusticiableItem.getAnio().trim().isEmpty()) {
+			sql.WHERE("designaciones.anio = " + asuntosJusticiableItem.getAnio().trim());
+		}
+
+
+		if (asuntosJusticiableItem.getNumero() != null && !asuntosJusticiableItem.getNumero().trim().isEmpty()) {
+			sql.WHERE("designaciones.numero = " + asuntosJusticiableItem.getNumero().trim());
+		}
+		
+		if (asuntosJusticiableItem.getIdEstadoDesigna() != null) {
+			sql.WHERE("designaciones.estado = '" + asuntosJusticiableItem.getIdEstadoDesigna().trim()+"'");
+		}
+		if(asuntosJusticiableItem.getIdTipoDesigna() != null && !asuntosJusticiableItem.getIdTipoDesigna().trim().isEmpty()) {
+	    	sql.WHERE("designaciones.IDTIPODESIGNACOLEGIO = "+asuntosJusticiableItem.getIdTipoDesigna());
+	    }
+		if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
+			fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
+			sql.WHERE("designaciones.fechaentrada >= TO_DATE('" + fecha + "','DD/MM/RRRR')");
+		}
+
+		if (asuntosJusticiableItem.getFechaAperturaHasta() != null) {
+			fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaHasta());
+			sql.WHERE("designaciones.fechaentrada <= TO_DATE('" + fecha + "','DD/MM/RRRR')");
+		}
+
+		if (asuntosJusticiableItem.getNif() != null && !asuntosJusticiableItem.getNif().trim().isEmpty()) {
+			sql.WHERE("per.nif = '%" + asuntosJusticiableItem.getNif().trim() + "%'");
+		}
+
+		if (asuntosJusticiableItem.getNombre() != null && !asuntosJusticiableItem.getNombre().trim().isEmpty()) {
+			sql.WHERE("per.nombre LIKE upper('%" + asuntosJusticiableItem.getNombre().trim() + "%')");
+		}
+
+		if (asuntosJusticiableItem.getApellidos() != null && !asuntosJusticiableItem.getApellidos().trim().isEmpty()) {
+			sql.WHERE("(per.apellido1 || ' ' || per.apellido2) LIKE upper('%"
+					+ asuntosJusticiableItem.getApellidos().trim() + "%')");
+		}
+		if (asuntosJusticiableItem.getNig() != null && !asuntosJusticiableItem.getNig().trim().isEmpty()) {
+			sql.WHERE("designaciones.nig = '"+asuntosJusticiableItem.getNig()+"'");
+		}
+		if (asuntosJusticiableItem.getIdJuzgado() != null) {
+			sql.WHERE("designaciones.idjuzgado = " + asuntosJusticiableItem.getIdJuzgado());
+		}
+		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
+			sql.WHERE("persona.idpersona = " + asuntosJusticiableItem.getIdPersonaColegiado());
+		}
+
+		if (asuntosJusticiableItem.getNumeroProcedimiento() != null && !asuntosJusticiableItem.getNumeroProcedimiento().trim().isEmpty()) {
+			sql.WHERE("designaciones.numprocedimiento   = '" + asuntosJusticiableItem.getNumeroProcedimiento().trim() + "'");
+		}
+		
+		
+//		if (asuntosJusticiableItem.getIdGuardia() != null) {
+//			sql.WHERE("ejg.guardiaturno_idguardia = " + asuntosJusticiableItem.getIdGuardia());
+//		}
+//		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
+//			sql.WHERE("ejg.idpersona = " + asuntosJusticiableItem.getIdPersonaColegiado());
+		
+//		 colegiado.ncolegiado = $$NCOLEGIADO$$
+//				    AND
+//		}
+
+		
+		
+		
+		
+		sql.WHERE("ROWNUM <= " + tamMax);
+
+		sql.ORDER_BY("designaciones.anio desc, designaciones.numero DESC");
+		return sql.toString();
+  
+		
+		/*
 		sql.WHERE("l.anio = des.anio"
 				+ "    AND"
 				+ "        l.numero = des.numero"
@@ -101,70 +220,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                        trunc(let2.fechadesigna) <= trunc(SYSDATE)"
 				+ "            )"
 				+ "    )");
-		
-		sql.WHERE("des.idinstitucion = "+asuntosJusticiableItem.getIdInstitucion());
-		
-		if (asuntosJusticiableItem.getAnio() != null && !asuntosJusticiableItem.getAnio().trim().isEmpty()) {
-			sql.WHERE("des.anio = " + asuntosJusticiableItem.getAnio().trim());
-		}
-
-		if (asuntosJusticiableItem.getNumero() != null && !asuntosJusticiableItem.getNumero().trim().isEmpty()) {
-			sql.WHERE("des.numero = " + asuntosJusticiableItem.getNumero().trim());
-		}
-
-		if (asuntosJusticiableItem.getIdEstadoDesigna() != null) {
-			sql.WHERE("des.estado = '" + asuntosJusticiableItem.getIdEstadoPorEjg().trim()+"'");
-		}
-
-		if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {
-			fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaDesde());
-			sql.WHERE("des.fechaentrada >= TO_DATE('" + fecha + "','DD/MM/RRRR')");
-		}
-
-		if (asuntosJusticiableItem.getFechaAperturaHasta() != null) {
-			fecha = dateFormat.format(asuntosJusticiableItem.getFechaAperturaHasta());
-			sql.WHERE("des.fechaentrada <= TO_DATE('" + fecha + "','DD/MM/RRRR')");
-		}
-
-		if (asuntosJusticiableItem.getNif() != null && !asuntosJusticiableItem.getNif().trim().isEmpty()) {
-			sql.WHERE("per.nif = '%" + asuntosJusticiableItem.getNif().trim() + "%'");
-		}
-
-		if (asuntosJusticiableItem.getNombre() != null && !asuntosJusticiableItem.getNombre().trim().isEmpty()) {
-			sql.WHERE("per.nombre LIKE upper('%" + asuntosJusticiableItem.getNombre().trim() + "%')");
-		}
-
-		if (asuntosJusticiableItem.getApellidos() != null && !asuntosJusticiableItem.getApellidos().trim().isEmpty()) {
-			sql.WHERE("(per.apellido1 || ' ' || per.apellido2) LIKE upper('%"
-					+ asuntosJusticiableItem.getApellidos().trim() + "%')");
-		}
-
-		if (asuntosJusticiableItem.getIdTurno() != null) {
-			sql.WHERE("des.idturno = " + asuntosJusticiableItem.getIdTurno());
-		}
-//		if (asuntosJusticiableItem.getIdGuardia() != null) {
-//			sql.WHERE("ejg.guardiaturno_idguardia = " + asuntosJusticiableItem.getIdGuardia());
-//		}
-//		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
-//			sql.WHERE("ejg.idpersona = " + asuntosJusticiableItem.getIdPersonaColegiado());
-		
-//		 colegiado.ncolegiado = $$NCOLEGIADO$$
-//				    AND
-//		}
-
-		if (asuntosJusticiableItem.getIdJuzgado() != null) {
-			sql.WHERE("des.idjuzgado = " + asuntosJusticiableItem.getIdJuzgado());
-		}
-		
-		if (asuntosJusticiableItem.getNig() != null && !asuntosJusticiableItem.getNig().trim().isEmpty()) {
-			sql.WHERE("des.nig = '"+asuntosJusticiableItem.getNig()+"'");
-		}
-		
-		
-		sql.WHERE("ROWNUM <= " + tamMax);
-
-		sql.ORDER_BY("ejg.anio desc, ejg.numero DESC");
-  
+				*/
 		
 //		sql.SELECT(
 //				"DESIGNA.idinstitucion, DESIGNA.anio,DESIGNA.numero,to_char(DESIGNA.idturno)  as clave, '' as rol, 'D' as tipo");
@@ -284,7 +340,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 //		}
 
 //		return sqlOrder.toString();
-		return sql.toString();
+		//return sql.toString();
 	}
 
 	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMax) throws Exception {

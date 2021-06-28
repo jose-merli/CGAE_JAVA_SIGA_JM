@@ -23,7 +23,8 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado,"
 				+ "a.fechahora, NVL(a.numeroprocedimiento,'') numeroprocedimiento,"
 				+ "a.comisaria centrodetencion,"
-				+ "a.juzgado");
+				+ "a.juzgado,"
+				+"a.numerodiligencia");
 		
 		sql.FROM("scs_asistencia a");
 	    sql.JOIN("scs_tipoasistencia ta ON (ta.idtipoasistencia = a.idtipoasistencia)");
@@ -68,7 +69,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 					+ asuntosJusticiableItem.getApellidos().trim() + "%')");
 		}
 		if (asuntosJusticiableItem.getNumeroDiligencia() != null && !asuntosJusticiableItem.getNumeroDiligencia().trim().isEmpty()) {
-			sql.WHERE("a.numerodiligencia = "+ asuntosJusticiableItem.getNumeroDiligencia().trim());
+			sql.WHERE("a.numerodiligencia = '"+ asuntosJusticiableItem.getNumeroDiligencia().trim()+ "'");
 		}
 		if (asuntosJusticiableItem.getComisaria() != null) {
 			sql.WHERE("a.comisaria   = " + asuntosJusticiableItem.getComisaria());
@@ -76,8 +77,8 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		if (asuntosJusticiableItem.getIdJuzgado() != null) {
 			sql.WHERE("a.juzgado  = " + asuntosJusticiableItem.getIdJuzgado());
 		}
-		if (asuntosJusticiableItem.getNumeroDiligencia() != null) {
-			sql.WHERE("a.juzgado  = " + asuntosJusticiableItem.getIdJuzgado());
+		if (asuntosJusticiableItem.getNumeroProcedimiento() != null && !asuntosJusticiableItem.getNumeroProcedimiento().trim().isEmpty()) {
+			sql.WHERE("a.numeroprocedimiento   = '" + asuntosJusticiableItem.getNumeroProcedimiento().trim() + "'");
 		}
 		
 		if (asuntosJusticiableItem.getIdGuardia() != null) {
