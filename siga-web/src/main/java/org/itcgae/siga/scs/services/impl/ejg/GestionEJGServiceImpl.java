@@ -774,17 +774,17 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					if (response != 1) {
 						responsedto.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
-						throw new Exception("ERROR: no se ha podido ");
+								"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha introducido ningún familiar en el ejg");
+						throw new Exception("ERROR: no se ha podido introducir ningún familiar en el ejg");
 					} else {
 						responsedto.setStatus(SigaConstants.OK);
 					}
 
 					LOGGER.debug(
-							"GestionEJGServiceImpl.insertFamiliarEJG() -> Salida del servicio para insertar en la unidad familiar para los ejgs");
+							"GestionEJGServiceImpl.insertFamiliarEJG() -> Salida del servicio para insertar en la unidad familiar en el ejg");
 				} catch (Exception e) {
 					LOGGER.debug(
-							"GestionEJGServiceImpl.insertFamiliarEJG() -> Se ha producido un error al insertar en la unidad familiar de los ejgs. ",
+							"GestionEJGServiceImpl.insertFamiliarEJG() -> Se ha producido un error al insertar en la unidad familiar en el ejg.",
 							e);
 				}
 			}
@@ -1637,7 +1637,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					//						NUMERO
 					//						IDTIPOEJG
 					//						IDPRESTACION
-					// Comprobar en el caso de que no se haga ningún cambio y con algún cambio.
 					if (datos.getPrestacionesRechazadas() != null) {
 						ScsEjgPrestacionRechazada preRe = new ScsEjgPrestacionRechazada();
 
@@ -1848,7 +1847,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	@Transactional
 	public UpdateResponseDTO borrarFamiliar(List<UnidadFamiliarEJGItem> datos, HttpServletRequest request) {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
-		int response = 0;
+		int response = 1;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1871,8 +1870,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				try {
 					for (int i = 0; datos.size() > i; i++) {
 
-						response = 0;
-
 						// seleccionamos el objeto por key
 						ScsUnidadfamiliarejgKey key = new ScsUnidadfamiliarejgKey();
 
@@ -1893,11 +1890,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						if (datos.get(i).getFechaBaja() == null) {
 							record.setFechabaja(new Date());
 
-							//Se elimina su propiedad como solicitante principal
-							if(record.getSolicitante().equals("1")) {
-								record.setSolicitante((short)0);
-
-								//Actualizamos el ejg correspondientemente para que no lo considere su solicitante principal
+							//Se elimina su propiedad como solicitante y su rol
+							record.setSolicitante((short)0);
+							
+							
+							//Actualizamos el ejg correspondientemente para que no lo considere su solicitante principal
+							if(record.getEncalidadde()!= null && record.getEncalidadde().equals("3")) {
 								ScsEjgKey ejgKey = new ScsEjgKey();
 
 								ejgKey.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
@@ -1908,12 +1906,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 								ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 
 								ejg.setIdpersonajg(null);
+								if(response == 1) response = scsEjgMapper.updateByPrimaryKey(ejg);
 							}
-							response = scsUnidadfamiliarejgMapper.updateByPrimaryKeySelective(record);
 						} else {
 							record.setFechabaja(null);
-							response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(record);
 						}
+
+						record.setEncalidadde(null);
+						if(response == 1) response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(record);
 
 					}
 					LOGGER.debug(
@@ -1922,6 +1922,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					LOGGER.debug(
 							"GestionEJGServiceImpl.borrarFamiliar() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
 							e);
+					response=0;
 				} finally {
 					// respuesta si se actualiza correctamente
 					if (response >= 1) {
@@ -3665,7 +3666,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				scsDocumentacionejg.setFechaentrega(documentacionEjgItem.getF_presentacion());
 				scsDocumentacionejg.setRegentrada(documentacionEjgItem.getRegEntrada());
 				scsDocumentacionejg.setRegsalida(documentacionEjgItem.getRegSalida());
-				scsDocumentacionejg.setIdmaestropresentador(Short.valueOf(documentacionEjgItem.getPresentador()));
+				
+				//Posible fuente de problemas por restricciones de la base de datos
+				//Se lee el valor de presentador enviado desde el front.
+				//Se ha implementado para que si empieza con "S_" (añadido unicamente en el combo de presentador)
+				//se trata de un solicitante de la unidad (idpersona), en caso contrario, es uno de los presentadores de EJGS 
+				if(documentacionEjgItem.getPresentador().contains("S_")) {
+					scsDocumentacionejg.setPresentador(Long.valueOf(documentacionEjgItem.getPresentador().split("S_")[1]));
+				}
+				else scsDocumentacionejg.setIdmaestropresentador(Short.valueOf(documentacionEjgItem.getPresentador()));
 				scsDocumentacionejg.setDocumentacion(documentacionEjgItem.getDescripcionDoc());
 
 				scsDocumentacionejg.setIdinstitucion(idInstitucion);
@@ -3682,13 +3691,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						if(response==1) {
 							nuevoId = scsEjgExtendsMapper.getNewIdDocumentacionEjg(idInstitucion);
 							scsDocumentacionejg.setIddocumentacion(Integer.valueOf(nuevoId.getIdMax().toString()));
-							response = scsDocumentacionejgMapper.insertSelective(scsDocumentacionejg);
+							response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
 						}
 					}
 				}
 				else {
 					scsDocumentacionejg.setIddocumento(Short.valueOf(documentacionEjgItem.getIdDocumento()));
-					response = scsDocumentacionejgMapper.insertSelective(scsDocumentacionejg);
+					response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
 				}
 
 
@@ -3717,6 +3726,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			error.setDescription("general.mensaje.error.bbdd");
 			error.setMessage(e.getMessage());
 			insertResponseDTO.setError(error);
+			insertResponseDTO.setStatus(SigaConstants.KO);
 		}
 
 		return insertResponseDTO;
