@@ -361,7 +361,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		query.SELECT("IDGRUPO");
 		query.SELECT("IDCONCEPTO");
 		query.SELECT("IMPORTETOTAL");
-		query.SELECT("SUM(IMPORTEPENDIENTE) AS IMPORTEPENDIENTE");
+		query.SELECT("IMPORTETOTAL - SUM(IMPORTEPENDIENTE) AS IMPORTEPENDIENTE");
 		query.FROM("( " + sql.toString() + " )");
 		query.GROUP_BY("IDINSTITUCION, IDFACTURACION, DESCGRUPO, DESCCONCEPTO, IDGRUPO, IDCONCEPTO, IMPORTETOTAL");
 
@@ -525,6 +525,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("pjg.idfacturacion");
 		sql.SELECT("pjg.nombre");
 		sql.SELECT("(" + sql3.toString() + ") desconcepto");
+		sql.SELECT("concept.idhitogeneral");
 		sql.SELECT("pjg.importeejg");
 		sql.SELECT("pjg.importeguardia");
 		sql.SELECT("pjg.importeoficio");

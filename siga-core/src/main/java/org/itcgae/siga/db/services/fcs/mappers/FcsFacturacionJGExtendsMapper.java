@@ -154,6 +154,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 		@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
 		@Result(column = "DESESTADO", property = "desEstado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCONCEPTO", property = "desConcepto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDHITOGENERAL", property = "idHitoGeneral", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PORCENTAJE", property = "porcentaje", jdbcType = JdbcType.VARCHAR)
 		
 	})
