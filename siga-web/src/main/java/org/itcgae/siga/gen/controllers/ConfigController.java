@@ -7,6 +7,7 @@ import org.itcgae.siga.DTOs.adm.UsuarioDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.DiccionarioDTO;
 import org.itcgae.siga.gen.services.IDiccionarioService;
+import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +22,9 @@ public class ConfigController {
 	
 	@Autowired
 	IDiccionarioService diccionarioService;
+	
+	@Autowired
+	SigaUserDetailsService sigaUserDetailsService;
     
     @RequestMapping(value = "/diccionarios", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DiccionarioDTO> getDiccionarios(@RequestParam(value="idioma", required=false) String idioma,HttpServletRequest request) {
@@ -42,6 +46,15 @@ public class ConfigController {
     @RequestMapping(value = "/recuperarApiKey",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ResponseDataDTO> recuperarApiKey(HttpServletRequest request) {		
 		ResponseDataDTO response = diccionarioService.obtenerTinyApiKey(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+    
+    @RequestMapping(value = "/reloadPermissionMap", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ResponseDataDTO> reloadPermissionMap(HttpServletRequest request) {
+    	ResponseDataDTO response = sigaUserDetailsService.getTokenAccess();
 		if(response.getError() == null)
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
 		else

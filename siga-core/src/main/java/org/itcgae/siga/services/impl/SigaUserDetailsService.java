@@ -9,7 +9,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
 import org.itcgae.siga.DTOs.gen.UserAccess;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -461,7 +463,9 @@ public class SigaUserDetailsService implements UserDetailsService {
 
     }
 	
-	public void getTokenAccess() {
+	public ResponseDataDTO getTokenAccess() {
+		ResponseDataDTO response = new ResponseDataDTO();
+		Error error = new Error();
 		try {
 			LOGGER.debug("Buscamos los permisos en base de datos.");
 			//Obtenemos todos los permisos de la bd de la tabla ADM_ACCESS
@@ -482,11 +486,15 @@ public class SigaUserDetailsService implements UserDetailsService {
 				}
 			}
 			PermisosAccionRepository.setPermisosAccion(mapPermisos);	
-
+			response.setData(mapPermisos.toString());
 		}catch(Exception e) {
 			LOGGER.error("Se ha producido un error en la busqueda de permisos", e);
-			throw e;
+			error.setCode(500);
+			error.setDescription("Se ha producido un error en la busqueda de permisos");
+			error.setMessage(e.getMessage());
+			response.setError(error);
 		}
+		return null;
 	}
 	
 }

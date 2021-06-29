@@ -1,19 +1,26 @@
 package org.itcgae.siga.security.develop;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.itcgae.siga.db.entities.AdmAccessKey;
 import org.itcgae.siga.db.entities.AdmRol;
+import org.itcgae.siga.security.PermisosAccionRepository;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -21,7 +28,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-
+@Primary
 public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 	
 	
@@ -33,7 +40,10 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	private SigaUserDetailsService userDetailsService;
 
 	private static String tokenHeaderAuthKey;
-
+	
+	@Autowired
+	private static ApplicationContext context;
+	
 	public DevAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
 			String tokenHeaderAuthKey, SigaUserDetailsService userDetailsService2) {
 		super(new AntPathRequestMatcher(loginUrl, loginMethod));
@@ -79,6 +89,10 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			if (auth.getClass().equals(UserAuthenticationToken.class)) {
 				UserAuthenticationToken userAuthToken = (UserAuthenticationToken) auth;
 				response.addHeader(tokenHeaderAuthKey, UserTokenUtils.generateToken(userAuthToken));
+				
+				userDetailsService.getTokenAccess();
+				
+				
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
