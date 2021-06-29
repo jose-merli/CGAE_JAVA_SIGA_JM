@@ -12,4 +12,6 @@ public interface IScheduledTaskService {
 	public void  cambiaEventosImpartido();
 	
 	public void  generarNotificaciones();
+	
+	public void ejecutaFacturacionSJCS();
 }
