@@ -22,9 +22,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 				+ "    soj.estado," 
 				+ "		soj.fechaapertura,"
 				+ "(nvl(t.abreviatura,'') || '/' || nvl(g.nombre,'')) turnoguardia,"
-				+ "('S' || soj.anio || '/' || soj.numero) asunto," + "    f_siga_getrecurso(ts.descripcion,"
-				+ idLenguaje + "" 
-				+ "    ) tiposoj," 
+				+ "('S' || soj.anio || '/' || soj.numero) asunto," + "    f_siga_getrecurso(nvl(ts.descripcion,'')," + idLenguaje + ") tiposoj," 
 				+ "		soj.idtiposoj,"
 				+ "    (nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado");
@@ -44,8 +42,8 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 			sql.WHERE("soj.numero = " + asuntosJusticiableItem.getNumero().trim());
 		}
 
-		if (asuntosJusticiableItem.getIdTipoEjg() != null && !asuntosJusticiableItem.getIdTipoEjg().trim().isEmpty()) {
-			sql.WHERE("soj.idtipoejg = " + asuntosJusticiableItem.getIdTipoEjg().trim());
+		if (asuntosJusticiableItem.getIdTipoSoj() != null && !asuntosJusticiableItem.getIdTipoSoj().trim().isEmpty()) {
+			sql.WHERE("soj.idtiposoj = " + asuntosJusticiableItem.getIdTipoSoj().trim());
 		}
 
 		if (asuntosJusticiableItem.getFechaAperturaDesde() != null) {

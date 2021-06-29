@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
@@ -68,6 +69,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		List<AsuntosJusticiableItem> asuntosJusticiableItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		Error error = new Error();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -157,6 +159,14 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					}
 
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
+					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						asuntosJusticiableDTO.setError(error);
+					}
 				}
 			}
 		}
@@ -195,6 +205,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		List<AsuntosJusticiableItem> asuntosJusticiableItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		Error error = new Error();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -286,6 +297,14 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					}
 
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
+					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						asuntosJusticiableDTO.setError(error);
+					}
 				}
 //					asuntosJusticiableDTO = gestionJusticiableServiceImpl
 //							.searchAsuntosConClave(asuntosJusticiableItems, false, request);
@@ -308,6 +327,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		List<AsuntosJusticiableItem> asuntosJusticiableItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		Error error = new Error();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -409,7 +429,16 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					}
 					
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
+					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						asuntosJusticiableDTO.setError(error);
+					}
 				}
+				
 //				asuntosJusticiableDTO = gestionJusticiableServiceImpl.searchAsuntosConClave(asuntosJusticiableItems,
 //						false, request);
 			}
@@ -430,6 +459,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		List<AsuntosJusticiableItem> asuntosJusticiableItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		Error error = new Error();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -510,7 +540,18 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					}
 					
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
+					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						asuntosJusticiableDTO.setError(error);
+					}
 				}
+				
+				
+				
 //				asuntosJusticiableDTO = gestionJusticiableServiceImpl
 //						.searchAsuntosConClave(asuntosJusticiableItems, false, request);
 			}

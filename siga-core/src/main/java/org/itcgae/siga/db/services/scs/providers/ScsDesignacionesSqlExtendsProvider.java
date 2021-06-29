@@ -47,8 +47,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "    NVL(designaciones.numprocedimiento, '') numeroprocedimiento,"
 				+ "    NVL(designaciones.estado, '') estado,"
 				+ "    designaciones.fechaentrada,"
+				+ "designaciones.IDTIPODESIGNACOLEGIO,"
 				+ "    f_siga_getrecurso(juzgado.nombre," + idLenguaje + ") juzgado,"
-				+ "f_siga_getrecurso(td.descripcion,"+idLenguaje+") tipodesigna");
+				+ "f_siga_getrecurso(nvl(td.descripcion,'')," + idLenguaje + ") tipodesigna");
 		
 		
 		sql.FROM("scs_designa designaciones");
