@@ -1048,38 +1048,52 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	
 	@Override
 	public FacturacionDTO conceptosFacturacion(String idFacturacion, HttpServletRequest request) {
+
+		LOGGER.info(
+				"FacturacionSJCSServicesImpl.conceptosFacturacion() -> Entrada al servicio para obtener los conceptos de facturaciones");
+
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		FacturacionDTO facturaciones = new FacturacionDTO();
 		String idLenguaje;
-		
-		if(null != idInstitucion) {
+
+		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	        exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-	        List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	        LOGGER.info("getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-	            
-	        if(null != usuarios && usuarios.size() > 0) {
-	        	AdmUsuarios usuario = usuarios.get(0);
-	            usuario.setIdinstitucion(idInstitucion);
-	            idLenguaje=usuario.getIdlenguaje();  
-	                
-	            LOGGER.info("conceptosFacturacion() / fcsFacturacionJGExtendsMapper.conceptosFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los conceptos de facturacón");
-	            List<FacturacionItem> facturacionItem = fcsFacturacionJGExtendsMapper.conceptosFacturacion(idFacturacion, idInstitucion.toString(), idLenguaje);
-	            facturaciones.setFacturacionItem(facturacionItem);
-	            LOGGER.info("conceptosFacturacion() / fcsFacturacionJGExtendsMapper.conceptosFacturacion() -> Salida de fcsFacturacionJGExtendsMapper para obtener los conceptos de facturación");
-	        }else {
-	        	LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
-	        }
-	    }else {
-	    	LOGGER.warn("getLabel() -> idInstitucion del token nula");
-	    }
-	        
-	    LOGGER.info("getLabel() -> Salida del servicio para obtener los conceptos de facturaciones");
-	    
-	    return facturaciones;	
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"FacturacionSJCSServicesImpl.conceptosFacturacion() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"FacturacionSJCSServicesImpl.conceptosFacturacion() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
+				idLenguaje = usuario.getIdlenguaje();
+
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.conceptosFacturacion() -> fcsFacturacionJGExtendsMapper.conceptosFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los conceptos de facturacón");
+				List<FacturacionItem> facturacionItem = fcsFacturacionJGExtendsMapper
+						.conceptosFacturacion(idFacturacion, idInstitucion.toString(), idLenguaje);
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.conceptosFacturacion() -> fcsFacturacionJGExtendsMapper.conceptosFacturacion() -> Salida de fcsFacturacionJGExtendsMapper para obtener los conceptos de facturación");
+
+				facturaciones.setFacturacionItem(facturacionItem);
+
+			} else {
+				LOGGER.warn(
+						"FacturacionSJCSServicesImpl.conceptosFacturacion() -> admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("FacturacionSJCSServicesImpl.conceptosFacturacion() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info(
+				"FacturacionSJCSServicesImpl.conceptosFacturacion() -> Salida del servicio para obtener los conceptos de facturaciones");
+
+		return facturaciones;
 	}
 	
 	@Override
@@ -1152,7 +1166,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 									"FacturacionSJCSServicesImpl.saveConceptosFac() -> fcsFactGrupofactHitoMapper.insert() -> Salida guardar datos en fcsFacturacionjg");
 						} else {
 							error.setCode(400);
-							error.setDescription("facturacionSJCS.facturacionesYPagos.mensaje.conceptoExistente");
+							error.setDescription("facturacionSJCS.facturacionesYPagos.mensaje.conceptosExistentes");
 							LOGGER.info("FacturacionSJCSServicesImpl.saveConceptosFac() -> Concepto ya existente");
 							insertResponse.setStatus(SigaConstants.KO);
 						}
@@ -1267,7 +1281,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 						} else {
 							error.setCode(400);
-							error.setDescription("facturacionSJCS.facturacionesYPagos.mensaje.conceptoExistente");
+							error.setDescription("facturacionSJCS.facturacionesYPagos.mensaje.conceptosExistentes");
 							LOGGER.info("FacturacionSJCSServicesImpl.updateConceptosFac() -> Concepto ya existente");
 							updateResponse.setStatus(SigaConstants.KO);
 						}

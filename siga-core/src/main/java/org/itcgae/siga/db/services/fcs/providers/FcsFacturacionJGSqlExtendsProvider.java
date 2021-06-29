@@ -314,47 +314,58 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		SQL sqlDescGrupo = new SQL();
 		SQL sqlDescConcepto = new SQL();
 
-		sqlDescGrupo.SELECT("rec.descripcion");
-		sqlDescGrupo.FROM("gen_recursos_catalogos rec");
-		sqlDescGrupo.WHERE("rec.idrecurso = grupo.nombre");
-		sqlDescGrupo.WHERE("rec.idlenguaje = '" + idLenguaje + "'");
+		sqlDescGrupo.SELECT("REC.DESCRIPCION");
+		sqlDescGrupo.FROM("GEN_RECURSOS_CATALOGOS REC");
+		sqlDescGrupo.WHERE("REC.IDRECURSO = GRUPO.NOMBRE");
+		sqlDescGrupo.WHERE("REC.IDLENGUAJE = '" + idLenguaje + "'");
 
-		sqlDescConcepto.SELECT("rec.descripcion");
-		sqlDescConcepto.FROM("gen_recursos_catalogos rec");
-		sqlDescConcepto.WHERE("rec.idrecurso = concept.descripcion");
-		sqlDescConcepto.WHERE("rec.idlenguaje = '" + idLenguaje + "'");
+		sqlDescConcepto.SELECT("REC.DESCRIPCION");
+		sqlDescConcepto.FROM("GEN_RECURSOS_CATALOGOS REC");
+		sqlDescConcepto.WHERE("REC.IDRECURSO = CONCEPT.DESCRIPCION");
+		sqlDescConcepto.WHERE("REC.IDLENGUAJE = '" + idLenguaje + "'");
 
-		sql.SELECT("fac.idinstitucion");
-		sql.SELECT("fac.idfacturacion");
-		sql.SELECT("(" + sqlDescGrupo.toString() + ") descGrupo");
-		sql.SELECT("(" + sqlDescConcepto.toString() + ") descConcepto");
-		sql.SELECT("grupo.idgrupofacturacion idgrupo");
-		sql.SELECT("concept.idhitogeneral idconcepto");
-		sql.SELECT("CASE concept.idhitogeneral\r\n" + "        WHEN 10   THEN\r\n"
-				+ "            NVL(fac.importeoficio,0)\r\n" + "        WHEN 20   THEN\r\n"
-				+ "             NVL(fac.importeguardia,0)\r\n" + "        WHEN 30   THEN\r\n"
-				+ "             NVL(fac.importesoj,0)\r\n" + "        ELSE\r\n"
-				+ "             NVL(fac.importeejg,0)\r\n" + "    END AS importetotal");
-		sql.SELECT("CASE concept.idhitogeneral\r\n" + "        WHEN 10   THEN\r\n"
-				+ "             NVL(fac.importeoficio,0) -  NVL(pago.importeoficio,0)\r\n"
-				+ "        WHEN 20   THEN\r\n"
-				+ "             NVL(fac.importeguardia,0) -  NVL(pago.importeguardia,0)\r\n"
-				+ "        WHEN 30   THEN\r\n" + "             NVL(fac.importesoj,0) -  NVL(pago.importesoj,0)\r\n"
-				+ "        ELSE\r\n" + "             NVL(fac.importeejg,0) -  NVL(pago.importeejg,0)\r\n"
-				+ "    END AS importependiente");
-		sql.FROM("fcs_fact_grupofact_hito   factgrupo");
+		sql.SELECT("FAC.IDINSTITUCION");
+		sql.SELECT("FAC.IDFACTURACION");
+		sql.SELECT("(" + sqlDescGrupo.toString() + ") DESCGRUPO");
+		sql.SELECT("(" + sqlDescConcepto.toString() + ") DESCCONCEPTO");
+		sql.SELECT("GRUPO.IDGRUPOFACTURACION IDGRUPO");
+		sql.SELECT("CONCEPT.IDHITOGENERAL IDCONCEPTO");
+		sql.SELECT("CASE CONCEPT.IDHITOGENERAL\r\n" + "        WHEN 10 THEN\r\n"
+				+ "            	NVL(FAC.IMPORTEOFICIO,0)\r\n" + "        WHEN 20 THEN\r\n"
+				+ "             NVL(FAC.IMPORTEGUARDIA,0)\r\n" + "        WHEN 30 THEN\r\n"
+				+ "             NVL(FAC.IMPORTESOJ,0)\r\n" + "        ELSE\r\n"
+				+ "             NVL(FAC.IMPORTEEJG,0)\r\n" + "END AS IMPORTETOTAL");
+		sql.SELECT("CASE CONCEPT.IDHITOGENERAL\r\n" + "        WHEN 10 THEN\r\n"
+				+ "             NVL(FAC.IMPORTEOFICIO,0) - NVL(PAGO.IMPORTEOFICIO,0)\r\n" + "        WHEN 20 THEN\r\n"
+				+ "             NVL(FAC.IMPORTEGUARDIA,0) - NVL(PAGO.IMPORTEGUARDIA,0)\r\n" + "        WHEN 30 THEN\r\n"
+				+ "             " + "				NVL(FAC.IMPORTESOJ,0) - NVL(PAGO.IMPORTESOJ,0)\r\n"
+				+ "        ELSE\r\n" + "            NVL(FAC.IMPORTEEJG,0) - NVL(PAGO.IMPORTEEJG,0)\r\n"
+				+ "END AS IMPORTEPENDIENTE");
+		sql.FROM("FCS_FACT_GRUPOFACT_HITO FACTGRUPO");
 		sql.LEFT_OUTER_JOIN(
-				"scs_grupofacturacion grupo ON (factgrupo.idgrupofacturacion = grupo.idgrupofacturacion AND factgrupo.idinstitucion = grupo.idinstitucion)");
-		sql.INNER_JOIN("fcs_hitogeneral concept ON (factgrupo.idhitogeneral = concept.idhitogeneral)");
+				"SCS_GRUPOFACTURACION GRUPO ON (FACTGRUPO.IDGRUPOFACTURACION = GRUPO.IDGRUPOFACTURACION AND FACTGRUPO.IDINSTITUCION = GRUPO.IDINSTITUCION)");
+		sql.INNER_JOIN("FCS_HITOGENERAL CONCEPT ON (FACTGRUPO.IDHITOGENERAL = CONCEPT.IDHITOGENERAL)");
 		sql.INNER_JOIN(
-				"fcs_facturacionjg fac ON (factgrupo.idfacturacion = fac.idfacturacion AND factgrupo.idinstitucion = fac.idinstitucion)");
+				"FCS_FACTURACIONJG FAC ON (FACTGRUPO.IDFACTURACION = FAC.IDFACTURACION AND FACTGRUPO.IDINSTITUCION = FAC.IDINSTITUCION)");
 		sql.LEFT_OUTER_JOIN(
-				"fcs_pagosjg pago ON (fac.idfacturacion = pago.idfacturacion AND fac.idinstitucion = pago.idinstitucion)");
-		sql.WHERE("factgrupo.idinstitucion = '" + idInstitucion + "'");
-		sql.WHERE(" factgrupo.idfacturacion = '" + idFacturacion + "'");
-		sql.ORDER_BY("factgrupo.idhitogeneral");
+				"FCS_PAGOSJG PAGO ON (FAC.IDFACTURACION = PAGO.IDFACTURACION AND FAC.IDINSTITUCION = PAGO.IDINSTITUCION)");
+		sql.WHERE("FACTGRUPO.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("FACTGRUPO.IDFACTURACION = '" + idFacturacion + "'");
+		sql.ORDER_BY("FACTGRUPO.IDHITOGENERAL");
 
-		return sql.toString();
+		SQL query = new SQL();
+		query.SELECT("IDINSTITUCION");
+		query.SELECT("IDFACTURACION");
+		query.SELECT("DESCGRUPO");
+		query.SELECT("DESCCONCEPTO");
+		query.SELECT("IDGRUPO");
+		query.SELECT("IDCONCEPTO");
+		query.SELECT("IMPORTETOTAL");
+		query.SELECT("SUM(IMPORTEPENDIENTE) AS IMPORTEPENDIENTE");
+		query.FROM("( " + sql.toString() + " )");
+		query.GROUP_BY("IDINSTITUCION, IDFACTURACION, DESCGRUPO, DESCCONCEPTO, IDGRUPO, IDCONCEPTO, IMPORTETOTAL");
+
+		return query.toString();
 	}
 
 	public String getComboFactColegio(Short idInstitucion) {
