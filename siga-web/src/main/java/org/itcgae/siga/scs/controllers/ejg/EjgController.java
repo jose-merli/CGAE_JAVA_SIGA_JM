@@ -601,15 +601,6 @@ public class EjgController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/gestion-ejg/nuevoProcuradorEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> nuevoProcuradorEJG(@RequestBody EjgItem item, HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.nuevoProcuradorEJG(item, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
 //	@RequestMapping(value = "/gestion-ejg/getDelitosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 //	ResponseEntity<ComboDTO> getDelitosEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
 //		ComboDTO response = gestionEJG.getDelitosEJG(ejgItem, request);

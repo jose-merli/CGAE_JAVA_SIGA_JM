@@ -121,6 +121,7 @@ public class EjgItem {
 	private String idProcurador;
 	private Short idInstitucionProc;
 	private String numerodesignaproc;
+	private String nombreApProcurador;
 	
 
 	/**
@@ -1563,5 +1564,13 @@ public class EjgItem {
 
 	public void setNumerodesignaproc(String numerodesignaproc) {
 		this.numerodesignaproc = numerodesignaproc;
+	}
+
+	public String getNombreApProcurador() {
+		return nombreApProcurador;
+	}
+
+	public void setNombreApProcurador(String nombreApProcurador) {
+		this.nombreApProcurador = nombreApProcurador;
 	}
 }

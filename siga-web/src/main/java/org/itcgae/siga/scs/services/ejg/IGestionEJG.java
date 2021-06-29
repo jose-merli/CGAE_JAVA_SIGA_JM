@@ -122,7 +122,7 @@ public interface IGestionEJG {
 
 	UpdateResponseDTO guardarProcuradorEJG(EjgItem item, HttpServletRequest request);
 
-	UpdateResponseDTO nuevoProcuradorEJG(EjgItem ejgItem, HttpServletRequest request);
+	//UpdateResponseDTO nuevoProcuradorEJG(EjgItem ejgItem, HttpServletRequest request);
 
 	ComboDTO comboDelitos(HttpServletRequest request);
 

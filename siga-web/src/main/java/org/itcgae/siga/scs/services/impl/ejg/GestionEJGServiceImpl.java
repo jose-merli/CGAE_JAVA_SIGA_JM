@@ -3231,6 +3231,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 0;
+		int response1 = 0;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -3263,6 +3264,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					if (item.getIdProcurador() != null)
 						ejg.setIdprocurador(Long.parseLong(item.getIdProcurador()));
+					else ejg.setIdprocurador(null);
 					ejg.setIdinstitucionProc(item.getIdInstitucionProc());
 					ejg.setFechaDesProc(item.getFechaDesProc());
 					ejg.setNumerodesignaproc(item.getNumerodesignaproc());
@@ -3277,6 +3279,44 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					LOGGER.info(
 							"guardarProcuradorEJG() / scsEjgMapper.updateByPrimaryKeySelective() -> Salida de scsContrariosejgMapper para guardar procurador EJG.");
 
+					ScsEstadoejg estado = new ScsEstadoejg();
+
+					// creamos el objeto para el insert
+					estado.setIdinstitucion(idInstitucion);
+					estado.setAnio(Short.parseShort(item.getAnnio()));
+					estado.setNumero(Long.parseLong(item.getNumero()));
+
+					estado.setIdestadoejg((short) 19);
+					estado.setFechainicio(new Date());
+					if(item.getNombreApProcurador()!=null)estado.setObservaciones(item.getNombreApProcurador());
+					else estado.setObservaciones("Ninguno");
+					estado.setAutomatico("0");
+
+					estado.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
+
+					estado.setFechamodificacion(new Date());
+					estado.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					// obtenemos el maximo de idestadoporejg
+					ScsEstadoejgExample example = new ScsEstadoejgExample();
+					example.setOrderByClause("IDESTADOPOREJG DESC");
+					example.createCriteria().andAnioEqualTo(Short.parseShort(item.getAnnio()))
+					.andIdinstitucionEqualTo(idInstitucion)
+					.andIdtipoejgEqualTo(Short.parseShort(item.getTipoEJG()))
+					.andNumeroEqualTo(Long.parseLong(item.getNumero()));
+
+					List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
+
+					// damos el varlo al idestadoporejg + 1
+					if (listEjg.size() > 0) {
+						estado.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
+					} else {
+						estado.setIdestadoporejg(Long.parseLong("0"));
+					}
+
+					if(response == 1) response1 = scsEstadoejgMapper.insert(estado);
+					
+					
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
@@ -3287,7 +3327,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		}
 
-		if (response == 0) {
+		if (response == 0 || response1 == 0) {
 			error.setCode(400);
 			error.setDescription("areasmaterias.materias.ficha.eliminarError");
 			updateResponseDTO.setStatus(SigaConstants.KO);
@@ -3300,80 +3340,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		updateResponseDTO.setError(error);
 
 		LOGGER.info("guardarProcuradorEJG() -> Salida del servicio para guardar procurador EJG");
-
-		return updateResponseDTO;
-	}
-
-	@Override
-	public UpdateResponseDTO nuevoProcuradorEJG(EjgItem ejgItem, HttpServletRequest request) {
-		LOGGER.info("nuevoProcuradorEJG() ->  Entrada al servicio para insertar un procurador ejg");
-
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		//		int existentes = 0;
-
-		if (null != idInstitucion) {
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"nuevoProcuradorEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"nuevoProcuradorEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (null != usuarios && usuarios.size() > 0) {
-
-				try {
-				// Creamos el objeto a actualizar
-
-				ScsEjgWithBLOBs ejg = new ScsEjgWithBLOBs();
-
-				ejg.setAnio(Short.parseShort(ejgItem.getAnnio()));
-				ejg.setNumero(Long.parseLong(ejgItem.getNumero()));
-				ejg.setIdtipoejg(Short.parseShort(ejgItem.getTipoEJG()));
-				ejg.setIdinstitucion(idInstitucion);
-
-				ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
-				ejg.setFechamodificacion(new Date());
-
-				ejg.setIdprocurador(Long.parseLong(ejgItem.getIdProcurador()));
-				ejg.setIdinstitucionProc(ejgItem.getIdInstitucionProc());
-
-				response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
-
-				} catch (Exception e) {
-					response = 0;
-					error.setCode(400);
-					error.setDescription(e.getMessage());
-					updateResponseDTO.setStatus(SigaConstants.KO);
-				}
-				if (response == 0 && error.getDescription() == null) {
-					error.setCode(400);
-					error.setDescription("No se ha insertado el procurador ejg");
-					updateResponseDTO.setStatus(SigaConstants.KO);
-				} else if (error.getCode() == null) {
-					error.setCode(200);
-					error.setDescription("Se ha insertado el procurador ejg correctamente");
-					updateResponseDTO.setStatus(SigaConstants.OK);
-				}
-
-				updateResponseDTO.setError(error);
-
-				LOGGER.info("nuevoProcuradorEJG() -> Salida del servicio para insertar un procurador ejg");
-
-			}
-
-		}
 
 		return updateResponseDTO;
 	}
