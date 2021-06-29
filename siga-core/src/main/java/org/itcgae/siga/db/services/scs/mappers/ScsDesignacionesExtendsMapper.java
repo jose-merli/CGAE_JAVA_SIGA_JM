@@ -56,9 +56,13 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 		@Result(column = "INTERESADO", property = "interesado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAENTRADA", property = "fecha", jdbcType = JdbcType.DATE),
-		@Result(column = "NUMEROPROCEDIMIENTO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numeroprocedimiento", property = "numeroProcedimiento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "ESTADO", property = "idEstadoDesigna", jdbcType = JdbcType.VARCHAR) })
+		@Result(column = "ESTADO", property = "idEstadoDesigna", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "JUZGADO", property = "juzgado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPODESIGNACOLEGIO", property = "idTipoDesigna", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPODESIGNA", property = "tipo", jdbcType = JdbcType.VARCHAR),})
+	
 	List<AsuntosJusticiableItem> searchClaveDesignaciones(AsuntosJusticiableItem asuntosJusticiableItem,
 			Integer tamMaximo, String idLenguaje);
 

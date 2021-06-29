@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
@@ -68,6 +69,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		List<AsuntosJusticiableItem> asuntosJusticiableItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		Error error = new Error();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -157,6 +159,14 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					}
 
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
+					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						asuntosJusticiableDTO.setError(error);
+					}
 				}
 			}
 		}
@@ -195,6 +205,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		List<AsuntosJusticiableItem> asuntosJusticiableItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		Error error = new Error();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -263,19 +274,37 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						if (data.getTipo() != null && !data.getTipo().isEmpty()) {
 							datoInteres += "<b>Tipo: </b>" + data.getTipo();
 						}
+						if (data.getIdEstadoDesigna() != null && !data.getIdEstadoDesigna().isEmpty()) {
+							datoInteres += "<b>Tipo: </b>" + data.getIdEstadoDesigna();
+						}
 
-						if (data.getNumProcedimiento() != null && !data.getNumProcedimiento().isEmpty()) {
+						if (data.getNumeroProcedimiento() != null && !data.getNumeroProcedimiento().isEmpty()) {
 							if (!datoInteres.isEmpty()) {
 								datoInteres += "<p>";
 							}
 
-							datoInteres += "<b>Núm. Procedimiento: </b>" + data.getNumProcedimiento();
+							datoInteres += "<b>Núm. Procedimiento: </b>" + data.getNumeroProcedimiento();
+						}
+						if (data.getNumeroDiligencia() != null && !data.getNumeroDiligencia().isEmpty()) {
+							if (!datoInteres.isEmpty()) {
+								datoInteres += "<p>";
+							}
+
+							datoInteres += "<b>Núm. Diligencia: </b>" + data.getNumeroDiligencia();
 						}
 
 						data.setDatosInteres(datoInteres);
 					}
 
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
+					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						asuntosJusticiableDTO.setError(error);
+					}
 				}
 //					asuntosJusticiableDTO = gestionJusticiableServiceImpl
 //							.searchAsuntosConClave(asuntosJusticiableItems, false, request);
@@ -298,6 +327,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		List<AsuntosJusticiableItem> asuntosJusticiableItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		Error error = new Error();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -361,18 +391,25 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					for(AsuntosJusticiableItem data : asuntosJusticiableItems) {
 						String datoInteres = "";
 						
-						if(data.getIdEstadoDesigna()!=null && !data.getIdEstadoDesigna().isEmpty()) {
-							datoInteres+="<b>Estado: </b>"+data.getTipo();
+						if (data.getTipo() != null && !data.getTipo().isEmpty()) {
+							datoInteres += "<b>Tipo: </b>" + data.getTipo();
 						}
-						
-						if(data.getNumProcedimiento()!=null && !data.getNumProcedimiento().isEmpty()) {
-							if(!datoInteres.isEmpty()) {
-								datoInteres+="<p>";
+
+						if (data.getNumeroProcedimiento() != null && !data.getNumeroProcedimiento().isEmpty()) {
+							if (!datoInteres.isEmpty()) {
+								datoInteres += "<p>";
 							}
-							
-							datoInteres+="<b>Núm. Procedimiento: </b>"+data.getNumProcedimiento();
+
+							datoInteres += "<b>Núm. Procedimiento: </b>" + data.getNumeroProcedimiento();
 						}
-						
+
+						if (data.getJuzgado() != null && !data.getJuzgado().isEmpty()) {
+							if (!datoInteres.isEmpty()) {
+								datoInteres += "<p>";
+							}
+
+							datoInteres += "<p><b>Juzgado: </b>" + data.getJuzgado();
+						}
 						if (data.getNig() != null && !data.getNig().isEmpty()) {
 							if (!datoInteres.isEmpty()) {
 								datoInteres += "<p>";
@@ -380,12 +417,28 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 							datoInteres += "<p><b>NIG: </b>" + data.getNig();
 						}
+						if (data.getIdTipoDesigna() != null && !data.getIdTipoDesigna().isEmpty()) {
+							if (!datoInteres.isEmpty()) {
+								datoInteres += "<p>";
+							}
+
+							datoInteres += "<p><b>Tipo: </b>" + data.getIdTipoDesigna();
+						}
 						
 						data.setDatosInteres(datoInteres);						
 					}
 					
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
+					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						asuntosJusticiableDTO.setError(error);
+					}
 				}
+				
 //				asuntosJusticiableDTO = gestionJusticiableServiceImpl.searchAsuntosConClave(asuntosJusticiableItems,
 //						false, request);
 			}
@@ -406,6 +459,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		List<AsuntosJusticiableItem> asuntosJusticiableItems = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
+		Error error = new Error();
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -486,7 +540,18 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					}
 					
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
+					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						asuntosJusticiableDTO.setError(error);
+					}
 				}
+				
+				
+				
 //				asuntosJusticiableDTO = gestionJusticiableServiceImpl
 //						.searchAsuntosConClave(asuntosJusticiableItems, false, request);
 			}
