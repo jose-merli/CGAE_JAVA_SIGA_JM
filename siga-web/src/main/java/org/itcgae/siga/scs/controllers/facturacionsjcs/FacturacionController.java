@@ -122,34 +122,25 @@ public class FacturacionController {
 		return new ResponseEntity<FacturacionDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/facturacionsjcs/saveConceptosFac",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> saveConceptosFac(@RequestBody FacturacionItem facturacionItem, HttpServletRequest request) { 
-		InsertResponseDTO response = facturacionServices.saveConceptosFac(facturacionItem, request);
-		if (response.getError().getCode() == 200) {
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		}else {
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
-		}
+	@RequestMapping(value = "/facturacionsjcs/saveConceptosFac", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> saveConceptosFac(@RequestBody List<FacturacionItem> listaFacturacionItem,
+			HttpServletRequest request) {
+		InsertResponseDTO response = facturacionServices.saveConceptosFac(listaFacturacionItem, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/facturacionsjcs/updateConceptosFac",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateConceptosFac(@RequestBody FacturacionItem facturacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = facturacionServices.updateConceptosFac(facturacionItem, request);
-		if (response.getError().getCode() == 200) {
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		}else {
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
-		}
+	@RequestMapping(value = "/facturacionsjcs/updateConceptosFac", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateConceptosFac(@RequestBody List<FacturacionItem> listaFacturacionItem,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = facturacionServices.updateConceptosFac(listaFacturacionItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/facturacionsjcs/deleteConceptosFac",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> deleteConceptosFac(@RequestBody List<FacturacionItem> facturacionDto, HttpServletRequest request) { 
+	@RequestMapping(value = "/facturacionsjcs/deleteConceptosFac", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> deleteConceptosFac(@RequestBody List<FacturacionItem> facturacionDto,
+			HttpServletRequest request) {
 		DeleteResponseDTO response = facturacionServices.deleteConceptosFac(facturacionDto, request);
-		if (response.getError().getCode() == 200) {
-			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-		}else {
-			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
-		}
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/facturacionsjcs/datospagos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
