@@ -128,7 +128,7 @@ public interface IGestionEJG {
 
 	DelitosEjgDTO getDelitosEjg(EjgItem item, HttpServletRequest request);
 
-	InsertResponseDTO actualizarDelitosEJG(EjgItem item, HttpServletRequest request);
+	//InsertResponseDTO actualizarDelitosEJG(EjgItem item, HttpServletRequest request);
 
 	ProcuradorDTO busquedaProcuradores(ProcuradorItem procuradorItem, HttpServletRequest request);
 

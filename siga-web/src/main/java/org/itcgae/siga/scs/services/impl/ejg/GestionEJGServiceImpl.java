@@ -2463,6 +2463,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	public UpdateResponseDTO updateDatosJuridicos(EjgItem datos, HttpServletRequest request) {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
+		int response2 = 0;
+		int response3 = 1;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -2523,6 +2525,39 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					record.setDelitos(datos.getDelitos());
 
 					response = scsEjgMapper.updateByPrimaryKeySelective(record);
+					
+					//Actualizamos los delitos del ejg
+					ScsDelitosejg delitos = new ScsDelitosejg();
+
+					delitos.setIdinstitucion(idInstitucion);
+					delitos.setAnio(Short.parseShort(datos.getAnnio()));
+					delitos.setNumero(Long.parseLong(datos.getNumero()));
+					delitos.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
+					delitos.setUsumodificacion(usuarios.get(0).getIdusuario());
+					delitos.setFechamodificacion(new Date());
+
+					ScsDelitosejgExample oldDelitos = new ScsDelitosejgExample();
+
+					oldDelitos.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(delitos.getAnio()).andNumeroEqualTo(delitos.getNumero())
+					.andIdtipoejgEqualTo(delitos.getIdtipoejg());
+
+					// Eliminamos las entradas existentes relacionadas si las hubiera.
+
+					if(response==1)response2 = scsDelitosejgMapper.deleteByExample(oldDelitos);
+					
+					List<ScsDelitosejg> oldDel = scsDelitosejgMapper.selectByExample(oldDelitos);
+
+					if (oldDel.isEmpty()) response2 = 1;
+					
+					if(datos.getDelitos()!=null){
+						String[] idDelitos = datos.getDelitos().split(",");
+						for (String idDelito : idDelitos) {
+							delitos.setIddelito(Short.parseShort(idDelito));
+							if(response3 == 1 && response2 == 1 && response == 1)response3 = scsDelitosejgMapper.insert(delitos);
+						}
+					}
+					
 
 					LOGGER.debug(
 							"GestionEJGServiceImpl.updateDatosJuridicos() -> Salida del servicio para cambiar los datos juridicos para el ejg");
@@ -2530,9 +2565,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					LOGGER.debug(
 							"GestionEJGServiceImpl.updateDatosJuridicos() -> Se ha producido un error al actualizar los datos juridicos para el ejg. ",
 							e);
+					response=0;
 				} finally {
 					// respuesta si se actualiza correctamente
-					if (response >= 1) {
+					if (response == 1 && response2 == 1 && response3 == 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
 								"GestionEJGServiceImpl.updateDatosJuridicos() -> OK. Datos juridicos del ejg actualizados");
@@ -3297,6 +3333,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 			if (null != usuarios && usuarios.size() > 0) {
 
+				try {
 				// Creamos el objeto a actualizar
 
 				ScsEjgWithBLOBs ejg = new ScsEjgWithBLOBs();
@@ -3314,6 +3351,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
 
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription(e.getMessage());
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
 				if (response == 0 && error.getDescription() == null) {
 					error.setCode(400);
 					error.setDescription("No se ha insertado el procurador ejg");
@@ -3386,80 +3429,80 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return delitosEjgDTO;
 	}
 
-	@Override
-	@Transactional
-	public InsertResponseDTO actualizarDelitosEJG(EjgItem item, HttpServletRequest request) {
-		LOGGER.info("actualizarDelitosEJG() -> Entrada al servicio para insertar delitos ejg");
-		InsertResponseDTO responsedto = new InsertResponseDTO();
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		if (idInstitucion != null) {
-			LOGGER.debug(
-					"GestionEJGServiceImpl.actualizarDelitosEJG() -> Entrada para obtener información del usuario logeado");
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.debug(
-					"GestionEJGServiceImpl.actualizarDelitosEJG() -> Salida de obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug("GestionEJGServiceImpl.actualizarDelitosEJG() -> Entrada para insertar delitos ejg");
-
-				try {
-					ScsDelitosejg delitos = new ScsDelitosejg();
-
-					delitos.setIdinstitucion(idInstitucion);
-					delitos.setAnio(Short.parseShort(item.getAnnio()));
-					delitos.setNumero(Long.parseLong(item.getNumero()));
-					delitos.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
-					delitos.setUsumodificacion(usuarios.get(0).getIdusuario());
-					delitos.setFechamodificacion(new Date());
-
-					ScsDelitosejgExample oldDelitos = new ScsDelitosejgExample();
-
-					oldDelitos.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-					.andAnioEqualTo(delitos.getAnio()).andNumeroEqualTo(delitos.getNumero())
-					.andIdtipoejgEqualTo(delitos.getIdtipoejg());
-
-					// Eliminamos las entradas existentes relacionadas si las hubiera.
-
-					response = scsDelitosejgMapper.deleteByExample(oldDelitos);
-
-					if (item.getDelitos().isEmpty())
-						response = 1;
-
-					String[] idDelitos = item.getDelitos().split(",");
-					for (String idDelito : idDelitos) {
-						delitos.setIddelito(Short.parseShort(idDelito));
-
-						response = scsDelitosejgMapper.insert(delitos);
-					}
-
-					LOGGER.debug(
-							"GestionEJGServiceImpl.actualizarDelitosEJG() -> Salida del servicio para insertar delitos ejgs");
-				} catch (Exception e) {
-					LOGGER.debug(
-							"GestionEJGServiceImpl.actualizarDelitosEJG() -> Se ha producido un error al insertar delitos ejgs. ",
-							e);
-				}
-				// respuesta si se actualiza correctamente
-				if (response >= 1) {
-					responsedto.setStatus(SigaConstants.OK);
-					LOGGER.debug("GestionEJGServiceImpl.actualizarDelitosEJG() -> OK.");
-				} else {
-					responsedto.setStatus(SigaConstants.KO);
-					LOGGER.error("GestionEJGServiceImpl.actualizarDelitosEJG() -> KO.");
-				}
-			}
-		}
-		return responsedto;
-	}
+//	@Override
+//	@Transactional
+//	public InsertResponseDTO actualizarDelitosEJG(EjgItem item, HttpServletRequest request) {
+//		LOGGER.info("actualizarDelitosEJG() -> Entrada al servicio para insertar delitos ejg");
+//		InsertResponseDTO responsedto = new InsertResponseDTO();
+//		int response = 0;
+//
+//		String token = request.getHeader("Authorization");
+//		String dni = UserTokenUtils.getDniFromJWTToken(token);
+//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+//
+//		if (idInstitucion != null) {
+//			LOGGER.debug(
+//					"GestionEJGServiceImpl.actualizarDelitosEJG() -> Entrada para obtener información del usuario logeado");
+//
+//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+//			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+//
+//			LOGGER.debug(
+//					"GestionEJGServiceImpl.actualizarDelitosEJG() -> Salida de obtener información del usuario logeado");
+//
+//			if (usuarios != null && usuarios.size() > 0) {
+//				LOGGER.debug("GestionEJGServiceImpl.actualizarDelitosEJG() -> Entrada para insertar delitos ejg");
+//
+//				try {
+//					ScsDelitosejg delitos = new ScsDelitosejg();
+//
+//					delitos.setIdinstitucion(idInstitucion);
+//					delitos.setAnio(Short.parseShort(item.getAnnio()));
+//					delitos.setNumero(Long.parseLong(item.getNumero()));
+//					delitos.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
+//					delitos.setUsumodificacion(usuarios.get(0).getIdusuario());
+//					delitos.setFechamodificacion(new Date());
+//
+//					ScsDelitosejgExample oldDelitos = new ScsDelitosejgExample();
+//
+//					oldDelitos.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+//					.andAnioEqualTo(delitos.getAnio()).andNumeroEqualTo(delitos.getNumero())
+//					.andIdtipoejgEqualTo(delitos.getIdtipoejg());
+//
+//					// Eliminamos las entradas existentes relacionadas si las hubiera.
+//
+//					response = scsDelitosejgMapper.deleteByExample(oldDelitos);
+//
+//					if (item.getDelitos()==null) response = 1;
+//					else {
+//						String[] idDelitos = item.getDelitos().split(",");
+//						for (String idDelito : idDelitos) {
+//							delitos.setIddelito(Short.parseShort(idDelito));
+//
+//							response = scsDelitosejgMapper.insert(delitos);
+//						}
+//					}
+//
+//					LOGGER.debug(
+//							"GestionEJGServiceImpl.actualizarDelitosEJG() -> Salida del servicio para insertar delitos ejgs");
+//				} catch (Exception e) {
+//					LOGGER.debug(
+//							"GestionEJGServiceImpl.actualizarDelitosEJG() -> Se ha producido un error al insertar delitos ejgs. ",
+//							e);
+//				}
+//				// respuesta si se actualiza correctamente
+//				if (response >= 1) {
+//					responsedto.setStatus(SigaConstants.OK);
+//					LOGGER.debug("GestionEJGServiceImpl.actualizarDelitosEJG() -> OK.");
+//				} else {
+//					responsedto.setStatus(SigaConstants.KO);
+//					LOGGER.error("GestionEJGServiceImpl.actualizarDelitosEJG() -> KO.");
+//				}
+//			}
+//		}
+//		return responsedto;
+//	}
 
 	@Override
 	public ProcuradorDTO busquedaProcuradores(ProcuradorItem procuradorItem, HttpServletRequest request) {
@@ -3700,22 +3743,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
 				}
 
-
-				if (response == 1) {
-					insertResponseDTO.setStatus(SigaConstants.OK);
-					error.setCode(200);
-					insertResponseDTO.setError(error);
-				}
-
-				if (response == 0) {
-					insertResponseDTO.setStatus(SigaConstants.KO);
-					LOGGER.error(
-							"GestionEJGServiceImpl.crearDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg");
-					error.setCode(500);
-					error.setDescription("general.mensaje.error.bbdd");
-					insertResponseDTO.setError(error);
-				}
-
 			}
 
 		} catch (Exception e) {
@@ -3727,6 +3754,22 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			error.setMessage(e.getMessage());
 			insertResponseDTO.setError(error);
 			insertResponseDTO.setStatus(SigaConstants.KO);
+			response = 0;
+		}
+		
+		if (response == 1) {
+			insertResponseDTO.setStatus(SigaConstants.OK);
+			error.setCode(200);
+			insertResponseDTO.setError(error);
+		}
+
+		if (response == 0) {
+			insertResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.error(
+					"GestionEJGServiceImpl.crearDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg");
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			insertResponseDTO.setError(error);
 		}
 
 		return insertResponseDTO;
@@ -3783,6 +3826,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			error.setDescription("general.mensaje.error.bbdd");
 			error.setMessage(e.getMessage());
 			updateResponseDTO.setError(error);
+			response = 0;
 		}
 
 		if (response == 1) {
@@ -3975,6 +4019,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			error.setDescription("general.mensaje.error.bbdd");
 			error.setMessage(e.getMessage());
 			deleteResponseDTO.setError(error);
+			response = 0;
 		}
 
 		if (response2 == 1 && response==1) {
@@ -4053,6 +4098,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			error.setDescription("general.mensaje.error.bbdd");
 			error.setMessage(e.getMessage());
 			insertResponseDTO.setError(error);
+			response=0;
 		}
 		if (response == 1) {
 			insertResponseDTO.setStatus(SigaConstants.OK);

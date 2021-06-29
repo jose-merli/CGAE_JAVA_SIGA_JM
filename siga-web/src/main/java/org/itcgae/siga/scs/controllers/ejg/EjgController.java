@@ -163,6 +163,15 @@ public class EjgController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/gestion-ejg/comboTipoencalidad", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboTipoencalidad(HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboTipoencalidad(request);
+		if (response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	
 
 	// busqueda
@@ -616,14 +625,14 @@ public class EjgController {
 		return new ResponseEntity<DelitosEjgDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/gestion-ejg/actualizarDelitosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> actualizarDelitosEJG(@RequestBody EjgItem item, HttpServletRequest request) {
-		InsertResponseDTO response = gestionEJG.actualizarDelitosEJG(item, request);
-		if (response.getStatus().equals("OK"))
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+//	@RequestMapping(value = "/gestion-ejg/actualizarDelitosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//	ResponseEntity<InsertResponseDTO> actualizarDelitosEJG(@RequestBody EjgItem item, HttpServletRequest request) {
+//		InsertResponseDTO response = gestionEJG.actualizarDelitosEJG(item, request);
+//		if (response.getStatus().equals("OK"))
+//			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+//		else
+//			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//	}
 	
 	@RequestMapping(value = "/gestion-ejg/busquedaProcuradores",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ProcuradorDTO> busquedaProcuradores(@RequestBody ProcuradorItem procuradorItem, HttpServletRequest request) {
