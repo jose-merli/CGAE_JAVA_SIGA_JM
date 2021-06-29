@@ -1,4 +1,8 @@
-package org.itcgae.siga.db.services.form.mappers;
+package org.itcgae.siga.db.services.fac.mappers;
+
+
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -12,34 +16,13 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
-import org.itcgae.siga.db.services.form.providers.PysServiciosSqlExtendsProvider;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
+import org.itcgae.siga.db.services.fac.providers.PySTiposServiciosSqlExtendsProvider;
 
 @Service
-@Primary
-public interface PysServiciosExtendsMapper extends PysServiciosMapper{
-
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "selectMaxIdServicio")
-	@Results({
-		@Result(column = "IDSERVICIO", property = "newId", jdbcType = JdbcType.VARCHAR),
-	})
-	NewIdDTO selectMaxIdServicio(Short idInstitucion);
+//@Primary
+public interface PySTiposServiciosExtendsMapper extends PysServiciosMapper{
 	
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "selectIdServicioByIdCurso")
-	@Results({
-		@Result(column = "IDSERVICIO", property = "newId", jdbcType = JdbcType.VARCHAR),
-	})
-	NewIdDTO selectIdServicioByIdCurso(Short idInstitucion, Long idCurso);
-
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "getServicesCourse")
-	@Results({
-		@Result(column = "IDTIPOSERVICIO", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-	})
-	List<ComboItem> getServicesCourse(String idInstitucion, String idLenguaje);
-	
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServicios")
+	@SelectProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "searchTiposServicios")
 	@Results({ 
 		@Result(column = "IDTIPOSERVICIOS", property = "idtiposervicios", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION_TIPO", property = "descripciontipo", jdbcType = JdbcType.VARCHAR),
@@ -49,7 +32,7 @@ public interface PysServiciosExtendsMapper extends PysServiciosMapper{
 		}) 
 	List<TiposServiciosItem> searchTiposServicios(String idioma, Short idInstitucion);
 	
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServiciosHistorico")
+	@SelectProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "searchTiposServiciosHistorico")
 	@Results({ 
 		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION_TIPO", property = "descripciontipo", jdbcType = JdbcType.VARCHAR),
@@ -59,19 +42,19 @@ public interface PysServiciosExtendsMapper extends PysServiciosMapper{
 		}) 
 	List<TiposServiciosItem> searchTiposServiciosHistorico(String idioma, Short idInstitucion);
 	
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "comboTiposServicios")
+	@SelectProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "comboTiposServicios")
 	@Results({ 
 		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ComboItem> comboTiposServicios(String idioma);
 
-	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "getIndiceMaxServicio")
+	@SelectProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "getIndiceMaxServicio")
 	@Results({ 
 		@Result(column = "IDSERVICIO", property = "newId", jdbcType = JdbcType.NUMERIC)
 		}) 
 	NewIdDTO getIndiceMaxServicio(List<TiposServiciosItem> listadoServicios, Short idInstitucion);
 	
-	@UpdateProvider(type = PysServiciosSqlExtendsProvider.class, method = "activarDesactivarServicio")
+	@UpdateProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "activarDesactivarServicio")
 	int activarDesactivarServicio(AdmUsuarios usuario, Short idInstitucion, TiposServiciosItem servicio);
 }

@@ -67,32 +67,22 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		return sql.toString();
 	}
 	
-	public String activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, List<TiposProductosItem> listadoProductos) {
+	public String activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, TiposProductosItem producto) {
 		SQL sql = new SQL();
-		String idsProductos ="";
-		
-		//Creo la cadena de ids de productos para usarlos en el IN del sql
-		for(int i = 0; i < listadoProductos.size(); i++){
-			if(i != listadoProductos.size() - 1) {
-				idsProductos = idsProductos + Integer.toString(listadoProductos.get(i).getIdproducto()) +",";
-			}else if(i == listadoProductos.size() - 1) {
-				idsProductos = idsProductos + Integer.toString(listadoProductos.get(i).getIdproducto());
-			}
-		}
 		
 		sql.UPDATE("PYS_PRODUCTOS");
 		sql.SET("FECHAMODIFICACION = SYSDATE");
 		sql.SET("USUMODIFICACION = '"+ usuario.getIdusuario() + "'");
 		
-		if(listadoProductos.get(0).getFechabaja() != null) {
+		if(producto.getFechabaja() != null) {
 			sql.SET("FECHABAJA = NULL");
 		}
 		else{
 			sql.SET("FECHABAJA = SYSDATE");
 		}
 		
-		
-		sql.WHERE("IDPRODUCTO IN ("+ idsProductos +")");
+		sql.WHERE("IDPRODUCTO = '" + producto.getIdproducto() + "'");
+		sql.WHERE("IDTIPOPRODUCTO = '" + producto.getIdtipoproducto() + "'");
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
 		return sql.toString();
 	}
@@ -106,36 +96,6 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		
 		sql.WHERE("IDTIPOPRODUCTO ='" + listadoProductos.get(0).getIdtipoproducto() + "'");;
 		sql.WHERE("IDINSTITUCION ='" + idInstitucion + "'");
-		
-		return sql.toString();
-	}
-	
-//	public String crearProducto(List<TiposProductosItem> listadoProductos, Short idInstitucion, AdmUsuarios usuario, int indice) {
-//		SQL sql = new SQL();
-//		
-//		sql.INSERT_INTO("PYS_PRODUCTOS");
-//		sql.INTO_COLUMNS("IDTIPOPRODUCTO, IDPRODUCTO, DESCRIPCION, FECHAMODIFICACION, USUMODIFICACION, IDINSTITUCION, FECHABAJA");
-//		sql.VALUES();
-//		
-//		//Se realizará un INSERT en la tabla PYS_PRODUCTOS, modificando el campo DESCRIPCION con el valor obtenido por pantalla
-//		
-//		
-//		return sql.toString();
-//	}
-	
-
-	
-	public String modificarProducto(List<TiposProductosItem> listadoProductos, Short idInstitucion, AdmUsuarios usuario) {
-		SQL sql = new SQL();
-		String idsProductos ="";
-		
-		
-		sql.UPDATE("PYS_PRODUCTOS");	//HAY QUE HACER UN FOR PARA EJECUTAR LA SQL VARIAS VECES
-//		sql.SET("DESCRIPCION = '" +  ); //MULTIPLES DESCRIPCIONES
-//		
-//		Se realizará un UPDATE en la tabla PYS_PRODUCTOS, modificando el campo DESCRIPCION con el valor obtenido por pantalla, FECHAMODIFICACION y USUMODIFICACION con la fecha y el usuario actual
-//		Se utilizará la entidad PYS_PRODUCTOS que genera MyBatis
-
 		
 		return sql.toString();
 	}

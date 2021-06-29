@@ -10,7 +10,6 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.services.fac.providers.PySTiposProductosSqlExtendsProvider;
@@ -56,7 +55,6 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 	List<ComboItem> comboTiposProductos(String idioma);
 	
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "activarDesactivarProducto")
-	int activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, List<TiposProductosItem> listadoProductos);
-	
+	int activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, TiposProductosItem producto);
 	
 }

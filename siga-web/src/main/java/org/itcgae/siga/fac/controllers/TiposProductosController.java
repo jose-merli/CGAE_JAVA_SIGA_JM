@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
 import org.itcgae.siga.DTO.fac.ProductoDTO;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.fac.services.ITiposProductosService;
@@ -14,11 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class TiposProductosServiciosController {
+public class TiposProductosController {
 	
 	@Autowired 
 	private ITiposProductosService tiposProductosService;
@@ -47,9 +47,16 @@ public class TiposProductosServiciosController {
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value="/pys/modificarProducto")
+	ResponseEntity<DeleteResponseDTO> modificarProducto(@RequestBody ListadoTipoProductoDTO listadoProductos, HttpServletRequest request){
+		DeleteResponseDTO response = tiposProductosService.modificarProducto(listadoProductos, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+	
 	@PostMapping(value="/pys/activarDesactivarProducto")
 	ResponseEntity<ProductoDTO> activarDesactivarProducto(@RequestBody ListadoTipoProductoDTO listadoProductos, HttpServletRequest request){
 		ProductoDTO response = tiposProductosService.activarDesactivarProducto(listadoProductos, request);
 		return new ResponseEntity<ProductoDTO>(response, HttpStatus.OK);
 	}
+	
 }
