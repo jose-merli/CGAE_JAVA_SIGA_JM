@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
+import org.itcgae.siga.DTOs.gen.UserAccess;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmAccessExample;
+import org.itcgae.siga.db.entities.AdmAccessKey;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmPerfilRol;
@@ -24,6 +28,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.mappers.AdmAccessMapper;
 import org.itcgae.siga.db.mappers.AdmPerfilRolMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuarioEfectivoMapper;
@@ -35,6 +40,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
+import org.itcgae.siga.security.PermisosAccionRepository;
 import org.itcgae.siga.security.UserCgae;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -82,7 +88,10 @@ public class SigaUserDetailsService implements UserDetailsService {
 	
 	@Autowired
 	AdmRolExtendsMapper admRol;
-
+	
+	@Autowired
+	AdmAccessMapper admAccessMapper;
+	
 	@Override
 	public UserDetails loadUserByUsername(String dni) throws UsernameNotFoundException {
 
@@ -451,4 +460,33 @@ public class SigaUserDetailsService implements UserDetailsService {
         return true;
 
     }
+	
+	public void getTokenAccess() {
+		try {
+			LOGGER.debug("Buscamos los permisos en base de datos.");
+			//Obtenemos todos los permisos de la bd de la tabla ADM_ACCESS
+			List<AdmAccessKey> permisosBD = admAccessMapper.selectByExample(null);
+			Map<String, List<String>> mapPermisos = new HashMap<String, List<String>>();
+			//Recorremos los permisos y lo convertimos en un map
+			List<String> permisosActuales;
+			for(AdmAccessKey admPermiso: permisosBD) {
+				if(mapPermisos.containsKey(admPermiso.getNombreAccion())) {
+					permisosActuales = mapPermisos.get(admPermiso.getNombreAccion());
+					permisosActuales.add(String.valueOf(admPermiso.getPermiso()));
+					mapPermisos.put(admPermiso.getNombreAccion(), permisosActuales);
+				}else {
+					permisosActuales = new ArrayList<String>();
+					permisosActuales.add(admPermiso.getIdproceso());
+					permisosActuales.add(String.valueOf(admPermiso.getPermiso()));
+					mapPermisos.put(admPermiso.getNombreAccion(), permisosActuales);
+				}
+			}
+			PermisosAccionRepository.setPermisosAccion(mapPermisos);	
+
+		}catch(Exception e) {
+			LOGGER.error("Se ha producido un error en la busqueda de permisos", e);
+			throw e;
+		}
+	}
+	
 }

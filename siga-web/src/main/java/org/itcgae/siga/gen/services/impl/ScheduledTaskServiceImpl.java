@@ -5,6 +5,7 @@ import org.itcgae.siga.age.service.IFichaEventosService;
 import org.itcgae.siga.cen.services.IBusquedaSancionesService;
 import org.itcgae.siga.form.services.IFichaCursosService;
 import org.itcgae.siga.gen.services.IScheduledTaskService;
+import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 	
 	@Autowired
 	private IBusquedaSancionesService busquedaSancionesService;
+	
+	@Autowired
+	private IFacturacionSJCSServices facturacionServices;
 	
 	@Scheduled(cron = "${cron.pattern.scheduled.forCurso}")
 	@Override
@@ -65,5 +69,13 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 	//	LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> ENTRA generateNotificationAuto");
 		fichaEventosService.generateNotificationsAuto();
 		//LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> SALE generateNotificationAuto");
+	}
+	
+	@Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacion}")
+	@Override
+	public void ejecutaFacturacionSJCS() {
+		LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> ENTRA ejecutaFacturacionSJCS");
+		facturacionServices.ejecutaFacturacionSJCS();
+		LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> SALE ejecutaFacturacionSJCS");
 	}
 }

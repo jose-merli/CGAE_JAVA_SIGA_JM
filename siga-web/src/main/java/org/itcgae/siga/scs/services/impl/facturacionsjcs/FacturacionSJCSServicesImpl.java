@@ -2085,7 +2085,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 				String resultado[] = new String[3];
 				resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_TURNOS_OFI(?,?,?,?,?,?)}", 3, param_in_facturacion);
-				if (!resultado[1].equalsIgnoreCase("0")) {
+				if (!resultado[1].equalsIgnoreCase("Fin correcto")) {
 					LOGGER.error("Error en PL = "+(String)resultado[2]);
 					throw new Exception ("Ha ocurrido un error al ejecutar la facturación de Turnos de Oficio: "+(String)resultado[2]);
 				}
@@ -2103,7 +2103,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 				resultado = new String[3];
 				resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_GUARDIAS(?,?,?,?,?,?)}", 3, param_in_facturacion);
-				if (!resultado[1].equalsIgnoreCase("0")) {
+				if (!resultado[2].equalsIgnoreCase("El proceso:PROC_FCS_FACTURAR_GUARDIAS ha finalizado correctamente")) {
 					LOGGER.error("Error en PL = "+(String)resultado[2]);
 					throw new Exception ("Ha ocurrido un error al ejecutar la facturación de Guardias: "+(String)resultado[2]);
 				} 
@@ -2120,7 +2120,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 				resultado = new String[3];
 				resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_SOJ(?,?,?,?,?,?)}", 3, param_in_facturacion);
-				if (!resultado[1].equalsIgnoreCase("0")) {
+				if (!resultado[2].equalsIgnoreCase("Fin correcto")) {
 					LOGGER.error("Error en PL = "+(String)resultado[2]);
 					throw new Exception ("Ha ocurrido un error al ejecutar la facturación de Expedientes de Orientación Jurídica: "+(String)resultado[2]);
 				} 
@@ -2138,7 +2138,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 				resultado = new String[3];
 				resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_EJG (?,?,?,?,?,?)}", 3, param_in_facturacion);
-				if (!resultado[1].equalsIgnoreCase("0")) {
+				if (!resultado[2].equalsIgnoreCase("Fin correcto")) {
 					LOGGER.error("Error en PL = "+(String)resultado[2]);
 					throw new Exception ("Ha ocurrido un error al ejecutar la facturación de Expedientes de Justicia Gratuita: "+(String)resultado[2]);
 				} 
