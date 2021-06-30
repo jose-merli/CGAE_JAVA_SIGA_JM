@@ -3130,7 +3130,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					ScsContrariosejg contrario = scsContrariosejgMapper.selectByPrimaryKey(key);
 
 					contrario.setIdprocurador(item.getIdprocurador());
-
+					contrario.setIdinstitucionProcu(item.getIdinstitucionProcu());
+					
 					//					List<FichaDatosColegialesItem> colegiadosSJCSItems = cenColegiadoExtendsMapper
 					//							.selectDatosColegiales(item.getIdprocurador().toString(), idInstitucion.toString());
 
@@ -3272,12 +3273,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 					LOGGER.info(
-							"guardarProcuradorEJG() / scsEjgMapper.updateByPrimaryKeySelective() -> Entrada a scsContrariosejgMapper para guardar procurador EJG.");
+							"guardarProcuradorEJG() / scsEjgMapper.updateByPrimaryKeySelective() -> Entrada a scsEjgMapper para guardar procurador EJG.");
 
 					response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
 
 					LOGGER.info(
-							"guardarProcuradorEJG() / scsEjgMapper.updateByPrimaryKeySelective() -> Salida de scsContrariosejgMapper para guardar procurador EJG.");
+							"guardarProcuradorEJG() / scsEjgMapper.updateByPrimaryKeySelective() -> Salida de scsEjgMapper para guardar procurador EJG.");
 
 					ScsEstadoejg estado = new ScsEstadoejg();
 

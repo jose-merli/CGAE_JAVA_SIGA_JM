@@ -28,6 +28,7 @@ import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
+import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
@@ -546,15 +547,20 @@ public class EjgController {
 
 	}
 
-	//[ sessionStorage.getItem("personaDesigna"), ejg.annio, ejg.numero, ejg.tipoEJG, this.generalBody.nombre]
+	//[ejg.idInstitucion, sessionStorage.getItem("personaDesigna"), ejg.annio, ejg.numero, ejg.tipoEJG, this.generalBody.idProcurador, this.generalBody.idInstitucion];
 	@RequestMapping(value = "/gestion-ejg/updateProcuradorContrarioEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateProcuradorContrarioEJG(@RequestBody String[] item, HttpServletRequest request) {
+//	ResponseEntity<UpdateResponseDTO> updateProcuradorContrarioEJG(@RequestBody ScsContrariosejg contrario, HttpServletRequest request) {
 		ScsContrariosejg contrario = new ScsContrariosejg();
-		contrario.setIdpersona(Long.parseLong(item[0]));
-		contrario.setAnio(Short.parseShort(item[1]));
-		contrario.setIdtipoejg(Short.parseShort(item[3]));
-		contrario.setNumero(Long.parseLong(item[2]));
-		contrario.setIdprocurador(Long.parseLong(item[4]));
+		contrario.setIdinstitucion(Short.parseShort(item[0]));
+		contrario.setIdpersona(Long.parseLong(item[1]));
+		contrario.setAnio(Short.parseShort(item[2]));
+		contrario.setNumero(Long.parseLong(item[3]));
+		contrario.setIdtipoejg(Short.valueOf(item[4]));
+		if(item[5]!=null)contrario.setIdprocurador(Long.valueOf(item[5]));
+		else contrario.setIdprocurador(null);
+		if(item[6]!=null)contrario.setIdinstitucionProcu(Short.parseShort(item[6]));
+		else contrario.setIdinstitucionProcu(null);
 		UpdateResponseDTO response = gestionEJG.updateProcuradorContrarioEJG(contrario, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
