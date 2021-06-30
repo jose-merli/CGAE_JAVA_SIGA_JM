@@ -855,6 +855,8 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql2.INNER_JOIN("CEN_INSTITUCION INS ON PAGO.IDINSTITUCION = INS.IDINSTITUCION");
 		sql2.INNER_JOIN(
 				"FCS_PAGOS_ESTADOSPAGOS EST ON PAGO.IDINSTITUCION = EST.IDINSTITUCION AND PAGO.IDPAGOSJG = EST.IDPAGOSJG");
+		sql2.INNER_JOIN(
+				"FCS_FACTURACIONJG FAC ON PAGO.IDFACTURACION = FAC.IDFACTURACION AND PAGO.IDINSTITUCION = FAC.IDINSTITUCION");
 		sql2.WHERE("PAGO.IDINSTITUCION = '" + idInstitucion + "'");
 
 		SQL sql4 = new SQL();
@@ -872,12 +874,12 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		// FILTRO NOMBRE
 		if (!UtilidadesString.esCadenaVacia(pagosItem.getNombre())) {
-			sql2.WHERE("(REGEXP_LIKE(PAGO.NOMBRE, '" + pagosItem.getNombre().trim() + "'))");
+			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("PAGO.NOMBRE", pagosItem.getNombre().trim()));
 		}
 
 		// FILTRO PARTIDA PRESUPUESTARIA
 		if (!UtilidadesString.esCadenaVacia(pagosItem.getIdPartidaPresupuestaria())) {
-			sql2.WHERE("PAGO.IDPARTIDAPRESUPUESTARIA IN ( " + pagosItem.getIdPartidaPresupuestaria() + " )");
+			sql2.WHERE("FAC.IDPARTIDAPRESUPUESTARIA IN ( " + pagosItem.getIdPartidaPresupuestaria() + " )");
 		}
 
 		// FILTRO POR CONCEPTOS DE FACTURACIÓN Y POR GRUPOS DE FACTURACIÓN
@@ -887,7 +889,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 			sql5.SELECT("1");
 			sql5.FROM("FCS_FACT_GRUPOFACT_HITO HIT");
-			sql5.WHERE("HIT.IDPAGOSJG = PAGO.IDPAGOSJG");
+			sql5.WHERE("HIT.IDFACTURACION = PAGO.IDFACTURACION");
 			sql5.WHERE("HIT.IDINSTITUCION = PAGO.IDINSTITUCION");
 
 			// FILTRO POR CONCEPTOS DE FACTURACION
