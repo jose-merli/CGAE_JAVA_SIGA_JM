@@ -581,17 +581,21 @@ public class DesignacionesController {
 
 		}
 
-		//[ designa.idInstitucion,  justiciable.idPersona, designa.anio,  designa.idTurno, designa.numero, representante]
+		// [designa.idInstitucion, sessionStorage.getItem("personaDesigna"), designa.ano, designa.numero, designa.idTurno, this.generalBody.idProcurador, this.generalBody.idInstitucion]
 		@RequestMapping(value = "/designas/updateProcuradorContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 		ResponseEntity<UpdateResponseDTO> updateProcuradorContrario(@RequestBody String[] item, HttpServletRequest request) {
-			String anio = item[2].substring(1,5);
+//		ResponseEntity<UpdateResponseDTO> updateProcuradorContrario(@RequestBody ScsContrariosdesigna contrario, HttpServletRequest request) {
 			ScsContrariosdesigna contrario = new ScsContrariosdesigna();
 			contrario.setIdinstitucion(Short.parseShort(item[0]));
 			contrario.setIdpersona(Long.parseLong(item[1]));
+			String anio = item[2].substring(1,5);
 			contrario.setAnio(Short.parseShort(anio));
-			contrario.setIdturno(Integer.parseInt(item[3]));
-			contrario.setNumero(Long.parseLong(item[4]));
-			contrario.setNombrerepresentante(item[5]);
+			contrario.setNumero(Long.parseLong(item[3]));
+			contrario.setIdturno(Integer.parseInt(item[4]));
+			if(item[5]!=null)contrario.setIdprocurador(Long.valueOf(item[5]));
+			else contrario.setIdprocurador(null);
+			if(item[6]!=null)contrario.setIdinstitucionProcu(Short.parseShort(item[6]));
+			else contrario.setIdinstitucionProcu(null);
 			UpdateResponseDTO response = designacionesService.updateProcuradorContrario(contrario, request);
 			if (response.getError().getCode() == 200)
 				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);

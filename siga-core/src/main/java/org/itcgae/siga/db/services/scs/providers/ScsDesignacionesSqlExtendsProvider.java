@@ -2397,9 +2397,18 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 	public String busquedaListaContrarios(DesignaItem item, Short idInstitucion, Boolean historico) {
 
-		String consulta = "SELECT\r\n" + "    t1.numero,\r\n" + "    t1.idinstitucion,\r\n" + "    t1.idturno,\r\n"
-				+ "    t1.anio,\r\n" + "    t1.nif,\r\n" + "    t1.idabogadocontrario,\r\n" + "    t1.idprocurador,\r\n"
-				+ "    t1.fechabaja,\r\n" + "    t1.idpersona,\r\n" + "    t1.idrepresentantelegal,\r\n"
+		String consulta = "SELECT\r\n" 
+				+ "    t1.numero,\r\n" 
+				+ "    t1.idinstitucion,\r\n" 
+				+ "    t1.idturno,\r\n"
+				+ "    t1.anio,\r\n" 
+				+ "    t1.nif,\r\n" 
+				+ "    t1.idabogadocontrario,\r\n"
+				+ "    t1.IDINSTITUCION_PROCU,\r\n"
+				+ "    t1.idprocurador,\r\n"
+				+ "    t1.fechabaja,\r\n" 
+				+ "    t1.idpersona,\r\n" 
+				+ "    t1.idrepresentantelegal,\r\n"
 				+ "    CASE\r\n" + "        WHEN t1.idabogadocontrario IS NOT NULL THEN\r\n" + "            (\r\n"
 				+ "                SELECT\r\n" + "                    col.ncolegiado\r\n"
 				+ "                    || ', '\r\n" + "                    || t1.NOMBREABOGADOCONTRARIO\r\n"

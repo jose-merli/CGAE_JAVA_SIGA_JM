@@ -928,7 +928,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		// [designaItem.idTurno, designaItem.nombreTurno, designaItem.numero,
 		// designaItem.anio]
 
-		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio servicio");
+		LOGGER.info("DesignacionesServiceImpl.busquedaListaInteresados() -> Entrada al servicio servicio");
 		List<ListaInteresadoJusticiableItem> interesados = null;
 //		List<GenParametros> tamMax = null;
 //		Integer tamMaximo = null;
@@ -943,12 +943,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"DesignacionesServiceImpl.busquedaListaInteresados() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"DesignacionesServiceImpl.busquedaListaContrarios() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"DesignacionesServiceImpl.busquedaListaInteresados() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 //			GenParametrosExample genParametrosExample = new GenParametrosExample();
 //			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
@@ -968,14 +968,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
-						"DesignacionesServiceImpl.busquedaListaContrarios -> Entrada a servicio para la busqueda de contrarios");
+						"DesignacionesServiceImpl.busquedaListaInteresados -> Entrada a servicio para la busqueda de interesados de una ficha de designacion");
 				try {
 					interesados = scsDesignacionesExtendsMapper.busquedaListaInteresados(item, idInstitucion);
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
-					LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Salida del servicio");
+					LOGGER.info("DesignacionesServiceImpl.busquedaListaInteresados -> Salida del servicio");
 				}
-				LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios -> Salida del servicio");
+				LOGGER.info("DesignacionesServiceImpl.busquedaListaInteresados -> Salida del servicio");
 			}
 		}
 
@@ -1019,12 +1019,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					key.setIdpersona(item.getIdpersona());
 
 					LOGGER.info(
-							"deleteInteresado() / ScsDefendidosdesignaMapper.deleteByPrimaryKey() -> Entrada a ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
+							"deleteInteresado() / ScsDefendidosdesignaMapper.deleteByPrimaryKey() -> Entrada a ScsDefendidosdesignaMapper para eliminar los interesados seleccionados");
 
 					response = scsDefendidosdesignaMapper.deleteByPrimaryKey(key);
 
 					LOGGER.info(
-							"deleteInteresado() / ScsDefendidosdesignaMapper.deleteByPrimaryKey() -> Salida de ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
+							"deleteInteresado() / ScsDefendidosdesignaMapper.deleteByPrimaryKey() -> Salida de ScsDefendidosdesignaMapper para eliminar los interesados seleccionados");
 
 				} catch (Exception e) {
 					response = 0;
@@ -1047,14 +1047,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		deleteResponseDTO.setError(error);
 
-		LOGGER.info("deleteInteresado() -> Salida del servicio para eliminar contrarios");
+		LOGGER.info("deleteInteresado() -> Salida del servicio para eliminar interesados");
 
 		return deleteResponseDTO;
 	}
 
 	@Override
 	public InsertResponseDTO insertInteresado(ScsDefendidosdesigna item, HttpServletRequest request) {
-		LOGGER.info("deleteInteresado() ->  Entrada al servicio para eliminar contrarios");
+		LOGGER.info("insertInteresado() ->  Entrada al servicio para insert un interesado");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -1091,7 +1091,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designa.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 					LOGGER.info(
-							"insertInteresado() / scsPersonajgExtendsMapper.selectByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables");
+							"insertInteresado() / scsPersonajgExtendsMapper.selectByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para obtener el justiciable");
 
 					ScsPersonajgKey scsPersonajgkey = new ScsPersonajgKey();
 					scsPersonajgkey.setIdpersona(Long.valueOf(item.getIdpersona()));
@@ -1114,12 +1114,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					LOGGER.info(
-							"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Entrada a ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
+							"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Entrada a ScsDefendidosdesignaMapper para insertar el interesado");
 
 					response = scsDefendidosdesignaMapper.insert(designa);
 
 					LOGGER.info(
-							"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Salida de ScsDefendidosdesignaMapper para eliminar los contrarios seleccionados");
+							"insertInteresado() / ScsDefendidosdesignaMapper.insert() -> Salida de ScsDefendidosdesignaMapper para insertar el interesado");
 
 				} catch (Exception e) {
 					response = 0;
@@ -1149,7 +1149,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public UpdateResponseDTO updateRepresentanteInteresado(ScsDefendidosdesigna item, HttpServletRequest request) {
-		LOGGER.info("deleteContrarios() ->  Entrada al servicio para eliminar contrarios");
+		LOGGER.info("updateRepresentanteInteresado() ->  Entrada al servicio para actualizar el representante de un interesado");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -1230,7 +1230,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public UpdateResponseDTO updateRepresentanteContrario(ScsContrariosdesigna item, HttpServletRequest request) {
-		LOGGER.info("updateRepresentanteContrario() ->  Entrada al servicio para eliminar contrarios");
+		LOGGER.info("updateRepresentanteContrario() ->  Entrada al servicio para actualizar el representante de un contrario");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -1274,12 +1274,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 					LOGGER.info(
-							"updateRepresentanteContrario() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Entrada a scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
+							"updateRepresentanteContrario() / scsContrariosDesignaMapper.updateByPrimaryKey() -> Entrada a scsContrariosDesignaMapper para actualizar el representante de un interesado.");
 
 					response = scsContrariosDesignaMapper.updateByPrimaryKey(contrario);
 
 					LOGGER.info(
-							"updateRepresentanteContrario() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Salida de scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
+							"updateRepresentanteContrario() / scsContrariosDesignaMapper.updateByPrimaryKey() -> Salida de scsContrariosDesignaMapper para actualizar el representante de un interesado.");
 
 					// }
 
@@ -1310,7 +1310,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public UpdateResponseDTO updateAbogadoContrario(ScsContrariosdesigna item, HttpServletRequest request) {
-		LOGGER.info("updateAbogadoContrario() ->  Entrada al servicio para eliminar contrarios");
+		LOGGER.info("updateAbogadoContrario() ->  Entrada al servicio para actualizar el abogado de un contrario");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -1361,12 +1361,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //						contrario.set
 
 					LOGGER.info(
-							"updateAbogadoContrario() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Entrada a scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
+							"updateAbogadoContrario() / scsContrariosDesignaMapper.updateByPrimaryKey() -> Entrada a scsContrariosDesignaMapper para actualizar el abogado de un contrario.");
 
 					response = scsContrariosDesignaMapper.updateByPrimaryKey(contrario);
 
 					LOGGER.info(
-							"updateAbogadoContrario() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Salida de scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
+							"updateAbogadoContrario() / scsContrariosDesignaMapper.updateByPrimaryKey() -> Salida de scsContrariosDesignaMapper para actualizar el abogado de un contrario.");
 
 					// }
 
@@ -1391,7 +1391,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("updateAbogadoContrario() -> Salida del servicio para eliminar contrarios");
+		LOGGER.info("updateAbogadoContrario() -> Salida del servicio para actualizar del abogado de un contrario.");
 
 		return updateResponseDTO;
 	}
@@ -1459,7 +1459,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Override
 	public UpdateResponseDTO updateProcuradorContrario(ScsContrariosdesigna item, HttpServletRequest request) {
-		LOGGER.info("updateProcuradorContrario() ->  Entrada al servicio para eliminar contrarios");
+		LOGGER.info("updateProcuradorContrario() ->  Entrada al servicio para actualizar el procurador de un contrario asociado a una designacion");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -1498,6 +1498,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					ScsContrariosdesigna contrario = scsContrariosDesignaMapper.selectByPrimaryKey(key);
 
 					contrario.setIdprocurador(item.getIdprocurador());
+					contrario.setIdinstitucionProcu(item.getIdinstitucionProcu());
 
 //					List<FichaDatosColegialesItem> colegiadosSJCSItems = cenColegiadoExtendsMapper
 //							.selectDatosColegiales(item.getIdprocurador().toString(), idInstitucion.toString());
@@ -1509,12 +1510,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 					LOGGER.info(
-							"updateProcuradorContrario() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Entrada a scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
+							"updateProcuradorContrario() / scsContrariosDesignaMapper.updateByPrimaryKey() -> Entrada a scsContrariosDesignaMapper para actualizar el procurador de un contrario asociado a una designacion.");
 
 					response = scsContrariosDesignaMapper.updateByPrimaryKey(contrario);
 
 					LOGGER.info(
-							"updateProcuradorContrario() / scsDefendidosdesignaMapper.updateByPrimaryKey() -> Salida de scsDefendidosdesignaMapper para actualizar el representante de un interesado.");
+							"updateProcuradorContrario() / scsContrariosDesignaMapper.updateByPrimaryKey() -> Salida de scsContrariosDesignaMapper para actualizar el procurador de un contrario asociado a una designacion.");
 
 					// }
 
@@ -1535,11 +1536,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		} else {
 			error.setCode(200);
 			error.setDescription("general.message.registro.actualizado");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("updateProcuradorContrario() -> Salida del servicio para eliminar contrarios");
+		LOGGER.info("updateProcuradorContrario() -> Salida del servicio para actualizar el procurador de un contrario asociado a una designacion");
 
 		return updateResponseDTO;
 	}
@@ -1547,7 +1549,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Override
 	public List<ListaContrarioJusticiableItem> busquedaListaContrarios(DesignaItem item, HttpServletRequest request,
 			Boolean historico) {
-		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio servicio");
+		LOGGER.info("DesignacionesServiceImpl.busquedaListaContrarios() -> Entrada al servicio para buscar los contrarios asociados a una designacion.");
 		List<ListaContrarioJusticiableItem> contrarios = null;
 //		List<GenParametros> tamMax = null;
 //		Integer tamMaximo = null;
@@ -6908,6 +6910,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					//designa.set (No existe campo calidad en ScsDesigna)
 					designa.setIdpretension(ejg.getIdpretension());
 					designa.setIdjuzgado(ejg.getJuzgado());
+					
+					//Falta por añadir los delitos
 					
 					designa.setUsumodificacion(usuarios.get(0).getIdusuario());
 					designa.setFechamodificacion(new Date());

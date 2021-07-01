@@ -28,6 +28,7 @@ import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
+import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
@@ -158,6 +159,15 @@ public class EjgController {
 	@RequestMapping(value = "/gestion-ejg/comboDelitos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboDelitos(HttpServletRequest request) {
 		ComboDTO response = gestionEJG.comboDelitos(request);
+		if (response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/gestion-ejg/comboTipoencalidad", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboTipoencalidad(HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboTipoencalidad(request);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
@@ -548,15 +558,20 @@ public class EjgController {
 
 	}
 
-	//[ sessionStorage.getItem("personaDesigna"), ejg.annio, ejg.numero, ejg.tipoEJG, this.generalBody.nombre]
+	//[ejg.idInstitucion, sessionStorage.getItem("personaDesigna"), ejg.annio, ejg.numero, ejg.tipoEJG, this.generalBody.idProcurador, this.generalBody.idInstitucion];
 	@RequestMapping(value = "/gestion-ejg/updateProcuradorContrarioEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateProcuradorContrarioEJG(@RequestBody String[] item, HttpServletRequest request) {
+//	ResponseEntity<UpdateResponseDTO> updateProcuradorContrarioEJG(@RequestBody ScsContrariosejg contrario, HttpServletRequest request) {
 		ScsContrariosejg contrario = new ScsContrariosejg();
-		contrario.setIdpersona(Long.parseLong(item[0]));
-		contrario.setAnio(Short.parseShort(item[1]));
-		contrario.setIdtipoejg(Short.parseShort(item[3]));
-		contrario.setNumero(Long.parseLong(item[2]));
-		contrario.setIdprocurador(Long.parseLong(item[4]));
+		contrario.setIdinstitucion(Short.parseShort(item[0]));
+		contrario.setIdpersona(Long.parseLong(item[1]));
+		contrario.setAnio(Short.parseShort(item[2]));
+		contrario.setNumero(Long.parseLong(item[3]));
+		contrario.setIdtipoejg(Short.valueOf(item[4]));
+		if(item[5]!=null)contrario.setIdprocurador(Long.valueOf(item[5]));
+		else contrario.setIdprocurador(null);
+		if(item[6]!=null)contrario.setIdinstitucionProcu(Short.parseShort(item[6]));
+		else contrario.setIdinstitucionProcu(null);
 		UpdateResponseDTO response = gestionEJG.updateProcuradorContrarioEJG(contrario, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -603,15 +618,6 @@ public class EjgController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/gestion-ejg/nuevoProcuradorEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> nuevoProcuradorEJG(@RequestBody EjgItem item, HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.nuevoProcuradorEJG(item, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
 //	@RequestMapping(value = "/gestion-ejg/getDelitosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 //	ResponseEntity<ComboDTO> getDelitosEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
 //		ComboDTO response = gestionEJG.getDelitosEJG(ejgItem, request);
@@ -627,14 +633,14 @@ public class EjgController {
 		return new ResponseEntity<DelitosEjgDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/gestion-ejg/actualizarDelitosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> actualizarDelitosEJG(@RequestBody EjgItem item, HttpServletRequest request) {
-		InsertResponseDTO response = gestionEJG.actualizarDelitosEJG(item, request);
-		if (response.getStatus().equals("OK"))
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+//	@RequestMapping(value = "/gestion-ejg/actualizarDelitosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//	ResponseEntity<InsertResponseDTO> actualizarDelitosEJG(@RequestBody EjgItem item, HttpServletRequest request) {
+//		InsertResponseDTO response = gestionEJG.actualizarDelitosEJG(item, request);
+//		if (response.getStatus().equals("OK"))
+//			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+//		else
+//			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//	}
 	
 	@RequestMapping(value = "/gestion-ejg/busquedaProcuradores",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ProcuradorDTO> busquedaProcuradores(@RequestBody ProcuradorItem procuradorItem, HttpServletRequest request) {

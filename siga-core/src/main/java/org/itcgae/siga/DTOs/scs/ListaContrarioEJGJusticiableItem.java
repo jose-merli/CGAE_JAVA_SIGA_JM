@@ -12,14 +12,18 @@ public class ListaContrarioEJGJusticiableItem {
 	private String nif;
 	private String idtipoejg;
 	private String abogado;
-	private String procurador;
-	private String idInstitucionProc;
+	
+	
 	private String apellidosnombre;
 	private String idPersona;
 	private String representante;
 	private Date fechaBaja;
 	private String idabogadocontrario;
+	
+	private String procurador; //nCol,apellidos,nombre
 	private String idprocurador;
+	private String idInstitucionProc;
+	
 	private String direccion;
 	private String rol;
 	

@@ -109,6 +109,8 @@ public class ScsTipodocumentoejgSqlExtendsProvider extends ScsTipodocumentoejgSq
       		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoTIPODOCUMENTOEJG on catalogoTIPODOCUMENTOEJG.idrecurso = TIPODOCUMENTOEJG.DESCRIPCION and catalogoTIPODOCUMENTOEJG.idlenguaje ="+idLenguaje);
       		sql.WHERE("TIPODOCUMENTOEJG.fechabaja is null");
       		sql.WHERE("TIPODOCUMENTOEJG.idinstitucion ='"+String.valueOf(idInstitucion)+"'");
+      		sql.WHERE("TIPODOCUMENTOEJG.IDTIPODOCUMENTOEJG is not null");
+      		sql.WHERE("catalogoTIPODOCUMENTOEJG.DESCRIPCION is not null");
       		sql.ORDER_BY("descripcion");
       		return sql.toString();
       	}
