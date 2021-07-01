@@ -90,6 +90,20 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 		return sql.toString();
 	}
 	
+	public String comboJuzgadoCdgoExt(Short idLenguaje, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("juzgado.CODIGOEXT");
+		sql.SELECT("juzgado.NOMBRE");
+		sql.FROM("SCS_JUZGADO juzgado");
+		sql.WHERE("juzgado.fechabaja is null");
+		sql.WHERE("juzgado.idinstitucion = " + idInstitucion);
+		sql.WHERE("juzgado.CODIGOEXT is not null");
+		sql.ORDER_BY("juzgado.NOMBRE");
+	
+		return sql.toString();
+	}
+	
 	public String comboJuzgadoDesignaciones(Short idLenguaje, Short idInstitucion) {
 
 		SQL sql = new SQL();

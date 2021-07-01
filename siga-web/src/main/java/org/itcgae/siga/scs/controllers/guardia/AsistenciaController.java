@@ -79,6 +79,18 @@ public class AsistenciaController {
 		return new ResponseEntity<TarjetaAsistenciaResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping(value="/buscarAsistenciasByIdSolicitud")
+	public ResponseEntity<TarjetaAsistenciaResponseDTO> buscarAsistenciasByIdSolicitud(HttpServletRequest request, 
+			@RequestParam String idSolicitud) {
+		TarjetaAsistenciaResponseDTO response = null;
+		try {
+			response = asistenciaService.searchAsistenciasByIdSolicitud(request, idSolicitud);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<TarjetaAsistenciaResponseDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping(value="/getJuzgados")
 	public ResponseEntity<ComboDTO> getJuzgados(HttpServletRequest request, 
 			@RequestParam String idTurno) {

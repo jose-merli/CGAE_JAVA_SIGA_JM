@@ -91,6 +91,22 @@ public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 		return sql.toString();
 	}
 	
+	public String comboComisariaCdgoExt(Short idLenguaje, Short idInstitucion){
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("comisaria.CODIGOEXT");
+		sql.SELECT("comisaria.NOMBRE");
+		sql.FROM("SCS_COMISARIA comisaria");
+		sql.WHERE("comisaria.fechabaja is null");
+		sql.WHERE("comisaria.idinstitucion = " + idInstitucion);
+		sql.WHERE("comisaria.CODIGOEXT is not null");
+		sql.ORDER_BY("comisaria.NOMBRE");
+	
+		return sql.toString();
+		
+	}
+	
 	public String getComisariasByIdTurno(Short idInstitucion, String idTurno) {
 		
 		SQL sql = new SQL();

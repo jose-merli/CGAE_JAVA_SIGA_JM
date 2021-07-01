@@ -17,6 +17,58 @@ public class TarjetaAsistenciaResponseItem {
 	private List<ActuacionAsistenciaItem> actuaciones;
 	private String nombre, sexo, apellido1, apellido2, nif;
 	private FiltroAsistenciaItem filtro;
+	private String descripcionGuardia;
+	/**
+	 * @return the descripcionGuardia
+	 */
+	public String getDescripcionGuardia() {
+		return descripcionGuardia;
+	}
+	/**
+	 * @param descripcionGuardia the descripcionGuardia to set
+	 */
+	public void setDescripcionGuardia(String descripcionGuardia) {
+		this.descripcionGuardia = descripcionGuardia;
+	}
+	/**
+	 * @return the numeroColegiado
+	 */
+	public String getNumeroColegiado() {
+		return numeroColegiado;
+	}
+	/**
+	 * @param numeroColegiado the numeroColegiado to set
+	 */
+	public void setNumeroColegiado(String numeroColegiado) {
+		this.numeroColegiado = numeroColegiado;
+	}
+	/**
+	 * @return the nombreColegiado
+	 */
+	public String getNombreColegiado() {
+		return nombreColegiado;
+	}
+	/**
+	 * @param nombreColegiado the nombreColegiado to set
+	 */
+	public void setNombreColegiado(String nombreColegiado) {
+		this.nombreColegiado = nombreColegiado;
+	}
+	/**
+	 * @return the fechaGuardia
+	 */
+	public String getFechaGuardia() {
+		return fechaGuardia;
+	}
+	/**
+	 * @param fechaGuardia the fechaGuardia to set
+	 */
+	public void setFechaGuardia(String fechaGuardia) {
+		this.fechaGuardia = fechaGuardia;
+	}
+	private String numeroColegiado;
+	private String nombreColegiado;
+	private String fechaGuardia;
 	
 	/**
 	 * @return the anio

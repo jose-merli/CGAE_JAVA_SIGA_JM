@@ -1463,4 +1463,66 @@ public class ComboServiceImpl implements ComboService {
 				"comboTipoDocumentacionDesigna() -> Salida del servicio para obtener comboTipoDocumentacionDesigna");
 		return comboDTO;
 	}
+
+	@Override
+	public ComboDTO comboComisariaCdgoExt(HttpServletRequest request) {
+		LOGGER.info("comboComisariaCdgoExt() -> Entrada al servicio para búsqueda de Comisaria con codigo externo");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboComisariaCdgoExt() / scsComisariaExtendsMapper.comboComisariaCdgoExt() -> Entrada a scsComisariaExtendsMapper para obtener combo Comisaria");
+
+				List<ComboItem> comboItems = scsComisariaExtendsMapper
+						.comboComisariaCdgoExt(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
+
+				LOGGER.info(
+						"comboComisariaCdgoExt() / scsComisariaExtendsMapper.comboComisariaCdgoExt() -> Salida a scsComisariaExtendsMapper para obtener combo Comisaria");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboComisariaCdgoExt() -> Salida del servicio para obtener combo comisaria con codigo externo");
+		}
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboJuzgadoCdgoExt(HttpServletRequest request) {
+		LOGGER.info("comboJuzgadoCdgoExt() -> Entrada al servicio para búsqueda de Juzgado por codigo externo");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboJuzgadoCdgoExt() / scsJuzgadoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener combo Juzgado");
+
+				List<ComboItem> comboItems = scsJuzgadoExtendsMapper
+						.comboJuzgadoCdgoExt(Short.parseShort(usuarios.get(0).getIdlenguaje()), idInstitucion);
+
+				LOGGER.info(
+						"comboJuzgadoCdgoExt() / scsJuzgadoExtendsMapper.comboGuardias() -> Salida a scsGuardiasturnoExtendsMapper para obtener combo Juzgado");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboJuzgadoCdgoExt() -> Salida del servicio para obtener combo Juzgado por codigo externo");
+		}
+		return comboDTO;
+	}
 }

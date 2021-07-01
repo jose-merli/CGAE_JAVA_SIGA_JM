@@ -9,6 +9,8 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.FiltroAsistenciaItem;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseDTO;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public interface AsistenciaService {
 	
@@ -25,4 +27,6 @@ public interface AsistenciaService {
 	public ComboDTO getComisarias (HttpServletRequest request, String idTurno);
 	
 	public DeleteResponseDTO guardarAsistencias(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
+	
+	public TarjetaAsistenciaResponseDTO searchAsistenciasByIdSolicitud(HttpServletRequest request, String idSolicitud);
 }

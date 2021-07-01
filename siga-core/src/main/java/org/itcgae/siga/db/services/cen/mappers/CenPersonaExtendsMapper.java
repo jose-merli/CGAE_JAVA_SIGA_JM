@@ -165,8 +165,8 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	@Results({
 		@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "APELLIDO1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "APELLIDO2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "COLEGIADO", property = "colegiado", jdbcType = JdbcType.VARCHAR),
 
 	})

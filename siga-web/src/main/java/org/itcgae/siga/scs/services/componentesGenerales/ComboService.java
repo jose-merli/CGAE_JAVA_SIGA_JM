@@ -51,6 +51,10 @@ public interface ComboService {
 	public ComboDTO comboComisaria(HttpServletRequest request);
 
 	public ComboDTO comboJuzgado(HttpServletRequest request);
+	
+	public ComboDTO comboComisariaCdgoExt(HttpServletRequest request);
+
+	public ComboDTO comboJuzgadoCdgoExt(HttpServletRequest request);
 
 	public ComboDTO comboListasGuardias(HttpServletRequest request, String idTurno);
 
