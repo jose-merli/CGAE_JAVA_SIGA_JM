@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
@@ -13,6 +14,9 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
+	
+	private Logger LOGGER = Logger.getLogger(ScsEjgComisionSqlExtendsProvider.class);
+
 
 	public String busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		String dictamenCad = "";
@@ -413,6 +417,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		// order
 //		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
 		sql.ORDER_BY("TURNO ASC, GUARDIA.NOMBRE ASC");
+
+		LOGGER.info("*******************busquedaejg********************" + sql.toString());
 
 		return sql.toString();
 	}

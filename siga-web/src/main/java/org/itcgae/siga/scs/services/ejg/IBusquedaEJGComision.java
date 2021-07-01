@@ -31,9 +31,11 @@ public interface IBusquedaEJGComision {
 
 	ComboDTO comboTipoColegioEjg(String idInstitucion, HttpServletRequest request);
 
-	ComboDTO comboAnioActa(String idInstitucion, HttpServletRequest request);
+	ComboDTO comboAnioActa(HttpServletRequest request);
 
 	ComboDTO comboResolucion(String idInstitucion, HttpServletRequest request);
+
+	ComboDTO obligatoriedadResolucion(HttpServletRequest request);
 	
 
 	
