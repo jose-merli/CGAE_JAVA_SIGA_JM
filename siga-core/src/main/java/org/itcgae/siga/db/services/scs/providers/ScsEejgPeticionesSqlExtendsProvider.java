@@ -60,4 +60,19 @@ public class ScsEejgPeticionesSqlExtendsProvider extends ScsEejgPeticionesSqlPro
 		return sql.toString();
 	}
 	
+	public String getMaxIdpeticion() {
+		SQL sql = new SQL();
+		sql.SELECT("max(IDPETICION) +1 ");
+		sql.FROM("SCS_EEJG_PETICIONES");
+		return sql.toString();
+	}
+	
+	public String getUltimoIdPeticion() {
+		SQL sql = new SQL();
+		sql.SELECT("max(IDPETICION)");
+		sql.FROM("SCS_EEJG_PETICIONES");
+		return sql.toString();
+	}
+	
+	
 }

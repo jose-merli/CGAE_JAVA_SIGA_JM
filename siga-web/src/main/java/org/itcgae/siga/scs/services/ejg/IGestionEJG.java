@@ -151,4 +151,6 @@ public interface IGestionEJG {
 
 	ResponseEntity<InputStreamResource> descargarDocumentosEjg(List<EjgDocumentacionItem> listadocumentoEjgItem,
 			HttpServletRequest request);
+
+	InsertResponseDTO solicitarEEJG(UnidadFamiliarEJGItem datos, HttpServletRequest request);
 }

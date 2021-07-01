@@ -49,6 +49,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public class EjgController {
 	@Autowired
 	private IBusquedaEJG busquedaEJG;
+	
 	@Autowired
 	private IGestionEJG gestionEJG;
 
@@ -209,6 +210,7 @@ public class EjgController {
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
 
 	// Expedientes Económicos
 	@RequestMapping(value = "/gestion-ejg/getExpedientesEconomicos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -346,6 +348,15 @@ public class EjgController {
 		ResponseEntity<InputStreamResource> response = gestionEJG.descargarExpedientesJG(datos, request);
 		
 			return response;
+	}
+	
+	@RequestMapping(value = "/gestion-ejg/solicitarEEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> solicitarEEJG(@RequestBody UnidadFamiliarEJGItem datos, HttpServletRequest request) {
+		InsertResponseDTO response = gestionEJG.solicitarEEJG(datos, request);
+		if (response.getStatus().equals("OK"))
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	//Actualizar turno, guardia y letrado

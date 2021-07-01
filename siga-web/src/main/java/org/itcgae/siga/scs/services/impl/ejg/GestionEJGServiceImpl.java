@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +56,9 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.EcomColaExample;
+import org.itcgae.siga.db.entities.EcomColaParametros;
 import org.itcgae.siga.db.entities.ExpExpediente;
 import org.itcgae.siga.db.entities.ExpExpedienteKey;
 import org.itcgae.siga.db.entities.GenFicheroKey;
@@ -68,6 +73,7 @@ import org.itcgae.siga.db.entities.ScsDelitosejgExample;
 import org.itcgae.siga.db.entities.ScsDocumentacionejg;
 import org.itcgae.siga.db.entities.ScsDocumentacionejgKey;
 import org.itcgae.siga.db.entities.ScsEejgPeticiones;
+import org.itcgae.siga.db.entities.ScsEejgPeticionesExample;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
@@ -81,6 +87,8 @@ import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
+import org.itcgae.siga.db.mappers.EcomColaMapper;
+import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
 import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -88,6 +96,7 @@ import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionejgMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentoejgMapper;
+import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgPrestacionRechazadaMapper;
 import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
@@ -238,6 +247,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ScsContrariosejgMapper scsContrariosejgMapper;
+	
+	@Autowired
+	private EcomColaMapper ecomColaMapper;
+	
+	@Autowired
+	private EcomColaParametrosMapper ecomColaParametrosMapper;
+	
+	
+	
 
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -4141,4 +4159,184 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return res;
 	}
 
+	@Override
+	@Transactional
+	public InsertResponseDTO solicitarEEJG(UnidadFamiliarEJGItem datos, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		
+		int response = 1;
+		int responseCola = 1;
+		int responseColaParam1 = 1;
+		int responseColaParam2 = 1;
+		long idComCola = 0;
+		
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.insertFamiliarEJG() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug(
+					"GestionEJGServiceImpl.insertFamiliarEJG() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.nuevoEstado() -> Entrada para insertar en la unidad familiar del ejg");
+
+				try {
+					
+					/*
+					for(UnidadFamiliarEJGItem item: datos) {
+						ScsEejgPeticiones eejgPeticion = new ScsEejgPeticiones();
+						eejgPeticion.setIdinstitucion(idInstitucion);
+						eejgPeticion.setIdtipoejg(Short.parseShort(item.getUf_idTipoejg()));
+						eejgPeticion.setAnio(Short.parseShort(item.getUf_anio()));
+						eejgPeticion.setNumero(Long.parseLong(item.getUf_numero()));
+						eejgPeticion.setEstado(Long.parseLong(item.getEstado()));
+						eejgPeticion.setNif(item.getPjg_nif());
+						eejgPeticion.setNombre(item.getPjg_nombre());
+						eejgPeticion.setApellido1(item.getPjg_ape1());
+						eejgPeticion.setApellido2(item.getPjg_ape2());
+						eejgPeticion.setIdusuariopeticion(BigDecimal.valueOf(usuarios.get(0).getIdusuario()));	
+						eejgPeticion.setIdpersona(Long.parseLong(item.getUf_idPersona()));
+						eejgPeticion.setFechapeticion(new Date());
+						eejgPeticion.setFechamodificacion(new Date());
+						eejgPeticion.setUsumodificacion(0);
+						eejgPeticion.setNumerointentosconsulta(Short.parseShort("0"));
+						eejgPeticion.setNumerointentospendienteinfo(Short.parseShort("0"));	
+						eejgPeticion.setNumerointentossolicitud(Short.parseShort("0"));	
+						eejgPeticion.setIdpeticion(scsEejgPeticionesExtendsMapper.getMaxIdpeticion() );
+						
+
+						response = scsEejgPeticionesExtendsMapper.insertSelective(eejgPeticion);
+						if(response == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha introducido ningún familiar en el ejg");
+							throw new Exception("ERROR: no se ha podido introducir ningún familiar en el ejg");
+						}
+					}
+					*/
+					//Peticion de EEJG.
+					ScsEejgPeticiones eejgPeticion = new ScsEejgPeticiones();
+					eejgPeticion.setIdinstitucion(idInstitucion);
+					eejgPeticion.setIdtipoejg(Short.parseShort(datos.getUf_idTipoejg()));
+					eejgPeticion.setAnio(Short.parseShort(datos.getUf_anio()));
+					eejgPeticion.setNumero(Long.parseLong(datos.getUf_numero()));
+					eejgPeticion.setEstado(10L);
+					eejgPeticion.setNif(datos.getPjg_nif());
+					eejgPeticion.setNombre(datos.getPjg_nombre());
+					eejgPeticion.setApellido1(datos.getPjg_ape1());
+					eejgPeticion.setApellido2(datos.getPjg_ape2());
+					eejgPeticion.setIdusuariopeticion(BigDecimal.valueOf(usuarios.get(0).getIdusuario()));	
+					eejgPeticion.setIdpersona(Long.parseLong(datos.getUf_idPersona()));
+					eejgPeticion.setFechapeticion(new Date());
+					eejgPeticion.setFechamodificacion(new Date());
+					eejgPeticion.setUsumodificacion(0);
+					eejgPeticion.setNumerointentosconsulta(Short.parseShort("0"));
+					eejgPeticion.setNumerointentospendienteinfo(Short.parseShort("0"));	
+					eejgPeticion.setNumerointentossolicitud(Short.parseShort("0"));	
+					eejgPeticion.setIdpeticion(scsEejgPeticionesExtendsMapper.getMaxIdpeticion() );
+					
+
+					response = scsEejgPeticionesExtendsMapper.insertSelective(eejgPeticion);
+					if(response == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha introducido ningún familiar en el ejg");
+						throw new Exception("ERROR: no se ha podido realizar la solicitud EEJG.");
+					}
+						
+					// insercion de nuevo registro a la tabla EcomCola una vez se realiza la peticion de EEJG.
+							EcomCola ecomCola = new EcomCola();
+						
+							//ecomCola.setIdecomcola(null);
+							ecomCola.setIdestadocola(Short.parseShort("1"));
+							ecomCola.setIdoperacion(81);
+							ecomCola.setReintento(0);
+							ecomCola.setFechacreacion(new Date());
+							ecomCola.setFechamodificacion(new Date());
+							ecomCola.setUsumodificacion(usuarios.get(0).getIdusuario());
+							
+							ecomCola.setIdinstitucion(idInstitucion);			
+							
+							responseCola = ecomColaMapper.insertSelective(ecomCola);
+							
+							if(responseCola == 0) {
+								insertResponseDTO.setStatus(SigaConstants.KO);
+								LOGGER.error(
+										"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha introducido ningún elemento en cola");
+								throw new Exception("ERROR: no se ha podido introducir ningún elemento en cola");
+							}
+							
+							
+							
+							LOGGER.debug(
+									"GestionEJGServiceImpl.insertFamiliarEJG() -> Salida del servicio para insertar una solicitud de EEJG en cola");
+							
+							//obtener el ultimo idcomcola de la tabla ECOM_COLA.
+							EcomColaExample example = new EcomColaExample();
+							example.setOrderByClause("IDECOMCOLA DESC");
+							example.createCriteria()
+									.andIdinstitucionEqualTo(idInstitucion)
+									.andIdestadocolaEqualTo((short) 1)
+									.andIdoperacionEqualTo(81);
+							
+							List<EcomCola> listEcomCola = ecomColaMapper.selectByExample(example);
+
+							if (listEcomCola.size() > 0) {
+								idComCola = listEcomCola.get(0).getIdecomcola();
+							} else {
+								idComCola = 0;
+							}
+							
+						//primer insert a la tabla ECOM_COLA_PARAMETROS con los datos idComCola, clave y valor para saber la institucion que hacer el insert.
+						EcomColaParametros ecmp = new EcomColaParametros();
+						ecmp.setIdecomcola(idComCola);
+						ecmp.setClave("IDINSTITUCION");
+						ecmp.setValor(idInstitucion.toString());
+						
+						responseColaParam1 = ecomColaParametrosMapper.insert(ecmp);
+						if(responseColaParam1 == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha introducido ningún elemento en cola");
+							throw new Exception("ERROR: no se ha podido introducir el primer elemento en cola parametros.");
+						}
+						
+						//segundo insert a la tabla ECOM_COLA_PARAMETROS con los datos idComCola, clave y valor para saber a que peticion pertenece.
+						EcomColaParametros ecmp2 = new EcomColaParametros();
+						ecmp2.setIdecomcola(idComCola);
+						ecmp2.setClave("IDPETICION");
+						ecmp2.setValor(scsEejgPeticionesExtendsMapper.getUltimoIdPeticion());
+						
+						responseColaParam2 = ecomColaParametrosMapper.insert(ecmp2);
+						if(responseColaParam2 == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"GestionEJGServiceImpl.borrarEstado() -> KO. No se ha introducido ningún elemento en cola");
+							throw new Exception("ERROR: no se ha podido introducir el primer elemento en cola parametros.");
+						}else {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+						LOGGER.debug(
+								"GestionEJGServiceImpl.insertFamiliarEJG() -> Salida del servicio para insertar una solicitud de EEJG");
+					
+					
+					
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.insertFamiliarEJG() -> Se ha producido un error al insertar en la unidad familiar en el ejg.",
+							e);
+				}
+			}
+		}
+		return insertResponseDTO;
+	}
+	
 }
