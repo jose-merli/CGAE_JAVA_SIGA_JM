@@ -139,9 +139,7 @@ public interface IDesignacionesService {
 
 	ComboDTO comboTipoMotivo(HttpServletRequest request);
 
-	public UpdateResponseDTO guardarProcurador(List<String> procurador, HttpServletRequest request);
-
-	InsertResponseDTO nuevoProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
+	public UpdateResponseDTO guardarProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
 	
 	public DesignaItem existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request);
 

@@ -361,11 +361,13 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMERODESIGNACION", property = "numerodesignacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHADESIGNA", property = "fechaDesigna", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHADESIGNA", property = "fechaDesigna", jdbcType = JdbcType.DATE),
 			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MOTIVOSRENUNCIA", property = "motivosRenuncia", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) })
+			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE),
+			@Result(column = "idprocurador", property = "idProcurador", jdbcType = JdbcType.DATE),
+			@Result(column = "idinstitucion_proc", property = "idInstitucion", jdbcType = JdbcType.DATE)})
 	List<ProcuradorItem> busquedaProcurador(String num, String idinstitucion, String idturno, String anio);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "compruebaProcurador")
@@ -411,10 +413,6 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "actualizarProcurador")
 	int actualizarProcurador(ProcuradorItem procuradorItem);
 
-	@InsertProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "nuevoProcurador")
-	int nuevoProcurador(ProcuradorItem procuradorItem, Integer usuario);
-
-	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "obtenerCodigoDesigna")
 	@Results({ 
 			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),

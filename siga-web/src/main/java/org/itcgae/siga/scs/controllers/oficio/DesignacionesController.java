@@ -891,20 +891,9 @@ public class DesignacionesController {
 		ComboDTO response = designacionesService.comboTipoMotivo(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
-
-	@RequestMapping(value = "/designas/guardarProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-
-	ResponseEntity<UpdateResponseDTO> guardarProcurador(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
-		UpdateResponseDTO response = designacionesService.guardarProcurador(procuradorItem, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
 	
 
 	@RequestMapping(value = "/designas/guardarProcuradorEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-
 	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.guardarProcuradorEJG(procuradorItem, request);
 		if (response.getError().getCode() == 200)
@@ -919,14 +908,14 @@ public class DesignacionesController {
 		return new ResponseEntity<ProcuradorDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/designas/nuevoProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> nuevoProcurador(@RequestBody ProcuradorItem procuradorItem,
+	@RequestMapping(value = "/designas/guardarProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> nuevoProcurador(@RequestBody ProcuradorItem procuradorItem,
 			HttpServletRequest request) {
-		InsertResponseDTO response = designacionesService.nuevoProcurador(procuradorItem, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		UpdateResponseDTO response = designacionesService.guardarProcurador(procuradorItem, request);
+		if (response.getStatus()=="OK")
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/designas/compruebaFechaProcurador",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

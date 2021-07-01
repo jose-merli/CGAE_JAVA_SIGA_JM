@@ -111,6 +111,7 @@ import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignaprocurador;
+import org.itcgae.siga.db.entities.ScsDesignaprocuradorExample;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsDesignasletradoExample;
 import org.itcgae.siga.db.entities.ScsDocumentacionasi;
@@ -3937,76 +3938,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info("compruebaFechaProcurador() -> Salida del servicio para obtener procuradores");
 		return procuradorDTO;
 	}
-
-	@Override
-	public UpdateResponseDTO guardarProcurador(List<String> procurador, HttpServletRequest request) {
-		LOGGER.info("guardarProcurador() ->  Entrada al servicio para guardar procuradores");
-
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-//		int existentes = 0;
-
-		if (null != idInstitucion) {
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"guardarProcurador() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"guardarProcurador() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (null != usuarios && usuarios.size() > 0) {
-
-				try {
-
-					ProcuradorItem procuradorItem = new ProcuradorItem();
-
-					procuradorItem.setFechaDesigna(procurador.get(0));
-					procuradorItem.setNumerodesignacion(procurador.get(1));
-					procuradorItem.setnColegiado(procurador.get(2));
-					procuradorItem.setNombre(procurador.get(3));
-					procuradorItem.setMotivosRenuncia(procurador.get(4));
-					procuradorItem.setObservaciones(procurador.get(5));
-					procuradorItem.setFecharenunciasolicita(procurador.get(6));
-					procuradorItem.setIdInstitucion(procurador.get(8));
-					procuradorItem.setNumero(procurador.get(9));
-					procuradorItem.setIdTurno(procurador.get(10));
-					
-					response = scsDesignacionesExtendsMapper.guardarProcurador(procuradorItem,procurador.get(7));
-
-				} catch (Exception e) {
-					response = 0;
-					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-					updateResponseDTO.setStatus(SigaConstants.KO);
-				}
-
-				if (response == 0 && error.getDescription() == null) {
-					error.setCode(400);
-					error.setDescription("No se ha guardado el procurador");
-					updateResponseDTO.setStatus(SigaConstants.KO);
-				} else if (error.getCode() == null) {
-					error.setCode(200);
-					error.setDescription("Se ha guardado el procurador correctamente");
-				}
-
-				updateResponseDTO.setError(error);
-
-				LOGGER.info("guardarProcurador() -> Salida del servicio para guardar procuradores");
-			}
-		}
-		return updateResponseDTO;
-	}
 	
 	@Override
 	public UpdateResponseDTO guardarProcuradorEJG(List<String> procurador, HttpServletRequest request) {
@@ -4041,13 +3972,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					ProcuradorItem procuradorItem = new ProcuradorItem();
 
-					procuradorItem.setFechaDesigna(procurador.get(0));
+//					procuradorItem.setFechaDesigna(procurador.get(0));
 					procuradorItem.setNumerodesignacion(procurador.get(1));
 					procuradorItem.setnColegiado(procurador.get(2));
 					procuradorItem.setNombre(procurador.get(3));
 					procuradorItem.setMotivosRenuncia(procurador.get(4));
 					procuradorItem.setObservaciones(procurador.get(5));
-					procuradorItem.setFecharenunciasolicita(procurador.get(6));
+//					procuradorItem.setFecharenunciasolicita(procurador.get(6));
 					procuradorItem.setIdInstitucion(procurador.get(7));
 					procuradorItem.setNumero(procurador.get(8));
 					procuradorItem.setIdTurno(procurador.get(9));
@@ -4115,13 +4046,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					ProcuradorItem procuradorItem = new ProcuradorItem();
 
-					procuradorItem.setFechaDesigna(procurador.get(0));
+//					procuradorItem.setFechaDesigna(procurador.get(0));
 					procuradorItem.setNumerodesignacion(procurador.get(1));
 					procuradorItem.setnColegiado(procurador.get(2));
 					procuradorItem.setNombre(procurador.get(3));
 					procuradorItem.setMotivosRenuncia(procurador.get(4));
 					procuradorItem.setObservaciones(procurador.get(5));
-					procuradorItem.setFecharenunciasolicita(procurador.get(6));
+//					procuradorItem.setFecharenunciasolicita(procurador.get(6));
 
 					response = scsDesignacionesExtendsMapper.actualizarProcurador(procuradorItem);
 
@@ -4153,12 +4084,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
-	public InsertResponseDTO nuevoProcurador(ProcuradorItem procuradorItem, HttpServletRequest request) {
-		LOGGER.info("nuevoProcurador() ->  Entrada al servicio para insertar un procurador");
+	@Transactional
+	public UpdateResponseDTO guardarProcurador(ProcuradorItem procuradorItem, HttpServletRequest request) {
+		LOGGER.info("nuevoProcurador() ->  Entrada al servicio para actualizar los procuradores de una designacion");
 
-		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
-		int response = 0;
+		int response1 = 1;
+		int response2 = 1;
+		int response3 = 1;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -4172,35 +4106,99 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"nuevoProcurador() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"guardarProcurador() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"nuevoProcurador() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"guardarProcurador() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				response = scsDesignacionesExtendsMapper.nuevoProcurador(procuradorItem,
-						usuarios.get(0).getIdusuario());
+				
+				try {
+					//Se extraen los procuradores asignados a la designacion
+					ScsDesignaprocuradorExample procsDesignaExample = new ScsDesignaprocuradorExample();
 
-				if (response == 0 && error.getDescription() == null) {
+					procsDesignaExample.setOrderByClause("FECHADESIGNA DESC");
+					procsDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(Integer.valueOf(procuradorItem.getIdTurno())).
+					andNumeroEqualTo(Long.valueOf(procuradorItem.getNumero())).andAnioEqualTo(procuradorItem.getAnio());
+					
+					List<ScsDesignaprocurador> procsDesigna = scsDesignaProcuradorMapper.selectByExample(procsDesignaExample);
+					
+					//En el caso que haya algun procurador asignado
+					if(!procsDesigna.isEmpty()){
+					//1. Se modifica la segunda entrada en la tabla, si la hubiera, para que su fecha de renuncia
+					//efectiva se corresponda con la fecha de designacion del nuevo procurador.
+					
+					procsDesigna.get(0).setFecharenuncia(procuradorItem.getFechaDesigna());
+					
+					response1 = scsDesignaProcuradorMapper.updateByPrimaryKey(procsDesigna.get(0));					
+					
+					//2. Se comprueba si la designacion tiene un procurador con la misma fecha de designacion 
+					//que el procurador nuevo y se elimina.
+					
+					procsDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(Integer.valueOf(procuradorItem.getIdTurno())).
+					andNumeroEqualTo(Long.valueOf(procuradorItem.getNumero())).andAnioEqualTo(procuradorItem.getAnio())
+					.andFechadesignaEqualTo(procuradorItem.getFechaDesigna());
+					
+					List<ScsDesignaprocurador> procsDesignaDelete = scsDesignaProcuradorMapper.selectByExample(procsDesignaExample);
+					
+					if(response1 == 1 && !procsDesignaDelete.isEmpty())response2 = scsDesignaProcuradorMapper.deleteByPrimaryKey(procsDesignaDelete.get(0));
+					}
+					//3. Se introduce el nuevo procurador
+					ScsDesignaprocurador newProcDesigna = new ScsDesignaprocurador();
+					
+					//Informacion designacion
+					newProcDesigna.setIdinstitucion(idInstitucion);
+					newProcDesigna.setIdturno(Integer.valueOf(procuradorItem.getIdTurno()));
+					newProcDesigna.setNumero(Long.valueOf(procuradorItem.getNumero()));
+					newProcDesigna.setAnio(procuradorItem.getAnio());
+					
+					//Informacion procurador
+					newProcDesigna.setIdinstitucionProc(Short.valueOf(procuradorItem.getIdInstitucion()));
+					newProcDesigna.setIdprocurador(Long.valueOf(procuradorItem.getIdProcurador()));
+					
+					//Informacion entrada
+					newProcDesigna.setFechadesigna(procuradorItem.getFechaDesigna());	
+					newProcDesigna.setNumerodesignacion(procuradorItem.getNumerodesignacion());
+					newProcDesigna.setMotivosrenuncia(procuradorItem.getMotivosRenuncia());
+					newProcDesigna.setObservaciones(procuradorItem.getObservaciones());
+					newProcDesigna.setFecharenunciasolicita(procuradorItem.getFecharenunciasolicita());
+					
+					newProcDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+					newProcDesigna.setFechamodificacion(new Date());						
+					
+					if(response1 == 1 && response2 == 1) {
+						if(procsDesigna.size()<Integer.valueOf(procuradorItem.getNumeroTotalProcuradores())) response3 = scsDesignaProcuradorMapper.insert(newProcDesigna);
+						else response3 = scsDesignaProcuradorMapper.updateByPrimaryKey(newProcDesigna);
+					}
+					
+					
+					
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("DesignacionesServiceImpl.getDatosAdicionales -> Salida del servicio");
+					response1 = 0;
+				}
+				if (response1 == 0 || response2 == 0 || response3 == 0) {
 					error.setCode(400);
-					error.setDescription("No se ha insertado el procurador");
-					insertResponseDTO.setStatus(SigaConstants.KO);
-				} else if (error.getCode() == null) {
+					error.setDescription("No se ha insertado el procurador correctamente");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else {
 					error.setCode(200);
 					error.setDescription("Se ha insertado el procurador correctamente");
+					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
 
-				insertResponseDTO.setError(error);
+				updateResponseDTO.setError(error);
 
-				LOGGER.info("nuevoProcurador() -> Salida del servicio para insertar un procurador");
+				LOGGER.info("guardarProcurador() -> Salida del servicio para actualizar los procuradores de una designacion");
 
 			}
 
 		}
 
-		return insertResponseDTO;
+		return updateResponseDTO;
 	}
 
 	@Override
@@ -7047,5 +7045,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		return responseDTO;
 	}
+	
 
 }
