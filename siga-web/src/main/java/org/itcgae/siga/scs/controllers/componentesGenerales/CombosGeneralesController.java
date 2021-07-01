@@ -54,6 +54,12 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping("/turnosInscritos")
+	public ResponseEntity<ComboDTO> comboTurnosInscritoLetrado(HttpServletRequest request, @RequestParam String idPersona) {
+		ComboDTO response = comboService.comboTurnosInscritoLetrado(request, idPersona);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping("/grupoFacturacion")
 	public ResponseEntity<ComboDTO> comboGrupoFacturacion(HttpServletRequest request) {
 		ComboDTO response = comboService.getComboGrupoFacturacion(request);
@@ -116,6 +122,12 @@ public class CombosGeneralesController {
 	@GetMapping("/guardias")
 	public ResponseEntity<ComboDTO> comboGuardias(HttpServletRequest request, String idTurno) {
 		ComboDTO response = comboService.comboGuardias(request, idTurno);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/guardiasInscritas")
+	public ResponseEntity<ComboDTO> comboGuardiasInscritas(HttpServletRequest request, @RequestParam String idTurno, @RequestParam String idPersona) {
+		ComboDTO response = comboService.comboGuardiasInscritoLetrado(request, idPersona, idTurno);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	

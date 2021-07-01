@@ -357,4 +357,17 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 
 		return sql.toString();
 	}
+	
+	public String comboGuardiasInscritoLetrado(Short idInstitucion, String idPersona, String idTurno) {
+		SQL sql = new SQL();
+		sql.SELECT("gt.IDGUARDIA", "gt.NOMBRE");
+		sql.FROM("scs_guardiasturno gt");
+		sql.INNER_JOIN("scs_inscripcionguardia ig on gt.idinstitucion = ig.idinstitucion and gt.idguardia = ig.idguardia and gt.idturno = ig.idturno");
+		sql.WHERE("gt.idinstitucion = "+idInstitucion,
+				"ig.fechabaja is null",
+				"ig.fechavalidacion is not null",
+				"ig.idpersona = '"+idPersona+"'",
+				"ig.idturno = '"+idTurno+"'");
+		return sql.toString();
+	}
 }
