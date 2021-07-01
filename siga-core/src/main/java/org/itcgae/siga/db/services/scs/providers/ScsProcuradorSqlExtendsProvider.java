@@ -69,10 +69,13 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 					"(TRANSLATE(LOWER( PROCURADOR.APELLIDOS2),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
 							+ procuradorItem.getApellido1().trim() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')))");*/
 		}
-		if (procuradorItem.getCodigoExt() != null && procuradorItem.getCodigoExt() != "") {
+		
+		if (procuradorItem.getnColegiado() != null && procuradorItem.getnColegiado() != "") {
 			sql.AND();
-			sql.WHERE("UPPER(procurador.codigo) like UPPER('%" + procuradorItem.getCodigoExt() + "%')");
+			sql.WHERE("UPPER(procurador.ncolegiado) like UPPER('%" + procuradorItem.getnColegiado() + "%')");
 		}
+		
+		
 		
 		if(procuradorItem.getIdColProcurador() != null) sql.WHERE("UPPER(procurador.idColProcurador) like UPPER('%"+procuradorItem.getIdColProcurador()+"%')");
 
