@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TiposServiciosServiceImpl implements ITiposServiciosService {
-	private Logger LOGGER = Logger.getLogger(TiposProductosServiceImpl.class);
+	private Logger LOGGER = Logger.getLogger(TiposServiciosServiceImpl.class);
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
