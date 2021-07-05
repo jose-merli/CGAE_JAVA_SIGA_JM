@@ -4021,7 +4021,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						LOGGER.info(
 								"guardarProcuradorEJG() / scsEjgMapper.updateByPrimaryKeySelective() -> Entrada a scsEjgMapper para guardar procurador EJG.");
 
-						if(response2 ==1) response1 = scsEjgMapper.updateByPrimaryKeySelective(ejg);
+						if(response2 ==1 && response1 == 1) response1 = scsEjgMapper.updateByPrimaryKeySelective(ejg);
 
 						LOGGER.info(
 								"guardarProcuradorEJG() / scsEjgMapper.updateByPrimaryKeySelective() -> Salida de scsEjgMapper para guardar procurador EJG.");
@@ -4061,7 +4061,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							estado.setIdestadoporejg(Long.parseLong("0"));
 						}
 
-						if(response1 == 1) response2 = scsEstadoejgMapper.insert(estado);
+						if(response1 == 1 && response2 == 1) response2 = scsEstadoejgMapper.insert(estado);
 					}
 
 				} catch (Exception e) {
@@ -4173,6 +4173,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if(!procsSupDesigna.isEmpty()) {
 						newProcDesigna.setFecharenuncia(procsSupDesigna.get(0).getFechadesigna());
 					}
+					else newProcDesigna.setFecharenuncia(null);
 					
 					//Se buscan los procuradores con fechas menores a la seleccionada y se selecciona 
 					//el procurador inmediatamente menor, si lo hubiera.
