@@ -32,6 +32,22 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		return sql.toString();
 	}
 	
+	public String searchTiposProductosByIdCategoria(String idioma, Short idInstitucion, String idCategoria) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDPRODUCTO AS ID");
+		sql.SELECT("f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
+		
+		sql.FROM("PYS_PRODUCTOS");
+		
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTIPOPRODUCTO = '" + idCategoria + "'");
+		
+		sql.ORDER_BY("DESCRIPCION");
+		
+		return sql.toString();
+	}
+	
 	public String searchTiposProductosHistorico(String idioma, Short idInstitucion) {
 		SQL sql = new SQL();
 

@@ -100,6 +100,63 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 	}
 	
 	@Override
+	public ComboDTO searchTiposProductosByIdCategoria(HttpServletRequest request, String idCategoria) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.info("searchTiposProductosByIdCategoria() -> Entrada al servicio para recuperar el combo de productos segun categoria");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"searchTiposProductosByIdCategoria() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchTiposProductosByIdCategoria() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"searchTiposProductosByIdCategoria() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoria() -> Entrada a pysTiposProductosExtendsMapper para obtener el combo de productos segun categoria");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboTiposProductos = pysTiposProductosExtendsMapper
+							.searchTiposProductosByIdCategoria(idioma, idInstitucion, idCategoria);
+
+					LOGGER.info(
+							"searchTiposProductosByIdCategoria() / pysTiposProductosExtendsMapper.searchTiposProductosByIdCategoria() -> Salida de pysTiposProductosExtendsMapper para obtener el combo de productos segun categoria");
+
+					if (listaComboTiposProductos != null && listaComboTiposProductos.size() > 0) {
+						comboDTO.setCombooItems(listaComboTiposProductos);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposProductosServiceImpl.searchTiposProductosByIdCategoria() -> Se ha producido un error al obtener el combo de productos segun categoria",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("searchTiposProductosByIdCategoria() -> Salida del servicio para obtener el combo de productos segun categoria");
+
+		return comboDTO;
+	}
+	
+	@Override
 	public ListadoTipoProductoDTO searchTiposProductosHistorico(HttpServletRequest request) {
 		ListadoTipoProductoDTO listadoTipoProductoDTO = new ListadoTipoProductoDTO();
 		Error error = new Error();

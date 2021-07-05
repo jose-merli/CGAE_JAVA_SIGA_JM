@@ -5,6 +5,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.fac.FiltroProductoItem;
+import org.itcgae.siga.DTO.fac.ListaProductosDTO;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
+import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
+import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -31,6 +36,9 @@ public class ProductosServiceImpl implements IProductosService{
 	
 	@Autowired
 	private PySTipoFormaPagoExtendsMapper pysTipoFormaPagoExtendsMapper;
+	
+	@Autowired
+	private PySTiposProductosExtendsMapper pysTiposProductosExtendsMapper;
 	
 	
 	@Override
@@ -145,5 +153,62 @@ public class ProductosServiceImpl implements IProductosService{
 		LOGGER.info("comboTipoFormaPago() -> Salida del servicio para recuperar el combo de formas de pago");
 
 		return comboDTO;
+	}
+
+	@Override
+	public ListaProductosDTO searchListadoProductos(HttpServletRequest request, FiltroProductoItem filtroProductoItem) {
+		ListaProductosDTO listaProductosDTO = new ListaProductosDTO();
+		Error error = new Error();
+
+		LOGGER.info("searchListadoProductos() -> Entrada al servicio para recuperar el listado de productos segun la busqueda");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"searchListadoProductos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchListadoProductos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"searchListadoProductos() / pysTiposProductosExtendsMapper.searchListadoProductos() -> Entrada a pysTiposProductosExtendsMapper para obtener el listado de productos segun la busqueda");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ListaProductosItem> listaProductos = pysTiposProductosExtendsMapper
+							.searchListadoProductosBuscador(idioma, idInstitucion, filtroProductoItem);
+
+					LOGGER.info(
+							"searchListadoProductos() / pysTiposProductosExtendsMapper.searchListadoProductos() -> Salida de pysTiposProductosExtendsMapper para obtener el listado de productos segun la busqueda");
+
+					if (listaProductos != null && listaProductos.size() > 0) {
+						listaProductosDTO.setListaProductosItems(listaProductos);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ProductosServiceImpl.searchListadoProductos() -> Se ha producido un error al obtener el listado de productos segun la busqueda",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+	listaProductosDTO.setError(error);
+
+		LOGGER.info("searchListadoProductos() -> Salida del servicio para obtener el listado de productos segun la busqueda");
+
+		return listaProductosDTO;
 	}
 }

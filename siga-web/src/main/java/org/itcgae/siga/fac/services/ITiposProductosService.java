@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface ITiposProductosService {
 	public ListadoTipoProductoDTO searchTiposProductos(HttpServletRequest request);
+	public ComboDTO searchTiposProductosByIdCategoria(HttpServletRequest request, String idCategoria);
 	public ListadoTipoProductoDTO searchTiposProductosHistorico(HttpServletRequest request);
 	public ComboDTO comboTiposProductos(HttpServletRequest request);
 	public InsertResponseDTO crearProducto(ListadoTipoProductoDTO listadoProductos, HttpServletRequest request);

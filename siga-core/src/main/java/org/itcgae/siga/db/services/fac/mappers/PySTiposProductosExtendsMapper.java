@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.FiltroProductoItem;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
@@ -41,6 +43,21 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		}) 
 	List<TiposProductosItem> searchTiposProductosHistorico(String idioma, Short idInstitucion);
 	
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "searchListadoProductosBuscador")
+	@Results({
+		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CATEGORIA", property = "categoria", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IVA", property = "iva", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "PRECIO_IVA", property = "precioiva", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FORMA_PAGO", property = "formapago", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ListaProductosItem> searchListadoProductosBuscador(String idioma, Short idInstitucion, FiltroProductoItem filtroProductoItem);
+	
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "getIndiceMaxProducto")
 	@Results({ 
 		@Result(column = "IDPRODUCTO", property = "newId", jdbcType = JdbcType.NUMERIC)
@@ -53,6 +70,13 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ComboItem> comboTiposProductos(String idioma);
+	
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "searchTiposProductosByIdCategoria")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> searchTiposProductosByIdCategoria(String idioma, Short idInstitucion, String idCategoria);
 	
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "activarDesactivarProducto")
 	int activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, TiposProductosItem producto);
