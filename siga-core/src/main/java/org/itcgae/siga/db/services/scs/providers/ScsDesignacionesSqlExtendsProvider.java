@@ -2519,18 +2519,20 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String compruebaFechaProcurador(String fecha, String numAnio) {
+	public String compruebaFechaProcurador(ProcuradorItem procurador, Short idInstitucion) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		
 		sql2.SELECT(
 				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
 
-		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
-		sql2.WHERE("dp.numerodesignacion = '" + numAnio + "'");
-		sql2.WHERE("dp.fechadesigna = TO_DATE('" + fecha + "','DD/MM/YYYY')");
-		sql2.WHERE("dp.idprocurador = p.idprocurador");
-		sql2.WHERE("dp.idinstitucion = p.idinstitucion");
+		sql2.FROM("SCS_DESIGNAPROCURADOR dp");
+		sql2.INNER_JOIN("SCS_PROCURADOR p on dp.idprocurador = p.idprocurador and dp.idinstitucion = p.idinstitucion");
+		sql2.WHERE("dp.numero = '" + procurador.getNumero() + "'");
+		sql2.WHERE("dp.fechadesigna = TO_DATE('" + procurador.getFechaDesigna() + "','DD/MM/YYYY')");
+		sql2.WHERE("dp.idprocurador = "+ procurador.getIdProcurador() +"");
+		sql2.WHERE("dp.idinstitucion = "+ idInstitucion +"");
+		sql2.WHERE("dp.idturno = "+ procurador.getIdTurno() +"");
 		sql2.ORDER_BY("dp.FECHADESIGNA DESC");
 
 		sql.SELECT("*");

@@ -396,7 +396,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "MOTIVOSRENUNCIA", property = "motivosRenuncia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) })
-	List<ProcuradorItem> compruebaFechaProcurador(String fecha, String numAnio);
+	List<ProcuradorItem> compruebaFechaProcurador(ProcuradorItem procurador, Short idInstitucion);
 
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "comboTipoMotivo")

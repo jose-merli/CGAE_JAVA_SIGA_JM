@@ -25,6 +25,8 @@ import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
+import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
@@ -894,7 +896,7 @@ public class DesignacionesController {
 	
 
 	@RequestMapping(value = "/designas/guardarProcuradorEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody  ProcuradorItem procuradorItem, HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.guardarProcuradorEJG(procuradorItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -909,28 +911,19 @@ public class DesignacionesController {
 	}
 	
 	@RequestMapping(value = "/designas/guardarProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> nuevoProcurador(@RequestBody ProcuradorItem procuradorItem,
+	ResponseEntity<InsertResponseDTO> nuevoProcurador(@RequestBody ProcuradorItem procuradorItem,
 			HttpServletRequest request) {
-		UpdateResponseDTO response = designacionesService.guardarProcurador(procuradorItem, request);
+		InsertResponseDTO response = designacionesService.guardarProcurador(procuradorItem, request);
 		if (response.getStatus()=="OK")
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/designas/compruebaFechaProcurador",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ProcuradorDTO> compruebaFechaProcurador(@RequestBody List<String> procurador, HttpServletRequest request) {
+	ResponseEntity<ProcuradorDTO> compruebaFechaProcurador(@RequestBody ProcuradorItem procurador, HttpServletRequest request) {
 		ProcuradorDTO response = designacionesService.compruebaFechaProcurador(procurador, request);
 		return new ResponseEntity<ProcuradorDTO>(response, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/designas/actualizarProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> actualizarProcurador(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
-		UpdateResponseDTO response = designacionesService.actualizarProcurador(procuradorItem, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@GetMapping("/comboPrisiones")
@@ -1053,5 +1046,15 @@ public class DesignacionesController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/designas/getEjgDesigna", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EjgDesignaDTO> getEjgDesigna(HttpServletRequest request, String idTurno, String ano, String numero ) {
+		DesignaItem designa = new DesignaItem();
+		designa.setIdTurno(Integer.valueOf(idTurno));
+		designa.setAno(Integer.valueOf(ano));
+		designa.setNumero(Integer.valueOf(numero));
+		EjgDesignaDTO response = designacionesService.getEjgDesigna(designa, request);
+		return new ResponseEntity<EjgDesignaDTO>(response, HttpStatus.OK);
 	}
 }
