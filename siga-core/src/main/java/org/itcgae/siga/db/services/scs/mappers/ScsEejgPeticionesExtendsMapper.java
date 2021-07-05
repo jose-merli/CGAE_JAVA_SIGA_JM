@@ -1,10 +1,13 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.db.entities.ScsEejgPeticiones;
@@ -47,5 +50,12 @@ public interface ScsEejgPeticionesExtendsMapper extends ScsEejgPeticionesMapper{
 		@Result(column = "MSGERROR", property = "msgerror", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CSV", property = "csv", jdbcType = JdbcType.VARCHAR)})
 	List<ScsEejgPeticiones> getPeticionesPorEJG(EjgItem ejg);
-
+	
+	@SelectProvider(type = ScsEejgPeticionesSqlExtendsProvider.class, method = "getMaxIdpeticion")
+	@Results({})
+	BigDecimal getMaxIdpeticion();
+	
+	@SelectProvider(type = ScsEejgPeticionesSqlExtendsProvider.class, method = "getUltimoIdPeticion")
+	@Results({})
+	String getUltimoIdPeticion();
 }
