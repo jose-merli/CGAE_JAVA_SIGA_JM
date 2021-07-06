@@ -1,17 +1,13 @@
 package org.itcgae.siga.security.develop;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.itcgae.siga.db.entities.AdmAccessKey;
 import org.itcgae.siga.db.entities.AdmRol;
-import org.itcgae.siga.security.PermisosAccionRepository;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -57,10 +53,10 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			throws AuthenticationException {
 		try{
 			LOGGER.info("Se accede por los combos");
-//			String dni = "44149718E"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
-//			String nombre = "Jesus"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
-			String dni = (String) request.getHeader("CAS-username");
-			String nombre = (String) request.getHeader("CAS-displayName");
+			String dni = "44149718E"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
+			String nombre = "Jesus"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
+//			String dni = (String) request.getHeader("CAS-username");
+//			String nombre = (String) request.getHeader("CAS-displayName");
 
 			String grupo = "";
 			String institucion = request.getParameter("location");
@@ -89,10 +85,6 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			if (auth.getClass().equals(UserAuthenticationToken.class)) {
 				UserAuthenticationToken userAuthToken = (UserAuthenticationToken) auth;
 				response.addHeader(tokenHeaderAuthKey, UserTokenUtils.generateToken(userAuthToken));
-				
-				userDetailsService.getTokenAccess();
-				
-				
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);

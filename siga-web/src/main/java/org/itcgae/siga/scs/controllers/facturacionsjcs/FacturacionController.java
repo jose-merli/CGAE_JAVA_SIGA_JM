@@ -156,14 +156,14 @@ public class FacturacionController {
 	}
 	
 	@RequestMapping(value="/facturacionsjcs/datosGeneralesPago", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<PagosjgItem> datosGeneralesPago(@RequestParam("idPago") String idPago, HttpServletRequest request){
-		PagosjgItem response = facturacionServices.datosGeneralesPagos(idPago, request);
-		return new ResponseEntity<PagosjgItem>(response, HttpStatus.OK);
+	ResponseEntity<PagosjgDTO> datosGeneralesPago(@RequestParam("idPago") String idPago, HttpServletRequest request){
+		PagosjgDTO response = facturacionServices.datosGeneralesPagos(idPago, request);
+		return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
 	}
 	
-	/*@RequestMapping(value="/facturacionsjcs/historicoPagos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/facturacionsjcs/historicoPagos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<PagosjgDTO> historicoPagos(@RequestParam("idPago") String idPago, HttpServletRequest request){
 		PagosjgDTO response = facturacionServices.historicoPagos(idPago, request);
 		return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
-	}*/
+	}
 }

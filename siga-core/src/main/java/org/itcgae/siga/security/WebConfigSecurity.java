@@ -60,6 +60,9 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private CgaeAuthenticationProvider proAuthenticationProvider;
+	
+	@Autowired
+	private YamlPermisos yamlPermisosProperties;
 
 	public WebConfigSecurity(SigaUserDetailsService userDetailsService) {
 		this.userDetailsService = userDetailsService;
@@ -94,7 +97,7 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 				.anyRequest().authenticated().and()
 				.addFilterBefore(new ProAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
 						tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
-				.addFilter(new ProAuthorizationFilter(authenticationManager()))
+				.addFilter(new ProAuthorizationFilter(authenticationManager(), yamlPermisosProperties))
 				.addFilterBefore(new DevAuthenticationFilter(authenticationManager(), "GET", "/loginDevelop",
 						tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);

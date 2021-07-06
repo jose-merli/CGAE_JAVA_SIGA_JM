@@ -1,6 +1,5 @@
 package org.itcgae.siga.gen.controllers;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UsuarioDTO;
@@ -19,46 +18,37 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ConfigController {
-	
+
 	@Autowired
 	IDiccionarioService diccionarioService;
-	
+
 	@Autowired
 	SigaUserDetailsService sigaUserDetailsService;
-    
-    @RequestMapping(value = "/diccionarios", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DiccionarioDTO> getDiccionarios(@RequestParam(value="idioma", required=false) String idioma,HttpServletRequest request) {
-    	DiccionarioDTO response = new DiccionarioDTO(); 
-    	response = diccionarioService.getDiccionario(idioma,request);
-    	return new ResponseEntity<DiccionarioDTO>(response, HttpStatus.OK);
+
+	@RequestMapping(value = "/diccionarios", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DiccionarioDTO> getDiccionarios(@RequestParam(value = "idioma", required = false) String idioma,
+			HttpServletRequest request) {
+		DiccionarioDTO response = new DiccionarioDTO();
+		response = diccionarioService.getDiccionario(idioma, request);
+		return new ResponseEntity<DiccionarioDTO>(response, HttpStatus.OK);
 
 	}
-    
-    
-    @RequestMapping(value = "/usuario", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	@RequestMapping(value = "/usuario", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UsuarioDTO> getUsuario(HttpServletRequest request) {
-    	UsuarioDTO response = new UsuarioDTO(); 
-    	response = diccionarioService.getUsuario(request);
-    	return new ResponseEntity<UsuarioDTO>(response, HttpStatus.OK);
+		UsuarioDTO response = new UsuarioDTO();
+		response = diccionarioService.getUsuario(request);
+		return new ResponseEntity<UsuarioDTO>(response, HttpStatus.OK);
 
 	}
-    
-    @RequestMapping(value = "/recuperarApiKey",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ResponseDataDTO> recuperarApiKey(HttpServletRequest request) {		
+
+	@RequestMapping(value = "/recuperarApiKey", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDataDTO> recuperarApiKey(HttpServletRequest request) {
 		ResponseDataDTO response = diccionarioService.obtenerTinyApiKey(request);
-		if(response.getError() == null)
+		if (response.getError() == null)
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-    
-    @RequestMapping(value = "/reloadPermissionMap", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-   	ResponseEntity<ResponseDataDTO> reloadPermissionMap(HttpServletRequest request) {
-    	ResponseDataDTO response = sigaUserDetailsService.getTokenAccess();
-		if(response.getError() == null)
-			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-    
+
 }

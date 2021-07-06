@@ -5,10 +5,12 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PagosjgItem {
+
 	private String idInstitucion;
 	private String idPagosjg;
 	private String idFacturacion;
 	private String nombre;
+	private String nombreFac;
 	private String importeEJG;
 	private String importeGuardia;
 	private String importeOficio;
@@ -65,6 +67,15 @@ public class PagosjgItem {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+
+	public String getNombreFac() {
+		return nombreFac;
+	}
+
+	@JsonProperty("nombreFac")
+	public void setNombreFac(String nombreFac) {
+		this.nombreFac = nombreFac;
 	}
 
 	@JsonProperty("importeEJG")
@@ -265,14 +276,14 @@ public class PagosjgItem {
 	@Override
 	public String toString() {
 		return "PagosjgItem [idInstitucion=" + idInstitucion + ", idPagosjg=" + idPagosjg + ", idFacturacion="
-				+ idFacturacion + ", nombre=" + nombre + ", importeEJG=" + importeEJG + ", importeGuardia="
-				+ importeGuardia + ", importeOficio=" + importeOficio + ", importesOJ=" + importesOJ
-				+ ", importeRepartir=" + importeRepartir + ", importePagado=" + importePagado + ", fechaEstado="
-				+ fechaEstado + ", desEstado=" + desEstado + ", desConcepto=" + desConcepto + ", idHitoGeneral="
-				+ idHitoGeneral + ", porcentaje=" + porcentaje + ", abreviatura=" + abreviatura + ", idEstado="
-				+ idEstado + ", idPartidaPresupuestaria=" + idPartidaPresupuestaria + ", idConcepto=" + idConcepto
-				+ ", idGrupo=" + idGrupo + ", descGrupo=" + descGrupo + ", fechaDesde=" + fechaDesde + ", fechaHasta="
-				+ fechaHasta + ", cantidad=" + cantidad + ", codBanco=" + codBanco + "]";
+				+ idFacturacion + ", nombre=" + nombre + ", nombreFac=" + nombreFac + ", importeEJG=" + importeEJG
+				+ ", importeGuardia=" + importeGuardia + ", importeOficio=" + importeOficio + ", importesOJ="
+				+ importesOJ + ", importeRepartir=" + importeRepartir + ", importePagado=" + importePagado
+				+ ", fechaEstado=" + fechaEstado + ", desEstado=" + desEstado + ", desConcepto=" + desConcepto
+				+ ", idHitoGeneral=" + idHitoGeneral + ", porcentaje=" + porcentaje + ", abreviatura=" + abreviatura
+				+ ", idEstado=" + idEstado + ", idPartidaPresupuestaria=" + idPartidaPresupuestaria + ", idConcepto="
+				+ idConcepto + ", idGrupo=" + idGrupo + ", descGrupo=" + descGrupo + ", fechaDesde=" + fechaDesde
+				+ ", fechaHasta=" + fechaHasta + ", cantidad=" + cantidad + ", codBanco=" + codBanco + "]";
 	}
 
 }
