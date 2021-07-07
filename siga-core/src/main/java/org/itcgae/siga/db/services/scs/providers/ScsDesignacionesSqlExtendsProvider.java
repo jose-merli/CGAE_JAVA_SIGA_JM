@@ -2230,7 +2230,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql2.SELECT(
 				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
-
+		sql2.SELECT("dp.idprocurador");
+		sql2.SELECT("dp.idinstitucion_proc");
+		
 		sql2.FROM("SCS_DESIGNAPROCURADOR dp");
 		sql2.INNER_JOIN("SCS_PROCURADOR p on dp.idprocurador = p.idprocurador and dp.idinstitucion = p.idinstitucion");
 		sql2.WHERE("dp.idinstitucion = " + idinstitucion);
@@ -2254,46 +2256,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.ORDER_BY("Descripcion");
 
 		return sql.toString();
-	}
-
-	public String nuevoProcurador(ProcuradorItem procuradorItem, Integer usuario) {
-
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-		SQL sql = new SQL();
-		sql.INSERT_INTO("SCS_DESIGNAPROCURADOR");
-
-		if (procuradorItem.getNombre() != null) {
-			sql.VALUES("nombre", "'" + procuradorItem.getNombre() + "'");
-		}
-		if (procuradorItem.getApellido1() != null) {
-			sql.VALUES("apellidos1", "'" + procuradorItem.getApellido1() + "'");
-		}
-		if (procuradorItem.getApellido2() != null) {
-			sql.VALUES("apellidos2", "'" + procuradorItem.getApellido2() + "'");
-		}
-		if (procuradorItem.getnColegiado() != null) {
-			sql.VALUES("ncolegiado", "'" + procuradorItem.getnColegiado() + "'");
-		}
-		if (procuradorItem.getNumerodesignacion() != null) {
-			sql.VALUES("numerodesignacion", "'" + procuradorItem.getNumerodesignacion() + "'");
-		}
-		if (procuradorItem.getFechaDesigna() != null) {
-			String fecha = dateFormat.format(procuradorItem.getFechaDesigna());
-			sql.VALUES("fechadesigna", "TO_DATE('" + fecha + "','DD/MM/RRRR')");
-		}
-		if (procuradorItem.getMotivosRenuncia() != null) {
-			sql.VALUES("motivorenuncia", "'" + procuradorItem.getMotivosRenuncia() + "'");
-		}
-		if (procuradorItem.getObservaciones() != null) {
-			sql.VALUES("observaciones", "'" + procuradorItem.getObservaciones() + "'");
-		}
-
-		sql.VALUES("usumodificacion", "'" + usuario + "'");
-		sql.VALUES("fechamodificacion", "SYSDATE");
-
-		return sql.toString();
-
 	}
 
 	public String busquedaActDesigna(ActuacionDesignaRequestDTO actuacionDesignaRequestDTO, String idInstitucion) {
@@ -2557,18 +2519,20 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String compruebaFechaProcurador(String fecha, String numAnio) {
+	public String compruebaFechaProcurador(ProcuradorItem procurador, Short idInstitucion) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		
 		sql2.SELECT(
 				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
 
-		sql2.FROM("SCS_DESIGNAPROCURADOR dp, SCS_PROCURADOR p");
-		sql2.WHERE("dp.numerodesignacion = '" + numAnio + "'");
-		sql2.WHERE("dp.fechadesigna = TO_DATE('" + fecha + "','DD/MM/YYYY')");
-		sql2.WHERE("dp.idprocurador = p.idprocurador");
-		sql2.WHERE("dp.idinstitucion = p.idinstitucion");
+		sql2.FROM("SCS_DESIGNAPROCURADOR dp");
+		sql2.INNER_JOIN("SCS_PROCURADOR p on dp.idprocurador = p.idprocurador and dp.idinstitucion = p.idinstitucion");
+		sql2.WHERE("dp.numero = '" + procurador.getNumero() + "'");
+		sql2.WHERE("dp.fechadesigna = TO_DATE('" + procurador.getFechaDesigna() + "','DD/MM/YYYY')");
+		sql2.WHERE("dp.idprocurador = "+ procurador.getIdProcurador() +"");
+		sql2.WHERE("dp.idinstitucion = "+ idInstitucion +"");
+		sql2.WHERE("dp.idturno = "+ procurador.getIdTurno() +"");
 		sql2.ORDER_BY("dp.FECHADESIGNA DESC");
 
 		sql.SELECT("*");

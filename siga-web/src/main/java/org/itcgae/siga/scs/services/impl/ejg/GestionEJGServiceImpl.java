@@ -1553,10 +1553,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				try {
 					ScsEjgdesignaExample example = new ScsEjgdesignaExample();
 
-					example.createCriteria().andAniodesignaEqualTo(Short.parseShort(datos.getAnnio()))
-							.andIdinstitucionEqualTo(idInstitucion)
-							.andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG()))
-							.andNumeroejgEqualTo(Long.parseLong(datos.getNumero()));
+					example.createCriteria().andAnioejgEqualTo(Short.parseShort(datos.getAnnio()))
+					.andIdinstitucionEqualTo(idInstitucion)
+					.andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG()))
+					.andNumeroejgEqualTo(Long.parseLong(datos.getNumero()));
 
 					List<ScsEjgdesigna> ejgDesignas = scsEjgdesignaMapper.selectByExample(example);
 
