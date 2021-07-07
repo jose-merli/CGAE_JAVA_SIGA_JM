@@ -9,7 +9,10 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.AsuntosAsistenciaItem;
+import org.itcgae.siga.DTOs.scs.AsuntosSOJItem;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
+import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoEjgItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
@@ -153,4 +156,10 @@ public interface IGestionEJG {
 			HttpServletRequest request);
 
 	InsertResponseDTO solicitarEEJG(UnidadFamiliarEJGItem datos, HttpServletRequest request);
+
+	UpdateResponseDTO asociarDesignacion(List<String> datos, HttpServletRequest request);
+
+	UpdateResponseDTO asociarAsistencia(List<String> datos, HttpServletRequest request);
+
+	UpdateResponseDTO asociarSOJ(List<String> datos, HttpServletRequest request);
 }
