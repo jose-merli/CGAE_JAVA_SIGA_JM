@@ -76,10 +76,6 @@ public interface IGestionEJG {
 	UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request);
 
 	UpdateResponseDTO guardarResolucion(EjgItem datos, HttpServletRequest request);
-
-	UpdateResponseDTO guardarInformeCalificacion(EjgItem datos, HttpServletRequest request);
-
-	UpdateResponseDTO borrarInformeCalificacion(EjgItem datos, HttpServletRequest request);
 	
 	UpdateResponseDTO descargarInformeCalificacion(EjgItem datos, HttpServletRequest request);
 	
@@ -153,4 +149,6 @@ public interface IGestionEJG {
 			HttpServletRequest request);
 
 	InsertResponseDTO solicitarEEJG(UnidadFamiliarEJGItem datos, HttpServletRequest request);
+
+	UpdateResponseDTO actualizarInformeCalificacionEjg(EjgItem ejgItem, HttpServletRequest request);
 }

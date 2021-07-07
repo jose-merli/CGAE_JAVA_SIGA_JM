@@ -158,7 +158,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					+ "','DD/MM/RRRR')");
 		}
 		if (ejgItem.getDictamen() != null) {
-			for (String dictamen : ejgItem.getDictamen()) {
+			String [] selectedDict = ejgItem.getDictamen().split(",");
+			for (String dictamen : selectedDict) {
 				if (!dictamen.equals("-1")) {
 					dictamenCad += dictamen + ",";
 				} else {
@@ -171,7 +172,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			}
 
 		}
-		if (ejgItem.getFundamentoCalif() != null && ejgItem.getFundamentoCalif() != "")
+		if (ejgItem.getFundamentoCalif() != null )//&& ejgItem.getFundamentoCalif() != ""
 			sql.WHERE("EJG.IDFUNDAMENTOCALIF = " + ejgItem.getFundamentoCalif());
 		if (ejgItem.getFechaDictamenDesd() != null) {
 			fechaDictamenDesd = dateFormat.format(ejgItem.getFechaDictamenDesd());
@@ -491,7 +492,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.idinstitucion_proc");
 		sql.SELECT("ejg.fecha_des_proc");
 		sql.SELECT("ejg.numerodesignaproc");
-
+		// Tarjeta Dictamen
+		sql.SELECT("ejg.idDictamen");
+		sql.SELECT("ejg.fechaDictamen");
+		sql.SELECT("ejg.idTipoDictamenEJG");
+		sql.SELECT("ejg.IDFUNDAMENTOCALIF");
+		sql.SELECT("ejg.dictamen as observacionesDictamen");
 		// from
 		sql.FROM("scs_ejg ejg");
 		// joins

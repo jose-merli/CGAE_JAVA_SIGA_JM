@@ -141,7 +141,12 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "idinstitucion_proc", property = "idInstitucionProc", jdbcType = JdbcType.INTEGER),
 			@Result(column = "idPretension", property = "idPretension", jdbcType = JdbcType.INTEGER),
 			@Result(column = "fecha_des_proc", property = "fechaDesProc", jdbcType = JdbcType.DATE),
-			@Result(column = "numerodesignaproc", property = "numerodesignaproc", jdbcType = JdbcType.VARCHAR) })
+			@Result(column = "numerodesignaproc", property = "numerodesignaproc", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "iddictamen", property = "iddictamen", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechaDictamen", property = "fechaDictamen", jdbcType = JdbcType.DATE),
+			@Result(column = "idTipoDictamenEJG", property = "idTipoDictamen", jdbcType = JdbcType.INTEGER),
+			@Result(column = "IDFUNDAMENTOCALIF", property = "fundamentoCalif", jdbcType = JdbcType.INTEGER),
+			@Result(column = "observacionesDictamen", property = "dictamen", jdbcType = JdbcType.CLOB)})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getDictamen")
