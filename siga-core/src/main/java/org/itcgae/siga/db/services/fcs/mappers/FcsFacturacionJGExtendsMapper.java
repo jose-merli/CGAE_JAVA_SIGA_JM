@@ -240,18 +240,24 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 	
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "comboFacturaciones")
 	@Results({ 
-		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDFACTURACION", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> comboFacturaciones(String idInstitucion);		
 	
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "datosGeneralesPagos")
-	@Results({
-		@Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "BANCOS_CODIGO", property = "codBanco", jdbcType = JdbcType.VARCHAR)
-	})
-	PagosjgItem datosGeneralesPagos(String idPago, String idInstitucion);
+	@Results({ @Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREFAC", property = "nombreFac", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "BANCOS_CODIGO", property = "codBanco", jdbcType = JdbcType.VARCHAR) })
+	List<PagosjgItem> datosGeneralesPagos(String idPago, String idInstitucion);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "historicoPagos")
+	@Results({ @Result(column = "IDESTADOPAGOSJG", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "desEstado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "USUARIO", property = "nombreUsuModificacion", jdbcType = JdbcType.VARCHAR) })
+	List<PagosjgItem> historicoPagos(String idPago, String lenguaje, Short idInstitucion);
 }

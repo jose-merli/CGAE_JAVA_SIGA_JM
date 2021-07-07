@@ -1,0 +1,9 @@
+application:
+  permisos:
+     # Permisos para el módulo de FacturacionSJCS
+    /facturacionsjcs/eliminarFacturacion: [600]
+    /facturacionsjcs/simularfacturacion: [601, 602, 603]
+    /facturacionsjcs/ejecutarfacturacion: [601]
+    /facturacionsjcs/reabrirfacturacion: [601]
+    /facturacionsjcs/saveFacturacion: [601]
+    /facturacionsjcs/updateFacturacion: [601]
