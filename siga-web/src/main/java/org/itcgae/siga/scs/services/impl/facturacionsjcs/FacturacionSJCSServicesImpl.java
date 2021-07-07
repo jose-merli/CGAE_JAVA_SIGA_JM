@@ -2342,13 +2342,15 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 				if (null != usuarios && !usuarios.isEmpty()) {
 
+					String idLenguaje = usuarios.get(0).getIdlenguaje();
+
 					LOGGER.info(
 							"FacturacionSJCSServicesImpl.historicoPagos() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los historicos de estados del pago");
-//					List<PagosjgItem> listaEstados = fcsFacturacionJGExtendsMapper.historicoPagos(idFacturacion,
-//							idLenguaje, idInstitucion.toString());
+					List<PagosjgItem> listaEstados = fcsFacturacionJGExtendsMapper.historicoPagos(idPago, idLenguaje,
+							idInstitucion);
 					LOGGER.info(
 							"FacturacionSJCSServicesImpl.historicoPagos() -> Salida a fcsFacturacionJGExtendsMapper para obtener los historicos de estados del pago");
-//					pagosjgDTO.setPagosjgItem(listaEstados);
+					pagosjgDTO.setPagosjgItem(listaEstados);
 				}
 			}
 

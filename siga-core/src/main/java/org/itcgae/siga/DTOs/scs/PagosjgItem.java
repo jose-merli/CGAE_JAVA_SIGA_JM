@@ -32,6 +32,7 @@ public class PagosjgItem {
 	private Date fechaHasta;
 	private String cantidad;
 	private String codBanco;
+	private String nombreUsuModificacion;
 
 	@JsonProperty("idInstitucion")
 	public String getIdInstitucion() {
@@ -273,6 +274,14 @@ public class PagosjgItem {
 		this.codBanco = codBanco;
 	}
 
+	public String getNombreUsuModificacion() {
+		return nombreUsuModificacion;
+	}
+
+	public void setNombreUsuModificacion(String nombreUsuModificacion) {
+		this.nombreUsuModificacion = nombreUsuModificacion;
+	}
+
 	@Override
 	public String toString() {
 		return "PagosjgItem [idInstitucion=" + idInstitucion + ", idPagosjg=" + idPagosjg + ", idFacturacion="
@@ -283,7 +292,8 @@ public class PagosjgItem {
 				+ ", idHitoGeneral=" + idHitoGeneral + ", porcentaje=" + porcentaje + ", abreviatura=" + abreviatura
 				+ ", idEstado=" + idEstado + ", idPartidaPresupuestaria=" + idPartidaPresupuestaria + ", idConcepto="
 				+ idConcepto + ", idGrupo=" + idGrupo + ", descGrupo=" + descGrupo + ", fechaDesde=" + fechaDesde
-				+ ", fechaHasta=" + fechaHasta + ", cantidad=" + cantidad + ", codBanco=" + codBanco + "]";
+				+ ", fechaHasta=" + fechaHasta + ", cantidad=" + cantidad + ", codBanco=" + codBanco
+				+ ", nombreUsuModificacion=" + nombreUsuModificacion + "]";
 	}
 
 }

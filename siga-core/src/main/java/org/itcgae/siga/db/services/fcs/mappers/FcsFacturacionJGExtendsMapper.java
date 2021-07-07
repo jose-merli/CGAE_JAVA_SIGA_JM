@@ -253,4 +253,11 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 			@Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "BANCOS_CODIGO", property = "codBanco", jdbcType = JdbcType.VARCHAR) })
 	List<PagosjgItem> datosGeneralesPagos(String idPago, String idInstitucion);
+	
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "historicoPagos")
+	@Results({ @Result(column = "IDESTADOPAGOSJG", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "desEstado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "USUARIO", property = "nombreUsuModificacion", jdbcType = JdbcType.VARCHAR) })
+	List<PagosjgItem> historicoPagos(String idPago, String lenguaje, Short idInstitucion);
 }
