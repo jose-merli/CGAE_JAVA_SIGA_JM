@@ -4400,6 +4400,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
 
 		int response = 1;
 
@@ -4419,86 +4420,45 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para asociar un EJG a una designacion");
 				try {
 
-					DesignaItem designaItem = new DesignaItem();
-
-					designaItem.setAno(Integer.parseInt(datos.get(0)));
-					designaItem.setNumero(Integer.parseInt(datos.get(4)));
-					//Comprobamos si se ha enviado el nombre del turno desde 
-					//la busqueda de asuntos en lugar de el id desde la ficha de designacion.
-//					contains("[a-zA-Z]+")   .matches("[0-9]+")
-					if(datos.get(3).matches("[0-9]+") && datos.get(3).length() >2) {
-						designaItem.setIdTurno(Integer.parseInt(datos.get(3)));
-					}
-					else {
-						TurnosItem turnosItem = new TurnosItem();
-						turnosItem.setNombre(datos.get(3));
-						List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
-						designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
-					}
 					
-
-					EjgItem ejg = new EjgItem();
-					ejg.setAnnio(datos.get(1));
-					ejg.setTipoEJG(datos.get(2));
-					ejg.setNumero(datos.get(5));
-
 					ScsEjgdesigna record = new ScsEjgdesigna();
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuarios.get(0).getIdusuario());
-					record.setIdinstitucion(idInstitucion);
-					record.setAnioejg(Short.parseShort(ejg.getAnnio()));
-					record.setIdtipoejg(Short.parseShort(ejg.getTipoEJG()));
-					record.setNumeroejg(Long.parseLong(ejg.getNumero()));
-					record.setIdturno(designaItem.getIdTurno());
-					record.setAniodesigna((short) designaItem.getAno());
-
-					Integer longitudDesigna;
-					String codigoDesigna = Integer.toString(designaItem.getNumero());
-
-					StringDTO parametros = genParametrosExtendsMapper
-							.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", idInstitucion.toString());
-					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
-					// la institucion 0
-					if (parametros != null && parametros.getValor() != null) {
-						longitudDesigna = Integer.parseInt(parametros.getValor());
-					} else {
-						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
-								"0");
-						longitudDesigna = Integer.parseInt(parametros.getValor());
-					}
-
-					// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
-					while (codigoDesigna.length() < longitudDesigna) {
-						codigoDesigna = "0" + codigoDesigna;
-					}
-
-					ScsDesignaExample designaExample = new ScsDesignaExample();
-
-					designaExample.createCriteria().andAnioEqualTo((short) designaItem.getAno())
-							.andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(designaItem.getIdTurno())
-							.andCodigoEqualTo(codigoDesigna);
-
-					List<ScsDesigna> designasCodigo = scsDesignaMapper.selectByExample(designaExample);
-
-					record.setNumerodesigna((long) designasCodigo.get(0).getNumero());
-
-					response = scsEjgdesignaMapper.insert(record);
+					record.setIdinstitucion(Short.parseShort(datos.get(0)));
 					
-					if (response == 0) {
+					record.setAniodesigna(Short.parseShort(datos.get(1)));
+					record.setNumerodesigna(Long.parseLong(datos.get(2)));
+					
+					record.setAnioejg(Short.parseShort(datos.get(5)));
+					record.setIdtipoejg(Short.parseShort(datos.get(4)));
+					record.setNumeroejg(Long.parseLong(datos.get(6)));
+					
+					TurnosItem turnosItem = new TurnosItem();
+					String turnoDesc = datos.get(7).substring(0, datos.get(7).length() -1);
+					turnosItem.setAbreviatura(turnoDesc);
+					List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
+					record.setIdturno(Integer.parseInt(turnos.get(0).getIdturno()));
+
+					response = scsEjgdesignaMapper.insertSelective(record);
+					
+
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							e);
+					response = 0;
+				} finally {
+					// respuesta si se actualiza correctamente
+						if (response != 1) {
 						
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
 								"GestionEJGServiceImpl.asociarDesignacion() -> KO. No se ha asociado ningun elemento");
-						throw new Exception("ERROR: no se ha podido asociar el EJG con la designacion.");
+						
 						
 					} else {
 						updateResponseDTO.setStatus(SigaConstants.OK);
 					}
-
-				} catch (Exception e) {
-					LOGGER.debug(
-							"GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al asociar un EJG a una designacion.",
-							e);
 				}
 			}
 		}
@@ -4513,6 +4473,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
 
 		int response = 1;
 
@@ -4533,86 +4494,41 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 
-					AsuntosAsistenciaItem asistenciaItem = new AsuntosAsistenciaItem();
-
-					asistenciaItem.setAnio(datos.get(0));
-					asistenciaItem.setNumero(datos.get(4));
-					//Comprobamos si se ha enviado el nombre del turno desde 
-					//la busqueda de asuntos en lugar de el id desde la ficha de designacion.
-//					contains("[a-zA-Z]+")   .matches("[0-9]+")
-					if(datos.get(3).matches("[0-9]+") && datos.get(3).length() >2) {
-						asistenciaItem.setIdTurno(datos.get(3));
-					}
-					else {
-						TurnosItem turnosItem = new TurnosItem();
-						turnosItem.setNombre(datos.get(3));
-						List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
-						asistenciaItem.setIdTurno(turnos.get(0).getIdturno());
-					}
-					
-
-					EjgItem ejg = new EjgItem();
-					ejg.setAnnio(datos.get(1));
-					ejg.setTipoEJG(datos.get(2));
-					ejg.setNumero(datos.get(5));
+				
 
 					ScsAsistencia record = new ScsAsistencia();
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuarios.get(0).getIdusuario());
-					record.setIdinstitucion(idInstitucion);
-					record.setEjganio(Short.parseShort(ejg.getAnnio()));
-					record.setEjgidtipoejg(Short.parseShort(ejg.getTipoEJG()));
-					record.setEjgnumero(Long.parseLong(ejg.getNumero()));
-					record.setIdturno(Integer.parseInt(asistenciaItem.getIdTurno()));
-					record.setDesignaAnio(Short.parseShort(asistenciaItem.getAnio()));
-
-					Integer longitudAsistencia;
-					String codigoAsistencia = asistenciaItem.getNumero().toString();
-
-					StringDTO parametros = genParametrosExtendsMapper
-							.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", idInstitucion.toString());
-					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
-					// la institucion 0
-					if (parametros != null && parametros.getValor() != null) {
-						longitudAsistencia = Integer.parseInt(parametros.getValor());
-					} else {
-						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
-								"0");
-						longitudAsistencia = Integer.parseInt(parametros.getValor());
-					}
-
-					// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
-					while (codigoAsistencia.length() < longitudAsistencia) {
-						codigoAsistencia = "0" + codigoAsistencia;
-					}
-
-					ScsAsistenciaExample asistenciaExample = new ScsAsistenciaExample();
-
-					asistenciaExample.createCriteria().andAnioEqualTo(Short.parseShort(asistenciaItem.getAnio()))
-							.andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(Integer.parseInt(asistenciaItem.getIdTurno()))
-							.andCodigoEqualTo(codigoAsistencia);
-
-					List<ScsAsistencia> asistenciaCodigo = scsAsistenciaMapper.selectByExample(asistenciaExample);
-
-					record.setDesignaNumero((long) asistenciaCodigo.get(0).getNumero());
-
-					response = scsAsistenciaMapper.insertSelective(record);
 					
-					if (response == 0) {
+					record.setIdinstitucion(Short.parseShort(datos.get(0)));
+					record.setEjganio(Short.parseShort(datos.get(4)));
+					record.setEjgidtipoejg(Short.parseShort(datos.get(3)));
+					record.setEjgnumero(Long.parseLong(datos.get(5)));
+					
+					record.setNumero(Long.parseLong(datos.get(2)));
+					record.setAnio(Short.parseShort(datos.get(1)));
+
+
+					response = scsAsistenciaMapper.updateByPrimaryKeySelective(record);
+					
+
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							e);
+					response = 0;
+				} finally {
+					// respuesta si se actualiza correctamente
+						if (response != 1) {
 						
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
 								"GestionEJGServiceImpl.asociarDesignacion() -> KO. No se ha asociado ningun elemento");
-						throw new Exception("ERROR: no se ha podido asociar el EJG con la designacion.");
+						
 						
 					} else {
 						updateResponseDTO.setStatus(SigaConstants.OK);
 					}
-
-				} catch (Exception e) {
-					LOGGER.debug(
-							"GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al asociar un EJG a una designacion.",
-							e);
 				}
 
 			}
@@ -4628,6 +4544,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
 
 		int response = 1;
 
@@ -4644,86 +4561,41 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.debug("GestionEJGServiceImpl.asociarSOJ() -> Entrada para asociar un EJG a un SOJ");
 				try {
 
-					AsuntosSOJItem sojItem = new AsuntosSOJItem();
-
-					sojItem.setAnio(datos.get(0));
-					sojItem.setNumero(datos.get(4));
-					//Comprobamos si se ha enviado el nombre del turno desde 
-					//la busqueda de asuntos en lugar de el id desde la ficha de designacion.
-//					contains("[a-zA-Z]+")   .matches("[0-9]+")
-					if(datos.get(3).matches("[0-9]+") && datos.get(3).length() >2) {
-						sojItem.setTurnoGuardia(datos.get(3));
-					}
-					else {
-						TurnosItem turnosItem = new TurnosItem();
-						turnosItem.setNombre(datos.get(3));
-						List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
-						sojItem.setTurnoGuardia(turnos.get(0).getIdturno());
-					}
-					
-					EjgItem ejg = new EjgItem();
-					ejg.setAnnio(datos.get(1));
-					ejg.setTipoEJG(datos.get(2));
-					ejg.setNumero(datos.get(5));
 
 					ScsSoj record = new ScsSoj();
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuarios.get(0).getIdusuario());
-					record.setIdinstitucion(idInstitucion);
-					record.setEjganio(Short.parseShort(ejg.getAnnio()));
-					record.setEjgidtipoejg(Short.parseShort(ejg.getTipoEJG()));
-					record.setEjgnumero(Long.parseLong(ejg.getNumero()));
-					record.setIdturno(Integer.parseInt(sojItem.getTurnoGuardia()));
-					record.setAnio(Short.parseShort(sojItem.getAnio()));
+					record.setIdinstitucion(Short.parseShort(datos.get(0)));
+					record.setNumero(Long.parseLong(datos.get(2)));
+					record.setAnio(Short.parseShort(datos.get(1)));
+					record.setIdtiposoj(Short.parseShort(datos.get(3)));
 					
-					Integer longitudSoj;
-					String codigoSoj = sojItem.getNumero().toString();
-
-					StringDTO parametros = genParametrosExtendsMapper
-							.selectParametroPorInstitucion("LONGITUD_CODSOJ", idInstitucion.toString());
-					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
-					// la institucion 0
-					if (parametros != null && parametros.getValor() != null) {
-						longitudSoj = Integer.parseInt(parametros.getValor());
-					} else {
-						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODSOJ",
-								"0");
-						longitudSoj = Integer.parseInt(parametros.getValor());
-					}
-
-					// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
-					while (codigoSoj.length() < longitudSoj) {
-						codigoSoj = "0" + codigoSoj;
-					}
+					record.setEjganio(Short.parseShort(datos.get(5)));
+					record.setEjgidtipoejg(Short.parseShort(datos.get(4)));
+					record.setEjgnumero(Long.parseLong(datos.get(6)));
 					
-					ScsSojExample sojExample = new ScsSojExample();
 					
-					sojExample.createCriteria().andAnioEqualTo(Short.parseShort(sojItem.getAnio())).andIdinstitucionEqualTo(idInstitucion)
-					.andIdturnoEqualTo(Integer.parseInt(sojItem.getTurnoGuardia())).andNumsojEqualTo(codigoSoj);		
+					response = scsSojMapper.updateByPrimaryKeySelective(record);
 					
-					List<ScsSoj> sojCodigo = scsSojMapper.selectByExample(sojExample);				
-					
-					record.setNumsoj( sojCodigo.get(0).getNumero().toString());
 					
 
-					
-					response = scsSojMapper.insertSelective(record);
-					
-					if (response == 0) {
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							e);
+					response = 0;
+				} finally {
+					// respuesta si se actualiza correctamente
+						if (response != 1) {
 						
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
 								"GestionEJGServiceImpl.asociarDesignacion() -> KO. No se ha asociado ningun elemento");
-						throw new Exception("ERROR: no se ha podido asociar el EJG con la designacion.");
+						
 						
 					} else {
 						updateResponseDTO.setStatus(SigaConstants.OK);
 					}
-
-				} catch (Exception e) {
-					LOGGER.debug(
-							"GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al asociar un EJG a una designacion.",
-							e);
 				}
 			}
 		}

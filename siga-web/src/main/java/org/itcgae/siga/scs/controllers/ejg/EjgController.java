@@ -720,33 +720,33 @@ public class EjgController {
 	}
 
 	// Asociar designacion
-	@PostMapping(value = "/gestion-ejg/asociarDesignacion", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/gestion-ejg/asociarDesignacion", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> asociarDesignacion(@RequestBody List<String> datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.asociarDesignacion(datos, request);
 
-		if (response.getError().getCode() == 200)
+		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	// Asociar Asistencia
-	@PostMapping(value = "/gestion-ejg/asociarAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/gestion-ejg/asociarAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> asociarAsistencia(@RequestBody List<String> datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.asociarAsistencia(datos, request);
 
-		if (response.getError().getCode() == 200)
+		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	// Asociar SOJ
-	@PostMapping(value = "/gestion-ejg/asociarSOJ", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/gestion-ejg/asociarSOJ", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> asociarSOJ(@RequestBody List<String> datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.asociarSOJ(datos, request);
 
-		if (response.getError().getCode() == 200)
+		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
