@@ -719,7 +719,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	public UnidadFamiliarEJGDTO unidadFamiliarEJG(EjgItem ejgItem, HttpServletRequest request) {
-		LOGGER.info("unidadFamiliarEJG() -> Entrada al servicio para obtener unidad Familiar");
+		LOGGER.info("unidadFamiliarEJG() -> Entrada al servicio para obtener la tarjeta unidad familiar de un EJG");
 		UnidadFamiliarEJGDTO unidadFamiliarEJGDTO = new UnidadFamiliarEJGDTO();
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
@@ -776,7 +776,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			LOGGER.warn("unidadFamiliarEJG() -> idInstitucion del token nula");
 		}
 
-		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
+		LOGGER.info("unidadFamiliarEJG() -> Salida del servicio para obtener la tarjeta unidad familiar de un EJG");
 		return unidadFamiliarEJGDTO;
 	}
 

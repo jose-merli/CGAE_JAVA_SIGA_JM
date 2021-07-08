@@ -47,6 +47,9 @@ public class UnidadFamiliarEJGItem {
     
     private String observaciones;
     
+    private String representante;
+    private String direccionRepresentante;
+    private String nifRepresentante;
     
 	/**
 	 **/
@@ -534,6 +537,30 @@ public class UnidadFamiliarEJGItem {
 				+ pjg_ape2 + ", pjg_direccion=" + pjg_direccion + ", uf_idinstitucion=" + uf_idInstitucion
 				+ ", pd_descripcion=" + pd_descripcion + ", estado=" + estado + ", fechaSolicitud=" + fechaSolicitud
 				+ ", fechaBaja=" + fechaBaja + "]";
+	}
+
+	public String getRepresentante() {
+		return representante;
+	}
+
+	public void setRepresentante(String representante) {
+		this.representante = representante;
+	}
+
+	public String getDireccionRepresentante() {
+		return direccionRepresentante;
+	}
+
+	public void setDireccionRepresentante(String direccionRepresentante) {
+		this.direccionRepresentante = direccionRepresentante;
+	}
+
+	public String getNifRepresentante() {
+		return nifRepresentante;
+	}
+
+	public void setNifRepresentante(String nifRepresentante) {
+		this.nifRepresentante = nifRepresentante;
 	}
 
 	
