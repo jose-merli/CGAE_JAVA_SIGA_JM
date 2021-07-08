@@ -56,6 +56,7 @@ import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
+import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -92,6 +93,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	
 	@Autowired
 	ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
+	
+	@Autowired
+	ScsPersonajgMapper scsPersonajgMapper;
 
 	@Autowired
 	private ScsMinusvaliaExtendsMapper scsMinusvaliaExtendsMapper;
@@ -922,10 +926,13 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 						}
 					}
-					if (validacionCodigoPostal || validacionDireccion || validacionEstadoCivil
+					if (
+							validacionCodigoPostal || validacionDireccion || validacionEstadoCivil
 							|| validacionFechaNacimiento || validacionPais || validacionParentesco
 							|| validacionPoblacion || validacionProvincia || validacionRegimenConyugal || validacionSexo
-							|| validacionTipoVia) {
+							|| validacionTipoVia
+//							false
+							) {
 						error.setCode(600);
 
 						String camposErroneos = "";
@@ -964,25 +971,39 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						return updateResponseDTO;
 
 					} else {
-						ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
-						scsPersonajgExample.createCriteria()
-								.andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()))
-								.andIdinstitucionEqualTo(idInstitucion);
-
+//						ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
+//						scsPersonajgExample.createCriteria()
+//								.andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()))
+//								.andIdinstitucionEqualTo(idInstitucion);
+//
+//						LOGGER.info(
+//								"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para buscar al justiciable a editar");
+//
+//						List<ScsPersonajg> personaList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
+//
+//						LOGGER.info(
+//								"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para buscar al justiciable a editar");
+//
+//						ScsPersonajg scsPersonajg = personaList.get(0);
+						
+						ScsPersonajgKey personajgKey = new ScsPersonajgKey();
+						
+						personajgKey.setIdinstitucion(idInstitucion);
+						personajgKey.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
+						
 						LOGGER.info(
-								"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para buscar al justiciable a editar");
+						"updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Entrada a scsPersonajgMapper para buscar al justiciable a editar");
 
-						List<ScsPersonajg> personaList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
-
+						ScsPersonajg scsPersonajg = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
+						
 						LOGGER.info(
-								"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para buscar al justiciable a editar");
-
-						ScsPersonajg scsPersonajg = personaList.get(0);
+						"updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Salida de scsPersonajgMapper para buscar al justiciable a editar");
 
 						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, datosGenerales,
 								idInstitucion, justiciableItem);
 
 						justiciable.setUsumodificacion(usuario.getIdusuario());
+						justiciable.setFechamodificacion(new Date());
 
 						LOGGER.info(
 								"updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para modificar al justiciable");
