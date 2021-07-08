@@ -77,6 +77,9 @@ import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsContrariosejgKey;
 import org.itcgae.siga.db.entities.ScsDelitosejg;
 import org.itcgae.siga.db.entities.ScsDelitosejgExample;
+import org.itcgae.siga.db.entities.ScsDictamenejg;
+import org.itcgae.siga.db.entities.ScsDictamenejgExample;
+import org.itcgae.siga.db.entities.ScsDictamenejgKey;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDocumentacionejg;
@@ -106,6 +109,7 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosejgMapper;
+import org.itcgae.siga.db.mappers.ScsDictamenejgMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionejgMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentoejgMapper;
@@ -215,6 +219,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	@Autowired
 	private ScsOrigencajgExtendsMapper scsOrigencajgExtendsMapper;
 
+	@Autowired
+	private ScsDictamenejgMapper scsDictamenejgMapper;
+	
 	@Autowired
 	private ScsActacomisionExtendsMapper scsActacomisionExtendsMapper;
 
@@ -1971,10 +1978,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					}
 					LOGGER.debug(
-							"GestionEJGServiceImpl.borrarFamiliar() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+							"GestionEJGServiceImpl.borrarFamiliar() -> Salida del servicio para borrar familiares del ejg");
 				} catch (Exception e) {
 					LOGGER.debug(
-							"GestionEJGServiceImpl.borrarFamiliar() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							"GestionEJGServiceImpl.borrarFamiliar() -> Se ha producido un error al borrar familiares del ejg",
 							e);
 					response = 0;
 				} finally {
@@ -1982,11 +1989,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					if (response >= 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
-								"GestionEJGServiceImpl.borrarFamiliar() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+								"GestionEJGServiceImpl.borrarFamiliar() -> OK.");
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"GestionEJGServiceImpl.borrarFamiliar() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+								"GestionEJGServiceImpl.borrarFamiliar() -> KO.");
 					}
 				}
 			}
@@ -2286,108 +2293,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		}
 
 		LOGGER.info("GestionEJGServiceImpl.guardarResolucion() -> Salida del servicio.");
-
-		return responsedto;
-	}
-
-	@Override
-	@Transactional
-	public UpdateResponseDTO guardarInformeCalificacion(EjgItem datos, HttpServletRequest request) {
-		UpdateResponseDTO responsedto = new UpdateResponseDTO();
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
-
-		if (idInstitucion != null) {
-			LOGGER.debug(
-					"GestionEJGServiceImpl.guardarInformeCalificacion() -> Entrada para obtener información del usuario logeado");
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.debug(
-					"GestionEJGServiceImpl.guardarInformeCalificacion() -> Salida de obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.guardarInformeCalificacion() -> Entrada para cambiar los datos generales del ejg");
-
-				try {
-
-				} catch (Exception e) {
-
-				} finally {
-					// respuesta si se actualiza correctamente
-					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug(
-								"GestionEJGServiceImpl.guardarInformeCalificacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
-					} else {
-						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.guardarInformeCalificacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
-					}
-				}
-			}
-		}
-
-		LOGGER.info("GestionEJGServiceImpl.guardarInformeCalificacion() -> Salida del servicio.");
-
-		return responsedto;
-	}
-
-	@Override
-	@Transactional
-	public UpdateResponseDTO borrarInformeCalificacion(EjgItem datos, HttpServletRequest request) {
-		UpdateResponseDTO responsedto = new UpdateResponseDTO();
-		int response = 0;
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		ScsEjgWithBLOBs record = new ScsEjgWithBLOBs();
-
-		if (idInstitucion != null) {
-			LOGGER.debug(
-					"GestionEJGServiceImpl.borrarInformeCalificacion() -> Entrada para obtener información del usuario logeado");
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.debug(
-					"GestionEJGServiceImpl.borrarInformeCalificacion() -> Salida de obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.borrarInformeCalificacion() -> Entrada para cambiar los datos generales del ejg");
-
-				try {
-
-				} catch (Exception e) {
-
-				} finally {
-					// respuesta si se actualiza correctamente
-					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug(
-								"GestionEJGServiceImpl.borrarInformeCalificacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
-					} else {
-						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.borrarInformeCalificacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
-					}
-				}
-			}
-		}
-
-		LOGGER.info("GestionEJGServiceImpl.borrarInformeCalificacion() -> Salida del servicio.");
 
 		return responsedto;
 	}
@@ -3349,7 +3254,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					estado.setAnio(Short.parseShort(item.getAnnio()));
 					estado.setNumero(Long.parseLong(item.getNumero()));
 
-					estado.setIdestadoejg((short) 19);
+					//Estado "Designado Procurador"
+					estado.setIdestadoejg((short) 12);
 					estado.setFechainicio(new Date());
 					if (item.getNombreApProcurador() != null)
 						estado.setObservaciones(item.getNombreApProcurador());
@@ -4602,5 +4508,203 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return updateResponseDTO;
 	}
+	
+	@Override
+	public UpdateResponseDTO actualizarInformeCalificacionEjg(EjgItem ejgItem, HttpServletRequest request) {
 
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 1;
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"GestionEJGServiceImpl.actualizarInformeCalificacionEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"GestionEJGServiceImpl.actualizarInformeCalificacionEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				//1. Actualizar informacion del EJG asociado
+				ScsEjgKey ejgKey = new ScsEjgKey();
+
+				//Introducimos la clave primaria y seleccionamos el ejg correspondiente
+				
+				ejgKey.setAnio(Short.valueOf(ejgItem.getAnnio()));
+				ejgKey.setIdinstitucion(idInstitucion);
+				ejgKey.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
+				ejgKey.setNumero(Long.valueOf(ejgItem.getNumero()));
+				
+				ScsEjgWithBLOBs newEjg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+				
+				//Modificamos la informacion vinculada a la tarjeta de dictamen de la ficha EJG, 
+				//excepto la fecha de dictamen que se actualiza más adelante
+				
+				
+				newEjg.setIdtipodictamenejg(ejgItem.getIdTipoDictamen());
+				newEjg.setIdfundamentocalif(ejgItem.getFundamentoCalif());
+				newEjg.setDictamen(ejgItem.getDictamen());
+				
+				newEjg.setFechamodificacion(new Date());
+				newEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+				
+				//2. Estado asociado
+				
+				//Se crea un nuevo estado unicamente cuando se introduce una nueva fecha
+				if(ejgItem.getFechaDictamen() != null && !ejgItem.getFechaDictamen().equals(newEjg.getFechadictamen())) {
+					ScsEstadoejg estado = new ScsEstadoejg();
+	
+					// creamos el objeto para el insert
+					estado.setIdinstitucion(idInstitucion);
+					estado.setAnio(Short.parseShort(ejgItem.getAnnio()));
+					estado.setNumero(Long.parseLong(ejgItem.getNumero()));
+	
+					//Estado "Dictaminado"
+					estado.setIdestadoejg((short) 6);
+					estado.setFechainicio(new Date());
+	//				estado.setObservaciones("Ninguno");
+					estado.setAutomatico("0");
+	
+					estado.setIdtipoejg(Short.parseShort(ejgItem.getTipoEJG()));
+	
+					estado.setFechamodificacion(new Date());
+					estado.setUsumodificacion(usuarios.get(0).getIdusuario());
+	
+					// obtenemos el maximo de idestadoporejg
+					ScsEstadoejgExample example = new ScsEstadoejgExample();
+					example.setOrderByClause("IDESTADOPOREJG DESC");
+					example.createCriteria().andAnioEqualTo(Short.parseShort(ejgItem.getAnnio()))
+					.andIdinstitucionEqualTo(idInstitucion)
+					.andIdtipoejgEqualTo(Short.parseShort(ejgItem.getTipoEJG()))
+					.andNumeroEqualTo(Long.parseLong(ejgItem.getNumero()));
+	
+					List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
+	
+					// damos el varlo al idestadoporejg + 1
+					if (listEjg.size() > 0) {
+						estado.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
+					} else {
+						estado.setIdestadoporejg(Long.parseLong("0"));
+					}
+	
+					response = scsEstadoejgMapper.insert(estado);
+					if(response == 0) throw(new Exception("Error al insertar el nuevo estado asociado"));
+				}
+				
+				//Ahora se actualiza la fecha de dictamen
+				newEjg.setFechadictamen(ejgItem.getFechaDictamen());
+				
+				//3. Objeto Dictamen asociado al EJG
+				
+				//si todos los campos son nulos, se elimina el dictamen asociado
+				if(ejgItem.getFechaDictamen() == null && ejgItem.getFechaDictamen() == null && ejgItem.getFechaDictamen() == null 
+						&& ejgItem.getFechaDictamen() == null && ejgItem.getFechaDictamen() == null && ejgItem.getIddictamen() != null) {
+					
+					//Actualizamos el EJG asociado para poder eliminar el dictamen.
+					newEjg.setIddictamen(null);
+					response = scsEjgMapper.updateByPrimaryKeyWithBLOBs(newEjg);
+					if(response==0)throw(new Exception("Error al actualizar el EJG"));
+					
+					ScsDictamenejgKey dictamenDelete = new ScsDictamenejgKey();
+					
+					dictamenDelete.setIddictamen(ejgItem.getIddictamen());
+					dictamenDelete.setIdinstitucion(idInstitucion);
+					
+					response = scsDictamenejgMapper.deleteByPrimaryKey(dictamenDelete);	
+					if(response==0) throw(new Exception("Error al eliminar el dictamen asociado al EJG"));
+				}
+				else{
+					//Creamos un nuevo dictamen con la informacion introducida
+					ScsDictamenejg dictamenEjg = new ScsDictamenejg();
+					
+					dictamenEjg.setDescripcion(ejgItem.getDictamen());
+					dictamenEjg.setIdtipodictamen(ejgItem.getIdTipoDictamen());
+					dictamenEjg.setIdfundamento(ejgItem.getFundamentoCalif());
+					dictamenEjg.setIdinstitucion(idInstitucion);
+					
+					dictamenEjg.setFechamodificacion(new Date());
+					dictamenEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
+					
+					//En el caso que se inserte un dictamen nuevo
+					if(ejgItem.getIddictamen() == null) {
+						ScsDictamenejgExample dictamenExample = new ScsDictamenejgExample();
+						dictamenExample.setOrderByClause("IDDICTAMEN DESC");
+						dictamenExample.createCriteria()
+								.andIdinstitucionEqualTo(idInstitucion);
+						
+						List<ScsDictamenejg> listDictCola = scsDictamenejgMapper.selectByExample(dictamenExample);
+		
+						//Buscamos el iddictamen qu corresponde para asignarlo al nuevo dictamen y al ejg.
+						short idDictCola;
+						if (!listDictCola.isEmpty()) {
+							idDictCola =  (short) (listDictCola.get(0).getIddictamen() + (short) 1);
+						} else {
+							idDictCola = 0;
+						}
+						dictamenEjg.setIddictamen(idDictCola);
+						
+						response = scsDictamenejgMapper.insertSelective(dictamenEjg);
+						if(response==0)throw(new Exception("Error al insertar el nuevo dictamen asociado al EJG"));
+						
+						//Actualizamos el EJG asociado 
+						newEjg.setIddictamen(idDictCola);
+						response = scsEjgMapper.updateByPrimaryKeyWithBLOBs(newEjg);
+						if(response==0)throw(new Exception("Error al actualizar el EJG"));
+					}
+					//Actualizamos dictamen ya existente
+					else {
+						
+						dictamenEjg.setIddictamen(ejgItem.getIddictamen());
+						response = scsDictamenejgMapper.updateByPrimaryKeySelective(dictamenEjg);
+						if(response==0)throw(new Exception("Error al actualizar el dictamen asociado al EJG"));
+						
+						//Actualizamos el EJG asociado
+						newEjg.setIddictamen(ejgItem.getIddictamen());
+						response = scsEjgMapper.updateByPrimaryKeyWithBLOBs(newEjg);
+						if(response==0)throw(new Exception("Error al actualizar el EJG"));
+					}
+					
+				}
+				
+				
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"GestionEJGServiceImpl.actualizarInformeCalificacionEjg() -> Se ha producido un error al actualizar el dictamen del ejg",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			updateResponseDTO.setError(error);
+			response = 0;
+		}
+
+		if (response == 1) {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+			error.setCode(200);
+			//error.setDescription("general.mensaje.error.bbdd");
+			updateResponseDTO.setError(error);
+		}
+
+		if (response == 0) {
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.error(
+					"GestionEJGServiceImpl.actualizarInformeCalificacionEjg() -> Se ha producido un error al actualizar el dictamen del ejg");
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			updateResponseDTO.setError(error);
+		}
+
+		return updateResponseDTO;
+	}
+	
 }

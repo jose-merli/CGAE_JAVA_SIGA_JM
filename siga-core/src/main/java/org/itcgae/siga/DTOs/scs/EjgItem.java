@@ -30,11 +30,9 @@ public class EjgItem {
 	private String numeroexpInsos;
 	private String idTipoExpInsos;
 
-	private String[] dictamen;
+	
 	private String dictamenSing;
-	private String fundamentoCalif;
 	private Date fechaDictamenDesd;
-	private Date fechaDictamen;
 	private Date fechaDictamenHast;
 	private String resolucion;
 	private String fundamentoJuridico;
@@ -44,6 +42,7 @@ public class EjgItem {
 	private String fundamentoImpuganacion;
 	private Date fechaImpugnacionDesd;
 	private Date fechaImpugnacionHast;
+	private String fundamentoCalifDes;
 
 	//Defensa juridica
 	private String juzgado;
@@ -59,7 +58,7 @@ public class EjgItem {
 	private Long comisaria;
 	private String delitos;
 	private Short idPretension;
-	private String observaciones;
+	
 
 	private String annioCAJG;
 	private String numCAJG;
@@ -96,8 +95,7 @@ public class EjgItem {
 	private Date fechalimitepresentacion;
 	private boolean historico;
 	private String observacionesDictamen;
-	private String fundamentoCalifDes;
-	private String iddictamen;
+	private String observaciones;
 
 	private String[] prestacion;
 	private String[] prestacionesRechazadas;
@@ -122,6 +120,13 @@ public class EjgItem {
 	private Short idInstitucionProc;
 	private String numerodesignaproc;
 	private String nombreApProcurador;
+	
+	//Tarjeta Dictamen
+	private Short iddictamen;
+	private Date fechaDictamen;
+	private Short idTipoDictamen;
+	private Short fundamentoCalif;
+	private String dictamen;
 	
 
 	/**
@@ -382,33 +387,33 @@ public class EjgItem {
 
 	/**
 	 **/
-	public EjgItem dictamen(String[] dictamen) {
+	public EjgItem dictamen(String dictamen) {
 		this.dictamen = dictamen;
 		return this;
 	}
 
 	@JsonProperty("dictamen")
-	public String[] getDictamen() {
+	public String getDictamen() {
 		return dictamen;
 	}
 
-	public void setDictamen(String[] dictamen) {
+	public void setDictamen(String dictamen) {
 		this.dictamen = dictamen;
 	}
 
 	/**
 	 **/
-	public EjgItem fundamentoCalif(String fundamentoCalif) {
+	public EjgItem fundamentoCalif(Short fundamentoCalif) {
 		this.fundamentoCalif = fundamentoCalif;
 		return this;
 	}
 
 	@JsonProperty("fundamentoCalif")
-	public String getFundamentoCalif() {
+	public Short getFundamentoCalif() {
 		return fundamentoCalif;
 	}
 
-	public void setFundamentoCalif(String fundamentoCalif) {
+	public void setFundamentoCalif(Short fundamentoCalif) {
 		this.fundamentoCalif = fundamentoCalif;
 	}
 
@@ -1230,17 +1235,17 @@ public class EjgItem {
 
 	/**
 	 **/
-	public EjgItem iddictamen(String iddictamen) {
+	public EjgItem iddictamen(Short iddictamen) {
 		this.iddictamen = iddictamen;
 		return this;
 	}
 
 	@JsonProperty("iddictamen")
-	public String getIddictamen() {
+	public Short getIddictamen() {
 		return iddictamen;
 	}
 
-	public void setIddictamen(String iddictamen) {
+	public void setIddictamen(Short iddictamen) {
 		this.iddictamen = iddictamen;
 	}
 
@@ -1572,5 +1577,13 @@ public class EjgItem {
 
 	public void setNombreApProcurador(String nombreApProcurador) {
 		this.nombreApProcurador = nombreApProcurador;
+	}
+
+	public Short getIdTipoDictamen() {
+		return idTipoDictamen;
+	}
+
+	public void setIdTipoDictamen(Short idTipoDictamen) {
+		this.idTipoDictamen = idTipoDictamen;
 	}
 }

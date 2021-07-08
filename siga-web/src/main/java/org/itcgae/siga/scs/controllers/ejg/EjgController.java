@@ -437,30 +437,6 @@ public class EjgController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
-	// guardarInformeCalificacion
-	@RequestMapping(value = "/gestion-ejg/guardarInformeCalificacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarInformeCalificacion(@RequestBody EjgItem datos,
-			HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.guardarInformeCalificacion(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-	}
-
-	// borrarInformeCalificacion
-	@RequestMapping(value = "/gestion-ejg/borrarInformeCalificacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> borrarInformeCalificacion(@RequestBody EjgItem datos,
-			HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.borrarInformeCalificacion(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-	}
-
-	// descargarInformeCalificacion
-	@RequestMapping(value = "/gestion-ejg/descargarInformeCalificacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> descargarInformeCalificacion(@RequestBody EjgItem datos,
-			HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.descargarInformeCalificacion(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-	}
-
 	// borrarRelacion
 	@RequestMapping(value = "/gestion-ejg/borrarRelacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> borrarRelacion(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
@@ -630,16 +606,7 @@ public class EjgController {
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-
-//	@RequestMapping(value = "/gestion-ejg/getDelitosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<ComboDTO> getDelitosEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
-//		ComboDTO response = gestionEJG.getDelitosEJG(ejgItem, request);
-//		if (response.getError() == null)
-//			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-//		else
-//			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//	}
-
+	
 	@RequestMapping(value = "/gestion-ejg/getDelitosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DelitosEjgDTO> getDelitosEjg(@RequestBody EjgItem item, HttpServletRequest request) {
 		DelitosEjgDTO response = gestionEJG.getDelitosEjg(item, request);
@@ -718,7 +685,16 @@ public class EjgController {
 				request);
 		return response;
 	}
-
+	
+	@RequestMapping(value = "/gestion-ejg/actualizarInformeCalificacionEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> actualizarInformeCalificacion(@RequestBody EjgItem item, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionEJG.actualizarInformeCalificacionEjg(item, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	// Asociar designacion
 	@RequestMapping(value = "/gestion-ejg/asociarDesignacion", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> asociarDesignacion(@RequestBody List<String> datos, HttpServletRequest request) {
@@ -729,6 +705,15 @@ public class EjgController {
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	// descargarInformeCalificacion
+		@RequestMapping(value = "/gestion-ejg/descargarInformeCalificacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> descargarInformeCalificacion(@RequestBody EjgItem datos,
+				HttpServletRequest request) {
+			UpdateResponseDTO response = gestionEJG.descargarInformeCalificacion(datos, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}
+	
 
 	// Asociar Asistencia
 	@RequestMapping(value = "/gestion-ejg/asociarAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
