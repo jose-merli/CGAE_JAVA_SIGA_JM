@@ -7,15 +7,16 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class ListaProductosItem {
 	private int idproducto;
 	private int idtipoproducto;
+	private int idproductoinstitucion; 
 	private String idcontador;
 	private String descripcion;
-	private int valor;
+	private String valor;
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechabaja;
 	private String tipo;
 	private String categoria;
-	private int iva;
-	private int precioiva;
+	private String iva;
+	private String precioiva;
 	private String formapago;
 	
 	public int getIdproducto() {
@@ -30,6 +31,12 @@ public class ListaProductosItem {
 	public void setIdtipoproducto(int idtipoproducto) {
 		this.idtipoproducto = idtipoproducto;
 	}
+	public int getIdproductoinstitucion() {
+		return idproductoinstitucion;
+	}
+	public void setIdproductoinstitucion(int idproductoinstitucion) {
+		this.idproductoinstitucion = idproductoinstitucion;
+	}
 	public String getIdcontador() {
 		return idcontador;
 	}
@@ -42,10 +49,10 @@ public class ListaProductosItem {
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
-	public int getValor() {
+	public String getValor() {
 		return valor;
 	}
-	public void setValor(int valor) {
+	public void setValor(String valor) {
 		this.valor = valor;
 	}
 	public Date getFechabaja() {
@@ -66,16 +73,16 @@ public class ListaProductosItem {
 	public void setCategoria(String categoria) {
 		this.categoria = categoria;
 	}
-	public int getIva() {
+	public String getIva() {
 		return iva;
 	}
-	public void setIva(int iva) {
+	public void setIva(String iva) {
 		this.iva = iva;
 	}
-	public int getPrecioiva() {
+	public String getPrecioiva() {
 		return precioiva;
 	}
-	public void setPrecioiva(int precioiva) {
+	public void setPrecioiva(String precioiva) {
 		this.precioiva = precioiva;
 	}
 	public String getFormapago() {
@@ -95,11 +102,12 @@ public class ListaProductosItem {
 		result = prime * result + ((formapago == null) ? 0 : formapago.hashCode());
 		result = prime * result + ((idcontador == null) ? 0 : idcontador.hashCode());
 		result = prime * result + idproducto;
+		result = prime * result + idproductoinstitucion;
 		result = prime * result + idtipoproducto;
-		result = prime * result + iva;
-		result = prime * result + precioiva;
+		result = prime * result + ((iva == null) ? 0 : iva.hashCode());
+		result = prime * result + ((precioiva == null) ? 0 : precioiva.hashCode());
 		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
-		result = prime * result + valor;
+		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
 		return result;
 	}
 	
@@ -139,28 +147,39 @@ public class ListaProductosItem {
 			return false;
 		if (idproducto != other.idproducto)
 			return false;
+		if (idproductoinstitucion != other.idproductoinstitucion)
+			return false;
 		if (idtipoproducto != other.idtipoproducto)
 			return false;
-		if (iva != other.iva)
+		if (iva == null) {
+			if (other.iva != null)
+				return false;
+		} else if (!iva.equals(other.iva))
 			return false;
-		if (precioiva != other.precioiva)
+		if (precioiva == null) {
+			if (other.precioiva != null)
+				return false;
+		} else if (!precioiva.equals(other.precioiva))
 			return false;
 		if (tipo == null) {
 			if (other.tipo != null)
 				return false;
 		} else if (!tipo.equals(other.tipo))
 			return false;
-		if (valor != other.valor)
+		if (valor == null) {
+			if (other.valor != null)
+				return false;
+		} else if (!valor.equals(other.valor))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "ListaProductosItem [idproducto=" + idproducto + ", idtipoproducto=" + idtipoproducto + ", idcontador="
-				+ idcontador + ", descripcion=" + descripcion + ", valor=" + valor + ", fechabaja=" + fechabaja
-				+ ", tipo=" + tipo + ", categoria=" + categoria + ", iva=" + iva + ", precioiva=" + precioiva
-				+ ", formapago=" + formapago + "]";
+		return "ListaProductosItem [idproducto=" + idproducto + ", idtipoproducto=" + idtipoproducto
+				+ ", idproductoinstitucion=" + idproductoinstitucion + ", idcontador=" + idcontador + ", descripcion="
+				+ descripcion + ", valor=" + valor + ", fechabaja=" + fechabaja + ", tipo=" + tipo + ", categoria="
+				+ categoria + ", iva=" + iva + ", precioiva=" + precioiva + ", formapago=" + formapago + "]";
 	}
 	
 }

@@ -1,20 +1,25 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
+import org.itcgae.siga.DTO.fac.IdPeticionDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
 import org.itcgae.siga.DTO.fac.TiposProductosItem;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.PysProductos;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoFormaPagoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
@@ -210,5 +215,82 @@ public class ProductosServiceImpl implements IProductosService{
 		LOGGER.info("searchListadoProductos() -> Salida del servicio para obtener el listado de productos segun la busqueda");
 
 		return listaProductosDTO;
+	}
+
+	@Override
+	public DeleteResponseDTO ReactivarBorradoFisicoLogicoProductos(ListaProductosDTO listadoProductos, HttpServletRequest request) {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		int status = 0;
+		int statusBorradoIdentificador = 0;
+		IdPeticionDTO idPeticionDTO = new IdPeticionDTO();
+		
+
+		LOGGER.info("ReactivarBorradoFisicoLogicoProductos() -> Entrada al servicio para borrar fisicamente o logicamente/reactivar un producto");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"ReactivarBorradoFisicoLogicoProductos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"ReactivarBorradoFisicoLogicoProductos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"ReactivarBorradoFisicoLogicoProductos() / pysTiposProductosExtendsMapper.ReactivarBorradoFisicoLogicoProductos() -> Entrada a pysTiposProductosExtendsMapper para borrar fisicamente o logicamente/reactivar un producto");
+					
+					for (ListaProductosItem producto : listadoProductos.getListaProductosItems()) {
+						
+						if(producto.getFechabaja() != null && pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion) != null)
+							idPeticionDTO = pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion);
+						
+						//Borrado logico --> Actualizamos la fechabaja del producto a la actual (sysdate)
+						//Borrado fisico --> Eliminamos el registro del producto y posteriormente el identificador
+						if(idPeticionDTO.getIdpeticion() != 0 || producto.getFechabaja() != null) { //Borrado logico ya que comprobarUsoProducto devolvio resultado por lo que el producto tiene alguna compra o solicitud de compra
+							status = pysTiposProductosExtendsMapper.borradoLogicoProductos(usuarios.get(0), producto, idInstitucion);
+						}else{ //Borrado fisico al no tener ninguna compra o solicitud de compra ya que el idpetidcion es 0, es decir comprobarUsoProducto no devolvio nada.
+							//Borramos el registro
+							status = pysTiposProductosExtendsMapper.borradoFisicoProductosRegistro(producto, idInstitucion);
+							//Borramos el identificador
+							statusBorradoIdentificador = pysTiposProductosExtendsMapper.borradoFisicoProductosIdentificador(producto, idInstitucion);
+						}
+					}
+					
+					if(status == 0 || statusBorradoIdentificador == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+					}else if(status == 1 || statusBorradoIdentificador == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+					
+					LOGGER.info(
+							"ReactivarBorradoFisicoLogicoProductos() / pysTiposProductosExtendsMapper.ReactivarBorradoFisicoLogicoProductos() -> Salida de pysTiposProductosExtendsMapper para borrar fisicamente o logicamente/reactivar un producto");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ProductosServiceImpl.ReactivarBorradoFisicoLogicoProductos() -> Se ha producido un error al borrar fisicamente o logicamente/reactivar un producto",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		
+		deleteResponseDTO.setError(error);
+
+		LOGGER.info("ReactivarBorradoFisicoLogicoProductos() -> Salida del servicio para borrar fisicamente o logicamente/reactivar un producto");
+
+		return deleteResponseDTO;
 	}
 }

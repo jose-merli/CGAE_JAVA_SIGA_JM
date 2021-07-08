@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
+import org.itcgae.siga.DTO.fac.IdPeticionDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -52,11 +53,26 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
 		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CATEGORIA", property = "categoria", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IVA", property = "iva", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "PRECIO_IVA", property = "precioiva", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IVA", property = "iva", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PRECIO_IVA", property = "precioiva", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FORMA_PAGO", property = "formapago", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ListaProductosItem> searchListadoProductosBuscador(String idioma, Short idInstitucion, FiltroProductoItem filtroProductoItem);
+	
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "comprobarUsoProducto")
+	@Results({ 
+		@Result(column = "IDPETICION", property = "idpeticion", jdbcType = JdbcType.NUMERIC)
+		}) 
+	IdPeticionDTO comprobarUsoProducto(ListaProductosItem producto, Short idInstitucion);
+	
+	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "borradoLogicoProductos")
+	int borradoLogicoProductos(AdmUsuarios usuario, ListaProductosItem producto, Short idInstitucion);
+	
+	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "borradoFisicoProductosRegistro")
+	int borradoFisicoProductosRegistro(ListaProductosItem producto, Short idInstitucion);
+	
+	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "borradoFisicoProductosIdentificador")
+	int borradoFisicoProductosIdentificador(ListaProductosItem producto, Short idInstitucion);
 	
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "getIndiceMaxProducto")
 	@Results({ 

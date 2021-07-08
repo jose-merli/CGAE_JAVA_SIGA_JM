@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.fac.services.IProductosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,11 @@ public class ProductosController {
 		return new ResponseEntity<ListaProductosDTO>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value="/pys/ReactivarBorradoFisicoLogicoProductos")
+	ResponseEntity<DeleteResponseDTO> ReactivarBorradoFisicoLogicoProductos(@RequestBody ListaProductosDTO listadoProductos, HttpServletRequest request){
+		DeleteResponseDTO response = productosService.ReactivarBorradoFisicoLogicoProductos(listadoProductos, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
 	
 	@GetMapping(value = "/combo/tipoIva")
 	ResponseEntity<ComboDTO> comboTiposIva(HttpServletRequest request) { 
