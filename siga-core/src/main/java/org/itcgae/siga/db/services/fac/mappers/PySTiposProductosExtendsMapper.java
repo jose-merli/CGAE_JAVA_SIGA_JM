@@ -48,6 +48,7 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 	@Results({
 		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDPRODUCTOINSTITUCION", property = "idproductoinstitucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),

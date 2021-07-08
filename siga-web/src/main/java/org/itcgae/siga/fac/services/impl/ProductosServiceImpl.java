@@ -257,7 +257,7 @@ public class ProductosServiceImpl implements IProductosService{
 						
 						//Borrado logico --> Actualizamos la fechabaja del producto a la actual (sysdate)
 						//Borrado fisico --> Eliminamos el registro del producto y posteriormente el identificador
-						if(idPeticionDTO.getIdpeticion() != 0 || producto.getFechabaja() != null) { //Borrado logico ya que comprobarUsoProducto devolvio resultado por lo que el producto tiene alguna compra o solicitud de compra
+						if(idPeticionDTO.getIdpeticion() != 0) { //Borrado logico ya que comprobarUsoProducto devolvio resultado por lo que el producto tiene alguna compra o solicitud de compra
 							status = pysTiposProductosExtendsMapper.borradoLogicoProductos(usuarios.get(0), producto, idInstitucion);
 						}else{ //Borrado fisico al no tener ninguna compra o solicitud de compra ya que el idpetidcion es 0, es decir comprobarUsoProducto no devolvio nada.
 							//Borramos el registro
