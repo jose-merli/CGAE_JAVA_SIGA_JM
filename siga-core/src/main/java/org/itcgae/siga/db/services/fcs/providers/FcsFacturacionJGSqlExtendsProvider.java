@@ -962,7 +962,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT(
 				"TO_CHAR(FAC.FECHADESDE, 'DD/MM/YYYY') || '-' || TO_CHAR(FAC.FECHAHASTA, 'DD/MM/YYYY') || ' - ' || FAC.NOMBRE AS NOMBREFAC");
 		sql.SELECT("PAG.IDPAGOSJG");
-		sql.SELECT("PAG.BANCOS_CODIGO");
+		sql.SELECT("PAG.ABREVIATURA");
 		sql.FROM("FCS_PAGOSJG PAG");
 		sql.JOIN(
 				"FCS_FACTURACIONJG FAC ON FAC.IDINSTITUCION = PAG.IDINSTITUCION AND FAC.IDFACTURACION = PAG.IDFACTURACION");
@@ -992,6 +992,17 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.WHERE("EST.IDPAGOSJG = '" + idPago + "'");
 		sql.WHERE("REC.IDLENGUAJE = '" + lenguaje + "'");
 		sql.ORDER_BY("FECHAESTADO DESC");
+
+		return sql.toString();
+	}
+
+	public String getNewIdPago(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("(NVL(MAX(IDPAGOSJG), 0) + 1) AS IDPAGOSJG");
+		sql.FROM("FCS_PAGOSJG");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 
 		return sql.toString();
 	}

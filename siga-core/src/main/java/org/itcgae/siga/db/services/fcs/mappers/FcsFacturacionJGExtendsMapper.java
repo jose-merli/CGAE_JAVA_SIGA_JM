@@ -251,7 +251,7 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBREFAC", property = "nombreFac", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "BANCOS_CODIGO", property = "codBanco", jdbcType = JdbcType.VARCHAR) })
+			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR) })
 	List<PagosjgItem> datosGeneralesPagos(String idPago, String idInstitucion);
 	
 	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "historicoPagos")
@@ -260,4 +260,10 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
 			@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.TIMESTAMP),
 			@Result(column = "USUARIO", property = "nombreUsuModificacion", jdbcType = JdbcType.VARCHAR) })
 	List<PagosjgItem> historicoPagos(String idPago, String lenguaje, Short idInstitucion);
+
+	@SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getNewIdPago")
+	@Results({ @Result(column = "IDPAGOSJG", property = "newId", jdbcType = JdbcType.VARCHAR)
+	})
+	NewIdDTO getNewIdPago(Short idInstitucion);
+
 }

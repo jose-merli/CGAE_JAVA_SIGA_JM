@@ -34,46 +34,7 @@ import org.itcgae.siga.DTOs.scs.PagosjgDTO;
 import org.itcgae.siga.DTOs.scs.PagosjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
-import org.itcgae.siga.db.entities.AdmConfig;
-import org.itcgae.siga.db.entities.AdmConfigExample;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenInstitucion;
-import org.itcgae.siga.db.entities.CenInstitucionExample;
-import org.itcgae.siga.db.entities.FcsFactActuaciondesignaExample;
-import org.itcgae.siga.db.entities.FcsFactApunteExample;
-import org.itcgae.siga.db.entities.FcsFactEjgExample;
-import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
-import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionExample;
-import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionKey;
-import org.itcgae.siga.db.entities.FcsFactGrupofactHito;
-import org.itcgae.siga.db.entities.FcsFactGrupofactHitoExample;
-import org.itcgae.siga.db.entities.FcsFactGuardiascolegiadoExample;
-import org.itcgae.siga.db.entities.FcsFactSojExample;
-import org.itcgae.siga.db.entities.FcsFacturacionEstadoEnvioExample;
-import org.itcgae.siga.db.entities.FcsFacturacionjg;
-import org.itcgae.siga.db.entities.FcsFacturacionjgExample;
-import org.itcgae.siga.db.entities.FcsHistoAcreditacionprocExample;
-import org.itcgae.siga.db.entities.FcsHistoTipoactcostefijoExample;
-import org.itcgae.siga.db.entities.FcsHistoricoAcreditacionExample;
-import org.itcgae.siga.db.entities.FcsHistoricoHitofactExample;
-import org.itcgae.siga.db.entities.FcsHistoricoProcedimientosExample;
-import org.itcgae.siga.db.entities.FcsHistoricoTipoactuacionExample;
-import org.itcgae.siga.db.entities.FcsHistoricoTipoasistcolegioExample;
-import org.itcgae.siga.db.entities.FcsMovimientosvarios;
-import org.itcgae.siga.db.entities.FcsMovimientosvariosExample;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.ScsActuacionasistencia;
-import org.itcgae.siga.db.entities.ScsActuacionasistenciaExample;
-import org.itcgae.siga.db.entities.ScsAsistencia;
-import org.itcgae.siga.db.entities.ScsAsistenciaExample;
-import org.itcgae.siga.db.entities.ScsEjg;
-import org.itcgae.siga.db.entities.ScsEjgExample;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample;
-import org.itcgae.siga.db.entities.ScsSoj;
-import org.itcgae.siga.db.entities.ScsSojExample;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.FcsFactActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.FcsFactApunteMapper;
@@ -92,6 +53,7 @@ import org.itcgae.siga.db.mappers.FcsHistoricoProcedimientosMapper;
 import org.itcgae.siga.db.mappers.FcsHistoricoTipoactuacionMapper;
 import org.itcgae.siga.db.mappers.FcsHistoricoTipoasistcolegioMapper;
 import org.itcgae.siga.db.mappers.FcsMovimientosvariosMapper;
+import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
 import org.itcgae.siga.db.mappers.FcsPagosjgMapper;
 import org.itcgae.siga.db.mappers.ScsActuacionasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
@@ -187,6 +149,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	
 	@Autowired
 	FcsPagosjgMapper fcsPagosjgMapper;
+	
+	@Autowired
+	private FcsPagosEstadospagosMapper fcsPagosEstadospagosMapper;
 	
 	@Autowired
 	FcsFacturacionjgMapper fcsFacturacionjgMapper;
@@ -1769,11 +1734,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	
 	/**
 	 * Funcion que devuelve el nombre de los ficheros de exportacion
-	 * @param idInstitucion
-	 * @param idFacturacion
 	 * @param usuario
 	 * @return
-	 * @throws SIGAException
 	 */
 	@SuppressWarnings("rawtypes")
 	public Hashtable getNombreFicherosFacturacion (FcsFacturacionjg itemFact, Integer usuario) throws Exception {
@@ -1782,13 +1744,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 	/**
 	 * Funcion que devuelve el nombre de los ficheros de exportacion
-	 * @param idInstitucion
-	 * @param idFacturacion
 	 * @param idPago
 	 * @param idPersona
 	 * @param usuario
 	 * @return
-	 * @throws SIGAException
 	 */
 	@SuppressWarnings("rawtypes")
 	public Hashtable getNombreFicherosPago (FcsFacturacionjg itemFact, Integer idPago, Long idPersona, Integer usuario) throws Exception {
@@ -1799,13 +1758,10 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	
 	/**
  	 * Funcion que devuelve el nombre de los ficheros de exportacion
-	 * @param idInstitucion
-	 * @param idFacturacion
 	 * @param idPago
 	 * @param idPersona
 	 * @param usuario
 	 * @return
-	 * @throws SIGAException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static private Hashtable getNombreFicherosFac (FcsFacturacionjg itemFact, Integer idPago, Long idPersona, Integer usuario) throws Exception  
@@ -2256,7 +2212,6 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	 * @throws NamingException
 	 * @throws IOException
 	 * @throws SQLException
-	 * @throws ClsExceptions
 	 *             type Exception
 	 */
 	private String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters)
@@ -2370,5 +2325,176 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 		return pagosjgDTO;
 	}
-	
+
+	@Override
+	public InsertResponseDTO savePago(PagosjgItem pagosjgItem, HttpServletRequest request) {
+
+		LOGGER.info("FacturacionSJCSServicesImpl.savePago() -> Entrada al servicio para la creación de un pago");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		try {
+
+			if (null != idInstitucion) {
+
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.savePago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.savePago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && !usuarios.isEmpty()) {
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.getNewIdPago() -> Entrada al método para obtener un nuevo identificador de pago");
+					NewIdDTO newId = fcsFacturacionJGExtendsMapper.getNewIdPago(idInstitucion);
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.getNewIdPago() -> Salida del método para obtener un nuevo identificador de pago: "
+									+ newId.getNewId());
+
+					FcsPagosjg record = new FcsPagosjg();
+					record.setIdinstitucion(idInstitucion);
+					record.setIdpagosjg(Integer.valueOf(newId.getNewId()));
+					record.setIdfacturacion(Integer.valueOf(pagosjgItem.getIdFacturacion()));
+					record.setNombre(pagosjgItem.getNombre());
+					record.setAbreviatura(pagosjgItem.getAbreviatura());
+					record.setFechadesde(pagosjgItem.getFechaDesde());
+					record.setFechahasta(pagosjgItem.getFechaHasta());
+					record.setCriteriopagoturno("F");
+					record.setImporterepartir(BigDecimal.ZERO);
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
+					record.setFechamodificacion(new Date());
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.insertSelective() -> Entrada al método para insertar el nuevo pago: "
+									+ newId.getNewId());
+					response = fcsPagosjgMapper.insertSelective(record);
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.insertSelective() -> Salida del método para insertar el nuevo pago: "
+									+ newId.getNewId());
+
+					FcsPagosEstadospagos record2 = new FcsPagosEstadospagos();
+					record2.setIdinstitucion(idInstitucion);
+					record2.setIdpagosjg(Integer.valueOf(newId.getNewId()));
+					record2.setIdestadopagosjg(Short.valueOf("10"));
+					record2.setFechaestado(new Date());
+					record2.setFechamodificacion(new Date());
+					record2.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosEstadospagosMapper.insertSelective() -> Entrada al método para insertar el nuevo estado al pago: "
+									+ newId.getNewId());
+					fcsPagosEstadospagosMapper.insertSelective(record2);
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosEstadospagosMapper.insertSelective() -> Salida del método para insertar el nuevo estado al pago: "
+									+ newId.getNewId());
+
+					if (response == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("general.message.error.realiza.accion");
+					} else {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+						insertResponseDTO.setId(newId.getNewId());
+					}
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("FacturacionSJCSServicesImpl.savePago() -> Se ha producido un error en la creación del pago",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("FacturacionSJCSServicesImpl.savePago() -> Salida del servicio para la creación de un pago");
+
+		return insertResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO updatePago(PagosjgItem pagosjgItem, HttpServletRequest request) {
+
+		LOGGER.info("FacturacionSJCSServicesImpl.updatePago() -> Entrada al servicio para la actualización de un pago");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		try {
+
+			if (null != idInstitucion) {
+
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.updatePago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"FacturacionSJCSServicesImpl.updatePago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && !usuarios.isEmpty()) {
+
+					FcsPagosjg record = new FcsPagosjg();
+					record.setIdinstitucion(idInstitucion);
+					record.setIdpagosjg(Integer.valueOf(pagosjgItem.getIdPagosjg()));
+					record.setIdfacturacion(Integer.valueOf(pagosjgItem.getIdFacturacion()));
+					record.setNombre(pagosjgItem.getNombre());
+					record.setAbreviatura(pagosjgItem.getAbreviatura());
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
+					record.setFechamodificacion(new Date());
+
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.updatePago() -> fcsPagosjgMapper.updateByPrimaryKeySelective() -> Entrada al método para actualizar el pago: "
+									+ pagosjgItem.getIdPagosjg());
+					response = fcsPagosjgMapper.updateByPrimaryKeySelective(record);
+					LOGGER.info(
+							"FacturacionSJCSServicesImpl.updatePago() -> fcsPagosjgMapper.updateByPrimaryKeySelective() -> Salida del método para actualizar el pago: "
+									+ pagosjgItem.getIdPagosjg());
+
+					if (response == 0) {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("general.message.error.realiza.accion");
+					} else {
+						updateResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionSJCSServicesImpl.updatePago() -> Se ha producido un error en la actualización del pago",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("FacturacionSJCSServicesImpl.updatePago() -> Salida del servicio para la actualización de un pago");
+
+		return updateResponseDTO;
+	}
+
 }
