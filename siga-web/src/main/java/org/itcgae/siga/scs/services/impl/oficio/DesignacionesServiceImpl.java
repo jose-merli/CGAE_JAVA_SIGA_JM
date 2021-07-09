@@ -6334,7 +6334,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 					else {
 						TurnosItem turnosItem = new TurnosItem();
-						turnosItem.setNombre(item.get(3));
+						turnosItem.setAbreviatura(item.get(3));
 						List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
 						designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
 					}
@@ -6415,6 +6415,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		} else {
 			error.setCode(200);
 			error.setDescription("general.message.registro.insertado");
+			responseDTO.setStatus(SigaConstants.OK);
 		}
 
 		responseDTO.setError(error);
