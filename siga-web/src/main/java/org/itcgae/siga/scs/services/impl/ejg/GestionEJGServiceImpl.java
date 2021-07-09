@@ -2195,6 +2195,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					scsEjgKey.setNumero(Long.valueOf(datos.getNumero()));
 
 					ScsEjgWithBLOBs scsEjgWithBLOBs = scsEjgMapper.selectByPrimaryKey(scsEjgKey);
+					
+					
 					if (scsEjgWithBLOBs != null) {
 						scsEjgWithBLOBs.setFechaauto(datos.getFechaAuto());
 						if (datos.getAutoResolutorio() != null) {
@@ -2210,12 +2212,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						if (datos.getBis()) {
 							scsEjgWithBLOBs.setBisresolucion("1");
 						}
+						else scsEjgWithBLOBs.setBisresolucion("0");
 						if (datos.isRequiereTurn()) {
 							scsEjgWithBLOBs.setTurnadoratificacion("1");
 						}
+						else scsEjgWithBLOBs.setTurnadoratificacion("0");
 					}
 
-					response = scsEjgMapper.updateByPrimaryKeySelective(scsEjgWithBLOBs);
+					response = scsEjgMapper.updateByPrimaryKeyWithBLOBs(scsEjgWithBLOBs);
 
 				} catch (Exception e) {
 
@@ -2226,19 +2230,23 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					error.setCode(500);
 					error.setDescription("general.mensaje.error.bbdd");
 					error.setMessage(e.getMessage());
-					responsedto.setError(error);
-
-				} finally {
-					// respuesta si se actualiza correctamente
-					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug("GestionEJGServiceImpl.guardarImpugnacion() -> OK.  Impugnacion");
-					} else {
-						responsedto.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"GestionEJGServiceImpl.guardarImpugnacion() -> KO. Se ha producido un error al actualizar la Impugnacion");
-					}
+					responsedto.setStatus(SigaConstants.OK);
+					} 
+				// respuesta si se actualiza correctamente
+				if (response == 1) {
+					responsedto.setStatus(SigaConstants.OK);
+					error.setCode(200);
+					LOGGER.debug("GestionEJGServiceImpl.guardarImpugnacion() -> OK.  Impugnacion");
+				} else {
+					responsedto.setStatus(SigaConstants.KO);
+					error.setCode(500);
+					error.setDescription("general.mensaje.error.bbdd");
+					LOGGER.error(
+							"GestionEJGServiceImpl.guardarImpugnacion() -> KO. Se ha producido un error al actualizar la Impugnacion");
 				}
+
+				responsedto.setError(error);
+
 			}
 		}
 		LOGGER.info("GestionEJGServiceImpl.guardarImpugnacion() -> Salida del servicio.");
