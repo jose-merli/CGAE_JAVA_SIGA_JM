@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
+import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -61,6 +63,12 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
+import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoExample;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.EcomCola;
 import org.itcgae.siga.db.entities.EcomColaExample;
 import org.itcgae.siga.db.entities.EcomColaParametros;
@@ -146,6 +154,7 @@ import org.itcgae.siga.scs.services.ejg.IEEJGServices;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.itcgae.siga.services.impl.DocushareHelper;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -240,6 +249,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	@Autowired
 	private ScsDelitosejgMapper scsDelitosejgMapper;
 
+	@Autowired
+	private DocushareHelper docushareHelper;
+	
 	@Autowired
 	private ScsEejgPeticionesExtendsMapper scsEejgPeticionesExtendsMapper;
 
@@ -4714,5 +4726,154 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		return updateResponseDTO;
 	}
+	
+	@Override
+	public DocushareDTO searchListDocEjg(EjgItem ejgItem, HttpServletRequest request)
+			throws Exception {
+		
+		DocushareDTO docushareDTO = new DocushareDTO();
+		String identificadorDS = null;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String valorNoColegiadoDocu = null;
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ScsEjgKey key = new ScsEjgKey();
+		
+		key.setIdinstitucion(idInstitucion);
+		key.setAnio(Short.valueOf(ejgItem.getAnnio()));
+		key.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
+		key.setNumero(Long.valueOf(ejgItem.getNumero()));
+		
+		ScsEjg config = scsEjgMapper.selectByPrimaryKey(key);
+		
+//		if (config.getIdentificadords() == null) {
+//			
+//			// longitud maxima para numero en esa institucion
+//			GenParametrosExample genParametrosExample = new GenParametrosExample();
+//			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
+//					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+//
+//			List<GenParametros> listParam = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+//
+//			String longitudEJG = listParam.get(0).getValor();
+//
+//			// Alteramos el numero para que todos los numeros de las carpetas de una institucion tengan
+//			// la misma longitud.
+//			
+//			String numero = ejgItem.getNumero();
+//
+//			int numCeros = Integer.parseInt(longitudEJG) - ejgItem.getNumero().length();
+//
+//			String ceros = "";
+//			for (int i = 0; i < numCeros; i++) {
+//				ceros += "0";
+//			}
+//
+//			ceros += numero;
+//			
+//			//Año EJG/Num EJG
+//			String carpeta = ejgItem.getAnnio()+"/"+ceros;
+//			
+//			identificadorDS = docushareHelper.buscaCollectionEjg(carpeta, idInstitucion);
+//		} else {
+		identificadorDS = config.getIdentificadords();
+//		}
+		List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, "");
+		docushareDTO.setDocuShareObjectVO(docus);
+
+		return docushareDTO;
+	}
+	
+	@Override
+	public String insertCollectionEjg(EjgItem ejgItem, HttpServletRequest request) throws Exception {
+
+		LOGGER.info("insertCollectionEjg() -> Entrada al servicio para la insertar una nueva colección");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String idDS = null;
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"insertCollectionEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"insertCollectionEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+						
+				// longitud maxima para num ejg
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
+				.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+				List<GenParametros> listParam = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+				String longitudEJG = listParam.get(0).getValor();
+
+				// Alteramos el numero para que todos los numeros de las carpetas de una institucion tengan
+				// la misma longitud.
+
+				String numero = ejgItem.getNumero();
+
+				int numCeros = Integer.parseInt(longitudEJG) - ejgItem.getNumero().length();
+
+				String ceros = "";
+				for (int i = 0; i < numCeros; i++) {
+					ceros += "0";
+				}
+
+				ceros += numero;
+
+				//Año EJG/Num EJG
+				String carpeta = ejgItem.getAnnio()+"/"+ceros;
+				//String carpeta = ejgItem.getAnnio().concat("/").concat(ceros);
+
+				idDS = docushareHelper.createCollectionCenso(idInstitucion, carpeta, "");
+
+				ScsEjgKey key = new ScsEjgKey();
+
+				key.setIdinstitucion(idInstitucion);
+				key.setAnio(Short.valueOf(ejgItem.getAnnio()));
+				key.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
+				key.setNumero(Long.valueOf(ejgItem.getNumero()));
+
+				ScsEjgWithBLOBs ejg = scsEjgMapper.selectByPrimaryKey(key);
+
+				ejg.setIdentificadords(idDS);
+				ejg.setFechamodificacion(new Date());
+				ejg.setUsumodificacion(usuario.getIdusuario());
+
+				LOGGER.info(
+						"insertCollectionEjg() / scsEjgMapper.updateByPrimaryKeySelective() -> Entrada a scsEjgMapper para modificar el identificador del EJG");
+
+				int response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
+
+				LOGGER.info(
+						"insertCollectionEjg() / scsEjgMapper.updateByPrimaryKeySelective() -> Salida de scsEjgMapper para modificar el identificador del EJG");
+
+				if (response == 0) {
+					LOGGER.warn(
+							"insertCollectionEjg() / scsEjgMapper.updateByPrimaryKeySelective() -> Error al modificar en el EJG el identificadords");
+				}
+			} 
+		}
+		
+		LOGGER.info("insertCollectionEjg() -> Salida al servicio para la insertar una nueva colección");
+
+		return idDS;
+
+	}
+	
 	
 }

@@ -60,9 +60,12 @@ public class DocushareHelper {
 
 	private static String PATH_DOCUSHARE_CENSO = "PATH_DOCUSHARE_CENSO";
 	private static String PATH_DOCUSHARE_NOCOLEGIADO = "PATH_DOCUSHARE_NOCOLEGIADO";
+	private static String PATH_DOCUSHARE_EJG = "PATH_DOCUSHARE_EJG";
 
 	private static String ID_DOCUSHARE_CENSO = "ID_DOCUSHARE_CENSO";
 	private static String ID_DOCUSHARE_NOCOLEGIADO = "ID_DOCUSHARE_NOCOLEGIADO";
+	private static String ID_DOCUSHARE_EJG = "ID_DOCUSHARE_EJG";
+	
 	private static String PATH_DOCUSHARE_DEBUG = "/ds";
 	
 	private DSServer server;
@@ -183,7 +186,7 @@ public class DocushareHelper {
 			// BusinessManager.getInstance()
 			// .getService(GenParametrosService.class);
 			
-			log.debug("Entramos a buscar la colección de Censo");
+			log.debug("Entramos a buscar la colección de DocuShare");//de Censo
 			List<String> listaParametros = new ArrayList<>();
 			listaParametros.add(pathRecibido);
 			
@@ -240,6 +243,10 @@ public class DocushareHelper {
 
 	public String buscaCollectionNoColegiado(String title, short idinstitucion) throws Exception {
 		return buscaCollection(idinstitucion, PATH_DOCUSHARE_NOCOLEGIADO, title);
+	}
+	
+	public String buscaCollectionEjg(String title, short idinstitucion) throws Exception {
+		return buscaCollection(idinstitucion, PATH_DOCUSHARE_EJG, title);
 	}
 
 	private String buscaCollectionMODO_DEBUG_LOCAL(String parent, String title) {
@@ -545,6 +552,19 @@ public class DocushareHelper {
 	 */
 	public String createCollectionCenso(short idinstitucion, String collectionTitle, String collectionSummary) throws Exception {
 		return createCollection(idinstitucion, ID_DOCUSHARE_CENSO, collectionTitle, collectionSummary);
+	}
+	
+	/**
+	 * 
+	 * @param collectionTitle Nombre de la carpeta o collecion que se quiere crear
+	 * @param collectionSummary Descripcion de la carpeta o collecion que se quiere crear
+	 * @return
+	 * @throws SIGAServiceException 
+	 * @throws SIGAException
+	 * @throws ClsExceptions
+	 */
+	public String createCollectionEjg(short idinstitucion, String collectionTitle, String collectionSummary) throws Exception {
+		return createCollection(idinstitucion, ID_DOCUSHARE_EJG, collectionTitle, collectionSummary);
 	}
 	
 

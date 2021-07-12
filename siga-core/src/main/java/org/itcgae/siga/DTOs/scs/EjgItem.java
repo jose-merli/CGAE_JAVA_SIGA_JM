@@ -128,6 +128,9 @@ public class EjgItem {
 	private Short fundamentoCalif;
 	private String dictamen;
 	
+	//REGTEL
+	private String identificadords;
+	
 
 	/**
 	 **/
@@ -1585,5 +1588,13 @@ public class EjgItem {
 
 	public void setIdTipoDictamen(Short idTipoDictamen) {
 		this.idTipoDictamen = idTipoDictamen;
+	}
+
+	public String getIdentificadords() {
+		return identificadords;
+	}
+
+	public void setIdentificadords(String identificadords) {
+		this.identificadords = identificadords;
 	}
 }

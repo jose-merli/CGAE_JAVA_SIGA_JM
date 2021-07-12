@@ -498,6 +498,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("ejg.idTipoDictamenEJG");
 		sql.SELECT("ejg.IDFUNDAMENTOCALIF");
 		sql.SELECT("ejg.dictamen as observacionesDictamen");
+		// REGTEL
+		sql.SELECT("ejg.identificadords");
 		// from
 		sql.FROM("scs_ejg ejg");
 		// joins

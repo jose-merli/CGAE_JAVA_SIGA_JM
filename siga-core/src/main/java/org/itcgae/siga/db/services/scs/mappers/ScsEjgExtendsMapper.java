@@ -146,7 +146,8 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "fechaDictamen", property = "fechaDictamen", jdbcType = JdbcType.DATE),
 			@Result(column = "idTipoDictamenEJG", property = "idTipoDictamen", jdbcType = JdbcType.INTEGER),
 			@Result(column = "IDFUNDAMENTOCALIF", property = "fundamentoCalif", jdbcType = JdbcType.INTEGER),
-			@Result(column = "observacionesDictamen", property = "dictamen", jdbcType = JdbcType.CLOB)})
+			@Result(column = "observacionesDictamen", property = "dictamen", jdbcType = JdbcType.CLOB),
+			@Result(column = "identificadords", property = "identificadords", jdbcType = JdbcType.VARCHAR)})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getDictamen")
