@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -365,8 +366,8 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.VALUES("MOTIVO", "'" + saltoItem.getMotivo() + "'");
 		sql.VALUES("MOTIVOCUMPLIMIENTO", "NULL");
 		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
-		sql.VALUES("IDTURNO", "'" + saltoItem.getIdGuardia() + "'");
-		sql.VALUES("IDGUARDIA", "'" + saltoItem.getIdTurno() + "'");
+		sql.VALUES("IDTURNO", "'" + saltoItem.getIdTurno() + "'");
+		sql.VALUES("IDGUARDIA", "'" + saltoItem.getIdGuardia() + "'");
 		sql.VALUES("IDCALENDARIOGUARDIAS", "NULL");
 		sql.VALUES("IDINSTITUCION_CUMPLI", "NULL");
 		sql.VALUES("IDTURNO_CUMPLI", "NULL");
@@ -497,6 +498,15 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 
 		sql.WHERE("IDSALTOCOMPENSACIONGRUPO = '" + saltoItem.getIdSaltosTurno() + "'");
 
+		return sql.toString();
+	}
+	
+	public String isGrupo(BusquedaLetradosGuardiaDTO letrado) {
+		SQL sql = new SQL();
+		sql.SELECT("SCS_GUARDIASTURNO.PORGRUPOS");
+		sql.FROM("SCS_GUARDIASTURNO");
+		sql.WHERE("IDTURNO = '" + letrado.getIdTurno() + "'");
+		sql.WHERE("IDGUARDIA = '" + letrado.getIdGuardia() + "'");
 		return sql.toString();
 	}
 

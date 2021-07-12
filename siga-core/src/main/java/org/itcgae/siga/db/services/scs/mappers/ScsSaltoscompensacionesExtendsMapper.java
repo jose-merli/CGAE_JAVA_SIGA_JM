@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaLetradoGrupoDTO;
@@ -116,5 +117,8 @@ public interface ScsSaltoscompensacionesExtendsMapper extends ScsSaltoscompensac
 
 	@DeleteProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "borrarSaltosCompensacionesGrupo")
 	int borrarSaltosCompensacionesGrupo(SaltoCompGuardiaItem saltoItem);
+
+	@SelectProvider(type = ScsSaltoscompensacionesSqlExtendsProvider.class, method = "isGrupo")
+	String isGrupobyId(BusquedaLetradosGuardiaDTO idGuardia);
 
 }
