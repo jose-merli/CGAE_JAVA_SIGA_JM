@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosAsistenciaItem;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -738,6 +740,24 @@ public class EjgController {
 				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 			else
 				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		@RequestMapping(value = "/gestion-ejg/searchListDocEjg", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<DocushareDTO> searchListEjg(HttpServletRequest request, String anio, String numero, String idTipoEJG, String identificadords) throws Exception {
+			EjgItem ejgItem = new EjgItem();
+			
+			ejgItem.setAnnio(anio);
+			ejgItem.setNumero(numero);
+			ejgItem.setTipoEJG(idTipoEJG);
+			
+			DocushareDTO response = gestionEJG.searchListDocEjg(ejgItem, request);
+			return new ResponseEntity<DocushareDTO>(response, HttpStatus.OK);
+		}
+		
+		@RequestMapping(value = "/gestion-ejg/insertCollectionEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<String> insertCollectionEjg(@RequestBody EjgItem ejgItem, HttpServletRequest request) throws Exception { 
+			String response = gestionEJG.insertCollectionEjg(ejgItem, request);
+			return new ResponseEntity<String>(response, HttpStatus.OK);
 		}
 
 }

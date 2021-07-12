@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosAsistenciaItem;
@@ -160,4 +161,8 @@ public interface IGestionEJG {
 	UpdateResponseDTO asociarAsistencia(List<String> datos, HttpServletRequest request);
 
 	UpdateResponseDTO asociarSOJ(List<String> datos, HttpServletRequest request);
+
+	String insertCollectionEjg(EjgItem ejgItem, HttpServletRequest request) throws Exception;
+
+	DocushareDTO searchListDocEjg(EjgItem ejgItem, HttpServletRequest request) throws Exception;
 }
