@@ -86,11 +86,11 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		if(filtroProductoItem.getIva() != null && filtroProductoItem.getIva() != "")
 			sql.WHERE(" PYS_TIPOIVA.IDTIPOIVA = '" + filtroProductoItem.getIva() + "'");
 		
-		if(filtroProductoItem.getPrecioDesde() != null && filtroProductoItem.getPrecioHasta() != "")
-			sql.WHERE(" ROUND((PYS_PRODUCTOSINSTITUCION.VALOR*PYS_TIPOIVA.VALOR/100)+PYS_PRODUCTOSINSTITUCION.VALOR, 2)  >= '" + filtroProductoItem.getPrecioDesde() + "'");
+		if(filtroProductoItem.getPrecioDesde() != null && filtroProductoItem.getPrecioDesde() != "")
+			sql.WHERE(" ROUND((PYS_PRODUCTOSINSTITUCION.VALOR*PYS_TIPOIVA.VALOR/100)+PYS_PRODUCTOSINSTITUCION.VALOR, 2)  >= " + Float.parseFloat(filtroProductoItem.getPrecioDesde()) + "");
 		
 		if(filtroProductoItem.getPrecioHasta() != null && filtroProductoItem.getPrecioHasta() != "")
-			sql.WHERE(" ROUND((PYS_PRODUCTOSINSTITUCION.VALOR*PYS_TIPOIVA.VALOR/100)+PYS_PRODUCTOSINSTITUCION.VALOR, 2)  <= '" + filtroProductoItem.getPrecioHasta() + "'");
+			sql.WHERE(" ROUND((PYS_PRODUCTOSINSTITUCION.VALOR*PYS_TIPOIVA.VALOR/100)+PYS_PRODUCTOSINSTITUCION.VALOR, 2)  <= " + Float.parseFloat(filtroProductoItem.getPrecioHasta()) + "");
 
 		sql.ORDER_BY(" PYS_PRODUCTOSINSTITUCION.DESCRIPCION");
 		
@@ -252,9 +252,6 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 
 		return sql.toString();
 	}
-	
-
-
 	
 	public String borradoFisicoProductosRegistro(ListaProductosItem producto, Short idInstitucion) {
 		SQL sql = new SQL();
