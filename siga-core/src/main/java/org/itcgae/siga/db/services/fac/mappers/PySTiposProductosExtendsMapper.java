@@ -61,10 +61,10 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 	List<ListaProductosItem> searchListadoProductosBuscador(String idioma, Short idInstitucion, FiltroProductoItem filtroProductoItem);
 	
 	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "comprobarUsoProducto")
-	@Results({ 
-		@Result(column = "IDPETICION", property = "idpeticion", jdbcType = JdbcType.NUMERIC)
-		}) 
-	IdPeticionDTO comprobarUsoProducto(ListaProductosItem producto, Short idInstitucion);
+	List<Integer> comprobarUsoProducto(ListaProductosItem producto, Short idInstitucion);
+	
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "comprobarSolicitudProducto")
+	List<Integer> comprobarSolicitudProducto(ListaProductosItem producto, Short idInstitucion);
 	
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "borradoLogicoProductos")
 	int borradoLogicoProductos(AdmUsuarios usuario, ListaProductosItem producto, Short idInstitucion);

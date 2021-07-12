@@ -252,12 +252,19 @@ public class ProductosServiceImpl implements IProductosService{
 					
 					for (ListaProductosItem producto : listadoProductos.getListaProductosItems()) {
 						
-						if(producto.getFechabaja() != null && pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion) != null)
-							idPeticionDTO = pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion);
+						//Comprueba que haya alguna compra realizada
+						if(pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion) != null)
+							idPeticionDTO.setIdpeticionUso(pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion)); 
+						
+						//Comprueba que haya solicitud de compra
+						if(pysTiposProductosExtendsMapper.comprobarSolicitudProducto(producto, idInstitucion) != null)
+							idPeticionDTO.setIdpeticionSolicitud(pysTiposProductosExtendsMapper.comprobarSolicitudProducto(producto, idInstitucion));
+							
+						
 						
 						//Borrado logico --> Actualizamos la fechabaja del producto a la actual (sysdate)
 						//Borrado fisico --> Eliminamos el registro del producto y posteriormente el identificador
-						if(idPeticionDTO.getIdpeticion() != 0) { //Borrado logico ya que comprobarUsoProducto devolvio resultado por lo que el producto tiene alguna compra o solicitud de compra
+						if(idPeticionDTO.getIdpeticionUso().size() > 0 || idPeticionDTO.getIdpeticionSolicitud().size() > 0 ) { //Borrado logico ya que comprobarUsoProducto devolvio resultado por lo que el producto tiene alguna compra o solicitud de compra
 							status = pysTiposProductosExtendsMapper.borradoLogicoProductos(usuarios.get(0), producto, idInstitucion);
 						}else{ //Borrado fisico al no tener ninguna compra o solicitud de compra ya que el idpetidcion es 0, es decir comprobarUsoProducto no devolvio nada.
 							//Borramos el registro

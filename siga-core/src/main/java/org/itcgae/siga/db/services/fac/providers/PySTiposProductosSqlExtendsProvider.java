@@ -196,9 +196,6 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		sql.JOIN(" PYS_PETICIONCOMPRASUSCRIPCION ON\r\n"
 				+ " PYS_COMPRA.IDPETICION = PYS_PETICIONCOMPRASUSCRIPCION.IDPETICION");
 		
-		sql.JOIN(" PYS_PETICIONCOMPRASUSCRIPCION ON\r\n"
-				+ "PYS_COMPRA.IDPETICION = PYS_PETICIONCOMPRASUSCRIPCION.IDPETICION");
-		
 		sql.JOIN(" PYS_PRODUCTOSINSTITUCION ON\r\n"
 				+ " PYS_PRODUCTOSINSTITUCION.IDTIPOPRODUCTO = PYS_PRODUCTOS.IDTIPOPRODUCTO\r\n"
 				+ " AND PYS_PRODUCTOSINSTITUCION.IDPRODUCTO = PYS_PRODUCTOS.IDPRODUCTO\r\n"
@@ -214,6 +211,21 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDPRODUCTOINSTITUCION = '" + producto.getIdproductoinstitucion() + "'");
 		
 		sql.WHERE(" PYS_PETICIONCOMPRASUSCRIPCION.IDINSTITUCION = '" + idInstitucion +"'");
+		
+		return sql.toString();
+	}
+	
+	public String comprobarSolicitudProducto(ListaProductosItem producto, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" PYS_PRODUCTOSSOLICITADOS.IDPETICION");
+
+		sql.FROM(" PYS_PRODUCTOSSOLICITADOS");
+		
+		sql.WHERE(" PYS_PRODUCTOSSOLICITADOS.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE(" PYS_PRODUCTOSSOLICITADOS.IDTIPOPRODUCTO = '" + producto.getIdtipoproducto() + "'");
+		sql.WHERE(" PYS_PRODUCTOSSOLICITADOS.IDPRODUCTO = '" + producto.getIdproducto() + "'");
+		sql.WHERE(" PYS_PRODUCTOSSOLICITADOS.IDPRODUCTOINSTITUCION = '" + producto.getIdproductoinstitucion() + "'");
 		
 		return sql.toString();
 	}
