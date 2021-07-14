@@ -4839,7 +4839,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				String carpeta = ejgItem.getAnnio()+"/"+ceros;
 				//String carpeta = ejgItem.getAnnio().concat("/").concat(ceros);
 
-				idDS = docushareHelper.createCollectionCenso(idInstitucion, carpeta, "");
+				idDS = docushareHelper.createCollectionEjg(idInstitucion, carpeta, "");
 
 				ScsEjgKey key = new ScsEjgKey();
 
