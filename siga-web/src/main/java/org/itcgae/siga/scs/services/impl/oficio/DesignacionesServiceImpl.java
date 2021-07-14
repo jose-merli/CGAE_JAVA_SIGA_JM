@@ -139,6 +139,8 @@ import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.entities.ScsTurnoKey;
+import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
+import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -158,9 +160,11 @@ import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
+import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
+import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
@@ -221,6 +225,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private ScsDefendidosdesignaMapper scsDefendidosdesignaMapper;
 
 	@Autowired
+	private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
+	
+	@Autowired
 	private ScsContrariosdesignaMapper scsContrariosdesignaMapper;
 
 	@Autowired
@@ -232,6 +239,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Autowired
 	private ScsPrisionExtendsMapper scsPrisionExtendsMapper;
 
+	@Autowired
+	private ScsPersonajgMapper scsPersonajgMapper;
+	
 	@Autowired
 	private ScsActuaciondesignaMapper scsActuaciondesignaMapper;
 
@@ -6928,10 +6938,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
-		int response11 = 1;
-		int response12 = 1;
-		int response2 = 1;
-		int response3 = 1;
+		int response = 0;
+//		int response11 = 1;
+//		int response12 = 1;
+//		int response2 = 1;
+//		int response3 = 1;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -7011,15 +7022,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if(!delitosEjg.isEmpty()){
 						for (ScsDelitosejg delitoEjg : delitosEjg) {
 							delitoDesigna.setIddelito(delitoEjg.getIddelito());
-							if(response11 == 1)response11 = scsDelitosdesignaMapper.insert(delitoDesigna);
+							response = scsDelitosdesignaMapper.insert(delitoDesigna);
+							if(response == 0) throw(new Exception("Error al introducir un delito en la designa proveniente del EJG"));
 						}
 					}
 					
 					designa.setUsumodificacion(usuarios.get(0).getIdusuario());
 					designa.setFechamodificacion(new Date());
 					
-					if(response11 == 1)response12 = scsDesignaMapper.updateByPrimaryKeySelective(designa);
-					
+					response = scsDesignaMapper.updateByPrimaryKeySelective(designa);
+					if(response == 0) throw(new Exception("Error al introducir los datos juridicos en la designa proveniente del EJG"));
+
 					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Saliendo de la actualizacion de algunos datos juridicos de designa");
 					
 					//2. Se debe insertar los contrarios seleccionados en EJG.
@@ -7079,8 +7092,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						
 						//Hacemos esto junto a la iniciacion response2 = 1 para evitar que si un contrario se introduce erroneamente,
 						//pase desapercibido al insertar bien el siguiente.
-						if(response2==1) response2 = scsContrariosdesignaMapper.insert(contrariosDesigna);
-						else {}
+						response = scsContrariosdesignaMapper.insert(contrariosDesigna);
+						if(response == 0) throw(new Exception("Error al introducir contrarios en la designa provenientes del EJG"));
+
 						
 					}
 					
@@ -7118,9 +7132,52 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					procDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
 					procDesigna.setFechamodificacion(new Date());						
 					
-					response3 = scsDesignaProcuradorMapper.insert(procDesigna);
+					response = scsDesignaProcuradorMapper.insert(procDesigna);
+					if(response == 0) throw(new Exception("Error al introducir un procurador en la designa proveniente del EJG"));
+
 					
-					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Iniciando los inserts...");
+					//4. Se debe insertar los interesados seleccionados en EJG en Unidad Familiar.
+					
+					ScsUnidadfamiliarejgExample familiaresEJGExample = new ScsUnidadfamiliarejgExample();
+					
+					familiaresEJGExample.createCriteria().andAnioEqualTo(ejg.getAnio()).andIdinstitucionEqualTo(idInstitucion)
+					.andIdtipoejgEqualTo(ejg.getIdtipoejg()).andNumeroEqualTo(ejg.getNumero());
+					
+					List<ScsUnidadfamiliarejg> familiaresEJG = scsUnidadfamiliarejgMapper.selectByExample(familiaresEJGExample);
+					
+					for(ScsUnidadfamiliarejg familiar : familiaresEJG) {
+
+						//Se crea el interesado que se introducira en el EJG
+						ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
+						
+						interesado.setAnio(designa.getAnio());
+						interesado.setNumero(designa.getNumero());
+						interesado.setIdinstitucion(idInstitucion);
+						interesado.setIdpersona(familiar.getIdpersona());
+						interesado.setIdturno(designa.getIdturno());
+						
+						//Se comprueba si el interesado introducido tiene un representante asociado
+						ScsPersonajgKey personajgKey = new ScsPersonajgKey();
+						
+						personajgKey.setIdinstitucion(idInstitucion);
+						personajgKey.setIdpersona(familiar.getIdpersona());
+						
+						ScsPersonajg personajg = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
+						
+						if(personajg.getIdrepresentantejg() != null) {personajgKey.setIdpersona(personajg.getIdrepresentantejg());
+						
+						ScsPersonajg representanteFamiliar = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
+						
+						interesado.setNombrerepresentante(representanteFamiliar.getNombre());
+						}
+						
+						interesado.setUsumodificacion(usuarios.get(0).getIdusuario());
+						interesado.setFechamodificacion(new Date());
+						
+						response = scsDefendidosdesignaMapper.insert(interesado);
+						if(response == 0) throw(new Exception("Error al introducir interesados en la designa proveniente de la unidad familiar del EJG"));
+
+					}
 					
 					}
 					
@@ -7128,14 +7185,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				} catch (Exception e) {
 					LOGGER.error("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Se ha producido un error ",
 							e);
-					response2 = 0;
+					response = 0;
 				}
 
 				LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Saliendo del servicio... ");
 			}
 		}
 
-		if (response11 == 0 || response12 == 0 || response2==0  || response3 == 0) {
+		if (response == 0) {
 			error.setCode(400);
 			error.setDescription("general.mensaje.error.bbdd");
 			responseDTO.setStatus(SigaConstants.KO);
