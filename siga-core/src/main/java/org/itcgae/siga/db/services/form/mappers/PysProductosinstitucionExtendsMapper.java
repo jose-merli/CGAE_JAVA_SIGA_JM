@@ -6,11 +6,18 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
+import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
+import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.DTOs.form.CertificadoCursoItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.PysProductosinstitucionMapper;
+import org.itcgae.siga.db.services.fac.providers.PySTiposProductosSqlExtendsProvider;
 import org.itcgae.siga.db.services.form.providers.PysProductosinstitucionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+
+
 
 @Service
 @Primary
@@ -30,5 +37,32 @@ public interface PysProductosinstitucionExtendsMapper extends PysProductosinstit
 	})
 	List<CertificadoCursoItem> selectTypesCertificatesCourse(Short idInstitucion);
 
+	@SelectProvider(type = PysProductosinstitucionSqlExtendsProvider.class, method = "detalleProducto")
+	@Results({ 
+		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDPRODUCTOINSTITUCION", property = "idproductoinstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDCONTADOR", property = "idcontador", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CUENTACONTABLE", property = "cuentacontable", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.FLOAT),
+		@Result(column = "IDTIPOIVA", property = "idtipoiva", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "MOMENTOCARGO", property = "momentocargo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
+		@Result(column = "SOLICITARBAJA", property = "solicitarbaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SOLICITARALTA", property = "solicitaralta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOCERTIFICADO", property = "tipocertificado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOFACTURABLE", property = "nofacturable", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CATEGORIA", property = "categoria", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALORIVA", property = "valoriva", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR)
+		}) 
+	ProductoDetalleDTO detalleProducto(ListaProductosItem producto, Short idInstitucion);
 
+	@SelectProvider(type = PysProductosinstitucionSqlExtendsProvider.class, method = "getIndiceMaxProducto")
+	@Results({ 
+		@Result(column = "IDPRODUCTO", property = "newId", jdbcType = JdbcType.NUMERIC)
+		}) 
+	NewIdDTO getIndiceMaxProducto(ProductoDetalleDTO producto, Short idInstitucion);
 }
+

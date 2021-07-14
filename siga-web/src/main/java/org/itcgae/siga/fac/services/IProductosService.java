@@ -4,12 +4,17 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
+import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IProductosService {
 	public ComboDTO comboIva(HttpServletRequest request);
 	public ComboDTO comboTipoFormaPago(HttpServletRequest request);
+	public ProductoDetalleDTO detalleProducto(HttpServletRequest request, ListaProductosItem producto);
+	public InsertResponseDTO nuevoProducto(ProductoDetalleDTO producto, HttpServletRequest request);
 	public ListaProductosDTO searchListadoProductos(HttpServletRequest request, FiltroProductoItem filtroProductoItem);
 	public DeleteResponseDTO ReactivarBorradoFisicoLogicoProductos(ListaProductosDTO listadoProductos, HttpServletRequest request);
 }

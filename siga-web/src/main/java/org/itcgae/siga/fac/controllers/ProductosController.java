@@ -4,8 +4,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
+import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.fac.services.IProductosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +30,16 @@ public class ProductosController {
 		return new ResponseEntity<ListaProductosDTO>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping(value="/pys/ReactivarBorradoFisicoLogicoProductos")
-	ResponseEntity<DeleteResponseDTO> ReactivarBorradoFisicoLogicoProductos(@RequestBody ListaProductosDTO listadoProductos, HttpServletRequest request){
-		DeleteResponseDTO response = productosService.ReactivarBorradoFisicoLogicoProductos(listadoProductos, request);
-		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	@GetMapping(value = "/pys/detalleProducto")
+	ResponseEntity<ProductoDetalleDTO> detalleProducto(HttpServletRequest request, @RequestBody ListaProductosItem producto) { 
+		ProductoDetalleDTO response = productosService.detalleProducto(request, producto);
+		return new ResponseEntity<ProductoDetalleDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value="/pys/nuevoProducto")
+	ResponseEntity<InsertResponseDTO> nuevoProducto(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request){
+		InsertResponseDTO response = productosService.nuevoProducto(producto, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/combo/tipoIva")
