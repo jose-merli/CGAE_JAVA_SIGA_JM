@@ -7141,7 +7141,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					ScsUnidadfamiliarejgExample familiaresEJGExample = new ScsUnidadfamiliarejgExample();
 					
 					familiaresEJGExample.createCriteria().andAnioEqualTo(ejg.getAnio()).andIdinstitucionEqualTo(idInstitucion)
-					.andIdtipoejgEqualTo(ejg.getIdtipoejg()).andNumeroEqualTo(ejg.getNumero());
+					.andIdtipoejgEqualTo(ejg.getIdtipoejg()).andNumeroEqualTo(ejg.getNumero()).andFechabajaIsNull();
 					
 					List<ScsUnidadfamiliarejg> familiaresEJG = scsUnidadfamiliarejgMapper.selectByExample(familiaresEJGExample);
 					
