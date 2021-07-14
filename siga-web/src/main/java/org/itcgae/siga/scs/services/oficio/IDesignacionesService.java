@@ -220,5 +220,7 @@ public interface IDesignacionesService {
 	EjgDesignaDTO getEjgDesigna(DesignaItem datos, HttpServletRequest request);
 
 	UpdateResponseDTO guardarProcuradorEJG(ProcuradorItem procurador, HttpServletRequest request);
+
+	public UpdateResponseDTO asociarAsistenciaDesigna(List<String> designaItem, HttpServletRequest request);
 	
 }

@@ -100,6 +100,7 @@ import org.itcgae.siga.db.entities.ScsAcreditacionExample;
 import org.itcgae.siga.db.entities.ScsActuaciondesigna;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaExample;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
+import org.itcgae.siga.db.entities.ScsAsistencia;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
@@ -144,6 +145,7 @@ import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsAcreditacionMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
+import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
@@ -309,6 +311,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired 
 	private ScsDelitosdesignaMapper scsDelitosdesignaMapper;
+	
+	@Autowired
+	private ScsAsistenciaMapper scsAsistenciaMapper;
 	
 	/**
 	 * busquedaJustificacionExpres
@@ -7202,6 +7207,79 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		LOGGER.info("getLabel() -> Salida del servicio para obtener las asociaciones con EJGs de la designacion.");
 		return ejgDesignaDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO asociarAsistenciaDesigna(List<String> designaItem, HttpServletRequest request) {
+		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		int response = 0;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.asociarEjgDesigna() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.asociarEjgDesigna() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.asociarEjgDesigna() -> Entrada a servicio para insertar las justificaciones express");
+
+				try {
+					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Haciendo el insert...");
+					
+					
+						
+					ScsAsistencia record = new ScsAsistencia();
+					record.setFechamodificacion(new Date());
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
+					
+					record.setIdinstitucion(Short.parseShort(designaItem.get(3)));
+					record.setNumero(Long.parseLong(designaItem.get(5)));
+					record.setAnio(Short.parseShort(designaItem.get(4)));
+					record.setDesignaAnio(Short.parseShort(designaItem.get(0)));
+					record.setDesignaNumero(Long.parseLong(designaItem.get(2)));
+					record.setDesignaTurno(Integer.parseInt(designaItem.get(1)));
+					response = scsAsistenciaMapper.updateByPrimaryKeySelective(record);
+					
+					
+
+					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");
+				} catch (Exception e) {
+					LOGGER.error("DesignacionesServiceImpl.asociarEjgDesigna() -> Se ha producido un error ",
+							e);
+					response = 0;
+				}finally {
+					if (response == 0) {
+						error.setCode(400);
+						error.setDescription("general.mensaje.error.bbdd");
+						responseDTO.setStatus(SigaConstants.KO);
+					} else {
+						error.setCode(200);
+						error.setDescription("general.message.registro.insertado");
+						responseDTO.setStatus(SigaConstants.OK);
+					}
+
+					responseDTO.setError(error);
+				}
+
+				LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Saliendo del servicio... ");
+			}
+		}
+
+		
+
+		return responseDTO;
 	}
 	
 

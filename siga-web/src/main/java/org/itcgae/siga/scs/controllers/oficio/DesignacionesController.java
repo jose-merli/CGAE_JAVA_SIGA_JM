@@ -1026,6 +1026,16 @@ public class DesignacionesController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@PostMapping(value = "/designas/asociarAsistenciaDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> asociarAsistenciaDesigna(@RequestBody List<String> designaItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.asociarAsistenciaDesigna(designaItem, request);
+
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@PostMapping(value = "/designas/actualizarPartidaPresupuestariaActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> actualizarPartidaPresupuestariaActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.actualizarPartidaPresupuestariaActDesigna(actuacionDesignaItem, request);
