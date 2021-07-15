@@ -324,12 +324,14 @@ public class ProductosServiceImpl implements IProductosService{
 					productoInstitucion.setIdproductoinstitucion(Long.parseLong(idOrdenacion.getNewId()));
 					productoInstitucion.setDescripcion(producto.getDescripcion());
 					productoInstitucion.setCuentacontable(producto.getCuentacontable());
+					productoInstitucion.setValor(new BigDecimal(0));//PROVISIONAL
 					productoInstitucion.setMomentocargo("P");
 					productoInstitucion.setSolicitarbaja(producto.getSolicitarbaja());
 					productoInstitucion.setSolicitaralta(producto.getSolicitaralta());
 					productoInstitucion.setIdcontador("PYS_" + producto.getIdtipoproducto() + "_" + producto.getIdproducto() + "_" + producto.getIdproductoinstitucion());
 					productoInstitucion.setTipocertificado(producto.getTipocertificado());
-					productoInstitucion.setFechamodificacion(new Date());
+					productoInstitucion.setFechamodificacion(new Date());//SYSTIMESTAMP?
+					productoInstitucion.setNofacturable("0");
 					productoInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 					status = pysProductosInstitucionMapper.insert(productoInstitucion);

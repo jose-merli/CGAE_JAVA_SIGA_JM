@@ -42,6 +42,12 @@ public class ProductosController {
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
+//	@PostMapping(value="/pys/editarProducto")
+//	ResponseEntity<DeleteResponseDTO> editarProducto(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request){
+//		DeleteResponseDTO response = tiposProductosService.modificarProducto(listadoProductos, request);
+//		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+//	}
+	
 	@GetMapping(value = "/combo/tipoIva")
 	ResponseEntity<ComboDTO> comboTiposIva(HttpServletRequest request) { 
 		ComboDTO response = productosService.comboIva(request);

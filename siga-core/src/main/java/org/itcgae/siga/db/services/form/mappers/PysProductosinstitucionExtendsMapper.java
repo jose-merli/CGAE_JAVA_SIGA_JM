@@ -61,8 +61,7 @@ public interface PysProductosinstitucionExtendsMapper extends PysProductosinstit
 
 	@SelectProvider(type = PysProductosinstitucionSqlExtendsProvider.class, method = "getIndiceMaxProducto")
 	@Results({ 
-		@Result(column = "IDPRODUCTO", property = "newId", jdbcType = JdbcType.NUMERIC)
+		@Result(column = "IDPRODUCTOINSTITUCION", property = "newId", jdbcType = JdbcType.NUMERIC)
 		}) 
 	NewIdDTO getIndiceMaxProducto(ProductoDetalleDTO producto, Short idInstitucion);
 }
-
