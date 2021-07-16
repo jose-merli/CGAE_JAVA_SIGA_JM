@@ -45,6 +45,7 @@ public interface PysProductosinstitucionExtendsMapper extends PysProductosinstit
 		@Result(column = "IDCONTADOR", property = "idcontador", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CUENTACONTABLE", property = "cuentacontable", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGOEXT", property = "codigoext", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.FLOAT),
 		@Result(column = "IDTIPOIVA", property = "idtipoiva", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "MOMENTOCARGO", property = "momentocargo", jdbcType = JdbcType.VARCHAR),
@@ -57,7 +58,7 @@ public interface PysProductosinstitucionExtendsMapper extends PysProductosinstit
 		@Result(column = "VALORIVA", property = "valoriva", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR)
 		}) 
-	ProductoDetalleDTO detalleProducto(ListaProductosItem producto, Short idInstitucion);
+	ProductoDetalleDTO detalleProducto(int idTipoProducto, int idProducto, int idProductoInstitucion, Short idInstitucion);
 
 	@SelectProvider(type = PysProductosinstitucionSqlExtendsProvider.class, method = "getIndiceMaxProducto")
 	@Results({ 

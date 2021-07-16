@@ -34,7 +34,7 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 	}
 	
 
-	public String detalleProducto(ListaProductosItem producto, Short idInstitucion) {
+	public String detalleProducto(int idTipoProducto, int idProducto, int idProductoInstitucion, Short idInstitucion) {
 
 		SQL sql = new SQL();
 		
@@ -44,6 +44,7 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.IDCONTADOR");
 		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.DESCRIPCION");
 		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.CUENTACONTABLE");
+		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.CODIGOEXT");
 		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.VALOR");
 		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.IDTIPOIVA");
 		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.MOMENTOCARGO");
@@ -52,9 +53,9 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.SOLICITARALTA");
 		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.TIPOCERTIFICADO");
 		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.NOFACTURABLE");
-		sql.SELECT(" PYS_PRODUCTOS.DESCRIPCION AS CATEGORIA");
+		sql.SELECT(" PYS_PRODUCTOS.DESCRIPCION AS TIPO");
 		sql.SELECT(" PYS_TIPOIVA.VALOR AS VALORIVA");
-		sql.SELECT(" F_SIGA_GETRECURSO (PYS_TIPOSPRODUCTOS.DESCRIPCION, 1) AS TIPO");
+		sql.SELECT(" F_SIGA_GETRECURSO (PYS_TIPOSPRODUCTOS.DESCRIPCION, 1) AS CATEGORIA");
 		
 		sql.FROM( "PYS_PRODUCTOSINSTITUCION");
 		
@@ -70,9 +71,9 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 				+ " PYS_PRODUCTOSINSTITUCION.IDTIPOIVA = PYS_TIPOIVA.IDTIPOIVA");
 		
 		sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDTIPOPRODUCTO = '" + producto.getIdtipoproducto()+ "'");
-		sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDPRODUCTO = '" + producto.getIdproducto() + "'");
-		sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDPRODUCTOINSTITUCION = '" + producto.getIdproductoinstitucion() + "'");
+		sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDTIPOPRODUCTO = '" + idTipoProducto + "'");
+		sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDPRODUCTO = '" + idProducto + "'");
+		sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDPRODUCTOINSTITUCION = '" + idProductoInstitucion + "'");
 		
 		sql.ORDER_BY("PYS_PRODUCTOSINSTITUCION.DESCRIPCION");
 		

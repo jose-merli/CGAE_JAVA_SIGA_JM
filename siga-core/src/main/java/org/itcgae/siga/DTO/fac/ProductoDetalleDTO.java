@@ -12,6 +12,7 @@ public class ProductoDetalleDTO {
 	private String idcontador;
 	private String descripcion;
 	private String cuentacontable;
+	private String codigoext;
 	private float valor;
 	private int idtipoiva;
 	private String momentocargo;
@@ -61,6 +62,12 @@ public class ProductoDetalleDTO {
 	}
 	public void setCuentacontable(String cuentacontable) {
 		this.cuentacontable = cuentacontable;
+	}
+	public String getCodigoext() {
+		return codigoext;
+	}
+	public void setCodigoext(String codigoext) {
+		this.codigoext = codigoext;
 	}
 	public float getValor() {
 		return valor;
@@ -139,6 +146,7 @@ public class ProductoDetalleDTO {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((categoria == null) ? 0 : categoria.hashCode());
+		result = prime * result + ((codigoext == null) ? 0 : codigoext.hashCode());
 		result = prime * result + ((cuentacontable == null) ? 0 : cuentacontable.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
 		result = prime * result + ((error == null) ? 0 : error.hashCode());
@@ -172,6 +180,11 @@ public class ProductoDetalleDTO {
 			if (other.categoria != null)
 				return false;
 		} else if (!categoria.equals(other.categoria))
+			return false;
+		if (codigoext == null) {
+			if (other.codigoext != null)
+				return false;
+		} else if (!codigoext.equals(other.codigoext))
 			return false;
 		if (cuentacontable == null) {
 			if (other.cuentacontable != null)
@@ -247,11 +260,11 @@ public class ProductoDetalleDTO {
 	public String toString() {
 		return "ProductoDetalleDTO [idproducto=" + idproducto + ", idtipoproducto=" + idtipoproducto
 				+ ", idproductoinstitucion=" + idproductoinstitucion + ", idcontador=" + idcontador + ", descripcion="
-				+ descripcion + ", cuentacontable=" + cuentacontable + ", valor=" + valor + ", idtipoiva=" + idtipoiva
-				+ ", momentocargo=" + momentocargo + ", fechabaja=" + fechabaja + ", solicitarbaja=" + solicitarbaja
-				+ ", solicitaralta=" + solicitaralta + ", tipocertificado=" + tipocertificado + ", nofacturable="
-				+ nofacturable + ", categoria=" + categoria + ", valoriva=" + valoriva + ", tipo=" + tipo + ", error="
-				+ error + "]";
+				+ descripcion + ", cuentacontable=" + cuentacontable + ", codigoext=" + codigoext + ", valor=" + valor
+				+ ", idtipoiva=" + idtipoiva + ", momentocargo=" + momentocargo + ", fechabaja=" + fechabaja
+				+ ", solicitarbaja=" + solicitarbaja + ", solicitaralta=" + solicitaralta + ", tipocertificado="
+				+ tipocertificado + ", nofacturable=" + nofacturable + ", categoria=" + categoria + ", valoriva="
+				+ valoriva + ", tipo=" + tipo + ", error=" + error + "]";
 	}
 	
 }

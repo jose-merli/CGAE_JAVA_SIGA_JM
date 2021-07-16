@@ -1,6 +1,7 @@
 package org.itcgae.siga.fac.services.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -210,8 +211,31 @@ public class ProductosServiceImpl implements IProductosService{
 					LOGGER.info(
 							"searchListadoProductos() / pysTiposProductosExtendsMapper.searchListadoProductos() -> Salida de pysTiposProductosExtendsMapper para obtener el listado de productos segun la busqueda");
 
-					if (listaProductos != null && listaProductos.size() > 0) {
-						listaProductosDTO.setListaProductosItems(listaProductos);
+					//Necesario para agrupar los productos, ya que la sql devuelve los productos repetidos con distintas formas de pago, con esto se pretende agrupar las formas de pago del producto en una sola linea (info mas detallada en el funcional)
+					List<ListaProductosItem> listaProductosProcesada = new ArrayList<ListaProductosItem>();
+					int numFormasDePago = 1; //Numero de productos que añades cuando realmente son el mismo pero con diferentes formas de pago
+					for (int i = 0; i < listaProductos.size(); i++) {
+						
+						if(i == 0) {
+							listaProductosProcesada.add(listaProductos.get(i));
+						}else if((listaProductos.get(i).getIdtipoproducto() == listaProductos.get(i - 1).getIdtipoproducto()) && (listaProductos.get(i).getIdproducto() == listaProductos.get(i - 1).getIdproducto())) //Comprueba que el producto actual es distinto al anterior no el mismo con distinta forma de pago 
+						{
+							//Este if comprueba si es el 3 producto identico excepto por la forma de pago al primero que añadiste (es decir este seria el 4 por lo que al tener mas de 3 formas de pago se ha de mostrar el numero)
+							if(numFormasDePago > 2) {
+								listaProductosProcesada.get(listaProductosProcesada.size() - 1).setFormapago("4");
+							}else {
+								listaProductosProcesada.get(listaProductosProcesada.size() - 1).setFormapago(listaProductosProcesada.get(listaProductosProcesada.size() - 1).getFormapago() + ", " + listaProductos.get(i).getFormapago());						
+							}
+							numFormasDePago++;
+					
+						}else{
+							numFormasDePago = 0;
+							listaProductosProcesada.add(listaProductos.get(i));
+						}
+					}
+					
+					if (listaProductosProcesada != null && listaProductosProcesada.size() > 0) {
+						listaProductosDTO.setListaProductosItems(listaProductosProcesada);
 					}
 				}
 
@@ -232,7 +256,7 @@ public class ProductosServiceImpl implements IProductosService{
 	}
 	
 	@Override
-	public ProductoDetalleDTO detalleProducto(HttpServletRequest request, ListaProductosItem producto) {
+	public ProductoDetalleDTO detalleProducto(HttpServletRequest request, int idTipoProducto, int idProducto, int idProductoInstitucion) {
 		ProductoDetalleDTO productoDetalleDTO = new ProductoDetalleDTO();
 		Error error = new Error();
 
@@ -262,7 +286,7 @@ public class ProductosServiceImpl implements IProductosService{
 
 					String idioma = usuarios.get(0).getIdlenguaje();
 					productoDetalleDTO = pysProductosInstitucionExtendsMapper
-							.detalleProducto(producto, idInstitucion);
+							.detalleProducto(idTipoProducto, idProducto, idProductoInstitucion, idInstitucion);
 
 					LOGGER.info(
 							"detalleProducto() / PysProductosinstitucionExtendsMapper.detalleProducto() -> Salida de PysProductosinstitucionExtendsMapper para obtener los detalles del producto");

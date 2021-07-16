@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,8 +32,8 @@ public class ProductosController {
 	}
 	
 	@GetMapping(value = "/pys/detalleProducto")
-	ResponseEntity<ProductoDetalleDTO> detalleProducto(HttpServletRequest request, @RequestBody ListaProductosItem producto) { 
-		ProductoDetalleDTO response = productosService.detalleProducto(request, producto);
+	ResponseEntity<ProductoDetalleDTO> detalleProducto(HttpServletRequest request, @RequestParam int idTipoProducto, @RequestParam int idProducto, @RequestParam int idProductoInstitucion) { 
+		ProductoDetalleDTO response = productosService.detalleProducto(request, idTipoProducto, idProducto, idProductoInstitucion);
 		return new ResponseEntity<ProductoDetalleDTO>(response, HttpStatus.OK);
 	}
 	
