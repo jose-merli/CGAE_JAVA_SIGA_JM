@@ -19,12 +19,12 @@ public class PagosjgItem {
 	private String importePagado;
 	private Date fechaEstado;
 	private String desEstado;
-	private String desConcepto;
 	private String idHitoGeneral;
 	private String porcentaje;
 	private String abreviatura;
 	private String idEstado;
 	private String idPartidaPresupuestaria;
+	private String desConcepto;
 	private String idConcepto;
 	private String idGrupo;
 	private String descGrupo;
