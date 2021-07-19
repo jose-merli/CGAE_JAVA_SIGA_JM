@@ -25,7 +25,8 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 				+ "('S' || soj.anio || '/' || soj.numero) asunto," + "    f_siga_getrecurso(nvl(ts.descripcion,'')," + idLenguaje + ") tiposoj," 
 				+ "		soj.idtiposoj,"
 				+ "    (nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
-				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado");
+				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado,"
+				+ "nvl( soj.numerodiligencia, 'Sin número' ) || ' - ' || nvl( soj.nig, 'Sin número' ) || ' - ' || nvl( soj.numeroprocedimiento,'Sin número' ) dilnigproc");
 		sql.FROM("    scs_soj soj\r\n");
 		sql.JOIN("scs_personajg pjg ON ( pjg.idpersona = soj.idpersonajg AND pjg.idinstitucion = soj.idinstitucion)");
 		sql.LEFT_OUTER_JOIN("cen_persona per ON (soj.idpersona = per.idpersona)");

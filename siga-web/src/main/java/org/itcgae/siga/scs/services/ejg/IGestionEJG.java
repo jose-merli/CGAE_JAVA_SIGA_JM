@@ -27,6 +27,7 @@ import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
+import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
@@ -75,7 +76,11 @@ public interface IGestionEJG {
 
 	InsertResponseDTO nuevoEstado(EstadoEjgItem datos, HttpServletRequest request);
 
-	UpdateResponseDTO borrarRelacion(List<EjgItem> datos, HttpServletRequest request);
+	DeleteResponseDTO borrarRelacion(RelacionesItem datos, HttpServletRequest request);
+	
+	UpdateResponseDTO borrarRelacionAsistenciaEJG(RelacionesItem datos, HttpServletRequest request);
+	
+	UpdateResponseDTO borrarRelacionSojEJG(RelacionesItem datos, HttpServletRequest request);
 
 	UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request);
 	

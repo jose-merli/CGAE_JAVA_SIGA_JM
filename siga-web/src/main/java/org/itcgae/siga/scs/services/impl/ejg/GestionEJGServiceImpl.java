@@ -142,6 +142,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsActacomisionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsContrariosejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDelitoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEejgPeticionesExtendsMapper;
@@ -312,6 +313,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	
 	@Autowired
 	private ScsSojMapper scsSojMapper;
+	
+	@Autowired
+	private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
 
 	@Override
 	public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -2569,7 +2573,71 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO borrarRelacion(List<EjgItem> datos, HttpServletRequest request) {
+	public DeleteResponseDTO borrarRelacion(RelacionesItem datos, HttpServletRequest request) {
+		DeleteResponseDTO responsedto = new DeleteResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.borrarRelacion() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.borrarRelacion() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.borrarRelacion() -> Entrada para cambiar los datos generales del ejg");
+
+				try {
+					
+						ScsEjgdesigna record = new ScsEjgdesigna();
+						response = 0;
+
+						// creamos el objeto para el insert
+						
+						String anio = datos.getAnio();
+						String num = datos.getNumero();
+						String idTurno = datos.getIdturno();
+						String institucion = datos.getIdinstitucion();
+						response = scsDesignacionesExtendsMapper.eliminarRelacion(anio, num, idTurno, institucion);
+						
+					
+					LOGGER.debug(
+							"GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.borrarRelacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							e);
+				} finally {
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug(
+								"GestionEJGServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"GestionEJGServiceImpl.borrarRelacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+					}
+				}
+			}
+		}
+
+		LOGGER.info("GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio.");
+
+		return responsedto;
+	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO borrarRelacionAsistenciaEJG(RelacionesItem datos, HttpServletRequest request) {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
 
@@ -2592,24 +2660,93 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						"GestionEJGServiceImpl.borrarRelacion() -> Entrada para cambiar los datos generales del ejg");
 
 				try {
-					for (int i = 0; datos.size() > i; i++) {
-						ScsEstadoejg record = new ScsEstadoejg();
-						response = 0;
+					
+					ScsAsistencia record = new ScsAsistencia();
+					record.setFechamodificacion(new Date());
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
+					
+					record.setIdinstitucion(Short.parseShort(datos.getIdinstitucion()));
+					record.setEjganio(null);
+					record.setEjgidtipoejg(null);
+					record.setEjgnumero(null);
+					
+					record.setNumero(Long.parseLong(datos.getNumero()));
+					record.setAnio(Short.parseShort(datos.getAnio()));
 
-						// creamos el objeto para el insert
-						record.setIdinstitucion(idInstitucion);
-						record.setIdtipoejg(Short.parseShort(datos.get(i).getTipoEJG()));
-						record.setAnio(Short.parseShort(datos.get(i).getAnnio()));
-						record.setNumero(Long.parseLong(datos.get(i).getNumero()));
-						record.setIdestadoejg(Short.parseShort(datos.get(i).getEstadoNew()));
-						record.setFechainicio(datos.get(i).getFechaEstadoNew());
+
+					response = scsAsistenciaMapper.updateByPrimaryKey(record);
+					
+					
+					LOGGER.debug(
+							"GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.borrarRelacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							e);
+				} finally {
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug(
+								"GestionEJGServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"GestionEJGServiceImpl.borrarRelacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+					}
+				}
+			}
+		}
+
+		LOGGER.info("GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio.");
+
+		return responsedto;
+	}
+
+	@Override
+	@Transactional
+	public UpdateResponseDTO borrarRelacionSojEJG(RelacionesItem datos, HttpServletRequest request) {
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.borrarRelacion() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.borrarRelacion() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.borrarRelacion() -> Entrada para cambiar los datos generales del ejg");
+
+				try {
+					
+					
+						ScsSoj record = new ScsSoj();
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(usuarios.get(0).getIdusuario());
-						record.setAutomatico("0");
-						record.setFechabaja(new Date());
+						
+						record.setIdinstitucion(Short.parseShort(datos.getIdinstitucion()));
+						record.setEjganio(null);
+						record.setEjgidtipoejg(null);
+						record.setEjgnumero(null);
+						
+						record.setNumero(Long.parseLong(datos.getNumero()));
+						record.setAnio(Short.parseShort(datos.getAnio()));
+						record.setIdtiposoj(Short.parseShort(datos.getIdtipo()));						
 
-						response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
-					}
+						response = scsSojMapper.updateByPrimaryKey(record);
+					
+					
+					
 					LOGGER.debug(
 							"GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
 				} catch (Exception e) {
@@ -5073,6 +5210,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return idDS;
 
 	}
+
+
 	
 	
 }

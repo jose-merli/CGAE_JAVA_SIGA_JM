@@ -52,7 +52,8 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "NUMEROPROCEDIMIENTO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPOEJG", property = "idTipoEjg", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "TIPOEJG", property = "tipo", jdbcType = JdbcType.VARCHAR) 
+			@Result(column = "TIPOEJG", property = "tipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR)
 	})
 	List<AsuntosJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo,
 			String idLenguaje);

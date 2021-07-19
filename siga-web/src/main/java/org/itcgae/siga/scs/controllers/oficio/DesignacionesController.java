@@ -938,10 +938,17 @@ public class DesignacionesController {
 		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping(value = "/designas/eliminarRelacion", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/designas/eliminarRelacion",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<DeleteResponseDTO> eliminarRelacion(
 			@RequestBody RelacionesItem listaRelaciones, HttpServletRequest request) {
 		DeleteResponseDTO response = designacionesService.eliminarRelacion(listaRelaciones, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/designas/eliminarRelacionAsistenciaDesigna",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> eliminarRelacionAsistenciaDesigna(
+			@RequestBody RelacionesItem listaRelaciones, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.eliminarRelacionAsistenciaDesigna(listaRelaciones, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
