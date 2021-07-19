@@ -29,6 +29,7 @@ import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
+import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
@@ -433,11 +434,23 @@ public class EjgController {
 	}
 
 	// borrarRelacion
-	@RequestMapping(value = "/gestion-ejg/borrarRelacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> borrarRelacion(@RequestBody List<EjgItem> datos, HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.borrarRelacion(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	@RequestMapping(value = "/gestion-ejg/borrarRelacion",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> borrarRelacion(@RequestBody RelacionesItem datos, HttpServletRequest request) {
+		DeleteResponseDTO response = gestionEJG.borrarRelacion(datos, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
+	// borrarRelacion
+	@RequestMapping(value = "/gestion-ejg/borrarRelacionAsistenciaEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> borrarRelacionAsistenciaEJG(@RequestBody RelacionesItem datos, HttpServletRequest request) {
+			UpdateResponseDTO response = gestionEJG.borrarRelacionAsistenciaEJG(datos, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}
+		// borrarRelacion
+	@RequestMapping(value = "/gestion-ejg/borrarRelacionSojEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<UpdateResponseDTO> borrarRelacionSojEJG(@RequestBody RelacionesItem datos, HttpServletRequest request) {
+			UpdateResponseDTO response = gestionEJG.borrarRelacionSojEJG(datos, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}
 
 	// getComunicaciones
 	@RequestMapping(value = "/gestion-ejg/getComunicaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -30,7 +30,8 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 		@Result(column = "NUMEROPROCEDIMIENTO", property = "numeroProcedimiento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOASISTENCIA", property = "idTipoAsistencia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOASISTENCIA", property = "tipo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NUMERODILIGENCIA", property = "numeroDiligencia", jdbcType = JdbcType.VARCHAR) 
+		@Result(column = "NUMERODILIGENCIA", property = "numeroDiligencia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR)
 	})
 	List<AsuntosJusticiableItem> searchClaveAsistencia(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo, String idLenguaje);
 	

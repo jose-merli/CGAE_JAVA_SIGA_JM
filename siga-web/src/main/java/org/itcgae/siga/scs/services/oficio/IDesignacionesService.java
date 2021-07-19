@@ -170,7 +170,7 @@ public interface IDesignacionesService {
 
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
 			
-	public DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request);
+	public DeleteResponseDTO eliminarRelacion(RelacionesItem datos, HttpServletRequest request);
 	
 	public EnviosMasivosDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request);
 
@@ -222,5 +222,7 @@ public interface IDesignacionesService {
 	UpdateResponseDTO guardarProcuradorEJG(ProcuradorItem procurador, HttpServletRequest request);
 
 	public UpdateResponseDTO asociarAsistenciaDesigna(List<String> designaItem, HttpServletRequest request);
+	
+	UpdateResponseDTO eliminarRelacionAsistenciaDesigna(RelacionesItem datos, HttpServletRequest request);
 	
 }

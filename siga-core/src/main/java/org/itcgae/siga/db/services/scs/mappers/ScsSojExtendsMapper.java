@@ -31,6 +31,7 @@ public interface ScsSojExtendsMapper extends ScsSojMapper{
 		@Result(column = "IDTIPOSOJ", property = "idTipoSoj", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOSOJ", property = "tipo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR)
 		
 	})
 	List<AsuntosJusticiableItem> searchClaveSoj(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo, String idLenguaje);

@@ -44,6 +44,7 @@ public class AsuntosJusticiableItem {
 	private Date fechaAperturaHasta;
 	private String nColegiado;
 	private String estado;
+	private String dilnigproc;
 
 	/**
 	 **/
@@ -433,5 +434,14 @@ public class AsuntosJusticiableItem {
 
 	public void setEstado(String estado) {
 		this.estado = estado;
+	}
+
+	@JsonProperty("dilnigproc")
+	public String getDilnigproc() {
+		return dilnigproc;
+	}
+
+	public void setDilnigproc(String dilnigproc) {
+		this.dilnigproc = dilnigproc;
 	}
 }

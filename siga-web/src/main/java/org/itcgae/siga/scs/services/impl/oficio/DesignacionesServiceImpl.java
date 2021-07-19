@@ -136,6 +136,7 @@ import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsProcedimientos;
 import org.itcgae.siga.db.entities.ScsProcedimientosKey;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
+import org.itcgae.siga.db.entities.ScsSoj;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
@@ -4895,7 +4896,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
-	public DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request) {
+	public DeleteResponseDTO eliminarRelacion(RelacionesItem datos, HttpServletRequest request) {
 		LOGGER.info("eliminarRelacion() ->  Entrada al servicio para eliminar relaciones");
 
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
@@ -4905,6 +4906,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		String anio;
+		String num;
+		String idTurno;
+		String institucion;
 
 		if (null != idInstitucion) {
 
@@ -4925,13 +4931,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					LOGGER.info(
 							"eliminarRelacion() / ScsDefendidosdesignaMapper.eliminarRelacion() -> Entrada a ScsDefendidosdesignaMapper para eliminar las relaciones");
+					
+							anio = datos.getAnio();
+							num = datos.getNumero();
+							idTurno = datos.getIdturno();
+							institucion = datos.getIdinstitucion();
+							response = scsDesignacionesExtendsMapper.eliminarRelacion(anio, num, idTurno, institucion);
+							
 
-					String anio = listaRelaciones.getAnio();
-					String num = listaRelaciones.getNumero();
-					String idTurno = listaRelaciones.getIdturno();
-					String institucion = listaRelaciones.getIdinstitucion();
-
-					response = scsDesignacionesExtendsMapper.eliminarRelacion(anio, num, idTurno, institucion);
+					
+					
 
 					LOGGER.info(
 							"eliminarRelacion() / ScsDefendidosdesignaMapper.eliminarRelacion() -> Salida de ScsDefendidosdesignaMapper para eliminar las relaciones");
@@ -4960,6 +4969,74 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info("eliminarRelacion() -> Salida del servicio para eliminar relaciones");
 
 		return deleteResponseDTO;
+	}
+	
+	@Override
+	@Transactional
+	public UpdateResponseDTO eliminarRelacionAsistenciaDesigna(RelacionesItem datos, HttpServletRequest request) {
+		UpdateResponseDTO responsedto = new UpdateResponseDTO();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			LOGGER.debug(
+					"GestionEJGServiceImpl.borrarRelacion() -> Entrada para obtener información del usuario logeado");
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.debug("GestionEJGServiceImpl.borrarRelacion() -> Salida de obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug(
+						"GestionEJGServiceImpl.borrarRelacion() -> Entrada para cambiar los datos generales del ejg");
+
+				try {
+					
+					ScsAsistencia record = new ScsAsistencia();
+					record.setFechamodificacion(new Date());
+					record.setUsumodificacion(usuarios.get(0).getIdusuario());
+					
+					record.setIdinstitucion(Short.parseShort(datos.getIdinstitucion()));
+					record.setDesignaAnio(null);
+					record.setDesignaTurno(null);
+					record.setDesignaNumero(null);
+					
+					record.setNumero(Long.parseLong(datos.getNumero()));
+					record.setAnio(Short.parseShort(datos.getAnio()));
+
+
+					response = scsAsistenciaMapper.updateByPrimaryKey(record);
+					
+					
+					LOGGER.debug(
+							"GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+				} catch (Exception e) {
+					LOGGER.debug(
+							"GestionEJGServiceImpl.borrarRelacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							e);
+				} finally {
+					// respuesta si se actualiza correctamente
+					if (response >= 1) {
+						responsedto.setStatus(SigaConstants.OK);
+						LOGGER.debug(
+								"GestionEJGServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+					} else {
+						responsedto.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"GestionEJGServiceImpl.borrarRelacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+					}
+				}
+			}
+		}
+
+		LOGGER.info("GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio.");
+
+		return responsedto;
 	}
 
 	/**
