@@ -51,7 +51,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		ListadoTipoServicioDTO listadoTipoServicioDTO = new ListadoTipoServicioDTO();
 		Error error = new Error();
 
-		LOGGER.info("searchTiposServicios() -> Entrada al servicio para recuperar el listado de servicios");
+		LOGGER.info("searchTiposServicios() -> Entrada al servicio para recuperar el listado de tipos de servicios");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -73,14 +73,14 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"searchTiposServicios() / pysServiciosExtendsMapper.searchTiposServicios() -> Entrada a pysServiciosExtendsMapper para obtener el listado de servicios");
+							"searchTiposServicios() / pysServiciosExtendsMapper.searchTiposServicios() -> Entrada a pysServiciosExtendsMapper para obtener el listado de tipos de servicios");
 
 					String idioma = usuarios.get(0).getIdlenguaje();
 					List<TiposServiciosItem> listaServicios = pysServiciosExtendsMapper
 							.searchTiposServicios(idioma, idInstitucion);
 
 					LOGGER.info(
-							"searchTiposServicios() / pysServiciosExtendsMapper.searchTiposServicios() -> Salida de pysServiciosExtendsMapper para obtener el listado de servicios");
+							"searchTiposServicios() / pysServiciosExtendsMapper.searchTiposServicios() -> Salida de pysServiciosExtendsMapper para obtener el listado de tipos de servicios");
 
 					if (listaServicios != null && listaServicios.size() > 0) {
 						listadoTipoServicioDTO.setTiposServiciosItems(listaServicios);
@@ -90,7 +90,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"TiposServiciosServiceImpl.searchTiposServicios() -> Se ha producido un error al obtener el listado de servicios",
+					"TiposServiciosServiceImpl.searchTiposServicios() -> Se ha producido un error al obtener el listado de tipos de servicios",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -98,7 +98,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 
 		listadoTipoServicioDTO.setError(error);
 
-		LOGGER.info("searchTiposServicios() -> Salida del servicio para obtener el listado de servicios");
+		LOGGER.info("searchTiposServicios() -> Salida del servicio para obtener el listado de tipos de servicios");
 
 		return listadoTipoServicioDTO;
 	}
@@ -108,7 +108,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		ListadoTipoServicioDTO listadoTipoServicioDTO = new ListadoTipoServicioDTO();
 		Error error = new Error();
 
-		LOGGER.info("searchTiposServiciosHistorico() -> Entrada al servicio para recuperar el listado de servicios historico");
+		LOGGER.info("searchTiposServiciosHistorico() -> Entrada al servicio para recuperar el listado de tipos de servicios historico");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -130,14 +130,14 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"searchTiposServiciosHistorico() / pysServiciosExtendsMapper.searchTiposServiciosHistorico() -> Entrada a pysServiciosExtendsMapper para obtener el listado de servicios historico");
+							"searchTiposServiciosHistorico() / pysServiciosExtendsMapper.searchTiposServiciosHistorico() -> Entrada a pysServiciosExtendsMapper para obtener el listado de tipos de servicios historico");
 
 					String idioma = usuarios.get(0).getIdlenguaje();
 					List<TiposServiciosItem> listaServicios = pysServiciosExtendsMapper
 							.searchTiposServiciosHistorico(idioma, idInstitucion);
 
 					LOGGER.info(
-							"searchTiposServiciosHistorico() / pysServiciosExtendsMapper.searchTiposServiciosHistorico() -> Salida de pysServiciosExtendsMapper para obtener el listado de servicios historico");
+							"searchTiposServiciosHistorico() / pysServiciosExtendsMapper.searchTiposServiciosHistorico() -> Salida de pysServiciosExtendsMapper para obtener el listado de tipos de servicios historico");
 
 					if (listaServicios != null && listaServicios.size() > 0) {
 						listadoTipoServicioDTO.setTiposServiciosItems(listaServicios);
@@ -147,7 +147,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"TiposServiciosServiceImpl.searchTiposServiciosHistorico() -> Se ha producido un error al obtener el listado de servicios historico",
+					"TiposServiciosServiceImpl.searchTiposServiciosHistorico() -> Se ha producido un error al obtener el listado de tipos de servicios historico",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -155,7 +155,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 
 		listadoTipoServicioDTO.setError(error);
 
-		LOGGER.info("searchTiposServiciosHistorico() -> Salida del servicio para obtener el listado de servicios historico");
+		LOGGER.info("searchTiposServiciosHistorico() -> Salida del servicio para obtener el listado de tipos de servicios historico");
 
 		return listadoTipoServicioDTO;
 	}
@@ -224,7 +224,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		int status = 0;
 		
 
-		LOGGER.info("crearServicio() -> Entrada al servicio para crear un servicio");
+		LOGGER.info("crearServicio() -> Entrada al servicio para crear un tipo de servicio");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -246,7 +246,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"crearServicio() / pysServiciosExtendsMapper.crearProducto() -> Entrada a pysServiciosExtendsMapper para crear un servicio");
+							"crearServicio() / pysServiciosExtendsMapper.crearProducto() -> Entrada a pysServiciosExtendsMapper para crear un tipo de servicio");
 
 					NewIdDTO idOrdenacion = pysServiciosExtendsMapper.getIndiceMaxServicio(listadoServicios.getTiposServiciosItems(), idInstitucion);
 					PysServicios servicio = new PysServicios();
@@ -269,13 +269,13 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 					}
 					
 					LOGGER.info(
-							"crearServicio() / pysServiciosExtendsMapper.crearServicio() -> Salida de pysServiciosExtendsMapper para crear un servicio");
+							"crearServicio() / pysServiciosExtendsMapper.crearServicio() -> Salida de pysServiciosExtendsMapper para crear un tipo de servicio");
 				}
 
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"TiposServiciosServiceImpl.crearServicio() -> Se ha producido un error al crear un servicio",
+					"TiposServiciosServiceImpl.crearServicio() -> Se ha producido un error al crear un tipo de servicio",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -283,7 +283,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		
 		insertResponseDTO.setError(error);
 
-		LOGGER.info("crearServicio() -> Salida del servicio para crear un servicio");
+		LOGGER.info("crearServicio() -> Salida del servicio para crear un tipo de servicio");
 
 		return insertResponseDTO;
 	}
@@ -295,7 +295,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		int status = 0;
 		
 
-		LOGGER.info("modificarServicio() -> Entrada al servicio para modificar un servicio");
+		LOGGER.info("modificarServicio() -> Entrada al servicio para modificar un tipo de servicio");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -317,7 +317,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"modificarServicio() / pysServiciosExtendsMapper.modificarServicio() -> Entrada a pysServiciosExtendsMapper para modificar un servicio");
+							"modificarServicio() / pysServiciosExtendsMapper.modificarServicio() -> Entrada a pysServiciosExtendsMapper para modificar un tipo de servicio");
 					
 					for (TiposServiciosItem servicio : listadoServicios.getTiposServiciosItems()) {
 						PysServicios servicioMyBatis = new PysServicios();
@@ -343,13 +343,13 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 					
 
 					LOGGER.info(
-							"modificarServicio() / pysServiciosExtendsMapper.modificarServicio() -> Salida de pysServiciosExtendsMapper para modificar un servicio");
+							"modificarServicio() / pysServiciosExtendsMapper.modificarServicio() -> Salida de pysServiciosExtendsMapper para modificar un tipo de servicio");
 				}
 
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"TiposServiciosServiceImpl.modificarServicio() -> Se ha producido un error al modificar un servicio",
+					"TiposServiciosServiceImpl.modificarServicio() -> Se ha producido un error al modificar un tipo de servicio",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -358,7 +358,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		
 		deleteResponseDTO.setError(error);
 
-		LOGGER.info("modificarServicio() -> Salida del servicio para modificar un servicio");
+		LOGGER.info("modificarServicio() -> Salida del servicio para modificar un tipo de servicio");
 
 		return deleteResponseDTO;
 	}
@@ -370,7 +370,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		int status = 0;
 		
 
-		LOGGER.info("activarDesactivarServicio() -> Entrada al servicio para activar/desactivar servicios");
+		LOGGER.info("activarDesactivarServicio() -> Entrada al servicio para activar/desactivar tipos de servicios");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -392,7 +392,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"activarDesactivarServicio() / pysServiciosExtendsMapper.activarDesactivarServicio() -> Entrada a pysServiciosExtendsMapper para activar/desactivar servicios");
+							"activarDesactivarServicio() / pysServiciosExtendsMapper.activarDesactivarServicio() -> Entrada a pysServiciosExtendsMapper para activar/desactivar tipos de servicios");
 
 					for (TiposServiciosItem servicio : listadoServicios.getTiposServiciosItems()) {
 						status = pysServiciosExtendsMapper
@@ -407,13 +407,13 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 					
 
 					LOGGER.info(
-							"activarDesactivarServicio() / pysServiciosExtendsMapper.activarDesactivarServicio() -> Salida de pysServiciosExtendsMapper para activar/desactivar servicios");
+							"activarDesactivarServicio() / pysServiciosExtendsMapper.activarDesactivarServicio() -> Salida de pysServiciosExtendsMapper para activar/desactivar tipos de servicios");
 				}
 
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"TiposServiciosServiceImpl.activarDesactivarServicio() -> Se ha producido un error al activar/desactivar servicios",
+					"TiposServiciosServiceImpl.activarDesactivarServicio() -> Se ha producido un error al activar/desactivar tipos de servicios",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -422,7 +422,7 @@ public class TiposServiciosServiceImpl implements ITiposServiciosService {
 		
 		servicioDTO.setError(error);
 
-		LOGGER.info("activarDesactivarServicio() -> Salida del servicio para activar/desactivar servicios");
+		LOGGER.info("activarDesactivarServicio() -> Salida del servicio para activar/desactivar tipos de servicios");
 
 		return servicioDTO;
 	}

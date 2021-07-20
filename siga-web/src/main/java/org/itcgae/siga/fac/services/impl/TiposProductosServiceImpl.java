@@ -47,7 +47,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		ListadoTipoProductoDTO listadoTipoProductoDTO = new ListadoTipoProductoDTO();
 		Error error = new Error();
 
-		LOGGER.info("searchTiposProductos() -> Entrada al servicio para recuperar el listado de productos");
+		LOGGER.info("searchTiposProductos() -> Entrada al servicio para recuperar el listado de tipos de productos");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -69,14 +69,14 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"searchTiposProductos() / pysTiposProductosExtendsMapper.searchTiposProductos() -> Entrada a pysTiposProductosExtendsMapper para obtener el listado de productos");
+							"searchTiposProductos() / pysTiposProductosExtendsMapper.searchTiposProductos() -> Entrada a pysTiposProductosExtendsMapper para obtener el listado de tipos de productos");
 
 					String idioma = usuarios.get(0).getIdlenguaje();
 					List<TiposProductosItem> listaProductos = pysTiposProductosExtendsMapper
 							.searchTiposProductos(idioma, idInstitucion);
 
 					LOGGER.info(
-							"searchTiposProductos() / pysTiposProductosExtendsMapper.searchTiposProductos() -> Salida de pysTiposProductosExtendsMapper para obtener el listado de productos");
+							"searchTiposProductos() / pysTiposProductosExtendsMapper.searchTiposProductos() -> Salida de pysTiposProductosExtendsMapper para obtener el listado de tipos de productos");
 
 					if (listaProductos != null && listaProductos.size() > 0) {
 						listadoTipoProductoDTO.setTiposProductosItems(listaProductos);
@@ -86,7 +86,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"TiposProductosServiceImpl.searchTiposProductos() -> Se ha producido un error al obtener el listado de productos",
+					"TiposProductosServiceImpl.searchTiposProductos() -> Se ha producido un error al obtener el listado de tipos de productos",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -94,7 +94,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 
 		listadoTipoProductoDTO.setError(error);
 
-		LOGGER.info("searchTiposProductos() -> Salida del servicio para obtener el listado de productos");
+		LOGGER.info("searchTiposProductos() -> Salida del servicio para obtener el listado de tipos de productos");
 
 		return listadoTipoProductoDTO;
 	}
@@ -161,7 +161,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		ListadoTipoProductoDTO listadoTipoProductoDTO = new ListadoTipoProductoDTO();
 		Error error = new Error();
 
-		LOGGER.info("searchTiposProductosHistorico() -> Entrada al servicio para recuperar el listado de productos historico");
+		LOGGER.info("searchTiposProductosHistorico() -> Entrada al servicio para recuperar el listado de tipos de productos historico");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -183,14 +183,14 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"searchTiposProductosHistorico() / pysTiposProductosExtendsMapper.searchTiposProductosHistorico() -> Entrada a pysTiposProductosExtendsMapper para obtener el listado de productos historico");
+							"searchTiposProductosHistorico() / pysTiposProductosExtendsMapper.searchTiposProductosHistorico() -> Entrada a pysTiposProductosExtendsMapper para obtener el listado de tipos de productos historico");
 
 					String idioma = usuarios.get(0).getIdlenguaje();
 					List<TiposProductosItem> listaProductos = pysTiposProductosExtendsMapper
 							.searchTiposProductosHistorico(idioma, idInstitucion);
 
 					LOGGER.info(
-							"searchTiposProductosHistorico() / pysTiposProductosExtendsMapper.searchTiposProductosHistorico() -> Salida de pysTiposProductosExtendsMapper para obtener el listado de productos historico");
+							"searchTiposProductosHistorico() / pysTiposProductosExtendsMapper.searchTiposProductosHistorico() -> Salida de pysTiposProductosExtendsMapper para obtener el listado de tipos de productos historico");
 
 					if (listaProductos != null && listaProductos.size() > 0) {
 						listadoTipoProductoDTO.setTiposProductosItems(listaProductos);
@@ -200,7 +200,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"TiposProductosServiceImpl.searchTiposProductosHistorico() -> Se ha producido un error al obtener el listado de productos historico",
+					"TiposProductosServiceImpl.searchTiposProductosHistorico() -> Se ha producido un error al obtener el listado de tipos de productos historico",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -208,7 +208,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 
 		listadoTipoProductoDTO.setError(error);
 
-		LOGGER.info("searchTiposProductosHistorico() -> Salida del servicio para obtener el listado de productos historico");
+		LOGGER.info("searchTiposProductosHistorico() -> Salida del servicio para obtener el listado de tipos de productos historico");
 
 		return listadoTipoProductoDTO;
 	}
@@ -277,7 +277,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		int status = 0;
 		
 
-		LOGGER.info("crearProducto() -> Entrada al servicio para crear un producto");
+		LOGGER.info("crearProducto() -> Entrada al servicio para crear un tipo de producto");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -299,7 +299,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"crearProducto() / pysTiposProductosExtendsMapper.crearProducto() -> Entrada a pysTiposProductosExtendsMapper para crear un producto");
+							"crearProducto() / pysTiposProductosExtendsMapper.crearProducto() -> Entrada a pysTiposProductosExtendsMapper para crear un tipo de producto");
 
 					NewIdDTO idOrdenacion = pysTiposProductosExtendsMapper.getIndiceMaxProducto(listadoProductos.getTiposProductosItems(), idInstitucion);
 					PysProductos producto = new PysProductos();
@@ -324,13 +324,13 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 					
 
 					LOGGER.info(
-							"crearProducto() / pysTiposProductosExtendsMapper.crearProducto() -> Salida de pysTiposProductosExtendsMapper para crear un producto");
+							"crearProducto() / pysTiposProductosExtendsMapper.crearProducto() -> Salida de pysTiposProductosExtendsMapper para crear un tipo de producto");
 				}
 
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"TiposProductosServiceImpl.crearProducto() -> Se ha producido un error al crear un producto",
+					"TiposProductosServiceImpl.crearProducto() -> Se ha producido un error al crear un tipo de producto",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -339,7 +339,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		
 		insertResponseDTO.setError(error);
 
-		LOGGER.info("crearProducto() -> Salida del servicio para crear un producto");
+		LOGGER.info("crearProducto() -> Salida del servicio para crear un tipo de producto");
 
 		return insertResponseDTO;
 	}
@@ -351,7 +351,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		int status = 0;
 		
 
-		LOGGER.info("modificarProducto() -> Entrada al servicio para modificar un producto");
+		LOGGER.info("modificarProducto() -> Entrada al servicio para modificar un tipo de producto");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -373,7 +373,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"modificarProducto() / pysTiposProductosExtendsMapper.modificarProducto() -> Entrada a pysTiposProductosExtendsMapper para modificar un producto");
+							"modificarProducto() / pysTiposProductosExtendsMapper.modificarProducto() -> Entrada a pysTiposProductosExtendsMapper para modificar un tipo de producto");
 					
 					for (TiposProductosItem producto : listadoProductos.getTiposProductosItems()) {
 						PysProductos productoMyBatis = new PysProductos();
@@ -399,13 +399,13 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 					
 
 					LOGGER.info(
-							"modificarProducto() / pysTiposProductosExtendsMapper.modificarProducto() -> Salida de pysTiposProductosExtendsMapper para modificar un producto");
+							"modificarProducto() / pysTiposProductosExtendsMapper.modificarProducto() -> Salida de pysTiposProductosExtendsMapper para modificar un tipo de producto");
 				}
 
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"TiposProductosServiceImpl.modificarProducto() -> Se ha producido un error al modificar un producto",
+					"TiposProductosServiceImpl.modificarProducto() -> Se ha producido un error al modificar un tipo de producto",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -414,7 +414,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		
 		deleteResponseDTO.setError(error);
 
-		LOGGER.info("modificarProducto() -> Salida del servicio para modificar un producto");
+		LOGGER.info("modificarProducto() -> Salida del servicio para modificar un tipo de producto");
 
 		return deleteResponseDTO;
 	}
@@ -426,7 +426,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		int status = 0;
 		
 
-		LOGGER.info("activarDesactivarProducto() -> Entrada al servicio para activar/desactivar productos");
+		LOGGER.info("activarDesactivarProducto() -> Entrada al servicio para activar/desactivar tipos de productos");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -448,7 +448,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"activarDesactivarProducto() / pysTiposProductosExtendsMapper.activarDesactivarProducto() -> Entrada a pysTiposProductosExtendsMapper para activar/desactivar productos");
+							"activarDesactivarProducto() / pysTiposProductosExtendsMapper.activarDesactivarProducto() -> Entrada a pysTiposProductosExtendsMapper para activar/desactivar tipos de productos");
 
 					for (TiposProductosItem producto : listadoProductos.getTiposProductosItems()) {
 						status = pysTiposProductosExtendsMapper
@@ -463,13 +463,13 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 					
 
 					LOGGER.info(
-							"activarDesactivarProducto() / pysTiposProductosExtendsMapper.activarDesactivarProducto() -> Salida de pysTiposProductosExtendsMapper para activar/desactivar productos");
+							"activarDesactivarProducto() / pysTiposProductosExtendsMapper.activarDesactivarProducto() -> Salida de pysTiposProductosExtendsMapper para activar/desactivar tipos de productos");
 				}
 
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"TiposProductosServiceImpl.activarDesactivarProducto() -> Se ha producido un error al activar/desactivar productos",
+					"TiposProductosServiceImpl.activarDesactivarProducto() -> Se ha producido un error al activar/desactivar tipos de productos",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -478,7 +478,7 @@ public class TiposProductosServiceImpl implements ITiposProductosService {
 		
 		productoDTO.setError(error);
 
-		LOGGER.info("activarDesactivarProducto() -> Salida del servicio para activar/desactivar productos");
+		LOGGER.info("activarDesactivarProducto() -> Salida del servicio para activar/desactivar tipos de productos");
 
 		return productoDTO;
 	}

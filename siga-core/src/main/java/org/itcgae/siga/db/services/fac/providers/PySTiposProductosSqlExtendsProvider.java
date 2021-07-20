@@ -34,6 +34,45 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		return sql.toString();
 	}
 	
+	public String searchTiposProductosHistorico(String idioma, Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("pp.IDTIPOPRODUCTO");
+		sql.SELECT("substr(f_siga_getrecurso (tp.DESCRIPCION ,'" + idioma +"'), 0, 30) AS DESCRIPCION_TIPO");
+		sql.SELECT("pp.IDPRODUCTO");
+		sql.SELECT("pp.DESCRIPCION");
+		sql.SELECT("pp.FECHABAJA");
+		
+		sql.FROM("PYS_PRODUCTOS pp");
+		
+		sql.JOIN("PYS_TIPOSPRODUCTOS tp ON pp.IDTIPOPRODUCTO = tp.IDTIPOPRODUCTO");
+		
+		sql.WHERE("pp.IDINSTITUCION = '" + idInstitucion + "'");
+		
+		sql.ORDER_BY("pp.IDTIPOPRODUCTO");
+		sql.ORDER_BY("pp.IDPRODUCTO");
+		sql.ORDER_BY("pp.IDINSTITUCION");
+
+		return sql.toString();
+	}
+	
+	public String searchTiposProductosByIdCategoria(String idioma, Short idInstitucion, String idCategoria) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDPRODUCTO AS ID");
+		sql.SELECT("f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
+		
+		sql.FROM("PYS_PRODUCTOS");
+		
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTIPOPRODUCTO = '" + idCategoria + "'");
+		
+		sql.ORDER_BY("DESCRIPCION");
+		
+		return sql.toString();
+	}
+	
+
 	public String searchListadoProductosBuscador(String idioma, Short idInstitucion, FiltroProductoItem filtroProductoItem) {
 		SQL sql = new SQL();
 		
@@ -96,44 +135,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		
 		return sql.toString();
 	}
-
-	public String searchTiposProductosByIdCategoria(String idioma, Short idInstitucion, String idCategoria) {
-		SQL sql = new SQL();
-		
-		sql.SELECT("IDPRODUCTO AS ID");
-		sql.SELECT("f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
-		
-		sql.FROM("PYS_PRODUCTOS");
-		
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE("IDTIPOPRODUCTO = '" + idCategoria + "'");
-		
-		sql.ORDER_BY("DESCRIPCION");
-		
-		return sql.toString();
-	}
 	
-	public String searchTiposProductosHistorico(String idioma, Short idInstitucion) {
-		SQL sql = new SQL();
-
-		sql.SELECT("pp.IDTIPOPRODUCTO");
-		sql.SELECT("substr(f_siga_getrecurso (tp.DESCRIPCION ,'" + idioma +"'), 0, 30) AS DESCRIPCION_TIPO");
-		sql.SELECT("pp.IDPRODUCTO");
-		sql.SELECT("pp.DESCRIPCION");
-		sql.SELECT("pp.FECHABAJA");
-		
-		sql.FROM("PYS_PRODUCTOS pp");
-		
-		sql.JOIN("PYS_TIPOSPRODUCTOS tp ON pp.IDTIPOPRODUCTO = tp.IDTIPOPRODUCTO");
-		
-		sql.WHERE("pp.IDINSTITUCION = '" + idInstitucion + "'");
-		
-		sql.ORDER_BY("pp.IDTIPOPRODUCTO");
-		sql.ORDER_BY("pp.IDPRODUCTO");
-		sql.ORDER_BY("pp.IDINSTITUCION");
-
-		return sql.toString();
-	}
 	
 	public String comboTiposProductos(String idioma) {
 		SQL sql = new SQL();
@@ -147,6 +149,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		
 		return sql.toString();
 	}
+	
 	
 	public String activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, TiposProductosItem producto) {
 		SQL sql = new SQL();
@@ -168,6 +171,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		return sql.toString();
 	}
 	
+	
 	public String getIndiceMaxProducto(List<TiposProductosItem> listadoProductos, Short idInstitucion) {
 		SQL sql = new SQL();
 		
@@ -180,6 +184,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		
 		return sql.toString();
 	}
+	
 	
 	public String comprobarUsoProducto(ListaProductosItem producto, Short idInstitucion) {
 		SQL sql = new SQL();
@@ -215,6 +220,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		return sql.toString();
 	}
 	
+	
 	public String comprobarSolicitudProducto(ListaProductosItem producto, Short idInstitucion) {
 		SQL sql = new SQL();
 		
@@ -229,6 +235,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		
 		return sql.toString();
 	}
+	
 	
 	public String borradoLogicoProductos(AdmUsuarios usuario, ListaProductosItem producto, Short idInstitucion) {
 		SQL sql = new SQL();
@@ -253,6 +260,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		return sql.toString();
 	}
 	
+	
 	public String borradoFisicoProductosRegistro(ListaProductosItem producto, Short idInstitucion) {
 		SQL sql = new SQL();
 	
@@ -265,6 +273,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		
 		return sql.toString();
 	}
+	
 	
 	public String borradoFisicoProductosIdentificador(ListaProductosItem producto, Short idInstitucion) {
 		SQL sql = new SQL();

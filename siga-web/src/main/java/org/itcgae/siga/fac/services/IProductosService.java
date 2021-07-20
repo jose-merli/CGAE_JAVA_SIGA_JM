@@ -15,6 +15,7 @@ public interface IProductosService {
 	public ComboDTO comboTipoFormaPago(HttpServletRequest request);
 	public ProductoDetalleDTO detalleProducto(HttpServletRequest request, int idTipoProducto, int idProducto, int idProductoInstitucion);
 	public InsertResponseDTO nuevoProducto(ProductoDetalleDTO producto, HttpServletRequest request);
+	public DeleteResponseDTO editarProducto(ProductoDetalleDTO producto, HttpServletRequest request);
 	public ListaProductosDTO searchListadoProductos(HttpServletRequest request, FiltroProductoItem filtroProductoItem);
-	public DeleteResponseDTO ReactivarBorradoFisicoLogicoProductos(ListaProductosDTO listadoProductos, HttpServletRequest request);
+	public DeleteResponseDTO reactivarBorradoFisicoLogicoProductos(ListaProductosDTO listadoProductos, HttpServletRequest request);
 }

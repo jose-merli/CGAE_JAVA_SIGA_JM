@@ -6,6 +6,7 @@ import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
+import org.itcgae.siga.DTO.fac.ProductoDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -43,11 +44,17 @@ public class ProductosController {
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
-//	@PostMapping(value="/pys/editarProducto")
-//	ResponseEntity<DeleteResponseDTO> editarProducto(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request){
-//		DeleteResponseDTO response = tiposProductosService.modificarProducto(listadoProductos, request);
-//		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-//	}
+	@PostMapping(value="/pys/editarProducto")
+	ResponseEntity<DeleteResponseDTO> editarProducto(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request){
+		DeleteResponseDTO response = productosService.editarProducto(producto, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value="/pys/reactivarBorradoFisicoLogicoProductos")
+	ResponseEntity<DeleteResponseDTO> reactivarBorradoFisicoLogicoProductos(@RequestBody ListaProductosDTO listadoProductos, HttpServletRequest request){
+		DeleteResponseDTO response = productosService.reactivarBorradoFisicoLogicoProductos(listadoProductos, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
 	
 	@GetMapping(value = "/combo/tipoIva")
 	ResponseEntity<ComboDTO> comboTiposIva(HttpServletRequest request) { 
