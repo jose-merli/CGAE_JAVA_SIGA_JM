@@ -146,6 +146,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.exp.mappers.ExpTipoexpedienteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsActacomisionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsContrariosejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDelitoExtendsMapper;
@@ -162,6 +163,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsPresentadorExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrestacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProcuradorExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSituacionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipodocumentoEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoencalidadExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
@@ -326,9 +328,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	
 	@Autowired
 	private ScsEjgActaMapper scsEjgActaMapper;
+
+	@Autowired
+	private ScsAsistenciaExtendsMapper scsAsistenciaExtendsMapper;
 	
 	@Autowired
 	private ScsSojMapper scsSojMapper;
+	
+	@Autowired
+	private ScsSojExtendsMapper scsSojExtendsMapper;
 	
 	@Autowired
 	private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
@@ -2698,10 +2706,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 					
-						ScsEjgdesigna record = new ScsEjgdesigna();
-						response = 0;
-
-						// creamos el objeto para el insert
 						
 						String anio = datos.getAnio();
 						String num = datos.getNumero();
@@ -2718,7 +2722,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							e);
 				} finally {
 					// respuesta si se actualiza correctamente
-					if (response >= 1) {
+					if (response == 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
 								"GestionEJGServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
@@ -2737,7 +2741,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	}
 	
 	@Override
-	@Transactional
 	public UpdateResponseDTO borrarRelacionAsistenciaEJG(RelacionesItem datos, HttpServletRequest request) {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
@@ -2762,20 +2765,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 					
-					ScsAsistencia record = new ScsAsistencia();
-					record.setFechamodificacion(new Date());
-					record.setUsumodificacion(usuarios.get(0).getIdusuario());
 					
-					record.setIdinstitucion(Short.parseShort(datos.getIdinstitucion()));
-					record.setEjganio(null);
-					record.setEjgidtipoejg(null);
-					record.setEjgnumero(null);
-					
-					record.setNumero(Long.parseLong(datos.getNumero()));
-					record.setAnio(Short.parseShort(datos.getAnio()));
+					String idinstitucion = datos.getIdinstitucion();
+					String numero = datos.getNumero();
+					String anio = datos.getAnio();
 
 
-					response = scsAsistenciaMapper.updateByPrimaryKey(record);
+					response = scsAsistenciaExtendsMapper.eliminarRelacionAsistencia(idinstitucion, anio, numero);
 					
 					
 					LOGGER.debug(
@@ -2786,7 +2782,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							e);
 				} finally {
 					// respuesta si se actualiza correctamente
-					if (response >= 1) {
+					if (response == 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
 								"GestionEJGServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
@@ -2805,7 +2801,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	}
 
 	@Override
-	@Transactional
 	public UpdateResponseDTO borrarRelacionSojEJG(RelacionesItem datos, HttpServletRequest request) {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
@@ -2831,20 +2826,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				try {
 					
 					
-						ScsSoj record = new ScsSoj();
-						record.setFechamodificacion(new Date());
-						record.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
-						record.setIdinstitucion(Short.parseShort(datos.getIdinstitucion()));
-						record.setEjganio(null);
-						record.setEjgidtipoejg(null);
-						record.setEjgnumero(null);
 						
-						record.setNumero(Long.parseLong(datos.getNumero()));
-						record.setAnio(Short.parseShort(datos.getAnio()));
-						record.setIdtiposoj(Short.parseShort(datos.getIdtipo()));						
+					String idinstitucion = datos.getIdinstitucion();
+					String numero = datos.getNumero();
+					String anio = datos.getAnio();
+					String tipoSoj = datos.getIdtipo();						
 
-						response = scsSojMapper.updateByPrimaryKey(record);
+					response = scsSojExtendsMapper.eliminarRelacionSoj(idinstitucion, anio, numero, tipoSoj);
 					
 					
 					
@@ -2856,7 +2845,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							e);
 				} finally {
 					// respuesta si se actualiza correctamente
-					if (response >= 1) {
+					if (response == 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
 								"GestionEJGServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
