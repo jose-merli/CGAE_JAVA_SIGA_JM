@@ -56,7 +56,7 @@ public interface IGestionEJG {
 
 	ComboDTO comboOrigen(HttpServletRequest request);
 
-	ComboDTO comboActaAnnio(HttpServletRequest request);
+	ComboDTO comboActaAnnio(String idActa, HttpServletRequest request);
 
 	ResolucionEJGItem getResolucion(EjgItem ejgItem, HttpServletRequest request);
 
@@ -83,8 +83,6 @@ public interface IGestionEJG {
 	UpdateResponseDTO borrarRelacionSojEJG(RelacionesItem datos, HttpServletRequest request);
 
 	UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request);
-
-	UpdateResponseDTO guardarResolucion(EjgItem datos, HttpServletRequest request);
 	
 	UpdateResponseDTO descargarInformeCalificacion(EjgItem datos, HttpServletRequest request);
 	
@@ -170,4 +168,8 @@ public interface IGestionEJG {
 	String insertCollectionEjg(EjgItem ejgItem, HttpServletRequest request) throws Exception;
 
 	DocushareDTO searchListDocEjg(EjgItem ejgItem, HttpServletRequest request) throws Exception;
+
+	UpdateResponseDTO guardarResolucion(ResolucionEJGItem datos, HttpServletRequest request);
+
+	Boolean getHabilitarActa(HttpServletRequest request);
 }

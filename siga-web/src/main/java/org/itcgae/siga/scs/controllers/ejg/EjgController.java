@@ -270,8 +270,8 @@ public class EjgController {
 
 	// comboActaAnnio
 	@RequestMapping(value = "/gestion-ejg/comboActaAnnio", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboActaAnnio(HttpServletRequest request) {
-		ComboDTO response = gestionEJG.comboActaAnnio(request);
+	ResponseEntity<ComboDTO> comboActaAnnio(String idActa, HttpServletRequest request) {
+		ComboDTO response = gestionEJG.comboActaAnnio(idActa, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
@@ -428,9 +428,19 @@ public class EjgController {
 
 	// guardarResolucion
 	@RequestMapping(value = "/gestion-ejg/guardarResolucion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarResolucion(@RequestBody EjgItem datos, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> guardarResolucion(@RequestBody ResolucionEJGItem datos, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionEJG.guardarResolucion(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if (response.getStatus().equals("OK"))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	// GetHabilitarActa (Permiso en la tarjeta resolucion)
+	@RequestMapping(value = "/gestion-ejg/getHabilitarActa", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Boolean> getHabilitarActa(HttpServletRequest request) {
+		Boolean response = gestionEJG.getHabilitarActa(request);
+		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
 	}
 
 	// borrarRelacion

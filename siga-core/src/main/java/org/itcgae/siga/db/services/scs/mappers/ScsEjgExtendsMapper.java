@@ -161,15 +161,15 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	EjgItem getDictamen(EjgItem ejgItem, String idInstitucion, String idLenguaje);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getResolucion")
-	@Results({ @Result(column = "anioacta", property = "annioActa", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idacta", property = "idActa", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idtiporatificacionejg", property = "idTiporatificacionEJG", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idfundamentojuridico", property = "idFundamentoJuridico", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "anioacta", property = "annioActa", jdbcType = JdbcType.INTEGER),
+			@Result(column = "idacta", property = "idActa", jdbcType = JdbcType.INTEGER),
+			@Result(column = "idtiporatificacionejg", property = "idTiporatificacionEJG", jdbcType = JdbcType.INTEGER),
+			@Result(column = "idfundamentojuridico", property = "idFundamentoJuridico", jdbcType = JdbcType.INTEGER),
 			@Result(column = "ratificaciondictamen", property = "ratificacionDictamen", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idorigencajg", property = "idOrigencajg", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "aniocajg", property = "anioCAJG", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idorigencajg", property = "idOrigencajg", jdbcType = JdbcType.INTEGER),
+			@Result(column = "aniocajg", property = "anioCAJG", jdbcType = JdbcType.INTEGER),
 			@Result(column = "numero_cajg", property = "numeroCAJG", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idponente", property = "idPonente", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idponente", property = "idPonente", jdbcType = JdbcType.INTEGER),
 			@Result(column = "fechapresentacionponente", property = "fechaPresentacionPonente", jdbcType = JdbcType.DATE),
 			@Result(column = "fecharesolucioncajg", property = "fechaResolucionCAJG", jdbcType = JdbcType.DATE),
 			@Result(column = "fecharatificacion", property = "fechaRatificacion", jdbcType = JdbcType.DATE),
@@ -282,8 +282,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 //			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) 
 	})
 	List<ProcuradorItem> busquedaProcuradorEJG(String idProcurador, String idinstitucion);// String num, String idturno,
-																							// String anio
-
+	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getNewIdDocumentacionEjg")
 	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR), })
 	MaxIdDto getNewIdDocumentacionEjg(Short idInstitucion);
