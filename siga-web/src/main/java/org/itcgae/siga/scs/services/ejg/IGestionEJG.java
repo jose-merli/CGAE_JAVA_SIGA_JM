@@ -169,7 +169,7 @@ public interface IGestionEJG {
 
 	DocushareDTO searchListDocEjg(EjgItem ejgItem, HttpServletRequest request) throws Exception;
 
-	UpdateResponseDTO guardarResolucion(ResolucionEJGItem datos, HttpServletRequest request);
+	UpdateResponseDTO guardarResolucion(ResolucionEJGItem datos, HttpServletRequest request) throws Exception;
 
 	Boolean getHabilitarActa(HttpServletRequest request);
 }

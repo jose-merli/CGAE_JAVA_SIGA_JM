@@ -828,7 +828,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ " ejg.fechapresentacionponente," + " ejg.fecharesolucioncajg," + " ejg.fecharatificacion,"
 				+ " ejg.fechanotificacion," + " ejg.refauto," + " ejg.turnadoratificacion,"
 				+ " ejg.requierenotificarproc," + " ejg.anioacta," + " ejg.idacta,"
-				+ " ejg.idinstitucion||','||ejg.anioacta||','||ejg.idacta as idannioacta,"
+//				+ " ejg.idinstitucion||','||ejg.idacta||','||ejg.anioacta as idannioacta,"
+				+ " (CASE WHEN ejg.idacta is  NULL THEN null ELSE ejg.idacta||','||ejg.anioacta END) as idannioacta,"
 				+ " resolucion.notascajg AS notascajg");
 
 		sql.FROM("scs_ejg ejg");
@@ -836,12 +837,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				"scs_ejg_resolucion resolucion on (resolucion.idinstitucion = ejg.idinstitucion AND resolucion.idtipoejg = ejg.idtipoejg AND resolucion.anio = ejg.anio AND resolucion.numero = ejg.numero)");
 
 		sql.WHERE("ejg.idinstitucion = " + idInstitucion);
-		if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
-			sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
-		if (ejgItem.getNumEjg() != null && ejgItem.getNumEjg() != "")
-			sql.WHERE("ejg.numejg =" + ejgItem.getNumEjg());
-		if (ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
-			sql.WHERE("ejg.idtipoejg = " + ejgItem.getTipoEJG());
+		sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
+		sql.WHERE("ejg.numejg =" + ejgItem.getNumEjg());
+		sql.WHERE("ejg.idtipoejg = " + ejgItem.getTipoEJG());
 
 		return sql.toString();
 	}

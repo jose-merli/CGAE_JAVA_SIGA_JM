@@ -5,9 +5,11 @@ import java.util.List;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
+import org.itcgae.siga.db.mappers.ScsAsistenciaSqlProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsAsistenciaSqlExtendsProvider;
 import org.itcgae.siga.DTOs.scs.AsuntosAsistenciaItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
@@ -51,5 +53,8 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 		@Result(column = "IDPERSONACOLEGIADO", property = "idPersonaColegiado", jdbcType = JdbcType.VARCHAR)
 	})
 	AsuntosAsistenciaItem getAsuntoTipoAsistencia(AsuntosClaveJusticiableItem asuntoClave, String idLenguaje);
+	
+	 @UpdateProvider(type=ScsAsistenciaSqlExtendsProvider.class, method="eliminarRelacionAsistencia")
+	    int eliminarRelacionAsistencia(String idinstitucion, String anio, String numero);
 
 }
