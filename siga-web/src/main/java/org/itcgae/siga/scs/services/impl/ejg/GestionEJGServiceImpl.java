@@ -2420,11 +2420,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					
 					if(nuevo)response = scsEjgResolucionMapper.insertSelective(ejgResolucion);
 					else response = scsEjgResolucionMapper.updateByPrimaryKey(ejgResolucion);
-					if(response==0) throw(new Exception("Error al insertar al actualizar la parte de la resolucino del EJG"));
+					if(response==0) throw(new Exception("Error al insertar o actualizar la parte de la resolucion asociada al EJG"));
+					
 					
 					//3. ASOCIAR EL EJG CON EL ACTA
 					
 //					if(ejg.getIdacta() != null) {
+//					LOGGER.info("GestionEJGServiceImpl.guardarResolucion() -> Se inicia la asociacion entre el EJG y el acta.");
 //						
 //						CajgEjgremesa relacion = new CajgEjgremesa();
 //						
@@ -2435,8 +2437,66 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 //						
 //						
 //						relacion.setFechamodificacion(new Date());
-//						relacion.setUsumodificacion(usuarios.get(0).getIdusuario());	
+//						relacion.setUsumodificacion(usuarios.get(0).getIdusuario());
+//					
+//					LOGGER.info("GestionEJGServiceImpl.guardarResolucion() -> Se finaliza la asociacion entre el EJG y el acta.");
 //					}
+					
+					//4. CREAMOS UN NUEVO ESTADO EN EL EJG
+					
+					LOGGER.info("GestionEJGServiceImpl.guardarResolucion() -> Se inicia la asocion de un estado \"Resuelto Comisión\" al EJG.");
+					
+					ScsEstadoejg estado = new ScsEstadoejg();
+
+					// creamos el objeto para el insert
+					estado.setIdinstitucion(idInstitucion);
+					estado.setAnio(ejg.getAnio());
+					estado.setNumero(ejg.getNumero());
+
+					//Estado "Resuelto Comisión"
+					estado.setIdestadoejg((short) 10);
+					estado.setFechainicio(new Date());
+					estado.setAutomatico("1");
+
+					estado.setIdtipoejg(ejg.getIdtipoejg());
+
+					estado.setFechamodificacion(new Date());
+					estado.setUsumodificacion(usuarios.get(0).getIdusuario());
+					
+					// Comprobamos si hay un estado "Resuelto Comisión" presente en el EJG y lo eliminamos
+					ScsEstadoejgExample example = new ScsEstadoejgExample();
+					example.createCriteria().andAnioEqualTo(ejg.getAnio())
+							.andIdinstitucionEqualTo(idInstitucion)
+							.andIdtipoejgEqualTo(ejg.getIdtipoejg())
+							.andNumeroEqualTo(ejg.getNumero())
+							.andIdestadoejgEqualTo((short) 10);
+
+					List<ScsEstadoejg> estadoResuelto = scsEstadoejgMapper.selectByExample(example);
+					
+					if(!estadoResuelto.isEmpty()) {
+						response = scsEstadoejgMapper.deleteByExample(example);
+						if(response==0) throw(new Exception("Error al borrar el estado \"Resuelto Comisión\" asociado al EJG"));
+					}
+					
+					// obtenemos el maximo de idestadoporejg
+					example = new ScsEstadoejgExample();
+					example.setOrderByClause("IDESTADOPOREJG DESC");
+					example.createCriteria().andAnioEqualTo(ejg.getAnio())
+							.andIdinstitucionEqualTo(idInstitucion)
+							.andIdtipoejgEqualTo(ejg.getIdtipoejg())
+							.andNumeroEqualTo(ejg.getNumero());
+
+					List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
+
+					// damos el valor al idestadoporejg + 1
+					if (listEjg.size() > 0) {
+						estado.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
+					} else {
+						estado.setIdestadoporejg(Long.parseLong("0"));
+					}
+
+					response = scsEstadoejgMapper.insert(estado);
+					if(response==0) throw(new Exception("Error al insertar el estado \\\"Resuelto Comisión\\\" asociado al EJG"));
 					
 					
 				} catch (Exception e) {
@@ -3617,7 +3677,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						estado.setObservaciones(item.getNombreApProcurador());
 					else
 						estado.setObservaciones("Ninguno");
-					estado.setAutomatico("0");
+					estado.setAutomatico("1");
 
 					estado.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
 
@@ -3634,7 +3694,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
 
-					// damos el varlo al idestadoporejg + 1
+					// damos el valor al idestadoporejg + 1
 					if (listEjg.size() > 0) {
 						estado.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
 					} else {
@@ -4927,7 +4987,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					estado.setIdestadoejg((short) 6);
 					estado.setFechainicio(new Date());
 	//				estado.setObservaciones("Ninguno");
-					estado.setAutomatico("0");
+					estado.setAutomatico("1");
 	
 					estado.setIdtipoejg(Short.parseShort(ejgItem.getTipoEJG()));
 	
