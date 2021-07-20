@@ -4,10 +4,12 @@ import java.util.List;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosSOJItem;
+import org.itcgae.siga.db.mappers.ScsAsistenciaSqlProvider;
 import org.itcgae.siga.db.mappers.ScsSojMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsSojSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -50,4 +52,7 @@ public interface ScsSojExtendsMapper extends ScsSojMapper{
 		@Result(column = "IDPERSONACOLEGIADO", property = "idPersonaColegiado", jdbcType = JdbcType.VARCHAR)
 	})
 	AsuntosSOJItem getAsuntoTipoSoj(AsuntosClaveJusticiableItem asuntoClave, String idLenguaje);
+	
+	@UpdateProvider(type=ScsSojSqlExtendsProvider.class, method="eliminarRelacionSoj")
+    int eliminarRelacionSoj(String idinstitucion, String anio, String numero, String tipoSoj);
 }

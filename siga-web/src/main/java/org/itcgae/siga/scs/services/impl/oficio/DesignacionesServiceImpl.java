@@ -171,6 +171,7 @@ import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignasLetradoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
@@ -325,6 +326,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private ScsAsistenciaMapper scsAsistenciaMapper;
+	
+	@Autowired
+	private ScsAsistenciaExtendsMapper scsAsistenciaExtendsMapper;
 	
 	/**
 	 * busquedaJustificacionExpres
@@ -4972,7 +4976,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 	
 	@Override
-	@Transactional
 	public UpdateResponseDTO eliminarRelacionAsistenciaDesigna(RelacionesItem datos, HttpServletRequest request) {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
@@ -4997,20 +5000,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 					
-					ScsAsistencia record = new ScsAsistencia();
-					record.setFechamodificacion(new Date());
-					record.setUsumodificacion(usuarios.get(0).getIdusuario());
-					
-					record.setIdinstitucion(Short.parseShort(datos.getIdinstitucion()));
-					record.setDesignaAnio(null);
-					record.setDesignaTurno(null);
-					record.setDesignaNumero(null);
-					
-					record.setNumero(Long.parseLong(datos.getNumero()));
-					record.setAnio(Short.parseShort(datos.getAnio()));
+					String idinstitucion = datos.getIdinstitucion();
+					String numero = datos.getNumero();
+					String anio = datos.getAnio();
 
 
-					response = scsAsistenciaMapper.updateByPrimaryKey(record);
+					response = scsAsistenciaExtendsMapper.eliminarRelacionAsistencia(idinstitucion, anio, numero);
 					
 					
 					LOGGER.debug(
@@ -5021,7 +5016,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							e);
 				} finally {
 					// respuesta si se actualiza correctamente
-					if (response >= 1) {
+					if (response == 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
 								"GestionEJGServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");

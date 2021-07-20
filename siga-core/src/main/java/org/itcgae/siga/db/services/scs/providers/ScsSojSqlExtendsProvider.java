@@ -26,7 +26,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 				+ "		soj.idtiposoj,"
 				+ "    (nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado,"
-				+ "nvl( soj.numerodiligencia, 'Sin número' ) || ' - ' || nvl( soj.nig, 'Sin número' ) || ' - ' || nvl( soj.numeroprocedimiento,'Sin número' ) dilnigproc");
+				+ "null dilnigproc");
 		sql.FROM("    scs_soj soj\r\n");
 		sql.JOIN("scs_personajg pjg ON ( pjg.idpersona = soj.idpersonajg AND pjg.idinstitucion = soj.idinstitucion)");
 		sql.LEFT_OUTER_JOIN("cen_persona per ON (soj.idpersona = per.idpersona)");
@@ -204,5 +204,21 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String eliminarRelacionSoj(String idinstitucion, String anio, String numero, String tipoSoj){
+    	SQL sql = new SQL();
+    	
+    	sql.UPDATE("SCS_SOJ");
+    	sql.SET("EJGIDTIPOEJG = null");
+    	sql.SET("EJGANIO = null");
+    	sql.SET("EJGNUMERO = null");
+    	
+    	sql.WHERE("IDINSTITUCION = " + idinstitucion);
+		sql.WHERE("ANIO = " + anio);
+		sql.WHERE("NUMERO = " + numero);
+		sql.WHERE("IDTIPOSOJ = " + tipoSoj);
+    	
+    	return sql.toString();
+    }
 
 }
