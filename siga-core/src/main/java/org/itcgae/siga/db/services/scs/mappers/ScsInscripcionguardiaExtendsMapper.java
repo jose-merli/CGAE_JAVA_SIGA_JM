@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
+import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.CargaMasivaDatosITItem;
@@ -40,6 +42,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 	})
 	List<InscripcionGuardiaItem> getColaGuardias(String idGuardia, String idTurno, String fecha,String ultimo,String ordenaciones, String idInstitucion, String idgrupoguardiacolegiado);
 
+
 	
 	
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "searchGrupo")
@@ -66,5 +69,36 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> comboGuardiasInscritoLetrado(Short idInstitucion, String idPersona, String idTurno);
+
+
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "listadoInscripciones")
+	@Results({ 
+		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "NOMBREGUARDIA", property = "nombreGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESBAJA", property = "observacionesbaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHASOLICITUDBAJA", property = "fechasolicitudbaja", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESVALIDACION", property = "observacionesvalidacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHADENEGACION", property = "fechadenegacion", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESDENEGACION", property = "observacionesdenegacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBSERVACIONESVALBAJA", property = "observacionesvalbaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHASUSCRIPCION", property = "fechasolicitud", jdbcType = JdbcType.DATE),
+	})
+	List<BusquedaInscripcionItem> getListadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion);
+	
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "validarInscripciones")
+	@Results({		
+	})
+	String getValidarInscripciones(BusquedaInscripcionItem inscripciones, String idInstitucion);
+	
+	
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "denegarInscripciones")
+	@Results({		
+	})
+	String getDenegarInscripciones(BusquedaInscripcionItem inscripciones, String idInstitucion);
 
 }

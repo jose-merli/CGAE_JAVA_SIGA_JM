@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosSalidaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
@@ -24,12 +25,15 @@ import org.itcgae.siga.DTOs.scs.IncompatibilidadesDTO;
 import org.itcgae.siga.DTOs.scs.IncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesResponseDTO;
 import org.itcgae.siga.DTOs.scs.LetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
+
 
 public interface GuardiasService {
 
@@ -90,6 +94,7 @@ public interface GuardiasService {
 	public DeleteResponseDTO deleteCalendariosProgramados(DeleteCalendariosProgDatosEntradaItem deleteCalBody,
 			HttpServletRequest request);
 	
+
 	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request);
 			
 	public DocumentoActDesignaDTO getDocumentosPorActDesigna(DocumentoActDesignaItem documentoActDesignaItem,
@@ -101,4 +106,14 @@ public interface GuardiasService {
 	public DeleteResponseDTO eliminarDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
 			HttpServletRequest request);
 			
+
+	public InscripcionesResponseDTO getInscripciones(InscripcionDatosEntradaDTO inscripcionesDTO,
+			HttpServletRequest request);
+	
+	public UpdateResponseDTO validarInscripciones(BusquedaInscripcionItem validarbody,
+			HttpServletRequest request);
+	
+	public UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarbody,
+			HttpServletRequest request);
+
 }
