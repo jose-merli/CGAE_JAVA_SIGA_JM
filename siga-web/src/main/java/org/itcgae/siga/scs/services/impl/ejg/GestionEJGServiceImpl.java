@@ -111,6 +111,7 @@ import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsEjgdesignaExample;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.entities.ScsEstadoejgKey;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsPonente;
@@ -1452,7 +1453,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.debug(
 						"GestionEJGServiceImpl.insertaDatosGenerales() -> Entrada para insertar los datos generales del ejg");
 
-				try {
+				//Para que @transactional funcione adecuadamente se comenta el try y el catch
+//				try {
 					record = setDatosGeneralesEJG(datos);
 
 					// AGREGAMOS DATOS QUE FALTAN EN EL RECORD
@@ -1549,12 +1551,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					if (response == 1)
 						response = scsEjgMapper.insert(record);
 
-				} catch (Exception e) {
-					LOGGER.error(
-							"GestionEJGServiceImpl.insertaDatosGenerales(). ERROR: al hacer el insert de datos generales. ",
-							e);
-					response = 0;
-				}
+//				} catch (Exception e) {
+//					LOGGER.error(
+//							"GestionEJGServiceImpl.insertaDatosGenerales(). ERROR: al hacer el insert de datos generales. ",
+//							e);
+//					response = 0;
+//				}
 				// respuesta si se actualiza correctamente para que se rellene el campo de
 				// numero
 				if (response >= 1) {
@@ -2263,9 +2265,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						if (datos.getAutoResolutorio() != null) {
 							scsEjgWithBLOBs.setIdtiporesolauto(Short.valueOf(datos.getAutoResolutorio()));
 						}
+						else scsEjgWithBLOBs.setIdtiporesolauto(null);
 						if (datos.getSentidoAuto() != null) {
 							scsEjgWithBLOBs.setIdtiposentidoauto(Short.valueOf(datos.getSentidoAuto()));
 						}
+						else scsEjgWithBLOBs.setIdtiposentidoauto(null);
 						scsEjgWithBLOBs.setObservacionimpugnacion(datos.getObservacionesImpugnacion());
 						// front -> numero impugnacion;
 						scsEjgWithBLOBs.setNumeroresolucion(datos.getnImpugnacion());
@@ -5233,6 +5237,288 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	}
 
 
+	public int triggersEstados(EjgItem ejgItem, ResolucionEJGItem resolEjg, short idEstado, short idInstitucion, short idLenguaje) throws Exception {
+
+		LOGGER.info("triggersEstados() -> Entrada al metodo para realizar cambios en estados anteriores");
+
+		//Este método sustituye los triggers presentes actualmente en la tabla SCS_EJG de la BBDD
+		//al insertar o actualizar.
+		
+		int response = 1;
+		
+		ScsEjgKey ejgKey = new ScsEjgKey();
+		
+		ejgKey.setAnio(Short.valueOf(ejgItem.getAnnio()));
+		ejgKey.setIdinstitucion(idInstitucion);		
+		ejgKey.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
+		ejgKey.setNumero(Long.valueOf(ejgItem.getNumero()));		
+		
+		ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+		
+		//Actualizar
+		
+		//1. Fecha de apertura. si modifican la fecha de apertura modificamos la fecha del estado inicial
+		if (!ejg.getFechaapertura().equals(ejgItem.getFechaApertura())) {
+			ScsEstadoejgExample estadoEjgExample = new ScsEstadoejgExample();
+			
+			estadoEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+			.andIdtipoejgEqualTo(Short.valueOf(ejgItem.getTipoEJG()))
+			.andAnioEqualTo(Short.valueOf(ejgItem.getAnnio()))
+			.andNumeroEqualTo(ejg.getNumero())
+			.andIdestadoejgEqualTo((short) 23); //Solicitud en procesdo de alta === scs_maestroestadosejg.idestado=23
+			
+			List<ScsEstadoejg> estadoIni = scsEstadoejgMapper.selectByExample(estadoEjgExample);
+			
+			estadoIni.get(0).setFechainicio(ejgItem.getFechaApertura());
+			
+			response = scsEstadoejgMapper.updateByExample(estadoIni.get(0), estadoEjgExample);
+			if(response==0)throw(new Exception("Error con trigger 1"));
+		}
+		
+		//2.Si cambia el dictamen o la fecha dictamen y no eran nulos antes o despues
+		//ponemos fecha de baja a todos los estados anteriores que hayan sido dictaminados
+		if ((!ejg.getFechadictamen().equals(ejgItem.getFechaDictamen()) ||
+			(!ejg.getIdtipodictamenejg().equals(ejgItem.getIdTipoDictamen())
+				)) && (ejg.getFechanotificacion()!= null && ejg.getIdtipodictamenejg() != null) 
+				|| (resolEjg.getFechaNotificacion() != null && ejgItem.getIdTipoDictamen() != null)) {
+			
+			ScsEstadoejgExample estadoEjgExample = new ScsEstadoejgExample();
+			
+			estadoEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+			.andIdtipoejgEqualTo(Short.valueOf(ejgItem.getTipoEJG()))
+			.andAnioEqualTo(Short.valueOf(ejgItem.getAnnio()))
+			.andNumeroEqualTo(ejg.getNumero())
+			.andIdestadoejgEqualTo((short) 6) //Dictaminado === scs_maestroestadosejg.idestado=6
+			.andAutomaticoEqualTo("1")
+			.andFechabajaIsNull();
+			
+			List<ScsEstadoejg> estadoDict = scsEstadoejgMapper.selectByExample(estadoEjgExample);
+			
+			estadoDict.get(0).setFechabaja(new Date());
+			
+			response = scsEstadoejgMapper.updateByExample(estadoDict.get(0), estadoEjgExample);
+			if(response==0)throw(new Exception("Error con trigger 2"));
+			
+			
+			//2.2 En el caso que ahora (los valores nuevos) no fueran nulos
+			if(resolEjg.getFechaNotificacion() != null && ejgItem.getIdTipoDictamen() != null) {
+			//Se inserta el estado dictaminado y se pone en las observacions el dictamen. La fecha de inicio es la fecha de dictamen
+				
+				ScsEstadoejg newEstadoDictaminado = new ScsEstadoejg();
+				
+				newEstadoDictaminado.setIdinstitucion(idInstitucion);
+				newEstadoDictaminado.setIdtipoejg(ejg.getIdtipoejg());
+				newEstadoDictaminado.setAnio(ejg.getAnio());
+				newEstadoDictaminado.setNumero(ejg.getNumero());
+				newEstadoDictaminado.setIdestadoejg((short) 6); //Dictaminado === scs_maestroestadosejg.idestado=6
+				newEstadoDictaminado.setFechainicio(ejgItem.getFechaDictamen());
+				newEstadoDictaminado.setFechamodificacion(new Date());
+				newEstadoDictaminado.setUsumodificacion(ejg.getUsumodificacion());
+				
+				//Se realiza una consulta SQL para obtener las observaciones asociadas
+				newEstadoDictaminado.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgDictamen(idInstitucion, idLenguaje, ejgItem.getIdTipoDictamen()));
+				
+				// obtenemos el maximo de idestadoporejg
+				newEstadoDictaminado.setIdestadoporejg(getNewIdestadoporejg(ejgItem, idInstitucion));
+				
+				newEstadoDictaminado.setIdestadoporejg(null);
+				newEstadoDictaminado.setAutomatico("1");
+				newEstadoDictaminado.setPropietariocomision("0");
+				
+				response = scsEstadoejgMapper.insert(newEstadoDictaminado);
+				if(response==0)throw(new Exception("Error con trigger 2.2"));
+				
+			}
+		}
+		
+		//3. Si cambia el ponente o la fecha presentacion ponente y no eran nulos antes o despues
+				//ponemos fecha de baja a todos los estados anteriores iguales
+				if ((!ejg.getFechapresentacionponente().equals(resolEjg.getFechaPresentacionPonente()) ||
+					(!ejg.getIdponente().equals(resolEjg.getIdPonente())))
+						&& (ejg.getFechapresentacionponente()!= null && ejg.getIdponente() != null) 
+						|| (resolEjg.getFechaPresentacionPonente() != null && resolEjg.getIdPonente() != null)) {
+					
+					ScsEstadoejgExample estadoEjgExample = new ScsEstadoejgExample();
+					
+					estadoEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andIdtipoejgEqualTo(Short.valueOf(ejgItem.getTipoEJG()))
+					.andAnioEqualTo(Short.valueOf(ejgItem.getAnnio()))
+					.andNumeroEqualTo(ejg.getNumero())
+					.andIdestadoejgEqualTo((short) 0) //Remitida apertura a CAJG-Reparto Ponente === scs_maestroestadosejg.idestado=0
+					.andAutomaticoEqualTo("1")
+					.andFechabajaIsNull();
+					
+					List<ScsEstadoejg> estadoDict = scsEstadoejgMapper.selectByExample(estadoEjgExample);
+					
+					estadoDict.get(0).setFechabaja(new Date());
+					
+					response = scsEstadoejgMapper.updateByExample(estadoDict.get(0), estadoEjgExample);
+					if(response==0)throw(new Exception("Error con trigger 3.1"));
+					
+					//3.2 En el caso que ahora (los valores nuevos) no fueran nulos
+					if(resolEjg.getFechaPresentacionPonente() != null && resolEjg.getIdPonente() != null) {
+					//Se inserta el estado remitir ponente y se pone en las observacions el ponente.
+						
+						ScsEstadoejg newEstadoPonente = new ScsEstadoejg();
+						
+						newEstadoPonente.setIdinstitucion(idInstitucion);
+						newEstadoPonente.setIdtipoejg(ejg.getIdtipoejg());
+						newEstadoPonente.setAnio(ejg.getAnio());
+						newEstadoPonente.setNumero(ejg.getNumero());
+						newEstadoPonente.setIdestadoejg((short) 0); //Remitida apertura a CAJG-Reparto Ponente === scs_maestroestadosejg.idestado=0
+						newEstadoPonente.setFechainicio(ejgItem.getFechaDictamen());
+						newEstadoPonente.setFechamodificacion(new Date());
+						newEstadoPonente.setUsumodificacion(ejg.getUsumodificacion());
+						
+						//Se realiza una consulta SQL para obtener las observaciones asociadas
+						newEstadoPonente.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgPonente(idInstitucion, idLenguaje, resolEjg.getIdPonente()));
+						
+						// obtenemos el maximo de idestadoporejg
+						newEstadoPonente.setIdestadoporejg(getNewIdestadoporejg(ejgItem, idInstitucion));
+						
+						newEstadoPonente.setAutomatico("1");
+						newEstadoPonente.setPropietariocomision("1");
+						
+						response = scsEstadoejgMapper.insert(newEstadoPonente);
+						if(response==0)throw(new Exception("Error con trigger 3.2"));
+					}
+				}
+				
+				//4. Si cambia la resolucion o la fecha de resolucion ponente y no eran nulos antes o despues
+				//ponemos fecha de baja a todos los estados anteriores iguales
+				if ((!ejg.getFecharesolucioncajg().equals(resolEjg.getFechaResolucionCAJG()) ||
+					(!ejg.getIdtiporatificacionejg().equals(resolEjg.getIdTiporatificacionEJG())))
+						&& (ejg.getFecharesolucioncajg()!= null && ejg.getIdtiporatificacionejg() != null) 
+						|| (resolEjg.getFechaResolucionCAJG() != null && resolEjg.getIdTiporatificacionEJG() != null)) {
+					
+					ScsEstadoejgExample estadoEjgExample = new ScsEstadoejgExample();
+					
+					estadoEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andIdtipoejgEqualTo(Short.valueOf(ejgItem.getTipoEJG()))
+					.andAnioEqualTo(Short.valueOf(ejgItem.getAnnio()))
+					.andNumeroEqualTo(ejg.getNumero())
+					.andIdestadoejgEqualTo((short) 10) //Resuelto Comisión === scs_maestroestadosejg.idestado=10
+					.andAutomaticoEqualTo("1")
+					.andFechabajaIsNull();
+					
+					List<ScsEstadoejg> estadoResol = scsEstadoejgMapper.selectByExample(estadoEjgExample);
+					
+					estadoResol.get(0).setFechabaja(new Date());
+					
+					response = scsEstadoejgMapper.updateByExample(estadoResol.get(0), estadoEjgExample);
+					if(response==0)throw(new Exception("Error con trigger 4.1"));
+					
+					//4.2 En el caso que ahora (los valores nuevos) no fueran nulos
+					if(resolEjg.getFechaResolucionCAJG() != null && resolEjg.getIdTiporatificacionEJG() != null) {
+					//Se inserta el estado Resuelto comisión y se pone en las observacions el tipo de resolcuion.
+						
+						ScsEstadoejg newEstadoResol = new ScsEstadoejg();
+						
+						newEstadoResol.setIdinstitucion(idInstitucion);
+						newEstadoResol.setIdtipoejg(ejg.getIdtipoejg());
+						newEstadoResol.setAnio(ejg.getAnio());
+						newEstadoResol.setNumero(ejg.getNumero());
+						newEstadoResol.setIdestadoejg((short) 10); //Resuelto Comisión === scs_maestroestadosejg.idestado=10
+						newEstadoResol.setFechainicio(ejgItem.getFechaDictamen());
+						newEstadoResol.setFechamodificacion(new Date());
+						newEstadoResol.setUsumodificacion(ejg.getUsumodificacion());
+						
+						//Se realiza una consulta SQL para obtener las observaciones asociadas
+						newEstadoResol.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgResol(idInstitucion, idLenguaje, resolEjg.getIdTiporatificacionEJG()));
+						
+						//Obtenemos el maximo de idestadoporejg
+						newEstadoResol.setIdestadoporejg(getNewIdestadoporejg(ejgItem, idInstitucion));
+						
+						newEstadoResol.setAutomatico("1");
+						newEstadoResol.setPropietariocomision("0");
+						
+						response = scsEstadoejgMapper.insert(newEstadoResol);
+						if(response==0)throw(new Exception("Error con trigger 4.2"));
+					}
+				}
+				
+				//5. Si cambia la impugnacion o la fecha de impugnacion y no eran nulos antes o despues
+				//ponemos fecha de baja a todos los estados anteriores iguales
+				if ((!ejg.getFechaauto().equals(ejgItem.getFechaAuto()) ||
+					(!ejg.getIdtiporesolauto().equals(resolEjg.getTipoResolucionCAJG())))
+						&& (ejg.getFechaauto()!= null && ejg.getIdtiporesolauto() != null) 
+						|| (ejgItem.getFechaAuto() != null && resolEjg.getTipoResolucionCAJG() != null)) {
+					
+					ScsEstadoejgExample estadoEjgExample = new ScsEstadoejgExample();
+					
+					estadoEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andIdtipoejgEqualTo(Short.valueOf(ejgItem.getTipoEJG()))
+					.andAnioEqualTo(Short.valueOf(ejgItem.getAnnio()))
+					.andNumeroEqualTo(ejg.getNumero())
+					.andIdestadoejgEqualTo((short) 13) //Resuelta Impugnación === scs_maestroestadosejg.idestado=13
+					.andAutomaticoEqualTo("1")
+					.andFechabajaIsNull();
+					
+					List<ScsEstadoejg> estadoImpug = scsEstadoejgMapper.selectByExample(estadoEjgExample);
+					
+					estadoImpug.get(0).setFechabaja(new Date());
+					
+					response = scsEstadoejgMapper.updateByExample(estadoImpug.get(0), estadoEjgExample);
+					if(response==0)throw(new Exception("Error con trigger 5.1"));
+					
+					//4.2 En el caso que ahora (los valores nuevos) no fueran nulos
+					if(ejgItem.getFechaAuto() != null && resolEjg.getTipoResolucionCAJG() != null) {
+					//Se inserta el estado Resuelta impugnación y se pone en las observaciones el tipo de resolucion.
+						
+						ScsEstadoejg newEstadoImpug = new ScsEstadoejg();
+						
+						newEstadoImpug.setIdinstitucion(idInstitucion);
+						newEstadoImpug.setIdtipoejg(ejg.getIdtipoejg());
+						newEstadoImpug.setAnio(ejg.getAnio());
+						newEstadoImpug.setNumero(ejg.getNumero());
+						newEstadoImpug.setIdestadoejg((short) 13); //Resuelta Impugnación === scs_maestroestadosejg.idestado=13
+						newEstadoImpug.setFechainicio(ejgItem.getFechaDictamen());
+						newEstadoImpug.setFechamodificacion(new Date());
+						newEstadoImpug.setUsumodificacion(ejg.getUsumodificacion());
+						
+						//Se realiza una consulta SQL para obtener las observaciones asociadas
+						newEstadoImpug.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgImpug(idInstitucion, idLenguaje, resolEjg.getTipoResolucionCAJG()));
+						
+						//Obtenemos el maximo de idestadoporejg
+						newEstadoImpug.setIdestadoporejg(getNewIdestadoporejg(ejgItem, idInstitucion));
+						
+						newEstadoImpug.setAutomatico("1");
+						newEstadoImpug.setPropietariocomision("1");
+						
+						response = scsEstadoejgMapper.insert(newEstadoImpug);
+						if(response==0)throw(new Exception("Error con trigger 5.2"));
+					}
+				}
+			
+
+		LOGGER.info("triggersEstados() -> Salida del metodo para realizar cambios en estados anteriores");
+
+		return response;
+	}
+	
+	private Long getNewIdestadoporejg(EjgItem ejgItem, Short idInstitucion) {
+		
+		Long newIdestadoporejg;
+		// obtenemos el maximo de idestadoporejg
+		ScsEstadoejgExample example = new ScsEstadoejgExample();
+		
+		example.setOrderByClause("IDESTADOPOREJG DESC");
+		example.createCriteria().andAnioEqualTo(Short.parseShort(ejgItem.getAnnio()))
+		.andIdinstitucionEqualTo(idInstitucion)
+		.andIdtipoejgEqualTo(Short.parseShort(ejgItem.getTipoEJG()))
+		.andNumeroEqualTo(Long.parseLong(ejgItem.getNumero()));
+
+		List<ScsEstadoejg> listEjg = scsEstadoejgMapper.selectByExample(example);
+
+		// damos el varlo al idestadoporejg + 1
+		if (listEjg.size() > 0) {
+			newIdestadoporejg = listEjg.get(0).getIdestadoporejg() + 1;
+		} else {
+			newIdestadoporejg = Long.parseLong("0");
+		}
+		
+		return newIdestadoporejg;
+	}
 	
 	
 }

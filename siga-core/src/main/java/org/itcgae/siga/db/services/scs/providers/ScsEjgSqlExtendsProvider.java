@@ -1729,4 +1729,62 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 	
+	public String getObservacionEstadoEjgDictamen(Short idInstitucion, Short idLenguaje, Short idTipoDictamen) {
+		SQL sql = new SQL();
+
+		sql.SELECT("select f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
+				+ "	|| ' ' || f_Siga_Getrecurso_Etiqueta('gratuita.busquedaEJG.dictamen', '"+ idLenguaje +"') || ' ' ||\r\n"
+				+ "				           (Select f_Siga_Getrecurso(Descripcion, '"+ idLenguaje +"')\r\n"
+				+ "				              From Scs_Tipodictamenejg\r\n"
+				+ "				             Where Idinstitucion = '"+ idInstitucion +"'\r\n"
+				+ "	                        And Idtipodictamenejg = "+ idTipoDictamen +") as observaciones");
+
+		sql.FROM("Scs_Estadoejg");
+
+		return sql.toString();
+	}
+	
+	public String getObservacionEstadoEjgPonente(Short idInstitucion, Short idLenguaje, Integer idPonente) {
+		SQL sql = new SQL();
+
+		sql.SELECT("select f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
+				+ "	|| ' ' || f_Siga_Getrecurso_Etiqueta('gratuita.operarRatificacion.literal.ponente', '"+ idLenguaje +"') || ' ' ||\r\n"
+				+ "				           (Select f_Siga_Getrecurso(Nombre, '"+ idLenguaje +"')\r\n"
+				+ "				              From Scs_Ponente\r\n"
+				+ "				             Where Idinstitucion = '"+ idInstitucion +"'\r\n"
+				+ "	                        And Idtipodictamenejg = "+ idPonente +") as observaciones");
+
+		sql.FROM("Scs_Estadoejg");
+
+		return sql.toString();
+	}
+
+	public String getObservacionEstadoEjgResol(Short idInstitucion, Short idLenguaje, Integer idTiporatificacionEJG) {
+		SQL sql = new SQL();
+
+		sql.SELECT("select f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
+				+ "	|| ' ' || f_Siga_Getrecurso_Etiqueta('gratuita.operarRatificacion.literal.tipoRatificacion', '"+ idLenguaje +"') || ' ' ||\r\n"
+				+ "				           (Select f_Siga_Getrecurso(Descripcion, '"+ idLenguaje +"')\r\n"
+				+ "				              From Scs_Tiporesolucion\r\n"
+				+ "				             Where Idtiporesolcuion = "+ idTiporatificacionEJG +") as observaciones");
+
+		sql.FROM("Scs_Estadoejg");
+
+		return sql.toString();
+	}
+	
+	public String getObservacionEstadoEjgImpug(Short idInstitucion, Short idLenguaje, String idTiporesolauto) {
+		SQL sql = new SQL();
+
+		sql.SELECT("select f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
+				+ "	|| ' ' || f_Siga_Getrecurso_Etiqueta('pestana.justiciagratuitaejg.impugnacion', '"+ idLenguaje +"') || ' ' ||\r\n"
+				+ "				           (Select f_Siga_Getrecurso(Descripcion, '"+ idLenguaje +"')\r\n"
+				+ "				              From Scs_Tiporesolauto\r\n"
+				+ "				             Where Idtiporesolauto = "+ idTiporesolauto +") as observaciones");
+
+		sql.FROM("Scs_Estadoejg");
+
+		return sql.toString();
+	}
+
 }
