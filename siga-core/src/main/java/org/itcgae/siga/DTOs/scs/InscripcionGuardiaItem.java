@@ -30,6 +30,7 @@ public class InscripcionGuardiaItem {
 	private String observacionesvalidacion;
 	private Date fechadenegacion;
 	private String observacionesdenegacion;
+	private Date fechaBaja;
 	private String observacionesvalbaja;
 
 	public String getIdGrupoGuardia() {
@@ -260,7 +261,14 @@ public class InscripcionGuardiaItem {
 	public void setObservacionesdenegacion(String observacionesdenegacion) {
 		this.observacionesdenegacion = observacionesdenegacion;
 	}
+	
 
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
 	/**
 	 * @return the observacionesvalbaja
 	 */

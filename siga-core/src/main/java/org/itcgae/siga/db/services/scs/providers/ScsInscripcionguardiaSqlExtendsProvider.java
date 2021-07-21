@@ -6,7 +6,9 @@ import java.util.Date;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
 import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.ScsInscripcionguardiaSqlProvider;
 
 public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguardiaSqlProvider{
@@ -635,4 +637,146 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		return sql.toString();
 	}
 	
+	public String insertarInscripcion(Short idInstitucion, InscripcionGuardiaItem inscripcion, AdmUsuarios admUsuarios) {
+		SQL sql = new SQL();
+
+		sql.INSERT_INTO("scs_inscripcionguardia");
+
+		sql.VALUES("IDPERSONA", inscripcion.getIdPersona());
+		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
+		sql.VALUES("IDTURNO", inscripcion.getIdTurno());
+		sql.VALUES("IDGUARDIA", inscripcion.getIdGuardia());
+		sql.VALUES("FECHASUSCRIPCION", "SYSTIMESTAMP");
+		sql.VALUES("FECHAMODIFICACION", "SYSTIMESTAMP");
+		sql.VALUES("USUMODIFICACION", "'" + admUsuarios.getIdusuario() + "'");
+		sql.VALUES("FECHABAJA", inscripcion.getFechabaja());
+		sql.VALUES("OBSERVACIONESSUSCRIPCION", inscripcion.getObservacionessuscripcion());
+		sql.VALUES("OBSERVACIONESBAJA", inscripcion.getObservacionesbaja());
+//		sql.VALUES("FECHASOLICITUDBAJA", "NULL");
+//		sql.VALUES("FECHAVALIDACION", inscripcion.getFechaValidacion());
+		sql.VALUES("OBSERVACIONESVALIDACION", inscripcion.getObservacionesvalidacion());
+//		sql.VALUES("FECHADENEGACION", "NULL");
+		sql.VALUES("OBSERVACIONESDENEGACION", inscripcion.getObservacionesdenegacion());
+		sql.VALUES("OBSERVACIONESVALBAJA", inscripcion.getObservacionesvalbaja());
+		return sql.toString();
+	}
+	
+	public String buscarInscripcion(Short idInstitucion, InscripcionGuardiaItem inscripcion,
+			AdmUsuarios admUsuarios){
+		SQL sql = new SQL();
+		sql.SELECT("IDPERSONA", "IDINSTITUCION", "IDTURNO", "IDGUARDIA", "FECHASUSCRIPCION", "FECHAMODIFICACION", "USUMODIFICACION", "FECHABAJA", "OBSERVACIONESSUSCRIPCION", "OBSERVACIONESBAJA", "FECHASOLICITUDBAJA", "FECHAVALIDACION", "OBSERVACIONESVALIDACION", "FECHADENEGACION", "OBSERVACIONESDENEGACION", "OBSERVACIONESVALBAJA");
+		sql.FROM("scs_inscripcionguardia");
+		sql.WHERE("IDINSTITUCION ="+ idInstitucion);
+		sql.WHERE("IDPERSONA ="+ admUsuarios.getIdusuario());
+		sql.WHERE("IDTURNO ="+ inscripcion.getIdTurno());
+		sql.WHERE("IDGUARDIA ="+ inscripcion.getIdGuardia());
+		sql.WHERE("IDGUARDIA ="+ inscripcion.getIdGuardia());
+		return sql.toString();
+	}
+	
+	public String inscripcionesDisponibles(Short idInstitucion, AdmUsuarios admUsuarios) {
+		SQL sql = new SQL();
+		sql.SELECT("scs_guardiasturno.idguardia AS idguardia",
+		"scs_guardiasturno.idturno AS idturno",
+		"scs_grupoguardia.numerogrupo AS numerogrupo",
+		"DECODE(cen_colegiado.comunitario,'1',cen_colegiado.ncomunitario,cen_colegiado.ncolegiado) AS colegiado",
+		"( DECODE(cen_colegiado.comunitario,'1',cen_colegiado.ncomunitario,cen_colegiado.ncolegiado)"
+		+ "    || '/'"
+		+ "    || lpad(scs_grupoguardia.numerogrupo,3,'0') ) AS colegiado_grupo",
+		"( cen_persona.apellidos1"
+		+ "    || ' '"
+		+ "    || cen_persona.apellidos2"
+		+ "    || ', '"
+		+ "    || cen_persona.nombre ) AS letrado",
+		"scs_turno.nombre AS nombre_turno",
+		"scs_turno.idzona AS idzona",
+		"scs_zona.nombre AS nombre_zona",
+		"scs_turno.idsubzona AS idsubzona",
+		"scs_subzona.nombre AS nombre_subzona",
+		"scs_turno.idarea AS idarea",
+		"scs_area.nombre AS nombre_area",
+		"scs_turno.idmateria AS idmateria",
+		"scs_materia.nombre AS nombre_materia",
+		"scs_guardiasturno.nombre AS nombre_guardia",
+		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia",
+		"scs_turno.guardias AS obligatoriedad_inscripcion",
+		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad");
+		
+		sql.FROM("scs_inscripcionguardia");
+		//Left Join
+		sql.JOIN("scs_turno ON scs_turno.idinstitucion = scs_inscripcionguardia.idinstitucion AND scs_turno.idturno = scs_inscripcionguardia.idturno");
+		sql.JOIN("scs_guardiasturno ON scs_inscripcionguardia.idguardia = scs_guardiasturno.idguardia AND scs_inscripcionguardia.idinstitucion = scs_guardiasturno.idinstitucion AND scs_inscripcionguardia.idturno = scs_guardiasturno.idturno");
+		sql.JOIN("cen_persona ON cen_persona.idpersona = scs_inscripcionguardia.idpersona");
+		sql.JOIN("cen_colegiado ON cen_colegiado.idpersona = scs_inscripcionguardia.idpersona AND cen_colegiado.idinstitucion = scs_inscripcionguardia.idinstitucion");
+		sql.JOIN("scs_grupoguardia ON scs_guardiasturno.idguardia = scs_grupoguardia.idguardia");
+		sql.JOIN("scs_zona ON scs_zona.idinstitucion = scs_turno.idinstitucion AND scs_zona.idzona = scs_turno.idzona");
+		sql.JOIN("scs_subzona ON scs_subzona.idinstitucion = scs_turno.idinstitucion AND scs_subzona.idzona = scs_turno.idzona AND scs_subzona.idsubzona = scs_turno.idsubzona");
+		sql.JOIN("scs_area ON scs_area.idinstitucion = scs_turno.idinstitucion AND scs_area.idarea = scs_turno.idarea");
+		sql.JOIN("scs_materia ON scs_materia.idinstitucion = scs_turno.idinstitucion AND scs_materia.idmateria = scs_turno.idmateria AND scs_materia.idarea = scs_turno.idarea");
+		sql.JOIN("scs_tiposguardias ON scs_guardiasturno.idtipoguardia = scs_tiposguardias.idtipoguardia");
+		//Left Join
+		sql.JOIN("gen_recursos_catalogos ON scs_tiposguardias.descripcion = gen_recursos_catalogos.idrecurso");
+		
+		sql.WHERE("scs_guardiasturno.porgrupos = 1",
+		"scs_guardiasturno.fechabaja IS NULL",
+		"scs_turno.fechabaja IS NULL",
+		"scs_inscripcionguardia.idpersona = " + admUsuarios.getIdusuario(),
+		"scs_inscripcionguardia.idinstitucion = " + idInstitucion,
+		"gen_recursos_catalogos.idlenguaje = 1"
+		);
+		return sql.toString();
+	}
+	
+	public String inscripcionPorguardia(Short idInstitucion, AdmUsuarios admUsuarios, String guardia) {
+		SQL sql = new SQL();
+		sql.SELECT("scs_guardiasturno.idguardia AS idguardia",
+		"scs_guardiasturno.idturno AS idturno",
+		"scs_grupoguardia.numerogrupo AS numerogrupo",
+		"DECODE(cen_colegiado.comunitario,'1',cen_colegiado.ncomunitario,cen_colegiado.ncolegiado) AS colegiado",
+		"( DECODE(cen_colegiado.comunitario,'1',cen_colegiado.ncomunitario,cen_colegiado.ncolegiado)"
+		+ "    || '/'"
+		+ "    || lpad(scs_grupoguardia.numerogrupo,3,'0') ) AS colegiado_grupo",
+		"( cen_persona.apellidos1"
+		+ "    || ' '"
+		+ "    || cen_persona.apellidos2"
+		+ "    || ', '"
+		+ "    || cen_persona.nombre ) AS letrado",
+		"scs_turno.nombre AS nombre_turno",
+		"scs_turno.idzona AS idzona",
+		"scs_zona.nombre AS nombre_zona",
+		"scs_turno.idsubzona AS idsubzona",
+		"scs_subzona.nombre AS nombre_subzona",
+		"scs_turno.idarea AS idarea",
+		"scs_area.nombre AS nombre_area",
+		"scs_turno.idmateria AS idmateria",
+		"scs_materia.nombre AS nombre_materia",
+		"scs_guardiasturno.nombre AS nombre_guardia",
+		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia",
+		"scs_turno.guardias AS obligatoriedad_inscripcion",
+		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad");
+		
+		sql.FROM("scs_inscripcionguardia");
+		//Left Join
+		sql.JOIN("scs_turno ON scs_turno.idinstitucion = scs_inscripcionguardia.idinstitucion AND scs_turno.idturno = scs_inscripcionguardia.idturno");
+		sql.JOIN("scs_guardiasturno ON scs_inscripcionguardia.idguardia = scs_guardiasturno.idguardia AND scs_inscripcionguardia.idinstitucion = scs_guardiasturno.idinstitucion AND scs_inscripcionguardia.idturno = scs_guardiasturno.idturno");
+		sql.JOIN("cen_persona ON cen_persona.idpersona = scs_inscripcionguardia.idpersona");
+		sql.JOIN("cen_colegiado ON cen_colegiado.idpersona = scs_inscripcionguardia.idpersona AND cen_colegiado.idinstitucion = scs_inscripcionguardia.idinstitucion");
+		sql.JOIN("scs_grupoguardia ON scs_guardiasturno.idguardia = scs_grupoguardia.idguardia");
+		sql.JOIN("scs_zona ON scs_zona.idinstitucion = scs_turno.idinstitucion AND scs_zona.idzona = scs_turno.idzona");
+		sql.JOIN("scs_subzona ON scs_subzona.idinstitucion = scs_turno.idinstitucion AND scs_subzona.idzona = scs_turno.idzona AND scs_subzona.idsubzona = scs_turno.idsubzona");
+		sql.JOIN("scs_area ON scs_area.idinstitucion = scs_turno.idinstitucion AND scs_area.idarea = scs_turno.idarea");
+		sql.JOIN("scs_materia ON scs_materia.idinstitucion = scs_turno.idinstitucion AND scs_materia.idmateria = scs_turno.idmateria AND scs_materia.idarea = scs_turno.idarea");
+		sql.JOIN("scs_tiposguardias ON scs_guardiasturno.idtipoguardia = scs_tiposguardias.idtipoguardia");
+		//Left Join
+		sql.JOIN("gen_recursos_catalogos ON scs_tiposguardias.descripcion = gen_recursos_catalogos.idrecurso");
+		
+		sql.WHERE("scs_guardiasturno.porgrupos = 1",
+		"scs_guardiasturno.fechabaja IS NULL",
+		"scs_turno.fechabaja IS NULL",
+		"scs_inscripcionguardia.idpersona = " + admUsuarios.getIdusuario(),
+		"scs_inscripcionguardia.idinstitucion = " + idInstitucion,
+		"scs_guardiasturno.IDGUARDIA = " + guardia,
+		"gen_recursos_catalogos.idlenguaje = 1");
+		return sql.toString();
+	}
 }
