@@ -231,5 +231,11 @@ public class CombosGeneralesController {
 		ComboDTO response = comboService.comboTipoDocumentacionDesigna(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/comboEstadosAsistencia")
+	public ResponseEntity<ComboDTO> comboEstadosAsistencia(HttpServletRequest request) {
+		ComboDTO response = comboService.comboEstadosAsistencia(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 }

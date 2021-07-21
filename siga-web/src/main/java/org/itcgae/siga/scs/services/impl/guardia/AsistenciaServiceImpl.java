@@ -12,7 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -29,6 +31,8 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBajastemporales;
 import org.itcgae.siga.db.entities.CenBajastemporalesExample;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.ScsActuacionasistencia;
@@ -40,19 +44,26 @@ import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgExample;
+import org.itcgae.siga.db.entities.ScsSolicitudAceptada;
+import org.itcgae.siga.db.entities.ScsTurno;
+import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.entities.ScsPersonajgExample.Criteria;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsActuacionasistenciaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsBajasTemporalesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEstadoasistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiascolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsJuzgadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsSolicitudAceptadaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoAsistenciaColegioExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.guardia.AsistenciaService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +109,18 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	@Autowired
+	private ScsSolicitudAceptadaExtendsMapper scsSolicitudAceptadaExtendsMapper;
+	
+	@Autowired
+	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
+	
+	@Autowired
+	private ScsEstadoasistenciaExtendsMapper scsEstadoasistenciaExtendsMapper;
+	
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
 		String token = request.getHeader("Authorization");
@@ -119,6 +142,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						"getGuardiasByColegiadoFecha() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 	
 				if (usuarios != null && usuarios.size() > 0) {
+					
+					//Si la fecha trae hora la recortamos
+					if(guardiaDia.length() > 10) {
+						
+						guardiaDia = guardiaDia.substring(0, 11);
+						
+					}
 					List<ComboItem> combosItems = scsGuardiascolegiadoExtendsMapper.getTurnosByColegiadoFecha(idPersona, idInstitucion, guardiaDia);
 					comboDTO.setCombooItems(combosItems);
 					
@@ -229,6 +259,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						"getColegiadosGuardiaDia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 	
 				if (usuarios != null && usuarios.size() > 0) {
+					
+					//Si la fecha trae hora la recortamos
+					if(guardiaDia.length() > 10) {
+						
+						guardiaDia = guardiaDia.substring(0, 11);
+						
+					}
 					
 					List<ComboItem> comboItems = scsGuardiascolegiadoExtendsMapper.getColegiadosGuardiaDia(idTurno, idGuardia, idInstitucion, guardiaDia);
 					
@@ -444,7 +481,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	}
 
 	@Override
-	public DeleteResponseDTO guardarAsistencias(HttpServletRequest request,
+	public DeleteResponseDTO guardarAsistenciasExpres(HttpServletRequest request,
 			List<TarjetaAsistenciaResponseItem> asistencias) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		String token = request.getHeader("Authorization");
@@ -657,35 +694,79 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		try {
 			if(!UtilidadesString.esCadenaVacia(anioAsistencia)) {
 				asistenciaBBDD.setAnio(Short.valueOf(anioAsistencia));
-			}else {
+			}else if (!UtilidadesString.esCadenaVacia(asistencia.getAnio())) {
 				asistenciaBBDD.setAnio(Short.valueOf(asistencia.getAnio()));
 			}
 			
 			if(!UtilidadesString.esCadenaVacia(numeroAsistencia)) {
 				asistenciaBBDD.setNumero(Long.valueOf(numeroAsistencia));
-			}else {
+			}else if(!UtilidadesString.esCadenaVacia(asistencia.getNumero())) {
 				asistenciaBBDD.setNumero(Long.valueOf(asistencia.getNumero()));
 			}
 			
+			if(!UtilidadesString.esCadenaVacia(asistencia.getFiltro().getDiaGuardia())) {
+				asistenciaBBDD.setFechahora(new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFiltro().getDiaGuardia()));
+			} else {
+				asistenciaBBDD.setFechahora(new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(asistencia.getFechaAsistencia()));
+			}
 			
-			asistenciaBBDD.setFechahora(new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFiltro().getDiaGuardia()));
+			if(!UtilidadesString.esCadenaVacia(asistencia.getFechaCierre())){
+				asistenciaBBDD.setFechacierre(new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFechaCierre()));
+			}
+			if(!UtilidadesString.esCadenaVacia(asistencia.getFechaSolicitud())) {
+				asistenciaBBDD.setFechasolicitud(new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(asistencia.getFechaSolicitud()));
+			}
 			
-			asistenciaBBDD.setIdpersonajg(Long.valueOf(idPersonaJg));
+			if(!UtilidadesString.esCadenaVacia(asistencia.getFechaEstado())) {
+				asistenciaBBDD.setFechaestadoasistencia(new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFechaEstado()));
+			}
+
+			if(!UtilidadesString.esCadenaVacia(idPersonaJg)) {
+				asistenciaBBDD.setIdpersonajg(Long.valueOf(idPersonaJg));
+			}
 			asistenciaBBDD.setIdinstitucion(idInstitucion);
-			asistenciaBBDD.setIdturno(Integer.valueOf(asistencia.getFiltro().getIdTurno()));
-			asistenciaBBDD.setIdguardia(Integer.valueOf(asistencia.getFiltro().getIdGuardia()));
-			asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoGuardia()));
+			if(!UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdTurno())) {
+				asistenciaBBDD.setIdturno(Integer.valueOf(asistencia.getFiltro().getIdTurno()));
+			} else {
+				asistenciaBBDD.setIdturno(Integer.valueOf(asistencia.getIdTurno()));
+			}
+			
+			if(!UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdGuardia())) {
+				asistenciaBBDD.setIdguardia(Integer.valueOf(asistencia.getFiltro().getIdGuardia()));
+			} else {
+				asistenciaBBDD.setIdguardia(Integer.valueOf(asistencia.getIdGuardia()));
+			}
+			
+			if(!UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdLetradoGuardia())) {
+				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoGuardia()));
+			} else {
+				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getIdLetradoGuardia()));
+			}
+			
 			
 			if(!UtilidadesString.esCadenaVacia(asistencia.getObservaciones())) {
 				asistenciaBBDD.setObservaciones(asistencia.getObservaciones());
 			}
-			asistenciaBBDD.setIdtipoasistencia(Short.valueOf(tipoAsistenciaGeneral));
+			if(!UtilidadesString.esCadenaVacia(tipoAsistenciaGeneral)) {
+				asistenciaBBDD.setIdtipoasistencia(Short.valueOf(tipoAsistenciaGeneral));
+			}
 			
 			if(!UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdTipoAsistenciaColegiado())) {
 				asistenciaBBDD.setIdtipoasistenciacolegio(Short.valueOf(asistencia.getFiltro().getIdTipoAsistenciaColegiado()));
+			}else if(!UtilidadesString.esCadenaVacia(asistencia.getIdTipoAsistenciaColegio())) {
+				asistenciaBBDD.setIdtipoasistencia(Short.valueOf(asistencia.getIdTipoAsistenciaColegio()));
+				asistenciaBBDD.setIdtipoasistenciacolegio(Short.valueOf(asistencia.getIdTipoAsistenciaColegio()));
 			}
 			if(!UtilidadesString.esCadenaVacia(asistencia.getIdDelito())) {
 				asistenciaBBDD.setDelitosimputados(asistencia.getIdDelito());
+			}
+			
+			if(!UtilidadesString.esCadenaVacia(asistencia.getEstado())) {
+				asistenciaBBDD.setIdestadoasistencia(Short.valueOf(asistencia.getEstado()));
+			}
+			
+			if(!UtilidadesString.esCadenaVacia(asistencia.getIdSolicitudCentralita())) {
+				asistenciaBBDD.setIdsolicitudcentralita(Integer.valueOf(asistencia.getIdSolicitudCentralita()));
 			}
 			
 			asistenciaBBDD.setFechamodificacion(new Date());
@@ -942,5 +1023,275 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 		return tarjetaAsistenciaResponseDTO;
 	}
+
+	@Override
+	public StringDTO getDefaultTipoAsistenciaColegio(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		StringDTO idTipoAsistencia = new StringDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	
+				LOGGER.info(
+						"getDefaultTipoAsistenciaColegio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	
+				LOGGER.info(
+						"getDefaultTipoAsistenciaColegio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				if (usuarios != null && usuarios.size() > 0) {
+					
+					List<Short> instituciones = new ArrayList<Short>();
+					instituciones.add(idInstitucion);
+					instituciones.add((short)0);
+					GenParametrosExample genParametrosExample = new GenParametrosExample();
+					genParametrosExample.createCriteria()
+					.andFechaBajaIsNull()
+					.andModuloEqualTo("SCS")
+					.andParametroEqualTo("CV_TIPO_ASISTENCIAALDETENIDO")
+					.andIdinstitucionIn(instituciones);
+					
+					List<GenParametros> parametros = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+					
+					if(parametros != null
+							&& !parametros.isEmpty()) {
+						
+						idTipoAsistencia.setValor(parametros.get(0).getValor());						
+					}
+				
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("getDefaultTipoAsistenciaColegio() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al buscar el tipo de asistencia por defecto " + e);
+			error.description("Error al buscar el tipo de asistencia por defecto " + e);
+		}
+		return idTipoAsistencia;
+	}
+
+	@Override
+	public InsertResponseDTO guardarAsistencia(HttpServletRequest request,
+			List<TarjetaAsistenciaResponseItem> asistencias) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponse = new InsertResponseDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	
+				LOGGER.info(
+						"guardarAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	
+				LOGGER.info(
+						"guardarAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				if(usuarios != null
+						&& !usuarios.isEmpty()) {
+					
+					for (int i = 0; i < asistencias.size(); i++) {
+						
+						TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = asistencias.get(i);
+						
+						if(UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getAnio())
+								&& UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getNumero())) {
+							
+							//Validamos guardia
+							
+							//Insertamos asistencia
+							ScsAsistencia asistencia = fromTarjetaAsistenciaItemToScsAsistencia(asistencias.get(i), null, null, null, null, idInstitucion, usuarios.get(0));
+							//Obtenemos proximo numero de una nueva asistencia
+							String anioAsistencia = tarjetaAsistenciaResponseItem.getFechaAsistencia().substring(0, 11).split("/")[2].trim();
+							String numeroAsistencia = scsAsistenciaExtendsMapper.getNextNumeroAsistencia(anioAsistencia, idInstitucion);
+							
+							asistencia.setNumero(Long.valueOf(numeroAsistencia));
+							asistencia.setAnio(Short.valueOf(anioAsistencia));
+							
+							int inserted = scsAsistenciaExtendsMapper.insertSelective(asistencia);
+							
+							//Si viene de una preasistencia, la pasamos a confirmada
+							if(inserted > 0) {
+								
+									insertResponse.setId(asistencia.getAnio() +"/"+asistencia.getNumero());
+
+									if(!UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getIdSolicitudCentralita())) {
+								
+										inserted = 0;
+										ScsSolicitudAceptada scsSolicitudAceptada = new ScsSolicitudAceptada();
+										scsSolicitudAceptada.setIdsolicitud(Integer.valueOf(asistencia.getIdsolicitudcentralita()));
+										scsSolicitudAceptada.setEstado(Short.valueOf("1")); //Estado confirmada
+										scsSolicitudAceptada.setUsumodificacion(usuarios.get(0).getIdusuario());
+										scsSolicitudAceptada.setFechamodificacion(new Date());
+										
+										inserted += scsSolicitudAceptadaExtendsMapper.updateByPrimaryKeySelective(scsSolicitudAceptada);
+									}
+									
+							}
+						} else {
+							//Actualizamos los datos de la asistencia
+						}
+						
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("guardarAsistencia() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al guardar la asistencia: " + e);
+			error.description("Error al guardar la asistencia: " + e);
+			insertResponse.setError(error);
+		}
+		return insertResponse;
+	}
+
+	@Override
+	public TarjetaAsistenciaResponseDTO buscarTarjetaAsistencias(HttpServletRequest request, String anioNumero) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		TarjetaAsistenciaResponseDTO tarjetaAsistenciaResponseDTO = new TarjetaAsistenciaResponseDTO();
+		String anio = anioNumero.split("/")[0];
+		String numero = anioNumero.split("/")[1];
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+	
+				LOGGER.info(
+						"buscarTarjetaAsistencias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	
+				LOGGER.info(
+						"buscarTarjetaAsistencias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				if (usuarios != null && usuarios.size() > 0) {
+					
+					ScsAsistenciaExample scsAsistenciaExample = new ScsAsistenciaExample();
+					scsAsistenciaExample.createCriteria().andAnioEqualTo(Short.valueOf(anio)).andNumeroEqualTo(Long.valueOf(numero)).andIdinstitucionEqualTo(idInstitucion);
+					List<ScsAsistencia> listaAsistencias = scsAsistenciaExtendsMapper.selectByExample(scsAsistenciaExample);
+					if(listaAsistencias != null
+							&& !listaAsistencias.isEmpty()) {
+						
+						List<TarjetaAsistenciaResponseItem> listaAsistenciasResponse = listaAsistencias.stream().map(asistencia ->{
+							TarjetaAsistenciaResponseItem asistenciaResponse = new TarjetaAsistenciaResponseItem();
+							asistenciaResponse.setAnioNumero(asistencia.getAnio() + "/"+ asistencia.getNumero());
+							asistenciaResponse.setFechaAsistencia(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(asistencia.getFechahora()));
+							return asistenciaResponse;
+						}).collect(Collectors.toList());
+						
+						for(int i = 0; i < listaAsistenciasResponse.size() ; i++) {
+							
+							TarjetaAsistenciaResponseItem asistenciaResponse = listaAsistenciasResponse.get(i);
+							ScsAsistencia asistenciaBBDD = listaAsistencias.get(i);
+							
+							ScsGuardiasturnoExample scsGuardiasturnoExample = new ScsGuardiasturnoExample();
+							scsGuardiasturnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(asistenciaBBDD.getIdturno()).andIdguardiaEqualTo(asistenciaBBDD.getIdguardia());
+							
+							List<ScsGuardiasturno> guardias = scsGuardiasturnoExtendsMapper.selectByExample(scsGuardiasturnoExample);
+							
+							if(guardias !=null
+									&& !guardias.isEmpty()) {
+								asistenciaResponse.setDescripcionGuardia(guardias.get(0).getNombre());
+							}
+							
+							ScsTurnoExample scsTurnoExample = new ScsTurnoExample();
+							scsTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(asistenciaBBDD.getIdturno());
+							
+							List<ScsTurno> turnos = scsTurnosExtendsMapper.selectByExample(scsTurnoExample);
+							
+							if(turnos != null
+									&& !turnos.isEmpty()) {
+								asistenciaResponse.setDescripcionTurno(turnos.get(0).getNombre());
+							}
+							
+							List<ComboItem> estadosAsistencia = scsEstadoasistenciaExtendsMapper.comboEstadosAsistencia(usuarios.get(0).getIdlenguaje());
+							
+							String descripcionEstado = estadosAsistencia.stream()
+									.filter( estado -> estado.getValue().equals(asistenciaBBDD.getIdestadoasistencia().toString()))
+									.findFirst().get().getLabel();
+							
+							asistenciaResponse.setDescripcionEstado(descripcionEstado);
+							
+							List<TiposAsistenciaItem> tiposAsistenciaColegio = scsTipoAsistenciaColegioExtendsMapper.getTiposAsistenciaColegiado(idInstitucion, Integer.valueOf(usuarios.get(0).getIdlenguaje()), guardias.get(0).getIdtipoguardia());
+							
+							String descripcionTipoAsistencia = tiposAsistenciaColegio.stream()
+									.filter(tipoAsistencia -> tipoAsistencia.getIdtipoasistenciacolegio().equals(asistenciaBBDD.getIdtipoasistenciacolegio().toString()))
+									.findFirst().get().getTipoasistencia();
+							
+							asistenciaResponse.setDescripcionTipoAsistenciaColegio(descripcionTipoAsistencia);
+							
+							FichaPersonaItem colegiado =  cenPersonaExtendsMapper.getColegiadoByIdPersona(String.valueOf(asistenciaBBDD.getIdpersonacolegiado()),idInstitucion);
+							
+							if(colegiado != null) {
+								asistenciaResponse.setNombreColegiado(colegiado.getApellido1() + " " + colegiado.getApellido2() + " " + colegiado.getNombre());
+								asistenciaResponse.setNumeroColegiado(colegiado.getNumeroColegiado());
+							}
+							
+							if(asistenciaBBDD.getIdpersonajg() != null) {
+								ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
+								scsPersonajgExample.createCriteria().andIdpersonaEqualTo(asistenciaBBDD.getIdpersonajg()).andIdinstitucionEqualTo(idInstitucion);
+								List<ScsPersonajg> justiciables = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
+								
+								if(justiciables != null
+										&& !justiciables.isEmpty()) {
+									
+									if(!UtilidadesString.esCadenaVacia(justiciables.get(0).getApellido2())) {
+										asistenciaResponse.setAsistido(justiciables.get(0).getApellido1() +" "+justiciables.get(0).getApellido2()+" "+ justiciables.get(0).getNombre());
+									}else {
+										asistenciaResponse.setAsistido(justiciables.get(0).getApellido1() +" "+ justiciables.get(0).getNombre());
+									}								
+								}
+							}
+							
+							ScsActuacionasistenciaExample scsActuacionasistenciaExample = new ScsActuacionasistenciaExample();
+							scsActuacionasistenciaExample.createCriteria().andAnioEqualTo(Short.valueOf(anio)).andNumeroEqualTo(Long.valueOf(numero)).andIdinstitucionEqualTo(idInstitucion);
+							
+							List<ScsActuacionasistencia> actuaciones = scsActuacionasistenciaMapper.selectByExample(scsActuacionasistenciaExample);
+							
+							if(actuaciones != null
+									&& !actuaciones.isEmpty()) {
+								
+								asistenciaResponse.setNumeroActuaciones(String.valueOf(actuaciones.size()));
+								boolean validadas = actuaciones.stream().allMatch(actuacion -> actuacion.getValidada().equals("1"));				
+								if(validadas) {
+									asistenciaResponse.setValidada("SI");
+								}else {
+									asistenciaResponse.setValidada("NO");
+								}
+							}else {
+								asistenciaResponse.setValidada("NO");
+								asistenciaResponse.setNumeroActuaciones("0");
+							}
+							
+						}
+						
+						tarjetaAsistenciaResponseDTO.setResponseItems(listaAsistenciasResponse);
+				
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("buscarTarjetaAsistencias() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al traer las asistencias asociadas a la solicitud: " + e);
+			error.description("Error al traer las asistencias asociadas a la solicitud: " + e);
+			tarjetaAsistenciaResponseDTO.setError(error);
+		}
+		return tarjetaAsistenciaResponseDTO;
+	}
+	
+	
 
 }

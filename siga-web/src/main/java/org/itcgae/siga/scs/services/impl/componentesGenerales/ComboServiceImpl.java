@@ -28,6 +28,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAreasMateriasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEstadoasistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEstadoejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupofacturacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
@@ -132,6 +133,10 @@ public class ComboServiceImpl implements ComboService {
 	
 	@Autowired
 	private ScsInscripcionguardiaExtendsMapper scsInscripcionguardiaExtendsMapper;
+	
+	@Autowired
+	private ScsEstadoasistenciaExtendsMapper scsEstadoasistenciaExtendsMapper;
+	
 
 	@Override
 	public ComboDTO comboTipoEjg(HttpServletRequest request) {
@@ -1636,6 +1641,42 @@ public class ComboServiceImpl implements ComboService {
 
 		}
 		LOGGER.info("comboGuardiasInscritoLetrado() -> Salida del servicio para obtener combo turnos a los que esta inscrito el letrado");
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboEstadosAsistencia(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"comboEstadosAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"comboEstadosAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboEstadosAsistencia() / scsInscripcionguardiaExtendsMapper.comboGuardiasInscritoLetrado() -> Entrada a scsInscripcionguardiaExtendsMapper para obtener las guardias a los que esta inscrito el letrado");
+
+				List<ComboItem> comboItems = scsEstadoasistenciaExtendsMapper.comboEstadosAsistencia(usuarios.get(0).getIdlenguaje());
+
+				LOGGER.info(
+						"comboEstadosAsistencia() / scsInscripcionguardiaExtendsMapper.comboGuardiasInscritoLetrado() -> Salida a scsInscripcionguardiaExtendsMapper para obtener las guardias a los que esta inscrito el letrado");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+		}
+		LOGGER.info("comboEstadosAsistencia() -> Salida del servicio para obtener combo turnos a los que esta inscrito el letrado");
 		return comboDTO;
 	}
 }

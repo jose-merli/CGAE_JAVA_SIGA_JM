@@ -25,6 +25,8 @@ public interface ScsSolicitudAceptadaExtendsMapper extends ScsSolicitudAceptadaM
 	        @Result(column = "centroDetencion", property = "centroDetencion", jdbcType = JdbcType.VARCHAR),
 	        @Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
 	        @Result(column = "fechaRecepcion", property = "fechaRecepcion", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+	        @Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
 	    })
 	    List<PreAsistenciaItem> searchPreAsistencias(PreAsistenciaItem preAsistencia, Integer tamMax, Short idInstitucion);
 }

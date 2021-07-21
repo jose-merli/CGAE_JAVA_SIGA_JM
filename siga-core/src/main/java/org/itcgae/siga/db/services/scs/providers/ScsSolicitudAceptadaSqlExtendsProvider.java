@@ -16,6 +16,7 @@ public class ScsSolicitudAceptadaSqlExtendsProvider extends ScsSolicitudAceptada
 				"TO_CHAR(SA.FECHALLAMADA,'DD/MM/YYYY HH24:MI') as fechaLlamada",
 				"SA.IDINSTITUCION",
 				"SA.NUMEROCOLEGIADO",
+				"SA.IDGUARDIA",
 				"SA.IDGUARDIA || ' - ' || SA.NOMBREGUARDIA AS descripcionGuardia",
 				"SA.FECHAGUARDIA",
 				"SA.ESTADO",
@@ -31,6 +32,7 @@ public class ScsSolicitudAceptadaSqlExtendsProvider extends ScsSolicitudAceptada
 				"SA.USUMODIFICACION",
 				"TO_CHAR(SA.FECHARECEPCION,'DD/MM/YYYY HH24:MI') as fechaRecepcion",
 				"LL.NUMAVISOCV",
+				"(SELECT MAX(IDTURNO) FROM SCS_GUARDIASTURNO WHERE IDINSTITUCION = SA.IDINSTITUCION AND IDGUARDIA = SA.IDGUARDIA ) AS IDTURNO",
 				"P.nombre || ' ' || P.apellidos1 || ' ' || p.apellidos2    AS nombreColegiado");
 		sql2.FROM("SCS_SOLICITUD_ACEPTADA SA");
 		sql2.INNER_JOIN("CV_LLAMADA LL ON SA.IDLLAMADA = LL.IDLLAMADA AND SA.IDINSTITUCION = LL.IDINSTITUCION",

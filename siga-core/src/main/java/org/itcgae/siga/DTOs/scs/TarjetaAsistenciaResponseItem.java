@@ -18,6 +18,49 @@ public class TarjetaAsistenciaResponseItem {
 	private String nombre, sexo, apellido1, apellido2, nif;
 	private FiltroAsistenciaItem filtro;
 	private String descripcionGuardia;
+	private String idGuardia;
+	private String idTurno;
+	private String estado;
+	private String fechaSolicitud;
+	private String fechaCierre;
+	private String fechaAsistencia;
+	private String idLetradoGuardia;
+	private String idTipoAsistenciaColegio;
+	private String idSolicitudCentralita;
+	private String fechaEstado;
+	private String descripcionEstado;
+	private String descripcionTurno;
+	private String descripcionTipoAsistenciaColegio;
+	/**
+	 * @return the descripcionTipoAsistenciaColegio
+	 */
+	public String getDescripcionTipoAsistenciaColegio() {
+		return descripcionTipoAsistenciaColegio;
+	}
+	/**
+	 * @param descripcionTipoAsistenciaColegio the descripcionTipoAsistenciaColegio to set
+	 */
+	public void setDescripcionTipoAsistenciaColegio(String descripcionTipoAsistenciaColegio) {
+		this.descripcionTipoAsistenciaColegio = descripcionTipoAsistenciaColegio;
+	}
+	private String numeroColegiado;
+	private String nombreColegiado;
+	private String fechaGuardia;
+	private String validada;
+	private String numeroActuaciones;
+	
+	/**
+	 * @return the numeroActuaciones
+	 */
+	public String getNumeroActuaciones() {
+		return numeroActuaciones;
+	}
+	/**
+	 * @param numeroActuaciones the numeroActuaciones to set
+	 */
+	public void setNumeroActuaciones(String numeroActuaciones) {
+		this.numeroActuaciones = numeroActuaciones;
+	}
 	/**
 	 * @return the descripcionGuardia
 	 */
@@ -66,9 +109,6 @@ public class TarjetaAsistenciaResponseItem {
 	public void setFechaGuardia(String fechaGuardia) {
 		this.fechaGuardia = fechaGuardia;
 	}
-	private String numeroColegiado;
-	private String nombreColegiado;
-	private String fechaGuardia;
 	
 	/**
 	 * @return the anio
@@ -262,6 +302,156 @@ public class TarjetaAsistenciaResponseItem {
 	 */
 	public void setFiltro(FiltroAsistenciaItem filtro) {
 		this.filtro = filtro;
+	}
+	/**
+	 * @return the idGuardia
+	 */
+	public String getIdGuardia() {
+		return idGuardia;
+	}
+	/**
+	 * @param idGuardia the idGuardia to set
+	 */
+	public void setIdGuardia(String idGuardia) {
+		this.idGuardia = idGuardia;
+	}
+	/**
+	 * @return the idTurno
+	 */
+	public String getIdTurno() {
+		return idTurno;
+	}
+	/**
+	 * @param idTurno the idTurno to set
+	 */
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
+	}
+	/**
+	 * @return the estado
+	 */
+	public String getEstado() {
+		return estado;
+	}
+	/**
+	 * @param estado the estado to set
+	 */
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+	/**
+	 * @return the fechaSolicitud
+	 */
+	public String getFechaSolicitud() {
+		return fechaSolicitud;
+	}
+	/**
+	 * @param fechaSolicitud the fechaSolicitud to set
+	 */
+	public void setFechaSolicitud(String fechaSolicitud) {
+		this.fechaSolicitud = fechaSolicitud;
+	}
+	/**
+	 * @return the fechaCierre
+	 */
+	public String getFechaCierre() {
+		return fechaCierre;
+	}
+	/**
+	 * @param fechaCierre the fechaCierre to set
+	 */
+	public void setFechaCierre(String fechaCierre) {
+		this.fechaCierre = fechaCierre;
+	}
+	/**
+	 * @return the fechaAsistencia
+	 */
+	public String getFechaAsistencia() {
+		return fechaAsistencia;
+	}
+	/**
+	 * @param fechaAsistencia the fechaAsistencia to set
+	 */
+	public void setFechaAsistencia(String fechaAsistencia) {
+		this.fechaAsistencia = fechaAsistencia;
+	}
+	/**
+	 * @return the idLetradoGuardia
+	 */
+	public String getIdLetradoGuardia() {
+		return idLetradoGuardia;
+	}
+	/**
+	 * @param idLetradoGuardia the idLetradoGuardia to set
+	 */
+	public void setIdLetradoGuardia(String idLetradoGuardia) {
+		this.idLetradoGuardia = idLetradoGuardia;
+	}
+	/**
+	 * @return the idTipoAsistenciaColegio
+	 */
+	public String getIdTipoAsistenciaColegio() {
+		return idTipoAsistenciaColegio;
+	}
+	/**
+	 * @param idTipoAsistenciaColegio the idTipoAsistenciaColegio to set
+	 */
+	public void setIdTipoAsistenciaColegio(String idTipoAsistenciaColegio) {
+		this.idTipoAsistenciaColegio = idTipoAsistenciaColegio;
+	}
+	/**
+	 * @return the idSolicitudCentralita
+	 */
+	public String getIdSolicitudCentralita() {
+		return idSolicitudCentralita;
+	}
+	/**
+	 * @param idSolicitudCentralita the idSolicitudCentralita to set
+	 */
+	public void setIdSolicitudCentralita(String idSolicitudCentralita) {
+		this.idSolicitudCentralita = idSolicitudCentralita;
+	}
+	public String getFechaEstado() {
+		return fechaEstado;
+	}
+	public void setFechaEstado(String fechaEstado) {
+		this.fechaEstado = fechaEstado;
+	}
+	/**
+	 * @return the descripcionEstado
+	 */
+	public String getDescripcionEstado() {
+		return descripcionEstado;
+	}
+	/**
+	 * @param descripcionEstado the descripcionEstado to set
+	 */
+	public void setDescripcionEstado(String descripcionEstado) {
+		this.descripcionEstado = descripcionEstado;
+	}
+	/**
+	 * @return the descripcionTurno
+	 */
+	public String getDescripcionTurno() {
+		return descripcionTurno;
+	}
+	/**
+	 * @param descripcionTurno the descripcionTurno to set
+	 */
+	public void setDescripcionTurno(String descripcionTurno) {
+		this.descripcionTurno = descripcionTurno;
+	}
+	/**
+	 * @return the validada
+	 */
+	public String getValidada() {
+		return validada;
+	}
+	/**
+	 * @param validada the validada to set
+	 */
+	public void setValidada(String validada) {
+		this.validada = validada;
 	}
 	@Override
 	public int hashCode() {

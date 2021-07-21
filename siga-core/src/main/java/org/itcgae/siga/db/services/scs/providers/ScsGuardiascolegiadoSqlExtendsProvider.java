@@ -23,17 +23,26 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
     public String getTurnosByColegiadoFecha(String idPersona, Short idInstitucion, String guardiaDia) {
     	SQL sql = new SQL();
         
-        sql.SELECT_DISTINCT("turno.idinstitucion,"
-        		+ " turno.idturno,"
-        		+ " turno.nombre");
-        sql.FROM("scs_turno turno ");
-        sql.INNER_JOIN("scs_calendarioguardias   gc on gc.idturno = turno.idturno and gc.idinstitucion = turno.idinstitucion");
+        sql.SELECT_DISTINCT("gc.idturno",
+        		"(\r\n"
+        		+ "        SELECT\r\n"
+        		+ "            turno.nombre\r\n"
+        		+ "        FROM\r\n"
+        		+ "            scs_turno turno\r\n"
+        		+ "        WHERE\r\n"
+        		+ "                gc.idinstitucion = turno.idinstitucion\r\n"
+        		+ "            AND gc.idturno = turno.idturno\r\n"
+        		+ "    )          AS nombre");
+        sql.FROM("scs_calendarioguardias  gc");
+        sql.INNER_JOIN("SCS_TURNO turno ON gc.idinstitucion = turno.idinstitucion AND gc.idturno = turno.idturno");
         sql.WHERE("turno.idinstitucion = " + idInstitucion);
+        sql.WHERE("nvl(turno.idtipoturno, 2) = 2");
         sql.WHERE("TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(gc.fechainicio) AND trunc(gc.fechafin)");
         if(idPersona != null
         		&& !"".equals(idPersona)) {
         	sql.WHERE("gc.IDPERSONA_ULTIMOANTERIOR = " + idPersona);
         }
+        sql.ORDER_BY("nombre");
         return sql.toString();
     }
     

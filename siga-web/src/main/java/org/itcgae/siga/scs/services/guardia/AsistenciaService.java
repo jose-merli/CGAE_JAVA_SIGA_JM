@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.FiltroAsistenciaItem;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseDTO;
@@ -26,7 +28,13 @@ public interface AsistenciaService {
 	
 	public ComboDTO getComisarias (HttpServletRequest request, String idTurno);
 	
-	public DeleteResponseDTO guardarAsistencias(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
+	public DeleteResponseDTO guardarAsistenciasExpres(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
 	
 	public TarjetaAsistenciaResponseDTO searchAsistenciasByIdSolicitud(HttpServletRequest request, String idSolicitud);
+	
+	public StringDTO getDefaultTipoAsistenciaColegio (HttpServletRequest request);
+	
+	public InsertResponseDTO guardarAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
+	
+	public TarjetaAsistenciaResponseDTO buscarTarjetaAsistencias(HttpServletRequest request, String anioNumero);
 }
