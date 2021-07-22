@@ -3759,7 +3759,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					estado.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 					// obtenemos el maximo de idestadoporejg
-					estado.setIdestadoporejg(getNewIdestadoporejg(item,idInstitucion));
+					estado.setIdestadoporejg(getNewIdestadoporejg(ejg,idInstitucion));
 
 					response = scsEstadoejgMapper.insert(estado);
 					if(response==0) throw(new Exception("Error al introducir el nuevo estado al cambiar el procurador del EJG"));
@@ -5294,7 +5294,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			estadoEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 			.andIdtipoejgEqualTo(Short.valueOf(ejgItem.getTipoEJG()))
 			.andAnioEqualTo(Short.valueOf(ejgItem.getAnnio()))
-			.andNumeroEqualTo(ejgItem.getNumero())
+			.andNumeroEqualTo(Long.valueOf(ejgItem.getNumero()))
 			.andIdestadoejgEqualTo((short) 23); //Solicitud en procesdo de alta === scs_maestroestadosejg.idestado=23
 			
 			List<ScsEstadoejg> estadoIni = scsEstadoejgMapper.selectByExample(estadoEjgExample);
