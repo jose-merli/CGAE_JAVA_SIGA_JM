@@ -324,7 +324,7 @@ public class EjgController {
 
 	// insertaDatosGenerales
 	@RequestMapping(value = "/gestion-ejg/insertaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<EjgDTO> insertaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
+	ResponseEntity<EjgDTO> insertaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) throws Exception {
 		EjgDTO response = gestionEJG.insertaDatosGenerales(datos, request);
 		if (response != null) {
 			return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
@@ -334,7 +334,7 @@ public class EjgController {
 
 	// actualizaDatosGenerales
 	@RequestMapping(value = "/gestion-ejg/actualizaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> actualizaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> actualizaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.actualizaDatosGenerales(datos, request);
 //		if (response.getError().getCode() == 200)
 //			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -408,7 +408,7 @@ public class EjgController {
 	// borrarFamiliar
 	@RequestMapping(value = "/gestion-ejg/borrarFamiliar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> borrarFamiliar(@RequestBody List<UnidadFamiliarEJGItem> datos,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.borrarFamiliar(datos, request);
 		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -491,7 +491,7 @@ public class EjgController {
 
 	// updateDatosJuridicos
 	@RequestMapping(value = "/gestion-ejg/updateDatosJuridicos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateDatosJuridicos(@RequestBody EjgItem datos, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> updateDatosJuridicos(@RequestBody EjgItem datos, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.updateDatosJuridicos(datos, request);
 		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -630,7 +630,7 @@ public class EjgController {
 	}
 
 	@RequestMapping(value = "/gestion-ejg/guardarProcuradorEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody EjgItem item, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody EjgItem item, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.guardarProcuradorEJG(item, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -719,7 +719,7 @@ public class EjgController {
 
 	@RequestMapping(value = "/gestion-ejg/actualizarInformeCalificacionEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> actualizarInformeCalificacion(@RequestBody EjgItem item,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.actualizarInformeCalificacionEjg(item, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -770,7 +770,7 @@ public class EjgController {
 
 	// guardarImpugnacion
 	@RequestMapping(value = "/gestion-ejg/guardarImpugnacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarImpugnacion(@RequestBody EjgItem datos, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> guardarImpugnacion(@RequestBody EjgItem datos, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.guardarImpugnacion(datos, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);

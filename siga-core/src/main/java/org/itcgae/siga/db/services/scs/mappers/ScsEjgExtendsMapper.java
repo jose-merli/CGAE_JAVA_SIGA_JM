@@ -289,18 +289,21 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgDictamen")
 	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
-	String getObservacionEstadoEjgDictamen(Short idInstitucion, Short idLenguaje, Short idTipoDictamen);
+	String getObservacionEstadoEjgDictamen(Short idInstitucion, String idLenguaje, Short idTipoDictamen);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgPonente")
 	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
-	String getObservacionEstadoEjgPonente(Short idInstitucion, Short idLenguaje, Integer idPonente);
+	String getObservacionEstadoEjgPonente(Short idInstitucion, String idLenguaje, Integer idPonente);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgResol")
 	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
-	String getObservacionEstadoEjgResol(Short idInstitucion, Short idLenguaje, Short idTiporatificacionEJG);
+	String getObservacionEstadoEjgResol(Short idInstitucion, String idLenguaje, Short idTiporatificacionEJG);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgImpug")
 	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
-	String getObservacionEstadoEjgImpug(Short idInstitucion, Short idLenguaje, String idTiporesolauto);
+	String getObservacionEstadoEjgImpug(Short idInstitucion, String idLenguaje, String idTiporesolauto);
 	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoIniInsertEjg")
+	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
+	String getObservacionEstadoIniInsertEjg(Short idInstitucion, String idLenguaje, String idTiporesolauto);
 }

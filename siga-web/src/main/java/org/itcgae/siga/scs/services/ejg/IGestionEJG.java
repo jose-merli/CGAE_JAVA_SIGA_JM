@@ -68,9 +68,9 @@ public interface IGestionEJG {
 	
 	ResponseEntity<InputStreamResource> descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request);
 	
-	EjgDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request);
+	EjgDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request) throws Exception;
 	
-	UpdateResponseDTO actualizaDatosGenerales(EjgItem datos, HttpServletRequest request);
+	UpdateResponseDTO actualizaDatosGenerales(EjgItem datos, HttpServletRequest request) throws Exception;
 
 	UpdateResponseDTO borrarEstado(List<EstadoEjgItem> datos, HttpServletRequest request);
 
@@ -82,7 +82,7 @@ public interface IGestionEJG {
 	
 	UpdateResponseDTO borrarRelacionSojEJG(RelacionesItem datos, HttpServletRequest request);
 
-	UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request);
+	UpdateResponseDTO guardarImpugnacion(EjgItem datos, HttpServletRequest request) throws Exception;
 	
 	UpdateResponseDTO descargarInformeCalificacion(EjgItem datos, HttpServletRequest request);
 	
@@ -96,7 +96,7 @@ public interface IGestionEJG {
 
 	InsertResponseDTO insertFamiliarEJG(List<String> item, HttpServletRequest request);
 
-	UpdateResponseDTO borrarFamiliar(List<UnidadFamiliarEJGItem> datos, HttpServletRequest request);
+	UpdateResponseDTO borrarFamiliar(List<UnidadFamiliarEJGItem> datos, HttpServletRequest request) throws Exception;
 	
 	RelacionesDTO getRelacionesEJG(EjgItem item, HttpServletRequest request);
 
@@ -106,7 +106,7 @@ public interface IGestionEJG {
 
 	ComboDTO comboTipoencalidad(HttpServletRequest request);
 
-	UpdateResponseDTO updateDatosJuridicos(EjgItem datos, HttpServletRequest request);
+	UpdateResponseDTO updateDatosJuridicos(EjgItem datos, HttpServletRequest request) throws Exception;
 
 	List<ListaContrarioEJGJusticiableItem> busquedaListaContrariosEJG(EjgItem item, HttpServletRequest request,
 			Boolean historico);
@@ -123,7 +123,7 @@ public interface IGestionEJG {
 
 	ProcuradorDTO busquedaProcuradorEJG(EjgItem ejg, HttpServletRequest request);
 
-	UpdateResponseDTO guardarProcuradorEJG(EjgItem item, HttpServletRequest request);
+	UpdateResponseDTO guardarProcuradorEJG(EjgItem item, HttpServletRequest request) throws Exception;
 
 	//UpdateResponseDTO nuevoProcuradorEJG(EjgItem ejgItem, HttpServletRequest request);
 
@@ -157,7 +157,7 @@ public interface IGestionEJG {
 
 	InsertResponseDTO solicitarEEJG(UnidadFamiliarEJGItem datos, HttpServletRequest request);
 
-	UpdateResponseDTO actualizarInformeCalificacionEjg(EjgItem ejgItem, HttpServletRequest request);
+	UpdateResponseDTO actualizarInformeCalificacionEjg(EjgItem ejgItem, HttpServletRequest request) throws Exception;
 	
 	UpdateResponseDTO asociarDesignacion(List<String> datos, HttpServletRequest request);
 
