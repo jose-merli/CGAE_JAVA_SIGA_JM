@@ -127,6 +127,7 @@ public class EjgItem {
 	private Short idTipoDictamen;
 	private Short fundamentoCalif;
 	private String dictamen;
+	private String dilnigproc;
 	
 	//REGTEL
 	private String identificadords;
@@ -1596,5 +1597,13 @@ public class EjgItem {
 
 	public void setIdentificadords(String identificadords) {
 		this.identificadords = identificadords;
+	}
+
+	public String getDilnigproc() {
+		return dilnigproc;
+	}
+
+	public void setDilnigproc(String dilnigproc) {
+		this.dilnigproc = dilnigproc;
 	}
 }

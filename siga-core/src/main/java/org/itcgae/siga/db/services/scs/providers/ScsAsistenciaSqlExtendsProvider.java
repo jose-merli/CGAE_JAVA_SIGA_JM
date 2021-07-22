@@ -23,7 +23,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado,"
 				+ "a.fechahora, NVL(a.numeroprocedimiento,'') numeroprocedimiento,"
 				+ "a.comisaria centrodetencion,"
-				+ "a.juzgado,"
+				+ "f_siga_getrecurso(juzgado.nombre," + idLenguaje + ") juzgado,"
 				+"a.numerodiligencia,"
 				+ "nvl( a.numerodiligencia, 'Sin número' ) || ' - ' || nvl( a.nig, 'Sin número' ) || ' - ' || nvl( a.numeroprocedimiento,'Sin número' ) dilnigproc");
 		

@@ -132,35 +132,35 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				if (asuntosJusticiableItems != null && asuntosJusticiableItems.size() > 0) {
 					// vamos a crear los datos de interes
-					for (AsuntosJusticiableItem data : asuntosJusticiableItems) {
-						String datoInteres = "";
-
-						if (data.getTipo() != null && !data.getTipo().isEmpty()) {
-							datoInteres += "<b>Tipo: </b>" + data.getTipo();
-						}
-
-						if (data.getNumProcedimiento() != null && !data.getNumProcedimiento().isEmpty()) {
-							if (!datoInteres.isEmpty()) {
-								datoInteres += "<p>";
-							}
-
-							datoInteres += "<b>Núm. Procedimiento: </b>" + data.getNumProcedimiento();
-						}
-
-						if (data.getNig() != null && !data.getNig().isEmpty()) {
-							if (!datoInteres.isEmpty()) {
-								datoInteres += "<p>";
-							}
-
-							datoInteres += "<p><b>NIG: </b>" + data.getNig();
-						}
-
-						data.setDatosInteres(datoInteres);
-					}
+//					for (AsuntosJusticiableItem data : asuntosJusticiableItems) {
+//						String datoInteres = "";
+//
+//						if (data.getTipo() != null && !data.getTipo().isEmpty()) {
+//							datoInteres += "<b>Tipo: </b>" + data.getTipo();
+//						}
+//
+//						if (data.getNumProcedimiento() != null && !data.getNumProcedimiento().isEmpty()) {
+//							if (!datoInteres.isEmpty()) {
+//								datoInteres += "<p>";
+//							}
+//
+//							datoInteres += "<b>Núm. Procedimiento: </b>" + data.getNumProcedimiento();
+//						}
+//
+//						if (data.getNig() != null && !data.getNig().isEmpty()) {
+//							if (!datoInteres.isEmpty()) {
+//								datoInteres += "<p>";
+//							}
+//
+//							datoInteres += "<p><b>NIG: </b>" + data.getNig();
+//						}
+//
+//						data.setDatosInteres(datoInteres);
+//					}
 
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
-							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size() >= tamMaximo) {
 						error.setCode(200);
 						error.setDescription("La consulta devuelve más de " + tamMaximo
 								+ " resultados, pero se muestran sólo los " + tamMaximo
@@ -298,7 +298,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
-							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size() >= tamMaximo) {
 						error.setCode(200);
 						error.setDescription("La consulta devuelve más de " + tamMaximo
 								+ " resultados, pero se muestran sólo los " + tamMaximo
@@ -386,51 +386,51 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				LOGGER.info(
 						"searchClaveAsuntosDesignaciones() / scsEjgExtendsMapper.searchClaveAsuntosDesignaciones() -> Salida a cenTiposolicitudSqlExtendsMapper para obtener los AsuntosEJG");
 
-				if (asuntosJusticiableItems != null && asuntosJusticiableItems.size()>0) {					
-					//vamos a crear los datos de interes
-					for(AsuntosJusticiableItem data : asuntosJusticiableItems) {
-						String datoInteres = "";
-						
-						if (data.getTipo() != null && !data.getTipo().isEmpty()) {
-							datoInteres += "<b>Tipo: </b>" + data.getTipo();
-						}
+				if (asuntosJusticiableItems != null && asuntosJusticiableItems.size() > 0) {
+					// vamos a crear los datos de interes
+//					for(AsuntosJusticiableItem data : asuntosJusticiableItems) {
+//						String datoInteres = "";
+//						
+//						if (data.getTipo() != null && !data.getTipo().isEmpty()) {
+//							datoInteres += "<b>Tipo: </b>" + data.getTipo();
+//						}
+//
+//						if (data.getNumeroProcedimiento() != null && !data.getNumeroProcedimiento().isEmpty()) {
+//							if (!datoInteres.isEmpty()) {
+//								datoInteres += "<p>";
+//							}
+//
+//							datoInteres += "<b>Núm. Procedimiento: </b>" + data.getNumeroProcedimiento();
+//						}
+//
+//						if (data.getJuzgado() != null && !data.getJuzgado().isEmpty()) {
+//							if (!datoInteres.isEmpty()) {
+//								datoInteres += "<p>";
+//							}
+//
+//							datoInteres += "<p><b>Juzgado: </b>" + data.getJuzgado();
+//						}
+//						if (data.getNig() != null && !data.getNig().isEmpty()) {
+//							if (!datoInteres.isEmpty()) {
+//								datoInteres += "<p>";
+//							}
+//
+//							datoInteres += "<p><b>NIG: </b>" + data.getNig();
+//						}
+//						if (data.getIdTipoDesigna() != null && !data.getIdTipoDesigna().isEmpty()) {
+//							if (!datoInteres.isEmpty()) {
+//								datoInteres += "<p>";
+//							}
+//
+//							datoInteres += "<p><b>Tipo: </b>" + data.getIdTipoDesigna();
+//						}
+//						
+//						data.setDatosInteres(datoInteres);						
+//					}
 
-						if (data.getNumeroProcedimiento() != null && !data.getNumeroProcedimiento().isEmpty()) {
-							if (!datoInteres.isEmpty()) {
-								datoInteres += "<p>";
-							}
-
-							datoInteres += "<b>Núm. Procedimiento: </b>" + data.getNumeroProcedimiento();
-						}
-
-						if (data.getJuzgado() != null && !data.getJuzgado().isEmpty()) {
-							if (!datoInteres.isEmpty()) {
-								datoInteres += "<p>";
-							}
-
-							datoInteres += "<p><b>Juzgado: </b>" + data.getJuzgado();
-						}
-						if (data.getNig() != null && !data.getNig().isEmpty()) {
-							if (!datoInteres.isEmpty()) {
-								datoInteres += "<p>";
-							}
-
-							datoInteres += "<p><b>NIG: </b>" + data.getNig();
-						}
-						if (data.getIdTipoDesigna() != null && !data.getIdTipoDesigna().isEmpty()) {
-							if (!datoInteres.isEmpty()) {
-								datoInteres += "<p>";
-							}
-
-							datoInteres += "<p><b>Tipo: </b>" + data.getIdTipoDesigna();
-						}
-						
-						data.setDatosInteres(datoInteres);						
-					}
-					
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
-							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size() >= tamMaximo) {
 						error.setCode(200);
 						error.setDescription("La consulta devuelve más de " + tamMaximo
 								+ " resultados, pero se muestran sólo los " + tamMaximo
@@ -438,13 +438,13 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						asuntosJusticiableDTO.setError(error);
 					}
 				}
-				
+
 //				asuntosJusticiableDTO = gestionJusticiableServiceImpl.searchAsuntosConClave(asuntosJusticiableItems,
 //						false, request);
 			}
 		}
 		LOGGER.info("searchClaveAsuntosDesignaciones() -> Salida del servicio para obtener los AsuntosEJG");
-		
+
 		return asuntosJusticiableDTO;
 	}
 
@@ -499,12 +499,14 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				} else {
 					tamMaximo = 200;
 				}
-				
-				//buscamos la idpersona del colegiado
-				if(asuntosJusticiableItem.getnColegiado()!=null && !asuntosJusticiableItem.getnColegiado().trim().isEmpty()) {
-					String idPersonaColegiado = getIdPersonaColegiado(asuntosJusticiableItem.getnColegiado(), asuntosJusticiableItem.getIdInstitucion());
-					
-					if(!idPersonaColegiado.isEmpty()) {
+
+				// buscamos la idpersona del colegiado
+				if (asuntosJusticiableItem.getnColegiado() != null
+						&& !asuntosJusticiableItem.getnColegiado().trim().isEmpty()) {
+					String idPersonaColegiado = getIdPersonaColegiado(asuntosJusticiableItem.getnColegiado(),
+							asuntosJusticiableItem.getIdInstitucion());
+
+					if (!idPersonaColegiado.isEmpty()) {
 						asuntosJusticiableItem.setIdPersonaColegiado(idPersonaColegiado);
 					}
 				}
@@ -513,35 +515,40 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						"searchClaveAsuntosSOJ() / scsEjgExtendsMapper.searchClaveAsuntosSOJ() -> Entrada a cenTiposolicitudSqlExtendsMapper para obtener los AsuntosEJG");
 
 				asuntosJusticiableItem.setIdInstitucion(idInstitucion.toString());
-				asuntosJusticiableItems = scsSojExtendsMapper.searchClaveSoj(asuntosJusticiableItem, tamMaximo, usuarios.get(0).getIdlenguaje());
+				asuntosJusticiableItems = scsSojExtendsMapper.searchClaveSoj(asuntosJusticiableItem, tamMaximo,
+						usuarios.get(0).getIdlenguaje());
 
 				LOGGER.info(
 						"searchClaveAsuntosSOJ() / scsEjgExtendsMapper.searchClaveAsuntosSOJ() -> Salida a cenTiposolicitudSqlExtendsMapper para obtener los AsuntosEJG");
 
-				if (asuntosJusticiableItems != null && asuntosJusticiableItems.size()>0) {					
-					//vamos a crear los datos de interes
-			for(AsuntosJusticiableItem data : asuntosJusticiableItems) {
-						String datoInteres = "";
-						
-						if(data.getTipo()!=null && !data.getTipo().isEmpty()) {
-							datoInteres+="<b>Tipo: </b>"+data.getTipo();
+				if (asuntosJusticiableItems != null && asuntosJusticiableItems.size() > 0) {
+					// vamos a crear los datos de interes
+					for (AsuntosJusticiableItem data : asuntosJusticiableItems) {
+//						String datoInteres = "";
+//						
+//						if(data.getTipo()!=null && !data.getTipo().isEmpty()) {
+//							datoInteres+="<b>Tipo: </b>"+data.getTipo();
+//						}
+//						
+//						if(data.getEstado()!=null && !data.getEstado().isEmpty()) {
+//							if(!datoInteres.isEmpty()) {
+//								datoInteres+="<p>";
+//							}
+//							
+//							datoInteres+="<b>Estado: </b>"+data.getEstado();
+//						}
+//						
+//						
+//						data.setDatosInteres(datoInteres);	
+						if (!(data.getDilnigproc() != null && !data.getDilnigproc().isEmpty())) {
+							data.setDilnigproc("Sin numero - Sin numero - Sin numero");
 						}
-						
-						if(data.getEstado()!=null && !data.getEstado().isEmpty()) {
-							if(!datoInteres.isEmpty()) {
-								datoInteres+="<p>";
-							}
-							
-							datoInteres+="<b>Estado: </b>"+data.getEstado();
-						}
-						
-						
-						data.setDatosInteres(datoInteres);						
+
 					}
-					
+
 					asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItems);
 					if (asuntosJusticiableDTO.getAsuntosJusticiableItems() != null && tamMaximo != null
-							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size()>=tamMaximo) {
+							&& asuntosJusticiableDTO.getAsuntosJusticiableItems().size() >= tamMaximo) {
 						error.setCode(200);
 						error.setDescription("La consulta devuelve más de " + tamMaximo
 								+ " resultados, pero se muestran sólo los " + tamMaximo
@@ -549,15 +556,13 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						asuntosJusticiableDTO.setError(error);
 					}
 				}
-				
-				
-				
+
 //				asuntosJusticiableDTO = gestionJusticiableServiceImpl
 //						.searchAsuntosConClave(asuntosJusticiableItems, false, request);
 			}
 		}
 		LOGGER.info("searchClaveAsuntosSOJ() -> Salida del servicio para obtener los AsuntosEJG");
-		
+
 		return asuntosJusticiableDTO;
 	}
 }
