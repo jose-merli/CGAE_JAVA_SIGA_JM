@@ -23,12 +23,13 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado,"
 				+ "a.fechahora, NVL(a.numeroprocedimiento,'') numeroprocedimiento,"
 				+ "a.comisaria centrodetencion,"
-				+ "a.juzgado,"
+				+ "scs_juzgado.nombre juzgado,"
 				+"a.numerodiligencia,"
 				+ "nvl( a.numerodiligencia, 'Sin número' ) || ' - ' || nvl( a.nig, 'Sin número' ) || ' - ' || nvl( a.numeroprocedimiento,'Sin número' ) dilnigproc");
 		
 		sql.FROM("scs_asistencia a");
 	    sql.JOIN("scs_tipoasistencia ta ON (ta.idtipoasistencia = a.idtipoasistencia)");
+	    sql.JOIN("scs_juzgado ON scs_juzgado.idjuzgado = a.juzgado AND scs_juzgado.idinstitucion = a.idinstitucion");
 	    sql.LEFT_OUTER_JOIN("scs_personajg pjg ON (pjg.idpersona = a.idpersonajg AND pjg.idinstitucion = a.idinstitucion)");
 	    sql.LEFT_OUTER_JOIN("scs_turno t ON (t.idturno = a.idturno AND t.idinstitucion = a.idinstitucion)");
 	    sql.LEFT_OUTER_JOIN("scs_guardiasturno g ON (a.idturno = g.idturno AND a.idinstitucion = g.idinstitucion AND a.idguardia = g.idguardia)");

@@ -26,7 +26,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 				+ "		soj.idtiposoj,"
 				+ "    (nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado,"
-				+ "null dilnigproc");
+				+ "NULL dilnigproc");
 		sql.FROM("    scs_soj soj\r\n");
 		sql.JOIN("scs_personajg pjg ON ( pjg.idpersona = soj.idpersonajg AND pjg.idinstitucion = soj.idinstitucion)");
 		sql.LEFT_OUTER_JOIN("cen_persona per ON (soj.idpersona = per.idpersona)");
@@ -167,6 +167,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 //			Integer tamMaxNumber = tamMax + 1;
 //			sqlOrder.WHERE("rownum <= " + tamMaxNumber);
 //		}
+		
 //		return sqlOrder.toString();
 		return sql.toString();
 	}
