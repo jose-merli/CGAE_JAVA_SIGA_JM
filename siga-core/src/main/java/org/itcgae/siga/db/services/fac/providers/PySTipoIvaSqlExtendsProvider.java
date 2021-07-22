@@ -18,4 +18,19 @@ public class PySTipoIvaSqlExtendsProvider extends PysTipoivaSqlProvider{
 		return sql.toString();
 	}
 	
+	public String comboIvaNoDerogados(String idioma) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDTIPOIVA AS ID");
+		sql.SELECT("f_siga_getrecurso (DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
+		
+		sql.FROM("PYS_TIPOIVA");
+		
+		sql.WHERE("FECHABAJA IS NULL");
+		
+		sql.ORDER_BY("NLSSORT(DESCRIPCION, 'NLS_SORT=BINARY')");
+		
+		return sql.toString();
+	}
+	
 }

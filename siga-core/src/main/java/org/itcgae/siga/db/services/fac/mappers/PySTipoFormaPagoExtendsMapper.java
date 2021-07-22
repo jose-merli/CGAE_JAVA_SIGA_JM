@@ -23,4 +23,19 @@ public interface PySTipoFormaPagoExtendsMapper extends PysFormapagoMapper{
 		}) 
 	List<ComboItem> comboTipoFormaPago(String idioma);
 	
+	@SelectProvider(type = PySTipoFormaPagoSqlExtendsProvider.class, method = "comboTipoFormaPagoInternet")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> comboTipoFormaPagoInternet(String idioma);
+	
+	@SelectProvider(type = PySTipoFormaPagoSqlExtendsProvider.class, method = "comboTipoFormaPagoSecretaria")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> comboTipoFormaPagoSecretaria(String idioma);
+	
+	
 }

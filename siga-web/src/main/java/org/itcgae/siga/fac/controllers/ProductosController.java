@@ -4,9 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
-import org.itcgae.siga.DTO.fac.ListaProductosItem;
-import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
-import org.itcgae.siga.DTO.fac.ProductoDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -62,9 +59,27 @@ public class ProductosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping(value = "/combo/tipoIvaNoDerogados")
+	ResponseEntity<ComboDTO> comboTiposIvaNoDerogados(HttpServletRequest request) { 
+		ComboDTO response = productosService.comboIvaNoDerogados(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping(value = "/combo/tipoFormaPago")
 	ResponseEntity<ComboDTO> comboTipoFormaPago(HttpServletRequest request) { 
 		ComboDTO response = productosService.comboTipoFormaPago(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/combo/pagoInternet")
+	ResponseEntity<ComboDTO> comboTipoFormaPagoInternet(HttpServletRequest request) { 
+		ComboDTO response = productosService.comboTipoFormaPagoInternet(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/combo/comboPagoSecretaria")
+	ResponseEntity<ComboDTO> comboTipoFormaPagoSecretaria(HttpServletRequest request) { 
+		ComboDTO response = productosService.comboTipoFormaPagoSecretaria(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 }

@@ -1,16 +1,11 @@
 package org.itcgae.siga.db.services.form.providers;
 
-import java.util.List;
-
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
-import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.db.mappers.PysProductosinstitucionSqlProvider;
 
 public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinstitucionSqlProvider {
 
-	
 	public String selectTypesCertificatesCourse(Short idInstitucion) {
 
 		SQL sql = new SQL();
@@ -33,7 +28,6 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 		return sql.toString();
 	}
 	
-
 	public String detalleProducto(int idTipoProducto, int idProducto, int idProductoInstitucion, Short idInstitucion) {
 
 		SQL sql = new SQL();
@@ -90,7 +84,6 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
 		sql.WHERE(" IDTIPOPRODUCTO ='" + producto.getIdtipoproducto() + "'");
 		sql.WHERE(" IDPRODUCTO ='" + producto.getIdproducto() + "'");
-		
 		
 		return sql.toString();
 	}

@@ -119,6 +119,63 @@ public class ProductosServiceImpl implements IProductosService{
 	}
 	
 	@Override
+	public ComboDTO comboIvaNoDerogados(HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.info("comboIvaNoDerogados() -> Entrada al servicio para recuperar el combo de ivas no derogados");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"comboIvaNoDerogados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"comboIvaNoDerogados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"comboIvaNoDerogados() / pysTipoIvaExtendsMapper.comboIva() -> Entrada a pysTipoIvaExtendsMapper para recuperar el combo de ivas no derogados");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboIvaNoDerogados = pysTipoIvaExtendsMapper
+							.comboIvaNoDerogados(idioma);
+
+					LOGGER.info(
+							"comboIvaNoDerogados() / pysTipoIvaExtendsMapper.comboIva() -> Salida de pysTipoIvaExtendsMapper para recuperar el combo de ivas no derogados");
+
+					if (listaComboIvaNoDerogados != null && listaComboIvaNoDerogados.size() > 0) {
+						comboDTO.setCombooItems(listaComboIvaNoDerogados);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ProductosServiceImpl.comboIvaNoDerogados() -> Se ha producido un error al recuperar el combo de ivas no derogados",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboIvaNoDerogados() -> Salida del servicio para recuperar el combo de ivas no derogados");
+
+		return comboDTO;
+	}
+	
+	@Override
 	public ComboDTO comboTipoFormaPago(HttpServletRequest request) {
 		ComboDTO comboDTO = new ComboDTO();
 		Error error = new Error();
@@ -174,6 +231,120 @@ public class ProductosServiceImpl implements IProductosService{
 
 		return comboDTO;
 	}
+	
+	@Override
+	public ComboDTO comboTipoFormaPagoInternet(HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.info("comboTipoFormaPagoInternet() -> Entrada al servicio para recuperar el combo de formas de pago de internet");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"comboTipoFormaPagoInternet() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"comboTipoFormaPagoInternet() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"comboTipoFormaPagoInternet() / pysTipoFormaPagoExtendsMapper.comboTipoFormaPagoInternet() -> Entrada a pysTipoFormaPagoExtendsMapper para recuperar el combo de formas de pago de internet");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboFormaPagoInternet = pysTipoFormaPagoExtendsMapper
+							.comboTipoFormaPagoInternet(idioma);
+
+					LOGGER.info(
+							"comboTipoFormaPagoInternet() / pysTipoFormaPagoExtendsMapper.comboTipoFormaPagoInternet() -> Salida de pysTipoFormaPagoExtendsMapper para recuperar el combo de formas de pago de internet");
+
+					if (listaComboFormaPagoInternet != null && listaComboFormaPagoInternet.size() > 0) {
+						comboDTO.setCombooItems(listaComboFormaPagoInternet);
+				}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ProductosServiceImpl.comboTipoFormaPagoInternet() -> Se ha producido un error al recuperar el combo de formas de pago de internet",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboTipoFormaPagoInternet() -> Salida del servicio para recuperar el combo de formas de pago de internet");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO comboTipoFormaPagoSecretaria(HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.info("comboTipoFormaPagoSecretaria() -> Entrada al servicio para recuperar el combo de formas de pago de secretaria");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"comboTipoFormaPagoSecretaria() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"comboTipoFormaPagoSecretaria() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"comboTipoFormaPagoSecretaria() / pysTipoFormaPagoExtendsMapper.comboTipoFormaPagoSecretaria() -> Entrada a pysTipoFormaPagoExtendsMapper para recuperar el combo de formas de pago de secretaria");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboFormaPagoSecretaria = pysTipoFormaPagoExtendsMapper
+							.comboTipoFormaPagoSecretaria(idioma);
+
+					LOGGER.info(
+							"comboTipoFormaPagoSecretaria() / pysTipoFormaPagoExtendsMapper.comboTipoFormaPagoSecretaria() -> Salida de pysTipoFormaPagoExtendsMapper para recuperar el combo de formas de pago de secretaria");
+
+					if (listaComboFormaPagoSecretaria != null && listaComboFormaPagoSecretaria.size() > 0) {
+						comboDTO.setCombooItems(listaComboFormaPagoSecretaria);
+				}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ProductosServiceImpl.comboTipoFormaPagoSecretaria() -> Se ha producido un error al recuperar el combo de formas de pago de secretaria",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboTipoFormaPagoSecretaria() -> Salida del servicio para recuperar el combo de formas de pago de secretaria");
+
+		return comboDTO;
+	}
 
 	@Override
 	public ListaProductosDTO searchListadoProductos(HttpServletRequest request, FiltroProductoItem filtroProductoItem) {
@@ -218,7 +389,7 @@ public class ProductosServiceImpl implements IProductosService{
 						
 						if(i == 0) {
 							listaProductosProcesada.add(listaProductos.get(i));
-						}else if((listaProductos.get(i).getIdtipoproducto() == listaProductos.get(i - 1).getIdtipoproducto()) && (listaProductos.get(i).getIdproducto() == listaProductos.get(i - 1).getIdproducto())) //Comprueba que el producto actual es distinto al anterior no el mismo con distinta forma de pago 
+						}else if((listaProductos.get(i).getIdtipoproducto() == listaProductos.get(i - 1).getIdtipoproducto()) && (listaProductos.get(i).getIdproducto() == listaProductos.get(i - 1).getIdproducto()) && (listaProductos.get(i).getIdproductoinstitucion() == listaProductos.get(i - 1).getIdproductoinstitucion())) //Comprueba que el producto actual es distinto al anterior no el mismo con distinta forma de pago 
 						{
 							//Este if comprueba si es el 3 producto identico excepto por la forma de pago al primero que añadiste (es decir este seria el 4 por lo que al tener mas de 3 formas de pago se ha de mostrar el numero)
 							if(numFormasDePago > 2) {
@@ -426,6 +597,7 @@ public class ProductosServiceImpl implements IProductosService{
 					productoInstitucion.setIdproducto((long) producto.getIdproducto());
 					productoInstitucion.setIdproductoinstitucion((long) producto.getIdproducto());
 					productoInstitucion.setDescripcion(producto.getDescripcion());
+					//productoInstitucion.setValor(new BigDecimal(0));//PROVISIONAL
 					
 					if(producto.getCuentacontable() != "" && producto.getCuentacontable() != null)
 						productoInstitucion.setCuentacontable(producto.getCuentacontable());
