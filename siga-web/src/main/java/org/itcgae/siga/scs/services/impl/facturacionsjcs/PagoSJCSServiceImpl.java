@@ -1,14 +1,7 @@
 package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -19,22 +12,12 @@ import org.itcgae.siga.DTOs.scs.PagosjgDTO;
 import org.itcgae.siga.DTOs.scs.PagosjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.FcsFactGrupofactHito;
-import org.itcgae.siga.db.entities.FcsFactGrupofactHitoExample;
-import org.itcgae.siga.db.entities.FcsPagoGrupofactHito;
-import org.itcgae.siga.db.entities.FcsPagoGrupofactHitoExample;
-import org.itcgae.siga.db.entities.FcsPagosEstadospagos;
-import org.itcgae.siga.db.entities.FcsPagosjg;
-import org.itcgae.siga.db.entities.FcsPagosjgKey;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.mappers.FcsFactGrupofactHitoMapper;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.FcsPagoGrupofactHitoMapper;
 import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFactGrupofactHitoExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsPagosjgExtendsMapper;
 import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.itcgae.siga.scs.services.facturacionsjcs.IPagoSJCSService;
@@ -42,681 +25,992 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.*;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
+
 @Service
 public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
-	private final Logger LOGGER = Logger.getLogger(PagoSJCSServiceImpl.class);
-
-	@Autowired
-	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-
-	@Autowired
-	private GenParametrosExtendsMapper genParametrosMapper;
-
-	@Autowired
-	private FcsPagosjgExtendsMapper fcsPagosjgExtendsMapper;
-
-	@Autowired
-	private FcsPagosEstadospagosMapper fcsPagosEstadospagosMapper;
-
-	@Autowired
-	private FcsFactGrupofactHitoMapper fcsFactGrupofactHitoMapper;
-
-	@Autowired
-	private FcsPagoGrupofactHitoMapper fcsPagoGrupofactHitoMapper;
-
-	@Override
-	public PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request) {
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		PagosjgDTO pagos = new PagosjgDTO();
-		String idLenguaje = "";
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
-		Error error = new Error();
-
-		try {
-
-			if (null != idInstitucion) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.buscarPagos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.buscarPagos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && usuarios.size() > 0) {
-					AdmUsuarios usuario = usuarios.get(0);
-					usuario.setIdinstitucion(idInstitucion);
-					idLenguaje = usuario.getIdlenguaje();
-
-					GenParametrosExample genParametrosExample = new GenParametrosExample();
-					genParametrosExample.createCriteria().andModuloEqualTo("SCS")
-							.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-					genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.buscarPagos() / genParametrosMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-					tamMax = genParametrosMapper.selectByExample(genParametrosExample);
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.buscarPagos() / genParametrosMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-					if (tamMax != null) {
-						tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-					} else {
-						tamMaximo = null;
-					}
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.buscarPagos() / fcsFacturacionJGExtendsMapper.buscarPagos() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los pagos");
-					List<PagosjgItem> pagosItems = fcsPagosjgExtendsMapper.buscarPagos(pagosItem,
-							idInstitucion.toString(), idLenguaje, tamMaximo);
-
-					if (null != pagosItems && pagosItems.size() > tamMaximo) {
-						pagosItems.remove(pagosItems.size() - 1);
-						error.setCode(200);
-						error.setDescription("general.message.consulta.resultados");
-					}
-
-					pagos.setPagosjgItem(pagosItems);
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.buscarPagos() / fcsFacturacionJGExtendsMapper.buscarPagos() -> Salida a fcsFacturacionJGExtendsMapper para obtener los pagos");
-				} else {
-					LOGGER.warn(
-							"FacturacionSJCSServicesImpl.buscarPagos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-									+ dni + " e idInstitucion = " + idInstitucion);
-				}
-			} else {
-				LOGGER.warn("FacturacionSJCSServicesImpl.buscarPagos() -> idInstitucion del token nula");
-			}
-
-		} catch (Exception e) {
-			LOGGER.error("FacturacionSJCSServicesImpl.buscarPagos() -> Se ha producido un error al buscar los pagos",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		pagos.setError(error);
-		LOGGER.info("FacturacionSJCSServicesImpl.buscarPagos() -> Salida del servicio para obtener los pagos");
-
-		return pagos;
-	}
-
-	@Override
-	public PagosjgDTO datosGeneralesPagos(String idPago, HttpServletRequest request) {
-
-		LOGGER.info(
-				"FacturacionSJCSServicesImpl.datosGeneralesPagos() -> Entrada para obtener los datos generales del pago: "
-						+ idPago);
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		PagosjgDTO pagosjgDTO = new PagosjgDTO();
-		Error error = new Error();
-
-		if (null != idInstitucion) {
-
-			try {
-
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.datosGeneralesPagos() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.datosGeneralesPagos() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && !usuarios.isEmpty()) {
-
-					AdmUsuarios usuario = usuarios.get(0);
-					usuario.setIdinstitucion(idInstitucion);
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.datosGeneralesPagos() -> fcsFacturacionJGExtendsMapper.datosGeneralesPagos() -> Entrada para obtener los datos del pago");
-					List<PagosjgItem> pago = fcsPagosjgExtendsMapper.datosGeneralesPagos(idPago,
-							idInstitucion.toString());
-					pagosjgDTO.setPagosjgItem(pago);
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.datosGeneralesPagos() -> fcsFacturacionJGExtendsMapper.datosGeneralesPagos() -> Salida para obtener los datos del pago");
-				} else {
-					LOGGER.warn(
-							"FacturacionSJCSServicesImpl.datosGeneralesPagos() -> admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-									+ dni + " e idInstitucion = " + idInstitucion);
-				}
-
-			} catch (Exception e) {
-				LOGGER.error(
-						"FacturacionSJCSServicesImpl.datosGeneralesPagos() -> Se ha producido un error al buscar los datos generales del pago: "
-								+ idPago,
-						e);
-				error.setCode(500);
-				error.setDescription("general.mensaje.error.bbdd");
-			}
-
-		} else {
-			LOGGER.warn("FacturacionSJCSServicesImpl.datosGeneralesPagos() -> idInstitucion del token nula");
-		}
-
-		pagosjgDTO.setError(error);
-
-		LOGGER.info("FacturacionSJCSServicesImpl.datosGeneralesPagos() -> Salida con los datos generales del pago: "
-				+ idPago);
-
-		return pagosjgDTO;
-	}
-
-	@Override
-	public PagosjgDTO historicoPagos(String idPago, HttpServletRequest request) {
-
-		LOGGER.info(
-				"FacturacionSJCSServicesImpl.historicoPagos() -> Entrada al servicio para obtener el histórico de un pago");
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		PagosjgDTO pagosjgDTO = new PagosjgDTO();
-		Error error = new Error();
-
-		try {
-
-			if (null != idInstitucion) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.historicoPagos() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.historicoPagos() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && !usuarios.isEmpty()) {
-
-					String idLenguaje = usuarios.get(0).getIdlenguaje();
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.historicoPagos() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los historicos de estados del pago");
-					List<PagosjgItem> listaEstados = fcsPagosjgExtendsMapper.historicoPagos(idPago, idLenguaje,
-							idInstitucion);
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.historicoPagos() -> Salida a fcsFacturacionJGExtendsMapper para obtener los historicos de estados del pago");
-					pagosjgDTO.setPagosjgItem(listaEstados);
-				}
-			}
-
-		} catch (Exception e) {
-			LOGGER.error(
-					"FacturacionSJCSServicesImpl.historicoPagos() -> Se ha producido un error al buscar el histórico de estados del pago: "
-							+ idPago,
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		pagosjgDTO.setError(error);
-
-		LOGGER.info(
-				"FacturacionSJCSServicesImpl.historicoPagos() -> Salida del servicio para obtener el histórico de un pago");
-
-		return pagosjgDTO;
-	}
-
-	@Override
-	public InsertResponseDTO savePago(PagosjgItem pagosjgItem, HttpServletRequest request) {
-
-		LOGGER.info("FacturacionSJCSServicesImpl.savePago() -> Entrada al servicio para la creación de un pago");
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		try {
-
-			if (null != idInstitucion) {
-
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.savePago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.savePago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && !usuarios.isEmpty()) {
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.getNewIdPago() -> Entrada al método para obtener un nuevo identificador de pago");
-					NewIdDTO newId = fcsPagosjgExtendsMapper.getNewIdPago(idInstitucion);
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.getNewIdPago() -> Salida del método para obtener un nuevo identificador de pago: "
-									+ newId.getNewId());
-
-					FcsPagosjg record = new FcsPagosjg();
-					record.setIdinstitucion(idInstitucion);
-					record.setIdpagosjg(Integer.valueOf(newId.getNewId()));
-					record.setIdfacturacion(Integer.valueOf(pagosjgItem.getIdFacturacion()));
-					record.setNombre(pagosjgItem.getNombre());
-					record.setAbreviatura(pagosjgItem.getAbreviatura());
-					record.setFechadesde(pagosjgItem.getFechaDesde());
-					record.setFechahasta(pagosjgItem.getFechaHasta());
-					record.setCriteriopagoturno("F");
-					record.setImportepagado(BigDecimal.ZERO);
-					record.setImporterepartir(BigDecimal.ZERO);
-					record.setImporteoficio(BigDecimal.ZERO);
-					record.setImporteguardia(BigDecimal.ZERO);
-					record.setImportesoj(BigDecimal.ZERO);
-					record.setImporteejg(BigDecimal.ZERO);
-					record.setImporteminimo(BigDecimal.ZERO);
-					record.setUsumodificacion(usuarios.get(0).getIdusuario());
-					record.setFechamodificacion(new Date());
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.insertSelective() -> Entrada al método para insertar el nuevo pago: "
-									+ newId.getNewId());
-					response = fcsPagosjgExtendsMapper.insertSelective(record);
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.insertSelective() -> Salida del método para insertar el nuevo pago: "
-									+ newId.getNewId());
-
-					FcsPagosEstadospagos record2 = new FcsPagosEstadospagos();
-					record2.setIdinstitucion(idInstitucion);
-					record2.setIdpagosjg(Integer.valueOf(newId.getNewId()));
-					record2.setIdestadopagosjg(Short.valueOf("10"));
-					record2.setFechaestado(new Date());
-					record2.setFechamodificacion(new Date());
-					record2.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosEstadospagosMapper.insertSelective() -> Entrada al método para insertar el nuevo estado al pago: "
-									+ newId.getNewId());
-					fcsPagosEstadospagosMapper.insertSelective(record2);
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.savePago() -> fcsPagosEstadospagosMapper.insertSelective() -> Salida del método para insertar el nuevo estado al pago: "
-									+ newId.getNewId());
-
-					if (response == 0) {
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						error.setCode(500);
-						error.setDescription("general.message.error.realiza.accion");
-					} else {
-						insertResponseDTO.setStatus(SigaConstants.OK);
-						insertResponseDTO.setId(newId.getNewId());
-					}
-
-				}
-
-			}
-
-		} catch (Exception e) {
-			LOGGER.error("FacturacionSJCSServicesImpl.savePago() -> Se ha producido un error en la creación del pago",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		insertResponseDTO.setError(error);
-
-		LOGGER.info("FacturacionSJCSServicesImpl.savePago() -> Salida del servicio para la creación de un pago");
-
-		return insertResponseDTO;
-	}
-
-	@Override
-	public UpdateResponseDTO updatePago(PagosjgItem pagosjgItem, HttpServletRequest request) {
-
-		LOGGER.info("FacturacionSJCSServicesImpl.updatePago() -> Entrada al servicio para la actualización de un pago");
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		try {
-
-			if (null != idInstitucion) {
-
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.updatePago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.updatePago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && !usuarios.isEmpty()) {
-
-					FcsPagosjg record = new FcsPagosjg();
-					record.setIdinstitucion(idInstitucion);
-					record.setIdpagosjg(Integer.valueOf(pagosjgItem.getIdPagosjg()));
-					record.setIdfacturacion(Integer.valueOf(pagosjgItem.getIdFacturacion()));
-					record.setNombre(pagosjgItem.getNombre());
-					record.setAbreviatura(pagosjgItem.getAbreviatura());
-					record.setUsumodificacion(usuarios.get(0).getIdusuario());
-					record.setFechamodificacion(new Date());
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.updatePago() -> fcsPagosjgMapper.updateByPrimaryKeySelective() -> Entrada al método para actualizar el pago: "
-									+ pagosjgItem.getIdPagosjg());
-					response = fcsPagosjgExtendsMapper.updateByPrimaryKeySelective(record);
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.updatePago() -> fcsPagosjgMapper.updateByPrimaryKeySelective() -> Salida del método para actualizar el pago: "
-									+ pagosjgItem.getIdPagosjg());
-
-					if (response == 0) {
-						updateResponseDTO.setStatus(SigaConstants.KO);
-						error.setCode(500);
-						error.setDescription("general.message.error.realiza.accion");
-					} else {
-						updateResponseDTO.setStatus(SigaConstants.OK);
-					}
-
-				}
-
-			}
-
-		} catch (Exception e) {
-			LOGGER.error(
-					"FacturacionSJCSServicesImpl.updatePago() -> Se ha producido un error en la actualización del pago",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		updateResponseDTO.setError(error);
-
-		LOGGER.info("FacturacionSJCSServicesImpl.updatePago() -> Salida del servicio para la actualización de un pago");
-
-		return updateResponseDTO;
-	}
-
-	@Override
-	public ConceptoPagoDTO getConceptosPago(String idPago, String idFacturacion, HttpServletRequest request) {
-
-		LOGGER.info(
-				"FacturacionSJCSServicesImpl.getConceptosPago() -> Entrada al servicio para obtener los conceptos del pago: "
-						+ idPago);
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ConceptoPagoDTO conceptoPagoDTO = new ConceptoPagoDTO();
-		Error error = new Error();
-		List<Integer> responses = new ArrayList<Integer>();
-		List<FcsFactGrupofactHito> listaConceptosFac = new ArrayList<FcsFactGrupofactHito>();
-		List<ConceptoPagoItem> listaConceptosPago = new ArrayList<ConceptoPagoItem>();
-
-		try {
-
-			if (null != idInstitucion) {
-
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.getConceptosPago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.getConceptosPago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && !usuarios.isEmpty()) {
-
-					FcsFactGrupofactHitoExample fcsFactGrupofactHitoExample = new FcsFactGrupofactHitoExample();
-					fcsFactGrupofactHitoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdfacturacionEqualTo(Integer.valueOf(idFacturacion));
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsFactGrupofactHitoMapper.selectByExample() -> Entrada para la obtención de los conceptos asociados a la facturación: "
-									+ idFacturacion);
-					listaConceptosFac = fcsFactGrupofactHitoMapper.selectByExample(fcsFactGrupofactHitoExample);
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsFactGrupofactHitoMapper.selectByExample() -> Salida de la obtención de los conceptos asociados a la facturación: "
-									+ idFacturacion);
-
-					FcsPagoGrupofactHitoExample fcsPagoGrupofactHitoExample = new FcsPagoGrupofactHitoExample();
-					fcsPagoGrupofactHitoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdpagosjgEqualTo(Integer.valueOf(idPago));
-
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsPagoGrupofactHitoMapper.deleteByExample() -> Entrada para la eliminación de los conceptos del pago: "
-									+ idPago);
-					fcsPagoGrupofactHitoMapper.deleteByExample(fcsPagoGrupofactHitoExample);
-					LOGGER.info(
-							"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsPagoGrupofactHitoMapper.deleteByExample() -> Salida de la eliminación de los conceptos del pago: "
-									+ idPago);
-
-					if (!listaConceptosFac.isEmpty()) {
-
-						for (FcsFactGrupofactHito fcsFactGrupofactHito : listaConceptosFac) {
-
-							FcsPagoGrupofactHito fcsPagoGrupofactHito = new FcsPagoGrupofactHito();
-							fcsPagoGrupofactHito.setIdinstitucion(idInstitucion);
-							fcsPagoGrupofactHito.setIdpagosjg(Integer.valueOf(idPago));
-							fcsPagoGrupofactHito.setIdhitogeneral(fcsFactGrupofactHito.getIdhitogeneral());
-							fcsPagoGrupofactHito.setIdgrupofacturacion(fcsFactGrupofactHito.getIdgrupofacturacion());
-							fcsPagoGrupofactHito.setFechamodificacion(new Date());
-							fcsPagoGrupofactHito.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-							LOGGER.info(
-									"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsPagoGrupofactHitoMapper.insertSelective() -> Entrada para la inserción de los conceptos del pago: "
-											+ idPago);
-							int response = fcsPagoGrupofactHitoMapper.insertSelective(fcsPagoGrupofactHito);
-							LOGGER.info(
-									"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsPagoGrupofactHitoMapper.insertSelective() -> Salida de la inserción de los conceptos del pago: "
-											+ idPago);
-
-							responses.add(response);
-
-						}
-
-						LOGGER.info(
-								"FacturacionSJCSServicesImpl.getConceptosPago() ->fcsPagosjgExtendsMapper.getConceptosPago() -> Entrada para la obtención de los conceptos del pago: "
-										+ idPago);
-						listaConceptosPago = fcsPagosjgExtendsMapper.getConceptosPago(idPago, idInstitucion,
-								usuarios.get(0).getIdlenguaje());
-						LOGGER.info(
-								"FacturacionSJCSServicesImpl.getConceptosPago() ->fcsPagosjgExtendsMapper.getConceptosPago() -> Salida de la obtención de los conceptos del pago: "
-										+ idPago);
-
-						conceptoPagoDTO.setListaConceptos(listaConceptosPago);
-					}
-
-				}
-
-			}
-
-		} catch (Exception e) {
-			LOGGER.error(
-					"FacturacionSJCSServicesImpl.getConceptosPago() -> Se ha producido un error en la obtención de los conceptos del pago: "
-							+ idPago,
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		if (!listaConceptosFac.isEmpty() && !responses.isEmpty() && responses.contains(0)) {
-			LOGGER.error(
-					"FacturacionSJCSServicesImpl.getConceptosPago() -> Se ha producido un error en la obtención de los conceptos del pago: "
-							+ idPago);
-			error.setCode(400);
-			error.setDescription("general.message.error.realiza.accion");
-		}
-
-		conceptoPagoDTO.setError(error);
-
-		LOGGER.info(
-				"FacturacionSJCSServicesImpl.getConceptosPago() -> Salida del servicio para obtener los conceptos del pago: "
-						+ idPago);
-
-		return conceptoPagoDTO;
-	}
-
-	@Override
-	public UpdateResponseDTO saveConceptoPago(List<ConceptoPagoItem> listaConceptoPagoItem,
-			HttpServletRequest request) {
-
-		LOGGER.info(
-				"FacturacionSJCSServicesImpl.saveConceptoPago() -> Entrada al servicio para actualizar los importes del pago");
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		try {
-
-			if (null != idInstitucion) {
-
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.saveConceptoPago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"FacturacionSJCSServicesImpl.saveConceptoPago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && !usuarios.isEmpty()) {
-
-					if (null != listaConceptoPagoItem && !listaConceptoPagoItem.isEmpty()) {
-
-						FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
-						fcsPagosjgKey.setIdinstitucion(idInstitucion);
-						fcsPagosjgKey.setIdpagosjg(Integer.valueOf(listaConceptoPagoItem.get(0).getIdPagosjg()));
-
-						FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
-
-						for (ConceptoPagoItem concepto : listaConceptoPagoItem) {
-
-							if (null != concepto.getCantidadApagar()) {
-
-								switch (concepto.getIdConcepto()) {
-								case "10":
-									pago.setImporteoficio(BigDecimal.valueOf(
-											pago.getImporteoficio().doubleValue() + concepto.getCantidadApagar()));
-									break;
-								case "20":
-									pago.setImporteguardia(BigDecimal.valueOf(
-											pago.getImporteguardia().doubleValue() + concepto.getCantidadApagar()));
-									break;
-								case "30":
-									pago.setImportesoj(BigDecimal.valueOf(
-											pago.getImportesoj().doubleValue() + concepto.getCantidadApagar()));
-									break;
-								case "40":
-									pago.setImporteejg(BigDecimal.valueOf(
-											pago.getImporteejg().doubleValue() + concepto.getCantidadApagar()));
-									break;
-								}
-
-							}
-
-						}
-
-						response = fcsPagosjgExtendsMapper.updateByPrimaryKeySelective(pago);
-
-					}
-
-				}
-
-			}
-
-		} catch (Exception e) {
-			LOGGER.error(
-					"FacturacionSJCSServicesImpl.saveConceptoPago() -> Se ha producido un error al intentar actualizar los importes del pago",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		if (response == 0) {
-			LOGGER.error(
-					"FacturacionSJCSServicesImpl.saveConceptoPago() -> Se ha producido un error al intentar actualizar los importes del pago");
-			error.setCode(400);
-			error.setDescription("general.message.error.realiza.accion");
-			updateResponseDTO.setStatus(SigaConstants.KO);
-		} else {
-			updateResponseDTO.setStatus(SigaConstants.OK);
-		}
-
-		updateResponseDTO.setError(error);
-
-		LOGGER.info(
-				"FacturacionSJCSServicesImpl.saveConceptoPago() -> Salida del servicio para actualizar los importes del pago");
-
-		return updateResponseDTO;
-	}
-
-	@Override
-	public InsertResponseDTO ejecutarPagoSJCS(String idPago, HttpServletRequest request) {
-
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		Error error = new Error();
-
-		try {
-
-			if (null != idInstitucion) {
-
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-				LOGGER.info(
-						"PagoSJCSServiceImpl.ejecutarPagoSJCS() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"PagoSJCSServiceImpl.ejecutarPagoSJCS() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && !usuarios.isEmpty()) {
-
-					// Antes de ejecutar el pago comprobamos si tiene banco asociado
-					FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
-					fcsPagosjgKey.setIdinstitucion(idInstitucion);
-					fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
-
-					LOGGER.info(
-							"PagoSJCSServiceImpl.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
-									+ idPago);
-					FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
-					LOGGER.info(
-							"PagoSJCSServiceImpl.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
-									+ idPago);
-
-					if (UtilidadesString.esCadenaVacia(pago.getBancosCodigo())) {
-						throw new FacturacionSJCSException("");
-					}
-
-					// CR7 - Antes de ejecutar simulamos el guardado
+    private final Logger LOGGER = Logger.getLogger(PagoSJCSServiceImpl.class);
+
+    @Autowired
+    private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+
+    @Autowired
+    private GenParametrosExtendsMapper genParametrosMapper;
+
+    @Autowired
+    private FcsPagosjgExtendsMapper fcsPagosjgExtendsMapper;
+
+    @Autowired
+    private FcsPagosEstadospagosMapper fcsPagosEstadospagosMapper;
+
+    @Autowired
+    private FcsFactGrupofactHitoExtendsMapper fcsFactGrupofactHitoExtendsMapper;
+
+    @Autowired
+    private FcsPagoGrupofactHitoMapper fcsPagoGrupofactHitoMapper;
+
+    @Override
+    public PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        PagosjgDTO pagos = new PagosjgDTO();
+        String idLenguaje = "";
+        List<GenParametros> tamMax = null;
+        Integer tamMaximo = null;
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.buscarPagos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.buscarPagos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && usuarios.size() > 0) {
+                    AdmUsuarios usuario = usuarios.get(0);
+                    usuario.setIdinstitucion(idInstitucion);
+                    idLenguaje = usuario.getIdlenguaje();
+
+                    GenParametrosExample genParametrosExample = new GenParametrosExample();
+                    genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+                            .andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+                            .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+                    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.buscarPagos() / genParametrosMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+                    tamMax = genParametrosMapper.selectByExample(genParametrosExample);
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.buscarPagos() / genParametrosMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+                    if (tamMax != null) {
+                        tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+                    } else {
+                        tamMaximo = null;
+                    }
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.buscarPagos() / fcsFacturacionJGExtendsMapper.buscarPagos() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los pagos");
+                    List<PagosjgItem> pagosItems = fcsPagosjgExtendsMapper.buscarPagos(pagosItem,
+                            idInstitucion.toString(), idLenguaje, tamMaximo);
+
+                    if (null != pagosItems && pagosItems.size() > tamMaximo) {
+                        pagosItems.remove(pagosItems.size() - 1);
+                        error.setCode(200);
+                        error.setDescription("general.message.consulta.resultados");
+                    }
+
+                    pagos.setPagosjgItem(pagosItems);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.buscarPagos() / fcsFacturacionJGExtendsMapper.buscarPagos() -> Salida a fcsFacturacionJGExtendsMapper para obtener los pagos");
+                } else {
+                    LOGGER.warn(
+                            "FacturacionSJCSServicesImpl.buscarPagos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                                    + dni + " e idInstitucion = " + idInstitucion);
+                }
+            } else {
+                LOGGER.warn("FacturacionSJCSServicesImpl.buscarPagos() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("FacturacionSJCSServicesImpl.buscarPagos() -> Se ha producido un error al buscar los pagos",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        pagos.setError(error);
+        LOGGER.info("FacturacionSJCSServicesImpl.buscarPagos() -> Salida del servicio para obtener los pagos");
+
+        return pagos;
+    }
+
+    @Override
+    public PagosjgDTO datosGeneralesPagos(String idPago, HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.datosGeneralesPagos() -> Entrada para obtener los datos generales del pago: "
+                        + idPago);
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        PagosjgDTO pagosjgDTO = new PagosjgDTO();
+        Error error = new Error();
+
+        if (null != idInstitucion) {
+
+            try {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.datosGeneralesPagos() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.datosGeneralesPagos() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    AdmUsuarios usuario = usuarios.get(0);
+                    usuario.setIdinstitucion(idInstitucion);
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.datosGeneralesPagos() -> fcsFacturacionJGExtendsMapper.datosGeneralesPagos() -> Entrada para obtener los datos del pago");
+                    List<PagosjgItem> pago = fcsPagosjgExtendsMapper.datosGeneralesPagos(idPago,
+                            idInstitucion.toString());
+                    pagosjgDTO.setPagosjgItem(pago);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.datosGeneralesPagos() -> fcsFacturacionJGExtendsMapper.datosGeneralesPagos() -> Salida para obtener los datos del pago");
+                } else {
+                    LOGGER.warn(
+                            "FacturacionSJCSServicesImpl.datosGeneralesPagos() -> admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                                    + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } catch (Exception e) {
+                LOGGER.error(
+                        "FacturacionSJCSServicesImpl.datosGeneralesPagos() -> Se ha producido un error al buscar los datos generales del pago: "
+                                + idPago,
+                        e);
+                error.setCode(500);
+                error.setDescription("general.mensaje.error.bbdd");
+            }
+
+        } else {
+            LOGGER.warn("FacturacionSJCSServicesImpl.datosGeneralesPagos() -> idInstitucion del token nula");
+        }
+
+        pagosjgDTO.setError(error);
+
+        LOGGER.info("FacturacionSJCSServicesImpl.datosGeneralesPagos() -> Salida con los datos generales del pago: "
+                + idPago);
+
+        return pagosjgDTO;
+    }
+
+    @Override
+    public PagosjgDTO historicoPagos(String idPago, HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.historicoPagos() -> Entrada al servicio para obtener el histórico de un pago");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        PagosjgDTO pagosjgDTO = new PagosjgDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.historicoPagos() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.historicoPagos() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    String idLenguaje = usuarios.get(0).getIdlenguaje();
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.historicoPagos() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los historicos de estados del pago");
+                    List<PagosjgItem> listaEstados = fcsPagosjgExtendsMapper.historicoPagos(idPago, idLenguaje,
+                            idInstitucion);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.historicoPagos() -> Salida a fcsFacturacionJGExtendsMapper para obtener los historicos de estados del pago");
+                    pagosjgDTO.setPagosjgItem(listaEstados);
+                }
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.historicoPagos() -> Se ha producido un error al buscar el histórico de estados del pago: "
+                            + idPago,
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        pagosjgDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.historicoPagos() -> Salida del servicio para obtener el histórico de un pago");
+
+        return pagosjgDTO;
+    }
+
+    @Override
+    public InsertResponseDTO savePago(PagosjgItem pagosjgItem, HttpServletRequest request) {
+
+        LOGGER.info("FacturacionSJCSServicesImpl.savePago() -> Entrada al servicio para la creación de un pago");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+        Error error = new Error();
+        int response = 0;
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.savePago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.savePago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.getNewIdPago() -> Entrada al método para obtener un nuevo identificador de pago");
+                    NewIdDTO newId = fcsPagosjgExtendsMapper.getNewIdPago(idInstitucion);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.getNewIdPago() -> Salida del método para obtener un nuevo identificador de pago: "
+                                    + newId.getNewId());
+
+                    FcsPagosjg record = new FcsPagosjg();
+                    record.setIdinstitucion(idInstitucion);
+                    record.setIdpagosjg(Integer.valueOf(newId.getNewId()));
+                    record.setIdfacturacion(Integer.valueOf(pagosjgItem.getIdFacturacion()));
+                    record.setNombre(pagosjgItem.getNombre());
+                    record.setAbreviatura(pagosjgItem.getAbreviatura());
+                    record.setFechadesde(pagosjgItem.getFechaDesde());
+                    record.setFechahasta(pagosjgItem.getFechaHasta());
+                    record.setCriteriopagoturno("F");
+                    record.setImportepagado(BigDecimal.ZERO);
+                    record.setImporterepartir(BigDecimal.ZERO);
+                    record.setImporteoficio(BigDecimal.ZERO);
+                    record.setImporteguardia(BigDecimal.ZERO);
+                    record.setImportesoj(BigDecimal.ZERO);
+                    record.setImporteejg(BigDecimal.ZERO);
+                    record.setImporteminimo(BigDecimal.ZERO);
+                    record.setUsumodificacion(usuarios.get(0).getIdusuario());
+                    record.setFechamodificacion(new Date());
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.insertSelective() -> Entrada al método para insertar el nuevo pago: "
+                                    + newId.getNewId());
+                    response = fcsPagosjgExtendsMapper.insertSelective(record);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.insertSelective() -> Salida del método para insertar el nuevo pago: "
+                                    + newId.getNewId());
+
+                    FcsPagosEstadospagos record2 = new FcsPagosEstadospagos();
+                    record2.setIdinstitucion(idInstitucion);
+                    record2.setIdpagosjg(Integer.valueOf(newId.getNewId()));
+                    record2.setIdestadopagosjg(Short.valueOf("10"));
+                    record2.setFechaestado(new Date());
+                    record2.setFechamodificacion(new Date());
+                    record2.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.savePago() -> fcsPagosEstadospagosMapper.insertSelective() -> Entrada al método para insertar el nuevo estado al pago: "
+                                    + newId.getNewId());
+                    fcsPagosEstadospagosMapper.insertSelective(record2);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.savePago() -> fcsPagosEstadospagosMapper.insertSelective() -> Salida del método para insertar el nuevo estado al pago: "
+                                    + newId.getNewId());
+
+                    if (response == 0) {
+                        insertResponseDTO.setStatus(SigaConstants.KO);
+                        error.setCode(500);
+                        error.setDescription("general.message.error.realiza.accion");
+                    } else {
+                        insertResponseDTO.setStatus(SigaConstants.OK);
+                        insertResponseDTO.setId(newId.getNewId());
+                    }
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("FacturacionSJCSServicesImpl.savePago() -> Se ha producido un error en la creación del pago",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        insertResponseDTO.setError(error);
+
+        LOGGER.info("FacturacionSJCSServicesImpl.savePago() -> Salida del servicio para la creación de un pago");
+
+        return insertResponseDTO;
+    }
+
+    @Override
+    public UpdateResponseDTO updatePago(PagosjgItem pagosjgItem, HttpServletRequest request) {
+
+        LOGGER.info("FacturacionSJCSServicesImpl.updatePago() -> Entrada al servicio para la actualización de un pago");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+        Error error = new Error();
+        int response = 0;
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.updatePago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.updatePago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    FcsPagosjg record = new FcsPagosjg();
+                    record.setIdinstitucion(idInstitucion);
+                    record.setIdpagosjg(Integer.valueOf(pagosjgItem.getIdPagosjg()));
+                    record.setIdfacturacion(Integer.valueOf(pagosjgItem.getIdFacturacion()));
+                    record.setNombre(pagosjgItem.getNombre());
+                    record.setAbreviatura(pagosjgItem.getAbreviatura());
+                    record.setUsumodificacion(usuarios.get(0).getIdusuario());
+                    record.setFechamodificacion(new Date());
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.updatePago() -> fcsPagosjgMapper.updateByPrimaryKeySelective() -> Entrada al método para actualizar el pago: "
+                                    + pagosjgItem.getIdPagosjg());
+                    response = fcsPagosjgExtendsMapper.updateByPrimaryKeySelective(record);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.updatePago() -> fcsPagosjgMapper.updateByPrimaryKeySelective() -> Salida del método para actualizar el pago: "
+                                    + pagosjgItem.getIdPagosjg());
+
+                    if (response == 0) {
+                        updateResponseDTO.setStatus(SigaConstants.KO);
+                        error.setCode(500);
+                        error.setDescription("general.message.error.realiza.accion");
+                    } else {
+                        updateResponseDTO.setStatus(SigaConstants.OK);
+                    }
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.updatePago() -> Se ha producido un error en la actualización del pago",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        updateResponseDTO.setError(error);
+
+        LOGGER.info("FacturacionSJCSServicesImpl.updatePago() -> Salida del servicio para la actualización de un pago");
+
+        return updateResponseDTO;
+    }
+
+    @Override
+    public ConceptoPagoDTO comboConceptosPago(String idFacturacion, String idPago, HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.comboConceptosPago() -> Entrada al servicio para obtener el combo de los conceptos del pago");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ConceptoPagoDTO conceptoPagoDTO = new ConceptoPagoDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.comboConceptosPago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.comboConceptosPago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.comboConceptosPago() -> fcsPagosjgExtendsMapper.comboConceptosPago() -> Entrada para obtener el combo de los conceptos del pago según su facturación");
+
+                    List<ConceptoPagoItem> listaConceptosFac = fcsPagosjgExtendsMapper.comboConceptosPago(idInstitucion, idFacturacion, idPago, usuarios.get(0).getIdlenguaje());
+                    conceptoPagoDTO.setListaConceptos(listaConceptosFac);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.comboConceptosPago() -> fcsPagosjgExtendsMapper.comboConceptosPago() -> Salida de obtener el combo de los conceptos del pago según su facturación");
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.comboConceptosPago() -> Se ha producido un error en la obtención del combo de conceptos del pago",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        conceptoPagoDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.comboConceptosPago() -> Salida del servicio para obtener el combo de los conceptos del pago");
+
+        return conceptoPagoDTO;
+    }
+
+//	@Override
+//	public ConceptoPagoDTO getConceptosPago(String idPago, String idFacturacion, HttpServletRequest request) {
+//
+//		LOGGER.info(
+//				"FacturacionSJCSServicesImpl.getConceptosPago() -> Entrada al servicio para obtener los conceptos del pago: "
+//						+ idPago);
+//
+//		String token = request.getHeader("Authorization");
+//		String dni = UserTokenUtils.getDniFromJWTToken(token);
+//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+//		ConceptoPagoDTO conceptoPagoDTO = new ConceptoPagoDTO();
+//		Error error = new Error();
+//		List<Integer> responses = new ArrayList<Integer>();
+//		List<FcsFactGrupofactHito> listaConceptosFac = new ArrayList<FcsFactGrupofactHito>();
+//		List<ConceptoPagoItem> listaConceptosPago = new ArrayList<ConceptoPagoItem>();
+//
+//		try {
+//
+//			if (null != idInstitucion) {
+//
+//				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+//				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+//						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+//
+//				LOGGER.info(
+//						"FacturacionSJCSServicesImpl.getConceptosPago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+//				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+//				LOGGER.info(
+//						"FacturacionSJCSServicesImpl.getConceptosPago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+//
+//				if (null != usuarios && !usuarios.isEmpty()) {
+//
+//					FcsFactGrupofactHitoExample fcsFactGrupofactHitoExample = new FcsFactGrupofactHitoExample();
+//					fcsFactGrupofactHitoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+//							.andIdfacturacionEqualTo(Integer.valueOf(idFacturacion));
+//
+//					LOGGER.info(
+//							"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsFactGrupofactHitoMapper.selectByExample() -> Entrada para la obtención de los conceptos asociados a la facturación: "
+//									+ idFacturacion);
+//					listaConceptosFac = fcsFactGrupofactHitoMapper.selectByExample(fcsFactGrupofactHitoExample);
+//					LOGGER.info(
+//							"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsFactGrupofactHitoMapper.selectByExample() -> Salida de la obtención de los conceptos asociados a la facturación: "
+//									+ idFacturacion);
+//
+//					FcsPagoGrupofactHitoExample fcsPagoGrupofactHitoExample = new FcsPagoGrupofactHitoExample();
+//					fcsPagoGrupofactHitoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+//							.andIdpagosjgEqualTo(Integer.valueOf(idPago));
+//
+//					LOGGER.info(
+//							"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsPagoGrupofactHitoMapper.deleteByExample() -> Entrada para la eliminación de los conceptos del pago: "
+//									+ idPago);
+//					fcsPagoGrupofactHitoMapper.deleteByExample(fcsPagoGrupofactHitoExample);
+//					LOGGER.info(
+//							"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsPagoGrupofactHitoMapper.deleteByExample() -> Salida de la eliminación de los conceptos del pago: "
+//									+ idPago);
+//
+//					if (!listaConceptosFac.isEmpty()) {
+//
+//						for (FcsFactGrupofactHito fcsFactGrupofactHito : listaConceptosFac) {
+//
+//							FcsPagoGrupofactHito fcsPagoGrupofactHito = new FcsPagoGrupofactHito();
+//							fcsPagoGrupofactHito.setIdinstitucion(idInstitucion);
+//							fcsPagoGrupofactHito.setIdpagosjg(Integer.valueOf(idPago));
+//							fcsPagoGrupofactHito.setIdhitogeneral(fcsFactGrupofactHito.getIdhitogeneral());
+//							fcsPagoGrupofactHito.setIdgrupofacturacion(fcsFactGrupofactHito.getIdgrupofacturacion());
+//							fcsPagoGrupofactHito.setFechamodificacion(new Date());
+//							fcsPagoGrupofactHito.setUsumodificacion(usuarios.get(0).getIdusuario());
+//
+//							LOGGER.info(
+//									"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsPagoGrupofactHitoMapper.insertSelective() -> Entrada para la inserción de los conceptos del pago: "
+//											+ idPago);
+//							int response = fcsPagoGrupofactHitoMapper.insertSelective(fcsPagoGrupofactHito);
+//							LOGGER.info(
+//									"FacturacionSJCSServicesImpl.getConceptosPago() -> fcsPagoGrupofactHitoMapper.insertSelective() -> Salida de la inserción de los conceptos del pago: "
+//											+ idPago);
+//
+//							responses.add(response);
+//
+//						}
+//
+//						LOGGER.info(
+//								"FacturacionSJCSServicesImpl.getConceptosPago() ->fcsPagosjgExtendsMapper.getConceptosPago() -> Entrada para la obtención de los conceptos del pago: "
+//										+ idPago);
+//						listaConceptosPago = fcsPagosjgExtendsMapper.getConceptosPago(idPago, idInstitucion,
+//								usuarios.get(0).getIdlenguaje());
+//						LOGGER.info(
+//								"FacturacionSJCSServicesImpl.getConceptosPago() ->fcsPagosjgExtendsMapper.getConceptosPago() -> Salida de la obtención de los conceptos del pago: "
+//										+ idPago);
+//
+//						conceptoPagoDTO.setListaConceptos(listaConceptosPago);
+//					}
+//
+//				}
+//
+//			}
+//
+//		} catch (Exception e) {
+//			LOGGER.error(
+//					"FacturacionSJCSServicesImpl.getConceptosPago() -> Se ha producido un error en la obtención de los conceptos del pago: "
+//							+ idPago,
+//					e);
+//			error.setCode(500);
+//			error.setDescription("general.mensaje.error.bbdd");
+//		}
+//
+//		if (!listaConceptosFac.isEmpty() && !responses.isEmpty() && responses.contains(0)) {
+//			LOGGER.error(
+//					"FacturacionSJCSServicesImpl.getConceptosPago() -> Se ha producido un error en la obtención de los conceptos del pago: "
+//							+ idPago);
+//			error.setCode(400);
+//			error.setDescription("general.message.error.realiza.accion");
+//		}
+//
+//		conceptoPagoDTO.setError(error);
+//
+//		LOGGER.info(
+//				"FacturacionSJCSServicesImpl.getConceptosPago() -> Salida del servicio para obtener los conceptos del pago: "
+//						+ idPago);
+//
+//		return conceptoPagoDTO;
+//	}
+
+    @Override
+    public ConceptoPagoDTO getConceptosPago(String idPago, String idFacturacion, HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getConceptosPago() -> Entrada al servicio para obtener los conceptos del pago: "
+                        + idPago);
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ConceptoPagoDTO conceptoPagoDTO = new ConceptoPagoDTO();
+        Error error = new Error();
+        List<ConceptoPagoItem> listaConceptosPago = new ArrayList<ConceptoPagoItem>();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.getConceptosPago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.getConceptosPago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.getConceptosPago() ->fcsPagosjgExtendsMapper.getConceptosPago() -> Entrada para la obtención de los conceptos del pago: "
+                                    + idPago);
+                    listaConceptosPago = fcsPagosjgExtendsMapper.getConceptosPago(idPago, idInstitucion,
+                            usuarios.get(0).getIdlenguaje());
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.getConceptosPago() ->fcsPagosjgExtendsMapper.getConceptosPago() -> Salida de la obtención de los conceptos del pago: "
+                                    + idPago);
+
+                    listaConceptosPago = listaConceptosPago.stream()
+                            .collect(collectingAndThen(toCollection(() -> new TreeSet<>(Comparator.comparing(ConceptoPagoItem::getIdConcepto))),
+                                    ArrayList::new));
+
+                    conceptoPagoDTO.setListaConceptos(listaConceptosPago);
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.getConceptosPago() -> Se ha producido un error en la obtención de los conceptos del pago: "
+                            + idPago,
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        conceptoPagoDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getConceptosPago() -> Salida del servicio para obtener los conceptos del pago: "
+                        + idPago);
+
+        return conceptoPagoDTO;
+    }
+
+    @Override
+    public UpdateResponseDTO saveConceptoPago(List<ConceptoPagoItem> listaConceptoPagoItem,
+                                              HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.saveConceptoPago() -> Entrada al servicio para actualizar conceptos asociados al pago");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+        Error error = new Error();
+        List<Integer> responses = null;
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.saveConceptoPago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.saveConceptoPago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (null != listaConceptoPagoItem && !listaConceptoPagoItem.isEmpty()) {
+
+                        responses = new ArrayList<Integer>();
+
+                        // Obtenemos los datos del pago sobre el que actuaremos
+                        FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+                        fcsPagosjgKey.setIdinstitucion(idInstitucion);
+                        fcsPagosjgKey.setIdpagosjg(Integer.valueOf(listaConceptoPagoItem.get(0).getIdPagosjg()));
+
+                        LOGGER.info(
+                                "FacturacionSJCSServicesImpl.saveConceptoPago() -> fcsPagosjgExtendsMapper.selectByPrimaryKey() -> Obtenemos el pago");
+                        FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+
+                        // Dependiendo de el tipo de concepto actualizaremos el importe correspondiente
+                        // y el importe pagado
+                        for (ConceptoPagoItem concepto : listaConceptoPagoItem) {
+
+                            if (null != concepto.getCantidadApagar()) {
+
+                                if (concepto.getCantidadApagar() == 0 && !hayMovimientosVariosPositivosAaplicar(idInstitucion, concepto.getIdFacturacion())) {
+                                    error.setCode(400);
+                                    error.setDescription("facturacionSJCS.facturacionesYPagos.errorImporteCriterio");
+                                    throw new Exception("No se puede introducir un importe igual a 0 si no hay movimientos varios positivos a aplicar");
+                                }
+
+                                switch (concepto.getIdConcepto()) {
+                                    case "10":
+                                        pago.setImporteoficio(BigDecimal.valueOf(
+                                                pago.getImporteoficio().doubleValue() + concepto.getCantidadApagar()));
+                                        pago.setImportepagado(BigDecimal.valueOf(pago.getImportepagado().doubleValue()
+                                                + pago.getImporteoficio().doubleValue()));
+                                        break;
+                                    case "20":
+                                        pago.setImporteguardia(BigDecimal.valueOf(
+                                                pago.getImporteguardia().doubleValue() + concepto.getCantidadApagar()));
+                                        pago.setImportepagado(BigDecimal.valueOf(pago.getImportepagado().doubleValue()
+                                                + pago.getImporteguardia().doubleValue()));
+                                        break;
+                                    case "30":
+                                        pago.setImportesoj(BigDecimal.valueOf(
+                                                pago.getImportesoj().doubleValue() + concepto.getCantidadApagar()));
+                                        pago.setImportepagado(BigDecimal.valueOf(pago.getImportepagado().doubleValue()
+                                                + pago.getImportesoj().doubleValue()));
+                                        break;
+                                    case "40":
+                                        pago.setImporteejg(BigDecimal.valueOf(
+                                                pago.getImporteejg().doubleValue() + concepto.getCantidadApagar()));
+                                        pago.setImportepagado(BigDecimal.valueOf(pago.getImportepagado().doubleValue()
+                                                + pago.getImporteejg().doubleValue()));
+                                        break;
+                                }
+
+                                LOGGER.info("FacturacionSJCSServicesImpl.saveConceptoPago() -> fcsFactGrupofactHitoExtendsMapper.selectByExample() -> Buscamos los conceptos de facturación con IDHITOGENERAL = " + concepto.getIdConcepto());
+                                FcsFactGrupofactHitoExample fcsFactGrupofactHitoExample = new FcsFactGrupofactHitoExample();
+                                fcsFactGrupofactHitoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                                        .andIdfacturacionEqualTo(Integer.valueOf(concepto.getIdFacturacion()))
+                                        .andIdhitogeneralEqualTo(Short.valueOf(concepto.getIdConcepto()));
+
+                                List<FcsFactGrupofactHito> listaFcsFactGrupofactHito = fcsFactGrupofactHitoExtendsMapper
+                                        .selectByExample(fcsFactGrupofactHitoExample);
+
+                                // Recorremos los conceptos de la facturación con el idHitogeneral buscado y por cada línea insertamos una en los conceptos del pago
+                                for (FcsFactGrupofactHito fcsFactGrupofactHito : listaFcsFactGrupofactHito) {
+
+                                    FcsPagoGrupofactHito fcsPagoGrupofactHito = new FcsPagoGrupofactHito();
+                                    fcsPagoGrupofactHito.setIdinstitucion(idInstitucion);
+                                    fcsPagoGrupofactHito.setIdpagosjg(fcsPagosjgKey.getIdpagosjg());
+                                    fcsPagoGrupofactHito.setIdhitogeneral(Short.valueOf(concepto.getIdConcepto()));
+                                    fcsPagoGrupofactHito
+                                            .setIdgrupofacturacion(fcsFactGrupofactHito.getIdgrupofacturacion());
+                                    fcsPagoGrupofactHito.setFechamodificacion(new Date());
+                                    fcsPagoGrupofactHito.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+                                    LOGGER.info("FacturacionSJCSServicesImpl.saveConceptoPago() -> fcsPagoGrupofactHitoMapper.insertSelective() -> Insertamos el concepto del pago");
+                                    int response = fcsPagoGrupofactHitoMapper.insertSelective(fcsPagoGrupofactHito);
+                                    responses.add(response);
+                                }
+
+                            }
+
+                        }
+
+                        LOGGER.info(
+                                "FacturacionSJCSServicesImpl.saveConceptoPago() -> fcsPagosjgExtendsMapper.updateByPrimaryKeySelective() -> Actualizamos los datos del pago");
+                        pago.setImporterepartir(pago.getImportepagado());
+                        pago.setFechamodificacion(new Date());
+                        pago.setUsumodificacion(usuarios.get(0).getIdusuario());
+                        fcsPagosjgExtendsMapper.updateByPrimaryKeySelective(pago);
+
+                    }
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.saveConceptoPago() -> Se ha producido un error al introducir los conceptos del pago",
+                    e);
+            if (null == error.getCode() || error.getCode() != 400) {
+                error.setCode(500);
+                error.setDescription("general.mensaje.error.bbdd");
+            }
+        }
+
+        if (null != responses && responses.contains(0)) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.saveConceptoPago() -> Se ha producido un error al introducir los conceptos del pago");
+            error.setCode(400);
+            error.setDescription("general.message.error.realiza.accion");
+            updateResponseDTO.setStatus(SigaConstants.KO);
+        } else {
+            updateResponseDTO.setStatus(SigaConstants.OK);
+        }
+
+        updateResponseDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.saveConceptoPago() -> Salida del servicio para actualizar conceptos asociados al pago");
+
+        return updateResponseDTO;
+    }
+
+    private boolean hayMovimientosVariosPositivosAaplicar(Short idInstitucion, String idFacturacion) {
+        int numero = fcsPagosjgExtendsMapper.hayMovimientosVariosPositivosAaplicar(idInstitucion, idFacturacion);
+        return (numero > 0);
+    }
+
+    @Override
+    public DeleteResponseDTO deleteConceptoPago(List<ConceptoPagoItem> listaConceptoPagoItem,
+                                                HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.deleteConceptoPago() -> Entrada al servicio para desasociar cenceptos del pago");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+        Error error = new Error();
+        List<Integer> responses = null;
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.deleteConceptoPago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.deleteConceptoPago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (null != listaConceptoPagoItem && !listaConceptoPagoItem.isEmpty()) {
+
+                        responses = new ArrayList<Integer>();
+
+                        // Obtenemos el pago
+                        FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+                        fcsPagosjgKey.setIdinstitucion(idInstitucion);
+                        fcsPagosjgKey.setIdpagosjg(Integer.valueOf(listaConceptoPagoItem.get(0).getIdPagosjg()));
+
+                        LOGGER.info(
+                                "FacturacionSJCSServicesImpl.deleteConceptoPago() -> fcsPagosjgExtendsMapper.selectByPrimaryKey() -> Obtenemos el pago");
+                        FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+
+                        // Dependiendo del concepto de pago, restaremos la cantidad al importe pagado y
+                        // además actualizaremos a 0 el campo correspondiente
+                        for (ConceptoPagoItem concepto : listaConceptoPagoItem) {
+
+                            switch (concepto.getIdConcepto()) {
+                                case "10":
+                                    pago.setImportepagado(BigDecimal.valueOf(
+                                            pago.getImportepagado().doubleValue() - pago.getImporteoficio().doubleValue()));
+                                    pago.setImporteoficio(BigDecimal.ZERO);
+                                    break;
+                                case "20":
+                                    pago.setImportepagado(BigDecimal.valueOf(pago.getImportepagado().doubleValue()
+                                            - pago.getImporteguardia().doubleValue()));
+                                    pago.setImporteguardia(BigDecimal.ZERO);
+                                    break;
+                                case "30":
+                                    pago.setImportepagado(BigDecimal.valueOf(
+                                            pago.getImportepagado().doubleValue() - pago.getImportesoj().doubleValue()));
+                                    pago.setImportesoj(BigDecimal.ZERO);
+                                    break;
+                                case "40":
+                                    pago.setImportepagado(BigDecimal.valueOf(
+                                            pago.getImportepagado().doubleValue() - pago.getImporteejg().doubleValue()));
+                                    pago.setImporteejg(BigDecimal.ZERO);
+                                    break;
+                            }
+
+                            // Eliminamos el concepto del pago
+                            FcsPagoGrupofactHitoExample fcsPagoGrupofactHitoExample = new FcsPagoGrupofactHitoExample();
+                            fcsPagoGrupofactHitoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                                    .andIdhitogeneralEqualTo(Short.valueOf(concepto.getIdConcepto()))
+                                    .andIdpagosjgEqualTo(Integer.valueOf(concepto.getIdPagosjg()));
+
+                            LOGGER.info(
+                                    "FacturacionSJCSServicesImpl.deleteConceptoPago() -> fcsPagoGrupofactHitoMapper.deleteByExample() -> Eliminamos el concepto del pago");
+                            int response = fcsPagoGrupofactHitoMapper.deleteByExample(fcsPagoGrupofactHitoExample);
+                            responses.add(response);
+
+                        }
+
+                        LOGGER.info(
+                                "FacturacionSJCSServicesImpl.deleteConceptoPago() -> fcsPagosjgExtendsMapper.updateByPrimaryKeySelective() -> Actualizamos los datos del pago");
+                        pago.setImporterepartir(pago.getImportepagado());
+                        pago.setFechamodificacion(new Date());
+                        pago.setUsumodificacion(usuarios.get(0).getIdusuario());
+                        fcsPagosjgExtendsMapper.updateByPrimaryKeySelective(pago);
+
+                    }
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.deleteConceptoPago() -> Se ha producido un error al intentar desasociar cenceptos del pago",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        if (null != responses && responses.contains(0)) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.deleteConceptoPago() -> Se ha producido un error al intentar desasociar cenceptos del pago");
+            error.setCode(400);
+            error.setDescription("general.message.error.realiza.accion");
+            deleteResponseDTO.setStatus(SigaConstants.KO);
+        } else {
+            deleteResponseDTO.setStatus(SigaConstants.OK);
+        }
+
+        deleteResponseDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.deleteConceptoPago() -> Salida del servicio para desasociar cenceptos del pago");
+
+        return deleteResponseDTO;
+    }
+
+    @Override
+    public InsertResponseDTO ejecutarPagoSJCS(String idPago, HttpServletRequest request) {
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    // Antes de ejecutar el pago comprobamos si tiene banco asociado
+                    FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+                    fcsPagosjgKey.setIdinstitucion(idInstitucion);
+                    fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
+
+                    LOGGER.info(
+                            "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
+                                    + idPago);
+                    FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+                    LOGGER.info(
+                            "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
+                                    + idPago);
+
+                    if (UtilidadesString.esCadenaVacia(pago.getBancosCodigo())) {
+                        throw new FacturacionSJCSException("");
+                    }
+
+                    // CR7 - Antes de ejecutar simulamos el guardado
 //					guardarBloquePago(miform, usr);
 
 //					estadoPago = miform.getIdEstadoPagosJG();
 //					criterioTurno = miform.getCriterioPagoTurno();
 
-					// Validacion de los datos antes de ejecutar el pago:
-					// 1. El estado del pago debe ser abierto:
+                    // Validacion de los datos antes de ejecutar el pago:
+                    // 1. El estado del pago debe ser abierto:
 //					if (!estadoPago.equals(ClsConstants.ESTADO_PAGO_ABIERTO))
 //						return exito("messages.factSJCS.error.EstadoPagoNoCorrecto",
 //								request);
@@ -730,23 +1024,23 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 //					if (Double.valueOf(miform.getImporteRepartir())==0.00)
 //						throw new SIGAException("messages.facturacionSJCS.abono.sin.importe.pago");
 
-				}
+                }
 
-			}
+            }
 
-		} catch (FacturacionSJCSException fe) {
+        } catch (FacturacionSJCSException fe) {
 
-		} catch (Exception e) {
-			LOGGER.error(
-					"PagoSJCSServiceImpl.ejecutarPagoSJCS() -> Se ha producido en la ejecución del pago: " + idPago, e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
+        } catch (Exception e) {
+            LOGGER.error(
+                    "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> Se ha producido en la ejecución del pago: " + idPago, e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
 
-		insertResponseDTO.setError(error);
+        insertResponseDTO.setError(error);
 
-		return insertResponseDTO;
-	}
+        return insertResponseDTO;
+    }
 
 //	protected String ejecutarPago(ActionMapping mapping, MasterForm formulario,
 //			HttpServletRequest request, HttpServletResponse response)
