@@ -286,4 +286,21 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getNewIdDocumentacionEjg")
 	@Results({ @Result(column = "ID", property = "idMax", jdbcType = JdbcType.VARCHAR), })
 	MaxIdDto getNewIdDocumentacionEjg(Short idInstitucion);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgDictamen")
+	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
+	String getObservacionEstadoEjgDictamen(Short idInstitucion, Short idLenguaje, Short idTipoDictamen);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgPonente")
+	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
+	String getObservacionEstadoEjgPonente(Short idInstitucion, Short idLenguaje, Integer idPonente);
+
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgResol")
+	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
+	String getObservacionEstadoEjgResol(Short idInstitucion, Short idLenguaje, Short idTiporatificacionEJG);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgImpug")
+	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
+	String getObservacionEstadoEjgImpug(Short idInstitucion, Short idLenguaje, String idTiporesolauto);
+	
 }

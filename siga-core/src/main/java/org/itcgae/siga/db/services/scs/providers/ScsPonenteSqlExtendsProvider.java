@@ -11,8 +11,7 @@ public class ScsPonenteSqlExtendsProvider extends ScsPonenteSqlProvider{
 		sql.FROM("SCS_PONENTE");
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS ON SCS_PONENTE.NOMBRE = GEN_RECURSOS_CATALOGOS.IDRECURSO");
 		sql.WHERE("SCS_PONENTE.FECHA_BAJA IS NULL AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE ='"+idLenguaje+"'");
-		//Se le supone que debe ser de la misma institucion que el EJG ya que sino puede haber duplicados por no cumplir con la clave primaria. 
-		//Pendiente de preguntar.
+		//Se le limita por isinstitucion como se indica en la documentacion tecnica.
 		sql.WHERE("SCS_PONENTE.IDINSTITUCION = "+idInstitucion);
 		sql.ORDER_BY("GEN_RECURSOS_CATALOGOS.DESCRIPCION");
 		return sql.toString();
