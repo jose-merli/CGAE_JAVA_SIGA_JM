@@ -87,4 +87,5 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 		
 		return sql.toString();
 	}
+
 }

@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTO.fac;
 
+
+import java.util.Arrays;
 import java.util.Date;
 import org.itcgae.siga.DTOs.gen.Error;
 
@@ -27,6 +29,42 @@ public class ProductoDetalleDTO {
 	private String tipo;
 	private Error error = null;
 	
+	private int[] formasdepagointernet;
+	private int[] formasdepagosecretaria;
+	private int[] formasdepagointernetoriginales;
+	private int[] formasdepagosecretariaoriginales;
+	boolean editar;
+	
+	public int[] getFormasdepagointernetoriginales() {
+		return formasdepagointernetoriginales;
+	}
+	public void setFormasdepagointernetoriginales(int[] formasdepagointernetoriginales) {
+		this.formasdepagointernetoriginales = formasdepagointernetoriginales;
+	}
+	public int[] getFormasdepagosecretariaoriginales() {
+		return formasdepagosecretariaoriginales;
+	}
+	public void setFormasdepagosecretariaoriginales(int[] formasdepagosecretariaoriginales) {
+		this.formasdepagosecretariaoriginales = formasdepagosecretariaoriginales;
+	}
+	public boolean isEditar() {
+		return editar;
+	}
+	public void setEditar(boolean editar) {
+		this.editar = editar;
+	}
+	public int[] getFormasdepagointernet() {
+		return formasdepagointernet;
+	}
+	public void setFormasdepagointernet(int[] formasdepagointernet) {
+		this.formasdepagointernet = formasdepagointernet;
+	}
+	public int[] getFormasdepagosecretaria() {
+		return formasdepagosecretaria;
+	}
+	public void setFormasdepagosecretaria(int[] formasdepagosecretaria) {
+		this.formasdepagosecretaria = formasdepagosecretaria;
+	}
 	public int getIdproducto() {
 		return idproducto;
 	}
@@ -149,8 +187,13 @@ public class ProductoDetalleDTO {
 		result = prime * result + ((codigoext == null) ? 0 : codigoext.hashCode());
 		result = prime * result + ((cuentacontable == null) ? 0 : cuentacontable.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
+		result = prime * result + (editar ? 1231 : 1237);
 		result = prime * result + ((error == null) ? 0 : error.hashCode());
 		result = prime * result + ((fechabaja == null) ? 0 : fechabaja.hashCode());
+		result = prime * result + Arrays.hashCode(formasdepagointernet);
+		result = prime * result + Arrays.hashCode(formasdepagointernetoriginales);
+		result = prime * result + Arrays.hashCode(formasdepagosecretaria);
+		result = prime * result + Arrays.hashCode(formasdepagosecretariaoriginales);
 		result = prime * result + ((idcontador == null) ? 0 : idcontador.hashCode());
 		result = prime * result + idproducto;
 		result = prime * result + idproductoinstitucion;
@@ -196,6 +239,8 @@ public class ProductoDetalleDTO {
 				return false;
 		} else if (!descripcion.equals(other.descripcion))
 			return false;
+		if (editar != other.editar)
+			return false;
 		if (error == null) {
 			if (other.error != null)
 				return false;
@@ -205,6 +250,14 @@ public class ProductoDetalleDTO {
 			if (other.fechabaja != null)
 				return false;
 		} else if (!fechabaja.equals(other.fechabaja))
+			return false;
+		if (!Arrays.equals(formasdepagointernet, other.formasdepagointernet))
+			return false;
+		if (!Arrays.equals(formasdepagointernetoriginales, other.formasdepagointernetoriginales))
+			return false;
+		if (!Arrays.equals(formasdepagosecretaria, other.formasdepagosecretaria))
+			return false;
+		if (!Arrays.equals(formasdepagosecretariaoriginales, other.formasdepagosecretariaoriginales))
 			return false;
 		if (idcontador == null) {
 			if (other.idcontador != null)
@@ -264,7 +317,11 @@ public class ProductoDetalleDTO {
 				+ ", idtipoiva=" + idtipoiva + ", momentocargo=" + momentocargo + ", fechabaja=" + fechabaja
 				+ ", solicitarbaja=" + solicitarbaja + ", solicitaralta=" + solicitaralta + ", tipocertificado="
 				+ tipocertificado + ", nofacturable=" + nofacturable + ", categoria=" + categoria + ", valoriva="
-				+ valoriva + ", tipo=" + tipo + ", error=" + error + "]";
+				+ valoriva + ", tipo=" + tipo + ", error=" + error + ", formasdepagointernet="
+				+ Arrays.toString(formasdepagointernet) + ", formasdepagosecretaria="
+				+ Arrays.toString(formasdepagosecretaria) + ", formasdepagointernetoriginales="
+				+ Arrays.toString(formasdepagointernetoriginales) + ", formasdepagosecretariaoriginales="
+				+ Arrays.toString(formasdepagosecretariaoriginales) + ", editar=" + editar + "]";
 	}
 	
 }

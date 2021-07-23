@@ -65,6 +65,12 @@ public class ProductosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value="/pys/formasPagoProducto")
+	ResponseEntity<InsertResponseDTO> nuevaFormaPago(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request){
+		InsertResponseDTO response = productosService.nuevaFormaPago(producto, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping(value = "/combo/tipoFormaPago")
 	ResponseEntity<ComboDTO> comboTipoFormaPago(HttpServletRequest request) { 
 		ComboDTO response = productosService.comboTipoFormaPago(request);

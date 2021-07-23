@@ -2,6 +2,7 @@ package org.itcgae.siga.fac.services.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -24,8 +25,11 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.PysFormapagoproducto;
+import org.itcgae.siga.db.entities.PysFormapagoproductoKey;
 import org.itcgae.siga.db.entities.PysProductos;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
+import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
 import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.mappers.PysProductosinstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -59,6 +63,9 @@ public class ProductosServiceImpl implements IProductosService{
 	
 	@Autowired
 	private PysProductosinstitucionMapper pysProductosInstitucionMapper;
+	
+	@Autowired
+	private PysFormapagoproductoMapper pysFormaPagoProducto;
 	
 	
 	@Override
@@ -173,6 +180,186 @@ public class ProductosServiceImpl implements IProductosService{
 		LOGGER.info("comboIvaNoDerogados() -> Salida del servicio para recuperar el combo de ivas no derogados");
 
 		return comboDTO;
+	}
+	
+	@Override
+	public InsertResponseDTO nuevaFormaPago(ProductoDetalleDTO producto, HttpServletRequest request) {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int statusInsertFormaPagoInternet = 0;
+		int statusInsertFormaPagoSecretaria = 0;
+		int statusEdicionFinalProducto = 0;
+		
+
+		LOGGER.info("nuevaFormaPago() -> Entrada al servicio para crear una forma de pago y editar los campos restantes del producto");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"nuevaFormaPago() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"nuevaFormaPago() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"nuevaFormaPago() / pysProductosInstitucionExtendsMapper.nuevaFormaPago() -> Entrada a pysProductosInstitucionExtendsMapper para crear una forma de pago");
+				
+				//Si estamos creando un producto a partir de cero, es decir le hemos dado a nuevo en filtros-productos (front) recorremos las listas de pago de internet y secretaria insertando cada una de las formas
+				if(!producto.isEditar()) {
+					if(producto.getFormasdepagointernet().length > 0) {					
+						for (int formasdepagointernet : producto.getFormasdepagointernet()) {
+							PysFormapagoproducto formaPagoProducto = new PysFormapagoproducto();
+							
+							formaPagoProducto.setIdinstitucion(idInstitucion);
+							formaPagoProducto.setIdproducto((long) producto.getIdproducto());
+							formaPagoProducto.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+							formaPagoProducto.setIdformapago((short) formasdepagointernet);
+							formaPagoProducto.setInternet("A");
+							formaPagoProducto.setFechamodificacion(new Date());
+							formaPagoProducto.setUsumodificacion(usuarios.get(0).getIdusuario());
+							
+							statusInsertFormaPagoInternet = pysFormaPagoProducto.insert(formaPagoProducto);
+						}
+					}
+					if(producto.getFormasdepagosecretaria().length > 0)
+						for (int formasdepagosecretaria : producto.getFormasdepagosecretaria()) {
+							PysFormapagoproducto formaPagoProducto = new PysFormapagoproducto();
+							
+							formaPagoProducto.setIdinstitucion(idInstitucion);
+							formaPagoProducto.setIdproducto((long) producto.getIdproducto());
+							formaPagoProducto.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+							formaPagoProducto.setIdformapago((short) formasdepagosecretaria);
+							formaPagoProducto.setInternet("S");
+							formaPagoProducto.setFechamodificacion(new Date());
+							formaPagoProducto.setUsumodificacion(usuarios.get(0).getIdusuario());
+							
+							statusInsertFormaPagoSecretaria = pysFormaPagoProducto.insert(formaPagoProducto);
+						}
+				//Si no estamos creando un producto a partir de cero si no que estamos editandolo habiendo accedido a traves del enlace en la columna 
+				//producto del listado de productos (gestion-productos (front)) tenemos que comprobar las formas de pago originales del producto para
+				//eliminar las correspondientes en caso de haber deseleccionado e insertar las nuevas ademas de no hacer inserts de las ya existentes
+				}else if (producto.isEditar()) {
+					PysFormapagoproductoKey pysFormaPagoProductoPrimaryKey = new PysFormapagoproductoKey();
+					//PRIMERO RECORREMOS LAS FORMAS DE PAGO DE INTERNET
+					//Comprobamos si en el producto editado no aparecen alguna/s formas de pago que se encontraban en el original para eliminarlas
+					for (int formasdepagointernetoriginales : producto.getFormasdepagointernetoriginales()) {
+						if(!Arrays.asList(producto.getFormasdepagointernet()).contains(Integer.valueOf(formasdepagointernetoriginales))) {
+							pysFormaPagoProductoPrimaryKey.setIdinstitucion(idInstitucion);
+							pysFormaPagoProductoPrimaryKey.setIdproducto((long) producto.getIdproducto());
+							pysFormaPagoProductoPrimaryKey.setIdformapago((short) formasdepagointernetoriginales);
+							pysFormaPagoProductoPrimaryKey.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+							pysFormaPagoProductoPrimaryKey.setIdtipoproducto((short) producto.getIdtipoproducto());
+							
+							pysFormaPagoProducto.deleteByPrimaryKey(pysFormaPagoProductoPrimaryKey);
+						}
+					}
+					
+					if(producto.getFormasdepagointernet().length > 0) {	
+						//Comprobamos las nuevas formas de pago en el producto editado comparandolo con el producto original para insertarlas
+						for(int formasdepagointernet : producto.getFormasdepagointernet()) {
+							if(!Arrays.asList(producto.getFormasdepagointernetoriginales()).contains(Integer.valueOf(formasdepagointernet))) {
+								PysFormapagoproducto formaPagoProducto = new PysFormapagoproducto();
+								
+								formaPagoProducto.setIdinstitucion(idInstitucion);
+								formaPagoProducto.setIdproducto((long) producto.getIdproducto());
+								formaPagoProducto.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+								formaPagoProducto.setIdformapago((short) formasdepagointernet);
+								formaPagoProducto.setInternet("A");
+								formaPagoProducto.setFechamodificacion(new Date());
+								formaPagoProducto.setUsumodificacion(usuarios.get(0).getIdusuario());
+								
+								statusInsertFormaPagoInternet = pysFormaPagoProducto.insert(formaPagoProducto);
+							}
+						}
+					}
+					
+					//POR ULTIMO RECORREMOS HACIENDO EXACTAMENTE LO MISMO LAS FORMAS DE PAGO DE SECRETARIA
+					//Comprobamos si en el producto editado no aparecen alguna/s formas de pago que se encontraban en el original para eliminarlas
+					for (int formasdepagosecretariasoriginales : producto.getFormasdepagosecretariaoriginales()) {
+						if(!Arrays.asList(producto.getFormasdepagosecretaria()).contains(Integer.valueOf(formasdepagosecretariasoriginales))) {
+							pysFormaPagoProductoPrimaryKey.setIdinstitucion(idInstitucion);
+							pysFormaPagoProductoPrimaryKey.setIdproducto((long) producto.getIdproducto());
+							pysFormaPagoProductoPrimaryKey.setIdformapago((short) formasdepagosecretariasoriginales);
+							pysFormaPagoProductoPrimaryKey.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+							pysFormaPagoProductoPrimaryKey.setIdtipoproducto((short) producto.getIdtipoproducto());
+							
+							pysFormaPagoProducto.deleteByPrimaryKey(pysFormaPagoProductoPrimaryKey);
+						}
+					}
+					
+					if(producto.getFormasdepagosecretaria().length > 0) {	
+						//Comprobamos las nuevas formas de pago en el producto editado comparandolo con el producto original para insertarlas
+						for(int formasdepagosecretaria : producto.getFormasdepagosecretaria()) {
+							if(!Arrays.asList(producto.getFormasdepagosecretariaoriginales()).contains(Integer.valueOf(formasdepagosecretaria))) {
+								PysFormapagoproducto formaPagoProducto = new PysFormapagoproducto();
+								
+								formaPagoProducto.setIdinstitucion(idInstitucion);
+								formaPagoProducto.setIdproducto((long) producto.getIdproducto());
+								formaPagoProducto.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+								formaPagoProducto.setIdformapago((short) formasdepagosecretaria);
+								formaPagoProducto.setInternet("S");
+								formaPagoProducto.setFechamodificacion(new Date());
+								formaPagoProducto.setUsumodificacion(usuarios.get(0).getIdusuario());
+								
+								statusInsertFormaPagoInternet = pysFormaPagoProducto.insert(formaPagoProducto);
+							}
+						}
+					}
+					
+				}
+				
+				//Actualizamos la informacion restante la cual no fue introducida al crear el producto en la tarjeta datos generales
+				PysProductosinstitucion productoInstitucion = new PysProductosinstitucion();
+				
+				productoInstitucion.setIdinstitucion(idInstitucion);
+				productoInstitucion.setIdtipoproducto((short) producto.getIdtipoproducto());
+				productoInstitucion.setIdproducto((long) producto.getIdproducto());
+				productoInstitucion.setIdproductoinstitucion((long) producto.getIdproducto());
+				productoInstitucion.setNofacturable(producto.getNofacturable());
+				productoInstitucion.setValor(new BigDecimal(producto.getValor()));
+				productoInstitucion.setIdtipoiva(producto.getIdtipoiva());
+				
+				productoInstitucion.setFechamodificacion(new Date());
+				productoInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());	
+
+				statusEdicionFinalProducto = pysProductosInstitucionMapper.updateByPrimaryKey(productoInstitucion);
+				
+					
+					if(statusInsertFormaPagoInternet == 0 || statusInsertFormaPagoSecretaria == 0 || statusEdicionFinalProducto == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+					}else if(statusInsertFormaPagoInternet == 1 && statusInsertFormaPagoSecretaria == 1 && statusEdicionFinalProducto == 0) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+					
+					LOGGER.info(
+							"nuevaFormaPago() / pysProductosInstitucionExtendsMapper.nuevaFormaPago() -> Salida de pysProductosInstitucionExtendsMapper para crear una forma de pago y editar los campos restantes del producto");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ProductosServiceImpl.nuevaFormaPago() -> Se ha producido un error al crear una forma de pago y editar los campos restantes del producto",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("nuevaFormaPago() -> Salida del servicio para crear una forma de pago y editar los campos restantes del producto");
+
+		return insertResponseDTO;
 	}
 	
 	@Override
@@ -597,7 +784,9 @@ public class ProductosServiceImpl implements IProductosService{
 					productoInstitucion.setIdproducto((long) producto.getIdproducto());
 					productoInstitucion.setIdproductoinstitucion((long) producto.getIdproducto());
 					productoInstitucion.setDescripcion(producto.getDescripcion());
-					//productoInstitucion.setValor(new BigDecimal(0));//PROVISIONAL
+					productoInstitucion.setValor(new BigDecimal(0));//PROVISIONAL
+					productoInstitucion.setMomentocargo(producto.getMomentocargo());
+					productoInstitucion.setNofacturable(producto.getNofacturable());
 					
 					if(producto.getCuentacontable() != "" && producto.getCuentacontable() != null)
 						productoInstitucion.setCuentacontable(producto.getCuentacontable());
@@ -614,7 +803,7 @@ public class ProductosServiceImpl implements IProductosService{
 					if(producto.getCodigoext() != "" && producto.getCodigoext() != null)
 						productoInstitucion.setCodigoext(producto.getCodigoext());
 					
-					productoInstitucion.setFechamodificacion(new Date());//SYSTIMESTAMP?
+					productoInstitucion.setFechamodificacion(new Date());
 					productoInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());	
 
 					status = pysProductosInstitucionMapper.updateByPrimaryKey(productoInstitucion);
