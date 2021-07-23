@@ -24,7 +24,9 @@ import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionguardiaExtendsMappe
 import org.itcgae.siga.scs.services.guardia.InscripcionService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class InscripcionServiceImpl implements InscripcionService {
 
 	private final String VALIDACION_BAJA = "Validacion Baja";
