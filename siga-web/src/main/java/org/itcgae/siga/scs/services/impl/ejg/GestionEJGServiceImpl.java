@@ -5214,7 +5214,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 			response = scsEstadoejgMapper.updateByExample(estadoIni.get(0), estadoEjgExample);
 			if (response == 0)
-				throw (new Exception("Error en triggersEjgUpdatesFApertura()"));
+				throw (new Exception("Error en triggersEjgUpdatesFApertura() 1."));
 		}
 		
 		LOGGER.info("triggersEjgUpdatesFApertura() -> Salida del metodo para realizar cambios en el estado inicial del EJG");
@@ -5241,9 +5241,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 
-		// 2.Si cambia el dictamen o la fecha dictamen y no eran nulos antes o despues
-		// ponemos fecha de baja a todos los estados anteriores que hayan sido
-		// dictaminados
+		// 2.1cSi cambia el dictamen o la fecha dictamen y no eran nulos antes o despues
+		// ponemos fecha de baja a todos los estados anteriores con valor "Dictaminado"
 		if ((ejg.getFechadictamen()!=ejgItem.getFechaDictamen()
 				|| ejg.getIdtipodictamenejg()!=ejgItem.getIdTipoDictamen())
 				&& (ejg.getFechadictamen() != null && ejg.getIdtipodictamenejg() != null)
@@ -5327,9 +5326,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 
-		// 3. Si cambia el ponente o la fecha presentacion ponente y no eran nulos antes
+		// 3.1 Si cambia el ponente o la fecha presentacion ponente y no eran nulos antes
 		// o despues
-		// ponemos fecha de baja a todos los estados anteriores iguales
+		// ponemos fecha de baja a todos los estados anteriores con "Remitida apertura a CAJG-Reparto Ponente"
 		if ((ejg.getFechapresentacionponente()!=resolEjg.getFechaPresentacionPonente()
 				|| (ejg.getIdponente()!=resolEjg.getIdPonente()))
 				&& (ejg.getFechapresentacionponente() != null && ejg.getIdponente() != null)
@@ -5341,7 +5340,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					.andIdtipoejgEqualTo(Short.valueOf(resolEjg.getIdTipoEJG()))
 					.andAnioEqualTo(Short.valueOf(resolEjg.getAnio())).andNumeroEqualTo(ejg.getNumero())
 					.andIdestadoejgEqualTo((short) 0) // Remitida apertura a CAJG-Reparto Ponente ===
-														// scs_maestroestadosejg.idestado=0
+														// scs_maestroestadosejg.idestadoejg=0
 					.andAutomaticoEqualTo("1").andFechabajaIsNull();
 
 			List<ScsEstadoejg> estadoPonente = scsEstadoejgMapper.selectByExample(estadoEjgExample);
@@ -5413,9 +5412,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		
 
-		// 4. Si cambia la resolucion o la fecha de resolucion y no eran nulos
+		// 4.1 Si cambia la resolucion o la fecha de resolucion y no eran nulos
 		// antes o despues
-		// ponemos fecha de baja a todos los estados anteriores iguales
+		// ponemos fecha de baja a todos los estados anteriores que hayan sido "Resuelto Comisión"
 		if ((ejg.getFecharesolucioncajg()!=resolEjg.getFechaResolucionCAJG()
 				|| (ejg.getIdtiporatificacionejg()!=resolEjg.getIdTiporatificacionEJG()))
 				&& (ejg.getFecharesolucioncajg() != null && ejg.getIdtiporatificacionejg() != null)
@@ -5526,8 +5525,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 		
-		// 5. Si cambia la impugnacion o la fecha de impugnacion y no eran nulos antes o
-		// despues ponemos fecha de baja a todos los estados anteriores iguales
+		// 5.1 Si cambia la impugnacion o la fecha de impugnacion y no eran nulos antes o
+		// despues ponemos fecha de baja a todos los estados anteriores "Resuelta Impugnación"
 		if ((ejg.getFechaauto()!=ejgItem.getFechaAuto()
 				|| (ejg.getIdtiporesolauto().toString()!=ejgItem.getAutoResolutorio()))
 				&& (ejg.getFechaauto() != null && ejg.getIdtiporesolauto() != null)
