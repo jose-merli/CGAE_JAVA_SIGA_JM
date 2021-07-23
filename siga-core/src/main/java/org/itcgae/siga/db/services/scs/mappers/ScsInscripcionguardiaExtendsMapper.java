@@ -2,18 +2,19 @@ package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
+import org.itcgae.siga.DTOs.scs.CargaMasivaDatosITItem;
+import org.itcgae.siga.DTOs.scs.GestionInscripcion;
 import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
-import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.scs.CargaMasivaDatosITItem;
-import org.itcgae.siga.DTOs.scs.ModulosItem;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
-import org.itcgae.siga.db.services.scs.providers.ScsInscripcionesTurnoSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsInscripcionguardiaSqlExtendsProvider;
 
 public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardiaMapper{
@@ -69,6 +70,78 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> comboGuardiasInscritoLetrado(Short idInstitucion, String idPersona, String idTurno);
+	
+	@InsertProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "insertarInscripcion")
+	int insertarInscripcion(Short idInstitucion, InscripcionGuardiaItem inscripcion, AdmUsuarios admUsuarios);
+
+	@Results({
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHASUSCRIPCION", property = "fechaSuscripcion", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.DATE),
+		@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESSUSCRIPCION", property = "observacionessuscripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBSERVACIONESBAJA", property = "observacionesbaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHASOLICITUDBAJA", property = "fechasolicitudbaja", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAVALIDACION", property = "fechavalidacion", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESVALIDACION", property = "observacionesvalidacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHADENEGACION", property = "fechadenegacion", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONESDENEGACION", property = "observacionesdenegacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBSERVACIONESVALBAJA", property = "observacionesvalbaja", jdbcType = JdbcType.VARCHAR)
+	})
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "buscarInscripcion")
+	List<InscripcionGuardiaItem> buscarInscripcion(Short idInstitucion, InscripcionGuardiaItem inscripcion,
+			AdmUsuarios admUsuarios);
+
+	@Results({
+		@Result(column = "idguardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idturno", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numerogrupo", property = "numeroGrupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "colegiado", property = "colegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "colegiado_grupo", property = "colegiadoGrupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "letrado", property = "letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_turno", property = "nombreTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idzona", property = "idZona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_zona", property = "nombreZona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idsubzona", property = "idSubzona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_subzona", property = "nombreSubzona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idarea", property = "idArea", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_area", property = "nombreArea", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idmateria", property = "idMateria", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_materia", property = "nombreMateria", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_guardia", property = "nombreGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "descripcion_tipo_guardia", property = "descripcionNombreGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "obligatoriedad_inscripcion", property = "obligatoriedadInscripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "descripcion_obligatoriedad", property = "descripcionObligatoriedad", jdbcType = JdbcType.VARCHAR)
+	})
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "inscripcionesDisponibles")
+	List<GestionInscripcion> inscripcionesDisponibles(Short idInstitucion, AdmUsuarios admUsuarios);
+
+	@Results({
+		@Result(column = "idguardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idturno", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numerogrupo", property = "numeroGrupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "colegiado", property = "colegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "colegiado_grupo", property = "colegiadoGrupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "letrado", property = "letrado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_turno", property = "nombreTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idzona", property = "idZona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_zona", property = "nombreZona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idsubzona", property = "idSubzona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_subzona", property = "nombreSubzona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idarea", property = "idArea", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_area", property = "nombreArea", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idmateria", property = "idMateria", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_materia", property = "nombreMateria", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre_guardia", property = "nombreGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "descripcion_tipo_guardia", property = "descripcionNombreGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "obligatoriedad_inscripcion", property = "obligatoriedadInscripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "descripcion_obligatoriedad", property = "descripcionObligatoriedad", jdbcType = JdbcType.VARCHAR)
+	})
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "inscripcionPorguardia")
+	List<GestionInscripcion> inscripcionPorguardia(Short idInstitucion, AdmUsuarios admUsuarios, String guardia);
 
 
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "listadoInscripciones")

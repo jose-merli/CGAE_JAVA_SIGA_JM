@@ -180,6 +180,20 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@Result(column = "NUMEROGRUPO", property = "numeroGrupo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ORDENGRUPO", property = "ordenGrupo", jdbcType = JdbcType.VARCHAR) })
 	List<LetradoGuardiaItem> searchLetradosGuardia(String idInstitucion, String idTurno, String idGuardia);
+	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "searchLetradosInscripcion")
+	@Results({ @Result(column = "ACTIVO", property = "activo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ALFABETICOAPELLIDOS", property = "alfabeticoApellidos", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMEROCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGRUPOGUARDIACOLEGIADO", property = "idGrupoGuardiaColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "GRUPO", property = "grupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMEROGRUPO", property = "numeroGrupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ORDENGRUPO", property = "ordenGrupo", jdbcType = JdbcType.VARCHAR) })
+	List<LetradoGuardiaItem> searchLetradosInscripcion(String idInstitucion, String idGuardia);
 
 	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "searchCalendarios")
