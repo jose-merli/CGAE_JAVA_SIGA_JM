@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.FiltroAsistenciaItem;
@@ -159,6 +160,17 @@ public class AsistenciaController {
 			throw e;
 		}
 		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/updateEstadoAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> updateEstadoAsistencia(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias) {
+		UpdateResponseDTO response = null;
+		try {
+			response = asistenciaService.updateEstadoAsistencia(request,asistencias);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 }

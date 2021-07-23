@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -25,6 +26,7 @@ import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaItem;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseDTO;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
 import org.itcgae.siga.DTOs.scs.TiposAsistenciaItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -537,6 +539,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									error.setMessage("Error al insertar la nueva asistencia");
 									error.description("Error al insertar la nueva asistencia");
 								}
+
+								procesarDelitosAsistencia(asistencia, anioAsistencia, numeroAsistencia, idInstitucion);
 								
 								//Recorremos actuaciones y las insertamos
 								for(int i = 0; i < asistencia.getActuaciones().size(); i++) {
@@ -756,9 +760,6 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}else if(!UtilidadesString.esCadenaVacia(asistencia.getIdTipoAsistenciaColegio())) {
 				asistenciaBBDD.setIdtipoasistencia(Short.valueOf(asistencia.getIdTipoAsistenciaColegio()));
 				asistenciaBBDD.setIdtipoasistenciacolegio(Short.valueOf(asistencia.getIdTipoAsistenciaColegio()));
-			}
-			if(!UtilidadesString.esCadenaVacia(asistencia.getIdDelito())) {
-				asistenciaBBDD.setDelitosimputados(asistencia.getIdDelito());
 			}
 			
 			if(!UtilidadesString.esCadenaVacia(asistencia.getEstado())) {
@@ -1155,6 +1156,94 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	}
 
 	@Override
+	public UpdateResponseDTO updateEstadoAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponse = new UpdateResponseDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"guardarAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"guardarAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()) {
+
+					for (int i = 0; i < asistencias.size(); i++) {
+
+						TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = asistencias.get(i);
+
+						if(!UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getAnio())
+								&& !UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getNumero())) {
+							int rowsUpdated = 0;
+							ScsAsistencia scsAsistencia = new ScsAsistencia();
+							scsAsistencia.setFechaestadoasistencia(new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaEstado()));
+							scsAsistencia.setIdestadoasistencia(Short.valueOf(tarjetaAsistenciaResponseItem.getEstado()));
+							scsAsistencia.setAnio(Short.valueOf(tarjetaAsistenciaResponseItem.getAnio()));
+							scsAsistencia.setNumero(Long.valueOf(tarjetaAsistenciaResponseItem.getNumero()));
+							scsAsistencia.setIdinstitucion(idInstitucion);
+
+							rowsUpdated = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(scsAsistencia);
+
+							//Si es una anulacion, anulamos sus actuaciones asociadas
+							if("2".equals(tarjetaAsistenciaResponseItem.getEstado())){
+
+								ScsActuacionasistencia scsActuacionasistencia = new ScsActuacionasistencia();
+								scsActuacionasistencia.setAnulacion((short)1);
+
+								ScsActuacionasistenciaExample scsActuacionasistenciaExample = new ScsActuacionasistenciaExample();
+								scsActuacionasistenciaExample.createCriteria()
+										.andIdinstitucionEqualTo(idInstitucion)
+										.andAnioEqualTo(Short.valueOf(tarjetaAsistenciaResponseItem.getAnio()))
+										.andNumeroEqualTo(Long.valueOf(tarjetaAsistenciaResponseItem.getNumero()));
+
+								rowsUpdated += scsActuacionasistenciaMapper.updateByExampleSelective(scsActuacionasistencia,scsActuacionasistenciaExample);
+
+							}
+
+							if(rowsUpdated > 0) {
+								updateResponse.setStatus(SigaConstants.OK);
+								updateResponse.setId(tarjetaAsistenciaResponseItem.getAnioNumero());
+							} else {
+
+								updateResponse.setStatus(SigaConstants.KO);
+								error.setCode(500);
+								error.setMessage("No se ha actualizado ningun registro");
+								error.description("No se ha actualizado ningun registro");
+								updateResponse.setError(error);
+
+							}
+
+						}else {
+							updateResponse.setStatus(SigaConstants.KO);
+							error.setCode(500);
+							error.setMessage("El año o el numero no van informados");
+							error.description("El año o el numero no van informados");
+							updateResponse.setError(error);
+						}
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("guardarAsistencia() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al guardar la asistencia: " + e);
+			error.description("Error al guardar la asistencia: " + e);
+			updateResponse.setError(error);
+		}
+		return updateResponse;
+	}
+
+	@Override
 	public TarjetaAsistenciaResponseDTO buscarTarjetaAsistencias(HttpServletRequest request, String anioNumero) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1188,6 +1277,16 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							TarjetaAsistenciaResponseItem asistenciaResponse = new TarjetaAsistenciaResponseItem();
 							asistenciaResponse.setAnioNumero(asistencia.getAnio() + "/"+ asistencia.getNumero());
 							asistenciaResponse.setFechaAsistencia(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(asistencia.getFechahora()));
+							asistenciaResponse.setIdGuardia(String.valueOf(asistencia.getIdguardia()));
+							asistenciaResponse.setIdTurno(String.valueOf(asistencia.getIdturno()));
+							asistenciaResponse.setIdLetradoGuardia(String.valueOf(asistencia.getIdpersonacolegiado()));
+							asistenciaResponse.setAnio(String.valueOf(asistencia.getAnio()));
+							asistenciaResponse.setNumero(String.valueOf(asistencia.getNumero()));
+							asistenciaResponse.setEstado(String.valueOf(asistencia.getIdestadoasistencia()));
+							asistenciaResponse.setFechaCierre(new SimpleDateFormat("dd/MM/yyyy").format(asistencia.getFechacierre()));
+							asistenciaResponse.setFechaSolicitud(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(asistencia.getFechasolicitud()));
+							asistenciaResponse.setFechaEstado(new SimpleDateFormat("dd/MM/yyyy").format(asistencia.getFechaestadoasistencia()));
+							asistenciaResponse.setIdTipoAsistenciaColegio(String.valueOf(asistencia.getIdtipoasistenciacolegio()));
 							return asistenciaResponse;
 						}).collect(Collectors.toList());
 						
@@ -1292,6 +1391,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return tarjetaAsistenciaResponseDTO;
 	}
 	
-	
+	private void procesarDelitosAsistencia (TarjetaAsistenciaResponseItem tarjetaAsistenciaItem, String anio, String numero, Short idInstitucion){
+
+
+
+	}
 
 }
