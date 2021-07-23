@@ -5456,18 +5456,48 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				newEstadoResol.setUsumodificacion(usuario.getIdusuario());
 
 				// Se realiza una consulta SQL para obtener las observaciones asociadas
-				newEstadoResol.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgResol(idInstitucion,
+				newEstadoResol.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgResol(
 						usuario.getIdlenguaje(), resolEjg.getIdTiporatificacionEJG()));
 
 				// Obtenemos el maximo de idestadoporejg
 				newEstadoResol.setIdestadoporejg(getNewIdestadoporejg(ejg, idInstitucion));
 
 				newEstadoResol.setAutomatico("1");
-				newEstadoResol.setPropietariocomision("0");
+				newEstadoResol.setPropietariocomision("1");
 
 				response = scsEstadoejgMapper.insert(newEstadoResol);
 				if (response == 0)
 					throw (new Exception("Error en triggersEjgUpdatesResol 4.2"));
+				
+				// 4.3 En el caso que ahora (los valores nuevos) la resolucion fuera "Devuelto al Colegio" (valor 6 del combo)
+				if (resolEjg.getIdTiporatificacionEJG() == 6) {
+					// Se inserta el estado Resuelta impugnación y se pone en las observaciones el
+					// tipo de resolucion.
+
+					ScsEstadoejg newEstadoResolDev = new ScsEstadoejg();
+
+					newEstadoResolDev.setIdinstitucion(idInstitucion);
+					newEstadoResolDev.setIdtipoejg(ejg.getIdtipoejg());
+					newEstadoResolDev.setAnio(ejg.getAnio());
+					newEstadoResolDev.setNumero(ejg.getNumero());
+					newEstadoResolDev.setIdestadoejg((short) 21); // Devuelto al Colegio === scs_maestroestadosejg.idestado=21
+					newEstadoResolDev.setFechainicio(resolEjg.getFechaResolucionCAJG());
+					newEstadoResolDev.setFechamodificacion(new Date());
+					newEstadoResolDev.setUsumodificacion(usuario.getIdusuario());
+
+					// Se realiza una consulta SQL para obtener las observaciones asociadas
+					newEstadoResolDev.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgResolDev(usuario.getIdlenguaje()));
+
+					// Obtenemos el maximo de idestadoporejg
+					newEstadoResolDev.setIdestadoporejg(getNewIdestadoporejg(ejg, idInstitucion));
+
+					newEstadoResolDev.setAutomatico("1");
+					newEstadoResolDev.setPropietariocomision("0");
+
+					response = scsEstadoejgMapper.insert(newEstadoResolDev);
+					if (response == 0)
+						throw (new Exception("Error en triggersEjgUpdatesResol 4.3"));
+				}
 			}
 		}
 		
@@ -5538,7 +5568,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				newEstadoImpug.setUsumodificacion(usuario.getIdusuario());
 
 				// Se realiza una consulta SQL para obtener las observaciones asociadas
-				newEstadoImpug.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgImpug(idInstitucion,
+				newEstadoImpug.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgImpug(
 						usuario.getIdlenguaje(), ejgItem.getAutoResolutorio()));
 
 				// Obtenemos el maximo de idestadoporejg
@@ -5583,7 +5613,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		newEstadoIni.setUsumodificacion(usuario.getIdusuario());
 		
 		// Se realiza una consulta SQL para obtener las observaciones asociadas
-		newEstadoIni.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoIniInsertEjg(idInstitucion,
+		newEstadoIni.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoIniInsertEjg(
 				usuario.getIdlenguaje()));
 
 		// Obtenemos el maximo de idestadoporejg

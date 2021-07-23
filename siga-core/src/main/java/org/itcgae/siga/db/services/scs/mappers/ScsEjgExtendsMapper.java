@@ -297,13 +297,17 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgResol")
 	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
-	String getObservacionEstadoEjgResol(Short idInstitucion, String idLenguaje, Short idTiporatificacionEJG);
+	String getObservacionEstadoEjgResol(String idLenguaje, Short idTiporatificacionEJG);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgImpug")
 	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
-	String getObservacionEstadoEjgImpug(Short idInstitucion, String idLenguaje, String idTiporesolauto);
+	String getObservacionEstadoEjgImpug(String idLenguaje, String idTiporesolauto);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoIniInsertEjg")
 	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
-	String getObservacionEstadoIniInsertEjg(Short idInstitucion, String idLenguaje);
+	String getObservacionEstadoIniInsertEjg(String idLenguaje);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgResolDev")
+	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
+	String getObservacionEstadoEjgResolDev(String idLenguaje);
 }

@@ -1765,7 +1765,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 
-	public String getObservacionEstadoEjgResol(Short idInstitucion, String idLenguaje, Short idTiporatificacionEJG) {
+	public String getObservacionEstadoEjgResol(String idLenguaje, Short idTiporatificacionEJG) {
 		SQL sql = new SQL();
 
 		sql.SELECT("f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
@@ -1782,7 +1782,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 	
-	public String getObservacionEstadoEjgImpug(Short idInstitucion, String idLenguaje, String idTiporesolauto) {
+	public String getObservacionEstadoEjgImpug(String idLenguaje, String idTiporesolauto) {
 		SQL sql = new SQL();
 
 		sql.SELECT("f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
@@ -1799,7 +1799,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 
-	public String getObservacionEstadoIniInsertEjg(Short idInstitucion, String idLenguaje) {
+	public String getObservacionEstadoIniInsertEjg(String idLenguaje) {
 		SQL sql = new SQL();
 
 		sql.SELECT("f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
@@ -1812,4 +1812,18 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String getObservacionEstadoEjgResolDev(String idLenguaje) {
+		SQL sql = new SQL();
+
+		sql.SELECT("f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') as observaciones\r\n");
+
+		sql.FROM("Scs_Estadoejg");
+		
+		//Para coger solo un resultado
+		sql.WHERE("ROWNUM = 1");
+
+		return sql.toString();
+	}
+	
 }
