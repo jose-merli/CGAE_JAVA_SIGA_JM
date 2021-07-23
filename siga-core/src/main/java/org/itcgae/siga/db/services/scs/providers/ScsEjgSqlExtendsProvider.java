@@ -1732,7 +1732,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	public String getObservacionEstadoEjgDictamen(Short idInstitucion, String idLenguaje, Short idTipoDictamen) {
 		SQL sql = new SQL();
 
-		sql.SELECT("select f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
+		sql.SELECT("f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
 				+ "	|| ' ' || f_Siga_Getrecurso_Etiqueta('gratuita.busquedaEJG.dictamen', '"+ idLenguaje +"') || ' ' ||\r\n"
 				+ "				           (Select f_Siga_Getrecurso(Descripcion, '"+ idLenguaje +"')\r\n"
 				+ "				              From Scs_Tipodictamenejg\r\n"
@@ -1740,6 +1740,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ "	                        And Idtipodictamenejg = "+ idTipoDictamen +") as observaciones");
 
 		sql.FROM("Scs_Estadoejg");
+		
+		//Para coger solo un resultado
+		sql.WHERE("ROWNUM = 1");
 
 		return sql.toString();
 	}
@@ -1747,7 +1750,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	public String getObservacionEstadoEjgPonente(Short idInstitucion, String idLenguaje, Integer idPonente) {
 		SQL sql = new SQL();
 
-		sql.SELECT("select f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
+		sql.SELECT("f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
 				+ "	|| ' ' || f_Siga_Getrecurso_Etiqueta('gratuita.operarRatificacion.literal.ponente', '"+ idLenguaje +"') || ' ' ||\r\n"
 				+ "				           (Select f_Siga_Getrecurso(Nombre, '"+ idLenguaje +"')\r\n"
 				+ "				              From Scs_Ponente\r\n"
@@ -1755,45 +1758,57 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ "	                        And Idtipodictamenejg = "+ idPonente +") as observaciones");
 
 		sql.FROM("Scs_Estadoejg");
+		
+		//Para coger solo un resultado
+		sql.WHERE("ROWNUM = 1");
 
 		return sql.toString();
 	}
 
-	public String getObservacionEstadoEjgResol(Short idInstitucion, String idLenguaje, Integer idTiporatificacionEJG) {
+	public String getObservacionEstadoEjgResol(Short idInstitucion, String idLenguaje, Short idTiporatificacionEJG) {
 		SQL sql = new SQL();
 
-		sql.SELECT("select f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
+		sql.SELECT("f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
 				+ "	|| ' ' || f_Siga_Getrecurso_Etiqueta('gratuita.operarRatificacion.literal.tipoRatificacion', '"+ idLenguaje +"') || ' ' ||\r\n"
 				+ "				           (Select f_Siga_Getrecurso(Descripcion, '"+ idLenguaje +"')\r\n"
 				+ "				              From Scs_Tiporesolucion\r\n"
-				+ "				             Where Idtiporesolcuion = "+ idTiporatificacionEJG +") as observaciones");
+				+ "				             Where Idtiporesolucion = "+ idTiporatificacionEJG +") as observaciones");
 
 		sql.FROM("Scs_Estadoejg");
 
+		//Para coger solo un resultado
+		sql.WHERE("ROWNUM = 1");
+				
 		return sql.toString();
 	}
 	
 	public String getObservacionEstadoEjgImpug(Short idInstitucion, String idLenguaje, String idTiporesolauto) {
 		SQL sql = new SQL();
 
-		sql.SELECT("select f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
+		sql.SELECT("f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
 				+ "	|| ' ' || f_Siga_Getrecurso_Etiqueta('pestana.justiciagratuitaejg.impugnacion', '"+ idLenguaje +"') || ' ' ||\r\n"
 				+ "				           (Select f_Siga_Getrecurso(Descripcion, '"+ idLenguaje +"')\r\n"
 				+ "				              From Scs_Tiporesolauto\r\n"
 				+ "				             Where Idtiporesolauto = "+ idTiporesolauto +") as observaciones");
 
 		sql.FROM("Scs_Estadoejg");
+		
+		//Para coger solo un resultado
+		sql.WHERE("ROWNUM = 1");
 
 		return sql.toString();
 	}
 
-	public String getObservacionEstadoIniInsertEjg(Short idInstitucion, String idLenguaje, String idTiporesolauto) {
+	public String getObservacionEstadoIniInsertEjg(Short idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 
-		sql.SELECT("select f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
-				+ "	|| ' ' || f_Siga_Getrecurso_Etiqueta('expedientes.nuevoExpediente.cabecera', '"+ idLenguaje +"') || ' ' ||\r\n");
+		sql.SELECT("f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico','"+ idLenguaje +"') \r\n"
+				+ "	|| ' ' || f_Siga_Getrecurso_Etiqueta('expedientes.nuevoExpediente.cabecera', '"+ idLenguaje +"') || ' ' as observaciones\r\n");
 
 		sql.FROM("Scs_Estadoejg");
+		
+		//Para coger solo un resultado
+		sql.WHERE("ROWNUM = 1");
 
 		return sql.toString();
 	}
