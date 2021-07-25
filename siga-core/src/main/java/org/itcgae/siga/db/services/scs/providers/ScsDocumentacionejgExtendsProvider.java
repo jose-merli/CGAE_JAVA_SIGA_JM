@@ -49,6 +49,8 @@ public class ScsDocumentacionejgExtendsProvider extends ScsDocumentacionejgSqlPr
 
 		}
 		
+		sql.ORDER_BY("doc.iddocumentacion");
+		
 		return sql.toString();
 	}
 }
