@@ -4090,6 +4090,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				} else
 					scsDocumentacionejg.setIdmaestropresentador(Short.valueOf(documentacionEjgItem.getPresentador()));
 				scsDocumentacionejg.setDocumentacion(documentacionEjgItem.getDescripcionDoc());
+				
+				//Actualmente se asigna la nueva documentacion a "CAJG" o a "ICA" según el perfil que lo cree
+				if(UserTokenUtils.getPerfilesFromJWTToken(token).equals("CAJG"))scsDocumentacionejg.setComisionajg((short) 1);
+				else scsDocumentacionejg.setComisionajg((short) 0);
+				
 
 				scsDocumentacionejg.setIdinstitucion(idInstitucion);
 				scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
