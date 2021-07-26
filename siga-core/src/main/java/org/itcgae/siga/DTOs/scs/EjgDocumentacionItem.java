@@ -16,6 +16,7 @@ public class EjgDocumentacionItem {
 	private String regSalida;
 	private Date f_presentacion;
 	private String propietario;	
+	private String propietarioDes;	
 	private String parentesco;
 	private String idTipoDocumento;
 	private String descripcionDoc;
@@ -207,6 +208,12 @@ public class EjgDocumentacionItem {
 	}
 	public void setLabelDocumento(String labelDocumento) {
 		this.labelDocumento = labelDocumento;
+	}
+	public String getPropietarioDes() {
+		return propietarioDes;
+	}
+	public void setPropietarioDes(String propietarioDes) {
+		this.propietarioDes = propietarioDes;
 	}
 	
 

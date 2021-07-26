@@ -58,6 +58,7 @@ public interface ScsDocumentacionEjgExtendsMapper extends ScsTipodocumentoejgMap
 		@Result(column = "regsalida", property = "regSalida", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaentrega", property = "f_presentacion", jdbcType = JdbcType.DATE),
 		@Result(column = "comisionajg", property = "propietario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "propietarioDes", property = "propietarioDes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipodocumento", property = "idTipoDocumento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "iddocumento", property = "idDocumento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "iddocumentacion", property = "idDocumentacion", jdbcType = JdbcType.VARCHAR),

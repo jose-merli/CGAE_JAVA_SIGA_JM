@@ -16,6 +16,7 @@ public class ScsDocumentacionejgExtendsProvider extends ScsDocumentacionejgSqlPr
 //				" persona.apellido2");
 				"(CASE WHEN persona.nombre is  NULL THEN '' ELSE persona.apellido1 || ' ' || persona.apellido2 || ', ' || persona.nombre END)as nombrecompleto");
 		sql.SELECT("catalogoDOCUMENTOEJG.DESCRIPCION as labelDocumento");
+		sql.SELECT("CASE WHEN doc.comisionajg = '1' THEN 'CAJG' ELSE 'ICA' END as propietarioDes");
 		
 		sql.FROM("scs_documentacionejg doc");
 		
