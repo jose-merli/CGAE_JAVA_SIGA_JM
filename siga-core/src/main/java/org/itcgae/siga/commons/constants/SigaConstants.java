@@ -1112,4 +1112,9 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String FACTURACION_COMPLETA="C";
 	public static final String FACTURACION_PARCIAL="P";
 
+	public static final String PARAMETRO_PROPOSITO_TRANSFERENCIA_SEPA = "PROPOSITO_TRANSFERENCIA_SEPA";
+	public static final String PARAMETRO_PROPOSITO_OTRA_TRANFERENCIA = "PROPOSITO_OTRA_TRANSFERENCIA";
+
+	public static final String MODULO_FACTURACION = "FAC";
+
 }

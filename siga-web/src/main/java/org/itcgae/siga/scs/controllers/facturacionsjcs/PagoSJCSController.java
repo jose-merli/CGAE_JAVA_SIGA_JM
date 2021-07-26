@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.controllers.facturacionsjcs;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ConceptoPagoDTO;
 import org.itcgae.siga.DTOs.scs.ConceptoPagoItem;
 import org.itcgae.siga.DTOs.scs.PagosjgDTO;
@@ -80,6 +81,36 @@ public class PagoSJCSController {
                                                          HttpServletRequest request) {
         DeleteResponseDTO response = iPagoSJCSService.deleteConceptoPago(listaConceptoPagoItem, request);
         return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/comboPropTranferenciaSepa")
+    ResponseEntity<ComboDTO> comboPropTranferenciaSepa(HttpServletRequest request) {
+        ComboDTO response = iPagoSJCSService.comboPropTranferenciaSepa(request);
+        return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/comboPropOtrasTranferencias")
+    ResponseEntity<ComboDTO> comboPropOtrasTranferencias(HttpServletRequest request) {
+        ComboDTO response = iPagoSJCSService.comboPropOtrasTranferencias(request);
+        return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/comboSufijos")
+    ResponseEntity<ComboDTO> comboSufijos(HttpServletRequest request) {
+        ComboDTO response = iPagoSJCSService.comboSufijos(request);
+        return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/comboCuentasBanc")
+    ResponseEntity<ComboDTO> comboCuentasBanc(HttpServletRequest request) {
+        ComboDTO response = iPagoSJCSService.comboCuentasBanc(request);
+        return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("saveConfigFichAbonos")
+    ResponseEntity<UpdateResponseDTO> saveConfigFichAbonos(@RequestBody PagosjgItem pagosjgItem, HttpServletRequest request) {
+        UpdateResponseDTO response = iPagoSJCSService.saveConfigFichAbonos(pagosjgItem, request);
+        return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
 }

@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.ConceptoPagoDTO;
@@ -17,8 +19,7 @@ import org.itcgae.siga.db.mappers.FcsPagoGrupofactHitoMapper;
 import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FcsFactGrupofactHitoExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FcsPagosjgExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.*;
 import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.itcgae.siga.scs.services.facturacionsjcs.IPagoSJCSService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -54,6 +55,15 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
     @Autowired
     private FcsPagoGrupofactHitoMapper fcsPagoGrupofactHitoMapper;
+
+    @Autowired
+    private FacPropositosExtendsMapper facPropositosExtendsMapper;
+
+    @Autowired
+    private FacSufijoExtendsMapper facSufijoExtendsMapper;
+
+    @Autowired
+    private FacBancoinstitucionExtendsMapper facBancoinstitucionExtendsMapper;
 
     @Override
     public PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request) {
@@ -312,6 +322,66 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                     record.setImporteminimo(BigDecimal.ZERO);
                     record.setUsumodificacion(usuarios.get(0).getIdusuario());
                     record.setFechamodificacion(new Date());
+
+                    // Buscamos el propósito sepa por defecto de la institución y lo seteamos en el pago
+                    GenParametrosExample genParametrosExample = new GenParametrosExample();
+                    genParametrosExample.createCriteria().andParametroEqualTo(SigaConstants.PARAMETRO_PROPOSITO_TRANSFERENCIA_SEPA)
+                            .andModuloEqualTo(SigaConstants.MODULO_FACTURACION)
+                            .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+                    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.savePago() -> genParametrosMapper.selectByExample() -> Obtenenos el proposito SEPA por defecto");
+                    List<GenParametros> parametrosPropSepa = genParametrosMapper.selectByExample(genParametrosExample);
+
+                    if (null != parametrosPropSepa && !parametrosPropSepa.isEmpty()) {
+
+                        FacPropositosExample facPropositosExample = new FacPropositosExample();
+                        facPropositosExample.createCriteria().andCodigoEqualTo(parametrosPropSepa.get(0).getValor());
+                        List<FacPropositos> propositos = facPropositosExtendsMapper.selectByExample(facPropositosExample);
+
+                        if (null != propositos && !propositos.isEmpty()) {
+                            record.setIdpropsepa(propositos.get(0).getIdproposito());
+                        }
+
+                    }
+
+                    // Buscamos el propósito para otras transferencias por defecto de la institución y lo seteamos en el pago
+                    genParametrosExample = new GenParametrosExample();
+                    genParametrosExample.createCriteria().andParametroEqualTo(SigaConstants.PARAMETRO_PROPOSITO_OTRA_TRANFERENCIA)
+                            .andModuloEqualTo(SigaConstants.MODULO_FACTURACION)
+                            .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.savePago() -> genParametrosMapper.selectByExample() -> Obtenenos el proposito para otras transferencias por defecto");
+                    List<GenParametros> parametrosPropOtraTrans = genParametrosMapper.selectByExample(genParametrosExample);
+
+                    if (null != parametrosPropOtraTrans && !parametrosPropOtraTrans.isEmpty()) {
+
+                        FacPropositosExample facPropositosExample = new FacPropositosExample();
+                        facPropositosExample.createCriteria().andCodigoEqualTo(parametrosPropSepa.get(0).getValor());
+                        List<FacPropositos> propositos = facPropositosExtendsMapper.selectByExample(facPropositosExample);
+
+                        if (null != propositos && !propositos.isEmpty()) {
+                            record.setIdpropotros(propositos.get(0).getIdproposito());
+                        }
+                    }
+
+                    // Si sólo encontramos un sufijo lo ponemos por defecto en el pago
+                    FacSufijoExample facSufijoExample = new FacSufijoExample();
+                    facSufijoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.savePago() -> facSufijoExtendsMapper.selectByExample() -> Obtenenos la lista de sufijos");
+                    List<FacSufijo> listaSufijos = facSufijoExtendsMapper.selectByExample(facSufijoExample);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.savePago() -> facSufijoExtendsMapper.selectByExample() -> Lista de sufijos obtenida: " + listaSufijos.toString());
+
+                    if (listaSufijos.size() == 1) {
+                        record.setIdsufijo(listaSufijos.get(0).getIdsufijo());
+                    }
 
                     LOGGER.info(
                             "FacturacionSJCSServicesImpl.savePago() -> fcsPagosjgMapper.insertSelective() -> Entrada al método para insertar el nuevo pago: "
@@ -959,6 +1029,302 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                 "FacturacionSJCSServicesImpl.deleteConceptoPago() -> Salida del servicio para desasociar cenceptos del pago");
 
         return deleteResponseDTO;
+    }
+
+    @Override
+    public ComboDTO comboPropTranferenciaSepa(HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.comboPropTranferenciaSepa() -> Entrada al servicio para obtener el combo de propósitos para transferencias SEPA");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ComboDTO comboDTO = new ComboDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.comboPropTranferenciaSepa() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.comboPropTranferenciaSepa() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.comboPropTranferenciaSepa() -> facPropositosExtendsMapper.comboPropTranferencia() -> LLamada al servicio para obtener el combo");
+                    List<ComboItem> combo = facPropositosExtendsMapper.
+                            comboPropTranferencia(usuarios.get(0).getIdlenguaje(), false);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.comboPropTranferenciaSepa() -> facPropositosExtendsMapper.comboPropTranferencia() -> Salida del servicio con el combo: " + combo.toString());
+                    comboDTO.setCombooItems(combo);
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.comboPropTranferenciaSepa() -> Se ha producido un error al intentar obtener el combo de propósitos para transferencias SEPA",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        comboDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.comboPropTranferenciaSepa() -> Salida del servicio para obtener el combo de propósitos para transferencias SEPA");
+
+        return comboDTO;
+    }
+
+    @Override
+    public ComboDTO comboPropOtrasTranferencias(HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.comboPropOtrasTranferencias() -> Entrada al servicio para obtener el combo de propósitos para otras transferencias");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ComboDTO comboDTO = new ComboDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.comboPropOtrasTranferencias() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.comboPropOtrasTranferencias() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.comboPropOtrasTranferencias() -> facPropositosExtendsMapper.comboPropTranferencia() -> LLamada al servicio para obtener el combo");
+                    List<ComboItem> combo = facPropositosExtendsMapper.
+                            comboPropTranferencia(usuarios.get(0).getIdlenguaje(), true);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.comboPropOtrasTranferencias() -> facPropositosExtendsMapper.comboPropTranferencia() -> Salida del servicio con el combo: " + combo.toString());
+                    comboDTO.setCombooItems(combo);
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.comboPropOtrasTranferencias() -> Se ha producido un error al intentar obtener el combo de propósitos para otras transferencias",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        comboDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.comboPropOtrasTranferencias() -> Salida del servicio para obtener el combo de propósitos para otras transferencias");
+
+        return comboDTO;
+    }
+
+    @Override
+    public ComboDTO comboSufijos(HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.comboSufijos() -> Entrada al servicio para obtener el combo de sufijos que se pueden aplicar a una cuenta bancaria");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ComboDTO comboDTO = new ComboDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.comboSufijos() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.comboSufijos() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.comboSufijos() -> facSufijoExtendsMapper.comboSufijos() -> Entrada al servicio para obtener el combo");
+                    List<ComboItem> comboSufijos = facSufijoExtendsMapper.comboSufijos(idInstitucion);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.comboSufijos() -> facSufijoExtendsMapper.comboSufijos() -> Salida del servicio con el combo obtenido: " + comboSufijos.toString());
+                    comboDTO.setCombooItems(comboSufijos);
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.comboSufijos() -> Se ha producido un error al intentar obtener el combo de sufijos que se pueden aplicar a una cuenta bancaria",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        comboDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.comboSufijos() -> Salida del servicio para obtener el combo de sufijos que se pueden aplicar a una cuenta bancaria");
+
+        return comboDTO;
+    }
+
+    @Override
+    public ComboDTO comboCuentasBanc(HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.comboCuentasBanc() -> Entrada al servicio para obtener el combo de cuentas bancarias");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        ComboDTO comboDTO = new ComboDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.comboCuentasBanc() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.comboCuentasBanc() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.comboCuentasBanc() -> facBancoinstitucionExtendsMapper.comboCuentasBanc() -> Entrada al servicio para obtener el combo");
+                    List<ComboItem> comboCuentasBancarias = facBancoinstitucionExtendsMapper.comboCuentasBanc(idInstitucion);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.comboCuentasBanc() -> facBancoinstitucionExtendsMapper.comboCuentasBanc() -> Salida del servicio con el combo obtenido: " + comboCuentasBancarias.toString());
+                    comboDTO.setCombooItems(comboCuentasBancarias);
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.comboCuentasBanc() -> Se ha producido un error al intentar obtener el combo de cuentas bancarias",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        comboDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.comboCuentasBanc() -> Salida del servicio para obtener el combo de cuentas bancarias");
+
+        return comboDTO;
+    }
+
+    @Override
+    public UpdateResponseDTO saveConfigFichAbonos(PagosjgItem pagosjgItem, HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.saveConfigFichAbonos() -> Entrada al servicio para guardar la configuración de ficheros de abonos");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+        Error error = new Error();
+        int response = 0;
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.saveConfigFichAbonos() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.saveConfigFichAbonos() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    FcsPagosjg record = new FcsPagosjg();
+                    record.setIdinstitucion(idInstitucion);
+                    record.setIdpagosjg(Integer.valueOf(pagosjgItem.getIdPagosjg()));
+                    record.setFechamodificacion(new Date());
+                    record.setUsumodificacion(usuarios.get(0).getIdusuario());
+                    record.setBancosCodigo(pagosjgItem.getCodBanco());
+                    record.setIdsufijo(Short.valueOf(pagosjgItem.getIdSufijo()));
+                    record.setIdpropsepa(Short.valueOf(pagosjgItem.getIdPropSepa()));
+                    record.setIdpropotros(Short.valueOf(pagosjgItem.getIdPropOtros()));
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.saveConfigFichAbonos() -> fcsPagosjgExtendsMapper.updateByPrimaryKeySelective() -> Actualizamos los datos en el pago");
+                    response = fcsPagosjgExtendsMapper.updateByPrimaryKeySelective(record);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.saveConfigFichAbonos() -> fcsPagosjgExtendsMapper.updateByPrimaryKeySelective() -> Pago actualizado: " + response);
+                }
+
+            }
+
+            if (response == 0) {
+                updateResponseDTO.setStatus(SigaConstants.KO);
+                error.setCode(500);
+                error.setDescription("general.message.error.realiza.accion");
+
+            } else {
+                updateResponseDTO.setStatus(SigaConstants.OK);
+                updateResponseDTO.setId(pagosjgItem.getIdPagosjg());
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.saveConfigFichAbonos() -> Se ha producido un error al intentar guardar la configuración de ficheros de abonos",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        updateResponseDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.saveConfigFichAbonos() -> Salida del servicio para guardar la configuración de ficheros de abonos");
+
+        return updateResponseDTO;
     }
 
     @Override
