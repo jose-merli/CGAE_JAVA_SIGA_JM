@@ -4092,7 +4092,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				scsDocumentacionejg.setDocumentacion(documentacionEjgItem.getDescripcionDoc());
 				
 				//Actualmente se asigna la nueva documentacion a "CAJG" o a "ICA" según el perfil que lo cree.
-				//La logica que se utiliza es que si es un perfil "'CJG'" se consideracion de comision, el resto no.
+				//La logica que se utiliza es que si es un perfil "'CJG'" (Comision de Justicia Gratuita) se considera de comision, el resto no.
 				if(UserTokenUtils.getPerfilesFromJWTToken(token).get(0).equals("'CJG'"))scsDocumentacionejg.setComisionajg((short) 1);
 				else scsDocumentacionejg.setComisionajg((short) 0);
 				
