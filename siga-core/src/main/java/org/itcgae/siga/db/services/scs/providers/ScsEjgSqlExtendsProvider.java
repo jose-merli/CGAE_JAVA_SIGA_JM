@@ -838,7 +838,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		sql.WHERE("ejg.idinstitucion = " + idInstitucion);
 		sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
-		sql.WHERE("ejg.numejg =" + ejgItem.getNumEjg());
+		sql.WHERE("ejg.numejg =" + ejgItem.getNumero());
 		sql.WHERE("ejg.idtipoejg = " + ejgItem.getTipoEJG());
 
 		return sql.toString();
