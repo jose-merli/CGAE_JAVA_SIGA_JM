@@ -88,4 +88,14 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
     @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "hayMovimientosVariosPositivosAaplicar")
     int hayMovimientosVariosPositivosAaplicar(Short idInstitucion, String idFacturacion);
 
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getConfigFichAbonos")
+    @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "BANCOS_CODIGO", property = "codBanco", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDSUFIJO", property = "idSufijo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPROPSEPA", property = "idPropSepa", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPROPOTROS", property = "idPropOtros", jdbcType = JdbcType.VARCHAR)})
+    List<PagosjgItem> getConfigFichAbonos(String idPago, Short idInstitucion);
+
 }

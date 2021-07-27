@@ -1328,6 +1328,61 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
     }
 
     @Override
+    public PagosjgDTO getConfigFichAbonos(String idPago, HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> Entrada al servicio para obtener la configuración de ficheros de abonos");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        PagosjgDTO pagosjgDTO = new PagosjgDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> fcsPagosjgExtendsMapper.getConfigFichAbonos() -> Entrada a la obtención de los datos");
+                    List<PagosjgItem> datosConfigFichAbonos = fcsPagosjgExtendsMapper.getConfigFichAbonos(idPago, idInstitucion);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> fcsPagosjgExtendsMapper.getConfigFichAbonos() -> Salida con los datos obtenidos: " + datosConfigFichAbonos.toString());
+                    pagosjgDTO.setPagosjgItem(datosConfigFichAbonos);
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> Se ha producido un error al intentar obtener la configuración de ficheros de abonos",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        pagosjgDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> Salida del servicio para obtener la configuración de ficheros de abonos");
+
+        return pagosjgDTO;
+    }
+
+    @Override
     public InsertResponseDTO ejecutarPagoSJCS(String idPago, HttpServletRequest request) {
 
         String token = request.getHeader("Authorization");

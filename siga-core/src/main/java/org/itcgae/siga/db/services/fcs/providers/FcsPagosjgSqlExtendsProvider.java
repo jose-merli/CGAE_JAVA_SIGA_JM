@@ -332,4 +332,24 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
 
         return sql.toString();
     }
+
+    public String getConfigFichAbonos(String idPago, Short idInstitucion) {
+
+        SQL sql = new SQL();
+
+        sql.SELECT("IDINSTITUCION");
+        sql.SELECT("IDPAGOSJG");
+        sql.SELECT("IDFACTURACION");
+        sql.SELECT("BANCOS_CODIGO");
+        sql.SELECT("IDSUFIJO");
+        sql.SELECT("IDPROPSEPA");
+        sql.SELECT("IDPROPOTROS");
+
+        sql.FROM("FCS_PAGOSJG");
+
+        sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+        sql.WHERE("IDPAGOSJG = '" + idPago + "'");
+
+        return sql.toString();
+    }
 }

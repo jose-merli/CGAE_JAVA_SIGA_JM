@@ -45,4 +45,6 @@ public interface IPagoSJCSService {
 
     public UpdateResponseDTO saveConfigFichAbonos(PagosjgItem pagosjgItem, HttpServletRequest request);
 
+    public PagosjgDTO getConfigFichAbonos(String idPago, HttpServletRequest request);
+
 }

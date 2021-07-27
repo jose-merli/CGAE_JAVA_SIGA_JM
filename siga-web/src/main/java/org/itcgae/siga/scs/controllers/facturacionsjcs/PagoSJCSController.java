@@ -113,4 +113,10 @@ public class PagoSJCSController {
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
+    @GetMapping("getConfigFichAbonos")
+    ResponseEntity<PagosjgDTO> getConfigFichAbonos(@RequestParam("idPago") String idPago, HttpServletRequest request) {
+        PagosjgDTO response = iPagoSJCSService.getConfigFichAbonos(idPago, request);
+        return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
+    }
+
 }
