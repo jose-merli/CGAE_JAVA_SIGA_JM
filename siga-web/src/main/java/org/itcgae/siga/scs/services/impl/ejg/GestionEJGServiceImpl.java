@@ -2671,7 +2671,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	@Transactional
-	public DeleteResponseDTO borrarRelacion(RelacionesItem datos, HttpServletRequest request) {
+	public DeleteResponseDTO borrarRelacion(List<String> datos, HttpServletRequest request) {
 		DeleteResponseDTO responsedto = new DeleteResponseDTO();
 		int response = 0;
 
@@ -2695,11 +2695,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				try {
 
-					String anio = datos.getAnio();
-					String num = datos.getNumero();
-					String idTurno = datos.getIdturno();
-					String institucion = datos.getIdinstitucion();
-					response = scsDesignacionesExtendsMapper.eliminarRelacion(anio, num, idTurno, institucion);
+					String anioEjg = datos.get(4);
+					String numEjg = datos.get(5);
+					String idTurno = datos.get(3);
+					String institucion = datos.get(0);
+					String anioDes = datos.get(2);
+					String numDes = datos.get(1);
+					String idTipoEjg = datos.get(6);
+					
+					response = scsDesignacionesExtendsMapper.eliminarRelacion(anioEjg, numEjg, idTurno, institucion, anioDes, numDes, idTipoEjg);
 
 					LOGGER.debug(
 							"GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
@@ -4697,7 +4701,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					ScsEjgdesigna record = new ScsEjgdesigna();
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuarios.get(0).getIdusuario());
-					record.setIdinstitucion(Short.parseShort(datos.get(0)));
+					record.setIdinstitucion(idInstitucion);
 
 					record.setAniodesigna(Short.parseShort(datos.get(1)));
 					record.setNumerodesigna(Long.parseLong(datos.get(2)));
@@ -4769,7 +4773,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-					record.setIdinstitucion(Short.parseShort(datos.get(0)));
+					record.setIdinstitucion(idInstitucion);
 					record.setEjganio(Short.parseShort(datos.get(4)));
 					record.setEjgidtipoejg(Short.parseShort(datos.get(3)));
 					record.setEjgnumero(Long.parseLong(datos.get(5)));
@@ -4830,7 +4834,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					ScsSoj record = new ScsSoj();
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuarios.get(0).getIdusuario());
-					record.setIdinstitucion(Short.parseShort(datos.get(0)));
+					record.setIdinstitucion(idInstitucion);
 					record.setNumero(Long.parseLong(datos.get(2)));
 					record.setAnio(Short.parseShort(datos.get(1)));
 					record.setIdtiposoj(Short.parseShort(datos.get(3)));

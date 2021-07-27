@@ -4900,7 +4900,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
-	public DeleteResponseDTO eliminarRelacion(RelacionesItem datos, HttpServletRequest request) {
+	public DeleteResponseDTO eliminarRelacion(List<String> datos, HttpServletRequest request) {
 		LOGGER.info("eliminarRelacion() ->  Entrada al servicio para eliminar relaciones");
 
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
@@ -4911,10 +4911,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		String anio;
-		String num;
-		String idTurno;
-		String institucion;
 
 		if (null != idInstitucion) {
 
@@ -4936,11 +4932,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"eliminarRelacion() / ScsDefendidosdesignaMapper.eliminarRelacion() -> Entrada a ScsDefendidosdesignaMapper para eliminar las relaciones");
 					
-							anio = datos.getAnio();
-							num = datos.getNumero();
-							idTurno = datos.getIdturno();
-							institucion = datos.getIdinstitucion();
-							response = scsDesignacionesExtendsMapper.eliminarRelacion(anio, num, idTurno, institucion);
+					String anioEjg = datos.get(2);
+					String numEjg = datos.get(1);
+					String idTurno = datos.get(6);
+					String institucion = datos.get(0);
+					String anioDes = datos.get(4);
+					String numDes = datos.get(5);
+					String idTipoEjg = datos.get(3);
+					
+					response = scsDesignacionesExtendsMapper.eliminarRelacion(anioEjg, numEjg, idTurno, institucion, anioDes, numDes, idTipoEjg);
 							
 
 					
@@ -5004,8 +5004,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					String numero = datos.getNumero();
 					String anio = datos.getAnio();
 
-
-					response = scsAsistenciaExtendsMapper.eliminarRelacionAsistencia(idinstitucion, anio, numero);
+					response = scsAsistenciaExtendsMapper.eliminarRelacionAsistenciaDes(idinstitucion, anio, numero);
 					
 					
 					LOGGER.debug(
@@ -7373,15 +7372,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuarios.get(0).getIdusuario());
 					
-					record.setIdinstitucion(Short.parseShort(designaItem.get(3)));
+					record.setIdinstitucion(idInstitucion);
 					record.setNumero(Long.parseLong(designaItem.get(5)));
 					record.setAnio(Short.parseShort(designaItem.get(4)));
 					record.setDesignaAnio(Short.parseShort(designaItem.get(0)));
 					record.setDesignaNumero(Long.parseLong(designaItem.get(2)));
 					record.setDesignaTurno(Integer.parseInt(designaItem.get(1)));
-					response = scsAsistenciaMapper.updateByPrimaryKeySelective(record);
-					
-					
+					response = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(record);
+			
 
 					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");
 				} catch (Exception e) {

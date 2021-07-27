@@ -170,7 +170,7 @@ public interface IDesignacionesService {
 
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
 			
-	public DeleteResponseDTO eliminarRelacion(RelacionesItem datos, HttpServletRequest request);
+	public DeleteResponseDTO eliminarRelacion(List<String> datos, HttpServletRequest request);
 	
 	public EnviosMasivosDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request);
 

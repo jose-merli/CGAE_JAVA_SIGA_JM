@@ -34,6 +34,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 		sql.JOIN(
 				"scs_guardiasturno g ON ( soj.idturno = g.idturno AND soj.idinstitucion = g.idinstitucion AND soj.idguardia = g.idguardia)");
 		sql.JOIN("scs_tiposoj ts ON ( ts.idtiposoj = soj.idtiposoj )");
+		sql.WHERE("soj.idinstitucion = "+asuntosJusticiableItem.getIdInstitucion());
 
 		if (asuntosJusticiableItem.getAnio() != null && !asuntosJusticiableItem.getAnio().trim().isEmpty()) {
 			sql.WHERE("soj.anio = " + asuntosJusticiableItem.getAnio().trim());

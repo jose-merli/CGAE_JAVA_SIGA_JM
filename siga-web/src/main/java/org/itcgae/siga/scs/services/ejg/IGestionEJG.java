@@ -76,7 +76,7 @@ public interface IGestionEJG {
 
 	InsertResponseDTO nuevoEstado(EstadoEjgItem datos, HttpServletRequest request);
 
-	DeleteResponseDTO borrarRelacion(RelacionesItem datos, HttpServletRequest request);
+	DeleteResponseDTO borrarRelacion(List<String> datos, HttpServletRequest request);
 	
 	UpdateResponseDTO borrarRelacionAsistenciaEJG(RelacionesItem datos, HttpServletRequest request);
 	

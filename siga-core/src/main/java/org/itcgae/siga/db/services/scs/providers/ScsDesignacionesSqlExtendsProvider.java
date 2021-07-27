@@ -50,7 +50,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "designaciones.IDTIPODESIGNACOLEGIO,"
 				+ "    f_siga_getrecurso(juzgado.nombre," + idLenguaje + ") juzgado,"
 				+ "f_siga_getrecurso(nvl(td.descripcion,'')," + idLenguaje + ") tipodesigna,"
-				+ "nvl( designaciones.numerodiligencia, 'Sin número' ) || ' - ' || nvl( designaciones.nig, 'Sin número' ) || ' - ' || nvl( designaciones.numeroprocedimiento,'Sin número' ) dilnigproc");
+				+ " 'Sin número'  || ' - ' || nvl( designaciones.nig, 'Sin número' ) || ' - ' || nvl( designaciones.numprocedimiento,'Sin número' ) dilnigproc");
 		
 		
 		sql.FROM("scs_designa designaciones");
@@ -3003,15 +3003,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 
-	public String eliminarRelacion(String anio, String num, String idTurno, String idinstitucion) {
+	public String eliminarRelacion(String anioEjg, String numEjg, String idTurno, String idinstitucion, String anioDes, String numDes, String idTipoEjg) {
 		SQL sql = new SQL();
 
 		sql.DELETE_FROM("SCS_EJGDESIGNA");
 
-		sql.WHERE("NUMEROEJG = " + num);
+		sql.WHERE("NUMEROEJG = " + numEjg);
 		sql.WHERE("IDTURNO = " + idTurno);
-		sql.WHERE("ANIOEJG = " + anio);
+		sql.WHERE("ANIOEJG = " + anioEjg);
 		sql.WHERE("IDINSTITUCION = " + idinstitucion);
+		sql.WHERE("ANIODESIGNA = " + anioDes);
+		sql.WHERE("NUMERODESIGNA = " + numDes);
+		sql.WHERE("IDTIPOEJG = " + idTipoEjg);
+		
 
 		return sql.toString();
 	}

@@ -445,7 +445,7 @@ public class EjgController {
 
 	// borrarRelacion
 	@RequestMapping(value = "/gestion-ejg/borrarRelacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> borrarRelacion(@RequestBody RelacionesItem datos, HttpServletRequest request) {
+	ResponseEntity<DeleteResponseDTO> borrarRelacion(@RequestBody List<String> datos, HttpServletRequest request) {
 		DeleteResponseDTO response = gestionEJG.borrarRelacion(datos, request);
 		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);

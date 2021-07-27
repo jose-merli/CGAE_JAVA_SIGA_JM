@@ -514,7 +514,8 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 
 	@DeleteProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "eliminarRelacion")
-	int eliminarRelacion(String anio, String num, String idTurno, String idinstitucion);
+	int eliminarRelacion(String anioEjg, String numEjg, String idTurno, String idinstitucion, String anioDes, String numDes, String idTipoEjg);
+	
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getPartidaPresupuestariaDesigna")
 	@Results({ @Result(column = "NOMBREPARTIDA", property = "label", jdbcType = JdbcType.VARCHAR),

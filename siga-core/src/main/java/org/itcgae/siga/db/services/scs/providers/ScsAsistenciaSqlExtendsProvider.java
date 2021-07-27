@@ -219,5 +219,20 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
     	
     	return sql.toString();
     }
+	
+	public String eliminarRelacionAsistenciaDes(String idinstitucion, String anio, String numero) {
+    	SQL sql = new SQL();
+    	
+    	sql.UPDATE("SCS_ASISTENCIA");
+    	sql.SET("DESIGNA_TURNO = null");
+    	sql.SET("DESIGNA_ANIO = null");
+    	sql.SET("DESIGNA_NUMERO = null");
+    	
+    	sql.WHERE("IDINSTITUCION = " + idinstitucion);
+		sql.WHERE("ANIO = " + anio);
+		sql.WHERE("NUMERO = " + numero);
+    	
+    	return sql.toString();
+    }
 
 }

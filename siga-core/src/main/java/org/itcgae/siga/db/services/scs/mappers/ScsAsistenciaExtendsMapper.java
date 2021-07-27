@@ -57,5 +57,8 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 	
 	 @UpdateProvider(type=ScsAsistenciaSqlExtendsProvider.class, method="eliminarRelacionAsistencia")
 	    int eliminarRelacionAsistencia(String idinstitucion, String anio, String numero);
+	 
+	 @UpdateProvider(type=ScsAsistenciaSqlExtendsProvider.class, method="eliminarRelacionAsistenciaDes")
+	    int eliminarRelacionAsistenciaDes(String idinstitucion, String anio, String numero);
 
 }

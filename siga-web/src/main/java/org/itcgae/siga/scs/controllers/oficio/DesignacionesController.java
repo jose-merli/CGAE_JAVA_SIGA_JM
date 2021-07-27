@@ -940,7 +940,7 @@ public class DesignacionesController {
 	
 	@RequestMapping(value = "/designas/eliminarRelacion",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<DeleteResponseDTO> eliminarRelacion(
-			@RequestBody RelacionesItem listaRelaciones, HttpServletRequest request) {
+			@RequestBody List<String> listaRelaciones, HttpServletRequest request) {
 		DeleteResponseDTO response = designacionesService.eliminarRelacion(listaRelaciones, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
