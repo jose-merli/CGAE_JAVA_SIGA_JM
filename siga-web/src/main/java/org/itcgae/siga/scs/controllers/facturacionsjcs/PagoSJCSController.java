@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.controllers.facturacionsjcs;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ConceptoPagoDTO;
 import org.itcgae.siga.DTOs.scs.ConceptoPagoItem;
@@ -119,4 +120,9 @@ public class PagoSJCSController {
         return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
     }
 
+    @GetMapping("getNumApuntesPago")
+    ResponseEntity<StringDTO> getNumApuntesPago(@RequestParam("idPago") String idPago, HttpServletRequest request) {
+        StringDTO response = iPagoSJCSService.getNumApuntesPago(idPago, request);
+        return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+    }
 }

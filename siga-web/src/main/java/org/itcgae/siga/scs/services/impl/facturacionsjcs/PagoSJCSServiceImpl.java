@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -1380,6 +1381,55 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                 "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> Salida del servicio para obtener la configuración de ficheros de abonos");
 
         return pagosjgDTO;
+    }
+
+    @Override
+    public StringDTO getNumApuntesPago(String idPago, HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getNumApuntesPago() -> Entrada al servicio para obtener el número de apuntes del pago: " + idPago);
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        StringDTO stringDTO = new StringDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.getNumApuntesPago() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.getNumApuntesPago() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.getNumApuntesPago() -> fcsPagosjgExtendsMapper.getNumApuntesPago() -> Entrada para obtener el número de apuntes");
+                    stringDTO = fcsPagosjgExtendsMapper.getNumApuntesPago(idPago, idInstitucion, usuarios.get(0).getIdlenguaje());
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.getNumApuntesPago() -> fcsPagosjgExtendsMapper.getNumApuntesPago() -> Salida, número de apuntes: " + stringDTO.getValor());
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.getNumApuntesPago() -> Se ha producido un error al intentar obtener el número de apuntes del pago:" + idPago,
+                    e);
+        }
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getNumApuntesPago() -> Salida del servicio para obtener el número de apuntes del pago: " + idPago);
+
+        return stringDTO;
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.ConceptoPagoItem;
@@ -97,5 +98,9 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
             @Result(column = "IDPROPSEPA", property = "idPropSepa", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDPROPOTROS", property = "idPropOtros", jdbcType = JdbcType.VARCHAR)})
     List<PagosjgItem> getConfigFichAbonos(String idPago, Short idInstitucion);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getNumApuntesPago")
+    @Results({@Result(column = "NUMAPUNTES", property = "valor", jdbcType = JdbcType.VARCHAR)})
+    StringDTO getNumApuntesPago(String idPago, Short idInstitucion, String idLenguaje);
 
 }

@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.services.facturacionsjcs;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ConceptoPagoDTO;
 import org.itcgae.siga.DTOs.scs.ConceptoPagoItem;
@@ -46,5 +47,7 @@ public interface IPagoSJCSService {
     public UpdateResponseDTO saveConfigFichAbonos(PagosjgItem pagosjgItem, HttpServletRequest request);
 
     public PagosjgDTO getConfigFichAbonos(String idPago, HttpServletRequest request);
+
+    public StringDTO getNumApuntesPago(String idPago, HttpServletRequest request);
 
 }
