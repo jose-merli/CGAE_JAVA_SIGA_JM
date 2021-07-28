@@ -35,22 +35,26 @@ public interface PysProductosinstitucionExtendsMapper extends PysProductosinstit
 	List<CertificadoCursoItem> selectTypesCertificatesCourse(Short idInstitucion);
 
 	@SelectProvider(type = PysProductosinstitucionSqlExtendsProvider.class, method = "detalleProducto")
-	@Results({ 
-		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
+	@Results({
 		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDPRODUCTOINSTITUCION", property = "idproductoinstitucion", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "IDCONTADOR", property = "idcontador", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "CUENTACONTABLE", property = "cuentacontable", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "CODIGOEXT", property = "codigoext", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.FLOAT),
-		@Result(column = "IDTIPOIVA", property = "idtipoiva", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "MOMENTOCARGO", property = "momentocargo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
 		@Result(column = "SOLICITARBAJA", property = "solicitarbaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SOLICITARALTA", property = "solicitaralta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CUENTACONTABLE", property = "cuentacontable", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDIMPRESORA", property = "idimpresora", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDPLANTILLA", property = "idplantilla", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "TIPOCERTIFICADO", property = "tipocertificado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
+		@Result(column = "IDCONTADOR", property = "idcontador", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOFACTURABLE", property = "nofacturable", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIVA", property = "idtipoiva", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "CODIGOEXT", property = "codigoext", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGO_TRASPASONAV", property = "codigo_traspasonav", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ORDEN", property = "orden", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "CATEGORIA", property = "categoria", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALORIVA", property = "valoriva", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR)

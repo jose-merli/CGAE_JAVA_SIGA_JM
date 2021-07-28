@@ -8,62 +8,75 @@ import org.itcgae.siga.DTOs.gen.Error;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class ProductoDetalleDTO {
-	private int idproducto;
 	private int idtipoproducto;
+	private int idproducto;
 	private int idproductoinstitucion;
-	private String idcontador;
 	private String descripcion;
-	private String cuentacontable;
-	private String codigoext;
 	private float valor;
-	private int idtipoiva;
 	private String momentocargo;
-	@JsonFormat(pattern = "dd/MM/yyyy")
-	private Date fechabaja;
 	private String solicitarbaja;
 	private String solicitaralta;
+	private String cuentacontable;
+	private int idimpresora;
+	private int idplantilla;
 	private String tipocertificado;
+	@JsonFormat(pattern = "dd/MM/yyyy")
+	private Date fechabaja;
+	private String idcontador;
 	private String nofacturable;
+	private int idtipoiva;
+	private String codigoext;
+	private String codigo_traspasonav;
+	private int orden;
+	
 	private String categoria;
 	private int valoriva;
 	private String tipo;
 	private Error error = null;
 	
-	private int[] formasdepagointernet;
-	private int[] formasdepagosecretaria;
-	private int[] formasdepagointernetoriginales;
-	private int[] formasdepagosecretariaoriginales;
-	boolean editar;
+	private Integer[] formasdepagointernet;
+	private Integer[] formasdepagosecretaria;
+	private Integer[] formasdepagointernetoriginales = {};
+	private Integer[] formasdepagosecretariaoriginales = {};
+	private boolean editar;
+	private ProductoDetalleDTO productoriginal;
 	
-	public int[] getFormasdepagointernetoriginales() {
-		return formasdepagointernetoriginales;
+
+	public ProductoDetalleDTO getProductoriginal() {
+		return productoriginal;
 	}
-	public void setFormasdepagointernetoriginales(int[] formasdepagointernetoriginales) {
-		this.formasdepagointernetoriginales = formasdepagointernetoriginales;
+	public void setProductoriginal(ProductoDetalleDTO productoriginal) {
+		this.productoriginal = productoriginal;
 	}
-	public int[] getFormasdepagosecretariaoriginales() {
-		return formasdepagosecretariaoriginales;
+	public int getIdimpresora() {
+		return idimpresora;
 	}
-	public void setFormasdepagosecretariaoriginales(int[] formasdepagosecretariaoriginales) {
-		this.formasdepagosecretariaoriginales = formasdepagosecretariaoriginales;
+	public void setIdimpresora(int idimpresora) {
+		this.idimpresora = idimpresora;
+	}
+	public int getIdplantilla() {
+		return idplantilla;
+	}
+	public void setIdplantilla(int idplantilla) {
+		this.idplantilla = idplantilla;
+	}
+	public String getCodigo_traspasonav() {
+		return codigo_traspasonav;
+	}
+	public void setCodigo_traspasonav(String codigo_traspasonav) {
+		this.codigo_traspasonav = codigo_traspasonav;
+	}
+	public int getOrden() {
+		return orden;
+	}
+	public void setOrden(int orden) {
+		this.orden = orden;
 	}
 	public boolean isEditar() {
 		return editar;
 	}
 	public void setEditar(boolean editar) {
 		this.editar = editar;
-	}
-	public int[] getFormasdepagointernet() {
-		return formasdepagointernet;
-	}
-	public void setFormasdepagointernet(int[] formasdepagointernet) {
-		this.formasdepagointernet = formasdepagointernet;
-	}
-	public int[] getFormasdepagosecretaria() {
-		return formasdepagosecretaria;
-	}
-	public void setFormasdepagosecretaria(int[] formasdepagosecretaria) {
-		this.formasdepagosecretaria = formasdepagosecretaria;
 	}
 	public int getIdproducto() {
 		return idproducto;
@@ -179,11 +192,37 @@ public class ProductoDetalleDTO {
 	public void setError(Error error) {
 		this.error = error;
 	}
+	public Integer[] getFormasdepagointernet() {
+		return formasdepagointernet;
+	}
+	public void setFormasdepagointernet(Integer[] formasdepagointernet) {
+		this.formasdepagointernet = formasdepagointernet;
+	}
+	public Integer[] getFormasdepagosecretaria() {
+		return formasdepagosecretaria;
+	}
+	public void setFormasdepagosecretaria(Integer[] formasdepagosecretaria) {
+		this.formasdepagosecretaria = formasdepagosecretaria;
+	}
+	public Integer[] getFormasdepagointernetoriginales() {
+		return formasdepagointernetoriginales;
+	}
+	public void setFormasdepagointernetoriginales(Integer[] formasdepagointernetoriginales) {
+		this.formasdepagointernetoriginales = formasdepagointernetoriginales;
+	}
+	public Integer[] getFormasdepagosecretariaoriginales() {
+		return formasdepagosecretariaoriginales;
+	}
+	public void setFormasdepagosecretariaoriginales(Integer[] formasdepagosecretariaoriginales) {
+		this.formasdepagosecretariaoriginales = formasdepagosecretariaoriginales;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((categoria == null) ? 0 : categoria.hashCode());
+		result = prime * result + ((codigo_traspasonav == null) ? 0 : codigo_traspasonav.hashCode());
 		result = prime * result + ((codigoext == null) ? 0 : codigoext.hashCode());
 		result = prime * result + ((cuentacontable == null) ? 0 : cuentacontable.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
@@ -195,12 +234,16 @@ public class ProductoDetalleDTO {
 		result = prime * result + Arrays.hashCode(formasdepagosecretaria);
 		result = prime * result + Arrays.hashCode(formasdepagosecretariaoriginales);
 		result = prime * result + ((idcontador == null) ? 0 : idcontador.hashCode());
+		result = prime * result + idimpresora;
+		result = prime * result + idplantilla;
 		result = prime * result + idproducto;
 		result = prime * result + idproductoinstitucion;
 		result = prime * result + idtipoiva;
 		result = prime * result + idtipoproducto;
 		result = prime * result + ((momentocargo == null) ? 0 : momentocargo.hashCode());
 		result = prime * result + ((nofacturable == null) ? 0 : nofacturable.hashCode());
+		result = prime * result + orden;
+		result = prime * result + ((productoriginal == null) ? 0 : productoriginal.hashCode());
 		result = prime * result + ((solicitaralta == null) ? 0 : solicitaralta.hashCode());
 		result = prime * result + ((solicitarbaja == null) ? 0 : solicitarbaja.hashCode());
 		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
@@ -223,6 +266,11 @@ public class ProductoDetalleDTO {
 			if (other.categoria != null)
 				return false;
 		} else if (!categoria.equals(other.categoria))
+			return false;
+		if (codigo_traspasonav == null) {
+			if (other.codigo_traspasonav != null)
+				return false;
+		} else if (!codigo_traspasonav.equals(other.codigo_traspasonav))
 			return false;
 		if (codigoext == null) {
 			if (other.codigoext != null)
@@ -264,6 +312,10 @@ public class ProductoDetalleDTO {
 				return false;
 		} else if (!idcontador.equals(other.idcontador))
 			return false;
+		if (idimpresora != other.idimpresora)
+			return false;
+		if (idplantilla != other.idplantilla)
+			return false;
 		if (idproducto != other.idproducto)
 			return false;
 		if (idproductoinstitucion != other.idproductoinstitucion)
@@ -281,6 +333,13 @@ public class ProductoDetalleDTO {
 			if (other.nofacturable != null)
 				return false;
 		} else if (!nofacturable.equals(other.nofacturable))
+			return false;
+		if (orden != other.orden)
+			return false;
+		if (productoriginal == null) {
+			if (other.productoriginal != null)
+				return false;
+		} else if (!productoriginal.equals(other.productoriginal))
 			return false;
 		if (solicitaralta == null) {
 			if (other.solicitaralta != null)
@@ -308,20 +367,22 @@ public class ProductoDetalleDTO {
 			return false;
 		return true;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "ProductoDetalleDTO [idproducto=" + idproducto + ", idtipoproducto=" + idtipoproducto
-				+ ", idproductoinstitucion=" + idproductoinstitucion + ", idcontador=" + idcontador + ", descripcion="
-				+ descripcion + ", cuentacontable=" + cuentacontable + ", codigoext=" + codigoext + ", valor=" + valor
-				+ ", idtipoiva=" + idtipoiva + ", momentocargo=" + momentocargo + ", fechabaja=" + fechabaja
-				+ ", solicitarbaja=" + solicitarbaja + ", solicitaralta=" + solicitaralta + ", tipocertificado="
-				+ tipocertificado + ", nofacturable=" + nofacturable + ", categoria=" + categoria + ", valoriva="
-				+ valoriva + ", tipo=" + tipo + ", error=" + error + ", formasdepagointernet="
-				+ Arrays.toString(formasdepagointernet) + ", formasdepagosecretaria="
+		return "ProductoDetalleDTO [idtipoproducto=" + idtipoproducto + ", idproducto=" + idproducto
+				+ ", idproductoinstitucion=" + idproductoinstitucion + ", descripcion=" + descripcion + ", valor="
+				+ valor + ", momentocargo=" + momentocargo + ", solicitarbaja=" + solicitarbaja + ", solicitaralta="
+				+ solicitaralta + ", cuentacontable=" + cuentacontable + ", idimpresora=" + idimpresora
+				+ ", idplantilla=" + idplantilla + ", tipocertificado=" + tipocertificado + ", fechabaja=" + fechabaja
+				+ ", idcontador=" + idcontador + ", nofacturable=" + nofacturable + ", idtipoiva=" + idtipoiva
+				+ ", codigoext=" + codigoext + ", codigo_traspasonav=" + codigo_traspasonav + ", orden=" + orden
+				+ ", categoria=" + categoria + ", valoriva=" + valoriva + ", tipo=" + tipo + ", error=" + error
+				+ ", formasdepagointernet=" + Arrays.toString(formasdepagointernet) + ", formasdepagosecretaria="
 				+ Arrays.toString(formasdepagosecretaria) + ", formasdepagointernetoriginales="
 				+ Arrays.toString(formasdepagointernetoriginales) + ", formasdepagosecretariaoriginales="
-				+ Arrays.toString(formasdepagosecretariaoriginales) + ", editar=" + editar + "]";
+				+ Arrays.toString(formasdepagosecretariaoriginales) + ", editar=" + editar + ", productoriginal="
+				+ productoriginal + "]";
 	}
 	
 }

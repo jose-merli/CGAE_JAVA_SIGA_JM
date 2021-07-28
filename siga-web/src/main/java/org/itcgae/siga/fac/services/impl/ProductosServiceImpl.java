@@ -13,9 +13,7 @@ import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.IdPeticionDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
-import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
-import org.itcgae.siga.DTO.fac.TiposProductosItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -27,10 +25,8 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.PysFormapagoproducto;
 import org.itcgae.siga.db.entities.PysFormapagoproductoKey;
-import org.itcgae.siga.db.entities.PysProductos;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
-import org.itcgae.siga.db.mappers.PysProductosMapper;
 import org.itcgae.siga.db.mappers.PysProductosinstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoFormaPagoExtendsMapper;
@@ -183,7 +179,7 @@ public class ProductosServiceImpl implements IProductosService{
 	}
 	
 	@Override
-	public InsertResponseDTO nuevaFormaPago(ProductoDetalleDTO producto, HttpServletRequest request) {
+	public InsertResponseDTO crearEditarFormaPago(ProductoDetalleDTO producto, HttpServletRequest request) {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int statusInsertFormaPagoInternet = 0;
@@ -191,7 +187,7 @@ public class ProductosServiceImpl implements IProductosService{
 		int statusEdicionFinalProducto = 0;
 		
 
-		LOGGER.info("nuevaFormaPago() -> Entrada al servicio para crear una forma de pago y editar los campos restantes del producto");
+		LOGGER.info("crearEditarFormaPago() -> Entrada al servicio para crear/editar formas de pago y editar los campos restantes del producto");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -204,24 +200,25 @@ public class ProductosServiceImpl implements IProductosService{
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
 				LOGGER.info(
-						"nuevaFormaPago() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"crearEditarFormaPago() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 				LOGGER.info(
-						"nuevaFormaPago() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"crearEditarFormaPago() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"nuevaFormaPago() / pysProductosInstitucionExtendsMapper.nuevaFormaPago() -> Entrada a pysProductosInstitucionExtendsMapper para crear una forma de pago");
+							"crearEditarFormaPago() / pysProductosInstitucionMapper -> Entrada a pysProductosInstitucionMapper para crear/editar formas de pago");
 				
 				//Si estamos creando un producto a partir de cero, es decir le hemos dado a nuevo en filtros-productos (front) recorremos las listas de pago de internet y secretaria insertando cada una de las formas
 				if(!producto.isEditar()) {
-					if(producto.getFormasdepagointernet().length > 0) {					
+					if(producto.getFormasdepagointernet() != null) {					
 						for (int formasdepagointernet : producto.getFormasdepagointernet()) {
 							PysFormapagoproducto formaPagoProducto = new PysFormapagoproducto();
 							
 							formaPagoProducto.setIdinstitucion(idInstitucion);
+							formaPagoProducto.setIdtipoproducto((short) producto.getIdtipoproducto());
 							formaPagoProducto.setIdproducto((long) producto.getIdproducto());
 							formaPagoProducto.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
 							formaPagoProducto.setIdformapago((short) formasdepagointernet);
@@ -232,11 +229,12 @@ public class ProductosServiceImpl implements IProductosService{
 							statusInsertFormaPagoInternet = pysFormaPagoProducto.insert(formaPagoProducto);
 						}
 					}
-					if(producto.getFormasdepagosecretaria().length > 0)
+					if(producto.getFormasdepagosecretaria() != null)
 						for (int formasdepagosecretaria : producto.getFormasdepagosecretaria()) {
 							PysFormapagoproducto formaPagoProducto = new PysFormapagoproducto();
 							
 							formaPagoProducto.setIdinstitucion(idInstitucion);
+							formaPagoProducto.setIdtipoproducto((short) producto.getIdtipoproducto());
 							formaPagoProducto.setIdproducto((long) producto.getIdproducto());
 							formaPagoProducto.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
 							formaPagoProducto.setIdformapago((short) formasdepagosecretaria);
@@ -254,7 +252,7 @@ public class ProductosServiceImpl implements IProductosService{
 					//PRIMERO RECORREMOS LAS FORMAS DE PAGO DE INTERNET
 					//Comprobamos si en el producto editado no aparecen alguna/s formas de pago que se encontraban en el original para eliminarlas
 					for (int formasdepagointernetoriginales : producto.getFormasdepagointernetoriginales()) {
-						if(!Arrays.asList(producto.getFormasdepagointernet()).contains(Integer.valueOf(formasdepagointernetoriginales))) {
+						if(Arrays.asList(producto.getFormasdepagointernet()).contains(formasdepagointernetoriginales) == false) {
 							pysFormaPagoProductoPrimaryKey.setIdinstitucion(idInstitucion);
 							pysFormaPagoProductoPrimaryKey.setIdproducto((long) producto.getIdproducto());
 							pysFormaPagoProductoPrimaryKey.setIdformapago((short) formasdepagointernetoriginales);
@@ -265,13 +263,14 @@ public class ProductosServiceImpl implements IProductosService{
 						}
 					}
 					
-					if(producto.getFormasdepagointernet().length > 0) {	
+					if(producto.getFormasdepagointernet() != null) {	
 						//Comprobamos las nuevas formas de pago en el producto editado comparandolo con el producto original para insertarlas
 						for(int formasdepagointernet : producto.getFormasdepagointernet()) {
-							if(!Arrays.asList(producto.getFormasdepagointernetoriginales()).contains(Integer.valueOf(formasdepagointernet))) {
+							if(Arrays.asList(producto.getFormasdepagointernetoriginales()).contains(formasdepagointernet) == false) {
 								PysFormapagoproducto formaPagoProducto = new PysFormapagoproducto();
 								
 								formaPagoProducto.setIdinstitucion(idInstitucion);
+								formaPagoProducto.setIdtipoproducto((short) producto.getIdtipoproducto());
 								formaPagoProducto.setIdproducto((long) producto.getIdproducto());
 								formaPagoProducto.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
 								formaPagoProducto.setIdformapago((short) formasdepagointernet);
@@ -287,7 +286,7 @@ public class ProductosServiceImpl implements IProductosService{
 					//POR ULTIMO RECORREMOS HACIENDO EXACTAMENTE LO MISMO LAS FORMAS DE PAGO DE SECRETARIA
 					//Comprobamos si en el producto editado no aparecen alguna/s formas de pago que se encontraban en el original para eliminarlas
 					for (int formasdepagosecretariasoriginales : producto.getFormasdepagosecretariaoriginales()) {
-						if(!Arrays.asList(producto.getFormasdepagosecretaria()).contains(Integer.valueOf(formasdepagosecretariasoriginales))) {
+						if(Arrays.asList(producto.getFormasdepagosecretaria()).contains(formasdepagosecretariasoriginales) == false) {
 							pysFormaPagoProductoPrimaryKey.setIdinstitucion(idInstitucion);
 							pysFormaPagoProductoPrimaryKey.setIdproducto((long) producto.getIdproducto());
 							pysFormaPagoProductoPrimaryKey.setIdformapago((short) formasdepagosecretariasoriginales);
@@ -298,13 +297,14 @@ public class ProductosServiceImpl implements IProductosService{
 						}
 					}
 					
-					if(producto.getFormasdepagosecretaria().length > 0) {	
+					if(producto.getFormasdepagosecretaria() != null) {	
 						//Comprobamos las nuevas formas de pago en el producto editado comparandolo con el producto original para insertarlas
 						for(int formasdepagosecretaria : producto.getFormasdepagosecretaria()) {
-							if(!Arrays.asList(producto.getFormasdepagosecretariaoriginales()).contains(Integer.valueOf(formasdepagosecretaria))) {
+							if(Arrays.asList(producto.getFormasdepagosecretariaoriginales()).contains(formasdepagosecretaria) == false) {
 								PysFormapagoproducto formaPagoProducto = new PysFormapagoproducto();
 								
 								formaPagoProducto.setIdinstitucion(idInstitucion);
+								formaPagoProducto.setIdtipoproducto((short) producto.getIdtipoproducto());
 								formaPagoProducto.setIdproducto((long) producto.getIdproducto());
 								formaPagoProducto.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
 								formaPagoProducto.setIdformapago((short) formasdepagosecretaria);
@@ -326,12 +326,25 @@ public class ProductosServiceImpl implements IProductosService{
 				productoInstitucion.setIdtipoproducto((short) producto.getIdtipoproducto());
 				productoInstitucion.setIdproducto((long) producto.getIdproducto());
 				productoInstitucion.setIdproductoinstitucion((long) producto.getIdproducto());
-				productoInstitucion.setNofacturable(producto.getNofacturable());
-				productoInstitucion.setValor(new BigDecimal(producto.getValor()));
-				productoInstitucion.setIdtipoiva(producto.getIdtipoiva());
 				
+				productoInstitucion.setDescripcion(producto.getDescripcion());
+				productoInstitucion.setValor(new BigDecimal(producto.getValor()));
+				productoInstitucion.setMomentocargo(producto.getMomentocargo());
+				productoInstitucion.setSolicitarbaja(producto.getSolicitarbaja());
+				productoInstitucion.setSolicitaralta(producto.getSolicitaralta());
 				productoInstitucion.setFechamodificacion(new Date());
-				productoInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());	
+				productoInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+				productoInstitucion.setCuentacontable(producto.getCuentacontable());
+				productoInstitucion.setIdimpresora((long) producto.getIdimpresora());
+				productoInstitucion.setIdplantilla((long) producto.getIdplantilla());
+				productoInstitucion.setTipocertificado(producto.getTipocertificado());
+				productoInstitucion.setFechabaja(producto.getFechabaja());
+				productoInstitucion.setIdcontador(producto.getIdcontador());
+				productoInstitucion.setNofacturable(producto.getNofacturable());
+				productoInstitucion.setIdtipoiva(producto.getIdtipoiva());
+				productoInstitucion.setCodigoext(producto.getCodigoext());
+				productoInstitucion.setCodigoTraspasonav(producto.getCodigo_traspasonav());
+				productoInstitucion.setOrden((long) producto.getOrden());
 
 				statusEdicionFinalProducto = pysProductosInstitucionMapper.updateByPrimaryKey(productoInstitucion);
 				
@@ -343,13 +356,13 @@ public class ProductosServiceImpl implements IProductosService{
 					}
 					
 					LOGGER.info(
-							"nuevaFormaPago() / pysProductosInstitucionExtendsMapper.nuevaFormaPago() -> Salida de pysProductosInstitucionExtendsMapper para crear una forma de pago y editar los campos restantes del producto");
+							"crearEditarFormaPago() / pysProductosInstitucionMapper-> Salida de pysProductosInstitucionMapper para crear/editar formas de pago y editar los campos restantes del producto");
 				}
 
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"ProductosServiceImpl.nuevaFormaPago() -> Se ha producido un error al crear una forma de pago y editar los campos restantes del producto",
+					"ProductosServiceImpl.crearEditarFormaPago() -> Se ha producido un error al crear/editar formas de pago y editar los campos restantes del producto",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -357,7 +370,7 @@ public class ProductosServiceImpl implements IProductosService{
 
 		insertResponseDTO.setError(error);
 
-		LOGGER.info("nuevaFormaPago() -> Salida del servicio para crear una forma de pago y editar los campos restantes del producto");
+		LOGGER.info("crearEditarFormaPago() -> Salida del servicio para crear/editar formas de pago y editar los campos restantes del producto");
 
 		return insertResponseDTO;
 	}
@@ -704,17 +717,28 @@ public class ProductosServiceImpl implements IProductosService{
 					productoInstitucion.setIdtipoproducto((short) producto.getIdtipoproducto());
 					productoInstitucion.setIdproducto((long) producto.getIdproducto());
 					productoInstitucion.setIdproductoinstitucion(Long.parseLong(idOrdenacion.getNewId()));
+					
 					productoInstitucion.setDescripcion(producto.getDescripcion());
 					productoInstitucion.setCuentacontable(producto.getCuentacontable());
-					productoInstitucion.setValor(new BigDecimal(0));//PROVISIONAL
-					productoInstitucion.setMomentocargo("P");
+					productoInstitucion.setMomentocargo("P");//Se informa por defecto a P
 					productoInstitucion.setSolicitarbaja(producto.getSolicitarbaja());
 					productoInstitucion.setSolicitaralta(producto.getSolicitaralta());
-					productoInstitucion.setIdcontador("PYS_" + producto.getIdtipoproducto() + "_" + producto.getIdproducto() + "_" + producto.getIdproductoinstitucion());
+					productoInstitucion.setIdimpresora(null);//No aplica
+					productoInstitucion.setIdplantilla(null);//No aplica
+					productoInstitucion.setIdcontador("PYS_" + producto.getIdtipoproducto() + "_" + producto.getIdproducto() + "_" + productoInstitucion.getIdproductoinstitucion());
 					productoInstitucion.setTipocertificado(producto.getTipocertificado());
-					productoInstitucion.setFechamodificacion(new Date());//SYSTIMESTAMP?
-					productoInstitucion.setNofacturable("0");
+					productoInstitucion.setFechabaja(null);
+					productoInstitucion.setFechamodificacion(new Date());
+					productoInstitucion.setCodigoext(producto.getCodigoext());
+					productoInstitucion.setCodigoTraspasonav(null);//No aplica
+					productoInstitucion.setOrden(null);//No aplica
 					productoInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+					
+					//Campos a informar despues en tarjeta formas de pago
+					productoInstitucion.setValor(null);
+					productoInstitucion.setIdtipoiva(null);
+					productoInstitucion.setNofacturable("0");
+					
 
 					status = pysProductosInstitucionMapper.insert(productoInstitucion);
 					
@@ -777,36 +801,41 @@ public class ProductosServiceImpl implements IProductosService{
 					LOGGER.info(
 							"editarProducto() / pysProductosMapper.editarProducto() -> Entrada a pysProductosMapper para modificar un producto");
 					
-					PysProductosinstitucion productoInstitucion = new PysProductosinstitucion();
+					//AL EDITAR PRODUCTOS HAY QUE USAR LA CONSULTA QUE TE TRAE EL IDORDENACION YA QUE AL CAMBIAR TIPO O CATEGORIA SE PUEDE REPETIR LA PK DE 4 CAMPOS AL HABER IDPRODUCTOSINSTITUCION REPETIDOS
+					//NewIdDTO idOrdenacion = pysProductosInstitucionExtendsMapper.getIndiceMaxProducto(producto, idInstitucion);
+					//productoInstitucion.setIdproductoinstitucion(Long.parseLong(idOrdenacion.getNewId()));
+					if(producto.getProductoOriginal().getIdtipoproducto() == producto.getIdtipoproducto() && producto.getProductoOriginal().getIdproducto() == producto.getIdproducto()) {
+						PysProductosinstitucion productoInstitucion = new PysProductosinstitucion();
+							
+						productoInstitucion.setIdinstitucion(idInstitucion);
+						productoInstitucion.setIdtipoproducto((short) producto.getIdtipoproducto());
+						productoInstitucion.setIdproducto((long) producto.getIdproducto());
+						productoInstitucion.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
 						
-					productoInstitucion.setIdinstitucion(idInstitucion);
-					productoInstitucion.setIdtipoproducto((short) producto.getIdtipoproducto());
-					productoInstitucion.setIdproducto((long) producto.getIdproducto());
-					productoInstitucion.setIdproductoinstitucion((long) producto.getIdproducto());
-					productoInstitucion.setDescripcion(producto.getDescripcion());
-					productoInstitucion.setValor(new BigDecimal(0));//PROVISIONAL
-					productoInstitucion.setMomentocargo(producto.getMomentocargo());
-					productoInstitucion.setNofacturable(producto.getNofacturable());
-					
-					if(producto.getCuentacontable() != "" && producto.getCuentacontable() != null)
-						productoInstitucion.setCuentacontable(producto.getCuentacontable());
-				
-					if(producto.getSolicitarbaja() != "" && producto.getSolicitarbaja() != null)
+						
+						productoInstitucion.setDescripcion(producto.getDescripcion());
+						productoInstitucion.setValor(new BigDecimal(producto.getValor()));
+						productoInstitucion.setMomentocargo(producto.getMomentocargo());
 						productoInstitucion.setSolicitarbaja(producto.getSolicitarbaja());
-					
-					if(producto.getSolicitaralta() != "" && producto.getSolicitaralta() != null)
 						productoInstitucion.setSolicitaralta(producto.getSolicitaralta());
-					
-					if(producto.getTipocertificado() != "" && producto.getTipocertificado() != null)
+						productoInstitucion.setFechamodificacion(new Date());
+						productoInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+						productoInstitucion.setCuentacontable(producto.getCuentacontable());
+						productoInstitucion.setIdimpresora((long) producto.getIdimpresora());
+						productoInstitucion.setIdplantilla((long) producto.getIdplantilla());
 						productoInstitucion.setTipocertificado(producto.getTipocertificado());
-					
-					if(producto.getCodigoext() != "" && producto.getCodigoext() != null)
+						productoInstitucion.setFechabaja(producto.getFechabaja());
+						productoInstitucion.setIdcontador(producto.getIdcontador());
+						productoInstitucion.setNofacturable(producto.getNofacturable());
+						productoInstitucion.setIdtipoiva(producto.getIdtipoiva());
 						productoInstitucion.setCodigoext(producto.getCodigoext());
-					
-					productoInstitucion.setFechamodificacion(new Date());
-					productoInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());	
-
-					status = pysProductosInstitucionMapper.updateByPrimaryKey(productoInstitucion);
+						productoInstitucion.setCodigoTraspasonav(producto.getCodigo_traspasonav());
+						productoInstitucion.setOrden((long) producto.getOrden());
+						
+						status = pysProductosInstitucionMapper.updateByPrimaryKey(productoInstitucion);
+					}else {
+						System.out.println("FSDKFLSDKFSDLKFLSDKSDF");
+					}
 					
 					if(status == 0) {
 						deleteResponseDTO.setStatus(SigaConstants.KO);

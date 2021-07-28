@@ -12,7 +12,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 public interface IProductosService {
 	public ComboDTO comboIva(HttpServletRequest request);
 	public ComboDTO comboIvaNoDerogados(HttpServletRequest request);
-	public InsertResponseDTO nuevaFormaPago(ProductoDetalleDTO producto, HttpServletRequest request);
+	public InsertResponseDTO crearEditarFormaPago(ProductoDetalleDTO producto, HttpServletRequest request);
 	public ComboDTO comboTipoFormaPago(HttpServletRequest request);
 	public ComboDTO comboTipoFormaPagoInternet(HttpServletRequest request);
 	public ComboDTO comboTipoFormaPagoSecretaria(HttpServletRequest request);

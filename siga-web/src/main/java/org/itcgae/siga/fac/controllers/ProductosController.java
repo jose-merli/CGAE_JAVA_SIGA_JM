@@ -66,8 +66,8 @@ public class ProductosController {
 	}
 	
 	@PostMapping(value="/pys/formasPagoProducto")
-	ResponseEntity<InsertResponseDTO> nuevaFormaPago(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request){
-		InsertResponseDTO response = productosService.nuevaFormaPago(producto, request);
+	ResponseEntity<InsertResponseDTO> crearEditarFormaPago(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request){
+		InsertResponseDTO response = productosService.crearEditarFormaPago(producto, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
