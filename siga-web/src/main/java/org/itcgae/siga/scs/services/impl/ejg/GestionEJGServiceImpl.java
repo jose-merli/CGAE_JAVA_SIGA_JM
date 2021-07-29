@@ -3640,7 +3640,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 0;
-		int response1 = 0;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -4524,8 +4523,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 			if (usuarios != null && !usuarios.isEmpty() && !listadocumentoEjgItem.isEmpty()) {
 
-				if (listadocumentoEjgItem.size() == 1) {
-
+				if (listadocumentoEjgItem.size() == 1 && listadocumentoEjgItem.get(0).getNombreFichero() != null) {
+					
 					String extension = listadocumentoEjgItem.get(0).getNombreFichero()
 							.substring(listadocumentoEjgItem.get(0).getNombreFichero().lastIndexOf("."),
 									listadocumentoEjgItem.get(0).getNombreFichero().length())
@@ -4553,6 +4552,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
 						HttpStatus.OK);
+				//Si no hay ningún fichero asociado al unico registro seleccionado
+				if(listadocumentoEjgItem.get(0).getNombreFichero() == null && listadocumentoEjgItem.size() == 1) {
+					res = new ResponseEntity<InputStreamResource>(null, headers,
+							HttpStatus.OK);
+				}
 			}
 
 		} catch (Exception e) {
