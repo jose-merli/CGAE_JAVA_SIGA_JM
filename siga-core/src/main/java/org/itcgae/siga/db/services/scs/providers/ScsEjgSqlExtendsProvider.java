@@ -118,8 +118,27 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.WHERE("ejg.idinstitucion = " + idInstitucion);
 		if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 			sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
-		if (ejgItem.getNumero() != null && ejgItem.getNumero() != "")
-			sql.WHERE("EJG.NUMEJG =" + ejgItem.getNumero());
+//		if (ejgItem.getNumero() != null && ejgItem.getNumero() != "")
+//			sql.WHERE("EJG.NUMEJG =" + ejgItem.getNumero());
+		
+		if (ejgItem.getNumero() != null && !ejgItem.getNumero().isEmpty()) {
+			// si viene - hay que buscar de uno a otro (1-5 => numDesignacion 1,2,3,4,5)
+			// si viene , hay que buscar uno u otro (1,6 => numDesignacion 1 ó 6)
+
+			//sql.append(" AND");
+
+			String[] parts;
+
+			 if (ejgItem.getNumero().trim().contains("-")) {
+				parts = ejgItem.getNumero().trim().split("-");
+
+				sql.WHERE("EJG.NUMEJG BETWEEN " + parts[0].trim() + " AND " + parts[1].trim());
+				
+			} else {
+				sql.WHERE(" EJG.NUMEJG = " + ejgItem.getNumero().trim());
+			}
+		}
+		
 		if (ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
 			sql.WHERE("ejg.IDTIPOEJG = " + ejgItem.getTipoEJG());
 		if (ejgItem.getTipoEJGColegio() != null && ejgItem.getTipoEJGColegio() != "")

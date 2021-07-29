@@ -702,8 +702,41 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				}
 				LOGGER.info(
 						"busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
+				// para obtener registros separados por ,
+				
+				String[] parts;
+				if (ejgItem.getNumero().trim().contains(",")) {
+					parts = ejgItem.getNumero().trim().split(",");
+					//se crea un objeto auxiliar para obtener la consulta de cada numero de EJG
+					EjgDTO listAux = new EjgDTO();
+					//se crea una lista auxiliar de EJGItem para guardar el primer registro que devuelve la consulta
+					List<EjgItem> listAux2 = new ArrayList<EjgItem>();
+					
+					//se recorre el array donde se ha almacenado los numeros de EJG
+					for (String str : parts) {
+						//al EJG se le aplica un numero del array
+						ejgItem.setNumero(str.trim());
+						//se carga los registros obtenidos de la consulta (se espera uno solo)
+						listAux.setEjgItems( scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+								usuarios.get(0).getIdlenguaje().toString()));
+						//se almacena en la lista de EJGItem el primer registro obtenido.
+						listAux2.add(listAux.getEjgItems().get(0));
+				
+					}
+					
+					//se guarda en el objeto DTO principal la lista de primeros registros obtenidos de las consultas realizadas.
+					ejgDTO.setEjgItems(listAux2);
+					
+					
+
+					
+				} else if(ejgItem.getNumero().trim().contains("-")) {
+					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString()));
+				}else {
 				ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
 						usuarios.get(0).getIdlenguaje().toString()));
+				}
 				LOGGER.info(
 						"busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
 				if (ejgDTO.getEjgItems() != null && tamMaximo != null
