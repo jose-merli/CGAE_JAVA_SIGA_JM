@@ -39,14 +39,13 @@ public class ProductoDetalleDTO {
 	private Integer[] formasdepagointernetoriginales = {};
 	private Integer[] formasdepagosecretariaoriginales = {};
 	private boolean editar;
-	private ProductoDetalleDTO productoriginal;
+	private ProductoDetalleDTO productooriginal;
 	
-
-	public ProductoDetalleDTO getProductoriginal() {
-		return productoriginal;
+	public ProductoDetalleDTO getProductooriginal() {
+		return productooriginal;
 	}
-	public void setProductoriginal(ProductoDetalleDTO productoriginal) {
-		this.productoriginal = productoriginal;
+	public void setProductooriginal(ProductoDetalleDTO productooriginal) {
+		this.productooriginal = productooriginal;
 	}
 	public int getIdimpresora() {
 		return idimpresora;
@@ -243,7 +242,7 @@ public class ProductoDetalleDTO {
 		result = prime * result + ((momentocargo == null) ? 0 : momentocargo.hashCode());
 		result = prime * result + ((nofacturable == null) ? 0 : nofacturable.hashCode());
 		result = prime * result + orden;
-		result = prime * result + ((productoriginal == null) ? 0 : productoriginal.hashCode());
+		result = prime * result + ((productooriginal == null) ? 0 : productooriginal.hashCode());
 		result = prime * result + ((solicitaralta == null) ? 0 : solicitaralta.hashCode());
 		result = prime * result + ((solicitarbaja == null) ? 0 : solicitarbaja.hashCode());
 		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
@@ -336,10 +335,10 @@ public class ProductoDetalleDTO {
 			return false;
 		if (orden != other.orden)
 			return false;
-		if (productoriginal == null) {
-			if (other.productoriginal != null)
+		if (productooriginal == null) {
+			if (other.productooriginal != null)
 				return false;
-		} else if (!productoriginal.equals(other.productoriginal))
+		} else if (!productooriginal.equals(other.productooriginal))
 			return false;
 		if (solicitaralta == null) {
 			if (other.solicitaralta != null)
@@ -381,8 +380,8 @@ public class ProductoDetalleDTO {
 				+ ", formasdepagointernet=" + Arrays.toString(formasdepagointernet) + ", formasdepagosecretaria="
 				+ Arrays.toString(formasdepagosecretaria) + ", formasdepagointernetoriginales="
 				+ Arrays.toString(formasdepagointernetoriginales) + ", formasdepagosecretariaoriginales="
-				+ Arrays.toString(formasdepagosecretariaoriginales) + ", editar=" + editar + ", productoriginal="
-				+ productoriginal + "]";
+				+ Arrays.toString(formasdepagosecretariaoriginales) + ", editar=" + editar + ", productooriginal="
+				+ productooriginal + "]";
 	}
 	
 }

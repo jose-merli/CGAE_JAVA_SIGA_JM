@@ -804,7 +804,7 @@ public class ProductosServiceImpl implements IProductosService{
 					//AL EDITAR PRODUCTOS HAY QUE USAR LA CONSULTA QUE TE TRAE EL IDORDENACION YA QUE AL CAMBIAR TIPO O CATEGORIA SE PUEDE REPETIR LA PK DE 4 CAMPOS AL HABER IDPRODUCTOSINSTITUCION REPETIDOS
 					//NewIdDTO idOrdenacion = pysProductosInstitucionExtendsMapper.getIndiceMaxProducto(producto, idInstitucion);
 					//productoInstitucion.setIdproductoinstitucion(Long.parseLong(idOrdenacion.getNewId()));
-					if(producto.getProductoOriginal().getIdtipoproducto() == producto.getIdtipoproducto() && producto.getProductoOriginal().getIdproducto() == producto.getIdproducto()) {
+					if(producto.getProductooriginal().getIdtipoproducto() == producto.getIdtipoproducto() && producto.getProductooriginal().getIdproducto() == producto.getIdproducto()) {
 						PysProductosinstitucion productoInstitucion = new PysProductosinstitucion();
 							
 						productoInstitucion.setIdinstitucion(idInstitucion);
