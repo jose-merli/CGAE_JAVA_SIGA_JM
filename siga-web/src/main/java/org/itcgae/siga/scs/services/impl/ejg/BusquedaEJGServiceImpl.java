@@ -705,7 +705,10 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				// para obtener registros separados por ,
 				
 				String[] parts;
-				if (ejgItem.getNumero().trim().contains(",")) {
+				if(ejgItem.getNumero() == null || ejgItem.getNumero().isEmpty()) {
+					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString()));
+				}else if (ejgItem.getNumero().trim().contains(",")) {
 					parts = ejgItem.getNumero().trim().split(",");
 					//se crea un objeto auxiliar para obtener la consulta de cada numero de EJG
 					EjgDTO listAux = new EjgDTO();
