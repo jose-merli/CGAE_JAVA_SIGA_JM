@@ -124,6 +124,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ibm.wsdl.util.StringUtils;
+
 @Service
 @Transactional
 public class WSCommons {
@@ -617,7 +619,9 @@ public class WSCommons {
 							}
 						}
 						//sociedadActualizacion.setResena(argResena);
-						sociedadActualizacion.setResena(argResena.getStringValue());
+						if(argResena.getStringValue().length() >= 3) {
+							sociedadActualizacion.setResena(argResena.getStringValue());
+						}
 						if (null != regSociedad.getObjetoSocial()) {
 							if(regSociedad.getObjetoSocial().length()>=20){
 								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial().substring(0, 20));
@@ -643,7 +647,6 @@ public class WSCommons {
 							argNotario.setApellido2(regSociedad.getApellido2Notario());
 							argNotario.setNombre(regSociedad.getNombreNotario());
 						}
-						argNotario.setIdentificacion(identificacion);
 						sociedadActualizacion.setDatosNotario(argNotario);
 						
 						
@@ -668,7 +671,9 @@ public class WSCommons {
 						//Insertamos los datos de la direccion
 						Direccion argDireccion = Direccion.Factory.newInstance();
 						argDireccion.setDomicilio(regSociedad.getDomicilio());
-						argDireccion.setCodigoPostal(regSociedad.getCodigoPostal());
+						if(validarCodPostal(regSociedad.getCodigoPostal())) {
+							argDireccion.setCodigoPostal(regSociedad.getCodigoPostal());
+						}
 						//Provincia
 						Provincia provincia = Provincia.Factory.newInstance();
 						provincia.setDescripcionProvincia(regSociedad.getProvincia());
@@ -1810,6 +1815,15 @@ public class WSCommons {
 						valid = true;
 					}
 				}
+			}
+			return valid;
+		}
+		
+		private boolean validarCodPostal(String codPostal) {
+			boolean valid = false;
+			String regex = "\\d{5}";
+			if(codPostal.matches(regex)) {
+				valid = true;
 			}
 			return valid;
 		}
