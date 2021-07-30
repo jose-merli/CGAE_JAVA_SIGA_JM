@@ -2864,8 +2864,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	public UpdateResponseDTO updateDatosJuridicos(EjgItem datos, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
-		int response2 = 0;
-		int response3 = 1;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -2953,7 +2951,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				List<ScsDelitosejg> oldDel = scsDelitosejgMapper.selectByExample(oldDelitos);
 
 				if (oldDel.isEmpty())
-					response2 = 1;
+					response = 1;
 				else {
 					// Eliminamos las entradas existentes relacionadas si las hubiera.
 
@@ -2996,7 +2994,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			}
 		}
 
-		LOGGER.info("GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio.");
+		LOGGER.info("GestionEJGServiceImpl.updateDatosJuridicos() -> Salida del servicio.");
 
 		return responsedto;
 	}
@@ -4750,6 +4748,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					} else {
 						updateResponseDTO.setStatus(SigaConstants.OK);
+						LOGGER.info(
+								"GestionEJGServiceImpl.asociarDesignacion() -> OK. Se ha asociado el elemento correctamente");
 					}
 				}
 			}

@@ -50,11 +50,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "designaciones.IDTIPODESIGNACOLEGIO,"
 				+ "    f_siga_getrecurso(juzgado.nombre," + idLenguaje + ") juzgado,"
 				+ "f_siga_getrecurso(nvl(td.descripcion,'')," + idLenguaje + ") tipodesigna,"
-				+ " 'Sin número'  || ' - ' || nvl( designaciones.nig, 'Sin número' ) || ' - ' || nvl( designaciones.numprocedimiento,'Sin número' ) dilnigproc");
+				+ " 'Sin número'  || ' / ' || nvl( designaciones.nig, 'Sin número' ) || ' / ' || nvl( designaciones.numprocedimiento,'Sin número' ) dilnigproc");
 		
 		
 		sql.FROM("scs_designa designaciones");
-		sql.JOIN("scs_tipodesignacolegio td ON (td.IDTIPODESIGNACOLEGIO = designaciones.IDTIPODESIGNACOLEGIO)");
+		sql.JOIN("scs_tipodesignacolegio td ON (td.IDTIPODESIGNACOLEGIO = designaciones.IDTIPODESIGNACOLEGIO AND td.IDINSTITUCION = designaciones.IDINSTITUCION)");
 		sql.JOIN("scs_designasletrado designaLetrado ON"
 				+ "    (designaLetrado.anio = designaciones.anio"
 				+ "        AND designaLetrado.numero = designaciones.numero"
@@ -2902,7 +2902,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT(" null fecharesolucion");
 		sql2.SELECT(" f_siga_getrecurso(com.nombre,1) centrodetencion");
 		sql2.SELECT(" fechahora fechaasunto");
-		sql2.SELECT(" NVL(numerodiligencia,'Sin número') || ' - ' || NVL(nig,'Sin número') || ' - ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
+		sql2.SELECT(" NVL(numerodiligencia,'Sin número') || ' / ' || NVL(nig,'Sin número') || ' / ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
 		sql2.FROM(" scs_asistencia asi");
 		sql2.JOIN(" cen_persona ON cen_persona.idpersona = asi.idpersonacolegiado");
 		sql2.JOIN(" scs_personajg perjg on perjg.idpersona = asi.idpersonajg and asi.idinstitucion = perjg.idinstitucion");
@@ -2973,7 +2973,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql5.SELECT(" e.FECHARESOLUCIONCAJG fecharesolucion");
 		sql5.SELECT(" null centrodetencion");
 		sql5.SELECT(" fechaapertura fechaasunto");
-		sql5.SELECT(" NVL(numerodiligencia,'Sin número') || ' - ' || NVL(nig,'Sin número') || ' - ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
+		sql5.SELECT(" NVL(numerodiligencia,'Sin número') || ' / ' || NVL(nig,'Sin número') || ' / ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
 		sql5.FROM(" scs_ejg e");
 		sql5.JOIN(" scs_ejgdesigna ed on ed.idinstitucion = e.idinstitucion\r\n"
 				+ "                AND\r\n"
