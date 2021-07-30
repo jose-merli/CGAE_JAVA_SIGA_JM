@@ -647,6 +647,11 @@ public class WSCommons {
 							argNotario.setApellido2(regSociedad.getApellido2Notario());
 							argNotario.setNombre(regSociedad.getNombreNotario());
 						}
+						if(identificacion.getNIF() != null) {
+							if(!identificacion.getNIF().isEmpty()) {
+								argNotario.setIdentificacion(identificacion);
+							}
+						}
 						sociedadActualizacion.setDatosNotario(argNotario);
 						
 						
