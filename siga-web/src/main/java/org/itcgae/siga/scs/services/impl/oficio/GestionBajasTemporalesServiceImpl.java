@@ -553,6 +553,7 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 							.andIdturnoEqualTo(inscripcion.getIdturno());
 				List<ScsInscripcionguardia> guardias = scsInscripcionguardiaExtendsMapper.selectByExample(guardiasExample);
 				if(guardias.size() > 0) {
+					//quitar el if y meter el método en un catch, si peta que lance la excepción
 					for(ScsInscripcionguardia guardia : guardias) {
 						ScsInscripcionguardia record = new ScsInscripcionguardia();
 						record.setIdinstitucion(new Short(idInstitucion));
@@ -563,9 +564,14 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 						record.setFechabaja(new Date());
 						record.setFechamodificacion(new Date());
 						record.setUsumodificacion(0);
-						if(scsInscripcionguardiaExtendsMapper.updateByPrimaryKeySelective(record)!=0) {
-							throw new Exception("Error al eliminar las guardias");
+						
+						//SIGARNV-2143@DTT.JAMARTIN@30/07/2021@INICIO
+						try {
+							scsInscripcionguardiaExtendsMapper.updateByPrimaryKeySelective(record);
+						} catch (Exception sqle) {
+							LOGGER.error("Error al eliminar las inscripciones a guardias: ", sqle);
 						}
+						//SIGARNV-2143@DTT.JAMARTIN@30/07/2021@FIN 
 					}
 				}
 				ScsInscripcionturno record = new ScsInscripcionturno();
@@ -576,8 +582,14 @@ public class GestionBajasTemporalesServiceImpl implements IGestionBajasTemporale
 				record.setFechabaja(new Date());
 				record.setFechamodificacion(new Date());
 				record.setUsumodificacion(0);
-				if(scsInscripcionesTurnoExtendsMapper.updateByPrimaryKeySelective(record)!=0)
-					throw new Exception("Error al eliminar las guardias");
+				
+				//SIGARNV-2143@DTT.JAMARTIN@30/07/2021@INICIO
+				try {
+					scsInscripcionesTurnoExtendsMapper.updateByPrimaryKeySelective(record);
+				} catch (Exception sqle) {
+					LOGGER.error("Error al eliminar las inscripciones a turnos: ", sqle);
+				}
+				//SIGARNV-2143@DTT.JAMARTIN@30/07/2021@FIN
 			}
 		}
 		
