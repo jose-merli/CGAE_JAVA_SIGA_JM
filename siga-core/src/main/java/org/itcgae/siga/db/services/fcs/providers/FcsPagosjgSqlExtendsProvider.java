@@ -420,4 +420,63 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         return query.toString();
     }
 
+    public String getEstadoPago(String idPago, Short idInstitucion) {
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("MAX(FECHAESTADO)");
+        subQuery.FROM("FCS_PAGOS_ESTADOSPAGOS");
+        subQuery.WHERE("IDPAGOSJG = '" + idPago + "'");
+        subQuery.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+        SQL query = new SQL();
+        query.SELECT("IDESTADOPAGOSJG");
+        query.FROM("FCS_PAGOS_ESTADOSPAGOS");
+        query.WHERE("IDPAGOSJG = '" + idPago + "'");
+        query.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+        query.WHERE("FECHAESTADO = ( " + subQuery.toString() + " )");
+
+        return query.toString();
+    }
+
+    public String getCompensacionFacturas(String idPago, Short idInstitucion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("1");
+        sql.FROM("FAC_FACTURA F");
+        sql.WHERE("F.IDPERSONA = PC.IDPERORIGEN");
+        sql.WHERE("F.IDINSTITUCION = PC.IDINSTITUCION");
+        sql.WHERE("F.NUMEROFACTURA > '0'");
+        sql.WHERE("F.IMPTOTALPORPAGAR > 0");
+        sql.WHERE("F.ESTADO IN (2, 4, 5)");
+
+        SQL sql1 = new SQL();
+        sql1.SELECT("IDPERORIGEN");
+        sql1.FROM("FCS_PAGO_COLEGIADO PC");
+        sql1.WHERE("PC.IDINSTITUCION = '" + idInstitucion + "'");
+        sql1.WHERE("PC.IDPAGOSJG = '" + idPago + "'");
+        sql1.WHERE("EXISTS ( " + sql.toString() + " )");
+
+        SQL query = new SQL();
+        query.SELECT("FACTURA.IDPERSONA");
+        query.SELECT("DECODE(COLEGIADO.COMUNITARIO, 0, COLEGIADO.NCOLEGIADO, COLEGIADO.NCOMUNITARIO) AS NCOLEGIADO");
+        query.SELECT("(PERSONA.APELLIDOS2 || ' ' || PERSONA.APELLIDOS1 || ', ' || PERSONA.NOMBRE) AS NOMBRE");
+        query.SELECT("FACTURA.IDFACTURA");
+        query.SELECT("FACTURA.NUMEROFACTURA");
+        query.SELECT("FACTURA.FECHAEMISION AS FECHAFACTURA");
+        query.SELECT("FACTURA.IMPTOTAL AS IMPORTETOTALFACTURA");
+        query.SELECT("FACTURA.IMPTOTALPORPAGAR AS IMPORTEPENDIENTEFACTURA");
+        query.SELECT("FACTURA.IMPTOTALCOMPENSADO AS IMPORTECOMPENSADO");
+        query.SELECT("FACTURA.IMPTOTALPAGADO AS IMPORTEPAGO");
+        query.FROM("FAC_FACTURA FACTURA");
+        query.JOIN("CEN_COLEGIADO COLEGIADO ON COLEGIADO.IDPERSONA = FACTURA.IDPERSONA AND COLEGIADO.IDINSTITUCION = FACTURA.IDINSTITUCION");
+        query.JOIN("CEN_PERSONA PERSONA ON PERSONA.IDPERSONA = COLEGIADO.IDPERSONA");
+        query.WHERE("FACTURA.IDINSTITUCION = '" + idInstitucion + "'");
+        query.WHERE("FACTURA.IDPERSONA IN ( " + sql1.toString() + " )");
+        query.WHERE("FACTURA.ESTADO NOT IN (1, 7, 8)");
+        query.WHERE("FACTURA.IMPTOTALPORPAGAR > 0");
+        query.ORDER_BY("FACTURA.FECHAEMISION ASC");
+
+        return query.toString();
+    }
+
 }

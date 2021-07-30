@@ -9,10 +9,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.ConceptoPagoDTO;
-import org.itcgae.siga.DTOs.scs.ConceptoPagoItem;
-import org.itcgae.siga.DTOs.scs.PagosjgDTO;
-import org.itcgae.siga.DTOs.scs.PagosjgItem;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
@@ -378,7 +375,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                             "FacturacionSJCSServicesImpl.savePago() -> facSufijoExtendsMapper.selectByExample() -> Obtenenos la lista de sufijos");
                     List<FacSufijo> listaSufijos = facSufijoExtendsMapper.selectByExample(facSufijoExample);
                     LOGGER.info(
-                            "FacturacionSJCSServicesImpl.savePago() -> facSufijoExtendsMapper.selectByExample() -> Lista de sufijos obtenida: " + listaSufijos.toString());
+                            "FacturacionSJCSServicesImpl.savePago() -> facSufijoExtendsMapper.selectByExample() -> Lista de sufijos obtenida");
 
                     if (listaSufijos.size() == 1) {
                         record.setIdsufijo(listaSufijos.get(0).getIdsufijo());
@@ -1065,7 +1062,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                     List<ComboItem> combo = facPropositosExtendsMapper.
                             comboPropTranferencia(usuarios.get(0).getIdlenguaje(), false);
                     LOGGER.info(
-                            "FacturacionSJCSServicesImpl.comboPropTranferenciaSepa() -> facPropositosExtendsMapper.comboPropTranferencia() -> Salida del servicio con el combo: " + combo.toString());
+                            "FacturacionSJCSServicesImpl.comboPropTranferenciaSepa() -> facPropositosExtendsMapper.comboPropTranferencia() -> Salida del servicio con el combo");
                     comboDTO.setCombooItems(combo);
 
                 }
@@ -1121,7 +1118,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                     List<ComboItem> combo = facPropositosExtendsMapper.
                             comboPropTranferencia(usuarios.get(0).getIdlenguaje(), true);
                     LOGGER.info(
-                            "FacturacionSJCSServicesImpl.comboPropOtrasTranferencias() -> facPropositosExtendsMapper.comboPropTranferencia() -> Salida del servicio con el combo: " + combo.toString());
+                            "FacturacionSJCSServicesImpl.comboPropOtrasTranferencias() -> facPropositosExtendsMapper.comboPropTranferencia() -> Salida del servicio con el combo");
                     comboDTO.setCombooItems(combo);
 
                 }
@@ -1176,7 +1173,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                             "FacturacionSJCSServicesImpl.comboSufijos() -> facSufijoExtendsMapper.comboSufijos() -> Entrada al servicio para obtener el combo");
                     List<ComboItem> comboSufijos = facSufijoExtendsMapper.comboSufijos(idInstitucion);
                     LOGGER.info(
-                            "FacturacionSJCSServicesImpl.comboSufijos() -> facSufijoExtendsMapper.comboSufijos() -> Salida del servicio con el combo obtenido: " + comboSufijos.toString());
+                            "FacturacionSJCSServicesImpl.comboSufijos() -> facSufijoExtendsMapper.comboSufijos() -> Salida del servicio con el combo obtenido");
                     comboDTO.setCombooItems(comboSufijos);
 
                 }
@@ -1231,7 +1228,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                             "FacturacionSJCSServicesImpl.comboCuentasBanc() -> facBancoinstitucionExtendsMapper.comboCuentasBanc() -> Entrada al servicio para obtener el combo");
                     List<ComboItem> comboCuentasBancarias = facBancoinstitucionExtendsMapper.comboCuentasBanc(idInstitucion);
                     LOGGER.info(
-                            "FacturacionSJCSServicesImpl.comboCuentasBanc() -> facBancoinstitucionExtendsMapper.comboCuentasBanc() -> Salida del servicio con el combo obtenido: " + comboCuentasBancarias.toString());
+                            "FacturacionSJCSServicesImpl.comboCuentasBanc() -> facBancoinstitucionExtendsMapper.comboCuentasBanc() -> Salida del servicio con el combo obtenido");
                     comboDTO.setCombooItems(comboCuentasBancarias);
 
                 }
@@ -1360,7 +1357,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                             "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> fcsPagosjgExtendsMapper.getConfigFichAbonos() -> Entrada a la obtención de los datos");
                     List<PagosjgItem> datosConfigFichAbonos = fcsPagosjgExtendsMapper.getConfigFichAbonos(idPago, idInstitucion);
                     LOGGER.info(
-                            "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> fcsPagosjgExtendsMapper.getConfigFichAbonos() -> Salida con los datos obtenidos: " + datosConfigFichAbonos.toString());
+                            "FacturacionSJCSServicesImpl.getConfigFichAbonos() -> fcsPagosjgExtendsMapper.getConfigFichAbonos() -> Salida con los datos obtenidos");
                     pagosjgDTO.setPagosjgItem(datosConfigFichAbonos);
 
                 }
@@ -1433,6 +1430,61 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
     }
 
     @Override
+    public CompensacionFacDTO getCompensacionFacturas(String idPago, HttpServletRequest request) {
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getCompensacionFacturas() -> Entrada al servicio para obtener todas las facturas pendientes de colegiados que estén en el pago para compensar");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        CompensacionFacDTO compensacionFacDTO = new CompensacionFacDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.getCompensacionFacturas() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "FacturacionSJCSServicesImpl.getCompensacionFacturas() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.getCompensacionFacturas() -> fcsPagosjgExtendsMapper.getCompensacionFacturas() -> Entrada al servicio para obtener las compensaciones del pago: " + idPago);
+                    List<CompensacionFacItem> compensaciones = fcsPagosjgExtendsMapper.getCompensacionFacturas(idPago, idInstitucion);
+                    LOGGER.info(
+                            "FacturacionSJCSServicesImpl.getCompensacionFacturas() -> fcsPagosjgExtendsMapper.getCompensacionFacturas() -> Salida del servicio para obtener las compensaciones del pago: " + idPago);
+                    compensacionFacDTO.setCompensaciones(compensaciones);
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "FacturacionSJCSServicesImpl.getCompensacionFacturas() -> Se ha producido un error al intentar obtener todas las facturas pendientes de colegiados que estén en el pago para compensar",
+                    e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        compensacionFacDTO.setError(error);
+
+        LOGGER.info(
+                "FacturacionSJCSServicesImpl.getCompensacionFacturas() -> Salida del servicio");
+
+        return compensacionFacDTO;
+    }
+
+    @Override
     public InsertResponseDTO ejecutarPagoSJCS(String idPago, HttpServletRequest request) {
 
         String token = request.getHeader("Authorization");
@@ -1471,14 +1523,16 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                                     + idPago);
 
                     if (UtilidadesString.esCadenaVacia(pago.getBancosCodigo())) {
-                        throw new FacturacionSJCSException("");
+                        throw new FacturacionSJCSException("Debe de seleccionar una cuenta bancaria", "factSJCS.abonos.configuracion.literal.cuentaObligatoria");
                     }
 
                     // CR7 - Antes de ejecutar simulamos el guardado
-//					guardarBloquePago(miform, usr);
+//					guardarBloquePago(miform, usr); //TODO no se si hay que hacerlo
 
 //					estadoPago = miform.getIdEstadoPagosJG();
 //					criterioTurno = miform.getCriterioPagoTurno();
+
+                    String estadoPago = fcsPagosjgExtendsMapper.getEstadoPago(idPago, idInstitucion);
 
                     // Validacion de los datos antes de ejecutar el pago:
                     // 1. El estado del pago debe ser abierto:
@@ -1500,7 +1554,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             }
 
         } catch (FacturacionSJCSException fe) {
-
+            error.setDescription(fe.getDescription());
         } catch (Exception e) {
             LOGGER.error(
                     "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> Se ha producido en la ejecución del pago: " + idPago, e);

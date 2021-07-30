@@ -5,10 +5,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ConceptoPagoDTO;
-import org.itcgae.siga.DTOs.scs.ConceptoPagoItem;
-import org.itcgae.siga.DTOs.scs.PagosjgDTO;
-import org.itcgae.siga.DTOs.scs.PagosjgItem;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.scs.services.facturacionsjcs.IPagoSJCSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -124,5 +121,11 @@ public class PagoSJCSController {
     ResponseEntity<StringDTO> getNumApuntesPago(@RequestParam("idPago") String idPago, HttpServletRequest request) {
         StringDTO response = iPagoSJCSService.getNumApuntesPago(idPago, request);
         return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("getCompensacionFacturas")
+    ResponseEntity<CompensacionFacDTO> getCompensacionFacturas(@RequestParam("idPago") String idPago, HttpServletRequest request) {
+        CompensacionFacDTO response = iPagoSJCSService.getCompensacionFacturas(idPago, request);
+        return new ResponseEntity<CompensacionFacDTO>(response, HttpStatus.OK);
     }
 }

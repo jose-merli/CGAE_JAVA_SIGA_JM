@@ -5,10 +5,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ConceptoPagoDTO;
-import org.itcgae.siga.DTOs.scs.ConceptoPagoItem;
-import org.itcgae.siga.DTOs.scs.PagosjgDTO;
-import org.itcgae.siga.DTOs.scs.PagosjgItem;
+import org.itcgae.siga.DTOs.scs.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -49,5 +46,7 @@ public interface IPagoSJCSService {
     public PagosjgDTO getConfigFichAbonos(String idPago, HttpServletRequest request);
 
     public StringDTO getNumApuntesPago(String idPago, HttpServletRequest request);
+
+    public CompensacionFacDTO getCompensacionFacturas(String idPago, HttpServletRequest request);
 
 }

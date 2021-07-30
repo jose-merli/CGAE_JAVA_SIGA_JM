@@ -7,6 +7,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.CompensacionFacItem;
 import org.itcgae.siga.DTOs.scs.ConceptoPagoItem;
 import org.itcgae.siga.DTOs.scs.PagosjgItem;
 import org.itcgae.siga.db.mappers.FcsPagosjgMapper;
@@ -102,5 +103,21 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
     @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getNumApuntesPago")
     @Results({@Result(column = "NUMAPUNTES", property = "valor", jdbcType = JdbcType.VARCHAR)})
     StringDTO getNumApuntesPago(String idPago, Short idInstitucion, String idLenguaje);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getEstadoPago")
+    String getEstadoPago(String idPago, Short idInstitucion);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getCompensacionFacturas")
+    @Results({@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDFACTURA", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NUMEROFACTURA", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHAFACTURA", property = "fechaFactura", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTETOTALFACTURA", property = "importeTotalFactura", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTEPENDIENTEFACTURA", property = "importePendienteFactura", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTECOMPENSADO", property = "importeCompensado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTEPAGO", property = "importePagado", jdbcType = JdbcType.VARCHAR)})
+    List<CompensacionFacItem> getCompensacionFacturas(String idPago, Short idInstitucion);
 
 }
