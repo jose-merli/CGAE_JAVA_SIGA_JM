@@ -678,7 +678,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ "(nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1, '') || ' ' || nvl(per.apellidos2,'')) letrado,"
 				+ "ejg.fechaapertura, nvl(ejg.numeroprocedimiento,'') numeroprocedimiento, nvl(ejg.nig,'') nig,"
-				+ "nvl( ejg.numerodiligencia, 'Sin número' ) || ' - ' || nvl( ejg.nig, 'Sin número' ) || ' - ' || nvl( ejg.numeroprocedimiento,'Sin número' ) dilnigproc");
+				+ "nvl( ejg.numerodiligencia, 'Sin número' ) || ' / ' || nvl( ejg.nig, 'Sin número' ) || ' / ' || nvl( ejg.numeroprocedimiento,'Sin número' ) dilnigproc");
 
 		sql.FROM("scs_ejg ejg");
 
@@ -1464,7 +1464,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						+ "(" + sqlAsistencia_3.toString() + ") des_tipo,"
 						+ "("+ sqlAsistencia_1.toString() + ") nombreletrado," 
 						+ "("+ sqlAsistencia_4.toString() + ") interesado,"
-						+ "nvl( numerodiligencia, 'Sin número' ) || ' - ' || nvl( nig, 'Sin número' ) || ' - ' || nvl( numeroprocedimiento,'Sin número' ) dilnigproc,"
+						+ "nvl( numerodiligencia, 'Sin número' ) || ' / ' || nvl( nig, 'Sin número' ) || ' / ' || nvl( numeroprocedimiento,'Sin número' ) dilnigproc,"
 						+ "NULL resolucion" );
 				
 				
@@ -1620,7 +1620,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						+ "(" + sqlDesigna_5.toString() + ") des_tipo," 
 						+ "("+ sqlDesigna_1.toString() + ") nombreletrado,"
 						+ "("+ sqlDesigna_6.toString() + ") interesado,"
-								+ "nvl( numerodiligencia,'Sin número') || ' - ' || nvl( nig, 'Sin número' ) || ' - ' || nvl( numeroprocedimiento,'Sin número') dilnigproc,"
+								+ "nvl( numerodiligencia,'Sin número') || ' / ' || nvl( nig, 'Sin número' ) || ' / ' || nvl( numeroprocedimiento,'Sin número') dilnigproc,"
 								+ " f_siga_getrecurso(res.descripcion,1) resolucion" );
 
 				sqlDesigna.FROM("scs_ejg ejg "
