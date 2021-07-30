@@ -4,6 +4,9 @@ package org.itcgae.siga.db.services.fac.mappers;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
@@ -11,11 +14,16 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.FiltroProductoItem;
+import org.itcgae.siga.DTO.fac.FiltroServicioItem;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.TiposServiciosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
+import org.itcgae.siga.db.services.fac.providers.PySTiposProductosSqlExtendsProvider;
 import org.itcgae.siga.db.services.fac.providers.PySTiposServiciosSqlExtendsProvider;
 
 @Service
@@ -41,6 +49,24 @@ public interface PySTiposServiciosExtendsMapper extends PysServiciosMapper{
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE)
 		}) 
 	List<TiposServiciosItem> searchTiposServiciosHistorico(String idioma, Short idInstitucion);
+	
+	@SelectProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "searchListadoServiciosBuscador")
+	@Results({
+		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDSERVICIO", property = "idservicio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOSERVICIOS", property = "idtiposervicios", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDSERVICIOSINSTITUCION", property = "idserviciosinstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
+		@Result(column = "AUTOMATICO", property = "automatico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIVA", property = "idtipoiva", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "CATEGORIA", property = "categoria", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IVA", property = "iva", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PRECIO_IVA_MES", property = "precioivames", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FORMA_PAGO", property = "formapago", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ListaServiciosItem> searchListadoServiciosBuscador(String idioma, Short idInstitucion, FiltroServicioItem filtroServicioItem);	
 	
 	@SelectProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "comboTiposServicios")
 	@Results({ 

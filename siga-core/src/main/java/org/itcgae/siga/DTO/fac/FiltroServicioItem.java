@@ -1,16 +1,17 @@
 package org.itcgae.siga.DTO.fac;
 
-public class FiltroProductoItem {
+public class FiltroServicioItem {
 	
-	 private String categoria;
-	 private String tipo;
-	 private String producto;
-	 private String codigo;
-	 private String precioDesde;
-	 private String precioHasta;
-	 private String iva;
-	 private String formaPago;
-	 
+	private String categoria;
+	private String tipo;
+	private String servicio;
+	private String codigo;
+	private String precioDesde;
+	private String precioHasta;
+	private String iva;
+	private String formaPago;
+	private String tipoSuscripcion;
+	
 	public String getCategoria() {
 		return categoria;
 	}
@@ -23,11 +24,11 @@ public class FiltroProductoItem {
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
-	public String getProducto() {
-		return producto;
+	public String getServicio() {
+		return servicio;
 	}
-	public void setProducto(String producto) {
-		this.producto = producto;
+	public void setServicio(String servicio) {
+		this.servicio = servicio;
 	}
 	public String getCodigo() {
 		return codigo;
@@ -59,7 +60,12 @@ public class FiltroProductoItem {
 	public void setFormaPago(String formaPago) {
 		this.formaPago = formaPago;
 	}
-	
+	public String getTipoSuscripcion() {
+		return tipoSuscripcion;
+	}
+	public void setTipoSuscripcion(String tipoSuscripcion) {
+		this.tipoSuscripcion = tipoSuscripcion;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -70,11 +76,11 @@ public class FiltroProductoItem {
 		result = prime * result + ((iva == null) ? 0 : iva.hashCode());
 		result = prime * result + ((precioDesde == null) ? 0 : precioDesde.hashCode());
 		result = prime * result + ((precioHasta == null) ? 0 : precioHasta.hashCode());
-		result = prime * result + ((producto == null) ? 0 : producto.hashCode());
+		result = prime * result + ((servicio == null) ? 0 : servicio.hashCode());
 		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
+		result = prime * result + ((tipoSuscripcion == null) ? 0 : tipoSuscripcion.hashCode());
 		return result;
 	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -83,7 +89,7 @@ public class FiltroProductoItem {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		FiltroProductoItem other = (FiltroProductoItem) obj;
+		FiltroServicioItem other = (FiltroServicioItem) obj;
 		if (categoria == null) {
 			if (other.categoria != null)
 				return false;
@@ -114,24 +120,29 @@ public class FiltroProductoItem {
 				return false;
 		} else if (!precioHasta.equals(other.precioHasta))
 			return false;
-		if (producto == null) {
-			if (other.producto != null)
+		if (servicio == null) {
+			if (other.servicio != null)
 				return false;
-		} else if (!producto.equals(other.producto))
+		} else if (!servicio.equals(other.servicio))
 			return false;
 		if (tipo == null) {
 			if (other.tipo != null)
 				return false;
 		} else if (!tipo.equals(other.tipo))
 			return false;
+		if (tipoSuscripcion == null) {
+			if (other.tipoSuscripcion != null)
+				return false;
+		} else if (!tipoSuscripcion.equals(other.tipoSuscripcion))
+			return false;
 		return true;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "FiltroProductoItem [categoria=" + categoria + ", tipo=" + tipo + ", producto=" + producto + ", codigo="
+		return "FiltroServicioItem [categoria=" + categoria + ", tipo=" + tipo + ", servicio=" + servicio + ", codigo="
 				+ codigo + ", precioDesde=" + precioDesde + ", precioHasta=" + precioHasta + ", iva=" + iva
-				+ ", formaPago=" + formaPago + "]";
+				+ ", formaPago=" + formaPago + ", tipoSuscripcion=" + tipoSuscripcion + "]";
 	}
-	 
+	
 }

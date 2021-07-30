@@ -5,16 +5,16 @@ import java.util.List;
 
 import org.itcgae.siga.DTOs.gen.Error;
 
-public class ListaProductosDTO {
+public class ListaServiciosDTO {
 	
-	private List<ListaProductosItem> listaProductosItems = new ArrayList<ListaProductosItem>();
+	private List<ListaServiciosItem> listaServiciosItems = new ArrayList<ListaServiciosItem>();
 	private Error error = null;
 	
-	public List<ListaProductosItem> getListaProductosItems() {
-		return listaProductosItems;
+	public List<ListaServiciosItem> getListaServiciosItems() {
+		return listaServiciosItems;
 	}
-	public void setListaProductosItems(List<ListaProductosItem> listaProductosItems) {
-		this.listaProductosItems = listaProductosItems;
+	public void setListaServiciosItems(List<ListaServiciosItem> listaServiciosItems) {
+		this.listaServiciosItems = listaServiciosItems;
 	}
 	public Error getError() {
 		return error;
@@ -28,10 +28,9 @@ public class ListaProductosDTO {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((error == null) ? 0 : error.hashCode());
-		result = prime * result + ((listaProductosItems == null) ? 0 : listaProductosItems.hashCode());
+		result = prime * result + ((listaServiciosItems == null) ? 0 : listaServiciosItems.hashCode());
 		return result;
 	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -40,23 +39,23 @@ public class ListaProductosDTO {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ListaProductosDTO other = (ListaProductosDTO) obj;
+		ListaServiciosDTO other = (ListaServiciosDTO) obj;
 		if (error == null) {
 			if (other.error != null)
 				return false;
 		} else if (!error.equals(other.error))
 			return false;
-		if (listaProductosItems == null) {
-			if (other.listaProductosItems != null)
+		if (listaServiciosItems == null) {
+			if (other.listaServiciosItems != null)
 				return false;
-		} else if (!listaProductosItems.equals(other.listaProductosItems))
+		} else if (!listaServiciosItems.equals(other.listaServiciosItems))
 			return false;
 		return true;
 	}
 	
 	@Override
 	public String toString() {
-		return "ListaProductosDTO [listaProductosItems=" + listaProductosItems + ", error=" + error + "]";
+		return "ListaServiciosDTO [listaServiciosItems=" + listaServiciosItems + ", error=" + error + "]";
 	}
-	
+
 }

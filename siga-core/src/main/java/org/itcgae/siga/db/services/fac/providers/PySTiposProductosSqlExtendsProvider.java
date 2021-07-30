@@ -110,7 +110,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		if(filtroProductoItem.getCategoria() != null && filtroProductoItem.getCategoria() != "")
 			sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDTIPOPRODUCTO = '" + filtroProductoItem.getCategoria() + "'");
 		
-		if(filtroProductoItem.getTipo() != null && filtroProductoItem.getCategoria() != "")
+		if(filtroProductoItem.getTipo() != null && filtroProductoItem.getTipo() != "")
 			sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDPRODUCTO = '" + filtroProductoItem.getTipo() + "'");
 		
 		if(filtroProductoItem.getProducto() != null && filtroProductoItem.getProducto() != "")
