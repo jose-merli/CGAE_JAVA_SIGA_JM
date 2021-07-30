@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
@@ -290,6 +291,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParamterosExtendsMapper;
 
 	@Autowired
 	private ScsEjgdesignaMapper scsEjgdesignaMapper;
@@ -2596,18 +2600,27 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.info(
 						"getHabilitarActa() / scsSituacionesExtendsMapper.comboSituaciones() -> Entrada a scsSituacionesExtendsMapper para obtener el combo de situaciones");
 
-				GenParametrosKey genKey = new GenParametrosKey();
+//				Por peticion del cliente (Adrian) No utilizamos una consulta SQL al uso si no utilizamos una funcion.
+//				GenParametrosKey genKey = new GenParametrosKey();
+//
+//				genKey.setIdinstitucion(idInstitucion);
+//				genKey.setParametro("HABILITA_ACTAS_COMISION");
+//				genKey.setModulo("SCS");
+//
+//				GenParametros parametro = genParametrosMapper.selectByPrimaryKey(genKey);
+				
+				ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+				
+				parametroRequestDTO.setIdInstitucion(idInstitucion.toString());
+				parametroRequestDTO.setModulo("SCS");
+				parametroRequestDTO.setParametrosGenerales("HABILITA_ACTAS_COMISION");
+				
+				StringDTO parametro = genParamterosExtendsMapper.getParameterFunction(0, parametroRequestDTO);
 
-				genKey.setIdinstitucion(idInstitucion);
-				genKey.setParametro("HABILITA_ACTAS_COMISION");
-				genKey.setModulo("SCS");
-
-				GenParametros parametro = genParametrosMapper.selectByPrimaryKey(genKey);
-
-				if (parametro != null)
-					habilitar = true;
-				else
+				if (parametro.getValor().equals("N"))
 					habilitar = false;
+				else
+					habilitar = true;
 
 				LOGGER.info(
 						"getHabilitarActa() / scsSituacionesExtendsMapper.comboSituaciones() -> Salida a scsSituacionesExtendsMapper para obtener el combo de situaciones");
