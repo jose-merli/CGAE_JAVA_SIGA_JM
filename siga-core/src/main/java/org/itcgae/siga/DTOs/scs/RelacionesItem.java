@@ -20,8 +20,6 @@ public class RelacionesItem {
 	private String datosinteres;
 	private String idsjcs;
 	
-
-	private String interesado;
 	private String impugnacion;
 	private Date fechaimpugnacion;
 	private String dictamen;
@@ -31,6 +29,7 @@ public class RelacionesItem {
 	private String centrodetencion;
 	private Date fechaasunto;
 	private String dilnigproc;
+	private String desturno;
 	
 	
 	public String getSjcs() {
@@ -126,6 +125,8 @@ public class RelacionesItem {
 
 	public void setDesturno(String desturno) {
 		this.desturno = desturno;
+	}
+	
 	public String getDescturno() {
 		return descturno;
 	}
@@ -165,13 +166,6 @@ public class RelacionesItem {
 		this.interesado = interesado;
 	}
 
-	public String getInteresado() {
-		return interesado;
-	}
-	public void setInteresado(String interesado) {
-		this.interesado = interesado;
-	}
-	
 	public String getImpugnacion() {
 		return impugnacion;
 	}
@@ -409,7 +403,7 @@ public class RelacionesItem {
 				+ numero + ", idletrado=" + idletrado + ", letrado=" + letrado + ", idturno=" + idturno
 				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", desturno="
 				+ desturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
-				+ fechaDesignacion + ", datosinteres=" + datosinteres +", idsjcs=" + idsjcs +"]";
+				+ fechaDesignacion + ", datosinteres=" + datosinteres +", idsjcs=" + idsjcs +"]"
 				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", descturno="
 				+ descturno + ", destipo=" + destipo + ", interesado=" + interesado + ", impugnacion=" + impugnacion
 				+ ", fechaimpugnacion=" + fechaimpugnacion + ", dictamen=" + dictamen + ", fechadictamen="
