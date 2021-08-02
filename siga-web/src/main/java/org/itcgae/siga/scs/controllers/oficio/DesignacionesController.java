@@ -1057,7 +1057,7 @@ public class DesignacionesController {
 	}
 	
 	@RequestMapping(value = "/designas/getPreDesignaEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> getPreDesignaEJG(@RequestBody ScsEjgdesigna datos, HttpServletRequest request) {
+	ResponseEntity<InsertResponseDTO> getPreDesignaEJG(@RequestBody ScsEjgdesigna datos, HttpServletRequest request) throws Exception {
 		InsertResponseDTO response = designacionesService.getPreDesignaEJG(datos, request);
 		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
