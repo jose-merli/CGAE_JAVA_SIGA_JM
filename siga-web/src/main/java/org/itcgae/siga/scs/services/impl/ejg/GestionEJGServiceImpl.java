@@ -5815,7 +5815,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return newIdestadoporejg;
 	}
 
-	@Override
 	@Transactional
 	@Override
 	public UpdateResponseDTO copyEjg2Soj(List<String> datos,
