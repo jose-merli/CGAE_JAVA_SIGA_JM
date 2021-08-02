@@ -778,7 +778,11 @@ public class WSCommons {
 									datosPersona.setApellido1(integrante.getApellidos1());
 									datosPersona.setApellido2(integrante.getApellidos2());
 									datosPersona.setNombre(integrante.getNombre());
-									identificacion.setNIF(integrante.getNifCif());
+									if ("NIE".equals(integrante.getTipoIdentificacion())){
+										identificacion.setNIE(integrante.getNifCif());
+									} else {
+										identificacion.setNIF(integrante.getNifCif());
+									}
 									datosPersona.setIdentificacion(identificacion);
 									integranteFisico.setDatosPersona(datosPersona);
 									DatosProfesional datosProfesional = DatosProfesional.Factory.newInstance();
@@ -1827,7 +1831,7 @@ public class WSCommons {
 		private boolean validarCodPostal(String codPostal) {
 			boolean valid = false;
 			String regex = "\\d{5}";
-			if(codPostal.matches(regex)) {
+			if(codPostal != null && codPostal.matches(regex)) {
 				valid = true;
 			}
 			return valid;
