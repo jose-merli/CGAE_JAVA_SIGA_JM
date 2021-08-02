@@ -607,7 +607,7 @@ public class WSCommons {
 					for (SociedadesEditadasDTO regSociedad : sociedadesEditadas) {
 						SociedadActualizacion sociedadActualizacion = SociedadActualizacion.Factory.newInstance();
 						
-						boolean argPublicar = Boolean.FALSE;
+						boolean argPublicar = Boolean.TRUE;
 
 						sociedadActualizacion.setPublicar(argPublicar);
 						Resena argResena = Resena.Factory.newInstance();
