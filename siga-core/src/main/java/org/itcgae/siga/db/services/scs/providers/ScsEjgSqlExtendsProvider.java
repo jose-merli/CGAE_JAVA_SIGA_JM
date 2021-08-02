@@ -1419,7 +1419,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				sqlAsistencia_1.FROM(
 						"scs_asistencia " + "JOIN cen_persona ON cen_persona.idpersona = scs_asistencia.idpersonacolegiado");
 				sqlAsistencia_1.WHERE("ejganio =" + item.getAnnio());
-				sqlAsistencia_1.WHERE("ejgnumero =" + item.getNumEjg());
+				sqlAsistencia_1.WHERE("ejgnumero =" + item.getNumero());
 				sqlAsistencia_1.WHERE("ejgidtipoejg =" + item.getTipoEJG());
 				sqlAsistencia_1.WHERE("idinstitucion =" + item.getidInstitucion());
 
@@ -1445,7 +1445,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						+ "                    AND scs_personajg.idinstitucion = scs_asistencia.idinstitucion");
 				sqlAsistencia_4.WHERE("scs_asistencia.idinstitucion = " + item.getidInstitucion());
 				sqlAsistencia_4.WHERE("scs_asistencia.anio = " + item.getAnnio());
-				sqlAsistencia_4.WHERE("scs_asistencia.numero =" + item.getNumEjg());
+				sqlAsistencia_4.WHERE("scs_asistencia.numero =" + item.getNumero());
 
 
 				// consulta para obtener la relacion de asistencias con los datos de las
@@ -1471,7 +1471,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 				sqlAsistencia.FROM("scs_asistencia");
 				sqlAsistencia.WHERE("ejganio = " + item.getAnnio());
-				sqlAsistencia.WHERE("ejgnumero = " + item.getNumEjg());
+				sqlAsistencia.WHERE("ejgnumero = " + item.getNumero());
 				sqlAsistencia.WHERE("ejgidtipoejg =  " + item.getTipoEJG());
 				sqlAsistencia.WHERE("idinstitucion =" + item.getidInstitucion());
 				
@@ -1481,7 +1481,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 								+ "             || ','\r\n" + "             || cen_persona.nombre ");
 				sqlSOJ_1.FROM("scs_soj " + "JOIN cen_persona ON cen_persona.idpersona = scs_soj.idpersona");
 				sqlSOJ_1.WHERE("ejganio =" + item.getAnnio());
-				sqlSOJ_1.WHERE("ejgnumero =" + item.getNumEjg());
+				sqlSOJ_1.WHERE("ejgnumero =" + item.getNumero());
 				sqlSOJ_1.WHERE("ejgidtipoejg =" + item.getTipoEJG());
 				sqlSOJ_1.WHERE("idinstitucion =" + item.getidInstitucion());
 
@@ -1508,7 +1508,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						+ "                        scs_personajg.idinstitucion = scs_soj.idinstitucion");
 				sqlSOJ_4.WHERE("scs_soj.idinstitucion = " + item.getidInstitucion());
 				sqlSOJ_4.WHERE("scs_soj.anio = " + item.getAnnio());
-				sqlSOJ_4.WHERE("scs_soj.numero =" + item.getNumEjg());
+				sqlSOJ_4.WHERE("scs_soj.numero =" + item.getNumero());
 
 			
 
@@ -1534,7 +1534,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 				sqlSOJ.FROM("scs_soj");
 				sqlSOJ.WHERE("ejganio = " + item.getAnnio());
-				sqlSOJ.WHERE("ejgnumero = " + item.getNumEjg());
+				sqlSOJ.WHERE("ejgnumero = " + item.getNumero());
 				sqlSOJ.WHERE("ejgidtipoejg =  " + item.getTipoEJG());
 				sqlSOJ.WHERE("idinstitucion =" + item.getidInstitucion());
 				
@@ -1545,7 +1545,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 								+ "             || ','\r\n" + "             || cen_persona.nombre ");
 				sqlDesigna_1.FROM("scs_ejg ejg\r\n" + "             JOIN cen_persona ON cen_persona.idpersona = ejg.idpersona");
 				sqlDesigna_1.WHERE("ejg.anio =" + item.getAnnio());
-				sqlDesigna_1.WHERE("ejg.numero =" + item.getNumEjg());
+				sqlDesigna_1.WHERE("ejg.numero =" + item.getNumero());
 				sqlDesigna_1.WHERE("ejg.idtipoejg =" + item.getTipoEJG());
 				sqlDesigna_1.WHERE("ejg.idinstitucion =" + item.getidInstitucion());
 
@@ -1593,7 +1593,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						+ "                        scs_personajg.idinstitucion = scs_ejg.idinstitucion");
 				sqlDesigna_6.WHERE("scs_ejg.idinstitucion = " + item.getidInstitucion());
 				sqlDesigna_6.WHERE("scs_ejg.anio = " + item.getAnnio());
-				sqlDesigna_6.WHERE("scs_ejg.numero =" + item.getNumEjg());
+				sqlDesigna_6.WHERE("scs_ejg.numero =" + item.getNumero());
 
 				// datos de interes de la consulta DESIGNA
 				sqlDesigna_7.SELECT("'Juzgado: ' || scs_juzgado.nombre");
@@ -1601,7 +1601,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						+ "                        scs_juzgado.idjuzgado = scs_ejg.juzgado\r\n" + "                    AND\r\n"
 						+ "                        scs_juzgado.idinstitucion = scs_ejg.idinstitucion");
 				sqlDesigna_7.WHERE("scs_ejg.anio = " + item.getAnnio());
-				sqlDesigna_7.WHERE("scs_ejg.numero = " + item.getNumEjg());
+				sqlDesigna_7.WHERE("scs_ejg.numero = " + item.getNumero());
 				sqlDesigna_7.WHERE("scs_ejg.idinstitucion = " + item.getidInstitucion());
 
 				// consulta para obtener la relacion de DESIGNA con los datos de las consultas
@@ -1627,7 +1627,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						+ "LEFT OUTER JOIN scs_tiporesolucion res ON ejg.idtiporatificacionejg = res.idtiporesolucion," 
 						+ " scs_ejgdesigna ejgd");
 				sqlDesigna.WHERE("ejg.anio = " + item.getAnnio());
-				sqlDesigna.WHERE("ejg.numero = " + item.getNumEjg());
+				sqlDesigna.WHERE("ejg.numero = " + item.getNumero());
 				sqlDesigna.WHERE("ejg.idtipoejg =  " + item.getTipoEJG());
 				sqlDesigna.WHERE("ejg.idinstitucion =" + item.getidInstitucion());
 				sqlDesigna.WHERE("ejgd.anioejg = ejg.anio");
@@ -1662,7 +1662,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						+ "            exp_denunciado den,"
 						+ "            cen_persona per,"
 						+ "            exp_tipoexpediente ext");
-				sqlExpediente.WHERE("exp.numeroejg = " + item.getNumEjg());
+				sqlExpediente.WHERE("exp.numeroejg = " + item.getNumero());
 				sqlExpediente.WHERE("exp.idtipoejg = " + item.getTipoEJG());
 				sqlExpediente.WHERE("exp.anioejg = " + item.getAnnio());
 				sqlExpediente.WHERE("exp.idinstitucion_tipoexpediente = " + item.getidInstitucion());

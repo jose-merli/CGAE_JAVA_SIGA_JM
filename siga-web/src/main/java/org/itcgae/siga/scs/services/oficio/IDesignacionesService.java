@@ -215,7 +215,7 @@ public interface IDesignacionesService {
 	
 	public ListDTO getDelitos(DesignaItem designaItem, HttpServletRequest request);
 
-	InsertResponseDTO getPreDesignaEJG(ScsEjgdesigna item, HttpServletRequest request);
+	InsertResponseDTO getPreDesignaEJG(ScsEjgdesigna item, HttpServletRequest request) throws Exception;
 
 	EjgDesignaDTO getEjgDesigna(DesignaItem datos, HttpServletRequest request);
 

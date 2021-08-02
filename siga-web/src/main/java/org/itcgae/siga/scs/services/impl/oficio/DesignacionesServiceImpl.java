@@ -7005,9 +7005,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return listDTO;
 	}
 	
+	@Transactional
 	@Override
 	public InsertResponseDTO getPreDesignaEJG(ScsEjgdesigna item,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws Exception {
 		InsertResponseDTO responseDTO = new InsertResponseDTO();
 
 		String token = request.getHeader("Authorization");
@@ -7035,8 +7036,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
 						"DesignacionesServiceImpl.extraerPreDesignaEJG() -> Entrada a servicio para insertar las justificaciones express");
-
-				try {
+				//Se comentan el try y el catch para que @Transactional funcone adecuadamente.
+//				try {
 					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Iniciando los inserts...");
 
 					//Tareas:
@@ -7074,8 +7075,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					//designa.set (No existe campo calidad en ScsDesigna)
 					designa.setIdpretension(ejg.getIdpretension());
 					designa.setIdjuzgado(ejg.getJuzgado());
-					
-					//Falta por añadir los delitos
 					
 					//Actualizamos los delitos del ejg
 					ScsDelitosdesigna delitoDesigna = new ScsDelitosdesigna();
@@ -7258,11 +7257,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 					
 					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Inserts finalizados");
-				} catch (Exception e) {
-					LOGGER.error("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Se ha producido un error ",
-							e);
-					response = 0;
-				}
+//				} catch (Exception e) {
+//					LOGGER.error("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Se ha producido un error ",
+//							e);
+//					response = 0;
+//				}
 
 				LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Saliendo del servicio... ");
 			}
