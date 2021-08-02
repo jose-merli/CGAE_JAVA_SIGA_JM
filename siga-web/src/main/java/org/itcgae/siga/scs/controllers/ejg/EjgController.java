@@ -797,5 +797,25 @@ public class EjgController {
 		String response = gestionEJG.insertCollectionEjg(ejgItem, request);
 		return new ResponseEntity<String>(response, HttpStatus.OK);
 	}
+	
+	// copiar EJG a un SOJ
+	@RequestMapping(value = "/gestion-ejg/copyEjg2Soj", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> copyEjg2Soj(@RequestBody List<String> datos, HttpServletRequest request) throws Exception {
+		UpdateResponseDTO response = gestionEJG.copyEjg2Soj(datos, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	// copiar EJG a una asistencia
+	@RequestMapping(value = "/gestion-ejg/copyEjg2Asis", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> copyEjg2Asis(@RequestBody List<String> datos, HttpServletRequest request) throws Exception {
+		UpdateResponseDTO response = gestionEJG.copyEjg2Asis(datos, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }

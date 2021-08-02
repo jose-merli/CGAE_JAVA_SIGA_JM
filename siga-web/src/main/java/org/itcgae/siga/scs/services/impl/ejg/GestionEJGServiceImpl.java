@@ -85,8 +85,17 @@ import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.ScsAsistencia;
 import org.itcgae.siga.db.entities.ScsAsistenciaExample;
+import org.itcgae.siga.db.entities.ScsAsistenciaKey;
+import org.itcgae.siga.db.entities.ScsContrariosasistencia;
+import org.itcgae.siga.db.entities.ScsContrariosasistenciaExample;
+import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
+import org.itcgae.siga.db.entities.ScsContrariosejgExample;
 import org.itcgae.siga.db.entities.ScsContrariosejgKey;
+import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
+import org.itcgae.siga.db.entities.ScsDelitosasistencia;
+import org.itcgae.siga.db.entities.ScsDelitosasistenciaExample;
+import org.itcgae.siga.db.entities.ScsDelitosdesigna;
 import org.itcgae.siga.db.entities.ScsDelitosejg;
 import org.itcgae.siga.db.entities.ScsDelitosejgExample;
 import org.itcgae.siga.db.entities.ScsDictamenejg;
@@ -94,6 +103,8 @@ import org.itcgae.siga.db.entities.ScsDictamenejgExample;
 import org.itcgae.siga.db.entities.ScsDictamenejgKey;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignaExample;
+import org.itcgae.siga.db.entities.ScsDesignaKey;
+import org.itcgae.siga.db.entities.ScsDesignaprocurador;
 import org.itcgae.siga.db.entities.ScsDocumentacionejg;
 import org.itcgae.siga.db.entities.ScsDocumentacionejgKey;
 import org.itcgae.siga.db.entities.ScsEejgPeticiones;
@@ -118,7 +129,9 @@ import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsPonente;
 import org.itcgae.siga.db.entities.ScsSoj;
 import org.itcgae.siga.db.entities.ScsSojExample;
+import org.itcgae.siga.db.entities.ScsSojKey;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
+import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
 import org.itcgae.siga.db.mappers.CajgEjgremesaMapper;
 import org.itcgae.siga.db.mappers.EcomColaMapper;
@@ -128,7 +141,9 @@ import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
+import org.itcgae.siga.db.mappers.ScsContrariosasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
+import org.itcgae.siga.db.mappers.ScsDelitosasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDictamenejgMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
@@ -208,6 +223,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	@Autowired
 	private ScsEjgExtendsMapper scsEjgExtendsMapper;
 
+	@Autowired 
+	private ScsDelitosasistenciaMapper scsDelitosasistenciaMapper;
 	@Autowired
 	private ScsPonenteMapper scsPonenteMapper;
 
@@ -246,6 +263,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ScsDocumentacionEjgExtendsMapper scsDocumentacionejgExtendsMapper;
+	
+	@Autowired
+	private ScsContrariosasistenciaMapper scsContrariosasistenciaMapper;
 
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
@@ -4731,7 +4751,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
 					record.setIdturno(Integer.parseInt(turnos.get(0).getIdturno()));
 
-					response = scsEjgdesignaMapper.insertSelective(record);
+//					response = scsEjgdesignaMapper.insertSelective(record);
+					response = scsEjgdesignaMapper.insert(record);
 
 				} catch (Exception e) {
 					LOGGER.debug(
@@ -5794,4 +5815,297 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return newIdestadoporejg;
 	}
 
+	@Override
+	@Transactional
+	@Override
+	public UpdateResponseDTO copyEjg2Soj(List<String> datos,
+			HttpServletRequest request) throws Exception {
+		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		int response = 0;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"GestionEJGServiceImpl.copyEjg2Soj() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"GestionEJGServiceImpl.copyEjg2Soj() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				//Se comentan el try y el catch para que @Transactional funcione adecuadamente.
+//				try {
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> Iniciando los inserts...");
+
+					//Tareas:
+					//1. Obtenemos los asuntos que vamos a manipular.
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> Seleccionando EJG y SOJ.");
+					
+					ScsSojKey sojKey = new ScsSojKey();
+					
+					sojKey.setIdinstitucion(idInstitucion);
+					sojKey.setNumero(Long.parseLong(datos.get(2)));
+					sojKey.setAnio(Short.parseShort(datos.get(1)));
+					sojKey.setIdtiposoj(Short.parseShort(datos.get(3)));
+					
+					ScsSoj soj = scsSojMapper.selectByPrimaryKey(sojKey);
+					
+					ScsEjgKey ejgKey = new ScsEjgKey();
+					
+					ejgKey.setIdinstitucion(idInstitucion);
+					ejgKey.setAnio(Short.parseShort(datos.get(5)));
+					ejgKey.setIdtipoejg(Short.parseShort(datos.get(4)));
+					ejgKey.setNumero(Long.parseLong(datos.get(6)));
+
+					ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> EJG y SOJ seleccionados.");
+					
+					//2. Se asignan el letrado y el solicitante principal del EJG al SOJ.
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> Copiando informacion del EJG al SOJ.");
+					soj.setIdpersona(ejg.getIdpersona());
+					soj.setIdpersonajg(ejg.getIdpersonajg());
+					
+					soj.setUsumodificacion(usuarios.get(0).getIdusuario());
+					soj.setFechamodificacion(new Date());
+					
+					response = scsSojMapper.updateByPrimaryKey(soj);
+					if(response == 0)throw (new Exception("Error en copyEjg2Soj() al copiar los datos del EJG al SOJ."));
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> INformacion copiada del EJG al SOJ.");
+//				} catch (Exception e) {
+//					LOGGER.error("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Se ha producido un error ",
+//							e);
+//					response = 0;
+//				}
+
+				LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> Saliendo del servicio... ");
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
+			responseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.insertado");
+			responseDTO.setStatus(SigaConstants.OK);
+		}
+
+		responseDTO.setError(error);
+
+		return responseDTO;
+	}
+	
+	
+	@Transactional
+	@Override
+	public UpdateResponseDTO copyEjg2Asis(List<String> datos,
+			HttpServletRequest request) throws Exception {
+		UpdateResponseDTO responseDTO = new UpdateResponseDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		int response = 0;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"GestionEJGServiceImpl.copyEjg2Asis() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"GestionEJGServiceImpl.copyEjg2Asis() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				//Se comentan el try y el catch para que @Transactional funcione adecuadamente.
+//				try {
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Iniciando los inserts...");
+
+					//Tareas:
+					//1. Obtenemos los asuntos que vamos a manipular.
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Seleccionando EJG y la asistencia correspondientes.");
+					
+					ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
+					
+					asisKey.setIdinstitucion(idInstitucion);
+					asisKey.setNumero(Long.parseLong(datos.get(2)));
+					asisKey.setAnio(Short.parseShort(datos.get(1)));
+					
+					ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
+					
+					ScsEjgKey ejgKey = new ScsEjgKey();
+					
+					ejgKey.setIdinstitucion(idInstitucion);
+					ejgKey.setAnio(Short.parseShort(datos.get(4)));
+					ejgKey.setIdtipoejg(Short.parseShort(datos.get(3)));
+					ejgKey.setNumero(Long.parseLong(datos.get(5)));
+
+					ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> EJG y Asistencia seleccionados.");
+					
+					//2. Actualizamos los delitos de la asistencia asignando los del EJG.
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Copiando delitos del EJG a la asistencia.");
+					
+					ScsDelitosasistencia delitoAsistencia = new ScsDelitosasistencia();
+
+					delitoAsistencia.setIdinstitucion(idInstitucion);
+					delitoAsistencia.setAnio(asis.getAnio());
+					delitoAsistencia.setNumero(asis.getNumero());
+					
+					delitoAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+					delitoAsistencia.setFechamodificacion(new Date());
+
+					ScsDelitosejgExample delitosEjgExample = new ScsDelitosejgExample();
+					
+					delitosEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(ejg.getAnio()).andNumeroEqualTo(ejg.getNumero())
+					.andIdtipoejgEqualTo(ejg.getIdtipoejg());
+					
+					List<ScsDelitosejg> delitosEjg = scsDelitosejgMapper.selectByExample(delitosEjgExample);
+					
+					ScsDelitosasistenciaExample delitosAsistenciaExample = new ScsDelitosasistenciaExample();
+					
+					delitosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(ejg.getAnio()).andNumeroEqualTo(ejg.getNumero());
+					
+					List<ScsDelitosasistencia> delitosAsistencia = scsDelitosasistenciaMapper.selectByExample(delitosAsistenciaExample);
+					
+					if(!delitosAsistencia.isEmpty()){
+						response = scsDelitosasistenciaMapper.deleteByExample(delitosAsistenciaExample);
+						if(response == 0) throw(new Exception("Error al eliminar los delitos anteriores de la asistencia"));
+
+					}
+					
+					if(!delitosEjg.isEmpty()){
+						for (ScsDelitosejg delitoEjg : delitosEjg) {
+							delitoAsistencia.setIddelito(delitoEjg.getIddelito());
+							response = scsDelitosasistenciaMapper.insert(delitoAsistencia);
+							if(response == 0) throw(new Exception("Error al introducir un delito en la asistencia proveniente del EJG"));
+						}
+					}
+					
+					asis.setUsumodificacion(usuarios.get(0).getIdusuario());
+					asis.setFechamodificacion(new Date());
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Delitos copiados del EJG a la asistencia.");
+					
+					//3. Actualizamos los contrarios de la asistencia asignando los del EJG.
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Copiando contrarios del EJG a la asistencia.");
+					
+					ScsContrariosasistencia contrarioAsistencia = new ScsContrariosasistencia();
+
+					contrarioAsistencia.setIdinstitucion(idInstitucion);
+					contrarioAsistencia.setAnio(asis.getAnio());
+					contrarioAsistencia.setNumero(asis.getNumero());
+					
+					contrarioAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+					contrarioAsistencia.setFechamodificacion(new Date());
+
+					ScsContrariosejgExample contrariosEjgExample = new ScsContrariosejgExample();
+					
+					contrariosEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(ejg.getAnio()).andNumeroEqualTo(ejg.getNumero())
+					.andIdtipoejgEqualTo(ejg.getIdtipoejg());
+					
+					List<ScsContrariosejg> contrariosEjg = scsContrariosejgMapper.selectByExample(contrariosEjgExample);
+					
+					ScsContrariosasistenciaExample contrariosAsistenciaExample = new ScsContrariosasistenciaExample();
+					
+					contrariosAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(ejg.getAnio()).andNumeroEqualTo(ejg.getNumero());
+					
+					List<ScsContrariosasistencia> contrariosAsistencia = scsContrariosasistenciaMapper.selectByExample(contrariosAsistenciaExample);
+					
+					if(!contrariosAsistencia.isEmpty()){
+						response = scsContrariosasistenciaMapper.deleteByExample(contrariosAsistenciaExample);
+						if(response == 0) throw(new Exception("Error al eliminar los contrarios anteriores de la asistencia"));
+
+					}
+					
+					String contrariosAsisString = "";
+					if(!contrariosEjg.isEmpty()){
+						for (ScsContrariosejg contrarioEjg : contrariosEjg) {
+							contrarioAsistencia.setIdpersona(contrarioEjg.getIdpersona());
+							contrariosAsisString += contrarioEjg.getIdpersona();
+							response = scsContrariosasistenciaMapper.insert(contrarioAsistencia);
+							if(response == 0) throw(new Exception("Error al introducir un contrario en la asistencia proveniente del EJG"));
+						}
+					}
+					
+					asis.setUsumodificacion(usuarios.get(0).getIdusuario());
+					asis.setFechamodificacion(new Date());
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Contrarios copiados del EJG a la asistencia.");
+					
+					//4. Se asignan los datos del EJG a la asistencia.
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Copiando informacion del EJG a la asistencia.");
+					
+					asis.setIdpersonacolegiado(ejg.getIdpersona());
+					asis.setIdpersonajg(ejg.getIdpersonajg());
+					
+					asis.setJuzgado(ejg.getJuzgado());
+					asis.setJuzgadoidinstitucion(ejg.getJuzgadoidinstitucion());
+					
+					asis.setComisaria(ejg.getComisaria());
+					asis.setComisariaidinstitucion(ejg.getComisariaidinstitucion());
+					
+					asis.setNumeroprocedimiento(ejg.getAnioprocedimiento()+ejg.getNumeroprocedimiento());
+					asis.setNumerodiligencia(ejg.getNumerodiligencia());
+					asis.setNig(ejg.getNig());
+					asis.setIdpretension(ejg.getIdpretension());
+					
+					asis.setDelitosimputados(ejg.getDelitos());
+					asis.setContrarios(contrariosAsisString);
+					
+					response = scsAsistenciaMapper.updateByPrimaryKey(asis);
+					if(response == 0)throw (new Exception("Error en copyEjg2Asis() al copiar los datos del EJG a la asistencia."));
+					
+					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Informacion del EJG a la asistencia copiada.");
+					
+//				} catch (Exception e) {
+//					LOGGER.error("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Se ha producido un error ",
+//							e);
+//					response = 0;
+//				}
+
+				LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Saliendo del servicio... ");
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
+			responseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.insertado");
+			responseDTO.setStatus(SigaConstants.OK);
+		}
+
+		responseDTO.setError(error);
+
+		return responseDTO;
+	}
 }
