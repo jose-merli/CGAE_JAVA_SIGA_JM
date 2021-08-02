@@ -692,7 +692,7 @@ public class WSCommons {
 						//Correo electronico
 						CorreoElectronico cElectronico = CorreoElectronico.Factory.newInstance();
 						cElectronico.setStringValue(regSociedad.getCorreoElectronico());
-						cElectronico.setPublicar(Boolean.FALSE);
+						cElectronico.setPublicar(Boolean.TRUE);
 						argDireccion.setCorreoElectronico(cElectronico);
 						int contador =0;
 						int contadorContacto = 0;
@@ -718,21 +718,21 @@ public class WSCommons {
 								if(telefono){
 									Contacto contacto1 = Contacto.Factory.newInstance();
 									Telefono telefono1 = Telefono.Factory.newInstance();
-									telefono1.setPublicar(Boolean.FALSE);
+									telefono1.setPublicar(Boolean.TRUE);
 									telefono1.setStringValue(regSociedad.getTelefono1());
 									contacto1.setTelefono(telefono1);
 									contactosArray[contadorContacto++] = contacto1;
 								}if(movil){
 									Contacto contacto1 = Contacto.Factory.newInstance();
 									TelefonoMovil movil1 = TelefonoMovil.Factory.newInstance();
-									movil1.setPublicar(Boolean.FALSE);
+									movil1.setPublicar(Boolean.TRUE);
 									movil1.setStringValue(regSociedad.getMovil());
 									contacto1.setTelefonoMovil(movil1);
 									contactosArray[contadorContacto++] = contacto1;
 								}if(faxB){
 									Contacto contacto1 = Contacto.Factory.newInstance();
 									Fax fax = Fax.Factory.newInstance();
-									fax.setPublicar(Boolean.FALSE);
+									fax.setPublicar(Boolean.TRUE);
 									fax.setStringValue(regSociedad.getFax1());
 									contacto1.setFax(fax);
 									contactosArray[contadorContacto++] = contacto1;
@@ -741,7 +741,7 @@ public class WSCommons {
 						
 						argDireccion.setPaginaWeb(regSociedad.getPaginaWeb());
 						argDireccion.setContactoArray(contactosArray);
-						argDireccion.setPublicar(Boolean.FALSE);
+						argDireccion.setPublicar(Boolean.TRUE);
 						if(validarDireccion(argDireccion)) {
 							sociedadActualizacion.setDireccion(argDireccion);
 						}
@@ -814,7 +814,7 @@ public class WSCommons {
 									integranteFisico.setDatosProfesional(datosProfesional);
 									integranteUnitario.setIntegranteFisico(integranteFisico);
 									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
-									integranteUnitario.setPublicar(Boolean.FALSE);
+									integranteUnitario.setPublicar(Boolean.TRUE);
 								}else{
 									IntegranteJuridico integranteJuridico = IntegranteJuridico.Factory.newInstance();
 									DatosCargo cargoJuridico = DatosCargo.Factory.newInstance();
@@ -829,7 +829,7 @@ public class WSCommons {
 									}
 									integranteJuridico.setDatosCargo(cargoJuridico);
 									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
-									integranteUnitario.setPublicar(Boolean.FALSE);
+									integranteUnitario.setPublicar(Boolean.TRUE);
 									DatosEntidad datosEntidad = DatosEntidad.Factory.newInstance();
 									datosEntidad.setCIFNIF(integrante.getNifCif());
 									datosEntidad.setDenominacion(integrante.getNombre());
