@@ -6003,9 +6003,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						}
 					}
 					
-					asis.setUsumodificacion(usuarios.get(0).getIdusuario());
-					asis.setFechamodificacion(new Date());
-					
 					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Delitos copiados del EJG a la asistencia.");
 					
 					//3. Actualizamos los contrarios de la asistencia asignando los del EJG.
@@ -6061,7 +6058,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					
 					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Copiando informacion del EJG a la asistencia.");
 					
-					asis.setIdpersonacolegiado(ejg.getIdpersona());
+					if(ejg.getIdpersona() != null)asis.setIdpersonacolegiado(ejg.getIdpersona());
 					asis.setIdpersonajg(ejg.getIdpersonajg());
 					
 					asis.setJuzgado(ejg.getJuzgado());
@@ -6077,6 +6074,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					
 					asis.setDelitosimputados(ejg.getDelitos());
 					asis.setContrarios(contrariosAsisString);
+					
+					asis.setUsumodificacion(usuarios.get(0).getIdusuario());
+					asis.setFechamodificacion(new Date());
 					
 					response = scsAsistenciaMapper.updateByPrimaryKey(asis);
 					if(response == 0)throw (new Exception("Error en copyEjg2Asis() al copiar los datos del EJG a la asistencia."));
