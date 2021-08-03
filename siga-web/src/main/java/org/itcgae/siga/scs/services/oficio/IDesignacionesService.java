@@ -224,5 +224,9 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO asociarAsistenciaDesigna(List<String> designaItem, HttpServletRequest request);
 	
 	UpdateResponseDTO eliminarRelacionAsistenciaDesigna(RelacionesItem datos, HttpServletRequest request);
+
+	UpdateResponseDTO copyDesigna2Asis(List<String> datos, HttpServletRequest request) throws Exception;
+
+	InsertResponseDTO copyDesigna2Ejg(List<String> datos, HttpServletRequest request) throws Exception;
 	
 }
