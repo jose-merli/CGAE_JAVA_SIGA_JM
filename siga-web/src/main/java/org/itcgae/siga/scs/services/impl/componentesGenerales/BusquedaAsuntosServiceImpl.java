@@ -750,7 +750,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					
 					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> INformacion copiada del EJG al SOJ.");
 //				} catch (Exception e) {
-//					LOGGER.error("GestionEJGServiceImpl.copyEjg2Designa() -> Se ha producido un error ",
+//					LOGGER.error("GestionEJGServiceImpl.copyEjg2Soj() -> Se ha producido un error ",
 //							e);
 //					response = 0;
 //				}
@@ -951,7 +951,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Informacion del EJG a la asistencia copiada.");
 					
 //				} catch (Exception e) {
-//					LOGGER.error("GestionEJGServiceImpl.copyEjg2Designa() -> Se ha producido un error ",
+//					LOGGER.error("GestionEJGServiceImpl.copyEjg2Asis() -> Se ha producido un error ",
 //							e);
 //					response = 0;
 //				}
@@ -1039,13 +1039,6 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					
 					//1. Se debe modificar los atributos asociados en la ficha predesignacion del EJG en la designa.
 					
-//					PRE
-//					numAnnioProcedimiento = this.designa.ano;
-//				    nig = this.designa.nig;
-//				    observaciones = this.designa.observaciones;
-//				    calidad = this.designa.idCalidad;
-//				    idPretension = this.designa.idPretension;
-//				    juzgado = this.designa.idJuzgado;
 					designa.setNumprocedimiento(ejg.getNumeroprocedimiento());
 					designa.setAnioprocedimiento(ejg.getAnioprocedimiento());	
 					designa.setNig(ejg.getNig());
@@ -1073,8 +1066,10 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					
 					List<ScsDelitosdesigna> delitosDesigna = scsDelitosdesignaMapper.selectByExample(delitosDesignaExample);
 
-					if(!delitosDesigna.isEmpty()) response = scsDelitosdesignaMapper.deleteByExample(delitosDesignaExample);
-					if(response == 0) throw(new Exception("Error al eliminar los delitos de la designacion"));
+					if(!delitosDesigna.isEmpty()) {
+						response = scsDelitosdesignaMapper.deleteByExample(delitosDesignaExample);
+						if(response == 0) throw(new Exception("Error al eliminar los delitos de la designacion"));
+					}
 					
 					ScsDelitosejgExample delitosEjgExample = new ScsDelitosejgExample();
 					
@@ -1124,8 +1119,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					
 					List<ScsContrariosdesigna> contrariosDesigna = scsContrariosdesignaMapper.selectByExample(contrariosDesignaExample);
 
-					if(!contrariosDesigna.isEmpty()) response = scsDelitosdesignaMapper.deleteByExample(delitosDesignaExample);
-					if(response == 0) throw(new Exception("Error al eliminar los contrarios de la designacion"));
+					if(!contrariosDesigna.isEmpty()) {
+						response = scsDelitosdesignaMapper.deleteByExample(delitosDesignaExample);
+						if(response == 0) throw(new Exception("Error al eliminar los contrarios de la designacion"));
+					}
+					
 					
 					//Se crean los nuevos contrarios y se asignan
 					
@@ -1227,8 +1225,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						
 						List<ScsDefendidosdesigna> interesadosDesigna = scsDefendidosdesignaMapper.selectByExample(interesadosDesignaExample);
 
-						if(!interesadosDesigna.isEmpty()) response = scsDefendidosdesignaMapper.deleteByExample(interesadosDesignaExample);
-						if(response == 0) throw(new Exception("Error al eliminar los interesados de la designacion"));
+						if(!interesadosDesigna.isEmpty()) {
+							response = scsDefendidosdesignaMapper.deleteByExample(interesadosDesignaExample);
+							if(response == 0) throw(new Exception("Error al eliminar los interesados de la designacion"));
+						}
+						
 
 						//Se crea el interesado que se introducira en la designacion
 						ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
@@ -1730,8 +1731,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					List<ScsUnidadfamiliarejg> familiaresEJG = scsUnidadfamiliarejgMapper.selectByExample(familiaresEJGExample);
 					
 					//Se eliminan los familiares presentes en la tarjeta Unidad Familiar del EJG.
-					if(!familiaresEJG.isEmpty()) response = scsUnidadfamiliarejgMapper.deleteByExample(familiaresEJGExample);
-					if(response==0) throw(new Exception("Error al eliminar la unidad familiar asociada al EJG"));
+					if(!familiaresEJG.isEmpty()) {
+						response = scsUnidadfamiliarejgMapper.deleteByExample(familiaresEJGExample);
+						if(response==0) throw(new Exception("Error al eliminar la unidad familiar asociada al EJG"));
+					}
+					
 					
 					ScsDefendidosdesignaExample defendidosDesignaExample = new ScsDefendidosdesignaExample();
 					
