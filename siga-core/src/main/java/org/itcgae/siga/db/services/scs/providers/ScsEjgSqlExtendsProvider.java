@@ -176,7 +176,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sql.WHERE("TO_CHAR(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') <= TO_DATE( '" + fechaLimiteHast
 					+ "','DD/MM/RRRR')");
 		}
-		if (ejgItem.getDictamen() != null) {
+		if (ejgItem.getDictamen() != null && !ejgItem.getDictamen().isEmpty()) {
 			String [] selectedDict = ejgItem.getDictamen().split(",");
 			for (String dictamen : selectedDict) {
 				if (!dictamen.equals("-1")) {
@@ -185,6 +185,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					indiferente = true;
 				}
 			}
+			
 			if (!indiferente) {
 				dictamenCad = dictamenCad.substring(0, (dictamenCad.length() - 1));
 				sql.WHERE("EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ")");
