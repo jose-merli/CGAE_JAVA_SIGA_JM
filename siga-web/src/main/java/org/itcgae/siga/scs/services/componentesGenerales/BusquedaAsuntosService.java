@@ -33,6 +33,12 @@ public interface BusquedaAsuntosService {
 	InsertResponseDTO copyDesigna2Ejg(List<String> datos, HttpServletRequest request) throws Exception;
 
 	UpdateResponseDTO copyDesigna2Soj(List<String> datos, HttpServletRequest request) throws Exception;
+
+	UpdateResponseDTO copyAsis2Soj(List<String> datos, HttpServletRequest request) throws Exception;
+
+	UpdateResponseDTO copyAsis2Ejg(List<String> datos, HttpServletRequest request) throws Exception;
+
+	InsertResponseDTO copyAsis2Designa(List<String> datos, HttpServletRequest request) throws Exception;
 	
 	
 
