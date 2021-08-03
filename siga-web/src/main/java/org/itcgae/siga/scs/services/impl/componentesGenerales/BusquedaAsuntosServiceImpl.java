@@ -699,22 +699,22 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"GestionEJGServiceImpl.copyEjg2Soj() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"GestionEJGServiceImpl.copyEjg2Soj() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				//Se comentan el try y el catch para que @Transactional funcione adecuadamente.
 //				try {
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> Iniciando los inserts...");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Iniciando los inserts...");
 
 					//Tareas:
 					//1. Obtenemos los asuntos que vamos a manipular.
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> Seleccionando EJG y SOJ.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Seleccionando EJG y SOJ.");
 					
 					ScsSojKey sojKey = new ScsSojKey();
 					
@@ -734,11 +734,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 					ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> EJG y SOJ seleccionados.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> EJG y SOJ seleccionados.");
 					
 					//2. Se asignan el letrado y el solicitante principal del EJG al SOJ.
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> Copiando informacion del EJG al SOJ.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Copiando informacion del EJG al SOJ.");
 					soj.setIdpersona(ejg.getIdpersona());
 					soj.setIdpersonajg(ejg.getIdpersonajg());
 					
@@ -748,14 +748,14 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					response = scsSojMapper.updateByPrimaryKey(soj);
 					if(response == 0)throw (new Exception("Error en copyEjg2Soj() al copiar los datos del EJG al SOJ."));
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> INformacion copiada del EJG al SOJ.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> INformacion copiada del EJG al SOJ.");
 //				} catch (Exception e) {
-//					LOGGER.error("GestionEJGServiceImpl.copyEjg2Soj() -> Se ha producido un error ",
+//					LOGGER.error("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Se ha producido un error ",
 //							e);
 //					response = 0;
 //				}
 
-				LOGGER.info("GestionEJGServiceImpl.copyEjg2Soj() -> Saliendo del servicio... ");
+				LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Saliendo del servicio... ");
 			}
 		}
 
@@ -792,22 +792,22 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"GestionEJGServiceImpl.copyEjg2Asis() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"GestionEJGServiceImpl.copyEjg2Asis() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				//Se comentan el try y el catch para que @Transactional funcione adecuadamente.
 //				try {
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Iniciando los inserts...");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Iniciando los inserts...");
 
 					//Tareas:
 					//1. Obtenemos los asuntos que vamos a manipular.
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Seleccionando EJG y la asistencia correspondientes.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Seleccionando EJG y la asistencia correspondientes.");
 					
 					ScsAsistenciaKey asisKey = new ScsAsistenciaKey();
 					
@@ -826,11 +826,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 					ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> EJG y Asistencia seleccionados.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> EJG y Asistencia seleccionados.");
 					
 					//2. Actualizamos los delitos de la asistencia asignando los del EJG.
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Copiando delitos del EJG a la asistencia.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Copiando delitos del EJG a la asistencia.");
 					
 					ScsDelitosasistencia delitoAsistencia = new ScsDelitosasistencia();
 
@@ -870,11 +870,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						}
 					}
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Delitos copiados del EJG a la asistencia.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Delitos copiados del EJG a la asistencia.");
 					
 					//3. Actualizamos los contrarios de la asistencia asignando los del EJG.
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Copiando contrarios del EJG a la asistencia.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Copiando contrarios del EJG a la asistencia.");
 					
 					ScsContrariosasistencia contrarioAsistencia = new ScsContrariosasistencia();
 
@@ -919,11 +919,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					asis.setUsumodificacion(usuarios.get(0).getIdusuario());
 					asis.setFechamodificacion(new Date());
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Contrarios copiados del EJG a la asistencia.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Contrarios copiados del EJG a la asistencia.");
 					
 					//4. Se asignan los datos del EJG a la asistencia.
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Copiando informacion del EJG a la asistencia.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Copiando informacion del EJG a la asistencia.");
 					
 					if(ejg.getIdpersona() != null)asis.setIdpersonacolegiado(ejg.getIdpersona());
 					asis.setIdpersonajg(ejg.getIdpersonajg());
@@ -948,15 +948,15 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					response = scsAsistenciaMapper.updateByPrimaryKey(asis);
 					if(response == 0)throw (new Exception("Error en copyEjg2Asis() al copiar los datos del EJG a la asistencia."));
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Informacion del EJG a la asistencia copiada.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Informacion del EJG a la asistencia copiada.");
 					
 //				} catch (Exception e) {
-//					LOGGER.error("GestionEJGServiceImpl.copyEjg2Asis() -> Se ha producido un error ",
+//					LOGGER.error("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Se ha producido un error ",
 //							e);
 //					response = 0;
 //				}
 
-				LOGGER.info("GestionEJGServiceImpl.copyEjg2Asis() -> Saliendo del servicio... ");
+				LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Saliendo del servicio... ");
 			}
 		}
 
@@ -993,24 +993,24 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"GestionEJGServiceImpl.copyEjg2Designa() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"GestionEJGServiceImpl.copyEjg2Designa() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
-						"GestionEJGServiceImpl.copyEjg2Designa() -> Entrada a servicio para insertar las justificaciones express");
+						"BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Entrada a servicio para insertar las justificaciones express");
 				//Se comentan el try y el catch para que @Transactional funcone adecuadamente.
 //				try {
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Iniciando los inserts...");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Iniciando los inserts...");
 
 					//Tareas:
 					//0. Seleccionamos los datos implicados
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Saliendo a la actualizacion de algunos datos juridicos de designa");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Saliendo a la actualizacion de algunos datos juridicos de designa");
 					
 					
 					ScsDesignaKey designaKey = new ScsDesignaKey();
@@ -1093,11 +1093,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					response = scsDesignaMapper.updateByPrimaryKeySelective(designa);
 					if(response == 0) throw(new Exception("Error al introducir los datos juridicos en la designacion proveniente del EJG"));
 
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Saliendo de la actualizacion de algunos datos juridicos de designa");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Saliendo de la actualizacion de algunos datos juridicos de designa");
 					
 					//2. Se debe insertar los contrarios seleccionados en EJG.
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Entrando a los inserts para los contrarios de designa");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Entrando a los inserts para los contrarios de designa");
 					
 					//Obtenemos los contrarios ejg a introducir. Se seleccionan solo los activos (con fecha de baja nula).
 					
@@ -1175,14 +1175,14 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						
 					}
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Saliendo de los inserts para los contrarios de designa");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Saliendo de los inserts para los contrarios de designa");
 					
 					//3. Se debe introducir el procurador seleccionado en el EJG.
 					
 					//Se comprueba que hay un procurador definido en el ejg para prevenir inserciones fallidas
 					if(ejg.getIdprocurador()!=null) {
 						
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Iniciando los inserts...");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Iniciando los inserts...");
 					
 					ScsDesignaprocurador procDesigna = new ScsDesignaprocurador();
 					
@@ -1265,14 +1265,14 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					
 					
 					
-					LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Inserts finalizados");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Inserts finalizados");
 //				} catch (Exception e) {
-//					LOGGER.error("GestionEJGServiceImpl.copyEjg2Designa() -> Se ha producido un error ",
+//					LOGGER.error("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Se ha producido un error ",
 //							e);
 //					response = 0;
 //				}
 
-				LOGGER.info("GestionEJGServiceImpl.copyEjg2Designa() -> Saliendo del servicio... ");
+				LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Saliendo del servicio... ");
 			}
 		}
 
@@ -1309,22 +1309,22 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"DesignacionesServiceImpl.copyDesigna2Asis() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"DesignacionesServiceImpl.copyDesigna2Asis() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				//Se comentan el try y el catch para que @Transactional funcione adecuadamente.
 //				try {
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> Iniciando los inserts...");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Iniciando los inserts...");
 
 					//Tareas:
 					//1. Obtenemos los asuntos que vamos a manipular.
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> Seleccionando la designacion y la asistencia correspondientes.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Seleccionando la designacion y la asistencia correspondientes.");
 					
 					ScsDesignaKey designaKey = new ScsDesignaKey();
 					
@@ -1343,11 +1343,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					
 					ScsAsistencia asis = scsAsistenciaMapper.selectByPrimaryKey(asisKey);
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> EJG y Asistencia seleccionados.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> EJG y Asistencia seleccionados.");
 					
 					//2. Actualizamos los delitos de la asistencia asignando los de la designacion.
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> Copiando delitos de la designacion a la asistencia.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Copiando delitos de la designacion a la asistencia.");
 					
 					ScsDelitosasistencia delitoAsistencia = new ScsDelitosasistencia();
 
@@ -1387,11 +1387,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						}
 					}
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> Delitos copiados de la designacion a la asistencia.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Delitos copiados de la designacion a la asistencia.");
 					
 					//3. Actualizamos los contrarios de la asistencia asignando los de la designacion.
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> Copiando contrarios de la designacion a la asistencia.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Copiando contrarios de la designacion a la asistencia.");
 					
 					ScsContrariosasistencia contrarioAsistencia = new ScsContrariosasistencia();
 
@@ -1437,11 +1437,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					asis.setUsumodificacion(usuarios.get(0).getIdusuario());
 					asis.setFechamodificacion(new Date());
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> Contrarios copiados de la designacion a la asistencia.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Contrarios copiados de la designacion a la asistencia.");
 					
 					//4. Se asignan los datos de la designacion a la asistencia.
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> Copiando informacion de la designacion a la asistencia.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Copiando informacion de la designacion a la asistencia.");
 					
 					ScsDesignasletradoExample letradoDesignaExample = new ScsDesignasletradoExample();
 					
@@ -1472,15 +1472,15 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					response = scsAsistenciaMapper.updateByPrimaryKey(asis);
 					if(response == 0)throw (new Exception("Error en copyDesigna2Asis() al copiar los datos de la designacion a la asistencia."));
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> Informacion de la designacino a la asistencia copiada.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Informacion de la designacino a la asistencia copiada.");
 					
 //				} catch (Exception e) {
-//					LOGGER.error("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Se ha producido un error ",
+//					LOGGER.error("BusquedaAsuntosServiceImpl.extraerPreDesignaEJG() -> Se ha producido un error ",
 //							e);
 //					response = 0;
 //				}
 
-				LOGGER.info("DesignacionesServiceImpl.copyDesigna2Asis() -> Saliendo del servicio... ");
+				LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Asis() -> Saliendo del servicio... ");
 			}
 		}
 
@@ -1517,24 +1517,24 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"DesignacionesServiceImpl.copyDesigna2Ejg() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"DesignacionesServiceImpl.copyDesigna2Ejg() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
-						"DesignacionesServiceImpl.copyDesigna2Ejg() -> Entrada a servicio para insertar las justificaciones express");
+						"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Entrada a servicio para insertar las justificaciones express");
 				//Se comentan el try y el catch para que @Transactional funcone adecuadamente.
 //				try {
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Ejg() -> Iniciando los inserts...");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Iniciando los inserts...");
 
 					//Tareas:
 					//0. Se debe modificar los atributos asociados con predesignacion en la designa.
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Ejg() -> Saliendo a la actualizacion de algunos datos juridicos de designa");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Saliendo a la actualizacion de algunos datos juridicos de designa");
 					
 					
 					ScsEjgdesigna item = getEjgDesigna(datos, idInstitucion, usuarios.get(0));
@@ -1589,11 +1589,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					response = scsDesignaMapper.updateByPrimaryKeySelective(designa);
 					if(response == 0) throw(new Exception("Error al introducir los datos juridicos en la designa proveniente del EJG"));
 
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Ejg() -> Saliendo de la actualizacion de algunos datos juridicos de designa");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Saliendo de la actualizacion de algunos datos juridicos de designa");
 					
 					//2. Se debe insertar los contrarios seleccionados en la designacion.
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Ejg() -> Entrando a los inserts para los contrarios de designa");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Entrando a los inserts para los contrarios de designa");
 					
 					//Obtenemos los contrarios ejg a introducir
 					
@@ -1658,7 +1658,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 					}
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Ejg() -> Saliendo de los inserts para los contrarios de designa");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Saliendo de los inserts para los contrarios de designa");
 					
 					//3. Se asignan los valores de defensa juridica de EJG
 					
@@ -1691,7 +1691,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					
 					//4. Se debe introducir el procurador seleccionado en la designacion.
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Ejg() -> Iniciando la introduccion del procurador de la designacion al EJG");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Iniciando la introduccion del procurador de la designacion al EJG");
 					
 					//Obtenemos la lista de procuradores asociados a la designacion
 					ScsDesignaprocuradorExample procuradoresDesignaExample = new ScsDesignaprocuradorExample();
@@ -1768,14 +1768,14 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					
 					}
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Ejg() -> Inserts finalizados");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Inserts finalizados");
 //				} catch (Exception e) {
-//					LOGGER.error("DesignacionesServiceImpl.copyDesigna2Ejg() -> Se ha producido un error ",
+//					LOGGER.error("BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Se ha producido un error ",
 //							e);
 //					response = 0;
 //				}
 
-				LOGGER.info("DesignacionesServiceImpl.copyDesigna2Ejg() -> Saliendo del servicio... ");
+				LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Saliendo del servicio... ");
 			}
 
 		if (response == 0) {
@@ -1811,22 +1811,22 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"DesignacionesServiceImpl.copyDesigna2Soj() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"DesignacionesServiceImpl.copyDesigna2Soj() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				//Se comentan el try y el catch para que @Transactional funcione adecuadamente.
 //				try {
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Soj() -> Iniciando los inserts...");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Iniciando los inserts...");
 
 					//Tareas:
 					//1. Obtenemos los asuntos que vamos a manipular.
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Soj() -> Seleccionando Designacion y SOJ.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Seleccionando Designacion y SOJ.");
 					
 					ScsSojKey sojKey = new ScsSojKey();
 					
@@ -1846,11 +1846,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 					ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Soj() -> Designacion y SOJ seleccionados.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Designacion y SOJ seleccionados.");
 					
 					//2. Se asignan el letrado y el solicitante principal del EJG al SOJ.
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Soj() -> Copiando informacion de la designacion al SOJ.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Copiando informacion de la designacion al SOJ.");
 					
 					ScsDesignasletradoExample letradosDesignaExample = new ScsDesignasletradoExample();
 					
@@ -1871,14 +1871,14 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					response = scsSojMapper.updateByPrimaryKey(soj);
 					if(response == 0)throw (new Exception("Error en copyDesigna2Soj() al copiar los datos del EJG al SOJ."));
 					
-					LOGGER.info("DesignacionesServiceImpl.copyDesigna2Soj() -> Informacion copiada de la designacion al SOJ.");
+					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Informacion copiada de la designacion al SOJ.");
 //				} catch (Exception e) {
-//					LOGGER.error("DesignacionesServiceImpl.copyEjg2Designa() -> Se ha producido un error ",
+//					LOGGER.error("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Se ha producido un error ",
 //							e);
 //					response = 0;
 //				}
 
-				LOGGER.info("DesignacionesServiceImpl.copyDesigna2Soj() -> Saliendo del servicio... ");
+				LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Saliendo del servicio... ");
 			}
 		}
 
