@@ -817,5 +817,15 @@ public class EjgController {
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	// copiar EJG a una designacion
+		@RequestMapping(value = "/gestion-ejg/copyEjg2Designa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<InsertResponseDTO> copyEjg2Designa(@RequestBody List<String> datos, HttpServletRequest request) throws Exception {
+			InsertResponseDTO response = gestionEJG.copyEjg2Designa(datos, request);
+			if (response.getError().getCode() == 200)
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			else
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
 }

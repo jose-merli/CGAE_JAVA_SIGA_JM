@@ -176,4 +176,6 @@ public interface IGestionEJG {
 	UpdateResponseDTO copyEjg2Asis(List<String> datos, HttpServletRequest request) throws Exception;
 
 	UpdateResponseDTO copyEjg2Soj(List<String> datos, HttpServletRequest request) throws Exception;
+
+	InsertResponseDTO copyEjg2Designa(List<String> datos, HttpServletRequest request) throws Exception;
 }
