@@ -101,12 +101,19 @@ import org.itcgae.siga.db.entities.ScsActuaciondesigna;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaExample;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsAsistencia;
+import org.itcgae.siga.db.entities.ScsAsistenciaKey;
+import org.itcgae.siga.db.entities.ScsContrariosasistencia;
+import org.itcgae.siga.db.entities.ScsContrariosasistenciaExample;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
+import org.itcgae.siga.db.entities.ScsContrariosdesignaExample;
 import org.itcgae.siga.db.entities.ScsContrariosdesignaKey;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsContrariosejgExample;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
+import org.itcgae.siga.db.entities.ScsDefendidosdesignaExample;
 import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
+import org.itcgae.siga.db.entities.ScsDelitosasistencia;
+import org.itcgae.siga.db.entities.ScsDelitosasistenciaExample;
 import org.itcgae.siga.db.entities.ScsDelitosdesigna;
 import org.itcgae.siga.db.entities.ScsDelitosdesignaExample;
 import org.itcgae.siga.db.entities.ScsDelitosejg;
@@ -137,6 +144,7 @@ import org.itcgae.siga.db.entities.ScsProcedimientos;
 import org.itcgae.siga.db.entities.ScsProcedimientosKey;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.entities.ScsSoj;
+import org.itcgae.siga.db.entities.ScsSojKey;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
@@ -149,9 +157,11 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsAcreditacionMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
+import org.itcgae.siga.db.mappers.ScsContrariosasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
+import org.itcgae.siga.db.mappers.ScsDelitosasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
@@ -166,6 +176,7 @@ import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
+import org.itcgae.siga.db.mappers.ScsSojMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -179,7 +190,6 @@ import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipodictamenejgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
-import org.itcgae.siga.scs.services.impl.ejg.GestionEJGServiceImpl;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.scs.services.oficio.ISaltosCompOficioService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -211,6 +221,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
 	
 	@Autowired
+	private ScsSojMapper scsSojMapper;
+	
+	@Autowired
 	private ScsEstadoejgMapper scsEstadoejgMapper;
 
 	@Autowired
@@ -234,6 +247,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Autowired
 	private ScsContrariosdesignaMapper scsContrariosdesignaMapper;
 
+	@Autowired
+	private ScsContrariosasistenciaMapper scsContrariosasistenciaMapper;
+	
 	@Autowired
 	private ScsPersonajgExtendsMapper scsPersonajgExtendsMapper;
 
@@ -293,6 +309,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private ScsEjgMapper scsEjgMapper;
+	
+	@Autowired
+	private ScsDelitosasistenciaMapper scsDelitosasistenciaMapper;
 	
 	@Autowired
 	private ScsProcedimientosMapper scsProcedimientosMapper;
@@ -4986,17 +5005,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		if (idInstitucion != null) {
 			LOGGER.debug(
-					"GestionEJGServiceImpl.borrarRelacion() -> Entrada para obtener información del usuario logeado");
+					"DesignacionesServiceImpl.borrarRelacion() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug("GestionEJGServiceImpl.borrarRelacion() -> Salida de obtener información del usuario logeado");
+			LOGGER.debug("DesignacionesServiceImpl.borrarRelacion() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.debug(
-						"GestionEJGServiceImpl.borrarRelacion() -> Entrada para cambiar los datos generales del ejg");
+						"DesignacionesServiceImpl.borrarRelacion() -> Entrada para cambiar los datos generales del ejg");
 
 				try {
 					
@@ -5008,27 +5027,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					
 					
 					LOGGER.debug(
-							"GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+							"DesignacionesServiceImpl.borrarRelacion() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
 				} catch (Exception e) {
 					LOGGER.debug(
-							"GestionEJGServiceImpl.borrarRelacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							"DesignacionesServiceImpl.borrarRelacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
 							e);
 				} finally {
 					// respuesta si se actualiza correctamente
 					if (response == 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
-								"GestionEJGServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+								"DesignacionesServiceImpl.borrarRelacion() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"GestionEJGServiceImpl.borrarRelacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+								"DesignacionesServiceImpl.borrarRelacion() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
 					}
 				}
 			}
 		}
 
-		LOGGER.info("GestionEJGServiceImpl.borrarRelacion() -> Salida del servicio.");
+		LOGGER.info("DesignacionesServiceImpl.borrarRelacion() -> Salida del servicio.");
 
 		return responsedto;
 	}
@@ -7180,36 +7199,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					//Se comprueba que hay un procurador definido en el ejg para prevenir inserciones fallidas
 					if(ejg.getIdprocurador()!=null) {
 						
-					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Iniciando los inserts...");
-					
-					ScsDesignaprocurador procDesigna = new ScsDesignaprocurador();
-					
-//					IDINSTITUCION
-//					IDTURNO
-//					NUMERO
-//					ANIO
-//					IDINSTITUCION_PROC
-//					IDPROCURADOR
-//					FECHADESIGNA
-					
-					procDesigna.setIdinstitucion(idInstitucion);
-					procDesigna.setIdturno(designa.getIdturno());
-					procDesigna.setNumero(designa.getNumero());
-					procDesigna.setNumerodesignacion(ejg.getNumerodesignaproc());
-//					procDesigna.setNumero(Long.parseLong(ejg.getNumerodesignaproc()));
-//					procDesigna.setNumerodesignacion(Long.toString(designa.getNumero()));
-					procDesigna.setAnio(designa.getAnio());
-					
-					procDesigna.setIdinstitucionProc(ejg.getIdinstitucionProc());
-					procDesigna.setIdprocurador(ejg.getIdprocurador());
-					procDesigna.setFechadesigna(ejg.getFechaDesProc());	
-					
-					procDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
-					procDesigna.setFechamodificacion(new Date());						
-					
-					response = scsDesignaProcuradorMapper.insert(procDesigna);
-					if(response == 0) throw(new Exception("Error al introducir un procurador en la designa proveniente del EJG"));
-
+						LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Iniciando los inserts...");
+						
+						ScsDesignaprocurador procDesigna = new ScsDesignaprocurador();
+						
+						
+						procDesigna.setIdinstitucion(idInstitucion);
+						procDesigna.setIdturno(designa.getIdturno());
+						procDesigna.setNumero(designa.getNumero());
+						procDesigna.setNumerodesignacion(ejg.getNumerodesignaproc());
+						procDesigna.setAnio(designa.getAnio());
+						
+						procDesigna.setIdinstitucionProc(ejg.getIdinstitucionProc());
+						procDesigna.setIdprocurador(ejg.getIdprocurador());
+						procDesigna.setFechadesigna(ejg.getFechaDesProc());	
+						
+						procDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+						procDesigna.setFechamodificacion(new Date());						
+						
+						response = scsDesignaProcuradorMapper.insert(procDesigna);
+						if(response == 0) throw(new Exception("Error al introducir un procurador en la designa proveniente del EJG"));
+					}
 					
 					//4. Se debe insertar los interesados seleccionados en EJG en Unidad Familiar.
 					
@@ -7252,8 +7262,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						response = scsDefendidosdesignaMapper.insert(interesado);
 						if(response == 0) throw(new Exception("Error al introducir interesados en la designa proveniente de la unidad familiar del EJG"));
 
-					}
-					
 					}
 					
 					LOGGER.info("DesignacionesServiceImpl.extraerPreDesignaEJG() -> Inserts finalizados");
@@ -7402,11 +7410,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Saliendo del servicio... ");
 			}
 		}
-
 		
-
 		return responseDTO;
 	}
-	
 
 }
