@@ -1615,19 +1615,20 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					contrariosEjg.setFechamodificacion(new Date());
 					contrariosEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-					LOGGER.info(
-							"copyDesigna2Ejg() / scsPersonajgExtendsMapper.selectByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables de los contrarios ejg");
-
+					
 					for(ScsContrariosdesigna contrarioDesigna: contrariosDesigna) {
 						
 						ScsPersonajgKey scsPersonajgkey = new ScsPersonajgKey();
 						scsPersonajgkey.setIdpersona(Long.valueOf(contrarioDesigna.getIdpersona()));
 						scsPersonajgkey.setIdinstitucion(idInstitucion);
 
+						LOGGER.info(
+								"copyDesigna2Ejg() / scsPersonajgMapper.selectByPrimaryKey() -> Entrada a scsPersonajgMapper para obtener justiciables de los contrarios de la designacion");
+
 						ScsPersonajg personajg = scsPersonajgMapper.selectByPrimaryKey(scsPersonajgkey);
 
 						LOGGER.info(
-								"copyDesigna2Ejg() / scsPersonajgExtendsMapper.selectByPrimaryKey() -> Salida de scsPersonajgExtendsMapper para obtener justiciables de los contrarios ejg");
+								"copyDesigna2Ejg() / scsPersonajgMapper.selectByPrimaryKey() -> Salida de scsPersonajgMapper para obtener justiciables de los contrarios de la designacion");
 
 						// Se comprueba si tiene representante y se busca.
 						if (personajg.getIdrepresentantejg() != null) {
