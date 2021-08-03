@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -39,6 +40,12 @@ public class TiposServiciosController {
 	@GetMapping(value = "/combo/tipoServicios")
 	ResponseEntity<ComboDTO> comboTiposServicios(HttpServletRequest request) { 
 		ComboDTO response = tiposServiciosService.comboTiposServicios(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/pys/listadoTipoServicioByIdCategoria")
+	ResponseEntity<ComboDTO> listadoTipoServicioByIdCategoria(HttpServletRequest request, @RequestParam String idCategoria) { 
+		ComboDTO response = tiposServiciosService.searchTiposServiciosByIdCategoria(request, idCategoria);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	

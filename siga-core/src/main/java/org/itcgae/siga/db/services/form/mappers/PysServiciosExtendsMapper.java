@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.PysServiciosMapper;
+import org.itcgae.siga.db.services.fac.providers.PySTiposProductosSqlExtendsProvider;
 import org.itcgae.siga.db.services.form.providers.PysServiciosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,13 @@ public interface PysServiciosExtendsMapper extends PysServiciosMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ComboItem> comboTiposServicios(String idioma);
+	
+	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "searchTiposServiciosByIdCategoria")
+	@Results({ 
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> searchTiposServiciosByIdCategoria(String idioma, Short idInstitucion, String idCategoria);
 
 	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "getIndiceMaxServicio")
 	@Results({ 

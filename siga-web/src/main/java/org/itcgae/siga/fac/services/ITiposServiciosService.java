@@ -13,6 +13,7 @@ public interface ITiposServiciosService {
 	public ListadoTipoServicioDTO searchTiposServicios(HttpServletRequest request);
 	public ListadoTipoServicioDTO searchTiposServiciosHistorico(HttpServletRequest request);
 	public ComboDTO comboTiposServicios(HttpServletRequest request);
+	public ComboDTO searchTiposServiciosByIdCategoria(HttpServletRequest request, String idCategoria);
 	public InsertResponseDTO crearServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request);
 	public DeleteResponseDTO modificarServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request);
 	public ServicioDTO activarDesactivarServicio(ListadoTipoServicioDTO listadoServicios, HttpServletRequest request);
