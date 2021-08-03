@@ -1739,16 +1739,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.info(
 						"GestionEJGServiceImpl.actualizaDatosGenerales() -> Entrada para actualizar los datos generales del ejg");
 
-//				try {
-				// for (int i = 0; datos.get) > i; i++) {
 				response = 0;
-
-				// Clave primaria scsEstadoejg
-				// IDINSTITUCION
-				// IDTIPOEJG
-				// ANIO
-				// NUMERO
-				// IDESTADOPOREJG
 
 				// seleccionamos el objeto para el update
 
@@ -1758,7 +1749,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				ejgKey.setAnio(Short.parseShort(datos.getAnnio()));
 				ejgKey.setNumero(Long.parseLong(datos.getNumero()));
 				ejgKey.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
-				// key.setIdestadoporejg(Long.parseLong(datos.getEstadoEJG()));
 
 				ScsEjgWithBLOBs ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 
@@ -1771,9 +1761,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					ejg.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
 				ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
 				ejg.setFechamodificacion(new Date());
-
+				ejg.setNumejg(datos.getNumEjg());
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
+				
 				// cuando una fila es actualizada.
 				this.triggersEjgUpdatesFApertura(datos, usuarios.get(0), idInstitucion);
 
