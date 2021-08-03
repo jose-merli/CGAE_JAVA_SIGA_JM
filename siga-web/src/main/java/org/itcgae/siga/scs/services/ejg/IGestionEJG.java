@@ -172,10 +172,4 @@ public interface IGestionEJG {
 	UpdateResponseDTO guardarResolucion(ResolucionEJGItem datos, HttpServletRequest request) throws Exception;
 
 	Boolean getHabilitarActa(HttpServletRequest request);
-
-	UpdateResponseDTO copyEjg2Asis(List<String> datos, HttpServletRequest request) throws Exception;
-
-	UpdateResponseDTO copyEjg2Soj(List<String> datos, HttpServletRequest request) throws Exception;
-
-	InsertResponseDTO copyEjg2Designa(List<String> datos, HttpServletRequest request) throws Exception;
 }
