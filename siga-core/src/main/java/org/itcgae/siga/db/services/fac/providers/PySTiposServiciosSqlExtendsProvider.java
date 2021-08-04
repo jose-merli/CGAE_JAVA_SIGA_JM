@@ -3,8 +3,9 @@ package org.itcgae.siga.db.services.fac.providers;
 import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.TiposServiciosItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.PysServiciosSqlProvider;
@@ -66,7 +67,7 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.DESCRIPCION");
 		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.FECHABAJA");
 		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.AUTOMATICO");
-		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.IDTIPOIVA,");
+		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.IDTIPOIVA");
 		sql.SELECT_DISTINCT(" F_SIGA_GETRECURSO (PYS_TIPOSERVICIOS.DESCRIPCION, 1) AS CATEGORIA");
 		sql.SELECT_DISTINCT(" PYS_SERVICIOS.DESCRIPCION AS TIPO");
 		sql.SELECT_DISTINCT(" PYS_TIPOIVA.DESCRIPCION AS IVA");
@@ -172,4 +173,59 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
 		return sql.toString();
 	}
+
+	public String comprobarUsoServicio(ListaServiciosItem servicio, Short idInstitucion) {
+		SQL sql = new SQL();
+	
+		sql.SELECT(" IDPETICION");
+		
+		sql.FROM(" PYS_SERVICIOSSOLICITADOS");
+		
+		sql.WHERE(" IDINSTITUCION = '" + idInstitucion +"'");
+		
+		sql.WHERE(" IDTIPOSERVICIOS = '" + servicio.getIdtiposervicios() + "'");
+		
+		sql.WHERE(" IDSERVICIO = '" + servicio.getIdservicio() + "'");
+		
+		sql.WHERE(" IDSERVICIOSINSTITUCION = '" + servicio.getIdserviciosinstitucion() + "'");
+		
+		return sql.toString();
+	}
+
+	public String borradoLogicoServicios(AdmUsuarios usuario, ListaServiciosItem servicio, Short idInstitucion) {
+		SQL sql = new SQL();
+	
+		sql.UPDATE(" PYS_SERVICIOSINSTITUCION");
+		
+		sql.SET(" FECHAMODIFICACION = SYSDATE");
+		sql.SET(" USUMODIFICACION = '"+ usuario.getIdusuario() + "'");
+		
+		if(servicio.getFechabaja() != null) {
+			sql.SET(" FECHABAJA = NULL");
+		}
+		else{
+			sql.SET(" FECHABAJA = SYSDATE");
+		}
+		
+		sql.WHERE(" IDSERVICIO = '" + servicio.getIdservicio() + "'");
+		sql.WHERE(" IDTIPOSERVICIOS = '" + servicio.getIdtiposervicios() + "'");
+		sql.WHERE(" IDSERVICIOSINSTITUCION = '" + servicio.getIdserviciosinstitucion() + "'");
+		sql.WHERE(" IDINSTITUCION = '"+ idInstitucion +"'");
+
+		return sql.toString();
+	}
+
+	public String borradoFisicoProductosRegistro(ListaServiciosItem servicio, Short idInstitucion) {
+		SQL sql = new SQL();
+	
+		sql.DELETE_FROM("PYS_SERVICIOSINSTITUCION");
+		
+		sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE(" IDTIPOSERVICIOS = '" + servicio.getIdtiposervicios() + "'");
+		sql.WHERE(" IDSERVICIO = '" + servicio.getIdservicio() + "'");
+		sql.WHERE(" IDSERVICIOSINSTITUCION = '" + servicio.getIdserviciosinstitucion() + "'");
+		
+		return sql.toString();
+	}
+
 }

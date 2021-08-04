@@ -1,12 +1,7 @@
 package org.itcgae.siga.db.services.fac.mappers;
 
-
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
@@ -14,7 +9,6 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
@@ -27,7 +21,6 @@ import org.itcgae.siga.db.services.fac.providers.PySTiposProductosSqlExtendsProv
 import org.itcgae.siga.db.services.fac.providers.PySTiposServiciosSqlExtendsProvider;
 
 @Service
-//@Primary
 public interface PySTiposServiciosExtendsMapper extends PysServiciosMapper{
 	
 	@SelectProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "searchTiposServicios")
@@ -83,4 +76,13 @@ public interface PySTiposServiciosExtendsMapper extends PysServiciosMapper{
 	
 	@UpdateProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "activarDesactivarServicio")
 	int activarDesactivarServicio(AdmUsuarios usuario, Short idInstitucion, TiposServiciosItem servicio);
+	
+	@SelectProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "comprobarUsoServicio")
+	List<Integer> comprobarUsoServicio(ListaServiciosItem servicio, Short idInstitucion);
+	
+	@UpdateProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "borradoLogicoServicios")
+	int borradoLogicoServicios(AdmUsuarios usuario, ListaServiciosItem servicio, Short idInstitucion);
+	
+	@UpdateProvider(type = PySTiposServiciosSqlExtendsProvider.class, method = "borradoFisicoServiciosRegistro")
+	int borradoFisicoServiciosRegistro(ListaServiciosItem servicio, Short idInstitucion);
 }

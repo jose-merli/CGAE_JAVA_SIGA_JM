@@ -8,11 +8,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
+import org.itcgae.siga.DTO.fac.IdPeticionDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -114,4 +117,83 @@ public class ServiciosServiceImpl implements IServiciosService {
 		return listaServiciosDTO;
 	}
 
+	@Override
+	public DeleteResponseDTO reactivarBorradoFisicoLogicoServicios(ListaServiciosDTO listadoServicios, HttpServletRequest request) {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		int status = 0;
+		IdPeticionDTO idPeticionDTO = new IdPeticionDTO();
+		
+
+		LOGGER.info("reactivarBorradoFisicoLogicoServicios() -> Entrada al servicio para borrar fisicamente o logicamente o reactivar un servicio");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"reactivarBorradoFisicoLogicoServicios() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"reactivarBorradoFisicoLogicoServicios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"reactivarBorradoFisicoLogicoServicios() / pysTiposServiciosExtendsMapper.reactivarBorradoFisicoLogicoServicios() -> Entrada a pysTiposServiciosExtendsMapper para borrar fisicamente o logicamente o reactivar un servicio");
+					
+					for (ListaServiciosItem servicio : listadoServicios.getListaServiciosItems()) {
+						
+						//Comprueba que haya alguna solicitud realizada
+						if(pysTiposServiciosExtendsMapper.comprobarUsoServicio(servicio, idInstitucion) != null)
+							idPeticionDTO.setIdpeticionUso(pysTiposServiciosExtendsMapper.comprobarUsoServicio(servicio, idInstitucion)); 
+				
+						//Borrado logico --> Actualizamos la fechabaja del servicio a la actual (sysdate)
+						//Borrado fisico --> Eliminamos el registro del servicio y posteriormente el identificador
+						if(idPeticionDTO.getIdpeticionUso().size() > 0 ) { //Borrado logico ya que comprobarUsoServicio devolvio resultado por lo que el servicio tiene alguna solicitud
+							status = pysTiposServiciosExtendsMapper.borradoLogicoServicios(usuarios.get(0), servicio, idInstitucion);
+							if(status == 0) {
+								deleteResponseDTO.setStatus(SigaConstants.KO);
+							}else if(status == 1) {
+								deleteResponseDTO.setStatus(SigaConstants.OK);
+							}
+						}else{ //Borrado fisico al no tener ninguna solicitud ya que el idpeticion es 0, es decir comprobarUsoServicio no devolvio nada.
+							//Borramos el registro
+							status = pysTiposServiciosExtendsMapper.borradoFisicoServiciosRegistro(servicio, idInstitucion);
+							
+							if(status == 0) {
+								deleteResponseDTO.setStatus(SigaConstants.KO);
+							}else if(status == 1) {
+								deleteResponseDTO.setStatus(SigaConstants.OK);
+							}
+						}
+					}
+					
+					LOGGER.info(
+							"reactivarBorradoFisicoLogicoServicios() / pysTiposServiciosExtendsMapper.reactivarBorradoFisicoLogicoServicios() -> Salida de pysTiposServiciosExtendsMapper para borrar fisicamente o logicamente o reactivar un servicio");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ServiciosServiceImpl.reactivarBorradoFisicoLogicoServicios() -> Se ha producido un error al borrar fisicamente o logicamente o reactivar un servicio",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		
+		deleteResponseDTO.setError(error);
+
+		LOGGER.info("reactivarBorradoFisicoLogicoServicios() -> Salida del servicio para borrar fisicamente o logicamente o reactivar un servicio");
+
+		return deleteResponseDTO;
+	}
 }

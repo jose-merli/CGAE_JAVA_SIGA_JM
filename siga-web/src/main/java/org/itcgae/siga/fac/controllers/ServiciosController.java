@@ -6,6 +6,7 @@ import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.fac.services.IProductosService;
 import org.itcgae.siga.fac.services.IServiciosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +26,11 @@ public class ServiciosController {
 	ResponseEntity<ListaServiciosDTO> listadoServicios(HttpServletRequest request, @RequestBody FiltroServicioItem filtroServicioItem) { 
 		ListaServiciosDTO response = serviciosService.searchListadoServicios(request, filtroServicioItem);
 		return new ResponseEntity<ListaServiciosDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value="/pys/reactivarBorradoFisicoLogicoServicios")
+	ResponseEntity<DeleteResponseDTO> reactivarBorradoFisicoLogicoServicios(@RequestBody ListaServiciosDTO listadoServicios, HttpServletRequest request){
+		DeleteResponseDTO response = serviciosService.reactivarBorradoFisicoLogicoServicios(listadoServicios, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 }
