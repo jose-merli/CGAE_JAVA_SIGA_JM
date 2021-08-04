@@ -1100,27 +1100,54 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						if (response == 0)
 							throw (new Exception("Error al eliminar los interesados de la designacion"));
 					}
+					
+					//4. Se debe insertar los interesados seleccionados en EJG en Unidad Familiar.
+					
+					ScsUnidadfamiliarejgExample familiaresEJGExample = new ScsUnidadfamiliarejgExample();
+					
+					familiaresEJGExample.createCriteria().andAnioEqualTo(ejg.getAnio()).andIdinstitucionEqualTo(idInstitucion)
+					.andIdtipoejgEqualTo(ejg.getIdtipoejg()).andNumeroEqualTo(ejg.getNumero()).andFechabajaIsNull();
+					
+					List<ScsUnidadfamiliarejg> familiaresEJG = scsUnidadfamiliarejgMapper.selectByExample(familiaresEJGExample);
+					
+					//Seleccionamos y borramos los interesados presentes anteriormente en la designacion
+					
+					ScsDefendidosdesignaExample interesadosDesignaExample = new ScsDefendidosdesignaExample();
+					
+					interesadosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
+					.andIdturnoEqualTo(designa.getIdturno());
+					
+					List<ScsDefendidosdesigna> interesadosDesigna = scsDefendidosdesignaMapper.selectByExample(interesadosDesignaExample);
 
-					// Se crea el interesado que se introducira en la designacion
+					if(!interesadosDesigna.isEmpty()) {
+						response = scsDefendidosdesignaMapper.deleteByExample(interesadosDesignaExample);
+						if(response == 0) throw(new Exception("Error al eliminar los interesados de la designacion"));
+					}
+					
+					//Se crea el interesado que se introducira en la designacion
 					ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
-
+					
 					interesado.setAnio(designa.getAnio());
 					interesado.setNumero(designa.getNumero());
 					interesado.setIdinstitucion(idInstitucion);
-					interesado.setIdpersona(familiar.getIdpersona());
 					interesado.setIdturno(designa.getIdturno());
+					
+					for(ScsUnidadfamiliarejg familiar : familiaresEJG) {
+						
 
-					// Se comprueba si el interesado introducido tiene un representante asociado
-					ScsPersonajgKey personajgKey = new ScsPersonajgKey();
-
-					personajgKey.setIdinstitucion(idInstitucion);
-					personajgKey.setIdpersona(familiar.getIdpersona());
-
-					ScsPersonajg personajg = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
-
-					if (personajg.getIdrepresentantejg() != null) {
-						personajgKey.setIdpersona(personajg.getIdrepresentantejg());
-
+						interesado.setIdpersona(familiar.getIdpersona());
+						
+						//Se comprueba si el interesado introducido tiene un representante asociado
+						ScsPersonajgKey personajgKey = new ScsPersonajgKey();
+						
+						personajgKey.setIdinstitucion(idInstitucion);
+						personajgKey.setIdpersona(familiar.getIdpersona());
+						
+						ScsPersonajg personajg = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
+						
+						if(personajg.getIdrepresentantejg() != null) {personajgKey.setIdpersona(personajg.getIdrepresentantejg());
+						
 						ScsPersonajg representanteFamiliar = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
 
 						interesado.setNombrerepresentante(representanteFamiliar.getNombre());
@@ -1822,7 +1849,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Informacion copiada de la designacion al SOJ.");
 //				} catch (Exception e) {
-//					LOGGER.error("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Se ha producido un error ",
+//					LOGGER.error("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Se ha producido un error ",
 //							e);
 //					response = 0;
 //				}
