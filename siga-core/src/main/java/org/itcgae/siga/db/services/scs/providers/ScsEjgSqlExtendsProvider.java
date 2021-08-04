@@ -38,8 +38,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ " AND   ejgacta.anioacta = ac.anioacta" + " AND   ejgacta.idinstitucionejg = ejg.idinstitucion"
 				+ " AND   ejgacta.anioejg = ejg.anio" + " AND   ejgacta.idtipoejg = ejg.idtipoejg"
 				+ " AND   ejgacta.numeroejg = ejg.numero" + " AND   ac.idinstitucion = " + idInstitucion;
-//				+ " AND   ac.anioacta = " + ejgItem.getAnnioActa()
-//				+ " AND   ac.numeroacta = " + ejgItem.getNumActa() + ")";
+
 
 		if (ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
 			condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.anioacta = " + ejgItem.getAnnioActa();
@@ -52,9 +51,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ " AND ejgremesa.idinstitucion = ejg.idinstitucion" + " AND   ejgremesa.anio = ejg.anio"
 				+ " AND   ejgremesa.idtipoejg = ejg.idtipoejg" + " AND   ejgremesa.numero = ejg.numero"
 				+ " AND   remesa.idinstitucion = " + idInstitucion;
-//				+ " AND   remesa.prefijo = " + ejgItem.getNumRegRemesa1()
-//				+ " AND   remesa.numero = " + ejgItem.getNumRegRemesa2()
-//				+ " AND   remesa.sufijo = " + ejgItem.getNumRegRemesa3() + ")";
+
 		if (ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != "")
 			condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.prefijo = '" + ejgItem.getNumRegRemesa1()
 					+ "'";
@@ -87,8 +84,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
 		sql.SELECT("ejg.idpersonajg");
 		sql.SELECT("perjg.NIF");
-//		sql.SELECT("perjg.correoelectronico");
-//		sql.SELECT("perjg.fechanacimiento");
+
 
 		// from
 		sql.FROM("scs_ejg ejg");
@@ -114,18 +110,14 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = '"
 				+ idLenguaje + "'");
 
-		// where
+	
 		sql.WHERE("ejg.idinstitucion = " + idInstitucion);
 		if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 			sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
-//		if (ejgItem.getNumero() != null && ejgItem.getNumero() != "")
-//			sql.WHERE("EJG.NUMEJG =" + ejgItem.getNumero());
+
 		
 		if (ejgItem.getNumero() != null && !ejgItem.getNumero().isEmpty()) {
-			// si viene - hay que buscar de uno a otro (1-5 => numDesignacion 1,2,3,4,5)
-			// si viene , hay que buscar uno u otro (1,6 => numDesignacion 1 ó 6)
-
-			//sql.append(" AND");
+			
 
 			String[] parts;
 
@@ -278,12 +270,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
 					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 				}
-//					sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(apellido1,apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
 				if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
 					String columna = "perjg.NOMBRE";
 					String cadena = ejgItem.getNombre();
 					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-//					sql.WHERE("TRANSLATE(LOWER(perjg.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
 				}
 			} else if (ejgItem.getRol().equals("4")) {
 				sql.INNER_JOIN(
@@ -298,13 +288,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
 					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 				}
-//					sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 				if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
 					String columna = "perjgunidadfamiliar.NOMBRE";
 					String cadena = ejgItem.getNombre();
 					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 				}
-//					sql.WHERE("TRANSLATE(LOWER(perjgunidadfamiliar.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 			} else if (ejgItem.getRol().equals("2")) {
 				sql.INNER_JOIN(
 						"scs_contrariosejg contrario on contrario.idinstitucion = ejg.idinstitucion and contrario.idtipoejg = ejg.idtipoejg");
@@ -318,13 +306,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
 					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 				}
-//					sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(perjgcontrario.apellido1,perjgcontrario.apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 				if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
 					String columna = "perjgcontrario.NOMBRE";
 					String cadena = ejgItem.getNombre();
 					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 				}
-//					sql.WHERE("TRANSLATE(LOWER(perjgcontrario.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 			} else if (ejgItem.getRol().equals("3")) {
 				sql.INNER_JOIN(
 						"scs_unidadfamiliarejg solicitante on solicitante.idinstitucion = ejg.idinstitucion and solicitante.idtipoejg = ejg.idtipoejg");
@@ -339,13 +325,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
 					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 				}
-//					sql.WHERE("(TRANSLATE(LOWER( REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 				if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
 					String columna = "perjgunidadfamiliar.NOMBRE";
 					String cadena = ejgItem.getNombre();
 					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 				}
-//					sql.WHERE("(TRANSLATE(LOWER(perjgunidadfamiliar.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
 			}
 		} else {
 			if (ejgItem.getNif() != null && ejgItem.getNif() != "")
@@ -355,13 +339,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
 				sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 			}
-//				sql.WHERE("TRANSLATE(LOWER( REPLACE(CONCAT(apellido1,apellido2), ' ', '')),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getApellidos() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
 			if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
 				String columna = "perjg.NOMBRE";
 				String cadena = ejgItem.getNombre();
 				sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 			}
-//				sql.WHERE("TRANSLATE(LOWER(perjg.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('"+ ejgItem.getNombre() +"'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')");
+
 		}
 		if (ejgItem.getTipoLetrado() != null && ejgItem.getTipoLetrado() != "") {
 			if (ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "") {
@@ -369,10 +352,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					// letrado tramitador
 					if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
 						sql.WHERE("PER.IDPERSONA = " + ejgItem.getIdPersona());
-					if (ejgItem.getTurno() != null && ejgItem.getTurno() != "")
-						sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getTurno());
-					if (ejgItem.getGuardia() != null && ejgItem.getGuardia() != "")
-						sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA " + ejgItem.getGuardia());
+					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+						sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+					if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+						sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA " + ejgItem.getIdGuardia());
 				} else if (ejgItem.getTipoLetrado().equals("D")) {
 					// letrado designas
 					sql.INNER_JOIN(
@@ -383,57 +366,56 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 							"SCS_DESIGNASLETRADO DESIGNALETRADO ON DESIGNALETRADO.idinstitucion = DESIGNA.idinstitucion  and DESIGNALETRADO.idturno = DESIGNA.idturno and DESIGNALETRADO.anio = DESIGNA.anio and DESIGNALETRADO.numero = DESIGNA.numero");
 					if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
 						sql.WHERE("DESIGNALETRADO.IDPERSONA = " + ejgItem.getIdPersona());
-					if (ejgItem.getTurno() != null && ejgItem.getTurno() != "")
-						sql.WHERE("DESIGNA.IDTURNO = " + ejgItem.getTurno());
+					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+						sql.WHERE("DESIGNA.IDTURNO = " + ejgItem.getIdTurno());
 				} else if (ejgItem.getTipoLetrado().equals("A")) {
 					// letrado asistencias
 					sql.INNER_JOIN(
 							"SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
 					if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
 						sql.WHERE("ASISTENCIA.IDPERSONACOLEGIADO = " + ejgItem.getIdPersona());
-					if (ejgItem.getTurno() != null && ejgItem.getTurno() != "")
-						sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getTurno());
-					if (ejgItem.getGuardia() != null && ejgItem.getGuardia() != "")
-						sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getGuardia());
+					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+						sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getIdTurno());
+					if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+						sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
 				}
 			} else {
 				if (ejgItem.getTipoLetrado().equals("E")) {
 					// letrado tramitador
-					if (ejgItem.getTurno() != null && ejgItem.getTurno() != "")
-						sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getTurno());
-					if (ejgItem.getGuardia() != null && ejgItem.getGuardia() != "")
-						sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getGuardia());
+					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+						sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+					if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+						sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
 				} else if (ejgItem.getTipoLetrado().equals("D")) {
 					// letrado designas
 					sql.INNER_JOIN(
 							"SCS_EJGDESIGNA EJGDESIGNA ON EJGDESIGNA.IDINSTITUCION = EJG.idinstitucion and EJGDESIGNA.idtipoejg = ejg.idtipoejg and EJGDESIGNA.ANIOEJG = ejg.anio and EJGDESIGNA.numeroejg = ejg.numero");
-					if (ejgItem.getTurno() != null && ejgItem.getTurno() != "")
-						sql.WHERE("EJGDESIGNA.IDTURNO = " + ejgItem.getTurno());
+					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+						sql.WHERE("EJGDESIGNA.IDTURNO = " + ejgItem.getIdTurno());
 				} else if (ejgItem.getTipoLetrado().equals("A")) {
 					// letrado asistencias
 					sql.INNER_JOIN(
 							"SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
-					if (ejgItem.getTurno() != null && ejgItem.getTurno() != "")
-						sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getTurno());
-					if (ejgItem.getGuardia() != null && ejgItem.getGuardia() != "")
-						sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getGuardia());
+					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+						sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getIdTurno());
+					if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+						sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
 				}
 			}
 		} else {
 			if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
 				sql.WHERE("PER.IDPERSONA = " + ejgItem.getIdPersona());
-			if (ejgItem.getTurno() != null && ejgItem.getTurno() != "")
-				sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getTurno());
-			if (ejgItem.getGuardia() != null && ejgItem.getGuardia() != "")
-				sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getGuardia());
+			if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+				sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+			if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+				sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
 		}
 		if (tamMaximo != null) {
 			Integer tamMaxNumber = tamMaximo + 1;
 			sql.WHERE("rownum <= " + tamMaxNumber);
 
 		}
-		// order
-//		sql.ORDER_BY("anio DESC, to_number(numejg) DESC");
+		
 		sql.ORDER_BY("TURNO ASC, GUARDIA.NOMBRE ASC");
 
 		return sql.toString();
