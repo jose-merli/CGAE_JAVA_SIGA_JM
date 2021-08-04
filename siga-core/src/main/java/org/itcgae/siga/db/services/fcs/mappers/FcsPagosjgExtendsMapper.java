@@ -7,9 +7,8 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.CompensacionFacItem;
-import org.itcgae.siga.DTOs.scs.ConceptoPagoItem;
-import org.itcgae.siga.DTOs.scs.PagosjgItem;
+import org.itcgae.siga.DTOs.scs.*;
+import org.itcgae.siga.db.entities.FcsPagoColegiado;
 import org.itcgae.siga.db.mappers.FcsPagosjgMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsPagosjgSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -120,4 +119,66 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
             @Result(column = "IMPORTEPAGO", property = "importePagado", jdbcType = JdbcType.VARCHAR)})
     List<CompensacionFacItem> getCompensacionFacturas(String idPago, Short idInstitucion);
 
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getColegiadosApagar")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPAGOSJG", property = "idpagosjg", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPERSONA_SJCS", property = "idperorigen", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPERDESTINO", property = "idperdestino", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPOFICIO", property = "impoficio", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPASISTENCIA", property = "impasistencia", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPSOJ", property = "impsoj", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPEJG", property = "impejg", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPMOVVAR", property = "impmovvar", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPIRPF", property = "impirpf", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPRET", property = "impret", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDCUENTA", property = "idcuenta", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "PORCENTAJEIRPF", property = "porcentajeirpf", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDRETENCION", property = "idretencion", jdbcType = JdbcType.DECIMAL)
+    })
+    List<FcsPagoColegiado> getColegiadosApagar(Short idInstitucion, String idPago, int caseMorosos);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "perteneceAunaSociedad")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idCuenta", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDCUENTA", property = "idCuenta", jdbcType = JdbcType.DECIMAL)
+    })
+    List<PerteneceAunaSociedadDTO> perteneceAunaSociedad(Short idInstitucion, String idPersona);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "tieneCuentaAbonoAsociada")
+    String tieneCuentaAbonoAsociada(Short idInstitucion, String idPersonaSociedad, String idCuenta);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getCuentaBancariaActiva")
+    List<String> getCuentaBancariaActiva(Short idInstitucion, String idPersona);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getMovimientosRW")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDMOVIMIENTO", property = "idMovimiento", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "CANTIDAD", property = "cantidad", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "USUMODIFICACION", property = "usuModificacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDFACTURACION", property = "idfacturacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDGRUPOFACTURACION", property = "idGrupoFacturacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPORTEAPLICADO", property = "importeAplicado", jdbcType = JdbcType.DECIMAL)
+    })
+    List<MovimientoVarioDTO> getMovimientosRW(Short idInstitucion, String idPersona, String idFacturacion, String fDesde, String idGrupoFacturacion, int caso);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getFacturacionesGruposPagos")
+    @Results({
+            @Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDGRUPOFACTURACION", property = "idGrupoFacturacion", jdbcType = JdbcType.DECIMAL)
+    })
+    List<FacturacionGrupoPagoDTO> getFacturacionesGruposPagos(String idPago, String idInstitucion);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getSumaMovimientosAplicados")
+    double getSumaMovimientosAplicados(String idInstitucion, String idMovimiento, String idPersona);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getSumaRetenciones")
+    double getSumaRetenciones(String idInstitucion, String idPago, String idPersona);
 }

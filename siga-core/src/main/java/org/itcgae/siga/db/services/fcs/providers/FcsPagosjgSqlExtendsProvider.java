@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.fcs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.PagosjgItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FcsPagosjgSqlProvider;
 
@@ -477,6 +478,195 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         query.ORDER_BY("FACTURA.FECHAEMISION ASC");
 
         return query.toString();
+    }
+
+    public String getColegiadosApagar(Short idInstitucion, String idPago, int caseMorosos) {
+
+        SQL sql1 = new SQL();
+        sql1.SELECT("1");
+        sql1.FROM("FAC_FACTURA F");
+        sql1.WHERE("F.IDPERSONA = PC.IDPERORIGEN");
+        sql1.WHERE("F.IDINSTITUCION = PC.IDINSTITUCION");
+        sql1.WHERE("F.NUMEROFACTURA > '0'");
+        sql1.WHERE("F.IMPTOTALPORPAGAR > 0");
+        sql1.WHERE("F.ESTADO IN (2,4,5)");
+
+        SQL sql = new SQL();
+        sql.SELECT("PC.IDINSTITUCION");
+        sql.SELECT("PC.IDPAGOSJG");
+        sql.SELECT("PC.IDPERORIGEN AS IDPERSONA_SJCS");
+        sql.SELECT("PC.IDPERDESTINO");
+        sql.SELECT("PC.IMPOFICIO");
+        sql.SELECT("PC.IMPASISTENCIA");
+        sql.SELECT("PC.IMPSOJ");
+        sql.SELECT("PC.IMPEJG");
+        sql.SELECT("PC.IMPMOVVAR");
+        sql.SELECT("PC.IMPIRPF");
+        sql.SELECT("PC.IMPRET");
+        sql.SELECT("PC.IDCUENTA");
+        sql.SELECT("PC.FECHAMODIFICACION");
+        sql.SELECT("PC.USUMODIFICACION");
+        sql.SELECT("PC.PORCENTAJEIRPF");
+        sql.SELECT("PC.IDRETENCION");
+        sql.FROM("FCS_PAGO_COLEGIADO PC");
+        sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+        sql.WHERE("IDPAGOSJG = '" + idPago + "'");
+
+        switch (caseMorosos) {
+            case 0:
+                sql.WHERE("EXISTS ( " + sql1.toString() + " )");
+                break;
+            case 1:
+                sql.WHERE("NOT EXISTS ( " + sql1.toString() + " )");
+                break;
+            default:
+                break;
+        }
+
+        return sql.toString();
+    }
+
+    public String perteneceAunaSociedad(Short idInstitucion, String idPersona) {
+
+        SQL sql = new SQL();
+        sql.SELECT("IDPERSONA");
+        sql.SELECT("IDCUENTA");
+        sql.FROM("CEN_COMPONENTES");
+        sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+        sql.WHERE("CEN_CLIENTE_IDPERSONA = '" + idPersona + "'");
+        sql.WHERE("IDINSTITUCION = CEN_CLIENTE_IDINSTITUCION");
+        sql.WHERE("SOCIEDAD = '1'");
+        sql.WHERE("FECHABAJA IS NULL");
+
+        return sql.toString();
+    }
+
+    public String tieneCuentaAbonoAsociada(Short idInstitucion, String idPersonaSociedad, String idCuenta) {
+
+        SQL sql = new SQL();
+        sql.SELECT("IDCUENTA");
+        sql.FROM("CEN_CUENTASBANCARIAS");
+        sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+        sql.WHERE("IDPERSONA = '" + idPersonaSociedad + "'");
+        sql.WHERE("FECHABAJA IS NULL");
+        sql.WHERE("ABONOSJCS = '1'");
+        sql.WHERE("IDCUENTA = '" + idCuenta + "'");
+
+        return sql.toString();
+    }
+
+    public String getCuentaBancariaActiva(Short idInstitucion, String idPersona) {
+
+        SQL sql = new SQL();
+        sql.SELECT("IDCUENTA");
+        sql.FROM("CEN_CUENTASBANCARIAS");
+        sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+        sql.WHERE("IDPERSONA = '" + idPersona + "'");
+        sql.WHERE("FECHABAJA IS NULL");
+        sql.WHERE("ABONOSJCS = '1'");
+        sql.ORDER_BY("FECHAMODIFICACION DESC");
+
+        return sql.toString();
+    }
+
+    public String getMovimientosRW(Short idInstitucion, String idPersona, String idFacturacion, String fDesde, String idGrupoFacturacion, int caso) {
+
+        SQL sql = new SQL();
+        sql.SELECT("M.MOTIVO");
+        sql.SELECT("M.DESCRIPCION");
+        sql.SELECT("M.IDINSTITUCION");
+        sql.SELECT("M.IDMOVIMIENTO");
+        sql.SELECT("M.CANTIDAD");
+        sql.SELECT("M.IDFACTURACION");
+        sql.SELECT("M.IDGRUPOFACTURACION");
+        sql.SELECT("SUM(NVL(A.IMPORTEAPLICADO, 0)) AS IMPORTEAPLICADO");
+        sql.SELECT("M.FECHAMODIFICACION");
+        sql.SELECT("M.FECHAALTA");
+        sql.SELECT("M.USUMODIFICACION");
+        sql.FROM("FCS_MOVIMIENTOSVARIOS M " +
+                "LEFT JOIN FCS_APLICA_MOVIMIENTOSVARIOS A ON M.IDINSTITUCION = A.IDINSTITUCION " +
+                "AND M.IDMOVIMIENTO = A.IDMOVIMIENTO");
+        sql.WHERE("M.IDINSTITUCION = '" + idInstitucion + "'");
+        sql.WHERE("M.IDPERSONA = '" + idPersona + "'");
+
+        SQL consultaPorFacturacion = new SQL();
+        consultaPorFacturacion.SELECT("1");
+        consultaPorFacturacion.FROM("FCS_FACTURACIONJG FACJG");
+        consultaPorFacturacion.WHERE("TRUNC(FECHADESDE) <= '" + fDesde + "'");
+        consultaPorFacturacion.WHERE("M.IDINSTITUCION = FACJG.IDINSTITUCION");
+        consultaPorFacturacion.WHERE("M.IDFACTURACION = FACJG.IDFACTURACION");
+
+        switch (caso) {
+            case SigaConstants.CASO_MVNOASOCIADO:
+                sql.WHERE("M.IDFACTURACION IS NULL");
+                sql.WHERE("M.IDGRUPOFACTURACION IS NULL");
+                break;
+            case SigaConstants.CASO_MVASOCIADOAFACTURACION:
+                sql.WHERE("M.IDGRUPOFACTURACION IS NULL");
+                sql.WHERE("M.IDFACTURACION IS NOT NULL");
+                sql.WHERE("(M.IDFACTURACION = " + idFacturacion + " OR EXISTS ( " + consultaPorFacturacion.toString() + " ))");
+                break;
+            case SigaConstants.CASO_MVASOCIADOAGRUPOFACT:
+                sql.WHERE("M.IDGRUPOFACTURACION = " + idGrupoFacturacion);
+                sql.WHERE("(M.IDFACTURACION IS NULL OR EXISTS ( " + consultaPorFacturacion.toString() + " ))");
+                break;
+        }
+
+        sql.GROUP_BY("M.MOTIVO");
+        sql.GROUP_BY("M.DESCRIPCION");
+        sql.GROUP_BY("M.IDINSTITUCION");
+        sql.GROUP_BY("M.IDMOVIMIENTO");
+        sql.GROUP_BY("M.CANTIDAD");
+        sql.GROUP_BY("M.FECHAMODIFICACION");
+        sql.GROUP_BY("M.USUMODIFICACION");
+        sql.GROUP_BY("M.FECHAALTA");
+        sql.GROUP_BY("M.IDFACTURACION");
+        sql.GROUP_BY("M.IDGRUPOFACTURACION");
+
+        sql.HAVING("ABS(M.CANTIDAD) > ABS(SUM(NVL(A.IMPORTEAPLICADO, 0)))");
+
+        sql.ORDER_BY("CASE WHEN (M.CANTIDAD > 0) THEN '1' ELSE '2' END ASC");
+        sql.ORDER_BY("M.FECHAALTA ASC");
+
+        return sql.toString();
+    }
+
+    public String getFacturacionesGruposPagos(String idPago, String idInstitucion) {
+
+        SQL sql = new SQL();
+        sql.SELECT_DISTINCT("FCS_PAGOSJG.IDFACTURACION");
+        sql.SELECT_DISTINCT("FCS_FACT_GRUPOFACT_HITO.IDGRUPOFACTURACION");
+        sql.FROM("FCS_PAGOSJG");
+        sql.JOIN("FCS_FACT_GRUPOFACT_HITO ON FCS_FACT_GRUPOFACT_HITO.IDINSTITUCION(+) = FCS_PAGOSJG.IDINSTITUCION" +
+                " AND FCS_FACT_GRUPOFACT_HITO.IDFACTURACION(+) = FCS_PAGOSJG.IDFACTURACION");
+        sql.WHERE("FCS_PAGOSJG.IDPAGOSJG = " + idPago);
+        sql.WHERE("FCS_PAGOSJG.IDINSTITUCION = " + idInstitucion);
+
+        return sql.toString();
+    }
+
+    public String getSumaMovimientosAplicados(String idInstitucion, String idMovimiento, String idPersona) {
+
+        SQL sql = new SQL();
+        sql.SELECT("SUM(IMPORTEAPLICADO) AS IMPORTE");
+        sql.FROM("FCS_APLICA_MOVIMIENTOSVARIOS");
+        sql.WHERE("IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDPERSONA = " + idPersona);
+        sql.WHERE("IDMOVIMIENTO = " + idMovimiento);
+
+        return sql.toString();
+    }
+
+    public String getSumaRetenciones(String idInstitucion, String idPago, String idPersona) {
+
+        SQL sql = new SQL();
+        sql.SELECT("SUM(IMPORTERETENIDO) AS IMPORTE");
+        sql.FROM("FCS_COBROS_RETENCIONJUDICIAL");
+        sql.WHERE("IDINSTITUCION = " + idInstitucion);
+        sql.WHERE("IDPERSONA = " + idPersona);
+        sql.WHERE("IDPAGOSJG = " + idPago);
+
+        return sql.toString();
     }
 
 }

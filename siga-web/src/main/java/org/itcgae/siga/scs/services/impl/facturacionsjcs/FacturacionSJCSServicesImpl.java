@@ -1474,7 +1474,6 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
         exampleInstitucion.setDistinct(true);
         exampleInstitucion.createCriteria().andFechaenproduccionIsNotNull();
-        ;
 
         List<CenInstitucion> listaInstituciones = institucionMapper.selectByExample(exampleInstitucion);
 

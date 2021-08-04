@@ -1117,4 +1117,20 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 
 	public static final String MODULO_FACTURACION = "FAC";
 
+	// Estados Pago SJCS
+	public static final String ESTADO_PAGO_ABIERTO = "10";
+	public static final String ESTADO_PAGO_EJECUTADO = "20";
+	public static final String ESTADO_PAGO_CERRADO = "30";
+
+	public static final String CRITERIOS_PAGO_FACTURACION = "F";
+	public static final String CRITERIOS_PAGO_PAGOS = "P";
+
+	public static final int LISTA_PAGO_SOLO_INCLUIR_MOROSOS = 0;
+	public static final int LISTA_PAGO_SOLO_INCLUIR_NO_MOROSOS = 1;
+	public static final int LISTA_PAGO_TODOS = 2;
+
+	public static final int CASO_MVNOASOCIADO = 1;
+	public static final int CASO_MVASOCIADOAGRUPOFACT = 2;
+	public static final int CASO_MVASOCIADOAFACTURACION = 3;
+
 }
