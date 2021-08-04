@@ -1213,32 +1213,33 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					
 					List<ScsUnidadfamiliarejg> familiaresEJG = scsUnidadfamiliarejgMapper.selectByExample(familiaresEJGExample);
 					
+					//Seleccionamos y borramos los interesados presentes anteriormente en la designacion
+					
+					ScsDefendidosdesignaExample interesadosDesignaExample = new ScsDefendidosdesignaExample();
+					
+					interesadosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
+					.andIdturnoEqualTo(designa.getIdturno());
+					
+					List<ScsDefendidosdesigna> interesadosDesigna = scsDefendidosdesignaMapper.selectByExample(interesadosDesignaExample);
+
+					if(!interesadosDesigna.isEmpty()) {
+						response = scsDefendidosdesignaMapper.deleteByExample(interesadosDesignaExample);
+						if(response == 0) throw(new Exception("Error al eliminar los interesados de la designacion"));
+					}
+					
+					//Se crea el interesado que se introducira en la designacion
+					ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
+					
+					interesado.setAnio(designa.getAnio());
+					interesado.setNumero(designa.getNumero());
+					interesado.setIdinstitucion(idInstitucion);
+					interesado.setIdturno(designa.getIdturno());
+					
 					for(ScsUnidadfamiliarejg familiar : familiaresEJG) {
 						
-						//Seleccionamos y borramos los interesados presentes anteriormente en la designacion
-						
-						ScsDefendidosdesignaExample interesadosDesignaExample = new ScsDefendidosdesignaExample();
-						
-						interesadosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
-						.andIdturnoEqualTo(designa.getIdturno());
-						
-						List<ScsDefendidosdesigna> interesadosDesigna = scsDefendidosdesignaMapper.selectByExample(interesadosDesignaExample);
 
-						if(!interesadosDesigna.isEmpty()) {
-							response = scsDefendidosdesignaMapper.deleteByExample(interesadosDesignaExample);
-							if(response == 0) throw(new Exception("Error al eliminar los interesados de la designacion"));
-						}
-						
-
-						//Se crea el interesado que se introducira en la designacion
-						ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
-						
-						interesado.setAnio(designa.getAnio());
-						interesado.setNumero(designa.getNumero());
-						interesado.setIdinstitucion(idInstitucion);
 						interesado.setIdpersona(familiar.getIdpersona());
-						interesado.setIdturno(designa.getIdturno());
 						
 						//Se comprueba si el interesado introducido tiene un representante asociado
 						ScsPersonajgKey personajgKey = new ScsPersonajgKey();
@@ -1907,7 +1908,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					
 					LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Informacion copiada de la designacion al SOJ.");
 //				} catch (Exception e) {
-//					LOGGER.error("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Se ha producido un error ",
+//					LOGGER.error("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Se ha producido un error ",
 //							e);
 //					response = 0;
 //				}
