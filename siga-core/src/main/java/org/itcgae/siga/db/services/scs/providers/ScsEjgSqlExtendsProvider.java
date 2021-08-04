@@ -679,7 +679,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ "(nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1, '') || ' ' || nvl(per.apellidos2,'')) letrado,"
 				+ "ejg.fechaapertura, nvl(ejg.numeroprocedimiento,'') numeroprocedimiento, nvl(ejg.nig,'') nig,"
-				+ "nvl( ejg.numerodiligencia, 'Sin número' ) || ' / ' || nvl( ejg.nig, 'Sin número' ) || ' / ' || nvl( ejg.numeroprocedimiento,'Sin número' ) dilnigproc");
+				+ "nvl( ejg.numerodiligencia, 'Sin número' ) || ' / ' || nvl( ejg.numeroprocedimiento,'Sin número' ) dilnigproc");
 
 		sql.FROM("scs_ejg ejg");
 
