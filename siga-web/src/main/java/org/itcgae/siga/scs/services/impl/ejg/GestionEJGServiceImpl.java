@@ -86,6 +86,7 @@ import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.ScsAsistencia;
 import org.itcgae.siga.db.entities.ScsAsistenciaExample;
 import org.itcgae.siga.db.entities.ScsAsistenciaKey;
+import org.itcgae.siga.db.entities.ScsAuditoriaejg;
 import org.itcgae.siga.db.entities.ScsContrariosasistencia;
 import org.itcgae.siga.db.entities.ScsContrariosasistenciaExample;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
@@ -144,6 +145,7 @@ import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
+import org.itcgae.siga.db.mappers.ScsAuditoriaejgMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
@@ -351,6 +353,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	@Autowired
 	private ScsContrariosejgExtendsMapper scsContrariosejgExtendsMapper;
 
+	@Autowired
+	private ScsAuditoriaejgMapper scsAuditoriaejgMapper;
 	@Autowired
 	private ScsContrariosejgMapper scsContrariosejgMapper;
 
@@ -947,6 +951,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						throw new Exception("ERROR: no se ha podido introducir ningún familiar en el ejg");
 					} else {
 						responsedto.setStatus(SigaConstants.OK);
+						EjgItem ejgItem = new EjgItem();
+						
+						ejgItem.setAnnio(item.get(2));
+						ejgItem.setidInstitucion(idInstitucion.toString());
+						ejgItem.setNumero(item.get(4));		
+						ejgItem.setTipoEJG(item.get(3));
+						
+						insertAuditoriaEJG("familiar" ,null ,"NUEVO" ,usuarios.get(0) ,ejgItem);
 					}
 
 					LOGGER.debug(
@@ -1624,7 +1636,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					EjgItem item = new EjgItem();
 
-					item.seteidInstitucion(idInstitucion.toString());
+					item.setidInstitucion(idInstitucion.toString());
 					item.setAnnio(datos.getAnnio());
 					item.setNumEjg(record.getNumejg());
 					item.setNumero(record.getNumero().toString());
@@ -5830,5 +5842,25 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return newIdestadoporejg;
 	}
 
+	private void insertAuditoriaEJG(String campo, String valorPre, String valorPost, AdmUsuarios usuario, EjgItem item){
+
+		ScsAuditoriaejg entradaAuditoriaEjg = new ScsAuditoriaejg();
+		
+		entradaAuditoriaEjg.setIdinstitucion(Short.valueOf(item.getidInstitucion()));
+		entradaAuditoriaEjg.setAnio(Short.valueOf(item.getAnnio()));
+		entradaAuditoriaEjg.setNumero(Long.valueOf(item.getNumero()));	
+		entradaAuditoriaEjg.setIdtipoejg(Short.valueOf(item.getTipoEJG()));
+		
+		entradaAuditoriaEjg.setCampo(campo);
+		entradaAuditoriaEjg.setValorpre(valorPre);
+		entradaAuditoriaEjg.setValorpost(valorPost);
+		//Revisar que se esta asignando la hora correctamente
+		entradaAuditoriaEjg.setFechahoracambio(new Date());
+		
+		entradaAuditoriaEjg.setFechamodificacion(new Date());
+		entradaAuditoriaEjg.setUsumodificacion(usuario.getIdusuario());
+		
+		int response = scsAuditoriaejgMapper.insert(entradaAuditoriaEjg);
+	}
 	
 }

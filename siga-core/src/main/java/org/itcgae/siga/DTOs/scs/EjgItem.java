@@ -1429,7 +1429,7 @@ public class EjgItem {
 		return idInstitucion;
 	}
 
-	public void seteidInstitucion(String idInstitucion) {
+	public void setidInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
 
