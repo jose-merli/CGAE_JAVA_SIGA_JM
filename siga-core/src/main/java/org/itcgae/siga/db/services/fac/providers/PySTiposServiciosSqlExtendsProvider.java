@@ -215,7 +215,7 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 		return sql.toString();
 	}
 
-	public String borradoFisicoProductosRegistro(ListaServiciosItem servicio, Short idInstitucion) {
+	public String borradoFisicoServiciosRegistro(ListaServiciosItem servicio, Short idInstitucion) {
 		SQL sql = new SQL();
 	
 		sql.DELETE_FROM("PYS_SERVICIOSINSTITUCION");

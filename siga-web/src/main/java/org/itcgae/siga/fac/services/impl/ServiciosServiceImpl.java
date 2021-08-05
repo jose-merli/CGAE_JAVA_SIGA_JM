@@ -96,6 +96,14 @@ public class ServiciosServiceImpl implements IServiciosService {
 						}
 					}
 					
+					for (ListaServiciosItem servicio : listaServiciosProcesada) {
+						if(servicio.getAutomatico().equals("1")) {
+							servicio.setAutomatico("Automático");
+						}else if(servicio.getAutomatico().equals("0")) {
+							servicio.setAutomatico("Manual");
+						}
+					}
+					
 					if (listaServiciosProcesada != null && listaServiciosProcesada.size() > 0) {
 						listaServiciosDTO.setListaServiciosItems(listaServiciosProcesada);
 					}
@@ -153,7 +161,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 						
 						//Comprueba que haya alguna solicitud realizada
 						if(pysTiposServiciosExtendsMapper.comprobarUsoServicio(servicio, idInstitucion) != null)
-							idPeticionDTO.setIdpeticionUso(pysTiposServiciosExtendsMapper.comprobarUsoServicio(servicio, idInstitucion)); 
+							idPeticionDTO.setIdpeticionUso(pysTiposServiciosExtendsMapper.comprobarUsoServicio(servicio, idInstitucion)); //Tener en cuenta que comprobarUsoServicio no devuelve solo un id si no uno por cada uso, por eso se usa una lista.
 				
 						//Borrado logico --> Actualizamos la fechabaja del servicio a la actual (sysdate)
 						//Borrado fisico --> Eliminamos el registro del servicio y posteriormente el identificador
@@ -164,7 +172,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 							}else if(status == 1) {
 								deleteResponseDTO.setStatus(SigaConstants.OK);
 							}
-						}else{ //Borrado fisico al no tener ninguna solicitud ya que el idpeticion es 0, es decir comprobarUsoServicio no devolvio nada.
+						}else{ //Borrado fisico al no tener ninguna solicitud, es decir comprobarUsoServicio no devolvio nada.
 							//Borramos el registro
 							status = pysTiposServiciosExtendsMapper.borradoFisicoServiciosRegistro(servicio, idInstitucion);
 							

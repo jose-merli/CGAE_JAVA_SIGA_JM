@@ -900,11 +900,11 @@ public class ProductosServiceImpl implements IProductosService{
 						
 						//Comprueba que haya alguna compra realizada
 						if(pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion) != null)
-							idPeticionDTO.setIdpeticionUso(pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion)); 
+							idPeticionDTO.setIdpeticionUso(pysTiposProductosExtendsMapper.comprobarUsoProducto(producto, idInstitucion)); //Tener en cuenta que comprobarUsoProducto no devuelve solo un id si no uno por cada uso, por eso se usa una lista.
 						
 						//Comprueba que haya solicitud de compra
 						if(pysTiposProductosExtendsMapper.comprobarSolicitudProducto(producto, idInstitucion) != null)
-							idPeticionDTO.setIdpeticionSolicitud(pysTiposProductosExtendsMapper.comprobarSolicitudProducto(producto, idInstitucion));
+							idPeticionDTO.setIdpeticionSolicitud(pysTiposProductosExtendsMapper.comprobarSolicitudProducto(producto, idInstitucion)); //Tener en cuenta que comprobarSolicitudProducto no devuelve solo un id si no uno por cada solicitud, por eso se usa una lista.
 							
 						
 						
@@ -917,7 +917,7 @@ public class ProductosServiceImpl implements IProductosService{
 							}else if(status == 1) {
 								deleteResponseDTO.setStatus(SigaConstants.OK);
 							}
-						}else{ //Borrado fisico al no tener ninguna compra o solicitud de compra ya que el idpetidcion es 0, es decir comprobarUsoProducto no devolvio nada.
+						}else{ //Borrado fisico al no tener ninguna compra o solicitud de compra, es decir comprobarUsoProducto no devolvio nada.
 							//Borramos el registro
 							status = pysTiposProductosExtendsMapper.borradoFisicoProductosRegistro(producto, idInstitucion);
 							//Borramos el identificador
