@@ -25,7 +25,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				+ "a.comisaria centrodetencion,"
 				+ "scs_juzgado.nombre juzgado,"
 				+"a.numerodiligencia,"
-				+ "nvl( a.numerodiligencia, 'Sin número' ) || ' - ' || nvl( a.nig, 'Sin número' ) || ' - ' || nvl( a.numeroprocedimiento,'Sin número' ) dilnigproc");
+				+ "nvl( a.numerodiligencia, 'Sin número' ) || ' / ' || nvl( a.numeroprocedimiento,'Sin número' ) dilnigproc");
 		
 		sql.FROM("scs_asistencia a");
 	    sql.JOIN("scs_tipoasistencia ta ON (ta.idtipoasistencia = a.idtipoasistencia)");
