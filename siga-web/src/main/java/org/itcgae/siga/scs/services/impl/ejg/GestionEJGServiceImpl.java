@@ -1776,19 +1776,39 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Modificamos el objeto obtenido
 
 				if(!ejg.getFechaapertura().equals(datos.getFechaApertura())){
+					insertAuditoriaEJG("fecha de apertura" ,ejg.getFechaapertura().toString() ,datos.getFechaApertura().toString() ,usuarios.get(0) ,(ScsEjg) ejg);
 					ejg.setFechaapertura(datos.getFechaApertura());
-					insertAuditoriaEJG("fechaApertura" ,ejg.getFechaapertura().toString() ,datos.getFechaApertura().toString() ,usuarios.get(0) ,(ScsEjg) ejg);
 				}
-				ejg.setFechapresentacion(datos.getFechapresentacion());
-				ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
-				if (datos.getTipoEJGColegio() != null)
+				if(!ejg.getFechapresentacion().equals(datos.getFechapresentacion())) {
+					insertAuditoriaEJG("fecha de presentacion" ,ejg.getFechapresentacion().toString() ,datos.getFechapresentacion().toString() ,usuarios.get(0) ,(ScsEjg) ejg);
+					ejg.setFechapresentacion(datos.getFechapresentacion());
+				}
+				if(!ejg.getFechapresentacion().equals(datos.getFechapresentacion())) {
+					insertAuditoriaEJG("fecha limite de presentacion" ,ejg.getFechalimitepresentacion().toString() ,datos.getFechalimitepresentacion().toString() ,usuarios.get(0) ,(ScsEjg) ejg);
+					ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
+				}
+				if (datos.getTipoEJGColegio() != null) {
+					if(ejg.getIdtipoejgcolegio()!=Short.parseShort(datos.getTipoEJGColegio())) {
+					if(ejg.getIdtipoejgcolegio()!= null)insertAuditoriaEJG("Tipo EEJG Colegio" ,ejg.getIdtipoejgcolegio().toString() ,datos.getTipoEJGColegio().toString() ,usuarios.get(0) ,(ScsEjg) ejg);
+					else insertAuditoriaEJG("Tipo EEJG Colegio" ,null ,datos.getTipoEJGColegio().toString() ,usuarios.get(0) ,(ScsEjg) ejg);
 					ejg.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
+					}					
+				}
+				else if(ejg.getIdtipoejgcolegio()!= null) {
+					insertAuditoriaEJG("Tipo EEJG Colegio" ,ejg.getIdtipoejgcolegio().toString() ,null ,usuarios.get(0) ,(ScsEjg) ejg);
+					ejg.setIdtipoejgcolegio(null);
+
+				}
+				if(!ejg.getNumejg().equals(datos.getNumEjg())) {
+					insertAuditoriaEJG("Numero EJG" ,ejg.getNumejg().toString() ,datos.getNumEjg() ,usuarios.get(0) ,(ScsEjg) ejg);
+					ejg.setNumejg(datos.getNumEjg());
+				}
+				
 				ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
 				ejg.setFechamodificacion(new Date());
-				ejg.setNumejg(datos.getNumEjg());
+				
 				// Se ejecuta el método de que sustituye los triggers asociados a la tabla
 				// SCS_EJG
-				
 				// cuando una fila es actualizada.
 				this.triggersEjgUpdatesFApertura(datos, usuarios.get(0), idInstitucion);
 
@@ -1801,21 +1821,34 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				ExpExpedienteKey expKey = new ExpExpedienteKey();
 
-				expKey.setIdinstitucion(idInstitucion);
-				if (datos.getAnioexpInsos() != null)
+				ExpExpediente newExp = null;
+				
+				if (datos.getAnioexpInsos() != null && datos.getNumeroexpInsos() != null
+						&& datos.getIdTipoExpInsos() != null && datos.getIdInstTipoExp() != null) {
+					expKey.setIdinstitucion(idInstitucion);
+
 					expKey.setAnioexpediente(Short.parseShort(datos.getAnioexpInsos()));
-				if (datos.getNumeroexpInsos() != null)
 					expKey.setNumeroexpediente(Integer.parseInt(datos.getNumeroexpInsos()));
-				if (datos.getIdTipoExpInsos() != null)
 					expKey.setIdtipoexpediente(Short.parseShort(datos.getIdTipoExpInsos()));
-				if (datos.getIdInstTipoExp() != null)
 					expKey.setIdinstitucionTipoexpediente(Short.parseShort(datos.getIdInstTipoExp()));
 
-				ExpExpediente newExp = expExpedienteMapper.selectByPrimaryKey(expKey);
+					newExp = expExpedienteMapper.selectByPrimaryKey(expKey);
+				}
 
 				if (newExp != null) {
-					if (datos.getTipoEJG() != null)
-						newExp.setIdtipoexpediente(Short.parseShort(datos.getTipoEJG()));
+					if (datos.getTipoEJG() != null) {
+						if(newExp.getIdtipoexpediente()!=null)insertAuditoriaEJG("Tipo expediente" ,newExp.getIdtipoexpediente().toString() ,datos.getIdTipoExpInsos() ,usuarios.get(0) ,(ScsEjg) ejg);
+						else insertAuditoriaEJG("Tipo expediente" ,null ,datos.getIdTipoExpInsos() ,usuarios.get(0) ,(ScsEjg) ejg);
+						newExp.setIdtipoexpediente(Short.parseShort(datos.getIdTipoExpInsos()));
+					}
+					else {
+						if(newExp.getIdtipoexpediente()!=null) {
+							insertAuditoriaEJG("Tipo expediente" ,newExp.getIdtipoexpediente().toString() ,null ,usuarios.get(0) ,(ScsEjg) ejg);
+							newExp.setIdtipoexpediente(null);
+						}
+						
+					}
+					
 					newExp.setUsumodificacion(usuarios.get(0).getIdusuario());
 					newExp.setFechamodificacion(new Date());
 
@@ -1836,6 +1869,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// NUMERO
 				// IDTIPOEJG
 				// IDPRESTACION
+				
+				//Comprobar que no es true con un conjunto vacio.
 				if (datos.getPrestacionesRechazadas() != null) {
 					ScsEjgPrestacionRechazada preRe = new ScsEjgPrestacionRechazada();
 
@@ -1845,8 +1880,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					preRe.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
 					preRe.setUsumodificacion(usuarios.get(0).getIdusuario());
 					preRe.setFechamodificacion(new Date());
-					preRe.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
-
+					
 					ScsEjgPrestacionRechazadaExample examplePresRe = new ScsEjgPrestacionRechazadaExample();
 
 					examplePresRe.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -1856,6 +1890,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					List<ScsEjgPrestacionRechazada> rechazadas = scsEjgPrestacionRechazadaMapper
 							.selectByExample(examplePresRe);
 
+					
+					
 					// Eliminamos las entradas existentes relacionadas si las hubiera.
 
 					response = scsEjgPrestacionRechazadaMapper.deleteByExample(examplePresRe);
@@ -1867,9 +1903,19 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						preRe.setIdprestacion(Short.parseShort(idprestacion));
 
 						response = scsEjgPrestacionRechazadaMapper.insert(preRe);
+						
 						if (response == 0)
 							throw (new Exception("Error al introducir prestaciones rechazadas al actualizar el EJG"));
 					}
+					
+					String oldRechazadasString = "";
+					for(ScsEjgPrestacionRechazada rechazada : rechazadas) {
+						if(oldRechazadasString != "")oldRechazadasString += ",";
+						oldRechazadasString += rechazada.getIdprestacion();
+					}
+					
+					if(datos.getPrestacionesRechazadas().length > 0) insertAuditoriaEJG("Prestaciones rechazadas" ,oldRechazadasString ,datos.getPrestacionesRechazadas().toString() ,usuarios.get(0) ,(ScsEjg) ejg);
+
 
 				}
 
@@ -2029,6 +2075,17 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							throw new Exception("ERROR: no se ha podido ");
 						} else {
 							responsedto.setStatus(SigaConstants.OK);
+							
+							ScsEjg ejg = new ScsEjg();
+							
+							ejg.setIdinstitucion(idInstitucion);
+							ejg.setIdtipoejg(Short.parseShort(item.getIdtipoejg()));
+							ejg.setAnio(Short.parseShort(item.getAnio()));
+							ejg.setNumero(Long.parseLong(item.getNumero()));
+							
+							
+							insertAuditoriaEJG("Estado borrado" ,record.getIdestadoporejg().toString() ,null ,usuarios.get(0) ,ejg);
+
 						}
 					}
 					LOGGER.debug(
@@ -2107,12 +2164,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 							ejgKey.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
 
 							ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+							
+							insertAuditoriaEJG("Solicitante principal borrado" ,ejg.getIdpersonajg().toString() ,null ,usuarios.get(0) ,ejg);
 
 							ejg.setIdpersonajg(null);
 
 							response = scsEjgMapper.updateByPrimaryKey(ejg);
 							if (response == 0)
 								throw (new Exception("Error al actualizar eliminar el solicitante principal del EJG"));
+							
 						}
 					} else {
 						record.setFechabaja(null);
@@ -2123,6 +2183,23 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(record);
 					if (response == 0)
 						throw (new Exception("Error al actualizar los datos generales del EJG"));
+					
+					ScsEjg ejg = new ScsEjg();
+							
+					ejg.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
+					ejg.setIdinstitucion(idInstitucion);
+					ejg.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
+					ejg.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
+					
+					ScsPersonajgKey perKey = new ScsPersonajgKey();
+					
+					perKey.setIdinstitucion(idInstitucion);
+					perKey.setIdpersona(record.getIdpersona());
+					
+					ScsPersonajg per = scsPersonajgMapper.selectByPrimaryKey(perKey);
+					
+					if(record.getFechabaja()!=null)insertAuditoriaEJG("Familiar borrado" ,per.getNif() ,null ,usuarios.get(0) ,ejg);
+					else insertAuditoriaEJG("Familiar activado" ,null ,per.getNif() ,usuarios.get(0) ,ejg);
 
 				}
 				LOGGER.debug(
@@ -2137,6 +2214,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				if (response >= 1) {
 					responsedto.setStatus(SigaConstants.OK);
 					LOGGER.debug("GestionEJGServiceImpl.borrarFamiliar() -> OK.");
+
 				} else {
 					responsedto.setStatus(SigaConstants.KO);
 					LOGGER.error("GestionEJGServiceImpl.borrarFamiliar() -> KO.");
@@ -2170,7 +2248,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Entrada para cambiar los datos generales del ejg");
+				LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Entrada para insertar un nuevo estado al ejg");
 
 				try {
 
@@ -2205,27 +2283,37 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					if (listEjg.size() > 0) {
 						record.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
 					} else {
-						record.setIdestadoporejg(Long.parseLong("0"));
+						record.setIdestadoporejg(Long.parseLong("1"));
 					}
 
 					response = scsEstadoejgMapper.insertSelective(record);
 
 					LOGGER.debug(
-							"GestionEJGServiceImpl.nuevoEstado() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
+							"GestionEJGServiceImpl.nuevoEstado() -> Salida del servicio para introducir un nuevo estado al EJG");
 				} catch (Exception e) {
 					LOGGER.debug(
-							"GestionEJGServiceImpl.nuevoEstado() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+							"GestionEJGServiceImpl.nuevoEstado() -> Se ha producido un error al introducir un nuevo estado al EJG",
 							e);
 				} finally {
 					// respuesta si se actualiza correctamente
 					if (response == 1) {
 						responsedto.setStatus(SigaConstants.OK);
 						LOGGER.debug(
-								"GestionEJGServiceImpl.nuevoEstado() -> OK. Estado y fecha actualizados para los ejgs seleccionados");
+								"GestionEJGServiceImpl.nuevoEstado() -> OK. nuevo estado introducido en el EJG");
+						
+						ScsEjg ejg = new ScsEjg();
+						
+						ejg.setAnio(Short.parseShort(datos.getAnio()));
+						ejg.setIdinstitucion(idInstitucion);
+						ejg.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
+						ejg.setNumero(Long.parseLong(datos.getNumero()));
+						
+						insertAuditoriaEJG("Nuevo Estado" ,null ,datos.getIdEstadoejg() ,usuarios.get(0) ,ejg);
+						
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
 						LOGGER.error(
-								"GestionEJGServiceImpl.nuevoEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
+								"GestionEJGServiceImpl.nuevoEstado() -> KO. Error al introducir un nuevo estado en el EJG");
 					}
 				}
 			}
