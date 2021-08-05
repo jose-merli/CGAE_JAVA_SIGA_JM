@@ -488,7 +488,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
 		sql.SELECT("rectipodictamen.descripcion AS dictamen");
 		sql.SELECT("rectiporesolucion.descripcion AS resolucion");
-		sql.SELECT("rectiporesolauto.descripcion AS resolauto");
+		sql.SELECT("tiporesolauto.descripcion AS resolauto");
 		sql.SELECT(
 				"(CASE WHEN personadesigna.nombre is  NULL THEN '' ELSE personadesigna.apellidos1 || ' ' || personadesigna.apellidos2 || ', ' || personadesigna.nombre END) AS nombreletradodesigna");
 		sql.SELECT("EXPEDIENTE.anioexpediente AS anioexpediente");
@@ -555,10 +555,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.LEFT_OUTER_JOIN(
 				"gen_recursos_catalogos rectiporesolucion ON rectiporesolucion.idrecurso = tiporesolucion.descripcion AND rectiporesolucion.idlenguaje = '"
 						+ idLenguaje + "'");
+		//Impugnacion
 		sql.LEFT_OUTER_JOIN("scs_tiporesolauto tiporesolauto ON tiporesolauto.idtiporesolauto = ejg.idtiporesolauto");
-		sql.LEFT_OUTER_JOIN(
-				"gen_recursos_catalogos rectiporesolauto ON rectiporesolauto.idrecurso = tiporesolauto.descripcion AND rectiporesolauto.idlenguaje = '"
-						+ idLenguaje + "'");
 		sql.LEFT_OUTER_JOIN(
 				"SCS_EJGDESIGNA EJGD ON   ejgd.anioejg = ejg.anio   AND   ejgd.numeroejg = ejg.numero AND   ejgd.idtipoejg = ejg.idtipoejg  AND   ejgd.idinstitucion = ejg.idinstitucion");
 		sql.LEFT_OUTER_JOIN(joinDesignaLetrado);

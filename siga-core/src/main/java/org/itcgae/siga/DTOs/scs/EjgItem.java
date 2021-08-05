@@ -38,7 +38,6 @@ public class EjgItem {
 	private String fundamentoJuridico;
 	private Date fechaResolucionDesd;
 	private Date fechaResolucionHast;
-	private String impugnacion;
 	private String fundamentoImpuganacion;
 	private Date fechaImpugnacionDesd;
 	private Date fechaImpugnacionHast;
@@ -100,6 +99,7 @@ public class EjgItem {
 	private String[] prestacion;
 	private String[] prestacionesRechazadas;
 	
+	//Impugnacion
 	private boolean requiereTurn;
 	private boolean bis;
 	private Date fechaPublicacion;
@@ -108,6 +108,8 @@ public class EjgItem {
 	private String sentidoAuto;
 	private String autoResolutorio;
 	private Date fechaAuto;
+	private String impugnacion;
+	private String impugnacionDesc;
 
 	private Date fechaEstadoNew;
 	private String estadoNew;
@@ -1605,5 +1607,13 @@ public class EjgItem {
 
 	public void setDilnigproc(String dilnigproc) {
 		this.dilnigproc = dilnigproc;
+	}
+
+	public String getImpugnacionDesc() {
+		return impugnacionDesc;
+	}
+
+	public void setImpugnacionDesc(String impugnacionDesc) {
+		this.impugnacionDesc = impugnacionDesc;
 	}
 }
