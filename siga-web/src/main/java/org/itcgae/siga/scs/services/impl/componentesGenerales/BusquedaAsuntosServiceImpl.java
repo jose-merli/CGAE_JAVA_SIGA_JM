@@ -1457,6 +1457,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				delitoEjg.setIdinstitucion(idInstitucion);
 				delitoEjg.setAnio(ejg.getAnio());
 				delitoEjg.setNumero(ejg.getNumero());
+				delitoEjg.setIdtipoejg(ejg.getIdtipoejg());
 				delitoEjg.setUsumodificacion(usuarios.get(0).getIdusuario());
 				delitoEjg.setFechamodificacion(new Date());
 
@@ -1489,7 +1490,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 							delitosEjgString += ",";
 						delitosEjgString += delitoDesigna.getIddelito();
 						delitoEjg.setIddelito(delitoDesigna.getIddelito());
-						response = scsDelitosdesignaMapper.insert(delitoDesigna);
+						response = scsDelitosejgMapper.insert(delitoEjg);
 						if (response == 0)
 							throw (new Exception(
 									"Error al introducir un delito en el EJG proveniente de la designacion."));
@@ -1705,8 +1706,8 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					familiar.setObservaciones(interesado.getObservaciones());
 					familiar.setSolicitante((short) 0);
 
-					interesado.setUsumodificacion(usuarios.get(0).getIdusuario());
-					interesado.setFechamodificacion(new Date());
+					familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
+					familiar.setFechamodificacion(new Date());
 
 					response = scsUnidadfamiliarejgMapper.insert(familiar);
 					if (response == 0)
