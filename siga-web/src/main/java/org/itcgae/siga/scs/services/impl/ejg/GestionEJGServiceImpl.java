@@ -1651,6 +1651,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					list.add(item);
 
 					ejgdto.setEjgItems(list);
+					
+					ScsEjg ejg = new ScsEjg();
+					
+					ejg.setIdinstitucion(idInstitucion);
+					ejg.setAnio(Short.valueOf(datos.getAnnio()));
+					ejg.setNumero(Long.valueOf(record.getNumero().toString()));
+					ejg.setIdtipoejg(Short.valueOf(datos.getTipoEJG()));
+					
+					insertAuditoriaEJG("EJG" ,null ,"NUEVO" ,usuarios.get(0) ,ejg);
 					// responsedto.setStatus(SigaConstants.OK);
 					error.setCode(200);
 					LOGGER.debug("GestionEJGServiceImpl.insertaDatosGenerales() -> OK. Datos generales insertados");
@@ -1766,7 +1775,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				// Modificamos el objeto obtenido
 
-				ejg.setFechaapertura(datos.getFechaApertura());
+				if(!ejg.getFechaapertura().equals(datos.getFechaApertura())){
+					ejg.setFechaapertura(datos.getFechaApertura());
+					insertAuditoriaEJG("fechaApertura" ,ejg.getFechaapertura().toString() ,datos.getFechaApertura().toString() ,usuarios.get(0) ,(ScsEjg) ejg);
+				}
 				ejg.setFechapresentacion(datos.getFechapresentacion());
 				ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
 				if (datos.getTipoEJGColegio() != null)
@@ -5842,14 +5854,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		return newIdestadoporejg;
 	}
 
-	private void insertAuditoriaEJG(String campo, String valorPre, String valorPost, AdmUsuarios usuario, EjgItem item){
+	private void insertAuditoriaEJG(String campo, String valorPre, String valorPost, AdmUsuarios usuario, ScsEjg item){
 
 		ScsAuditoriaejg entradaAuditoriaEjg = new ScsAuditoriaejg();
 		
-		entradaAuditoriaEjg.setIdinstitucion(Short.valueOf(item.getidInstitucion()));
-		entradaAuditoriaEjg.setAnio(Short.valueOf(item.getAnnio()));
-		entradaAuditoriaEjg.setNumero(Long.valueOf(item.getNumero()));	
-		entradaAuditoriaEjg.setIdtipoejg(Short.valueOf(item.getTipoEJG()));
+		entradaAuditoriaEjg.setIdinstitucion(item.getIdinstitucion());
+		entradaAuditoriaEjg.setAnio(item.getAnio());
+		entradaAuditoriaEjg.setNumero(item.getNumero());	
+		entradaAuditoriaEjg.setIdtipoejg(item.getIdtipoejg());
 		
 		entradaAuditoriaEjg.setCampo(campo);
 		entradaAuditoriaEjg.setValorpre(valorPre);
