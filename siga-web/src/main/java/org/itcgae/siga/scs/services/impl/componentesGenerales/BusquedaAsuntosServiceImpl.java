@@ -1072,85 +1072,61 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				// 4. Se debe insertar los interesados seleccionados en EJG en Unidad Familiar.
 
+				// Seleccionamos y borramos los interesados presentes anteriormente en la
+				// designacion
+
+				ScsDefendidosdesignaExample interesadosDesignaExample = new ScsDefendidosdesignaExample();
+
+				interesadosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
+						.andIdturnoEqualTo(designa.getIdturno());
+
+				List<ScsDefendidosdesigna> interesadosDesigna = scsDefendidosdesignaMapper
+						.selectByExample(interesadosDesignaExample);
+
+				if (!interesadosDesigna.isEmpty()) {
+					response = scsDefendidosdesignaMapper.deleteByExample(interesadosDesignaExample);
+					if (response == 0)
+						throw (new Exception("Error al eliminar los interesados de la designacion"));
+				}
+
+				// Se debe insertar los interesados seleccionados en EJG en Unidad Familiar.
+
 				ScsUnidadfamiliarejgExample familiaresEJGExample = new ScsUnidadfamiliarejgExample();
 
 				familiaresEJGExample.createCriteria().andAnioEqualTo(ejg.getAnio())
-						.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(ejg.getIdtipoejg())
-						.andNumeroEqualTo(ejg.getNumero()).andFechabajaIsNull();
+				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(ejg.getIdtipoejg())
+				.andNumeroEqualTo(ejg.getNumero()).andFechabajaIsNull();
 
 				List<ScsUnidadfamiliarejg> familiaresEJG = scsUnidadfamiliarejgMapper
 						.selectByExample(familiaresEJGExample);
 
-				for (ScsUnidadfamiliarejg familiar : familiaresEJG) {
+				//Se crea el interesado que se introducira en la designacion
+				ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
 
-					// Seleccionamos y borramos los interesados presentes anteriormente en la
-					// designacion
+				interesado.setAnio(designa.getAnio());
+				interesado.setNumero(designa.getNumero());
+				interesado.setIdinstitucion(idInstitucion);
+				interesado.setIdturno(designa.getIdturno());
 
-					ScsDefendidosdesignaExample interesadosDesignaExample = new ScsDefendidosdesignaExample();
+				for(ScsUnidadfamiliarejg familiar : familiaresEJG) {
 
-					interesadosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
-							.andIdturnoEqualTo(designa.getIdturno());
 
-					List<ScsDefendidosdesigna> interesadosDesigna = scsDefendidosdesignaMapper
-							.selectByExample(interesadosDesignaExample);
+					interesado.setIdpersona(familiar.getIdpersona());
 
-					if (!interesadosDesigna.isEmpty()) {
-						response = scsDefendidosdesignaMapper.deleteByExample(interesadosDesignaExample);
-						if (response == 0)
-							throw (new Exception("Error al eliminar los interesados de la designacion"));
-					}
-					
-					//4. Se debe insertar los interesados seleccionados en EJG en Unidad Familiar.
-					
-					ScsUnidadfamiliarejgExample familiaresEJGExample = new ScsUnidadfamiliarejgExample();
-					
-					familiaresEJGExample.createCriteria().andAnioEqualTo(ejg.getAnio()).andIdinstitucionEqualTo(idInstitucion)
-					.andIdtipoejgEqualTo(ejg.getIdtipoejg()).andNumeroEqualTo(ejg.getNumero()).andFechabajaIsNull();
-					
-					List<ScsUnidadfamiliarejg> familiaresEJG = scsUnidadfamiliarejgMapper.selectByExample(familiaresEJGExample);
-					
-					//Seleccionamos y borramos los interesados presentes anteriormente en la designacion
-					
-					ScsDefendidosdesignaExample interesadosDesignaExample = new ScsDefendidosdesignaExample();
-					
-					interesadosDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-					.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
-					.andIdturnoEqualTo(designa.getIdturno());
-					
-					List<ScsDefendidosdesigna> interesadosDesigna = scsDefendidosdesignaMapper.selectByExample(interesadosDesignaExample);
+					//Se comprueba si el interesado introducido tiene un representante asociado
+					ScsPersonajgKey personajgKey = new ScsPersonajgKey();
 
-					if(!interesadosDesigna.isEmpty()) {
-						response = scsDefendidosdesignaMapper.deleteByExample(interesadosDesignaExample);
-						if(response == 0) throw(new Exception("Error al eliminar los interesados de la designacion"));
-					}
-					
-					//Se crea el interesado que se introducira en la designacion
-					ScsDefendidosdesigna interesado = new ScsDefendidosdesigna();
-					
-					interesado.setAnio(designa.getAnio());
-					interesado.setNumero(designa.getNumero());
-					interesado.setIdinstitucion(idInstitucion);
-					interesado.setIdturno(designa.getIdturno());
-					
-					for(ScsUnidadfamiliarejg familiar : familiaresEJG) {
-						
+					personajgKey.setIdinstitucion(idInstitucion);
+					personajgKey.setIdpersona(familiar.getIdpersona());
 
-						interesado.setIdpersona(familiar.getIdpersona());
-						
-						//Se comprueba si el interesado introducido tiene un representante asociado
-						ScsPersonajgKey personajgKey = new ScsPersonajgKey();
-						
-						personajgKey.setIdinstitucion(idInstitucion);
-						personajgKey.setIdpersona(familiar.getIdpersona());
-						
-						ScsPersonajg personajg = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
-						
-						if(personajg.getIdrepresentantejg() != null) {personajgKey.setIdpersona(personajg.getIdrepresentantejg());
-						
-						ScsPersonajg representanteFamiliar = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
+					ScsPersonajg personajg = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
 
-						interesado.setNombrerepresentante(representanteFamiliar.getNombre());
+					if(personajg.getIdrepresentantejg() != null) {personajgKey.setIdpersona(personajg.getIdrepresentantejg());
+
+					ScsPersonajg representanteFamiliar = scsPersonajgMapper.selectByPrimaryKey(personajgKey);
+
+					interesado.setNombrerepresentante(representanteFamiliar.getNombre());
 					}
 
 					interesado.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -1164,9 +1140,9 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				}
 
 				LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Inserts finalizados");
-//				} catch (Exception e) {
-//					LOGGER.error("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Se ha producido un error ",
-//							e);
+				//				} catch (Exception e) {
+				//					LOGGER.error("BusquedaAsuntosServiceImpl.copyEjg2Designa() -> Se ha producido un error ",
+				//							e);
 //					response = 0;
 //				}
 
@@ -1687,7 +1663,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				if (response == 0)
 					throw (new Exception("Error al introducir un procurador en el EJG proveniente de la designacion"));
 
-				// 4. Se debe insertar los interesados seleccionados en la designacion en Unidad
+				// 5. Se debe insertar los interesados seleccionados en la designacion en Unidad
 				// Familiar del EJG.
 
 				ScsUnidadfamiliarejgExample familiaresEJGExample = new ScsUnidadfamiliarejgExample();
@@ -1727,6 +1703,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					familiar.setIdpersona(interesado.getIdpersona());
 					familiar.setEncalidadde(interesado.getCalidad());
 					familiar.setObservaciones(interesado.getObservaciones());
+					familiar.setSolicitante((short) 0);
 
 					interesado.setUsumodificacion(usuarios.get(0).getIdusuario());
 					interesado.setFechamodificacion(new Date());
