@@ -3,7 +3,9 @@ package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +25,18 @@ public class EjecucionPlsPago {
     @Autowired
     private AdmConfigMapper admConfigMapper;
 
+    @Autowired
+    private UtilidadesFacturacionSJCS utilidadesFacturacionSJCS;
+
     /**
      * PL para el pago de Turnos de Oficio con Criterio por Facturacion
      */
-    public String[] ejecutarPL_PagoTurnosOficio(Integer idInstitucion, Integer idPago, Integer usuario) throws Exception {
+    public String[] ejecutarPL_PagoTurnosOficio(Integer idInstitucion, Integer idPago, AdmUsuarios usuario) throws Exception {
 
         Object[] paramIn = new Object[3];
         paramIn[0] = idInstitucion.toString(); // IDINSTITUCION
         paramIn[1] = idPago.toString(); // IDPAGO
-        paramIn[2] = usuario.toString(); // USUARIO
+        paramIn[2] = usuario.getIdusuario().toString(); // USUARIO
 
         String resultado[] = new String[3];
 
@@ -39,7 +44,8 @@ public class EjecucionPlsPago {
 
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
-            throw new Exception("Ha ocurrido un error al ejecutar el Pago de Turnos de Justicia Gratuita.\nError en PL = " + (String) resultado[3]);
+            throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Turnos de Justicia Gratuita. Error en PL = " + (String) resultado[3],
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoTurnosSJCS"));
         }
 
         return resultado;
@@ -48,12 +54,12 @@ public class EjecucionPlsPago {
     /**
      * PL para el pago de Guardias con Criterio por Facturacion
      */
-    public String[] ejecutarPL_PagoGuardias(Integer idInstitucion, Integer idFacturacion, Integer usuario) throws Exception {
+    public String[] ejecutarPL_PagoGuardias(Integer idInstitucion, Integer idFacturacion, AdmUsuarios usuario) throws Exception {
 
         Object[] paramIn = new Object[3];
         paramIn[0] = idInstitucion.toString(); // IDINSTITUCION
         paramIn[1] = idFacturacion.toString(); // IDFACTURACION
-        paramIn[2] = usuario.toString(); // USUARIO
+        paramIn[2] = usuario.getIdusuario().toString(); // USUARIO
 
         String resultado[] = new String[3];
 
@@ -61,7 +67,8 @@ public class EjecucionPlsPago {
 
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
-            throw new Exception("Ha ocurrido un error al ejecutar el Pago de Guardias de Justicia Gratuita.\nError en PL = " + (String) resultado[3]);
+            throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Guardias de Justicia Gratuita. Error en PL = " + (String) resultado[3],
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoGuardiasSJCS"));
         }
 
         return resultado;
@@ -70,12 +77,12 @@ public class EjecucionPlsPago {
     /**
      * PL para el pago de SOJ con Criterio por Facturacion
      */
-    public String[] ejecutarPL_PagoSOJ(Integer idInstitucion, Integer idFacturacion, Integer usuario) throws Exception {
+    public String[] ejecutarPL_PagoSOJ(Integer idInstitucion, Integer idFacturacion, AdmUsuarios usuario) throws Exception {
 
         Object[] paramIn = new Object[3];
         paramIn[0] = idInstitucion.toString(); // IDINSTITUCION
         paramIn[1] = idFacturacion.toString(); // IDFACTURACION
-        paramIn[2] = usuario.toString(); // USUARIO
+        paramIn[2] = usuario.getIdusuario().toString(); // USUARIO
 
         String resultado[] = new String[3];
 
@@ -83,7 +90,8 @@ public class EjecucionPlsPago {
 
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
-            throw new Exception("Ha ocurrido un error al ejecutar el Pago de Expedientes SOJ de Justicia Gratuita.\nError en PL = " + (String) resultado[3]);
+            throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Expedientes SOJ de Justicia Gratuita. Error en PL = " + (String) resultado[3],
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoExpedientesSogSJCS"));
         }
 
         return resultado;
@@ -92,12 +100,12 @@ public class EjecucionPlsPago {
     /**
      * PL para el pago de EJG con Criterio por Facturacion
      */
-    public String[] ejecutarPL_PagoEJG(Integer idInstitucion, Integer idFacturacion, Integer usuario) throws Exception {
+    public String[] ejecutarPL_PagoEJG(Integer idInstitucion, Integer idFacturacion, AdmUsuarios usuario) throws Exception {
 
         Object[] paramIn = new Object[3];
         paramIn[0] = idInstitucion.toString(); // IDINSTITUCION
         paramIn[1] = idFacturacion.toString(); // IDFACTURACION
-        paramIn[2] = usuario.toString(); // USUARIO
+        paramIn[2] = usuario.getIdusuario().toString(); // USUARIO
 
         String resultado[] = new String[3];
 
@@ -105,7 +113,8 @@ public class EjecucionPlsPago {
 
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
-            throw new Exception("Ha ocurrido un error al ejecutar el Pago de Expedientes EJG de Justicia Gratuita.\nError en PL = " + (String) resultado[3]);
+            throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Expedientes EJG de Justicia Gratuita. Error en PL = " + (String) resultado[3],
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoExpedientesEjgSJCS"));
         }
 
         return resultado;
@@ -167,6 +176,67 @@ public class EjecucionPlsPago {
         return resultado;
     }
 
+    public String ejecutarPLExportarTurno(String idInstitucion, String idFacturacionDesde, String idFacturacionHasta, String idPersona,
+                                          String pathFichero, String fichero, String idioma, AdmUsuarios usuario) throws Exception {
+        Object[] param_in; // Parametros de entrada del PL
+        String resultado[] = null; // Parametros de salida del PL
+
+        try {
+            param_in = new Object[7];
+            param_in[0] = idInstitucion;
+            param_in[1] = idFacturacionDesde;
+            param_in[2] = (idFacturacionHasta == null ? "" : idFacturacionHasta);
+            param_in[3] = (idPersona == null ? "" : idPersona);
+            param_in[4] = pathFichero;
+            param_in[5] = fichero;
+            param_in[6] = idioma;
+
+            // Ejecucion del PL
+            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_EXPORTAR_TURNOS_OFI (?,?,?,?,?,?,?,?,?)}", 2, param_in);
+            if (!resultado[0].equalsIgnoreCase("0")) {
+                //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
+                LOGGER.error("Error en PL = " + (String) resultado[1]);
+            }
+
+        } catch (Exception e) {
+            throw new FacturacionSJCSException("Error al exportar datos", e, utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.exportDatos"));
+        }
+
+        // Resultado del PL
+        return resultado[0];
+    }
+
+    public String ejecutarPLExportarGuardias(String idInstitucion, String idFacturacionDesde, String idFacturacionHasta, String idPersona,
+                                             String pathFichero, String fichero, String idioma, AdmUsuarios usuario) throws Exception {
+
+        Object[] param_in; // Parametros de entrada del PL
+        String resultado[] = null; // Parametros de salida del PL
+
+        try {
+            param_in = new Object[7];
+            param_in[0] = idInstitucion;
+            param_in[1] = idFacturacionDesde;
+            param_in[2] = (idFacturacionHasta == null ? "" : idFacturacionHasta);
+            param_in[3] = (idPersona == null ? "" : idPersona);
+            param_in[4] = pathFichero;
+            param_in[5] = fichero;
+            param_in[6] = idioma;
+
+            // Ejecucion del PL
+            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_EXPORTAR_GUARDIAS (?,?,?,?,?,?,?,?,?)}", 2, param_in);
+            if (!resultado[0].equalsIgnoreCase("0")) {
+                //ClsLogging.writeFileLog("Error en PL = " + (String) resultado[1], 3);
+                LOGGER.error("Error en PL = " + (String) resultado[1]);
+            }
+
+        } catch (Exception e) {
+            throw new FacturacionSJCSException("Error al exportar datos", e, utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.exportDatos"));
+        }
+
+        // Resultado del PL
+        return resultado[0];
+    }
+
     /**
      * Recupera el datasource con los datos de conexión sacados del fichero de
      * configuracion
@@ -203,7 +273,7 @@ public class EjecucionPlsPago {
      * @throws Exception       type Exception
      * @author CSD
      */
-    private String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters)
+    public String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters)
             throws IOException, NamingException, SQLException {
 
         String result[] = null;

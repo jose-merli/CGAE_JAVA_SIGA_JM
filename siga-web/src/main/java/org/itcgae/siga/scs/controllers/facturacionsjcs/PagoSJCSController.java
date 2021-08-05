@@ -52,6 +52,12 @@ public class PagoSJCSController {
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/ejecutarPagoSJCS")
+    ResponseEntity<InsertResponseDTO> ejecutarPagoSJCS(@RequestBody PagosjgItem pagosjgItem, HttpServletRequest request) {
+        InsertResponseDTO response = iPagoSJCSService.ejecutarPagoSJCS(pagosjgItem.getIdPagosjg(), request);
+        return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+    }
+
     @GetMapping("/comboConceptosPago")
     ResponseEntity<ConceptoPagoDTO> comboConceptosPago(@RequestParam("idFacturacion") String idFacturacion, @RequestParam("idPago") String idPago,
                                                        HttpServletRequest request) {

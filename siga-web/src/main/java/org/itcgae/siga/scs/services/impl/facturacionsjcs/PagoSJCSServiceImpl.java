@@ -78,6 +78,9 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
     @Autowired
     private FcsMovimientosvariosMapper fcsMovimientosvariosMapper;
 
+    @Autowired
+    private UtilidadesFacturacionSJCS utilidadesFacturacionSJCS;
+
     @Override
     public PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
@@ -1538,11 +1541,9 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                                     + idPago);
 
                     if (UtilidadesString.esCadenaVacia(pago.getBancosCodigo())) {
-                        throw new FacturacionSJCSException("Debe de seleccionar una cuenta bancaria", "factSJCS.abonos.configuracion.literal.cuentaObligatoria");
+                        throw new FacturacionSJCSException("Debe de seleccionar una cuenta bancaria",
+                                utilidadesFacturacionSJCS.getMensajeIdioma(usuarios.get(0).getIdlenguaje(), "factSJCS.abonos.configuracion.literal.cuentaObligatoria"));
                     }
-
-                    // CR7 - Antes de ejecutar simulamos el guardado
-//					guardarBloquePago(miform, usr); //TODO no se si hay que hacerlo
 
                     String estadoPago = fcsPagosjgExtendsMapper.getEstadoPago(idPago, idInstitucion);
                     String criterioTurno = pago.getCriteriopagoturno();
@@ -1550,16 +1551,19 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                     // Validacion de los datos antes de ejecutar el pago:
                     // 1. El estado del pago debe ser abierto:
                     if (!estadoPago.equals(SigaConstants.ESTADO_PAGO_ABIERTO)) {
-                        // TODO MIRAR EXCEPCIÓN
+                        throw new FacturacionSJCSException("El pago no se encuentra en un estado correcto para realizar esta operación",
+                                utilidadesFacturacionSJCS.getMensajeIdioma(usuarios.get(0).getIdlenguaje(), "messages.factSJCS.error.estadoPagoNoCorrecto"));
                     }
                     // 2. Criterios correctos del Turno:
                     if (!criterioTurno.equals(SigaConstants.CRITERIOS_PAGO_FACTURACION)) {
-                        // TODO MIRAR EXCEPCIÓN
+                        throw new FacturacionSJCSException("No ha sido configurado el criterio de pago.",
+                                utilidadesFacturacionSJCS.getMensajeIdioma(usuarios.get(0).getIdlenguaje(), "messages.factSJCS.error.criterioPago"));
                     }
 
                     //3. Si no se ha introducido importe a pagar el importe a facturar será cero
                     if (pago.getImporterepartir().doubleValue() == 0.00) {
-                        // TODO MIRAR EXCEPCIÓN
+                        throw new FacturacionSJCSException("El importe a facturar será cero, introduzca importe a pagar distinto de cero.",
+                                utilidadesFacturacionSJCS.getMensajeIdioma(usuarios.get(0).getIdlenguaje(), "messages.facturacionSJCS.abono.sin.importe.pago"));
                     }
 
                     // Insertamos el estado del pago:
@@ -1573,17 +1577,19 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                     fcsPagosEstadospagosMapper.insertSelective(record);
 
-                    ejecucionPlsPago.ejecutarPL_PagoTurnosOficio(Integer.valueOf(idInstitucion.toString()), Integer.valueOf(idPago), usuarios.get(0).getIdusuario());
-                    ejecucionPlsPago.ejecutarPL_PagoGuardias(Integer.valueOf(idInstitucion.toString()), Integer.valueOf(idPago), usuarios.get(0).getIdusuario());
-                    ejecucionPlsPago.ejecutarPL_PagoSOJ(Integer.valueOf(idInstitucion.toString()), Integer.valueOf(idPago), usuarios.get(0).getIdusuario());
-                    ejecucionPlsPago.ejecutarPL_PagoEJG(Integer.valueOf(idInstitucion.toString()), Integer.valueOf(idPago), usuarios.get(0).getIdusuario());
+                    ejecucionPlsPago.ejecutarPL_PagoTurnosOficio(Integer.valueOf(idInstitucion.toString()), Integer.valueOf(idPago), usuarios.get(0));
+                    ejecucionPlsPago.ejecutarPL_PagoGuardias(Integer.valueOf(idInstitucion.toString()), Integer.valueOf(idPago), usuarios.get(0));
+                    ejecucionPlsPago.ejecutarPL_PagoSOJ(Integer.valueOf(idInstitucion.toString()), Integer.valueOf(idPago), usuarios.get(0));
+                    ejecucionPlsPago.ejecutarPL_PagoEJG(Integer.valueOf(idInstitucion.toString()), Integer.valueOf(idPago), usuarios.get(0));
 
                     // Calculo de todos los importes totales, importes de movimientos,
                     // importes de irpf, importe bruto, importe neto ......
                     // así como la forma de pago, si el pago es por banco, obtención del
                     // nombre del banco y la cuenta corriente.
-
                     this.obtencionImportes(idInstitucion, idPago, usuarios.get(0));
+
+                    // Exportacion de datos a EXCEL
+                    utilidadesFacturacionSJCS.exportarDatosPagos(idInstitucion, pago.getIdfacturacion(), pago.getIdpagosjg(), null, usuarios.get(0));
 
                 }
 
@@ -1599,6 +1605,12 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
         }
 
         insertResponseDTO.setError(error);
+
+        if (error.getDescription() == null) {
+            insertResponseDTO.setStatus(SigaConstants.OK);
+        } else {
+            insertResponseDTO.setStatus(SigaConstants.KO);
+        }
 
         return insertResponseDTO;
     }
@@ -1618,7 +1630,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
             // Recuperamos los colegiados a los que tenemos que pagar
             // aquellos incluidos en el pago o con movimientos varios pendientes
-            List<FcsPagoColegiado> colegiados = getColegiadosApagar(idInstitucion, idPago, SigaConstants.LISTA_PAGO_TODOS);
+            List<FcsPagoColegiado> colegiados = getColegiadosApagar(idInstitucion, idPago, SigaConstants.LISTA_PAGO_TODOS, usuario);
 
             // Si no existe un pago para el colegiado debe existir al menos un
             // MV
@@ -1630,7 +1642,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                 idPersonaDestino = colegiado.getIdperdestino().toString();
 
-                ArrayList<String> cuenta = getCuentaAbonoSJCS(idInstitucion, idPersonaDestino);
+                ArrayList<String> cuenta = getCuentaAbonoSJCS(idInstitucion, idPersonaDestino, usuario);
 
                 idCuenta = cuenta.get(2).equals("-1") ? null : cuenta.get(2);
 
@@ -1654,7 +1666,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                 // aplicar
                 // los movimientos varios y calcular el IRPF del importe bruto.
                 porcentajeIRPF = obtenerIrpf(idInstitucion.toString(), idPersonaDestino,
-                        !idPersonaDestino.equals(colegiado.getIdperorigen().toString()));
+                        !idPersonaDestino.equals(colegiado.getIdperorigen().toString()), usuario);
 
                 // 2. Aplicar los movimientos varios
                 // Asocia todos los movimientos sin idpago al pago actual.
@@ -1663,7 +1675,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                 fcsMovimientosvarios.setIdinstitucion(idInstitucion);
                 fcsMovimientosvarios.setIdpersona(colegiado.getIdperorigen());
 
-                importeMovimientos = aplicarMovimientosVarios(fcsMovimientosvarios, idPago, importeSJCS);
+                importeMovimientos = aplicarMovimientosVarios(fcsMovimientosvarios, idPago, importeSJCS, usuario);
 
                 // 3. Obtener importe bruto como la suma de los movimientos varios y
                 // el total SJCS
@@ -1680,10 +1692,10 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                 //aalg Incidencia del 28-sep-2011. Se modifica el usuario de modificacion que se estaba
                 // cogiendo el idPersona en vez del userName
                 aplicarRetencionesJudiciales(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString(),
-                        Double.toString(importeNeto), usuario.getIdusuario().toString(), usuario.getIdlenguaje());
+                        Double.toString(importeNeto), usuario.getIdusuario().toString(), usuario.getIdlenguaje(), usuario);
 
                 // obtener el importe de las retenciones judiciales
-                importeRetenciones = getSumaRetenciones(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString());
+                importeRetenciones = getSumaRetenciones(idInstitucion.toString(), idPago, colegiado.getIdperorigen().toString(), usuario);
 
                 // Actualizar el irpf, movimientos varios y retenciones en
                 // fcs_pago_colegiado
@@ -1701,7 +1713,8 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             } // fin del for de colegiados
 
         } catch (Exception e) {
-            throw new Exception("Error en la obtención de los importes", e);
+            throw new FacturacionSJCSException("Error en la obtención de los importes", e,
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.importes"));
         }
     }
 
@@ -1717,16 +1730,17 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
      * @param idPago
      * @return List<FcsPagoColegiado>
      */
-    private List<FcsPagoColegiado> getColegiadosApagar(Short idInstitucion, String idPago, int caseMorosos) throws Exception {
+    private List<FcsPagoColegiado> getColegiadosApagar(Short idInstitucion, String idPago, int caseMorosos, AdmUsuarios usuario) throws Exception {
 
         List<FcsPagoColegiado> colegiados;
 
         try {
 
-            colegiados = fcsPagosjgExtendsMapper.getColegiadosApagar(idInstitucion, idPago, 2);
+            colegiados = fcsPagosjgExtendsMapper.getColegiadosApagar(idInstitucion, idPago, caseMorosos);
 
         } catch (Exception e) {
-            throw new Exception("Error al obtener los colegiados a pagar", e);
+            throw new FacturacionSJCSException("Error al obtener los colegiados a pagar", e,
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.colegiadosApagar"));
         }
 
         return colegiados;
@@ -1741,7 +1755,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
      * <br> Si la cuenta es -1 es que pasa a pagar por caja
      * @throws Exception En cualquier caso de error
      */
-    private ArrayList<String> getCuentaAbonoSJCS(Short idInstitucion, String idPersona) throws Exception {
+    private ArrayList<String> getCuentaAbonoSJCS(Short idInstitucion, String idPersona, AdmUsuarios usuario) throws Exception {
 
         ArrayList<String> salida = new ArrayList<>();
         salida.add(idInstitucion.toString());
@@ -1782,7 +1796,8 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             }
 
         } catch (Exception e) {
-            throw new Exception("Error al obtener la cuenta de abono SJCS", e);
+            throw new FacturacionSJCSException("Error al obtener la cuenta de abono SJCS", e,
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.cuentaAbonoSJCS"));
         }
 
         return salida;
@@ -1798,17 +1813,18 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
      * @throws Exception
      */
     private Double obtenerIrpf(String idInstitucion, String idPersonaSociedad,
-                               boolean esSociedad) throws Exception {
+                               boolean esSociedad, AdmUsuarios usuario) throws Exception {
 
         String[] resultado = ejecucionPlsPago.ejecutarPLCalcularIRPF_Pagos(idInstitucion, idPersonaSociedad, esSociedad);
 
         // comprueba si el pl se ha ejecutado correctamente
         if (!resultado[2].equals("0")) {
             if (resultado[2].equals("100"))
-                // TODO Meter FacturacionSJCSException
-                throw new Exception("error.irpf.fileNotExist");
+                throw new FacturacionSJCSException("Existen colegiados sin IRPF o varios IRPFs asignados. Puede revisar el listado de IRPFs asignados que encontrará en el módulo de Consultas",
+                        utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "error.irpf.fileNotExist"));
             else
-                throw new Exception("Error al obtener importes de colegiado: " + resultado[3]);
+                throw new FacturacionSJCSException("Error en la obtención de IRPF: " + resultado[3],
+                        utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.obtIrpf"));
         }
         return new Double((String) resultado[0]);
     }
@@ -1827,7 +1843,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
      * @return
      * @throws Exception
      */
-    private double aplicarMovimientosVarios(FcsMovimientosvarios fcsMovimientosvarios, String idPago, double importeSJCS) throws Exception {
+    private double aplicarMovimientosVarios(FcsMovimientosvarios fcsMovimientosvarios, String idPago, double importeSJCS, AdmUsuarios usuario) throws Exception {
 
         // en esta variable se guarda el importe final de los movimientos varios
         double importeMovimientos = 0.0d;
@@ -1854,10 +1870,10 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             List<MovimientoVarioDTO> movimientos_aux = new ArrayList<>();
 
             //Se obtienen los movimientos del colegiado que no estén asociados ni a una facturación ni a un grupo. (Caso 1)
-            movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), null, null, null, SigaConstants.CASO_MVNOASOCIADO));
+            movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), null, null, null, SigaConstants.CASO_MVNOASOCIADO, usuario));
 
             //Obtiene la facturación del pago y sus grupos.
-            List<FacturacionGrupoPagoDTO> facturacionesGruposPagosList = getFacturacionesGruposPagos(idPago, fcsMovimientosvarios.getIdinstitucion().toString());
+            List<FacturacionGrupoPagoDTO> facturacionesGruposPagosList = getFacturacionesGruposPagos(idPago, fcsMovimientosvarios.getIdinstitucion().toString(), usuario);
 
             Integer idFacturacion = null;
 
@@ -1877,13 +1893,13 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                     //Se obtienen los movimientos de la facturación que no tienen grupo asociado
                     // y que estén pendientes de aplicar de la facturación del pago y de facturaciones anteriores
-                    movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), idFacturacion.toString(), fechaDesde, null, SigaConstants.CASO_MVASOCIADOAFACTURACION));
+                    movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), idFacturacion.toString(), fechaDesde, null, SigaConstants.CASO_MVASOCIADOAFACTURACION, usuario));
 
                     for (int i = 0; i < facturacionesGruposPagosList.size(); i++) {
                         Short idGrupo = facturacionesGruposPagosList.get(i).getIdGrupoFacturacion();
                         if (null != idGrupo) {
                             //Se obtienen los movimientos del colegiado que tienen idfacturacion <= que la del pago y el grupo = grupo del pago que estamos tratando (Caso 2)
-                            movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), idFacturacion.toString(), fechaDesde, idGrupo.toString(), SigaConstants.CASO_MVASOCIADOAGRUPOFACT));
+                            movimientos_aux.addAll(getMovimientosRW(fcsMovimientosvarios.getIdinstitucion(), idPago, fcsMovimientosvarios.getIdpersona().toString(), idFacturacion.toString(), fechaDesde, idGrupo.toString(), SigaConstants.CASO_MVASOCIADOAGRUPOFACT, usuario));
                         }
                     }
 
@@ -1987,7 +2003,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                             //Primero comprobamos si se ha aplicado anteriormente algun importe en
                             // otro pago al movimiento
                             importeAnteriorAplicado = getSumaMovimientosAplicados(fcsMovimientosvarios.getIdinstitucion().toString(),
-                                    auxIdMovimiento.toString(), fcsMovimientosvarios.getIdpersona().toString());
+                                    auxIdMovimiento.toString(), fcsMovimientosvarios.getIdpersona().toString(), usuario);
 
                             importeTotalMovimiento = redondea(importeTotalMovimiento - importeAnteriorAplicado, 2);
 
@@ -2024,8 +2040,8 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
 
         } catch (Exception e) {
-            //TODO VER QUE HACER CON LA EXCEPCIÓN
-            throw new Exception("", e);
+            throw new FacturacionSJCSException("No se ha podido realizar la petición. La incidencia ha sido remitida a RedAbogacia para su resolución.", e,
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.general.error"));
         }
 
         return importeMovimientos;
@@ -2040,7 +2056,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
      * @return
      */
     private List<MovimientoVarioDTO> getMovimientosRW(Short idInstitucion, String idPago, String idPersona, String idFacturacion, String fDesde,
-                                                      String idGrupoFacturacion, int caso) throws Exception {
+                                                      String idGrupoFacturacion, int caso, AdmUsuarios usuario) throws Exception {
 
         List<MovimientoVarioDTO> listaMovimientos;
 
@@ -2049,13 +2065,14 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             listaMovimientos = fcsPagosjgExtendsMapper.getMovimientosRW(idInstitucion, idPersona, idFacturacion, fDesde, idGrupoFacturacion, caso);
 
         } catch (Exception e) {
-            throw new Exception("Error al obtener los movimientos varios que hay que pagar a una persona", e);
+            throw new FacturacionSJCSException("Error al obtener los movimientos varios que hay que pagar a una persona", e,
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.movimientos"));
         }
 
         return listaMovimientos;
     }
 
-    private List<FacturacionGrupoPagoDTO> getFacturacionesGruposPagos(String idPago, String idInstitucion) throws Exception {
+    private List<FacturacionGrupoPagoDTO> getFacturacionesGruposPagos(String idPago, String idInstitucion, AdmUsuarios usuario) throws Exception {
 
         List<FacturacionGrupoPagoDTO> listaFacturaciones;
 
@@ -2063,13 +2080,14 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             listaFacturaciones = fcsPagosjgExtendsMapper.getFacturacionesGruposPagos(idPago, idInstitucion);
 
         } catch (Exception e) {
-            throw new Exception("Error al obtener las facturaciones grupos pago", e);
+            throw new FacturacionSJCSException("Error al obtener las facturaciones grupos pago", e,
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.factGrupoPago"));
         }
 
         return listaFacturaciones;
     }
 
-    private double getSumaMovimientosAplicados(String idInstitucion, String idMovimiento, String idPersona) throws Exception {
+    private double getSumaMovimientosAplicados(String idInstitucion, String idMovimiento, String idPersona, AdmUsuarios usuario) throws Exception {
 
         double importe;
 
@@ -2078,7 +2096,46 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             importe = fcsPagosjgExtendsMapper.getSumaMovimientosAplicados(idInstitucion, idMovimiento, idPersona);
 
         } catch (Exception e) {
-            throw new Exception("Error al obtener la suma de los movimientos varios aplicados", e);
+            throw new FacturacionSJCSException("Error al obtener la suma de los movimientos varios aplicados", e,
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.sumaMovVariosAplica"));
+        }
+
+        return importe;
+    }
+
+    /**
+     * Devuelve el porcentaje de irpf a aplicar en un pago
+     */
+    private void aplicarRetencionesJudiciales(String idInstitucion,
+                                              String idPagoJg, String idPersonaSociedad, String importeNeto,
+                                              String usuMod, String idioma, AdmUsuarios usuario) throws Exception {
+
+        // Aplicar las retenciones judiciales
+        String resultado[] = ejecucionPlsPago.ejecutarPLAplicarRetencionesJudiciales(idInstitucion, idPagoJg, idPersonaSociedad, importeNeto, usuMod,
+                idioma);
+        // comprueba si el pl se ha ejecutado correctamente
+        if (!resultado[0].equals("0")) {
+            if (resultado[0].equals("11"))
+                throw new FacturacionSJCSException("Se ha producido un error al calcular el importe de retención LEC. Seguramente no haya smi para el año o no esten configurados los tramos LEC",
+                        utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "FactSJCS.mantRetencionesJ.plAplicarRetencionesJudiciales.error.tramosLEC"));
+            else
+                throw new FacturacionSJCSException("Error al aplicar las retenciones judiciales",
+                        utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.retencionesJudi"));
+        }
+
+    }
+
+    private double getSumaRetenciones(String idInstitucion, String idPago, String idPersona, AdmUsuarios usuario) throws Exception {
+
+        double importe;
+
+        try {
+
+            importe = fcsPagosjgExtendsMapper.getSumaRetenciones(idInstitucion, idPago, idPersona);
+
+        } catch (Exception e) {
+            throw new FacturacionSJCSException("Error al obtener la suma de retenciones", e,
+                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.sumaRetenciones"));
         }
 
         return importe;
@@ -2118,41 +2175,5 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
         bCalculo = bCalculo.multiply(bdSigno); // Control final del signo
 
         return bCalculo.doubleValue();
-    }
-
-    /**
-     * Devuelve el porcentaje de irpf a aplicar en un pago
-     */
-    private void aplicarRetencionesJudiciales(String idInstitucion,
-                                              String idPagoJg, String idPersonaSociedad, String importeNeto,
-                                              String usuMod, String idioma) throws Exception {
-
-        // Aplicar las retenciones judiciales
-        String resultado[] = ejecucionPlsPago.ejecutarPLAplicarRetencionesJudiciales(idInstitucion, idPagoJg, idPersonaSociedad, importeNeto, usuMod,
-                idioma);
-        // comprueba si el pl se ha ejecutado correctamente
-        if (!resultado[0].equals("0")) {
-            if (resultado[0].equals("11"))
-                //TODO REVISAR EXCEPCIÓN
-                throw new Exception("FactSJCS.mantRetencionesJ.plAplicarRetencionesJudiciales.error.tramosLEC");
-            else
-                throw new Exception("Error al obtener importes de colegiado: " + resultado[1]);
-        }
-
-    }
-
-    private double getSumaRetenciones(String idInstitucion, String idPago, String idPersona) throws Exception {
-
-        double importe;
-
-        try {
-
-            importe = fcsPagosjgExtendsMapper.getSumaRetenciones(idInstitucion, idPago, idPersona);
-
-        } catch (Exception e) {
-            throw new Exception("Error al obtener la suma de retenciones", e);
-        }
-
-        return importe;
     }
 }

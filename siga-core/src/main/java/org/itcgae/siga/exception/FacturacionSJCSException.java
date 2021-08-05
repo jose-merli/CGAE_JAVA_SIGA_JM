@@ -10,6 +10,11 @@ public class FacturacionSJCSException extends Exception {
         this.description = description;
     }
 
+    public FacturacionSJCSException(String mensaje, Exception e, String description) {
+        super(mensaje, e);
+        this.description = description;
+    }
+
     public String getDescription() {
         return description;
     }

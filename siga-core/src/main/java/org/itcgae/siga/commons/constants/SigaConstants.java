@@ -1132,5 +1132,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final int CASO_MVNOASOCIADO = 1;
 	public static final int CASO_MVASOCIADOAGRUPOFACT = 2;
 	public static final int CASO_MVASOCIADOAFACTURACION = 3;
+	
+	public static final String PATH_PREVISIONES_BD = "PATH_PREVISIONES_BD";
+	public static final String MODULO_FCS = "FCS";
 
 }
