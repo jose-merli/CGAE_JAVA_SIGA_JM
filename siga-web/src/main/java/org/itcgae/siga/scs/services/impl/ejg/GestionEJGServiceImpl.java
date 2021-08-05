@@ -83,6 +83,8 @@ import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.GenRecursosCatalogos;
+import org.itcgae.siga.db.entities.GenRecursosCatalogosKey;
 import org.itcgae.siga.db.entities.ScsAsistencia;
 import org.itcgae.siga.db.entities.ScsAsistenciaExample;
 import org.itcgae.siga.db.entities.ScsAsistenciaKey;
@@ -128,6 +130,7 @@ import org.itcgae.siga.db.entities.ScsEjgdesignaExample;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.entities.ScsEstadoejgKey;
+import org.itcgae.siga.db.entities.ScsMaestroestadosejg;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsPonente;
@@ -144,6 +147,7 @@ import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.GenRecursosCatalogosMapper;
 import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsAuditoriaejgMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosasistenciaMapper;
@@ -165,6 +169,7 @@ import org.itcgae.siga.db.mappers.ScsEjgPrestacionRechazadaMapper;
 import org.itcgae.siga.db.mappers.ScsEjgResolucionMapper;
 import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
+import org.itcgae.siga.db.mappers.ScsMaestroestadosejgMapper;
 import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsPonenteMapper;
 import org.itcgae.siga.db.mappers.ScsSojMapper;
@@ -223,6 +228,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private FicherosServiceImpl ficherosServiceImpl;
+	
+	@Autowired
+	private GenRecursosCatalogosMapper genRecursosCatalogosMapper;
 
 	@Autowired
 	private ScsDocumentacionejgMapper scsDocumentacionejgMapper;
@@ -334,6 +342,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private ScsEjgdesignaMapper scsEjgdesignaMapper;
+	
+	@Autowired
+	private ScsMaestroestadosejgMapper scsMaestroestadosejgMapper;
 
 	@Autowired
 	private IEEJGServices eejgService;
@@ -2308,7 +2319,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						ejg.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
 						ejg.setNumero(Long.parseLong(datos.getNumero()));
 						
-						insertAuditoriaEJG("Nuevo Estado" ,null ,datos.getIdEstadoejg() ,usuarios.get(0) ,ejg);
+						ScsMaestroestadosejg labelEstado = scsMaestroestadosejgMapper.selectByPrimaryKey(Short.valueOf(datos.getIdEstadoejg()));
+						
+						GenRecursosCatalogosKey labelRecursoKey = new GenRecursosCatalogosKey();
+						
+						labelRecursoKey.setIdlenguaje(usuarios.get(0).getIdlenguaje());
+						labelRecursoKey.setIdrecurso(labelEstado.getDescripcion());
+						
+						GenRecursosCatalogos labelRecurso = genRecursosCatalogosMapper.selectByPrimaryKey(labelRecursoKey);
+						insertAuditoriaEJG("Nuevo Estado" ,null ,labelRecurso.getDescripcion() ,usuarios.get(0) ,ejg);
 						
 					} else {
 						responsedto.setStatus(SigaConstants.KO);
@@ -2326,7 +2345,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO editarEstado(EstadoEjgItem datos, HttpServletRequest request) {
+	public UpdateResponseDTO editarEstado(EstadoEjgItem datos, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO responsedto = new UpdateResponseDTO();
 		int response = 0;
 
@@ -2345,8 +2364,24 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.debug("GestionEJGServiceImpl.nuevoEstado() -> Entrada para cambiar los datos generales del ejg");
-
-				try {
+//
+//				try {
+					
+					ScsEjg ejg = new ScsEjg();
+					
+					ejg.setAnio(Short.parseShort(datos.getAnio()));
+					ejg.setIdinstitucion(idInstitucion);
+					ejg.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
+					ejg.setNumero(Long.parseLong(datos.getNumero()));
+					
+					ScsMaestroestadosejg labelEstado = scsMaestroestadosejgMapper.selectByPrimaryKey(Short.valueOf(datos.getIdEstadoejg()));
+					
+					GenRecursosCatalogosKey labelRecursoKey = new GenRecursosCatalogosKey();
+					
+					labelRecursoKey.setIdlenguaje(usuarios.get(0).getIdlenguaje());
+					labelRecursoKey.setIdrecurso(labelEstado.getDescripcion());
+					
+					GenRecursosCatalogos labelRecurso = genRecursosCatalogosMapper.selectByPrimaryKey(labelRecursoKey);
 
 					ScsEstadoejg record = new ScsEstadoejg();
 					response = 0;
@@ -2354,26 +2389,48 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					record.setIdinstitucion(idInstitucion);
 					record.setAnio(Short.parseShort(datos.getAnio()));
 					record.setNumero(Long.parseLong(datos.getNumero()));
-
-					record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
-					record.setFechainicio(datos.getFechaInicio());
-					record.setObservaciones(datos.getObservaciones());
-
 					record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
+
+					if(record.getIdestadoejg()!=Short.parseShort(datos.getIdEstadoejg())) {
+						ScsMaestroestadosejg oldLabelEstado = scsMaestroestadosejgMapper.selectByPrimaryKey(Short.valueOf(record.getIdestadoejg()));
+						
+						GenRecursosCatalogosKey oldLabelRecursoKey = new GenRecursosCatalogosKey();
+						
+						oldLabelRecursoKey.setIdlenguaje(usuarios.get(0).getIdlenguaje());
+						oldLabelRecursoKey.setIdrecurso(labelEstado.getDescripcion());
+						
+						GenRecursosCatalogos oldLabelRecurso = genRecursosCatalogosMapper.selectByPrimaryKey(labelRecursoKey);
+						
+						insertAuditoriaEJG("Estado Actualizado (Tipo estado)" ,oldLabelRecurso.getDescripcion() ,labelRecurso.getDescripcion() ,usuarios.get(0) ,ejg);
+						record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
+						
+						
+					}
+					if(record.getFechainicio()!=datos.getFechaInicio()) {
+						insertAuditoriaEJG("Estado Actualizado (FechaInicio)" ,record.getFechainicio().toString() ,datos.getFechaInicio().toString() ,usuarios.get(0) ,ejg);
+
+						record.setFechainicio(datos.getFechaInicio());
+					}
+					if(record.getObservaciones()!=datos.getObservaciones()) {
+						insertAuditoriaEJG("Estado Actualizado (Observaciones)" ,record.getObservaciones().toString() ,datos.getObservaciones().toString() ,usuarios.get(0) ,ejg);
+
+						record.setObservaciones(datos.getObservaciones());
+					}
 
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuarios.get(0).getIdusuario());
 					record.setIdestadoporejg(Long.parseLong(datos.getIdestadoporejg()));
 
 					response = scsEstadoejgMapper.updateByPrimaryKeySelective(record);
+					if(response==0)throw (new Exception("Error al actualizar un estado"));
 
 					LOGGER.debug(
 							"GestionEJGServiceImpl.nuevoEstado() -> Salida del servicio para cambiar los estados y la fecha de estados para los ejgs");
-				} catch (Exception e) {
-					LOGGER.debug(
-							"GestionEJGServiceImpl.nuevoEstado() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
-							e);
-				} finally {
+//				} catch (Exception e) {
+//					LOGGER.debug(
+//							"GestionEJGServiceImpl.nuevoEstado() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ",
+//							e);
+//				} finally {
 					// respuesta si se actualiza correctamente
 					if (response == 1) {
 						responsedto.setStatus(SigaConstants.OK);
@@ -2384,7 +2441,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						LOGGER.error(
 								"GestionEJGServiceImpl.nuevoEstado() -> KO. No se ha actualizado ningún estado y fecha para los ejgs seleccionados");
 					}
-				}
+//				}
 			}
 		}
 
