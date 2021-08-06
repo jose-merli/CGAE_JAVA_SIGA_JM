@@ -527,12 +527,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				if (designaItem.getNombreInteresado() != null
 						&& !designaItem.getNombreInteresado().equalsIgnoreCase("")) {
 //					sql += " and PER.NOMBRE = " + "'" + designaItem.getNombreInteresado().trim() + "'";
-					sql += " AND PER.NOMBRE like UPPER('%" + designaItem.getNombreInteresado().trim() + "%')";
+					sql += " AND upper(PER.NOMBRE) like UPPER('%" + designaItem.getNombreInteresado().trim() + "%')";
 				}
 				if (designaItem.getApellidosInteresado() != null
 						&& !designaItem.getApellidosInteresado().equalsIgnoreCase("")) {
-					sql += " and (PER.APELLIDO1 like UPPER('%" + designaItem.getApellidosInteresado().trim() + "%')";
-					sql += " or PER.APELLIDO2 like UPPER('%" + designaItem.getApellidosInteresado().trim() + "%'))";
+					sql += " and upper(PER.APELLIDO1 || ' ' || PER.APELLIDO2) like upper ('%" + designaItem.getApellidosInteresado() + "%')";
 				}
 			}
 
@@ -1017,12 +1016,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				if (designaItem.getNombreInteresado() != null
 						&& !designaItem.getNombreInteresado().equalsIgnoreCase("")) {
 //					sql += " and PER.NOMBRE = " + "'" + designaItem.getNombreInteresado().trim() + "'";
-					sql += " AND PER.NOMBRE like UPPER('%" + designaItem.getNombreInteresado().trim() + "%')";
+					sql += " AND persona.NOMBRE like UPPER('%" + designaItem.getNombreInteresado().trim() + "%')";
 				}
 				if (designaItem.getApellidosInteresado() != null
 						&& !designaItem.getApellidosInteresado().equalsIgnoreCase("")) {
-					sql += " and (PER.APELLIDO1 like UPPER('%" + designaItem.getApellidosInteresado().trim() + "%')";
-					sql += " or PER.APELLIDO2 like UPPER('%" + designaItem.getApellidosInteresado().trim() + "%'))";
+					sql += " and (upper(persona.APELLIDO1) like UPPER('%" + designaItem.getApellidosInteresado().trim() + "%')";
+					sql += " or upper(persona.APELLIDO2) like UPPER('%" + designaItem.getApellidosInteresado().trim() + "%'))";
 				}
 			}
 
