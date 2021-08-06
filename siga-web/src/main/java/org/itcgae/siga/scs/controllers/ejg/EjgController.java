@@ -395,7 +395,7 @@ public class EjgController {
 
 	// editarEstado
 	@RequestMapping(value = "/gestion-ejg/editarEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> editarEstado(@RequestBody EstadoEjgItem datos, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> editarEstado(@RequestBody EstadoEjgItem datos, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.editarEstado(datos, request);
 
 		if (response.getStatus().equals("OK"))

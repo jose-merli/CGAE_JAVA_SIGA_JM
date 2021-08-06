@@ -962,12 +962,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						throw new Exception("ERROR: no se ha podido introducir ningún familiar en el ejg");
 					} else {
 						responsedto.setStatus(SigaConstants.OK);
-						EjgItem ejgItem = new EjgItem();
+						ScsEjg ejgItem = new ScsEjg();
 						
-						ejgItem.setAnnio(item.get(2));
-						ejgItem.setidInstitucion(idInstitucion.toString());
-						ejgItem.setNumero(item.get(4));		
-						ejgItem.setTipoEJG(item.get(3));
+						ejgItem.setAnio(Short.valueOf(item.get(2)));
+						ejgItem.setIdinstitucion(idInstitucion);
+						ejgItem.setNumero(Long.valueOf(item.get(4)));		
+						ejgItem.setIdtipoejg(Short.valueOf(item.get(3)));
 						
 						insertAuditoriaEJG("familiar" ,null ,"NUEVO" ,usuarios.get(0) ,ejgItem);
 					}
