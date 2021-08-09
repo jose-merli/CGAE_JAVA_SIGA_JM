@@ -38,6 +38,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ERROR_SERVER;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_CARGAS;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.commons.utils.Validaciones;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.CargasWs;
@@ -597,8 +598,10 @@ public class WSCommons {
 					SociedadBaja sociedadBaja = SociedadBaja.Factory.newInstance();
 					sociedadBaja.setCIFNIF(sociedadBajaDTO.getNif());
 					sociedadBaja.setFechaBajaColegio(UtilidadesString.toCalendar(sociedadBajaDTO.getFechaBaja()));
-					registro.setSociedadBaja(sociedadBaja );
-					registrosList.add(registro);
+					if (validaSociedadBaja(sociedadBaja)) {
+						registro.setSociedadBaja(sociedadBaja );
+						registrosList.add(registro);
+					}
 				}
 			}
 				List<SociedadesEditadasDTO> sociedadesEditadas = cenNoColegiado.selectSociedadesEditar(idInstitucion,peticion.getFechaDesde().getTime(),peticion.getFechaHasta().getTime());
@@ -883,9 +886,11 @@ public class WSCommons {
 							for (SociedadActualizacion sociedadActualizacion : sociedadesEditadasResult) {
 
 								RegistroSociedad registro = RegistroSociedad.Factory.newInstance();
-								registro.setSociedadActualizacion(sociedadActualizacion);
-								registrosList.add(registro);
 								
+								if (validaSociedadActualizacion(sociedadActualizacion)) {
+									registro.setSociedadActualizacion(sociedadActualizacion);
+									registrosList.add(registro);
+								}
 							}
 						}
 					}catch(AssertionError e){
@@ -915,7 +920,7 @@ public class WSCommons {
 	
 	}
 	
-	
+
 	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
 		CenInstitucionExample example = new CenInstitucionExample();
 		example.createCriteria().andCodigoextEqualTo(codExterno);
@@ -1835,5 +1840,80 @@ public class WSCommons {
 				valid = true;
 			}
 			return valid;
+		}
+		
+		/**
+		 * Valida los dato de una sociedad dada de baja.
+		 * @param sociedadBaja
+		 * @return
+		 */
+		public boolean validaSociedadBaja(SociedadBaja sociedadBaja) {
+			boolean valid = false;
+			
+			// Comprueba si se ha proporcionado un CIF o NIF válido
+			if ( (Validaciones.validaNIF(sociedadBaja.getCIFNIF()) ||
+				  Validaciones.validaCIF(sociedadBaja.getCIFNIF()) ) && 
+			// Comprueba si existe la fecha de baja del colegio
+				sociedadBaja.getFechaBajaColegio() != null) {
+				valid = true;
+			}
+			
+			return valid;
+		}
+		
+		/**
+		 * Valida los datos de una sociedad.
+		 * @param sociedadActualizacion
+		 * @return
+		 */
+		private boolean validaSociedadActualizacion(SociedadActualizacion sociedadActualizacion) {
+			
+			// Comprueba si se ha proporcionado un CIF o NIF válido
+			if ( (Validaciones.validaNIF(sociedadActualizacion.getDatosSociedad().getCIFNIF()) ||
+				  Validaciones.validaCIF(sociedadActualizacion.getDatosSociedad().getCIFNIF()) ) &&
+			// Comprueba si existen los datos de la sociedad
+				sociedadActualizacion.getDatosSociedad() != null &&
+				sociedadActualizacion.getFechaAlta() != null &&
+				sociedadActualizacion.getFechaConstitucion() != null &&
+				sociedadActualizacion.getResena() != null &&
+				sociedadActualizacion.getDireccion() != null) {
+				
+					// Si existe el campo objeto social, comprueba si el valor no supera los 500 caracteres
+					if (sociedadActualizacion.getObjetoSocial() != null &&
+						sociedadActualizacion.getObjetoSocial().length() > 500) {
+						return false;
+					}
+					
+					// Comprueba que exista al menos un integrante en la sociedad
+					if (sociedadActualizacion.getIntegranteSociedadArray().length == 0) {
+						return false;
+					} else {
+						for (IntegranteSociedad integrante: sociedadActualizacion.getIntegranteSociedadArray()) {
+							
+							// Comprueba que los datos de los integrantes de la sociedad sean válidos
+							if (!Validaciones.validaIntegranteSociedad(integrante)) {
+								return false;
+							}
+						}
+							
+					}
+					
+					// Comprueba que los datos de la dirección de la sociedad sean válidos
+					if (sociedadActualizacion.getDireccion() == null ||
+						!Validaciones.validaDireccion(sociedadActualizacion.getDireccion())) {
+						return false;
+					}
+					
+					// Comprueba que los datos del notario de la sociedad sean válidos
+					if (sociedadActualizacion.getDatosNotario() != null &&
+						!Validaciones.validaDatosPersona(sociedadActualizacion.getDatosNotario())) {
+						return false;
+					}
+				} else {
+					return false;
+				}
+				
+			
+			return true;
 		}
 }
