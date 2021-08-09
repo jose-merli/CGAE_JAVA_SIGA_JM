@@ -18,7 +18,6 @@ public class DocumentoActDesignaItem {
 	private String asociado;
 	private String extension;
 	private String idPersona;
-	private String numColegiado;
 
 	/**
 	 * @return the idDocumentacionasi
@@ -244,20 +243,6 @@ public class DocumentoActDesignaItem {
 		this.idPersona = idPersona;
 	}
 
-	/**
-	 * @return the numColegiado
-	 */
-	public String getNumColegiado() {
-		return numColegiado;
-	}
-
-	/**
-	 * @param numColegiado the numColegiado to set
-	 */
-	public void setNumColegiado(String numColegiado) {
-		this.numColegiado = numColegiado;
-	}
-
 	@Override
 	public String toString() {
 		return "DocumentoActDesignaItem [idDocumentacionasi=" + idDocumentacionasi + ", idTipoDocumento="
@@ -266,7 +251,7 @@ public class DocumentoActDesignaItem {
 				+ fechaModificacion + ", fechaEntrada=" + fechaEntrada + ", anio=" + anio + ", numero=" + numero
 				+ ", idActuacion=" + idActuacion + ", observaciones=" + observaciones + ", nombreFichero="
 				+ nombreFichero + ", asociado=" + asociado + ", extension=" + extension + ", idPersona=" + idPersona
-				+ ", numColegiado=" + numColegiado + "]";
+				+ "]";
 	}
 
 }

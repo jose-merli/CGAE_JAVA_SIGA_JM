@@ -40,8 +40,13 @@ public class ActuacionDesignaItem {
 	private String usuValidacion;
 	private String fechaValidacion;
 	private boolean permiteModificacion;
-	private String validarJustificacion; 
-	
+	private String validarJustificacion;
+	private String nombreProcedimiento;
+	private String nombreModulo;
+	private String idPartidaPresupuestaria;
+	private String partidaPresupuestaria;
+	private String idInstitucion;
+
 	/**
 	 * @return the fechaActuacion
 	 */
@@ -559,7 +564,7 @@ public class ActuacionDesignaItem {
 	public void setFechaValidacion(String fechaValidacion) {
 		this.fechaValidacion = fechaValidacion;
 	}
-	
+
 	public boolean isPermiteModificacion() {
 		return permiteModificacion;
 	}
@@ -567,13 +572,57 @@ public class ActuacionDesignaItem {
 	public void setPermiteModificacion(boolean permiteModificacion) {
 		this.permiteModificacion = permiteModificacion;
 	}
-	
+
 	public String getValidarJustificacion() {
 		return validarJustificacion;
 	}
 
 	public void setValidarJustificacion(String validarJustificacion) {
 		this.validarJustificacion = validarJustificacion;
+	}
+
+	public String getNombreProcedimiento() {
+		return nombreProcedimiento;
+	}
+
+	public void setNombreProcedimiento(String nombreProcedimiento) {
+		this.nombreProcedimiento = nombreProcedimiento;
+	}
+
+	public String getNombreModulo() {
+		return nombreModulo;
+	}
+
+	public void setNombreModulo(String nombreModulo) {
+		this.nombreModulo = nombreModulo;
+	}
+
+	/**
+	 * @return the idPartidaPresupuestaria
+	 */
+	public String getIdPartidaPresupuestaria() {
+		return idPartidaPresupuestaria;
+	}
+
+	/**
+	 * @param idPartidaPresupuestaria the idPartidaPresupuestaria to set
+	 */
+	public void setIdPartidaPresupuestaria(String idPartidaPresupuestaria) {
+		this.idPartidaPresupuestaria = idPartidaPresupuestaria;
+	}
+
+	/**
+	 * @return the partidaPresupuestaria
+	 */
+	public String getPartidaPresupuestaria() {
+		return partidaPresupuestaria;
+	}
+
+	/**
+	 * @param partidaPresupuestaria the partidaPresupuestaria to set
+	 */
+	public void setPartidaPresupuestaria(String partidaPresupuestaria) {
+		this.partidaPresupuestaria = partidaPresupuestaria;
 	}
 
 	@Override
@@ -591,7 +640,18 @@ public class ActuacionDesignaItem {
 				+ usuCreacion + ", fechaCreacion=" + fechaCreacion + ", usuModificacion=" + usuModificacion
 				+ ", fechaModificacion=" + fechaModificacion + ", usuJustificacion=" + usuJustificacion
 				+ ", fechaUsuJustificacion=" + fechaUsuJustificacion + ", usuValidacion=" + usuValidacion
-				+ ", fechaValidacion=" + fechaValidacion + "]";
+				+ ", fechaValidacion=" + fechaValidacion + ", permiteModificacion=" + permiteModificacion
+				+ ", validarJustificacion=" + validarJustificacion + ", nombreProcedimiento=" + nombreProcedimiento
+				+ ", nombreModulo=" + nombreModulo + ", idPartidaPresupuestaria=" + idPartidaPresupuestaria
+				+ ", partidaPresupuestaria=" + partidaPresupuestaria + "]";
+	}
+
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 
 }

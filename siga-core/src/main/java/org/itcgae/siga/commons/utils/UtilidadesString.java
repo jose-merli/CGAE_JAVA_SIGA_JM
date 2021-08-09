@@ -7,6 +7,13 @@
 package org.itcgae.siga.commons.utils;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -15,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -135,8 +143,6 @@ public class UtilidadesString {
 	public static String filtroTextoBusquedas(String columna, String cadena) {
 		StringBuilder cadenaWhere = new StringBuilder();
 		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN') ");
-//		cadenaWhere.append(" LIKE");
-//		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')) ");
 		cadenaWhere.append(" LIKE");
 		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')) ");
 		return cadenaWhere.toString();
@@ -334,4 +340,122 @@ public class UtilidadesString {
 		} else
 			return null;
 	}
+
+	public static String getFileContent(File plantillaFO) throws IOException, Exception {
+			String content =null;
+		
+			if (!plantillaFO.exists()){
+				throw new IOException("El fichero "+plantillaFO.getName()+" no existe");
+			}
+			InputStream is= null;
+			try {
+				is=new FileInputStream(plantillaFO);
+				int nBytes = is.available();
+				byte buffer[] = new byte[nBytes];
+				is.read(buffer, 0, nBytes);
+				content = new String(buffer);
+				is.close();
+				return content;
+			} catch (IOException e) {
+			    try {
+			        is.close();
+			    } catch (Exception eee) {}
+				throw new Exception("Error en la lectura del fichero", e);			    
+			}
+	}
+
+	public static void setFileContent(File ficheroFOP, String sPlantillaFO) throws Exception {
+		try {
+			StringReader is= new StringReader(sPlantillaFO);
+			OutputStream os = new FileOutputStream(ficheroFOP);
+			int car;
+			while ((car=is.read())!=-1){
+				os.write(car);
+			}
+			os.flush();
+			os.close();
+			is.close();
+			
+		}catch (IOException e) {
+			throw new Exception("Error al insertar contenido en fichero",e);			    
+		}
+		
+	}
+	
+	public static String reemplazaEntreMarcasCon(String texto, String marcaInicial, String marcaFinal, String insTexto){
+		String retorno=null;
+		int inicio=texto.indexOf(marcaInicial);
+		int fin=texto.indexOf(marcaFinal);
+		
+		if(inicio!=-1 && fin!=-1){
+			retorno=texto.substring(0,inicio)+insTexto+texto.substring(fin+marcaFinal.length());
+		}else{
+			retorno=texto;
+		}
+		return retorno;
+	} 
+	
+	public static String reemplazaParametros(String texto, String marca, Hashtable<String,String> properties){
+		
+		StringBuffer finalText = new StringBuffer();
+		int dif=marca.length();
+		String prop;
+		int pos1 = 0;
+		int pos2 = 0;
+		int index = 0;
+		if(texto==null) texto="";
+		//while parameters in the string
+		while ((pos1 = texto.indexOf(marca,index)) != -1) {
+			// search the parameter betwen the control characters
+			// and replace by its value
+			pos2 = texto.indexOf(marca,pos1+dif);
+			prop = texto.substring(pos1+dif,pos2);
+			
+			finalText.append(texto.substring(index,pos1));
+			String propValue =(String)properties.get(prop.toUpperCase());
+			if (propValue != null) {
+				propValue=UtilidadesString.formato_ISO_8859_1(propValue);
+				finalText.append(propValue);
+			}
+			// searching on from the last control character
+			index = pos2+dif;
+		}
+		
+		finalText.append(texto.substring(index,texto.length()));
+		return finalText.toString();
+	}
+	
+	public static String formato_ISO_8859_1(String s) {
+	    StringBuffer buf = new StringBuffer("");
+	    char[] mChars = s.toCharArray();
+	    for (int i=0;i<mChars.length;i++){
+	        int code = mChars[i];
+	        if(code>47 && code<58){//digito
+	        	buf.append(mChars[i]);
+	        }else if(code>64 && code<91){//mayuscula
+	        	buf.append(mChars[i]);
+	        }else if(code>96 && code<123){//minuscula
+	        	buf.append(mChars[i]);
+	        }else if(code==128){//excepcion del euro
+	        	//LMS 08/08/2006
+	        	//En lugar de utilizar el formato decimal, se usa el hexadecimal para definir el símbolo del euro.
+	        	//buf.append("&#x20AC;");
+	        	buf.append("&#8364;");
+	        }else {//resto de caracteres
+	        	if(code!=0)
+	        		buf.append("&#x"+Integer.toHexString(code)+";");
+	        }
+	    }
+	    return buf.toString();
+	  }
+	
+	public static String encuentraEntreMarcas(String texto, String marcaInicial, String marcaFinal){
+		int inicio=texto.indexOf(marcaInicial);
+		int fin=texto.indexOf(marcaFinal);
+		String retorno=null;
+		if(inicio!=-1 && fin!=-1){
+			retorno=texto.substring(inicio+marcaInicial.length(),fin);
+		}
+		return retorno;
+	} 
 }

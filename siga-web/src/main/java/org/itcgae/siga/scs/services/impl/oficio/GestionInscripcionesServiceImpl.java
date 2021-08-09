@@ -8,58 +8,36 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.http.client.utils.DateUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.util.SSCellRange;
-import org.itcgae.siga.DTO.scs.GuardiasDTO;
-import org.itcgae.siga.DTO.scs.GuardiasItem;
-
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
-import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesTarjetaOficioDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesTarjetaOficioItem;
-import org.itcgae.siga.DTOs.scs.TurnosDTO;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.ScsGuardiasturno;
-import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
 import org.itcgae.siga.db.entities.ScsInscripcionturno;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoKey;
-import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
-import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
-import org.itcgae.siga.db.entities.ScsProcurador;
-import org.itcgae.siga.db.entities.ScsProcuradorExample;
-import org.itcgae.siga.db.entities.ScsTipoactuacion;
-import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
-
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.entities.ScsTurnoKey;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
 import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
 import org.itcgae.siga.db.mappers.ScsInscripcionturnoMapper;
-import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -69,7 +47,6 @@ import org.itcgae.siga.db.services.scs.mappers.ScsOrdenacionColasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.impl.maestros.FichaPartidasJudicialesServiceImpl;
 import org.itcgae.siga.scs.services.oficio.IGestionInscripcionesService;
-import org.itcgae.siga.scs.services.oficio.IGestionTurnosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -699,22 +676,6 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									"updateCambiarFecha()  -> Entrada a GestionInscripcionesServiceImpl");
 								
 								if(inscripcionesItem.getEstadonombre().equals("Alta") || inscripcionesItem.getEstadonombre().equals("Pendiente de Baja") ) {
-									// Falta comprobar que la fecha cumplimentada  sea igual o anterior a la fecha efectiva de alta 
-									// a todas las inscripciones de guardia de ese turno y ese colegiado.
-									
-									
-//									if(!guardias.isEmpty()){
-//										response = 0;
-//										error.setCode(400);
-//										error.setDescription("oficio.busquedaInscripcion.cambioFecha.validacionErrorTurno");
-//										updateResponseDTO.setStatus(SigaConstants.KO);
-//										break;
-//									}
-//									InscripcionesItem insSave = inscripcionesItem;
-//									insSave.setIdturno(null);
-//									insSave.setEstado(null);
-//									List<InscripcionesItem> checkColegiado = scsInscripcionturnoExtendsMapper.busquedaInscripciones(inscripcionesItem,
-//											idInstitucion, null, null, null, null);
 									int ccindex = 0;
 									int cc = 0;
 									while(ccindex<guardias.size() && cc==0) {
@@ -734,7 +695,11 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 											|| inscripcionesItem.getFechaActual().equals(inscripcionturno.getFechavalidacion()) 
 											|| response != 0) {
 										inscripcionturno.setFechavalidacion(inscripcionesItem.getFechaActual());
-										inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
+										if(inscripcionesItem.getEstadonombre().equals("Alta") ) {
+											inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
+										}else if(inscripcionesItem.getEstadonombre().equals("Pendiente de Baja")) {
+											inscripcionturno.setObservacionesvalbaja(inscripcionesItem.getObservaciones());
+										}
 										inscripcionturno.setFechamodificacion(new Date());
 										inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
 
@@ -751,25 +716,6 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 								}
 								
 								else if(inscripcionesItem.getEstadonombre().equals("Baja")) {
-									// Falta comprobar que la fecha cumplimentada  sea igual o anterior a la fecha efectiva de baja 
-									// a todas las inscripciones de guardia de ese turno y ese colegiado.
-//									ScsInscripcionturnoExample exampleinscripcionB = new ScsInscripcionturnoExample();
-//									exampleinscripcionB.createCriteria()
-//											.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-//											.andIdinstitucionEqualTo(idInstitucion)
-//											.andFechabajaLessThan(inscripcionesItem.getFechaActual());
-//									if(!scsInscripcionturnoExtendsMapper.selectByExample(exampleinscripcionB).isEmpty()){
-//										response = 0;
-//										error.setCode(400);
-//										error.setDescription("oficio.busquedaInscripcion.cambioFecha.bajaErrorTurno");
-//										updateResponseDTO.setStatus(SigaConstants.KO);
-//										break;
-//									}
-//									InscripcionesItem insSave = inscripcionesItem;
-//									insSave.setIdturno(null);
-//									insSave.setEstado(null);
-//									List<InscripcionesItem> checkColegiado = scsInscripcionturnoExtendsMapper.busquedaInscripciones(inscripcionesItem,
-//											idInstitucion, null, null, null, null);
 									int ccindex = 0;
 									int cc = 0;
 									while(ccindex<guardias.size() && cc==0) {
@@ -786,11 +732,11 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									
 									//Final comprobación
 									
-									if(inscripcionesItem.getFechaActual().before(inscripcionesItem.getFechabaja()) 
+									if(inscripcionesItem.getFechaActual().after(inscripcionesItem.getFechabaja()) 
 											|| inscripcionesItem.getFechaActual().equals(inscripcionesItem.getFechabaja()) 
 											|| response != 0) {
 										inscripcionturno.setFechabaja(inscripcionesItem.getFechaActual());
-										inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservaciones());
+										inscripcionturno.setObservacionesbaja(inscripcionesItem.getObservaciones());
 
 										inscripcionturno.setFechamodificacion(new Date());
 										inscripcionturno.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -877,41 +823,54 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 				try {
 					for (InscripcionesItem inscripcionesItem : inscripcionesDTO.getInscripcionesItems()) {
 
-						//Buscamos el turno asociado para determinar si ese turno requiere validacion del colegio para las inscripciones o no
+						// Buscamos el turno asociado para determinar si ese turno requiere validacion
+						// del colegio para las inscripciones o no
 						ScsTurnoKey turnoKey = new ScsTurnoKey();
 						turnoKey.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 						turnoKey.setIdinstitucion(idInstitucion);
 						ScsTurno turnoItem = scsTurnoMapper.selectByPrimaryKey(turnoKey);
 						String valid = turnoItem.getValidarinscripciones();
-						//						String valid = "S";
-						//CREAMOS INSCRIPCION A TURNO
 
+						// Buscamos las inscripciones ya existentes
+						ScsInscripcionturnoExample scsInscripcionturnoExample = new ScsInscripcionturnoExample();
+						scsInscripcionturnoExample.createCriteria()
+								.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdpersonaEqualTo(Long.parseLong(inscripcionesItem.getIdpersona()));
 
-						//							ScsInscripcionturnoExample exampleinscripcion = new ScsInscripcionturnoExample();
-						//							exampleinscripcion.createCriteria()
-						//									.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()))
-						//									.andIdinstitucionEqualTo(idInstitucion);
+						List<ScsInscripcionturno> oldListInscripcionturno = scsInscripcionturnoMapper
+								.selectByExample(scsInscripcionturnoExample);
 
-						ScsInscripcionturnoKey keyinscripcion = new ScsInscripcionturnoKey();
+						// Si hay inscripciones ya existentes las eliminamos
+						if (!oldListInscripcionturno.isEmpty()) {
 
-						keyinscripcion.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
-						keyinscripcion.setIdinstitucion(idInstitucion);
-						keyinscripcion.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
-						keyinscripcion.setFechasolicitud( inscripcionesItem.getFechasolicitud());
+							for (ScsInscripcionturno scsInscripcionturno : oldListInscripcionturno) {
 
-						ScsInscripcionturno oldInscripcionturno = scsInscripcionturnoMapper.selectByPrimaryKey(keyinscripcion);
+								ScsInscripcionturnoKey scsInscripcionturnoKey = new ScsInscripcionturnoKey();
+								scsInscripcionturnoKey.setIdturno(scsInscripcionturno.getIdturno());
+								scsInscripcionturnoKey.setIdinstitucion(scsInscripcionturno.getIdinstitucion());
+								scsInscripcionturnoKey.setIdpersona(scsInscripcionturno.getIdpersona());
+								scsInscripcionturnoKey.setFechasolicitud(scsInscripcionturno.getFechasolicitud());
 
-						if(oldInscripcionturno!=null) scsInscripcionturnoMapper.deleteByPrimaryKey(keyinscripcion);
+								scsInscripcionturnoMapper.deleteByPrimaryKey(scsInscripcionturnoKey);
 
+							}
+
+						}
+
+						// Procedemos a insertar la nueva inscripción
 						ScsInscripcionturno inscripcionturno = new ScsInscripcionturno();
-
 						inscripcionturno.setObservacionessolicitud(inscripcionesItem.getObservacionessolicitud());
 						inscripcionturno.setFechasolicitud(new Date());
-						if(inscripcionesItem.getEstadonombre().equals("NoPermisos") || inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
+						
+						if (inscripcionesItem.getEstadonombre().equals("NoPermisos")
+								|| inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
 							inscripcionturno.setFechavalidacion(null);
-						}else {
-							if(valid=="N")	inscripcionturno.setFechavalidacion(new Date());
-						}	
+						} else {
+							if (valid == "N")
+								inscripcionturno.setFechavalidacion(new Date());
+						}
+						
 						inscripcionturno.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 						inscripcionturno.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
 						inscripcionturno.setIdinstitucion(idInstitucion);
@@ -920,33 +879,39 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 
 						response = scsInscripcionturnoMapper.insert(inscripcionturno);
 
-						//Creamos inscripcion a turno
-						if(inscripcionesItem.getIdguardia()!=null) {
+						// Creamos inscripcion a turno
+						if (inscripcionesItem.getIdguardia() != null) {
 
-							//							ScsInscripcionguardiaExample exampleguardia = new ScsInscripcionguardiaExample();
-							//							exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							//									.andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()));
+							// ScsInscripcionguardiaExample exampleguardia = new
+							// ScsInscripcionguardiaExample();
+							// exampleguardia.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							// .andIdturnoEqualTo(Integer.parseInt(inscripcionesItem.getIdturno()));
 
 							ScsInscripcionguardiaKey keyinscripcionguardia = new ScsInscripcionguardiaKey();
 
 							keyinscripcionguardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 							keyinscripcionguardia.setIdinstitucion(idInstitucion);
 							keyinscripcionguardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
-							keyinscripcionguardia.setFechasuscripcion( inscripcionesItem.getFechasolicitud());
+							keyinscripcionguardia.setFechasuscripcion(inscripcionesItem.getFechasolicitud());
 
-							ScsInscripcionguardia oldInscripcionguardia = scsInscripcionguardiaMapper.selectByPrimaryKey(keyinscripcionguardia);
+							ScsInscripcionguardia oldInscripcionguardia = scsInscripcionguardiaMapper
+									.selectByPrimaryKey(keyinscripcionguardia);
 
-							if(oldInscripcionguardia!=null) scsInscripcionguardiaMapper.deleteByPrimaryKey(keyinscripcionguardia);
+							if (oldInscripcionguardia != null) {
+								scsInscripcionguardiaMapper.deleteByPrimaryKey(keyinscripcionguardia);
+							}
 
 							ScsInscripcionguardia guardia = new ScsInscripcionguardia();
 
 							guardia.setObservacionessuscripcion(inscripcionesItem.getObservacionessolicitud());
 							guardia.setFechasuscripcion(new Date());
-							if(inscripcionesItem.getEstadonombre().equals("NoPermisos") || inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
+							if (inscripcionesItem.getEstadonombre().equals("NoPermisos")
+									|| inscripcionesItem.getEstadonombre().equals("PendienteDeValidar")) {
 								guardia.setFechavalidacion(null);
-							}else {
-								if(valid=="N")	guardia.setFechavalidacion(new Date());
-							}				
+							} else {
+								if (valid == "N")
+									guardia.setFechavalidacion(new Date());
+							}
 							guardia.setIdturno(Integer.parseInt(inscripcionesItem.getIdturno()));
 							guardia.setIdpersona(Long.parseLong(inscripcionesItem.getIdpersona()));
 							guardia.setIdinstitucion(idInstitucion);
@@ -957,9 +922,9 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 							response = scsInscripcionguardiaMapper.insert(guardia);
 						}
 					}
-					
+
 					LOGGER.info("insertSolicitarAlta() / -> Salida del servicio para guardar nuevas inscripciones");
-						
+
 				}
 
 				catch (Exception e) {

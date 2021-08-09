@@ -1441,12 +1441,6 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							List<RelacionesItem> relaciones = scsAsistenciaExtendsMapper.searchRelaciones(anio,numero,idInstitucion,Integer.valueOf(usuarios.get(0).getIdlenguaje()).intValue(),1);
 							if(relaciones != null
                                 && !relaciones.isEmpty()){
-							    if(!UtilidadesString.esCadenaVacia(relaciones.get(0).getFechaDictamen())){
-							        relaciones.get(0).setFechaDictamen(relaciones.get(0).getFechaDictamen());
-                                }
-                                if(!UtilidadesString.esCadenaVacia(relaciones.get(0).getFechaResolucion())){
-                                    relaciones.get(0).setFechaResolucion(relaciones.get(0).getFechaResolucion());
-                                }
 							    asistenciaResponse.setPrimeraRelacion(relaciones.get(0));
                             }
 							ScsDelitosasistenciaExample scsDelitosasistenciaExample = new ScsDelitosasistenciaExample();

@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.itcgae.siga.DTOs.gen.Error;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JustificacionExpressItem {
@@ -48,7 +50,27 @@ public class JustificacionExpressItem {
 	private String procedimiento;
 	private String validarjustificaciones;
 	private Map<String, String> expedientes;
-	private List<ActuacionesJustificacionExpressItem> actuaciones;	
+	private List<ActuacionesJustificacionExpressItem> actuaciones;	 
+	private String categoriaProcedimiento;
+	private Error error = null;
+	
+	/**
+	   * 
+	   **/
+	  public JustificacionExpressItem error(Error error) {
+	    this.error = error;
+	    return this;
+	  }
+	  
+	  @JsonProperty("error")
+	  public Error getError() {
+	    return error;
+	  }
+	  
+	  public void setError(Error error) {
+	    this.error = error;
+	  }
+	  
 	
 	/**
 	 * @return the nColegiado
@@ -375,7 +397,11 @@ public class JustificacionExpressItem {
 	 * @param cliente the cliente to set
 	 */
 	public void setCliente(String cliente) {
-		this.cliente = cliente;
+		if(cliente == null ) {
+			this.cliente = " ";
+		}else {
+			this.cliente = cliente;
+		}
 	}
 
 	/**
@@ -654,5 +680,12 @@ public class JustificacionExpressItem {
 
 	public void setValidarjustificaciones(String validarjustificaciones) {
 		this.validarjustificaciones = validarjustificaciones;
+	}
+	public String getCategoriaProcedimiento() {
+		return categoriaProcedimiento;
+	}
+
+	public void setCategoriaProcedimiento(String categoriaProcedimiento) {
+		this.categoriaProcedimiento = categoriaProcedimiento;
 	}
 }

@@ -66,10 +66,10 @@ public class ScsBajasTemporalesSqlExtendsProvider extends CenBajastemporalesSqlP
 			sql.WHERE("(col.ncolegiado = '"+bajasTemporalesItem.getNcolegiado()+"' OR col.ncomunitario = '"+bajasTemporalesItem.getNcolegiado()+"')");
 		}
 		if(!bajasTemporalesItem.isHistorico()) {
-			sql.WHERE("bt.eliminado = 0");
-		}else {
-			sql.WHERE("(bt.eliminado = 1 OR bt.eliminado = 0)");
+			//sql.WHERE("bt.eliminado = 0");
+			sql.WHERE("NVL(bt.eliminado,0) = 0");
 		}
+		
 		sql.ORDER_BY("bt.fechadesde DESC");
 		
 		SQL sql2 = new SQL();
@@ -193,7 +193,7 @@ public String nuevaBajaTemporal(BajasTemporalesItem bajasTemporalesItem, Integer
 	sql.VALUES("VALIDADO", "2");
 	sql.VALUES("FECHAESTADO", "TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"','DD/MM/RRRR')");
 	sql.VALUES("FECHAMODIFICACION", "SYSDATE");
-	sql.VALUES("FECHAALTA", "'"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"'");
+	sql.VALUES("FECHAALTA", "TO_DATE('"+ dateFormat.format(bajasTemporalesItem.getFechaalta())+"','DD/MM/RRRR')");
 	sql.VALUES("ELIMINADO", "0");
 	sql.VALUES("FECHABT","SYSDATE");
 	sql.VALUES("IDPERSONA", bajasTemporalesItem.getIdpersona());

@@ -3,6 +3,10 @@ package org.itcgae.siga.DTOs.scs;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.itcgae.siga.DTOs.gen.Error;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author Dani
  *
@@ -87,11 +91,26 @@ public class DesignaItem {
 	private String nombreColegiado;
 	private String apellido1Colegiado;
 	private String apellido2Colegiado;
-	private int idPartidaPresupuestaria;
+	private String idPartidaPresupuestaria;
 	private String nombrePartida;
 	private String validada;
 	private int existeDesignaJuzgadoProcedimiento;
-	private String idPersona;
+	private String idPersona;  
+	private Error error = null;
+	
+	 public DesignaItem error(Error error) {
+		 this.error = error;
+		 return this;
+	 }
+		  
+	@JsonProperty("error")
+	public Error getError() {
+		 return error;
+	}
+		  
+	public void setError(Error error) {
+		 this.error = error;
+	}
 	
 	public String getApellido1Colegiado() {
 		return apellido1Colegiado;
@@ -917,10 +936,10 @@ public class DesignaItem {
 		this.idModulo = idModulo;
 	}
 	
-	public int getIdPartidaPresupuestaria() {
+	public String getIdPartidaPresupuestaria() {
 		return idPartidaPresupuestaria;
 	}
-	public void setIdPartidaPresupuestaria(int idPartidaPresupuestaria) {
+	public void setIdPartidaPresupuestaria(String idPartidaPresupuestaria) {
 		this.idPartidaPresupuestaria = idPartidaPresupuestaria;
 	}
 	

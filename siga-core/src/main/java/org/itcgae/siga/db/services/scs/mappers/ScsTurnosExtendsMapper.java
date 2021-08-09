@@ -29,6 +29,11 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
 	List<ComboItem> comboTurnos(Short idInstitucion);
 
+	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "comboTurnosTipo")
+	@Results({ @Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
+	List<ComboItem> comboTurnosTipo(Short idInstitucion, String tipoturno);
+	
 	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "busquedaTurnos")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
 			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR, id = true),
@@ -164,6 +169,16 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
 	    List<TurnosItem> updateUltimo(TurnosItem turnosItem,Short idInstitucion);
+	 
+	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="busquedaUltimoLetrado")
+	 @Results({ 
+		 	@Result(column = "NOMBREPERSONA", property = "nombrepersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROCOLEGIADO", property = "numerocolegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRETURNO", property = "nombre", jdbcType = JdbcType.VARCHAR)
+			 })
+	    List<TurnosItem> busquedaUltimoLetrado(String idTurno,Short idInstitucion);
 	 
 	 @SelectProvider(type=ScsTurnosSqlExtendsProvider.class, method="busquedaColaOficio")
 	 @Results({ 
