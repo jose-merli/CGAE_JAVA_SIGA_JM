@@ -592,7 +592,7 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         SQL consultaPorFacturacion = new SQL();
         consultaPorFacturacion.SELECT("1");
         consultaPorFacturacion.FROM("FCS_FACTURACIONJG FACJG");
-        consultaPorFacturacion.WHERE("TRUNC(FECHADESDE) <= '" + fDesde + "'");
+        consultaPorFacturacion.WHERE("TRUNC(FECHADESDE) <= TO_DATE('" + fDesde + "', 'YYYY/MM/DD HH24:MI:SS')");
         consultaPorFacturacion.WHERE("M.IDINSTITUCION = FACJG.IDINSTITUCION");
         consultaPorFacturacion.WHERE("M.IDFACTURACION = FACJG.IDFACTURACION");
 
@@ -648,7 +648,7 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
     public String getSumaMovimientosAplicados(String idInstitucion, String idMovimiento, String idPersona) {
 
         SQL sql = new SQL();
-        sql.SELECT("SUM(IMPORTEAPLICADO) AS IMPORTE");
+        sql.SELECT("NVL(SUM(IMPORTEAPLICADO), 0) AS IMPORTE");
         sql.FROM("FCS_APLICA_MOVIMIENTOSVARIOS");
         sql.WHERE("IDINSTITUCION = " + idInstitucion);
         sql.WHERE("IDPERSONA = " + idPersona);
@@ -660,11 +660,20 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
     public String getSumaRetenciones(String idInstitucion, String idPago, String idPersona) {
 
         SQL sql = new SQL();
-        sql.SELECT("SUM(IMPORTERETENIDO) AS IMPORTE");
+        sql.SELECT("NVL(SUM(IMPORTERETENIDO), 0) AS IMPORTE");
         sql.FROM("FCS_COBROS_RETENCIONJUDICIAL");
         sql.WHERE("IDINSTITUCION = " + idInstitucion);
         sql.WHERE("IDPERSONA = " + idPersona);
         sql.WHERE("IDPAGOSJG = " + idPago);
+
+        return sql.toString();
+    }
+
+    public String getNuevoIdAplicaMovimientosVarios() {
+
+        SQL sql = new SQL();
+        sql.SELECT("(NVL(MAX(IDAPLICACION), 0) + 1) AS IDAPLICACION");
+        sql.FROM("FCS_APLICA_MOVIMIENTOSVARIOS");
 
         return sql.toString();
     }

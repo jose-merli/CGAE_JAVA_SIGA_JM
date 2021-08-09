@@ -534,7 +534,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.SELECT("pjg.importesoj");
         sql.SELECT("pjg.importerepartir");
         sql.SELECT("pjg.importepagado");
-        sql.SELECT("( pjg.importepagado * 100 ) / pjg.importerepartir AS porcentaje");
+        sql.SELECT("(CASE pjg.importerepartir WHEN 0 THEN 0 ELSE ( pjg.importepagado * 100 ) / pjg.importerepartir END ) AS porcentaje");
         sql.SELECT("est.fechaestado");
         sql.SELECT("rec.descripcion desestado");
         sql.FROM("fcs_pagosjg pjg");

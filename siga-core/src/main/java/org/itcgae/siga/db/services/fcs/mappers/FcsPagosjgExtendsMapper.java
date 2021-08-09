@@ -163,7 +163,7 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
             @Result(column = "CANTIDAD", property = "cantidad", jdbcType = JdbcType.DECIMAL),
             @Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.TIMESTAMP),
             @Result(column = "USUMODIFICACION", property = "usuModificacion", jdbcType = JdbcType.DECIMAL),
-            @Result(column = "IDFACTURACION", property = "idfacturacion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.DECIMAL),
             @Result(column = "IDGRUPOFACTURACION", property = "idGrupoFacturacion", jdbcType = JdbcType.DECIMAL),
             @Result(column = "IMPORTEAPLICADO", property = "importeAplicado", jdbcType = JdbcType.DECIMAL)
     })
@@ -181,4 +181,7 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
 
     @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getSumaRetenciones")
     double getSumaRetenciones(String idInstitucion, String idPago, String idPersona);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getNuevoIdAplicaMovimientosVarios")
+    Long getNuevoIdAplicaMovimientosVarios();
 }

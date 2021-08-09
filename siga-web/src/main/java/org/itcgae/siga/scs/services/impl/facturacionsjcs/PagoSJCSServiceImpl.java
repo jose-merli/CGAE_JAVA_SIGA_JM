@@ -13,7 +13,7 @@ import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
-import org.itcgae.siga.db.mappers.FcsMovimientosvariosMapper;
+import org.itcgae.siga.db.mappers.FcsAplicaMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsPagoGrupofactHitoMapper;
 import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -76,7 +76,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
     private FcsPagoColegiadoExtendsMapper fcsPagoColegiadoExtendsMapper;
 
     @Autowired
-    private FcsMovimientosvariosMapper fcsMovimientosvariosMapper;
+    private FcsAplicaMovimientosvariosMapper fcsAplicaMovimientosvariosMapper;
 
     @Autowired
     private UtilidadesFacturacionSJCS utilidadesFacturacionSJCS;
@@ -1510,6 +1510,8 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         Error error = new Error();
+        FcsPagosjg pago = null;
+        List<AdmUsuarios> usuarios = null;
 
         try {
 
@@ -1521,7 +1523,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                 LOGGER.info(
                         "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
                 LOGGER.info(
                         "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
@@ -1535,7 +1537,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                     LOGGER.info(
                             "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
                                     + idPago);
-                    FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+                    pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
                     LOGGER.info(
                             "PagoSJCSServiceImpl.ejecutarPagoSJCS() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
                                     + idPago);
@@ -1596,6 +1598,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             }
 
         } catch (FacturacionSJCSException fe) {
+            ponerPagoEstadoAbierto(pago, idInstitucion, usuarios.get(0));
             error.setDescription(fe.getDescription());
         } catch (Exception e) {
             LOGGER.error(
@@ -1613,6 +1616,35 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
         }
 
         return insertResponseDTO;
+    }
+
+    private void ponerPagoEstadoAbierto(FcsPagosjg pago, Short idInstitucion, AdmUsuarios usuario) {
+
+        LOGGER.info(
+                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> INICIO");
+
+        // Eliminamos los estados del pago
+        FcsPagosEstadospagosExample fcsPagosEstadospagosExample = new FcsPagosEstadospagosExample();
+        fcsPagosEstadospagosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                .andIdpagosjgEqualTo(pago.getIdpagosjg());
+        LOGGER.info(
+                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> fcsPagosEstadospagosMapper.deleteByExample() -> Eliminamos los estados del pago");
+        fcsPagosEstadospagosMapper.deleteByExample(fcsPagosEstadospagosExample);
+
+        // Ponemos el pago en estado ABIERTO
+        FcsPagosEstadospagos fcsPagosEstadospagos = new FcsPagosEstadospagos();
+        fcsPagosEstadospagos.setIdinstitucion(idInstitucion);
+        fcsPagosEstadospagos.setIdpagosjg(pago.getIdpagosjg());
+        fcsPagosEstadospagos.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_ABIERTO));
+        fcsPagosEstadospagos.setFechaestado(new Date());
+        fcsPagosEstadospagos.setFechamodificacion(new Date());
+        fcsPagosEstadospagos.setUsumodificacion(usuario.getIdusuario());
+        LOGGER.info(
+                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> fcsPagosEstadospagosMapper.insertSelective() -> Ponemos el pago en estado abierto");
+        fcsPagosEstadospagosMapper.insertSelective(fcsPagosEstadospagos);
+
+        LOGGER.info(
+                "PagoSJCSServiceImpl.ponerPagoEstadoAbierto() -> FIN");
     }
 
     private void obtencionImportes(Short idInstitucion, String idPago, AdmUsuarios usuario) throws Exception {
@@ -1995,7 +2027,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                             // Si el importe del movimiento es positivo
                             if (importeTotalMovimiento > 0) {
                                 importeMovimientos += importeTotalMovimiento;
-                                fcsMovimientosvariosMapper.insertSelective(fcsMovimientosvarios);
+                                insertarAplicacionMovimientos(fcsMovimientosvarios, idPago, importeTotalMovimiento, usuario);
                             }
                         } else {
                             // Si el importe del movimiento es negatio
@@ -2015,7 +2047,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                                 fcsMovimientosvarios.setCantidad(BigDecimal.valueOf(importeAplicado));
 
-                                fcsMovimientosvariosMapper.insertSelective(fcsMovimientosvarios);
+                                insertarAplicacionMovimientos(fcsMovimientosvarios, idPago, importeAplicado, usuario);
 
                                 importeMovimientos = redondea((importeAplicado - (importeTotalMovimiento - (importeSJCS + importeMovimientos)) - importeSJCS), 2);
 
@@ -2025,7 +2057,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                                 fcsMovimientosvarios.setCantidad(BigDecimal.valueOf(importeTotalMovimiento));
 
-                                fcsMovimientosvariosMapper.insertSelective(fcsMovimientosvarios);
+                                insertarAplicacionMovimientos(fcsMovimientosvarios, idPago, importeTotalMovimiento, usuario);
 
                             }
                         }
@@ -2045,6 +2077,23 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
         }
 
         return importeMovimientos;
+    }
+
+    private void insertarAplicacionMovimientos(FcsMovimientosvarios movimientosvarios, String idPago, double importeAplicado, AdmUsuarios usuario) {
+
+        Long nuevoId = fcsPagosjgExtendsMapper.getNuevoIdAplicaMovimientosVarios();
+
+        FcsAplicaMovimientosvarios fcsAplicaMovimientosvarios = new FcsAplicaMovimientosvarios();
+        fcsAplicaMovimientosvarios.setIdaplicacion(nuevoId);
+        fcsAplicaMovimientosvarios.setIdinstitucion(movimientosvarios.getIdinstitucion());
+        fcsAplicaMovimientosvarios.setIdmovimiento(movimientosvarios.getIdmovimiento());
+        fcsAplicaMovimientosvarios.setIdpersona(movimientosvarios.getIdpersona());
+        fcsAplicaMovimientosvarios.setImporteaplicado(BigDecimal.valueOf(importeAplicado));
+        fcsAplicaMovimientosvarios.setFechamodificacion(movimientosvarios.getFechamodificacion());
+        fcsAplicaMovimientosvarios.setUsumodificacion(Long.valueOf(usuario.getIdusuario()));
+        fcsAplicaMovimientosvarios.setIdpagosjg(Integer.valueOf(idPago));
+
+        fcsAplicaMovimientosvariosMapper.insertSelective(fcsAplicaMovimientosvarios);
     }
 
     /**
@@ -2109,6 +2158,11 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
     private void aplicarRetencionesJudiciales(String idInstitucion,
                                               String idPagoJg, String idPersonaSociedad, String importeNeto,
                                               String usuMod, String idioma, AdmUsuarios usuario) throws Exception {
+
+        // Sustituimos el carácter '.' por ',' para que el PL se ejecute correctamente
+        if (importeNeto != null && importeNeto.contains(".")) {
+            importeNeto = importeNeto.replace(".", ",");
+        }
 
         // Aplicar las retenciones judiciales
         String resultado[] = ejecucionPlsPago.ejecutarPLAplicarRetencionesJudiciales(idInstitucion, idPagoJg, idPersonaSociedad, importeNeto, usuMod,
