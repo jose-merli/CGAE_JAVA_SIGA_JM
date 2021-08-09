@@ -579,3 +579,4 @@ siga-web/.sts4-cache/
 siga-parent.iml
 siga-core/siga-core.iml
 siga-web/siga-web.iml
+.gradle/
