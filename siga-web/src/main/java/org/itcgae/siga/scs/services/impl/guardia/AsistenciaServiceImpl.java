@@ -2,10 +2,7 @@ package org.itcgae.siga.scs.services.impl.guardia;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,53 +16,16 @@ import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.scs.ActuacionAsistenciaItem;
-import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
-import org.itcgae.siga.DTOs.scs.FiltroAsistenciaItem;
-import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaItem;
-import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseDTO;
-import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
-import org.itcgae.siga.DTOs.scs.TiposAsistenciaItem;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenBajastemporales;
-import org.itcgae.siga.db.entities.CenBajastemporalesExample;
-import org.itcgae.siga.db.entities.CenPersonaExample;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
-import org.itcgae.siga.db.entities.ScsActuacionasistencia;
-import org.itcgae.siga.db.entities.ScsActuacionasistenciaExample;
-import org.itcgae.siga.db.entities.ScsAsistencia;
-import org.itcgae.siga.db.entities.ScsAsistenciaExample;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
-import org.itcgae.siga.db.entities.ScsGuardiasturno;
-import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
-import org.itcgae.siga.db.entities.ScsPersonajg;
-import org.itcgae.siga.db.entities.ScsPersonajgExample;
-import org.itcgae.siga.db.entities.ScsSolicitudAceptada;
-import org.itcgae.siga.db.entities.ScsTurno;
-import org.itcgae.siga.db.entities.ScsTurnoExample;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.entities.ScsPersonajgExample.Criteria;
-import org.itcgae.siga.db.mappers.GenPropertiesMapper;
-import org.itcgae.siga.db.mappers.ScsActuacionasistenciaMapper;
+import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsBajasTemporalesExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsEstadoasistenciaExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsGuardiascolegiadoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsJuzgadoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsSolicitudAceptadaExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsTipoAsistenciaColegioExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.*;
 import org.itcgae.siga.scs.services.guardia.AsistenciaService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +37,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	private Logger LOGGER = Logger.getLogger(AsistenciaServiceImpl.class);
 	@Autowired
 	private ScsGuardiascolegiadoExtendsMapper scsGuardiascolegiadoExtendsMapper;
+
+	@Autowired
+	private ScsCalendarioguardiasMapper scsCalendarioguardiasMapper;
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -122,7 +85,25 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	
 	@Autowired
 	private ScsEstadoasistenciaExtendsMapper scsEstadoasistenciaExtendsMapper;
-	
+
+	@Autowired
+	private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
+
+	@Autowired
+	private ScsDelitosasistenciaMapper scsDelitosasistenciaMapper;
+
+	@Autowired
+	private ScsCabeceraguardiasExtendsMapper scsCabeceraguardiasExtendsMapper;
+
+	@Autowired
+	private ScsContrariosasistenciaMapper scsContrariosasistenciaMapper;
+
+	@Autowired
+	private ScsCaractasistenciaMapper scsCaractasistenciaMapper;
+
+	@Autowired
+	private ScsDefendidosdesignasExtendsMapper scsDefendidosdesignasExtendsMapper;
+
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
 		String token = request.getHeader("Authorization");
@@ -390,8 +371,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										actuacionAsistenciaItem.setNumeroAsunto(actuacion.getNumeroAsunto());
 										actuacionAsistenciaItem.setFechaJustificacion(actuacion.getFchaJustificacion());
 										actuacionAsistenciaItem.setComisariaJuzgado(actuacion.getComisariaJuzgado());
-										
-										actuacAsistenciaItems.add(actuacionAsistenciaItem);
+										if(actuacion.getIdDelito() != null
+                                            && actuacion.getIdDelito().equals(actuaciones.get(0).getIdDelito())){
+                                            actuacAsistenciaItems.add(actuacionAsistenciaItem);
+                                        }
 								});
 								responseItem.setActuaciones(actuacAsistenciaItems);
 								tarjetaAsistenciaResponseItems.add(responseItem);
@@ -540,7 +523,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									error.description("Error al insertar la nueva asistencia");
 								}
 
-								procesarDelitosAsistencia(asistencia, anioAsistencia, numeroAsistencia, idInstitucion);
+								procesarDelitosAsistenciaExpress(asistencia, anioAsistencia, numeroAsistencia, idInstitucion, usuarios.get(0));
 								
 								//Recorremos actuaciones y las insertamos
 								for(int i = 0; i < asistencia.getActuaciones().size(); i++) {
@@ -566,7 +549,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									error.setCode(500);
 									error.setMessage("Error al actualizar las asistencias");
 									error.description("Error al actualizar las asistencias");
+
 								}
+								procesarDelitosAsistenciaExpress(asistencia,null, null, idInstitucion, usuarios.get(0));
 								for(int i = 0; i < asistencia.getActuaciones().size(); i++) {
 									//Comprobamos si es una nueva actuacion
 									boolean isNuevaActuacion = isNuevaActuacion(asistencia, i+1, idInstitucion);
@@ -1106,9 +1091,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						
 						if(UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getAnio())
 								&& UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getNumero())) {
-							
-							//Validamos guardia
-							
+
 							//Insertamos asistencia
 							ScsAsistencia asistencia = fromTarjetaAsistenciaItemToScsAsistencia(asistencias.get(i), null, null, null, null, idInstitucion, usuarios.get(0));
 							//Obtenemos proximo numero de una nueva asistencia
@@ -1117,6 +1100,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							
 							asistencia.setNumero(Long.valueOf(numeroAsistencia));
 							asistencia.setAnio(Short.valueOf(anioAsistencia));
+
+							//Validamos guardias colegiado
+							procesaGuardiasColegiado(tarjetaAsistenciaResponseItem, idInstitucion);
 							
 							int inserted = scsAsistenciaExtendsMapper.insertSelective(asistencia);
 							
@@ -1139,7 +1125,44 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									
 							}
 						} else {
-							//Actualizamos los datos de la asistencia
+							//Actualizamos
+							int affectedRows = 0;
+							ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+							scsAsistenciaKey.setIdinstitucion(idInstitucion);
+							scsAsistenciaKey.setAnio(Short.valueOf(tarjetaAsistenciaResponseItem.getAnio()));
+							scsAsistenciaKey.setNumero(Long.valueOf(tarjetaAsistenciaResponseItem.getNumero()));
+							ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
+
+							scsAsistencia.setIdpersonacolegiado(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+							if(!UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getIdTipoAsistenciaColegio())){
+								scsAsistencia.setIdtipoasistenciacolegio(Short.valueOf(tarjetaAsistenciaResponseItem.getIdTipoAsistenciaColegio()));
+							} else {
+								scsAsistencia.setIdtipoasistenciacolegio(null);
+							}
+
+							if(!UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getFechaCierre())){
+								scsAsistencia.setFechacierre(new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaCierre()));
+							}else{
+								scsAsistencia.setFechacierre(null);
+							}
+
+							if(!UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getFechaSolicitud())){
+								scsAsistencia.setFechasolicitud(new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(tarjetaAsistenciaResponseItem.getFechaSolicitud()));
+							}else{
+								scsAsistencia.setFechasolicitud(null);
+							}
+							affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
+
+							if(affectedRows > 0 ){
+								insertResponse.setId(tarjetaAsistenciaResponseItem.getAnioNumero());
+								insertResponse.setStatus(SigaConstants.OK);
+							}else{
+								insertResponse.setStatus(SigaConstants.KO);
+								error.setCode(500);
+								error.setDescription("No se actualizó ninguna fila al intentar actualizar la asistencia");
+								insertResponse.setError(error);
+							}
+
 						}
 						
 					}
@@ -1243,6 +1266,14 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return updateResponse;
 	}
 
+
+	/**
+	 * Método que recoge toda la información necesaria para mostrarla en la ficha de asistencia
+	 *
+	 * @param request
+	 * @param anioNumero
+	 * @return
+	 */
 	@Override
 	public TarjetaAsistenciaResponseDTO buscarTarjetaAsistencias(HttpServletRequest request, String anioNumero) {
 		String token = request.getHeader("Authorization");
@@ -1283,9 +1314,30 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							asistenciaResponse.setAnio(String.valueOf(asistencia.getAnio()));
 							asistenciaResponse.setNumero(String.valueOf(asistencia.getNumero()));
 							asistenciaResponse.setEstado(String.valueOf(asistencia.getIdestadoasistencia()));
-							asistenciaResponse.setFechaCierre(new SimpleDateFormat("dd/MM/yyyy").format(asistencia.getFechacierre()));
-							asistenciaResponse.setFechaSolicitud(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(asistencia.getFechasolicitud()));
-							asistenciaResponse.setFechaEstado(new SimpleDateFormat("dd/MM/yyyy").format(asistencia.getFechaestadoasistencia()));
+							asistenciaResponse.setNig(asistencia.getNig());
+							asistenciaResponse.setNumDiligencia(asistencia.getNumerodiligencia());
+							asistenciaResponse.setNumProcedimiento(asistencia.getNumeroprocedimiento());
+							if(asistencia.getIdpretension() != null){
+								asistenciaResponse.setIdProcedimiento(String.valueOf(asistencia.getIdpretension()));
+							}
+							if(asistencia.getComisaria() != null) {
+								asistenciaResponse.setComisaria(String.valueOf(asistencia.getComisaria()));
+							}
+							if(asistencia.getJuzgado() != null) {
+								asistenciaResponse.setJuzgado(String.valueOf(asistencia.getJuzgado()));
+							}
+							if(asistencia.getIdpersonajg() != null){
+								asistenciaResponse.setIdPersonaJg(String.valueOf(asistencia.getIdpersonajg()));
+							}
+							if(asistencia.getFechacierre() != null) {
+								asistenciaResponse.setFechaCierre(new SimpleDateFormat("dd/MM/yyyy").format(asistencia.getFechacierre()));
+							}
+							if(asistencia.getFechasolicitud() != null) {
+								asistenciaResponse.setFechaSolicitud(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(asistencia.getFechasolicitud()));
+							}
+							if(asistencia.getFechaestadoasistencia() != null) {
+								asistenciaResponse.setFechaEstado(new SimpleDateFormat("dd/MM/yyyy").format(asistencia.getFechaestadoasistencia()));
+							}
 							asistenciaResponse.setIdTipoAsistenciaColegio(String.valueOf(asistencia.getIdtipoasistenciacolegio()));
 							return asistenciaResponse;
 						}).collect(Collectors.toList());
@@ -1350,7 +1402,13 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										asistenciaResponse.setAsistido(justiciables.get(0).getApellido1() +" "+justiciables.get(0).getApellido2()+" "+ justiciables.get(0).getNombre());
 									}else {
 										asistenciaResponse.setAsistido(justiciables.get(0).getApellido1() +" "+ justiciables.get(0).getNombre());
-									}								
+									}
+
+									asistenciaResponse.setNif(justiciables.get(0).getNif());
+									asistenciaResponse.setNombre(justiciables.get(0).getNombre());
+									asistenciaResponse.setApellido1(justiciables.get(0).getApellido1());
+									asistenciaResponse.setApellido2(justiciables.get(0).getApellido2());
+
 								}
 							}
 							
@@ -1373,7 +1431,38 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								asistenciaResponse.setValidada("NO");
 								asistenciaResponse.setNumeroActuaciones("0");
 							}
-							
+
+							List<ListaContrarioJusticiableItem> contrarios = scsAsistenciaExtendsMapper.searchListaContrarios(anioNumero, idInstitucion, false);
+							if(contrarios != null && !contrarios.isEmpty()){
+								asistenciaResponse.setNumContrarios(String.valueOf(contrarios.size()));
+								asistenciaResponse.setPrimerContrario(contrarios.get(0));
+							}
+
+							List<RelacionesItem> relaciones = scsAsistenciaExtendsMapper.searchRelaciones(anio,numero,idInstitucion,Integer.valueOf(usuarios.get(0).getIdlenguaje()).intValue(),1);
+							if(relaciones != null
+                                && !relaciones.isEmpty()){
+							    if(!UtilidadesString.esCadenaVacia(relaciones.get(0).getFechaDictamen())){
+							        relaciones.get(0).setFechaDictamen(relaciones.get(0).getFechaDictamen());
+                                }
+                                if(!UtilidadesString.esCadenaVacia(relaciones.get(0).getFechaResolucion())){
+                                    relaciones.get(0).setFechaResolucion(relaciones.get(0).getFechaResolucion());
+                                }
+							    asistenciaResponse.setPrimeraRelacion(relaciones.get(0));
+                            }
+							ScsDelitosasistenciaExample scsDelitosasistenciaExample = new ScsDelitosasistenciaExample();
+							scsDelitosasistenciaExample.createCriteria()
+									.andNumeroEqualTo(asistenciaBBDD.getNumero())
+									.andAnioEqualTo(asistenciaBBDD.getAnio())
+									.andIdinstitucionEqualTo(asistenciaBBDD.getIdinstitucion());
+							List<ScsDelitosasistencia> delitos = scsDelitosasistenciaMapper.selectByExample(scsDelitosasistenciaExample);
+							if(delitos != null
+								&& !delitos.isEmpty()){
+								List<String> idDelitos = new ArrayList<>();
+								delitos.forEach( delito ->{
+									idDelitos.add(String.valueOf(delito.getIddelito()));
+								});
+								asistenciaResponse.setDelitos(idDelitos);
+							}
 						}
 						
 						tarjetaAsistenciaResponseDTO.setResponseItems(listaAsistenciasResponse);
@@ -1390,11 +1479,1168 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 		return tarjetaAsistenciaResponseDTO;
 	}
+
+	/**
+	 *
+	 * Método que procesa los delitos seleccionados en la tabla de Asistencias Expres para insertarlos en SCS_DELITOSASISTENCIA
+	 *
+	 * @param tarjetaAsistenciaItem
+	 * @param anioParam
+	 * @param numeroParam
+	 * @param idInstitucion
+	 * @param usuario
+	 */
 	
-	private void procesarDelitosAsistencia (TarjetaAsistenciaResponseItem tarjetaAsistenciaItem, String anio, String numero, Short idInstitucion){
+	private void procesarDelitosAsistenciaExpress (TarjetaAsistenciaResponseItem tarjetaAsistenciaItem, String anioParam, String numeroParam, Short idInstitucion, AdmUsuarios usuario){
+
+		String anio = "";
+		String numero = "";
+
+		if(UtilidadesString.esCadenaVacia(anioParam)
+		&& UtilidadesString.esCadenaVacia(numeroParam)){
+			anio = tarjetaAsistenciaItem.getAnio();
+			numero = tarjetaAsistenciaItem.getNumero();
+		} else {
+			anio = anioParam;
+			numero = numeroParam;
+		}
+		//Borramos los asociados e insertamos el nuevo
+		ScsDelitosasistenciaExample scsDelitosasistenciaExample = new ScsDelitosasistenciaExample();
+		scsDelitosasistenciaExample.createCriteria()
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andAnioEqualTo(Short.valueOf(anio))
+				.andNumeroEqualTo(Long.valueOf(numero));
+
+		scsDelitosasistenciaMapper.deleteByExample(scsDelitosasistenciaExample);
+
+		ScsDelitosasistencia scsDelitosasistencia = new ScsDelitosasistencia();
+		int affectedRows = 0 ;
+		scsDelitosasistencia.setAnio(Short.valueOf(anio));
+		scsDelitosasistencia.setNumero(Long.valueOf(numero));
+		scsDelitosasistencia.setIdinstitucion(idInstitucion);
+		scsDelitosasistencia.setIddelito(Short.valueOf(tarjetaAsistenciaItem.getIdDelito()));
+		scsDelitosasistencia.setFechamodificacion(new Date());
+		scsDelitosasistencia.setUsumodificacion(usuario.getIdusuario());
+		affectedRows = scsDelitosasistenciaMapper.insertSelective(scsDelitosasistencia);
+
+	}
+
+	/**
+	 * Método que procesa las guardias de colegiado y las cabeceras de guardia al crear una asistencia
+	 *
+	 *
+	 * @param tarjetaAsistenciaResponseItem
+	 */
+	private void procesaGuardiasColegiado(TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem, Short idInstitucion){
+
+		try {
+
+			int affectedRows = 0;
+			//Buscamos las guardias de colegiado para el letrado seleccionado
+			List<ScsGuardiascolegiado> guardiascolegiados = scsGuardiascolegiadoExtendsMapper.getGuardiasColegiadoNoSustitucion(tarjetaAsistenciaResponseItem, idInstitucion);
+
+			//Si no hay guardias de colegiado creadas
+			if(guardiascolegiados == null
+				|| guardiascolegiados.isEmpty()) {
+
+				//Nos devuelve el idpersona de la persona que esta en guardia para esa fecha
+				guardiascolegiados = scsGuardiascolegiadoExtendsMapper.getGuardiasColegiadoEnFecha(tarjetaAsistenciaResponseItem, idInstitucion);
+				//Buscamos sus respectivas guardias de colegiado
+				if (guardiascolegiados != null
+						&& !guardiascolegiados.isEmpty()) {
+					guardiascolegiados = scsGuardiascolegiadoExtendsMapper.getGuardiasColegiado(tarjetaAsistenciaResponseItem, idInstitucion, String.valueOf(guardiascolegiados.get(0).getIdpersona()));
+				}
+			}
+
+			//Si hay guardias de colegiado
+			if(guardiascolegiados != null
+					&& !guardiascolegiados.isEmpty()){
+
+				ScsGuardiascolegiado firstGuardiaColegiado = guardiascolegiados.get(0);
+				ScsCabeceraguardias scsCabeceraguardias = new ScsCabeceraguardias();
+				scsCabeceraguardias.setIdpersona(firstGuardiaColegiado.getIdpersona());
+				scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+				scsCabeceraguardias.setIdinstitucion(idInstitucion);
+				scsCabeceraguardias.setFechainicio(firstGuardiaColegiado.getFechainicio());
+				scsCabeceraguardias.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+				scsCabeceraguardias = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(scsCabeceraguardias);
+
+				//Si el letrado estaba ya de guardia, validamos las cabeceras
+				if(firstGuardiaColegiado.getIdpersona().longValue() == Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia())){
+
+					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFechamodificacion(new Date());
+					scsCabeceraguardias.setUsumodificacion(0);
+					affectedRows += scsCabeceraguardiasExtendsMapper.updateByPrimaryKeySelective(scsCabeceraguardias);
+
+					if(affectedRows  <= 0){
+						LOGGER.error("procesaGuardiasColegiado() / El letrado de la asistencia estaba de guardia pero no se actualizo ninguna fila");
+					}
+
+				//Si no, lo aniadimos como refuerzo
+				} else {
+
+					//Recorremos para setear el idPersona del colegiado que tentemos que insertar(el que hace la asistencia)
+					for (ScsGuardiascolegiado scsGuardiascolegiado : guardiascolegiados) {
+						//Para cada guardia colegiado accedemos a sus cabeceras de guardia, a las que luego habra que setear del idPersona y ponerlo en la ultima posicion(por eso se ha obtenido el ultimo de la fila)
+
+						scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
+						scsGuardiascolegiado.setFacturado("N");
+						scsGuardiascolegiado.setIdfacturacion(null);
+						scsGuardiascolegiado.setPagado("N");
+						scsGuardiascolegiado.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+						scsGuardiascolegiado.setFechamodificacion(new Date());
+						scsGuardiascolegiado.setUsumodificacion(0);
+
+					}
+
+					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					scsCabeceraguardias.setPosicion((short)(scsCabeceraguardias.getPosicion().shortValue()+1));
+					scsCabeceraguardias.setFechamodificacion(new Date());
+					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setUsumodificacion(0);
+
+					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
+					guardiascolegiados.stream().forEach(scsGuardiascolegiado -> {
+						scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+					});
+					if(affectedRows <= 0){
+						LOGGER.error("procesaGuardiasColegiado() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
+					}
+				}
+			//No hay guardias de colegiado creadas para la fecha, se crean
+			} else {
+
+				ScsCalendarioguardiasExample example = new ScsCalendarioguardiasExample();
+
+				example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()))
+						.andIdguardiaEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()))
+						.andFechainicioLessThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()))
+						.andFechainicioGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+
+				List<ScsCalendarioguardias> scsCalendarioguardias = scsCalendarioguardiasMapper.selectByExample(example);
+
+				if(scsCalendarioguardias != null
+					&& !scsCalendarioguardias.isEmpty()){
+
+					ScsGuardiascolegiado scsGuardiascolegiado = new ScsGuardiascolegiado();
+					scsGuardiascolegiado.setIdinstitucion(idInstitucion);
+					scsGuardiascolegiado.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+					scsGuardiascolegiado.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+					scsGuardiascolegiado.setFechainicio(new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					scsGuardiascolegiado.setFechafin(new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					scsGuardiascolegiado.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					scsGuardiascolegiado.setDiasguardia((long)1);
+					scsGuardiascolegiado.setDiasacobrar((long)1);
+					scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
+
+					scsGuardiascolegiado.setReserva("N");
+					scsGuardiascolegiado.setFacturado("N");
+					scsGuardiascolegiado.setIdfacturacion(null);
+					scsGuardiascolegiado.setPagado("N");
+					scsGuardiascolegiado.setFechamodificacion(new Date());
+					scsGuardiascolegiado.setUsumodificacion(0);
+
+					ScsCabeceraguardias scsCabeceraguardias  =  new ScsCabeceraguardias();
+					scsCabeceraguardias.setIdinstitucion(idInstitucion);
+					scsCabeceraguardias.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+					scsCabeceraguardias.setIdcalendarioguardias(scsCalendarioguardias.get(0).getIdcalendarioguardias());
+
+					scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+					scsCabeceraguardias.setFechainicio(new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy").parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					scsCabeceraguardias.setPosicion((short)1);
+					scsCabeceraguardias.setFechamodificacion(new Date());
+					scsCabeceraguardias.setSustituto("0");
+					scsCabeceraguardias.setFechaalta(new Date());
+
+					//Las metemos validadas
+					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setUsumodificacion(0);
+
+					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
+					affectedRows += scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+
+					if(affectedRows <= 0){
+						LOGGER.error("procesaGuardiasColegiado() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
+					}
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, " + e, e);
+		}
+
+	}
+
+	@Override
+	public UpdateResponseDTO asociarJusticiable(HttpServletRequest request, JusticiableItem justiciable, String anioNumero, String actualizaDatos) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponse = new UpdateResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"asociarJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"asociarJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()) {
+
+					if(!UtilidadesString.esCadenaVacia(anioNumero)){
+
+						ScsPersonajg scsPersonajg = new ScsPersonajg();
+						if(!UtilidadesString.esCadenaVacia(justiciable.getIdPersona())){
+
+							scsPersonajg.setIdinstitucion(Short.valueOf(justiciable.getIdInstitucion()));
+							scsPersonajg.setIdpersona(Long.valueOf(justiciable.getIdPersona()));
+							scsPersonajg = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajg);
+
+							scsPersonajg.setNombre(justiciable.getNombre());
+							scsPersonajg.setApellido1(justiciable.getApellido1());
+							scsPersonajg.setApellido2(justiciable.getApellido2());
+							scsPersonajg.setTipopersonajg(justiciable.getTipoPersonajg());
+							scsPersonajg.setFechamodificacion(new Date());
+
+						} else{
+
+							ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
+
+							scsPersonajgExample.createCriteria().andNifEqualTo(justiciable.getNif().toUpperCase())
+									.andIdinstitucionEqualTo(idInstitucion);
+
+							scsPersonajgExample.setOrderByClause("FECHAMODIFICACION DESC");
+
+							List<ScsPersonajg> personajgs = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
+
+							if(personajgs != null
+								&& !personajgs.isEmpty()){
+								scsPersonajg = personajgs.get(0);
+								scsPersonajg.setNif(justiciable.getNif());
+								scsPersonajg.setNombre(justiciable.getNombre());
+								scsPersonajg.setApellido1(justiciable.getApellido1());
+								scsPersonajg.setApellido2(justiciable.getApellido2());
+								scsPersonajg.setFechamodificacion(new Date());
+								justiciable.setIdPersona(String.valueOf(scsPersonajg.getIdpersona()));
+							}
+						}
+
+						//Actualizamos datos del justiciable
+						if(!UtilidadesString.esCadenaVacia(actualizaDatos)
+								&& "S".equals(actualizaDatos)) {
+
+							affectedRows += scsPersonajgExtendsMapper.updateByPrimaryKeySelective(scsPersonajg);
+						//Duplicamos el justiciable
+						} else if( "N".equals(actualizaDatos)){
+
+							String newIdPersona = scsPersonajgExtendsMapper.getIdPersonajg(idInstitucion).getNewId();
+							scsPersonajg.setIdpersona(Long.valueOf(newIdPersona)+1);
+							affectedRows += scsPersonajgExtendsMapper.insertSelective(scsPersonajg);
+							justiciable.setIdPersona(String.valueOf(scsPersonajg.getIdpersona()));
+
+						}
+
+						ScsAsistencia scsAsistencia = new ScsAsistencia();
+						scsAsistencia.setIdpersonajg(Long.valueOf(justiciable.getIdPersona()));
+						ScsAsistenciaExample scsAsistenciaExample = new ScsAsistenciaExample();
+						scsAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
+								.andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]));
+
+						affectedRows += scsAsistenciaExtendsMapper.updateByExampleSelective(scsAsistencia,scsAsistenciaExample);
+
+					}
+
+					if(affectedRows <= 0){
+						updateResponse.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se ha actualizado ningún registro");
+						updateResponse.setError(error);
+						updateResponse.setId(anioNumero);
+					} else{
+						updateResponse.setStatus(SigaConstants.OK);
+						updateResponse.setId(anioNumero);
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("asociarJusticiable() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al asociar el justiciable: " + e);
+			error.description("Error al asociar el justiciable: " + e);
+			updateResponse.setError(error);
+		}
+		return updateResponse;
+	}
+
+	@Override
+	public UpdateResponseDTO desasociarJusticiable(HttpServletRequest request, JusticiableItem justiciable, String anioNumero) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponse = new UpdateResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"desasociarJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"desasociarJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()) {
+
+					if(!UtilidadesString.esCadenaVacia(anioNumero)){
+
+						ScsAsistenciaExample scsAsistenciaExample = new ScsAsistenciaExample();
+						scsAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
+								.andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]));
+
+						List<ScsAsistencia> scsAsistencias = scsAsistenciaExtendsMapper.selectByExample(scsAsistenciaExample);
+
+						if(scsAsistencias != null
+							&& !scsAsistencias.isEmpty()) {
+							ScsAsistencia scsAsistencia = scsAsistencias.get(0);
+							scsAsistencia.setIdpersonajg(null);
+							affectedRows += scsAsistenciaExtendsMapper.updateByExample(scsAsistencia,scsAsistenciaExample);
+						}
+					}
+
+					if(affectedRows <= 0){
+						updateResponse.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se ha actualizado ningún registro");
+						updateResponse.setError(error);
+						updateResponse.setId(anioNumero);
+					} else{
+						updateResponse.setStatus(SigaConstants.OK);
+						updateResponse.setId(anioNumero);
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("desasociarJusticiable() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al desasociar el justiciable: " + e);
+			error.description("Error al desasociar el justiciable: " + e);
+			updateResponse.setError(error);
+		}
+		return updateResponse;
+	}
+
+	/**
+	 * Metodo encargado de buscar los contrarios asociados a una asistencia
+	 *
+	 * @param request
+	 * @param anioNumero
+	 * @return
+	 */
+	@Override
+	public List<ListaContrarioJusticiableItem> searchListaContrarios(HttpServletRequest request, String anioNumero, boolean mostrarHistorico) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<ListaContrarioJusticiableItem> listaContrarios = new ArrayList<>();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"searchListaContrarios() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchListaContrarios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()) {
+
+					if(!UtilidadesString.esCadenaVacia(anioNumero)){
+
+						listaContrarios = scsAsistenciaExtendsMapper.searchListaContrarios(anioNumero, idInstitucion, mostrarHistorico);
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("searchListaContrarios() / ERROR: "+ e.getMessage(), e);
+		}
+		return listaContrarios;
+	}
+
+	/**
+	 * Metodo encargado de insertar en la tabla SCS_CONTRARIOSASISTENCIA para asociar un justiciable contrario (SCS_PERSONAJG) a la asistencia (SCS_ASISTENCIA)
+	 *
+	 * @param request
+	 * @param justiciables
+	 * @param anioNumero
+	 * @return
+	 */
+	@Override
+	public InsertResponseDTO asociarContrario(HttpServletRequest request, List<JusticiableItem> justiciables, String anioNumero) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"asociarContrario() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"asociarContrario() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()) {
+
+					for (int i = 0; i < justiciables.size(); i++) {
+						ScsContrariosasistenciaExample scsContrariosasistenciaExample = new ScsContrariosasistenciaExample();
+						scsContrariosasistenciaExample.createCriteria()
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]))
+								.andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
+								.andIdpersonaEqualTo(Long.valueOf(justiciables.get(i).getIdPersona()));
+
+						List<ScsContrariosasistencia> contrariosYaExistentes = scsContrariosasistenciaMapper.selectByExample(scsContrariosasistenciaExample);
+
+						if(contrariosYaExistentes != null
+								&& !contrariosYaExistentes.isEmpty()){ //Si el contrario ya estaba asociado, es que estaba dado de baja, por lo que seteamos fechaBaja a null
+							ScsContrariosasistencia contrario = contrariosYaExistentes.get(0);
+							contrario.setFechabaja(null);
+							affectedRows += scsContrariosasistenciaMapper.updateByExample(contrario, scsContrariosasistenciaExample);
+						}else { //Es un contrario nuevo, insertamos
+
+							if (!UtilidadesString.esCadenaVacia(anioNumero)) {
+
+								ScsContrariosasistencia scsContrariosasistencia = new ScsContrariosasistencia();
+								scsContrariosasistencia.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+								scsContrariosasistencia.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+								scsContrariosasistencia.setIdpersona(Long.valueOf(justiciables.get(i).getIdPersona()));
+								scsContrariosasistencia.setIdinstitucion(idInstitucion);
+								scsContrariosasistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+								scsContrariosasistencia.setFechamodificacion(new Date());
+
+								affectedRows = scsContrariosasistenciaMapper.insertSelective(scsContrariosasistencia);
+							}
+						}
+					}
+					if(affectedRows <= 0){
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se ha insertado ningún registro");
+						insertResponseDTO.setError(error);
+						insertResponseDTO.setId(anioNumero);
+					} else{
+						insertResponseDTO.setStatus(SigaConstants.OK);
+						insertResponseDTO.setId(anioNumero);
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("asociarContrario() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al asociar el contrario: " + e);
+			error.description("Error al asociar el contrario: " + e);
+			insertResponseDTO.setError(error);
+		}
+		return insertResponseDTO;
+	}
+
+	/**
+	 * Metodo encargado de insertar en la tabla SCS_CONTRARIOSASISTENCIA para asociar un justiciable contrario (SCS_PERSONAJG) a la asistencia (SCS_ASISTENCIA)
+	 *
+	 * @param request
+	 * @param contrarios
+	 * @param anioNumero
+	 * @return
+	 */
+	@Override
+	public UpdateResponseDTO desasociarContrario(HttpServletRequest request, List<ListaContrarioJusticiableItem> contrarios, String anioNumero) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"desasociarContrario() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"desasociarContrario() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()) {
+
+					if(!UtilidadesString.esCadenaVacia(anioNumero)
+						&& contrarios != null
+						&& !contrarios.isEmpty()){
+
+						for (int i = 0; i < contrarios.size(); i++) {
+							ScsContrariosasistenciaExample scsContrariosasistenciaExample = new ScsContrariosasistenciaExample();
+
+							scsContrariosasistenciaExample.createCriteria()
+									.andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]))
+									.andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]))
+									.andIdinstitucionEqualTo(idInstitucion)
+									.andIdpersonaEqualTo(Long.valueOf(contrarios.get(i).getIdPersona()));
+
+							ScsContrariosasistencia scsContrariosasistencia = new ScsContrariosasistencia();
+							scsContrariosasistencia.setFechabaja(new Date());
+							affectedRows += scsContrariosasistenciaMapper.updateByExampleSelective(scsContrariosasistencia,scsContrariosasistenciaExample);
+
+						}
+					}
+
+					if(affectedRows <= 0){
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se ha borrado ningún registro");
+						updateResponseDTO.setError(error);
+					} else{
+						updateResponseDTO.setStatus(SigaConstants.OK);
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("desasociarContrario() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al desasociar el contrario: " + e);
+			error.description("Error al desasociar el contrario: " + e);
+			updateResponseDTO.setError(error);
+		}
+		return updateResponseDTO;
+	}
+
+	@Override
+	public TarjetaDefensaJuridicaDTO searchTarjetaDefensaJuridica(HttpServletRequest request, String anioNumero) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		TarjetaDefensaJuridicaDTO tarjetaDefensaJuridicaDTO = new TarjetaDefensaJuridicaDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"searchTarjetaDefensaJuridica() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchTarjetaDefensaJuridica() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()
+						&& !UtilidadesString.esCadenaVacia(anioNumero)) {
+
+					ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+					scsAsistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+					scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+					scsAsistenciaKey.setIdinstitucion(idInstitucion);
+					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
+
+					if(scsAsistencia != null){
+						TarjetaDefensaJuridicaItem tarjetaDefensaJuridicaItem = new TarjetaDefensaJuridicaItem();
+						tarjetaDefensaJuridicaItem.setNig(scsAsistencia.getNig());
+						tarjetaDefensaJuridicaItem.setComentariosDelitos(scsAsistencia.getDelitosimputados());
+						tarjetaDefensaJuridicaItem.setObservaciones(scsAsistencia.getDatosdefensajuridica());
+						tarjetaDefensaJuridicaItem.setNumDiligencia(scsAsistencia.getNumerodiligencia());
+						tarjetaDefensaJuridicaItem.setNumProcedimiento(scsAsistencia.getNumeroprocedimiento());
+						if(scsAsistencia.getIdpretension() != null) {
+							tarjetaDefensaJuridicaItem.setIdProcedimiento(scsAsistencia.getIdpretension().toString());
+						}
+						if(scsAsistencia.getComisaria() != null) {
+							tarjetaDefensaJuridicaItem.setIdComisaria(scsAsistencia.getComisaria().toString());
+						}else if(scsAsistencia.getJuzgado() != null){
+							tarjetaDefensaJuridicaItem.setIdJuzgado(scsAsistencia.getJuzgado().toString());
+						}
+
+						ScsDelitosasistenciaExample scsDelitosasistenciaExample = new ScsDelitosasistenciaExample();
+						scsDelitosasistenciaExample.createCriteria()
+								.andAnioEqualTo(scsAsistencia.getAnio())
+								.andNumeroEqualTo(scsAsistencia.getNumero())
+								.andIdinstitucionEqualTo(idInstitucion);
+
+						List<ScsDelitosasistencia> delitos = scsDelitosasistenciaMapper.selectByExample(scsDelitosasistenciaExample);
+
+						if(delitos != null
+							&& !delitos.isEmpty()){
+							List<String> idDelitos = new ArrayList<>();
+							delitos.stream().forEach(delito ->{
+								idDelitos.add(delito.getIddelito().toString());
+							});
+							tarjetaDefensaJuridicaItem.setIdDelitos(idDelitos);
+						}
+
+						tarjetaDefensaJuridicaDTO.getResponseItems().add(tarjetaDefensaJuridicaItem);
+					}
+
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("searchTarjetaDefensaJuridica() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al buscar los datos de la defensa juridica: " + e);
+			error.description("Error al buscar los datos de la defensa juridica: " + e);
+			tarjetaDefensaJuridicaDTO.setError(error);
+		}
+		return tarjetaDefensaJuridicaDTO;
+	}
+
+	/**
+	 * Metodo encargado de guardar los datos juridicos de la asistencia en SCS_ASISTENCIA.
+	 * Dependiendo de si elegimos comisaria o juzgado, se modificara tambien la tabla SCS_CARACTASISTENCIA.
+	 *
+	 * @param request
+	 * @param tarjetaDefensaJuridicaItem
+	 * @param anioNumero
+	 * @return
+	 */
+	@Override
+	public UpdateResponseDTO guardarTarjetaDefensaJuridica(HttpServletRequest request, TarjetaDefensaJuridicaItem tarjetaDefensaJuridicaItem, String anioNumero) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"guardarTarjetaDefensaJuridica() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"guardarTarjetaDefensaJuridica() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()) {
+
+					if(!UtilidadesString.esCadenaVacia(anioNumero)) {
+
+						ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+						scsAsistenciaKey.setIdinstitucion(idInstitucion);
+						scsAsistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+						scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+
+						//Actualizamos los delitos asociados seleccionados en el multiselect en SCS_DELITOSASISTENCIA
+						procesarDelitos(tarjetaDefensaJuridicaItem, idInstitucion, anioNumero);
+
+						ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
+						scsAsistencia.setNig(tarjetaDefensaJuridicaItem.getNig());
+						scsAsistencia.setDelitosimputados(tarjetaDefensaJuridicaItem.getComentariosDelitos());
+						scsAsistencia.setDatosdefensajuridica(tarjetaDefensaJuridicaItem.getObservaciones());
+						scsAsistencia.setNumerodiligencia(tarjetaDefensaJuridicaItem.getNumDiligencia());
+						scsAsistencia.setNumeroprocedimiento(tarjetaDefensaJuridicaItem.getNumProcedimiento());
+						if(!UtilidadesString.esCadenaVacia(tarjetaDefensaJuridicaItem.getIdProcedimiento())){
+							scsAsistencia.setIdpretension(Short.valueOf(tarjetaDefensaJuridicaItem.getIdProcedimiento()));
+						}else{
+							scsAsistencia.setIdpretension(null);
+						}
+
+						ScsCaractasistenciaKey scsCaractasistenciaKey = new ScsCaractasistenciaKey();
+						scsCaractasistenciaKey.setAnio(scsAsistencia.getAnio());
+						scsCaractasistenciaKey.setNumero(scsAsistencia.getNumero());
+						scsCaractasistenciaKey.setIdinstitucion(idInstitucion);
+						ScsCaractasistencia scsCaractasistencia = scsCaractasistenciaMapper.selectByPrimaryKey(scsCaractasistenciaKey);
+
+						if(!UtilidadesString.esCadenaVacia(tarjetaDefensaJuridicaItem.getIdComisaria())){
+							scsAsistencia.setComisaria(Long.valueOf(tarjetaDefensaJuridicaItem.getIdComisaria()));
+							scsAsistencia.setComisariaidinstitucion(idInstitucion);
+							scsAsistencia.setJuzgado(null);
+							scsAsistencia.setJuzgadoidinstitucion(null);
+							//Si elegimos comisaria y la caracteristica de la asistencia estaba creada, hay que dejarlo
+							//reflejado en SCS_CARACTASISTENCIA
+							if(scsCaractasistencia != null){
+								scsCaractasistencia.setIdjuzgado(null);
+								scsCaractasistencia.setIdinstitucionJuzgado(null);
+								scsCaractasistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+								scsCaractasistencia.setFechamodificacion(new Date());
+								affectedRows += scsCaractasistenciaMapper.updateByPrimaryKey(scsCaractasistencia);
+							}
+						} else if(!UtilidadesString.esCadenaVacia(tarjetaDefensaJuridicaItem.getIdJuzgado())){
+							scsAsistencia.setJuzgado(Long.valueOf(tarjetaDefensaJuridicaItem.getIdJuzgado()));
+							scsAsistencia.setJuzgadoidinstitucion(idInstitucion);
+							scsAsistencia.setComisaria(null);
+							scsAsistencia.setComisariaidinstitucion(null);
+							//Si se selecciona juzgado hay que dejarlo registrado en la tabla SCS_CARACTASISTENCIA
+							//Si no tiene creado registro lo creamos y si lo tiene creado lo actualizamos
+							if(scsCaractasistencia == null){
+								scsCaractasistencia = new ScsCaractasistencia();
+								scsCaractasistencia.setAnio(scsAsistencia.getAnio());
+								scsCaractasistencia.setNumero(scsAsistencia.getNumero());
+								scsCaractasistencia.setIdinstitucion(idInstitucion);
+								scsCaractasistencia.setIdjuzgado(Long.valueOf(tarjetaDefensaJuridicaItem.getIdJuzgado()));
+								scsCaractasistencia.setIdinstitucionJuzgado(idInstitucion);
+								scsCaractasistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+								scsCaractasistencia.setFechamodificacion(new Date());
+								affectedRows += scsCaractasistenciaMapper.insertSelective(scsCaractasistencia);
+							} else{
+								scsCaractasistencia.setIdjuzgado(Long.valueOf(tarjetaDefensaJuridicaItem.getIdJuzgado()));
+								scsCaractasistencia.setIdinstitucionJuzgado(idInstitucion);
+								scsCaractasistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+								scsCaractasistencia.setFechamodificacion(new Date());
+								affectedRows += scsCaractasistenciaMapper.updateByPrimaryKey(scsCaractasistencia);
+							}
+
+						}else{
+							scsAsistencia.setComisaria(null);
+							scsAsistencia.setJuzgado(null);
+							scsAsistencia.setComisariaidinstitucion(null);
+							scsAsistencia.setJuzgadoidinstitucion(null);
+						}
+
+						affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
+
+					}
+
+					if(affectedRows <= 0){
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se ha borrado ningún registro");
+						updateResponseDTO.setError(error);
+					} else{
+						updateResponseDTO.setStatus(SigaConstants.OK);
+						updateResponseDTO.setId(anioNumero);
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("guardarTarjetaDefensaJuridica() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al guardar los datos de defensa juridica: " + e);
+			error.description("Error al guardar los datos de defensa juridica: " + e);
+			updateResponseDTO.setError(error);
+		}
+		return updateResponseDTO;
+	}
+	private void procesarDelitos(TarjetaDefensaJuridicaItem tarjetaDefensaJuridicaItem, Short idInstitucion , String anioNumero){
+
+		ScsDelitosasistenciaExample scsDelitosasistenciaExample = new ScsDelitosasistenciaExample();
+		scsDelitosasistenciaExample.createCriteria()
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andAnioEqualTo(Short.valueOf(anioNumero.split("/")[0]))
+				.andNumeroEqualTo(Long.valueOf(anioNumero.split("/")[1]));
+		scsDelitosasistenciaMapper.deleteByExample(scsDelitosasistenciaExample);
+
+		if(tarjetaDefensaJuridicaItem.getIdDelitos() != null
+			&& !tarjetaDefensaJuridicaItem.getIdDelitos().isEmpty()){
+
+			for (int i = 0; i < tarjetaDefensaJuridicaItem.getIdDelitos().size(); i++) {
+
+				String idDelito = tarjetaDefensaJuridicaItem.getIdDelitos().get(i);
+				ScsDelitosasistencia scsDelitosasistencia = new ScsDelitosasistencia();
+				scsDelitosasistencia.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+				scsDelitosasistencia.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+				scsDelitosasistencia.setIdinstitucion(idInstitucion);
+				scsDelitosasistencia.setIddelito(Short.valueOf(idDelito));
+				scsDelitosasistencia.setUsumodificacion(1);
+				scsDelitosasistencia.setFechamodificacion(new Date());
+
+				scsDelitosasistenciaMapper.insertSelective(scsDelitosasistencia);
+			}
+
+		}
+	}
 
 
+	@Override
+	public TarjetaObservacionesDTO searchTarjetaObservaciones(HttpServletRequest request, String anioNumero) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		TarjetaObservacionesDTO tarjetaObservacionesDTO = new TarjetaObservacionesDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
+				LOGGER.info(
+						"searchTarjetaObservaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchTarjetaObservaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()
+						&& !UtilidadesString.esCadenaVacia(anioNumero)) {
+
+					ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+					scsAsistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+					scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+					scsAsistenciaKey.setIdinstitucion(idInstitucion);
+					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
+
+					if(scsAsistencia != null){
+
+						TarjetaObservacionesItem tarjetaObservacionesItem = new TarjetaObservacionesItem();
+						tarjetaObservacionesItem.setIncidencias(scsAsistencia.getIncidencias());
+						tarjetaObservacionesItem.setObservaciones(scsAsistencia.getObservaciones());
+
+						tarjetaObservacionesDTO.getResponseItems().add(tarjetaObservacionesItem);
+					}
+
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("searchTarjetaObservaciones() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al buscar la tarjeta observaciones: " + e);
+			error.description("Error al buscar la tarjeta observaciones: " + e);
+			tarjetaObservacionesDTO.setError(error);
+		}
+		return tarjetaObservacionesDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO guardarTarjetaObservaciones(HttpServletRequest request, TarjetaObservacionesItem tarjetaObservacionesItem, String anioNumero) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"guardarTarjetaObservaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"guardarTarjetaObservaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()
+						&& !UtilidadesString.esCadenaVacia(anioNumero)) {
+
+					ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+					scsAsistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+					scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+					scsAsistenciaKey.setIdinstitucion(idInstitucion);
+					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
+
+					if(scsAsistencia != null
+						&& tarjetaObservacionesItem != null){
+
+						scsAsistencia.setObservaciones(tarjetaObservacionesItem.getObservaciones());
+						scsAsistencia.setIncidencias(tarjetaObservacionesItem.getIncidencias());
+						affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
+					}
+
+					if(affectedRows > 0){
+						updateResponseDTO.setStatus(SigaConstants.OK);
+						updateResponseDTO.setId(anioNumero);
+					}else{
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se actualizo ningun registro");
+						updateResponseDTO.setError(error);
+					}
+
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("guardarTarjetaObservaciones() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al actualizar la tarjeta observaciones: " + e);
+			error.description("Error al actualizar la tarjeta observaciones: " + e);
+			updateResponseDTO.setError(error);
+		}
+		return updateResponseDTO;
+	}
+
+	@Override
+	public RelacionesDTO searchRelaciones(HttpServletRequest request, String anioNumero) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		RelacionesDTO relacionesDTO = new RelacionesDTO();
+		Error error = new Error();
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"searchRelaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchRelaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()
+						&& !UtilidadesString.esCadenaVacia(anioNumero)) {
+
+					GenParametrosExample genParametrosExample = new GenParametrosExample();
+
+					genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+							.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+					genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+					LOGGER.info(
+							"PreAsistenciaServiceImpl.searchRelaciones() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+					tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+					LOGGER.info(
+							"AsistenciaServiceImpl.searchRelaciones() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+					if (tamMax != null) {
+						tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+					} else {
+						tamMaximo = null;
+					}
+
+					List<RelacionesItem> relacionesItems = scsAsistenciaExtendsMapper.searchRelaciones(anioNumero.split("/")[0],anioNumero.split("/")[1],idInstitucion, Integer.valueOf(usuarios.get(0).getIdlenguaje()).intValue(),tamMaximo);
+
+					if(relacionesItems != null
+						&& !relacionesItems.isEmpty()){
+						relacionesDTO.setRelacionesItem(relacionesItems);
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("searchRelaciones() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al buscar las relaciones: " + e);
+			error.description("Error al buscar las relaciones: " + e);
+			relacionesDTO.setError(error);
+		}
+		return relacionesDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO asociarDesigna(HttpServletRequest request, String anioNumero, DesignaItem designaItem, String copiarDatos) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"asociarDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"asociarDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()
+						&& !UtilidadesString.esCadenaVacia(anioNumero)) {
+
+					ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+					scsAsistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+					scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+					scsAsistenciaKey.setIdinstitucion(idInstitucion);
+					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
+
+					if(scsAsistencia != null
+							&& designaItem != null){
+						scsAsistencia.setDesignaAnio((short)designaItem.getAno());
+						scsAsistencia.setDesignaNumero(Long.valueOf(designaItem.getCodigo()));
+						scsAsistencia.setDesignaTurno(Integer.valueOf(designaItem.getIdTurnos()[0]));
+						affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
+
+						if("S".equals(copiarDatos)) { //Pasamos los datos de la asistencia a la designa
+							affectedRows += updateDesignaConAsistencia(scsAsistencia);
+						}
+					}
+
+					if(affectedRows > 0){
+						updateResponseDTO.setStatus(SigaConstants.OK);
+						updateResponseDTO.setId(anioNumero);
+					}else{
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se actualizo ningun registro");
+						updateResponseDTO.setError(error);
+					}
+
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("asociarDesigna() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al asociar la designa a la asistencia: " + e);
+			error.description("Error al asociar la designa a la asistencia: " + e);
+			updateResponseDTO.setError(error);
+		}
+		return updateResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO eliminarRelacion(HttpServletRequest request, String anioNumero, List<RelacionesItem> asuntos) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"asociarDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"asociarDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()
+						&& !UtilidadesString.esCadenaVacia(anioNumero)
+						&& asuntos != null) {
+
+					ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+					scsAsistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+					scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+					scsAsistenciaKey.setIdinstitucion(idInstitucion);
+					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
+
+					if(scsAsistencia != null){
+						for (int i = 0; i < asuntos.size(); i++) {
+
+							if("D".equals(String.valueOf(asuntos.get(i).getSjcs().charAt(0)))){
+								scsAsistencia.setDesignaAnio(null);
+								scsAsistencia.setDesignaNumero(null);
+								scsAsistencia.setDesignaTurno(null);
+								affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
+							}else if("E".equals(String.valueOf(asuntos.get(i).getSjcs().charAt(0)))){
+
+								scsAsistencia.setEjganio(null);
+								scsAsistencia.setEjgnumero(null);
+								scsAsistencia.setEjgidtipoejg(null);
+								affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
+							}
+
+						}
+					}
+
+					if(affectedRows > 0){
+						updateResponseDTO.setStatus(SigaConstants.OK);
+						updateResponseDTO.setId(anioNumero);
+					}else{
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se actualizo ningun registro");
+						updateResponseDTO.setError(error);
+					}
+
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("asociarDesigna() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al asociar la designa a la asistencia: " + e);
+			error.description("Error al actualizar la designa a la asistencia: " + e);
+			updateResponseDTO.setError(error);
+		}
+		return updateResponseDTO;
+	}
+
+	/**
+	 * Metodo encargado de actualizar la designa con los datos de la asistencia
+	 * @param scsAsistencia
+	 * @return
+	 */
+	private int updateDesignaConAsistencia(ScsAsistencia scsAsistencia){
+		int affectedRows = 0;
+		ScsDesignaKey scsDesignaKey = new ScsDesignaKey();
+		scsDesignaKey.setAnio(scsAsistencia.getDesignaAnio());
+		scsDesignaKey.setNumero(scsAsistencia.getDesignaNumero());
+		scsDesignaKey.setIdturno(scsAsistencia.getDesignaTurno());
+		scsDesignaKey.setIdinstitucion(scsAsistencia.getIdinstitucion());
+
+		//Actualizamos los datos generales
+		ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(scsDesignaKey);
+		scsDesigna.setNig(scsAsistencia.getNig());
+		scsDesigna.setNumprocedimiento(scsAsistencia.getNumeroprocedimiento());
+		scsDesigna.setIdpretension(scsAsistencia.getIdpretension());
+		scsDesigna.setIdjuzgado(scsAsistencia.getJuzgado());
+		scsDesigna.setIdinstitucionJuzg(scsAsistencia.getJuzgadoidinstitucion());
+		affectedRows += scsDesignacionesExtendsMapper.updateByPrimaryKey(scsDesigna);
+
+		//Insertamos el interesado (asistido de la asistencia)
+		if(scsAsistencia.getIdpersonajg() != null ) {
+			ScsDefendidosdesigna scsDefendidosdesigna = new ScsDefendidosdesigna();
+			scsDefendidosdesigna.setIdinstitucion(scsAsistencia.getIdinstitucion());
+			scsDefendidosdesigna.setAnio(scsAsistencia.getDesignaAnio());
+			scsDefendidosdesigna.setNumero(scsAsistencia.getDesignaNumero());
+			scsDefendidosdesigna.setIdturno(scsAsistencia.getDesignaTurno());
+			scsDefendidosdesigna.setIdpersona(scsAsistencia.getIdpersonajg());
+			scsDefendidosdesigna.setUsumodificacion(1);
+			scsDefendidosdesigna.setFechamodificacion(new Date());
+			affectedRows += scsDefendidosdesignasExtendsMapper.insertSelective(scsDefendidosdesigna);
+		}
+
+		//TODO Falta copiar delitos asistencia tras MERGE con EJG, revisar updateDatosAdicionales en DesignacionesServiceImpl
+
+		return affectedRows;
 	}
 
 }

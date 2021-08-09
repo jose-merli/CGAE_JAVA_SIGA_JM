@@ -31,23 +31,17 @@ public class TarjetaAsistenciaResponseItem {
 	private String descripcionEstado;
 	private String descripcionTurno;
 	private String descripcionTipoAsistenciaColegio;
-	/**
-	 * @return the descripcionTipoAsistenciaColegio
-	 */
-	public String getDescripcionTipoAsistenciaColegio() {
-		return descripcionTipoAsistenciaColegio;
-	}
-	/**
-	 * @param descripcionTipoAsistenciaColegio the descripcionTipoAsistenciaColegio to set
-	 */
-	public void setDescripcionTipoAsistenciaColegio(String descripcionTipoAsistenciaColegio) {
-		this.descripcionTipoAsistenciaColegio = descripcionTipoAsistenciaColegio;
-	}
+	private String idPersonaJg;
+	private String numContrarios;
 	private String numeroColegiado;
 	private String nombreColegiado;
 	private String fechaGuardia;
 	private String validada;
 	private String numeroActuaciones;
+	private ListaContrarioJusticiableItem primerContrario;
+	private RelacionesItem primeraRelacion;
+	private String nig, juzgado, comisaria, numProcedimiento, idProcedimiento, numDiligencia;
+	private List<String> delitos;
 	
 	/**
 	 * @return the numeroActuaciones
@@ -453,6 +447,107 @@ public class TarjetaAsistenciaResponseItem {
 	public void setValidada(String validada) {
 		this.validada = validada;
 	}
+
+	public String getIdPersonaJg() {
+		return idPersonaJg;
+	}
+
+	public void setIdPersonaJg(String idPersonaJg) {
+		this.idPersonaJg = idPersonaJg;
+	}
+
+	public String getNumContrarios() {
+		return numContrarios;
+	}
+
+	public void setNumContrarios(String numContrarios) {
+		this.numContrarios = numContrarios;
+	}
+	/**
+	 * @return the descripcionTipoAsistenciaColegio
+	 */
+	public String getDescripcionTipoAsistenciaColegio() {
+		return descripcionTipoAsistenciaColegio;
+	}
+	/**
+	 * @param descripcionTipoAsistenciaColegio the descripcionTipoAsistenciaColegio to set
+	 */
+	public void setDescripcionTipoAsistenciaColegio(String descripcionTipoAsistenciaColegio) {
+		this.descripcionTipoAsistenciaColegio = descripcionTipoAsistenciaColegio;
+	}
+
+	public ListaContrarioJusticiableItem getPrimerContrario() {
+		return primerContrario;
+	}
+
+	public void setPrimerContrario(ListaContrarioJusticiableItem primerContrario) {
+		this.primerContrario = primerContrario;
+	}
+
+	public RelacionesItem getPrimeraRelacion() {
+		return primeraRelacion;
+	}
+
+	public void setPrimeraRelacion(RelacionesItem primeraRelacion) {
+		this.primeraRelacion = primeraRelacion;
+	}
+
+	public String getNig() {
+		return nig;
+	}
+
+	public void setNig(String nig) {
+		this.nig = nig;
+	}
+
+	public String getJuzgado() {
+		return juzgado;
+	}
+
+	public void setJuzgado(String juzgado) {
+		this.juzgado = juzgado;
+	}
+
+	public String getComisaria() {
+		return comisaria;
+	}
+
+	public void setComisaria(String comisaria) {
+		this.comisaria = comisaria;
+	}
+
+	public String getNumProcedimiento() {
+		return numProcedimiento;
+	}
+
+	public void setNumProcedimiento(String numProcedimiento) {
+		this.numProcedimiento = numProcedimiento;
+	}
+
+	public String getIdProcedimiento() {
+		return idProcedimiento;
+	}
+
+	public void setIdProcedimiento(String idProcedimiento) {
+		this.idProcedimiento = idProcedimiento;
+	}
+
+	public String getNumDiligencia() {
+		return numDiligencia;
+	}
+
+	public void setNumDiligencia(String numDiligencia) {
+		this.numDiligencia = numDiligencia;
+	}
+
+	public List<String> getDelitos() {
+		return delitos;
+	}
+
+	public void setDelitos(List<String> delitos) {
+		this.delitos = delitos;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(actuaciones, anio, anioNumero, apellido1, apellido2, asistido,

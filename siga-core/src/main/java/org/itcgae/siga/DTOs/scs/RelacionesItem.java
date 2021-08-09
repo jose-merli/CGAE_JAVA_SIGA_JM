@@ -12,6 +12,7 @@ public class RelacionesItem {
 	private String codigo;
 	private String desturno;
 	private String destipo;
+	private String fechaAsunto, fechaDictamen, fechaResolucion, resolucion, letrado, interesado, dictamen, dilnigproc;
 	public String getSjcs() {
 		return sjcs;
 	}
@@ -78,6 +79,71 @@ public class RelacionesItem {
 	public void setDestipo(String destipo) {
 		this.destipo = destipo;
 	}
+
+	public String getFechaAsunto() {
+		return fechaAsunto;
+	}
+
+	public void setFechaAsunto(String fechaAsunto) {
+		this.fechaAsunto = fechaAsunto;
+	}
+
+	public String getFechaDictamen() {
+		return fechaDictamen;
+	}
+
+	public void setFechaDictamen(String fechaDictamen) {
+		this.fechaDictamen = fechaDictamen;
+	}
+
+	public String getResolucion() {
+		return resolucion;
+	}
+
+	public void setResolucion(String resolucion) {
+		this.resolucion = resolucion;
+	}
+
+	public String getLetrado() {
+		return letrado;
+	}
+
+	public void setLetrado(String letrado) {
+		this.letrado = letrado;
+	}
+
+	public String getInteresado() {
+		return interesado;
+	}
+
+	public void setInteresado(String interesado) {
+		this.interesado = interesado;
+	}
+
+	public String getDictamen() {
+		return dictamen;
+	}
+
+	public void setDictamen(String dictamen) {
+		this.dictamen = dictamen;
+	}
+
+	public String getDilnigproc() {
+		return dilnigproc;
+	}
+
+	public void setDilnigproc(String dilnigproc) {
+		this.dilnigproc = dilnigproc;
+	}
+
+	public String getFechaResolucion() {
+		return fechaResolucion;
+	}
+
+	public void setFechaResolucion(String fechaResolucion) {
+		this.fechaResolucion = fechaResolucion;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
