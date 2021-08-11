@@ -179,6 +179,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "turnadoratificacion", property = "turnadoRatificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "requierenotificarproc", property = "requiereNotificarProc", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "notascajg", property = "notasCAJG", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "docresolucion", property = "docResolucion", jdbcType = JdbcType.VARCHAR),
 
 	})
 	ResolucionEJGItem getResolucion(EjgItem ejgItem, String idInstitucion, String idLenguaje);

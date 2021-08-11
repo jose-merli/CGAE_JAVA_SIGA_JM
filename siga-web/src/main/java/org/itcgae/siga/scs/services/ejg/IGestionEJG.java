@@ -99,6 +99,8 @@ public interface IGestionEJG {
 	UpdateResponseDTO borrarFamiliar(List<UnidadFamiliarEJGItem> datos, HttpServletRequest request) throws Exception;
 	
 	RelacionesDTO getRelacionesEJG(EjgItem item, HttpServletRequest request);
+	
+	ResponseEntity<InputStreamResource> descargarDocumentoResolucion(String docReslucion, HttpServletRequest request);
 
 	ComboDTO comboSituaciones(HttpServletRequest request);
 

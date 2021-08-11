@@ -825,7 +825,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ " ejg.requierenotificarproc," + " ejg.anioacta," + " ejg.idacta,"
 //				+ " ejg.idinstitucion||','||ejg.idacta||','||ejg.anioacta as idannioacta,"
 				+ " (CASE WHEN ejg.idacta is  NULL THEN null ELSE ejg.idacta||','||ejg.anioacta END) as idannioacta,"
-				+ " resolucion.notascajg AS notascajg");
+				+ " resolucion.notascajg AS notascajg, ejg.docresolucion");
 
 		sql.FROM("scs_ejg ejg");
 		sql.LEFT_OUTER_JOIN(
