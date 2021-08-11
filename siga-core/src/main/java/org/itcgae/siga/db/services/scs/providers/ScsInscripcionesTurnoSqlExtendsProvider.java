@@ -242,13 +242,13 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 					"          SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA,\r\n" + 
 //					"          SCS_TURNO.IDTURNO\r\n" +
                     "          SCS_TURNO.IDTURNO,\r\n" + 
-                    "          SCS_GUARDIASTURNO.IDGUARDIA,\r\n" + 
-                    "          SCS_GUARDIASTURNO.NOMBRE AS NOMBRE_GUARDIA,\r\n" + 
+//                    "          SCS_GUARDIASTURNO.IDGUARDIA,\r\n" + 
+//                    "          SCS_GUARDIASTURNO.NOMBRE AS NOMBRE_GUARDIA,\r\n" + 
                     "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION, --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
                     "          DECODE(SCS_TURNO.GUARDIAS, 0, 'Obligatorias', DECODE(SCS_TURNO.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" +
 					"FROM\r\n" + 
 					"          SCS_INSCRIPCIONTURNO\r\n" + 
-					"          JOIN SCS_GUARDIASTURNO ON SCS_INSCRIPCIONTURNO.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION AND SCS_INSCRIPCIONTURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO\r\n" + 
+//					"          JOIN SCS_GUARDIASTURNO ON SCS_INSCRIPCIONTURNO.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION AND SCS_INSCRIPCIONTURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO\r\n" + 
 					"          JOIN SCS_TURNO ON SCS_TURNO.IDINSTITUCION = SCS_INSCRIPCIONTURNO.IDINSTITUCION AND SCS_TURNO.IDTURNO = SCS_INSCRIPCIONTURNO.IDTURNO\r\n" + 
 					"          JOIN SCS_ZONA ON SCS_ZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_ZONA.IDZONA = SCS_TURNO.IDZONA\r\n" + 
 					"          JOIN SCS_SUBZONA ON SCS_SUBZONA.IDINSTITUCION = SCS_TURNO.IDINSTITUCION AND SCS_SUBZONA.IDZONA = SCS_TURNO.IDZONA AND SCS_SUBZONA.IDSUBZONA = SCS_TURNO.IDSUBZONA\r\n" + 
