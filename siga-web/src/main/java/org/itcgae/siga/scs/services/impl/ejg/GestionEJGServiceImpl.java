@@ -1398,10 +1398,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 						}
 					}
-					
-					if(ficheros.isEmpty()) {
+
+					if (ficheros.isEmpty()) {
 						new Exception("No se puede descargar el archivo.");
-					}else {
+					} else {
 						fichero = WSCommons.zipBytes(ficheros, new File("downloads.zip"));
 
 						String tipoMime = "application/zip";
@@ -1413,10 +1413,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						response = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
 								HttpStatus.OK);
 
-						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Acción realizada correctamente");
+						LOGGER.debug(
+								"GestionEJGServiceImpl.descargarExpedientesJG() -> Acción realizada correctamente");
 					}
 
-					
 				} catch (Exception e) {
 					if ("noExiste".equals(e.getMessage())) {
 						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() ->", e);
@@ -3228,56 +3228,55 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				LOGGER.info(
 						"GestionEJGServiceImpl.descargarDocumentoResolucion -> Entrada a servicio para la descarga del zip de la resolucion");
 				try {
-					//obtenemos los datos de la ruta de gen_properties
-					
-					//directorio fisico cajg
+					// obtenemos los datos de la ruta de gen_properties
+
+					// directorio fisico cajg
 					GenPropertiesKey key = new GenPropertiesKey();
-					
+
 					key.setFichero("SIGA");
 					key.setParametro("cajg.directorioFisicoCAJG");
-					
+
 					GenProperties directorioFisicoCAJG = genPropertiesMapper.selectByPrimaryKey(key);
-					
-					//directorio cajg java
+
+					// directorio cajg java
 					key = new GenPropertiesKey();
 					key.setFichero("SIGA");
 					key.setParametro("cajg.directorioCAJGJava");
-					
+
 					GenProperties directorioCAJGJava = genPropertiesMapper.selectByPrimaryKey(key);
-					
-					//directorio remesa resolcion
+
+					// directorio remesa resolcion
 					key = new GenPropertiesKey();
 					key.setFichero("SIGA");
 					key.setParametro("cajg.directorioRemesaResoluciones");
-					
+
 					GenProperties directorioRemesaResoluciones = genPropertiesMapper.selectByPrimaryKey(key);
-					
-					//directorio Resoluciones Archivos
+
+					// directorio Resoluciones Archivos
 					key = new GenPropertiesKey();
 					key.setFichero("SIGA");
 					key.setParametro("cajg.directorioResolucionesArchivos");
-					
+
 					GenProperties directorioResolucionesArchivos = genPropertiesMapper.selectByPrimaryKey(key);
 					
-					
-					String path = directorioFisicoCAJG.getValor() + directorioCAJGJava.getValor() + File.separator + 
-							idInstitucion + File.separator + directorioRemesaResoluciones.getValor() + File.separator +
-							directorioResolucionesArchivos.getValor()+File.separator+docResolucion;
-					
+					String path = directorioFisicoCAJG.getValor() + directorioCAJGJava.getValor() + File.separator
+							+ idInstitucion + File.separator + directorioRemesaResoluciones.getValor() + File.separator
+							+ directorioResolucionesArchivos.getValor() + File.separator + docResolucion;
+
 					File file = new File(path);
 					FileInputStream fileStream = new FileInputStream(file);
-
-					headers.setContentType(MediaType.parseMediaType(".zip"));
-					headers.set("Content-Disposition",
-							"attachment; filename=\"" + docResolucion + "\"");
-					headers.setContentLength(file.length());
+					
+					headers.setContentType(MediaType.parseMediaType("application/zip"));
+					
+					headers.set("Content-Disposition", "attachment; filename=\"" + docResolucion + "\"");
+//					headers.setContentLength(file.length());
 
 					res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
-						HttpStatus.OK);
-					
+							HttpStatus.OK);
+
 					LOGGER.error(
 							"GestionEJGServiceImpl.descargarDocumentoResolucion() -> Operación realizada correctamente. Saliendo del servicio");
-					
+
 				} catch (Exception e) {
 					res = new ResponseEntity<InputStreamResource>(null, null, HttpStatus.BAD_REQUEST);
 					LOGGER.error(
