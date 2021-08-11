@@ -1398,19 +1398,25 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 						}
 					}
+					
+					if(ficheros.isEmpty()) {
+						new Exception("No se puede descargar el archivo.");
+					}else {
+						fichero = WSCommons.zipBytes(ficheros, new File("downloads.zip"));
 
-					fichero = WSCommons.zipBytes(ficheros, new File("downloads.zip"));
+						String tipoMime = "application/zip";
+						headers.setContentType(MediaType.parseMediaType(tipoMime));
+						headers.set("Content-Disposition", "attachment; filename=\"" + fichero.getName() + "\"");
+						headers.setContentLength(fichero.length());
 
-					String tipoMime = "application/zip";
-					headers.setContentType(MediaType.parseMediaType(tipoMime));
-					headers.set("Content-Disposition", "attachment; filename=\"" + fichero.getName() + "\"");
-					headers.setContentLength(fichero.length());
+						InputStream fileStream = new FileInputStream(fichero);
+						response = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+								HttpStatus.OK);
 
-					InputStream fileStream = new FileInputStream(fichero);
-					response = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
-							HttpStatus.OK);
+						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Acción realizada correctamente");
+					}
 
-					LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() -> Acción realizada correctamente");
+					
 				} catch (Exception e) {
 					if ("noExiste".equals(e.getMessage())) {
 						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() ->", e);

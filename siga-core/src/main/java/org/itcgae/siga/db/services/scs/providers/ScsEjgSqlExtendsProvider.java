@@ -127,15 +127,15 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		}
 
 		if (ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
-			sql.WHERE("ejg.IDTIPOEJG = " + ejgItem.getTipoEJG());
+			sql.WHERE("ejg.IDTIPOEJG IN (" + ejgItem.getTipoEJG() + ")");
 		if (ejgItem.getTipoEJGColegio() != null && ejgItem.getTipoEJGColegio() != "")
-			sql.WHERE("ejg.idtipoejgcolegio = " + ejgItem.getTipoEJGColegio());
+			sql.WHERE("ejg.idtipoejgcolegio IN (" + ejgItem.getTipoEJGColegio() + ")");
 		if (ejgItem.getCreadoDesde() != null && ejgItem.getCreadoDesde() != "")
-			sql.WHERE("ejg.origenapertura = '" + ejgItem.getCreadoDesde() + "'");
+			sql.WHERE("ejg.origenapertura IN (" + ejgItem.getCreadoDesde() + ")");
 		if (ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != "")
 			sql.WHERE("regexp_like(EJG.NUMEROPROCEDIMIENTO,'" + ejgItem.getProcedimiento() + "')");
 		if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "")
-			sql.WHERE("estado.idestadoejg =" + ejgItem.getEstadoEJG());
+			sql.WHERE("estado.idestadoejg IN (" + ejgItem.getEstadoEJG() + ")");
 		if (ejgItem.getFechaAperturaDesd() != null) {
 			fechaAperturaDesd = dateFormat.format(ejgItem.getFechaAperturaDesd());
 			sql.WHERE("EJG.FECHAAPERTURA >= TO_DATE( '" + fechaAperturaDesd + "','DD/MM/RRRR')");
