@@ -133,7 +133,9 @@ public class EjgItem {
 	
 	//REGTEL
 	private String identificadords;
-	
+
+	// Estados de solicitud de expediente económico
+	private String [] estadosSolicitudExpEco;
 
 	/**
 	 **/
@@ -1615,5 +1617,13 @@ public class EjgItem {
 
 	public void setImpugnacionDesc(String impugnacionDesc) {
 		this.impugnacionDesc = impugnacionDesc;
+	}
+
+	public String[] getEstadosSolicitudExpEco() {
+		return estadosSolicitudExpEco;
+	}
+
+	public void setEstadosSolicitudExpEco(String[] estadosSolicitudExpEco) {
+		this.estadosSolicitudExpEco = estadosSolicitudExpEco;
 	}
 }

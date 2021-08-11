@@ -1090,5 +1090,24 @@ public class SigaConstants {
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";
 	public static final String ACREDITACION_TIPO_COMPLETA = "3";
+
+	public static enum EEJG_ESTADO {
+		INICIAL (10),
+		INICIAL_ESPERANDO (15),
+		ESPERA (20),
+		ESPERA_ESPERANDO (25),
+		PENDIENTE_INFO (23),
+		FINALIZADO (30),
+		ERROR_SOLICITUD (40),
+		ERROR_CONSULTA_INFO (50),
+		CADUCADO (60);
+		private long id = -1;
+		EEJG_ESTADO(long id) {
+			this.id = id;
+		}
+		public long getId() {
+			return this.id;
+		}
+	}
 	
 }
