@@ -833,125 +833,125 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + " ejg.fecharatificacion," + " ejg.fechanotificacion," + " ejg.refauto," + " ejg.turnadoratificacion,"
                 + " ejg.requierenotificarproc," + " ejg.anioacta," + " ejg.idacta,"
 //				+ " ejg.idinstitucion||','||ejg.idacta||','||ejg.anioacta as idannioacta,"
-                + " (CASE WHEN ejg.idacta is  NULL THEN null ELSE ejg.idacta||','||ejg.anioacta END) as idannioacta,"
-                + " resolucion.notascajg AS notascajg");
+				+ " (CASE WHEN ejg.idacta is  NULL THEN null ELSE ejg.idacta||','||ejg.anioacta END) as idannioacta,"
+				+ " resolucion.notascajg AS notascajg, ejg.docresolucion");
 
-        sql.FROM("scs_ejg ejg");
-        sql.LEFT_OUTER_JOIN(
-                "scs_ejg_resolucion resolucion on (resolucion.idinstitucion = ejg.idinstitucion AND resolucion.idtipoejg = ejg.idtipoejg AND resolucion.anio = ejg.anio AND resolucion.numero = ejg.numero)");
+		sql.FROM("scs_ejg ejg");
+		sql.LEFT_OUTER_JOIN(
+				"scs_ejg_resolucion resolucion on (resolucion.idinstitucion = ejg.idinstitucion AND resolucion.idtipoejg = ejg.idtipoejg AND resolucion.anio = ejg.anio AND resolucion.numero = ejg.numero)");
 
-        sql.WHERE("ejg.idinstitucion = " + idInstitucion);
-        sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
-        sql.WHERE("ejg.numejg =" + ejgItem.getNumero());
-        sql.WHERE("ejg.idtipoejg = " + ejgItem.getTipoEJG());
+		sql.WHERE("ejg.idinstitucion = " + idInstitucion);
+		sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
+		sql.WHERE("ejg.numejg =" + ejgItem.getNumero());
+		sql.WHERE("ejg.idtipoejg = " + ejgItem.getTipoEJG());
 
-        return sql.toString();
-    }
+		return sql.toString();
+	}
 
-    public String busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje) {
-        SQL sql = new SQL();
-        SQL sql2 = new SQL();
-        SQL sql3 = new SQL();
+	public String busquedaColegiadoEJG(ColegiadosSJCSItem item, String idLenguaje) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		SQL sql3 = new SQL();
 
-        // SUBQUERY PARA EL INNER JOIN
-        sql2.SELECT("MAX(COL2.FECHAESTADO)");
-        sql2.FROM("CEN_DATOSCOLEGIALESESTADO COL2");
-        sql2.WHERE("COL2.IDPERSONA=PER.IDPERSONA AND COL2.IDINSTITUCION = COL.IDINSTITUCION");
+		// SUBQUERY PARA EL INNER JOIN
+		sql2.SELECT("MAX(COL2.FECHAESTADO)");
+		sql2.FROM("CEN_DATOSCOLEGIALESESTADO COL2");
+		sql2.WHERE("COL2.IDPERSONA=PER.IDPERSONA AND COL2.IDINSTITUCION = COL.IDINSTITUCION");
 
-        // QUERY PRINCIPAL
-        sql.SELECT(
-                "PER.NIFCIF NIF,PER.IDPERSONA, PER.NOMBRE NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2) APELLIDOS, NVL(col.ncolegiado, col.ncomunitario) NCOLEGIADO, "
-                        + "COL.NCOMUNITARIO NCOMUNITARIO, ESTADO.IDESTADO IDESTADO,COL.IDINSTITUCION IDINSTITUCION, INS.ABREVIATURA ABREVIATURA, "
-                        + "F_SIGA_GETRECURSO(TIPOESTADO.DESCRIPCION, " + idLenguaje
-                        + ") ESTADO, COL.SITUACIONRESIDENTE RESIDENTE,\r\n"
-                        + "            COUNT(tur.idturno) sumaturnos,\r\n"
-                        + "            COUNT(guar.idguardia) tieneguardias,\r\n"
-                        + "            SUM(nvl(guarpend.pendiente, 0)) AS guardiaspendientes");
+		// QUERY PRINCIPAL
+		sql.SELECT(
+				"PER.NIFCIF NIF,PER.IDPERSONA, PER.NOMBRE NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2) APELLIDOS, NVL(col.ncolegiado, col.ncomunitario) NCOLEGIADO, "
+						+ "COL.NCOMUNITARIO NCOMUNITARIO, ESTADO.IDESTADO IDESTADO,COL.IDINSTITUCION IDINSTITUCION, INS.ABREVIATURA ABREVIATURA, "
+						+ "F_SIGA_GETRECURSO(TIPOESTADO.DESCRIPCION, " + idLenguaje
+						+ ") ESTADO, COL.SITUACIONRESIDENTE RESIDENTE,\r\n"
+						+ "            COUNT(tur.idturno) sumaturnos,\r\n"
+						+ "            COUNT(guar.idguardia) tieneguardias,\r\n"
+						+ "            SUM(nvl(guarpend.pendiente, 0)) AS guardiaspendientes");
 
-        sql.FROM("CEN_PERSONA PER");
+		sql.FROM("CEN_PERSONA PER");
 
-        sql.INNER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = PER.IDPERSONA)");
-        sql.INNER_JOIN(
-                "CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION )");
-        if ((item.getIdGuardia() != null && item.getIdGuardia().length > 0)
-                || (item.getIdTurno() != null && item.getIdTurno().length > 0)) {
-            sql.INNER_JOIN(
-                    "SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
-        }
+		sql.INNER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = PER.IDPERSONA)");
+		sql.INNER_JOIN(
+				"CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION )");
+		if ((item.getIdGuardia() != null && item.getIdGuardia().length > 0)
+				|| (item.getIdTurno() != null && item.getIdTurno().length > 0)) {
+			sql.INNER_JOIN(
+					"SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
+		}
 
-        sql.INNER_JOIN("CEN_ESTADOCOLEGIAL TIPOESTADO ON (TIPOESTADO.IDESTADO=ESTADO.IDESTADO)");
-        sql.INNER_JOIN("CEN_INSTITUCION INS ON (INS.IDINSTITUCION=COL.IDINSTITUCION)");
-        sql.LEFT_OUTER_JOIN("scs_inscripcionturno        tur ON ( tur.idinstitucion = col.idinstitucion\r\n"
-                + "                                                          AND tur.idpersona = col.idpersona )\r\n");
-        sql.LEFT_OUTER_JOIN("scs_inscripcionguardia      guar ON ( guar.idinstitucion = tur.idinstitucion\r\n"
-                + "                                                             AND guar.idpersona = tur.idpersona\r\n"
-                + "                                                             AND guar.idturno = tur.idturno )\r\n");
-        sql.LEFT_OUTER_JOIN(
-                " (SELECT\r\n" + "                    guardiain.*,\r\n" + "                    1 AS pendiente\r\n"
-                        + "                FROM\r\n" + "                    scs_inscripcionguardia guardiain\r\n"
-                        + "                WHERE\r\n" + "                    ( fechavalidacion IS NULL )\r\n"
-                        + "            ) guarpend ON ( guarpend.idinstitucion = guar.idinstitucion\r\n"
-                        + "                            AND guarpend.idpersona = guar.idpersona\r\n"
-                        + "                            AND guarpend.idturno = guar.idturno\r\n"
-                        + "                            AND guarpend.idguardia = guar.idguardia )");
+		sql.INNER_JOIN("CEN_ESTADOCOLEGIAL TIPOESTADO ON (TIPOESTADO.IDESTADO=ESTADO.IDESTADO)");
+		sql.INNER_JOIN("CEN_INSTITUCION INS ON (INS.IDINSTITUCION=COL.IDINSTITUCION)");
+		sql.LEFT_OUTER_JOIN("scs_inscripcionturno        tur ON ( tur.idinstitucion = col.idinstitucion\r\n"
+				+ "                                                          AND tur.idpersona = col.idpersona )\r\n");
+		sql.LEFT_OUTER_JOIN("scs_inscripcionguardia      guar ON ( guar.idinstitucion = tur.idinstitucion\r\n"
+				+ "                                                             AND guar.idpersona = tur.idpersona\r\n"
+				+ "                                                             AND guar.idturno = tur.idturno )\r\n");
+		sql.LEFT_OUTER_JOIN(
+				" (SELECT\r\n" + "                    guardiain.*,\r\n" + "                    1 AS pendiente\r\n"
+						+ "                FROM\r\n" + "                    scs_inscripcionguardia guardiain\r\n"
+						+ "                WHERE\r\n" + "                    ( fechavalidacion IS NULL )\r\n"
+						+ "            ) guarpend ON ( guarpend.idinstitucion = guar.idinstitucion\r\n"
+						+ "                            AND guarpend.idpersona = guar.idpersona\r\n"
+						+ "                            AND guarpend.idturno = guar.idturno\r\n"
+						+ "                            AND guarpend.idguardia = guar.idguardia )");
 
-        // CONDICIONES WHERE
-        if (item.getIdInstitucion() != null && !item.getIdInstitucion().isEmpty()) {
-            sql.WHERE("COL.IDINSTITUCION = " + item.getIdInstitucion());
-        }
+		// CONDICIONES WHERE
+		if (item.getIdInstitucion() != null && !item.getIdInstitucion().isEmpty()) {
+			sql.WHERE("COL.IDINSTITUCION = " + item.getIdInstitucion());
+		}
 
-        if (item.getNombre() != null && !item.getNombre().trim().isEmpty()) {
-            sql.WHERE("UPPER(PER.NOMBRE) LIKE UPPER('%" + item.getNombre().trim() + "%')");
-        }
+		if (item.getNombre() != null && !item.getNombre().trim().isEmpty()) {
+			sql.WHERE("UPPER(PER.NOMBRE) LIKE UPPER('%" + item.getNombre().trim() + "%')");
+		}
 
-        if (item.getApellidos() != null && !item.getApellidos().trim().isEmpty()) {
-            sql.WHERE("CONCAT(CONCAT(UPPER(PER.APELLIDOS1), ' '), UPPER(PER.APELLIDOS2)) LIKE UPPER('%"
-                    + item.getApellidos().trim() + "%')");
-        }
+		if (item.getApellidos() != null && !item.getApellidos().trim().isEmpty()) {
+			sql.WHERE("CONCAT(CONCAT(UPPER(PER.APELLIDOS1), ' '), UPPER(PER.APELLIDOS2)) LIKE UPPER('%"
+					+ item.getApellidos().trim() + "%')");
+		}
 
-        if (item.getIdEstado() != null && !item.getIdEstado().isEmpty()) {
-            sql.WHERE("ESTADO.IDESTADO = " + item.getIdEstado());
-        }
+		if (item.getIdEstado() != null && !item.getIdEstado().isEmpty()) {
+			sql.WHERE("ESTADO.IDESTADO = " + item.getIdEstado());
+		}
 
-        sql.WHERE(" ESTADO.FECHAESTADO = (" + sql2.toString() + ")");
+		sql.WHERE(" ESTADO.FECHAESTADO = (" + sql2.toString() + ")");
 
-        if (item.getnColegiado() != null && !item.getnColegiado().trim().isEmpty()) {
-            sql.WHERE("(COL.NCOLEGIADO = " + item.getnColegiado().trim() + " OR COL.NCOMUNITARIO = "
-                    + item.getnColegiado().trim() + ")");
-        }
+		if (item.getnColegiado() != null && !item.getnColegiado().trim().isEmpty()) {
+			sql.WHERE("(COL.NCOLEGIADO = " + item.getnColegiado().trim() + " OR COL.NCOMUNITARIO = "
+					+ item.getnColegiado().trim() + ")");
+		}
 
-        if (item.getIdTurno() != null && item.getIdTurno().length > 0) {
-            String inSQL = item.getIdTurno()[0];
-            for (int i = 1; i < item.getIdTurno().length; i++) {
-                inSQL += ", " + item.getIdTurno()[i];
-            }
-            sql.WHERE("GUARDIAS.IDTURNO IN  (" + inSQL + ")");
-        }
+		if (item.getIdTurno() != null && item.getIdTurno().length > 0) {
+			String inSQL = item.getIdTurno()[0];
+			for (int i = 1; i < item.getIdTurno().length; i++) {
+				inSQL += ", " + item.getIdTurno()[i];
+			}
+			sql.WHERE("GUARDIAS.IDTURNO IN  (" + inSQL + ")");
+		}
 
-        if (item.getIdGuardia() != null && item.getIdGuardia().length > 0) {
-            String inSQL = item.getIdGuardia()[0];
-            for (int i = 1; i < item.getIdGuardia().length; i++) {
-                inSQL += ", " + item.getIdGuardia()[i];
-            }
-            sql.WHERE("GUARDIAS.IDGUARDIA IN (" + inSQL + ")");
-        }
+		if (item.getIdGuardia() != null && item.getIdGuardia().length > 0) {
+			String inSQL = item.getIdGuardia()[0];
+			for (int i = 1; i < item.getIdGuardia().length; i++) {
+				inSQL += ", " + item.getIdGuardia()[i];
+			}
+			sql.WHERE("GUARDIAS.IDGUARDIA IN (" + inSQL + ")");
+		}
 
-        if (item.getNif() != null && !item.getNif().isEmpty()) {
-            sql.WHERE("PER.NIFCIF = '" + item.getNif() + "'");
-        }
+		if (item.getNif() != null && !item.getNif().isEmpty()) {
+			sql.WHERE("PER.NIFCIF = '" + item.getNif() + "'");
+		}
 
-        sql.GROUP_BY(
-                "PER.NIFCIF, PER.IDPERSONA, PER.NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2), COL.NCOLEGIADO, "
-                        + "COL.NCOMUNITARIO, COL.IDINSTITUCION, INS.ABREVIATURA, ESTADO.IDESTADO, TIPOESTADO.DESCRIPCION, COL.SITUACIONRESIDENTE");
-        sql.ORDER_BY("PER.NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2)");
+		sql.GROUP_BY(
+				"PER.NIFCIF, PER.IDPERSONA, PER.NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2), COL.NCOLEGIADO, "
+						+ "COL.NCOMUNITARIO, COL.IDINSTITUCION, INS.ABREVIATURA, ESTADO.IDESTADO, TIPOESTADO.DESCRIPCION, COL.SITUACIONRESIDENTE");
+		sql.ORDER_BY("PER.NOMBRE, CONCAT(CONCAT(PER.APELLIDOS1, ' '), PER.APELLIDOS2)");
 
-        // Se realiza esta consulta para poder aplicar el filtro del número máximo de
-        // registros
-        sql3.SELECT("nif,\r\n" + "    idpersona,\r\n" + "    nombre,\r\n" + "    apellidos,\r\n" + "    ncolegiado,\r\n"
-                + "    ncomunitario,\r\n" + "    idestado,\r\n" + "    idinstitucion,\r\n" + "    abreviatura,\r\n"
-                + "    estado,\r\n" + "    residente,\r\n" + "    tieneguardias,\r\n" + "    guardiaspendientes,\r\n"
-                + "    CASE sumaturnos\r\n" + "        WHEN 0 THEN\r\n" + "            'No'\r\n" + "        ELSE\r\n"
-                + "            'Sí'\r\n" + "    END AS tieneturno FROM ( " + sql.toString() + ")");
+		// Se realiza esta consulta para poder aplicar el filtro del número máximo de
+		// registros
+		sql3.SELECT("nif,\r\n" + "    idpersona,\r\n" + "    nombre,\r\n" + "    apellidos,\r\n" + "    ncolegiado,\r\n"
+				+ "    ncomunitario,\r\n" + "    idestado,\r\n" + "    idinstitucion,\r\n" + "    abreviatura,\r\n"
+				+ "    estado,\r\n" + "    residente,\r\n" + "    tieneguardias,\r\n" + "    guardiaspendientes,\r\n"
+				+ "    CASE sumaturnos\r\n" + "        WHEN 0 THEN\r\n" + "            'No'\r\n" + "        ELSE\r\n"
+				+ "            'Sí'\r\n" + "    END AS tieneturno FROM ( " + sql.toString() + ")");
 
 //		if (tamMaximo != null) {
 //			Integer tamMaxNumber = tamMaximo + 1;

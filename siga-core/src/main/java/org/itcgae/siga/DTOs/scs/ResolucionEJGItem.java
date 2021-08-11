@@ -28,6 +28,7 @@ public class ResolucionEJGItem {
 	Long numero;
 	Short idInstitucion;
 	Short idTipoEJG;
+	String docResolucion;
 	
 	/**
 	 **/
@@ -291,6 +292,7 @@ public class ResolucionEJGItem {
 		this.notasCAJG = notasCAJG;
 	}
 
+	@JsonProperty("anio")
 	public Short getAnio() {
 		return anio;
 	}
@@ -299,6 +301,7 @@ public class ResolucionEJGItem {
 		this.anio = anio;
 	}
 
+	@JsonProperty("numero")
 	public Long getNumero() {
 		return numero;
 	}
@@ -307,6 +310,7 @@ public class ResolucionEJGItem {
 		this.numero = numero;
 	}
 
+	@JsonProperty("idInstitucion")
 	public Short getIdInstitucion() {
 		return idInstitucion;
 	}
@@ -315,6 +319,7 @@ public class ResolucionEJGItem {
 		this.idInstitucion = idInstitucion;
 	}
 
+	@JsonProperty("idTipoEJG")
 	public Short getIdTipoEJG() {
 		return idTipoEJG;
 	}
@@ -323,5 +328,12 @@ public class ResolucionEJGItem {
 		this.idTipoEJG = idTipoEJG;
 	}
 	
-	
+	@JsonProperty("docResolucion")
+	public String getDocResolucion() {
+		return docResolucion;
+	}
+
+	public void setDocResolucion(String docResolucion) {
+		this.docResolucion = docResolucion;
+	}
 }

@@ -488,6 +488,14 @@ public class EjgController {
 		RelacionesDTO response = gestionEJG.getRelacionesEJG(item, request);
 		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
 	}
+	
+	// descargarDocumentoResolucion
+	@RequestMapping(value = "/gestion-ejg/descargarDocumentoResolucion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InputStreamResource> descargarDocumentoResolucion(@RequestBody String docResolucion, HttpServletRequest request) {
+		ResponseEntity<InputStreamResource> response = gestionEJG.descargarDocumentoResolucion(docResolucion, request);
+
+		return response;
+	}
 
 	// updateDatosJuridicos
 	@RequestMapping(value = "/gestion-ejg/updateDatosJuridicos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
