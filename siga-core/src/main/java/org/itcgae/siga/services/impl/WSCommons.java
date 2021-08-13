@@ -645,13 +645,17 @@ public class WSCommons {
 						//Insertamos el Notario
 						Identificacion identificacion = Identificacion.Factory.newInstance();
 						if(regSociedad.getIdentificacionNotario()!=null){
-							identificacion.setNIF(regSociedad.getIdentificacionNotario());
+							if (Validaciones.validaNIE(regSociedad.getIdentificacionNotario())){
+								identificacion.setNIE(regSociedad.getIdentificacionNotario());
+							} else {
+								identificacion.setNIF(regSociedad.getIdentificacionNotario());
+							}
 							argNotario.setApellido1(regSociedad.getApellido1Notario());
 							argNotario.setApellido2(regSociedad.getApellido2Notario());
 							argNotario.setNombre(regSociedad.getNombreNotario());
 						}
-						if(identificacion.getNIF() != null) {
-							if(!identificacion.getNIF().isEmpty()) {
+						if(identificacion.getNIF() != null || identificacion.getNIE() != null) {
+							if(!identificacion.getNIF().isEmpty() || !identificacion.getNIE().isEmpty()) {
 								argNotario.setIdentificacion(identificacion);
 							}
 						}
