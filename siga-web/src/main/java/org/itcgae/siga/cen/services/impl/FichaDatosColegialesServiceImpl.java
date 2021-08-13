@@ -1757,7 +1757,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				}
 				if (colegiadoItem.getSituacionResidente() != null) {
 					colegiado.setSituacionresidente(
-							colegiadoItem.getSituacionResidente().equalsIgnoreCase("1") ? "1" : "0");
+							colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
 				} else {
 					colegiado.setSituacionresidente("0");
 				}
