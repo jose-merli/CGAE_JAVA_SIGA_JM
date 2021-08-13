@@ -34,21 +34,21 @@ public class ConConsultasExtendsSqlProvider {
 		sql.SELECT("(SELECT CAT2.DESCRIPCION FROM MOD_CLASECOMUNICACIONES CLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT2 ON CAT2.IDRECURSO = CLA.DESCRIPCION WHERE CLA.IDCLASECOMUNICACION = CONSULTA.IDCLASECOMUNICACION AND CLA. CAT2.IDLENGUAJE = '" + idLenguaje + "') AS NOMBRECLASE");
 		sql.FROM("CON_CONSULTA CONSULTA");
 		
-		String condicionPermisos = " EXISTS (SELECT 1 FROM MOD_PLANTILLADOC_CONSULTA PC"
-				+ " JOIN MOD_MODELO_PLANTILLADOCUMENTO MD ON MD.IDPLANTILLADOCUMENTO = PC.IDPLANTILLADOCUMENTO"
-				+ " JOIN MOD_MODELO_PERFILES MP ON MP.IDMODELOCOMUNICACION = MD.IDMODELOCOMUNICACION"
-				+ " WHERE PC.IDCONSULTA = CONSULTA.IDCONSULTA AND PC.IDINSTITUCION_CONSULTA = CONSULTA.IDINSTITUCION";
-		
-		if (perfiles != null && perfiles.size() > 0) {
-			condicionPermisos += " AND MP.IDPERFIL IN ('SIN_PERFIL'";//METEMOS SIN_PEFIL PARA QUE AL MENOS HAYA UNO Y NO PETE
-			for (String perfil : perfiles) {
-				condicionPermisos += ", " + perfil;
-			}
-			condicionPermisos += " )";
-		}
-		condicionPermisos += ")";
-		
-		sql.WHERE(condicionPermisos);
+//		String condicionPermisos = " EXISTS (SELECT 1 FROM MOD_PLANTILLADOC_CONSULTA PC"
+//				+ " JOIN MOD_MODELO_PLANTILLADOCUMENTO MD ON MD.IDPLANTILLADOCUMENTO = PC.IDPLANTILLADOCUMENTO"
+//				+ " JOIN MOD_MODELO_PERFILES MP ON MP.IDMODELOCOMUNICACION = MD.IDMODELOCOMUNICACION"
+//				+ " WHERE PC.IDCONSULTA = CONSULTA.IDCONSULTA AND PC.IDINSTITUCION_CONSULTA = CONSULTA.IDINSTITUCION";
+//		
+//		if (perfiles != null && perfiles.size() > 0) {
+//			condicionPermisos += " AND MP.IDPERFIL IN ('SIN_PERFIL'";//METEMOS SIN_PEFIL PARA QUE AL MENOS HAYA UNO Y NO PETE
+//			for (String perfil : perfiles) {
+//				condicionPermisos += ", " + perfil;
+//			}
+//			condicionPermisos += " )";
+//		}
+//		condicionPermisos += ")";
+//		
+//		sql.WHERE(condicionPermisos);
 		
 	
 		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){

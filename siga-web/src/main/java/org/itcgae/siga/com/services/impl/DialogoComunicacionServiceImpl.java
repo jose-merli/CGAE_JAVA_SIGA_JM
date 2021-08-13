@@ -2343,6 +2343,25 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return rutaTmp;
 	}
 	
+	private String getRutaFicheroSalidaTemp(String idInstitucion) {
+		GenPropertiesKey key = new GenPropertiesKey();
+		key.setFichero(SigaConstants.FICHERO_SIGA);
+		key.setParametro(SigaConstants.pathAbsolutoFiler);
+		
+		// Obtenemos la ruta del filer
+		GenProperties rutaFiler = _genPropertiesMapper.selectByPrimaryKey(key);
+		
+		key.setFichero(SigaConstants.FICHERO_SIGA);
+		key.setParametro(SigaConstants.pathRelativoTemp);
+		
+		// Obtenemos la ruta de la carpeta de ficheros temporales
+		GenProperties carpetaTemp = _genPropertiesMapper.selectByPrimaryKey(key);
+		
+		String rutaTmp = rutaFiler.getValor() + carpetaTemp.getValor() + idInstitucion + SigaConstants.pathSeparator + System.currentTimeMillis() + SigaConstants.pathSeparator;
+		
+		return rutaTmp;
+	}
+	
 	private String getRutaPlantilla(String rutaPlantillaClase) {
 		GenPropertiesKey key = new GenPropertiesKey();
 		key.setFichero(SigaConstants.FICHERO_SIGA);
@@ -2398,7 +2417,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario, boolean consultasDestinatarioEjecutadas) {
 		
 		LOGGER.debug("Obtenemos la ruta temporal del fichero de salida");
-		String rutaTmp = getRutaFicheroSalida(dialogo.getIdInstitucion());
+		String rutaTmp = getRutaFicheroSalidaTemp(dialogo.getIdInstitucion());
 		
 		LOGGER.debug("Obtenemos la ruta de la plantilla");
 		String rutaPlantilla = getRutaPlantilla(rutaPlantillaClase);												
