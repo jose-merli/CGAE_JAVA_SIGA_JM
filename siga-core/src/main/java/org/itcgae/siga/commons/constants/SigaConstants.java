@@ -60,8 +60,8 @@ public class SigaConstants {
 	public static String rutaPlantillaSinClase = "plantillasSinClase";
 	public static String parametroSizePlantillas = "gen.ficheros.maxsize.bytes";
 	
-	public static String pathAbsolutoFiler = "path.absoluto.origenFiler";
-	public static String pathRelativoTemp = "path.relativo.temporalesDescarga";
+	public static String pathAbsolutoFiler = "path.absoluto.origenFiler"; 
+	public static String pathRelativoTemp = "path.relativo.temporalesDescarga"; 
 
 	public static String pathSeparator = "/";
 	
