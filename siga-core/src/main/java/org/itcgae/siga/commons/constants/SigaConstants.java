@@ -62,6 +62,9 @@ public class SigaConstants {
 
 	public static String pathSeparator = "/";
 	
+	public static String pathAbsolutoFiler = "path.absoluto.origenFiler";
+	public static String pathRelativoTemp = "path.relativo.temporalesDescarga";
+	
 	public static String nombreExcelConsulta = "ResultadoConsulta";
 	public static String nombreZip = "DocumentosComunicacion";
 	public static String rutaLicencia = "/WEB-INF/Aspose.Words.lic";
