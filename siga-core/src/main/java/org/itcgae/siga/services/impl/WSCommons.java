@@ -785,6 +785,8 @@ public class WSCommons {
 									datosPersona.setApellido1(integrante.getApellidos1());
 									datosPersona.setApellido2(integrante.getApellidos2());
 									datosPersona.setNombre(integrante.getNombre());
+									// Nos aseguramos que no se utilice la identificación del integrante anterior
+									identificacion = Identificacion.Factory.newInstance();
 									if ("NIE".equals(integrante.getTipoIdentificacion())){
 										identificacion.setNIE(integrante.getNifCif());
 									} else {
