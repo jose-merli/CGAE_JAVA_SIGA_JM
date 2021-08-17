@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
@@ -21,6 +22,35 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.WHERE("PARAMETRO like '%VALIDAR_OBL%'");
 		sql.WHERE("IDINSTITUCION =" + idInstitucion);
 		LOGGER.info(sql.toString());
+		return sql.toString();
+	}
+	
+	public String comboPresidente(String idLenguaje) {
+
+		SQL sqlPresidente = new SQL();
+		sqlPresidente.SELECT("pon.IDPONENTE as value, f_siga_getrecurso(pon.nombre,"+idLenguaje+") as nombre");
+		sqlPresidente.FROM("scs_ponente pon");
+		LOGGER.info("*******************comboPresidente********************" + sqlPresidente.toString());
+		return sqlPresidente.toString();
+	}
+	
+	public String busquedaActas(ActasItem actasItem) {
+		
+		String fechaReunion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechaReunion());
+		String fechaResolucion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechaResolucion());
+
+		
+		
+		SQL sql = new SQL();
+		sql.SELECT("NUMEROACTA,IDPRESIDENTE,IDSECRETARIO,FECHAREUNION,FECHARESOLUCION ");
+		sql.FROM("scs_ACTACOMISION");
+		sql.WHERE("NUMEROACTA like '"+actasItem.getActa()+"'");
+		sql.WHERE("IDPRESIDENTE like '"+actasItem.getPresidente()+"'");
+		sql.WHERE("IDSECRETARIO like '"+actasItem.getSecretario()+"'");
+		sql.WHERE("FECHAREUNION = '"+fechaReunion+"'");
+		sql.WHERE("FECHARESOLUCION = '"+fechaResolucion+"'");
+
+		LOGGER.info("*******************busquedaActas********************" + sql.toString());
 		return sql.toString();
 	}
 	
@@ -149,7 +179,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboFundamentoCalificacionComision(String idLenguaje, String idInstitucion, String[] list_dictamen) {
+	public String comboFundamentoCalificacionComision(Short idLenguaje, String idInstitucion, String[] list_dictamen) {
 		SQL sql = new SQL();
 		String dictamenCad = "";
 		boolean indiferente = false;
@@ -182,7 +212,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboPonenteComision(String idLenguaje, String idInstitucion) {
+	public String comboPonenteComision(Short idLenguaje, String idInstitucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("SCS_PONENTE.IDPONENTE as CLAVE");
@@ -228,6 +258,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ ejgItem.getTipoEJG() + "," + ejgItem.getAnnio() + "," + ejgItem.getNumero() + ") AS ID";
 		sqlIdEstadoEjg.SELECT(F_SIGA_GET_IDULTIMOESTADOEJG);
 		sqlIdEstadoEjg.FROM("dual");
+		LOGGER.info("*******************idUltimoEstado********************" + sqlIdEstadoEjg.toString());
 		return sqlIdEstadoEjg.toString();
 	}
 
@@ -249,7 +280,6 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		String fechaPonenteHast;
 		String fechaResolucionDesd;
 		String fechaResolucionHast;
-		idInstitucion = "2005";
 		SQL sql = new SQL();
 
 		String condicionAnnioNumActas = " (EXISTS (SELECT 1 FROM scs_ejg_acta ejgacta, scs_actacomision ac"
@@ -305,7 +335,6 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		// from
 		sql.FROM("scs_ejg ejg");
-		idUltimoEstado = "23";
 		// joins
 		sql.LEFT_OUTER_JOIN("cen_persona per on per.idpersona = ejg.idpersona");
 		sql.LEFT_OUTER_JOIN(
@@ -322,14 +351,14 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ "AND ESTADO.NUMERO = ESTADO2.NUMERO " + "AND ESTADO2.FECHABAJA IS NULL) "
 				+ "AND ESTADO2.FECHAINICIO = (SELECT MAX(FECHAINICIO) FROM SCS_ESTADOEJG ESTADO3 WHERE (ESTADO3.IDINSTITUCION = ESTADO2.IDINSTITUCION "
 				+ "AND ESTADO.IDTIPOEJG = ESTADO3.IDTIPOEJG " + "AND ESTADO.ANIO = ESTADO3.ANIO "
-				+ "AND ESTADO.NUMERO = ESTADO3.NUMERO " + "AND ESTADO3.FECHABAJA IS NULL ))))");  //AND ESTADO.IDTIPOEJG = "+idUltimoEstado+" 
+				+ "AND ESTADO.NUMERO = ESTADO3.NUMERO " + "AND ESTADO3.FECHABAJA IS NULL))))");  //AND ESTADO.IDTIPOEJG = "+idUltimoEstado+" 
 		sql.INNER_JOIN(
-				"SCS_MAESTROESTADOSEJG MAESTROESTADO ON ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG");  //AND MAESTROESTADO.VISIBLECOMISION = 1
+				"SCS_MAESTROESTADOSEJG MAESTROESTADO ON ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG AND MAESTROESTADO.VISIBLECOMISION = 1");  //AND MAESTROESTADO.VISIBLECOMISION = 1
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = '"
 				+ idLenguaje + "'");
 
 		// where
-		sql.WHERE("ejg.idinstitucion = " + idInstitucion);
+		sql.WHERE("ejg.idinstitucion = 2005"); //+ idInstitucion
 		if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 			sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
 		if (ejgItem.getNumero() != null && ejgItem.getNumero() != "")

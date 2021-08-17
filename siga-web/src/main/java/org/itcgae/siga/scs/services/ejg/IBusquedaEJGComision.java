@@ -4,12 +4,14 @@ package org.itcgae.siga.scs.services.ejg;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ActasDTO;
+import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 
 public interface IBusquedaEJGComision {
 
-	ComboDTO comboFundamentoCalificacion(String idInstitucion, HttpServletRequest request, String[] list_dictamen);
+	ComboDTO comboFundamentoCalificacion(HttpServletRequest request, String[] list_dictamen);
 
 	ComboDTO getLabelColegiosCol(HttpServletRequest request);
 
@@ -19,23 +21,30 @@ public interface IBusquedaEJGComision {
 
 	EjgDTO busquedaEJG(EjgItem ejgItem, HttpServletRequest request);
 
-	ComboDTO comboDictamen(String idInstitucion, HttpServletRequest request);
+	ComboDTO comboDictamen(HttpServletRequest request);
 
-	ComboDTO comboEstadoEJG(String idInstitucion, HttpServletRequest request, String resolucion);
+	ComboDTO obligatoriedadResolucion(HttpServletRequest request);
 
-	ComboDTO comboJuzgados(String idInstitucion, HttpServletRequest request);
+	ComboDTO comboTipoColegioEjg(HttpServletRequest request);
 
-	ComboDTO comboTurnosTipo(String idInstitucion, HttpServletRequest request, String idTurno);
+	ComboDTO comboEstadoEJG(HttpServletRequest request, String resolucion);
 
-	ComboDTO comboGuardias(String idInstitucion, HttpServletRequest request, String idTurno);
-
-	ComboDTO comboTipoColegioEjg(String idInstitucion, HttpServletRequest request);
+	ComboDTO comboResolucion(HttpServletRequest request);
 
 	ComboDTO comboAnioActa(HttpServletRequest request);
 
-	ComboDTO comboResolucion(String idInstitucion, HttpServletRequest request);
+	ComboDTO comboJuzgados(HttpServletRequest request);
 
-	ComboDTO obligatoriedadResolucion(HttpServletRequest request);
+	ComboDTO comboTurnosTipo(HttpServletRequest request, String idTurno);
+
+	ComboDTO comboGuardias(HttpServletRequest request, String idTurno);
+
+	ComboDTO comboPresidente(HttpServletRequest request);
+
+	ComboDTO comboSecretario(HttpServletRequest request);
+
+	ActasDTO busquedaActas(ActasItem actasItem, HttpServletRequest request);
+
 	
 
 	
