@@ -14,6 +14,16 @@ public class EstadoEjgItem {
 	private String automatico;
 	private String propietario;
 	private String user;
+	
+	private String idtipoejg;
+	private String anio;
+	private String numero;
+	private String usumodificacion;
+	private String idestadoporejg;
+	private String propietariocomision;
+	private Date fechabaja;
+	private String idinstitucion;
+	
 
 	
 	/**
@@ -144,6 +154,69 @@ public class EstadoEjgItem {
 	public void setUser(String user) {
 		this.user = user;
 	}
+	public String getIdtipoejg() {
+		return idtipoejg;
+	}
+
+	public void setIdtipoejg(String idtipotejg) {
+		this.idtipoejg = idtipotejg;
+	}
+
+	public String getAnio() {
+		return anio;
+	}
+
+	public void setAnio(String anio) {
+		this.anio = anio;
+	}
+
+	public String getNumero() {
+		return numero;
+	}
+
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
+
+	public String getUsumodificacion() {
+		return usumodificacion;
+	}
+
+	public void setUsumodificacion(String usumodificacion) {
+		this.usumodificacion = usumodificacion;
+	}
+
+	public String getIdestadoporejg() {
+		return idestadoporejg;
+	}
+
+	public void setIdEstadoporEJG(String idestadoporejg) {
+		this.idestadoporejg = idestadoporejg;
+	}
+
+	public String getPropietariocomision() {
+		return propietariocomision;
+	}
+
+	public void setPropietariocomision(String propietariocomision) {
+		this.propietariocomision = propietariocomision;
+	}
+
+	public Date getFechabaja() {
+		return fechabaja;
+	}
+
+	public void setFechabaja(Date fechabaja) {
+		this.fechabaja = fechabaja;
+	}
+	public String getIdinstitucion() {
+		return idinstitucion;
+	}
+
+	public void setIdinstitucion(String idinstitucion) {
+		this.idinstitucion = idinstitucion;
+	}
+
 
 	@Override
 	public int hashCode() {
@@ -153,9 +226,20 @@ public class EstadoEjgItem {
 		result = prime * result + ((fechaInicio == null) ? 0 : fechaInicio.hashCode());
 		result = prime * result + ((fechaModificacion == null) ? 0 : fechaModificacion.hashCode());
 		result = prime * result + ((idEstadoejg == null) ? 0 : idEstadoejg.hashCode());
+		result = prime * result + ((idtipoejg == null) ? 0 : idtipoejg.hashCode());
+		result = prime * result + ((anio == null) ? 0 : anio.hashCode());
+		result = prime * result + ((numero == null) ? 0 : numero.hashCode());
+		result = prime * result + ((usumodificacion == null) ? 0 : usumodificacion.hashCode());
+		result = prime * result + ((idestadoporejg == null) ? 0 : idestadoporejg.hashCode());
+		result = prime * result + ((idtipoejg == null) ? 0 : idtipoejg.hashCode());
+		result = prime * result + ((propietariocomision == null) ? 0 : propietariocomision.hashCode());
+		result = prime * result + ((fechabaja == null) ? 0 : fechabaja.hashCode());
+		result = prime * result + ((idinstitucion == null) ? 0 : idinstitucion.hashCode());
+		result = prime * result + ((observaciones == null) ? 0 : observaciones.hashCode());
 		return result;
 	}
 
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -185,12 +269,64 @@ public class EstadoEjgItem {
 				return false;
 		} else if (!idEstadoejg.equals(other.idEstadoejg))
 			return false;
+		if (idtipoejg == null) {
+			if (other.idtipoejg != null)
+				return false;
+		} else if (!idtipoejg.equals(other.idtipoejg))
+			return false;
+		if (anio == null) {
+			if (other.anio != null)
+				return false;
+		} else if (!anio.equals(other.anio))
+			return false;
+		if (numero == null) {
+			if (other.numero != null)
+				return false;
+		} else if (!numero.equals(other.numero))
+			return false;
+		if (usumodificacion == null) {
+			if (other.usumodificacion != null)
+				return false;
+		} else if (!usumodificacion.equals(other.usumodificacion))
+			return false;
+		if (idestadoporejg == null) {
+			if (other.idestadoporejg != null)
+				return false;
+		} else if (!idestadoporejg.equals(other.idestadoporejg))
+			return false;
+		if (propietariocomision == null) {
+			if (other.propietariocomision != null)
+				return false;
+		} else if (!propietariocomision.equals(other.propietariocomision))
+			return false;
+		if (fechabaja == null) {
+			if (other.fechabaja != null)
+				return false;
+		} else if (!fechabaja.equals(other.fechabaja))
+			return false;
+		if (idinstitucion == null) {
+			if (other.idinstitucion != null)
+				return false;
+		} else if (!idinstitucion.equals(other.idinstitucion))
+			return false;
+		if (observaciones == null) {
+			if (other.observaciones != null)
+				return false;
+		} else if (!observaciones.equals(other.observaciones))
+			return false;
 		return true;
+
 	}
 
 	@Override
 	public String toString() {
 		return "EstadoEjgItem [idEstadoejg=" + idEstadoejg + ", fechaModificacion=" + fechaModificacion
-				+ ", fechaInicio=" + fechaInicio + ", descripcion=" + descripcion + "]";
+				+ ", fechaInicio=" + fechaInicio + ", descripcion=" + descripcion + ", idtipoejg=" + idtipoejg + 
+				", anio=" + anio + ", numero=" + numero + ", usumodificacion=" + usumodificacion + 
+				", idestadoporejg=" + idestadoporejg + " propietariocomision=" + propietariocomision + 
+				", fechabaja=" + fechabaja +", idinstitucion=" + idinstitucion + ", observaciones=" + observaciones + "]";
 	}
+
+
+	
 }

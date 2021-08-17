@@ -119,6 +119,7 @@ public class RelacionesItem {
 		this.codigo = codigo;
 	}
 
+<<<<<<< HEAD
 	public String getDesturno() {
 		return desturno;
 	}
@@ -127,6 +128,8 @@ public class RelacionesItem {
 		this.desturno = desturno;
 	}
 	
+=======
+>>>>>>> EJG
 	public String getDescturno() {
 		return descturno;
 	}
@@ -155,6 +158,7 @@ public class RelacionesItem {
 	public void setDatosinteres(String datosinteres) {
 		this.datosinteres = datosinteres;
 	}
+<<<<<<< HEAD
 
 	
 	
@@ -166,6 +170,15 @@ public class RelacionesItem {
 		this.interesado = interesado;
 	}
 
+=======
+	public String getInteresado() {
+		return interesado;
+	}
+	public void setInteresado(String interesado) {
+		this.interesado = interesado;
+	}
+	
+>>>>>>> EJG
 	public String getImpugnacion() {
 		return impugnacion;
 	}
@@ -221,6 +234,7 @@ public class RelacionesItem {
 	public void setDilnigproc(String dilnigproc) {
 		this.dilnigproc = dilnigproc;
 	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -401,15 +415,15 @@ public class RelacionesItem {
 	public String toString() {
 		return "RelacionesItem [sjcs=" + sjcs + ", idinstitucion=" + idinstitucion + ", anio=" + anio + ", numero="
 				+ numero + ", idletrado=" + idletrado + ", letrado=" + letrado + ", idturno=" + idturno
+<<<<<<< HEAD
 				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", desturno="
 				+ desturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
 				+ fechaDesignacion + ", datosinteres=" + datosinteres +", idsjcs=" + idsjcs +"]"
+=======
+>>>>>>> EJG
 				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", descturno="
-				+ descturno + ", destipo=" + destipo + ", interesado=" + interesado + ", impugnacion=" + impugnacion
-				+ ", fechaimpugnacion=" + fechaimpugnacion + ", dictamen=" + dictamen + ", fechadictamen="
-				+ fechadictamen + ", resolucion=" + resolucion + ", fecharesolucion=" + fecharesolucion
-				+ ", centrodetencion=" + centrodetencion + ", fechaasunto=" + fechaasunto + ", dilnigproc=" + dilnigproc
-				+ "]";
+				+ descturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
+				+ fechaDesignacion + ", datosinteres=" + datosinteres +", idsjcs=" + idsjcs +"]";
 	}
 
 	/**
@@ -422,5 +436,7 @@ public class RelacionesItem {
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
+
+	
 
 }

@@ -66,6 +66,37 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	        @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR) })
 	    List<InscripcionesItem> busquedaTarjetaInscripciones(InscripcionesItem inscripcionesItem,Short idInstitucion, String idlenguaje);
 	 
+	//SIGARNV-2009@DTT.JAMARTIN@06/08/2021@INICIO
+	 @SelectProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="buscaTurnoInscrito")
+	 @Results({ @Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),
+	        @Result(column="IDPERSONA", property="idpersona", jdbcType=JdbcType.DECIMAL, id=true),
+	        @Result(column="IDTURNO", property="idturno", jdbcType=JdbcType.DECIMAL, id=true),
+	        @Result(column="FECHASOLICITUD", property="fechasolicitud", jdbcType=JdbcType.DATE),
+	        @Result(column="FECHAMODIFICACION", property="fechamodificacion", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="USUMODIFICACION", property="usumodificacion", jdbcType=JdbcType.DECIMAL),
+	        @Result(column="FECHAVALIDACION", property="fechavalidacion", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="OBSERVACIONESSOLICITUD", property="observacionessolicitud", jdbcType=JdbcType.VARCHAR),
+	        @Result(column="OBSERVACIONESVALIDACION", property="observacionesvalidacion", jdbcType=JdbcType.VARCHAR),
+	        @Result(column="OBSERVACIONESBAJA", property="observacionesbaja", jdbcType=JdbcType.VARCHAR),
+	        @Result(column="FECHASOLICITUDBAJA", property="fechasolicitudbaja", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="FECHADENEGACION", property="fechadenegacion", jdbcType=JdbcType.TIMESTAMP),
+	        @Result(column="OBSERVACIONESDENEGACION", property="observacionesdenegacion", jdbcType=JdbcType.VARCHAR),
+	        @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR) })
+	List<InscripcionesItem> buscaTurnoInscrito(List<InscripcionesItem> inscripcionesItems, Short idInstitucion, String idPersona);
+	 
+	@SelectProvider(type = ScsInscripcionesTurnoSqlExtendsProvider.class, method = "buscarGuardiasTurnosNoInscritos")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.DECIMAL, id = true),
+			@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "tipoguardias", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre_guardia", jdbcType = JdbcType.VARCHAR) })
+	List<InscripcionesItem> buscarGuardiasTurnosNoInscritos(List<InscripcionesItem> inscripcionesItems, Short idInstitucion, String idPersona);
+	// SIGARNV-2009@DTT.JAMARTIN@06/08/2021@FIN
+	 
 	 @UpdateProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="borrarSaltos")
 	    int borrarSaltos(InscripcionesItem inscripcionesItem, Short idInstitucion, int usumodificacion);
 

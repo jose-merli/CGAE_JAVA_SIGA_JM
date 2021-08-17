@@ -50,15 +50,22 @@ public interface ScsDocumentacionEjgExtendsMapper extends ScsTipodocumentoejgMap
 	@SelectProvider(type = ScsDocumentacionejgExtendsProvider.class, method = "getDocumentacion")
 	@Results({ 
 		@Result(column = "fechalimite", property = "flimite_presentacion", jdbcType = JdbcType.DATE),
-		@Result(column = "presentadores", property = "presentador", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "presentador", property = "presentador", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombrecompleto", property = "presentador_persona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "parentesco", property = "parentesco", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "documentacion", property = "documentoDesc", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "documentacion", property = "descripcionDoc", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "regentrada", property = "regEntrada", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "regsalida", property = "regSalida", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaentrega", property = "f_presentacion", jdbcType = JdbcType.DATE),
 		@Result(column = "comisionajg", property = "propietario", jdbcType = JdbcType.VARCHAR),
-
+		@Result(column = "propietarioDes", property = "propietarioDes", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idtipodocumento", property = "idTipoDocumento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "iddocumento", property = "idDocumento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "iddocumentacion", property = "idDocumentacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idMaestroPresentador", property = "idMaestroPresentador", jdbcType = JdbcType.INTEGER),
+		@Result(column = "idFichero", property = "idFichero", jdbcType = JdbcType.INTEGER),
+		@Result(column = "nombreFichero", property = "nombreFichero", jdbcType = JdbcType.INTEGER),
+		@Result(column = "labelDocumento", property = "labelDocumento", jdbcType = JdbcType.VARCHAR),
 	})
 	List<EjgDocumentacionItem> getDocumentacion(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
 	

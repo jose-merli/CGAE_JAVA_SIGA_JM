@@ -4,16 +4,23 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.mappers.ScsActacomisionSqlProvider;
 
 public class ScsActacomisionSqlExtendsProvider extends ScsActacomisionSqlProvider{
-	public String getActaAnnio(String idInstitucion) {
+	public String getActaAnnio(String idInstitucion, String idActa) {
 		SQL sql = new SQL();
-		sql.SELECT("idinstitucion||','||anioacta||','||idacta as IDACTANNIO," + 
-				   " anioacta||'/'||numeroacta || ' - ' || to_char(fecharesolucion, 'dd/mm/yyyy') as DESCRIPCION");
+		//La clave primaria de SCS_ACTACOMISION son la institucion, el año y su id.
+		//Como en esta consulta solo se devuelven filas de la misma institucion que el EJG, 
+		//se considera reduntante que el id tenga esa informacion.
+		//sql.SELECT("idinstitucion||','||anioacta||','||idacta as IDACTANNIO");
+		sql.SELECT("idacta||','||anioacta as IDACTANNIO");
+		sql.SELECT("anioacta||'/'||numeroacta || ' - ' || to_char(fecharesolucion, 'dd/mm/yyyy') as DESCRIPCION");
 		
 		sql.FROM("scs_actacomision");
 		
-		if(idInstitucion != null && idInstitucion != "")
-			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
-		sql.ORDER_BY("anioacta desc, to_number(regexp_replace(numeroacta, '\\D', '')) desc, numeroacta desc");
+		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
+		//Esta comprobacion se realiza para que la consulta solo seleccione actas abiertas de la institucion
+		//además de la ultima acta al EJG que se selecciona siempre.
+		if(idActa!=null)sql.WHERE("(fechaResolucion is null OR idinstitucion||','||anioacta||','||idacta like '" +idActa+ "')");
+		else sql.WHERE("fechaResolucion is null");
+		
 		return sql.toString();
 	}
 }

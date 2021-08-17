@@ -22,6 +22,8 @@ import org.itcgae.siga.db.entities.CajgRemesa;
 import org.itcgae.siga.db.entities.CajgRemesaKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.ScsEstadoejg;
+import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.entities.ScsTiposentidoauto;
 import org.itcgae.siga.db.entities.ScsTiposentidoautoExample;
 import org.itcgae.siga.db.mappers.CajgEjgremesaMapper;
@@ -142,6 +144,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 	public InsertResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request) {
 		InsertResponseDTO responsedto = new InsertResponseDTO();
 		int response = 0;
+		int responseEstado= 0;
 		Error error = null;
 
 		String token = request.getHeader("Authorization");
@@ -164,7 +167,7 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				LOGGER.debug(
 						"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> Entrada para cambiar los estados y la fecha de estado para los ejgs");
 
-				try {
+			
 					
 					//Buscamos la descripcion de la remesa seleccionada en el modal
 					
@@ -203,25 +206,59 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 //						else item.setNumerointercambio(1);
 					
 						response = cajgEjgremesaMapper.insert(item);
+						// respuesta si se actualiza correctamente
+						if (response == 1) {
+							
+							
+							ScsEstadoejg estado = new ScsEstadoejg();
+							estado.setIdinstitucion(idInstitucion);
+							estado.setIdtipoejg(Short.parseShort(dato.getTipoEJG()));
+							estado.setAnio(Short.parseShort(dato.getAnnio()));
+							estado.setNumero(Long.parseLong(dato.getNumero()));
+							estado.setIdestadoejg(Short.parseShort("8"));	//id de estado correspondiente a Generado Remesa.
+							estado.setObservaciones("Nº Remesa: " + remesaSelected.getIdremesa());
+							estado.setFechainicio(new Date());
+							estado.setFechamodificacion(new Date());
+							estado.setUsumodificacion(usuarios.get(0).getIdusuario());
+							estado.setAutomatico("1");
+							
+							//asignamiento del id de estado por EJG.
+							
+							// obtenemos el maximo de idestadoporejg
+							ScsEstadoejgExample example = new ScsEstadoejgExample();
+
+							example.setOrderByClause("IDESTADOPOREJG DESC");
+							example.createCriteria().andAnioEqualTo(item.getAnio()).andIdinstitucionEqualTo(idInstitucion)
+									.andIdtipoejgEqualTo(item.getIdtipoejg()).andNumeroEqualTo(item.getNumero());
+
+							List<ScsEstadoejg> listEjg = scsEstadoEjgextendsMapper.selectByExample(example);
+
+							// damos el varlo al idestadoporejg + 1
+							if (listEjg.size() > 0) {
+								estado.setIdestadoporejg(listEjg.get(0).getIdestadoporejg() + 1);
+							} else {
+								estado.setIdestadoporejg(Long.parseLong("1"));
+							}
+							
+						
+							responseEstado = scsEstadoEjgextendsMapper.insertSelective(estado);
+							
+							if(responseEstado == 1) {
+								responsedto.setStatus(SigaConstants.OK);
+								LOGGER.debug(
+										"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> OK. Asignacion realizada adecuadamente");
+							}
+							else {
+								responsedto.setStatus(SigaConstants.KO);
+								responsedto.setId("500");
+								LOGGER.error(
+										"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> KO. No se ha realizado la asignacion adecuadamente");
+							}
+						} 
 					}
 					
-				} catch (Exception e) {
-					LOGGER.debug("BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> Se ha producido un error: ", e);
-					response = 0;
-
-				} finally {
-					// respuesta si se actualiza correctamente
-					if (response >= 1) {
-						responsedto.setStatus(SigaConstants.OK);
-						LOGGER.debug(
-								"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> OK. Asignacion realizada adecuadamente");
-					} else {
-						responsedto.setStatus(SigaConstants.KO);
-						responsedto.setId("500");
-						LOGGER.error(
-								"BusquedaEJGServiceImpl.anadirExpedienteARemesa() -> KO. No se ha realizado la asignacion adecuadamente");
-					}
-				}
+					
+				
 			}
 		}
 
@@ -624,8 +661,44 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				}
 				LOGGER.info(
 						"busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
+				// para obtener registros separados por ,
+				
+				String[] parts;
+				if(ejgItem.getNumero() == null || ejgItem.getNumero().isEmpty()) {
+					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString()));
+				}else if (ejgItem.getNumero().trim().contains(",")) {
+					parts = ejgItem.getNumero().trim().split(",");
+					//se crea un objeto auxiliar para obtener la consulta de cada numero de EJG
+					EjgDTO listAux = new EjgDTO();
+					//se crea una lista auxiliar de EJGItem para guardar el primer registro que devuelve la consulta
+					List<EjgItem> listAux2 = new ArrayList<EjgItem>();
+					
+					//se recorre el array donde se ha almacenado los numeros de EJG
+					for (String str : parts) {
+						//al EJG se le aplica un numero del array
+						ejgItem.setNumero(str.trim());
+						//se carga los registros obtenidos de la consulta (se espera uno solo)
+						listAux.setEjgItems( scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+								usuarios.get(0).getIdlenguaje().toString()));
+						//se almacena en la lista de EJGItem el primer registro obtenido.
+						listAux2.add(listAux.getEjgItems().get(0));
+				
+					}
+					
+					//se guarda en el objeto DTO principal la lista de primeros registros obtenidos de las consultas realizadas.
+					ejgDTO.setEjgItems(listAux2);
+					
+					
+
+					
+				} else if(ejgItem.getNumero().trim().contains("-")) {
+					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+							usuarios.get(0).getIdlenguaje().toString()));
+				}else {
 				ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
 						usuarios.get(0).getIdlenguaje().toString()));
+				}
 				LOGGER.info(
 						"busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
 				if (ejgDTO.getEjgItems() != null && tamMaximo != null

@@ -5,16 +5,17 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ResolucionEJGItem {
-	String idActa;
-	String annioActa;
+	Long idActa;
+	Short annioActa;
 	String idAnnioActa;
-	String idTiporatificacionEJG;
-	String idFundamentoJuridico;
+	Short idTiporatificacionEJG;
+	Short idFundamentoJuridico;
 	String ratificacionDictamen;
-	String idOrigencajg;
-	String anioCAJG;
+	Short idOrigencajg;
+	Short anioCAJG;
 	String numeroCAJG;
-	String idPonente;
+	Integer idPonente;
+	String tipoResolucionCAJG;
 	Date fechaPresentacionPonente;
 	Date fechaResolucionCAJG;
     Date fechaRatificacion;
@@ -23,33 +24,38 @@ public class ResolucionEJGItem {
 	String turnadoRatificacion;
 	String requiereNotificarProc;
 	String notasCAJG;
+	Short anio;
+	Long numero;
+	Short idInstitucion;
+	Short idTipoEJG;
+	String docResolucion;
 	
 	/**
 	 **/
-	public ResolucionEJGItem idActa(String idActa) {
+	public ResolucionEJGItem idActa(Long idActa) {
 		this.idActa = idActa;
 		return this;
 	}
 
 	@JsonProperty("idActa")
-	public String getIdActa() {
+	public Long getIdActa() {
 		return idActa;
 	}
-	public void setIdActa(String idActa) {
+	public void setIdActa(Long idActa) {
 		this.idActa = idActa;
 	}
 	/**
 	 **/
-	public ResolucionEJGItem annioActa(String annioActa) {
+	public ResolucionEJGItem annioActa(Short annioActa) {
 		this.annioActa = annioActa;
 		return this;
 	}
 
 	@JsonProperty("annioActa")
-	public String getAnnioActa() {
+	public Short getAnnioActa() {
 		return annioActa;
 	}
-	public void setAnnioActa(String annioActa) {
+	public void setAnnioActa(Short annioActa) {
 		this.annioActa = annioActa;
 	}
 	/**
@@ -68,30 +74,30 @@ public class ResolucionEJGItem {
 	}
 	/**
 	 **/
-	public ResolucionEJGItem idTiporatificacionEJG(String idTiporatificacionEJG) {
+	public ResolucionEJGItem idTiporatificacionEJG(Short idTiporatificacionEJG) {
 		this.idTiporatificacionEJG = idTiporatificacionEJG;
 		return this;
 	}
 
 	@JsonProperty("idTiporatificacionEJG")
-	public String getIdTiporatificacionEJG() {
+	public Short getIdTiporatificacionEJG() {
 		return idTiporatificacionEJG;
 	}
-	public void setIdTiporatificacionEJG(String idTiporatificacionEJG) {
+	public void setIdTiporatificacionEJG(Short idTiporatificacionEJG) {
 		this.idTiporatificacionEJG = idTiporatificacionEJG;
 	}
 	/**
 	 **/
-	public ResolucionEJGItem idFundamentoJuridico(String idFundamentoJuridico) {
+	public ResolucionEJGItem idFundamentoJuridico(Short idFundamentoJuridico) {
 		this.idFundamentoJuridico = idFundamentoJuridico;
 		return this;
 	}
 
 	@JsonProperty("idFundamentoJuridico")
-	public String getIdFundamentoJuridico() {
+	public Short getIdFundamentoJuridico() {
 		return idFundamentoJuridico;
 	}
-	public void setIdFundamentoJuridico(String idFundamentoJuridico) {
+	public void setIdFundamentoJuridico(Short idFundamentoJuridico) {
 		this.idFundamentoJuridico = idFundamentoJuridico;
 	}
 	/**
@@ -110,30 +116,30 @@ public class ResolucionEJGItem {
 	}
 	/**
 	 **/
-	public ResolucionEJGItem idOrigencajg(String idOrigencajg) {
+	public ResolucionEJGItem idOrigencajg(Short idOrigencajg) {
 		this.idOrigencajg = idOrigencajg;
 		return this;
 	}
 
 	@JsonProperty("idOrigencajg")
-	public String getIdOrigencajg() {
+	public Short getIdOrigencajg() {
 		return idOrigencajg;
 	}
-	public void setIdOrigencajg(String idOrigencajg) {
+	public void setIdOrigencajg(Short idOrigencajg) {
 		this.idOrigencajg = idOrigencajg;
 	}
 	/**
 	 **/
-	public ResolucionEJGItem anioCAJG(String anioCAJG) {
+	public ResolucionEJGItem anioCAJG(Short anioCAJG) {
 		this.anioCAJG = anioCAJG;
 		return this;
 	}
 
 	@JsonProperty("anioCAJG")
-	public String getAnioCAJG() {
+	public Short getAnioCAJG() {
 		return anioCAJG;
 	}
-	public void setAnioCAJG(String anioCAJG) {
+	public void setAnioCAJG(Short anioCAJG) {
 		this.anioCAJG = anioCAJG;
 	}
 	/**
@@ -152,16 +158,16 @@ public class ResolucionEJGItem {
 	}
 	/**
 	 **/
-	public ResolucionEJGItem idPonente(String idPonente) {
+	public ResolucionEJGItem idPonente(Integer idPonente) {
 		this.idPonente = idPonente;
 		return this;
 	}
 
 	@JsonProperty("idPonente")
-	public String getIdPonente() {
+	public Integer getIdPonente() {
 		return idPonente;
 	}
-	public void setIdPonente(String idPonente) {
+	public void setIdPonente(Integer idPonente) {
 		this.idPonente = idPonente;
 	}
 	/**
@@ -194,6 +200,15 @@ public class ResolucionEJGItem {
 	}
 	/**
 	 **/
+	@JsonProperty("tipoResolucionCAJG")
+	public String getTipoResolucionCAJG() {
+		return tipoResolucionCAJG;
+	}
+
+	public void setTipoResolucionCAJG(String tipoResolucionCAJG) {
+		this.tipoResolucionCAJG = tipoResolucionCAJG;
+	}
+	
 	public ResolucionEJGItem fechaRatificacion(Date fechaRatificacion) {
 		this.fechaRatificacion = fechaRatificacion;
 		return this;
@@ -276,6 +291,49 @@ public class ResolucionEJGItem {
 	public void setNotasCAJG(String notasCAJG) {
 		this.notasCAJG = notasCAJG;
 	}
+
+	@JsonProperty("anio")
+	public Short getAnio() {
+		return anio;
+	}
+
+	public void setAnio(Short anio) {
+		this.anio = anio;
+	}
+
+	@JsonProperty("numero")
+	public Long getNumero() {
+		return numero;
+	}
+
+	public void setNumero(Long numero) {
+		this.numero = numero;
+	}
+
+	@JsonProperty("idInstitucion")
+	public Short getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setIdInstitucion(Short idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+
+	@JsonProperty("idTipoEJG")
+	public Short getIdTipoEJG() {
+		return idTipoEJG;
+	}
+
+	public void setIdTipoEJG(Short idTipoEJG) {
+		this.idTipoEJG = idTipoEJG;
+	}
 	
-	
+	@JsonProperty("docResolucion")
+	public String getDocResolucion() {
+		return docResolucion;
+	}
+
+	public void setDocResolucion(String docResolucion) {
+		this.docResolucion = docResolucion;
+	}
 }

@@ -76,6 +76,9 @@ public class ScsFundamentoscalificacionSqlExtendsProvider extends ScsTipofundame
 		sql.FROM("SCS_TIPOFUNDAMENTOCALIF");
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
 		
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoFundamento on catalogoFundamento.idrecurso = fundamento.DESCRIPCION and catalogoFundamento.idlenguaje ="+idLenguaje);
+		sql.WHERE("fundamento.fecha_baja is null and fundamento.idinstitucion  = '"+ idInstitucion +"'");
+		sql.WHERE("catalogoFundamento.descripcion is not null");
 		return sql.toString();
 	}
 

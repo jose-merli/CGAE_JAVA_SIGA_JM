@@ -21,8 +21,10 @@ import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
+import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
+import org.itcgae.siga.DTOs.scs.ListDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaInteresadoJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ListaLetradosDesignaItem;
@@ -34,6 +36,7 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -133,13 +136,11 @@ public interface IDesignacionesService {
 	
 	public ProcuradorDTO compruebaProcurador(String procurador, HttpServletRequest request);
 	
-	public ProcuradorDTO compruebaFechaProcurador(List<String> procurador, HttpServletRequest request);
+	public ProcuradorDTO compruebaFechaProcurador(ProcuradorItem procurador, HttpServletRequest request);
 
 	ComboDTO comboTipoMotivo(HttpServletRequest request);
 
-	public UpdateResponseDTO guardarProcurador(List<String> procurador, HttpServletRequest request);
-
-	InsertResponseDTO nuevoProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
+	public InsertResponseDTO guardarProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
 	
 	public DesignaItem existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request);
 
@@ -169,7 +170,7 @@ public interface IDesignacionesService {
 
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
 			
-	public DeleteResponseDTO eliminarRelacion(RelacionesItem listaRelaciones, HttpServletRequest request);
+	public DeleteResponseDTO eliminarRelacion(List<String> datos, HttpServletRequest request);
 	
 	public EnviosMasivosDTO busquedaComunicaciones(List<String> comunicaciones, HttpServletRequest request);
 
@@ -205,15 +206,23 @@ public interface IDesignacionesService {
 	public ResponseEntity<InputStreamResource> descargarDocumentosDesigna(
 			List<DocumentoDesignaItem> listaDocumentoDesignaItem, HttpServletRequest request);
 
-	public UpdateResponseDTO actualizarProcurador(List<String> procuradorItem, HttpServletRequest request);
-
 	public InsertResponseDTO asociarEjgDesigna(List<String> item, HttpServletRequest request);
-	
-	public UpdateResponseDTO guardarProcuradorEJG(List<String> procurador, HttpServletRequest request);
 	
 	public String busquedaJuzgadoDesignas(Integer idJuzgado, HttpServletRequest request);
 	
 	public UpdateResponseDTO actualizarPartidaPresupuestariaActDesigna(ActuacionDesignaItem actuacionDesignaItem,
 			HttpServletRequest request);
+	
+	public ListDTO getDelitos(DesignaItem designaItem, HttpServletRequest request);
+
+	InsertResponseDTO getPreDesignaEJG(ScsEjgdesigna item, HttpServletRequest request) throws Exception;
+
+	EjgDesignaDTO getEjgDesigna(DesignaItem datos, HttpServletRequest request);
+
+	UpdateResponseDTO guardarProcuradorEJG(ProcuradorItem procurador, HttpServletRequest request);
+
+	public UpdateResponseDTO asociarAsistenciaDesigna(List<String> designaItem, HttpServletRequest request);
+	
+	UpdateResponseDTO eliminarRelacionAsistenciaDesigna(RelacionesItem datos, HttpServletRequest request);
 	
 }
