@@ -467,7 +467,7 @@ public class Validaciones {
 		}
 		
 		// Comprueba que tenga una provincia válida
-		if (direccion.getProvincia() != null &&
+		if (direccion.getProvincia() == null ||
 			!validaProvincia(direccion.getProvincia())) {
 			return false;
 		}
@@ -649,7 +649,7 @@ public class Validaciones {
 	private static boolean validaProvincia(Provincia provincia) {
 		
 		// Comprueba que el codigo de provincia sean 2 caracteres
-		if (provincia.getCodigoProvincia() != null &&
+		if (provincia.getCodigoProvincia() == null ||
 			provincia.getCodigoProvincia().length() != 2) {
 			return false;
 		}
