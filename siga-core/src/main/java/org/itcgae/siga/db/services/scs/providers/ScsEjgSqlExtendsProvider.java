@@ -1245,6 +1245,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
                 + "(" + sqlSOJ_4.toString() + ") interesado," + "NULL dilnigproc," + "NULL resolucion");
 
+        sqlSOJ.SELECT("scs_soj.IDPERSONAJG");
+
         sqlSOJ.FROM("scs_soj");
         sqlSOJ.WHERE("ejganio = " + item.getAnnio());
         sqlSOJ.WHERE("ejgnumero = " + item.getNumero());
