@@ -110,6 +110,11 @@ public class SigaConstants {
 	public static final String ALIASCORREO = "CORREOELECTRONICO";
 	public static final String ALIASDOMICILIO = "DOMICILIO";
 	public static final String ALIASMOVIL = "MOVIL";
+	public static final String ALIASCODIGOPOSTAL = "CODIGOPOSTAL";
+	public static final String ALIASIDPAIS = "IDPAIS";
+	public static final String ALIASIDPOBLACION = "IDPOBLACION";
+	public static final String ALIASIDPROVINCIA = "IDPROVINCIA";
+	public static final String ALIASPOBLACIONEXTRANJERA = "POBLACIONEXTRANJERA";
 	
 	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
 	public static final long ID_OBJETIVO_DESTINATARIOS = 1;
