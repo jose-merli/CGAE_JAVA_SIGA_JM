@@ -5855,23 +5855,23 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
     private void insertAuditoriaEJG(String campo, String valorPre, String valorPost, AdmUsuarios usuario, ScsEjg item) {
 
-        ScsAuditoriaejg entradaAuditoriaEjg = new ScsAuditoriaejg();
-
-        entradaAuditoriaEjg.setIdinstitucion(item.getIdinstitucion());
-        entradaAuditoriaEjg.setAnio(item.getAnio());
-        entradaAuditoriaEjg.setNumero(item.getNumero());
-        entradaAuditoriaEjg.setIdtipoejg(item.getIdtipoejg());
-
-        entradaAuditoriaEjg.setCampo(campo);
-        entradaAuditoriaEjg.setValorpre(valorPre);
-        entradaAuditoriaEjg.setValorpost(valorPost);
-        // Revisar que se esta asignando la hora correctamente
-        entradaAuditoriaEjg.setFechahoracambio(new Date());
-
-        entradaAuditoriaEjg.setFechamodificacion(new Date());
-        entradaAuditoriaEjg.setUsumodificacion(usuario.getIdusuario());
-
-        int response = scsAuditoriaejgMapper.insert(entradaAuditoriaEjg);
+//        ScsAuditoriaejg entradaAuditoriaEjg = new ScsAuditoriaejg();
+//
+//        entradaAuditoriaEjg.setIdinstitucion(item.getIdinstitucion());
+//        entradaAuditoriaEjg.setAnio(item.getAnio());
+//        entradaAuditoriaEjg.setNumero(item.getNumero());
+//        entradaAuditoriaEjg.setIdtipoejg(item.getIdtipoejg());
+//
+//        entradaAuditoriaEjg.setCampo(campo);
+//        entradaAuditoriaEjg.setValorpre(valorPre);
+//        entradaAuditoriaEjg.setValorpost(valorPost);
+//        // Revisar que se esta asignando la hora correctamente
+//        entradaAuditoriaEjg.setFechahoracambio(new Date());
+//
+//        entradaAuditoriaEjg.setFechamodificacion(new Date());
+//        entradaAuditoriaEjg.setUsumodificacion(usuario.getIdusuario());
+//
+//        int response = scsAuditoriaejgMapper.insert(entradaAuditoriaEjg);
     }
 
     private String getDescripcionEjg(ScsEjg ejbAnterior, ScsEjg ejgNuevo, String accion) {
