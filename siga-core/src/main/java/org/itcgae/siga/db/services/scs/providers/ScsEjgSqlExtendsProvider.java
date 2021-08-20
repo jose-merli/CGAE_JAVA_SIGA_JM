@@ -1193,6 +1193,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + sqlAsistencia_1.toString() + ") nombreletrado," + "(" + sqlAsistencia_4.toString() + ") interesado,"
                 + "nvl( numerodiligencia, 'Sin número' ) || ' / ' || nvl( numeroprocedimiento,'Sin número' ) dilnigproc,"
                 + "NULL resolucion");
+        sqlAsistencia.SELECT("NULL IDPERSONAJG");
 
         sqlAsistencia.FROM("scs_asistencia");
         sqlAsistencia.WHERE("ejganio = " + item.getAnnio());
@@ -1331,6 +1332,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + "nvl( numerodiligencia,'Sin número') || ' / ' || nvl( numeroprocedimiento,'Sin número') dilnigproc,"
                 + " f_siga_getrecurso(res.descripcion,1) resolucion");
 
+        sqlDesigna.SELECT("NULL IDPERSONAJG");
+
         sqlDesigna.FROM("scs_ejg ejg "
                 + "LEFT OUTER JOIN scs_tiporesolucion res ON ejg.idtiporatificacionejg = res.idtiporesolucion,"
                 + " scs_ejgdesigna ejgd");
@@ -1355,6 +1358,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + "( per.apellidos1 || ' ' || per.apellidos2 || ',' || per.nombre) nombreletrado,"
 
                 + "NULL interesado," + "NULL dilnigproc," + "exp.DESCRIPCIONRESOLUCION resolucion");
+
+        sqlExpediente.SELECT("NULL IDPERSONAJG");
 
         sqlExpediente.FROM("   exp_expediente exp," + "            exp_denunciado den," + "            cen_persona per,"
                 + "            exp_tipoexpediente ext");
