@@ -85,6 +85,8 @@ public class SigaConstants {
 	public static String SI = "SI";
 	public static String NO = "NO";
 	
+	public static String minutosRevisionEnviosProcesando = "minutos.revision.envios.procesando"; 
+	
 	// Para la busqueda de criterios dinamicos de las consultas
 	public static final String TIPONUMERO	= "N";
 	public static final String TIPOTEXTO	= "A";
@@ -110,6 +112,11 @@ public class SigaConstants {
 	public static final String ALIASCORREO = "CORREOELECTRONICO";
 	public static final String ALIASDOMICILIO = "DOMICILIO";
 	public static final String ALIASMOVIL = "MOVIL";
+	public static final String ALIASCODIGOPOSTAL = "CODIGOPOSTAL";
+	public static final String ALIASIDPAIS = "IDPAIS";
+	public static final String ALIASIDPOBLACION = "IDPOBLACION";
+	public static final String ALIASIDPROVINCIA = "IDPROVINCIA";
+	public static final String ALIASPOBLACIONEXTRANJERA = "POBLACIONEXTRANJERA";
 	
 	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
 	public static final long ID_OBJETIVO_DESTINATARIOS = 1;
@@ -1026,7 +1033,12 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static Integer USUMODIFICACION_0 = 0;
 	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
 	
+<<<<<<< HEAD
 	public static String SIGAFRONT_VERSION = "202106251500";
 	public static String SIGAWEB_VERSION = "1.0.71_5";
+=======
+	public static String SIGAFRONT_VERSION = "202105071500";
+	public static String SIGAWEB_VERSION = "1.0.71_7";
+>>>>>>> incidencias
 	
 }

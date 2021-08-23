@@ -647,15 +647,19 @@ public class WSCommons {
 						if(regSociedad.getIdentificacionNotario()!=null){
 							if (Validaciones.validaNIE(regSociedad.getIdentificacionNotario())){
 								identificacion.setNIE(regSociedad.getIdentificacionNotario());
-							} else {
+							} else if (Validaciones.validaNIF(regSociedad.getIdentificacionNotario())) {
 								identificacion.setNIF(regSociedad.getIdentificacionNotario());
 							}
 							argNotario.setApellido1(regSociedad.getApellido1Notario());
 							argNotario.setApellido2(regSociedad.getApellido2Notario());
 							argNotario.setNombre(regSociedad.getNombreNotario());
 						}
-						if(identificacion.getNIF() != null || identificacion.getNIE() != null) {
-							if(!identificacion.getNIF().isEmpty() || !identificacion.getNIE().isEmpty()) {
+						if(identificacion.getNIF() != null) {
+							if(!identificacion.getNIF().isEmpty()) {
+								argNotario.setIdentificacion(identificacion);
+							}
+						} else if (identificacion.getNIE() != null) {
+							if(!identificacion.getNIE().isEmpty()) {
 								argNotario.setIdentificacion(identificacion);
 							}
 						}
@@ -785,12 +789,22 @@ public class WSCommons {
 									datosPersona.setApellido1(integrante.getApellidos1());
 									datosPersona.setApellido2(integrante.getApellidos2());
 									datosPersona.setNombre(integrante.getNombre());
+									// Nos aseguramos que no se utilice la identificación del integrante anterior
+									identificacion = Identificacion.Factory.newInstance();
+									/* Si el integrante no tiene NIF ni NIE, no se le añade la identificación
+									 * NOTA IMPORTANTE: Para un profesionalAbogadoPropio SI es necesaria la identificación
+									 * independientemente de su tipo de documento, por tanto, si el integrante
+									 * es profesionalAbogadoPropio y no tiene NIF ni NIE, se deberá devolver como
+									 * profesionalAbogado
+									 */
 									if ("NIE".equals(integrante.getTipoIdentificacion())){
 										identificacion.setNIE(integrante.getNifCif());
-									} else {
+										datosPersona.setIdentificacion(identificacion);
+									} else if ("NIF".equals(integrante.getTipoIdentificacion()) ||
+											   "CIF".equals(integrante.getTipoIdentificacion())) {
 										identificacion.setNIF(integrante.getNifCif());
+										datosPersona.setIdentificacion(identificacion);
 									}
-									datosPersona.setIdentificacion(identificacion);
 									integranteFisico.setDatosPersona(datosPersona);
 									DatosProfesional datosProfesional = DatosProfesional.Factory.newInstance();
 									Colegio colegio = Colegio.Factory.newInstance();

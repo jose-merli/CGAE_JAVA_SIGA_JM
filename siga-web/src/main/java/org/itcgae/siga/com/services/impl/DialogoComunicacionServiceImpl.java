@@ -1824,6 +1824,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									destinatario.setFechamodificacion(new Date());
 									destinatario.setUsumodificacion(usuario.getIdusuario());
 									destinatario.setTipodestinatario(SigaConstants.TIPO_CEN_PERSONA);
+									destinatario.setDomicilio(dest.getDomicilio());
+									destinatario.setCodigopostal(dest.getCodigoPostal());
+									destinatario.setIdpais(dest.getIdPais());
+									destinatario.setIdpoblacion(dest.getIdPoblacion());
+									destinatario.setIdprovincia(dest.getIdProvincia());
+									destinatario.setPoblacionextranjera(dest.getPoblacionExtranjera());
 									_envDestinatariosMapper.insert(destinatario);
 
 								}
@@ -2381,6 +2387,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		Object correo = dest.get(SigaConstants.ALIASCORREO.trim());
 		Object movil = dest.get(SigaConstants.ALIASMOVIL.trim());
 		Object domicilio = dest.get(SigaConstants.ALIASDOMICILIO.trim());
+		Object codigoPostal = dest.get(SigaConstants.ALIASCODIGOPOSTAL.trim());
+		Object idPais = dest.get(SigaConstants.ALIASIDPAIS.trim());
+		Object idPoblacion = dest.get(SigaConstants.ALIASIDPOBLACION.trim());
+		Object idProvincia= dest.get(SigaConstants.ALIASIDPROVINCIA.trim());
+		Object poblacionExtranjera= dest.get(SigaConstants.ALIASPOBLACIONEXTRANJERA.trim());
 		
 		CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona.toString()));
 		
@@ -2397,6 +2408,24 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		}
 		if(movil != null){
 			destinatario.setMovil(movil.toString());
+		}
+		if(domicilio != null){
+			destinatario.setDomicilio(domicilio.toString());
+		}
+		if(codigoPostal != null){
+			destinatario.setCodigoPostal(codigoPostal.toString());
+		}
+		if(idPais != null){
+			destinatario.setIdPais(idPais.toString());
+		}
+		if(idPoblacion != null){
+			destinatario.setIdPoblacion(idPoblacion.toString());
+		}
+		if(idProvincia != null){
+			destinatario.setIdProvincia(idProvincia.toString());
+		}
+		if(poblacionExtranjera != null){
+			destinatario.setPoblacionExtranjera(poblacionExtranjera.toString());
 		}
 		return destinatario;
 	}
