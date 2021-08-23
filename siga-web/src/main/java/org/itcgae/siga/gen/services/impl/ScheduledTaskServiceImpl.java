@@ -3,6 +3,7 @@ package org.itcgae.siga.gen.services.impl;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.age.service.IFichaEventosService;
 import org.itcgae.siga.cen.services.IBusquedaSancionesService;
+import org.itcgae.siga.com.services.IProcesaEnviosAntiguosService;
 import org.itcgae.siga.form.services.IFichaCursosService;
 import org.itcgae.siga.gen.services.IScheduledTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 	
 	@Autowired
 	private IBusquedaSancionesService busquedaSancionesService;
+	
+	@Autowired
+	private IProcesaEnviosAntiguosService procesaEnviosAntiguosService;
 	
 	@Scheduled(cron = "${cron.pattern.scheduled.forCurso}")
 	@Override
@@ -65,5 +69,13 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 	//	LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> ENTRA generateNotificationAuto");
 		fichaEventosService.generateNotificationsAuto();
 		//LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> SALE generateNotificationAuto");
+	}
+	
+	@Scheduled(cron = "${cron.pattern.scheduled.forEnviosInutilizables}") 
+	@Override
+	public void comprobarEnviosAntiguos() {
+		//LOGGER.info("ScheduledTaskServiceImpl --> comprobarEnviosAntiguos --> ENTRA compruebaEnviosAntiguos");
+		procesaEnviosAntiguosService.compruebaEnviosAntiguos();
+		//LOGGER.info("ScheduledTaskServiceImpl --> comprobarEnviosAntiguos --> SALE compruebaEnviosAntiguos");
 	}
 }

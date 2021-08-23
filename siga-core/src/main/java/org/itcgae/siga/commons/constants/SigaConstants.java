@@ -85,6 +85,8 @@ public class SigaConstants {
 	public static String SI = "SI";
 	public static String NO = "NO";
 	
+	public static String minutosRevisionEnviosProcesando = "minutos.revision.envios.procesando"; 
+	
 	// Para la busqueda de criterios dinamicos de las consultas
 	public static final String TIPONUMERO	= "N";
 	public static final String TIPOTEXTO	= "A";
@@ -1032,6 +1034,6 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static int ECOM_COLA_HORAS_EN_EJECUCION_MAXIMAS = 2;
 	
 	public static String SIGAFRONT_VERSION = "202105071500";
-	public static String SIGAWEB_VERSION = "1.0.73_1";
+	public static String SIGAWEB_VERSION = "1.0.71_7";
 	
 }
