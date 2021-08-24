@@ -64,6 +64,8 @@ import org.itcgae.siga.db.entities.EnvEnvioprogramado;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosExample;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModClasecomunicaciones;
@@ -478,8 +480,19 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				String idClaseComunicacion = dialogo.getIdClaseComunicacion();
 				
 				List<KeyItem> listaKey = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
-				
 								
+				EnvPlantillasenviosKey keyPlantilla = new EnvPlantillasenviosKey();
+				keyPlantilla.setIdplantillaenvios(Integer.parseInt(modelosComunicacionItem.getIdPlantillaEnvio()));
+				keyPlantilla.setIdtipoenvios(Short.parseShort(modelosComunicacionItem.getIdTipoEnvio()));
+				keyPlantilla.setIdinstitucion(Short.valueOf(dialogo.getIdInstitucion()));
+				EnvPlantillasenviosWithBLOBs plantilla = _envPlantillaEnviosExtendsMapper.selectByPrimaryKey(keyPlantilla);
+				
+				//Comprobamos si la plantilla especificada contiene remitente	
+				if(plantilla.getIdpersona() == null) {
+					String mensaje = "La plantilla especificada no tiene remitente"; 
+					LOGGER.warn(mensaje);
+					throw new BusinessException(mensaje);
+				}
 				
 				// Obtenemos la plantilla de envio seleccionada en el modelo
 				List<ConsultaItem> listaConsultasPlantillaEnvio = null;
