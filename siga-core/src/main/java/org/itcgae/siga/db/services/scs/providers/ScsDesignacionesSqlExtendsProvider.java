@@ -2726,7 +2726,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "            )\r\n"
 				+ "             || anio\r\n"
 				+ "             || '/'\r\n"
-				+ "             || TO_CHAR(numero) sjcs");
+				+ "             || TO_CHAR(numejg) sjcs");
 		sql5.SELECT(" e.idinstitucion");
 		sql5.SELECT(" e.anio");
 		sql5.SELECT(" e.numero");
