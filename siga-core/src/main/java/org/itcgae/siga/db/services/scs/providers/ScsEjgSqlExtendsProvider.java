@@ -1545,5 +1545,13 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
         return sql.toString();
     }
+    
+    public String getIdEcomCola() {
+        SQL sql = new SQL();
 
+        sql.SELECT("SEQ_ECOM_COLA.CURRVAL");
+        sql.FROM("DUAL");
+
+        return sql.toString();
+    }
 }
