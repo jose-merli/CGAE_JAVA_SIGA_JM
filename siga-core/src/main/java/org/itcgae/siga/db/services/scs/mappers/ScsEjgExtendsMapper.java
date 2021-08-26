@@ -312,4 +312,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgResolDev")
 	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
 	String getObservacionEstadoEjgResolDev(String idLenguaje);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getIdEcomCola")
+	int getIdEcomCola();
 }
