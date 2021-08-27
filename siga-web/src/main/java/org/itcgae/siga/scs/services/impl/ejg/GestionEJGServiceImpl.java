@@ -1071,7 +1071,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
     @Override
     public ResolucionEJGItem getResolucion(EjgItem ejgItem, HttpServletRequest request) {
-        // TODO Auto-generated method stub
+
         LOGGER.info("getResolucion() -> Entrada al servicio para obtener el colegiado");
         ResolucionEJGItem resolucion = new ResolucionEJGItem();
         String token = request.getHeader("Authorization");
@@ -4134,7 +4134,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
     @Override
     @Transactional
     public InsertResponseDTO crearDocumentacionEjg(EjgDocumentacionItem documentacionEjgItem,
-                                                   HttpServletRequest request) {
+                                                   HttpServletRequest request) throws Exception {
 
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -4142,8 +4142,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         Error error = new Error();
         int response = 1;
-
-        try {
+        //Se comentan el try y el catch para que @Transactional funcione adecuadamente
+//        try {
 
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
             exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -4211,26 +4211,30 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                             nuevoId = scsEjgExtendsMapper.getNewIdDocumentacionEjg(idInstitucion);
                             scsDocumentacionejg.setIddocumentacion(Integer.valueOf(nuevoId.getIdMax().toString()));
                             response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
+                            if (response == 0)
+                                throw (new Exception("Error al introducir la nueva documentación en el EJG"));
                         }
                     }
                 } else {
                     scsDocumentacionejg.setIddocumento(Short.valueOf(documentacionEjgItem.getIdDocumento()));
                     response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
+                    if (response == 0)
+                        throw (new Exception("Error al introducir la nueva documentación en el EJG"));
                 }
 
             }
 
-        } catch (Exception e) {
-            LOGGER.error(
-                    "GestionEJGServiceImpl.crearDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg",
-                    e);
-            error.setCode(500);
-            error.setDescription("general.mensaje.error.bbdd");
-            error.setMessage(e.getMessage());
-            insertResponseDTO.setError(error);
-            insertResponseDTO.setStatus(SigaConstants.KO);
-            response = 0;
-        }
+//        } catch (Exception e) {
+//            LOGGER.error(
+//                    "GestionEJGServiceImpl.crearDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg",
+//                    e);
+//            error.setCode(500);
+//            error.setDescription("general.mensaje.error.bbdd");
+//            error.setMessage(e.getMessage());
+//            insertResponseDTO.setError(error);
+//            insertResponseDTO.setStatus(SigaConstants.KO);
+//            response = 0;
+//        }
 
         if (response == 1) {
             insertResponseDTO.setStatus(SigaConstants.OK);
@@ -4546,21 +4550,41 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 String extension = FilenameUtils.getExtension(nombreFichero);
 
                 String idDocumentacion = request.getParameter("idPersona");
-
-                Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-                        nombreFichero, extension);
-
+                
                 // Actualizamos la documentacion modificada
                 ScsDocumentacionejg scsDocumentacionejg = new ScsDocumentacionejg();
 
                 scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
                 scsDocumentacionejg.setFechamodificacion(new Date());
                 scsDocumentacionejg.setIdinstitucion(idInstitucion);
-                scsDocumentacionejg.setIdfichero(idFile);
-                scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDocumentacion));
                 scsDocumentacionejg.setNombrefichero(nombreFichero);
+                
+                //En el caso que se haya seleccionado "Todos" en el desplegable "Documento",
+                //se pasan varios idDocumentacion y se introduce el fichero en cada uno de ellos
+                if (idDocumentacion.contains(",")) {
+                	String[] documentaciones = idDocumentacion.split(",");
+                	for(String idDoc:documentaciones) {
+                		//Se introduce el fichero varias veces para que si se se borra en una de las documentaciones,
+                		//el resto no se vean afectadas
+	                	Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+	                            nombreFichero, extension);
+	                    
+	                    scsDocumentacionejg.setIdfichero(idFile);
+	                    scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDoc));
+	                    
+	                    response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
+                	}
+                } else {
+                	Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+                            nombreFichero, extension);
+                    
+                    scsDocumentacionejg.setIdfichero(idFile);
+                    scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDocumentacion));
+                    
+                    response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
+                }
 
-                response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
+                
 
             }
         } catch (Exception e) {

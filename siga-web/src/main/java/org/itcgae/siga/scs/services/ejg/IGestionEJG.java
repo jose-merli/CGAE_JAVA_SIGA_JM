@@ -143,9 +143,9 @@ public interface IGestionEJG {
 
 	ComboDTO comboDocumentos(String idTipoDocumentacion, HttpServletRequest request);
 
-	InsertResponseDTO subirDocumentoEjg(MultipartHttpServletRequest request);
+	InsertResponseDTO subirDocumentoEjg(MultipartHttpServletRequest request) throws Exception;
 
-	InsertResponseDTO crearDocumentacionEjg(EjgDocumentacionItem documentacionEjgItem, HttpServletRequest request);
+	InsertResponseDTO crearDocumentacionEjg(EjgDocumentacionItem documentacionEjgItem, HttpServletRequest request) throws Exception;
 
 	UpdateResponseDTO actualizarDocumentacionEjg(EjgDocumentacionItem documentoEjgItem, HttpServletRequest request);
 

@@ -669,7 +669,7 @@ public class EjgController {
 	}
 
 	@RequestMapping(value = "/gestion-ejg/subirDocumentoEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<InsertResponseDTO> subirDocumentoEjg(MultipartHttpServletRequest request) {
+	ResponseEntity<InsertResponseDTO> subirDocumentoEjg(MultipartHttpServletRequest request) throws Exception {
 		InsertResponseDTO response = gestionEJG.subirDocumentoEjg(request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
@@ -679,7 +679,7 @@ public class EjgController {
 
 	@RequestMapping(value = "/gestion-ejg/crearDocumentacionEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> crearDocumentacionEjg(@RequestBody EjgDocumentacionItem documentoEjgItem,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws Exception {
 		InsertResponseDTO response = gestionEJG.crearDocumentacionEjg(documentoEjgItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
