@@ -2479,7 +2479,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 if (nuevo)
                     response = scsEjgResolucionMapper.insertSelective(ejgResolucion);
                 else
-                    response = scsEjgResolucionMapper.updateByPrimaryKey(ejgResolucion);
+                    response = scsEjgResolucionMapper.updateByPrimaryKeyWithBLOBs(ejgResolucion);
                 if (response == 0)
                     throw (new Exception("Error al insertar o actualizar la parte de la resolucion asociada al EJG"));
 
@@ -2911,7 +2911,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     record.setJuzgado(Long.parseLong(datos.getJuzgado()));
                 else
                     record.setJuzgado(null);
-                record.setIdpretension(datos.getIdPretension());
+                record.setIdpretension( datos.getIdPretension());
                 record.setObservaciones(datos.getObservaciones());
                 record.setDelitos(datos.getDelitos());
 
