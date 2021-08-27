@@ -2217,33 +2217,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 record.setNumero(Long.parseLong(datos.getNumero()));
                 record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
 
-                if (record.getIdestadoejg() != Short.parseShort(datos.getIdEstadoejg())) {
-                    GenRecursosCatalogosKey oldLabelRecursoKey = new GenRecursosCatalogosKey();
-
-                    oldLabelRecursoKey.setIdlenguaje(usuarios.get(0).getIdlenguaje());
-                    oldLabelRecursoKey.setIdrecurso(labelEstado.getDescripcion());
-
-                    GenRecursosCatalogos oldLabelRecurso = genRecursosCatalogosMapper
-                            .selectByPrimaryKey(labelRecursoKey);
-
-                    insertAuditoriaEJG("Estado Actualizado (Tipo estado)", oldLabelRecurso.getDescripcion(),
-                            labelRecurso.getDescripcion(), usuarios.get(0), ejg);
-                    record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
-
-                }
-                if (record.getFechainicio() != datos.getFechaInicio()) {
-                    insertAuditoriaEJG("Estado Actualizado (FechaInicio)", record.getFechainicio().toString(),
-                            datos.getFechaInicio().toString(), usuarios.get(0), ejg);
-
-                    record.setFechainicio(datos.getFechaInicio());
-                }
-                if (record.getObservaciones() != datos.getObservaciones()) {
-                    insertAuditoriaEJG("Estado Actualizado (Observaciones)", record.getObservaciones().toString(),
-                            datos.getObservaciones().toString(), usuarios.get(0), ejg);
-
-                    record.setObservaciones(datos.getObservaciones());
-                }
-
+                record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
+                record.setFechainicio(datos.getFechaInicio());
+                record.setObservaciones(datos.getObservaciones());
+                
                 record.setFechamodificacion(new Date());
                 record.setUsumodificacion(usuarios.get(0).getIdusuario());
                 record.setIdestadoporejg(Long.parseLong(datos.getIdestadoporejg()));
@@ -2502,7 +2479,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 if (nuevo)
                     response = scsEjgResolucionMapper.insertSelective(ejgResolucion);
                 else
-                    response = scsEjgResolucionMapper.updateByPrimaryKey(ejgResolucion);
+                    response = scsEjgResolucionMapper.updateByPrimaryKeyWithBLOBs(ejgResolucion);
                 if (response == 0)
                     throw (new Exception("Error al insertar o actualizar la parte de la resolucion asociada al EJG"));
 
@@ -2934,7 +2911,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     record.setJuzgado(Long.parseLong(datos.getJuzgado()));
                 else
                     record.setJuzgado(null);
-                record.setIdpretension(datos.getIdPretension());
+                record.setIdpretension( datos.getIdPretension());
                 record.setObservaciones(datos.getObservaciones());
                 record.setDelitos(datos.getDelitos());
 
