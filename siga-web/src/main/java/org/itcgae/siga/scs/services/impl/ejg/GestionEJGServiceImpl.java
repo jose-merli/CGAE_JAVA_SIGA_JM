@@ -5190,11 +5190,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			docushareDTO.setDocuShareObjectVO(docus);
 			docushareDTO.setIdentificadorDS(identificadorDS);
 		}
-        identificadorDS = ejg.getIdentificadords();
-
-        List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, "");
-        docushareDTO.setDocuShareObjectVO(docus);
-
         return docushareDTO;
     }
 
