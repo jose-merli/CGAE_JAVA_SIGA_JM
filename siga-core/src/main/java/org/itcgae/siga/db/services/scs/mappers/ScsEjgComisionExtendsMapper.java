@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsEjgComisionSqlExtendsProvider;
@@ -116,19 +115,5 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 			@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboPresidente(String string);
 
-	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "busquedaActas")
-	@Results({
-
-			@Result(column = "IDACTA", property = "idActa", jdbcType = JdbcType.NUMERIC),
-			//@Result(column = "IDINSTITUCION", property = "institucion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NUMEROACTA", property = "numeroActa", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHARESOLUCION", property = "fechaResolucion", jdbcType = JdbcType.DATE),
-			@Result(column = "FECHAREUNION", property = "fechaReunion", jdbcType = JdbcType.DATE),
-			@Result(column = "IDPRESIDENTE", property = "idPresidente", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "IDSECRETARIO", property = "idSecretario", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "NOMBREPRESIDENTE", property = "nombrePresidente", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBRESECRETARIO", property = "nombreSecretario", jdbcType = JdbcType.VARCHAR)
-
-	})
-	List<ActasItem> busquedaActas(ActasItem actasItem, Short idInstitucion);
+	
 }

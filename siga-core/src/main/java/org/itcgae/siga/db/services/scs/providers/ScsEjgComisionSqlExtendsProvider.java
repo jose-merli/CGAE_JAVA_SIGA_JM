@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
@@ -31,62 +30,6 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sqlPresidente.FROM("scs_ponente pon");
 		LOGGER.info("*******************comboPresidente********************" + sqlPresidente.toString());
 		return sqlPresidente.toString();
-	}
-
-	public String busquedaActas(ActasItem actasItem, Short idInstitucion) {
-
-		String fechaReunion = "0";
-		String fechaResolucion = "0";
-		
-		if (actasItem.getFechaReunion() != null) {
-			fechaReunion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechaReunion());
-
-		}
-
-		if (actasItem.getFechaResolucion() != null) {
-			fechaResolucion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechaResolucion());
-		}
-		
-
-		SQL sql = new SQL();
-		sql.SELECT("ACT.IDACTA as IDACTA,ACT.IDINSTITUCION as IDINSTITUCION,ACT.ANIOACTA || '/' || ACT.NUMEROACTA as NUMEROACTA,ACT.FECHARESOLUCION as FECHARESOLUCION,"
-				+ "ACT.FECHAREUNION as FECHAREUNION, ACT.IDPRESIDENTE as IDPRESIDENTE, ACT.IDSECRETARIO as IDSECRETARIO,"
-				+ " f_siga_getrecurso(PRE.NOMBRE,1) AS NOMBREPRESIDENTE , f_siga_getrecurso(SEC.NOMBRE,1) AS NOMBRESECRETARIO   ");
-		sql.FROM("SCS_ACTACOMISION ACT, SCS_PONENTE PRE, SCS_PONENTE SEC");
-		//sql.WHERE("ACT.IDINSTITUCION like '" + idInstitucion + "'");
-		sql.WHERE("PRE.IDPONENTE (+) = ACT.IDPRESIDENTE");
-		sql.WHERE("PRE.IDINSTITUCION (+) = ACT.IDINSTITUCION");
-		sql.WHERE("SEC.IDPONENTE (+) = ACT.IDSECRETARIO");
-		sql.WHERE("SEC.IDINSTITUCION (+) = ACT.IDINSTITUCION");
-
-		if(actasItem.getAnio() != null) {
-			sql.WHERE("ACT.ANIOACTA='" + actasItem.getAnio() + "'");
-		}
-		
-		if(actasItem.getNumeroActa() != null) {
-			sql.WHERE("ACT.NUMEROACTA LIKE'" + actasItem.getNumeroActa() + "'");
-		}
-
-		if (fechaResolucion != "0") {
-			sql.WHERE("FECHARESOLUCION = '" + fechaResolucion + "'");
-		}
-		if (fechaReunion != "0") {
-			sql.WHERE("FECHAREUNION = '" + fechaReunion + "'");
-		}
-			
-		if (actasItem.getIdPresidente()!= null) {
-			sql.WHERE("ACT.IDPRESIDENTE ='" + actasItem.getIdPresidente() + "'");
-
-		}
-		
-		if (actasItem.getIdSecretario() != null) {
-			sql.WHERE("ACT.IDSECRETARIO'" + actasItem.getIdSecretario() + "'");
-		}
-		
-		//ORDER BY ACT.ANIOACTA DESC, TO_NUMBER(regexp_replace(NUMEROACTA, '\\D', '')) desc,NUMEROACTA desc;
-
-		LOGGER.info("*******************busquedaActas********************" + sql.toString());
-		return sql.toString();
 	}
 
 	public String comboAnioActa(Short idInstitucion) {
