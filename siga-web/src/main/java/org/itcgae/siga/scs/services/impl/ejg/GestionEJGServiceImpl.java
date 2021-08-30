@@ -5140,9 +5140,56 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         key.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
         key.setNumero(Long.valueOf(ejgItem.getNumero()));
 
-        ScsEjg config = scsEjgMapper.selectByPrimaryKey(key);
+        ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(key);
 
-        identificadorDS = config.getIdentificadords();
+        if (ejg.getIdentificadords() == null) {
+
+            // longitud maxima para num
+            GenParametrosExample genParametrosExample = new GenParametrosExample();
+            genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
+                    .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+            genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+            List<GenParametros> listParam = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+            String longitudEJG = listParam.get(0).getValor();
+
+            // Alteramos el numero para que todos los numeros de las carpetas de una
+            // institucion tengan la misma longitud.
+
+            String numero = ejgItem.getNumero();
+
+            int numCeros = Integer.parseInt(longitudEJG) - ejgItem.getNumero().length();
+
+            String ceros = "";
+            for (int i = 0; i < numCeros; i++) {
+                ceros += "0";
+            }
+
+            ceros += numero;
+
+            // Año EJG/Num EJG. Se realiza el proceso anterior para no utilizar numEjg ya que no es una clave unica
+            //y mantener el formato de DocuShare.
+            String title = ejgItem.getAnnio() + "/" + ceros;
+			LOGGER.debug("ValorEjgDocu : " + title);
+			identificadorDS = docushareHelper.buscaCollectionEjg(title, idInstitucion);
+			if (null != identificadorDS) {
+				ejg.setIdentificadords(identificadorDS);
+				scsEjgMapper.updateByPrimaryKey(ejg);
+			}
+		} else {
+			LOGGER.debug("IdentificadorDS : " + ejg.getIdentificadords());
+			identificadorDS = ejg.getIdentificadords();
+		}
+		LOGGER.debug("IdentificadorDS : " + identificadorDS);
+		// EJG - ALICANTE
+		// identificadorDS = "Collection-691";
+		if (identificadorDS != null) {
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, identificadorDS);
+			docushareDTO.setDocuShareObjectVO(docus);
+			docushareDTO.setIdentificadorDS(identificadorDS);
+		}
+        identificadorDS = ejg.getIdentificadords();
 
         List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, "");
         docushareDTO.setDocuShareObjectVO(docus);
@@ -5200,10 +5247,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
                 ceros += numero;
 
-                // Año EJG/Num EJG
-                String carpeta = ejgItem.getAnnio() + "/" + ceros;
+                // Año EJG/Num EJG. Se realiza el proceso anterior para no utilizar numEjg ya que no es una clave unica
+                //y mantener el formato de DocuShare.
+                String title = ejgItem.getAnnio() + "/" + ceros;
 
-                idDS = docushareHelper.createCollectionEjg(idInstitucion, carpeta, "");
+                idDS = docushareHelper.createCollectionEjg(idInstitucion, title, "");
+                
+                LOGGER.info(
+                        "insertCollectionEjg() / docushareHelper.createCollectionEjg() -> Valor de idDS obtenido: "+idDS);
+
 
                 ScsEjgKey key = new ScsEjgKey();
 
@@ -5233,7 +5285,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         LOGGER.info("insertCollectionEjg() -> Salida al servicio para la insertar una nueva colección");
 
         return idDS;
-
     }
 
     public int triggersEjgUpdatesFApertura(EjgItem ejgItem, AdmUsuarios usuario, short idInstitucion) throws Exception {
