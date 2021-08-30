@@ -31,6 +31,63 @@ public class InscripcionGuardiaItem {
 	private Date fechadenegacion;
 	private String observacionesdenegacion;
 	private String observacionesvalbaja;
+	// Atributos calculados
+	private String	estado;
+	private String idInstitucion;
+	
+	public InscripcionGuardiaItem(String numeroGrupo, String idGrupoGuardiaColegiado, String orden, String nColegiado,
+			String fechaValidacion, String fechabaja, String compensaciones, String saltos, String apellido1,
+			String apellido2, String nombre, String idPersona, String ordenCola, String idTurno, String idGuardia,
+			String idGrupoGuardia, Date fechaSuscripcion, Date fechamodificacion, Integer usumodificacion,
+			String observacionessuscripcion, String observacionesbaja, Date fechasolicitudbaja, Date fechavalidacion2,
+			String observacionesvalidacion, Date fechadenegacion, String observacionesdenegacion,
+			String observacionesvalbaja) {
+		super();
+		this.numeroGrupo = numeroGrupo;
+		this.idGrupoGuardiaColegiado = idGrupoGuardiaColegiado;
+		this.orden = orden;
+		this.nColegiado = nColegiado;
+		this.fechaValidacion = fechaValidacion;
+		this.fechabaja = fechabaja;
+		this.compensaciones = compensaciones;
+		this.saltos = saltos;
+		this.apellido1 = apellido1;
+		this.apellido2 = apellido2;
+		this.nombre = nombre;
+		this.idPersona = idPersona;
+		this.ordenCola = ordenCola;
+		this.idTurno = idTurno;
+		this.idGuardia = idGuardia;
+		this.idGrupoGuardia = idGrupoGuardia;
+		this.fechaSuscripcion = fechaSuscripcion;
+		this.fechamodificacion = fechamodificacion;
+		this.usumodificacion = usumodificacion;
+		this.observacionessuscripcion = observacionessuscripcion;
+		this.observacionesbaja = observacionesbaja;
+		this.fechasolicitudbaja = fechasolicitudbaja;
+		fechavalidacion = fechavalidacion2;
+		this.observacionesvalidacion = observacionesvalidacion;
+		this.fechadenegacion = fechadenegacion;
+		this.observacionesdenegacion = observacionesdenegacion;
+		this.observacionesvalbaja = observacionesvalbaja;
+	}
+	
+	public InscripcionGuardiaItem( String idInstitucion, String idTurno, String idGuardia,String idPersona, Date fechaSuscripcion,
+			String idGrupoGuardia) {
+		super();
+		this.idPersona = idPersona;
+		this.idTurno = idTurno;
+		this.idGuardia = idGuardia;
+		this.idGrupoGuardia = idGrupoGuardia;
+		this.fechaSuscripcion = fechaSuscripcion;
+		this.idInstitucion = idInstitucion;
+	
+	}
+	
+	public InscripcionGuardiaItem() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	public String getIdGrupoGuardia() {
 		return idGrupoGuardia;
@@ -273,6 +330,20 @@ public class InscripcionGuardiaItem {
 	 */
 	public void setObservacionesvalbaja(String observacionesvalbaja) {
 		this.observacionesvalbaja = observacionesvalbaja;
+	}
+	public String getEstado() {
+		return estado;
+	}
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 
 }

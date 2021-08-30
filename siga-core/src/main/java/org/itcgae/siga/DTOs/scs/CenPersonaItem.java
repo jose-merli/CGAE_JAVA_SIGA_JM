@@ -211,6 +211,31 @@ public class CenPersonaItem {
 	public void setSexo(String sexo) {
 		this.sexo = sexo;
 	}
+	
+	
+	public CenPersonaItem() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public CenPersonaItem(Long idpersona, String nombre, String apellidos1, String apellidos2, String nifcif,
+			Date fechamodificacion, Integer usumodificacion, Short idtipoidentificacion, Date fechanacimiento,
+			Short idestadocivil, String naturalde, String fallecido, String sexo) {
+		super();
+		this.idpersona = idpersona;
+		this.nombre = nombre;
+		this.apellidos1 = apellidos1;
+		this.apellidos2 = apellidos2;
+		this.nifcif = nifcif;
+		this.fechamodificacion = fechamodificacion;
+		this.usumodificacion = usumodificacion;
+		this.idtipoidentificacion = idtipoidentificacion;
+		this.fechanacimiento = fechanacimiento;
+		this.idestadocivil = idestadocivil;
+		this.naturalde = naturalde;
+		this.fallecido = fallecido;
+		this.sexo = sexo;
+	}
 
 	
 	

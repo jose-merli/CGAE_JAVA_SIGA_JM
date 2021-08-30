@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosSalidaItem;
@@ -18,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.DeleteCalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
+import org.itcgae.siga.DTOs.scs.GuardiaCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.IncompatibilidadesDTO;
@@ -25,6 +27,7 @@ import org.itcgae.siga.DTOs.scs.IncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.DTOs.scs.LetradosGuardiaDTO;
+import org.itcgae.siga.DTOs.scs.RangoFechasItem;
 import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.springframework.core.io.InputStreamResource;
@@ -100,5 +103,30 @@ public interface GuardiasService {
 			
 	public DeleteResponseDTO eliminarDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
 			HttpServletRequest request);
+
+	public List<GuardiaCalendarioItem> getGuardiasFromCalendar(String idCalendar, HttpServletRequest request);
+
+
+	public List<GuardiaCalendarioItem> guardiasFromCojunto(HttpServletRequest request, String idConjuntoGuardia);
+
+	public List<RangoFechasItem> getFechasProgramacionGuardia(String idGuardia, HttpServletRequest request);
+
+	public InsertResponseDTO insertGuardiaToConjunto(HttpServletRequest request, String idConjuntoGuardia, List<GuardiaCalendarioItem> item);
+
+	public InsertResponseDTO insertGuardiaToCalendar(HttpServletRequest request, String idCalendar,
+			List<GuardiaCalendarioItem> itemList);
+
+	public InsertResponseDTO deleteGuardiaFromCalendar(HttpServletRequest request, String idCalendar,
+			List<GuardiaCalendarioItem> itemList);
+
+	public InsertResponseDTO updateCalendarioProgramado(HttpServletRequest request,
+			DatosCalendarioProgramadoItem calendarioItem);
+
+	public InsertResponseDTO newCalendarioProgramado(HttpServletRequest request,
+			DatosCalendarioProgramadoItem calendarioItem);
+
+	public InsertResponseDTO generarCalendario(HttpServletRequest request, DatosCalendarioProgramadoItem programacionItem);
+
+	public DatosDocumentoItem descargarExcelLog(HttpServletRequest request);
 			
 }

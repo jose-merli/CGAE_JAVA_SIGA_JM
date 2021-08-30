@@ -43,104 +43,104 @@ public class ScsCabeceraguardiasSqlProvider {
      *
      * @mbg.generated Fri Dec 14 13:11:58 CET 2018
      */
-    public String insertSelective(ScsCabeceraguardias record) {
+    public String insertSelective(ScsCabeceraguardias record, String fechaInicioPSt, String fechaFinPSt, String today, String idInstitucion, String idturno, String idguardia, String idpersona, String fechaalta) {
         SQL sql = new SQL();
         sql.INSERT_INTO("SCS_CABECERAGUARDIAS");
         
         if (record.getIdinstitucion() != null) {
-            sql.VALUES("IDINSTITUCION", "#{idinstitucion,jdbcType=DECIMAL}");
+            sql.VALUES("IDINSTITUCION", idInstitucion);
         }
         
         if (record.getIdturno() != null) {
-            sql.VALUES("IDTURNO", "#{idturno,jdbcType=DECIMAL}");
+            sql.VALUES("IDTURNO", idturno);
         }
         
         if (record.getIdguardia() != null) {
-            sql.VALUES("IDGUARDIA", "#{idguardia,jdbcType=DECIMAL}");
+            sql.VALUES("IDGUARDIA", idguardia);
         }
         
         if (record.getIdpersona() != null) {
-            sql.VALUES("IDPERSONA", "#{idpersona,jdbcType=DECIMAL}");
+            sql.VALUES("IDPERSONA", idpersona);
         }
         
         if (record.getFechainicio() != null) {
-            sql.VALUES("FECHAINICIO", "#{fechainicio,jdbcType=TIMESTAMP}");
+            sql.VALUES("FECHAINICIO", "'" + fechaInicioPSt + "'");
         }
         
         if (record.getIdcalendarioguardias() != null) {
-            sql.VALUES("IDCALENDARIOGUARDIAS", "#{idcalendarioguardias,jdbcType=DECIMAL}");
+            sql.VALUES("IDCALENDARIOGUARDIAS", record.getIdcalendarioguardias().toString());
         }
         
         if (record.getFechaFin() != null) {
-            sql.VALUES("FECHA_FIN", "#{fechaFin,jdbcType=TIMESTAMP}");
+            sql.VALUES("FECHA_FIN", "'" + fechaFinPSt + "'");
         }
         
         if (record.getFechamodificacion() != null) {
-            sql.VALUES("FECHAMODIFICACION", "#{fechamodificacion,jdbcType=TIMESTAMP}");
+            sql.VALUES("FECHAMODIFICACION", "'" + today + "'");
         }
         
         if (record.getSustituto() != null) {
-            sql.VALUES("SUSTITUTO", "#{sustituto,jdbcType=VARCHAR}");
+            sql.VALUES("SUSTITUTO", record.getSustituto());
         }
         
         if (record.getUsumodificacion() != null) {
-            sql.VALUES("USUMODIFICACION", "#{usumodificacion,jdbcType=DECIMAL}");
+            sql.VALUES("USUMODIFICACION", record.getUsumodificacion().toString());
         }
         
-        if (record.getFacturado() != null) {
-            sql.VALUES("FACTURADO", "#{facturado,jdbcType=VARCHAR}");
+        if (record.getFacturado() != null && !record.getFacturado().isEmpty()) {
+            sql.VALUES("FACTURADO", record.getFacturado());
         }
         
-        if (record.getPagado() != null) {
-            sql.VALUES("PAGADO", "#{pagado,jdbcType=VARCHAR}");
+        if (record.getPagado() != null && !record.getPagado().isEmpty()) {
+            sql.VALUES("PAGADO", record.getPagado());
         }
         
         if (record.getValidado() != null) {
-            sql.VALUES("VALIDADO", "#{validado,jdbcType=VARCHAR}");
+            sql.VALUES("VALIDADO", record.getValidado());
         }
         
         if (record.getLetradosustituido() != null) {
-            sql.VALUES("LETRADOSUSTITUIDO", "#{letradosustituido,jdbcType=DECIMAL}");
+            sql.VALUES("LETRADOSUSTITUIDO", record.getLetradosustituido().toString());
         }
         
         if (record.getFechasustitucion() != null) {
-            sql.VALUES("FECHASUSTITUCION", "#{fechasustitucion,jdbcType=TIMESTAMP}");
+            sql.VALUES("FECHASUSTITUCION", "'" + record.getFechasustitucion().toString()+ "'");
         }
         
         if (record.getComensustitucion() != null) {
-            sql.VALUES("COMENSUSTITUCION", "#{comensustitucion,jdbcType=VARCHAR}");
+            sql.VALUES("COMENSUSTITUCION", record.getComensustitucion());
         }
         
         if (record.getFechavalidacion() != null) {
-            sql.VALUES("FECHAVALIDACION", "#{fechavalidacion,jdbcType=TIMESTAMP}");
+            sql.VALUES("FECHAVALIDACION", "'" + record.getFechavalidacion().toString() + "'");
         }
         
         if (record.getIdfacturacion() != null) {
-            sql.VALUES("IDFACTURACION", "#{idfacturacion,jdbcType=DECIMAL}");
+            sql.VALUES("IDFACTURACION", record.getIdfacturacion().toString());
         }
         
         if (record.getFechaalta() != null) {
-            sql.VALUES("FECHAALTA", "#{fechaalta,jdbcType=TIMESTAMP}");
+            sql.VALUES("FECHAALTA", "'" + fechaalta + "'");
         }
         
         if (record.getPosicion() != null) {
-            sql.VALUES("POSICION", "#{posicion,jdbcType=DECIMAL}");
+            sql.VALUES("POSICION", record.getPosicion().toString());
         }
         
         if (record.getUsualta() != null) {
-            sql.VALUES("USUALTA", "#{usualta,jdbcType=DECIMAL}");
+            sql.VALUES("USUALTA", record.getUsualta().toString());
         }
         
         if (record.getNumerogrupo() != null) {
-            sql.VALUES("NUMEROGRUPO", "#{numerogrupo,jdbcType=DECIMAL}");
+            sql.VALUES("NUMEROGRUPO", record.getNumerogrupo().toString());
         }
         
         if (record.getObservacionesanulacion() != null) {
-            sql.VALUES("OBSERVACIONESANULACION", "#{observacionesanulacion,jdbcType=VARCHAR}");
+            sql.VALUES("OBSERVACIONESANULACION", record.getObservacionesanulacion());
         }
         
         if (record.getIdmovimiento() != null) {
-            sql.VALUES("IDMOVIMIENTO", "#{idmovimiento,jdbcType=DECIMAL}");
+            sql.VALUES("IDMOVIMIENTO", record.getIdmovimiento().toString());
         }
         
         return sql.toString();

@@ -16,6 +16,9 @@ public interface IGeneracionDocumentosService {
 	public DatosDocumentoItem grabaDocumento(Document doc, String pathfinal, String nombrefichero, boolean firmado) throws Exception;
 
 	public DatosDocumentoItem generarExcel(String string, String pathFicheroSalida, String nombreFicheroSalida,	List<List<Map<String, Object>>> listaDatosExcel, ArrayList<String> nombresConsultasDatos) throws Exception;
+
+	public DatosDocumentoItem generarExcelGeneracionCalendario(String pathFicheroSalida, String nombreFicheroSalida,
+			List<List<Map<String, Object>>> listaDatosExcel) throws Exception;
 	
 	
 }
