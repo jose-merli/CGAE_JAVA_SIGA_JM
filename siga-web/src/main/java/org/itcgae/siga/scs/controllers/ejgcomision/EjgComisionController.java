@@ -75,12 +75,6 @@ public class EjgComisionController {
 		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
 	}
 	
-	// busqueda
-		@RequestMapping(value = "/filtros-ejg/busquedaActas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<ActasDTO> busquedaActas(@RequestBody ActasItem actasItem, HttpServletRequest request) {
-			ActasDTO response = busquedaEJGComision.busquedaActas(actasItem, request);
-			return new ResponseEntity<ActasDTO>(response, HttpStatus.OK);
-		}
 
 	@GetMapping(value = "/filtros-ejg/comboDictamenComision", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboDictamen(HttpServletRequest request) {

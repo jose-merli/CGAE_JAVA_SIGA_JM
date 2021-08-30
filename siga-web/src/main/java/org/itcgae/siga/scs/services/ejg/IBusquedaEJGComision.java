@@ -43,7 +43,6 @@ public interface IBusquedaEJGComision {
 
 	ComboDTO comboSecretario(HttpServletRequest request);
 
-	ActasDTO busquedaActas(ActasItem actasItem, HttpServletRequest request);
 
 	
 

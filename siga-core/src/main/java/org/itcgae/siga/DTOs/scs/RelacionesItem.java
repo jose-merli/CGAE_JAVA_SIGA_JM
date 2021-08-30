@@ -118,18 +118,7 @@ public class RelacionesItem {
 	public void setCodigo(String codigo) {
 		this.codigo = codigo;
 	}
-
-<<<<<<< HEAD
-	public String getDesturno() {
-		return desturno;
-	}
-
-	public void setDesturno(String desturno) {
-		this.desturno = desturno;
-	}
 	
-=======
->>>>>>> EJG
 	public String getDescturno() {
 		return descturno;
 	}
@@ -158,19 +147,7 @@ public class RelacionesItem {
 	public void setDatosinteres(String datosinteres) {
 		this.datosinteres = datosinteres;
 	}
-<<<<<<< HEAD
 
-	
-	
-	public String getInteresado() {
-		return interesado;
-	}
-
-	public void setInteresado(String interesado) {
-		this.interesado = interesado;
-	}
-
-=======
 	public String getInteresado() {
 		return interesado;
 	}
@@ -178,7 +155,6 @@ public class RelacionesItem {
 		this.interesado = interesado;
 	}
 	
->>>>>>> EJG
 	public String getImpugnacion() {
 		return impugnacion;
 	}
@@ -415,12 +391,6 @@ public class RelacionesItem {
 	public String toString() {
 		return "RelacionesItem [sjcs=" + sjcs + ", idinstitucion=" + idinstitucion + ", anio=" + anio + ", numero="
 				+ numero + ", idletrado=" + idletrado + ", letrado=" + letrado + ", idturno=" + idturno
-<<<<<<< HEAD
-				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", desturno="
-				+ desturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
-				+ fechaDesignacion + ", datosinteres=" + datosinteres +", idsjcs=" + idsjcs +"]"
-=======
->>>>>>> EJG
 				+ ", idturnodesigna=" + idturnodesigna + ", idtipo=" + idtipo + ", codigo=" + codigo + ", descturno="
 				+ descturno + ", destipo=" + destipo +", interesado="+interesado+", fechaDesignacion=" 
 				+ fechaDesignacion + ", datosinteres=" + datosinteres +", idsjcs=" + idsjcs +"]";

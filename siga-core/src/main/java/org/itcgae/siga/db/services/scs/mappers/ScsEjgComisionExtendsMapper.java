@@ -119,12 +119,16 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "busquedaActas")
 	@Results({
 
-			@Result(column = "ANIOACTA", property = "anio", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NUMEROACTA", property = "acta", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPRESIDENTE", property = "presidente", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDSECRETARIO", property = "secretario", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDACTA", property = "idActa", jdbcType = JdbcType.NUMERIC),
+			//@Result(column = "IDINSTITUCION", property = "institucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROACTA", property = "numeroActa", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHARESOLUCION", property = "fechaResolucion", jdbcType = JdbcType.DATE),
 			@Result(column = "FECHAREUNION", property = "fechaReunion", jdbcType = JdbcType.DATE),
-			@Result(column = "FECHARESOLUCION", property = "fechaResolucion", jdbcType = JdbcType.DATE)
+			@Result(column = "IDPRESIDENTE", property = "idPresidente", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDSECRETARIO", property = "idSecretario", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NOMBREPRESIDENTE", property = "nombrePresidente", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRESECRETARIO", property = "nombreSecretario", jdbcType = JdbcType.VARCHAR)
+
 	})
-	List<ActasItem> busquedaActas(ActasItem actasItem);
+	List<ActasItem> busquedaActas(ActasItem actasItem, Short idInstitucion);
 }
