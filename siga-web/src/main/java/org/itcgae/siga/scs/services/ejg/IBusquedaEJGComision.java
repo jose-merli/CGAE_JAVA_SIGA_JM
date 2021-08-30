@@ -4,7 +4,7 @@ package org.itcgae.siga.scs.services.ejg;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ActasDTO;
+//import org.itcgae.siga.DTOs.scs.ActasDTO;
 import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
@@ -43,7 +43,7 @@ public interface IBusquedaEJGComision {
 
 	ComboDTO comboSecretario(HttpServletRequest request);
 
-	ActasDTO busquedaActas(ActasItem actasItem, HttpServletRequest request);
+//	ActasDTO busquedaActas(ActasItem actasItem, HttpServletRequest request);
 
 	
 

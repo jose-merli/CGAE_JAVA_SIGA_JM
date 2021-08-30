@@ -38,7 +38,7 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		return sql.toString();
 	}
 
-	public String comboEstadoEjg(Short idLenguaje) {
+	public String comboEstadoEjg(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 
         sql.SELECT("estado.fechainicio," + 

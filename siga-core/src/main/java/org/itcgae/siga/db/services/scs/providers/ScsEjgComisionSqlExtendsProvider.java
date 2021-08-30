@@ -400,21 +400,23 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 			sql.WHERE("TO_CHAR(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') <= TO_DATE( '" + fechaLimiteHast
 					+ "','DD/MM/RRRR')");
 		}
-		if (ejgItem.getDictamen() != null) {
-			for (String dictamen : ejgItem.getDictamen()) {
-				if (!dictamen.equals("-1")) {
-					dictamenCad += dictamen + ",";
-				} else {
-					indiferente = true;
-				}
-			}
-			if (!indiferente) {
-				dictamenCad = dictamenCad.substring(0, (dictamenCad.length() - 1));
-				sql.WHERE("EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ")");
-			}
+		if (ejgItem.getDictamen() != null && !ejgItem.getDictamen().isEmpty()) {
+            String[] selectedDict = ejgItem.getDictamen().split(",");
+            for (String dictamen : selectedDict) {
+                if (!dictamen.equals("-1")) {
+                    dictamenCad += dictamen + ",";
+                } else {
+                    indiferente = true;
+                }
+            }
 
-		}
-		if (ejgItem.getFundamentoCalif() != null && ejgItem.getFundamentoCalif() != "")
+            if (!indiferente) {
+                dictamenCad = dictamenCad.substring(0, (dictamenCad.length() - 1));
+                sql.WHERE("EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ")");
+            }
+
+        }
+		if (ejgItem.getFundamentoCalif() != null)
 			sql.WHERE("EJG.IDFUNDAMENTOCALIF = " + ejgItem.getFundamentoCalif());
 		if (ejgItem.getFechaDictamenDesd() != null) {
 			fechaDictamenDesd = dateFormat.format(ejgItem.getFechaDictamenDesd());
