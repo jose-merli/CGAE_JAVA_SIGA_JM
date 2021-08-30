@@ -40,6 +40,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -5943,5 +5944,41 @@ public class GestionEJGServiceImpl implements IGestionEJG {
     private void addDato(StringBuilder sb, String descripcion, BigDecimal valor) {
         addDato(sb, descripcion, (valor != null ? valor.toString() : ""));
     }
+    
+    @Override
+	public ExpInsosDTO getDatosExpInsos(EjgItem ejgItem, HttpServletRequest request) {
+    	ExpInsosDTO result = new ExpInsosDTO();
+    	
+    	 String token = request.getHeader("Authorization");
+         String dni = UserTokenUtils.getDniFromJWTToken(token);
+         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
+         if (idInstitucion != null) {
+             LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> Entrada para obtener información del usuario logeado");
+
+             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+             exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+             List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+             LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> Salida de obtener información del usuario logeado");
+
+             if (usuarios != null && usuarios.size() > 0) {
+                 LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> Entrada para obtener los datos del expediente de insostenibilidad");
+
+                 try {
+                	 if(ejgItem!=null)
+                		 result.setExpInsosItems(scsEjgExtendsMapper.getDatosExpInsos(ejgItem));
+                	 else
+                		 LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> ejgItem vacío. "); 
+                 }catch (Exception e) {
+                     LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> Se ha producido un error. ", e);
+                 }
+             }
+         }
+         
+         LOGGER.info(
+                 "guardarServiciosTramitacion() -> Salida del servicio para actualizar turno, guardia y letrado asociados a un EJG.");
+    	
+		return result;
+    }
 }

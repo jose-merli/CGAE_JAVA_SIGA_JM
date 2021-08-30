@@ -11,12 +11,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.AsuntosAsistenciaItem;
-import org.itcgae.siga.DTOs.scs.AsuntosSOJItem;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
-import org.itcgae.siga.DTOs.scs.DesignaItem;
-import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
-import org.itcgae.siga.DTOs.scs.DocumentoEjgItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -24,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.EjgDocumentacionItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
+import org.itcgae.siga.DTOs.scs.ExpInsosDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
@@ -33,7 +29,6 @@ import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
-import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJG;
@@ -47,7 +42,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -324,7 +318,8 @@ public class EjgController {
 
 	// insertaDatosGenerales
 	@RequestMapping(value = "/gestion-ejg/insertaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<EjgDTO> insertaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) throws Exception {
+	ResponseEntity<EjgDTO> insertaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request)
+			throws Exception {
 		EjgDTO response = gestionEJG.insertaDatosGenerales(datos, request);
 		if (response != null) {
 			return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
@@ -334,7 +329,8 @@ public class EjgController {
 
 	// actualizaDatosGenerales
 	@RequestMapping(value = "/gestion-ejg/actualizaDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> actualizaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request) throws Exception {
+	ResponseEntity<UpdateResponseDTO> actualizaDatosGenerales(@RequestBody EjgItem datos, HttpServletRequest request)
+			throws Exception {
 		UpdateResponseDTO response = gestionEJG.actualizaDatosGenerales(datos, request);
 //		if (response.getError().getCode() == 200)
 //			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -395,7 +391,8 @@ public class EjgController {
 
 	// editarEstado
 	@RequestMapping(value = "/gestion-ejg/editarEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> editarEstado(@RequestBody EstadoEjgItem datos, HttpServletRequest request) throws Exception {
+	ResponseEntity<UpdateResponseDTO> editarEstado(@RequestBody EstadoEjgItem datos, HttpServletRequest request)
+			throws Exception {
 		UpdateResponseDTO response = gestionEJG.editarEstado(datos, request);
 
 		if (response.getStatus().equals("OK"))
@@ -428,14 +425,15 @@ public class EjgController {
 
 	// guardarResolucion
 	@RequestMapping(value = "/gestion-ejg/guardarResolucion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarResolucion(@RequestBody ResolucionEJGItem datos, HttpServletRequest request) throws Exception {
+	ResponseEntity<UpdateResponseDTO> guardarResolucion(@RequestBody ResolucionEJGItem datos,
+			HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = gestionEJG.guardarResolucion(datos, request);
 		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
+
 	// GetHabilitarActa (Permiso en la tarjeta resolucion)
 	@RequestMapping(value = "/gestion-ejg/getHabilitarActa", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Boolean> getHabilitarActa(HttpServletRequest request) {
@@ -488,10 +486,11 @@ public class EjgController {
 		RelacionesDTO response = gestionEJG.getRelacionesEJG(item, request);
 		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
 	}
-	
+
 	// descargarDocumentoResolucion
 	@RequestMapping(value = "/gestion-ejg/descargarDocumentoResolucion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InputStreamResource> descargarDocumentoResolucion(@RequestBody String docResolucion, HttpServletRequest request) {
+	ResponseEntity<InputStreamResource> descargarDocumentoResolucion(@RequestBody String docResolucion,
+			HttpServletRequest request) {
 		ResponseEntity<InputStreamResource> response = gestionEJG.descargarDocumentoResolucion(docResolucion, request);
 
 		return response;
@@ -499,7 +498,8 @@ public class EjgController {
 
 	// updateDatosJuridicos
 	@RequestMapping(value = "/gestion-ejg/updateDatosJuridicos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateDatosJuridicos(@RequestBody EjgItem datos, HttpServletRequest request) throws Exception {
+	ResponseEntity<UpdateResponseDTO> updateDatosJuridicos(@RequestBody EjgItem datos, HttpServletRequest request)
+			throws Exception {
 		UpdateResponseDTO response = gestionEJG.updateDatosJuridicos(datos, request);
 		if (response.getStatus().equals("OK"))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -638,7 +638,8 @@ public class EjgController {
 	}
 
 	@RequestMapping(value = "/gestion-ejg/guardarProcuradorEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody EjgItem item, HttpServletRequest request) throws Exception {
+	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody EjgItem item, HttpServletRequest request)
+			throws Exception {
 		UpdateResponseDTO response = gestionEJG.guardarProcuradorEJG(item, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -778,7 +779,8 @@ public class EjgController {
 
 	// guardarImpugnacion
 	@RequestMapping(value = "/gestion-ejg/guardarImpugnacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarImpugnacion(@RequestBody EjgItem datos, HttpServletRequest request) throws Exception {
+	ResponseEntity<UpdateResponseDTO> guardarImpugnacion(@RequestBody EjgItem datos, HttpServletRequest request)
+			throws Exception {
 		UpdateResponseDTO response = gestionEJG.guardarImpugnacion(datos, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -806,4 +808,10 @@ public class EjgController {
 		return new ResponseEntity<String>(response, HttpStatus.OK);
 	}
 
+	// Prestaciones Rechazadas
+	@RequestMapping(value = "/gestion-ejg/getDatosExpInsos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ExpInsosDTO> getDatosExpInsos(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		ExpInsosDTO response = gestionEJG.getDatosExpInsos(ejgItem, request);
+		return new ResponseEntity<ExpInsosDTO>(response, HttpStatus.OK);
+	}
 }

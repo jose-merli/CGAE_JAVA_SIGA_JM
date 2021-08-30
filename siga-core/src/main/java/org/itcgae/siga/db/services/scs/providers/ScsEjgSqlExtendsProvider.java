@@ -1,5 +1,9 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
@@ -7,10 +11,6 @@ import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
-
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
 
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
@@ -1553,5 +1553,19 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.FROM("DUAL");
 
         return sql.toString();
+    }
+    
+    public String getDatosExpInsos(EjgItem ejgItem) {
+    	SQL sql = new SQL();
+    	
+    	sql.SELECT("e.numero, e.numejg, e.idtipoejg, e.anio, e.idinstitucion, e.juzgado, e.idpretension, d.idturno, des.idprocedimiento");
+    	sql.FROM("SCS_EJG e");
+    	sql.INNER_JOIN("SCS_EJGDESIGNA d ON (d.idinstitucion=e.idInstitucion and d.anioejg=e.anio and d.idtipoejg=e.idtipoejg and d.numeroejg=e.numero)");
+    	sql.INNER_JOIN("SCS_DESIGNA des ON (d.idinstitucion=des.idInstitucion and d.aniodesigna=des.anio and d.idturno=des.idturno "
+    			+ "and d.numerodesigna=des.numero)");
+    	sql.WHERE("e.idinstitucion="+ejgItem.getidInstitucion()+" and e.anio="+ejgItem.getAnnio()+" and e.idtipoejg="+ejgItem.getTipoEJG()+
+    			" and e.numero="+ejgItem.getNumero());
+    	
+    	return sql.toString();
     }
 }
