@@ -5146,7 +5146,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         if (ejg.getIdentificadords() == null) {
 
         	 // Año EJG/Num EJG. Se utiliza numero para no utilizar numEjg ya que no es una clave unica.
-            String title = ejgItem.getAnnio() + "/" + ejgItem.getNumero();
+            String title = ejgItem.getAnnio() + "_" + ejgItem.getNumero();
             
 			LOGGER.debug("ValorEjgDocu : " + title);
 			identificadorDS = docushareHelper.buscaCollectionEjg(title, idInstitucion);
@@ -5194,7 +5194,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
             if (null != usuarios && usuarios.size() > 0) {
 
                 // Año EJG/Num EJG. Se utiliza numero para no utilizar numEjg ya que no es una clave unica.
-                String title = ejgItem.getAnnio() + "/" + ejgItem.getNumero();
+                String title = ejgItem.getAnnio() + "_" + ejgItem.getNumero();
 
                 idDS = docushareHelper.createCollectionEjg(idInstitucion, title, "");
                 
