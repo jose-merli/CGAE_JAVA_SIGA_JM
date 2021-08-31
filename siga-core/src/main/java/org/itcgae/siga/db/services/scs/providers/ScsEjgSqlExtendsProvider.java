@@ -1557,8 +1557,17 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
     
     public String getDatosExpInsos(EjgItem ejgItem) {
     	SQL sql = new SQL();
+    	SQL sqlIdpersona = new SQL();
     	
-    	sql.SELECT("e.numero, e.numejg, e.idtipoejg, e.anio, e.idinstitucion, e.juzgado, e.idpretension, d.idturno, des.idprocedimiento");
+    	sqlIdpersona.SELECT("p.IDPERSONA");
+    	sqlIdpersona.FROM("CEN_PERSONA p, SCS_DESIGNASLETRADO desle");
+    	sqlIdpersona.WHERE("desle.IDINSTITUCION = des.idinstitucion and desle.IDTURNO = des.idturno and desle.ANIO = des.anio "
+    			+ "and desle.NUMERO = des.numero and p.IDPERSONA = desle.IDPERSONA and desle.IDPERSONA = "
+    			+ "F_SIGA_GETIDLETRADO_DESIGNA(desle.idInstitucion,desle.idTurno,desle.anio,desle.NUMERO) and rownum = 1");
+    			
+    	
+    	sql.SELECT("e.numero, e.numejg, e.idtipoejg, e.anio, e.idinstitucion, e.juzgado, e.idpretension, d.idturno, des.idprocedimiento,"
+    			+ "("+sqlIdpersona.toString()+") idpersona");
     	sql.FROM("SCS_EJG e");
     	sql.INNER_JOIN("SCS_EJGDESIGNA d ON (d.idinstitucion=e.idInstitucion and d.anioejg=e.anio and d.idtipoejg=e.idtipoejg and d.numeroejg=e.numero)");
     	sql.INNER_JOIN("SCS_DESIGNA des ON (d.idinstitucion=des.idInstitucion and d.aniodesigna=des.anio and d.idturno=des.idturno "

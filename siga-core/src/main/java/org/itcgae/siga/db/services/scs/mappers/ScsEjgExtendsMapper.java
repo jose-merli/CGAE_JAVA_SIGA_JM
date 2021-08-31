@@ -333,7 +333,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPRETENSION", property = "idPretension", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idpersona", property = "nombre", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ExpInsosItem> getDatosExpInsos(EjgItem item);
 }
