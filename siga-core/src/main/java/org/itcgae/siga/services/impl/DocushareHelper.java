@@ -215,7 +215,7 @@ public class DocushareHelper {
 				log.debug("new path: " +path);
 				String[] titles = path.split(";");
 				log.debug("DSCollection.title: " +DSCollection.title);
-				log.debug("titles: " +titles);
+				log.debug("titles: " +titles.toString());
 				log.debug("DSSelectSet.NO_PROPERTIES: " +DSSelectSet.NO_PROPERTIES);
 				DSObject dsObject = dssession.getResolvedObject(DSCollection.title, titles, DSSelectSet.NO_PROPERTIES);
 				log.debug("dsObject: " +dsObject);
