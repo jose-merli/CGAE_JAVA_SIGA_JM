@@ -5281,6 +5281,65 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
         return idDS;
     }
+    
+    
+    @Override
+	public DocushareDTO searchListDirEjg(int numPagina, DocuShareObjectVO docu, HttpServletRequest request)
+			throws Exception {
+		DocushareDTO docushareDTO = new DocushareDTO();
+		String identificadorDS = null;
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ScsEjgKey key = new ScsEjgKey();
+
+        key.setIdinstitucion(idInstitucion);
+        key.setAnio(Short.valueOf(docu.getAnio()));
+        key.setIdtipoejg(Short.valueOf(docu.getIdTipoEjg()));
+        key.setNumero(Long.valueOf(docu.getNumero()));
+
+        ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(key);
+
+        if (ejg.getIdentificadords() == null) {
+        	
+            // longitud maxima para num
+            GenParametrosExample genParametrosExample = new GenParametrosExample();
+            genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
+                    .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+            genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+            List<GenParametros> listParam = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+            String longitudEJG = listParam.get(0).getValor();
+
+            // Alteramos el numero para que todos los numeros de las carpetas de una
+            // institucion tengan la misma longitud.
+
+            String numero = docu.getNumero();
+
+            int numCeros = Integer.parseInt(longitudEJG) - numero.length();
+
+            String ceros = "";
+            for (int i = 0; i < numCeros; i++) {
+                ceros += "0";
+            }
+
+            ceros += numero;
+
+            // Año EJG/Num EJG. Se realiza el proceso anterior para no utilizar numEjg ya que no es una clave unica
+            //y mantener el formato de DocuShare.
+            String title = docu.getAnio() + "/" + ceros;
+            
+			LOGGER.debug("ValorEjgDocu : " + title);
+			identificadorDS = docushareHelper.buscaCollectionEjg(title, idInstitucion);
+		} else {
+			identificadorDS = ejg.getIdentificadords();
+		}
+		if (identificadorDS != null) {
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, docu.getParent());
+			docushareDTO.setDocuShareObjectVO(docus);
+		}
+		return docushareDTO;
+	}
 
     public int triggersEjgUpdatesFApertura(EjgItem ejgItem, AdmUsuarios usuario, short idInstitucion) throws Exception {
 
