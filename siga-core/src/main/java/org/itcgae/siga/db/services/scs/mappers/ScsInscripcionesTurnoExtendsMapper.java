@@ -41,7 +41,8 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	        @Result(column="FECHASOLICITUDBAJA", property="fechasolicitudbaja", jdbcType=JdbcType.TIMESTAMP),
 	        @Result(column="FECHADENEGACION", property="fechadenegacion", jdbcType=JdbcType.TIMESTAMP),
 	        @Result(column="OBSERVACIONESDENEGACION", property="observacionesdenegacion", jdbcType=JdbcType.VARCHAR),
-	        @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR) })
+	        @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR),
+	        @Result(column="VALIDARINSCRIPCIONES", property="validarinscripciones", jdbcType=JdbcType.VARCHAR) })
 	    List<InscripcionesItem> busquedaInscripciones(InscripcionesItem inscripcionesItem,Short idInstitucion,String fechadesde,String fechahasta,String afechade,Integer tamMaximo);
 	 
 	 
@@ -208,4 +209,11 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	        @Result(column="IDTURNO", property="idturno", jdbcType=JdbcType.DECIMAL),
 	        @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP) })
 	    List<InscripcionesItem> obtenerColegiadoInscritoTurno(Short idInstitucion, String idTurno, String idPersona);
+	 
+	 @SelectProvider(type = ScsInscripcionesTurnoSqlExtendsProvider.class, method = "comboTurnosInscritoLetrado")
+		@Results({
+			@Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+		})
+		List<ComboItem> comboTurnosInscritoLetrado(Short idInstitucion, String idPersona);
 }

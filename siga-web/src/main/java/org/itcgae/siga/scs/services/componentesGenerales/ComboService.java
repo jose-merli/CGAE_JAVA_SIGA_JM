@@ -26,13 +26,15 @@ public interface ComboService {
 
 	public ComboDTO getComboGrupoFacturacion(HttpServletRequest request);
 
-	public ComboDTO getComboPartidasPresupuestarias(HttpServletRequest request);
+	public ComboDTO getComboPartidasPresupuestarias(HttpServletRequest request, String importe);
 
 	public ComboDTO comboRequisitosGuardias(HttpServletRequest request);
 	
 	public ComboDTO comboGuardias(HttpServletRequest request, String idTurno);
 	
 	public ComboDTO comboGuardiasNoGrupo(HttpServletRequest request, String idTurno);
+	
+	public ComboDTO comboGuardiasGrupo(HttpServletRequest request, String idTurno);
 	
 	public ComboColaOrdenadaDTO ordenCola(HttpServletRequest request, String idordenacioncolas);
 
@@ -51,6 +53,10 @@ public interface ComboService {
 	public ComboDTO comboComisaria(HttpServletRequest request);
 
 	public ComboDTO comboJuzgado(HttpServletRequest request);
+	
+	public ComboDTO comboComisariaCdgoExt(HttpServletRequest request);
+
+	public ComboDTO comboJuzgadoCdgoExt(HttpServletRequest request);
 
 	public ComboDTO comboListasGuardias(HttpServletRequest request, String idTurno);
 
@@ -81,4 +87,10 @@ public interface ComboService {
 	public ComboDTO comboAcreditacionesPorModulo(HttpServletRequest request, String idModulo, String idTurno);
 	
 	public ComboDTO comboTipoDocumentacionDesigna(HttpServletRequest request);
+	
+	public ComboDTO comboTurnosInscritoLetrado(HttpServletRequest request, String idPersona);
+	
+	public ComboDTO comboGuardiasInscritoLetrado(HttpServletRequest request, String idPersona, String idTurno);
+	
+	public ComboDTO comboEstadosAsistencia(HttpServletRequest request);
 }

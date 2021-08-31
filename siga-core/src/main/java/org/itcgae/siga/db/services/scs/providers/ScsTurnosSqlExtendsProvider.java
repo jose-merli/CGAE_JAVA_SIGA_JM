@@ -19,6 +19,20 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		return sql.toString();
 	}
 
+	public String comboTurnosTipo(Short idInstitucion, String tipoturno) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDTURNO, NOMBRE");
+		sql.FROM("SCS_TURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("FECHABAJA IS NULL");
+		if (tipoturno.equals("1") || tipoturno.equals("2"))
+			sql.WHERE("IDTIPOTURNO= '" + tipoturno + "'");
+		sql.ORDER_BY("NOMBRE");
+		return sql.toString();
+	}
+
 	public String busquedaTurnos(TurnosItem turnosItem, Short idInstitucion) {
 
 		SQL sql = new SQL();
@@ -183,6 +197,24 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 
 		sql.SELECT("MAX(IDORDENACIONCOLAS) AS IDORDENACIONCOLAS");
 		sql.FROM("scs_ordenacioncolas");
+		return sql.toString();
+	}
+	
+	public String busquedaUltimoLetrado(String idTurno,Short idInstitucion) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT("col.ncolegiado NUMEROCOLEGIADO");
+		sql.SELECT("per.nombre NOMBREPERSONA");
+		sql.SELECT("per.apellidos1 APELLIDOS1");
+		sql.SELECT("per.apellidos2 APELLIDOS2");
+		sql.SELECT("tur.nombre NOMBRETURNO");
+		sql.FROM("scs_turno tur");
+		sql.JOIN("cen_colegiado col on tur.idinstitucion = col.idinstitucion and tur.idpersona_ultimo = col.idpersona");
+		sql.JOIN("cen_persona per on tur.idpersona_ultimo = per.idpersona");
+		sql.WHERE("tur.idinstitucion = "+idInstitucion);
+		sql.WHERE("tur.idturno = "+idTurno);
+
 		return sql.toString();
 	}
 
@@ -436,7 +468,7 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 	sql.INNER_JOIN("cen_persona per ON per.IDPERSONA = ins.IDPERSONA");
 	sql.INNER_JOIN("cen_colegiado col ON col.idpersona = per.IDPERSONA and col.IDINSTITUCION = ins.IDINSTITUCION and col.IDPERSONA = ins.IDPERSONA");
 	sql.INNER_JOIN("scs_turno tur ON tur.IDTURNO = ins.IDTURNO and tur.IDINSTITUCION = col.IDINSTITUCION");
-	sql.WHERE("(ins.fechabaja is null AND Ins.Fechavalidacion IS NOT NULL AND tur.Idinstitucion = '"+idInstitucion+"'AND tur.Idturno = '"+turnosItem.getIdturno()+"')");
+    sql.WHERE("(Ins.Fechavalidacion IS NOT NULL AND Ins.Fechavalidacion <= '"+strDate+"' AND tur.Idinstitucion = '"+idInstitucion+"'AND tur.Idturno = '"+turnosItem.getIdturno()+"')");
 	sql.ORDER_BY("/*aqui debemos de consultar primero el orden que vamos a ordenar.*/\r\n" +busquedaOrden+
 			"          ) consulta ) consulta2)\r\n" + 
 			"SELECT * from(\r\n" + 
@@ -499,9 +531,8 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 		
 		sql4.SELECT("(CASE\r\n" + 
 				"		WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-				"		AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
-				"		AND (Ins.Fechabaja IS NULL\r\n" + 
-				"		OR TRUNC(Ins.Fechabaja) > NVL('"+strDate+"', '01/01/1900')) THEN '1'\r\n" + 
+				"		AND TRUNC(Ins.Fechavalidacion) <= NVL(TO_DATE('"+strDate+"','DD/MM/RRRR'), Ins.Fechavalidacion)\r\n" + 
+				"		THEN '1'\r\n" + 
 				"		ELSE '0'\r\n" + 
 				"	END) Activo,\r\n" + 
 				"	Ins.Idinstitucion,\r\n" + 
@@ -556,7 +587,6 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 		sql4.INNER_JOIN("scs_guardiasturno gua ON gua.idturno = ins.idturno and gua.idguardia = ins.idguardia and gua.IDINSTITUCION = ins.IDINSTITUCION");
 		sql4.LEFT_OUTER_JOIN("scs_grupoguardiacolegiado gru ON gru.IDINSTITUCION = ins.IDINSTITUCION and gru.IDTURNO = ins.IDTURNO and gru.IDGUARDIA = ins.IDGUARDIA and gru.IDPERSONA = per.IDPERSONA and gru.FECHASUSCRIPCION = ins.FECHASUSCRIPCION");
 		sql4.LEFT_OUTER_JOIN("scs_grupoguardia grg ON grg.IDGRUPOGUARDIA = gru.IDGRUPOGUARDIA");
-		sql4.WHERE("ins.fechabaja is null");
 		sql4.WHERE("Ins.Fechavalidacion IS NOT NULL "+
 				"AND Gua.Idinstitucion = '"+idInstitucion+"'" + 
 				"AND Gua.Idturno = '"+turnosItem.getIdturno()+"'"+
@@ -578,9 +608,8 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 		sqls5.SELECT("consulta4.* from(SELECT ROWNUM AS orden,consulta3.* FROM (SELECT \r\n" + 
 				"	(CASE\r\n" + 
 				"		WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-				"		AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
-				"		AND (Ins.Fechabaja IS NULL\r\n" + 
-				"		OR TRUNC(Ins.Fechabaja) > NVL('"+strDate+"', '01/01/1900')) THEN '1'\r\n" + 
+				"		AND TRUNC(Ins.Fechavalidacion) <= NVL(TO_DATE('"+strDate+"','DD/MM/RRRR'), Ins.Fechavalidacion)\r\n" + 
+				"		THEN '1'\r\n" + 
 				"		ELSE '0'\r\n" + 
 				"	END) Activo,\r\n" + 
 				"	Ins.Idinstitucion,\r\n" + 

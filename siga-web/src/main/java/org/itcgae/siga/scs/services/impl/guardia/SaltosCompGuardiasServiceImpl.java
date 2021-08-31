@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.LetradoGuardiaItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
@@ -520,6 +521,13 @@ public class SaltosCompGuardiasServiceImpl implements SaltosCompGuardiasService 
 		}
 
 		return deleteResponseDTO;
+	}
+	
+	@Override
+	public String isGrupo(BusquedaLetradosGuardiaDTO letradoGuardia) {
+		LOGGER.info("isGrupo() -> Consulta para saber si la guardia es un grupo");
+		String porGrupos = saltoscompensacionesMapper.isGrupobyId(letradoGuardia);
+		return porGrupos;
 	}
 
 	private List<ComboItem> transformToListComboItem(List<LetradoGuardiaItem> listaLetradoGuardiaItem,

@@ -1,5 +1,6 @@
 package org.itcgae.siga.com.services;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,9 @@ public interface IGeneracionDocumentosService {
 
 	public DatosDocumentoItem generarExcelGeneracionCalendario(String pathFicheroSalida, String nombreFicheroSalida,
 			List<List<Map<String, Object>>> listaDatosExcel) throws Exception;
+	
+	public DatosDocumentoItem generarFO(String plantilla, String rutaTmp, String nombreFicheroSalida,
+			List<Map<String, Object>> resultDatos) throws IOException, Exception;
 	
 	
 }

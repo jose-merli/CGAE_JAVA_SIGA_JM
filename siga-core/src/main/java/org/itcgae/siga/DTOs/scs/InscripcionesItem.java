@@ -59,12 +59,6 @@ public class InscripcionesItem {
 	public String nifcif;
 	public String telefono;
 	public String movil;
-	
-	
-	
-	
-	
-
 
 	public String getTelefono() {
 		return telefono;
@@ -269,7 +263,7 @@ public class InscripcionesItem {
 	public String getNombreturno() {
 		return nombreturno;
 	}
-	
+
 	public String getIdzona() {
 		return idzona;
 	}
@@ -313,141 +307,187 @@ public class InscripcionesItem {
 	public void setNombreturno(String nombreturno) {
 		this.nombreturno = nombreturno;
 	}
+
 	public String getEstado() {
 		return estado;
 	}
+
 	public void setEstado(String estado) {
 		this.estado = estado;
 	}
+
 	public String getAbreviatura() {
 		return abreviatura;
 	}
+
 	public void setAbreviatura(String abreviatura) {
 		this.abreviatura = abreviatura;
 	}
+
 	public String getGuardias() {
 		return guardias;
 	}
+
 	public void setGuardias(String guardias) {
 		this.guardias = guardias;
 	}
+
 	public String getApellidosnombre() {
 		return apellidosnombre;
 	}
+
 	public void setApellidosnombre(String apellidosnombre) {
 		this.apellidosnombre = apellidosnombre;
 	}
+
 	public String getNcolegiado() {
 		return ncolegiado;
 	}
+
 	public void setNcolegiado(String ncolegiado) {
 		this.ncolegiado = ncolegiado;
 	}
+
 	public String getNombre() {
 		return nombre;
 	}
+
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
+
 	public String getApellidos() {
 		return apellidos;
 	}
+
 	public void setApellidos(String apellidos) {
 		this.apellidos = apellidos;
 	}
+
 	public String getApellidos2() {
 		return apellidos2;
 	}
+
 	public void setApellidos2(String apellidos2) {
 		this.apellidos2 = apellidos2;
 	}
+
 	public String getIdinstitucion() {
 		return idinstitucion;
 	}
+
 	public void setIdinstitucion(String idinstitucion) {
 		this.idinstitucion = idinstitucion;
 	}
+
 	public String getIdpersona() {
 		return idpersona;
 	}
+
 	public void setIdpersona(String idpersona) {
 		this.idpersona = idpersona;
 	}
+
 	public Date getFechasolicitud() {
 		return fechasolicitud;
 	}
+
 	public void setFechasolicitud(Date fechasolicitud) {
 		this.fechasolicitud = fechasolicitud;
 	}
+
 	public String getObservacionessolicitud() {
 		return observacionessolicitud;
 	}
+
 	public void setObservacionessolicitud(String observacionessolicitud) {
 		this.observacionessolicitud = observacionessolicitud;
 	}
+
 	public Date getFechavalidacion() {
 		return fechavalidacion;
 	}
+
 	public void setFechavalidacion(Date fechavalidacion) {
 		this.fechavalidacion = fechavalidacion;
 	}
+
 	public String getObservacionesvalidacion() {
 		return observacionesvalidacion;
 	}
+
 	public void setObservacionesvalidacion(String observacionesvalidacion) {
 		this.observacionesvalidacion = observacionesvalidacion;
 	}
+
 	public Date getFechasolicitudbaja() {
 		return fechasolicitudbaja;
 	}
+
 	public void setFechasolicitudbaja(Date fechasolicitudbaja) {
 		this.fechasolicitudbaja = fechasolicitudbaja;
 	}
+
 	public String getObservacionesbaja() {
 		return observacionesbaja;
 	}
+
 	public void setObservacionesbaja(String observacionesbaja) {
 		this.observacionesbaja = observacionesbaja;
 	}
+
 	public Date getFechabaja() {
 		return fechabaja;
 	}
+
 	public void setFechabaja(Date fechabaja) {
 		this.fechabaja = fechabaja;
 	}
+
 	public String getObservacionesvalbaja() {
 		return observacionesvalbaja;
 	}
+
 	public void setObservacionesvalbaja(String observacionesvalbaja) {
 		this.observacionesvalbaja = observacionesvalbaja;
 	}
+
 	public Date getFechadenegacion() {
 		return fechadenegacion;
 	}
+
 	public void setFechadenegacion(Date fechadenegacion) {
 		this.fechadenegacion = fechadenegacion;
 	}
+
 	public String getObservacionesdenegacion() {
 		return observacionesdenegacion;
 	}
+
 	public void setObservacionesdenegacion(String observacionesdenegacion) {
 		this.observacionesdenegacion = observacionesdenegacion;
 	}
+
 	public Date getFechavaloralta() {
 		return fechavaloralta;
 	}
+
 	public void setFechavaloralta(Date fechavaloralta) {
 		this.fechavaloralta = fechavaloralta;
 	}
+
 	public Date getFechavalorbaja() {
 		return fechavalorbaja;
 	}
+
 	public void setFechavalorbaja(Date fechavalorbaja) {
 		this.fechavalorbaja = fechavalorbaja;
 	}
+
 	public String getIdturno() {
 		return idturno;
 	}
+
 	public void setIdturno(String idturno) {
 		this.idturno = idturno;
 	}
@@ -459,7 +499,30 @@ public class InscripcionesItem {
 	public void setFechaActual(Date fechaActual) {
 		this.fechaActual = fechaActual;
 	}
-	
-	
-	
+
+	@Override
+	public String toString() {
+		return "InscripcionesItem [nombreturno=" + nombreturno + ", estado=" + estado + ", abreviatura=" + abreviatura
+				+ ", guardias=" + guardias + ", idturno=" + idturno + ", apellidosnombre=" + apellidosnombre
+				+ ", ncolegiado=" + ncolegiado + ", fechamodificacion=" + fechamodificacion + ", nombre=" + nombre
+				+ ", apellidos=" + apellidos + ", apellidos2=" + apellidos2 + ", idinstitucion=" + idinstitucion
+				+ ", idpersona=" + idpersona + ", fechadesde=" + fechadesde + ", idzona=" + idzona + ", afechade="
+				+ afechade + ", fechahasta=" + fechahasta + ", fechaActual=" + fechaActual + ", fechasolicitud="
+				+ fechasolicitud + ", observacionessolicitud=" + observacionessolicitud + ", fechavalidacion="
+				+ fechavalidacion + ", observacionesvalidacion=" + observacionesvalidacion + ", fechasolicitudbaja="
+				+ fechasolicitudbaja + ", observacionesbaja=" + observacionesbaja + ", validarinscripciones="
+				+ validarinscripciones + ", fechabaja=" + fechabaja + ", observacionesvalbaja=" + observacionesvalbaja
+				+ ", fechadenegacion=" + fechadenegacion + ", observacionesdenegacion=" + observacionesdenegacion
+				+ ", fechavaloralta=" + fechavaloralta + ", fechavalorbaja=" + fechavalorbaja + ", estadonombre="
+				+ estadonombre + ", observaciones=" + observaciones + ", nombre_turno=" + nombre_turno
+				+ ", nombre_zona=" + nombre_zona + ", idsubzona=" + idsubzona + ", nombre_subzona=" + nombre_subzona
+				+ ", idarea=" + idarea + ", nombre_area=" + nombre_area + ", idmateria=" + idmateria
+				+ ", nombre_materia=" + nombre_materia + ", idguardia=" + idguardia + ", nombre_guardia="
+				+ nombre_guardia + ", descripcion_tipo_guardia=" + descripcion_tipo_guardia
+				+ ", obligatoriedad_inscripcion=" + obligatoriedad_inscripcion + ", tipoguardias=" + tipoguardias
+				+ ", orden=" + orden + ", numerocolegiado=" + numerocolegiado + ", accion=" + accion
+				+ ", observacionestabla=" + observacionestabla + ", fechatabla=" + fechatabla + ", usumodificacion="
+				+ usumodificacion + ", nifcif=" + nifcif + ", telefono=" + telefono + ", movil=" + movil + "]";
+	}
+
 }

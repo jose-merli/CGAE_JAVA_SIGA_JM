@@ -80,19 +80,49 @@ public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 	public String comboComisaria(Short idLenguaje, Short idInstitucion) {
 
 		SQL sql = new SQL();
-	
+
 		sql.SELECT("comisaria.IDCOMISARIA");
 		sql.SELECT("comisaria.NOMBRE");
 		sql.FROM("SCS_COMISARIA comisaria");
 		sql.WHERE("comisaria.fechabaja is null");
 		sql.WHERE("comisaria.idinstitucion = " + idInstitucion);
 		sql.ORDER_BY("comisaria.NOMBRE");
-	
+
+		return sql.toString();
+	}
+
+	public String comboCDetencion(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("comisaria.IDCOMISARIA");
+		sql.SELECT("comisaria.nombre || ' [' || comisaria.CODIGOEXT || ']' as cdetencion");
+		sql.FROM("SCS_COMISARIA comisaria");
+		sql.WHERE("comisaria.fechabaja is null");
+		sql.WHERE("comisaria.idinstitucion = " + idInstitucion);
+		sql.ORDER_BY("cdetencion");
+
 		return sql.toString();
 	}
 	
+	public String comboComisariaCdgoExt(Short idLenguaje, Short idInstitucion){
+
+		SQL sql = new SQL();
+
+		sql.SELECT("comisaria.CODIGOEXT");
+		sql.SELECT("comisaria.NOMBRE");
+		sql.FROM("SCS_COMISARIA comisaria");
+		sql.WHERE("comisaria.fechabaja is null");
+		sql.WHERE("comisaria.idinstitucion = " + idInstitucion);
+		sql.WHERE("comisaria.CODIGOEXT is not null");
+		sql.ORDER_BY("comisaria.NOMBRE");
+
+		return sql.toString();
+
+	}
+
 	public String getComisariasByIdTurno(Short idInstitucion, String idTurno) {
-		
+
 		SQL sql = new SQL();
 		sql.SELECT("c.idcomisaria");
 		sql.SELECT("decode(c.fechabaja, NULL, c.nombre\r\n"
@@ -113,10 +143,10 @@ public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 		sql.AND();
 		sql.WHERE("tu.idturno = "+idTurno+"");
 		sql.ORDER_BY("c.fechabaja DESC, nombre");
-		
-		
-		
-		return sql.toString();
-	}
 
+
+
+		return sql.toString();
+		}
+	
 }

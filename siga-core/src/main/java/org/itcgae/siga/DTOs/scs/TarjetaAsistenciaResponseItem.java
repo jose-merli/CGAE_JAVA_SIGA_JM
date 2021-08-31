@@ -16,6 +16,93 @@ public class TarjetaAsistenciaResponseItem {
 	private String ejgAnioNumero;
 	private List<ActuacionAsistenciaItem> actuaciones;
 	private String nombre, sexo, apellido1, apellido2, nif;
+	private FiltroAsistenciaItem filtro;
+	private String descripcionGuardia;
+	private String idGuardia;
+	private String idTurno;
+	private String estado;
+	private String fechaSolicitud;
+	private String fechaCierre;
+	private String fechaAsistencia;
+	private String idLetradoGuardia;
+	private String idTipoAsistenciaColegio;
+	private String idSolicitudCentralita;
+	private String fechaEstado;
+	private String descripcionEstado;
+	private String descripcionTurno;
+	private String descripcionTipoAsistenciaColegio;
+	private String idPersonaJg;
+	private String numContrarios;
+	private String numeroColegiado;
+	private String nombreColegiado;
+	private String fechaGuardia;
+	private String validada;
+	private String numeroActuaciones;
+	private ListaContrarioJusticiableItem primerContrario;
+	private RelacionesItem primeraRelacion;
+	private String nig, juzgado, comisaria, numProcedimiento, idProcedimiento, numDiligencia;
+	private List<String> delitos;
+	
+	/**
+	 * @return the numeroActuaciones
+	 */
+	public String getNumeroActuaciones() {
+		return numeroActuaciones;
+	}
+	/**
+	 * @param numeroActuaciones the numeroActuaciones to set
+	 */
+	public void setNumeroActuaciones(String numeroActuaciones) {
+		this.numeroActuaciones = numeroActuaciones;
+	}
+	/**
+	 * @return the descripcionGuardia
+	 */
+	public String getDescripcionGuardia() {
+		return descripcionGuardia;
+	}
+	/**
+	 * @param descripcionGuardia the descripcionGuardia to set
+	 */
+	public void setDescripcionGuardia(String descripcionGuardia) {
+		this.descripcionGuardia = descripcionGuardia;
+	}
+	/**
+	 * @return the numeroColegiado
+	 */
+	public String getNumeroColegiado() {
+		return numeroColegiado;
+	}
+	/**
+	 * @param numeroColegiado the numeroColegiado to set
+	 */
+	public void setNumeroColegiado(String numeroColegiado) {
+		this.numeroColegiado = numeroColegiado;
+	}
+	/**
+	 * @return the nombreColegiado
+	 */
+	public String getNombreColegiado() {
+		return nombreColegiado;
+	}
+	/**
+	 * @param nombreColegiado the nombreColegiado to set
+	 */
+	public void setNombreColegiado(String nombreColegiado) {
+		this.nombreColegiado = nombreColegiado;
+	}
+	/**
+	 * @return the fechaGuardia
+	 */
+	public String getFechaGuardia() {
+		return fechaGuardia;
+	}
+	/**
+	 * @param fechaGuardia the fechaGuardia to set
+	 */
+	public void setFechaGuardia(String fechaGuardia) {
+		this.fechaGuardia = fechaGuardia;
+	}
 	
 	/**
 	 * @return the anio
@@ -198,6 +285,269 @@ public class TarjetaAsistenciaResponseItem {
 	public void setObservaciones(String observaciones) {
 		this.observaciones = observaciones;
 	}
+	/**
+	 * @return the filtro
+	 */
+	public FiltroAsistenciaItem getFiltro() {
+		return filtro;
+	}
+	/**
+	 * @param filtro the filtro to set
+	 */
+	public void setFiltro(FiltroAsistenciaItem filtro) {
+		this.filtro = filtro;
+	}
+	/**
+	 * @return the idGuardia
+	 */
+	public String getIdGuardia() {
+		return idGuardia;
+	}
+	/**
+	 * @param idGuardia the idGuardia to set
+	 */
+	public void setIdGuardia(String idGuardia) {
+		this.idGuardia = idGuardia;
+	}
+	/**
+	 * @return the idTurno
+	 */
+	public String getIdTurno() {
+		return idTurno;
+	}
+	/**
+	 * @param idTurno the idTurno to set
+	 */
+	public void setIdTurno(String idTurno) {
+		this.idTurno = idTurno;
+	}
+	/**
+	 * @return the estado
+	 */
+	public String getEstado() {
+		return estado;
+	}
+	/**
+	 * @param estado the estado to set
+	 */
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+	/**
+	 * @return the fechaSolicitud
+	 */
+	public String getFechaSolicitud() {
+		return fechaSolicitud;
+	}
+	/**
+	 * @param fechaSolicitud the fechaSolicitud to set
+	 */
+	public void setFechaSolicitud(String fechaSolicitud) {
+		this.fechaSolicitud = fechaSolicitud;
+	}
+	/**
+	 * @return the fechaCierre
+	 */
+	public String getFechaCierre() {
+		return fechaCierre;
+	}
+	/**
+	 * @param fechaCierre the fechaCierre to set
+	 */
+	public void setFechaCierre(String fechaCierre) {
+		this.fechaCierre = fechaCierre;
+	}
+	/**
+	 * @return the fechaAsistencia
+	 */
+	public String getFechaAsistencia() {
+		return fechaAsistencia;
+	}
+	/**
+	 * @param fechaAsistencia the fechaAsistencia to set
+	 */
+	public void setFechaAsistencia(String fechaAsistencia) {
+		this.fechaAsistencia = fechaAsistencia;
+	}
+	/**
+	 * @return the idLetradoGuardia
+	 */
+	public String getIdLetradoGuardia() {
+		return idLetradoGuardia;
+	}
+	/**
+	 * @param idLetradoGuardia the idLetradoGuardia to set
+	 */
+	public void setIdLetradoGuardia(String idLetradoGuardia) {
+		this.idLetradoGuardia = idLetradoGuardia;
+	}
+	/**
+	 * @return the idTipoAsistenciaColegio
+	 */
+	public String getIdTipoAsistenciaColegio() {
+		return idTipoAsistenciaColegio;
+	}
+	/**
+	 * @param idTipoAsistenciaColegio the idTipoAsistenciaColegio to set
+	 */
+	public void setIdTipoAsistenciaColegio(String idTipoAsistenciaColegio) {
+		this.idTipoAsistenciaColegio = idTipoAsistenciaColegio;
+	}
+	/**
+	 * @return the idSolicitudCentralita
+	 */
+	public String getIdSolicitudCentralita() {
+		return idSolicitudCentralita;
+	}
+	/**
+	 * @param idSolicitudCentralita the idSolicitudCentralita to set
+	 */
+	public void setIdSolicitudCentralita(String idSolicitudCentralita) {
+		this.idSolicitudCentralita = idSolicitudCentralita;
+	}
+	public String getFechaEstado() {
+		return fechaEstado;
+	}
+	public void setFechaEstado(String fechaEstado) {
+		this.fechaEstado = fechaEstado;
+	}
+	/**
+	 * @return the descripcionEstado
+	 */
+	public String getDescripcionEstado() {
+		return descripcionEstado;
+	}
+	/**
+	 * @param descripcionEstado the descripcionEstado to set
+	 */
+	public void setDescripcionEstado(String descripcionEstado) {
+		this.descripcionEstado = descripcionEstado;
+	}
+	/**
+	 * @return the descripcionTurno
+	 */
+	public String getDescripcionTurno() {
+		return descripcionTurno;
+	}
+	/**
+	 * @param descripcionTurno the descripcionTurno to set
+	 */
+	public void setDescripcionTurno(String descripcionTurno) {
+		this.descripcionTurno = descripcionTurno;
+	}
+	/**
+	 * @return the validada
+	 */
+	public String getValidada() {
+		return validada;
+	}
+	/**
+	 * @param validada the validada to set
+	 */
+	public void setValidada(String validada) {
+		this.validada = validada;
+	}
+
+	public String getIdPersonaJg() {
+		return idPersonaJg;
+	}
+
+	public void setIdPersonaJg(String idPersonaJg) {
+		this.idPersonaJg = idPersonaJg;
+	}
+
+	public String getNumContrarios() {
+		return numContrarios;
+	}
+
+	public void setNumContrarios(String numContrarios) {
+		this.numContrarios = numContrarios;
+	}
+	/**
+	 * @return the descripcionTipoAsistenciaColegio
+	 */
+	public String getDescripcionTipoAsistenciaColegio() {
+		return descripcionTipoAsistenciaColegio;
+	}
+	/**
+	 * @param descripcionTipoAsistenciaColegio the descripcionTipoAsistenciaColegio to set
+	 */
+	public void setDescripcionTipoAsistenciaColegio(String descripcionTipoAsistenciaColegio) {
+		this.descripcionTipoAsistenciaColegio = descripcionTipoAsistenciaColegio;
+	}
+
+	public ListaContrarioJusticiableItem getPrimerContrario() {
+		return primerContrario;
+	}
+
+	public void setPrimerContrario(ListaContrarioJusticiableItem primerContrario) {
+		this.primerContrario = primerContrario;
+	}
+
+	public RelacionesItem getPrimeraRelacion() {
+		return primeraRelacion;
+	}
+
+	public void setPrimeraRelacion(RelacionesItem primeraRelacion) {
+		this.primeraRelacion = primeraRelacion;
+	}
+
+	public String getNig() {
+		return nig;
+	}
+
+	public void setNig(String nig) {
+		this.nig = nig;
+	}
+
+	public String getJuzgado() {
+		return juzgado;
+	}
+
+	public void setJuzgado(String juzgado) {
+		this.juzgado = juzgado;
+	}
+
+	public String getComisaria() {
+		return comisaria;
+	}
+
+	public void setComisaria(String comisaria) {
+		this.comisaria = comisaria;
+	}
+
+	public String getNumProcedimiento() {
+		return numProcedimiento;
+	}
+
+	public void setNumProcedimiento(String numProcedimiento) {
+		this.numProcedimiento = numProcedimiento;
+	}
+
+	public String getIdProcedimiento() {
+		return idProcedimiento;
+	}
+
+	public void setIdProcedimiento(String idProcedimiento) {
+		this.idProcedimiento = idProcedimiento;
+	}
+
+	public String getNumDiligencia() {
+		return numDiligencia;
+	}
+
+	public void setNumDiligencia(String numDiligencia) {
+		this.numDiligencia = numDiligencia;
+	}
+
+	public List<String> getDelitos() {
+		return delitos;
+	}
+
+	public void setDelitos(List<String> delitos) {
+		this.delitos = delitos;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(actuaciones, anio, anioNumero, apellido1, apellido2, asistido,

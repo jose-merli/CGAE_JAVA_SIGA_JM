@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.FundamentosCalificacionItem;
 import org.itcgae.siga.db.mappers.ScsTipofundamentocalifMapper;
@@ -40,5 +41,11 @@ public interface ScsFundamentoscalificacionExtendsMapper extends ScsTipofundamen
 	})
 	NewIdDTO getIdFundamento(Short idInstitucion,String idLenguaje);
 	
-	
+	@SelectProvider(type = ScsFundamentoscalificacionSqlExtendsProvider.class, method = "comboFundamentoCalificacion")
+	@Results({ 
+		@Result(column = "IDFUNDAMENTOCALIF", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> comboFundamentoCalificacion(String idlenguaje, String idInstitucion, String[] list_dictamen);
+		
 }

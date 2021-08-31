@@ -1,9 +1,8 @@
 package org.itcgae.siga.db.services.scs.providers;
 
-import java.util.Date;
-
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.ModulosItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsProcedimientosSqlProvider;
 
 public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlProvider{
@@ -41,6 +40,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		
 		sql.FROM("SCS_PRETENSION procedimiento");
 		sql.WHERE("procedimiento.idinstitucion = '" + idInstitucion + "'");
+		if(UtilidadesString.esCadenaVacia(idJurisdiccion))
 		sql.WHERE("procedimiento.idjurisdiccion = '"+idJurisdiccion+"'");
 		sql.WHERE("procedimiento.fechabaja is null");
 		sql.ORDER_BY("nombre");
@@ -125,6 +125,5 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 
 		return sql.toString();
 	}
-	
 	
 }

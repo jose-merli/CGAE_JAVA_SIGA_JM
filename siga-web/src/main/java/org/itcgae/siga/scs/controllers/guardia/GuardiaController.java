@@ -18,11 +18,12 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
-import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesResponse;
+import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
 import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosSalidaItem;
+import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesResponse;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
 import org.itcgae.siga.DTOs.scs.DeleteCalendariosProgDatosEntradaItem;
@@ -34,8 +35,10 @@ import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.IncompatibilidadesDTO;
 import org.itcgae.siga.DTOs.scs.IncompatibilidadesDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesResponseDTO;
 import org.itcgae.siga.DTOs.scs.LetradosGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.RangoFechasItem;
 import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
@@ -265,8 +268,7 @@ public class GuardiaController {
 				request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
-	
-	@GetMapping("/guardiasFromIdConjunto")
+	@GetMapping(value = "/guardiasFromIdConjunto")
 	public ResponseEntity<List<GuardiaCalendarioItem>> guardiasFromCojunto(HttpServletRequest request, String idConjunto) {
 		List<GuardiaCalendarioItem> response = guardiasService.guardiasFromCojunto(request, idConjunto);
 		return new ResponseEntity<List<GuardiaCalendarioItem>>(response, HttpStatus.OK);
@@ -344,4 +346,40 @@ public class GuardiaController {
 //        return new ResponseEntity<Response>(rb.build(), HttpStatus.OK); 
 //    }  
 	
+
+	@PostMapping(value = "/busquedainscripciones", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<InscripcionesResponseDTO> getInscripciones(@RequestBody InscripcionDatosEntradaDTO inscripcionesBody, HttpServletRequest request){
+        InscripcionesResponseDTO response= guardiasService.getInscripciones(inscripcionesBody, request);
+        return new ResponseEntity<InscripcionesResponseDTO>(response, HttpStatus.OK);
+	}
+	
+//	@PostMapping(value = "/turnoconbajas", produces = MediaType.APPLICATION_JSON_VALUE)
+//	ResponseEntity<ComboDTO> getTurnoconBajas(@RequestBody DeleteIncompatibilidadesDatosEntradaItem deleteIncompatibilidadesBody, HttpServletRequest request){
+//		DeleteResponseDTO response= guardiasService.deleteIncompatibilidades(deleteIncompatibilidadesBody, request);
+//		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+//	}
+	
+	@PostMapping(value = "/validarInscripciones", produces = MediaType.APPLICATION_JSON_VALUE)	
+	ResponseEntity<UpdateResponseDTO> validarInscripciones(@RequestBody BusquedaInscripcionItem validarbody, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasService.validarInscripciones(validarbody, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/denegarInscripciones", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> denegarInscripciones(@RequestBody BusquedaInscripcionItem denegarbody, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasService.denegarInscripciones(denegarbody, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+//	@PostMapping(value = "/solicitarBajaInscripcion", produces = MediaType.APPLICATION_JSON_VALUE)
+//	ResponseEntity<SolicitarBajaInscripcionResponseDTO> solicitarBajaInscripcion(@RequestBody List<SolicitarBajaInscripcionDatosEntradaItem> solicitarbajabody, HttpServletRequest request){
+//		SolicitarBajaInscripcionResponseDTO response= guardiasService.solicitarBajaInscripcion(solicitarbajabody, request);
+//		return new ResponseEntity<SolicitarBajaInscripcionResponseDTO>(response, HttpStatus.OK);
+//	}
+//	
+//	@PostMapping(value = "/cambiarFechaInscripcion", produces = MediaType.APPLICATION_JSON_VALUE)
+//	ResponseEntity<CambiarFechainscripcionResponseDTO> cambiarFechaInscripcion(@RequestBody List<CambiarFechaInscripcionDatosEntradaItem> cambiarfechabody, HttpServletRequest request){
+//		CambiarFechainscripcionResponseDTO response= guardiasService.cambiarFechaInscripcion(cambiarfechabody, request);
+//		return new ResponseEntity<CambiarFechainscripcionResponseDTO>(response, HttpStatus.OK);
+//	}
 }

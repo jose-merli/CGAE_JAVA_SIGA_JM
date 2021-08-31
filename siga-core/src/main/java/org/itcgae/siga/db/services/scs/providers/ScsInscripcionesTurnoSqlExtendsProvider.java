@@ -136,8 +136,8 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"    ins.observacionesvalbaja,\r\n" + 
 				"    ins.fechadenegacion,\r\n" + 
 				"    ins.observacionesdenegacion,\r\n" + 
-				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado,"
-				+ "DECODE(tur.GUARDIAS, 0, 'Obligatorias', DECODE(tur.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" + 
+				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado," +
+				"    DECODE(tur.GUARDIAS, 0, 'Obligatorias', DECODE(tur.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" +
 				"FROM\r\n" + 
 				"    scs_inscripcionturno ins\r\n" + 
 				"    JOIN cen_colegiado col ON col.idpersona = ins.idpersona\r\n" + 
@@ -463,9 +463,9 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"FROM (SELECT ROWNUM AS orden,consulta.* \r\n" + 
 				"FROM (SELECT (CASE\r\n" + 
 				"				WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-				"				AND TRUNC(Ins.Fechavalidacion) <= NVL('"+strDate+"', Ins.Fechavalidacion)\r\n" + 
+				"				AND TRUNC(Ins.Fechavalidacion) <= NVL(TO_DATE('"+strDate+"', 'DD/MM/YYYY'), Ins.Fechavalidacion)\r\n" + 
 				"				AND (Ins.Fechabaja IS NULL\r\n" + 
-				"				OR TRUNC(Ins.Fechabaja) > NVL('"+strDate+"', '01/01/1900')) THEN '1'\r\n" + 
+				"				OR TRUNC(Ins.Fechabaja) > NVL(TO_DATE('"+strDate+"', 'DD/MM/YYYY'), TO_DATE('01/01/1900', 'DD/MM/YYYY'))) THEN '1'\r\n" + 
 				"				ELSE '0'\r\n" + 
 				"				END) Activo,\r\n" + 
 				"				Ins.Idinstitucion,\r\n" + 
@@ -645,5 +645,18 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 		sql1.WHERE("SCS_INSCRIPCIONTURNO.fechabaja is null");
 		
 		return sql1.toString();
+	}
+	
+	public String comboTurnosInscritoLetrado(Short idInstitucion, String idPersona) {
+		SQL sql = new SQL();
+		sql.SELECT("t.IDTURNO", "t.NOMBRE");
+		sql.FROM("SCS_TURNO t");
+		sql.INNER_JOIN("scs_inscripcionturno IT ON t.idturno =  IT.IDTURNO AND t.idinstitucion = it.idinstitucion");
+		sql.WHERE("t.idinstitucion = "+idInstitucion,
+				"it.fechabaja is null",
+				"it.fechavalidacion is not null",
+				"it.idpersona = '"+idPersona+"'");
+		
+		return sql.toString();
 	}
 }

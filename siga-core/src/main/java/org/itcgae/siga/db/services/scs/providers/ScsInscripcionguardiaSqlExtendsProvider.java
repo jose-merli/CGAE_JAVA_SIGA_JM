@@ -1,7 +1,14 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
+import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.ScsInscripcionguardiaSqlProvider;
 
 public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguardiaSqlProvider{
@@ -29,9 +36,9 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"			SELECT\r\n" + 
 					"				(CASE\r\n" + 
 					"					WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 
-					"					"+fechaAnd + 
+					"					" + fechaAnd + 
 					"					AND (Ins.Fechabaja IS NULL\r\n" + 
-					"					" +fechaOr+ 
+					"					" + fechaOr+ 
 					"					ELSE '0'\r\n" + 
 					"				END) Activo,\r\n" + 
 					"				Ins.Idinstitucion,\r\n" + 
@@ -337,8 +344,143 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		return sql.toString();
 	}
 	
-	public String searchGrupo(String grupo, Short idInstitucion) {
 
+	
+
+	public String listadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion) {
+		
+		SQL sql = new SQL();
+		
+		SQL subQuerysql = new SQL();
+		subQuerysql.SELECT("MAX(it2.fechasuscripcion)");
+		subQuerysql.FROM("scs_inscripcionguardia it2");
+		subQuerysql.WHERE("it2.idinstitucion = ins.idinstitucion");
+		subQuerysql.WHERE("it2.idturno = ins.idturno");
+		subQuerysql.WHERE("it2.idpersona = ins.idpersona");
+		
+		SQL subQuerysql2 = new SQL();
+		subQuerysql2.SELECT("guar.nombre");
+		subQuerysql2.FROM("scs_guardiasturno guar2");
+		subQuerysql2.WHERE("guar2.idinstitucion = ins.idinstitucion");
+		subQuerysql2.WHERE("guar2.idturno = ins.idturno");
+		subQuerysql2.WHERE("guar2.idguardia = guar.idguardia");
+		
+		sql.SELECT("( CASE WHEN ins.fechadenegacion IS NOT NULL"
+                + "     AND ins.fechabaja IS NOT NULL"
+                + "     AND ins.fechasolicitudbaja IS NOT NULL"
+                + "     AND ins.fechavalidacion IS NOT NULL THEN '4' /*Denegada*/ "
+                + "WHEN ins.fechadenegacion IS NULL AND ins.fechabaja IS NOT NULL"
+                + "     AND ins.fechasolicitudbaja IS NOT NULL"
+                + "     AND ins.fechavalidacion IS NOT NULL THEN '3' /*Baja*/"
+                + "WHEN ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL"
+                + "     AND ins.fechasolicitudbaja IS NOT NULL"
+                + "     AND ins.fechavalidacion IS NOT NULL THEN '2' /*Pendiente de Baja*/"
+                + "WHEN ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL"
+                + "     AND ins.fechasolicitudbaja IS NULL"
+                + "     AND ins.fechavalidacion IS NOT NULL THEN '1' /*Alta*/"
+                + "ELSE '0' /*Pendiente de Alta*/" + " END) estado");
+		
+		sql.SELECT("tur.nombre");
+		sql.SELECT("tur.abreviatura abreviatura");
+		sql.SELECT("tur.validarinscripciones");
+		
+		sql.SELECT("guar.nombre NOMBREGUARDIA");
+		sql.SELECT("guar.idguardia IDGUARDIA");
+		
+		sql.SELECT("per.apellidos1 || DECODE(per.apellidos2,NULL,'',' ' || per.apellidos2) || ', ' || per.nombre apellidosnombre");
+		sql.SELECT("DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado");
+		sql.SELECT("per.nombre");
+		sql.SELECT("per.apellidos1");
+		sql.SELECT("per.apellidos2");
+		sql.SELECT("ins.idinstitucion");
+		sql.SELECT("ins.idpersona");
+		sql.SELECT("ins.idturno");
+		sql.SELECT("ins.fechasuscripcion");
+		sql.SELECT("ins.observacionessuscripcion");
+		sql.SELECT("ins.fechavalidacion");
+		sql.SELECT("ins.observacionesvalidacion");
+		sql.SELECT("ins.fechasolicitudbaja");
+		sql.SELECT("ins.observacionesbaja");
+		sql.SELECT("ins.fechabaja");
+		sql.SELECT("ins.observacionesvalbaja");
+		sql.SELECT("ins.fechadenegacion");
+		sql.SELECT("ins.observacionesdenegacion");
+		sql.SELECT("DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) ncolegiado");
+		sql.SELECT("TO_CHAR(nvl(ins.fechadenegacion,ins.fechavalidacion),'dd/mm/yyyy') fechavalidacion");
+		sql.SELECT("TO_CHAR(nvl(ins.fechadenegacion,ins.fechabaja),'dd/mm/yyyy') fechabaja");
+
+        sql.FROM("scs_inscripcionguardia ins");
+        sql.INNER_JOIN("cen_colegiado col ON col.idpersona = ins.idpersona AND col.idinstitucion = ins.idinstitucion");
+        sql.INNER_JOIN("cen_persona per ON per.idpersona = col.idpersona");
+        sql.INNER_JOIN("scs_turno tur ON tur.idturno = ins.idturno AND tur.idinstitucion = ins.idinstitucion");
+        sql.INNER_JOIN("scs_guardiasturno guar ON guar.idturno = tur.idturno AND guar.idinstitucion = ins.idinstitucion");
+
+ 
+        if(idInstitucion != null) {
+        	sql.WHERE("ins.idinstitucion = " + idInstitucion);
+        }
+        
+        if(inscripciones.getIdTurno() != null) {
+        	sql.WHERE("ins.idturno in ("+ inscripciones.getIdTurno()+")");
+        }
+        
+        if(inscripciones.getIdEstado() != null) {
+            String condestados = "(";
+            String[] estados = inscripciones.getIdEstado().split(",");
+            for(int i = 0; i< estados.length; i++) {
+                if(i>0) condestados+=" or ";
+                // Pendiente de alta
+                if(estados[i].equals("0")) {
+                    condestados+=" (ins.fechavalidacion is null and ins.fechadenegacion is null)" ;
+                }
+                // Alta
+                else if(estados[i].equals("1")) {
+                    condestados+=" (ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
+                            " AND ins.fechasolicitudbaja IS NULL AND ins.fechavalidacion IS NOT NULL)" ;
+                }
+                // Pendiente de Baja
+                else if(estados[i].equals("2")) {
+                    condestados+=" (ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL" + 
+                            " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL)" ;
+                }
+                // Baja
+                else if(estados[i].equals("3")) {
+                    condestados+=" (ins.fechadenegacion IS NULL AND ins.fechabaja IS NOT NULL"
+                            + " AND ins.fechasolicitudbaja IS NOT NULL AND ins.fechavalidacion IS NOT NULL )" ;
+                }
+                // Denegada
+                else if(estados[i].equals("4")) {
+                    condestados+=" (ins.fechadenegacion is not null)" ;
+                }
+            }
+            condestados+=")";
+            sql.WHERE(condestados);
+        }
+        
+        sql.WHERE("ins.fechasuscripcion = (" + subQuerysql + ")");
+        
+        sql.WHERE("guar.nombre = (" + subQuerysql2 + ")");
+        
+        sql.WHERE("fechadenegacion IS NULL");
+        sql.WHERE("fechavalidacion IS NOT NULL");
+        
+        if(inscripciones.getFechaDesde() != null) {
+        	sql.WHERE("ins.fechasuscripcion >= TO_DATE('" + inscripciones.getFechaDesde() + "','DD/MM/RRRR')");
+        }
+        
+        if(inscripciones.getFechaHasta() != null) {
+        	 sql.WHERE("ins.fechasuscripcion <= TO_DATE('" + inscripciones.getFechaHasta() + "','DD/MM/RRRR')");
+        }
+        
+        sql.WHERE("ROWNUM <= 200");
+       
+        sql.ORDER_BY("tur.nombre");
+		
+		return sql.toString();
+
+	}
+
+	public String searchGrupo(String grupo, Short idInstitucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("SCS_GRUPOGUARDIA.NUMEROGRUPO");
@@ -355,6 +497,286 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sql.WHERE("SCS_GRUPOGUARDIA.NUMEROGRUPO = '" + grupo + "'");
 
 
+		return sql.toString();
+	}
+	
+	public String comboGuardiasInscritoLetrado(Short idInstitucion, String idPersona, String idTurno) {
+		SQL sql = new SQL();
+		sql.SELECT("gt.IDGUARDIA", "gt.NOMBRE");
+		sql.FROM("scs_guardiasturno gt");
+		sql.INNER_JOIN("scs_inscripcionguardia ig on gt.idinstitucion = ig.idinstitucion and gt.idguardia = ig.idguardia and gt.idturno = ig.idturno");
+		sql.WHERE("gt.idinstitucion = "+idInstitucion,
+				"ig.fechabaja is null",
+				"ig.fechavalidacion is not null",
+				"ig.idpersona = '"+idPersona+"'",
+				"ig.idturno = '"+idTurno+"'");
+		return sql.toString();
+	}
+	
+	public String validarInscripciones(BusquedaInscripcionItem inscripciones, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        String today = formatter.format(new Date());
+        
+		sql.UPDATE("scs_inscripcionguardia");
+		
+		if (idInstitucion != null) {
+			sql.SET("IDINSTITUCION = "+idInstitucion);
+		}
+		if (inscripciones.getIdpersona() != null) {
+			sql.SET("IDPERSONA = "+inscripciones.getIdpersona());
+		}
+		if (inscripciones.getIdTurno() != null) {
+			sql.SET("IDTURNO = "+inscripciones.getIdTurno());
+		}
+		if (inscripciones.getIdguardia() != null) {
+			sql.SET("IDGUARDIA = "+inscripciones.getIdguardia());
+		}
+		if (inscripciones.getFechasolicitud() != null) {
+			sql.SET("FECHASUSCRIPCION = "+inscripciones.getFechasolicitud());
+		}
+		if (today != null) {
+			sql.SET("FECHAMODIFICACION = "+today);
+		}
+		
+		sql.SET("USUMODIFICACION = "+0);
+		
+		if (inscripciones.getFechabaja() != null) {
+			sql.SET("FECHABAJA = "+inscripciones.getFechabaja());
+		}
+		if (inscripciones.getObservacionessolicitud() != null) {
+			sql.SET("OBSERVACIONESSUSCRIPCION = "+inscripciones.getObservacionessolicitud());
+		}
+		if (inscripciones.getObservacionesbaja() != null) {
+			sql.SET("OBSERVACIONESBAJA = "+inscripciones.getObservacionesbaja());
+		}
+		
+		if (inscripciones.getFechasolicitudbaja() != null) {
+			sql.SET("FECHASOLICITUDBAJA = "+inscripciones.getFechasolicitudbaja());
+		}
+		
+		if (inscripciones.getFechavalidacion() != null) {
+			sql.SET("FECHAVALIDACION = "+inscripciones.getFechavalidacion());
+		}
+		if (inscripciones.getObservacionesvalidacion() != null) {
+			sql.SET("OBSERVACIONESVALIDACION = "+inscripciones.getObservacionesvalidacion());
+		}
+		if (inscripciones.getFechadenegacion() != null) {
+			sql.SET("FECHADENEGACION = "+inscripciones.getFechadenegacion());
+		}
+		if (inscripciones.getObservacionesdenegacion() != null) {
+			sql.SET("OBSERVACIONESDENEGACION = "+inscripciones.getObservacionesdenegacion());
+		}
+		if (inscripciones.getObservacionesvalbaja() != null) {
+			sql.SET("OBSERVACIONESVALBAJA = "+inscripciones.getObservacionesvalbaja());
+		}		
+		
+		return sql.toString();
+	}
+	
+	public String denegarInscripciones(BusquedaInscripcionItem inscripciones, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        String today = formatter.format(new Date());
+        
+		sql.UPDATE("scs_inscripcionguardia");
+		
+		if (idInstitucion != null) {
+			sql.SET("IDINSTITUCION = "+idInstitucion);
+		}
+		if (inscripciones.getIdpersona() != null) {
+			sql.SET("IDPERSONA = "+inscripciones.getIdpersona());
+		}
+		if (inscripciones.getIdTurno() != null) {
+			sql.SET("IDTURNO = "+inscripciones.getIdTurno());
+		}
+		if (inscripciones.getIdguardia() != null) {
+			sql.SET("IDGUARDIA = "+inscripciones.getIdguardia());
+		}
+		if (inscripciones.getFechasolicitud() != null) {
+			sql.SET("FECHASUSCRIPCION = "+inscripciones.getFechasolicitud());
+		}
+		if (today != null) {
+			sql.SET("FECHAMODIFICACION = "+today);
+		}
+		
+		sql.SET("USUMODIFICACION = "+0);
+		
+		if (inscripciones.getFechabaja() != null) {
+			sql.SET("FECHABAJA = "+inscripciones.getFechabaja());
+		}
+		if (inscripciones.getObservacionessolicitud() != null) {
+			sql.SET("OBSERVACIONESSUSCRIPCION = "+inscripciones.getObservacionessolicitud());
+		}
+		if (inscripciones.getObservacionesbaja() != null) {
+			sql.SET("OBSERVACIONESBAJA = "+inscripciones.getObservacionesbaja());
+		}
+		
+		if (inscripciones.getFechasolicitudbaja() != null) {
+			sql.SET("FECHASOLICITUDBAJA = "+inscripciones.getFechasolicitudbaja());
+		}
+		
+		if (inscripciones.getFechavalidacion() != null) {
+			sql.SET("FECHAVALIDACION = "+inscripciones.getFechavalidacion());
+		}
+		if (inscripciones.getObservacionesvalidacion() != null) {
+			sql.SET("OBSERVACIONESVALIDACION = "+inscripciones.getObservacionesvalidacion());
+		}
+		if (inscripciones.getFechadenegacion() != null) {
+			sql.SET("FECHADENEGACION = "+inscripciones.getFechadenegacion());
+		}
+		if (inscripciones.getObservacionesdenegacion() != null) {
+			sql.SET("OBSERVACIONESDENEGACION = "+inscripciones.getObservacionesdenegacion());
+		}
+		if (inscripciones.getObservacionesvalbaja() != null) {
+			sql.SET("OBSERVACIONESVALBAJA = "+inscripciones.getObservacionesvalbaja());
+		}		
+		
+		return sql.toString();
+	}
+	
+	public String insertarInscripcion(Short idInstitucion, InscripcionGuardiaItem inscripcion, AdmUsuarios admUsuarios) {
+		SQL sql = new SQL();
+
+		sql.INSERT_INTO("scs_inscripcionguardia");
+
+		sql.VALUES("IDPERSONA", inscripcion.getIdPersona());
+		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
+		sql.VALUES("IDTURNO", inscripcion.getIdTurno());
+		sql.VALUES("IDGUARDIA", inscripcion.getIdGuardia());
+		sql.VALUES("FECHASUSCRIPCION", "SYSTIMESTAMP");
+		sql.VALUES("FECHAMODIFICACION", "SYSTIMESTAMP");
+		sql.VALUES("USUMODIFICACION", "'" + admUsuarios.getIdusuario() + "'");
+		sql.VALUES("FECHABAJA", inscripcion.getFechabaja());
+		sql.VALUES("OBSERVACIONESSUSCRIPCION", inscripcion.getObservacionessuscripcion());
+		sql.VALUES("OBSERVACIONESBAJA", inscripcion.getObservacionesbaja());
+//		sql.VALUES("FECHASOLICITUDBAJA", "NULL");
+//		sql.VALUES("FECHAVALIDACION", inscripcion.getFechaValidacion());
+		sql.VALUES("OBSERVACIONESVALIDACION", inscripcion.getObservacionesvalidacion());
+//		sql.VALUES("FECHADENEGACION", "NULL");
+		sql.VALUES("OBSERVACIONESDENEGACION", inscripcion.getObservacionesdenegacion());
+		sql.VALUES("OBSERVACIONESVALBAJA", inscripcion.getObservacionesvalbaja());
+		return sql.toString();
+	}
+	
+	public String buscarInscripcion(Short idInstitucion, InscripcionGuardiaItem inscripcion,
+			AdmUsuarios admUsuarios){
+		SQL sql = new SQL();
+		sql.SELECT("IDPERSONA", "IDINSTITUCION", "IDTURNO", "IDGUARDIA", "FECHASUSCRIPCION", "FECHAMODIFICACION", "USUMODIFICACION", "FECHABAJA", "OBSERVACIONESSUSCRIPCION", "OBSERVACIONESBAJA", "FECHASOLICITUDBAJA", "FECHAVALIDACION", "OBSERVACIONESVALIDACION", "FECHADENEGACION", "OBSERVACIONESDENEGACION", "OBSERVACIONESVALBAJA");
+		sql.FROM("scs_inscripcionguardia");
+		sql.WHERE("IDINSTITUCION ="+ idInstitucion);
+		sql.WHERE("IDPERSONA ="+ admUsuarios.getIdusuario());
+		sql.WHERE("IDTURNO ="+ inscripcion.getIdTurno());
+		sql.WHERE("IDGUARDIA ="+ inscripcion.getIdGuardia());
+		sql.WHERE("IDGUARDIA ="+ inscripcion.getIdGuardia());
+		return sql.toString();
+	}
+	
+	public String inscripcionesDisponibles(Short idInstitucion, AdmUsuarios admUsuarios) {
+		SQL sql = new SQL();
+		sql.SELECT("scs_guardiasturno.idguardia AS idguardia",
+		"scs_guardiasturno.idturno AS idturno",
+		"scs_grupoguardia.numerogrupo AS numerogrupo",
+		"DECODE(cen_colegiado.comunitario,'1',cen_colegiado.ncomunitario,cen_colegiado.ncolegiado) AS colegiado",
+		"( DECODE(cen_colegiado.comunitario,'1',cen_colegiado.ncomunitario,cen_colegiado.ncolegiado)"
+		+ "    || '/'"
+		+ "    || lpad(scs_grupoguardia.numerogrupo,3,'0') ) AS colegiado_grupo",
+		"( cen_persona.apellidos1"
+		+ "    || ' '"
+		+ "    || cen_persona.apellidos2"
+		+ "    || ', '"
+		+ "    || cen_persona.nombre ) AS letrado",
+		"scs_turno.nombre AS nombre_turno",
+		"scs_turno.idzona AS idzona",
+		"scs_zona.nombre AS nombre_zona",
+		"scs_turno.idsubzona AS idsubzona",
+		"scs_subzona.nombre AS nombre_subzona",
+		"scs_turno.idarea AS idarea",
+		"scs_area.nombre AS nombre_area",
+		"scs_turno.idmateria AS idmateria",
+		"scs_materia.nombre AS nombre_materia",
+		"scs_guardiasturno.nombre AS nombre_guardia",
+		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia",
+		"scs_turno.guardias AS obligatoriedad_inscripcion",
+		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad");
+		
+		sql.FROM("scs_inscripcionguardia");
+		//Left Join
+		sql.JOIN("scs_turno ON scs_turno.idinstitucion = scs_inscripcionguardia.idinstitucion AND scs_turno.idturno = scs_inscripcionguardia.idturno");
+		sql.JOIN("scs_guardiasturno ON scs_inscripcionguardia.idguardia = scs_guardiasturno.idguardia AND scs_inscripcionguardia.idinstitucion = scs_guardiasturno.idinstitucion AND scs_inscripcionguardia.idturno = scs_guardiasturno.idturno");
+		sql.JOIN("cen_persona ON cen_persona.idpersona = scs_inscripcionguardia.idpersona");
+		sql.JOIN("cen_colegiado ON cen_colegiado.idpersona = scs_inscripcionguardia.idpersona AND cen_colegiado.idinstitucion = scs_inscripcionguardia.idinstitucion");
+		sql.JOIN("scs_grupoguardia ON scs_guardiasturno.idguardia = scs_grupoguardia.idguardia");
+		sql.JOIN("scs_zona ON scs_zona.idinstitucion = scs_turno.idinstitucion AND scs_zona.idzona = scs_turno.idzona");
+		sql.JOIN("scs_subzona ON scs_subzona.idinstitucion = scs_turno.idinstitucion AND scs_subzona.idzona = scs_turno.idzona AND scs_subzona.idsubzona = scs_turno.idsubzona");
+		sql.JOIN("scs_area ON scs_area.idinstitucion = scs_turno.idinstitucion AND scs_area.idarea = scs_turno.idarea");
+		sql.JOIN("scs_materia ON scs_materia.idinstitucion = scs_turno.idinstitucion AND scs_materia.idmateria = scs_turno.idmateria AND scs_materia.idarea = scs_turno.idarea");
+		sql.JOIN("scs_tiposguardias ON scs_guardiasturno.idtipoguardia = scs_tiposguardias.idtipoguardia");
+		//Left Join
+		sql.JOIN("gen_recursos_catalogos ON scs_tiposguardias.descripcion = gen_recursos_catalogos.idrecurso");
+		
+		sql.WHERE("scs_guardiasturno.porgrupos = 1",
+		"scs_guardiasturno.fechabaja IS NULL",
+		"scs_turno.fechabaja IS NULL",
+		"scs_inscripcionguardia.idpersona = " + admUsuarios.getIdusuario(),
+		"scs_inscripcionguardia.idinstitucion = " + idInstitucion,
+		"gen_recursos_catalogos.idlenguaje = 1"
+		);
+		return sql.toString();
+	}
+	
+	public String inscripcionPorguardia(Short idInstitucion, AdmUsuarios admUsuarios, String guardia) {
+		SQL sql = new SQL();
+		sql.SELECT("scs_guardiasturno.idguardia AS idguardia",
+		"scs_guardiasturno.idturno AS idturno",
+		"scs_grupoguardia.numerogrupo AS numerogrupo",
+		"DECODE(cen_colegiado.comunitario,'1',cen_colegiado.ncomunitario,cen_colegiado.ncolegiado) AS colegiado",
+		"( DECODE(cen_colegiado.comunitario,'1',cen_colegiado.ncomunitario,cen_colegiado.ncolegiado)"
+		+ "    || '/'"
+		+ "    || lpad(scs_grupoguardia.numerogrupo,3,'0') ) AS colegiado_grupo",
+		"( cen_persona.apellidos1"
+		+ "    || ' '"
+		+ "    || cen_persona.apellidos2"
+		+ "    || ', '"
+		+ "    || cen_persona.nombre ) AS letrado",
+		"scs_turno.nombre AS nombre_turno",
+		"scs_turno.idzona AS idzona",
+		"scs_zona.nombre AS nombre_zona",
+		"scs_turno.idsubzona AS idsubzona",
+		"scs_subzona.nombre AS nombre_subzona",
+		"scs_turno.idarea AS idarea",
+		"scs_area.nombre AS nombre_area",
+		"scs_turno.idmateria AS idmateria",
+		"scs_materia.nombre AS nombre_materia",
+		"scs_guardiasturno.nombre AS nombre_guardia",
+		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia",
+		"scs_turno.guardias AS obligatoriedad_inscripcion",
+		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad");
+		
+		sql.FROM("scs_inscripcionguardia");
+		//Left Join
+		sql.JOIN("scs_turno ON scs_turno.idinstitucion = scs_inscripcionguardia.idinstitucion AND scs_turno.idturno = scs_inscripcionguardia.idturno");
+		sql.JOIN("scs_guardiasturno ON scs_inscripcionguardia.idguardia = scs_guardiasturno.idguardia AND scs_inscripcionguardia.idinstitucion = scs_guardiasturno.idinstitucion AND scs_inscripcionguardia.idturno = scs_guardiasturno.idturno");
+		sql.JOIN("cen_persona ON cen_persona.idpersona = scs_inscripcionguardia.idpersona");
+		sql.JOIN("cen_colegiado ON cen_colegiado.idpersona = scs_inscripcionguardia.idpersona AND cen_colegiado.idinstitucion = scs_inscripcionguardia.idinstitucion");
+		sql.JOIN("scs_grupoguardia ON scs_guardiasturno.idguardia = scs_grupoguardia.idguardia");
+		sql.JOIN("scs_zona ON scs_zona.idinstitucion = scs_turno.idinstitucion AND scs_zona.idzona = scs_turno.idzona");
+		sql.JOIN("scs_subzona ON scs_subzona.idinstitucion = scs_turno.idinstitucion AND scs_subzona.idzona = scs_turno.idzona AND scs_subzona.idsubzona = scs_turno.idsubzona");
+		sql.JOIN("scs_area ON scs_area.idinstitucion = scs_turno.idinstitucion AND scs_area.idarea = scs_turno.idarea");
+		sql.JOIN("scs_materia ON scs_materia.idinstitucion = scs_turno.idinstitucion AND scs_materia.idmateria = scs_turno.idmateria AND scs_materia.idarea = scs_turno.idarea");
+		sql.JOIN("scs_tiposguardias ON scs_guardiasturno.idtipoguardia = scs_tiposguardias.idtipoguardia");
+		//Left Join
+		sql.JOIN("gen_recursos_catalogos ON scs_tiposguardias.descripcion = gen_recursos_catalogos.idrecurso");
+		
+		sql.WHERE("scs_guardiasturno.porgrupos = 1",
+		"scs_guardiasturno.fechabaja IS NULL",
+		"scs_turno.fechabaja IS NULL",
+		"scs_inscripcionguardia.idpersona = " + admUsuarios.getIdusuario(),
+		"scs_inscripcionguardia.idinstitucion = " + idInstitucion,
+		"scs_guardiasturno.IDGUARDIA = " + guardia,
+		"gen_recursos_catalogos.idlenguaje = 1");
 		return sql.toString();
 	}
 }

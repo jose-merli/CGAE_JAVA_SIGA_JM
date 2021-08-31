@@ -6,9 +6,12 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.FundamentoResolucionItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ScsTipofundamentosMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsEjgSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsFundamentoscalificacionSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTipofundamentosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -40,5 +43,15 @@ public interface ScsTipofundamentosExtendsMapper extends ScsTipofundamentosMappe
 	
 	})
 	NewIdDTO getIdFundamentoResolucion(Short idInstitucion);
+
+	
+	@SelectProvider(type = ScsTipofundamentosSqlExtendsProvider.class, method = "comboFundamentoJurid")
+	@Results({ 
+		@Result(column = "IDFUNDAMENTO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+
+	})
+	List<ComboItem> comboFundamentoJurid(String idlenguaje, String string, String resolucion);
+	
 	
 }
