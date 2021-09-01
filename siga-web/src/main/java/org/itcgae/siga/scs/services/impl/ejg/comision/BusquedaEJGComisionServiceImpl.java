@@ -721,67 +721,6 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 				return comboDTO;
 	}
 
-	@Override
-	public ActasDTO busquedaActas(ActasItem actasItem, HttpServletRequest request) {
-		LOGGER.info("busquedaEJGComision() -> Entrada al servicio para obtener el colegiado");
-		Error error = new Error();
-		ActasDTO actasDTO = new ActasDTO();
-		List<GenParametros> tamMax = null;
-		Integer tamMaximo = null;
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String idUltimoEstado = "";
-		
 
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"busquedaEJGComision() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info(
-					"busquedaEJGComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (1 > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-				usuario.setIdinstitucion(idInstitucion);
-				GenParametrosExample genParametrosExample = new GenParametrosExample();
-				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-				LOGGER.info(
-						"busquedaEJGComision() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-
-				LOGGER.info(
-						"busquedaEJGComision() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-				LOGGER.info(
-						"busquedaEJGComision() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
-				if (tamMax != null) {
-					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-				} else {
-					tamMaximo = null;
-				}
-
-				LOGGER.info(
-						"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
-				actasDTO.actasItem(scsEjgComisionExtendsMapper.busquedaActas(actasItem));
-				LOGGER.info(
-						"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
-			} else {
-				LOGGER.warn(
-						"busquedaEJGComision() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-								+ dni + " e idInstitucion = " + idInstitucion);
-			}
-		} else {
-			LOGGER.warn("busquedaEJGComision() -> idInstitucion del token nula");
-		}
-
-		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
-		return actasDTO;
-	}
 
 }
