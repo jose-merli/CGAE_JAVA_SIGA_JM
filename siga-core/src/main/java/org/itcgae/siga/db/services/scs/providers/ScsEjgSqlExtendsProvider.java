@@ -1564,14 +1564,15 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
     	sqlIdpersona.WHERE("desle.IDINSTITUCION = des.idinstitucion and desle.IDTURNO = des.idturno and desle.ANIO = des.anio "
     			+ "and desle.NUMERO = des.numero and p.IDPERSONA = desle.IDPERSONA and desle.IDPERSONA = "
     			+ "F_SIGA_GETIDLETRADO_DESIGNA(desle.idInstitucion,desle.idTurno,desle.anio,desle.NUMERO) and rownum = 1");
-    			
     	
-    	sql.SELECT("e.numero, e.numejg, e.idtipoejg, e.anio, e.idinstitucion, e.juzgado, e.idpretension, d.idturno, des.idprocedimiento,"
-    			+ "("+sqlIdpersona.toString()+") idpersona");
+    	sql.SELECT("e.numero, e.numejg, e.idtipoejg, e.anio, e.idinstitucion, des.idjuzgado, des.idpretension, d.idturno, NVL(des.idprocedimiento, '') idprocedimiento,"
+    			+ "("+sqlIdpersona.toString()+") idpersona, pjg.idpersona idpersonasolicitante, pjg.nif nifsolicitante, pjg.nombre nombresolicitante, pjg.apellido1 apellido1solicitante, "
+    					+ "NVL(pjg.apellido2,'') apellido2solicitante, des.numprocedimiento");
     	sql.FROM("SCS_EJG e");
     	sql.INNER_JOIN("SCS_EJGDESIGNA d ON (d.idinstitucion=e.idInstitucion and d.anioejg=e.anio and d.idtipoejg=e.idtipoejg and d.numeroejg=e.numero)");
     	sql.INNER_JOIN("SCS_DESIGNA des ON (d.idinstitucion=des.idInstitucion and d.aniodesigna=des.anio and d.idturno=des.idturno "
     			+ "and d.numerodesigna=des.numero)");
+    	sql.INNER_JOIN("SCS_PERSONAJG pjg ON (e.idpersonajg=pjg.idpersona)");
     	sql.WHERE("e.idinstitucion="+ejgItem.getidInstitucion()+" and e.anio="+ejgItem.getAnnio()+" and e.idtipoejg="+ejgItem.getTipoEJG()+
     			" and e.numero="+ejgItem.getNumero());
     	
