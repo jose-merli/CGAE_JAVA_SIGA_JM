@@ -37,7 +37,7 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter  {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.protocols(Collections.singleton("http"))
 				.select()
-				.apis(RequestHandlerSelectors.basePackage("org.itcgae.siga.scs.controllers.ejgcomision"))
+				.apis(RequestHandlerSelectors.basePackage("org.itcgae.siga.scs.controllers.acta"))
 				.paths(PathSelectors.any())
 				.build()
 				.apiInfo(getApiInfo())

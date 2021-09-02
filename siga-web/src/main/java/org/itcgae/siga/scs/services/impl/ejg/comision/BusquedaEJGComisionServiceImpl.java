@@ -720,6 +720,4 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		return comboDTO;
 	}
 
-	
-
 }
