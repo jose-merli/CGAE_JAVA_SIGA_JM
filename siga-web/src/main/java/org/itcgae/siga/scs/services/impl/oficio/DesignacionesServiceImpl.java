@@ -182,6 +182,7 @@ import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignasLetradoExtendsMapper;
@@ -348,6 +349,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private ScsAsistenciaExtendsMapper scsAsistenciaExtendsMapper;
+	
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 	
 	/**
 	 * busquedaJustificacionExpres
@@ -6120,7 +6124,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.subirDocumentoDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (usuarios != null && !usuarios.isEmpty()) {
+			LOGGER.info(
+					"DesignacionesServiceImpl.subirDocumentoDesigna() / cenPersonaExtendsMapper.selectByExample() -> Entrada de cenPersonaExtendsMapper para obtener la persona y compararla mas adelante con la tabla de usuario");
+			CenPersonaExample examplePersona = new CenPersonaExample();
+			examplePersona.createCriteria().andNifcifEqualTo(dni);
+			List<CenPersona> persona = cenPersonaExtendsMapper.selectByExample(examplePersona);
+			
+			LOGGER.info(
+					"DesignacionesServiceImpl.subirDocumentoDesigna() / cenPersonaExtendsMapper.selectByExample() -> Salida de cenPersonaExtendsMapper para obtener la persona y compararla mas adelante con la tabla de usuario");
+			
+			if ((usuarios != null && !usuarios.isEmpty()) && (persona != null && !persona.isEmpty())) {
 
 				Iterator<String> itr = request.getFileNames();
 
@@ -6139,43 +6152,46 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionDes(idInstitucion);
 
 					ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
-
-					scsDocumentaciondesigna.setAnio(Short.valueOf(documentoDesignaItem.getAnio()));
-					scsDocumentaciondesigna.setNumero(Long.valueOf(documentoDesignaItem.getNumero()));
-					scsDocumentaciondesigna.setIdturno(Integer.valueOf(documentoDesignaItem.getIdTurno()));
-
-					if (!UtilidadesString.esCadenaVacia(documentoDesignaItem.getObservaciones())) {
-						scsDocumentaciondesigna.setObservaciones(documentoDesignaItem.getObservaciones());
-					}
-					scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(nuevoId.getIdMax().toString()));
-					scsDocumentaciondesigna.setNombrefichero(nombreFichero);
-					scsDocumentaciondesigna
-							.setIdtipodocumento(Short.valueOf(documentoDesignaItem.getIdTipodocumento()));
-					scsDocumentaciondesigna.setIdfichero(idFile);
-					scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
-					scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
-					scsDocumentaciondesigna.setFechamodificacion(new Date());
-					scsDocumentaciondesigna.setFechaentrada(new Date());
 					
-					if(!UtilidadesString.esCadenaVacia(documentoDesignaItem.getIdActuacion())) {
-						scsDocumentaciondesigna.setIdactuacion(Long.valueOf(documentoDesignaItem.getIdActuacion()));
-						scsDocumentaciondesigna.setIdtipodocumento(Short.valueOf("1"));
-					}
+					
+						scsDocumentaciondesigna.setAnio(Short.valueOf(documentoDesignaItem.getAnio()));
+						scsDocumentaciondesigna.setNumero(Long.valueOf(documentoDesignaItem.getNumero()));
+						scsDocumentaciondesigna.setIdturno(Integer.valueOf(documentoDesignaItem.getIdTurno()));
 
-					int response = scsDocumentaciondesignaMapper.insertSelective(scsDocumentaciondesigna);
+						if (!UtilidadesString.esCadenaVacia(documentoDesignaItem.getObservaciones())) {
+							scsDocumentaciondesigna.setObservaciones(documentoDesignaItem.getObservaciones());
+						}
+						scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(nuevoId.getIdMax().toString()));
+						scsDocumentaciondesigna.setNombrefichero(nombreFichero);
+						scsDocumentaciondesigna
+								.setIdtipodocumento(Short.valueOf(documentoDesignaItem.getIdTipodocumento()));
+						scsDocumentaciondesigna.setIdfichero(idFile);
+						scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
+						scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsDocumentaciondesigna.setFechamodificacion(new Date());
+						scsDocumentaciondesigna.setFechaentrada(new Date());
+						
+						if(!UtilidadesString.esCadenaVacia(documentoDesignaItem.getIdActuacion())) {
+							scsDocumentaciondesigna.setIdactuacion(Long.valueOf(documentoDesignaItem.getIdActuacion()));
+							scsDocumentaciondesigna.setIdtipodocumento(Short.valueOf("1"));
+						}
 
-					if (response == 1) {
-						insertResponseDTO.setStatus(SigaConstants.OK);
-					}
+						int response = scsDocumentaciondesignaMapper.insertSelective(scsDocumentaciondesigna);
 
-					if (response == 0) {
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						LOGGER.error(
-								"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
-						error.setCode(500);
-						error.setDescription("general.mensaje.error.bbdd");
-						insertResponseDTO.setError(error);
-					}
+						if (response == 1) {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+
+						if (response == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
+							error.setCode(500);
+							error.setDescription("general.mensaje.error.bbdd");
+							insertResponseDTO.setError(error);
+						}
+					
+					
 
 				}
 
@@ -6189,36 +6205,46 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					for (DocumentoDesignaItem doc : listaDocumentos) {
 
 						ScsDocumentaciondesigna scsDocumentaciondesigna = new ScsDocumentaciondesigna();
+						
+						if(Integer.parseInt(doc.getUsuModificacion())  == usuarios.get(0).getIdusuario()) {
+							if (!UtilidadesString.esCadenaVacia(doc.getObservaciones())) {
+								scsDocumentaciondesigna.setObservaciones(doc.getObservaciones());
+							}
+							
+							scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+							scsDocumentaciondesigna.setFechamodificacion(new Date());
+							scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
+							scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(doc.getIdDocumentaciondes()));
 
-						if (!UtilidadesString.esCadenaVacia(doc.getObservaciones())) {
-							scsDocumentaciondesigna.setObservaciones(doc.getObservaciones());
+							int response2 = scsDocumentaciondesignaMapper
+									.updateByPrimaryKeySelective(scsDocumentaciondesigna);
+
+							if (response2 == 1) {
+								insertResponseDTO.setStatus(SigaConstants.OK);
+							}
+
+							if (response2 == 0) {
+								insertResponseDTO.setStatus(SigaConstants.KO);
+								LOGGER.error(
+										"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
+								error.setCode(500);
+								error.setDescription("general.mensaje.error.bbdd");
+								insertResponseDTO.setError(error);
+							}
 						}
 						
-						scsDocumentaciondesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
-						scsDocumentaciondesigna.setFechamodificacion(new Date());
-						scsDocumentaciondesigna.setIdinstitucion(idInstitucion);
-						scsDocumentaciondesigna.setIddocumentaciondes(Integer.valueOf(doc.getIdDocumentaciondes()));
-
-						int response2 = scsDocumentaciondesignaMapper
-								.updateByPrimaryKeySelective(scsDocumentaciondesigna);
-
-						if (response2 == 1) {
-							insertResponseDTO.setStatus(SigaConstants.OK);
-						}
-
-						if (response2 == 0) {
-							insertResponseDTO.setStatus(SigaConstants.KO);
-							LOGGER.error(
-									"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error al subir un fichero perteneciente a la designación");
-							error.setCode(500);
-							error.setDescription("general.mensaje.error.bbdd");
-							insertResponseDTO.setError(error);
-						}
 
 					}
 
 				}
 
+			}else {
+				LOGGER.error(
+						"DesignacionesServiceImpl.subirDocumentoDesigna() -> Se ha producido un error, el usuario no pertenece a la tabla de cen_persona o a la tabla de adm_usuarios");
+				error.setCode(500);
+				error.setDescription("general.mensaje.error.bbdd");
+				error.setMessage("Este usuario no puede subir ficheros.");
+				insertResponseDTO.setError(error);
 			}
 
 		} catch (Exception e) {
@@ -6229,6 +6255,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			error.setDescription("general.mensaje.error.bbdd");
 			error.setMessage(e.getMessage());
 			insertResponseDTO.setError(error);
+			
 		}
 
 		return insertResponseDTO;
