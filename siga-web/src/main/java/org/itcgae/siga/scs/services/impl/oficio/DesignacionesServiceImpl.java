@@ -4612,7 +4612,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	@Override
 	@Transactional
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente,
-			ScsDesignasletrado letradoEntrante, Boolean checkCompensacionSaliente , Boolean checkSaltoEntrante , HttpServletRequest request) {
+			ScsDesignasletrado letradoEntrante, Boolean checkCompensacionSaliente , Boolean checkSaltoEntrante , HttpServletRequest request) throws Exception {
 		LOGGER.info(
 				"updateLetradoDesigna() -> Entrada al servicio para actualizar el letrado asociado a la designación");
 		String token = request.getHeader("Authorization");
@@ -4630,7 +4630,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				try {
+//				try {
 
 					ScsDesignasletradoExample example = new ScsDesignasletradoExample();
 
@@ -4639,6 +4639,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							.andIdpersonaEqualTo(letradoSaliente.getIdpersona())
 							.andFechadesignaGreaterThanOrEqualTo(letradoSaliente.getFechadesigna())
 							.andFecharenunciasolicitaIsNull();
+					
+					example.setOrderByClause("FECHADESIGNA DESC");
 
 					List<ScsDesignasletrado> designas = scsDesignasletradoMapper.selectByExample(example);
 
@@ -4690,7 +4692,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						response = scsDesignasletradoMapper.deleteByPrimaryKey(designaLetradoVieja);
 						if(response == 1) {
 							response = scsDesignasletradoMapper.insertSelective(designaLetradoNueva);
+							if(response==0) throw(new Exception("Error al actualizar el letrado asociado a la designacion"));
 						}
+						else throw(new Exception("Error al actualizar el letrado asociado a la designacion"));
 					}else {
 						//Creamos designa nueva para letradoEntrante
 						response = scsDesignasletradoMapper.insertSelective(designaLetradoNueva);
@@ -4719,7 +4723,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 									designaLetradoVieja.setFecharenuncia(letradoSaliente.getFecharenunciasolicita());
 								}
 								
-								response = scsDesignasletradoMapper.updateByPrimaryKeySelective(designaLetradoVieja);
+								response = scsDesignasletradoMapper.updateByPrimaryKey(designaLetradoVieja);
+								if(response==0) throw(new Exception("Error al actualizar el letrado asociado a la designacion"));
 							}
 					}
 					
@@ -4751,8 +4756,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 					
 					//Introducimos el salto y/o compensacion
-					saltosCompOficioService.guardarSaltosCompensaciones(listaSaltoItem, request);
+					DeleteResponseDTO op = saltosCompOficioService.guardarSaltosCompensaciones(listaSaltoItem, request);
 
+					if(op.getError() != null && op.getError().getCode()==500) throw(new Exception("Error al asociar un salto o una compensacion a unos de los letrados"));
 					
 					if (response == 0) {
 						if (error.getCode() != 100) {
@@ -4767,14 +4773,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						updateResponseDTO.setError(error);
 					}
 
-				} catch (Exception e) {
-					error.setDescription("general.mensaje.error.bbdd");
-					error.code(500);
-					updateResponseDTO.setStatus(SigaConstants.KO);
-					updateResponseDTO.setError(error);
-					LOGGER.error(e.getMessage());
-					LOGGER.info("updateLetradoDesigna() -> Salida del servicio");
-				}
+//				} catch (Exception e) {
+//					error.setDescription("general.mensaje.error.bbdd");
+//					error.code(500);
+//					updateResponseDTO.setStatus(SigaConstants.KO);
+//					updateResponseDTO.setError(error);
+//					LOGGER.error(e.getMessage());
+//					LOGGER.info("updateLetradoDesigna() -> Salida del servicio");
+//				}
 
 			}
 
