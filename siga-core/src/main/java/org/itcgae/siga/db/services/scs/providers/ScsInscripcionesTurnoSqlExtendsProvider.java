@@ -268,13 +268,13 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 					"          SCS_AREA.NOMBRE AS NOMBRE_AREA,\r\n" + 
 					"          SCS_TURNO.IDMATERIA,\r\n" + 
 					"          SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA,\r\n" + 
-					"          SCS_TURNO.IDTURNO\r\n"+
+					"          SCS_TURNO.IDTURNO,\r\n"+
 //                    "          SCS_TURNO.IDTURNO,\r\n" + 
 //                    "          SCS_GUARDIASTURNO.IDGUARDIA,\r\n" + 
 //                    "          SCS_GUARDIASTURNO.NOMBRE AS NOMBRE_GUARDIA,\r\n" + 
 //                    "          GEN_RECURSOS_CATALOGOS.DESCRIPCION AS DESCRIPCION_TIPO_GUARDIA,\r\n" + 
-//                    "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION, --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
-//                    "          DECODE(SCS_TURNO.GUARDIAS, 0, 'Obligatorias', DECODE(SCS_TURNO.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias,\r\n" + 
+                    "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION, --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
+                    "          DECODE(SCS_TURNO.GUARDIAS, 0, 'Obligatorias', DECODE(SCS_TURNO.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" + 
 //                    "          ROW_NUMBER() OVER(PARTITION BY SCS_GUARDIASTURNO.IDGUARDIA ORDER BY NUMEROLETRADOSGUARDIA DESC) rn \r\n"+
 					"FROM\r\n" + 
 					"          SCS_INSCRIPCIONTURNO\r\n" + 
@@ -335,13 +335,13 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"          SCS_AREA.NOMBRE AS NOMBRE_AREA,\r\n" + 
 				"          SCS_TURNO.IDMATERIA,\r\n" + 
 				"          SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA,\r\n" + 
-				"          SCS_TURNO.IDTURNO\r\n");
+				"          SCS_TURNO.IDTURNO,\r\n" +
 //				"          SCS_TURNO.IDTURNO,\r\n" + 
 //		        "          SCS_GUARDIASTURNO.IDGUARDIA,\r\n" + 
 //		        "          SCS_GUARDIASTURNO.NOMBRE AS NOMBRE_GUARDIA,\r\n" + 
 //		        "          GEN_RECURSOS_CATALOGOS.DESCRIPCION AS DESCRIPCION_TIPO_GUARDIA,\r\n" + 
-//		        "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION, --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
-//		        "          DECODE(SCS_TURNO.GUARDIAS, 0, 'Obligatorias', DECODE(SCS_TURNO.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias,\r\n" + 
+		        "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION, --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
+		        "          DECODE(SCS_TURNO.GUARDIAS, 0, 'Obligatorias', DECODE(SCS_TURNO.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n"); 
 //		        "          ROW_NUMBER() OVER(PARTITION BY SCS_GUARDIASTURNO.IDGUARDIA ORDER BY NUMEROLETRADOSGUARDIA DESC) rn \r\n");
 
 				sql2.FROM( 
@@ -395,13 +395,13 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 				"          SCS_AREA.NOMBRE AS NOMBRE_AREA,\r\n" + 
 				"          SCS_TURNO.IDMATERIA,\r\n" + 
 				"          SCS_MATERIA.NOMBRE AS NOMBRE_MATERIA,\r\n" + 
-				"          SCS_TURNO.IDTURNO\r\n"+
+				"          SCS_TURNO.IDTURNO,\r\n"+
 //	            "          SCS_TURNO.IDTURNO,\r\n" + 
 //	            "          GUARDIAS_NO_ASIGNADAS.IDGUARDIA,\r\n" + 
 //	            "          GUARDIAS_NO_ASIGNADAS.NOMBRE AS NOMBRE_GUARDIA,\r\n" + 
 //	            "          GEN_RECURSOS_CATALOGOS.DESCRIPCION AS DESCRIPCION_TIPO_GUARDIA,\r\n" + 
-//	            "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION, --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
-//	            "          DECODE(SCS_TURNO.GUARDIAS, 0, 'Obligatorias', DECODE(SCS_TURNO.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias,\r\n" + 
+	            "          SCS_TURNO.GUARDIAS AS OBLIGATORIEDAD_INSCRIPCION, --La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias\r\n" + 
+	            "          DECODE(SCS_TURNO.GUARDIAS, 0, 'Obligatorias', DECODE(SCS_TURNO.GUARDIAS, 2, 'A elegir', 'Todas o ninguna'))as tipoguardias\r\n" + 
 //	            "          ROW_NUMBER() OVER(PARTITION BY GUARDIAS_NO_ASIGNADAS.IDGUARDIA ORDER BY NUMEROLETRADOSGUARDIA DESC) rn \r\n"+
 				"FROM\r\n" + 
 				"          SCS_INSCRIPCIONTURNO\r\n" + 
