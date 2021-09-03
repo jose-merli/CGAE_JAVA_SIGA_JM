@@ -34,8 +34,8 @@ public class RemesasController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/buscarRemesas", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<RemesaBusquedaDTO> buscarRemesas(RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request) {
+	@RequestMapping(value = "/buscarRemesas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<RemesaBusquedaDTO> buscarRemesas(@RequestBody RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request) {
 		LOGGER.info("Entra en el método buscarRemesas");
 		RemesaBusquedaDTO response = busquedaRemesas.buscarRemesas(remesasBusquedaItem, request);
 		LOGGER.info("Termina el método buscarRemesas");

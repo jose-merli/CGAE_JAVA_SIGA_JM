@@ -37,7 +37,7 @@ public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
               List<ComboItem> comboEstadoEjg(Short idLenguaje);
           
               
-            @SelectProvider(type = ScsEstadoejgSqlExtendsProvider.class, method = "getEstados")
+            @SelectProvider(type = ScsEstadoejgSqlExtendsProvider.class, method = "getEstadoEjg")
           	@Results({ 
           		@Result(column = "fechainicio", property = "fechaInicio", jdbcType = JdbcType.DATE),
           		@Result(column = "fechamodificacion", property = "fechaModificacion", jdbcType = JdbcType.DATE),
@@ -53,9 +53,6 @@ public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
           		@Result(column = "fechabaja", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
           		@Result(column = "anio", property = "anio", jdbcType = JdbcType.VARCHAR),
           		@Result(column = "idestadoporejg", property = "idestadoporejg", jdbcType = JdbcType.VARCHAR),
-          		
-          		
-
           	})
           	List<EstadoEjgItem> getEstados(EjgItem ejgItem, String idInstitucion, String idLenguaje);
             

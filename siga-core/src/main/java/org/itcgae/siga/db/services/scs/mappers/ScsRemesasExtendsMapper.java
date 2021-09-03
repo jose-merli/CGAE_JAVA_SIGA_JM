@@ -20,7 +20,7 @@ public interface ScsRemesasExtendsMapper{
 
 	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "comboEstado")
 	@Results({ 
-		@Result(column = "IDESTADO", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> comboEstado(String string);
@@ -32,6 +32,7 @@ public interface ScsRemesasExtendsMapper{
 		@Result(column = "PREFIJO", property = "prefijo", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "SUFIJO", property = "sufijo", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NREGISTRO", property = "nRegistro", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHA_GENERACION", property = "fechaGeneracion", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHA_ENVIO", property = "fechaEnvio", jdbcType = JdbcType.DATE),

@@ -50,7 +50,7 @@ public class RemesasBusquedaItem {
 	public void setSufijo(int sufijo) {
 		this.sufijo = sufijo;
 	}
-	
+
 	public String getDescripcion() {
 		return descripcion;
 	}

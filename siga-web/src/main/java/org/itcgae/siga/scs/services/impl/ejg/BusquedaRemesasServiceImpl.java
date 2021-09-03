@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.services.impl.ejg;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +22,10 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CajgEjgremesa;
 import org.itcgae.siga.db.entities.CajgEjgremesaExample;
+import org.itcgae.siga.db.entities.CajgRemesa;
+import org.itcgae.siga.db.entities.CajgRemesaExample;
 import org.itcgae.siga.db.entities.CajgRemesaKey;
+import org.itcgae.siga.db.entities.CajgRemesaestadosExample;
 import org.itcgae.siga.db.entities.CajgRemesaestadosKey;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
@@ -71,12 +75,14 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			// exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
 					"comboEstado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
+			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+			
 			LOGGER.info(
 					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
@@ -103,7 +109,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Short idInstitucion = Short.valueOf("2005");//UserTokenUtils.getInstitucionFromJWTToken(token);
 		RemesaBusquedaDTO remesaBusquedaDTO = new RemesaBusquedaDTO();
 		List<RemesasItem> remesasItems = null;
 
@@ -114,7 +120,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					"buscarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
+			
 			LOGGER.info(
 					"buscarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			
@@ -145,11 +151,13 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
-		int response = 9;
+		String remesasNoBorradas = "";
+		CajgRemesa remesasItems;
+		int response = 0;
 		
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			LOGGER.info(
 					"borrarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
@@ -171,6 +179,13 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 						
 						LOGGER.info("Entra al foreach de la remesas");
 						
+						CajgRemesaKey remesaKey =new CajgRemesaKey();
+						
+						remesaKey.setIdinstitucion(idInstitucion);
+						remesaKey.setIdremesa(Long.valueOf(remesas.getIdRemesa()));
+						
+						remesasItems = cajgRemesaExtendsMapper.selectByPrimaryKey(remesaKey);
+						
 						List<RemesasItem2> remesaEstado = scsRemesasExtendsMapper.isEstadoRemesaIniciada(remesas, idInstitucion);
 						
 						//Se comprueba que la remesa esté en estado "Iniciado"
@@ -185,12 +200,12 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 								example.createCriteria().andIdremesaEqualTo(Long.valueOf(remesas.getIdRemesa())).andIdinstitucionremesaEqualTo(idInstitucion);
 								List<CajgEjgremesa> ejgRemesas = cajgEjgremesaExtendsMapper.selectByExample(example);
 								
+								LOGGER.info("Obtenemos los EJG asociados a la remesa");
+								
 								//Comprobamos si está vacia la lista con los EJG asociados
 								if(!ejgRemesas.isEmpty()) {
 									
 									for(CajgEjgremesa cajgEjgRemesa: ejgRemesas) {
-										
-										LOGGER.info("Obtenemos los EJG asociados a la remesa");
 										
 										//Buscamos los registros de los EJG asociados a la remesa con ciertas condiciones
 										ScsEstadoejgExample exampleEstadoEjg = new ScsEstadoejgExample();
@@ -211,52 +226,53 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 											//Hacemos el update de la columna FechaBaja del EJG
 											for(ScsEstadoejg scsEstadoejg: estadoEjg) {
 												
-												LOGGER.info("Actualizamos los EJG para ponerles FECHABAJA");
+												LOGGER.info("Actualizamos el EJG con año/numero: " + scsEstadoejg.getAnio() + "/" + scsEstadoejg.getNumero() + " para ponerle FECHABAJA");
 											
 												cambiarFechaBaja.setAnio(scsEstadoejg.getAnio());
 												cambiarFechaBaja.setNumero(scsEstadoejg.getNumero());
 												cambiarFechaBaja.setIdinstitucion(scsEstadoejg.getIdinstitucion());
 												cambiarFechaBaja.setIdtipoejg(scsEstadoejg.getIdtipoejg());
+												cambiarFechaBaja.setIdestadoporejg(scsEstadoejg.getIdestadoporejg());
 												cambiarFechaBaja.setFechabaja(new Date());
 												
-												response = scsEstadoejgExtendsMapper.updateByPrimaryKey(cambiarFechaBaja);										
+												response = scsEstadoejgExtendsMapper.updateByPrimaryKeySelective(cambiarFechaBaja);	
+												
 											}
 											
 										}
 										
-										LOGGER.info("Borramos la relación entre el EJG yla remesa");
+										LOGGER.info("Borramos la relación entre el EJG y la remesa");
 										
 										//Borramos la relación entre el ejg y la remesa
-										response = cajgEjgremesaExtendsMapper.deleteByPrimaryKey(cajgEjgRemesa.getIdejgremesa());
+										
+										CajgEjgremesaExample ejgRemesaExample = new CajgEjgremesaExample();
+										ejgRemesaExample.createCriteria().andIdejgremesaEqualTo(cajgEjgRemesa.getIdejgremesa());
+										response = cajgEjgremesaExtendsMapper.deleteByExample(ejgRemesaExample);
 										
 									}
 									
 								}
 								
-								LOGGER.info("Borramos la relacion entre la remesa y la estado de la misma");
+								LOGGER.info("Borramos la relacion entre la remesa y el estado de la misma");
 								
 								//Borramos la relacion de la remesa y su estado
-								CajgRemesaestadosKey remesaEstadoKey = new CajgRemesaestadosKey();
-								remesaEstadoKey.setIdremesa(Long.valueOf(remesaEstado.get(0).getIdRemesa()));
-								remesaEstadoKey.setIdinstitucion(Short.valueOf(remesaEstado.get(0).getIdInstitucion()));
-								remesaEstadoKey.setIdestado(Short.valueOf(remesaEstado.get(0).getIdEstado()));
-								Date fecha = new Date();
-								fecha = new SimpleDateFormat("DD/MM/YYYY").parse(remesaEstado.get(0).getFechaRemesa());
-								remesaEstadoKey.setFecharemesa(fecha);
+								CajgRemesaestadosExample remesaEstadoKey = new CajgRemesaestadosExample();
+								remesaEstadoKey.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdremesaEqualTo(Long.valueOf(remesaEstado.get(0).getIdRemesa()));
 								
-								response = cajgRemesaEstadosMapper.deleteByPrimaryKey(remesaEstadoKey);
-								
-								LOGGER.info("Borramos la remesa");
-								
-								//Borramos la remesa
-								CajgRemesaKey key = new CajgRemesaKey();
-								key.setIdremesa(new Long(remesas.getIdRemesa()));
-								key.setIdinstitucion(idInstitucion);
-								
-								response = cajgRemesaExtendsMapper.deleteByPrimaryKey(key);
+								response = cajgRemesaEstadosMapper.deleteByExample(remesaEstadoKey);
 								
 							}
 						
+							LOGGER.info("Borramos la remesa con id: " + remesas.getIdRemesa());
+							
+							//Borramos la remesa
+							CajgRemesaExample remesaExample= new CajgRemesaExample();
+							remesaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdremesaEqualTo(Long.valueOf(remesas.getIdRemesa()));
+							
+							response = cajgRemesaExtendsMapper.deleteByExample(remesaExample);
+							
+						}else {
+							remesasNoBorradas += remesasItems.getNumero() + ",";
 						}
 						
 					}
@@ -271,11 +287,24 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				LOGGER.info("Se ha producido un error en BBDD contacte con su administrador");
 			}
 			
-			if (response == 0 && error.getDescription() == null) {
-				error.setCode(400);
-				error.setDescription("No se han borrado parte de las remesas");
+			if (!remesasNoBorradas.equals("") && error.getDescription() == null) {
+				error.setCode(200);
+				
+				String nRegistro = "";
+				
+				String[] remesas = remesasNoBorradas.split(",");
+				
+				for(int i = 0; i < remesas.length; i++) {
+					if(i == remesas.length - 1) {
+						nRegistro += remesas[i].toString();
+					}else {
+						nRegistro += remesas[i].toString() + ", ";
+					}
+				}
+				
+				error.setDescription("No se ha(n) borrado la(s) remesa(s) con Nº de Registro: " + nRegistro + ", porque no estan en estado 'Iniciado'");
 				deleteResponseDTO.setStatus(SigaConstants.OK);
-				LOGGER.info("No se han borrado parte de las remesas");
+				LOGGER.info("No se ha(n) borrado la(s) remesa(s) con Nº de Registro: " + nRegistro + ", porque no estan en estado 'Iniciado'");
 			} else if (error.getCode() == null) {
 				error.setCode(200);
 				error.setDescription("Se han borrado las remesas correctamente");

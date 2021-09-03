@@ -145,7 +145,7 @@ public class ScsRemesasExtendsProvider {
 		}
 		
 		estado.SELECT("1");
-		estado.FROM("cajg_remesaalestados est");
+		estado.FROM("cajg_remesaestados est");
 		estado.WHERE("est.idremesa = rem.idremesa");
 		estado.WHERE("est.idinstitucion = rem.idinstitucion");
 		estado.WHERE("est.idestado LIKE '" + remesasBusquedaItem.getEstado() + "'");
@@ -155,6 +155,7 @@ public class ScsRemesasExtendsProvider {
 		sql.SELECT("REM.PREFIJO PREFIJO");
 		sql.SELECT("rem.numero NUMERO");
 		sql.SELECT("REM.SUFIJO SUFIJO");
+		sql.SELECT("REM.PREFIJO || rem.numero || REM.SUFIJO as NREGISTRO");
 		sql.SELECT("rem.descripcion");
 		sql.SELECT("(" + subquery.toString() + ") fecha_generacion");
 		sql.SELECT("(" + subquery1.toString() + ") fecha_envio");
@@ -205,6 +206,8 @@ public class ScsRemesasExtendsProvider {
 		if(remesasBusquedaItem.getAnnioEJG() != 0) {
 			sql.WHERE("exists (" + subquery8.toString() + ")"); //año deEJG
 		}
+		
+		sql.WHERE("ROWNUM <= 200");
 		
 		LOGGER.info(sql.toString());
 

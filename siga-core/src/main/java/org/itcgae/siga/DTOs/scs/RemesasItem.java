@@ -9,6 +9,7 @@ public class RemesasItem {
 	private int prefijo;
 	private int numero; 
 	private int sufijo;
+	private int nRegistro;
 	private String descripcion;
 	private Date fechaGeneracion;
 	private Date fechaEnvio;
@@ -55,6 +56,14 @@ public class RemesasItem {
 	
 	public void setSufijo(int sufijo) {
 		this.sufijo = sufijo;
+	}
+
+	public int getnRegistro() {
+		return nRegistro;
+	}
+
+	public void setnRegistro(int nRegistro) {
+		this.nRegistro = nRegistro;
 	}
 	
 	public String getDescripcion() {
