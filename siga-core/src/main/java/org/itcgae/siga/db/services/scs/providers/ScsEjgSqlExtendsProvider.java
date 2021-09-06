@@ -1572,7 +1572,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
     	sql.INNER_JOIN("SCS_EJGDESIGNA d ON (d.idinstitucion=e.idInstitucion and d.anioejg=e.anio and d.idtipoejg=e.idtipoejg and d.numeroejg=e.numero)");
     	sql.INNER_JOIN("SCS_DESIGNA des ON (d.idinstitucion=des.idInstitucion and d.aniodesigna=des.anio and d.idturno=des.idturno "
     			+ "and d.numerodesigna=des.numero)");
-    	sql.INNER_JOIN("SCS_PERSONAJG pjg ON (e.idpersonajg=pjg.idpersona)");
+    	sql.LEFT_OUTER_JOIN("SCS_PERSONAJG pjg ON (e.idpersonajg=pjg.idpersona)");
     	sql.WHERE("e.idinstitucion="+ejgItem.getidInstitucion()+" and e.anio="+ejgItem.getAnnio()+" and e.idtipoejg="+ejgItem.getTipoEJG()+
     			" and e.numero="+ejgItem.getNumero());
     	
