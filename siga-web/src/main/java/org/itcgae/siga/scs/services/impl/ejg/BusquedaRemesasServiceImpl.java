@@ -39,6 +39,7 @@ import org.itcgae.siga.scs.services.ejg.IBusquedaRemesas;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
@@ -109,7 +110,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = Short.valueOf("2005");//UserTokenUtils.getInstitucionFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		RemesaBusquedaDTO remesaBusquedaDTO = new RemesaBusquedaDTO();
 		List<RemesasItem> remesasItems = null;
 
@@ -144,7 +145,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		return remesaBusquedaDTO;
 	}
 
-	@Override
+	@Override @Transactional
 	public DeleteResponseDTO borrarRemesas(List<RemesasBusquedaItem> remesasBusquedaItem, HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -285,6 +286,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 				deleteResponseDTO.setStatus(SigaConstants.KO);
 				LOGGER.info("Se ha producido un error en BBDD contacte con su administrador");
+				throw e;
 			}
 			
 			if (!remesasNoBorradas.equals("") && error.getDescription() == null) {
