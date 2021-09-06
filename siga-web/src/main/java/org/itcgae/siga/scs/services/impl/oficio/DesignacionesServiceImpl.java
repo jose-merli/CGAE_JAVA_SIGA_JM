@@ -470,12 +470,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 							for (String str : parts) {
 								if (str.indexOf("##") != -1) {
-									expedientes.put(str.substring(0, str.indexOf("##")).trim(),
-											(str.substring(str.length() - 1) == idFavorable ? "FAVORABLE"
-													: (str.substring(str.length() - 1) == idDesfavorable
-															? "DESFAVORABLE"
-															: "''")));
+									String id = str.substring(str.length() - 1).toString();
+//									expedientes.put(str.substring(0, str.indexOf("##")).trim(),
+//											(str.substring(str.length() - 1) == idFavorable ? "FAVORABLE"
+//													: (str.substring(str.length() - 1) == idDesfavorable
+//															? "DESFAVORABLE"
+//															: "''")));
+									if(id.equals(idFavorable)) {
+										expedientes.put(str.substring(0, str.indexOf("##")).trim(),"FAVORABLE");
+									}else if(id.equals(idDesfavorable)) {
+										expedientes.put(str.substring(0, str.indexOf("##")).trim(),"DESFAVORABLE");
+									}else {
+										expedientes.put(str.substring(0, str.indexOf("##")).trim(),"''");
+									}
 								}
+								
 							}
 						}
 
