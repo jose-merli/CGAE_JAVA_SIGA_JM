@@ -748,20 +748,50 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 try {
                     // [ejg.idInstitucion, justiciable.idpersona, ejg.annio, ejg.tipoEJG,
                     // ejg.numero]
+                	
+                	ScsUnidadfamiliarejgExample exampleFamiliar = new ScsUnidadfamiliarejgExample();
+                	exampleFamiliar.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.parseLong(item.get(1)))
+                	.andAnioEqualTo(Short.parseShort(item.get(2))).andIdtipoejgEqualTo(Short.parseShort(item.get(3))).andNumeroEqualTo(Long.parseLong(item.get(4)));
+                    
+                    List<ScsUnidadfamiliarejg> uf = scsUnidadfamiliarejgMapper.selectByExample(exampleFamiliar);
+                    
+                    
                     ScsUnidadfamiliarejg familiar = new ScsUnidadfamiliarejg();
+                    
+                    
+                    
+                    if(!uf.isEmpty() ){
+                    	if(uf.get(0).getFechabaja() != null) {
+                    		familiar.setIdinstitucion(idInstitucion);
+                            familiar.setIdpersona(Long.parseLong(item.get(1)));
+                            familiar.setAnio(Short.parseShort(item.get(2)));
+                            familiar.setIdtipoejg(Short.parseShort(item.get(3)));
+                            familiar.setNumero(Long.parseLong(item.get(4)));
 
-                    familiar.setIdinstitucion(idInstitucion);
-                    familiar.setIdpersona(Long.parseLong(item.get(1)));
-                    familiar.setAnio(Short.parseShort(item.get(2)));
-                    familiar.setIdtipoejg(Short.parseShort(item.get(3)));
-                    familiar.setNumero(Long.parseLong(item.get(4)));
+                            familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
+                            familiar.setFechamodificacion(new Date());
+                        	familiar.setFechabaja(null);
+                        	familiar.setSolicitante((short) 0);
+                        	response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(familiar);
+                    	}else {
+                    		response = 0;
+                    	}
+                    	
+                    }else {
+                    	 familiar.setIdinstitucion(idInstitucion);
+                         familiar.setIdpersona(Long.parseLong(item.get(1)));
+                         familiar.setAnio(Short.parseShort(item.get(2)));
+                         familiar.setIdtipoejg(Short.parseShort(item.get(3)));
+                         familiar.setNumero(Long.parseLong(item.get(4)));
 
-                    familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
-                    familiar.setFechamodificacion(new Date());
+                         familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
+                         familiar.setFechamodificacion(new Date());
 
-                    familiar.setSolicitante((short) 0);
+                         familiar.setSolicitante((short) 0);
 
-                    response = scsUnidadfamiliarejgMapper.insert(familiar);
+                         response = scsUnidadfamiliarejgMapper.insert(familiar);
+                    }
+                   
 
                     if (response != 1) {
                         responsedto.setStatus(SigaConstants.KO);
