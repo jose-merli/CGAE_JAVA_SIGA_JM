@@ -1587,6 +1587,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		// NCOLEGIADO
 		if (idPersona != null && !idPersona.isEmpty()) {
 			sql.append(" AND DL.IDPERSONA = " + idPersona);
+			sql.append(" and dl.fechadesigna = (select MAX(dl2.fechadesigna) from scs_designasletrado dl2 ");
+			sql.append(" where d.idinstitucion = dl2.idinstitucion");
+			sql.append(" AND dl2.anio = d.anio");
+			sql.append(" AND dl2.numero = d.numero");
+			sql.append(" AND dl2.idturno = d.idturno");
+			sql.append(" AND dl2.idpersona = "+ idPersona+")");
 		}
 
 		if (item.isMuestraPendiente()) {
