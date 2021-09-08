@@ -706,7 +706,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									}else {
 										response = 0;
 										error.setCode(400);
-										error.setDescription("enviosMasivos.literal.fechaHora");
+										error.setDescription("justiciaGratuita.oficio.inscripciones.errorFechaAlta");
 										updateResponseDTO.setStatus(SigaConstants.KO);
 										break;
 									}
@@ -744,7 +744,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									}else {
 										response = 0;
 										error.setCode(400);
-										error.setDescription("enviosMasivos.literal.fechaHora");
+										error.setDescription("justiciaGratuita.oficio.inscripciones.errorFechaBaja");
 										updateResponseDTO.setStatus(SigaConstants.KO);
 										break;
 									}

@@ -182,7 +182,7 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO updateDesigna(DesignaItem designaItem, HttpServletRequest request);
 
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente,
-			ScsDesignasletrado letradoEntrante, Boolean checkCompensacion , Boolean checkSaltoEntrante , HttpServletRequest request);
+			ScsDesignasletrado letradoEntrante, Boolean checkCompensacion , Boolean checkSaltoEntrante , HttpServletRequest request) throws Exception;
 	
 	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request);
 	
