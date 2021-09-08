@@ -706,7 +706,7 @@ public class DesignacionesController {
 	@RequestMapping(value = "/designas/updateLetradoDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(
 			@RequestBody String[] item,
-			HttpServletRequest request) throws ParseException {
+			HttpServletRequest request) throws Exception {
 		
 		String anio = item[0].substring(1, 5);
 		
