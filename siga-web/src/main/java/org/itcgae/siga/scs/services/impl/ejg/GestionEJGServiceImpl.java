@@ -167,6 +167,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
     @Autowired
     private IEEJGServices eejgService;
+    
+    @Autowired
+    private EEJGServiceImpl eejgServiceImpl;
 
     @Autowired
     private ScsPersonajgMapper scsPersonajgMapper;
@@ -1307,12 +1310,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                                         // obtenemos los datos del fichero
                                         LOGGER.debug(
                                                 "GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos para el informe...");
-                                        Map<Integer, Map<String, String>> mapInformeEejg = eejgService
+                                        Map<Integer, Map<String, String>> mapInformeEejg = eejgServiceImpl
                                                 .getDatosInformeEejg(ejg, peticion);
 
                                         LOGGER.debug(
                                                 "GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo el informe...");
-                                        DatosDocumentoItem documento = eejgService.getInformeEejg(mapInformeEejg,
+                                        DatosDocumentoItem documento = eejgServiceImpl.getInformeEejg(mapInformeEejg,
                                                 ejg.getidInstitucion());
 
                                         ficheros.add(documento);
