@@ -620,8 +620,10 @@ public class EjgController {
 		contrario.setAnio(Short.parseShort(item[1]));
 		contrario.setIdtipoejg(Short.parseShort(item[3]));
 		contrario.setNumero(Long.parseLong(item[2]));
-		contrario.setIdabogadocontrarioejg(Long.parseLong(item[4]));
-		contrario.setNombreabogadocontrarioejg(item[5]);
+		if(!item[4].equals(""))contrario.setIdabogadocontrarioejg(Long.parseLong(item[4]));
+		else contrario.setIdabogadocontrarioejg(null);
+		if(!item[5].equals(""))contrario.setNombreabogadocontrarioejg(item[5]);
+		else contrario.setNombreabogadocontrarioejg(null);
 		UpdateResponseDTO response = gestionEJG.updateAbogadoContrarioEJG(contrario, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
