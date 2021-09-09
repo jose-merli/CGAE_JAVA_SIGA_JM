@@ -1018,6 +1018,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return designas;
 	}
 
+
+	
+
 	@Override
 	public List<DesignaItem> busquedaModuloDesignas(DesignaItem designaItem, HttpServletRequest request) {
 		// DesignaItem result = new DesignaItem();
@@ -7584,6 +7587,51 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return responseDTO;
+	}
+
+
+	@Override
+	public ScsEjg getEJG(EjgItem item, HttpServletRequest request) {
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		int response = 0;
+		
+		ScsEjg ejg = new ScsEjg();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getEJG() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getEJG() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.getEJG() -> Entrada a servicio para insertar laobtener la infromacion de un EJG");
+
+					LOGGER.info("DesignacionesServiceImpl.getEJG() -> Haciendo la consulta...");
+
+					ScsEjgExample ejgExample = new ScsEjgExample();
+					
+					ejgExample.createCriteria().andAnioEqualTo(Short.valueOf(item.getAnnio())).andIdinstitucionactaEqualTo(idInstitucion)
+					.andNumejgEqualTo(item.getNumEjg());
+					List<ScsEjg> ejgs = scsEjgMapper.selectByExample(ejgExample);
+					
+					ejg = ejgs.get(0);
+			}
+		}
+		
+		LOGGER.info("DesignacionesServiceImpl.getEJG() -> Saliendo del servicio...");
+
+		return ejg;
 	}
 
 }
