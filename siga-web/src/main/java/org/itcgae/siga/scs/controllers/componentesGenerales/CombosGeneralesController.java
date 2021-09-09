@@ -205,6 +205,36 @@ public class CombosGeneralesController {
 		ComboDTO response = comboService.comboJuzgadoDesignaciones(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+
+	@GetMapping("/comboTipoDocAsistencia")
+	public ResponseEntity<ComboDTO> comboTipoDocAsistencia(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTipoDocAsistencia(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping("/comboAsociadoAsistencia")
+	public ResponseEntity<ComboDTO> comboAsociadoAsistencia(HttpServletRequest request, @RequestParam String anioNumero) {
+		ComboDTO response = comboService.comboAsociadoAsistencia(request, anioNumero);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping("/comboCosteFijoActuacionAsistencia")
+	public ResponseEntity<ComboDTO> comboCosteFijoActuacionAsistencia(HttpServletRequest request, @RequestParam String anioNumero, @RequestParam String idTipoActuacion) {
+		ComboDTO response = comboService.comboCosteFijo(request,anioNumero,idTipoActuacion);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping("/comboTipoActuacionAsistencia")
+	public ResponseEntity<ComboDTO> comboTipoActuacionAsistencia(HttpServletRequest request, @RequestParam String anioNumero) {
+		ComboDTO response = comboService.comboTipoActuacionAsistencia(request, anioNumero);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping("/comboOrigenContacto")
+	public ResponseEntity<ComboDTO> comboOrigenContacto(HttpServletRequest request) {
+		ComboDTO response = comboService.comboOrigenContacto(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 	
 	/**
 	 * 

@@ -93,4 +93,14 @@ public interface ComboService {
 	public ComboDTO comboGuardiasInscritoLetrado(HttpServletRequest request, String idPersona, String idTurno);
 	
 	public ComboDTO comboEstadosAsistencia(HttpServletRequest request);
+	
+	public ComboDTO comboTipoDocAsistencia(HttpServletRequest request);
+
+	public ComboDTO comboAsociadoAsistencia(HttpServletRequest request, String anioNumero);
+
+	public ComboDTO comboCosteFijo(HttpServletRequest request, String anioNumero, String idTipoActuacion);
+
+	public ComboDTO comboTipoActuacionAsistencia(HttpServletRequest request, String anioNumero);
+
+	public ComboDTO comboOrigenContacto(HttpServletRequest request);
 }

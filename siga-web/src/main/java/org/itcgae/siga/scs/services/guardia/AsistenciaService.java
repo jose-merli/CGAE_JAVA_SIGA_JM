@@ -10,9 +10,12 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.*;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface AsistenciaService {
 	
@@ -63,4 +66,24 @@ public interface AsistenciaService {
 	public UpdateResponseDTO asociarDesigna(HttpServletRequest request, String anioNumero,  DesignaItem designaItem, String copiarDatos);
 
 	public UpdateResponseDTO eliminarRelacion(HttpServletRequest request, String anioNumero,  List<RelacionesItem> asuntos);
+
+	public UpdateResponseDTO asociarEjg(HttpServletRequest request, String anioNumero, EjgItem ejg, String copiarDatos);
+
+	public DocumentacionAsistenciaDTO searchDocumentacion(HttpServletRequest request, String anioNumero, String idActuacion);
+
+	public InsertResponseDTO subirDocumentoAsistencia(MultipartHttpServletRequest request);
+
+	public DeleteResponseDTO eliminarDocumentoAsistencia(HttpServletRequest request, List<DocumentacionAsistenciaItem> documentos, String anioNumero);
+
+	public ResponseEntity<InputStreamResource> descargarDocumento(HttpServletRequest request, List<DocumentacionAsistenciaItem> documentos);
+
+	public UpdateResponseDTO saveCaracteristicas(HttpServletRequest request, CaracteristicasAsistenciaItem caracteristicasAsistenciaItem, String anioNumero);
+
+	public CaracteristicasAsistenciaDTO searchCaracteristicas (HttpServletRequest request, String anioNumero);
+
+	public ActuacionAsistenciaDTO searchActuaciones (HttpServletRequest request, String anioNumero, String mostrarHistorico);
+
+	public UpdateResponseDTO updateEstadoActuacion(HttpServletRequest request, List<ActuacionAsistenciaItem> actuaciones, String anioNumero);
+
+	public DeleteResponseDTO eliminarActuaciones (HttpServletRequest request, List<ActuacionAsistenciaItem> actuaciones, String anioNumero);
 }

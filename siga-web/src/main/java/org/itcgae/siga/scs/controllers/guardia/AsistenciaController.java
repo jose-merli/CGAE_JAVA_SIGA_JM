@@ -10,8 +10,10 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.*;
+import org.itcgae.siga.com.services.IModelosYcomunicacionesService;
 import org.itcgae.siga.scs.services.guardia.AsistenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/asistencia")
@@ -292,6 +295,17 @@ public class AsistenciaController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
+	@PostMapping(value = "/asociarEjg", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> asociarEjg(HttpServletRequest request, @RequestParam String anioNumero, @RequestBody EjgItem ejg, @RequestParam String copiarDatos) {
+		UpdateResponseDTO response = null;
+		try {
+			response = asistenciaService.asociarEjg(request, anioNumero, ejg, copiarDatos);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
 	@PostMapping(value = "/eliminarRelacion", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UpdateResponseDTO> eliminarRelacion(HttpServletRequest request, @RequestParam String anioNumero, @RequestBody List<RelacionesItem> asuntos) {
 		UpdateResponseDTO response = null;
@@ -303,5 +317,99 @@ public class AsistenciaController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
-	
+	@GetMapping(value = "/searchDocumentacion")
+	public ResponseEntity<DocumentacionAsistenciaDTO> searchDocumentacion(HttpServletRequest request, @RequestParam String anioNumero, @RequestParam(required = false) String idActuacion) {
+		DocumentacionAsistenciaDTO response = null;
+		try {
+			response = asistenciaService.searchDocumentacion(request, anioNumero, idActuacion);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<DocumentacionAsistenciaDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/subirDocumentoAsistencia", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<InsertResponseDTO> subirDocumentoAsistencia(MultipartHttpServletRequest request) {
+		InsertResponseDTO response = null;
+		try {
+			response = asistenciaService.subirDocumentoAsistencia(request);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/eliminarDocumentoAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> eliminarDocumentoAsistencia(HttpServletRequest request, @RequestParam String anioNumero, @RequestBody List<DocumentacionAsistenciaItem> documentos) {
+		DeleteResponseDTO response = null;
+		try {
+			response = asistenciaService.eliminarDocumentoAsistencia(request,documentos,anioNumero);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/descargarDocumentoAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InputStreamResource> descargarDocumentosAsistencia(
+			@RequestBody List<DocumentacionAsistenciaItem> documentos, HttpServletRequest request) {
+		ResponseEntity<InputStreamResource> response = asistenciaService.descargarDocumento(request, documentos);
+		return response;
+	}
+
+
+	@PostMapping(value = "/saveCaracteristicas", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> saveCaracteristicas(HttpServletRequest request, @RequestBody CaracteristicasAsistenciaItem caracteristicasAsistenciaItem, @RequestParam String anioNumero) {
+		UpdateResponseDTO response = null;
+		try {
+			response = asistenciaService.saveCaracteristicas(request, caracteristicasAsistenciaItem, anioNumero);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/searchCaracteristicas")
+	public ResponseEntity<CaracteristicasAsistenciaDTO> searchCaracteristicas(HttpServletRequest request, @RequestParam String anioNumero) {
+		CaracteristicasAsistenciaDTO response = null;
+		try {
+			response = asistenciaService.searchCaracteristicas(request, anioNumero);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<CaracteristicasAsistenciaDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/searchActuaciones")
+	public ResponseEntity<ActuacionAsistenciaDTO> searchActuaciones(HttpServletRequest request, @RequestParam String anioNumero, @RequestParam String mostrarHistorico) {
+		ActuacionAsistenciaDTO response = null;
+		try {
+			response = asistenciaService.searchActuaciones(request, anioNumero, mostrarHistorico);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<ActuacionAsistenciaDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/updateEstadoActuacion", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> updateEstadoActuacion(HttpServletRequest request, @RequestBody List<ActuacionAsistenciaItem> actuaciones, @RequestParam String anioNumero) {
+		UpdateResponseDTO response = null;
+		try {
+			response = asistenciaService.updateEstadoActuacion(request,actuaciones,anioNumero);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/eliminarActuaciones", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> eliminarActuaciones(HttpServletRequest request, @RequestBody List<ActuacionAsistenciaItem> actuaciones, @RequestParam String anioNumero) {
+		DeleteResponseDTO response = null;
+		try {
+			response = asistenciaService.eliminarActuaciones(request,actuaciones,anioNumero);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
 }

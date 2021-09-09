@@ -7,6 +7,7 @@ public class RelacionesItem {
 	private String idinstitucion;
 	private String anio;
 	private String numero;
+	private String numEjg;
 	private String idletrado;
 	private String letrado;
 	private String interesado;
@@ -29,8 +30,51 @@ public class RelacionesItem {
 	private String centrodetencion;
 	private Date fechaasunto;
 	private String dilnigproc;
-	
-	
+	private String idTipoDictamenEJG;
+	private String idFundamentoCalif;
+	private String dictamenObs;
+	private String idGuardia;
+
+	public String getIdGuardia() {
+		return idGuardia;
+	}
+
+	public void setIdGuardia(String idGuardia) {
+		this.idGuardia = idGuardia;
+	}
+
+	public String getDictamenObs() {
+		return dictamenObs;
+	}
+
+	public void setDictamenObs(String dictamenObs) {
+		this.dictamenObs = dictamenObs;
+	}
+
+	public String getIdFundamentoCalif() {
+		return idFundamentoCalif;
+	}
+
+	public void setIdFundamentoCalif(String idFundamentoCalif) {
+		this.idFundamentoCalif = idFundamentoCalif;
+	}
+
+	public String getIdTipoDictamenEJG() {
+		return idTipoDictamenEJG;
+	}
+
+	public void setIdTipoDictamenEJG(String idTipoDictamenEJG) {
+		this.idTipoDictamenEJG = idTipoDictamenEJG;
+	}
+
+	public String getNumEjg() {
+		return numEjg;
+	}
+
+	public void setNumEjg(String numEjg) {
+		this.numEjg = numEjg;
+	}
+
 	public String getSjcs() {
 		return sjcs;
 	}

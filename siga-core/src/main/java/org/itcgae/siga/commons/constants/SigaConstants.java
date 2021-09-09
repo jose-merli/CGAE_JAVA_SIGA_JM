@@ -963,8 +963,10 @@ public class SigaConstants {
 
 	public static String DATEST_FORMAT_MIN = "dd/MM/yyyy HH:mm";
 	public static String DATEST_FORMAT_MIN_SEC = "dd/MM/yyyy HH:mm:ss";
+	public static String DATEST_FORMAT_ONLYDATE = "dd/MM/yyyy";
 
 	public static DateFormat DATE_FORMAT_MIN = new SimpleDateFormat(DATEST_FORMAT_MIN);
+	public static DateFormat DATE_FORMAT = new SimpleDateFormat(DATEST_FORMAT_ONLYDATE);
 
 	public static String[] columnsExcelLogEnvios = new String[] { "ENVIO", "DESCRIPCION", "FECHA ENVÍO", "REMITENTE",
 			"CORREO REMITENTE", "NIF/CIF", "NOMBRE", "APELLIDO 1", "APELLIDO 2", "MOVIL", "CORREO ELECTRONICO",
