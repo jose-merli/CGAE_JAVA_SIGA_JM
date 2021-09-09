@@ -75,6 +75,7 @@ import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
+import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
@@ -147,6 +148,11 @@ import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.entities.ScsSoj;
 import org.itcgae.siga.db.entities.ScsSojKey;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
+import org.itcgae.siga.db.entities.ScsTipodictamenejgExample;
+import org.itcgae.siga.db.entities.ScsTiporesolauto;
+import org.itcgae.siga.db.entities.ScsTiporesolautoExample;
+import org.itcgae.siga.db.entities.ScsTiporesolucion;
+import org.itcgae.siga.db.entities.ScsTiporesolucionExample;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.entities.ScsTurnoKey;
@@ -178,6 +184,7 @@ import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.mappers.ScsSojMapper;
+import org.itcgae.siga.db.mappers.ScsTiporesolautoMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -187,10 +194,12 @@ import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignasLetradoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipodictamenejgExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTiporesolucionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.itcgae.siga.scs.services.oficio.ISaltosCompOficioService;
@@ -353,7 +362,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+	
+	@Autowired
+	private ScsEjgExtendsMapper scsEjgExtendsMapper;
 
+	@Autowired
+	private ScsTiporesolucionExtendsMapper scsTiporesolucionExtendMapper;
 	/**
 	 * busquedaJustificacionExpres
 	 */
@@ -425,16 +439,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					List<ScsTipodictamenejg> estadosExpedientes = scsTipodictamenejgExtendsMapper
 							.estadosDictamen(usuarios.get(0).getIdlenguaje(), idInstitucion.toString());
-					String idFavorable = null;
-					String idDesfavorable = null;
-
-					for (ScsTipodictamenejg tipoDictamen : estadosExpedientes) {
-						if ("FAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())) {
-							idFavorable = tipoDictamen.getIdtipodictamenejg().toString();
-						} else if ("DESFAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())) {
-							idDesfavorable = tipoDictamen.getIdtipodictamenejg().toString();
-						}
-					}
+					
+//					String idFavorable = null;
+//					String idDesfavorable = null;
+//
+//					for (ScsTipodictamenejg tipoDictamen : estadosExpedientes) {
+//						if ("FAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())) {
+//							idFavorable = tipoDictamen.getIdtipodictamenejg().toString();
+//						} else if ("DESFAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())) {
+//							idDesfavorable = tipoDictamen.getIdtipodictamenejg().toString();
+//						}
+//					}
 					String fechaDesde = null;
 					String fechaHasta = null;
 					if (item.getDesignacionDesde() != null) {
@@ -446,8 +461,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo justificaciones...");
 					// busqueda de designaciones segun los filtros (max 200)
+//					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
+//							idInstitucion.toString(), longitudCodEJG, idPersona, idFavorable, idDesfavorable,
+//							fechaDesde, fechaHasta);
 					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
-							idInstitucion.toString(), longitudCodEJG, idPersona, idFavorable, idDesfavorable,
+							idInstitucion.toString(), longitudCodEJG, idPersona, 
 							fechaDesde, fechaHasta);
 
 					LOGGER.info(
@@ -471,19 +489,78 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 							for (String str : parts) {
 								if (str.indexOf("##") != -1) {
-									String id = str.substring(str.length() - 1).toString();
-//									expedientes.put(str.substring(0, str.indexOf("##")).trim(),
-//											(str.substring(str.length() - 1) == idFavorable ? "FAVORABLE"
-//													: (str.substring(str.length() - 1) == idDesfavorable
-//															? "DESFAVORABLE"
-//															: "''")));
-									if(id.equals(idFavorable)) {
-										expedientes.put(str.substring(0, str.indexOf("##")).trim(),"FAVORABLE");
-									}else if(id.equals(idDesfavorable)) {
-										expedientes.put(str.substring(0, str.indexOf("##")).trim(),"DESFAVORABLE");
-									}else {
-										expedientes.put(str.substring(0, str.indexOf("##")).trim(),"''");
+//									String id = str.substring(str.length() - 1).toString();
+////									expedientes.put(str.substring(0, str.indexOf("##")).trim(),
+////											(str.substring(str.length() - 1) == idFavorable ? "FAVORABLE"
+////													: (str.substring(str.length() - 1) == idDesfavorable
+////															? "DESFAVORABLE"
+////															: "''")));
+//									if(id.equals(idFavorable)) {
+//										expedientes.put(str.substring(0, str.indexOf("##")).trim(),"FAVORABLE");
+//									}else if(id.equals(idDesfavorable)) {
+//										expedientes.put(str.substring(0, str.indexOf("##")).trim(),"DESFAVORABLE");
+//									}else {
+//										expedientes.put(str.substring(0, str.indexOf("##")).trim(),"''");
+//									}
+									
+									
+									//obtenemos los datos del EJG
+									String anioEJG = str.substring(1, 5).toString();
+									String numEJG = str.substring(30, 36).replace("#","").trim();
+									String idInstitucionEJG = str.substring(16, 20).toString();
+									String idtipoEJG = str.substring(28, 29).toString();
+									String dictamen = "";
+									String resolucion = "";
+									
+									
+									//hacemos una busqueda para obtener el EJG con el dictamen y la resolucion
+									ScsEjgExample ejgExample = new ScsEjgExample();
+									ejgExample.createCriteria().andAnioEqualTo(Short.parseShort(anioEJG)).
+									andNumeroEqualTo(Long.parseLong(numEJG)).andIdtipoejgEqualTo(Short.parseShort(idtipoEJG)).andIdinstitucionEqualTo(Short.parseShort(idInstitucionEJG));
+									List<ScsEjg> ejg = scsEjgExtendsMapper.selectByExample(ejgExample);
+									if(!ejg.isEmpty()) {
+										
+										//si la resolucion no esta vacia hace una busqueda para obtener la descripcion de la resolucion
+										if(ejg.get(0).getIdtiporatificacionejg() != null) {
+											
+											List<ScsTiporesolucion> resolucionExpediente = scsTiporesolucionExtendMapper.getResolucionesEJG(usuarios.get(0).getIdlenguaje());
+											//resolucion = resolucionExpediente.get(0).getDescripcion();
+											
+											for (ScsTiporesolucion tipoResolucion : resolucionExpediente) {
+												if (ejg.get(0).getIdtiporatificacionejg().toString().equals(tipoResolucion.getIdtiporesolucion().toString())) {
+													resolucion = tipoResolucion.getDescripcion();
+												} 
+											
+										}
+										}
+										
+										//si el dictamen no esta vacio hace una busqueda para obtener la descripcion del dictamen
+										if(ejg.get(0).getIdtipodictamenejg() != null) {
+										
+											for (ScsTipodictamenejg tipoDictamen : estadosExpedientes) {
+												if (ejg.get(0).getIdtipodictamenejg().toString().equals(tipoDictamen.getIdtipodictamenejg().toString())) {
+													dictamen = tipoDictamen.getDescripcion();
+												} 
+											}
+										
+										}
+										
+										//en esta parte se configura el mensaje para el tooltip
+										if((dictamen == null || dictamen == "") && (resolucion == null || resolucion == "")){
+											expedientes.put(str.substring(0, str.indexOf("##")).trim(), "Designación con EJG sin Resolución" );
+										}else if((dictamen != null || dictamen != "") && (resolucion == null || resolucion == "")){
+											
+											expedientes.put(str.substring(0, str.indexOf("##")).trim(), "Dictamen: " + dictamen);
+											
+										}else if((dictamen == null || dictamen == "") && (resolucion != null || resolucion != "")){
+											
+											expedientes.put(str.substring(0, str.indexOf("##")).trim(), "Resolución: " + resolucion);
+											
+										}else {
+											expedientes.put(str.substring(0, str.indexOf("##")).trim(), "Dictamen: " + dictamen + " / Resolución: " +  resolucion );
+										}
 									}
+									
 								}
 								
 							}
