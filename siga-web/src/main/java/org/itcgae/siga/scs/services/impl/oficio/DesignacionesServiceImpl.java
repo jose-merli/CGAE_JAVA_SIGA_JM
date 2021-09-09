@@ -4763,8 +4763,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(designa.getAnio())
 							.andIdturnoEqualTo(designa.getIdturno()).andNumeroEqualTo(designa.getNumero())
 							.andIdpersonaEqualTo(letradoSaliente.getIdpersona())
-							.andFechadesignaGreaterThanOrEqualTo(letradoSaliente.getFechadesigna())
-							.andFecharenunciasolicitaIsNull();
+							.andFechadesignaEqualTo(letradoSaliente.getFechadesigna());
 					
 					example.setOrderByClause("FECHADESIGNA DESC");
 
