@@ -42,6 +42,7 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
@@ -1073,5 +1074,14 @@ public class DesignacionesController {
 		designa.setNumero(Integer.valueOf(numero));
 		EjgDesignaDTO response = designacionesService.getEjgDesigna(designa, request);
 		return new ResponseEntity<EjgDesignaDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getEJG", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ScsEjg> comboTipoEJG(HttpServletRequest request, String numEjg, String anioEjg) {
+		EjgItem item = new EjgItem();
+		item.setAnnio(anioEjg);
+		item.numEjg(numEjg);
+		ScsEjg response = designacionesService.getEJG(item, request);
+		return new ResponseEntity<ScsEjg>(response, HttpStatus.OK);
 	}
 }
