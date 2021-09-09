@@ -1,13 +1,22 @@
 
 package org.itcgae.siga.scs.controllers.guardia;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
 import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
@@ -21,6 +30,7 @@ import org.itcgae.siga.DTOs.scs.DeleteCalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DeleteIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
+import org.itcgae.siga.DTOs.scs.GuardiaCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.IncompatibilidadesDTO;
@@ -30,19 +40,24 @@ import org.itcgae.siga.DTOs.scs.InscripcionGuardiaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesResponseDTO;
 import org.itcgae.siga.DTOs.scs.LetradosGuardiaDTO;
+import org.itcgae.siga.DTOs.scs.RangoFechasItem;
 import org.itcgae.siga.DTOs.scs.SaveIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
 
 @RestController
 @RequestMapping(value = "/guardia")
@@ -207,6 +222,17 @@ public class GuardiaController {
 		List<DatosCalendarioProgramadoItem> response = guardiasService.getCalendarioProgramado(calendarioProgBody, request);
 		return new ResponseEntity<List<DatosCalendarioProgramadoItem>>(response, HttpStatus.OK);
 	}
+	@PostMapping(value = "/getGuardiasCalendario", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<GuardiaCalendarioItem>> getGuardiasCalendario(@RequestBody String idCalendar, HttpServletRequest request) {
+		List<GuardiaCalendarioItem> response = guardiasService.getGuardiasFromCalendar(idCalendar, request);
+	return new ResponseEntity<List<GuardiaCalendarioItem>>(response, HttpStatus.OK);
+}
+	
+	@GetMapping(value = "/getFechasProgramacionGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<RangoFechasItem>> getFechasProgramacionGuardia(String idGuardia, HttpServletRequest request) {
+		List<RangoFechasItem> response = guardiasService.getFechasProgramacionGuardia(idGuardia, request);
+	return new ResponseEntity<List<RangoFechasItem>>(response, HttpStatus.OK);
+}
 	
 	@PostMapping(value = "/eliminarCalendariosProgramados", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> deleteCalendariosProgramados(@RequestBody DeleteCalendariosProgDatosEntradaItem deleteCalBody, HttpServletRequest request){
@@ -242,7 +268,85 @@ public class GuardiaController {
 				request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
+	@GetMapping(value = "/guardiasFromIdConjunto")
+	public ResponseEntity<List<GuardiaCalendarioItem>> guardiasFromCojunto(HttpServletRequest request, String idConjunto) {
+		List<GuardiaCalendarioItem> response = guardiasService.guardiasFromCojunto(request, idConjunto);
+		return new ResponseEntity<List<GuardiaCalendarioItem>>(response, HttpStatus.OK);
+	}
 	
+	@PostMapping(value = "/addGuardiaConjunto", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> insertGuardiaToConjunto(
+			@RequestBody List<GuardiaCalendarioItem> guardiaCalendarioItemList, String idConjuntoGuardia, HttpServletRequest request) {
+		InsertResponseDTO response = guardiasService.insertGuardiaToConjunto(request,  idConjuntoGuardia,  guardiaCalendarioItemList);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			}
+	@PostMapping(value = "/addGuardiaCalendario", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> insertGuardiaToCalendar(
+			@RequestBody List<GuardiaCalendarioItem> guardiaCalendarioItemList, String idCalendar, HttpServletRequest request) {
+		InsertResponseDTO response = guardiasService.insertGuardiaToCalendar( request, idCalendar, guardiaCalendarioItemList);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			}
+	
+	
+	@PostMapping(value = "/deleteGuardiaCalendario", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> deleteGuardiaFromCalendar(
+			@RequestBody List<GuardiaCalendarioItem> guardiaCalendarioItemList, String idCalendar, HttpServletRequest request) {
+		InsertResponseDTO response = guardiasService.deleteGuardiaFromCalendar( request, idCalendar, guardiaCalendarioItemList);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			}
+	@PostMapping(value = "/updateCalendarioProgramado", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> updateCalendarioProgramado(
+			@RequestBody DatosCalendarioProgramadoItem calendarioItem, HttpServletRequest request) {
+		InsertResponseDTO response = guardiasService.updateCalendarioProgramado( request, calendarioItem);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			}
+	@PostMapping(value = "/newCalendarioProgramado", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> newCalendarioProgramado(
+			@RequestBody DatosCalendarioProgramadoItem calendarioItem, HttpServletRequest request) {
+		InsertResponseDTO response = guardiasService.newCalendarioProgramado( request, calendarioItem);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			}
+	
+	
+	@PostMapping(value = "/generarCalendario", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> generarCalendario(
+			@RequestBody DatosCalendarioProgramadoItem programacionItem, HttpServletRequest request) {
+		InsertResponseDTO response = guardiasService.generarCalendario(request, programacionItem);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			}
+	
+	/*@GetMapping(value = "/descargarExcelLog", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DatosDocumentoItem> descargarExcelLog( HttpServletRequest request) {
+		DatosDocumentoItem response = guardiasService.descargarExcelLog(request);
+			return new ResponseEntity<DatosDocumentoItem>(response, HttpStatus.OK);
+			}*/
+	
+	
+	@RequestMapping(value = "/descargarExcelLog",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	public ResponseEntity<InputStreamResource> descargarModelo(HttpServletRequest request) throws IOException, EncryptedDocumentException, InvalidFormatException {
+		DatosDocumentoItem response = guardiasService.descargarExcelLog(request);
+		ByteArrayInputStream bis = new ByteArrayInputStream(response.getDatos());
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.parseMediaType("application/octet-stream"));
+		headers.add("Content-Disposition", String.format("inline; filename=%s", response.getFileName()));
+		headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+//		CorsFilter corsFilter = new CorsFilter();
+//	    corsFilter.setAllowedHeaders("Content-Type, Access-Control-Allow-Headers, Access-Control-Expose-Headers, Content-Disposition, Authorization, X-Requested-With");
+//	    corsFilter.setExposedHeaders("Content-Disposition");
+		return ResponseEntity.ok().headers(headers)
+				.body(new InputStreamResource(bis));
+}
+	
+//	@GetMapping(value = "/descargarExcelLog",  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE) 
+//    ResponseEntity<Response> test2(HttpServletRequest request) {  
+//		DatosDocumentoItem response = guardiasService.descargarExcelLog(request);
+//        File file = new File(response.getPathDocumento() + response.getFileName());  
+//        ResponseBuilder rb = Response.ok(file);  
+//        rb.header("content-disposition", "attachment; filename=" + response.getFileName());  
+//        return new ResponseEntity<Response>(rb.build(), HttpStatus.OK); 
+//    }  
+	
+
 	@PostMapping(value = "/busquedainscripciones", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<InscripcionesResponseDTO> getInscripciones(@RequestBody InscripcionDatosEntradaDTO inscripcionesBody, HttpServletRequest request){
         InscripcionesResponseDTO response= guardiasService.getInscripciones(inscripcionesBody, request);
