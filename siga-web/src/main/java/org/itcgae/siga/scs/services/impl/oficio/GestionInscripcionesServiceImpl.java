@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GestionInscripcionesServiceImpl implements IGestionInscripcionesService {
 
-	private Logger LOGGER = Logger.getLogger(FichaPartidasJudicialesServiceImpl.class);
+	private Logger LOGGER = Logger.getLogger(GestionInscripcionesServiceImpl.class);
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;

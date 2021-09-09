@@ -1589,7 +1589,24 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		// NCOLEGIADO
 		if (idPersona != null && !idPersona.isEmpty()) {
 			sql.append(" AND DL.IDPERSONA = " + idPersona);
+			//Esto evita que se repitan los registros al tener varios letrados designados por cada designa
+			sql.append(" and dl.fechadesigna = (select MAX(dl2.fechadesigna) from scs_designasletrado dl2 ");
+			sql.append(" where d.idinstitucion = dl2.idinstitucion");
+			sql.append(" AND dl2.anio = d.anio");
+			sql.append(" AND dl2.numero = d.numero");
+			sql.append(" AND dl2.idturno = d.idturno");
+			sql.append(" AND dl2.idpersona = "+ idPersona+")");
 		}
+		
+		//Esto evita que se repitan los registros al tener varios ejg por cada designa
+		sql.append(" AND ejg.numero = (select ejgdes.numeroejg from scs_ejgdesigna ejgdes"); 
+		sql.append(" WHERE d.idinstitucion = ejgdes.idinstitucion");
+		sql.append(" AND d.anio = ejgdes.aniodesigna");
+		sql.append(" AND d.numero = ejgdes.numerodesigna");
+		sql.append(" AND d.idturno = ejgdes.idturno");
+		sql.append(" AND ejg.anioresolucion IS NULL");
+		sql.append(" AND ejg.numeroresolucion IS NULL");
+		sql.append(" and rownum = 1)");
 
 		if (item.isMuestraPendiente()) {
 			sql.append(" AND D.ESTADO NOT IN ('A','F') ");
