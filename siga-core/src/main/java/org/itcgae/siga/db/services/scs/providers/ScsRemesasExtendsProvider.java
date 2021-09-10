@@ -36,7 +36,7 @@ public class ScsRemesasExtendsProvider {
 		SQL fechaGeneracion = new SQL();
 		SQL fechaEnvio = new SQL();
 		SQL fechaRecepcion = new SQL();
-		SQL estado = new SQL();
+		SQL fechamodificacion = new SQL();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		
 		subquery.SELECT("fecharemesa");
@@ -144,11 +144,10 @@ public class ScsRemesasExtendsProvider {
 			fechaRecepcion.WHERE("TRUNC(est.fecharemesa) <= TO_DATE('" + fechaRecepcionHasta + "', 'DD/MM/RRRR')");
 		}
 		
-		estado.SELECT("1");
-		estado.FROM("cajg_remesaestados est");
-		estado.WHERE("est.idremesa = rem.idremesa");
-		estado.WHERE("est.idinstitucion = rem.idinstitucion");
-		estado.WHERE("est.idestado LIKE '" + remesasBusquedaItem.getEstado() + "'");
+		fechamodificacion.SELECT("MAX(fechamodificacion)");
+		fechamodificacion.FROM("cajg_remesaestados est2");
+		fechamodificacion.WHERE("est2.idinstitucion = rem.idinstitucion");
+		fechamodificacion.WHERE("est2.idremesa = rem.idremesa");
 
 		sql.SELECT("REM.IDREMESA IDREMESA");
 		sql.SELECT("REM.IDINSTITUCION IDINSTITUCION");
@@ -160,16 +159,23 @@ public class ScsRemesasExtendsProvider {
 		sql.SELECT("(" + subquery.toString() + ") fecha_generacion");
 		sql.SELECT("(" + subquery1.toString() + ") fecha_envio");
 		sql.SELECT("(" + subquery2.toString() + ") fecha_recepcion");
-		sql.SELECT("F_SIGA_GETRECURSO((" + subquery3.toString() + "), " + idLenguaje + ") estado");
+		sql.SELECT("F_SIGA_GETRECURSO((tipoest.descripcion), " + idLenguaje + ") estado");
 		sql.SELECT("(" + subquery5.toString() + ") incidencias_ejg");
 		sql.SELECT("(" + subquery6.toString() + ") total_ejg");
+		sql.SELECT("(" + subquery5.toString() + ") || ' / ' || (" + subquery6.toString() + ") as INCIDENCIAS");
 		sql.FROM("cajg_remesa rem");
+		sql.FROM("cajg_remesaestados est");
+		sql.FROM("cajg_tipoestadoremesa tipoest");
 		
+		sql.WHERE("rem.idinstitucion = " + idInstitucion.toString()); //colegio logado
+		
+		sql.WHERE("est.fechamodificacion = (" + fechamodificacion.toString() + ")");
+		
+		sql.WHERE("tipoest.idestado = est.idestado");
+
 		if(remesasBusquedaItem.getNumero() != 0) {
 			sql.WHERE("rem.numero= " + remesasBusquedaItem.getNumero()); //numero
 		}
-		
-		sql.WHERE("rem.idinstitucion = " + idInstitucion.toString()); //colegio logado
 		
 		if(remesasBusquedaItem.getPrefijo() != 0) {
 			sql.WHERE("rem.prefijo = " + remesasBusquedaItem.getPrefijo()); //prefijo
@@ -184,7 +190,7 @@ public class ScsRemesasExtendsProvider {
 		}
 		
 		if(remesasBusquedaItem.getEstado() != null) {
-			sql.WHERE("exists(" + estado.toString() + ")");
+			sql.WHERE("est.idestado = " + remesasBusquedaItem.getEstado()); //estado
 		}
 		
 		if(remesasBusquedaItem.getFechaGeneracionDesde() != null || remesasBusquedaItem.getFechaGeneracionHasta() != null) {

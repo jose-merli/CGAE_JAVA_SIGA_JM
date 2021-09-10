@@ -17,6 +17,7 @@ public class RemesasItem {
 	private String estado;
 	private int incidenciasEJG;
 	private int totalEJG;
+	private String incidencias;
 	
 	public int getIdRemesa() {
 		return idRemesa;
@@ -121,5 +122,15 @@ public class RemesasItem {
 	public void setTotalEJG(int totalEJG) {
 		this.totalEJG = totalEJG;
 	}
+
+	public String getIncidencias() {
+		return incidencias;
+	}
+
+	public void setIncidencias(String incidencias) {
+		this.incidencias = incidencias;
+	}
+	
+	
 		
 }

@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 	private Logger LOGGER = Logger.getLogger(BusquedaRemesasServiceImpl.class);
@@ -145,7 +146,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		return remesaBusquedaDTO;
 	}
 
-	@Override @Transactional
+	@Override
 	public DeleteResponseDTO borrarRemesas(List<RemesasBusquedaItem> remesasBusquedaItem, HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
