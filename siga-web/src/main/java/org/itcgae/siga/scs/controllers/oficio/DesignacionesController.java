@@ -1,6 +1,5 @@
 package org.itcgae.siga.scs.controllers.oficio;
 
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -716,18 +715,17 @@ public class DesignacionesController {
 		designa.setAnio(Short.parseShort(anio));
 		designa.setIdturno(Integer.parseInt(item[1]));
 		designa.setNumero(Long.parseLong(item[2]));
-		
+		designa.setArt27(item[12]);
 		
 		ScsDesignasletrado letradoSaliente = new ScsDesignasletrado();
 		letradoSaliente.setIdpersona(Long.parseLong(item[3]));
 		letradoSaliente.setObservaciones(item[4]);
 		letradoSaliente.setIdtipomotivo(Short.parseShort(item[5]));
 		if(item[6]!=null) {
-//			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-//			Calendar calendar = Calendar.getInstance();
-//			calendar.setTimeInMillis(Long.parseLong(item[6]));
-//			letradoSaliente.setFechadesigna(formatter.parse(formatter.format(calendar.getTime()))); 
-			letradoSaliente.setFechadesigna(new Date(Long.parseLong(item[6])));
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(Long.parseLong(item[6]));
+			letradoSaliente.setFechadesigna(formatter.parse(formatter.format(calendar.getTime()))); 
 		}
 		if(item[7]!=null) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -738,16 +736,15 @@ public class DesignacionesController {
 		ScsDesignasletrado letradoEntrante = new ScsDesignasletrado();
 		
 		if(item[8]!=null) {
-//			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-//			SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-//			if(item[8].length() != 10) {
-//				String date = item[8].substring(0, 10);
-//				letradoEntrante.setFechadesigna(formatter.parse(date));
-//			}else {
-//				String date = item[8].substring(0, 10);
-//				letradoEntrante.setFechadesigna(format.parse(date));
-//			}
-			letradoSaliente.setFechadesigna(new Date(Long.parseLong(item[8])));
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+			if(item[8].length() != 10) {
+				String date = item[8].substring(0, 10);
+				letradoEntrante.setFechadesigna(formatter.parse(date));
+			}else {
+				String date = item[8].substring(0, 10);
+				letradoEntrante.setFechadesigna(format.parse(date));
+			}
 		}
 		
 		if(item[9]!=null) {

@@ -3321,18 +3321,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 	}
 
-	/**
-	 * Obtiene la cola de turno dada una fecha
-	 * 
-	 * @param idInstitucion
-	 * @param idTurno
-	 * @param idGuardia
-	 * @param fecha
-	 * @param usr
-	 * @return
-	 * @throws Exception
-	 * @throws ClsExceptions
-	 */
+
 	public List<LetradoInscripcionItem> getColaTurno(Integer idInstitucion, Integer idTurno, String fecha,
 			boolean quitarSaltos, AdmUsuarios usr) throws Exception {
 		try {
@@ -4766,7 +4755,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(designa.getAnio())
 							.andIdturnoEqualTo(designa.getIdturno()).andNumeroEqualTo(designa.getNumero())
 							.andIdpersonaEqualTo(letradoSaliente.getIdpersona())
-							.andFechadesignaEqualTo(letradoSaliente.getFechadesigna());
+							.andFechadesignaGreaterThanOrEqualTo(letradoSaliente.getFechadesigna())
+							.andFecharenunciasolicitaIsNull();
 					
 					example.setOrderByClause("FECHADESIGNA DESC");
 
@@ -4812,10 +4802,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designaLetradoNueva.setIdpersona(letradoEntrante.getIdpersona());
 					}
 
-					if (letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna())) {
+					if (letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna()) || designa.getArt27().equals("Si")) {
 						Long idPersonaDesignaVieja = designaLetradoVieja.getIdpersona();
 //						designaLetradoNueva = designaLetradoVieja;
-						designaLetradoNueva.setIdpersona(idPersonaDesignaVieja);
+						designaLetradoNueva.setIdpersona(designaLetradoNueva.getIdpersona());
 						response = scsDesignasletradoMapper.deleteByPrimaryKey(designaLetradoVieja);
 						if (response == 1) {
 							response = scsDesignasletradoMapper.insertSelective(designaLetradoNueva);
@@ -4902,7 +4892,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 //				} catch (Exception e) {
 //					error.setDescription("general.mensaje.error.bbdd");
-//					error.code(500);
+//					error.code(500);/designas/busquedaLetradosDesignacion
 //					updateResponseDTO.setStatus(SigaConstants.KO);
 //					updateResponseDTO.setError(error);
 //					LOGGER.error(e.getMessage());
