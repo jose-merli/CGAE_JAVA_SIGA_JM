@@ -492,6 +492,7 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 	//SIGARNV-2009@DTT.JAMARTIN@06/08/2021@FIN
 	
 	
+	
 	public String buscarGuardiasTurnosInscritos(List<InscripcionesItem> inscripcionesItems, Short idInstitucion, String idPersona) {
 	    String listadoIdTurnos = "";
 	    for(int i=0; i<inscripcionesItems.size(); i++) {
@@ -501,7 +502,9 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 	            listadoIdTurnos += ", "+inscripcionesItems.get(i).getIdturno();
 	        }
 	    }
-
+	    
+	    //En la consulta se incluyen aquellas inscripciones a guardias que hayan sido dadas de baja.
+	    //Si se quisieran excluir, se deberia añadir el condicional más abajo.
 	    String sql = "SELECT sg2.IDGUARDIA, F_SIGA_GETRECURSO(stp.descripcion, 1) AS DESCRIPCION, sg2.IDINSTITUCION , sg2.IDTURNO, " +
 	            "sg2.FECHAMODIFICACION,  sg2.USUMODIFICACION,  sg2.FECHABAJA,  sg2.NOMBRE " +
 	            "FROM SCS_GUARDIASTURNO sg2 " +
@@ -510,7 +513,9 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 	            + " AND sg2.IDTURNO IN (" + listadoIdTurnos + ") AND sg2.IDGUARDIA IN (SELECT DISTINCT sg.IDGUARDIA FROM "
 	            + "SCS_INSCRIPCIONGUARDIA sg INNER JOIN SCS_TURNO st ON sg.IDINSTITUCION = st.IDINSTITUCION AND sg.IDTURNO = st.IDTURNO "
 	            + "INNER JOIN SCS_GUARDIASTURNO si ON sg.IDINSTITUCION = si.IDINSTITUCION AND sg.IDTURNO = si.IDTURNO AND sg.IDGUARDIA = si.IDGUARDIA WHERE sg.IDINSTITUCION = "
-	            + idInstitucion + " AND sg.IDTURNO IN (" + listadoIdTurnos + ") AND sg.IDPERSONA =  " + idPersona
+	            + idInstitucion  
+	            //+" AND asg.FECHABAJA IS NULL"
+	            + " AND sg.IDTURNO IN (" + listadoIdTurnos + ") AND sg.IDPERSONA =  " + idPersona
 	            + ")";
 
 	    return sql;
