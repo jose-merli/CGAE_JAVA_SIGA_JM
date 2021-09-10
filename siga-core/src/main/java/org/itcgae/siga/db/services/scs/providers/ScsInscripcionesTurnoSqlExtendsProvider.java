@@ -491,6 +491,31 @@ public class ScsInscripcionesTurnoSqlExtendsProvider extends ScsInscripcionturno
 	} 
 	//SIGARNV-2009@DTT.JAMARTIN@06/08/2021@FIN
 	
+	
+	public String buscarGuardiasTurnosInscritos(List<InscripcionesItem> inscripcionesItems, Short idInstitucion, String idPersona) {
+	    String listadoIdTurnos = "";
+	    for(int i=0; i<inscripcionesItems.size(); i++) {
+	        if(i==0) {
+	            listadoIdTurnos += inscripcionesItems.get(i).getIdturno();
+	        } else {
+	            listadoIdTurnos += ", "+inscripcionesItems.get(i).getIdturno();
+	        }
+	    }
+
+	    String sql = "SELECT sg2.IDGUARDIA, F_SIGA_GETRECURSO(stp.descripcion, 1) AS DESCRIPCION, sg2.IDINSTITUCION , sg2.IDTURNO, " +
+	            "sg2.FECHAMODIFICACION,  sg2.USUMODIFICACION,  sg2.FECHABAJA,  sg2.NOMBRE " +
+	            "FROM SCS_GUARDIASTURNO sg2 " +
+	            "INNER JOIN SCS_TIPOSGUARDIAS stp ON stp.IDTIPOGUARDIA = sg2.IDTIPOGUARDIA "
+	            + " WHERE sg2.IDINSTITUCION = " + idInstitucion
+	            + " AND sg2.IDTURNO IN (" + listadoIdTurnos + ") AND sg2.IDGUARDIA IN (SELECT DISTINCT sg.IDGUARDIA FROM "
+	            + "SCS_INSCRIPCIONGUARDIA sg INNER JOIN SCS_TURNO st ON sg.IDINSTITUCION = st.IDINSTITUCION AND sg.IDTURNO = st.IDTURNO "
+	            + "INNER JOIN SCS_GUARDIASTURNO si ON sg.IDINSTITUCION = si.IDINSTITUCION AND sg.IDTURNO = si.IDTURNO AND sg.IDGUARDIA = si.IDGUARDIA WHERE sg.IDINSTITUCION = "
+	            + idInstitucion + " AND sg.IDTURNO IN (" + listadoIdTurnos + ") AND sg.IDPERSONA =  " + idPersona
+	            + ")";
+
+	    return sql;
+	} 
+	
 	public String busquedaColaOficio(InscripcionesItem inscripcionesItem,String strDate,String busquedaOrden, Short idInstitucion) {
 		SQL sql = new SQL();
 		
