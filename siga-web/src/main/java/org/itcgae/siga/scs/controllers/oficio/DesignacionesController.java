@@ -715,7 +715,7 @@ public class DesignacionesController {
 		designa.setAnio(Short.parseShort(anio));
 		designa.setIdturno(Integer.parseInt(item[1]));
 		designa.setNumero(Long.parseLong(item[2]));
-		
+		designa.setArt27(item[12]);
 		
 		ScsDesignasletrado letradoSaliente = new ScsDesignasletrado();
 		letradoSaliente.setIdpersona(Long.parseLong(item[3]));
