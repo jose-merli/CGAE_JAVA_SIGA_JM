@@ -97,6 +97,17 @@ public interface ScsInscripcionesTurnoExtendsMapper extends ScsInscripcionturnoM
 	List<InscripcionesItem> buscarGuardiasTurnosNoInscritos(List<InscripcionesItem> inscripcionesItems, Short idInstitucion, String idPersona);
 	// SIGARNV-2009@DTT.JAMARTIN@06/08/2021@FIN
 	 
+	@SelectProvider(type = ScsInscripcionesTurnoSqlExtendsProvider.class, method = "buscarGuardiasTurnosInscritos")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.DECIMAL, id = true),
+			@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESCRIPCION", property = "tipoguardias", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre_guardia", jdbcType = JdbcType.VARCHAR) })
+	List<InscripcionesItem> buscarGuardiasTurnosInscritos(List<InscripcionesItem> inscripcionesItems, Short idInstitucion, String idPersona);
+	
 	 @UpdateProvider(type=ScsInscripcionesTurnoSqlExtendsProvider.class, method="borrarSaltos")
 	    int borrarSaltos(InscripcionesItem inscripcionesItem, Short idInstitucion, int usumodificacion);
 
