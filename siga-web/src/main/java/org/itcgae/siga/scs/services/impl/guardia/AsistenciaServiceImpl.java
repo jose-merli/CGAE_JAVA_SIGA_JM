@@ -564,6 +564,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								ScsAsistencia asistenciaBBDD = fromTarjetaAsistenciaItemToScsAsistencia(asistencia, anioAsistencia, numeroAsistencia, tipoAsistenciaGeneral, idPersona, idInstitucion, usuarios.get(0));
 								//Como es una nueva Asistencia, le ponemos estado ACTIVO
 								asistenciaBBDD.setIdestadoasistencia((short)1);
+								asistenciaBBDD.setIdorigenasistencia((short)30); //30 - Es una asistencia expres
 								int responseAsistencia = scsAsistenciaExtendsMapper.insertSelective(asistenciaBBDD);
 								
 								if(responseAsistencia == 0) {
@@ -803,6 +804,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			
 			if(!UtilidadesString.esCadenaVacia(asistencia.getIdSolicitudCentralita())) {
 				asistenciaBBDD.setIdsolicitudcentralita(Integer.valueOf(asistencia.getIdSolicitudCentralita()));
+				asistenciaBBDD.setIdorigenasistencia((short)40); //40 - Proviene de una solicitud de centralita
 			}
 			
 			asistenciaBBDD.setFechamodificacion(new Date());

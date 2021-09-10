@@ -100,7 +100,7 @@ public interface ComboService {
 
 	public ComboDTO comboCosteFijo(HttpServletRequest request, String anioNumero, String idTipoActuacion);
 
-	public ComboDTO comboTipoActuacionAsistencia(HttpServletRequest request, String anioNumero);
+	public ComboDTO comboTipoActuacionAsistencia(HttpServletRequest request, String anioNumero, String idTipoAsistencia);
 
 	public ComboDTO comboOrigenContacto(HttpServletRequest request);
 }

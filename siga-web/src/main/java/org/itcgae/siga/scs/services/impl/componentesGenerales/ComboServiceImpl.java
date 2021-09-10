@@ -1798,7 +1798,7 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
-	public ComboDTO comboTipoActuacionAsistencia(HttpServletRequest request, String anioNumero) {
+	public ComboDTO comboTipoActuacionAsistencia(HttpServletRequest request, String anioNumero, String idTipoAsistencia) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -1815,18 +1815,23 @@ public class ComboServiceImpl implements ComboService {
 			LOGGER.info(
 					"comboTipoActuacionAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (usuarios != null && usuarios.size() > 0 && !UtilidadesString.esCadenaVacia(anioNumero)) {
+			if (usuarios != null && usuarios.size() > 0) {
 
 				LOGGER.info(
 						"comboTipoActuacionAsistencia() / scsAsistenciaExtendsMapper.comboTipoActuacionAsistencia() -> Entrada a scsInscripcionguardiaExtendsMapper para obtener las guardias a los que esta inscrito el letrado");
 
-				ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
-				scsAsistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
-				scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
-				scsAsistenciaKey.setIdinstitucion(idInstitucion);
-				ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
-				if(scsAsistencia != null){
-					List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacion(idInstitucion,scsAsistencia.getIdtipoasistencia(),Integer.valueOf(usuarios.get(0).getIdlenguaje()));
+				if(!UtilidadesString.esCadenaVacia(anioNumero)) {
+					ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+					scsAsistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
+					scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
+					scsAsistenciaKey.setIdinstitucion(idInstitucion);
+					ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
+					if (scsAsistencia != null) {
+						List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacion(idInstitucion, scsAsistencia.getIdtipoasistencia(), Integer.valueOf(usuarios.get(0).getIdlenguaje()));
+						comboDTO.setCombooItems(comboItems);
+					}
+				}else if(!UtilidadesString.esCadenaVacia(idTipoAsistencia)){
+					List<ComboItem> comboItems = scsActuacionasistenciaExtendsMapper.comboTipoActuacion(idInstitucion, Short.valueOf(idTipoAsistencia), Integer.valueOf(usuarios.get(0).getIdlenguaje()));
 					comboDTO.setCombooItems(comboItems);
 				}
 

@@ -225,8 +225,8 @@ public class CombosGeneralesController {
 	}
 
 	@GetMapping("/comboTipoActuacionAsistencia")
-	public ResponseEntity<ComboDTO> comboTipoActuacionAsistencia(HttpServletRequest request, @RequestParam String anioNumero) {
-		ComboDTO response = comboService.comboTipoActuacionAsistencia(request, anioNumero);
+	public ResponseEntity<ComboDTO> comboTipoActuacionAsistencia(HttpServletRequest request, @RequestParam(required = false) String anioNumero, @RequestParam(required = false) String idTipoAsistencia) {
+		ComboDTO response = comboService.comboTipoActuacionAsistencia(request, anioNumero, idTipoAsistencia);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
