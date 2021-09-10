@@ -86,6 +86,7 @@ import org.itcgae.siga.db.entities.GenRecursosCatalogosKey;
 import org.itcgae.siga.db.entities.GenRecursosExample;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
+import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
 import org.itcgae.siga.db.entities.ScsInscripcionturno;
 import org.itcgae.siga.db.mappers.CenBajastemporalesMapper;
@@ -1155,21 +1156,19 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					if(!listGu.get(0).getObligatoriedad().equals("0")) {
 						if(!listGu.get(0).getObligatoriedad().equals("1")) {
 					
-							ScsInscripcionguardiaKey key1= new ScsInscripcionguardiaKey();
 							
-							key1.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
-							key1.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
-							key1.setIdinstitucion(idInstitucion);
 							
 							//Comprobamos si se introdujo una guardia o no.
 							if(cargaMasivaDatosITItem.getIdGuardia() == null) {
-							
-								for(GuardiasItem gu : listGu) {
-		
-									key1.setIdguardia(Integer.parseInt(gu.getIdGuardia()));
+								
+									ScsInscripcionguardiaExample example1= new ScsInscripcionguardiaExample();
 									
-									ScsInscripcionguardia ins = null;
-									ins = scsInscripcionguardiaMapper.selectByPrimaryKey(key1);
+									example1.setOrderByClause("FECHASOLICITUD DESC");
+									example1.createCriteria().andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+									.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
+									.andIdinstitucionEqualTo(idInstitucion);
+									
+									List<ScsInscripcionguardia> insGur = scsInscripcionguardiaMapper.selectByExample(example1);
 									
 									if(listGu.get(0).getIdTurno().toString().equals(cargaMasivaDatosITItem.getIdTurno())) {
 										errorLinea.append("No se ha encontrado una guardia con el nombre introducido en el turno asociado");
@@ -1177,12 +1176,22 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 									}
 									
 									//Se comprueba si la inscripción en la guardia no existe
-									if(ins==null) errorLinea.append("El colegiado no esta inscrito en la guardia "+gu.getNombre()+" del turno.");
+									if(insGur.size()!=listGu.size()) errorLinea.append("El colegiado no esta inscrito en todas las guardias del turno.");
 									//Se comprueba si ya esta de baja
-									else if(ins.getFechabaja()!=null) errorLinea.append("El colegiado ya dió de baja la inscripcion en la guardia "+gu.getNombre()+" del turno.");
-								}
+									else {
+										for(ScsInscripcionguardia guardia: insGur) {
+											if(guardia.getFechabaja() != null)errorLinea.append("El colegiado ya dió de baja la inscripcion en alguna guardia del turno.");
+										}
+									}
+								
 							}
 							else {
+								
+								ScsInscripcionguardiaKey key1= new ScsInscripcionguardiaKey();
+								
+								key1.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
+								key1.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
+								key1.setIdinstitucion(idInstitucion);
 								
 								key1.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
 								
