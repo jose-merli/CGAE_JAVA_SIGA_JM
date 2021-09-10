@@ -440,16 +440,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					List<ScsTipodictamenejg> estadosExpedientes = scsTipodictamenejgExtendsMapper
 							.estadosDictamen(usuarios.get(0).getIdlenguaje(), idInstitucion.toString());
 					
-//					String idFavorable = null;
-//					String idDesfavorable = null;
-//
-//					for (ScsTipodictamenejg tipoDictamen : estadosExpedientes) {
-//						if ("FAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())) {
-//							idFavorable = tipoDictamen.getIdtipodictamenejg().toString();
-//						} else if ("DESFAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())) {
-//							idDesfavorable = tipoDictamen.getIdtipodictamenejg().toString();
-//						}
-//					}
+					String idFavorable = null;
+					String idDesfavorable = null;
+
+					for (ScsTipodictamenejg tipoDictamen : estadosExpedientes) {
+						if ("FAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())) {
+							idFavorable = tipoDictamen.getIdtipodictamenejg().toString();
+						} else if ("DESFAVORABLE".equalsIgnoreCase(tipoDictamen.getDescripcion())) {
+							idDesfavorable = tipoDictamen.getIdtipodictamenejg().toString();
+						}
+					}
 					String fechaDesde = null;
 					String fechaHasta = null;
 					if (item.getDesignacionDesde() != null) {
@@ -461,12 +461,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					LOGGER.info(
 							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo justificaciones...");
 					// busqueda de designaciones segun los filtros (max 200)
-//					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
-//							idInstitucion.toString(), longitudCodEJG, idPersona, idFavorable, idDesfavorable,
-//							fechaDesde, fechaHasta);
 					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
-							idInstitucion.toString(), longitudCodEJG, idPersona, 
+							idInstitucion.toString(), longitudCodEJG, idPersona, idFavorable, idDesfavorable,
 							fechaDesde, fechaHasta);
+//					result = scsDesignacionesExtendsMapper.busquedaJustificacionExpresPendientes(item,
+//							idInstitucion.toString(), longitudCodEJG, idPersona, 
+//							fechaDesde, fechaHasta);
 
 					LOGGER.info(
 							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo las actuaciones...");

@@ -1230,6 +1230,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				" AND act.idprocedimiento = acp.idprocedimiento AND act.idinstitucion_proc = pro.idinstitucion AND act.idprocedimiento = pro.idprocedimiento ");
 		sql.append(" AND act.idinstitucion = " + idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = "
 				+ anio + " AND act.numero = " + numero + " ");
+		
+		if(item.isMuestraPendiente()) {
+			sql.append(" AND act.validada = 0");
+		}else {
+			sql.append(" AND act.validada = 1");
+		}
 		if (item.getJustificacionDesde() != null) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			String fecha = dateFormat.format(item.getJustificacionDesde());
@@ -1256,10 +1262,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	 * @param idPersona
 	 * @return
 	 */
-//	public String busquedaJustificacionExpres(JustificacionExpressItem item, String idInstitucion,
-//			String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable, String fechaDesde, String fechaHasta) {
 	public String busquedaJustificacionExpres(JustificacionExpressItem item, String idInstitucion,
-			String longitudCodEJG, String idPersona,  String fechaDesde, String fechaHasta) {
+			String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable, String fechaDesde, String fechaHasta) {
+//	public String busquedaJustificacionExpres(JustificacionExpressItem item, String idInstitucion,
+//			String longitudCodEJG, String idPersona,  String fechaDesde, String fechaHasta) {
 
 		StringBuilder sql = new StringBuilder();
 
@@ -1371,28 +1377,28 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql.append(" AND ejg.anio is not null ");
 			}
 		}
-//		if ((item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty())) {
-//			if (item.getEjgSinResolucion().equals("0")) {
-//				sql.append(" AND ejg.IDTIPODICTAMENEJG <> " + idDesfavorable);
-//			} // else {
-				// sql.append(" AND ejg.IDTIPODICTAMENEJG = " + idFavorable);
+		if ((item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty())) {
+			if (item.getEjgSinResolucion().equals("0")) {
+				sql.append(" AND ejg.IDTIPODICTAMENEJG <> " + idDesfavorable);
+			} // else {
+				 sql.append(" AND ejg.IDTIPODICTAMENEJG = " + idFavorable);
+				 }
+		
+		if ((item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty())) {
+			if (item.getConEJGNoFavorables().equals("0")) {
+				sql.append(" AND ejg.anioresolucion is not null\r\n" + " and ejg.numeroresolucion is not null ");
+			} else {
+				sql.append(" AND ejg.anioresolucion IS NULL\r\n" + " AND ejg.numeroresolucion IS NULL ");
+			}
+		}
+
+		if ((item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty())) {
+			if (item.getResolucionPTECAJG().equals("0")) {
+				sql.append(" AND ejg.EJG.FECHARESOLUCIONCAJG IS NOT NULL");
+			} // else {
+				// sql.append(" AND ejg.EJG.FECHARESOLUCIONCAJG IS NULL");
 				// }
-		//}
-//		if ((item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty())) {
-//			if (item.getConEJGNoFavorables().equals("0")) {
-//				sql.append(" AND ejg.anioresolucion is not null\r\n" + " and ejg.numeroresolucion is not null ");
-//			} else {
-//				sql.append(" AND ejg.anioresolucion IS NULL\r\n" + " AND ejg.numeroresolucion IS NULL ");
-//			}
-//		}
-//
-//		if ((item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty())) {
-//			if (item.getResolucionPTECAJG().equals("0")) {
-//				sql.append(" AND ejg.EJG.FECHARESOLUCIONCAJG IS NOT NULL");
-//			} // else {
-//				// sql.append(" AND ejg.EJG.FECHARESOLUCIONCAJG IS NULL");
-//				// }
-//		}
+		}
 
 		if (item.getAnioDesignacion() != null && !item.getAnioDesignacion().trim().isEmpty()) {
 			sql.append(" AND D.ANIO = " + item.getAnioDesignacion().trim());
