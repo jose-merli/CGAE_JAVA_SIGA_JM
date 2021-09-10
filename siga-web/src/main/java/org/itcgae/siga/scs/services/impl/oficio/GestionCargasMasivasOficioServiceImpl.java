@@ -166,6 +166,9 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
 	
 	@Autowired
+	private ScsInscripcionesTurnoExtendsMapper scsInscripcionturnoExtendsMapper;
+	
+	@Autowired
 	private ScsTurnoMapper scsTurnoMapper;
 	
 	@Autowired
@@ -697,14 +700,15 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 								if (cargaMasivaDatosITItem.getIdGuardia() == null
 										|| cargaMasivaDatosITItem.getIdGuardia().equals("")) {
 									int i = 0;
-									while (i < listGu.size() && result != 0) {
 
-										GuardiasItem gu = listGu.get(i);
+									InscripcionesItem ins = new InscripcionesItem();
+									ins.setIdturno(cargaMasivaDatosITItem.getIdTurno());
+									List<InscripcionesItem> inscripcionesItems =Arrays.asList(ins);
+									List<InscripcionesItem> guardiasInscritas = scsInscripcionturnoExtendsMapper.buscarGuardiasTurnosInscritos(inscripcionesItems, idInstitucion, cargaMasivaDatosITItem.getIdPersona());
 
-										guardia.setIdguardia(Integer.parseInt(gu.getIdGuardia()));
-
-										//Puede dar problemas al intentar actualizar una incripcion a guardia que no existe 
-										//Ya que se ha bu
+									while (i < guardiasInscritas.size() && result != 0) {
+										guardia.setIdguardia(Integer.parseInt(guardiasInscritas.get(i).getIdguardia()));
+										
 										result = scsInscripcionguardiaMapper.updateByPrimaryKeySelective(guardia);
 										i++;
 									}
