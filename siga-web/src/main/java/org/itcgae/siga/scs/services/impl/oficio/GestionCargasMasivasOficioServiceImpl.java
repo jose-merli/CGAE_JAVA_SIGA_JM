@@ -48,6 +48,7 @@ import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.db.entities.ScsInscripcionturno;
+import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.SubtiposCVItem;
@@ -526,7 +527,6 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 		return returnFile;
 	}
 	
-	
 	@Override
 	@Transactional
 	public DeleteResponseDTO uploadFileIT(MultipartHttpServletRequest request) throws Exception {
@@ -541,7 +541,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 		LOGGER.debug("uploadFileIT() -> Coger archivo del request");
 		Iterator<String> itr = request.getFileNames();
 		MultipartFile file = request.getFile(itr.next());
-		String nombreFichero = file.getOriginalFilename(); 
+		String nombreFichero = file.getOriginalFilename();
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFileIT() -> Extraer los datos del archivo");
@@ -563,82 +563,127 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					"uploadFileIT() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				
+
 				AdmUsuarios usuario = usuarios.get(0);
-				
-				
+
 				List<CargaMasivaDatosITItem> cargaMasivaDatosITItems = parseExcelFileIT(datos, usuario);
-				
-				
+
 				for (CargaMasivaDatosITItem cargaMasivaDatosITItem : cargaMasivaDatosITItems) {
-					
+
 					int result = -1;
-					
-					//Si no se ha detectado errores leyendo el excel introducido
+
+					// Si no se ha detectado errores leyendo el excel introducido
 					if (cargaMasivaDatosITItem.getErrores() == null) {
-						int z=1;
-						//En el caso que se haya introducido un tipo alta
-						if(cargaMasivaDatosITItem.getTipo()=="ALTA") {
-							
-							TurnosItem t = new TurnosItem();
-							t.setIdturno(cargaMasivaDatosITItem.getIdTurno());
-							List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t, idInstitucion.toString(), usuario.getIdlenguaje());
+						int z = 1;						
+
+						TurnosItem t = new TurnosItem();
+						t.setIdturno(cargaMasivaDatosITItem.getIdTurno());
+						List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t,
+								idInstitucion.toString(), usuario.getIdlenguaje());
+						
+						// En el caso que se haya introducido un tipo alta
+						if (cargaMasivaDatosITItem.getTipo().equals("ALTA")) {
+
+							//Se comprueba si el turno tiene turnos o no
+							if (!listGu.isEmpty()) {
 								
-							ScsInscripcionguardia guardia = new ScsInscripcionguardia();
-								
-							guardia.setFechasuscripcion(cargaMasivaDatosITItem.getFechaEfectiva());
-							guardia.setFechavalidacion(cargaMasivaDatosITItem.getFechaEfectiva());
-							guardia.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
-							guardia.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
-							guardia.setIdinstitucion(idInstitucion);
-							guardia.setFechamodificacion(new Date());
-							guardia.setUsumodificacion(usuario.getIdusuario());
-								
-							//Se comprueba si se ha introducido una guardia especifica. Si no es asi, se realiza con todos las guardias del turno.
-							if(cargaMasivaDatosITItem.getIdGuardia().equals(null) || cargaMasivaDatosITItem.getIdGuardia().equals("")) {
-								int i=0;
-								while(i < listGu.size() && result!=0) {
-									GuardiasItem gu = listGu.get(i);
-									guardia.setIdguardia(Integer.parseInt(gu.getIdGuardia()));
-												
+								//Se compruaba si hay inscripciones guardias ya insertadas con los valores introducidos
+								ScsInscripcionguardia guardia = new ScsInscripcionguardia();
+
+								guardia.setFechasuscripcion(cargaMasivaDatosITItem.getFechaEfectiva());
+								guardia.setFechavalidacion(cargaMasivaDatosITItem.getFechaEfectiva());
+								guardia.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
+								guardia.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
+								guardia.setIdinstitucion(idInstitucion);
+								guardia.setFechamodificacion(new Date());
+								guardia.setUsumodificacion(usuario.getIdusuario());
+
+								// Se comprueba si se ha introducido una guardia especifica. Si no es asi, se
+								// realiza con todos las guardias del turno.
+								if (cargaMasivaDatosITItem.getIdGuardia() == null
+										|| cargaMasivaDatosITItem.getIdGuardia().equals("")) {
+									int i = 0;
+									while (i < listGu.size() && result != 0) {
+										GuardiasItem gu = listGu.get(i);
+										guardia.setIdguardia(Integer.parseInt(gu.getIdGuardia()));
+
+										result = scsInscripcionguardiaMapper.insert(guardia);
+										i++;
+									}
+									if (result == 0) {
+										errores += "Error insertando la peticion de la linea " + z + ". <br/>";
+										error.setDescription(errores);
+										deleteResponseDTO.setError(error);
+
+										throw new Exception("Error insertando la peticion de la linea " + z);
+									}
+								} else {
+
+									guardia.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
+
 									result = scsInscripcionguardiaMapper.insert(guardia);
-									i++;
-								}
-								if(result==0) {
-									errores += "Error insertando la peticion de la linea "+z+". <br/>";
-									error.setDescription(errores);
-									deleteResponseDTO.setError(error);
 
-									throw new Exception("Error insertando la peticion de la linea "+z);
-									
-									
+									if (result == 0) {
+										errores += "Error insertando la peticion de la linea " + z + ". <br/>";
+										error.setDescription(errores);
+										deleteResponseDTO.setError(error);
+
+										registrosErroneos++;
+
+//									throw new Exception("Error insertando la peticion de la linea "+z);
+
+									}
 								}
+
 							}
-							else {
 
-								guardia.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
-									
-								result = scsInscripcionguardiaMapper.insert(guardia);
-								
-								if(result==0) {
-									errores += "Error insertando la peticion de la linea "+z+". <br/>";
-									error.setDescription(errores);
-									deleteResponseDTO.setError(error);
-									
+							// Se busca si ya existe una incripcion a dicho turno para esa persona.
+							ScsInscripcionturnoExample exampleInscripcion = new ScsInscripcionturnoExample();
 
-									throw new Exception("Error insertando la peticion de la linea "+z);
+							exampleInscripcion.setOrderByClause("FECHASOLICITUD DESC");
+							exampleInscripcion.createCriteria()
+									.andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+									.andIdinstitucionEqualTo(idInstitucion)
+									.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
 
-								}
+							List<ScsInscripcionturno> inscripcionesTurno = scsInscripcionturnoMapper
+									.selectByExample(exampleInscripcion);
+
+							if (!inscripcionesTurno.isEmpty()) {
+
+								ScsInscripcionturno inscripcionturno = inscripcionesTurno.get(0);
+
+								inscripcionturno.setFechavalidacion(cargaMasivaDatosITItem.getFechaEfectiva());
+								inscripcionturno.setFechabaja(null);
+								inscripcionturno.setFechasolicitudbaja(null);
+								inscripcionturno.setFechamodificacion(new Date());
+								inscripcionturno.setUsumodificacion(usuario.getIdusuario());
+
+								scsInscripcionturnoMapper.updateByPrimaryKey(inscripcionturno);
+							} else {
+
+								ScsInscripcionturno inscripcionturno = new ScsInscripcionturno();
+
+								inscripcionturno.setFechasolicitud(cargaMasivaDatosITItem.getFechaEfectiva());
+								inscripcionturno.setFechavalidacion(cargaMasivaDatosITItem.getFechaEfectiva());
+								inscripcionturno.setFechabaja(null);
+								inscripcionturno.setFechasolicitudbaja(null);
+								inscripcionturno.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
+								inscripcionturno.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
+								inscripcionturno.setIdinstitucion(idInstitucion);
+								inscripcionturno.setFechamodificacion(new Date());
+								inscripcionturno.setUsumodificacion(usuario.getIdusuario());
+
+								scsInscripcionturnoMapper.insert(inscripcionturno);
 							}
 						}
-						//En el caso que se haya introducido una inscripcion de baja
+						// En el caso que se haya introducido una inscripcion de baja
 						else {
-							TurnosItem t = new TurnosItem();
-							t.setIdturno(cargaMasivaDatosITItem.getIdTurno());
-							List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t, idInstitucion.toString(), usuario.getIdlenguaje());
-									
+
+							//Se comprueba si el turno tiene turnos o no
+							if (!listGu.isEmpty()) {
 								ScsInscripcionguardia guardia = new ScsInscripcionguardia();
-									
+
 								guardia.setFechabaja(cargaMasivaDatosITItem.getFechaEfectiva());
 								guardia.setFechasolicitudbaja(cargaMasivaDatosITItem.getFechaEfectiva());
 								guardia.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
@@ -646,49 +691,95 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 								guardia.setIdinstitucion(idInstitucion);
 								guardia.setFechamodificacion(new Date());
 								guardia.setUsumodificacion(usuario.getIdusuario());
-									
-								//Se comprueba si se ha introducido una guardia especifica. Si no es asi, se realiza con todos las guardias del turno.
-								if(cargaMasivaDatosITItem.getIdGuardia().equals(null) || cargaMasivaDatosITItem.getIdGuardia().equals("")) {
-									int i=0;
-									while(i < listGu.size() && result!=0) {
-										
+
+								// Se comprueba si se ha introducido una guardia especifica. Si no es asi, se
+								// realiza con todos las guardias del turno.
+								if (cargaMasivaDatosITItem.getIdGuardia() == null
+										|| cargaMasivaDatosITItem.getIdGuardia().equals("")) {
+									int i = 0;
+									while (i < listGu.size() && result != 0) {
+
 										GuardiasItem gu = listGu.get(i);
-											
+
 										guardia.setIdguardia(Integer.parseInt(gu.getIdGuardia()));
-													
+
+										//Puede dar problemas al intentar actualizar una incripcion a guardia que no existe 
+										//Ya que se ha bu
 										result = scsInscripcionguardiaMapper.updateByPrimaryKeySelective(guardia);
 										i++;
 									}
-									if(result==0) {
-										errores += "Error insertando la baja temporal de la linea "+z+". <br/>";
+									if (result == 0) {
+										errores += "Error insertando la baja temporal de la linea " + z + ". <br/>";
 										error.setDescription(errores);
 										deleteResponseDTO.setError(error);
-										
 
-										throw new Exception("Error insertando la baja temporal de la linea "+z);
+										// En este caso se realiza un roolbback completo porque no
+										throw new Exception("Error insertando la baja temporal de la linea " + z);
 
 									}
-								}
-								else {
-	
+								} else {
+
 									guardia.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
-										
+
 									result = scsInscripcionguardiaMapper.updateByPrimaryKeySelective(guardia);
-									if(result==0) {
-										errores += "Error insertando la baja temporal de la linea "+z+". <br/>";
+									if (result == 0) {
+										errores += "Error insertando la baja temporal de la linea " + z + ". <br/>";
 										error.setDescription(errores);
 										deleteResponseDTO.setError(error);
 
-										throw new Exception("Error insertando la baja temporal de la linea "+z);
-										
+										registrosErroneos++;
+
+//										throw new Exception("Error insertando la baja temporal de la linea "+z);
+
 									}
 								}
+
 							}
-							if (result == 1) {
-								insertaCenHistoricoIT(cargaMasivaDatosITItem, usuario);
+							
+							// Actualmete solo se realizará una baja a la inscripcion de turno si se deja 
+							// el campo de guardia vacio.
+							if (cargaMasivaDatosITItem.getIdGuardia() == null
+									|| cargaMasivaDatosITItem.getIdGuardia().equals("")) {
+
+								// Se busca si ya hay una inscripcion aun turno para esa persona.
+								ScsInscripcionturnoExample exampleInscripcion = new ScsInscripcionturnoExample();
+
+								exampleInscripcion.setOrderByClause("FECHASOLICITUD DESC");
+								exampleInscripcion.createCriteria()
+										.andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+										.andIdinstitucionEqualTo(idInstitucion)
+										.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
+
+								List<ScsInscripcionturno> inscripcionesTurno = scsInscripcionturnoMapper
+										.selectByExample(exampleInscripcion);
+
+								if (!inscripcionesTurno.isEmpty()) {
+
+									ScsInscripcionturno inscripcionturno = inscripcionesTurno.get(0);
+
+									inscripcionturno.setFechabaja(cargaMasivaDatosITItem.getFechaEfectiva());
+									inscripcionturno.setFechasolicitudbaja(cargaMasivaDatosITItem.getFechaEfectiva());
+									inscripcionturno.setFechamodificacion(new Date());
+									inscripcionturno.setUsumodificacion(usuario.getIdusuario());
+
+									result = scsInscripcionturnoMapper.updateByPrimaryKey(inscripcionturno);
+
+									if (result == 0)
+										throw new Exception("Error realizando la linea " + z
+												+ " al actualizar la inscripcion al turno.");
+								}
+								// Actualmente se hace un rollback completo si se encuentra que se esta
+								// intentando realizar una baja a una incripcion que no existe
+								else
+									throw new Exception("Error realizando la linea " + z
+											+ " ya que no hay inscripcion a dicho turno.");
 							}
-	
-						
+						}
+
+						// Se introduce el documento en el hisotrico tanto para bajas temporales como
+						// para inscripciones.
+						insertaCenHistoricoIT(cargaMasivaDatosITItem, usuario);
+
 					} else {
 						errores += cargaMasivaDatosITItem.getErrores();
 						error.setDescription(errores);
@@ -702,12 +793,11 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					// Guardar log
 					datosLog.add(e);
 				}
-				
-				
-				if(cargaMasivaDatosITItems.isEmpty()) {
+
+				if (cargaMasivaDatosITItems.isEmpty()) {
 					error.setMessage("No existen registros en el fichero.");
-					deleteResponseDTO.setStatus(SigaConstants.OK); 
-				}else {
+					deleteResponseDTO.setStatus(SigaConstants.OK);
+				} else {
 					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGIT, datosLog);
 
 					cenCargamasivacv.setTipocarga("IT");
@@ -726,18 +816,18 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 					cenCargamasivacv.setIdficherolog(idLogFile);
 
 					int result = cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
-					
+
 					if (result == 0) {
 						throw new Exception("Error subiendo el fichero al repositorio");
-					} 
-					
+					}
+
 					LOGGER.info("uploadFileIT() -> Salida al servicio para subir un archivo");
 					deleteResponseDTO.setStatus(SigaConstants.OK);
 					error.setDescription(errores);
 					int correctos = cenCargamasivacv.getNumregistros() - registrosErroneos;
 					error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
 							+ "<br/> Registros Erroneos: " + cenCargamasivacv.getNumregistroserroneos());
-					error.setCode(SigaConstants.CODE_200); 
+					error.setCode(SigaConstants.CODE_200);
 				}
 			}
 		}
@@ -1046,7 +1136,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 //						}
 //						else errorLinea.append("El colegiado no esta inscrito en el turno indicado.");
 					}
-					else errorLinea.append("Las guardias en el turno son obligatorias por lo que no se puede realizar la fila con una guardia determinada. Se debe dejar en blanco.");
+					else errorLinea.append("Las guardias en el turno son obligatorias por lo que no se puede realizar la fila.");
 				}
 //				else errorLinea.append("No se ha encontrado guardias asociadas al turno indicado.");
 			}
@@ -1068,7 +1158,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 							key1.setIdinstitucion(idInstitucion);
 							
 							//Comprobamos si se introdujo una guardia o no.
-							if(cargaMasivaDatosITItem.getIdGuardia().equals(null)) {
+							if(cargaMasivaDatosITItem.getIdGuardia() == null) {
 							
 								for(GuardiasItem gu : listGu) {
 		
@@ -1285,7 +1375,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 
 		descripcion.append("\n");
 		descripcion.append("- Turno: ");
-		descripcion.append(cargaMasivaDatosITItem.getIdTurno() != null ? cargaMasivaDatosITItem.getIdTurno() : "");
+		descripcion.append(cargaMasivaDatosITItem.getNombreTurno() != null ? cargaMasivaDatosITItem.getNombreTurno() : "");
 		
 		descripcion.append("\n");
 		descripcion.append("- Idinstitucion: ");
@@ -1294,9 +1384,9 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 						: "");
 		
 		descripcion.append("\n");
-		descripcion.append("- IdGuardia: ");
+		descripcion.append("- Guardia: ");
 		descripcion.append(
-				cargaMasivaDatosITItem.getIdGuardia() != null ? cargaMasivaDatosITItem.getIdGuardia()
+				cargaMasivaDatosITItem.getNombreGuardia() != null ? cargaMasivaDatosITItem.getNombreGuardia()
 						: "");
 		
 		descripcion.append("\n");
@@ -1380,7 +1470,7 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 						cenBajasTemporales.setDescripcion(cargaMasivaDatosBTItem.getMotivo());
 						cenBajasTemporales.setFechaalta(new Date());
 						cenBajasTemporales.setEliminado(0);
-						cenBajasTemporales.setValidado("1");
+						cenBajasTemporales.setValidado("2");
 						
 //						CenBajastemporalesMapper cenBajasTemporalesMapper;
 						
