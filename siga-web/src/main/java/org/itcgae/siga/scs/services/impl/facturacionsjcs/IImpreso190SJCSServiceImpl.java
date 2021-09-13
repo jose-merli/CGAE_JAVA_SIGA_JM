@@ -8,7 +8,7 @@ import org.itcgae.siga.scs.services.facturacionsjcs.IImpreso190Service;
 
 public class IImpreso190SJCSServiceImpl implements IImpreso190Service{
 
-	@Override
+	/*@Override
 	public Impreso190DTO impreso190generar(Impreso190Item impreso190Item, HttpServletRequest request) {
 		String salida = null;
 		String sNombreFichero = "";
@@ -52,6 +52,6 @@ public class IImpreso190SJCSServiceImpl implements IImpreso190Service{
 		}
 		// COMUN
 		return salida;
-	}
+	}*/
 
 }

@@ -7,6 +7,6 @@ import org.itcgae.siga.DTOs.gen.Error;
 
 public class Impreso190DTO {
 
-	private List<Impreso190Item>  facturacionItem = new ArrayList<Impreso190Item>();
-	private Error error = null;
+	//private List<Impreso190Item>  facturacionItem = new ArrayList<Impreso190Item>();
+	//private Error error = null;
 }

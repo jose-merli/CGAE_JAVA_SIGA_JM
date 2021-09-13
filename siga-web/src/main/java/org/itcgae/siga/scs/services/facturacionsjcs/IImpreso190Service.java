@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface IImpreso190Service {
 
-	Impreso190DTO impreso190generar(@RequestBody Impreso190Item impreso190Item, HttpServletRequest request);
+	//Impreso190DTO impreso190generar(@RequestBody Impreso190Item impreso190Item, HttpServletRequest request);
 }
