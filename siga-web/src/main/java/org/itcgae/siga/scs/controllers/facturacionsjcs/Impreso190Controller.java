@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Impreso190Controller {
 
-	@Autowired
-	private IImpreso190Service impresoService;
+	//@Autowired
+	//private IImpreso190Service impresoService;
 	
 	/*@RequestMapping(value="/facturacionsjcs/impreso190generar", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Impreso190DTO> impreso190generar(@RequestBody Impreso190Item impreso190Item, HttpServletRequest request){

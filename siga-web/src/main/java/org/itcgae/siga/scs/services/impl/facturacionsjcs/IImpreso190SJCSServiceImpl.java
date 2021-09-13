@@ -31,7 +31,7 @@ public class IImpreso190SJCSServiceImpl implements IImpreso190Service{
 			
 			FcsFacturacionJGAdm admFac = new FcsFacturacionJGAdm(this.getUserBean(request));
 			try {
-				request.removeAttribute("mensaje");
+				request.removeAttribute(i"mensaje");
 				fichero = admFac.generarImpreso190(miform, user.getLocation());
 				miform.setNombreFichero(fichero.getName());
 				
