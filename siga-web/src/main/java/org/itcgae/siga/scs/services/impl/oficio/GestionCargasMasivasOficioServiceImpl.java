@@ -1187,22 +1187,28 @@ public class GestionCargasMasivasOficioServiceImpl implements IGestionCargasMasi
 							}
 							else {
 								
-								ScsInscripcionguardiaKey key1= new ScsInscripcionguardiaKey();
+								ScsInscripcionguardiaExample example1= new ScsInscripcionguardiaExample();
 								
-								key1.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
-								key1.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
-								key1.setIdinstitucion(idInstitucion);
+								example1.setOrderByClause("FECHASOLICITUD DESC");
+								example1.createCriteria().andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()))
+								.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()))
+								.andIdinstitucionEqualTo(idInstitucion).andIdguardiaEqualTo(Integer.valueOf(cargaMasivaDatosITItem.getIdGuardia()));
 								
-								key1.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
+								List<ScsInscripcionguardia> insGur = scsInscripcionguardiaMapper.selectByExample(example1);
 								
-								ScsInscripcionguardia ins = null;
-								ins = scsInscripcionguardiaMapper.selectByPrimaryKey(key1);
+								if(listGu.get(0).getIdTurno().toString().equals(cargaMasivaDatosITItem.getIdTurno())) {
+									errorLinea.append("No se ha encontrado una guardia con el nombre introducido en el turno asociado");
+									cargaMasivaDatosITItem.setNombreGuardia("Error");
+								}
 								
 								//Se comprueba si la inscripción en la guardia no existe
-								if(ins==null) errorLinea.append("El colegiado ya esta inscrito en la guardia "+cargaMasivaDatosITItem.getNombreGuardia()+" del turno.");
+								if(insGur.size()==0) errorLinea.append("El colegiado no esta inscrito en la guardia introducida.");
 								//Se comprueba si ya esta de baja
-								else if(ins.getFechabaja()==null) errorLinea.append("El colegiado ya dió de baja la inscripcion en la guardia "+cargaMasivaDatosITItem.getNombreGuardia()+" del turno.");
-							
+								else {
+									for(ScsInscripcionguardia guardia: insGur) {
+										if(guardia.getFechabaja() != null)errorLinea.append("El colegiado ya dió de baja la inscripcion en esa guardia del turno.");
+									}
+								}
 							}
 						}
 						else errorLinea.append("Las guardias en el turno son \"Todas o ninguna\" por lo que no se puede realizar la fila.");
