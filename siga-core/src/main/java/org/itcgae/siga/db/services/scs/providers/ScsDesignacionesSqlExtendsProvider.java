@@ -294,7 +294,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				} else if ((designaItem.getCodigo().indexOf('-') == -1)
 						&& (designaItem.getCodigo().indexOf(',') == -1)) {
 //					sql += " AND des.codigo = " + String.valueOf(designaItem.getCodigo()).trim();
-					sql += "AND ltrim(des.codigo,'0') = ltrim(" + designaItem.getCodigo() + ",'0')";
+					sql += " AND ltrim(des.codigo,'0') = ltrim(" + designaItem.getCodigo() + ",'0')";
 				}
 			}
 			if (designaItem.getIdJuzgados() != null && designaItem.getIdJuzgados().length > 0) {
@@ -1231,11 +1231,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.append(" AND act.idinstitucion = " + idInstitucion + " AND act.idturno = " + idTurno + " AND act.anio = "
 				+ anio + " AND act.numero = " + numero + " ");
 		
+		
 		if(item.isMuestraPendiente()) {
 			sql.append(" AND act.validada = 0");
-		}else {
-			sql.append(" AND act.validada = 1");
 		}
+		
 		if (item.getJustificacionDesde() != null) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			String fecha = dateFormat.format(item.getJustificacionDesde());
