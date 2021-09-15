@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
@@ -19,7 +21,10 @@ import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem2;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmContador;
+import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CajgEjgremesa;
@@ -31,7 +36,11 @@ import org.itcgae.siga.db.entities.CajgRemesaestadosExample;
 import org.itcgae.siga.db.entities.CajgRemesaestadosKey;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
+import org.itcgae.siga.db.entities.ScsTurno;
+import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.mappers.CajgRemesaestadosMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgEjgremesaExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgRemesaExtendsMapper;
@@ -42,6 +51,8 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.classmate.util.ResolvedTypeCache.Key;
 
 @Service
 @Transactional
@@ -66,6 +77,9 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 	@Autowired
 	private ScsEstadoejgExtendsMapper scsEstadoejgExtendsMapper;
+	
+	@Autowired
+	private AdmContadorExtendsMapper admContadorExtendsMapper;
 
 	@Override
 	public ComboDTO comboEstado(HttpServletRequest request) {
@@ -366,5 +380,111 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				}
 				LOGGER.info("getLabel() -> Salida del servicio para obtener los estado de la remesa");
 				return estadoRemesaDTO;
+	}
+
+	@Override
+	public AdmContador getUltimoRegitroRemesa(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		AdmContador contador = new AdmContador();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getUltimoRegitroRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+			
+			LOGGER.info(
+					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			LOGGER.info(
+					"getUltimoRegitroRemesa() / admContadorExtendsMapper.getUltimoRegitroRemesa() -> Entrada a AdmContadorExtendsMapper para obtener el ultimo registro de las remesas");
+			AdmContadorKey key = new AdmContadorKey();
+			
+			key.setIdinstitucion(idInstitucion);
+			key.setIdcontador("REMESA");
+
+			contador = admContadorExtendsMapper.selectByPrimaryKey(key);
+
+			LOGGER.info(
+					"getUltimoRegitroRemesa() / admContadorExtendsMapper.getUltimoRegitroRemesa() -> Salida a AdmContadorExtendsMapper para obtener el ultimo registro de las remesas");
+			
+		}
+		LOGGER.info("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
+		return contador;
+	}
+
+	@Override
+	public InsertResponseDTO guardarRemesa(RemesasItem remesasItem, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+		Integer idRemesaNueva = 0;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"guardarRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			AdmUsuarios usuario = usuarios.get(0);
+			
+			LOGGER.info(
+					"guardarRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			try {
+				LOGGER.info(
+						"guardarRemesa() / admContadorExtendsMapper.getUltimoRegitroRemesa() -> Entrada a AdmContadorExtendsMapper para obtener el ultimo registro de las remesas");
+				
+				//response = cajgRemesaExtendsMapper.ins
+
+			} catch (Exception e) {
+				LOGGER.error(
+						"guardarRemesa()" + e.getMessage());
+
+				response = 0;
+				error.setCode(400);
+				error.setDescription("general.mensaje.error.bbdd");
+				insertResponseDTO.setStatus(SigaConstants.KO);
+				insertResponseDTO.setError(error);
+				return insertResponseDTO;
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			if (error.getDescription() == null) {
+				error.setDescription("areasmaterias.materias.ficha.insertarerror");
+			}
+			insertResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			insertResponseDTO.setId(String.valueOf(idRemesaNueva));
+			error.setCode(200);
+			error.setDescription("general.message.registro.insertado");
+		}
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("guardarRemesa() -> Salida del servicio para insertar remesa");
+
+		return insertResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO actualizarRemesa(RemesasItem remesasItem, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

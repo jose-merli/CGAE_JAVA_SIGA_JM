@@ -6,10 +6,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
+import org.itcgae.siga.DTOs.scs.RemesasItem;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.scs.services.ejg.IBusquedaRemesas;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,6 +62,31 @@ public class RemesasController {
 		EstadoRemesaDTO response = busquedaRemesas.listadoEstadoRemesa(remesasBusquedaItem, request);
 		LOGGER.info("Termina el método listadoEstadosRemesa");
 		return new ResponseEntity<EstadoRemesaDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getUltimoRegitroRemesa", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<AdmContador> getUltimoRegitroRemesa(HttpServletRequest request) {
+		AdmContador response = busquedaRemesas.getUltimoRegitroRemesa(request);
+		return new ResponseEntity<AdmContador>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/guardarRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> guardarRemesa(@RequestBody RemesasItem remesasItem, HttpServletRequest request) {
+		InsertResponseDTO response = busquedaRemesas.guardarRemesa(remesasItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/actualizarRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> actualizarRemesa(@RequestBody RemesasItem remesasItem, HttpServletRequest request) {
+		UpdateResponseDTO response = busquedaRemesas.actualizarRemesa(remesasItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 	}
 	
 }
