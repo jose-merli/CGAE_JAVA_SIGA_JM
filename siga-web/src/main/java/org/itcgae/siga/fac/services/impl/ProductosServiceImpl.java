@@ -9,8 +9,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.hamcrest.text.IsEmptyString;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.IdPeticionDTO;
+import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
@@ -21,11 +23,13 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.PysFormapagoproducto;
 import org.itcgae.siga.db.entities.PysFormapagoproductoKey;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
+import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
 import org.itcgae.siga.db.mappers.PysProductosinstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -37,6 +41,7 @@ import org.itcgae.siga.fac.services.IProductosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductosServiceImpl implements IProductosService{
@@ -62,6 +67,9 @@ public class ProductosServiceImpl implements IProductosService{
 	
 	@Autowired
 	private PysFormapagoproductoMapper pysFormaPagoProducto;
+	
+	@Autowired
+	private AdmContadorMapper admContadorMapper;
 	
 	
 	@Override
@@ -679,11 +687,14 @@ public class ProductosServiceImpl implements IProductosService{
 		return productoDetalleDTO;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
+	@Transactional
 	public InsertResponseDTO nuevoProducto(ProductoDetalleDTO producto, HttpServletRequest request) {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int status = 0;
+		int statusInsertAdmContador = 0;
 		
 
 		LOGGER.info("nuevoProducto() -> Entrada al servicio para crear un producto");
@@ -725,17 +736,59 @@ public class ProductosServiceImpl implements IProductosService{
 					productoInstitucion.setSolicitaralta(producto.getSolicitaralta());
 					productoInstitucion.setIdimpresora(null);//No aplica
 					productoInstitucion.setIdplantilla(null);//No aplica
-					productoInstitucion.setIdcontador("PYS_" + producto.getIdtipoproducto() + "_" + producto.getIdproducto() + "_" + productoInstitucion.getIdproductoinstitucion());
+					
+					if(producto.getTipocertificado() == null) {
+						productoInstitucion.setIdcontador(null);
+					}else {						
+						productoInstitucion.setIdcontador("PYS_" + producto.getIdtipoproducto() + "_" + producto.getIdproducto() + "_" + productoInstitucion.getIdproductoinstitucion());
+						
+						AdmContador admContador = new AdmContador();
+						
+						admContador.setContador(0L);
+						admContador.setDescripcion("fdsf");
+						admContador.setFechareconfiguracion(new Date("2022/01/01 00:00:00")); //FECHA RECONFIGURACION
+						admContador.setIdcampocontador("CONTADOR_CER");
+						admContador.setIdcampoprefijo("PREFIJO_CER");
+						admContador.setIdcamposufijo("SUFIJO_CER");
+						admContador.setIdcontador(producto.getIdcontador());
+						admContador.setIdinstitucion(idInstitucion);
+						admContador.setIdtabla("CER_SOLICITUDCERTIFICADOS");
+						admContador.setLongitudcontador(5);
+						admContador.setModificablecontador("0");
+						admContador.setModo((short) 0);
+						admContador.setNombre("fdsf");
+						admContador.setPrefijo(null);
+						admContador.setReconfiguracioncontador("0");
+						admContador.setReconfiguracionprefijo(null);
+						admContador.setReconfiguracionsufijo("/2022");
+						admContador.setSufijo("/2021");
+						admContador.setGeneral("0");
+						admContador.setIdmodulo((short) 9);
+						admContador.setFechamodificacion(new Date());
+						admContador.setUsumodificacion(usuarios.get(0).getIdusuario());
+						admContador.setFechacreacion(new Date());
+						admContador.setUsucreacion(usuarios.get(0).getIdusuario());
+						
+						statusInsertAdmContador = admContadorMapper.insert(admContador);
+		
+					}
+					
 					productoInstitucion.setTipocertificado(producto.getTipocertificado());
 					productoInstitucion.setFechabaja(null);
 					productoInstitucion.setFechamodificacion(new Date());
-					productoInstitucion.setCodigoext(producto.getCodigoext());
+					
+					if(producto.getCodigoext() != null) {
+						productoInstitucion.setCodigoext(producto.getCodigoext());
+					}else {
+						productoInstitucion.setCodigoext(producto.getIdtipoproducto() + "|" + producto.getIdproducto() + "|" + producto.getIdproductoinstitucion());
+					}
+					
 					productoInstitucion.setCodigoTraspasonav(null);//No aplica
 					productoInstitucion.setOrden(null);//No aplica
 					productoInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
 					
 					//Campos a informar despues en tarjeta formas de pago
-					productoInstitucion.setValor(null);
+					productoInstitucion.setValor(new BigDecimal(0));//Fijado a 0 hasta que se rellene en formas de pago
 					productoInstitucion.setIdtipoiva(null);
 					productoInstitucion.setNofacturable("0");
 					
@@ -950,5 +1003,62 @@ public class ProductosServiceImpl implements IProductosService{
 		LOGGER.info("reactivarBorradoFisicoLogicoProductos() -> Salida del servicio para borrar fisicamente o logicamente o reactivar un producto");
 
 		return deleteResponseDTO;
+	}
+
+	@Override
+	public ListaCodigosPorColegioDTO obtenerCodigosPorColegio(HttpServletRequest request) {
+		ListaCodigosPorColegioDTO listaCodigosPorColegioDTO = new ListaCodigosPorColegioDTO();
+		Error error = new Error();
+
+		LOGGER.info("obtenerCodigosPorColegio() -> Entrada al servicio para recuperar el listado de codigos en una institucion concreta");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"obtenerCodigosPorColegio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"obtenerCodigosPorColegio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"obtenerCodigosPorColegio() / pysTiposProductosExtendsMapper.obtenerCodigosPorColegio() -> Entrada a pysTiposProductosExtendsMapper para recuperar el listado de codigos en una institucion concreta");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<String> listaCodigosPorColegio = pysTiposProductosExtendsMapper
+							.obtenerCodigosPorColegio(idInstitucion);
+
+					LOGGER.info(
+							"obtenerCodigosPorColegio() / pysTiposProductosExtendsMapper.obtenerCodigosPorColegio() -> Salida de pysTiposProductosExtendsMapper para recuperar el listado de codigos en una institucion concreta");
+
+					if (listaCodigosPorColegio != null && listaCodigosPorColegio.size() > 0) {
+						listaCodigosPorColegioDTO.setListaCodigosPorColegio(listaCodigosPorColegio);
+				}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ProductosServiceImpl.obtenerCodigosPorColegio() -> Se ha producido un error al recuperar el listado de codigos en una institucion concreta",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		listaCodigosPorColegioDTO.setError(error);
+
+		LOGGER.info("comboTipoFormaPagoSecretaria() -> Salida del servicio para recuperar el combo de formas de pago de secretaria");
+
+		return listaCodigosPorColegioDTO;
 	}
 }

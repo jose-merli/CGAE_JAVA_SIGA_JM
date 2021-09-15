@@ -3,6 +3,7 @@ package org.itcgae.siga.fac.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
+import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
@@ -88,4 +89,11 @@ public class ProductosController {
 		ComboDTO response = productosService.comboTipoFormaPagoSecretaria(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/pys/obtenerCodigosPorColegio")
+	ResponseEntity<ListaCodigosPorColegioDTO> obtenerCodigosPorColegio(HttpServletRequest request) { 
+		ListaCodigosPorColegioDTO response = productosService.obtenerCodigosPorColegio(request);
+		return new ResponseEntity<ListaCodigosPorColegioDTO>(response, HttpStatus.OK);
+	}
+
 }

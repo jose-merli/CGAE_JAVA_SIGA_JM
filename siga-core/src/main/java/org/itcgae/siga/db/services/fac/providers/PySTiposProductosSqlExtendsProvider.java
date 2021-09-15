@@ -276,6 +276,18 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 	
 		return sql.toString();
 	}
+	
+	public String obtenerCodigosPorColegio(Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" CODIGOEXT");
+		
+		sql.FROM(" PYS_PRODUCTOSINSTITUCION");
+		
+		sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
+		
+		return sql.toString();
+	}
 
 }
 

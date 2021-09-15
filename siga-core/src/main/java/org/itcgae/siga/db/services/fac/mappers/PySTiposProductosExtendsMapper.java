@@ -97,4 +97,6 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 	@UpdateProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "activarDesactivarProducto")
 	int activarDesactivarProducto(AdmUsuarios usuario, Short idInstitucion, TiposProductosItem producto);
 	
+	@SelectProvider(type = PySTiposProductosSqlExtendsProvider.class, method = "obtenerCodigosPorColegio")
+	List<String> obtenerCodigosPorColegio(Short idInstitucion);
 }
