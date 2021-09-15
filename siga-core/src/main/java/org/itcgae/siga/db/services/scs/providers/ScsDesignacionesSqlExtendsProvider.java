@@ -1605,7 +1605,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}
 		
 		//Esto evita que se repitan los registros al tener varios ejg por cada designa
-		sql.append(" AND ejg.numero = (select ejgdes.numeroejg from scs_ejgdesigna ejgdes"); 
+		sql.append(" AND ejg.numero IN (select ejgdes.numeroejg from scs_ejgdesigna ejgdes"); 
 		sql.append(" WHERE d.idinstitucion = ejgdes.idinstitucion");
 		sql.append(" AND d.anio = ejgdes.aniodesigna");
 		sql.append(" AND d.numero = ejgdes.numerodesigna");
