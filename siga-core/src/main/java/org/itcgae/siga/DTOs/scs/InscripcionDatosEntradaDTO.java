@@ -5,7 +5,7 @@ import java.util.Date;
 public class InscripcionDatosEntradaDTO {
 
 	private String idEstado;
-	private String idTurno;
+	private String idturno;
 	private String idGuardia;
 	private Object aFechaDe;
 	private Object fechaDesde;
@@ -42,12 +42,14 @@ public class InscripcionDatosEntradaDTO {
 		this.idEstado = idEstado;
 	}
 
-	public String getIdTurno() {
-		return idTurno;
+	
+
+	public String getIdturno() {
+		return idturno;
 	}
 
-	public void setIdTurno(String idTurno) {
-		this.idTurno = idTurno;
+	public void setIdturno(String idturno) {
+		this.idturno = idturno;
 	}
 
 	public String getIdGuardia() {

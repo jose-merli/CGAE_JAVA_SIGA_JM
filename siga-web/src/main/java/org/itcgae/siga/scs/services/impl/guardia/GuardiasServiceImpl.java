@@ -1586,7 +1586,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				try {
 					GuardiasItem guardiasItem = new GuardiasItem();
 					if (inscripciones != null && inscripciones.size() > 0) {
-						guardiasItem.setIdTurno(inscripciones.get(0).getIdTurno());
+						guardiasItem.setIdTurno(inscripciones.get(0).getIdturno());
 						guardiasItem.setIdGuardia(inscripciones.get(0).getIdGuardia());
 					}
 					List<InscripcionGuardiaItem> inscripcionesGrupoNuevo = new ArrayList<InscripcionGuardiaItem>();
@@ -5766,7 +5766,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					//beanCabeceraGuardias.setIdinstitucion(letrado.getIdinstitucion());
 					beanCabeceraGuardias.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
 					//beanCabeceraGuardias.setIdturno(letrado.getIdturno());
-					beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdTurno()));
+					beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
 					//beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
 					beanCabeceraGuardias.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
 					beanCabeceraGuardias.setIdcalendarioguardias(idCalendarioGuardias);
@@ -5808,7 +5808,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if(validaGuardiaLetradoPeriodo(beanCabeceraGuardias.getIdinstitucion(), beanCabeceraGuardias.getIdturno(), beanCabeceraGuardias.getIdguardia(), beanCabeceraGuardias.getIdpersona(), fechaInicioPeriodo, fechaFinPeriodo))
 						throw new Exception("gratuita.calendarios.guardias.mensaje.existe");
 
-					scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias , fechaInicioPSt, fechaFinPSt, today, letrado.getInscripcionGuardia().getIdInstitucion(), letrado.getInscripcionGuardia().getIdTurno(), letrado.getInscripcionGuardia().getIdGuardia(), letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
+					scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias , fechaInicioPSt, fechaFinPSt, today, letrado.getInscripcionGuardia().getIdInstitucion(), letrado.getInscripcionGuardia().getIdturno(), letrado.getInscripcionGuardia().getIdGuardia(), letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
 
 
 					//Paso2: inserto un registro por dia de guardia en cada guardia:
@@ -6186,73 +6186,5 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return ins;
 	}
 	
-	@Override
-	public UpdateResponseDTO validarInscripciones(BusquedaInscripcionItem validarBody, HttpServletRequest request) {
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		//List<BusquedaInscripcionItem> inscripciones = new ArrayList<BusquedaInscripcionItem>();
-		String inscripciones=null;
-		UpdateResponseDTO upd = new UpdateResponseDTO();		
-		
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"getInscripciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("getInscripciones() -> Entrada para obtener las inscripciones");
-				
-				
-				
-				inscripciones = scsInscripcionguardiaExtendsMapper.getValidarInscripciones(validarBody, idInstitucion.toString());
-
-				
-				LOGGER.info("getInscripciones() -> Salida ya con los datos recogidos");
-			}
-		}
-		
-		upd.setStatus(inscripciones);
-		return upd;
-	}
-
-	@Override
-	public UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarBody,
-			HttpServletRequest request) {
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		//List<BusquedaInscripcionItem> inscripciones = new ArrayList<BusquedaInscripcionItem>();
-		String inscripciones=null;
-		UpdateResponseDTO upd = new UpdateResponseDTO();		
-		
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"getInscripciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("getInscripciones() -> Entrada para obtener las inscripciones");
-				
-				
-				
-				inscripciones = scsInscripcionguardiaExtendsMapper.getDenegarInscripciones(denegarBody, idInstitucion.toString());
-
-				
-				LOGGER.info("getInscripciones() -> Salida ya con los datos recogidos");
-			}
-		}
-		
-		upd.setStatus(inscripciones);
-		return upd;
-	}
 
 }

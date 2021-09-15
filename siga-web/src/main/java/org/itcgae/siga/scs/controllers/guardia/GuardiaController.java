@@ -65,6 +65,7 @@ public class GuardiaController {
 
 	@Autowired
 	GuardiasService guardiasService;
+	
 
 	@PostMapping(value = "/busquedaGuardia/searchGuardias", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<GuardiasDTO> searchGuardias(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -359,27 +360,4 @@ public class GuardiaController {
 //		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 //	}
 	
-	@PostMapping(value = "/validarInscripciones", produces = MediaType.APPLICATION_JSON_VALUE)	
-	ResponseEntity<UpdateResponseDTO> validarInscripciones(@RequestBody BusquedaInscripcionItem validarbody, HttpServletRequest request){
-		UpdateResponseDTO response= guardiasService.validarInscripciones(validarbody, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-	}
-
-	@PostMapping(value = "/denegarInscripciones", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> denegarInscripciones(@RequestBody BusquedaInscripcionItem denegarbody, HttpServletRequest request){
-		UpdateResponseDTO response= guardiasService.denegarInscripciones(denegarbody, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-	}
-	
-//	@PostMapping(value = "/solicitarBajaInscripcion", produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<SolicitarBajaInscripcionResponseDTO> solicitarBajaInscripcion(@RequestBody List<SolicitarBajaInscripcionDatosEntradaItem> solicitarbajabody, HttpServletRequest request){
-//		SolicitarBajaInscripcionResponseDTO response= guardiasService.solicitarBajaInscripcion(solicitarbajabody, request);
-//		return new ResponseEntity<SolicitarBajaInscripcionResponseDTO>(response, HttpStatus.OK);
-//	}
-//	
-//	@PostMapping(value = "/cambiarFechaInscripcion", produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<CambiarFechainscripcionResponseDTO> cambiarFechaInscripcion(@RequestBody List<CambiarFechaInscripcionDatosEntradaItem> cambiarfechabody, HttpServletRequest request){
-//		CambiarFechainscripcionResponseDTO response= guardiasService.cambiarFechaInscripcion(cambiarfechabody, request);
-//		return new ResponseEntity<CambiarFechainscripcionResponseDTO>(response, HttpStatus.OK);
-//	}
 }
