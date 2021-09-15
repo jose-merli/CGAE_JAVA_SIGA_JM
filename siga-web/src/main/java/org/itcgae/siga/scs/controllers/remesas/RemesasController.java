@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.scs.services.ejg.IBusquedaRemesas;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/remesas")
+@RequestMapping(value = "/remesasEnvio")
 public class RemesasController {
 
 	private Logger LOGGER = Logger.getLogger(RemesasController.class);
@@ -49,4 +50,13 @@ public class RemesasController {
 		LOGGER.info("Termina el método borrarRemesas");
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/listadoEstadosRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EstadoRemesaDTO> listadoEstadosRemesa(@RequestBody RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request) {
+		LOGGER.info("Entra en el método listadoEstadosRemesa");
+		EstadoRemesaDTO response = busquedaRemesas.listadoEstadoRemesa(remesasBusquedaItem, request);
+		LOGGER.info("Termina el método listadoEstadosRemesa");
+		return new ResponseEntity<EstadoRemesaDTO>(response, HttpStatus.OK);
+	}
+	
 }

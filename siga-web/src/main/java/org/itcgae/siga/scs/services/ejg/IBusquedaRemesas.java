@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 
@@ -17,5 +18,7 @@ public interface IBusquedaRemesas {
 	RemesaBusquedaDTO buscarRemesas(RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request);
 
 	DeleteResponseDTO borrarRemesas(List<RemesasBusquedaItem> remesasBusquedaItem, HttpServletRequest request);
+
+	EstadoRemesaDTO listadoEstadoRemesa(RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request);
 	
 }

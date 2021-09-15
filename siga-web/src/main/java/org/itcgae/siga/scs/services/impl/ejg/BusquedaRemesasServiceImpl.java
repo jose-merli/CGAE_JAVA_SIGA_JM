@@ -12,6 +12,8 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
+import org.itcgae.siga.DTOs.scs.EstadoRemesaItem;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
@@ -324,5 +326,45 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		LOGGER.info("getLabel() -> Salida del servicio para eliminar las remesas");
 		
 		return deleteResponseDTO;
+	}
+
+	@Override
+	public EstadoRemesaDTO listadoEstadoRemesa(RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		// Conseguimos información del usuario logeado
+				String token = request.getHeader("Authorization");
+				String dni = UserTokenUtils.getDniFromJWTToken(token);
+				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+				EstadoRemesaDTO estadoRemesaDTO = new EstadoRemesaDTO();
+				List<EstadoRemesaItem> estadoRemesaItem = null;
+
+				if (idInstitucion != null) {
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					LOGGER.info(
+							"listadoEstadoRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+					LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+					
+					LOGGER.info(
+							"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					LOGGER.info(
+							"listadoEstadoRemesa() / ScsRemesasExtendsMapper.listadoEstadoRemesa() -> Entrada a ScsRemesasExtendsMapper para obtener los estados de la remesa");
+					
+					estadoRemesaItem = scsRemesasExtendsMapper.listadoEstadoRemesa(remesasBusquedaItem, Short.valueOf(idInstitucion), usuarios.get(0).getIdlenguaje());
+
+					LOGGER.info(
+							"listadoEstadoRemesa() / ScsRemesasExtendsMapper.listadoEstadoRemesa() -> Salida a ScsRemesasExtendsMapper para obtener los estados de la remesa");
+
+					if (estadoRemesaItem != null) {
+						estadoRemesaDTO.setEstadoRemesaItem(estadoRemesaItem);
+					}
+					
+				}
+				LOGGER.info("getLabel() -> Salida del servicio para obtener los estado de la remesa");
+				return estadoRemesaDTO;
 	}
 }

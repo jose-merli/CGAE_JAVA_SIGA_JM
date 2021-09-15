@@ -229,7 +229,11 @@ public class ScsRemesasExtendsProvider {
 		subquery.WHERE("rem.idremesa = " + remesasBusquedaItem.getIdRemesa());
 		subquery.WHERE("rem.idinstitucion = " + idInstitucion.toString());
 		
-		sql.SELECT("rem.idremesa, REM.IDINSTITUCION, REM.IDESTADO, to_char(REM.FECHAREMESA,'DD/MM/YYYY HH:MM:SS') FECHAREMESA");
+		sql.SELECT("rem.idremesa");
+		sql.SELECT("rem.idremesa");
+		sql.SELECT("REM.IDINSTITUCION");
+		sql.SELECT("REM.IDESTADO");
+		sql.SELECT("REM.FECHAREMESA");
 		sql.FROM("cajg_remesaestados rem");
 		sql.WHERE("rem.idremesa = " + remesasBusquedaItem.getIdRemesa());
 		sql.WHERE("rem.idinstitucion = " + idInstitucion.toString());
@@ -240,4 +244,24 @@ public class ScsRemesasExtendsProvider {
 		
 		return sql.toString();
 	}
+	
+	public String listadoEstadoRemesa(RemesasBusquedaItem remesasBusquedaItem, Short idInstitucion, String idLenguaje) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("rem.idremesa");
+		sql.SELECT("REM.IDINSTITUCION");
+		sql.SELECT("TO_CHAR(rem.FECHAMODIFICACION, 'dd/MM/yyyy HH24:MI:SS') FECHAMODIFICACION");
+		sql.SELECT("F_SIGA_GETRECURSO(tip.descripcion, " + idLenguaje + ") estado");
+		sql.FROM("cajg_remesaestados rem");
+		sql.FROM("cajg_tipoestadoremesa tip");
+		sql.WHERE("tip.idestado = rem.idestado");
+		sql.WHERE("rem.idremesa = " + remesasBusquedaItem.getIdRemesa());
+		sql.WHERE("rem.idinstitucion = " + idInstitucion.toString());
+		sql.ORDER_BY("rem.FECHAMODIFICACION");
+		
+		LOGGER.info(sql.toString());
+		
+		return sql.toString();
+	}
+	
 }

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.EstadoRemesaItem;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem2;
@@ -52,4 +53,13 @@ public interface ScsRemesasExtendsMapper{
 		@Result(column = "FECHAREMESA", property = "fechaRemesa", jdbcType = JdbcType.VARCHAR)
 	})
 	List<RemesasItem2> isEstadoRemesaIniciada(RemesasBusquedaItem remesasBusquedaItem, Short idInstitucion);
+	
+	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "listadoEstadoRemesa")
+	@Results({
+		@Result(column = "IDREMESA", property = "idRemesa", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<EstadoRemesaItem> listadoEstadoRemesa(RemesasBusquedaItem remesasBusquedaItem, Short idInstitucion, String idLenguaje);
 }
