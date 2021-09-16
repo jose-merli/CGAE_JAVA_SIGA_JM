@@ -1,15 +1,18 @@
 package org.itcgae.siga;
 
+import org.itcgae.siga.swagger.config.SwaggerConfig;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.WebApplicationInitializer;
 
 @SpringBootApplication
 @EnableScheduling
 @MapperScan({"org.itcgae.siga.db.mappers","org.itcgae.siga.db.services"})
+@Import(SwaggerConfig.class)
 public class Application extends SpringBootServletInitializer implements WebApplicationInitializer {
 	
 //	@Override
