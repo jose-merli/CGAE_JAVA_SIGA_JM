@@ -184,4 +184,27 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
 
     @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getNuevoIdAplicaMovimientosVarios")
     Long getNuevoIdAplicaMovimientosVarios();
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getDetallePagoColegiado")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPAGOS", property = "idPagos", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "TOTALIMPORTESJCS", property = "totalImporteSjcs", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPORTETOTALRETENCIONES", property = "importeTotalRetenciones", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPORTETOTALMOVIMIENTOS", property = "importeTotalMovimientos", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "TOTALIMPORTEIRPF", property = "totalImporteIrpf", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPERSONASJCS", property = "idPersonaSjcs", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDPERDESTINO", property = "idPerDestino", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IDCUENTA", property = "idCuenta", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "TIPOIRPF", property = "tipoIrpf", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPORTETOTALOFICIO", property = "importeTotalOficio", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPORTETOTALASISTENCIA", property = "importeTotalAsistencia", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPORTETOTALEJG", property = "importeTotalEjg", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "IMPORTETOTALSOJ", property = "importeTotalSoj", jdbcType = JdbcType.DECIMAL),
+            @Result(column = "DESTINATARIO", property = "destinatario", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "FORMADEPAGO", property = "formaDePago", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBREBANCO", property = "nombreBanco", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NUMEROCUENTA", property = "numeroCuenta", jdbcType = JdbcType.VARCHAR)
+    })
+    DetallePagoColegiadoDTO getDetallePagoColegiado(String idInstitucion, String idPagosJg, String idPersona, boolean irpf, String idioma);
 }

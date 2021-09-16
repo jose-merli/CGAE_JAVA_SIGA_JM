@@ -1135,5 +1135,32 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static final String PATH_PREVISIONES_BD = "PATH_PREVISIONES_BD";
 	public static final String MODULO_FCS = "FCS";
+	public static final String MODULO_CER = "CER";
+	public static final String CONTADOR_ABONOS_PAGOSJG = "FAC_ABONOS_FCS";
+
+	// Fcatura/abono Contabilizada
+	public static final String FACTURA_ABONO_CONTABILIZADA	= "S";
+	public static final String FACTURA_ABONO_NO_CONTABILIZADA = "N";
+
+	public static final String MODULO_FACTURACION_SJCS = "FCS";
+
+	public static final String DEDUCIR_COBROS_AUTOMATICO = "DEDUCIR_COBROS_AUTOMATICO";
+
+	public static final String TIPO_APUNTE_COMPENSADO = "C";
+
+	//Estado Facturas
+	public static final String ESTADO_FACTURA_PAGADA     = "1";
+	public static final String ESTADO_FACTURA_CAJA       = "2";
+	public static final String ESTADO_FACTURA_BANCO      = "5";
+	public static final String ESTADO_FACTURA_ENREVISION = "7";
+	public static final String ESTADO_FACTURA_ANULADA    = "8";
+	public static final String ESTADO_FACTURA_DEVUELTA   = "4";
+
+	public static final String PARAMETRO_DIRECTORIO_FISICO_FACTURA_PDF = "facturacion.directorioFisicoFacturaPDFJava";
+	public static final String PARAMETRO_DIRECTORIO_FACTURA_PDF = "facturacion.directorioFacturaPDFJava";
+	public static final String PARAMETRO_PATH_CERTIFICADOS_DIGITALES = "PATH_CERTIFICADOS_DIGITALES";
+	public static final String PARAMETRO_NOMBRE_CERTIFICADOS_DIGITALES = "NOMBRE_CERTIFICADOS_DIGITALES";
+	public static final String PARAMETRO_CLAVE_CERTIFICADOS_DIGITALES = "CLAVE_CERTIFICADOS_DIGITALES";
+	public static final String FILE_SEP = System.getProperty("file.separator");
 
 }

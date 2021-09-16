@@ -49,4 +49,6 @@ public interface IPagoSJCSService {
 
     public CompensacionFacDTO getCompensacionFacturas(String idPago, HttpServletRequest request);
 
+    public void cerrarPago(String idPago, HttpServletRequest request);
+
 }

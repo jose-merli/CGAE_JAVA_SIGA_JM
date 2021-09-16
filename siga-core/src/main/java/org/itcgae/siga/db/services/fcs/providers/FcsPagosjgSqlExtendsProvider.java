@@ -678,4 +678,71 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         return sql.toString();
     }
 
+    public String getDetallePagoColegiado(String idInstitucion, String idPagosJg, String idPersona, boolean irpf, String idioma) {
+
+        SQL sql = new SQL();
+        sql.SELECT("PC.IDINSTITUCION");
+        sql.SELECT("PC.IDPAGOSJG as IDPAGOS");
+        sql.SELECT("SUM(PC.IMPOFICIO + PC.IMPASISTENCIA + PC.IMPEJG + PC.IMPSOJ) AS TOTALIMPORTESJCS");
+        sql.SELECT("SUM(PC.IMPRET) AS IMPORTETOTALRETENCIONES");
+        sql.SELECT("SUM(PC.IMPMOVVAR) AS IMPORTETOTALMOVIMIENTOS");
+        sql.SELECT("SUM(PC.IMPIRPF) AS TOTALIMPORTEIRPF");
+//        sql.SELECT("SUM(PC.IMPOFICIO + PC.IMPASISTENCIA + PC.IMPEJG + PC.IMPSOJ)");
+//        sql.SELECT("SUM(PC.IMPRET)");
+//        sql.SELECT("SUM(PC.IMPMOVVAR)");
+//        sql.SELECT("SUM(PC.IMPIRPF) AS TOTALFINAL");
+//        sql.SELECT("SUM(PC.IMPIRPF) AS TOTALIMPORTEIVA");
+
+        if (irpf) {
+            sql.SELECT("PC.IDPERDESTINO as IDPERSONASJCS");
+        } else {
+            sql.SELECT("PC.IDCUENTA");
+            sql.SELECT("PC.IDPERDESTINO");
+            sql.SELECT("PC.PORCENTAJEIRPF AS TIPOIRPF");
+            sql.SELECT("SUM(PC.IMPOFICIO) AS IMPORTETOTALOFICIO");
+            sql.SELECT("SUM(PC.IMPASISTENCIA) AS IMPORTETOTALASISTENCIA");
+            sql.SELECT("SUM(PC.IMPEJG) AS IMPORTETOTALEJG");
+            sql.SELECT("SUM(PC.IMPSOJ) AS IMPORTETOTALSOJ");
+            sql.SELECT("DECODE(PC.IDPERDESTINO, PC.IDPERORIGEN, 'Colegiado', 'Sociedad') AS DESTINATARIO");
+            sql.SELECT("F_SIGA_GETRECURSO_ETIQUETA(DECODE(PC.IDCUENTA, NULL, 'gratuita.pagos.porCaja', 'gratuita.pagos.porBanco'), " + idioma + ") AS FORMADEPAGO");
+
+            SQL subQuery = new SQL();
+            subQuery.SELECT("B.NOMBRE");
+            subQuery.FROM("CEN_CUENTASBANCARIAS CB");
+            subQuery.INNER_JOIN("CEN_BANCOS B ON CB.CBO_CODIGO = B.CODIGO");
+            subQuery.WHERE("PC.IDPERDESTINO = CB.IDPERSONA");
+            subQuery.WHERE("PC.IDINSTITUCION = CB.IDINSTITUCION");
+            subQuery.WHERE("PC.IDCUENTA = CB.IDCUENTA");
+            sql.SELECT("( " + subQuery.toString() + " ) AS NOMBREBANCO");
+
+            SQL subQuery2 = new SQL();
+            subQuery2.SELECT("F_SIGA_FORMATOIBAN(CB.IBAN) AS CUENTA");
+            subQuery2.FROM("CEN_CUENTASBANCARIAS CB");
+            subQuery2.WHERE("PC.IDPERDESTINO = CB.IDPERSONA");
+            subQuery2.WHERE("PC.IDINSTITUCION = CB.IDINSTITUCION");
+            subQuery2.WHERE("PC.IDCUENTA = CB.IDCUENTA");
+            sql.SELECT("( " + subQuery2.toString() + " ) AS NUMEROCUENTA");
+
+            sql.SELECT("PC.IDPERORIGEN as IDPERSONASJCS");
+        }
+
+        sql.FROM("FCS_PAGO_COLEGIADO PC");
+        sql.WHERE("PC.IDINSTITUCION = '" + idInstitucion + "'");
+        sql.WHERE("PC.IDPAGOSJG = NVL(" + idPagosJg + ", PC.IDPAGOSJG)");
+
+        if (null != idPersona) {
+            sql.WHERE("PC.IDPERDESTINO = '" + idPersona + "'");
+        } else {
+            sql.WHERE("PC.IDPERORIGEN = '" + idPersona + "'");
+        }
+
+        if (irpf) {
+            sql.GROUP_BY("PC.IDPERDESTINO, PC.IDPAGOSJG, PC.IDINSTITUCION, PC.PORCENTAJEIRPF, PC.IDCUENTA");
+        } else {
+            sql.GROUP_BY("PC.IDPERORIGEN, PC.IDPERDESTINO, PC.IDPAGOSJG, PC.IDINSTITUCION, PC.PORCENTAJEIRPF, PC.IDCUENTA");
+        }
+
+        return sql.toString();
+    }
+
 }
