@@ -37,7 +37,7 @@ public class ProductosController {
 	}
 	
 	@PostMapping(value="/pys/nuevoProducto")
-	ResponseEntity<InsertResponseDTO> nuevoProducto(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request){
+	ResponseEntity<InsertResponseDTO> nuevoProducto(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request) throws Exception{
 		InsertResponseDTO response = productosService.nuevoProducto(producto, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
@@ -67,7 +67,7 @@ public class ProductosController {
 	}
 	
 	@PostMapping(value="/pys/formasPagoProducto")
-	ResponseEntity<InsertResponseDTO> crearEditarFormaPago(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request){
+	ResponseEntity<InsertResponseDTO> crearEditarFormaPago(@RequestBody ProductoDetalleDTO producto, HttpServletRequest request) throws Exception{
 		InsertResponseDTO response = productosService.crearEditarFormaPago(producto, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
