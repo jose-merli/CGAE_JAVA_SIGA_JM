@@ -62,4 +62,10 @@ public interface ScsRemesasExtendsMapper{
 		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<EstadoRemesaItem> listadoEstadoRemesa(RemesasBusquedaItem remesasBusquedaItem, Short idInstitucion, String idLenguaje);
+	
+	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "getMaxIdRemesa")
+	@Results({
+		@Result(column = "IDREMESA", property = "idRemesa", jdbcType = JdbcType.VARCHAR)
+	})
+	RemesasItem getMaxIdRemesa(Short idInstitucion);
 }

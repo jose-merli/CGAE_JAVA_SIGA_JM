@@ -27,8 +27,6 @@ public interface IBusquedaRemesas {
 	
 	AdmContador getUltimoRegitroRemesa(HttpServletRequest request);
 
-	InsertResponseDTO guardarRemesa(RemesasItem remesasItem, HttpServletRequest request);
-
-	UpdateResponseDTO actualizarRemesa(RemesasItem remesasItem, HttpServletRequest request);
+	UpdateResponseDTO guardarRemesa(RemesasItem remesasItem, HttpServletRequest request);
 	
 }
