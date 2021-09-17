@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "application")
+@PropertySource(value = "classpath:application.yml", factory = YamlPropertySourceFactory.class)
 public class YamlPermisos {
 
 	private Map<String, List<String>> permisos;
