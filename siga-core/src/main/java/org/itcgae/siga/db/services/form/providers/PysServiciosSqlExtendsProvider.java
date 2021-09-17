@@ -152,4 +152,16 @@ public class PysServiciosSqlExtendsProvider extends PysServiciosSqlProvider {
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
 		return sql.toString();
 	}
+	
+	public String obtenerCodigosPorColegioServicios(Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" CODIGOEXT");
+		
+		sql.FROM(" PYS_SERVICIOSINSTITUCION");
+		
+		sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
+		
+		return sql.toString();
+	}
 }

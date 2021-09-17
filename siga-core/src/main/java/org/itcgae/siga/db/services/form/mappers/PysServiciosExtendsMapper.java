@@ -82,4 +82,7 @@ public interface PysServiciosExtendsMapper extends PysServiciosMapper{
 	
 	@UpdateProvider(type = PysServiciosSqlExtendsProvider.class, method = "activarDesactivarServicio")
 	int activarDesactivarServicio(AdmUsuarios usuario, Short idInstitucion, TiposServiciosItem servicio);
+	
+	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "obtenerCodigosPorColegioServicios")
+	List<String> obtenerCodigosPorColegioServicios(Short idInstitucion);
 }

@@ -1,6 +1,8 @@
 package org.itcgae.siga.db.services.form.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
+import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.db.mappers.PysServiciosinstitucionSqlProvider;
 
 public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinstitucionSqlProvider {
@@ -40,6 +42,20 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		sql.WHERE("idInstitucion =" + idInstitucion);
 		sql.WHERE("idCurso =" + idCurso);
 		
+		return sql.toString();
+	}
+	
+	public String getIndiceMaxServicio(ServicioDetalleDTO servicio, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" NVL((MAX(IDSERVICIOSINSTITUCION) + 1),1) AS IDSERVICIOSINSTITUCION");
+		
+		sql.FROM(" PYS_SERVICIOSINSTITUCION");
+		
+		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
+		sql.WHERE(" IDTIPOSERVICIOS ='" + servicio.getIdtiposervicios() + "'");
+		sql.WHERE(" IDSERVICIO ='" + servicio.getIdservicio() + "'");
+
 		return sql.toString();
 	}
 
