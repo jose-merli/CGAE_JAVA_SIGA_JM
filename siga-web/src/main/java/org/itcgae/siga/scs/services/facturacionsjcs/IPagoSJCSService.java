@@ -12,43 +12,44 @@ import java.util.List;
 
 public interface IPagoSJCSService {
 
-    public PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request);
+    PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request);
 
-    public PagosjgDTO datosGeneralesPagos(String idPago, HttpServletRequest request);
+    PagosjgDTO datosGeneralesPagos(String idPago, HttpServletRequest request);
 
-    public PagosjgDTO historicoPagos(String idPago, HttpServletRequest request);
+    PagosjgDTO historicoPagos(String idPago, HttpServletRequest request);
 
-    public InsertResponseDTO savePago(PagosjgItem pagosjgItem, HttpServletRequest request);
+    InsertResponseDTO savePago(PagosjgItem pagosjgItem, HttpServletRequest request);
 
-    public UpdateResponseDTO updatePago(PagosjgItem pagosjgItem, HttpServletRequest request);
+    UpdateResponseDTO updatePago(PagosjgItem pagosjgItem, HttpServletRequest request);
 
-    public ConceptoPagoDTO comboConceptosPago(String idFacturacion, String idPago, HttpServletRequest request);
+    ConceptoPagoDTO comboConceptosPago(String idFacturacion, String idPago, HttpServletRequest request);
 
-    public ConceptoPagoDTO getConceptosPago(String idPago, String idFacturacion, HttpServletRequest request);
+    ConceptoPagoDTO getConceptosPago(String idPago, String idFacturacion, HttpServletRequest request);
 
-    public UpdateResponseDTO saveConceptoPago(List<ConceptoPagoItem> listaConceptoPagoItem, HttpServletRequest request);
+    UpdateResponseDTO saveConceptoPago(List<ConceptoPagoItem> listaConceptoPagoItem, HttpServletRequest request);
 
-    public DeleteResponseDTO deleteConceptoPago(List<ConceptoPagoItem> listaConceptoPagoItem,
-                                                HttpServletRequest request);
+    DeleteResponseDTO deleteConceptoPago(List<ConceptoPagoItem> listaConceptoPagoItem,
+                                         HttpServletRequest request);
 
-    public InsertResponseDTO ejecutarPagoSJCS(String idPago, HttpServletRequest request);
+    InsertResponseDTO ejecutarPagoSJCS(String idPago, HttpServletRequest request);
 
-    public ComboDTO comboPropTranferenciaSepa(HttpServletRequest request);
+    ComboDTO comboPropTranferenciaSepa(HttpServletRequest request);
 
-    public ComboDTO comboPropOtrasTranferencias(HttpServletRequest request);
+    ComboDTO comboPropOtrasTranferencias(HttpServletRequest request);
 
-    public ComboDTO comboSufijos(HttpServletRequest request);
+    ComboDTO comboSufijos(HttpServletRequest request);
 
-    public ComboDTO comboCuentasBanc(HttpServletRequest request);
+    ComboDTO comboCuentasBanc(HttpServletRequest request);
 
-    public UpdateResponseDTO saveConfigFichAbonos(PagosjgItem pagosjgItem, HttpServletRequest request);
+    UpdateResponseDTO saveConfigFichAbonos(PagosjgItem pagosjgItem, HttpServletRequest request);
 
-    public PagosjgDTO getConfigFichAbonos(String idPago, HttpServletRequest request);
+    PagosjgDTO getConfigFichAbonos(String idPago, HttpServletRequest request);
 
-    public StringDTO getNumApuntesPago(String idPago, HttpServletRequest request);
+    StringDTO getNumApuntesPago(String idPago, HttpServletRequest request);
 
-    public CompensacionFacDTO getCompensacionFacturas(String idPago, HttpServletRequest request);
+    CompensacionFacDTO getCompensacionFacturas(String idPago, HttpServletRequest request);
 
-    public void cerrarPago(String idPago, HttpServletRequest request);
+    UpdateResponseDTO cerrarPago(String idPago, HttpServletRequest request);
 
+    UpdateResponseDTO cerrarPagoManual(String idPago, List<String> idsParaEnviar, HttpServletRequest request);
 }

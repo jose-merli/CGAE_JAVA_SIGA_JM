@@ -111,27 +111,39 @@ public class PagoSJCSController {
         return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
     }
 
-    @PostMapping("saveConfigFichAbonos")
+    @PostMapping("/saveConfigFichAbonos")
     ResponseEntity<UpdateResponseDTO> saveConfigFichAbonos(@RequestBody PagosjgItem pagosjgItem, HttpServletRequest request) {
         UpdateResponseDTO response = iPagoSJCSService.saveConfigFichAbonos(pagosjgItem, request);
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
-    @GetMapping("getConfigFichAbonos")
+    @GetMapping("/getConfigFichAbonos")
     ResponseEntity<PagosjgDTO> getConfigFichAbonos(@RequestParam("idPago") String idPago, HttpServletRequest request) {
         PagosjgDTO response = iPagoSJCSService.getConfigFichAbonos(idPago, request);
         return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
     }
 
-    @GetMapping("getNumApuntesPago")
+    @GetMapping("/getNumApuntesPago")
     ResponseEntity<StringDTO> getNumApuntesPago(@RequestParam("idPago") String idPago, HttpServletRequest request) {
         StringDTO response = iPagoSJCSService.getNumApuntesPago(idPago, request);
         return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
     }
 
-    @GetMapping("getCompensacionFacturas")
+    @GetMapping("/getCompensacionFacturas")
     ResponseEntity<CompensacionFacDTO> getCompensacionFacturas(@RequestParam("idPago") String idPago, HttpServletRequest request) {
         CompensacionFacDTO response = iPagoSJCSService.getCompensacionFacturas(idPago, request);
         return new ResponseEntity<CompensacionFacDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/cerrarPago")
+    ResponseEntity<UpdateResponseDTO> cerrarPago(@RequestBody CerrarPagoDTO cerrarPagoDTO, HttpServletRequest request) {
+        UpdateResponseDTO response = iPagoSJCSService.cerrarPago(cerrarPagoDTO.getIdPago(), request);
+        return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/cerrarPagoManual")
+    ResponseEntity<UpdateResponseDTO> cerrarPagoManual(@RequestBody CerrarPagoDTO cerrarPagoDTO, HttpServletRequest request) {
+        UpdateResponseDTO response = iPagoSJCSService.cerrarPagoManual(cerrarPagoDTO.getIdPago(), cerrarPagoDTO.getIdsParaEnviar(), request);
+        return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 }

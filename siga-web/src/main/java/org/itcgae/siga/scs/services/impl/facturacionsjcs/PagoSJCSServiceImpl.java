@@ -2291,7 +2291,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
      * cerrado.
      */
     @Override
-    public void cerrarPago(String idPago, HttpServletRequest request) {
+    public UpdateResponseDTO cerrarPago(String idPago, HttpServletRequest request) {
 
         LOGGER.info("PagoSJCSServiceImpl.cerrarPago() -> Entrada al servicio para el cierre de un pago");
 
@@ -2299,9 +2299,12 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         Error error = new Error();
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
         FcsPagosjg pago = null;
 
         try {
+
+            updateResponseDTO.setStatus(SigaConstants.OK);
 
             if (null != idInstitucion) {
 
@@ -2354,13 +2357,113 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
         } catch (Exception e) {
             LOGGER.error(
-                    "PagoSJCSServiceImpl.cerrarPago() -> Se ha producido en el cierre del pago: " + idPago, e);
+                    "PagoSJCSServiceImpl.cerrarPago() -> Se ha producido un error en el cierre del pago: " + idPago, e);
             error.setCode(500);
             error.setDescription("formacion.mensaje.general.mensaje.error");
+            updateResponseDTO.setStatus(SigaConstants.KO);
         }
+
+        updateResponseDTO.setError(error);
+        updateResponseDTO.setId(idPago);
 
         LOGGER.info("PagoSJCSServiceImpl.cerrarPago() -> Salida del servicio para el cierre de un pago");
 
+        return updateResponseDTO;
+    }
+
+    /**
+     * Método que implementa la accion cerrarPagoManual. Modifica el estado del pago a cerrado
+     *
+     * @param idPago
+     * @param idsParaEnviar Son los idPersona
+     * @param request
+     */
+    @Override
+    public UpdateResponseDTO cerrarPagoManual(String idPago, List<String> idsParaEnviar, HttpServletRequest request) {
+
+        LOGGER.info("PagoSJCSServiceImpl.cerrarPagoManual() -> Entrada al servicio para cerrar manualmente el pago: " + idPago);
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+        FcsPagosjg pago;
+
+        try {
+
+            updateResponseDTO.setStatus(SigaConstants.OK);
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info(
+                        "PagoSJCSServiceImpl.cerrarPagoManual() -> admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "PagoSJCSServiceImpl.cerrarPagoManual() -> admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+                    fcsPagosjgKey.setIdinstitucion(idInstitucion);
+                    fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
+
+                    LOGGER.info(
+                            "PagoSJCSServiceImpl.cerrarPagoManual() -> fcsPagosjgMapper.selectByPrimaryKey() -> Entrada para obtener los datos del pago: "
+                                    + idPago);
+                    pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+                    LOGGER.info(
+                            "PagoSJCSServiceImpl.cerrarPagoManual() -> fcsPagosjgMapper.selectByPrimaryKey() -> Salida de obtener los datos del pago: "
+                                    + idPago);
+
+                    // Insertamos el estado del pago
+                    FcsPagosEstadospagos record = new FcsPagosEstadospagos();
+                    record.setIdinstitucion(idInstitucion);
+                    record.setIdpagosjg(pago.getIdpagosjg());
+                    record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_CERRADO));
+                    record.setFechaestado(new Date());
+                    record.setFechamodificacion(new Date());
+                    record.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+                    LOGGER.info(
+                            "PagoSJCSServiceImpl.cerrarPagoManual() -> fcsPagosEstadospagosMapper.insertSelective() -> Insertamo el estado CERRADO para el pago: " + idPago);
+                    // Insertamos el estado del pago
+                    fcsPagosEstadospagosMapper.insertSelective(record);
+
+                    // ahora pasamos a generar abonos
+                    List<ColegiadosPagoDTO> letradosAPagar = new ArrayList<>();
+
+                    idsParaEnviar.forEach(id -> {
+                        ColegiadosPagoDTO b = new ColegiadosPagoDTO();
+                        b.setIdInstitucion(idInstitucion.toString());
+                        b.setIdPersona(id);
+                        b.setMarcado("1");
+                        letradosAPagar.add(b);
+                    });
+
+                    generarAbonos(idInstitucion, idPago, usuarios.get(0), letradosAPagar);
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "PagoSJCSServiceImpl.cerrarPagoManual() -> Se ha producido un error en el cierre manual del pago: " + idPago, e);
+            error.setCode(500);
+            error.setDescription("formacion.mensaje.general.mensaje.error");
+            updateResponseDTO.setStatus(SigaConstants.KO);
+        }
+
+        updateResponseDTO.setError(error);
+        updateResponseDTO.setId(idPago);
+
+        LOGGER.info("PagoSJCSServiceImpl.cerrarPagoManual() -> Salida del servicio para cerrar manualmente el pago: " + idPago);
+
+        return updateResponseDTO;
     }
 
     /**
