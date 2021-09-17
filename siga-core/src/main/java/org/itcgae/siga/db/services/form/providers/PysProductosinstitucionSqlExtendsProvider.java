@@ -56,6 +56,7 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 		sql.SELECT(" PYS_TIPOIVA.VALOR AS VALORIVA");
 		sql.SELECT(" F_SIGA_GETRECURSO (PYS_TIPOSPRODUCTOS.DESCRIPCION, 1) AS CATEGORIA");
 		
+		
 		sql.FROM( "PYS_PRODUCTOSINSTITUCION");
 		
 		sql.JOIN(" PYS_PRODUCTOS ON\r\n"
@@ -78,6 +79,38 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 		
 		return sql.toString();
 	}
+	
+	public String obtenerFormasDePagoInternetByProducto(int idTipoProducto, int idProducto, int idProductoInstitucion, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" IDFORMAPAGO");
+				
+		sql.FROM(" PYS_FORMAPAGOPRODUCTO");
+				
+		sql.WHERE(" PYS_FORMAPAGOPRODUCTO.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE(" PYS_FORMAPAGOPRODUCTO.IDTIPOPRODUCTO = '" + idTipoProducto + "'");
+		sql.WHERE(" PYS_FORMAPAGOPRODUCTO.IDPRODUCTO = '" + idProducto + "'");
+		sql.WHERE(" PYS_FORMAPAGOPRODUCTO.IDPRODUCTOINSTITUCION = '" + idProductoInstitucion + "'");
+		sql.WHERE(" PYS_FORMAPAGOPRODUCTO.INTERNET = 'A'" );
+				
+		return sql.toString();
+	}
+	
+	public String obtenerFormasDePagoSecretariaByProducto(int idTipoProducto, int idProducto, int idProductoInstitucion, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" IDFORMAPAGO");
+				
+		sql.FROM(" PYS_FORMAPAGOPRODUCTO");
+				
+		sql.WHERE(" PYS_FORMAPAGOPRODUCTO.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE(" PYS_FORMAPAGOPRODUCTO.IDTIPOPRODUCTO = '" + idTipoProducto + "'");
+		sql.WHERE(" PYS_FORMAPAGOPRODUCTO.IDPRODUCTO = '" + idProducto + "'");
+		sql.WHERE(" PYS_FORMAPAGOPRODUCTO.IDPRODUCTOINSTITUCION = '" + idProductoInstitucion + "'");
+		sql.WHERE(" PYS_FORMAPAGOPRODUCTO.INTERNET = 'S'" );
+				
+		return sql.toString();
+	}
 
 	public String getIndiceMaxProducto(ProductoDetalleDTO producto, Short idInstitucion) {
 		SQL sql = new SQL();
@@ -89,6 +122,21 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
 		sql.WHERE(" IDTIPOPRODUCTO ='" + producto.getIdtipoproducto() + "'");
 		sql.WHERE(" IDPRODUCTO ='" + producto.getIdproducto() + "'");
+		
+		return sql.toString();
+	}
+	
+	public String getIdProductoInstitucion(ProductoDetalleDTO producto, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" IDPRODUCTOINSTITUCION");
+		
+		sql.FROM(" PYS_PRODUCTOSINSTITUCION");
+		
+		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
+		sql.WHERE(" IDTIPOPRODUCTO ='" + producto.getIdtipoproducto() + "'");
+		sql.WHERE(" IDPRODUCTO ='" + producto.getIdproducto() + "'");
+		sql.WHERE(" DESCRIPCION = '" + producto.getDescripcion() + "'");
 		
 		return sql.toString();
 	}
