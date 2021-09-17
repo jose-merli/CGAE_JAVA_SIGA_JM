@@ -447,6 +447,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		// TODO Auto-generated method stub
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
+		Integer idRemesa = 0;
 		int response = 0;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -474,6 +475,8 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					CajgRemesa remesa = new CajgRemesa();
 
 					RemesasItem rem = scsRemesasExtendsMapper.getMaxIdRemesa(idInstitucion);
+					
+					idRemesa = rem.getIdRemesa();
 
 					remesa.setIdinstitucion(idInstitucion);
 					remesa.setIdremesa(Long.valueOf(rem.getIdRemesa()));
@@ -549,7 +552,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				} else {
-					updateResponseDTO.setId(String.valueOf(remesasItem.getIdRemesa()));
+					updateResponseDTO.setId(String.valueOf(idRemesa));
 					error.setCode(200);
 					error.setDescription("Remesa añadida correctamente");
 					updateResponseDTO.setStatus(SigaConstants.OK);
@@ -598,6 +601,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					error.setDescription("No se ha modificado la remesa");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				} else if (error.getCode() == null) {
+					updateResponseDTO.setId(String.valueOf(remesasItem.getIdRemesa()));
 					error.setCode(200);
 					error.setDescription("Se ha modificado la remesa correctamente");
 					updateResponseDTO.setStatus(SigaConstants.OK);
