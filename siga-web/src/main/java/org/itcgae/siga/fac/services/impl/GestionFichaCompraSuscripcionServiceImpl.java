@@ -14,18 +14,25 @@ import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.entities.PysCompra;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcionExample;
+import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcionKey;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
 import org.itcgae.siga.db.entities.PysProductossolicitados;
 import org.itcgae.siga.db.entities.PysServiciossolicitados;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.PysCompraMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
 import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionMapper;
 import org.itcgae.siga.db.mappers.PysProductosinstitucionMapper;
@@ -55,6 +62,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
 	@Autowired
+	private GenParametrosMapper genParametrosMapper;
+
+	@Autowired
 	private PySTipoIvaExtendsMapper pysTipoIvaExtendsMapper;
 
 	@Autowired
@@ -80,16 +90,19 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 	@Autowired
 	private PysProductossolicitadosMapper pysProductossolicitadosMapper;
-	
+
 	@Autowired
 	private PysServiciossolicitadosMapper pysServiciossolicitadosMapper;
 
 	@Autowired
+	private PysCompraMapper pysCompraMapper;
+
+	@Autowired
 	private AdmContadorMapper admContadorMapper;
 
-	public FichaCompraSuscripcionItem getFichaCompraSuscripcion(HttpServletRequest request) {
+	public FichaCompraSuscripcionItem getFichaCompraSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
 
-		FichaCompraSuscripcionItem ficha = null;
+		FichaCompraSuscripcionItem fichaCompleta = null;
 		Error error = new Error();
 
 		LOGGER.info(
@@ -116,15 +129,33 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						"getFichaCompraSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion() -> Entrada a PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la compra/suscripcion");
+					//Si es una compra/suscrpición nueva
+					if(ficha.getnSolicitud() == null) {
+						ficha.setIdInstitucion(idInstitucion.toString());
+						ficha.setUsuModificacion(usuarios.get(0).getIdusuario().toString());
+						
+						LOGGER.info(
+								"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getNuevaFichaCompraSuscripcion() -> Entrada a PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la nueva compra/suscripcion");
 
-					ficha = pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion(idInstitucion,
-							new FichaCompraSuscripcionItem());
+						fichaCompleta = pysPeticioncomprasuscripcionExtendsMapper.getNuevaFichaCompraSuscripcion(ficha);
+						
+						LOGGER.info(
+								"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getNuevaFichaCompraSuscripcion() -> Salida de PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la nueva compra/suscripcion");
 
-					LOGGER.info(
-							"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion() -> Salida de PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la compra/suscripcion");
-				}
+						fichaCompleta.setIdInstitucion(idInstitucion.toString());
+						fichaCompleta.setProductos(ficha.getProductos());
+					}
+					//Para obtener toda la informacion de una compra/suscripcion ya creada
+					else { 
+						LOGGER.info(
+								"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion() -> Entrada a PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la compra/suscripcion");
+
+						fichaCompleta = pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion(ficha);
+						
+						LOGGER.info(
+								"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion() -> Salida de PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la compra/suscripcion");
+					}
+					}
 
 			}
 		} catch (Exception e) {
@@ -136,72 +167,16 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		LOGGER.info(
 				"getFichaCompraSuscripcion() -> Salida del servicio para obtener los detalles de la compra/suscripcion");
 
-		return ficha;
-	}
-
-	public Long getNewNSolicitud(HttpServletRequest request) {
-
-		ProductoDetalleDTO productoDetalleDTO = new ProductoDetalleDTO();
-		Error error = new Error();
-		Long newNSolicitud = null;
-
-		LOGGER.info(
-				"getNewNSolicitud() -> Entrada al servicio para recuperar el numero de peticion de la nueva petición");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"getNewNSolicitud() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"getNewNSolicitud() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-					PysPeticioncomprasuscripcionExample peticionExample = new PysPeticioncomprasuscripcionExample();
-
-					peticionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion);
-					peticionExample.setOrderByClause("idpeticion desc");
-
-					List<PysPeticioncomprasuscripcion> peticiones = pysPeticioncomprasuscripcionMapper
-							.selectByExample(peticionExample);
-
-					newNSolicitud = peticiones.get(0).getIdpeticion() + 1;
-				}
-
-			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"getNewNSolicitud() -> Se ha producido un error al obtener el el numero de peticion de la nueva petición",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-		}
-
-		productoDetalleDTO.setError(error);
-
-		LOGGER.info(
-				"getNewNSolicitud() -> Salida del servicio para obtener el numero de peticion de la nueva petición");
-
-		return newNSolicitud;
+		return fichaCompleta;
 	}
 
 	@Transactional
-	public InsertResponseDTO solicitarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
+	public InsertResponseDTO solicitarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha)
+			throws Exception {
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int response = 0;
-		int statusInsertAdmContador = 0;
 
 		LOGGER.info("solicitarCompra() -> Entrada al servicio para crear una solicitud de compra");
 
@@ -210,89 +185,139 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"solicitarCompra() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"solicitarCompra() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				GenParametrosKey genKey = new GenParametrosKey();
+
+				genKey.setModulo("PYS");
+				genKey.setIdinstitucion(idInstitucion);
+				genKey.setParametro("APROBAR_SOLICITUD_COMPRA");
+
+				GenParametros aprobNecesaria = genParametrosMapper.selectByPrimaryKey(genKey);
 
 				LOGGER.info(
-						"solicitarCompra() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"solicitarCompra() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear una solicitud de compra");
 
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				PysPeticioncomprasuscripcion solicitud = new PysPeticioncomprasuscripcion();
 
-				LOGGER.info(
-						"solicitarCompra() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-					LOGGER.info(
-							"solicitarCompra() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear una solicitud de compra");
-
-					PysPeticioncomprasuscripcion solicitud = new PysPeticioncomprasuscripcion();
-
-					solicitud.setFecha(new Date());
-					solicitud.setIdinstitucion(idInstitucion);
-					solicitud.setIdpersona(Long.valueOf(ficha.getIdPersona()));
-					solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
-					solicitud.setTipopeticion("A");
+				solicitud.setFecha(new Date());
+				solicitud.setIdinstitucion(idInstitucion);
+				solicitud.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+				solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
+				solicitud.setTipopeticion("A");
+				// Caso en el que el colegio no necesite aprobacion para realizar compras o
+				// suscripciones
+				if (aprobNecesaria.getValor() == "N")
+					solicitud.setIdestadopeticion((short) 20);
+				else
 					solicitud.setIdestadopeticion((short) 10);
-					solicitud.setFecha(new Date());
-					Long fechaActual = new Date().getTime();
-					solicitud.setNumOperacion("1"+idInstitucion.toString()+ficha.getIdPersona()+fechaActual.toString()); //Necesita confirmacion de que es el valor correcto
-					solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
-					solicitud.setFechamodificacion(new Date());
+				solicitud.setFecha(new Date());
+				Long fechaActual = new Date().getTime();
+				solicitud.setNumOperacion(
+						"1" + idInstitucion.toString() + ficha.getIdPersona() + fechaActual.toString()); // Necesita
+																											// confirmacion
+																											// de que es
+																											// el valor
+																											// correcto
+				solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
+				solicitud.setFechamodificacion(new Date());
 
-					response = pysPeticioncomprasuscripcionMapper.insert(solicitud);
+				response = pysPeticioncomprasuscripcionMapper.insert(solicitud);
+				if (response == 0)
+					throw new Exception("Error al insertar la solicitud de compra en la BBDD.");
+
+				LOGGER.info(
+						"solicitarCompra() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear una solicitud de compra");
+
+				LOGGER.info(
+						"solicitarCompra() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para crear una solicitud de compra");
+
+				PysProductossolicitados productoSolicitado = new PysProductossolicitados();
+
+				productoSolicitado.setIdinstitucion(idInstitucion);
+				productoSolicitado.setFechamodificacion(new Date());
+				productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+				for (ListaProductosItem producto : ficha.getProductos()) {
+
+					productoSolicitado.setIdproducto((long) producto.getIdproducto());
+					productoSolicitado.setIdtipoproducto((short) producto.getIdtipoproducto());
+					productoSolicitado.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+					productoSolicitado.setValor(new BigDecimal(producto.getValor()));
+					productoSolicitado.setIdformapago(ficha.getIdFormaPagoSeleccionada());
+
+					response = pysProductossolicitadosMapper.insert(productoSolicitado);
 					if (response == 0)
-						throw new Exception("Error al insertar la solicitud de compra en la BBDD.");
-
-					LOGGER.info(
-							"solicitarCompra() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear una solicitud de compra");
-
-					
-					LOGGER.info(
-							"solicitarCompra() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para crear una solicitud de compra");
-
-					for (ListaProductosItem producto : ficha.getProductos()) {
-						PysProductossolicitados productoSolicitado = new PysProductossolicitados();
-
-						productoSolicitado.setIdproducto((long) producto.getIdproducto());
-						productoSolicitado.setIdtipoproducto((short) producto.getIdtipoproducto());
-						productoSolicitado.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
-						productoSolicitado.setValor(new BigDecimal(producto.getValor()));
-						productoSolicitado.setIdinstitucion(idInstitucion);
-						productoSolicitado.setFechamodificacion(new Date());
-						productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-						response = pysProductossolicitadosMapper.insert(productoSolicitado);
-						if (response == 0)
-							throw new Exception("Error al insertar un producto solicitado en la BBDD.");
-					}
-					
-					LOGGER.info(
-							"solicitarCompra() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para crear una solicitud de compra");
-
-
-					insertResponseDTO.setStatus("200");
+						throw new Exception("Error al insertar un producto solicitado en la BBDD.");
 				}
 
+				LOGGER.info(
+						"solicitarCompra() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para crear una solicitud de compra");
+
+				// Al no necesitar aprobación, se crea el registro de compra/suscripción
+				// inmediatamente
+				if (aprobNecesaria.getValor() == "N") {
+					PysCompra compra = new PysCompra();
+
+					compra.setFecha(new Date());
+					compra.setFechamodificacion(new Date());
+					compra.setIdinstitucion(idInstitucion);
+					compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+					compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
+					compra.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					for (ListaProductosItem producto : ficha.getProductos()) {
+
+						compra.setIdproducto((long) producto.getIdproducto());
+						compra.setIdtipoproducto((short) producto.getIdtipoproducto());
+						compra.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+						compra.setDescripcion(producto.getDescripcion());
+						compra.setIdformapago(ficha.getIdFormaPagoSeleccionada());
+
+						response = pysCompraMapper.insert(compra);
+						if (response == 0)
+							throw new Exception("Error al insertar un registro de compra en la BBDD.");
+					}
+
+				}
+
+				insertResponseDTO.setStatus("200");
 			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"GestionFichaCompraSuscripcionServiceImpl.solicitarCompra() -> Se ha producido un error al crear una solicitud de compra",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			insertResponseDTO.setStatus("500");
+
 		}
+//		} catch (Exception e) {
+//			LOGGER.error(
+//					"GestionFichaCompraSuscripcionServiceImpl.solicitarCompra() -> Se ha producido un error al crear una solicitud de compra",
+//					e);
+//			error.setCode(500);
+//			error.setDescription("general.mensaje.error.bbdd");
+//			insertResponseDTO.setStatus("500");
+//		}
 
 		insertResponseDTO.setError(error);
 		LOGGER.info("solicitarCompra() -> Salida del servicio para crear una solicitud de compra");
 
 		return insertResponseDTO;
 	}
-	
+
 	@Transactional
-	public InsertResponseDTO solicitarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
+	public InsertResponseDTO solicitarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha)
+			throws Exception {
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -305,22 +330,105 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"solicitarSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"solicitarSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"solicitarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear una solicitud de suscripción");
+
+				PysPeticioncomprasuscripcion solicitud = new PysPeticioncomprasuscripcion();
+
+				solicitud.setFecha(new Date());
+				solicitud.setFechamodificacion(new Date());
+				solicitud.setIdinstitucion(idInstitucion);
+				solicitud.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+				solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
+				solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
+				solicitud.setTipopeticion("B");
+
+				response = pysPeticioncomprasuscripcionMapper.insert(solicitud);
+				if (response == 0)
+					throw new Exception("Error al insertar la solicitud de suscripción en la BBDD.");
+
+				LOGGER.info(
+						"solicitarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear una solicitud de suscripción");
+
+				LOGGER.info(
+						"solicitarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para crear una solicitud de suscripción");
+
+				PysServiciossolicitados servicioSolicitado = new PysServiciossolicitados();
+
+				servicioSolicitado.setFechamodificacion(new Date());
+				servicioSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+				response = pysServiciossolicitadosMapper.insert(servicioSolicitado);
+				if (response == 0)
+					throw new Exception("Error al insertar un servicio solicitado en la BBDD.");
+			}
+
+			LOGGER.info(
+					"solicitarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de suscripción");
+
+			insertResponseDTO.setStatus("200");
+		}
+//		} catch (Exception e) {
+//			LOGGER.error(
+//					"GestionFichaCompraSuscripcionServiceImpl.solicitarSuscripcion() -> Se ha producido un error al crear una solicitud de suscripción",
+//					e);
+//			error.setCode(500);
+//			error.setDescription("general.mensaje.error.bbdd");
+//			insertResponseDTO.setStatus("500");
+//		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.info("solicitarSuscripcion() -> Salida del servicio para crear una solicitud de suscripción");
+
+		return insertResponseDTO;
+	}
+
+	@Transactional
+	public UpdateResponseDTO aprobarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info("aprobarSuscripcion() -> Entrada al servicio para crear una solicitud de suscripción");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
 		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
 				LOGGER.info(
-						"solicitarSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"aprobarSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 				LOGGER.info(
-						"solicitarSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"aprobarSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"solicitarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear una solicitud de suscripción");
+							"aprobarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para aprobar una solicitud de suscripción");
 
 					PysPeticioncomprasuscripcion solicitud = new PysPeticioncomprasuscripcion();
 
@@ -334,43 +442,136 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 					response = pysPeticioncomprasuscripcionMapper.insert(solicitud);
 					if (response == 0)
-						throw new Exception("Error al insertar la solicitud de suscripción en la BBDD.");
+						throw new Exception(
+								"Error al modificar la solicitud de suscripción en la BBDD para su aprobación.");
 
 					LOGGER.info(
-							"solicitarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear una solicitud de suscripción");
+							"aprobarSuscripcion() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para aprobar una solicitud de suscripción");
 
 					LOGGER.info(
-							"solicitarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para crear una solicitud de suscripción");
+							"aprobarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una solicitud de suscripción");
 
-						PysServiciossolicitados servicioSolicitado = new PysServiciossolicitados();
+					PysServiciossolicitados servicioSolicitado = new PysServiciossolicitados();
 
-						servicioSolicitado.setFechamodificacion(new Date());
-						servicioSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
+					servicioSolicitado.setFechamodificacion(new Date());
+					servicioSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-						response = pysServiciossolicitadosMapper.insert(servicioSolicitado);
-						if (response == 0)
-							throw new Exception("Error al insertar un producto solicitado en la BBDD.");
-					}
-				
-					LOGGER.info(
-							"solicitarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de suscripción");
+					response = pysServiciossolicitadosMapper.insert(servicioSolicitado);
+					if (response == 0)
+						throw new Exception("Error al insertar un producto solicitado en la BBDD.");
+				}
 
+				LOGGER.info(
+						"aprobarSuscripcion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de suscripción");
 
-					insertResponseDTO.setStatus("200");
+				updateResponseDTO.setStatus("200");
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"GestionFichaCompraSuscripcionServiceImpl.solicitarSuscripcion() -> Se ha producido un error al crear una solicitud de suscripción",
+					"GestionFichaCompraSuscripcionServiceImpl.aprobarSuscripcion() -> Se ha producido un error al aprobar una solicitud de suscripción",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
-			insertResponseDTO.setStatus("500");
+			updateResponseDTO.setStatus("500");
 		}
 
-		insertResponseDTO.setError(error);
-		LOGGER.info("solicitarSuscripcion() -> Salida del servicio para crear una solicitud de suscripción");
+		updateResponseDTO.setError(error);
+		LOGGER.info("aprobarSuscripcion() -> Salida del servicio para aprobar una solicitud de suscripción");
 
-		return insertResponseDTO;
+		return updateResponseDTO;
 	}
 
+	@Transactional
+	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info("aprobarCompra() -> Entrada al servicio para crear una solicitud de suscripción");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"aprobarCompra() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"aprobarCompra() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.updateByPrimaryKey() -> Entrada a pysPeticioncomprasuscripcionMapper para aprobar una solicitud de compra");
+
+					PysPeticioncomprasuscripcionKey solicitudKey = new PysPeticioncomprasuscripcionKey();
+
+					solicitudKey.setIdinstitucion(idInstitucion);
+					solicitudKey.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
+
+					PysPeticioncomprasuscripcion solicitud = pysPeticioncomprasuscripcionMapper
+							.selectByPrimaryKey(solicitudKey);
+
+					solicitud.setIdestadopeticion((short) 20);
+
+					response = pysPeticioncomprasuscripcionMapper.updateByPrimaryKey(solicitud);
+					if (response == 0)
+						throw new Exception("Error al modificar la solicitud de compra en la BBDD para su aprobación.");
+
+					LOGGER.info(
+							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.updateByPrimaryKey() -> Salida de pysPeticioncomprasuscripcionMapper para aprobar una solicitud de compra");
+
+					LOGGER.info(
+							"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una solicitud de compra");
+
+					PysCompra compra = new PysCompra();
+
+					compra.setFecha(new Date());
+					compra.setFechamodificacion(new Date());
+					compra.setIdinstitucion(idInstitucion);
+					compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+					compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
+					compra.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					for (ListaProductosItem producto : ficha.getProductos()) {
+
+						compra.setIdproducto((long) producto.getIdproducto());
+						compra.setIdtipoproducto((short) producto.getIdtipoproducto());
+						compra.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+						compra.setDescripcion(producto.getDescripcion());
+						compra.setIdformapago(ficha.getIdFormaPagoSeleccionada());
+
+						response = pysCompraMapper.insert(compra);
+						if (response == 0)
+							throw new Exception("Error al insertar un registro de compra en la BBDD.");
+					}
+				}
+
+				LOGGER.info(
+						"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de compra");
+
+				updateResponseDTO.setStatus("200");
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"GestionFichaCompraSuscripcionServiceImpl.aprobarCompra() -> Se ha producido un error al aprobar una solicitud de compra",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			updateResponseDTO.setStatus("500");
+		}
+
+		updateResponseDTO.setError(error);
+		LOGGER.info("aprobarCompra() -> Salida del servicio para aprobar una solicitud de compra");
+
+		return updateResponseDTO;
+	}
 }

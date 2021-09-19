@@ -26,31 +26,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class GestionFichaCompraSuscripcionController {
 	@Autowired 
 	private IGestionFichaCompraSuscripcionService gestionFichaCompraSuscripcionService;
-	
 
-	@GetMapping(value = "/pys/getFichaCompraSuscripcion")
-	ResponseEntity<FichaCompraSuscripcionItem> getFichaCompraSuscripcion(HttpServletRequest request) { 
-		FichaCompraSuscripcionItem ficha = gestionFichaCompraSuscripcionService.getFichaCompraSuscripcion(request);
-		if(ficha != null)return new ResponseEntity<FichaCompraSuscripcionItem>(ficha, HttpStatus.OK);
-		else return new ResponseEntity<FichaCompraSuscripcionItem>(ficha, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@GetMapping(value = "/pys/getNewNSolicitud")
-	ResponseEntity<Long> getNewNSolicitud(HttpServletRequest request) { 
-		Long nSolicitud = gestionFichaCompraSuscripcionService.getNewNSolicitud(request);
-		if(nSolicitud != null) return new ResponseEntity<Long>(nSolicitud, HttpStatus.OK);
-		else return new ResponseEntity<Long>(nSolicitud, HttpStatus.INTERNAL_SERVER_ERROR);
+	@PostMapping(value = "/pys/getFichaCompraSuscripcion")
+	ResponseEntity<FichaCompraSuscripcionItem> getFichaCompraSuscripcion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem peticion) { 
+		FichaCompraSuscripcionItem fichaCompleta = gestionFichaCompraSuscripcionService.getFichaCompraSuscripcion(request, peticion);
+		if(fichaCompleta != null)return new ResponseEntity<FichaCompraSuscripcionItem>(fichaCompleta, HttpStatus.OK);
+		else return new ResponseEntity<FichaCompraSuscripcionItem>(fichaCompleta, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@PutMapping(value = "/pys/solicitarCompra")
-	ResponseEntity<InsertResponseDTO>  SolicitarCompra(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) {
+	ResponseEntity<InsertResponseDTO>  SolicitarCompra(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
 		InsertResponseDTO response = gestionFichaCompraSuscripcionService.solicitarCompra(request, ficha);
 		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@PutMapping(value = "/pys/solicitarSuscripcion")
-	ResponseEntity<InsertResponseDTO>  SolicitarSuscripcion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) {
+	ResponseEntity<InsertResponseDTO>  SolicitarSuscripcion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
 		InsertResponseDTO response = gestionFichaCompraSuscripcionService.solicitarSuscripcion(request, ficha);
 		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);

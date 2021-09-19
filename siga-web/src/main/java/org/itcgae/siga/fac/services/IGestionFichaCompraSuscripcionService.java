@@ -7,11 +7,9 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 
 public interface IGestionFichaCompraSuscripcionService {
 	
-	public FichaCompraSuscripcionItem getFichaCompraSuscripcion(HttpServletRequest request);
+	public FichaCompraSuscripcionItem getFichaCompraSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem peticion);
 
-	public Long getNewNSolicitud(HttpServletRequest request);
-
-	public InsertResponseDTO solicitarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha);
+	public InsertResponseDTO solicitarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
 	
-	public InsertResponseDTO solicitarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha);
+	public InsertResponseDTO solicitarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
 }

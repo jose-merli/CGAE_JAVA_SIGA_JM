@@ -14,10 +14,15 @@ public class FichaCompraSuscripcionItem {
 
 	// TARJETA SOLICITUD
 	private String nSolicitud;
+	private String usuModificacion;
 	private Date fechaSolicitud;
 	private Date fechaAprobacion;
 	private Date fechaDenegacion;
 	private Date fechaAnulacion;
+	
+	//TARJETA FORMA DE PAGO
+	private String idFormasPagoComunes;
+	private Short idFormaPagoSeleccionada;
 	
 
     private ListaProductosItem[] productos;
@@ -93,6 +98,24 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setProductos(ListaProductosItem[] productos) {
 		this.productos = productos;
+	}
+	public String getIdFormasPagoComunes() {
+		return idFormasPagoComunes;
+	}
+	public void setIdFormasPagoComunes(String idFormasPagoComunes) {
+		this.idFormasPagoComunes = idFormasPagoComunes;
+	}
+	public Short getIdFormaPagoSeleccionada() {
+		return idFormaPagoSeleccionada;
+	}
+	public void setIdFormaPagoSeleccionada(Short idFormaPagoSeleccionada) {
+		this.idFormaPagoSeleccionada = idFormaPagoSeleccionada;
+	}
+	public String getUsuModificacion() {
+		return usuModificacion;
+	}
+	public void setUsuModificacion(String usuModificacion) {
+		this.usuModificacion = usuModificacion;
 	}
 
 }
