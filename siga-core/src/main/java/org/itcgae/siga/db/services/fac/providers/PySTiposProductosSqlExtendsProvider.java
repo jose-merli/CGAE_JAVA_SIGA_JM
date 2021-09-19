@@ -75,62 +75,71 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 	public String searchListadoProductosBuscador(String idioma, Short idInstitucion, FiltroProductoItem filtroProductoItem) {
 		SQL sql = new SQL();
 		
-		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.IDPRODUCTO");
-		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.IDTIPOPRODUCTO");
-		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.IDPRODUCTOINSTITUCION");
-		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.DESCRIPCION");
-		sql.SELECT(" concat(F_siga_formatonumero(PYS_PRODUCTOSINSTITUCION.VALOR,2), ' €') AS VALOR");
-		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.FECHABAJA");
-		sql.SELECT(" F_SIGA_GETRECURSO (PYS_TIPOSPRODUCTOS.DESCRIPCION,1) AS CATEGORIA");
-		sql.SELECT(" PYS_PRODUCTOS.DESCRIPCION AS TIPO");
-		sql.SELECT(" PYS_TIPOIVA.DESCRIPCION AS IVA");
-		sql.SELECT(" concat(F_siga_formatonumero(ROUND((PYS_PRODUCTOSINSTITUCION.VALOR*PYS_TIPOIVA.VALOR/100)+PYS_PRODUCTOSINSTITUCION.VALOR, 2),2), ' €') AS PRECIO_IVA");
-		sql.SELECT(" f_siga_getrecurso (PYS_FORMAPAGO.DESCRIPCION, 1) AS FORMA_PAGO");
-		sql.SELECT(" PYS_PRODUCTOSINSTITUCION.IDCONTADOR");
+		sql.SELECT(" PRIN.IDPRODUCTO");
+		sql.SELECT(" PRIN.IDTIPOPRODUCTO");
+		sql.SELECT(" PRIN.IDPRODUCTOINSTITUCION");
+		sql.SELECT(" PRIN.DESCRIPCION");
+		sql.SELECT(" PRIN.FECHABAJA");
+		sql.SELECT("count(fopa1.idformapago) AS NUM_FORMAS_PAGO\r\n"
+				+ ", case when count(fopa1.idformapago)<=3 \r\n"
+				+ " then LISTAGG(f_siga_getrecurso(fo.descripcion,"+idioma+") , ', ') WITHIN GROUP (ORDER BY prin.descripcion)\r\n"
+				+ " else to_char(count(fopa1.idformapago))\r\n"
+				+ " end FORMAS_PAGO");
+		sql.SELECT(" concat(F_siga_formatonumero(PRIN.VALOR,2), ' €') AS VALOR");
+		sql.SELECT(" F_SIGA_GETRECURSO (TPRODUCTO.DESCRIPCION,"+idioma+") AS CATEGORIA");
+		sql.SELECT(" PRODUC.DESCRIPCION AS TIPO");
+		sql.SELECT(" TIVA.DESCRIPCION AS IVA");
+		sql.SELECT(" concat(F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2), ' €') AS PRECIO_IVA");
+		sql.SELECT(" PRIN.IDCONTADOR");
 		
-		sql.FROM(" PYS_PRODUCTOSINSTITUCION");
+		sql.FROM(" pys_productosinstitucion prin, pys_formapagoproducto fopa1, pys_formapago fo, pys_tipoiva tiva, pys_tiposproductos tproducto, pys_productos produc");
+		if(filtroProductoItem.getFormaPago() != null && filtroProductoItem.getFormaPago() != "")
+			sql.FROM(" pys_formapagoproducto fopa2");
 		
-		sql.INNER_JOIN(" PYS_TIPOSPRODUCTOS ON PYS_PRODUCTOSINSTITUCION.IDTIPOPRODUCTO = PYS_TIPOSPRODUCTOS.IDTIPOPRODUCTO");
-		sql.INNER_JOIN(" PYS_PRODUCTOS ON PYS_PRODUCTOSINSTITUCION.IDTIPOPRODUCTO = PYS_PRODUCTOS.IDTIPOPRODUCTO\r\n"
-				+ "	AND PYS_PRODUCTOSINSTITUCION.IDPRODUCTO = PYS_PRODUCTOS.IDPRODUCTO\r\n"
-				+ "	AND PYS_PRODUCTOSINSTITUCION.IDINSTITUCION = PYS_PRODUCTOS.IDINSTITUCION");
-		sql.INNER_JOIN(" PYS_TIPOIVA ON\r\n"
-				+ " PYS_PRODUCTOSINSTITUCION.IDTIPOIVA = PYS_TIPOIVA.IDTIPOIVA");
-		sql.INNER_JOIN(" PYS_FORMAPAGOPRODUCTO ON\r\n"
-				+ "	PYS_PRODUCTOSINSTITUCION.IDTIPOPRODUCTO = PYS_FORMAPAGOPRODUCTO.IDTIPOPRODUCTO\r\n"
-				+ " AND PYS_PRODUCTOSINSTITUCION.IDPRODUCTO = PYS_FORMAPAGOPRODUCTO.IDPRODUCTO\r\n"
-				+ " AND PYS_PRODUCTOSINSTITUCION.IDINSTITUCION = PYS_FORMAPAGOPRODUCTO.IDINSTITUCION\r\n"
-				+ " AND PYS_PRODUCTOSINSTITUCION.IDPRODUCTOINSTITUCION = PYS_FORMAPAGOPRODUCTO.IDPRODUCTOINSTITUCION");
-		sql.INNER_JOIN(" PYS_FORMAPAGO ON (PYS_FORMAPAGOPRODUCTO.IDFORMAPAGO = PYS_FORMAPAGO.IDFORMAPAGO)");
-		
-		
-		sql.WHERE("PYS_PRODUCTOSINSTITUCION.IDINSTITUCION = '" + idInstitucion +"'");
+		sql.WHERE(" PRIN.IDINSTITUCION = '" + idInstitucion +"'");
+		sql.WHERE(" fopa1.idinstitucion(+) = prin.idinstitucion");
+		sql.WHERE(" fopa1.idtipoproducto(+) = prin.idtipoproducto");
+		sql.WHERE(" fopa1.idproducto(+) = prin.idproducto");
+		sql.WHERE(" fopa1.idproductoinstitucion(+) = prin.idproductoinstitucion");
+		sql.WHERE(" fo.idformapago (+) = fopa1.idformapago");
+		sql.WHERE(" tiva.idtipoiva (+) = prin.idtipoiva");
+		sql.WHERE(" tproducto.idtipoproducto (+) = prin.idtipoproducto");
+		sql.WHERE(" produc.idproducto (+) = prin.idproducto");
+		sql.WHERE(" produc.idtipoproducto (+) = prin.idtipoproducto");
+		sql.WHERE(" produc.idinstitucion (+) = prin.idinstitucion");
 		
 		if(filtroProductoItem.getCategoria() != null && filtroProductoItem.getCategoria() != "")
-			sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDTIPOPRODUCTO = '" + filtroProductoItem.getCategoria() + "'");
+			sql.WHERE(" PRIN.IDTIPOPRODUCTO = '" + filtroProductoItem.getCategoria() + "'");
 		
 		if(filtroProductoItem.getTipo() != null && filtroProductoItem.getTipo() != "")
-			sql.WHERE(" PYS_PRODUCTOSINSTITUCION.IDPRODUCTO = '" + filtroProductoItem.getTipo() + "'");
+			sql.WHERE(" PRIN.IDPRODUCTO = '" + filtroProductoItem.getTipo() + "'");
 		
 		if(filtroProductoItem.getProducto() != null && filtroProductoItem.getProducto() != "")
-			sql.WHERE(" regexp_like(PYS_PRODUCTOSINSTITUCION.DESCRIPCION,'" + filtroProductoItem.getProducto() + "')");
+			sql.WHERE(" regexp_like(PRIN.DESCRIPCION,'" + filtroProductoItem.getProducto() + "')");
 		
-		if(filtroProductoItem.getFormaPago() != null && filtroProductoItem.getFormaPago() != "")
-			sql.WHERE(" PYS_FORMAPAGOPRODUCTO.IDFORMAPAGO = '" + filtroProductoItem.getFormaPago() + "'");
+		if(filtroProductoItem.getFormaPago() != null && filtroProductoItem.getFormaPago() != "") {
+			sql.WHERE(" fopa2.idinstitucion = prin.idinstitucion");
+			sql.WHERE(" fopa2.idtipoproducto = prin.idtipoproducto");
+			sql.WHERE(" fopa2.idproducto = prin.idproducto");
+			sql.WHERE(" fopa2.idproductoinstitucion = prin.idproductoinstitucion");
+			sql.WHERE(" fopa2.IDFORMAPAGO = '" + filtroProductoItem.getFormaPago() + "'");
+		}
 		
 		if(filtroProductoItem.getCodigo() != null && filtroProductoItem.getCodigo() != "")
-			sql.WHERE(" PYS_PRODUCTOSINSTITUCION.CODIGOEXT = '" + filtroProductoItem.getCodigo() + "'");
+			sql.WHERE(" PRIN.CODIGOEXT = '" + filtroProductoItem.getCodigo() + "'");
 		
 		if(filtroProductoItem.getIva() != null && filtroProductoItem.getIva() != "")
-			sql.WHERE(" PYS_TIPOIVA.IDTIPOIVA = '" + filtroProductoItem.getIva() + "'");
+			sql.WHERE(" TIVA.IDTIPOIVA = '" + filtroProductoItem.getIva() + "'");
 		
 		if(filtroProductoItem.getPrecioDesde() != null && filtroProductoItem.getPrecioDesde() != "")
-			sql.WHERE(" ROUND((PYS_PRODUCTOSINSTITUCION.VALOR*PYS_TIPOIVA.VALOR/100)+PYS_PRODUCTOSINSTITUCION.VALOR, 2)  >= " + Float.parseFloat(filtroProductoItem.getPrecioDesde()) + "");
+			sql.WHERE(" ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2)  >= " + Float.parseFloat(filtroProductoItem.getPrecioDesde()) + "");
 		
 		if(filtroProductoItem.getPrecioHasta() != null && filtroProductoItem.getPrecioHasta() != "")
-			sql.WHERE(" ROUND((PYS_PRODUCTOSINSTITUCION.VALOR*PYS_TIPOIVA.VALOR/100)+PYS_PRODUCTOSINSTITUCION.VALOR, 2)  <= " + Float.parseFloat(filtroProductoItem.getPrecioHasta()) + "");
+			sql.WHERE(" ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2)  <= " + Float.parseFloat(filtroProductoItem.getPrecioHasta()) + "");
+		
+		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, tiva.valor, prin.idcontador");
 
-		sql.ORDER_BY(" PYS_PRODUCTOSINSTITUCION.DESCRIPCION");
+		sql.ORDER_BY(" PRIN.DESCRIPCION");
 		
 		return sql.toString();
 	}

@@ -1099,7 +1099,7 @@ public class ProductosServiceImpl implements IProductosService{
 
 		listaCodigosPorColegioDTO.setError(error);
 
-		LOGGER.info("comboTipoFormaPagoSecretaria() -> Salida del servicio para recuperar el combo de formas de pago de secretaria");
+		LOGGER.info("obtenerCodigosPorColegio() -> Salida del servicio para recuperar el listado de codigos en una institucion concreta");
 
 		return listaCodigosPorColegioDTO;
 	}
