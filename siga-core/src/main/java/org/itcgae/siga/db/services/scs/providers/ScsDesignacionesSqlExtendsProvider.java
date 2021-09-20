@@ -1358,10 +1358,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                AND d.idinstitucion_juzg = j.idinstitucion ");
 		sql.append(" LEFT OUTER join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento\r\n"
 				+ "                AND p.idinstitucion = d.idinstitucion ");
-		if ((item.getSinEJG() != null && !item.getSinEJG().isEmpty())
-				|| (item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty())
-				|| (item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty())
-				|| (item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty())) {
+		if ((item.getSinEJG() != null && !item.getSinEJG().isEmpty() && !item.getSinEJG().equals("2"))
+					|| (item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty() && !item.getConEJGNoFavorables().equals("2"))
+					|| (item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty() && !item.getEjgSinResolucion().equals("2"))
+					|| (item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty() && !item.getResolucionPTECAJG().equals("2"))
+					|| ((item.getAnioEJG() != null && !item.getAnioEJG().trim().isEmpty())
+					|| (item.getNumEJG() != null && !item.getNumEJG().trim().isEmpty())))
+		{
 			sql.append("LEFT OUTER join scs_ejgdesigna ejd ON  d.anio = ejd.aniodesigna\r\n"
 					+ "                AND d.numero = ejd.numerodesigna\r\n"
 					+ "                AND d.idturno = ejd.idturno\r\n"
@@ -1372,27 +1375,27 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}
 		sql.append(" WHERE D.IDINSTITUCION = " + idInstitucion);
 
-		if (item.getSinEJG() != null && !item.getSinEJG().isEmpty()) {
+		if (item.getSinEJG() != null && !item.getSinEJG().isEmpty() && !item.getSinEJG().equals("2")) {
 			if (item.getSinEJG().equals("0")) {
 				sql.append(" AND ejg.anio is not null ");
 			}
 		}
-		if ((item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty())) {
-			if (item.getEjgSinResolucion().equals("0")) {
+		if ((item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty() && !item.getConEJGNoFavorables().equals("2"))) {
+			if (item.getConEJGNoFavorables().equals("0")) {
 				sql.append(" AND ejg.IDTIPODICTAMENEJG <> " + idDesfavorable);
 			} // else {
-				 sql.append(" AND ejg.IDTIPODICTAMENEJG = " + idFavorable);
+				 //sql.append(" AND ejg.IDTIPODICTAMENEJG = " + idFavorable);
 				 }
 		
-		if ((item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty())) {
-			if (item.getConEJGNoFavorables().equals("0")) {
+		if ((item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty() && !item.getEjgSinResolucion().equals("2"))) {
+			if (item.getEjgSinResolucion().equals("0")) {
 				sql.append(" AND ejg.anioresolucion is not null\r\n" + " and ejg.numeroresolucion is not null ");
-			} else {
-				sql.append(" AND ejg.anioresolucion IS NULL\r\n" + " AND ejg.numeroresolucion IS NULL ");
-			}
+			} //else {
+			//	sql.append(" AND ejg.anioresolucion IS NULL\r\n" + " AND ejg.numeroresolucion IS NULL ");
+			//}
 		}
 
-		if ((item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty())) {
+		if ((item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty() && !item.getResolucionPTECAJG().equals("2"))) {
 			if (item.getResolucionPTECAJG().equals("0")) {
 				sql.append(" AND ejg.EJG.FECHARESOLUCIONCAJG IS NOT NULL");
 			} // else {
@@ -1451,8 +1454,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			}
 		}
 
-		if ((item.getAnioEJG() != null && !item.getAnioEJG().trim().isEmpty())
-				|| (item.getNumEJG() != null && !item.getNumEJG().trim().isEmpty())) {
+		if ((item.getSinEJG() != null && !item.getSinEJG().isEmpty() && !item.getSinEJG().equals("2"))
+				|| (item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty() && !item.getConEJGNoFavorables().equals("2"))
+				|| (item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty() && !item.getEjgSinResolucion().equals("2"))
+				|| (item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty() && !item.getResolucionPTECAJG().equals("2"))
+				|| ((item.getAnioEJG() != null && !item.getAnioEJG().trim().isEmpty())
+				|| (item.getNumEJG() != null && !item.getNumEJG().trim().isEmpty()))) {
 			sql.append(" AND EXISTS ( ");
 			sql.append(" SELECT 1 ");
 			sql.append(" FROM SCS_EJG EJG, ");
@@ -1604,15 +1611,22 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" AND dl2.idpersona = "+ idPersona+")");
 		}
 		
-		//Esto evita que se repitan los registros al tener varios ejg por cada designa
-		sql.append(" AND ejg.numero IN (select ejgdes.numeroejg from scs_ejgdesigna ejgdes"); 
-		sql.append(" WHERE d.idinstitucion = ejgdes.idinstitucion");
-		sql.append(" AND d.anio = ejgdes.aniodesigna");
-		sql.append(" AND d.numero = ejgdes.numerodesigna");
-		sql.append(" AND d.idturno = ejgdes.idturno");
-		sql.append(" AND ejg.anioresolucion IS NULL");
-		sql.append(" AND ejg.numeroresolucion IS NULL");
-		sql.append(" and rownum = 1)");
+		if ((item.getSinEJG() != null && !item.getSinEJG().isEmpty() && !item.getSinEJG().equals("2"))
+				|| (item.getConEJGNoFavorables() != null && !item.getConEJGNoFavorables().isEmpty() && !item.getConEJGNoFavorables().equals("2"))
+				|| (item.getEjgSinResolucion() != null && !item.getEjgSinResolucion().isEmpty() && !item.getEjgSinResolucion().equals("2"))
+				|| (item.getResolucionPTECAJG() != null && !item.getResolucionPTECAJG().isEmpty() && !item.getResolucionPTECAJG().equals("2"))
+				|| ((item.getAnioEJG() != null && !item.getAnioEJG().trim().isEmpty())
+				|| (item.getNumEJG() != null && !item.getNumEJG().trim().isEmpty()))) {
+			//Esto evita que se repitan los registros al tener varios ejg por cada designa
+			sql.append(" AND ejg.numero IN (select ejgdes.numeroejg from scs_ejgdesigna ejgdes"); 
+			sql.append(" WHERE d.idinstitucion = ejgdes.idinstitucion");
+			sql.append(" AND d.anio = ejgdes.aniodesigna");
+			sql.append(" AND d.numero = ejgdes.numerodesigna");
+			sql.append(" AND d.idturno = ejgdes.idturno");
+			sql.append(" AND ejg.anioresolucion IS NULL");
+			sql.append(" AND ejg.numeroresolucion IS NULL");
+			sql.append(" and rownum = 1)");
+		}
 
 		if (item.isMuestraPendiente()) {
 			sql.append(" AND D.ESTADO NOT IN ('A','F') ");
