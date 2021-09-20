@@ -24,6 +24,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
+import org.itcgae.siga.db.mappers.PysServiciosinstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTiposProductosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTiposServiciosExtendsMapper;
@@ -50,7 +51,10 @@ public class ServiciosServiceImpl implements IServiciosService {
 	private PysServiciosExtendsMapper pysServiciosExtendsMapper;
 	
 	@Autowired
-	private PysServiciosinstitucionExtendsMapper pysServiciosInstitucionMapper;
+	private PysServiciosinstitucionExtendsMapper pysServiciosInstitucionExtendsMapper;
+	
+	@Autowired
+	private PysServiciosinstitucionMapper pysServiciosInstitucionMapper;
 	
 	@Override
 	public ListaServiciosDTO searchListadoServicios(HttpServletRequest request, FiltroServicioItem filtroServicioItem) {
@@ -250,8 +254,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 							"obtenerCodigosPorColegioServicios() / pysServiciosExtendsMapper.obtenerCodigosPorColegioServicios() -> Entrada a pysTiposProductosExtendsMapper para recuperar el listado de codigos en una institucion concreta");
 
 					String idioma = usuarios.get(0).getIdlenguaje();
-					List<String> listaCodigosPorColegio = pysServiciosExtendsMapper
-							.obtenerCodigosPorColegioServicios(idInstitucion);
+					List<String> listaCodigosPorColegio = pysServiciosExtendsMapper.obtenerCodigosPorColegioServicios(idInstitucion);
 
 					LOGGER.info(
 							"obtenerCodigosPorColegioServicios() / pysServiciosExtendsMapper.obtenerCodigosPorColegioServicios() -> Salida de pysTiposProductosExtendsMapper para recuperar el listado de codigos en una institucion concreta");
@@ -277,102 +280,93 @@ public class ServiciosServiceImpl implements IServiciosService {
 		return listaCodigosPorColegioDTO;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	@Transactional
 	public InsertResponseDTO nuevoServicio(ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-//		Error error = new Error();
-//		int status = 0;
-//		
-//		LOGGER.info("nuevoServicio() -> Entrada al servicio para crear un servicio (PYS_SERVICIOSINSTITUCION)");
-//
-//		// Conseguimos información del usuario logeado
-//		String token = request.getHeader("Authorization");
-//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-//
-//		try {
-//			if (idInstitucion != null) {
-//				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-//				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-//
-//				LOGGER.info(
-//						"nuevoServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-//
-//				LOGGER.info(
-//						"nuevoServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//				if (usuarios != null && !usuarios.isEmpty()) {
-//					LOGGER.info(
-//							"nuevoServicio() / pysServiciosInstitucionMapper.nuevoServicio() -> Entrada a pysServiciosInstitucionMapper para crear un servicio");
-//
-//					NewIdDTO idOrdenacion = pysServiciosInstitucionMapper.getIndiceMaxProducto(servicio, idInstitucion);
-//					PysServiciosinstitucion servicioInstitucion = new PysServiciosinstitucion();
-//			
-//					servicioInstitucion.setIdinstitucion(idInstitucion);
-//					servicioInstitucion.setIdtiposervicios((short) servicio.getIdtiposervicios());
-//					servicioInstitucion.setIdservicio((long) servicio.getIdservicio());
-//					servicioInstitucion.setIdserviciosinstitucion(Long.parseLong(idOrdenacion.getNewId()));
-//					
-//					servicioInstitucion.setDescripcion(servicio.getDescripcion());
-//					servicioInstitucion.setCuentacontable(servicio.getCuentacontable());
-//					servicioInstitucion.setSolicitarbaja(servicio.getPermitirbaja());
-//					servicioInstitucion.setSolicitaralta(servicio.getPermitiralta());
-//				
-//					
-//					
-//					
-//					servicioInstitucion.setFechabaja(null);
-//					servicioInstitucion.setFechamodificacion(new Date());
-//					EJECUTAR DE NUEVO MYBATTIS PARA AÑADIR LA COLUMNA CODIGOEXT
-//					if(servicio.getCodigoext() != null) {
-//						servicioInstitucion.setCodigoext(servicio.getCodigoext());
-//					}else {  
-//						servicioInstitucion.setCodigoext(servicio.getIdtiposervicios() + "|" + servicio.getIdservicio() + "|" + servicio.getIdserviciosinstitucion());
-//					}
-//					
-//					productoInstitucion.setCodigoTraspasonav(null);//No aplica
-//					productoInstitucion.setOrden(null);//No aplica
-//					productoInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
-//					
-//					//Campos a informar despues en tarjeta formas de pago
-//					productoInstitucion.setValor(new BigDecimal(0));//Fijado a 0 hasta que se rellene en formas de pago
-//					productoInstitucion.setIdtipoiva(null);
-//					productoInstitucion.setNofacturable("0");
-//					
-//
-//					status = pysProductosInstitucionMapper.insert(productoInstitucion);
-//					
-//					
-//					if(status == 0) {
-//						insertResponseDTO.setStatus(SigaConstants.KO);
-//						throw new Exception("No se ha podido crear el registro en PYS_PRODUCTOSEXCEPTION");
-//					}else if(status == 1) {
-//						insertResponseDTO.setStatus(SigaConstants.OK);
-//					}
-//					
-//
-//					LOGGER.info(
-//							"nuevoProducto() / pysProductosInstitucionMapper.crearProducto() -> Salida de pysProductosInstitucionMapper para crear un producto");
-//				}
-//
-//			}
-//		} catch (Exception e) {
-//			LOGGER.error(
-//					"ProductosServiceImpl.nuevoProducto() -> Se ha producido un error al crear un producto",
-//					e);
-//			error.setCode(500);
-//			error.setDescription("general.mensaje.error.bbdd");
-//		}
-//
-//		
-//		insertResponseDTO.setError(error);
-//
-//		LOGGER.info("nuevoProducto() -> Salida del servicio para crear un producto");
-//
+		Error error = new Error();
+		int status = 0;
+		
+		LOGGER.info("nuevoServicio() -> Entrada al servicio para crear un servicio (PYS_SERVICIOSINSTITUCION)");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"nuevoServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"nuevoServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"nuevoServicio() / pysServiciosInstitucionMapper.nuevoServicio() -> Entrada a pysServiciosInstitucionMapper para crear un servicio");
+
+					NewIdDTO idOrdenacion = pysServiciosInstitucionExtendsMapper.getIndiceMaxProducto(servicio, idInstitucion);
+					PysServiciosinstitucion servicioInstitucion = new PysServiciosinstitucion();
+			
+					servicioInstitucion.setIdinstitucion(idInstitucion);
+					servicioInstitucion.setIdtiposervicios((short) servicio.getIdtiposervicios());
+					servicioInstitucion.setIdservicio((long) servicio.getIdservicio());
+					servicioInstitucion.setIdserviciosinstitucion(Long.parseLong(idOrdenacion.getNewId()));
+					
+					servicioInstitucion.setDescripcion(servicio.getDescripcion());
+					servicioInstitucion.setCuentacontable(servicio.getCuentacontable());
+					servicioInstitucion.setSolicitarbaja(servicio.getPermitirbaja());
+					servicioInstitucion.setSolicitaralta(servicio.getPermitiralta());
+					servicioInstitucion.setAutomatico(servicio.getAutomatico());
+					servicioInstitucion.setIniciofinalponderado("I");//INICIOFINALPONDERADO??
+					//Falta condicion de suscripcion servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
+					
+					servicioInstitucion.setFechabaja(null);
+					servicioInstitucion.setFechamodificacion(new Date());
+			
+					if(servicio.getCodigoext() != null) {
+						servicioInstitucion.setCodigoext(servicio.getCodigoext());
+					}else {  
+						servicioInstitucion.setCodigoext(servicio.getIdtiposervicios() + "|" + servicio.getIdservicio() + "|" + servicioInstitucion.getIdserviciosinstitucion());
+					}
+					
+					servicioInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+					status = pysServiciosInstitucionMapper.insertSelective(servicioInstitucion);
+					
+					
+					if(status == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						throw new Exception("No se ha podido crear el registro en PYS_SERVICIOSINSTITUCION");
+					}else if(status == 1) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+					
+
+					LOGGER.info(
+							"nuevoServicio() / pysServiciosInstitucionMapper.nuevoServicio() -> Salida de pysServiciosInstitucionMapper para crear un servicio");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ServiciosServiceImpl.nuevoServicio() -> Se ha producido un error al crear un servicio",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("nuevoServicio() -> Salida del servicio para crear un servicio");
+
 		return insertResponseDTO;
 	}
 }

@@ -838,7 +838,7 @@ public class ProductosServiceImpl implements IProductosService{
 					
 					if(status == 0) {
 						insertResponseDTO.setStatus(SigaConstants.KO);
-						throw new Exception("No se ha podido crear el registro en PYS_PRODUCTOSEXCEPTION");
+						throw new Exception("No se ha podido crear el registro en PYS_PRODUCTOSINSTITUCION");
 					}else if(status == 1) {
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}

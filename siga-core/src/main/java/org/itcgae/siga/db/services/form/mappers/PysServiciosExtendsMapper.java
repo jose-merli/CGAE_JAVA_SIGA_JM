@@ -85,4 +85,6 @@ public interface PysServiciosExtendsMapper extends PysServiciosMapper{
 	
 	@SelectProvider(type = PysServiciosSqlExtendsProvider.class, method = "obtenerCodigosPorColegioServicios")
 	List<String> obtenerCodigosPorColegioServicios(Short idInstitucion);
+	
+	
 }
