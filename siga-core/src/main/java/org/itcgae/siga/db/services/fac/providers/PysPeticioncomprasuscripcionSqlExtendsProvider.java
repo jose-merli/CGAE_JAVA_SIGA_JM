@@ -3,8 +3,9 @@ package org.itcgae.siga.db.services.fac.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
+import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionSqlProvider;
 
-public class PysPeticioncomprasuscripcionSqlExtendsProvider {
+public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticioncomprasuscripcionSqlProvider {
 
 	public String getFichaCompraSuscripcion(FichaCompraSuscripcionItem peticion) {
 		SQL sql = new SQL();
@@ -42,10 +43,6 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider {
 		// campos se modificarian para reflejar que la petición
 		// está en "Solicitud de anulación".
 
-		// Con listagg logramos que los distintos ids de formas de pago se muestren en
-		// unica fila
-		sql.SELECT("LISTAGG(formasPagoComunes, ',') WITHIN GROUP (ORDER BY formasPagoComunes)  AS idformaspagocomunes");
-
 		sql.FROM("pys_peticioncomprasuscripcion pet");
 
 		sql.INNER_JOIN("cen_persona per on per.idpersona = pet.idpersona");
@@ -55,20 +52,33 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider {
 		sql.WHERE("pet.idinstitucion = " + peticion.getIdInstitucion());
 		sql.WHERE("pet.idpeticion = " + peticion.getnSolicitud());
 
-		// OBTENEMOS LAS FORMAS DE PAGO COMUNES
-		String fromPagosComunes = "(";
-		for (ListaProductosItem producto : peticion.getProductos()) {
-			fromPagosComunes += "select pago.idformapago\r\n" + "				from pys_productosinstitucion prod\r\n"
-					+ "				inner join pys_formapagoproducto pago on pago.idinstitucion = prod.idinstitucion and prod.idproducto = pago.idproducto \r\n"
-					+ "				and pago.idtipoproducto = prod.idtipoproducto AND prod.IDPRODUCTOINSTITUCION = pago.IDPRODUCTOINSTITUCION\r\n"
-					+ "				where prod.idinstitucion = " + peticion.getIdInstitucion()
-					+ " and (prod.idproducto = " + producto.getIdproducto() + " and prod.idtipoproducto="
-					+ producto.getIdtipoproducto() + " and prod.idproductoinstitucion="
-					+ producto.getIdproductoinstitucion() + "\r\n";
-			fromPagosComunes += "intersection\r\n";
+		// Para obtener las formas de pago comunes entre los productos de la compra. Se
+		// devuelven los idformapago concatenados con comas para se gestion.
+		if (peticion.getProductos() != null) {
+			SQL sqlPagos = new SQL();
+			// Con listagg logramos que los distintos ids de formas de pago se muestren en
+			// unica fila
+			sqlPagos.SELECT(
+					"LISTAGG(formasPagoComunes.idformapago, ',') WITHIN GROUP (ORDER BY formasPagoComunes.idformapago) ");
+
+			// OBTENEMOS LAS FORMAS DE PAGO COMUNES
+			String fromPagosComunes = "(";
+			for (ListaProductosItem producto : peticion.getProductos()) {
+				fromPagosComunes += "select pago.idformapago\r\n"
+						+ "				from pys_productosinstitucion prod\r\n"
+						+ "				inner join pys_formapagoproducto pago on pago.idinstitucion = prod.idinstitucion and prod.idproducto = pago.idproducto \r\n"
+						+ "				and pago.idtipoproducto = prod.idtipoproducto AND prod.IDPRODUCTOINSTITUCION = pago.IDPRODUCTOINSTITUCION\r\n"
+						+ "				where prod.idinstitucion = " + peticion.getIdInstitucion()
+						+ " and (prod.idproducto = " + producto.getIdproducto() + " and prod.idtipoproducto="
+						+ producto.getIdtipoproducto() + " and prod.idproductoinstitucion="
+						+ producto.getIdproductoinstitucion() + "\r\n";
+				fromPagosComunes += "intersection\r\n";
+			}
+			// Se elimina la ultima interseccion
+			sqlPagos.FROM(fromPagosComunes.substring(0, fromPagosComunes.length() - 16) + ")) formasPagoComunes");
+
+			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 		}
-		// Se elimina la ultima interseccion
-		sql.FROM(fromPagosComunes.substring(0, fromPagosComunes.length() - 16) + ") as formasPagoComunes");
 
 		return sql.toString();
 	}
@@ -76,22 +86,17 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider {
 	public String getNuevaFichaCompraSuscripcion(FichaCompraSuscripcionItem peticion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("(\r\n"
-				+ "        SELECT\r\n"
-				+ "            MAX(pet.idpeticion)\r\n"
-				+ "        FROM\r\n"
-				+ "            pys_peticioncomprasuscripcion pet\r\n"
-				+ "    ) + 1 AS idpeticion");
+		sql.SELECT("(\r\n" + "        SELECT\r\n" + "            MAX(pet.idpeticion)\r\n" + "        FROM\r\n"
+				+ "            pys_peticioncomprasuscripcion pet\r\n" + "    ) + 1 AS idpeticion");
 		sql.SELECT("usuario.descripcion as usuModificacion");
-		
+
 		sql.FROM("pys_peticioncomprasuscripcion pet");
-		
-		sql.WHERE("pet.idinstitucion = "+peticion.getIdInstitucion());
-		sql.INNER_JOIN(
-				"adm_usuarios usuario ON (pet.usumodificacion = "+peticion.getUsuModificacion()+" and pet.idinstitucion = "+peticion.getIdInstitucion()+")");
+
+		sql.WHERE("pet.idinstitucion = " + peticion.getIdInstitucion());
+		sql.INNER_JOIN("adm_usuarios usuario ON (pet.usumodificacion = " + peticion.getUsuModificacion()
+				+ " and pet.idinstitucion = " + peticion.getIdInstitucion() + ")");
 		sql.WHERE("rownum = 1");
-		
-		
+
 		// Para obtener la informacion de la tarjeta cliente en caso de que el cliente
 		// sea un colegiado
 		if (peticion.getIdPersona() != null) {
@@ -130,8 +135,30 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider {
 			// Se elimina la ultima interseccion
 			sqlPagos.FROM(fromPagosComunes.substring(0, fromPagosComunes.length() - 16) + ")) formasPagoComunes");
 
-			sql.SELECT("("+sqlPagos.toString()+") AS idformaspagocomunes");
+			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 		}
+
+		return sql.toString();
+	}
+
+	public String selectMaxIdPeticion(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("NVL(max(IDPETICION) +1, 1) AS IDPETICION");
+		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION");
+		sql.WHERE("idInstitucion =" + idInstitucion);
+
+		return sql.toString();
+	}
+
+	public String selectMaxNumOperacion(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("NVL(max(NUM_OPERACION) +1, 0) AS NUM_OPERACION");
+		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION");
+		sql.WHERE("idInstitucion =" + idInstitucion);
 
 		return sql.toString();
 	}
