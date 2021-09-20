@@ -14,6 +14,8 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
+import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaItem;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
@@ -614,6 +616,47 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		LOGGER.info("guardarRemesa() -> Salida del servicio para insertar/actualizar remesa");
 
 		return updateResponseDTO;
+	}
+
+	@Override
+	public EJGRemesaDTO getEJGRemesa(RemesasItem remesasItem, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		EJGRemesaDTO ejgRemesaDTO = new EJGRemesaDTO();
+		List<EJGRemesaItem> ejgRemesaItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getEJGRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getEJGRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			LOGGER.info(
+					"getEJGRemesa() / ScsRemesasExtendsMapper.getEJGRemesa() -> Entrada a ScsRemesasExtendsMapper para obtener los ejg asociados a la remesa");
+
+			LOGGER.info("Id remesa -> " + remesasItem.getIdRemesa());
+
+			ejgRemesaItems = scsRemesasExtendsMapper.getEJGRemesa(remesasItem, idInstitucion);
+
+			LOGGER.info(
+					"getEJGRemesa() / ScsRemesasExtendsMapper.getEJGRemesa() -> Salida a ScsRemesasExtendsMapper para obtener los ejg asociados a la remesa");
+
+			if (ejgRemesaItems != null) {
+				ejgRemesaDTO.setEJGRemesaItem(ejgRemesaItems);
+			}
+		}
+		
+		LOGGER.info("getLabel() -> Salida del servicio para obtener los ejg asociados a la remesa");
+		
+		return ejgRemesaDTO;
 	}
 
 }

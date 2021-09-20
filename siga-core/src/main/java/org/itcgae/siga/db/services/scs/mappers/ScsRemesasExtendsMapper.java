@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaItem;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
@@ -68,4 +69,19 @@ public interface ScsRemesasExtendsMapper{
 		@Result(column = "IDREMESA", property = "idRemesa", jdbcType = JdbcType.VARCHAR)
 	})
 	RemesasItem getMaxIdRemesa(Short idInstitucion);
+	
+	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "getEJGRemesa")
+	@Results({
+		@Result(column = "IDENTIFICADOR", property = "identificadorEJG", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOEJG", property = "idTipoEJG", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "TURNO_GUARDIA_EJG", property = "turnoGuardiaEJG", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ANIOEJG", property = "anioEJG", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NUMEROEJG", property = "numeroEJG", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SOLICITANTE", property = "solicitante", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUEVAREMESA", property = "nuevaRemesa", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "ESTADOREMESA", property = "estadoRemesa", jdbcType = JdbcType.VARCHAR)
+	})
+	List<EJGRemesaItem> getEJGRemesa(RemesasItem remesasItem, Short idInstitucion);
 }

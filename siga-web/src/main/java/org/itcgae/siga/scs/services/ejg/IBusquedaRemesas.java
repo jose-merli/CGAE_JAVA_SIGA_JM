@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
@@ -28,5 +29,7 @@ public interface IBusquedaRemesas {
 	AdmContador getUltimoRegitroRemesa(HttpServletRequest request);
 
 	UpdateResponseDTO guardarRemesa(RemesasItem remesasItem, HttpServletRequest request);
+	
+	EJGRemesaDTO getEJGRemesa(RemesasItem remesasItem, HttpServletRequest request);
 	
 }

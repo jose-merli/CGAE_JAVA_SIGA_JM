@@ -238,10 +238,17 @@ public class ScsRemesasExtendsProvider {
 		sql.SELECT("REM.IDESTADO");
 		sql.SELECT("REM.FECHAREMESA");
 		sql.FROM("cajg_remesaestados rem");
-		sql.WHERE("rem.idremesa = " + remesasBusquedaItem.getIdRemesa());
+		
+		if (remesasBusquedaItem.getIdRemesa() != 0) {
+			subquery.WHERE("rem.idremesa = " + remesasBusquedaItem.getIdRemesa());
+		}
+		
 		sql.WHERE("rem.idinstitucion = " + idInstitucion.toString());
 		sql.WHERE("rem.idestado = 0");
-		sql.WHERE("rem.fechamodificacion = (" + subquery.toString() + ")");
+		
+		if (remesasBusquedaItem.getIdRemesa() != 0) {
+			sql.WHERE("rem.fechamodificacion = (" + subquery.toString() + ")");
+		}
 
 		LOGGER.info(sql.toString());
 
@@ -258,7 +265,11 @@ public class ScsRemesasExtendsProvider {
 		sql.FROM("cajg_remesaestados rem");
 		sql.FROM("cajg_tipoestadoremesa tip");
 		sql.WHERE("tip.idestado = rem.idestado");
-		sql.WHERE("rem.idremesa = " + remesasBusquedaItem.getIdRemesa());
+		
+		if (remesasBusquedaItem.getIdRemesa() != 0) {
+			sql.WHERE("rem.idremesa = " + remesasBusquedaItem.getIdRemesa());
+		}
+		
 		sql.WHERE("rem.idinstitucion = " + idInstitucion.toString());
 		sql.ORDER_BY("rem.FECHAMODIFICACION");
 
@@ -276,6 +287,95 @@ public class ScsRemesasExtendsProvider {
 
 		LOGGER.info(sql.toString());
 
+		return sql.toString();
+	}
+	
+	public String getEJGRemesa(RemesasItem remesasItem, Short idInstitucion) {
+		SQL sql = new SQL();
+		SQL nuevaRemesa = new SQL();
+		SQL estadoRemesa = new SQL();
+		
+		nuevaRemesa.SELECT("COUNT(1)");
+		nuevaRemesa.FROM("CAJG_EJGREMESA ER2, CAJG_REMESA REM2");
+		nuevaRemesa.WHERE("ER2.IDINSTITUCION = REM2.IDINSTITUCION");
+		nuevaRemesa.WHERE("ER2.IDREMESA = REM2.IDREMESA");
+		nuevaRemesa.WHERE("REM2.IDTIPOREMESA = remesa.IDTIPOREMESA");
+		nuevaRemesa.WHERE("ER2.IDINSTITUCION = EJGREMESA.IDINSTITUCION");
+		nuevaRemesa.WHERE("ER2.ANIO = EJGREMESA.ANIO");
+		nuevaRemesa.WHERE("ER2.NUMERO = EJGREMESA.NUMERO");
+		nuevaRemesa.WHERE("ER2.IDTIPOEJG = EJGREMESA.IDTIPOEJG");
+		nuevaRemesa.WHERE("ER2.IDREMESA > EJGREMESA.IDREMESA");
+		
+		estadoRemesa.SELECT("MAX(IDTIPORESPUESTA)");
+		estadoRemesa.FROM("CAJG_RESPUESTA_EJGREMESA ER");
+		estadoRemesa.WHERE("ER.IDEJGREMESA = ejgremesa.IDEJGREMESA");
+		
+		sql.SELECT("ejgremesa.idinstitucion || '-' || ejgremesa.idtipoejg || '-' || ejgremesa.anio || '-' || ejgremesa.numero IDENTIFICADOR");
+		sql.SELECT("ejgremesa.idinstitucion");
+		sql.SELECT("ejgremesa.idtipoejg");
+		sql.SELECT("guardia.descripcion TURNO_GUARDIA_EJG");
+		sql.SELECT("tipoejg.descripcion ESTADOEJG");
+		sql.SELECT("colegiado.ncolegiado SOLICITANTE");
+		sql.SELECT("(" + nuevaRemesa.toString() + ") NUEVAREMESA");
+		sql.SELECT("DECODE( (" + estadoRemesa.toString() + "), 1, 'Incidencias validacion', "
+				+ "2, 'Incidencias envio', 'Correcto') ESTADOREMESA");
+		sql.FROM("SCS_EJG ejg");
+		sql.FROM("SCS_GUARDIASTURNO guardia");
+		sql.FROM("SCS_TIPOEJG tipoejg");
+		sql.FROM("CEN_COLEGIADO colegiado");
+		sql.FROM("CAJG_EJGREMESA ejgremesa");
+		sql.FROM("CAJG_REMESA remesa");
+		sql.WHERE("ejg.IDTIPOEJG = tipoejg.IDTIPOEJG");
+		sql.WHERE("ejg.IDINSTITUCION = guardia.IDINSTITUCION");
+		sql.WHERE("ejg.GUARDIATURNO_IDTURNO = guardia.IDTURNO");
+		sql.WHERE("ejg.GUARDIATURNO_IDGUARDIA = guardia.IDGUARDIA");
+		sql.WHERE("ejg.IDINSTITUCION = colegiado.IDINSTITUCION");
+		sql.WHERE("ejg.IDPERSONA = colegiado.IDPERSONA");
+		sql.WHERE("ejg.idinstitucion=ejgremesa.idinstitucion");
+		sql.WHERE("ejg.anio=ejgremesa.anio");
+		sql.WHERE("ejg.numero=ejgremesa.numero");
+		sql.WHERE("ejg.idtipoejg=ejgremesa.idtipoejg");
+		sql.WHERE("ejgremesa.idremesa = remesa.idremesa");
+		sql.WHERE("ejgremesa.idinstitucion = remesa.idinstitucion");
+		
+		if(remesasItem.getIdRemesa() != 0) {
+			sql.WHERE("ejgremesa.idremesa= " + remesasItem.getIdRemesa());
+		}
+		
+		sql.WHERE("ejgremesa.idinstitucion = " + idInstitucion.toString());
+		
+		if(remesasItem.getComboIncidencia() != null) {
+			// con_incidencias
+			if(remesasItem.getComboIncidencia().equals("con_inci")) {
+				sql.WHERE("(SELECT COUNT(1) FROM CAJG_RESPUESTA_EJGREMESA ER WHERE ER.IDEJGREMESA = ejgremesa.IDEJGREMESA) > 0");			
+			}
+			
+			// sin_incidencias
+			if(remesasItem.getComboIncidencia().equals("sin_inci")) {
+				sql.WHERE("(SELECT COUNT(1) FROM CAJG_RESPUESTA_EJGREMESA ER WHERE ER.IDEJGREMESA = ejgremesa.IDEJGREMESA) = 0");
+			}
+			
+			// incidencias_antes_envio
+			if(remesasItem.getComboIncidencia().equals("inci_env")) {
+				sql.WHERE("(SELECT COUNT(1) FROM CAJG_RESPUESTA_EJGREMESA ER WHERE ER.IDEJGREMESA = ejgremesa.IDEJGREMESA AND ER.IDTIPORESPUESTA = 1) > 0");
+			}
+			
+			// incidencias_despues_envio
+			if(remesasItem.getComboIncidencia().equals("desp_env")) {
+				sql.WHERE("(SELECT COUNT(1) FROM CAJG_RESPUESTA_EJGREMESA ER WHERE ER.IDEJGREMESA = ejgremesa.IDEJGREMESA AND ER.IDTIPORESPUESTA = 2) > 0");
+			}
+			
+			//  no_nueva_remesa
+			if(remesasItem.getComboIncidencia().equals("inci_no_re")) {
+				sql.WHERE("(SELECT COUNT(1) FROM CAJG_RESPUESTA_EJGREMESA ER WHERE ER.IDEJGREMESA = ejgremesa.IDEJGREMESA) > 0");
+				sql.WHERE("(SELECT COUNT(1) FROM CAJG_EJGREMESA ER2,CAJG_REMESA REM2 WHERE ER2.IDINSTITUCION = REM2.IDINSTITUCION AND ER2.IDREMESA = REM2.IDREMESA " + 
+						"AND REM2.IDTIPOREMESA = remesa.IDTIPOREMESA AND ER2.IDINSTITUCION = EJGREMESA.IDINSTITUCION AND ER2.ANIO = EJGREMESA.ANIO " + 
+						"AND ER2.NUMERO = EJGREMESA.NUMERO AND ER2.IDTIPOEJG = EJGREMESA.IDTIPOEJG AND ER2.IDREMESA > EJGREMESA.IDREMESA) = 0");
+			}
+		}
+		
+		LOGGER.info(sql.toString());
+		
 		return sql.toString();
 	}
 

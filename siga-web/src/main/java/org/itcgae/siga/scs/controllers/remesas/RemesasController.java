@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
@@ -77,5 +78,13 @@ public class RemesasController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}	
+	}
+	
+	@RequestMapping(value = "/getEJGRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EJGRemesaDTO> getEJGRemesa(@RequestBody RemesasItem remesasItem, HttpServletRequest request) {
+		LOGGER.info("Entra en el método buscarRemesas");
+		EJGRemesaDTO response = busquedaRemesas.getEJGRemesa(remesasItem, request);
+		LOGGER.info("Termina el método buscarRemesas");
+		return new ResponseEntity<EJGRemesaDTO>(response, HttpStatus.OK);
+	}
 }

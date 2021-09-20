@@ -18,6 +18,7 @@ public class RemesasItem {
 	private int incidenciasEJG;
 	private int totalEJG;
 	private String incidencias;
+	private String comboIncidencia;
 	
 	public int getIdRemesa() {
 		return idRemesa;
@@ -25,14 +26,6 @@ public class RemesasItem {
 
 	public void setIdRemesa(int idRemesa) {
 		this.idRemesa = idRemesa;
-	}
-	
-	public int getidInstitucion() {
-		return idInstitucion;
-	}
-
-	public void setidInstitucion(int idInstitucion) {
-		this.idInstitucion = idInstitucion;
 	}
 
 	public int getPrefijo() {
@@ -130,7 +123,13 @@ public class RemesasItem {
 	public void setIncidencias(String incidencias) {
 		this.incidencias = incidencias;
 	}
-	
-	
+
+	public String getComboIncidencia() {
+		return comboIncidencia;
+	}
+
+	public void setComboIncidencia(String comboIncidencia) {
+		this.comboIncidencia = comboIncidencia;
+	}
 		
 }
