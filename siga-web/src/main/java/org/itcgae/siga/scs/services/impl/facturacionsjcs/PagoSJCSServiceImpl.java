@@ -1562,6 +1562,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
         Error error = new Error();
         FcsPagosjg pago = null;
         List<AdmUsuarios> usuarios = null;
+        boolean ponerEnEstadoAbierto = true;
 
         try {
 
@@ -1603,6 +1604,7 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                     // Validacion de los datos antes de ejecutar el pago:
                     // 1. El estado del pago debe ser abierto:
                     if (!estadoPago.equals(SigaConstants.ESTADO_PAGO_ABIERTO)) {
+                        ponerEnEstadoAbierto = false;
                         throw new FacturacionSJCSException("El pago no se encuentra en un estado correcto para realizar esta operación",
                                 utilidadesFacturacionSJCS.getMensajeIdioma(usuarios.get(0).getIdlenguaje(), "messages.factSJCS.error.estadoPagoNoCorrecto"));
                     }
@@ -1648,7 +1650,9 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             }
 
         } catch (FacturacionSJCSException fe) {
-            ponerPagoEstadoAbierto(pago, idInstitucion, usuarios.get(0));
+            if(ponerEnEstadoAbierto) {
+                ponerPagoEstadoAbierto(pago, idInstitucion, usuarios.get(0));
+            }
             error.setDescription(fe.getDescription());
         } catch (Exception e) {
             LOGGER.error(
@@ -2361,6 +2365,11 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             error.setCode(500);
             error.setDescription("formacion.mensaje.general.mensaje.error");
             updateResponseDTO.setStatus(SigaConstants.KO);
+            FcsPagosEstadospagosKey fcsPagosEstadospagosKey = new FcsPagosEstadospagosKey();
+            fcsPagosEstadospagosKey.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_CERRADO));
+            fcsPagosEstadospagosKey.setIdinstitucion(idInstitucion);
+            fcsPagosEstadospagosKey.setIdpagosjg(Integer.valueOf(idPago));
+            fcsPagosEstadospagosMapper.deleteByPrimaryKey(fcsPagosEstadospagosKey);
         }
 
         updateResponseDTO.setError(error);
@@ -2456,6 +2465,11 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
             error.setCode(500);
             error.setDescription("formacion.mensaje.general.mensaje.error");
             updateResponseDTO.setStatus(SigaConstants.KO);
+            FcsPagosEstadospagosKey fcsPagosEstadospagosKey = new FcsPagosEstadospagosKey();
+            fcsPagosEstadospagosKey.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_CERRADO));
+            fcsPagosEstadospagosKey.setIdinstitucion(idInstitucion);
+            fcsPagosEstadospagosKey.setIdpagosjg(Integer.valueOf(idPago));
+            fcsPagosEstadospagosMapper.deleteByPrimaryKey(fcsPagosEstadospagosKey);
         }
 
         updateResponseDTO.setError(error);
