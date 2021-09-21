@@ -13,7 +13,7 @@ public class FichaCompraSuscripcionItem {
 	private String nif;
 
 	// TARJETA SOLICITUD
-	private String nSolicitud;
+	private String idPeticion;
 	private String usuModificacion;
 	private Date fechaSolicitud;
 	private Date fechaAprobacion;
@@ -23,8 +23,11 @@ public class FichaCompraSuscripcionItem {
 	//TARJETA FORMA DE PAGO
 	private String idFormasPagoComunes;
 	private Short idFormaPagoSeleccionada;
+	private float totalNeto;
+	private float totalIVA;
+	private float impTotal;
+	private float pendPago;
     private String cuentaBancSelecc;
-    private Boolean noFact;
 	
 	private String idEstadoPeticion;
 
@@ -65,12 +68,6 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setNif(String nif) {
 		this.nif = nif;
-	}
-	public String getnSolicitud() {
-		return nSolicitud;
-	}
-	public void setnSolicitud(String nSolicitud) {
-		this.nSolicitud = nSolicitud;
 	}
 	public Date getFechaSolicitud() {
 		return fechaSolicitud;
@@ -132,11 +129,35 @@ public class FichaCompraSuscripcionItem {
 	public void setCuentaBancSelecc(String cuentaBancSelecc) {
 		this.cuentaBancSelecc = cuentaBancSelecc;
 	}
-	public Boolean getNoFact() {
-		return noFact;
+	public float getTotalNeto() {
+		return totalNeto;
 	}
-	public void setNoFact(Boolean noFact) {
-		this.noFact = noFact;
+	public void setTotalNeto(float totalNeto) {
+		this.totalNeto = totalNeto;
+	}
+	public float getTotalIVA() {
+		return totalIVA;
+	}
+	public void setTotalIVA(float totalIVA) {
+		this.totalIVA = totalIVA;
+	}
+	public float getImpTotal() {
+		return impTotal;
+	}
+	public void setImpTotal(float impTotal) {
+		this.impTotal = impTotal;
+	}
+	public float getPendPago() {
+		return pendPago;
+	}
+	public void setPendPago(float pendPago) {
+		this.pendPago = pendPago;
+	}
+	public String getIdPeticion() {
+		return idPeticion;
+	}
+	public void setIdPeticion(String idPeticion) {
+		this.idPeticion = idPeticion;
 	}
 
 }

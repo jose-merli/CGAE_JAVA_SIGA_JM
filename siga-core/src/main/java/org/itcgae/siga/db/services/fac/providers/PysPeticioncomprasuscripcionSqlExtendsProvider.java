@@ -7,7 +7,7 @@ import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionSqlProvider;
 
 public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticioncomprasuscripcionSqlProvider {
 
-	public String getFichaCompraSuscripcion(FichaCompraSuscripcionItem peticion) {
+	public String getFichaCompraSuscripcion(FichaCompraSuscripcionItem peticion, String letrado) {
 		SQL sql = new SQL();
 
 		sql.SELECT("pet.idinstitucion");
@@ -68,8 +68,11 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						+ "				from pys_productosinstitucion prod\r\n"
 						+ "				inner join pys_formapagoproducto pago on pago.idinstitucion = prod.idinstitucion and prod.idproducto = pago.idproducto \r\n"
 						+ "				and pago.idtipoproducto = prod.idtipoproducto AND prod.IDPRODUCTOINSTITUCION = pago.IDPRODUCTOINSTITUCION\r\n"
-						+ "				where prod.idinstitucion = " + peticion.getIdInstitucion()
-						+ " and (prod.idproducto = " + producto.getIdproducto() + " and prod.idtipoproducto="
+						+ "				where prod.idinstitucion = " + peticion.getIdInstitucion();
+						//Se filtran los metodos de pago sean por internet o no según si el usuario es un colegiado o no 
+						if(!letrado.equals("N"))fromPagosComunes += " and pago.internet = 'A'";
+						else fromPagosComunes += " and pago.internet = 'S'";
+						fromPagosComunes += " and (prod.idproducto = " + producto.getIdproducto() + " and prod.idtipoproducto="
 						+ producto.getIdtipoproducto() + " and prod.idproductoinstitucion="
 						+ producto.getIdproductoinstitucion() + "\r\n";
 				fromPagosComunes += "intersection\r\n";
@@ -87,25 +90,12 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		return sql.toString();
 	}
 
-	public String getNuevaFichaCompraSuscripcion(FichaCompraSuscripcionItem peticion) {
+	public String getNuevaFichaCompraSuscripcion(FichaCompraSuscripcionItem peticion, String letrado, boolean nueva) {
 		SQL sql = new SQL();
 
-		sql.SELECT("(\r\n" + "        SELECT\r\n" + "            MAX(pet.idpeticion)\r\n" + "        FROM\r\n"
-				+ "            pys_peticioncomprasuscripcion pet\r\n" + "where pet.idinstitucion = "+peticion.getIdInstitucion()+"    ) + 1 AS idpeticion");
-		sql.SELECT("usuario.descripcion as usuModificacion");
-
-		sql.FROM("pys_peticioncomprasuscripcion pet");
-
-		sql.WHERE("pet.idinstitucion = " + peticion.getIdInstitucion());
-		sql.INNER_JOIN("adm_usuarios usuario ON (pet.usumodificacion = " + peticion.getUsuModificacion()
-				+ " and pet.idinstitucion = " + peticion.getIdInstitucion() + ")");
-		sql.WHERE("rownum = 1");
-
-		// Para obtener la informacion de la tarjeta cliente en caso de que el cliente
-		// sea un colegiado
+		// TARJETA CLIENTE
 		if (peticion.getIdPersona() != null) {
 			sql.SELECT("per.idpersona");
-			// TARJETA CLIENTE
 			sql.SELECT("per.nombre");
 			sql.SELECT("concat(per.apellidos1,concat(' ',per.apellidos2)) as apellidos");
 			sql.SELECT("per.nifcif");
@@ -113,9 +103,24 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 			sql.INNER_JOIN("cen_persona per on per.idpersona = " + peticion.getIdPersona());
 		}
+				
+		//TRAJETA SOLICITUD
+		if(nueva)sql.SELECT("(\r\n" + "        SELECT\r\n" + "            MAX(pet.idpeticion)\r\n" + "        FROM\r\n"
+				+ "            pys_peticioncomprasuscripcion pet\r\n" + "where pet.idinstitucion = "+peticion.getIdInstitucion()+"    ) + 1 AS idpeticion");
+		else sql.SELECT("pet.idpeticion");
+		sql.SELECT("usuario.descripcion as usuModificacion");
+
+		sql.FROM("pys_peticioncomprasuscripcion pet");
+
+		sql.WHERE("pet.idinstitucion = " + peticion.getIdInstitucion());
+		sql.INNER_JOIN("adm_usuarios usuario ON (pet.usumodificacion = " + peticion.getUsuModificacion()
+				+ " and pet.idinstitucion = " + peticion.getIdInstitucion() + ")");
+		
+
+		
 
 		// Para obtener las formas de pago comunes entre los productos de la compra. Se
-		// devuelven los idformapago concatenados con comas para se gestion.
+		// devuelven los idformapago concatenados con comas para su gestion.
 		if (peticion.getProductos() != null) {
 			SQL sqlPagos = new SQL();
 			// Con listagg logramos que los distintos ids de formas de pago se muestren en
@@ -130,8 +135,11 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						+ "				from pys_productosinstitucion prod\r\n"
 						+ "				inner join pys_formapagoproducto pago on pago.idinstitucion = prod.idinstitucion and prod.idproducto = pago.idproducto \r\n"
 						+ "				and pago.idtipoproducto = prod.idtipoproducto AND prod.IDPRODUCTOINSTITUCION = pago.IDPRODUCTOINSTITUCION\r\n"
-						+ "				where prod.idinstitucion = " + peticion.getIdInstitucion()
-						+ " and (prod.idproducto = " + producto.getIdproducto() + " and prod.idtipoproducto="
+						+ "				where prod.idinstitucion = " + peticion.getIdInstitucion();
+						//Se filtran los metodos de pago sean por internet o no según si el usuario es un colegiado o no 
+						if(!letrado.equals("N"))fromPagosComunes += " and pago.internet = 'A'";
+						else fromPagosComunes += " and pago.internet = 'S'";
+						fromPagosComunes += " and (prod.idproducto = " + producto.getIdproducto() + " and prod.idtipoproducto="
 						+ producto.getIdtipoproducto() + " and prod.idproductoinstitucion="
 						+ producto.getIdproductoinstitucion() + "\r\n";
 				fromPagosComunes += "intersection\r\n";
@@ -140,7 +148,38 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sqlPagos.FROM(fromPagosComunes.substring(0, fromPagosComunes.length() - 16) + ")) formasPagoComunes");
 
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
+			
+			//Obtenemos el id de la forma de pago utilizada.
+			if(peticion.getIdEstadoPeticion() != null) {
+				sql.SELECT("FIRST(prodSol.idformapago) as idFormaPagoSeleccionada");
+				
+				sql.INNER_JOIN("pys_productossolicitados prodSol on prodSol.idinstitucion = pet.idinstitucion and prodSol.idpeticion = pet.idpeticion");
+			}
+			
+			//Obtención de importes de productos
+			sql.SELECT("F_siga_formatonumero(PRIN.VALOR,2) AS totalNeto");
+			sql.SELECT("F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100), 2),2) as totalIVA");
+			sql.SELECT("F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2) AS impTotal");
+			if(peticion.getIdPersona() != null) {
+				//Importe total menos Anticipos (pysanticiposletrado) menos Suma de lo pagado en las facturas (fac_factura) asociadas
+				sql.SELECT("F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR - "
+						+ "(SELECT SUM(importe inicial)\r\n"
+						+ "FROM pys_anticipoletrado "
+						+ "where idpersona = "+peticion.getIdPersona()+") - "
+								+ "SELECT SUM(IMPTOTALPAGADO)\r\n"
+								+ "FROM fac_factura fact\r\n"
+								+ "INNER JOIN pys_compra on pys_compra.idfactura = fact.idfactura and pys_compra.idpeticion = "+ peticion.getnSolicitud()
+								+ "WHERE fact.idfactura = IDFACTURA;, 2),2) AS pendPago");
+				//Solo se puden comprobar las facturas en el caso que haya habido un registro de compra.
+				//Pendiente de optimizacion por SQL
+				if(!peticion.getIdEstadoPeticion().equals("10") && peticion.getIdEstadoPeticion() != null) {
+				sql.LEFT_OUTER_JOIN("fac_factura fact on fact.idfactura = compras.IDFACTURA");
+				}
+			}
+			else sql.SELECT("F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2) AS pendPago");
 		}
+		
+		sql.WHERE("rownum = 1");
 
 		return sql.toString();
 	}
