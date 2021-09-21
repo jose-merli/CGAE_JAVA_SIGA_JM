@@ -138,7 +138,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		if(filtroProductoItem.getPrecioHasta() != null && filtroProductoItem.getPrecioHasta() != "")
 			sql.WHERE(" ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2)  <= " + Float.parseFloat(filtroProductoItem.getPrecioHasta()) + "");
 		
-		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, tiva.valor, prin.idcontador");
+		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, tiva.valor, prin.idcontador, PRIN.NOFACTURABLE");
 
 		sql.ORDER_BY(" PRIN.DESCRIPCION");
 		

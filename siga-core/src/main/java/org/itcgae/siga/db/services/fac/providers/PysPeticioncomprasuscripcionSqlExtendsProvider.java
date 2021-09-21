@@ -79,7 +79,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 			
-			sql.SELECT("FIRST(prodSol.idformapago)");
+			sql.SELECT("FIRST(prodSol.idformapago) as idFormaPagoSeleccionada");
 			
 			sql.INNER_JOIN("pys_productossolicitados prodSol on prodSol.idinstitucion = pet.idinstitucion and prodSol.idpeticion = pet.idpeticion");
 		}
