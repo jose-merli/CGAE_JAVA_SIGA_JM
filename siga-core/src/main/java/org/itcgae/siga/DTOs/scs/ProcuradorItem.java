@@ -6,40 +6,47 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ProcuradorItem {
-
+	
 		private String idProcurador;
 		private String nombre;
 		private String apellido1;
 		private String apellido2;
+		private String nombreApe;
 		private String nColegiado;
+		
 		private String idColProcurador;
+		private String nombreColProcurador;
+		
 		private String domicilio;
 		private String idInstitucion;
-		private Long usuModificacion;
-		private Date fechaModificacion;
 		private String codigoPostal;
 		private String idPoblacion;
 		private String idProvincia;
-		private String idTurno;
+		private String nombrePoblacion;
+		private String nombreProvincia;
+		
 		private boolean historico;
 		private Date fechabaja;
+		
 		private String fax1;
 		private String telefono1;
 		private String telefono2;
 		private String codigoExt;
 		private String email;
-		private String nombrePoblacion;
-		private String nombreProvincia;
-		private String nombreApe;
-		private String numero;
+		
 		private String numerodesignacion;
-		private String fechaDesigna;
+		private Date fechaDesigna;
 		private String observaciones;
 		private String motivosRenuncia;
-		private String fecharenunciasolicita;
+		private Date fecharenunciasolicita;
 		private String numeroTotalProcuradores;
 		
+		private Short anio;
+		private String idTurno;
+		private String numero;
 		
+		private Long usuModificacion;
+		private Date fechaModificacion;
 		
 		public String getIdTurno() {
 			return idTurno;
@@ -383,16 +390,16 @@ public class ProcuradorItem {
 		/**
 		 * @return the fechabaja
 		 */
-		public Date getFechabaja() {
-			return fechabaja;
-		}
+//		public Date getFechabaja() {
+//			return fechabaja;
+//		}
 
 		/**
 		 * @param fechabaja the fechabaja to set
 		 */
-		public void setFechabaja(Date fechabaja) {
-			this.fechabaja = fechabaja;
-		}
+//		public void setFechabaja(Date fechabaja) {
+//			this.fechabaja = fechabaja;
+//		}
 
 		/**
 		 * @return the numero
@@ -425,14 +432,14 @@ public class ProcuradorItem {
 		/**
 		 * @return the fechaDesigna
 		 */
-		public String getFechaDesigna() {
+		public Date getFechaDesigna() {
 			return fechaDesigna;
 		}
 
 		/**
 		 * @param fechaDesigna the fechaDesigna to set
 		 */
-		public void setFechaDesigna(String fechaDesigna) {
+		public void setFechaDesigna(Date fechaDesigna) {
 			this.fechaDesigna = fechaDesigna;
 		}
 
@@ -467,14 +474,14 @@ public class ProcuradorItem {
 		/**
 		 * @return the fecharenunciasolicita
 		 */
-		public String getFecharenunciasolicita() {
+		public Date getFecharenunciasolicita() {
 			return fecharenunciasolicita;
 		}
 
 		/**
 		 * @param fecharenunciasolicita the fecharenunciasolicita to set
 		 */
-		public void setFecharenunciasolicita(String fecharenunciasolicita) {
+		public void setFecharenunciasolicita(Date fecharenunciasolicita) {
 			this.fecharenunciasolicita = fecharenunciasolicita;
 		}
 
@@ -567,5 +574,21 @@ public class ProcuradorItem {
 				return "null";
 			}
 			return o.toString().replace("\n", "\n    ");
+		}
+
+		public String getNombreColProcurador() {
+			return nombreColProcurador;
+		}
+
+		public void setNombreColProcurador(String nombreColProcurador) {
+			this.nombreColProcurador = nombreColProcurador;
+		}
+
+		public Short getAnio() {
+			return anio;
+		}
+
+		public void setAnio(Short anio) {
+			this.anio = anio;
 		}
 	}

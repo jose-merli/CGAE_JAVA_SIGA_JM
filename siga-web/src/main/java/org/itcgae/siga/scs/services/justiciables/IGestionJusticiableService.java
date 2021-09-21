@@ -9,10 +9,13 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.DTOs.scs.JusticiableDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
+import org.itcgae.siga.DTOs.scs.ScsUnidadfamiliarejgDTO;
+import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 
 public interface IGestionJusticiableService {
 	
@@ -42,5 +45,15 @@ public interface IGestionJusticiableService {
 
 	public UpdateResponseDTO associateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request);
 
-	public UpdateResponseDTO disassociateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request);	
+	public UpdateResponseDTO disassociateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request);
+
+	public ComboDTO getGruposLaborales(HttpServletRequest request);
+
+	public ComboDTO getParentesco(HttpServletRequest request);
+
+	public ComboDTO getTiposIngresos(HttpServletRequest request);
+
+	public UpdateResponseDTO updateUnidadFamiliar(UnidadFamiliarEJGItem unidadFamiliarEJGItem, HttpServletRequest request);
+
+	public ScsUnidadfamiliarejgDTO getSolicitante(EjgItem datos, HttpServletRequest request);	
 }

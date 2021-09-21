@@ -9,7 +9,9 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
+import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsPersonajgSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -56,4 +58,49 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR)
 	})
 	List<AsuntosClaveJusticiableItem> searchClaveAsuntosJusticiable(String idPersona, Short idInstitucion);
+
+	@SelectProvider(type = ScsPersonajgSqlExtendsProvider.class, method = "unidadFamiliarEJG")
+	@Results({ 
+		@Result(column = "idinstitucion", property = "uf_idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idtipoejg", property = "uf_idTipoejg", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "anio", property = "uf_anio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "numero", property = "uf_numero", jdbcType = JdbcType.VARCHAR),	
+		@Result(column = "idpersona", property = "uf_idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "solicitante", property = "uf_solicitante", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "encalidadde", property = "uf_enCalidad", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nif", property = "pjg_nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombrecompletopjg", property = "pjg_nombrecompleto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "pjg_nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellido1", property = "pjg_ape1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellido2", property = "pjg_ape2", jdbcType = JdbcType.VARCHAR),	
+		@Result(column = "direccion", property = "pjg_direccion", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "nombrePrincipal", property = "nombrePrincipal", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "apellido1Principal", property = "apellido1Principal", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "apellido2Principal", property = "apellido2Principal", jdbcType = JdbcType.VARCHAR),	
+		@Result(column = "descripcion", property = "pd_descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechasolicitud", property = "fechaSolicitud", jdbcType = JdbcType.DATE),
+		@Result(column = "fechabaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BIENESINMUEBLES", property = "bienesInmu", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BIENESMUEBLES", property = "bienesMu", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CIRCUNSTANCIAS_EXCEPCIONALES", property = "circunsExcep", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCIONINGRESOSANUALES", property = "descrIngrAnuales", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPARENTESCO", property = "idParentesco", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOGRUPOLAB", property = "idTipoGrupoLab", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOINGRESO", property = "idTipoIngreso", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IMPORTEBIENESINMUEBLES", property = "impBienesInmu", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IMPORTEBIENESMUEBLES", property = "impBienesMu", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IMPORTEINGRESOSANUALES", property = "impIngrAnuales", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IMPORTEOTROSBIENES", property = "impOtrosBienes", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "INCAPACITADO", property = "incapacitado", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OTROSBIENES", property = "otrosBienes", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "representante", property = "representante", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "direccionRepresentante", property = "direccionRepresentante", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nifRepresentante", property = "nifRepresentante", jdbcType = JdbcType.VARCHAR)
+		
+
+	})
+	List<UnidadFamiliarEJGItem> unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
+
 }

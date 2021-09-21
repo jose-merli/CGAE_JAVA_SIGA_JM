@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -293,12 +294,12 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("concat(consulta.apellido1 || ' ', consulta.apellido2) as apellidos");
 		sql.SELECT("consulta.nombre as nombresolo");
 		sql.SELECT(
-				"LISTAGG(consulta.asunto, ', ') WITHIN GROUP (ORDER BY consulta.idpersona,fechamodificacionasunto desc) AS ASUNTOS");
+				"LISTAGG(consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc) AS ASUNTOS");
 		sql.SELECT("count(consulta.asunto) as numeroasuntos");
 		sql.SELECT(
-				"nvl(SUBSTR(LISTAGG(consulta.asunto, ', ') WITHIN GROUP (ORDER BY consulta.idpersona,fechamodificacionasunto desc), 0, INSTR(LISTAGG(consulta.asunto, ', ')"
-						+ "		WITHIN GROUP (ORDER BY consulta.idpersona,fechamodificacionasunto desc), ',')-1),"
-						+ "		LISTAGG(consulta.asunto, ', ') WITHIN GROUP (ORDER BY consulta.idpersona,fechamodificacionasunto desc)) as ultimoasunto");
+				"nvl(SUBSTR(LISTAGG(consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc), 0, INSTR(LISTAGG(consulta.asunto, ', ')"
+						+ "		WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc), ',')-1),"
+						+ "		LISTAGG(consulta.asunto, ', ') WITHIN GROUP (ORDER BY fechamodificacionasunto desc,consulta.idpersona desc)) as ultimoasunto");
 
 		SQL sqlUnidadFamiliar = new SQL();
 		sqlUnidadFamiliar.SELECT("unidadFamiliar.idpersona");
@@ -308,7 +309,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlUnidadFamiliar.SELECT("per.nombre");
 		sqlUnidadFamiliar.SELECT("per.apellido1");
 		sqlUnidadFamiliar.SELECT("per.apellido2");
-		sqlUnidadFamiliar.SELECT("unidadFamiliar.fechamodificacion as fechamodificacionasunto");
+		sqlUnidadFamiliar.SELECT("e.fechaapertura as fechamodificacionasunto");
 		sqlUnidadFamiliar.SELECT("concat('E' || unidadFamiliar.anio || '/',lpad(e.NumEJG,5,'0') ) as asunto");
 		sqlUnidadFamiliar.FROM("SCS_PERSONAJG per");
 		sqlUnidadFamiliar.INNER_JOIN(
@@ -339,7 +340,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrarioEjg.SELECT("per.nombre");
 		sqlContrarioEjg.SELECT("per.apellido1");
 		sqlContrarioEjg.SELECT("per.apellido2");
-		sqlContrarioEjg.SELECT("CONTRARIOEJG.fechamodificacion as fechamodificacionasunto");
+		sqlContrarioEjg.SELECT("e.fechaapertura as fechamodificacionasunto");
 		sqlContrarioEjg.SELECT("concat('E' || CONTRARIOEJG.anio || '/',lpad(e.NumEJG,5,'0') ) as asunto");
 		sqlContrarioEjg.FROM("SCS_PERSONAJG per");
 		sqlContrarioEjg.INNER_JOIN(
@@ -370,7 +371,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrariosDesigna.SELECT("per.nombre");
 		sqlContrariosDesigna.SELECT("per.apellido1");
 		sqlContrariosDesigna.SELECT("per.apellido2");
-		sqlContrariosDesigna.SELECT("CONTRARIOSDESIGNA.fechamodificacion as fechamodificacionasunto");
+		sqlContrariosDesigna.SELECT("d.FECHAENTRADA  as fechamodificacionasunto");
 		sqlContrariosDesigna.SELECT("concat('D' || CONTRARIOSDESIGNA.anio || '/',lpad(d.codigo,5,'0') ) as asunto");
 		sqlContrariosDesigna.FROM("SCS_PERSONAJG per");
 		sqlContrariosDesigna.INNER_JOIN(
@@ -401,7 +402,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlDefendidosDesigna.SELECT("per.nombre");
 		sqlDefendidosDesigna.SELECT("per.apellido1");
 		sqlDefendidosDesigna.SELECT("per.apellido2");
-		sqlDefendidosDesigna.SELECT("DEFENDIDOSDESIGNA.fechamodificacion as fechamodificacionasunto");
+		sqlDefendidosDesigna.SELECT("d.FECHAENTRADA  as fechamodificacionasunto");
 		sqlDefendidosDesigna.SELECT("concat('D' || DEFENDIDOSDESIGNA.anio || '/',lpad(d.codigo,5,'0') ) as asunto");
 		sqlDefendidosDesigna.FROM("SCS_PERSONAJG per");
 		sqlDefendidosDesigna.INNER_JOIN(
@@ -432,7 +433,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlSoj.SELECT("per.nombre");
 		sqlSoj.SELECT("per.apellido1");
 		sqlSoj.SELECT("per.apellido2");
-		sqlSoj.SELECT("SOJ.fechamodificacion as fechamodificacionasunto");
+		sqlSoj.SELECT("SOJ.FECHAAPERTURA as fechamodificacionasunto");
 		sqlSoj.SELECT("concat('S' || SOJ.anio || '/',lpad(SOJ.numSOJ,5,'0') ) as asunto");
 		sqlSoj.FROM("SCS_PERSONAJG per");
 		sqlSoj.INNER_JOIN("SCS_SOJ SOJ  on SOJ.idpersonajg = per.idpersona and SOJ.idinstitucion = per.idinstitucion");
@@ -460,7 +461,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlContrariosAsistencia.SELECT("per.nombre");
 		sqlContrariosAsistencia.SELECT("per.apellido1");
 		sqlContrariosAsistencia.SELECT("per.apellido2");
-		sqlContrariosAsistencia.SELECT("CONTRARIOSASISTENCIA.fechamodificacion as fechamodificacionasunto");
+		sqlContrariosAsistencia.SELECT("A.FECHAHORA as fechamodificacionasunto");
 		sqlContrariosAsistencia
 				.SELECT("concat('A' || CONTRARIOSASISTENCIA.anio || '/',lpad(a.numero,5,'0') ) as asunto");
 		sqlContrariosAsistencia.FROM("SCS_PERSONAJG per");
@@ -492,7 +493,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlAsistencia.SELECT("per.nombre");
 		sqlAsistencia.SELECT("per.apellido1");
 		sqlAsistencia.SELECT("per.apellido2");
-		sqlAsistencia.SELECT("ASISTENCIA.fechamodificacion as fechamodificacionasunto");
+		sqlAsistencia.SELECT("ASISTENCIA.FECHAHORA as fechamodificacionasunto");
 		sqlAsistencia.SELECT("concat('A' || ASISTENCIA.anio || '/',lpad(ASISTENCIA.numero,5,'0') ) as asunto");
 		sqlAsistencia.FROM("SCS_PERSONAJG per");
 		sqlAsistencia.INNER_JOIN(
@@ -658,6 +659,83 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ " union all " + sqlDefendidosDesigna + " union all " + sqlSoj + " union all "
 				+ sqlContrariosAsistencia + "union all " + sqlAsistencia + ") consulta");
 
+		return sql.toString();
+	}
+	
+	
+	
+	public String unidadFamiliarEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
+		SQL sql = new SQL();
+		sql.SELECT("uf.idinstitucion," + 
+					" uf.idtipoejg," + 
+					" uf.anio," + 
+					" uf.numero," + 
+					" uf.idpersona," + 
+					" uf.fechabaja," + 
+					" uf.solicitante," + 
+					" pjg.nif," + 
+					"pjg.apellido1 || ' ' || pjg.apellido2 || ', ' || pjg.nombre as nombrecompletopjg," +
+					" pjg.nombre," + 
+					" pjg.apellido1," + 
+					" pjg.apellido2," + 
+					" pjg.direccion," + 
+					" uf.encalidadde," + 
+					" pd.descripcion," + 
+					" eejg_p.estado," + 
+					" eejg_p.fechasolicitud,"
+					+ " uf.BIENESINMUEBLES,\r\n"
+					+ "	uf.BIENESMUEBLES,\r\n"
+					+ "	uf.CIRCUNSTANCIAS_EXCEPCIONALES,\r\n"
+					+ "	uf.DESCRIPCIONINGRESOSANUALES,\r\n"
+					+ "	uf.IDPARENTESCO,\r\n"
+					+ "	uf.IDTIPOGRUPOLAB,\r\n"
+					+ "	uf.IDTIPOINGRESO,\r\n"
+					+ "	uf.IMPORTEBIENESINMUEBLES,\r\n"
+					+ "	uf.IMPORTEBIENESMUEBLES,\r\n"
+					+ "	uf.IMPORTEINGRESOSANUALES,\r\n"
+					+ "	uf.IMPORTEOTROSBIENES,\r\n"
+					+ "	uf.INCAPACITADO,\r\n"
+					+ "	uf.OBSERVACIONES,\r\n"
+					+ "	uf.OTROSBIENES");
+		sql.SELECT("case when pjg.idrepresentantejg is not null then repre.apellido1 || ' ' || repre.apellido2 || ', ' || repre.nombre\r\n"
+				+ "else null end as representante");
+		sql.SELECT("case when pjg.idrepresentantejg is not null then repre.direccion\r\n"
+				+ "else null end as direccionRepresentante");
+		sql.SELECT("case when pjg.idrepresentantejg is not null then repre.nif\r\n"
+				+ "else null end as nifRepresentante");
+		
+		sql.FROM("scs_unidadfamiliarejg uf");
+		
+		sql.INNER_JOIN("scs_personajg pjg on (uf.idpersona=pjg.idpersona and uf.idinstitucion=pjg.idinstitucion)");
+		sql.LEFT_OUTER_JOIN("scs_personajg repre on (repre.idpersona =  pjg.idrepresentantejg AND repre.idinstitucion=pjg.idinstitucion)");
+		sql.LEFT_OUTER_JOIN("(select grc.descripcion, p.idparentesco, p.idinstitucion, grc.idlenguaje from scs_parentesco p inner join gen_recursos_catalogos grc on (grc.idrecurso=p.descripcion) where grc.idlenguaje= '" + idLenguaje + "'" + " ) pd on (pd.idparentesco=uf.idparentesco and pd.idinstitucion=uf.idinstitucion)");
+		//sql.LEFT_OUTER_JOIN("scs_eejg_peticiones eejg_p on (eejg_p.numero = uf.numero and eejg_p.anio=uf.anio and eejg_p.idtipoejg = uf.idtipoejg and eejg_p.idinstitucion = uf.idinstitucion and eejg_p.idpersona=uf.idpersona)");
+
+		if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
+			sql.WHERE("uf.anio = '" + ejgItem.getAnnio() + "'");
+		if(ejgItem.getNumero() != null && ejgItem.getNumero() != "")
+			sql.WHERE("uf.numero = '" + ejgItem.getNumero() + "'");
+		if(ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
+			sql.WHERE("uf.idtipoejg = '" + ejgItem.getTipoEJG() + "'");
+		if(idInstitucion != null && idInstitucion != "")
+			sql.WHERE("uf.idinstitucion = '" + idInstitucion + "'");
+//		if(ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
+//			sql.WHERE("pjgP.idpersona = '" + ejgItem.getIdPersona() + "'");
+//		sql.WHERE("pjgP.idinstitucion = uf.idinstitucion ");
+		sql.LEFT_OUTER_JOIN("(\r\n"
+				+ "SELECT * \r\n"
+				+ "        FROM scs_eejg_peticiones eejg_p\r\n"
+				+ "        WHERE eejg_p.numero = '" + ejgItem.getNumero() + "' and eejg_p.anio='" + ejgItem.getAnnio() + "' and eejg_p.idtipoejg = '" + ejgItem.getTipoEJG() + "' and eejg_p.idinstitucion = '" + idInstitucion + "'  \r\n"
+				+ "    )  eejg_p on eejg_p.idpersona=uf.idpersona");
+		//sql.WHERE("eejg_p.fechaconsulta=(SELECT MAX(p2.FECHACONSULTA) from scs_eejg_peticiones p2 where eejg_p.nif=p2.nif)");
+		
+		
+		if (tamMaximo != null) {
+			Integer tamMaxNumber = tamMaximo + 1;
+			sql.WHERE("rownum <= " + tamMaxNumber);
+
+		}
+		
 		return sql.toString();
 	}
 

@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GestionInscripcionesServiceImpl implements IGestionInscripcionesService {
 
-	private Logger LOGGER = Logger.getLogger(FichaPartidasJudicialesServiceImpl.class);
+	private Logger LOGGER = Logger.getLogger(GestionInscripcionesServiceImpl.class);
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
@@ -706,7 +706,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									}else {
 										response = 0;
 										error.setCode(400);
-										error.setDescription("enviosMasivos.literal.fechaHora");
+										error.setDescription("justiciaGratuita.oficio.inscripciones.errorFechaAlta");
 										updateResponseDTO.setStatus(SigaConstants.KO);
 										break;
 									}
@@ -744,7 +744,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 									}else {
 										response = 0;
 										error.setCode(400);
-										error.setDescription("enviosMasivos.literal.fechaHora");
+										error.setDescription("justiciaGratuita.oficio.inscripciones.errorFechaBaja");
 										updateResponseDTO.setStatus(SigaConstants.KO);
 										break;
 									}
@@ -1245,6 +1245,7 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InscripcionesDTO inscripcionesDTO = new InscripcionesDTO();
 		List<InscripcionesItem> inscripcionesItems = null;
+		List<InscripcionesItem> inscripciones = null;
 		String busquedaOrden = "";
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1265,9 +1266,74 @@ public class GestionInscripcionesServiceImpl implements IGestionInscripcionesSer
 				LOGGER.info(
 						"busquedaTarjetaInscripciones() -> Entrada a csInscripcionturnoExtendsMapper para obtener las tarjetas de inscripciones");
 
+				//SIGARNV-2009@DTT.JAMARTIN@06/08/2021@INICIO
+				//Obtenemos todos los turnos
 				inscripcionesItems = scsInscripcionturnoExtendsMapper.busquedaTarjetaInscripciones(inscripcionesItem,
 						idInstitucion, usuario.getIdlenguaje());
+				
+				//Consultamos a que turnos esta inscrito la persona
+				List<InscripcionesItem> inscripcionesBorrar = scsInscripcionturnoExtendsMapper.buscaTurnoInscrito(inscripcionesItems, idInstitucion, inscripcionesItem.getIdpersona());
 
+				//Ahora quitamos los turnos donde esta inscrito del listado de turnos
+				for(int i=0; i < inscripcionesItems.size(); i++) {
+					for(int j=0; j < inscripcionesBorrar.size(); j++) {
+						if(inscripcionesItems.get(i).getIdturno() == inscripcionesBorrar.get(j).getIdturno()) {
+							inscripcionesItems.remove(i);
+						}
+					}
+				}
+				
+//				//Sacamos las guardias de los turnos donde no esta inscrito
+//				List<InscripcionesItem> guardias = scsInscripcionturnoExtendsMapper.buscarGuardiasTurnosNoInscritos(inscripcionesItems, idInstitucion, inscripcionesItem.getIdpersona());
+//
+//				//Ahora recorremos este listado de guardias y se las asignamos a los turnos
+//				for(int k=0; k < inscripcionesItems.size(); k++) {
+//					for(int l=0; l < guardias.size(); l++) {
+//						if(inscripcionesItems.get(k).getIdturno().equals(guardias.get(l).getIdturno())) {
+//							inscripcionesItems.get(k).setIdguardia(guardias.get(l).getIdguardia());
+//							inscripcionesItems.get(k).setGuardias(guardias.get(l).getGuardias());
+//							inscripcionesItems.get(k).setNombre_guardia(guardias.get(l).getNombre_guardia());
+//							inscripcionesItems.get(k).setTipoguardias(guardias.get(l).getTipoguardias()); 
+//						}
+//					}
+//				}
+				//SIGARNV-2009@DTT.JAMARTIN@06/08/2021@FIN 
+				
+				//Se añade la asignacion de guardias para el caso en el que se editando una inscripcion
+				if(inscripcionesItem.getIdturno()!= null) {
+					//Sacamos las guardias de los turnos donde esta inscrito
+					List<InscripcionesItem> guardiasInscritas = scsInscripcionturnoExtendsMapper.buscarGuardiasTurnosInscritos(inscripcionesItems, idInstitucion, inscripcionesItem.getIdpersona());
+
+					//Ahora recorremos este listado de guardiasInscritas y se las asignamos a los turnos
+					for(int k=0; k < inscripcionesItems.size(); k++) {
+						for(int l=0; l < guardiasInscritas.size(); l++) {
+							if(inscripcionesItems.get(k).getIdturno().equals(guardiasInscritas.get(l).getIdturno())) {
+								inscripcionesItems.get(k).setIdguardia(guardiasInscritas.get(l).getIdguardia());
+								inscripcionesItems.get(k).setGuardias(guardiasInscritas.get(l).getGuardias());
+								inscripcionesItems.get(k).setNombre_guardia(guardiasInscritas.get(l).getNombre_guardia());
+								inscripcionesItems.get(k).setTipoguardias(guardiasInscritas.get(l).getTipoguardias()); 
+							}
+						}
+					}
+				}
+				else {
+					//Sacamos las guardias de los turnos donde no esta inscrito
+					List<InscripcionesItem> guardias = scsInscripcionturnoExtendsMapper.buscarGuardiasTurnosNoInscritos(inscripcionesItems, idInstitucion, inscripcionesItem.getIdpersona());
+
+					//Ahora recorremos este listado de guardias y se las asignamos a los turnos
+					for(int k=0; k < inscripcionesItems.size(); k++) {
+						for(int l=0; l < guardias.size(); l++) {
+							if(inscripcionesItems.get(k).getIdturno().equals(guardias.get(l).getIdturno())) {
+								inscripcionesItems.get(k).setIdguardia(guardias.get(l).getIdguardia());
+								inscripcionesItems.get(k).setGuardias(guardias.get(l).getGuardias());
+								inscripcionesItems.get(k).setNombre_guardia(guardias.get(l).getNombre_guardia());
+								inscripcionesItems.get(k).setTipoguardias(guardias.get(l).getTipoguardias()); 
+							}
+						}
+					}
+				}
+					
+				
 				LOGGER.info(
 						"busquedaTarjetaInscripciones()  -> Salida a csInscripcionturnoExtendsMapper para obtener la tarjetas de inscripciones");
 

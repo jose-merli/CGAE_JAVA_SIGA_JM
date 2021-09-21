@@ -13,6 +13,9 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ColegiadoJGDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -42,12 +45,12 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+	
+	@Autowired
+	private ScsEjgExtendsMapper scsEjgExtendsMapper;
 
 	@Autowired
 	private ScsTurnosExtendsMapper scsTurnosextendsMapper;
-
-	@Autowired
-	private ScsEjgExtendsMapper scsEjgExtendsMapper;
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
@@ -94,7 +97,6 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
 		return colegiadoJGDTO;
 	}
-
 	@Override
 	public ColegiadosSJCSDTO busquedaColegiadoEJG(ColegiadosSJCSItem datos, HttpServletRequest request) {
 		ColegiadosSJCSDTO responsedto = new ColegiadosSJCSDTO();
@@ -108,19 +110,16 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 		Error error = new Error();
 
 		if (idInstitucion != null) {
-			LOGGER.debug(
-					"BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Entrada para obtener información del usuario logeado");
+			LOGGER.debug("busquedaColegiadosExpress.busquedaColegiadoEJG() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug(
-					"BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Salida de obtener información del usuario logeado");
+			LOGGER.debug("busquedaColegiadosExpress.busquedaColegiadoEJG() -> Salida de obtener información del usuario logeado");
 
-			if (usuarios != null && !usuarios.isEmpty()) {
-				LOGGER.debug(
-						"BusquedaEJGServiceImpl.busquedaColegiadoEJG() -> Entrada para obtener los datos del colegiado segun los filtros");
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.debug("busquedaColegiadosExpress.busquedaColegiadoEJG() -> Entrada para obtener los datos del colegiado segun los filtros");
 
 				try {
 					GenParametrosExample genParametrosExample = new GenParametrosExample();
@@ -224,33 +223,28 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				LOGGER.info(
-						"BusquedaEJGServiceImpl.comboTurnos() -> Entrada al servicio para obtener los turnos. Viene desde "
-								+ pantalla);
+				LOGGER.info("busquedaColegiadosExpress.comboTurnos() -> Entrada al servicio para obtener los turnos. Viene desde "+ pantalla);
 
 				if (pantalla != null && !pantalla.isEmpty()) {
 					comboItems = scsTurnosextendsMapper.comboTurnosBusqueda(idInstitucion, pantalla);
 				}
 
-				LOGGER.info(
-						"BusquedaEJGServiceImpl.comboTurnos()-> Salida del servicio para obtener los datos del combo");
+				LOGGER.info("busquedaColegiadosExpress.comboTurnos()-> Salida del servicio para obtener los datos del combo");
 
 				if (comboItems != null) {
 					comboDTO.setCombooItems(comboItems);
 				}
 			}
 		}
-		LOGGER.info("cBusquedaEJGServiceImpl.comboTurnos() -> Salida del servicio para obtener los turnos");
+		LOGGER.info("busquedaColegiadosExpress.comboTurnos() -> Salida del servicio para obtener los turnos");
 		return comboDTO;
 	}
 }

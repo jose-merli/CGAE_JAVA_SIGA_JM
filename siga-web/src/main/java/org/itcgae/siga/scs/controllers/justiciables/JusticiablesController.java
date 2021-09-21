@@ -6,11 +6,14 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.JusticiableBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableBusquedaItem;
 import org.itcgae.siga.DTOs.scs.JusticiableDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
+import org.itcgae.siga.DTOs.scs.ScsUnidadfamiliarejgDTO;
+import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.scs.services.justiciables.IBusquedaJusticiablesService;
 import org.itcgae.siga.scs.services.justiciables.IGestionJusticiableService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +57,24 @@ public class JusticiablesController {
 	@RequestMapping(value = "/gestionJusticiables/comboMinusvalias", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getMinusvalias(HttpServletRequest request) {
 		ComboDTO response = gestionJusticiableService.getMinusvalias(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/gestionJusticiables/comboGruposLaborales", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getGrupoLaboral(HttpServletRequest request) {
+		ComboDTO response = gestionJusticiableService.getGruposLaborales(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/gestionJusticiables/comboParentesco", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getParentesco(HttpServletRequest request) {
+		ComboDTO response = gestionJusticiableService.getParentesco(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/gestionJusticiables/comboTiposIngresos", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTipoIngresos(HttpServletRequest request) {
+		ComboDTO response = gestionJusticiableService.getTiposIngresos(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
@@ -101,6 +122,26 @@ public class JusticiablesController {
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 
+	}
+	
+	@RequestMapping(value = "/gestionJusticiables/updateUnidadFamiliar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateUnidadFamiliar(@RequestBody UnidadFamiliarEJGItem unidadFamiliarItem, HttpServletRequest request) {
+
+		UpdateResponseDTO response = gestionJusticiableService.updateUnidadFamiliar(unidadFamiliarItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "/gestionJusticiables/getSolicitante", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ScsUnidadfamiliarejgDTO> getSolicitante(@RequestBody EjgItem unidadFamiliarItem, HttpServletRequest request) {
+
+		ScsUnidadfamiliarejgDTO response = gestionJusticiableService.getSolicitante(unidadFamiliarItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<ScsUnidadfamiliarejgDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ScsUnidadfamiliarejgDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "/gestionJusticiables/updateDatosSolicitudJusticiable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

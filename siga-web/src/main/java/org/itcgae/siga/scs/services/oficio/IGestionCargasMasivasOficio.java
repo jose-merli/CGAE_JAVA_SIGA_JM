@@ -34,7 +34,7 @@ public interface IGestionCargasMasivasOficio {
 	public File createExcelFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector, String tipo)
 			throws BusinessException;
 
-	public DeleteResponseDTO uploadFileIT(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
+	public DeleteResponseDTO uploadFileIT(MultipartHttpServletRequest request) throws IllegalStateException, IOException, Exception;
 
 	public DeleteResponseDTO uploadFileBT(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 
