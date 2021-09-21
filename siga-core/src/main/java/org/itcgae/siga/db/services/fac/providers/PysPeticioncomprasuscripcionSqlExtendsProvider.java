@@ -78,6 +78,10 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sqlPagos.FROM(fromPagosComunes.substring(0, fromPagosComunes.length() - 16) + ")) formasPagoComunes");
 
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
+			
+			sql.SELECT("FIRST(prodSol.idformapago)");
+			
+			sql.INNER_JOIN("pys_productossolicitados prodSol on prodSol.idinstitucion = pet.idinstitucion and prodSol.idpeticion = pet.idpeticion");
 		}
 
 		return sql.toString();
@@ -87,7 +91,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		SQL sql = new SQL();
 
 		sql.SELECT("(\r\n" + "        SELECT\r\n" + "            MAX(pet.idpeticion)\r\n" + "        FROM\r\n"
-				+ "            pys_peticioncomprasuscripcion pet\r\n" + "    ) + 1 AS idpeticion");
+				+ "            pys_peticioncomprasuscripcion pet\r\n" + "where pet.idinstitucion = "+peticion.getIdInstitucion()+"    ) + 1 AS idpeticion");
 		sql.SELECT("usuario.descripcion as usuModificacion");
 
 		sql.FROM("pys_peticioncomprasuscripcion pet");
