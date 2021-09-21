@@ -15,6 +15,7 @@ import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -103,7 +104,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 						{
 							//Este if comprueba si es el 3 servicio identico excepto por la forma de pago al primero que añadiste (es decir este seria el 4 por lo que al tener mas de 3 formas de pago se ha de mostrar el numero)
 							if(numFormasDePago > 2) {
-								listaServiciosProcesada.get(listaServiciosProcesada.size() - 1).setFormapago("4");
+								listaServiciosProcesada.get(listaServiciosProcesada.size() - 1).setFormapago(String.valueOf(numFormasDePago));
 							}else {
 								listaServiciosProcesada.get(listaServiciosProcesada.size() - 1).setFormapago(listaServiciosProcesada.get(listaServiciosProcesada.size() - 1).getFormapago() + ", " + listaServicios.get(i).getFormapago());						
 							}
@@ -368,5 +369,74 @@ public class ServiciosServiceImpl implements IServiciosService {
 		LOGGER.info("nuevoServicio() -> Salida del servicio para crear un servicio");
 
 		return insertResponseDTO;
+	}
+	
+	@Override
+	public ServicioDetalleDTO detalleServicio(HttpServletRequest request, int idTipoServicio, int idServicio, int idServicioInstitucion) {
+		ServicioDetalleDTO servicioDetalleDTO = new ServicioDetalleDTO();
+		Error error = new Error();
+
+		LOGGER.info("detalleServicio() -> Entrada al servicio para recuperar los detalles del servicio");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"detalleServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"detalleServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"detalleServicio() / PysServiciosinstitucionExtendsMapper.detalleServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para obtener los detalles del servicio");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					servicioDetalleDTO = pysServiciosInstitucionExtendsMapper
+							.detalleServicio(idTipoServicio, idServicio, idServicioInstitucion, idInstitucion);
+
+					LOGGER.info(
+							"detalleServicio() / PysServiciosinstitucionExtendsMapper.detalleServicio() -> Salida de PysServiciosinstitucionExtendsMapper para obtener los detalles del servicio");
+					
+					LOGGER.info(
+							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de internet");
+					
+					servicioDetalleDTO.setFormasdepagointernet(pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio(idTipoServicio, idServicio, idServicioInstitucion, idInstitucion));
+					
+					LOGGER.info(
+							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio() -> Salida a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de internet");
+					
+					LOGGER.info(
+							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
+					
+					servicioDetalleDTO.setFormasdepagosecretaria(pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio(idTipoServicio, idServicio, idServicioInstitucion, idInstitucion));
+					
+					LOGGER.info(
+							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio() -> Salida a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ProductosServiceImpl.detalleServicio() -> Se ha producido un error al obtener el los detalles del servicio",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		servicioDetalleDTO.setError(error);
+
+		LOGGER.info("detalleServicio() -> Salida del servicio para obtener los detalles del servicio");
+
+		return servicioDetalleDTO;
 	}
 }

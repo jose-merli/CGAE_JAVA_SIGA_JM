@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -50,5 +51,11 @@ public class ServiciosController {
 	ResponseEntity<InsertResponseDTO> nuevoServicio(@RequestBody ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
 		InsertResponseDTO response = serviciosService.nuevoServicio(servicio, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/pys/detalleServicio")
+	ResponseEntity<ServicioDetalleDTO> detalleServicio(HttpServletRequest request, @RequestParam int idTipoServicio, @RequestParam int idServicio, @RequestParam int idServicioInstitucion) { 
+		ServicioDetalleDTO response = serviciosService.detalleServicio(request, idTipoServicio, idServicio, idServicioInstitucion);
+		return new ResponseEntity<ServicioDetalleDTO>(response, HttpStatus.OK);
 	}
 }

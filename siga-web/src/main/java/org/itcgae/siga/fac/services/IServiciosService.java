@@ -17,5 +17,6 @@ public interface IServiciosService {
 	public DeleteResponseDTO reactivarBorradoFisicoLogicoServicios(ListaServiciosDTO listadoServicios, HttpServletRequest request);
 	public ListaCodigosPorColegioDTO obtenerCodigosPorColegioServicios(HttpServletRequest request);
 	public InsertResponseDTO nuevoServicio(ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception;
+	public ServicioDetalleDTO detalleServicio(HttpServletRequest request, int idTipoServicio, int idServicio, int idServicioInstitucion);
 
 }

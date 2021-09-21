@@ -1,5 +1,7 @@
 package org.itcgae.siga.db.services.form.mappers;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -35,4 +37,31 @@ public interface PysServiciosinstitucionExtendsMapper extends PysServiciosinstit
 		}) 
 	NewIdDTO getIndiceMaxProducto(ServicioDetalleDTO servicio, Short idInstitucion);
 
+	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "detalleServicio")
+	@Results({
+		@Result(column = "IDTIPOSERVICIO", property = "idtiposervicios", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDSERVICIO", property = "idservicio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDSERVICIOSINSTITUCION", property = "idserviciosinstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SOLICITARBAJA", property = "permitirbaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SOLICITARALTA", property = "permitiralta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CUENTACONTABLE", property = "cuentacontable", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
+		@Result(column = "NOFACTURABLE", property = "nofacturable", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIVA", property = "idtipoiva", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "CODIGOEXT", property = "codigoext", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CATEGORIA", property = "categoria", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALORIVA", property = "valoriva", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "AUTOMATICO", property = "automatico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCONSULTA", property = "idconsulta", jdbcType = JdbcType.NUMERIC),
+		}) 
+	ServicioDetalleDTO detalleServicio(int idTipoServicio, int idServicio, int idServicioInstitucion, Short idInstitucion);
+	
+	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "obtenerFormasDePagoInternetByServicio")
+	List<Integer> obtenerFormasDePagoInternetByServicio(int idTipoServicio, int idServicio, int idServicioInstitucion, Short idInstitucion);
+	
+	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "obtenerFormasDePagoSecretariaByServicio")
+	List<Integer> obtenerFormasDePagoSecretariaByServicio(int idTipoServicio, int idServicio, int idServicioInstitucion, Short idInstitucion);
 }
+
