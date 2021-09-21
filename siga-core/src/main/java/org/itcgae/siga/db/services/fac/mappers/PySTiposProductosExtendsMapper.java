@@ -55,7 +55,8 @@ public interface PySTiposProductosExtendsMapper extends PysProductosMapper{
 		@Result(column = "CATEGORIA", property = "categoria", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IVA", property = "iva", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PRECIO_IVA", property = "precioiva", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FORMAS_PAGO", property = "formapago", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "FORMAS_PAGO", property = "formapago", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOFACTURABLE", property = "noFacturable", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ListaProductosItem> searchListadoProductosBuscador(String idioma, Short idInstitucion, FiltroProductoItem filtroProductoItem);
 	

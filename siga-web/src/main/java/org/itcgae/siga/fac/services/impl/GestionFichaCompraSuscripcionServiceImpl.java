@@ -21,6 +21,8 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.PysCompra;
@@ -31,6 +33,7 @@ import org.itcgae.siga.db.entities.PysProductosinstitucion;
 import org.itcgae.siga.db.entities.PysProductossolicitados;
 import org.itcgae.siga.db.entities.PysServiciossolicitados;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.PysCompraMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
@@ -60,6 +63,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
 
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
@@ -129,10 +135,22 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						"getFichaCompraSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && !usuarios.isEmpty()) {
+					
 					//Si es una compra/suscrpición nueva
 					if(ficha.getnSolicitud() == null) {
 						ficha.setIdInstitucion(idInstitucion.toString());
 						ficha.setUsuModificacion(usuarios.get(0).getIdusuario().toString());
+
+						//Se obtiene el idpersona del colegiado conectado en el caso se este creando una nueva compra/suscripción
+						if(!letrado.equals("N")) {
+						CenPersonaExample personaExmaple = new CenPersonaExample();
+						
+						personaExmaple.createCriteria().andNifcifEqualTo(dni);
+						
+						CenPersona colegiado = cenPersonaMapper.selectByExample(personaExmaple).get(0);
+						
+						ficha.setIdPersona(colegiado.getIdpersona().toString());
+						}
 						
 						LOGGER.info(
 								"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getNuevaFichaCompraSuscripcion() -> Entrada a PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la nueva compra/suscripcion");
@@ -144,6 +162,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 						fichaCompleta.setIdInstitucion(idInstitucion.toString());
 						fichaCompleta.setProductos(ficha.getProductos());
+						fichaCompleta.setIdFormaPagoSeleccionada(Short.valueOf(fichaCompleta.getIdFormasPagoComunes().split(",")[0]));
 					}
 					//Para obtener toda la informacion de una compra/suscripcion ya creada
 					else { 
@@ -222,9 +241,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				solicitud.setTipopeticion("A");
 				// Caso en el que el colegio no necesite aprobacion para realizar compras o
 				// suscripciones
-				if (aprobNecesaria.getValor() == "N")
-					solicitud.setIdestadopeticion((short) 20);
-				else
+//				if (aprobNecesaria.getValor() == "N")
+//					solicitud.setIdestadopeticion((short) 20);
+//				else
 					solicitud.setIdestadopeticion((short) 10);
 				solicitud.setFecha(new Date());
 				Long fechaActual = new Date().getTime();
@@ -271,30 +290,30 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				// Al no necesitar aprobación, se crea el registro de compra/suscripción
 				// inmediatamente
-				if (aprobNecesaria.getValor() == "N") {
-					PysCompra compra = new PysCompra();
-
-					compra.setFecha(new Date());
-					compra.setFechamodificacion(new Date());
-					compra.setIdinstitucion(idInstitucion);
-					compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
-					compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
-					compra.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-					for (ListaProductosItem producto : ficha.getProductos()) {
-
-						compra.setIdproducto((long) producto.getIdproducto());
-						compra.setIdtipoproducto((short) producto.getIdtipoproducto());
-						compra.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
-						compra.setDescripcion(producto.getDescripcion());
-						compra.setIdformapago(ficha.getIdFormaPagoSeleccionada());
-
-						response = pysCompraMapper.insert(compra);
-						if (response == 0)
-							throw new Exception("Error al insertar un registro de compra en la BBDD.");
-					}
-
-				}
+//				if (aprobNecesaria.getValor() == "N") {
+//					PysCompra compra = new PysCompra();
+//
+//					compra.setFecha(new Date());
+//					compra.setFechamodificacion(new Date());
+//					compra.setIdinstitucion(idInstitucion);
+//					compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+//					compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
+//					compra.setUsumodificacion(usuarios.get(0).getIdusuario());
+//
+//					for (ListaProductosItem producto : ficha.getProductos()) {
+//
+//						compra.setIdproducto((long) producto.getIdproducto());
+//						compra.setIdtipoproducto((short) producto.getIdtipoproducto());
+//						compra.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+//						compra.setDescripcion(producto.getDescripcion());
+//						compra.setIdformapago(ficha.getIdFormaPagoSeleccionada());
+//
+//						response = pysCompraMapper.insert(compra);
+//						if (response == 0)
+//							throw new Exception("Error al insertar un registro de compra en la BBDD.");
+//					}
+//
+//				}
 
 				insertResponseDTO.setStatus("200");
 			}
@@ -311,7 +330,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 		insertResponseDTO.setError(error);
 		LOGGER.info("solicitarCompra() -> Salida del servicio para crear una solicitud de compra");
-
+		
 		return insertResponseDTO;
 	}
 

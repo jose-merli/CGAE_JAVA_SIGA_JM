@@ -23,7 +23,10 @@ public class FichaCompraSuscripcionItem {
 	//TARJETA FORMA DE PAGO
 	private String idFormasPagoComunes;
 	private Short idFormaPagoSeleccionada;
+    private String cuentaBancSelecc;
+    private Boolean noFact;
 	
+	private String idEstadoPeticion;
 
     private ListaProductosItem[] productos;
 	
@@ -116,6 +119,24 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setUsuModificacion(String usuModificacion) {
 		this.usuModificacion = usuModificacion;
+	}
+	public String getIdEstadoPeticion() {
+		return idEstadoPeticion;
+	}
+	public void setIdEstadoPeticion(String idEstadoPeticion) {
+		this.idEstadoPeticion = idEstadoPeticion;
+	}
+	public String getCuentaBancSelecc() {
+		return cuentaBancSelecc;
+	}
+	public void setCuentaBancSelecc(String cuentaBancSelecc) {
+		this.cuentaBancSelecc = cuentaBancSelecc;
+	}
+	public Boolean getNoFact() {
+		return noFact;
+	}
+	public void setNoFact(Boolean noFact) {
+		this.noFact = noFact;
 	}
 
 }

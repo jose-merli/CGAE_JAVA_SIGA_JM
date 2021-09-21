@@ -18,6 +18,7 @@ public class ListaProductosItem {
 	private String iva;
 	private String precioiva;
 	private String formapago;
+	private String noFacturable;
 	
 	public int getIdproducto() {
 		return idproducto;
@@ -92,6 +93,12 @@ public class ListaProductosItem {
 		this.formapago = formapago;
 	}
 	
+	public String getNoFacturable() {
+		return noFacturable;
+	}
+	public void setNoFacturable(String noFacturable) {
+		this.noFacturable = noFacturable;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;

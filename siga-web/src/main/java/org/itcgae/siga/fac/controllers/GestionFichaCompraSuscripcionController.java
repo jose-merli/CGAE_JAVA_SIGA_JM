@@ -34,14 +34,14 @@ public class GestionFichaCompraSuscripcionController {
 		else return new ResponseEntity<FichaCompraSuscripcionItem>(fichaCompleta, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@PutMapping(value = "/pys/solicitarCompra")
+	@PostMapping(value = "/pys/solicitarCompra")
 	ResponseEntity<InsertResponseDTO>  SolicitarCompra(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
 		InsertResponseDTO response = gestionFichaCompraSuscripcionService.solicitarCompra(request, ficha);
 		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@PutMapping(value = "/pys/solicitarSuscripcion")
+	@PostMapping(value = "/pys/solicitarSuscripcion")
 	ResponseEntity<InsertResponseDTO>  SolicitarSuscripcion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
 		InsertResponseDTO response = gestionFichaCompraSuscripcionService.solicitarSuscripcion(request, ficha);
 		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
