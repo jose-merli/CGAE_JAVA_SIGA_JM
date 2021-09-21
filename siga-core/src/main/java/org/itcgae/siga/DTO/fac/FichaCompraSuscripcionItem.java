@@ -13,7 +13,7 @@ public class FichaCompraSuscripcionItem {
 	private String nif;
 
 	// TARJETA SOLICITUD
-	private String idPeticion;
+	private String nSolicitud;
 	private String usuModificacion;
 	private Date fechaSolicitud;
 	private Date fechaAprobacion;
@@ -68,6 +68,12 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setNif(String nif) {
 		this.nif = nif;
+	}
+	public String getnSolicitud() {
+		return nSolicitud;
+	}
+	public void setnSolicitud(String nSolicitud) {
+		this.nSolicitud = nSolicitud;
 	}
 	public Date getFechaSolicitud() {
 		return fechaSolicitud;
@@ -152,12 +158,6 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setPendPago(float pendPago) {
 		this.pendPago = pendPago;
-	}
-	public String getIdPeticion() {
-		return idPeticion;
-	}
-	public void setIdPeticion(String idPeticion) {
-		this.idPeticion = idPeticion;
 	}
 
 }
