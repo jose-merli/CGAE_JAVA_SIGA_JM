@@ -18,7 +18,7 @@ public class ListaServiciosItem {
 	private String categoria;
 	private String tipo;
 	private String iva;
-	private String precioivames;
+	private String precioperiodicidad;
 	private String formapago;
 	
 	public int getIdinstitucion() {
@@ -87,11 +87,11 @@ public class ListaServiciosItem {
 	public void setIva(String iva) {
 		this.iva = iva;
 	}
-	public String getPrecioivames() {
-		return precioivames;
+	public String getPrecioperiodicidad() {
+		return precioperiodicidad;
 	}
-	public void setPrecioivames(String precioivames) {
-		this.precioivames = precioivames;
+	public void setPrecioperiodicidad(String precioperiodicidad) {
+		this.precioperiodicidad = precioperiodicidad;
 	}
 	public String getFormapago() {
 		return formapago;
@@ -114,7 +114,7 @@ public class ListaServiciosItem {
 		result = prime * result + idtipoiva;
 		result = prime * result + idtiposervicios;
 		result = prime * result + ((iva == null) ? 0 : iva.hashCode());
-		result = prime * result + ((precioivames == null) ? 0 : precioivames.hashCode());
+		result = prime * result + ((precioperiodicidad == null) ? 0 : precioperiodicidad.hashCode());
 		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
 		return result;
 	}
@@ -168,10 +168,10 @@ public class ListaServiciosItem {
 				return false;
 		} else if (!iva.equals(other.iva))
 			return false;
-		if (precioivames == null) {
-			if (other.precioivames != null)
+		if (precioperiodicidad == null) {
+			if (other.precioperiodicidad != null)
 				return false;
-		} else if (!precioivames.equals(other.precioivames))
+		} else if (!precioperiodicidad.equals(other.precioperiodicidad))
 			return false;
 		if (tipo == null) {
 			if (other.tipo != null)
@@ -187,7 +187,7 @@ public class ListaServiciosItem {
 				+ ", idtiposervicios=" + idtiposervicios + ", idserviciosinstitucion=" + idserviciosinstitucion
 				+ ", descripcion=" + descripcion + ", fechabaja=" + fechabaja + ", automatico=" + automatico
 				+ ", idtipoiva=" + idtipoiva + ", categoria=" + categoria + ", tipo=" + tipo + ", iva=" + iva
-				+ ", precioivames=" + precioivames + ", formapago=" + formapago + "]";
+				+ ", precioperiodicidad=" + precioperiodicidad + ", formapago=" + formapago + "]";
 	}
 	
 }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
-import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.TiposServiciosItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -60,70 +59,240 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 	public String searchListadoServiciosBuscador(String idioma, Short idInstitucion, FiltroServicioItem filtroServicioItem) {
 		SQL sql = new SQL();
 		
-		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.IDINSTITUCION");
-		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.IDSERVICIO");
-		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.IDTIPOSERVICIOS");
-		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.IDSERVICIOSINSTITUCION");
-		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.DESCRIPCION");
-		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.FECHABAJA");
-		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.AUTOMATICO");
-		sql.SELECT_DISTINCT(" PYS_SERVICIOSINSTITUCION.IDTIPOIVA");
-		sql.SELECT_DISTINCT(" F_SIGA_GETRECURSO (PYS_TIPOSERVICIOS.DESCRIPCION, 1) AS CATEGORIA");
-		sql.SELECT_DISTINCT(" PYS_SERVICIOS.DESCRIPCION AS TIPO");
-		sql.SELECT_DISTINCT(" PYS_TIPOIVA.DESCRIPCION AS IVA");
-		sql.SELECT_DISTINCT(" concat(F_siga_formatonumero(ROUND(((PYS_PRECIOSSERVICIOS.VALOR / PYS_PERIODICIDAD.PERIODOSMES)*PYS_TIPOIVA.VALOR / 100)+ (PYS_PRECIOSSERVICIOS.VALOR / PYS_PERIODICIDAD.PERIODOSMES), 2), 2), ' €') AS PRECIO_IVA_MES");
-		sql.SELECT_DISTINCT(" f_siga_getrecurso (PYS_FORMAPAGO.DESCRIPCION, 1) AS FORMA_PAGO");
+		sql.SELECT("  DECODE(\r\n"
+				+ " valor_minimo,\r\n"
+				+ " NULL,\r\n"
+				+ " 'Sin precio',\r\n"
+				+ " (valor_minimo\r\n"
+				+ "  || '/'\r\n"
+				+ " || f_siga_getrecurso(\r\n"
+				+ " perio_min.descripcion,\r\n"
+				+ " 1\r\n"
+				+ " )\r\n"
+				+ " || ' - '\r\n"
+				+ " || valor_maximo\r\n"
+				+ " || '/'\r\n"
+				+ " || f_siga_getrecurso(\r\n"
+				+ " perio_max.descripcion,\r\n"
+				+ " 1\r\n"
+				+ " ) )\r\n"
+				+ " ) precio");
+		sql.SELECT(" servin.idinstitucion");
+		sql.SELECT(" servin.idservicio");
+		sql.SELECT(" servin.idtiposervicios");
+		sql.SELECT(" servin.idserviciosinstitucion");
+		sql.SELECT(" servin.descripcion");
+		sql.SELECT(" servin.fechabaja");
+		sql.SELECT(" servin.automatico");
+		sql.SELECT(" servin.idtipoiva");
+		sql.SELECT(" f_siga_getrecurso(\r\n"
+				+ " tservicio.descripcion,\r\n"
+				+ " 1\r\n"
+				+ " ) AS categoria");
+		sql.SELECT(" servis.descripcion AS tipo");
+		sql.SELECT(" tiva.descripcion AS iva");
+		sql.SELECT(" CASE\r\n"
+				+ " WHEN COUNT(foserv.idformapago) <= 3 THEN\r\n"
+				+ " LISTAGG(\r\n"
+				+ " f_siga_getrecurso(\r\n"
+				+ " fo.descripcion,\r\n"
+				+ " 1\r\n"
+				+ " ),\r\n"
+				+ " ','\r\n"
+				+ " ) WITHIN GROUP(ORDER BY servin.descripcion)\r\n"
+				+ " ELSE TO_CHAR(COUNT(foserv.idformapago) )\r\n"
+				+ " END\r\n"
+				+ " forma_pago");
 		
-		sql.FROM(" PYS_SERVICIOSINSTITUCION");
+		sql.FROM("   (\r\n"
+				+ "	        SELECT\r\n"
+				+ "	            MIN(precioserv_min.valor) valor_minimo,\r\n"
+				+ "	            MIN(precioserv_min.idperiodicidad) id_periodicidad_minima,\r\n"
+				+ "	            MAX(precioserv_max.valor) valor_maximo,\r\n"
+				+ "	            MAX(precioserv_max.idperiodicidad) id_periodicidad_maxima,\r\n"
+				+ "	            servin.idinstitucion,\r\n"
+				+ "	            servin.idservicio,\r\n"
+				+ "	            servin.idtiposervicios,\r\n"
+				+ "	            servin.idserviciosinstitucion\r\n"
+				+ "	        FROM\r\n"
+				+ "	            pys_serviciosinstitucion servin,\r\n"
+				+ "	            pys_preciosservicios precioserv_min,\r\n"
+				+ "	            pys_periodicidad perio_min,\r\n"
+				+ "	            pys_preciosservicios precioserv_max,\r\n"
+				+ "	            pys_periodicidad perio_max\r\n"
+				+ "	        WHERE\r\n"
+				+ "	                servin.idinstitucion = '" + idInstitucion +"'\r\n"
+				+ "	/*and servin.idservicio  = 2\r\n"
+				+ "	AND servin.idtiposervicios  = 12\r\n"
+				+ "	AND servin.idserviciosinstitucion  = 1*/\r\n"
+				+ "	            AND\r\n"
+				+ "	                precioserv_min.idservicio (+) = servin.idservicio\r\n"
+				+ "	            AND\r\n"
+				+ "	                precioserv_min.idtiposervicios (+) = servin.idtiposervicios\r\n"
+				+ "	            AND\r\n"
+				+ "	                precioserv_min.idserviciosinstitucion (+) = servin.idserviciosinstitucion\r\n"
+				+ "	            AND\r\n"
+				+ "	                precioserv_min.idinstitucion (+) = servin.idinstitucion\r\n"
+				+ "	            AND\r\n"
+				+ "	                perio_min.idperiodicidad (+) = precioserv_min.idperiodicidad\r\n"
+				+ "	            AND\r\n"
+				+ "	                ( precioserv_min.valor / perio_min.periodosmes ) = (\r\n"
+				+ "	                    SELECT\r\n"
+				+ "	                        MIN(precioserv.valor / perio.periodosmes)\r\n"
+				+ "	                    FROM\r\n"
+				+ "	                        pys_preciosservicios precioserv,\r\n"
+				+ "	                        pys_periodicidad perio\r\n"
+				+ "	                    WHERE\r\n"
+				+ "	                            precioserv.idservicio (+) = servin.idservicio\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            precioserv.idtiposervicios (+) = servin.idtiposervicios\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            precioserv.idserviciosinstitucion (+) = servin.idserviciosinstitucion\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            precioserv.idinstitucion (+) = servin.idinstitucion\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            perio.idperiodicidad (+) = precioserv.idperiodicidad\r\n"
+				+ "	                )\r\n"
+				+ "	            AND\r\n"
+				+ "	                precioserv_max.idservicio (+) = servin.idservicio\r\n"
+				+ "	            AND\r\n"
+				+ "	                precioserv_max.idtiposervicios (+) = servin.idtiposervicios\r\n"
+				+ "	            AND\r\n"
+				+ "	                precioserv_max.idserviciosinstitucion (+) = servin.idserviciosinstitucion\r\n"
+				+ "	            AND\r\n"
+				+ "	                precioserv_max.idinstitucion (+) = servin.idinstitucion\r\n"
+				+ "	            AND\r\n"
+				+ "	                perio_max.idperiodicidad (+) = precioserv_max.idperiodicidad\r\n"
+				+ "	            AND\r\n"
+				+ "	                ( precioserv_max.valor / perio_max.periodosmes ) = (\r\n"
+				+ "	                    SELECT\r\n"
+				+ "	                        MAX(precioserv.valor / perio.periodosmes)\r\n"
+				+ "	                    FROM\r\n"
+				+ "	                        pys_preciosservicios precioserv,\r\n"
+				+ "	                        pys_periodicidad perio\r\n"
+				+ "	                    WHERE\r\n"
+				+ "	                            precioserv.idservicio (+) = servin.idservicio\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            precioserv.idtiposervicios (+) = servin.idtiposervicios\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            precioserv.idserviciosinstitucion (+) = servin.idserviciosinstitucion\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            precioserv.idinstitucion (+) = servin.idinstitucion\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            perio.idperiodicidad (+) = precioserv.idperiodicidad\r\n"
+				+ "	                )\r\n"
+				+ "	        GROUP BY\r\n"
+				+ "	            servin.idinstitucion,\r\n"
+				+ "	            servin.idservicio,\r\n"
+				+ "	            servin.idtiposervicios,\r\n"
+				+ "	            servin.idserviciosinstitucion\r\n"
+				+ "	        UNION\r\n"
+				+ "	        SELECT\r\n"
+				+ "	            NULL,\r\n"
+				+ "	            NULL,\r\n"
+				+ "	            NULL,\r\n"
+				+ "	            NULL,\r\n"
+				+ "	            servin.idinstitucion,\r\n"
+				+ "	            servin.idservicio,\r\n"
+				+ "	            servin.idtiposervicios,\r\n"
+				+ "	            servin.idserviciosinstitucion\r\n"
+				+ "	        FROM\r\n"
+				+ "	            pys_serviciosinstitucion servin\r\n"
+				+ "	        WHERE\r\n"
+				+ "	                servin.idinstitucion = '" + idInstitucion + "'\r\n"
+				+ "	            AND NOT\r\n"
+				+ "	                EXISTS (\r\n"
+				+ "	                    SELECT\r\n"
+				+ "	                        1\r\n"
+				+ "	                    FROM\r\n"
+				+ "	                        pys_preciosservicios precioserv_min\r\n"
+				+ "	                    WHERE\r\n"
+				+ "	                            precioserv_min.idservicio = servin.idservicio\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            precioserv_min.idtiposervicios = servin.idtiposervicios\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            precioserv_min.idserviciosinstitucion = servin.idserviciosinstitucion\r\n"
+				+ "	                        AND\r\n"
+				+ "	                            precioserv_min.idinstitucion = servin.idinstitucion\r\n"
+				+ "	                )\r\n"
+				+ "	    ) a");
+		sql.FROM(" pys_periodicidad perio_min");
+		sql.FROM(" pys_periodicidad perio_max");
+		sql.FROM(" pys_serviciosinstitucion servin");
+		sql.FROM(" pys_tipoiva tiva");
+		sql.FROM(" pys_tiposervicios tservicio");
+		sql.FROM(" pys_servicios servis");
+		sql.FROM(" pys_formapagoservicios foserv");
+		sql.FROM(" pys_formapago fo");
+		if(filtroServicioItem.getFormaPago() != null && filtroServicioItem.getFormaPago() != "")
+			sql.FROM(" pys_formapagoservicios foserv2");
 		
-		sql.INNER_JOIN(" PYS_TIPOSERVICIOS ON PYS_SERVICIOSINSTITUCION.IDTIPOSERVICIOS = PYS_TIPOSERVICIOS.IDTIPOSERVICIOS");
-		sql.INNER_JOIN(" PYS_SERVICIOS ON PYS_SERVICIOSINSTITUCION.IDTIPOSERVICIOS = PYS_SERVICIOS.IDTIPOSERVICIOS\r\n"
-				+ " AND PYS_SERVICIOSINSTITUCION.IDSERVICIO = PYS_SERVICIOS.IDSERVICIO\r\n"
-				+ " AND PYS_SERVICIOSINSTITUCION.IDINSTITUCION = PYS_SERVICIOS.IDINSTITUCION");
-		sql.INNER_JOIN(" PYS_TIPOIVA ON\r\n"
-				+ " PYS_SERVICIOSINSTITUCION.IDTIPOIVA = PYS_TIPOIVA.IDTIPOIVA");
-		sql.JOIN(" PYS_FORMAPAGOSERVICIOS ON PYS_SERVICIOSINSTITUCION.IDTIPOSERVICIOS = PYS_FORMAPAGOSERVICIOS.IDTIPOSERVICIOS\r\n"
-				+ " AND PYS_SERVICIOSINSTITUCION.IDSERVICIO = PYS_FORMAPAGOSERVICIOS.IDSERVICIO\r\n"
-				+ " AND PYS_SERVICIOSINSTITUCION.IDINSTITUCION = PYS_FORMAPAGOSERVICIOS.IDINSTITUCION\r\n"
-				+ " AND PYS_SERVICIOSINSTITUCION.IDSERVICIOSINSTITUCION = PYS_FORMAPAGOSERVICIOS.IDSERVICIOSINSTITUCION");
-		sql.JOIN(" PYS_PRECIOSSERVICIOS ON PYS_SERVICIOSINSTITUCION.IDSERVICIO = PYS_PRECIOSSERVICIOS.IDSERVICIO\r\n"
-				+ " AND PYS_SERVICIOSINSTITUCION.IDTIPOSERVICIOS = PYS_PRECIOSSERVICIOS.IDTIPOSERVICIOS\r\n"
-				+ " AND PYS_SERVICIOSINSTITUCION.IDSERVICIOSINSTITUCION = PYS_PRECIOSSERVICIOS.IDSERVICIOSINSTITUCION\r\n"
-				+ " AND PYS_SERVICIOSINSTITUCION.IDINSTITUCION = PYS_PRECIOSSERVICIOS.IDINSTITUCION");
-		sql.JOIN(" PYS_PERIODICIDAD ON PYS_PRECIOSSERVICIOS.IDPERIODICIDAD = PYS_PERIODICIDAD.IDPERIODICIDAD");
-		sql.JOIN(" PYS_FORMAPAGO ON PYS_FORMAPAGO.IDFORMAPAGO = PYS_FORMAPAGOSERVICIOS.IDFORMAPAGO ");
+		sql.WHERE(" perio_min.idperiodicidad (+) = a.id_periodicidad_minima");
+		sql.WHERE(" perio_max.idperiodicidad (+) = a.id_periodicidad_maxima");
+		sql.WHERE(" servin.idinstitucion = a.idinstitucion");
+		sql.WHERE(" servin.idtiposervicios = a.idtiposervicios");
+		sql.WHERE(" servin.idserviciosinstitucion = a.idserviciosinstitucion");
+		sql.WHERE(" servin.idservicio = a.idservicio");
+		sql.WHERE(" tiva.idtipoiva (+) = servin.idtipoiva");
+		sql.WHERE(" tservicio.idtiposervicios (+) = servin.idtiposervicios");
+		sql.WHERE(" servis.idservicio (+) = servin.idservicio");
+		sql.WHERE(" servis.idtiposervicios (+) = servin.idtiposervicios");
+		sql.WHERE(" servis.idinstitucion (+) = servin.idinstitucion");
+		sql.WHERE(" foserv.idinstitucion (+) = servin.idinstitucion");
+		sql.WHERE(" foserv.idtiposervicios (+) = servin.idtiposervicios");
+		sql.WHERE(" foserv.idservicio (+) = servin.idservicio");
+		sql.WHERE(" foserv.idserviciosinstitucion (+) = servin.idserviciosinstitucion");
+		sql.WHERE(" fo.idformapago (+) = foserv.idformapago");
 		
-		sql.WHERE(" PYS_SERVICIOSINSTITUCION.IDINSTITUCION = '" + idInstitucion +"'");
+		if(filtroServicioItem.getFormaPago() != null && filtroServicioItem.getFormaPago() != "") {
+			sql.WHERE(" foserv2.idinstitucion = servin.idinstitucion");
+			sql.WHERE(" foserv2.idtiposervicios = servin.idtiposervicios");
+			sql.WHERE(" foserv2.idservicio = servin.idservicio");
+			sql.WHERE(" foserv2.idserviciosinstitucion = servin.idserviciosinstitucion");
+			sql.WHERE(" foserv2.IDFORMAPAGO = '" + filtroServicioItem.getFormaPago() + "'");
+		}
 		
 		if(filtroServicioItem.getTipoSuscripcion() != null && filtroServicioItem.getTipoSuscripcion() != "")
-			sql.WHERE(" PYS_SERVICIOSINSTITUCION.AUTOMATICO = = '" + filtroServicioItem.getTipoSuscripcion() + "'");
+			sql.WHERE(" servin.AUTOMATICO = '" + filtroServicioItem.getTipoSuscripcion() + "'");
 		
 		if(filtroServicioItem.getCategoria() != null && filtroServicioItem.getCategoria() != "")
-			sql.WHERE("  PYS_SERVICIOSINSTITUCION.IDTIPOSERVICIOS = '" + filtroServicioItem.getCategoria() + "'");
+			sql.WHERE("  servin.IDTIPOSERVICIOS = '" + filtroServicioItem.getCategoria() + "'");
 		
 		if(filtroServicioItem.getTipo() != null && filtroServicioItem.getTipo() != "")
-			sql.WHERE(" PYS_SERVICIOSINSTITUCION.IDSERVICIO = '" + filtroServicioItem.getTipo() + "'");
-		
-		if(filtroServicioItem.getFormaPago() != null && filtroServicioItem.getFormaPago() != "")
-			sql.WHERE(" PYS_FORMAPAGOSERVICIOS.IDFORMAPAGO = '" + filtroServicioItem.getFormaPago() + "'");
+			sql.WHERE(" servin.IDSERVICIO = '" + filtroServicioItem.getTipo() + "'");
 		
 		if(filtroServicioItem.getCodigo() != null && filtroServicioItem.getCodigo() != "")
-			sql.WHERE(" PYS_SERVICIOSINSTITUCION.CODIGO_TRASPASONAV = " + filtroServicioItem.getCodigo() + "')");
+			sql.WHERE(" servin.CODIGOEXT = " + filtroServicioItem.getCodigo() + "')");
 		
 		if(filtroServicioItem.getIva() != null && filtroServicioItem.getIva() != "")
-			sql.WHERE(" PYS_SERVICIOSINSTITUCION.IDTIPOIVA = '" + filtroServicioItem.getIva() + "'");
+			sql.WHERE(" servin.IDTIPOIVA = '" + filtroServicioItem.getIva() + "'");
 		
 		if(filtroServicioItem.getServicio() != null && filtroServicioItem.getServicio() != "")
-			sql.WHERE(" regexp_like(PYS_SERVICIOSINSTITUCION.DESCRIPCION,'" + filtroServicioItem.getServicio() + "')");
+			sql.WHERE(" regexp_like(servin.DESCRIPCION,'" + filtroServicioItem.getServicio() + "')");
 		
 		if(filtroServicioItem.getPrecioDesde() != null && filtroServicioItem.getPrecioDesde() != "")
-			sql.WHERE(" F_siga_formatonumero(ROUND(((PYS_PRECIOSSERVICIOS.VALOR / PYS_PERIODICIDAD.PERIODOSMES)*PYS_TIPOIVA.VALOR / 100)+ (PYS_PRECIOSSERVICIOS.VALOR / PYS_PERIODICIDAD.PERIODOSMES), 2), 2)  >= " + Float.parseFloat(filtroServicioItem.getPrecioDesde()) + "");
+			sql.WHERE(" F_siga_formatonumero(ROUND(((precioserv.VALOR / perio.PERIODOSMES)*PYS_TIPOIVA.VALOR / 100)+ (precioserv.VALOR / perio.PERIODOSMES), 2), 2)  >= " + Float.parseFloat(filtroServicioItem.getPrecioDesde()) + "");
 	
 		if(filtroServicioItem.getPrecioHasta() != null && filtroServicioItem.getPrecioHasta() != "")
-			sql.WHERE(" F_siga_formatonumero(ROUND(((PYS_PRECIOSSERVICIOS.VALOR / PYS_PERIODICIDAD.PERIODOSMES)*PYS_TIPOIVA.VALOR / 100)+ (PYS_PRECIOSSERVICIOS.VALOR / PYS_PERIODICIDAD.PERIODOSMES), 2), 2)  <= " + Float.parseFloat(filtroServicioItem.getPrecioHasta()) + "");
+			sql.WHERE(" F_siga_formatonumero(ROUND(((precioserv.VALOR / perio.PERIODOSMES)*PYS_TIPOIVA.VALOR / 100)+ (precioserv.VALOR / perio.PERIODOSMES), 2), 2)  <= " + Float.parseFloat(filtroServicioItem.getPrecioHasta()) + "");
 
-
-		sql.ORDER_BY(" PYS_SERVICIOSINSTITUCION.DESCRIPCION");
+		sql.GROUP_BY(" valor_minimo");
+		sql.GROUP_BY(" perio_min.descripcion");
+		sql.GROUP_BY(" valor_maximo");
+		sql.GROUP_BY(" perio_max.descripcion");
+		sql.GROUP_BY(" servin.idinstitucion");
+		sql.GROUP_BY(" servin.idservicio");
+		sql.GROUP_BY(" servin.idtiposervicios");
+		sql.GROUP_BY(" servin.idserviciosinstitucion");
+		sql.GROUP_BY(" servin.fechabaja");
+		sql.GROUP_BY(" servin.idtipoiva");
+		sql.GROUP_BY(" tservicio.descripcion");
+		sql.GROUP_BY(" servin.descripcion");
+		sql.GROUP_BY(" servin.automatico");
+		sql.GROUP_BY(" tiva.descripcion");
+		sql.GROUP_BY(" servis.descripcion");
+			
+		sql.ORDER_BY(" servin.DESCRIPCION");
 		
 		return sql.toString();
 	}
