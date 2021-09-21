@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem2;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.JuzgadoItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -553,7 +554,7 @@ public class ComboServiceImpl implements ComboService {
 
 	}
 
-	public ComboDTO getComboPartidasPresupuestarias(HttpServletRequest request) {
+	public ComboDTO getComboPartidasPresupuestarias(HttpServletRequest request, String importe) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);

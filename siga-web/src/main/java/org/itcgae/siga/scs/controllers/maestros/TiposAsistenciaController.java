@@ -34,10 +34,19 @@ public class TiposAsistenciaController {
 		return new ResponseEntity<TiposAsistenciasDTO>(response, HttpStatus.OK);
 	}
 	
+	/*
 	@RequestMapping(value = "/gestionTiposAsistencia/ComboTiposAsistencia",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getTiposGuardia(HttpServletRequest request) {
 		ComboDTO response = TiposAsistenciaService.getTiposGuardia(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		
+	}
+	*/
+	@RequestMapping(value = "/gestionTiposAsistencia/ComboTiposAsistencia",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTiposGuardia(HttpServletRequest request) {
+		ComboDTO response = TiposAsistenciaService.getComboAsistencia(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		
 	}
 	
 	@RequestMapping(value = "/gestionTiposAsistencia/deleteTipoAsitencia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

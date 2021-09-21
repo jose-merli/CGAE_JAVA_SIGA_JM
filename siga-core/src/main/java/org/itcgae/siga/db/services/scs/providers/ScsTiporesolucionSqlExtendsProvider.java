@@ -23,5 +23,4 @@ public class ScsTiporesolucionSqlExtendsProvider extends ScsTiporesolucionSqlPro
 		return sql.toString();
 	}
 	
-	
 }

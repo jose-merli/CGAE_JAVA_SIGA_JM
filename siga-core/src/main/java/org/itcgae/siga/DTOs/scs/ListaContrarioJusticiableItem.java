@@ -10,13 +10,16 @@ public class ListaContrarioJusticiableItem {
 	private String numero;
 	private String nif;
 	private String abogado;
-	private String procurador;
+	
 	private String apellidosnombre;
 	private String idPersona;
 	private String representante;
 	private Date fechaBaja;
 	private String idabogadocontrario;
+	
 	private String idprocurador;
+	private String procurador;
+	private String idInstitucionProc;
 	
 	public String getIdPersona() {
 		return idPersona;
@@ -95,6 +98,12 @@ public class ListaContrarioJusticiableItem {
 	}
 	public void setIdprocurador(String idprocurador) {
 		this.idprocurador = idprocurador;
+	}
+	public String getIdInstitucionProc() {
+		return idInstitucionProc;
+	}
+	public void setIdInstitucionProc(String idInstitucionProc) {
+		this.idInstitucionProc = idInstitucionProc;
 	}
 	
 	

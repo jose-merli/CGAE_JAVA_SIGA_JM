@@ -34,12 +34,13 @@ public class ScsDesignasLetradoSqlExtendsProvider extends ScsDesignasletradoSqlP
 		sql2.SELECT("MAX(LET2.Fechadesigna)");
 		sql2.FROM("SCS_DESIGNASLETRADO LET2");
 		sql2.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
-		sql2.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
 		sql2.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
 		sql2.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
 		sql2.WHERE("TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)");
 
-		sql.WHERE("(DESIGNALETRADO.fecharenuncia is null or DESIGNALETRADO.Fechadesigna = (" + sql2 + "))");
+		sql.WHERE("(DESIGNALETRADO.fecharenunciasolicita is null)");
+		//or DESIGNALETRADO.Fechadesigna = (" + sql2 + "))");
+		sql.WHERE("ROWNUM <= 1");
 		sql.ORDER_BY("DESIGNALETRADO.fechadesigna");
 		return sql.toString();
 	}

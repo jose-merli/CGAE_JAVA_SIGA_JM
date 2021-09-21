@@ -89,6 +89,20 @@ public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 	sql.ORDER_BY("comisaria.NOMBRE");
 
 	return sql.toString();
-}
+	}
+	
+	public String comboCDetencion(Short idInstitucion) {
 
+		SQL sql = new SQL();
+
+		sql.SELECT("comisaria.IDCOMISARIA");
+		sql.SELECT("comisaria.nombre || ' [' || comisaria.CODIGOEXT || ']' as cdetencion");
+		sql.FROM("SCS_COMISARIA comisaria");
+		sql.WHERE("comisaria.fechabaja is null");
+		sql.WHERE("comisaria.idinstitucion = " + idInstitucion);
+		sql.ORDER_BY("cdetencion");
+
+		return sql.toString();
+		}
+	
 }

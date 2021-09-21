@@ -45,4 +45,19 @@ public class ScsDocumentoejgSqlExtendsProvider extends ScsDocumentoejgSqlProvide
 		return sql.toString();
 	}
 	
+	public String comboDocumentos(String idLenguaje, Short idInstitucion, String idTipoDocumentacion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("DOCUMENTOEJG.IDDOCUMENTOEJG");
+		sql.SELECT("catalogoDOCUMENTOEJG.DESCRIPCION");
+
+		sql.FROM("scs_DOCUMENTOEJG DOCUMENTOEJG");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoDOCUMENTOEJG on catalogoDOCUMENTOEJG.idrecurso = DOCUMENTOEJG.DESCRIPCION and catalogoDOCUMENTOEJG.idlenguaje ="+idLenguaje);
+		sql.WHERE("DOCUMENTOEJG.fechabaja is null");
+		sql.WHERE("DOCUMENTOEJG.idinstitucion ='"+String.valueOf(idInstitucion)+"'");
+		sql.WHERE("DOCUMENTOEJG.idtipodocumentoejg ='"+String.valueOf(idTipoDocumentacion)+"'");
+		sql.ORDER_BY("descripcion");
+		return sql.toString();
+	}
+	
 }

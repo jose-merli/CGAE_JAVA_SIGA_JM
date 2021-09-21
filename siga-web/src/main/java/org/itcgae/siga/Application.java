@@ -4,6 +4,7 @@ import org.itcgae.siga.swagger.config.SwaggerConfig;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -15,10 +16,10 @@ import org.springframework.web.WebApplicationInitializer;
 @Import(SwaggerConfig.class)
 public class Application extends SpringBootServletInitializer implements WebApplicationInitializer {
 	
-//	@Override
-//    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-//        return application.sources(Application.class);
-//    }
+	@Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Application.class);
+    }
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Application.class, args);
