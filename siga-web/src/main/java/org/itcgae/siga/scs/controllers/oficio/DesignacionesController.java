@@ -25,6 +25,9 @@ import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
+import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
+import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListDTO;
@@ -39,6 +42,8 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -385,9 +390,9 @@ public class DesignacionesController {
 	// 3.3.6.2.5. Tarjeta Datos Facturación
 
 	@RequestMapping(value = "/designas/comboPartidaPresupuestaria", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboPartidaPresupuestaria(HttpServletRequest request) {
+	ResponseEntity<ComboDTO> comboPartidaPresupuestaria(HttpServletRequest request, String importe) {
 
-		ComboDTO response = comboService.getComboPartidasPresupuestarias(request);
+		ComboDTO response = comboService.getComboPartidasPresupuestarias(request, importe);
 		if (response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
@@ -579,17 +584,21 @@ public class DesignacionesController {
 
 		}
 
-		//[ designa.idInstitucion,  justiciable.idPersona, designa.anio,  designa.idTurno, designa.numero, representante]
+		// [designa.idInstitucion, sessionStorage.getItem("personaDesigna"), designa.ano, designa.numero, designa.idTurno, this.generalBody.idProcurador, this.generalBody.idInstitucion]
 		@RequestMapping(value = "/designas/updateProcuradorContrario", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 		ResponseEntity<UpdateResponseDTO> updateProcuradorContrario(@RequestBody String[] item, HttpServletRequest request) {
-			String anio = item[2].substring(1,5);
+//		ResponseEntity<UpdateResponseDTO> updateProcuradorContrario(@RequestBody ScsContrariosdesigna contrario, HttpServletRequest request) {
 			ScsContrariosdesigna contrario = new ScsContrariosdesigna();
 			contrario.setIdinstitucion(Short.parseShort(item[0]));
 			contrario.setIdpersona(Long.parseLong(item[1]));
+			String anio = item[2].substring(1,5);
 			contrario.setAnio(Short.parseShort(anio));
-			contrario.setIdturno(Integer.parseInt(item[3]));
-			contrario.setNumero(Long.parseLong(item[4]));
-			contrario.setNombrerepresentante(item[5]);
+			contrario.setNumero(Long.parseLong(item[3]));
+			contrario.setIdturno(Integer.parseInt(item[4]));
+			if(item[5]!=null)contrario.setIdprocurador(Long.valueOf(item[5]));
+			else contrario.setIdprocurador(null);
+			if(item[6]!=null)contrario.setIdinstitucionProcu(Short.parseShort(item[6]));
+			else contrario.setIdinstitucionProcu(null);
 			UpdateResponseDTO response = designacionesService.updateProcuradorContrario(contrario, request);
 			if (response.getError().getCode() == 200)
 				return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -698,7 +707,7 @@ public class DesignacionesController {
 	@RequestMapping(value = "/designas/updateLetradoDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(
 			@RequestBody String[] item,
-			HttpServletRequest request) throws ParseException {
+			HttpServletRequest request) throws Exception {
 		
 		String anio = item[0].substring(1, 5);
 		
@@ -706,7 +715,7 @@ public class DesignacionesController {
 		designa.setAnio(Short.parseShort(anio));
 		designa.setIdturno(Integer.parseInt(item[1]));
 		designa.setNumero(Long.parseLong(item[2]));
-		
+		designa.setArt27(item[12]);
 		
 		ScsDesignasletrado letradoSaliente = new ScsDesignasletrado();
 		letradoSaliente.setIdpersona(Long.parseLong(item[3]));
@@ -885,21 +894,10 @@ public class DesignacionesController {
 		ComboDTO response = designacionesService.comboTipoMotivo(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
-
-	@RequestMapping(value = "/designas/guardarProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-
-	ResponseEntity<UpdateResponseDTO> guardarProcurador(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
-		UpdateResponseDTO response = designacionesService.guardarProcurador(procuradorItem, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
 	
 
 	@RequestMapping(value = "/designas/guardarProcuradorEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-
-	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> guardarProcuradorEJG(@RequestBody  ProcuradorItem procuradorItem, HttpServletRequest request) {
 		UpdateResponseDTO response = designacionesService.guardarProcuradorEJG(procuradorItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
@@ -913,29 +911,20 @@ public class DesignacionesController {
 		return new ResponseEntity<ProcuradorDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/designas/nuevoProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/designas/guardarProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> nuevoProcurador(@RequestBody ProcuradorItem procuradorItem,
 			HttpServletRequest request) {
-		InsertResponseDTO response = designacionesService.nuevoProcurador(procuradorItem, request);
-		if (response.getError().getCode() == 200)
+		InsertResponseDTO response = designacionesService.guardarProcurador(procuradorItem, request);
+		if (response.getStatus()=="OK")
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/designas/compruebaFechaProcurador",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ProcuradorDTO> compruebaFechaProcurador(@RequestBody List<String> procurador, HttpServletRequest request) {
+	ResponseEntity<ProcuradorDTO> compruebaFechaProcurador(@RequestBody ProcuradorItem procurador, HttpServletRequest request) {
 		ProcuradorDTO response = designacionesService.compruebaFechaProcurador(procurador, request);
 		return new ResponseEntity<ProcuradorDTO>(response, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/designas/actualizarProcurador", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> actualizarProcurador(@RequestBody  List<String> procuradorItem, HttpServletRequest request) {
-		UpdateResponseDTO response = designacionesService.actualizarProcurador(procuradorItem, request);
-		if (response.getError().getCode() == 200)
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@GetMapping("/comboPrisiones")
@@ -950,10 +939,17 @@ public class DesignacionesController {
 		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping(value = "/designas/eliminarRelacion", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/designas/eliminarRelacion",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<DeleteResponseDTO> eliminarRelacion(
-			@RequestBody RelacionesItem listaRelaciones, HttpServletRequest request) {
+			@RequestBody List<String> listaRelaciones, HttpServletRequest request) {
 		DeleteResponseDTO response = designacionesService.eliminarRelacion(listaRelaciones, request);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/designas/eliminarRelacionAsistenciaDesigna",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> eliminarRelacionAsistenciaDesigna(
+			@RequestBody RelacionesItem listaRelaciones, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.eliminarRelacionAsistenciaDesigna(listaRelaciones, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
@@ -1028,11 +1024,30 @@ public class DesignacionesController {
 		return response;
 	}
 	
+	@PostMapping(value = "/designas/asociarEjgDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> asociarEjgDesigna(@RequestBody List<String> designaItem, HttpServletRequest request) {
+		InsertResponseDTO response = designacionesService.asociarEjgDesigna(designaItem, request);
+
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/designas/asociarAsistenciaDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> asociarAsistenciaDesigna(@RequestBody List<String> designaItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.asociarAsistenciaDesigna(designaItem, request);
+
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@PostMapping(value = "/designas/actualizarPartidaPresupuestariaActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> actualizarPartidaPresupuestariaActDesigna(
-			@RequestBody ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request) {
-		UpdateResponseDTO response = designacionesService
-				.actualizarPartidaPresupuestariaActDesigna(actuacionDesignaItem, request);
+	ResponseEntity<UpdateResponseDTO> actualizarPartidaPresupuestariaActDesigna(@RequestBody ActuacionDesignaItem actuacionDesignaItem, HttpServletRequest request) {
+		UpdateResponseDTO response = designacionesService.actualizarPartidaPresupuestariaActDesigna(actuacionDesignaItem, request);
+		
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
@@ -1042,4 +1057,31 @@ public class DesignacionesController {
 		return new ResponseEntity<ListDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/designas/getPreDesignaEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> getPreDesignaEJG(@RequestBody ScsEjgdesigna datos, HttpServletRequest request) throws Exception {
+		InsertResponseDTO response = designacionesService.getPreDesignaEJG(datos, request);
+		if (response.getStatus().equals("OK"))
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/designas/getEjgDesigna", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EjgDesignaDTO> getEjgDesigna(HttpServletRequest request, String idTurno, String ano, String numero ) {
+		DesignaItem designa = new DesignaItem();
+		designa.setIdTurno(Integer.valueOf(idTurno));
+		designa.setAno(Integer.valueOf(ano));
+		designa.setNumero(Integer.valueOf(numero));
+		EjgDesignaDTO response = designacionesService.getEjgDesigna(designa, request);
+		return new ResponseEntity<EjgDesignaDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getEJG", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ScsEjg> comboTipoEJG(HttpServletRequest request, String numEjg, String anioEjg) {
+		EjgItem item = new EjgItem();
+		item.setAnnio(anioEjg);
+		item.numEjg(numEjg);
+		ScsEjg response = designacionesService.getEJG(item, request);
+		return new ResponseEntity<ScsEjg>(response, HttpStatus.OK);
+	}
 }

@@ -130,8 +130,8 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAPRESENTACION", property = "fechapresentacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR)
-
+			@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "COLEGIORESULTADO", property = "colegioResultado", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ColegiadoItem> selectColegiadosByIdPersona(Short idInstitucion, String idPersona);
 
@@ -282,6 +282,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "busquedaColegiadosSJCS")
 	@Results({ 
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),

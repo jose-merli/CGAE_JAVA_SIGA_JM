@@ -95,7 +95,7 @@
 	    <dependency>
 			<groupId>org.redabogacia</groupId>
 			<artifactId>registro-sociedades</artifactId>
-			<version>1.1.4</version>
+			<version>1.1.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
@@ -148,6 +148,13 @@
 			<artifactId>fusionador-personas</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+<!-- 		<dependency> -->
+<!--     		<groupId>org.redabogacia.plataforma-firma-core</groupId> -->
+<!-- 		    <artifactId>plataformaFirmaCore</artifactId> -->
+<!-- 		    <version>3.1.0</version> -->
+<!-- 		    <scope>system</scope> -->
+<!-- 		    <systemPath>C:\\Users\\Jesus\\.m2\\repository\\org\\redabogacia\\plataforma-firma-core\\plataformaFirmaCore\\3.1.0\\plataformaFirmaCore.jar</systemPath> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.redabogacia.jdom-b9</groupId>
 			<artifactId>jdom</artifactId>
