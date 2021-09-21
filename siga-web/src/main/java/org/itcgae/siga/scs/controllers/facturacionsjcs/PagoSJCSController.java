@@ -52,6 +52,12 @@ public class PagoSJCSController {
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/deletePago")
+    ResponseEntity<DeleteResponseDTO> deletePago(@RequestBody PagosjgItem pagosjgItem, HttpServletRequest request) {
+        DeleteResponseDTO response = iPagoSJCSService.deletePago(pagosjgItem, request);
+        return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+    }
+
     @PostMapping("/ejecutarPagoSJCS")
     ResponseEntity<InsertResponseDTO> ejecutarPagoSJCS(@RequestBody PagosjgItem pagosjgItem, HttpServletRequest request) {
         InsertResponseDTO response = iPagoSJCSService.ejecutarPagoSJCS(pagosjgItem.getIdPagosjg(), request);
