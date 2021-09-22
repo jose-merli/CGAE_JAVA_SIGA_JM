@@ -144,4 +144,12 @@ public interface GuardiasService {
 	public UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarbody,
 			HttpServletRequest request);
 
+	GuardiasDTO busquedaGuardiasColegiado(GuardiasItem guardiaItem, HttpServletRequest request);
+
+	public UpdateResponseDTO validarSolicitudGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
+
+	public UpdateResponseDTO desvalidarGuardiaColegiado(GuardiasItem guardiasItem, HttpServletRequest request);
+
+	public DeleteResponseDTO eliminarGuardiaColegiado(GuardiasItem guardiasItem, HttpServletRequest request);
+
 }
