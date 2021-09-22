@@ -5429,29 +5429,48 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					actuacionDesignaItem = listaActuacionDesignaItem.get(0);
 
 					AdmUsuariosExample exampleUsuario = null;
+					List<AdmUsuarios> listaUsuarios = null;
 
 					if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getUsuCreacion())) {
 						exampleUsuario = new AdmUsuariosExample();
 						exampleUsuario.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 								.andIdusuarioEqualTo(Integer.valueOf(actuacionDesignaItem.getUsuCreacion()));
-						actuacionDesignaItem.setUsuCreacion(
-								admUsuariosExtendsMapper.selectByExample(exampleUsuario).get(0).getDescripcion());
+						listaUsuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuario);
+						if(listaUsuarios!=null && !listaUsuarios.isEmpty()) {
+							actuacionDesignaItem.setUsuCreacion(listaUsuarios.get(0).getDescripcion());
+						}else {
+							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+						}
+					}else {
+						actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
 					}
 
 					if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getUsuJustificacion())) {
 						exampleUsuario = new AdmUsuariosExample();
 						exampleUsuario.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 								.andIdusuarioEqualTo(Integer.valueOf(actuacionDesignaItem.getUsuJustificacion()));
-						actuacionDesignaItem.setUsuJustificacion(
-								admUsuariosExtendsMapper.selectByExample(exampleUsuario).get(0).getDescripcion());
+						listaUsuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuario);
+						if(listaUsuarios!=null && !listaUsuarios.isEmpty()) {
+							actuacionDesignaItem.setUsuJustificacion(listaUsuarios.get(0).getDescripcion());
+						}else {
+							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+						}
+					}else {
+						actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
 					}
 
 					if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getUsuValidacion())) {
 						exampleUsuario = new AdmUsuariosExample();
 						exampleUsuario.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 								.andIdusuarioEqualTo(Integer.valueOf(actuacionDesignaItem.getUsuValidacion()));
-						actuacionDesignaItem.setUsuValidacion(
-								admUsuariosExtendsMapper.selectByExample(exampleUsuario).get(0).getDescripcion());
+						listaUsuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuario);
+						if(listaUsuarios!=null && !listaUsuarios.isEmpty()) {
+							actuacionDesignaItem.setUsuValidacion(listaUsuarios.get(0).getDescripcion());
+						}else {
+							actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
+						}
+					}else {
+						actuacionDesignaItem.setUsuCreacion(usuarios.get(0).getDescripcion());
 					}
 
 				}
