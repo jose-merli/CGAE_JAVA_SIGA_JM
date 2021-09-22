@@ -11,6 +11,10 @@ public class EJGRemesaItem {
 	private String solicitante;
 	private int nuevaRemesa;
 	private String estadoRemesa;
+	private int numIncidencias;
+	private int incidenciasAntesEnvio;
+	private int incidenciasDespuesEnvio;
+	private String incidencias;
 	
 	public String getIdentificadorEJG() {
 		return identificadorEJG;
@@ -90,5 +94,38 @@ public class EJGRemesaItem {
 	
 	public void setEstadoRemesa(String estadoRemesa) {
 		this.estadoRemesa = estadoRemesa;
+	}
+
+	public int getNumIncidencias() {
+		return numIncidencias;
+	}
+
+	public void setNumIncidencias(int numIncidencias) {
+		this.numIncidencias = numIncidencias;
+	}
+
+	public int getIncidenciasAntesEnvio() {
+		return incidenciasAntesEnvio;
+	}
+
+	public void setIncidenciasAntesEnvio(int incidenciasAntesEnvio) {
+		this.incidenciasAntesEnvio = incidenciasAntesEnvio;
+	}
+
+	public int getIncidenciasDespuesEnvio() {
+		return incidenciasDespuesEnvio;
+	}
+
+	public void setIncidenciasDespuesEnvio(int incidenciasDespuesEnvio) {
+		this.incidenciasDespuesEnvio = incidenciasDespuesEnvio;
+	}
+
+	public String getIncidencias() {
+		return incidencias;
+	}
+
+	public void setIncidencias(String incidencias) {
+		this.incidencias = incidencias;
 	} 
+	
 }

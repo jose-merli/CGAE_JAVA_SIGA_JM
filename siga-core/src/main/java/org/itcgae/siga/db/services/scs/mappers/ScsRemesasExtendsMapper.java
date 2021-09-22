@@ -34,7 +34,6 @@ public interface ScsRemesasExtendsMapper{
 		@Result(column = "PREFIJO", property = "prefijo", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "SUFIJO", property = "sufijo", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "NREGISTRO", property = "nRegistro", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHA_GENERACION", property = "fechaGeneracion", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHA_ENVIO", property = "fechaEnvio", jdbcType = JdbcType.DATE),
@@ -81,7 +80,10 @@ public interface ScsRemesasExtendsMapper{
 		@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SOLICITANTE", property = "solicitante", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUEVAREMESA", property = "nuevaRemesa", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "ESTADOREMESA", property = "estadoRemesa", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "ESTADOREMESA", property = "estadoRemesa", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMERO_INCIDENCIAS", property = "numIncidencias", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "INCIDENCIAS_ANTES_ENVIO", property = "incidenciasAntesEnvio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "INCIDENCIAS_DESPUES_ENVIO", property = "incidenciasDespuesEnvio", jdbcType = JdbcType.NUMERIC)
 	})
 	List<EJGRemesaItem> getEJGRemesa(RemesasItem remesasItem, Short idInstitucion);
 }

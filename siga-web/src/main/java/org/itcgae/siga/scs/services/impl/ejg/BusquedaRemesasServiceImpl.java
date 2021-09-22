@@ -160,6 +160,14 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 			remesasItems = scsRemesasExtendsMapper.buscarRemesas(remesasBusquedaItem, idInstitucion,
 					usuarios.get(0).getIdlenguaje());
+			
+			String nRegistro;
+			
+			for(int i = 0; i < remesasItems.size(); i++) {
+				nRegistro = "";
+				nRegistro += remesasItems.get(i).getPrefijo() + "" + remesasItems.get(i).getNumero() + "" + remesasItems.get(i).getSufijo();
+				remesasItems.get(i).setnRegistro(Integer.parseInt(nRegistro));
+			}
 
 			LOGGER.info(
 					"buscarRemesas() / ScsRemesasExtendsMapper.buscarRemesas() -> Salida a ScsRemesasExtendsMapper para obtener las remesas");
@@ -645,6 +653,11 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			LOGGER.info("Id remesa -> " + remesasItem.getIdRemesa());
 
 			ejgRemesaItems = scsRemesasExtendsMapper.getEJGRemesa(remesasItem, idInstitucion);
+			
+			for(int i = 0; i < ejgRemesaItems.size(); i++) {
+				String incidencias = ejgRemesaItems.get(i).getNumIncidencias() + "/" + ejgRemesaItems.get(i).getIncidenciasAntesEnvio() + "/" + ejgRemesaItems.get(i).getIncidenciasDespuesEnvio() + "/" + ejgRemesaItems.get(i).getNuevaRemesa();
+				ejgRemesaItems.get(i).setIncidencias(incidencias);
+			}
 
 			LOGGER.info(
 					"getEJGRemesa() / ScsRemesasExtendsMapper.getEJGRemesa() -> Salida a ScsRemesasExtendsMapper para obtener los ejg asociados a la remesa");
