@@ -32,31 +32,31 @@ public class ScsRemesasResultadosExtendsProvider {
 		sql.FROM("CAJG_REMESARESOLUCION REMR");
 		sql.LEFT_OUTER_JOIN("CAJG_REMESA REM ON REM.IDINSTITUCION = REMR.IDINSTITUCION");
 		
-		if(remesasResultadoItem.getNumRemesaPrefijo() != null) {
+		if(remesasResultadoItem.getNumRemesaPrefijo() != null && !remesasResultadoItem.getNumRemesaPrefijo().isEmpty()) {
 			sql.WHERE("REM.PREFIJO = '" + remesasResultadoItem.getNumRemesaPrefijo() + "'");
 		}
 		
-		if(remesasResultadoItem.getNumRemesaNumero() != null) {
+		if(remesasResultadoItem.getNumRemesaNumero() != null && !remesasResultadoItem.getNumRemesaNumero().isEmpty()) {
 			sql.WHERE("REM.NUMERO = '" + remesasResultadoItem.getNumRemesaNumero() + "'");
 		}
 		
-		if(remesasResultadoItem.getNumRemesaSufijo() != null) {
+		if(remesasResultadoItem.getNumRemesaSufijo() != null && !remesasResultadoItem.getNumRemesaSufijo().isEmpty()) {
 			sql.WHERE("REM.SUFIJO = '" + remesasResultadoItem.getNumRemesaSufijo() + "'");
 		}
 		
-		if(remesasResultadoItem.getNumRegistroPrefijo() != null) {
+		if(remesasResultadoItem.getNumRegistroPrefijo() != null && !remesasResultadoItem.getNumRegistroPrefijo().isEmpty()) {
 			sql.WHERE("REMR.PREFIJO = '" + remesasResultadoItem.getNumRegistroPrefijo() + "'");
 		}
 		
-		if(remesasResultadoItem.getNumRegistroNumero() != null) {
+		if(remesasResultadoItem.getNumRegistroNumero() != null && !remesasResultadoItem.getNumRegistroNumero().isEmpty()) {
 			sql.WHERE("REMR.NUMERO = '" + remesasResultadoItem.getNumRegistroNumero() + "'");
 		}
 		
-		if(remesasResultadoItem.getNumRegistroSufijo() != null) {
+		if(remesasResultadoItem.getNumRegistroSufijo() != null && !remesasResultadoItem.getNumRegistroSufijo().isEmpty()) {
 			sql.WHERE("REMR.SUFIJO = '" + remesasResultadoItem.getNumRegistroSufijo() + "'");
 		}
 		
-		if(remesasResultadoItem.getNombreFichero() != null) {
+		if(remesasResultadoItem.getNombreFichero() != null && !remesasResultadoItem.getNombreFichero().isEmpty()) {
 			sql.WHERE("REMR.NOMBREFICHERO = '" + remesasResultadoItem.getNombreFichero() + "'");
 		}
 		
@@ -95,5 +95,28 @@ public class ScsRemesasResultadosExtendsProvider {
 		LOGGER.info(sql.toString());
 		return sql.toString();
 	}
+	
+	public String buscarLineasFichero(int idRemesaResultado, Short idInstitucion) {
+		SQL sql = new SQL();
+		
+		
+		sql.SELECT("IDREMESARESOLUCIONFICHERO");
+		sql.SELECT("LINEA");
+		
+		
+		sql.FROM("CAJG_REMESARESOLUCIONFICHERO");
+		
+		if(idRemesaResultado != 0) {
+			sql.WHERE("IDREMESARESOLUCION =" + idRemesaResultado);
+		}
+			
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		
+		sql.ORDER_BY("NUMEROLINEA ASC");
+		
+		LOGGER.info(sql.toString());
+		return sql.toString();
+	}
+	
 	
 }

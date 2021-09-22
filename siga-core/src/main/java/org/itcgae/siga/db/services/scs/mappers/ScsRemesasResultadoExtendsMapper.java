@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.scs.RemesasResultadoFicheroItem;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasResultadosExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -32,4 +33,13 @@ public interface ScsRemesasResultadoExtendsMapper {
 		@Result(column = "DESCRIPCIONREMESA", property = "descripcionRemesa", jdbcType = JdbcType.VARCHAR)
 	})
 	List<RemesasResultadoItem> buscarRemesasResultado(RemesasResultadoItem remesasBusquedaItem, Short idInstitucion);
+	
+	@SelectProvider(type = ScsRemesasResultadosExtendsProvider.class, method = "buscarLineasFichero")
+	@Results({
+		@Result(column = "IDREMESARESOLUCIONFICHERO", property = "idRemesaResolucionFichero", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "LINEA", property = "linea", jdbcType = JdbcType.VARCHAR)
+	})
+	List<RemesasResultadoFicheroItem> buscarLineasFichero(int idRemesaResultado, Short idInstitucion);
+	
+	
 }
