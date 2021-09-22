@@ -17,7 +17,7 @@ public class InscripcionGuardiaItem {
 	private String nombre;
 	private String idPersona;
 	private String ordenCola;
-	private String idTurno;
+	private String idturno;
 	private String idGuardia;
 	private String idGrupoGuardia;
 	private Date fechaSuscripcion;
@@ -57,7 +57,7 @@ public class InscripcionGuardiaItem {
 		this.nombre = nombre;
 		this.idPersona = idPersona;
 		this.ordenCola = ordenCola;
-		this.idTurno = idTurno;
+		this.idturno = idTurno;
 		this.idGuardia = idGuardia;
 		this.idGrupoGuardia = idGrupoGuardia;
 		this.fechaSuscripcion = fechaSuscripcion;
@@ -77,7 +77,7 @@ public class InscripcionGuardiaItem {
 			String idGrupoGuardia) {
 		super();
 		this.idPersona = idPersona;
-		this.idTurno = idTurno;
+		this.idturno = idTurno;
 		this.idGuardia = idGuardia;
 		this.idGrupoGuardia = idGrupoGuardia;
 		this.fechaSuscripcion = fechaSuscripcion;
@@ -102,11 +102,12 @@ public class InscripcionGuardiaItem {
 	public void setFechaSuscripcion(Date fechaSuscripcion) {
 		this.fechaSuscripcion = fechaSuscripcion;
 	}
-	public String getIdTurno() {
-		return idTurno;
+	
+	public String getIdturno() {
+		return idturno;
 	}
-	public void setIdTurno(String idTurno) {
-		this.idTurno = idTurno;
+	public void setIdturno(String idturno) {
+		this.idturno = idturno;
 	}
 	public String getIdGuardia() {
 		return idGuardia;

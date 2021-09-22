@@ -65,6 +65,7 @@ public class GuardiaController {
 
 	@Autowired
 	GuardiasService guardiasService;
+	
 
 	@PostMapping(value = "/busquedaGuardia/searchGuardias", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<GuardiasDTO> searchGuardias(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request) {

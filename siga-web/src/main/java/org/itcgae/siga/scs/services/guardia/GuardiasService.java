@@ -138,11 +138,8 @@ public interface GuardiasService {
 	public InscripcionesResponseDTO getInscripciones(InscripcionDatosEntradaDTO inscripcionesDTO,
 			HttpServletRequest request);
 	
-	public UpdateResponseDTO validarInscripciones(BusquedaInscripcionItem validarbody,
-			HttpServletRequest request);
 	
-	public UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarbody,
-			HttpServletRequest request);
+	
 
 	GuardiasDTO busquedaGuardiasColegiado(GuardiasItem guardiaItem, HttpServletRequest request);
 
