@@ -745,4 +745,40 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         return sql.toString();
     }
 
+    public String getPago(String idPago, Short idInstitucion, String idLenguaje) {
+
+        SQL subQuery = new SQL();
+
+        subQuery.SELECT("REC.DESCRIPCION DESCRIPCION");
+        subQuery.FROM("FCS_ESTADOSPAGOS ESTADOS");
+        subQuery.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON ESTADOS.DESCRIPCION = REC.IDRECURSO");
+        subQuery.WHERE("EST.IDESTADOPAGOSJG = ESTADOS.IDESTADOPAGOSJG");
+        subQuery.WHERE("REC.IDLENGUAJE = " + idLenguaje);
+
+        SQL subQueryEstadoPago = new SQL();
+        subQueryEstadoPago.SELECT("MAX(FECHAESTADO)");
+        subQueryEstadoPago.FROM("FCS_PAGOS_ESTADOSPAGOS");
+        subQueryEstadoPago.WHERE("IDPAGOSJG = '" + idPago + "'");
+        subQueryEstadoPago.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+
+        SQL query = new SQL();
+        query.SELECT("PG.IDINSTITUCION");
+        query.SELECT("PG.IDPAGOSJG");
+        query.SELECT("PG.NOMBRE");
+        query.SELECT("EST.IDESTADOPAGOSJG AS IDESTADO");
+        query.SELECT("(" + subQuery.toString() + ") AS DESESTADO");
+        query.SELECT("PG.IDFACTURACION");
+        query.SELECT("TO_CHAR(FAC.FECHADESDE, 'DD/MM/YYYY') || '-' || TO_CHAR(FAC.FECHAHASTA, 'DD/MM/YYYY') || ' - ' || FAC.NOMBRE AS NOMBREFAC");
+        query.FROM("FCS_PAGOSJG PG");
+        query.JOIN(
+                "FCS_FACTURACIONJG FAC ON FAC.IDINSTITUCION = PG.IDINSTITUCION AND FAC.IDFACTURACION = PG.IDFACTURACION");
+        query.INNER_JOIN(
+                "FCS_PAGOS_ESTADOSPAGOS EST ON PG.IDINSTITUCION = EST.IDINSTITUCION AND PG.IDPAGOSJG = EST.IDPAGOSJG");
+        query.WHERE("PG.IDINSTITUCION = '" + idInstitucion + "'");
+        query.WHERE("PG.IDPAGOSJG = '" + idPago + "'");
+        query.WHERE("EST.FECHAESTADO = (" + subQueryEstadoPago.toString() + ")");
+
+        return query.toString();
+    }
+
 }

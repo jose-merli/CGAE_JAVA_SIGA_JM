@@ -216,6 +216,51 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
     }
 
     @Override
+    public PagosjgDTO getPago(String idPago, HttpServletRequest request) {
+
+        LOGGER.info("PagoSJCSServiceImpl.getPago() -> Entrada al servicio para obtener los datos del pago: " + idPago);
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        PagosjgDTO pagosjgDTO = new PagosjgDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info(
+                        "PagoSJCSServiceImpl.getPago() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "PagoSJCSServiceImpl.getPago() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && usuarios.size() > 0) {
+
+                    PagosjgItem pagosjgItem = fcsPagosjgExtendsMapper.getPago(idPago, idInstitucion, usuarios.get(0).getIdlenguaje());
+                    pagosjgDTO.setPagosjgItem(Collections.singletonList(pagosjgItem));
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(
+                    "PagoSJCSServiceImpl.getPago() -> Se ha producido un error al buscar el pago: " + idPago, e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        pagosjgDTO.setError(error);
+
+        LOGGER.info("PagoSJCSServiceImpl.getPago() -> Salida del servicio para obtener los datos del pago: " + idPago);
+
+        return pagosjgDTO;
+    }
+
+    @Override
     public PagosjgDTO datosGeneralesPagos(String idPago, HttpServletRequest request) {
 
         LOGGER.info(

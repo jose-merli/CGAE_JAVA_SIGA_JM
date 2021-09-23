@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface IPagoSJCSService {
 
+    PagosjgDTO getPago(String idPago, HttpServletRequest request);
+
     PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request);
 
     PagosjgDTO datosGeneralesPagos(String idPago, HttpServletRequest request);

@@ -207,4 +207,16 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
             @Result(column = "NUMEROCUENTA", property = "numeroCuenta", jdbcType = JdbcType.VARCHAR)
     })
     DetallePagoColegiadoDTO getDetallePagoColegiado(String idInstitucion, String idPagosJg, String idPersona, boolean irpf, String idioma);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getPago")
+    @Results({
+            @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "DESESTADO", property = "desEstado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBREFAC", property = "nombreFac", jdbcType = JdbcType.VARCHAR),
+    })
+    PagosjgItem getPago(String idPago, Short idInstitucion, String idLenguaje);
 }

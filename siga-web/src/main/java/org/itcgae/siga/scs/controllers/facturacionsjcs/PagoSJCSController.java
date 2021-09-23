@@ -22,6 +22,12 @@ public class PagoSJCSController {
     @Autowired
     private IPagoSJCSService iPagoSJCSService;
 
+    @GetMapping("/getPago")
+    ResponseEntity<PagosjgDTO> getPago(@RequestParam("idPago") String idPago, HttpServletRequest request) {
+        PagosjgDTO response = iPagoSJCSService.getPago(idPago, request);
+        return new ResponseEntity<PagosjgDTO>(response, HttpStatus.OK);
+    }
+
     @PostMapping("/buscarPagos")
     ResponseEntity<PagosjgDTO> buscarPagos(@RequestBody PagosjgItem pagosItem, HttpServletRequest request) {
         PagosjgDTO response = iPagoSJCSService.buscarPagos(pagosItem, request);
