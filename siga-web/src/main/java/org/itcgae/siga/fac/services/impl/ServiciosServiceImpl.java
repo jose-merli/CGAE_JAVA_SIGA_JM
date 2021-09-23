@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,12 +20,21 @@ import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.PysFormapagoproducto;
+import org.itcgae.siga.db.entities.PysFormapagoproductoKey;
+import org.itcgae.siga.db.entities.PysFormapagoservicios;
+import org.itcgae.siga.db.entities.PysFormapagoserviciosKey;
+import org.itcgae.siga.db.entities.PysProductosinstitucion;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
+import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
+import org.itcgae.siga.db.mappers.PysFormapagoserviciosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosinstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTiposProductosExtendsMapper;
@@ -56,6 +66,9 @@ public class ServiciosServiceImpl implements IServiciosService {
 	
 	@Autowired
 	private PysServiciosinstitucionMapper pysServiciosInstitucionMapper;
+	
+	@Autowired
+	private PysFormapagoserviciosMapper pysFormaPagoServicios;
 	
 	@Override
 	public ListaServiciosDTO searchListadoServicios(HttpServletRequest request, FiltroServicioItem filtroServicioItem) {
@@ -325,9 +338,9 @@ public class ServiciosServiceImpl implements IServiciosService {
 					servicioInstitucion.setSolicitarbaja(servicio.getPermitirbaja());
 					servicioInstitucion.setSolicitaralta(servicio.getPermitiralta());
 					servicioInstitucion.setAutomatico(servicio.getAutomatico());
-					servicioInstitucion.setIniciofinalponderado("I");//INICIOFINALPONDERADO??
-					//Falta condicion de suscripcion servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
-					
+					servicioInstitucion.setIniciofinalponderado("P");
+					servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
+									
 					servicioInstitucion.setFechabaja(null);
 					servicioInstitucion.setFechamodificacion(new Date());
 			
@@ -349,6 +362,9 @@ public class ServiciosServiceImpl implements IServiciosService {
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
 					
+					if(servicio.getAutomatico().equals("1") && status == 1) {
+					//AQUI LLAMAR AL PL SUSCRIPCION AUTO
+					}
 
 					LOGGER.info(
 							"nuevoServicio() / pysServiciosInstitucionMapper.nuevoServicio() -> Salida de pysServiciosInstitucionMapper para crear un servicio");
@@ -372,7 +388,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 	}
 	
 	@Override
-	public ServicioDetalleDTO detalleServicio(HttpServletRequest request, int idTipoServicio, int idServicio, int idServicioInstitucion) {
+	public ServicioDetalleDTO detalleServicio(HttpServletRequest request, int idTipoServicio, int idServicio, int idServiciosInstitucion) {
 		ServicioDetalleDTO servicioDetalleDTO = new ServicioDetalleDTO();
 		Error error = new Error();
 
@@ -402,7 +418,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 
 					String idioma = usuarios.get(0).getIdlenguaje();
 					servicioDetalleDTO = pysServiciosInstitucionExtendsMapper
-							.detalleServicio(idTipoServicio, idServicio, idServicioInstitucion, idInstitucion);
+							.detalleServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion);
 
 					LOGGER.info(
 							"detalleServicio() / PysServiciosinstitucionExtendsMapper.detalleServicio() -> Salida de PysServiciosinstitucionExtendsMapper para obtener los detalles del servicio");
@@ -410,7 +426,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 					LOGGER.info(
 							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de internet");
 					
-					servicioDetalleDTO.setFormasdepagointernet(pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio(idTipoServicio, idServicio, idServicioInstitucion, idInstitucion));
+					servicioDetalleDTO.setFormasdepagointernet(pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion));
 					
 					LOGGER.info(
 							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio() -> Salida a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de internet");
@@ -418,7 +434,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 					LOGGER.info(
 							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
 					
-					servicioDetalleDTO.setFormasdepagosecretaria(pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio(idTipoServicio, idServicio, idServicioInstitucion, idInstitucion));
+					servicioDetalleDTO.setFormasdepagosecretaria(pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion));
 					
 					LOGGER.info(
 							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio() -> Salida a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
@@ -438,5 +454,337 @@ public class ServiciosServiceImpl implements IServiciosService {
 		LOGGER.info("detalleServicio() -> Salida del servicio para obtener los detalles del servicio");
 
 		return servicioDetalleDTO;
+	}
+	
+//	@Override
+//	public ComboDTO comboCondicionSuscripcion(HttpServletRequest request, int idConsulta) {
+//		ComboDTO comboDTO = new ComboDTO();
+//		Error error = new Error();
+//
+//		LOGGER.info("comboCondicionSuscripcion() -> Entrada al servicio para recuperar el combo de condicion de suscripcion");
+//
+//		// Conseguimos información del usuario logeado
+//		String token = request.getHeader("Authorization");
+//		String dni = UserTokenUtils.getDniFromJWTToken(token);
+//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+//
+//		try {
+//			if (idInstitucion != null) {
+//				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+//				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+//
+//				LOGGER.info(
+//						"comboCondicionSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+//
+//				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+//
+//				LOGGER.info(
+//						"comboCondicionSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+//
+//				if (usuarios != null && !usuarios.isEmpty()) {
+//					LOGGER.info(
+//							"comboCondicionSuscripcion() / pysServiciosInstitucionExtendsMapper.comboCondicionSuscripcion() -> Entrada a pysServiciosInstitucionExtendsMapper para recuperar el combo de condicion de suscripcion");
+//
+//					String idioma = usuarios.get(0).getIdlenguaje();
+//					List<ComboItem> listaComboCondicionSuscripcion = pysServiciosInstitucionExtendsMapper
+//							.comboCondicionSuscripcion(idioma, idInstitucion, idConsulta);
+//
+//					LOGGER.info(
+//							"comboCondicionSuscripcion() / pysServiciosInstitucionExtendsMapper.comboCondicionSuscripcion() -> Salida de pysServiciosInstitucionExtendsMapper para recuperar el combo de condicion de suscripcion");
+//
+//					if (listaComboCondicionSuscripcion != null && listaComboCondicionSuscripcion.size() > 0) {
+//						comboDTO.setCombooItems(listaComboCondicionSuscripcion);
+//					}
+//				}
+//
+//			}
+//		} catch (Exception e) {
+//			LOGGER.error(
+//					"TiposServiciosServiceImpl.comboCondicionSuscripcion() -> Se ha producido un error al recuperar el combo de condicion de suscripcion",
+//					e);
+//			error.setCode(500);
+//			error.setDescription("general.mensaje.error.bbdd");
+//		}
+//
+//		comboDTO.setError(error);
+//
+//		LOGGER.info("comboCondicionSuscripcion() -> Salida del servicio para recuperar el combo de condicion de suscripcion");
+//
+//		return comboDTO;
+//	}
+	
+	@Override
+	public ComboDTO comboCondicionSuscripcion(HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.info("comboCondicionSuscripcion() -> Entrada al servicio para recuperar el combo de condicion de suscripcion");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"comboCondicionSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"comboCondicionSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"comboCondicionSuscripcion() / pysServiciosInstitucionExtendsMapper.comboCondicionSuscripcion() -> Entrada a pysServiciosInstitucionExtendsMapper para recuperar el combo de condicion de suscripcion");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboCondicionSuscripcion = pysServiciosInstitucionExtendsMapper
+							.comboCondicionSuscripcion(idioma, idInstitucion);
+
+					LOGGER.info(
+							"comboCondicionSuscripcion() / pysServiciosInstitucionExtendsMapper.comboCondicionSuscripcion() -> Salida de pysServiciosInstitucionExtendsMapper para recuperar el combo de condicion de suscripcion");
+
+					if (listaComboCondicionSuscripcion != null && listaComboCondicionSuscripcion.size() > 0) {
+						comboDTO.setCombooItems(listaComboCondicionSuscripcion);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposServiciosServiceImpl.comboCondicionSuscripcion() -> Se ha producido un error al recuperar el combo de condicion de suscripcion",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboCondicionSuscripcion() -> Salida del servicio para recuperar el combo de condicion de suscripcion");
+
+		return comboDTO;
+	}
+
+	@Override
+	@Transactional
+	public InsertResponseDTO crearEditarFormaPago(ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		NewIdDTO idServicioInstitucion = new NewIdDTO();
+		Error error = new Error();
+		int statusInsertFormaPagoInternet = 0;
+		int statusInsertFormaPagoSecretaria = 0;
+		int statusEdicionFinalServicio = 0;
+		int statusDeleteFormasDePagoInternet = 0;
+		int statusDeleteFormasDePagoSecretaria = 0;
+		
+
+		LOGGER.info("crearEditarFormaPago() -> Entrada al servicio para crear/editar formas de pago y editar los campos restantes del servicio");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"crearEditarFormaPago() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"crearEditarFormaPago() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"crearEditarFormaPago() / pysServiciosInstitucionMapper -> Entrada a pysServiciosInstitucionMapper para crear/editar formas de pago");
+				
+					idServicioInstitucion = (pysServiciosInstitucionExtendsMapper.getIdServicioInstitucion(servicio, idInstitucion));	
+				//Si estamos creando un servicio a partir de cero, es decir le hemos dado a nuevo en filtros-servicios (front) recorremos las listas de pago de internet y secretaria insertando cada una de las formas
+				if(!servicio.isEditar()) {
+					if(servicio.getFormasdepagointernet() != null) {					
+						for (int formasdepagointernet : servicio.getFormasdepagointernet()) {
+							PysFormapagoservicios formaPagoServicio = new PysFormapagoservicios();
+							
+							formaPagoServicio.setIdinstitucion(idInstitucion);
+							formaPagoServicio.setIdtiposervicios((short) servicio.getIdtiposervicios());
+							formaPagoServicio.setIdservicio((long) servicio.getIdservicio());
+							formaPagoServicio.setIdserviciosinstitucion(Long.valueOf(idServicioInstitucion.getNewId()));
+							formaPagoServicio.setIdformapago((short) formasdepagointernet);
+							formaPagoServicio.setInternet("A");
+							formaPagoServicio.setFechamodificacion(new Date());
+							formaPagoServicio.setUsumodificacion(usuarios.get(0).getIdusuario());
+							
+							statusInsertFormaPagoInternet = pysFormaPagoServicios.insert(formaPagoServicio);
+							
+							if(statusInsertFormaPagoInternet == 0) {
+								throw new Exception("Error al insertar una forma de pago de internet del servicio");
+							}
+						}
+					}
+					if(servicio.getFormasdepagosecretaria() != null)
+						for (int formasdepagosecretaria : servicio.getFormasdepagosecretaria()) {
+							PysFormapagoservicios formaPagoServicio = new PysFormapagoservicios();
+							
+							formaPagoServicio.setIdinstitucion(idInstitucion);
+							formaPagoServicio.setIdtiposervicios((short) servicio.getIdtiposervicios());
+							formaPagoServicio.setIdservicio((long) servicio.getIdservicio());
+							formaPagoServicio.setIdserviciosinstitucion(Long.valueOf(idServicioInstitucion.getNewId()));
+							formaPagoServicio.setIdformapago((short) formasdepagosecretaria);
+							formaPagoServicio.setInternet("S");
+							formaPagoServicio.setFechamodificacion(new Date());
+							formaPagoServicio.setUsumodificacion(usuarios.get(0).getIdusuario());
+							
+							statusInsertFormaPagoSecretaria = pysFormaPagoServicios.insert(formaPagoServicio);
+							
+							if(statusInsertFormaPagoSecretaria == 0) {
+								throw new Exception("Error al insertar una forma de pago de secretaria del servicio");
+							}
+						}
+				}else if (servicio.isEditar()) {
+					PysFormapagoserviciosKey pysFormaPagoServicioPrimaryKey = new PysFormapagoserviciosKey();
+					
+					//PRIMERO ELIMINAMOS LAS FORMAS DE PAGO ORIGINALES DE INTERNET Y SECRETARIA
+					//INTERNET
+					if(servicio.getFormasdepagointernetoriginales() != null) {
+						for (int formasdepagointernetoriginales : servicio.getFormasdepagointernetoriginales()) {
+							
+							pysFormaPagoServicioPrimaryKey.setIdinstitucion(idInstitucion);
+							pysFormaPagoServicioPrimaryKey.setIdservicio((long) servicio.getIdservicio());
+							pysFormaPagoServicioPrimaryKey.setIdformapago((short) formasdepagointernetoriginales);
+							pysFormaPagoServicioPrimaryKey.setIdserviciosinstitucion((long) servicio.getIdserviciosinstitucion());
+							pysFormaPagoServicioPrimaryKey.setIdtiposervicios((short) servicio.getIdtiposervicios());
+								
+								statusDeleteFormasDePagoInternet = pysFormaPagoServicios.deleteByPrimaryKey(pysFormaPagoServicioPrimaryKey);
+								
+								if(statusDeleteFormasDePagoInternet == 0) {
+									throw new Exception("Error al eliminar una forma de pago de internet del servicio");
+								}						
+						}
+					}
+					
+					//SECRETARIA
+					if(servicio.getFormasdepagosecretariaoriginales() != null) {
+						for (int formasdepagosecretariasoriginales : servicio.getFormasdepagosecretariaoriginales()) {
+							
+							pysFormaPagoServicioPrimaryKey.setIdinstitucion(idInstitucion);
+							pysFormaPagoServicioPrimaryKey.setIdservicio((long) servicio.getIdservicio());
+							pysFormaPagoServicioPrimaryKey.setIdformapago((short) formasdepagosecretariasoriginales);
+							pysFormaPagoServicioPrimaryKey.setIdserviciosinstitucion(Long.valueOf(idServicioInstitucion.getNewId()));
+							pysFormaPagoServicioPrimaryKey.setIdtiposervicios((short) servicio.getIdtiposervicios());
+								
+								statusDeleteFormasDePagoSecretaria = pysFormaPagoServicios.deleteByPrimaryKey(pysFormaPagoServicioPrimaryKey);
+								
+								if(statusDeleteFormasDePagoSecretaria == 0) {
+									throw new Exception("Error al eliminar una forma de pago de secretaria del servicio");
+								}							
+						}
+					}
+					
+					
+					//SEGUNDO INSERTAMOS LAS FORMAS DE PAGO DE INTERNET Y SECRETARIA
+					//INTERNET
+					if(servicio.getFormasdepagointernet() != null) {	
+						for(int formasdepagointernet : servicio.getFormasdepagointernet()) {
+			
+							PysFormapagoservicios formaPagoServicio = new PysFormapagoservicios();
+								
+							formaPagoServicio.setIdinstitucion(idInstitucion);
+							formaPagoServicio.setIdtiposervicios((short) servicio.getIdtiposervicios());
+							formaPagoServicio.setIdservicio((long) servicio.getIdservicio());
+							formaPagoServicio.setIdserviciosinstitucion(Long.valueOf(idServicioInstitucion.getNewId()));
+							formaPagoServicio.setIdformapago((short) formasdepagointernet);
+							formaPagoServicio.setInternet("A");
+							formaPagoServicio.setFechamodificacion(new Date());
+							formaPagoServicio.setUsumodificacion(usuarios.get(0).getIdusuario());
+								
+								statusInsertFormaPagoInternet = pysFormaPagoServicios.insert(formaPagoServicio);
+								
+								if(statusInsertFormaPagoInternet == 0) {
+									throw new Exception("Error al insertar una forma de pago de internet del servicio");
+								}
+						}
+					}
+					
+					//SECRETARIA
+					if(servicio.getFormasdepagosecretaria() != null) {	
+						for(int formasdepagosecretaria : servicio.getFormasdepagosecretaria()) {
+				
+							PysFormapagoservicios formaPagoServicio = new PysFormapagoservicios();
+								
+							formaPagoServicio.setIdinstitucion(idInstitucion);
+							formaPagoServicio.setIdtiposervicios((short) servicio.getIdtiposervicios());
+							formaPagoServicio.setIdservicio((long) servicio.getIdservicio());
+							formaPagoServicio.setIdserviciosinstitucion(Long.valueOf(idServicioInstitucion.getNewId()));
+							formaPagoServicio.setIdformapago((short) formasdepagosecretaria);
+							formaPagoServicio.setInternet("S");
+							formaPagoServicio.setFechamodificacion(new Date());
+							formaPagoServicio.setUsumodificacion(usuarios.get(0).getIdusuario());
+								
+								statusInsertFormaPagoSecretaria = pysFormaPagoServicios.insert(formaPagoServicio);
+								
+								if(statusInsertFormaPagoSecretaria == 0) {
+									throw new Exception("Error al insertar una forma de pago de secretaria del servicio");
+								}					
+						}
+					}
+					
+				}
+				
+				//Actualizamos la informacion restante la cual no fue introducida al crear el producto en la tarjeta datos generales
+				PysServiciosinstitucion servicioInstitucion = new PysServiciosinstitucion();
+				
+				servicioInstitucion.setIdinstitucion(idInstitucion);
+				servicioInstitucion.setIdtiposervicios((short) servicio.getIdtiposervicios());
+				servicioInstitucion.setIdservicio((long) servicio.getIdservicio());
+				servicioInstitucion.setIdserviciosinstitucion(Long.valueOf(idServicioInstitucion.getNewId()));
+							
+				//servicioInstitucion.setNofacturable(servicio.getNofacturable());Falta la columna en la tabla 
+				servicioInstitucion.setIdtipoiva(servicio.getIdtipoiva());
+				//FACTURACION PROPORCIONAL POR DIAS
+				//RADIO BUTTONS Aplicación de precio por cambio de situación del interesado SE GUARDA EN INICIOFINALPONDERADO POR DEFECTO A P
+				
+				servicioInstitucion.setFechamodificacion(new Date());
+				servicioInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+				
+				statusEdicionFinalServicio = pysServiciosInstitucionMapper.updateByPrimaryKeySelective(servicioInstitucion);
+				
+				if(statusEdicionFinalServicio == 0) {
+					throw new Exception("Error al insertar la informacion restante de la tarjeta formas de pago en el servicio");
+				}
+				
+					
+					if(statusInsertFormaPagoInternet == 0 || statusInsertFormaPagoSecretaria == 0 || statusEdicionFinalServicio == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+					}else if(statusInsertFormaPagoInternet == 1 && statusInsertFormaPagoSecretaria == 1 && statusEdicionFinalServicio == 0) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+					
+					LOGGER.info(
+							"crearEditarFormaPago() / pysServiciosInstitucionMapper-> Salida de pysServiciosInstitucionMapper para crear/editar formas de pago y editar los campos restantes del servicio");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ServiciosServiceImpl.crearEditarFormaPago() -> Se ha producido un error al crear/editar formas de pago y editar los campos restantes del servicio",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("crearEditarFormaPago() -> Salida del servicio para crear/editar formas de pago y editar los campos restantes del servicio");
+
+		return insertResponseDTO;
 	}
 }

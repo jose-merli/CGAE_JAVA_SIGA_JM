@@ -306,7 +306,7 @@ public class ProductosServiceImpl implements IProductosService{
 					}
 					
 					
-					//SEGUNDO INSERTAMOS LAS FORMAS DE PAGO ORIGINALES DE INTERNET Y SECRETARIA
+					//SEGUNDO INSERTAMOS LAS FORMAS DE PAGO DE INTERNET Y SECRETARIA
 					//INTERNET
 					if(producto.getFormasdepagointernet() != null) {	
 						for(int formasdepagointernet : producto.getFormasdepagointernet()) {
