@@ -6750,7 +6750,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 					
 					guardias.setIdTurno(guardia.getIdTurno());
 					guardias.setIdGuardia(guardia.getIdGuardia());
-					guardias.setIdPersonaUltimo(guardia.getIdPersonaUltimo());
 					
 					
 					List<GuardiasItem> guardiasTurno = scsGuardiasturnoExtendsMapper.searchGuardias2(guardias,
