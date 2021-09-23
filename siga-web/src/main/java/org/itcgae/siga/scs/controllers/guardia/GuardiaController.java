@@ -65,12 +65,20 @@ public class GuardiaController {
 
 	@Autowired
 	GuardiasService guardiasService;
+	
 
 	@PostMapping(value = "/busquedaGuardia/searchGuardias", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<GuardiasDTO> searchGuardias(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request) {
 		GuardiasDTO response = guardiasService.searchGuardias(guardiasItem, request);
 		return new ResponseEntity<GuardiasDTO>(response, HttpStatus.OK);
 	}
+	
+	@PostMapping(value = "/busquedaGuardia/busquedaGuardiasColegiado", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<GuardiasDTO> busquedaGuardiasColegiado(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request) {
+		GuardiasDTO response = guardiasService.busquedaGuardiasColegiado(guardiasItem, request);
+		return new ResponseEntity<GuardiasDTO>(response, HttpStatus.OK);
+	}
+
 
 	@PostMapping(value = "/busquedaGuardia/deleteGuardias", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> deleteGuardias(@RequestBody GuardiasDTO guardiasDTO, HttpServletRequest request) {
@@ -391,6 +399,24 @@ public class GuardiaController {
 	ResponseEntity<UpdateResponseDTO> denegarInscripciones(@RequestBody BusquedaInscripcionItem denegarbody, HttpServletRequest request){
 		UpdateResponseDTO response= guardiasService.denegarInscripciones(denegarbody, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/validarSolicitudGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> validarSolicitudGuardia(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasService.validarSolicitudGuardia(guardiasItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/desvalidarGuardiaColegiado", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> desvalidarGuardiaColegiado(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasService.desvalidarGuardiaColegiado(guardiasItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/eliminarGuardiaColegiado", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> eliminarGuardiaColegiado(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request){
+		DeleteResponseDTO response= guardiasService.eliminarGuardiaColegiado(guardiasItem, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	
 //	@PostMapping(value = "/solicitarBajaInscripcion", produces = MediaType.APPLICATION_JSON_VALUE)

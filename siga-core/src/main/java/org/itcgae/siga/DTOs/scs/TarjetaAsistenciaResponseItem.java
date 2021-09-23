@@ -3,7 +3,7 @@ package org.itcgae.siga.DTOs.scs;
 import java.util.List;
 import java.util.Objects;
 
-public class TarjetaAsistenciaResponseItem {
+public class TarjetaAsistenciaResponseItem implements Comparable<TarjetaAsistenciaResponseItem> {
 	
 	private String anio;
 	private String numero;
@@ -14,6 +14,7 @@ public class TarjetaAsistenciaResponseItem {
 	private String ejgNumero;
 	private String ejgAnio;
 	private String ejgAnioNumero;
+	private String idTipoEjg;
 	private List<ActuacionAsistenciaItem> actuaciones;
 	private String nombre, sexo, apellido1, apellido2, nif;
 	private FiltroAsistenciaItem filtro;
@@ -42,7 +43,60 @@ public class TarjetaAsistenciaResponseItem {
 	private RelacionesItem primeraRelacion;
 	private String nig, juzgado, comisaria, numProcedimiento, idProcedimiento, numDiligencia;
 	private List<String> delitos;
-	
+	private String numDocumentos;
+	private String numValidadas;
+	private String numJustificadas;
+	private String numFacturadas;
+	private boolean diaDespuesDisabled;
+
+	public String getIdTipoEjg() {
+		return idTipoEjg;
+	}
+
+	public void setIdTipoEjg(String idTipoEjg) {
+		this.idTipoEjg = idTipoEjg;
+	}
+
+	public boolean isDiaDespuesDisabled() {
+		return diaDespuesDisabled;
+	}
+
+	public void setDiaDespuesDisabled(boolean diaDespuesDisabled) {
+		this.diaDespuesDisabled = diaDespuesDisabled;
+	}
+
+	public String getNumValidadas() {
+		return numValidadas;
+	}
+
+	public void setNumValidadas(String numValidadas) {
+		this.numValidadas = numValidadas;
+	}
+
+	public String getNumJustificadas() {
+		return numJustificadas;
+	}
+
+	public void setNumJustificadas(String numJustificadas) {
+		this.numJustificadas = numJustificadas;
+	}
+
+	public String getNumFacturadas() {
+		return numFacturadas;
+	}
+
+	public void setNumFacturadas(String numFacturadas) {
+		this.numFacturadas = numFacturadas;
+	}
+
+	public String getNumDocumentos() {
+		return numDocumentos;
+	}
+
+	public void setNumDocumentos(String numDocumentos) {
+		this.numDocumentos = numDocumentos;
+	}
+
 	/**
 	 * @return the numeroActuaciones
 	 */
@@ -548,6 +602,8 @@ public class TarjetaAsistenciaResponseItem {
 		this.delitos = delitos;
 	}
 
+
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(actuaciones, anio, anioNumero, apellido1, apellido2, asistido,
@@ -577,7 +633,31 @@ public class TarjetaAsistenciaResponseItem {
 				+ ejgNumero + ", ejgAnio=" + ejgAnio + ", ejgAnioNumero=" + ejgAnioNumero + ", actuaciones=" + actuaciones + ", nombre=" + nombre + ", sexo=" + sexo
 				+ ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", nif=" + nif + "]";
 	}
-	
-	
 
+
+	@Override
+	public int compareTo(TarjetaAsistenciaResponseItem that) {
+		if (this.getAnio() == null && that.getAnio() == null) {
+			// pass
+		} else if (this.getAnio() == null) {
+			return -1;
+		} else if (that.getAnio() == null) {
+			return 1;
+		} else {
+			int anioComparison = Integer.valueOf(this.getAnio()).compareTo(Integer.valueOf(that.getAnio()));
+			if (anioComparison != 0) {
+				return anioComparison < 0 ? -1 : 1;
+			}
+		}
+
+		if (this.getNumero() == null && that.getNumero() == null) {
+			return 0;
+		} else if (this.getNumero() == null) {
+			return -1;
+		} else if (that.getNumero() == null) {
+			return 1;
+		} else {
+			return Integer.valueOf(this.getNumero()).compareTo(Integer.valueOf(that.getNumero()));
+		}
+	}
 }

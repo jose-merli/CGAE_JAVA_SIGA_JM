@@ -23,12 +23,21 @@ public class TarjetaAsistenciaItem {
 	private String ejgNumero;
 	private String ejgAnio;
 	private String ejgAnioNumero;
+	private String idTipoEjg;
 	private String fchaActuacion;
 	private String fchaJustificacion;
 	private String lugar;
 	private String numeroAsunto;
 	private String nombre, sexo, apellido1, apellido2, nif, comisariaJuzgado;
-	
+
+	public String getIdTipoEjg() {
+		return idTipoEjg;
+	}
+
+	public void setIdTipoEjg(String idTipoEjg) {
+		this.idTipoEjg = idTipoEjg;
+	}
+
 	public String getAnio() {
 		return anio;
 	}

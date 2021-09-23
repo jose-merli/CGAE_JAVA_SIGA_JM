@@ -32,7 +32,7 @@ public class GuardiasItem {
 	private String jurisdiccion;
 	private String grupoFacturacion;
 	private String partidaPresupuestaria;
-	private String tipoTurno;		
+	private String tipoTurno;
 	private String tipoGuardia;
 	private String tipoDia;
 	private String tipoDiasGuardia;
@@ -51,149 +51,198 @@ public class GuardiasItem {
 	private String incompatibilidades;
 	private boolean requeridaValidacion;
 	private Date fechabaja;
+	private Date fechaalta;
+	private Date fechadesde;
+	private Date fechahasta;
 	private boolean historico;
 	private String separarGuardia;
-	
-	
-	
-	
-	
-	
+	private String numColegiado;
+	private String validada;
+	private String ordenGrupo;
+	private String grupoGuardiaColegiado;
+	private String idPersona;
+	private Date fechaValidacion;
+
 	public String getSepararGuardia() {
 		return separarGuardia;
 	}
+
 	public void setSepararGuardia(String separarGuardia) {
 		this.separarGuardia = separarGuardia;
 	}
+
 	public boolean isRequeridaValidacion() {
 		return requeridaValidacion;
 	}
+
 	public void setRequeridaValidacion(boolean requeridaValidacion) {
 		this.requeridaValidacion = requeridaValidacion;
 	}
+
 	public String getIncompatibilidades() {
 		return incompatibilidades;
 	}
+
 	public void setIncompatibilidades(String incompatibilidades) {
 		this.incompatibilidades = incompatibilidades;
 	}
+
 	public String getOrdenacionManual() {
 		return ordenacionManual;
 	}
+
 	public void setOrdenacionManual(String ordenacionManual) {
 		this.ordenacionManual = ordenacionManual;
 	}
+
 	public String getIdGrupoUltimo() {
 		return idGrupoUltimo;
 	}
+
 	public void setIdGrupoUltimo(String idGrupoUltimo) {
 		this.idGrupoUltimo = idGrupoUltimo;
 	}
+
 	public String getRotarComponentes() {
 		return rotarComponentes;
 	}
+
 	public void setRotarComponentes(String rotarComponentes) {
 		this.rotarComponentes = rotarComponentes;
 	}
+
 	public String getFiltros() {
 		return filtros;
 	}
+
 	public void setFiltros(String filtros) {
 		this.filtros = filtros;
 	}
+
 	public String getIdGuardiaPrincipal() {
 		return idGuardiaPrincipal;
 	}
+
 	public void setIdGuardiaPrincipal(String idGuardiaPrincipal) {
 		this.idGuardiaPrincipal = idGuardiaPrincipal;
 	}
+
 	public String getIdTurnoPrincipal() {
 		return idTurnoPrincipal;
 	}
+
 	public void setIdTurnoPrincipal(String idTurnoPrincipal) {
 		this.idTurnoPrincipal = idTurnoPrincipal;
 	}
+
 	public String getIdGuardiaVinculada() {
 		return idGuardiaVinculada;
 	}
+
 	public void setIdGuardiaVinculada(String idGuardiaVinculada) {
 		this.idGuardiaVinculada = idGuardiaVinculada;
 	}
+
 	public String getIdTurnoVinculada() {
 		return idTurnoVinculada;
 	}
+
 	public void setIdTurnoVinculada(String idTurnoVinculada) {
 		this.idTurnoVinculada = idTurnoVinculada;
 	}
+
 	public String getIdTipoGuardia() {
 		return idTipoGuardia;
 	}
+
 	public void setIdTipoGuardia(String idTipoGuardia) {
 		this.idTipoGuardia = idTipoGuardia;
 	}
+
 	public String getIdPersonaUltimo() {
 		return idPersonaUltimo;
 	}
+
 	public void setIdPersonaUltimo(String idPersonaUltimo) {
 		this.idPersonaUltimo = idPersonaUltimo;
 	}
+
 	public String getTipoDiasGuardia() {
 		return tipoDiasGuardia;
 	}
+
 	public void setTipoDiasGuardia(String tipoDiasGuardia) {
 		this.tipoDiasGuardia = tipoDiasGuardia;
 	}
+
 	public String getTipoDiasPeriodo() {
 		return tipoDiasPeriodo;
 	}
+
 	public void setTipoDiasPeriodo(String tipoDiasPeriodo) {
 		this.tipoDiasPeriodo = tipoDiasPeriodo;
 	}
+
 	public String getDiasGuardia() {
 		return diasGuardia;
 	}
+
 	public void setDiasGuardia(String diasGuardia) {
 		this.diasGuardia = diasGuardia;
 	}
+
 	public String getDiasSeparacionGuardias() {
 		return diasSeparacionGuardias;
 	}
+
 	public void setDiasSeparacionGuardias(String diasSeparacionGuardias) {
 		this.diasSeparacionGuardias = diasSeparacionGuardias;
 	}
+
 	public String getDiasPeriodo() {
 		return diasPeriodo;
 	}
+
 	public void setDiasPeriodo(String diasPeriodo) {
 		this.diasPeriodo = diasPeriodo;
 	}
+
 	public String getIdOrdenacionColas() {
 		return idOrdenacionColas;
 	}
+
 	public void setIdOrdenacionColas(String idOrdenacionColas) {
 		this.idOrdenacionColas = idOrdenacionColas;
 	}
+
 	public String getPorGrupos() {
 		return porGrupos;
 	}
+
 	public void setPorGrupos(String porGrupos) {
 		this.porGrupos = porGrupos;
 	}
+
 	public String getDescripcionPago() {
 		return descripcionPago;
 	}
+
 	public void setDescripcionPago(String descripcionPago) {
 		this.descripcionPago = descripcionPago;
 	}
+
 	public String getDescripcionFacturacion() {
 		return descripcionFacturacion;
 	}
+
 	public void setDescripcionFacturacion(String descripcionFacturacion) {
 		this.descripcionFacturacion = descripcionFacturacion;
 	}
+
 	public Boolean getEnvioCentralita() {
 		return envioCentralita;
 	}
+
 	public void setEnvioCentralita(Boolean envioCentralita) {
 		this.envioCentralita = envioCentralita;
 	}
@@ -201,153 +250,271 @@ public class GuardiasItem {
 	public String getDescripcion() {
 		return descripcion;
 	}
+
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
+
 	public String getTurno() {
 		return turno;
 	}
+
 	public void setTurno(String turno) {
 		this.turno = turno;
 	}
+
 	public boolean isHistorico() {
 		return historico;
 	}
+
 	public void setHistorico(boolean historico) {
 		this.historico = historico;
 	}
+
 	public String getSeleccionLaborables() {
 		return seleccionLaborables;
 	}
+
 	public void setSeleccionLaborables(String seleccionLaborables) {
 		this.seleccionLaborables = seleccionLaborables;
 	}
+
 	public String getSeleccionFestivos() {
 		return seleccionFestivos;
 	}
+
 	public void setSeleccionFestivos(String seleccionFestivos) {
 		this.seleccionFestivos = seleccionFestivos;
 	}
+
 	public String getIdGuardia() {
 		return idGuardia;
 	}
+
 	public void setIdGuardia(String idGuardia) {
 		this.idGuardia = idGuardia;
 	}
+
 	public String getIdTurno() {
 		return idTurno;
 	}
+
 	public void setIdTurno(String idTurno) {
 		this.idTurno = idTurno;
 	}
+
 	public String getNombre() {
 		return nombre;
 	}
+
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
+
 	public String getArea() {
 		return area;
 	}
+
 	public void setArea(String area) {
 		this.area = area;
 	}
+
 	public String getMateria() {
 		return materia;
 	}
+
 	public void setMateria(String materia) {
 		this.materia = materia;
 	}
+
 	public String getGrupoZona() {
 		return grupoZona;
 	}
+
 	public void setGrupoZona(String grupoZona) {
 		this.grupoZona = grupoZona;
 	}
+
 	public String getZona() {
 		return zona;
 	}
+
 	public void setZona(String zona) {
 		this.zona = zona;
 	}
+
 	public String getObligatoriedad() {
 		return obligatoriedad;
 	}
+
 	public void setObligatoriedad(String obligatoriedad) {
 		this.obligatoriedad = obligatoriedad;
 	}
+
 	public String getDuracion() {
 		return duracion;
 	}
+
 	public void setDuracion(String duracion) {
 		this.duracion = duracion;
 	}
+
 	public String getValidaJustificacion() {
 		return validaJustificacion;
 	}
+
 	public void setValidaJustificacion(String validaJustificacion) {
 		this.validaJustificacion = validaJustificacion;
 	}
+
 	public String getPartidaJudicial() {
 		return partidaJudicial;
 	}
+
 	public void setPartidaJudicial(String partidaJudicial) {
 		this.partidaJudicial = partidaJudicial;
 	}
+
 	public String getJurisdiccion() {
 		return jurisdiccion;
 	}
+
 	public void setJurisdiccion(String jurisdiccion) {
 		this.jurisdiccion = jurisdiccion;
 	}
+
 	public String getGrupoFacturacion() {
 		return grupoFacturacion;
 	}
+
 	public void setGrupoFacturacion(String grupoFacturacion) {
 		this.grupoFacturacion = grupoFacturacion;
 	}
+
 	public String getPartidaPresupuestaria() {
 		return partidaPresupuestaria;
 	}
+
 	public void setPartidaPresupuestaria(String partidaPresupuestaria) {
 		this.partidaPresupuestaria = partidaPresupuestaria;
 	}
+
 	public String getTipoTurno() {
 		return tipoTurno;
 	}
+
 	public void setTipoTurno(String tipoTurno) {
 		this.tipoTurno = tipoTurno;
 	}
+
 	public String getTipoGuardia() {
 		return tipoGuardia;
 	}
+
 	public void setTipoGuardia(String tipoGuardia) {
 		this.tipoGuardia = tipoGuardia;
 	}
+
 	public String getTipoDia() {
 		return tipoDia;
 	}
+
 	public void setTipoDia(String tipoDia) {
 		this.tipoDia = tipoDia;
 	}
+
 	public String getLetradosGuardia() {
 		return letradosGuardia;
 	}
+
 	public void setLetradosGuardia(String letradosGuardia) {
 		this.letradosGuardia = letradosGuardia;
 	}
+
 	public String getLetradosIns() {
 		return letradosIns;
 	}
+
 	public void setLetradosIns(String letradosIns) {
 		this.letradosIns = letradosIns;
 	}
+
 	public Date getFechabaja() {
 		return fechabaja;
 	}
+
 	public void setFechabaja(Date fechabaja) {
 		this.fechabaja = fechabaja;
 	}
+
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+
+	public Date getFechaalta() {
+		return fechaalta;
+	}
+
+	public void setFechaalta(Date fechaalta) {
+		this.fechaalta = fechaalta;
+	}
+	
+	public String getValidada() {
+		return validada;
+	}
+
+	public void setValidada(String validada) {
+		this.validada = validada;
+	}
+
+	public Date getFechadesde() {
+		return fechadesde;
+	}
+
+	public void setFechadesde(Date fechadesde) {
+		this.fechadesde = fechadesde;
+	}
+	public Date getFechahasta() {
+		return fechahasta;
+	}
+
+	public void setFechahasta(Date fechahasta) {
+		this.fechahasta = fechahasta;
+	}
+	public String getOrdenGrupo() {
+		return ordenGrupo;
+	}
+
+	public void setOrdenGrupo(String ordenGrupo) {
+		this.ordenGrupo = ordenGrupo;
+	}
+	public String getGrupoGuardiaColegiado() {
+		return grupoGuardiaColegiado;
+	}
+
+	public void setGrupoGuardiaColegiado(String grupoGuardiaColegiado) {
+		this.grupoGuardiaColegiado = grupoGuardiaColegiado;
+	}
+	public String getIdPersona() {
+		return idPersona;
+	}
+
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+
+	public Date getFechaValidacion() {
+		return fechaValidacion;
+	}
+
+	public void setFechaValidacion(Date fechaValidacion) {
+		this.fechaValidacion = fechaValidacion;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -372,8 +539,18 @@ public class GuardiasItem {
 		result = prime * result + ((tipoTurno == null) ? 0 : tipoTurno.hashCode());
 		result = prime * result + ((validaJustificacion == null) ? 0 : validaJustificacion.hashCode());
 		result = prime * result + ((zona == null) ? 0 : zona.hashCode());
+		result = prime * result + ((numColegiado == null) ? 0 : numColegiado.hashCode());
+		result = prime * result + ((fechaalta == null) ? 0 : fechaalta.hashCode());
+		result = prime * result + ((validada == null) ? 0 : validada.hashCode());
+		result = prime * result + ((fechadesde == null) ? 0 : fechadesde.hashCode());
+		result = prime * result + ((fechahasta == null) ? 0 : fechahasta.hashCode());
+		result = prime * result + ((ordenGrupo == null) ? 0 : ordenGrupo.hashCode());
+		result = prime * result + ((grupoGuardiaColegiado == null) ? 0 : grupoGuardiaColegiado.hashCode());
+		result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
+		result = prime * result + ((fechaValidacion == null) ? 0 : fechaValidacion.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -483,9 +660,54 @@ public class GuardiasItem {
 				return false;
 		} else if (!zona.equals(other.zona))
 			return false;
+		if (numColegiado == null) {
+			if (other.numColegiado != null)
+				return false;
+		} else if (!numColegiado.equals(other.numColegiado))
+			return false;
+		if (fechaalta == null) {
+			if (other.fechaalta != null)
+				return false;
+		} else if (!fechaalta.equals(other.fechaalta))
+			return false;
+		if (validada == null) {
+			if (other.validada != null)
+				return false;
+		} else if (!validada.equals(other.validada))
+			return false;
+		if (ordenGrupo == null) {
+			if (other.ordenGrupo != null)
+				return false;
+		} else if (!ordenGrupo.equals(other.ordenGrupo))
+			return false;
+		if (fechadesde == null) {
+			if (other.fechadesde != null)
+				return false;
+		} else if (!fechadesde.equals(other.fechadesde))
+			return false;
+		if (fechahasta == null) {
+			if (other.fechahasta != null)
+				return false;
+		} else if (!fechahasta.equals(other.fechahasta))
+			return false;
+		if (grupoGuardiaColegiado == null) {
+			if (other.grupoGuardiaColegiado != null)
+				return false;
+		} else if (!grupoGuardiaColegiado.equals(other.grupoGuardiaColegiado))
+			return false;
+		if (idPersona == null) {
+			if (other.idPersona != null)
+				return false;
+		} else if (!idPersona.equals(other.idPersona))
+			return false;
+		if (fechaValidacion == null) {
+			if (other.fechaValidacion != null)
+				return false;
+		} else if (!fechaValidacion.equals(other.fechaValidacion))
+			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "GuardiasItem [idGuardia=" + idGuardia + ", idTurno=" + idTurno + ", nombre=" + nombre + ", area=" + area
@@ -494,8 +716,17 @@ public class GuardiasItem {
 				+ ", partidaJudicial=" + partidaJudicial + ", jurisdiccion=" + jurisdiccion + ", grupoFacturacion="
 				+ grupoFacturacion + ", partidaPresupuestaria=" + partidaPresupuestaria + ", tipoTurno=" + tipoTurno
 				+ ", tipoGuardia=" + tipoGuardia + ", tipoDia=" + tipoDia + ", letradosGuardia=" + letradosGuardia
-				+ ", letradosIns=" + letradosIns + ", fechabaja=" + fechabaja + "]";
-	} 
+				+ ", letradosIns=" + letradosIns + ", fechabaja=" + fechabaja + ", numColegiado=" + numColegiado + ", fechaalta=" + fechaalta +
+				", validada=" + validada + ", ordenGrupo=" + ordenGrupo +", fechadesde=" + fechadesde +", fechahasta=" + fechahasta +
+				", grupoGuardiaColegiado=" + grupoGuardiaColegiado + ", idPersona=" + idPersona + ", fechaValidacion=" + fechaValidacion + "]";
+	}
 
 	
+
+	
+
+	
+
+	
+
 }

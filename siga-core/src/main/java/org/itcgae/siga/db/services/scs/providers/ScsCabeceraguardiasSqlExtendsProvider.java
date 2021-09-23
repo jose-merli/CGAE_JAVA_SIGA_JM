@@ -1,8 +1,12 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.GuardiasItem;
+import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
+import org.itcgae.siga.db.entities.ScsCabeceraguardias;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasSqlProvider;
 
 public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSqlProvider{
@@ -39,5 +43,142 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		
 		return sql.toString();
 	}
+	
+	public String busquedaGuardiasColegiado(GuardiasItem guardiaItem, String idInstitucion) {
+		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fechahasta;
+		String fechadesde;
+		sql.SELECT("guard.validado,"
+				+ "    guard.fechavalidacion,"
+				+ "    guard.idturno,"
+				+ "    guard.idguardia,"
+				+ "    guard.idcalendarioguardias,"
+				+ "    guard.idpersona,"
+				+ "    guard.fechavalidacion,"
+				+ "    guard.posicion AS ordenGrupo,"
+				+ "    guard.numerogrupo,"
+				+ "    ("
+				+ "        SELECT"
+				+ "            t.nombre"
+				+ "        FROM"
+				+ "            scs_turno t"
+				+ "        WHERE"
+				+ "                t.idinstitucion = guard.idinstitucion"
+				+ "            AND"
+				+ "                t.idturno = guard.idturno"
+				+ "    ) AS nomturno,"
+				+ "    ("
+				+ "        SELECT"
+				+ "            g.nombre"
+				+ "        FROM"
+				+ "            scs_guardiasturno g"
+				+ "        WHERE"
+				+ "                g.idinstitucion = guard.idinstitucion"
+				+ "            AND"
+				+ "                g.idturno = guard.idturno"
+				+ "            AND"
+				+ "                g.idguardia = guard.idguardia"
+				+ "    ) AS nomguardia,"
+				+ "    guard.fechainicio,"
+				+ "    guard.fecha_fin,"
+				+ "    perso.apellidos1"
+				+ "     || ' '"
+				+ "     || perso.apellidos2"
+				+ "     || ','"
+				+ "     || perso.nombre colegiado,"
+				+ "coleg.ncolegiado numeroColegiado");
+		
+				sql.FROM(" scs_cabeceraguardias guard,"
+						+ "    cen_persona perso,"
+						+ "    cen_colegiado coleg");
+				
+			sql.WHERE("coleg.idpersona = guard.idpersona"
+					+ "    AND"
+					+ "        coleg.idinstitucion = guard.idinstitucion"
+					+ "    AND"
+					+ "        perso.idpersona = guard.idpersona"
+					+ "    AND"
+					+ "        perso.idpersona = coleg.idpersona"
+					+ " AND "
+					+ "guard.idinstitucion = " + idInstitucion);
+			
+			
+			if(guardiaItem.getIdTurno() != null && guardiaItem.getIdTurno() != "") {
+				sql.WHERE("guard.idturno = " + guardiaItem.getIdTurno());
+			}
+			
+			if(guardiaItem.getIdGuardia() != null && guardiaItem.getIdGuardia() != "") {
+				sql.WHERE("guard.idguardia = " + guardiaItem.getIdGuardia());
+			}
+			
+			if(guardiaItem.getNumColegiado() != null && guardiaItem.getNumColegiado() != "") {
+				sql.WHERE("coleg.NCOLEGIADO = " + guardiaItem.getNumColegiado());
+			}
+			
+			
+			if(guardiaItem.getValidada() != null && guardiaItem.getValidada() != "") {
+				sql.WHERE("guard.validado= " + guardiaItem.getValidada());
+			}
+			
+			
+		
+			
+			if(guardiaItem.getFechadesde() != null) {
+				fechadesde = dateFormat.format(guardiaItem.getFechadesde());
+				sql.WHERE("( TO_CHAR(guard.fechainicio ,'DD/MM/RRRR') >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR')"
+						+ " OR "
+						+ "TO_CHAR(guard.fecha_fin ,'DD/MM/RRRR') >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR') )");
+			}
+			if(guardiaItem.getFechahasta() != null) {
+				fechahasta = dateFormat.format(guardiaItem.getFechahasta());
+				sql.WHERE("( TO_CHAR(guard.fechainicio ,'DD/MM/RRRR') <= TO_DATE('" + fechahasta + "', 'DD/MM/RRRR')"
+						+ " OR "
+						+ "TO_CHAR(guard.fecha_fin ,'DD/MM/RRRR') >= TO_DATE('" + fechahasta + "', 'DD/MM/RRRR') )");
+			}
+			
+			sql.WHERE("ROWNUM <= 200");
+	
+		return sql.toString();
+	}
+	
+	public String validarSolicitudGuardia(ScsCabeceraguardias record) {
+		SQL sql = new SQL();
+		String fechavalidacion;
+		String fechaInicio;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		fechavalidacion = dateFormat.format(record.getFechavalidacion());
+		fechaInicio = dateFormat.format(record.getFechainicio());
+		sql.UPDATE("SCS_CABECERAGUARDIAS");
+		
+		if (record.getFechavalidacion() != null) {
+			sql.SET("FECHAVALIDACION =  TO_DATE('" + fechavalidacion + "', 'DD/MM/RRRR')");
+		}
+		
+		sql.WHERE("IDINSTITUCION = '" + record.getIdinstitucion() + "'");
+		sql.WHERE("IDTURNO = " + record.getIdturno());
+		sql.WHERE("IDGUARDIA = " + record.getIdguardia());
+		sql.WHERE("IDPERSONA = " + record.getIdpersona());
+		sql.WHERE("FECHAINICIO = TO_DATE('" + fechaInicio + "', 'DD/MM/RRRR')");
+		return sql.toString();
+	}
+	
+	public String desvalidarGuardiaColegiado(ScsCabeceraguardias record) {
+		SQL sql = new SQL();
+		String fechaInicio;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		fechaInicio = dateFormat.format(record.getFechainicio());
+		sql.UPDATE("SCS_CABECERAGUARDIAS");
+		
+		sql.SET("FECHAVALIDACION =  null");
+		
+		sql.WHERE("IDINSTITUCION = '" + record.getIdinstitucion() + "'");
+		sql.WHERE("IDTURNO = " + record.getIdturno());
+		sql.WHERE("IDGUARDIA = " + record.getIdguardia());
+		sql.WHERE("IDPERSONA = " + record.getIdpersona());
+		sql.WHERE("FECHAINICIO = TO_DATE('" + fechaInicio + "', 'DD/MM/RRRR')");
+		return sql.toString();
+	}
+	
 }
 

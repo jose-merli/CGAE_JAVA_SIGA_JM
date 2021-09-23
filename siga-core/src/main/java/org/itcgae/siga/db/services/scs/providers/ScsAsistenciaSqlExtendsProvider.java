@@ -464,16 +464,18 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		SQL_INTERESADODESIGNA.SELECT("p.apellido1 || ' ' || p.apellido2|| ', '|| p.nombre");
 		SQL_INTERESADODESIGNA.FROM("scs_personajg p",
 				"scs_defendidosdesigna dd");
-		SQL_INTERESADODESIGNA.WHERE("p.idpersona = dd.idpersona and dd.anio = d.anio and dd.numero = d.numero and dd.idturno = d.idturno and dd.idinstitucion = d.idinstitucion and p.idinstitucion = d.idinstitucion");
+		SQL_INTERESADODESIGNA.WHERE("p.idpersona = dd.idpersona and dd.anio = d.anio and dd.numero = d.numero and dd.idturno = d.idturno and dd.idinstitucion = d.idinstitucion and p.idinstitucion = d.idinstitucion AND asi.idpersonajg = p.idpersona");
 		//---
 		SQL_DESIGNAS.SELECT(
 				"TRIM('D')|| d.anio|| '/'|| TO_CHAR(d.numero) sjcs",
 				"d.idinstitucion",
 				"d.anio",
 				"d.numero",
+				"null numejg",
 				"dl.idpersona idletrado",
 				"nvl(decode(nvl(c.comunitario,0),0, c.ncolegiado, c.ncomunitario), c.ncolegiado)|| ' - ' || cen_persona.apellidos1 || ' ' || cen_persona.apellidos2|| ','|| cen_persona.nombre letrado",
 				"TO_CHAR(asi.idturno) idturno",
+				"null idguardia",
 				"TO_CHAR(d.idturno) idturnodesigna",
 				"TO_CHAR(d.idtipodesignacolegio) idtipo",
 				"TO_CHAR(d.numero) codigo",
@@ -484,10 +486,13 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				"null fechaimpugnacion",
 				"null dictamen",
 				"null fechadictamen",
+				"null idTipoDictamenEjg",
+				"null IDFUNDAMENTOCALIF",
+				"null dictamenObs",
 				"'Sin resolución' resolucion",
 				"null fecharesolucion",
 				"null centrodetencion",
-				"TO_CHAR(d.fechaentrada, 'DD/MM/YYYY') fechaasunto",
+				"d.fechaentrada fechaasunto",
 				"'Sin número' || ' / ' || NVL(d.nig,'Sin número') || ' / ' || NVL(d.numprocedimiento,'Sin número') dilnigproc");
 		SQL_DESIGNAS.FROM("scs_asistencia asi");
 		SQL_DESIGNAS.INNER_JOIN(
@@ -514,13 +519,15 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 
 
 		SQL_EJG.SELECT(
-				"TRIM('E') || e.anio || '/' || TO_CHAR(e.numero) sjcs",
+				"TRIM('E') || e.anio || '/' || e.numejg sjcs",
 				"e.idinstitucion",
 				"e.anio",
-				"e.numero",
+				"e.numero numero",
+				"e.numejg numejg",
 				"e.idpersona idletrado",
-				"nvl(decode(nvl(c.comunitario,0),0, c.ncolegiado, c.ncomunitario), c.ncolegiado)|| ' - ' || cen_persona.apellidos1|| ' '|| cen_persona.apellidos2|| ','|| cen_persona.nombre letrado",
+				"case when e.idpersona is not null then nvl(decode(nvl(c.comunitario,0),0, c.ncolegiado, c.ncomunitario), c.ncolegiado)|| ' - ' || cen_persona.apellidos1|| ' '|| cen_persona.apellidos2|| ','|| cen_persona.nombre else '' end letrado",
 				"TO_CHAR(e.guardiaturno_idturno) idturno",
+				"TO_CHAR(e.guardiaturno_idguardia) idguardia",
 				"TO_CHAR(a.idturno) idturnodesigna",
 				"TO_CHAR(e.idtipoejg) idtipo",
 				"e.numejg codigo",
@@ -535,19 +542,22 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 				"imp.descripcion impugnacion",
 				"fechaauto fechaimpugnacion",
 				"f_siga_getrecurso(dic.descripcion,"+idLenguaje+") dictamen",
-				"TO_CHAR(fechadictamen,'DD/MM/YYYY') fechadictamen",
+				"fechadictamen fechadictamen",
+				"e.idtipodictamenejg idTipoDictamenEjg",
+				"e.IDFUNDAMENTOCALIF",
+				"DBMS_LOB.substr(e.dictamen,3000) dictamenObs",
 				"NVL(f_siga_getrecurso(res.descripcion,"+idLenguaje+"),'Sin resolución') resolucion",
-				"TO_CHAR(e.FECHARESOLUCIONCAJG,'DD/MM/YYYY') fecharesolucion",
+				"e.FECHARESOLUCIONCAJG fecharesolucion",
 				"null centrodetencion",
-				"TO_CHAR(fechaapertura, 'DD/MM/YYYY') fechaasunto",
+				"fechaapertura fechaasunto",
 				"NVL(e.numerodiligencia,'Sin número') || ' / ' || NVL(e.nig,'Sin número') || ' / ' || NVL(e.numeroprocedimiento,'Sin número') dilnigproc");
 
 		SQL_EJG.FROM("scs_ejg e");
-		SQL_EJG.INNER_JOIN("scs_asistencia a on a.idinstitucion = e.idinstitucion AND a.ejganio = e.anio AND a.ejgnumero = e.numero AND a.ejgidtipoejg = e.idtipoejg",
-				"cen_persona on cen_persona.idpersona = e.idpersona",
+		SQL_EJG.INNER_JOIN("scs_asistencia a on a.idinstitucion = e.idinstitucion AND a.ejganio = e.anio AND a.ejgnumero = e.numero AND a.ejgidtipoejg = e.idtipoejg");
+		SQL_EJG.LEFT_OUTER_JOIN("cen_persona on cen_persona.idpersona = e.idpersona",
 				"cen_colegiado c on cen_persona.idpersona=c.idpersona and c.idinstitucion=e.idinstitucion",
-				"scs_personajg perjg on perjg.idpersona = e.idpersonajg and e.idinstitucion = perjg.idinstitucion");
-		SQL_EJG.LEFT_OUTER_JOIN("scs_tipodictamenejg dic on e.idtipodictamenejg = dic.idtipodictamenejg and e.idinstitucion = dic.idinstitucion",
+				"scs_personajg perjg on perjg.idpersona = e.idpersonajg and e.idinstitucion = perjg.idinstitucion",
+				"scs_tipodictamenejg dic on e.idtipodictamenejg = dic.idtipodictamenejg and e.idinstitucion = dic.idinstitucion",
 				"scs_tiporesolucion res on e.IDTIPORATIFICACIONEJG = res.idtiporesolucion",
 				"scs_tiporesolauto imp ON e.idtiporesolauto = imp.idtiporesolauto");
 		SQL_EJG.WHERE("a.anio = '"+anio+"' AND  a.numero = '"+num+"' AND  a.idinstitucion ="+idInstitucion);
@@ -565,4 +575,110 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		return SQL_PADRE.toString();
 	}
 
+	public String comboTipoDocumentosAsistencia (){
+		SQL SQL = new SQL();
+
+		SQL.SELECT("TDA.IDTIPODOCUMENTOASI",
+				"TDA.NOMBRE");
+		SQL.FROM("SCS_TIPODOCUMENTOASI TDA");
+		SQL.WHERE("FECHABAJA IS NULL");
+
+		return SQL.toString();
+	}
+
+	public String comboAsociadoAsistencia (String anio, String numero, Short idInstitucion, Integer idLenguaje){
+		SQL SQL = new SQL();
+		SQL.SELECT("AA.IDACTUACION AS ID",
+				"AA.IDACTUACION || ' - ' || substr(F_SIGA_GETRECURSO(TA.DESCRIPCION, "+idLenguaje+"), 0, 60) AS DESCRIPCION ");
+		SQL.FROM("SCS_ACTUACIONASISTENCIA AA");
+		SQL.INNER_JOIN("SCS_TIPOACTUACION TA ON TA.IDINSTITUCION = AA.IDINSTITUCION \n" +
+				"AND TA.IDTIPOASISTENCIA = AA.IDTIPOASISTENCIA \n" +
+				"AND TA.IDTIPOACTUACION = AA.IDTIPOACTUACION ");
+		SQL.WHERE("AA.IDINSTITUCION = "+ idInstitucion,
+				"AA.ANIO = '"+anio+"'",
+				"AA.NUMERO = '"+numero+"'");
+		SQL.ORDER_BY("ID");
+		return SQL.toString();
+	}
+
+	public String searchDocumentacion(String anio , String numero, Short idInstitucion, String idActuacion){
+		SQL SQL = new SQL();
+		SQL.SELECT("da.iddocumentacionasi",
+				"da.idtipodocumento",
+				"da.idfichero",
+				"CASE " +
+						"WHEN DA.IDACTUACION IS NULL " +
+						"THEN 0 " +
+						"WHEN DA.IDACTUACION IS NOT NULL " +
+						"THEN DA.IDACTUACION END AS IDACTUACION",
+				"da.observaciones",
+				"da.nombrefichero",
+				"TO_CHAR(da.fechaentrada,'DD/MM/YYYY') fechaentrada",
+				"p.idpersona");
+		SQL.FROM("scs_documentacionasi DA");
+		SQL.INNER_JOIN("ADM_USUARIOS ADM ON ADM.IDUSUARIO = DA.USUMODIFICACION AND ADM.IDINSTITUCION = DA.IDINSTITUCION");
+		SQL.INNER_JOIN("CEN_PERSONA P ON ADM.NIF = P.NIFCIF");
+
+		SQL.WHERE("DA.ANIO = '"+anio+"' AND DA.NUMERO = '"+numero+"' AND da.idinstitucion = "+idInstitucion);
+		if(!UtilidadesString.esCadenaVacia(idActuacion)){
+			SQL.WHERE("DA.IDACTUACION = '"+idActuacion+"'");
+		}
+
+		return SQL.toString();
+	}
+
+	public String comboOrigenContacto (Short idInstitucion){
+		SQL SQL = new SQL();
+
+		SQL.SELECT("IDORIGENCONTACTO AS ID",
+				"DESCRIPCION");
+		SQL.FROM("SCS_ORIGENCONTACTO");
+		SQL.WHERE("IDINSTITUCION="+idInstitucion,
+				"FECHA_BAJA IS NULL");
+		SQL.ORDER_BY("IDORIGENCONTACTO");
+
+		return SQL.toString();
+	}
+
+	public String searchActuaciones(String anio, String num, Short idInstitucion, int idLenguaje, String mostrarHistorico){
+		SQL SQL = new SQL();
+		SQL.SELECT("aa.idactuacion",
+				"TO_CHAR(aa.fecha, 'DD/MM/YYYY') fecha",
+				"aa.numeroasunto",
+				"TO_CHAR(aa.fechajustificacion,'DD/MM/YYYY') fechajustificacion",
+				"CASE " +
+						" when aa.validada = '1'" +
+						"     then 'SÍ'\n" +
+						"     else 'NO'\n" +
+						"    end validada",
+				"aa.anulacion",
+				"aa.idfacturacion",
+				"aa.facturado",
+				"aa.IDTIPOACTUACION ",
+				"f_siga_getrecurso(ta.descripcion, "+idLenguaje+") descripcionactuacion",
+				"CASE" +
+						"    WHEN aa.facturado = '1'" +
+						"    then decode(aa.idfacturacion, NULL, NULL, fjg.nombre" +
+						"                                         || ' ('" +
+						"                                         || to_char(fjg.fechadesde, 'DD/MM/YYYY')" +
+						"                                         || '-'" +
+						"                                         || to_char(fjg.fechahasta, 'DD/MM/YYYY')" +
+						"                                         || ')')" +
+						"    else null end nombrefacturacion");
+		SQL.FROM("scs_actuacionasistencia  aa");
+		SQL.INNER_JOIN(" scs_asistencia a on  aa.idinstitucion = a.idinstitucion AND aa.anio = a.anio AND aa.numero = a.numero",
+				"  scs_tipoactuacion  ta on ta.idinstitucion = aa.idinstitucion AND ta.idtipoasistencia = aa.idtipoasistencia  AND ta.idtipoactuacion= aa.idtipoactuacion");
+		SQL.LEFT_OUTER_JOIN(" fcs_facturacionjg fjg on fjg.idfacturacion = aa.idfacturacion AND fjg.idinstitucion = aa.idinstitucion");
+		SQL.WHERE("aa.idinstitucion = "+idInstitucion,
+				"aa.anio = '"+anio+"'",
+				"aa.numero = '"+num+"'");
+		SQL.AND();
+		if("S".equals(mostrarHistorico)){
+			SQL.WHERE("aa.anulacion = '0' or aa.anulacion is null or aa.anulacion = '1'");
+		}else{
+			SQL.WHERE("aa.anulacion = '0' or aa.anulacion is null");
+		}
+		SQL.ORDER_BY("aa.idactuacion");
+		return SQL.toString();
+	}
 }

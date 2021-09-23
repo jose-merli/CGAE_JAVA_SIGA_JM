@@ -139,14 +139,23 @@ public interface GuardiasService {
 	public InscripcionesResponseDTO getInscripciones(InscripcionDatosEntradaDTO inscripcionesDTO,
 			HttpServletRequest request);
 	
-	public UpdateResponseDTO validarInscripciones(BusquedaInscripcionItem validarbody,
-			HttpServletRequest request);
 	
-	public UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarbody,
-			HttpServletRequest request);
+	
+
+	GuardiasDTO busquedaGuardiasColegiado(GuardiasItem guardiaItem, HttpServletRequest request);
+
+	public UpdateResponseDTO validarSolicitudGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
+
+	public UpdateResponseDTO desvalidarGuardiaColegiado(GuardiasItem guardiasItem, HttpServletRequest request);
+
+	public DeleteResponseDTO eliminarGuardiaColegiado(GuardiasItem guardiasItem, HttpServletRequest request);
 
 	public InsertResponseDTO generarCalendarioAsync();
 
 	public ByteArrayInputStream descargarZIPExcelLog(HttpServletRequest request, List<DatosCalendarioProgramadoItem> programacionItem);
+
+	UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarBody, HttpServletRequest request);
+
+	UpdateResponseDTO validarInscripciones(BusquedaInscripcionItem validarBody, HttpServletRequest request);
 
 }
