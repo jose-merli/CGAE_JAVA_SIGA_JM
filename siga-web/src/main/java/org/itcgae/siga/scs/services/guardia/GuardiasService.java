@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.guardia;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -132,7 +133,7 @@ public interface GuardiasService {
 
 	public InsertResponseDTO generarCalendario(HttpServletRequest request, DatosCalendarioProgramadoItem programacionItem);
 
-	public DatosDocumentoItem descargarExcelLog(HttpServletRequest request);
+	public DatosDocumentoItem descargarExcelLog(HttpServletRequest request, DatosCalendarioProgramadoItem list);
 			
 
 	public InscripcionesResponseDTO getInscripciones(InscripcionDatosEntradaDTO inscripcionesDTO,
@@ -143,5 +144,9 @@ public interface GuardiasService {
 	
 	public UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarbody,
 			HttpServletRequest request);
+
+	public InsertResponseDTO generarCalendarioAsync();
+
+	public ByteArrayInputStream descargarZIPExcelLog(HttpServletRequest request, List<DatosCalendarioProgramadoItem> programacionItem);
 
 }

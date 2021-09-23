@@ -187,7 +187,7 @@ public class ScsCabeceraguardiasSqlProvider {
         }
         
         if (record.getComensustitucion() != null) {
-            sql.VALUES("COMENSUSTITUCION", record.getComensustitucion());
+            sql.VALUES("COMENSUSTITUCION", "'" + record.getComensustitucion()+ "'");
         }
         
         if (record.getFechavalidacion() != null) {
@@ -195,11 +195,13 @@ public class ScsCabeceraguardiasSqlProvider {
         }
         
         if (record.getIdfacturacion() != null) {
-            sql.VALUES("IDFACTURACION", record.getIdfacturacion().toString());
+            sql.VALUES("IDFACTURACION", record.getIdfacturacion().toString() );
         }
         
-        if (record.getFechaalta() != null) {
+        if (fechaalta != null) {
             sql.VALUES("FECHAALTA", "'" + fechaalta + "'");
+        }else {
+        	sql.VALUES("FECHAALTA", "'" + today + "'");
         }
         
         if (record.getPosicion() != null) {

@@ -2,6 +2,7 @@ package org.itcgae.siga.DTOs.scs;
 
 public class DatosCalendarioProgramadoItem {
 	
+	private String idInstitucion;
 	private String turno;
 	private String guardia;
 	private String idGuardia;
@@ -16,6 +17,8 @@ public class DatosCalendarioProgramadoItem {
 	private String idCalG;
 	private String listaGuardias;
 	private String idCalendarioProgramado;
+	private Boolean facturado;
+	private Boolean asistenciasAsociadas;
 	
 	public String getFechaDesde() {
 		return fechaDesde;
@@ -101,6 +104,25 @@ public class DatosCalendarioProgramadoItem {
 	public void setIdCalendarioProgramado(String idCalendarioProgramado) {
 		this.idCalendarioProgramado = idCalendarioProgramado;
 	}
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+	public Boolean getFacturado() {
+		return facturado;
+	}
+	public void setFacturado(Boolean facturado) {
+		this.facturado = facturado;
+	}
+	public Boolean getAsistenciasAsociadas() {
+		return asistenciasAsociadas;
+	}
+	public void setAsistenciasAsociadas(Boolean asistenciasAsociadas) {
+		this.asistenciasAsociadas = asistenciasAsociadas;
+	}
+
 	
 	
 }

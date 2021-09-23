@@ -304,7 +304,12 @@ public class GuardiaController {
 	ResponseEntity<InsertResponseDTO> newCalendarioProgramado(
 			@RequestBody DatosCalendarioProgramadoItem calendarioItem, HttpServletRequest request) {
 		InsertResponseDTO response = guardiasService.newCalendarioProgramado( request, calendarioItem);
+		
+		if (response.getStatus() == "OK") {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.CONFLICT);
+		}
 			}
 	
 	
@@ -315,6 +320,23 @@ public class GuardiaController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 			}
 	
+	
+	@PostMapping(value = "/descargarZipExcelLog", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InputStreamResource> descargarZIPExcelLog(
+			@RequestBody  List<DatosCalendarioProgramadoItem> programacionItemList, HttpServletRequest request) {
+		ByteArrayInputStream response = guardiasService.descargarZIPExcelLog(request, programacionItemList);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.parseMediaType("application/zip"));
+		headers.add("Content-Disposition", String.format("inline; filename=%s", "GeneracionCalendariosLog_ZIP"));
+		headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+		if (response != null) {
+		return ResponseEntity.ok().headers(headers).body(new InputStreamResource(response));
+		}else {
+			return new ResponseEntity<InputStreamResource>(null, headers,
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+}
+	
 	/*@GetMapping(value = "/descargarExcelLog", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DatosDocumentoItem> descargarExcelLog( HttpServletRequest request) {
 		DatosDocumentoItem response = guardiasService.descargarExcelLog(request);
@@ -322,9 +344,9 @@ public class GuardiaController {
 			}*/
 	
 	
-	@RequestMapping(value = "/descargarExcelLog",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public ResponseEntity<InputStreamResource> descargarModelo(HttpServletRequest request) throws IOException, EncryptedDocumentException, InvalidFormatException {
-		DatosDocumentoItem response = guardiasService.descargarExcelLog(request);
+	@RequestMapping(value = "/descargarExcelLog",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	public ResponseEntity<InputStreamResource> descargarModelo(@RequestBody DatosCalendarioProgramadoItem programacionItem, HttpServletRequest request) throws IOException, EncryptedDocumentException, InvalidFormatException {
+		DatosDocumentoItem response = guardiasService.descargarExcelLog(request, programacionItem);
 		ByteArrayInputStream bis = new ByteArrayInputStream(response.getDatos());
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.parseMediaType("application/octet-stream"));
