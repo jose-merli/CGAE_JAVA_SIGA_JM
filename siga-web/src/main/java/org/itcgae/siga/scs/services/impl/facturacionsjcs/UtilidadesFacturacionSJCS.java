@@ -13,6 +13,7 @@ import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Hashtable;
 
@@ -41,11 +42,11 @@ public class UtilidadesFacturacionSJCS {
     @Autowired
     private GenRecursosMapper genRecursosMapper;
 
-    private Hashtable getNombreFicherosFacturacion(Short idInstitucion, Integer idFacturacion) throws Exception {
+    public Hashtable getNombreFicherosFacturacion(Short idInstitucion, Integer idFacturacion) throws Exception {
         return getNombreFicherosFac(idInstitucion, idFacturacion, null, null);
     }
 
-    private Hashtable getNombreFicherosPago(Short idInstitucion, Integer idFacturacion, Integer idPago, Long idPersona) throws Exception {
+    public Hashtable getNombreFicherosPago(Short idInstitucion, Integer idFacturacion, Integer idPago, Long idPersona) throws Exception {
         return getNombreFicherosFac(idInstitucion, idFacturacion, idPago, idPersona);
     }
 
@@ -256,4 +257,49 @@ public class UtilidadesFacturacionSJCS {
             throw new FacturacionSJCSException("Error al exportar datos", e, getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.exportDatos"));
         }
     }
+
+    /**
+     * Funcion que elimina los ficheros de una facturacion o pago
+     *
+     * @param idInstitucion
+     * @param nombreFicheros
+     */
+    public void borrarFicheros(Short idInstitucion, Hashtable nombreFicheros) {
+
+        GenParametrosExample genParametrosExample = new GenParametrosExample();
+        genParametrosExample.createCriteria().andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion))
+                .andModuloEqualTo(SigaConstants.MODULO_FCS)
+                .andParametroEqualTo(SigaConstants.PATH_PREVISIONES);
+
+        genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+        String path = genParametrosExtendsMapper.selectByExample(genParametrosExample).get(0).getValor();
+
+        File fichero;
+
+        if (nombreFicheros == null) {
+            return;
+        }
+
+        fichero = new File(path + File.separator + nombreFicheros.get(SigaConstants.HITO_GENERAL_TURNO));
+        if (fichero.exists()) {
+            fichero.delete();
+        }
+
+        fichero = new File(path + File.separator + nombreFicheros.get(SigaConstants.HITO_GENERAL_GUARDIA));
+        if (fichero.exists()) {
+            fichero.delete();
+        }
+
+        fichero = new File(path + File.separator + nombreFicheros.get(SigaConstants.HITO_GENERAL_EJG));
+        if (fichero.exists()) {
+            fichero.delete();
+        }
+
+        fichero = new File(path + File.separator + nombreFicheros.get(SigaConstants.HITO_GENERAL_SOJ));
+        if (fichero.exists()) {
+            fichero.delete();
+        }
+    }
+
 }
