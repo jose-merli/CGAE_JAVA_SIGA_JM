@@ -208,6 +208,23 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 
 	}
 	
+	public String getCriterioByIdConsulta(short idInstitucion, int idConsulta) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" SENTENCIA");
+		
+		sql.FROM(" con_consulta");
+		sql.WHERE(" idobjetivo = 3");
+		sql.WHERE(" idclase = 1");
+		sql.WHERE(" idinstitucion = '" + idInstitucion + "'");
+		sql.WHERE(" idconsulta = " + idConsulta);
+
+		return sql.toString();
+		
+		//select sentencia from con_consulta where idobjetivo = 3 and idclase = 1 and idinstitucion = 2005 and idconsulta = 44;
+
+	}
+	
 	public String getIdServicioInstitucion(ServicioDetalleDTO servicio, Short idInstitucion) {
 		SQL sql = new SQL();
 		

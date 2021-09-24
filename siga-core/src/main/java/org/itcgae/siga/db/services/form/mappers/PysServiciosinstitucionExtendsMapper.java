@@ -79,6 +79,9 @@ public interface PysServiciosinstitucionExtendsMapper extends PysServiciosinstit
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ComboItem> comboCondicionSuscripcion(String idioma ,Short idInstitucion);
+	
+	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "getCriterioByIdConsulta")
+	String getCriterioByIdConsulta(Short idInstitucion, int idConsulta);
 
 	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "getIdServicioInstitucion")
 	@Results({ 

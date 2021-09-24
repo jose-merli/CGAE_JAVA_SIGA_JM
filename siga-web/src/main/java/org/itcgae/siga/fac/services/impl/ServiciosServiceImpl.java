@@ -70,6 +70,10 @@ public class ServiciosServiceImpl implements IServiciosService {
 	@Autowired
 	private PysFormapagoserviciosMapper pysFormaPagoServicios;
 	
+	@Autowired
+	private EjecucionPlsServicios ejecucionPlsServicios;
+	
+	
 	@Override
 	public ListaServiciosDTO searchListadoServicios(HttpServletRequest request, FiltroServicioItem filtroServicioItem) {
 		ListaServiciosDTO listaServiciosDTO = new ListaServiciosDTO();
@@ -340,6 +344,18 @@ public class ServiciosServiceImpl implements IServiciosService {
 					servicioInstitucion.setAutomatico(servicio.getAutomatico());
 					servicioInstitucion.setIniciofinalponderado("P");
 					servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
+					
+					if(servicio.getIdconsulta() != 0) {
+						String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, servicio.getIdconsulta());
+						criterios = criterios.replace("<SELECT>", "");
+						criterios = criterios.replace("</SELECT>", "");
+						criterios = criterios.replace("<FROM>", "");
+						criterios = criterios.replace("</FROM>", "");
+						criterios = criterios.replace("<WHERE>", "");
+						criterios = criterios.replace("</WHERE>", "");
+
+						servicioInstitucion.setCriterios(criterios);
+					}
 									
 					servicioInstitucion.setFechabaja(null);
 					servicioInstitucion.setFechamodificacion(new Date());
@@ -352,8 +368,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 					
 					servicioInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-					status = pysServiciosInstitucionMapper.insertSelective(servicioInstitucion);
-					
+					status = pysServiciosInstitucionMapper.insertSelective(servicioInstitucion);			
 					
 					if(status == 0) {
 						insertResponseDTO.setStatus(SigaConstants.KO);
@@ -362,8 +377,22 @@ public class ServiciosServiceImpl implements IServiciosService {
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
 					
-					if(servicio.getAutomatico().equals("1") && status == 1) {
-					//AQUI LLAMAR AL PL SUSCRIPCION AUTO
+					if(servicio.getAutomatico() != null) {
+						if(servicio.getAutomatico().equals("1") && status == 1) {
+							LOGGER.info(
+									"nuevoServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Entrada a ejecucionPlsServicios para comenzar el proceso de suscripcion automatica de servicios");
+						
+							
+							 String resultado[] = ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio(idInstitucion, servicio.getIdtiposervicios(), servicio.getIdservicio(), idOrdenacion.getNewId(), usuarios.get(0));
+							 
+							 if (!resultado[0].equalsIgnoreCase("0")) {
+						            LOGGER.error("Error en PL = " + (String) resultado[1]);
+						            throw new Exception("Ha ocurrido un error al ejecutar el proceso de suscripción automática. Error en PL = " + (String) resultado[1]);				          
+						      }
+							 
+								LOGGER.info(
+										"nuevoServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Salida de ejecucionPlsServicios, proceso de suscripcion automatica de servicios terminado");
+						}
 					}
 
 					LOGGER.info(
