@@ -12,7 +12,8 @@ public class ServicioDetalleDTO {
 	private int idservicio; //Tipo Servicio
 	private int idserviciosinstitucion; //Servicio
 	private String descripcion;
-	private String iniciofinalponderado;
+	private String iniciofinalponderado; //Aplicación de precio por cambio de situación del interesado Radio Buttons
+	private String facturacionponderada; //Facturación proporcional por días de suscripción Checkbox
 	private String momentocargo;
 	private String permitirbaja;
 	private String permitiralta;
@@ -22,7 +23,6 @@ public class ServicioDetalleDTO {
 	private Date fechabaja;
 	private int idconsulta;
 	private String criterios;
-	private String facturacionponderada;
 	private int idtipoiva;
 	private String codigo_traspasonav;
 	

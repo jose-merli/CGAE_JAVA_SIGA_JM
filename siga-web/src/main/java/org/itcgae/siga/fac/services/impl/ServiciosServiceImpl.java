@@ -454,16 +454,22 @@ public class ServiciosServiceImpl implements IServiciosService {
 					
 					LOGGER.info(
 							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de internet");
+					List<Integer> listaFormasDePagoInternet = pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion);
 					
-					servicioDetalleDTO.setFormasdepagointernet(pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion));
+					if(listaFormasDePagoInternet != null && !listaFormasDePagoInternet.isEmpty()) {
+						servicioDetalleDTO.setFormasdepagointernet(listaFormasDePagoInternet);
+					}
 					
 					LOGGER.info(
 							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio() -> Salida a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de internet");
 					
 					LOGGER.info(
 							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
+					List<Integer> listaFormasDePagoSecretaria = pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion);
 					
-					servicioDetalleDTO.setFormasdepagosecretaria(pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion));
+					if(listaFormasDePagoSecretaria != null && !listaFormasDePagoSecretaria.isEmpty()) {
+						servicioDetalleDTO.setFormasdepagosecretaria(listaFormasDePagoSecretaria);
+					}
 					
 					LOGGER.info(
 							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio() -> Salida a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
@@ -776,10 +782,12 @@ public class ServiciosServiceImpl implements IServiciosService {
 				servicioInstitucion.setIdservicio((long) servicio.getIdservicio());
 				servicioInstitucion.setIdserviciosinstitucion(Long.valueOf(idServicioInstitucion.getNewId()));
 							
-				//servicioInstitucion.setNofacturable(servicio.getNofacturable());Falta la columna en la tabla 
+				servicioInstitucion.setNofacturable(servicio.getNofacturable());
 				servicioInstitucion.setIdtipoiva(servicio.getIdtipoiva());
-				//FACTURACION PROPORCIONAL POR DIAS
-				//RADIO BUTTONS Aplicación de precio por cambio de situación del interesado SE GUARDA EN INICIOFINALPONDERADO POR DEFECTO A P
+				servicioInstitucion.setFacturacionponderada(servicio.getFacturacionponderada());
+				servicioInstitucion.setIniciofinalponderado(servicio.getIniciofinalponderado());
+				
+				//SOLO SI LA OPCION INICIOFINALPONDERADO ES P, LLAMAR A PL?
 				
 				servicioInstitucion.setFechamodificacion(new Date());
 				servicioInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());

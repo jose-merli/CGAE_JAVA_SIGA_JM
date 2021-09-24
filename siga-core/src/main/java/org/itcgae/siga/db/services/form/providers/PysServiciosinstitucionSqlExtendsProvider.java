@@ -230,7 +230,7 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		
 		sql.SELECT(" IDSERVICIOSINSTITUCION");
 		
-		sql.FROM(" IDSERVICIOSINSTITUCION");
+		sql.FROM(" PYS_SERVICIOSINSTITUCION");
 		
 		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
 		sql.WHERE(" IDTIPOSERVICIOS ='" + servicio.getIdtiposervicios() + "'");

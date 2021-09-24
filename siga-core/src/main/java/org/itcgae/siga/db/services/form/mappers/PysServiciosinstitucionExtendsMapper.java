@@ -85,7 +85,7 @@ public interface PysServiciosinstitucionExtendsMapper extends PysServiciosinstit
 
 	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "getIdServicioInstitucion")
 	@Results({ 
-		@Result(column = "IDPRODUCTOINSTITUCION", property = "newId", jdbcType = JdbcType.NUMERIC)
+		@Result(column = "IDSERVICIOSINSTITUCION", property = "newId", jdbcType = JdbcType.NUMERIC)
 		}) 
 	NewIdDTO getIdServicioInstitucion(ServicioDetalleDTO servicio, Short idInstitucion);
 }

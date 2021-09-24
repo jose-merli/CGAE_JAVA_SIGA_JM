@@ -692,16 +692,22 @@ public class ProductosServiceImpl implements IProductosService{
 					
 					LOGGER.info(
 							"detalleProducto() / PysProductosinstitucionExtendsMapper.obtenerFormasDePagoInternetByProducto() -> Entrada a PysProductosinstitucionExtendsMapper para obtener las formas de pago de internet");
+					List<Integer> listaFormasDePagoInternet = pysProductosInstitucionExtendsMapper.obtenerFormasDePagoInternetByProducto(idTipoProducto, idProducto, idProductoInstitucion, idInstitucion);
 					
-					productoDetalleDTO.setFormasdepagointernet(pysProductosInstitucionExtendsMapper.obtenerFormasDePagoInternetByProducto(idTipoProducto, idProducto, idProductoInstitucion, idInstitucion));
+					if(listaFormasDePagoInternet != null && !listaFormasDePagoInternet.isEmpty()) {
+						productoDetalleDTO.setFormasdepagointernet(listaFormasDePagoInternet);
+					}
 					
 					LOGGER.info(
 							"detalleProducto() / PysProductosinstitucionExtendsMapper.obtenerFormasDePagoInternetByProducto() -> Salida a PysProductosinstitucionExtendsMapper para obtener las formas de pago de internet");
 					
 					LOGGER.info(
 							"detalleProducto() / PysProductosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByProducto() -> Entrada a PysProductosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
+					List<Integer> listaFormasDePagoSecretaria = pysProductosInstitucionExtendsMapper.obtenerFormasDePagoSecretariaByProducto(idTipoProducto, idProducto, idProductoInstitucion, idInstitucion);
 					
-					productoDetalleDTO.setFormasdepagosecretaria(pysProductosInstitucionExtendsMapper.obtenerFormasDePagoSecretariaByProducto(idTipoProducto, idProducto, idProductoInstitucion, idInstitucion));
+					if(listaFormasDePagoSecretaria != null && !listaFormasDePagoSecretaria.isEmpty()) {
+						productoDetalleDTO.setFormasdepagosecretaria(listaFormasDePagoSecretaria);
+					}
 					
 					LOGGER.info(
 							"detalleProducto() / PysProductosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByProducto() -> Salida a PysProductosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
