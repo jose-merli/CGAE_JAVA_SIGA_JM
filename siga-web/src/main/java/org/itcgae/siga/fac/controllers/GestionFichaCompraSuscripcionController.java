@@ -9,6 +9,7 @@ import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.fac.services.IGestionFichaCompraSuscripcionService;
 import org.itcgae.siga.fac.services.IProductosService;
@@ -28,7 +29,7 @@ public class GestionFichaCompraSuscripcionController {
 	private IGestionFichaCompraSuscripcionService gestionFichaCompraSuscripcionService;
 
 	@PostMapping(value = "/pys/getFichaCompraSuscripcion")
-	ResponseEntity<FichaCompraSuscripcionItem> getFichaCompraSuscripcion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem peticion) { 
+	ResponseEntity<FichaCompraSuscripcionItem> getFichaCompraSuscripcionColegiado(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem peticion) { 
 		FichaCompraSuscripcionItem fichaCompleta = gestionFichaCompraSuscripcionService.getFichaCompraSuscripcion(request, peticion);
 		if(fichaCompleta != null)return new ResponseEntity<FichaCompraSuscripcionItem>(fichaCompleta, HttpStatus.OK);
 		else return new ResponseEntity<FichaCompraSuscripcionItem>(fichaCompleta, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -47,5 +48,18 @@ public class GestionFichaCompraSuscripcionController {
 		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@PostMapping(value = "/pys/aprobarCompra")
+	ResponseEntity<UpdateResponseDTO> aprobarCompra(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
+		UpdateResponseDTO response = gestionFichaCompraSuscripcionService.aprobarCompra(request, ficha);
+		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
+	@PostMapping(value = "/pys/savePagoCompraSuscripcion")
+	ResponseEntity<UpdateResponseDTO> savePagoCompraSuscripcion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
+		UpdateResponseDTO response = gestionFichaCompraSuscripcionService.savePagoCompraSuscripcion(request, ficha);
+		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }
