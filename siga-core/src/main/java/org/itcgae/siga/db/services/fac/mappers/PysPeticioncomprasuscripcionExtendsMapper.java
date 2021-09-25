@@ -1,5 +1,7 @@
 package org.itcgae.siga.db.services.fac.mappers;
 
+import java.util.Date;
+
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -28,14 +30,15 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			// TARJETA SOLICITUD
 			@Result(column = "idpeticion", property = "nSolicitud", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "usuModificacion", property = "usuModificacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "fechaSolicitud", property = "fechaSolicitud", jdbcType = JdbcType.DATE),
-			@Result(column = "fechaAprobacion", property = "fechaAprobacion", jdbcType = JdbcType.DATE),
-			@Result(column = "fechaDenegacion", property = "fechaDenegacion", jdbcType = JdbcType.DATE),
-			@Result(column = "fechaAnulacion", property = "fechaAnulacion", jdbcType = JdbcType.DATE),
+			@Result(column = "fechafechaPendiente", property = "fechafechaPendiente", jdbcType = JdbcType.DATE),
+			@Result(column = "fechafechaAceptada", property = "fechafechaAceptada", jdbcType = JdbcType.DATE),
+			@Result(column = "fechaDenegada", property = "fechaDenegada", jdbcType = JdbcType.DATE),
+			@Result(column = "fechaSolicitadaAnulacion", property = "fechaSolicitadaAnulacion", jdbcType = JdbcType.DATE),
+			@Result(column = "fechaAnulada", property = "fechaAnulada", jdbcType = JdbcType.DATE),
 			//TARJETA FORMAS DE PAGO
 			@Result(column = "idformaspagocomunes", property = "idFormasPagoComunes", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idFormaPagoSeleccionada", property = "idFormaPagoSeleccionada", jdbcType = JdbcType.VARCHAR)})
-	FichaCompraSuscripcionItem getFichaCompraSuscripcion(FichaCompraSuscripcionItem ficha, String letrado);
+	FichaCompraSuscripcionItem getFichaCompraSuscripcion(FichaCompraSuscripcionItem ficha, boolean esColegiado);
 	
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getNuevaFichaCompraSuscripcion")
 	@Results({ 
@@ -50,8 +53,12 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			@Result(column = "idpeticion", property = "nSolicitud", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "usuModificacion", property = "usuModificacion", jdbcType = JdbcType.VARCHAR),
 			//TARJETA FORMAS DE PAGO
-			@Result(column = "idformaspagocomunes", property = "idFormasPagoComunes", jdbcType = JdbcType.VARCHAR)})
-	FichaCompraSuscripcionItem getNuevaFichaCompraSuscripcion(FichaCompraSuscripcionItem ficha, String letrado);
+			@Result(column = "idformaspagocomunes", property = "idFormasPagoComunes", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "totalNeto", property = "totalNeto", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "totalIVA", property = "totalIVA", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "impTotal", property = "impTotal", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "pendPago", property = "pendPago", jdbcType = JdbcType.VARCHAR)})
+	FichaCompraSuscripcionItem getNuevaFichaCompraSuscripcion(FichaCompraSuscripcionItem ficha, boolean esColegiado);
 
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "selectMaxIdPeticion")
 	@Results({

@@ -15,19 +15,21 @@ public class FichaCompraSuscripcionItem {
 	// TARJETA SOLICITUD
 	private String nSolicitud;
 	private String usuModificacion;
-	private Date fechaSolicitud;
-	private Date fechaAprobacion;
-	private Date fechaDenegacion;
-	private Date fechaAnulacion;
+	private Date fechaPendiente;
+	private Date fechaDenegada;
+	private Date fechaAceptada;
+	private Date fechaSolicitadaAnulacion;
+	private Date fechaAnulada;
 	
 	//TARJETA FORMA DE PAGO
 	private String idFormasPagoComunes;
-	private Short idFormaPagoSeleccionada;
-	private float totalNeto;
-	private float totalIVA;
-	private float impTotal;
-	private float pendPago;
+	private String idFormaPagoSeleccionada;
+	private String totalNeto;
+	private String totalIVA;
+	private String impTotal;
+	private String pendPago;
     private String cuentaBancSelecc;
+    private String noFact;
 	
 	private String idEstadoPeticion;
 
@@ -75,30 +77,6 @@ public class FichaCompraSuscripcionItem {
 	public void setnSolicitud(String nSolicitud) {
 		this.nSolicitud = nSolicitud;
 	}
-	public Date getFechaSolicitud() {
-		return fechaSolicitud;
-	}
-	public void setFechaSolicitud(Date fechaSolicitud) {
-		this.fechaSolicitud = fechaSolicitud;
-	}
-	public Date getFechaAprobacion() {
-		return fechaAprobacion;
-	}
-	public void setFechaAprobacion(Date fechaAprobacion) {
-		this.fechaAprobacion = fechaAprobacion;
-	}
-	public Date getFechaDenegacion() {
-		return fechaDenegacion;
-	}
-	public void setFechaDenegacion(Date fechaDenegacion) {
-		this.fechaDenegacion = fechaDenegacion;
-	}
-	public Date getFechaAnulacion() {
-		return fechaAnulacion;
-	}
-	public void setFechaAnulacion(Date fechaAnulacion) {
-		this.fechaAnulacion = fechaAnulacion;
-	}
 	public ListaProductosItem[] getProductos() {
 		return productos;
 	}
@@ -111,10 +89,10 @@ public class FichaCompraSuscripcionItem {
 	public void setIdFormasPagoComunes(String idFormasPagoComunes) {
 		this.idFormasPagoComunes = idFormasPagoComunes;
 	}
-	public Short getIdFormaPagoSeleccionada() {
+	public String getIdFormaPagoSeleccionada() {
 		return idFormaPagoSeleccionada;
 	}
-	public void setIdFormaPagoSeleccionada(Short idFormaPagoSeleccionada) {
+	public void setIdFormaPagoSeleccionada(String idFormaPagoSeleccionada) {
 		this.idFormaPagoSeleccionada = idFormaPagoSeleccionada;
 	}
 	public String getUsuModificacion() {
@@ -135,29 +113,65 @@ public class FichaCompraSuscripcionItem {
 	public void setCuentaBancSelecc(String cuentaBancSelecc) {
 		this.cuentaBancSelecc = cuentaBancSelecc;
 	}
-	public float getTotalNeto() {
+	public String getTotalNeto() {
 		return totalNeto;
 	}
-	public void setTotalNeto(float totalNeto) {
+	public void setTotalNeto(String totalNeto) {
 		this.totalNeto = totalNeto;
 	}
-	public float getTotalIVA() {
+	public String getTotalIVA() {
 		return totalIVA;
 	}
-	public void setTotalIVA(float totalIVA) {
+	public void setTotalIVA(String totalIVA) {
 		this.totalIVA = totalIVA;
 	}
-	public float getImpTotal() {
+	public String getImpTotal() {
 		return impTotal;
 	}
-	public void setImpTotal(float impTotal) {
+	public void setImpTotal(String impTotal) {
 		this.impTotal = impTotal;
 	}
-	public float getPendPago() {
+	public String getPendPago() {
 		return pendPago;
 	}
-	public void setPendPago(float pendPago) {
+	public void setPendPago(String pendPago) {
 		this.pendPago = pendPago;
+	}
+	public String getNoFact() {
+		return noFact;
+	}
+	public void setNoFact(String noFact) {
+		this.noFact = noFact;
+	}
+	public Date getFechaPendiente() {
+		return fechaPendiente;
+	}
+	public void setFechaPendiente(Date fechaPendiente) {
+		this.fechaPendiente = fechaPendiente;
+	}
+	public Date getFechaDenegada() {
+		return fechaDenegada;
+	}
+	public void setFechaDenegada(Date fechaDenegada) {
+		this.fechaDenegada = fechaDenegada;
+	}
+	public Date getFechaAceptada() {
+		return fechaAceptada;
+	}
+	public void setFechaAceptada(Date fechaAceptada) {
+		this.fechaAceptada = fechaAceptada;
+	}
+	public Date getFechaSolicitadaAnulacion() {
+		return fechaSolicitadaAnulacion;
+	}
+	public void setFechaSolicitadaAnulacion(Date fechaSolicitadaAnulacion) {
+		this.fechaSolicitadaAnulacion = fechaSolicitadaAnulacion;
+	}
+	public Date getFechaAnulada() {
+		return fechaAnulada;
+	}
+	public void setFechaAnulada(Date fechaAnulada) {
+		this.fechaAnulada = fechaAnulada;
 	}
 
 }
