@@ -12,7 +12,8 @@ public class ServicioDetalleDTO {
 	private int idservicio; //Tipo Servicio
 	private int idserviciosinstitucion; //Servicio
 	private String descripcion;
-	private String iniciofinalponderado;
+	private String iniciofinalponderado; //Aplicación de precio por cambio de situación del interesado Radio Buttons
+	private String facturacionponderada; //Facturación proporcional por días de suscripción Checkbox
 	private String momentocargo;
 	private String permitirbaja;
 	private String permitiralta;
@@ -22,7 +23,6 @@ public class ServicioDetalleDTO {
 	private Date fechabaja;
 	private int idconsulta;
 	private String criterios;
-	private String facturacionponderada;
 	private int idtipoiva;
 	private String codigo_traspasonav;
 	
@@ -35,7 +35,7 @@ public class ServicioDetalleDTO {
 	private List<Integer> formasdepagointernetoriginales;
 	private List<Integer> formasdepagosecretariaoriginales;
 	private boolean editar;
-	private ProductoDetalleDTO productooriginal;
+	private ServicioDetalleDTO serviciooriginal;
 	
 	private String codigoext;
 	private String nofacturable;
@@ -234,12 +234,13 @@ public class ServicioDetalleDTO {
 		this.editar = editar;
 	}
 
-	public ProductoDetalleDTO getProductooriginal() {
-		return productooriginal;
+
+	public ServicioDetalleDTO getServiciooriginal() {
+		return serviciooriginal;
 	}
 
-	public void setProductooriginal(ProductoDetalleDTO productooriginal) {
-		this.productooriginal = productooriginal;
+	public void setServiciooriginal(ServicioDetalleDTO serviciooriginal) {
+		this.serviciooriginal = serviciooriginal;
 	}
 
 	public String getCodigoext() {
@@ -297,7 +298,7 @@ public class ServicioDetalleDTO {
 		result = prime * result + ((nofacturable == null) ? 0 : nofacturable.hashCode());
 		result = prime * result + ((permitiralta == null) ? 0 : permitiralta.hashCode());
 		result = prime * result + ((permitirbaja == null) ? 0 : permitirbaja.hashCode());
-		result = prime * result + ((productooriginal == null) ? 0 : productooriginal.hashCode());
+		result = prime * result + ((serviciooriginal == null) ? 0 : serviciooriginal.hashCode());
 		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
 		result = prime * result + valoriva;
 		return result;
@@ -419,10 +420,10 @@ public class ServicioDetalleDTO {
 				return false;
 		} else if (!permitirbaja.equals(other.permitirbaja))
 			return false;
-		if (productooriginal == null) {
-			if (other.productooriginal != null)
+		if (serviciooriginal == null) {
+			if (other.serviciooriginal != null)
 				return false;
-		} else if (!productooriginal.equals(other.productooriginal))
+		} else if (!serviciooriginal.equals(other.serviciooriginal))
 			return false;
 		if (tipo == null) {
 			if (other.tipo != null)
@@ -446,7 +447,7 @@ public class ServicioDetalleDTO {
 				+ valoriva + ", tipo=" + tipo + ", formasdepagointernet=" + formasdepagointernet
 				+ ", formasdepagosecretaria=" + formasdepagosecretaria + ", formasdepagointernetoriginales="
 				+ formasdepagointernetoriginales + ", formasdepagosecretariaoriginales="
-				+ formasdepagosecretariaoriginales + ", editar=" + editar + ", productooriginal=" + productooriginal
+				+ formasdepagosecretariaoriginales + ", editar=" + editar + ", serviciooriginal=" + serviciooriginal
 				+ ", codigoext=" + codigoext + ", nofacturable=" + nofacturable + ", error=" + error + "]";
 	}
 

@@ -12,6 +12,7 @@ import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.fac.services.IProductosService;
 import org.itcgae.siga.fac.services.IServiciosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,26 @@ public class ServiciosController {
 	}
 	
 	@GetMapping(value = "/pys/detalleServicio")
-	ResponseEntity<ServicioDetalleDTO> detalleServicio(HttpServletRequest request, @RequestParam int idTipoServicio, @RequestParam int idServicio, @RequestParam int idServicioInstitucion) { 
-		ServicioDetalleDTO response = serviciosService.detalleServicio(request, idTipoServicio, idServicio, idServicioInstitucion);
+	ResponseEntity<ServicioDetalleDTO> detalleServicio(HttpServletRequest request, @RequestParam int idTipoServicio, @RequestParam int idServicio, @RequestParam int idServiciosInstitucion) { 
+		ServicioDetalleDTO response = serviciosService.detalleServicio(request, idTipoServicio, idServicio, idServiciosInstitucion);
 		return new ResponseEntity<ServicioDetalleDTO>(response, HttpStatus.OK);
+	}
+	
+//	@GetMapping(value = "/combo/CondicionSuscripcion")
+//	ResponseEntity<ComboDTO> comboCondicionSuscripcion(HttpServletRequest request, @RequestParam int idConsulta) { 
+//		ComboDTO response = serviciosService.comboCondicionSuscripcion(request, idConsulta);
+//		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+//	}
+	
+	@GetMapping(value = "/combo/CondicionSuscripcion")
+	ResponseEntity<ComboDTO> comboCondicionSuscripcion(HttpServletRequest request) { 
+		ComboDTO response = serviciosService.comboCondicionSuscripcion(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value="/pys/formasPagoServicio")
+	ResponseEntity<InsertResponseDTO> crearEditarFormaPago(@RequestBody ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
+		InsertResponseDTO response = serviciosService.crearEditarFormaPago(servicio, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 }

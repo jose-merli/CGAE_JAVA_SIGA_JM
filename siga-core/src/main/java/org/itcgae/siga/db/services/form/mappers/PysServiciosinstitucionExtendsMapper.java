@@ -8,8 +8,10 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.PysServiciosinstitucionMapper;
+import org.itcgae.siga.db.services.fac.providers.PySTiposServiciosSqlExtendsProvider;
 import org.itcgae.siga.db.services.form.providers.PysProductosinstitucionSqlExtendsProvider;
 import org.itcgae.siga.db.services.form.providers.PysServiciosinstitucionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -39,7 +41,7 @@ public interface PysServiciosinstitucionExtendsMapper extends PysServiciosinstit
 
 	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "detalleServicio")
 	@Results({
-		@Result(column = "IDTIPOSERVICIO", property = "idtiposervicios", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOSERVICIOS", property = "idtiposervicios", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDSERVICIO", property = "idservicio", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDSERVICIOSINSTITUCION", property = "idserviciosinstitucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
@@ -56,12 +58,35 @@ public interface PysServiciosinstitucionExtendsMapper extends PysServiciosinstit
 		@Result(column = "AUTOMATICO", property = "automatico", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCONSULTA", property = "idconsulta", jdbcType = JdbcType.NUMERIC),
 		}) 
-	ServicioDetalleDTO detalleServicio(int idTipoServicio, int idServicio, int idServicioInstitucion, Short idInstitucion);
+	ServicioDetalleDTO detalleServicio(int idTipoServicio, int idServicio, int idServiciosInstitucion, Short idInstitucion);
 	
 	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "obtenerFormasDePagoInternetByServicio")
 	List<Integer> obtenerFormasDePagoInternetByServicio(int idTipoServicio, int idServicio, int idServicioInstitucion, Short idInstitucion);
 	
 	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "obtenerFormasDePagoSecretariaByServicio")
 	List<Integer> obtenerFormasDePagoSecretariaByServicio(int idTipoServicio, int idServicio, int idServicioInstitucion, Short idInstitucion);
+
+//	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "comboCondicionSuscripcion")
+//	@Results({ 
+//		@Result(column = "ID", property = "value", jdbcType = JdbcType.NUMERIC),
+//		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+//		}) 
+//	List<ComboItem> comboCondicionSuscripcion(String idioma ,Short idInstitucion, int idConsulta);
+	
+	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "comboCondicionSuscripcion")
+	@Results({ 
+		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ComboItem> comboCondicionSuscripcion(String idioma ,Short idInstitucion);
+	
+	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "getCriterioByIdConsulta")
+	String getCriterioByIdConsulta(Short idInstitucion, int idConsulta);
+
+	@SelectProvider(type = PysServiciosinstitucionSqlExtendsProvider.class, method = "getIdServicioInstitucion")
+	@Results({ 
+		@Result(column = "IDSERVICIOSINSTITUCION", property = "newId", jdbcType = JdbcType.NUMERIC)
+		}) 
+	NewIdDTO getIdServicioInstitucion(ServicioDetalleDTO servicio, Short idInstitucion);
 }
 
