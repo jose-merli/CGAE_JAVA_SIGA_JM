@@ -56,7 +56,8 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 				+ "    guard.idcalendarioguardias,"
 				+ "    guard.idpersona,"
 				+ "    guard.fechavalidacion,"
-				+ "    guard.posicion AS ordenGrupo,"
+				+ "    guard.facturado,"
+				+ "    guard.idfacturacion,"
 				+ "    guard.numerogrupo,"
 				+ "    ("
 				+ "        SELECT"
@@ -177,6 +178,14 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		sql.WHERE("IDGUARDIA = " + record.getIdguardia());
 		sql.WHERE("IDPERSONA = " + record.getIdpersona());
 		sql.WHERE("FECHAINICIO = TO_DATE('" + fechaInicio + "', 'DD/MM/RRRR')");
+		return sql.toString();
+	}
+	
+	public String getPermutaGuardiaColegiado(GuardiasItem guardiaItem) {
+		SQL sql = new SQL();
+		
+		
+		
 		return sql.toString();
 	}
 	

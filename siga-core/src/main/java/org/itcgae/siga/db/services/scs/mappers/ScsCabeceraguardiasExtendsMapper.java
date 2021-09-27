@@ -46,10 +46,12 @@ public interface ScsCabeceraguardiasExtendsMapper extends ScsCabeceraguardiasMap
 			@Result(column = "colegiado", property = "letradosGuardia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numerocolegiado", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "tipodias", property = "tipoDiasGuardia", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ordengrupo", property = "ordenGrupo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numerogrupo", property = "grupoGuardiaColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idpersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "fechavalidacion", property = "fechaValidacion", jdbcType = JdbcType.VARCHAR),})
+			@Result(column = "fechavalidacion", property = "fechaValidacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idcalendarioguardias", property = "idCalendarioGuardias", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "facturado", property = "facturado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idfacturacion", property = "idFacturacion", jdbcType = JdbcType.INTEGER),})
 	List<org.itcgae.siga.DTOs.scs.GuardiasItem> busquedaGuardiasColegiado(GuardiasItem guardiaItem, String idInstitucion);
 	
 	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "validarSolicitudGuardia")
@@ -57,5 +59,12 @@ public interface ScsCabeceraguardiasExtendsMapper extends ScsCabeceraguardiasMap
 	
 	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "desvalidarGuardiaColegiado")
 	int desvalidarGuardiaColegiado(ScsCabeceraguardias record);
+	
+	@SelectProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "getPermutaGuardiaColegiado")
+	@Results({ 
+		@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPAGOSJG", property = "idpagosjg", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ScsCabeceraguardias> getPermutaGuardiaColegiado(GuardiasItem guardiaItem);
 	
 }
