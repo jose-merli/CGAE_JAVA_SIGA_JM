@@ -62,4 +62,11 @@ public class GestionFichaCompraSuscripcionController {
 		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@PostMapping(value = "/pys/denegarPeticion")
+	ResponseEntity<InsertResponseDTO>  denegarPeticion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.denegarPeticion(request, ficha);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }
