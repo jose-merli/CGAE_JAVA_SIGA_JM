@@ -562,7 +562,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
+	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -575,7 +575,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		try {
+//		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -592,6 +592,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					LOGGER.info(
 							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.updateByPrimaryKey() -> Entrada a pysPeticioncomprasuscripcionMapper para aprobar una solicitud de compra");
 
+					
+
+					
 					PysPeticioncomprasuscripcionKey solicitudKey = new PysPeticioncomprasuscripcionKey();
 
 					solicitudKey.setIdinstitucion(idInstitucion);
@@ -599,12 +602,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 					PysPeticioncomprasuscripcion solicitud = pysPeticioncomprasuscripcionMapper
 							.selectByPrimaryKey(solicitudKey);
-
-					solicitud.setIdestadopeticion((short) 20);
-
-					response = pysPeticioncomprasuscripcionMapper.updateByPrimaryKey(solicitud);
-					if (response == 0)
-						throw new Exception("Error al modificar la solicitud de compra en la BBDD para su aprobación.");
+					
+					if(solicitud==null) {
+						this.solicitarCompra(request, ficha);
+					}
 
 					LOGGER.info(
 							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.updateByPrimaryKey() -> Salida de pysPeticioncomprasuscripcionMapper para aprobar una solicitud de compra");
@@ -629,6 +630,13 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						compra.setDescripcion(producto.getDescripcion());
 						if(compra.getIdformapago()!=null)compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
 						else compra.setIdformapago(null);
+						//Revisar posteriormente
+						compra.setCantidad(1);
+						if(producto.getValor()!=null) {
+							compra.setImporteunitario(new BigDecimal(String.join(".",producto.getValor().split(",")[0],producto.getValor().split(",")[1].substring(0, 2))));
+						}
+						else compra.setImporteunitario(new BigDecimal(0));
+						compra.setNofacturable(ficha.getNoFact());
 
 						response = pysCompraMapper.insert(compra);
 						if (response == 0)
@@ -641,14 +649,14 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				updateResponseDTO.setStatus("200");
 			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"GestionFichaCompraSuscripcionServiceImpl.aprobarCompra() -> Se ha producido un error al aprobar una solicitud de compra",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			updateResponseDTO.setStatus("500");
-		}
+//		} catch (Exception e) {
+//			LOGGER.error(
+//					"GestionFichaCompraSuscripcionServiceImpl.aprobarCompra() -> Se ha producido un error al aprobar una solicitud de compra",
+//					e);
+//			error.setCode(500);
+//			error.setDescription("general.mensaje.error.bbdd");
+//			updateResponseDTO.setStatus("500");
+//		}
 
 		updateResponseDTO.setError(error);
 		LOGGER.info("aprobarCompra() -> Salida del servicio para aprobar una solicitud de compra");

@@ -14,7 +14,7 @@ public interface IGestionFichaCompraSuscripcionService {
 	
 	public InsertResponseDTO solicitarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
 
-	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha);
+	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
 
 	public UpdateResponseDTO savePagoCompraSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
 
