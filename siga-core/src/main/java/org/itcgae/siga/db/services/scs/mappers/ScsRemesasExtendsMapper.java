@@ -71,6 +71,7 @@ public interface ScsRemesasExtendsMapper{
 	
 	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "getEJGRemesa")
 	@Results({
+		@Result(column = "IDEJGREMESA", property = "idEjgRemesa", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDENTIFICADOR", property = "identificadorEJG", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTIPOEJG", property = "idTipoEJG", jdbcType = JdbcType.NUMERIC),

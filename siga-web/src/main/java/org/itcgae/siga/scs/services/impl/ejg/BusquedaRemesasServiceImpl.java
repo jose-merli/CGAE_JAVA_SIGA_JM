@@ -160,12 +160,13 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 			remesasItems = scsRemesasExtendsMapper.buscarRemesas(remesasBusquedaItem, idInstitucion,
 					usuarios.get(0).getIdlenguaje());
-			
+
 			String nRegistro;
-			
-			for(int i = 0; i < remesasItems.size(); i++) {
+
+			for (int i = 0; i < remesasItems.size(); i++) {
 				nRegistro = "";
-				nRegistro += remesasItems.get(i).getPrefijo() + "" + remesasItems.get(i).getNumero() + "" + remesasItems.get(i).getSufijo();
+				nRegistro += remesasItems.get(i).getPrefijo() + "" + remesasItems.get(i).getNumero() + ""
+						+ remesasItems.get(i).getSufijo();
 				remesasItems.get(i).setnRegistro(Integer.parseInt(nRegistro));
 			}
 
@@ -485,7 +486,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					CajgRemesa remesa = new CajgRemesa();
 
 					RemesasItem rem = scsRemesasExtendsMapper.getMaxIdRemesa(idInstitucion);
-					
+
 					idRemesa = rem.getIdRemesa();
 
 					remesa.setIdinstitucion(idInstitucion);
@@ -567,7 +568,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					error.setDescription("Remesa añadida correctamente");
 					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
-				
+
 			} else {
 				try {
 
@@ -653,9 +654,12 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			LOGGER.info("Id remesa -> " + remesasItem.getIdRemesa());
 
 			ejgRemesaItems = scsRemesasExtendsMapper.getEJGRemesa(remesasItem, idInstitucion);
-			
-			for(int i = 0; i < ejgRemesaItems.size(); i++) {
-				String incidencias = ejgRemesaItems.get(i).getNumIncidencias() + "/" + ejgRemesaItems.get(i).getIncidenciasAntesEnvio() + "/" + ejgRemesaItems.get(i).getIncidenciasDespuesEnvio() + "/" + ejgRemesaItems.get(i).getNuevaRemesa();
+
+			for (int i = 0; i < ejgRemesaItems.size(); i++) {
+				String incidencias = ejgRemesaItems.get(i).getNumIncidencias() + "/"
+						+ ejgRemesaItems.get(i).getIncidenciasAntesEnvio() + "/"
+						+ ejgRemesaItems.get(i).getIncidenciasDespuesEnvio() + "/"
+						+ ejgRemesaItems.get(i).getNuevaRemesa();
 				ejgRemesaItems.get(i).setIncidencias(incidencias);
 			}
 
@@ -666,10 +670,117 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				ejgRemesaDTO.setEJGRemesaItem(ejgRemesaItems);
 			}
 		}
-		
+
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los ejg asociados a la remesa");
-		
+
 		return ejgRemesaDTO;
+	}
+
+	@Override
+	public DeleteResponseDTO borrarExpedientesRemesa(List<EJGRemesaItem> ejgRemesaItem, HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"borrarExpedientesRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"borrarExpedientesRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			LOGGER.info(
+					"borrarExpedientesRemesa() / ScsRemesasExtendsMapper.borrarExpedientesRemesa() -> Entrada a ScsRemesasExtendsMapper para eliminar los expedientes de la remesa");
+
+			try {
+
+				if (ejgRemesaItem != null && ejgRemesaItem.size() > 0) {
+
+					LOGGER.info("remesaBusquedaItem -> " + ejgRemesaItem.get(0).getIdentificadorEJG());
+
+					for (EJGRemesaItem ejg : ejgRemesaItem) {
+
+						LOGGER.info("Entra al foreach de los EJG's");
+
+						// Buscamos los registros de los EJG asociados a la remesa con ciertas condiciones
+						ScsEstadoejgExample exampleEstadoEjg = new ScsEstadoejgExample();
+						exampleEstadoEjg.createCriteria().andAnioEqualTo((short)ejg.getAnioEJG())
+								.andNumeroEqualTo(Long.valueOf(ejg.getNumeroEJG()))
+								.andIdtipoejgEqualTo((short)ejg.getIdTipoEJG())
+								.andIdinstitucionEqualTo(idInstitucion).andIdestadoejgEqualTo(Short.valueOf("8"))
+								.andFechabajaIsNull();
+
+						List<ScsEstadoejg> estadoEjg = scsEstadoejgExtendsMapper.selectByExample(exampleEstadoEjg);
+
+						// Comprobamos si está vacia la lista con los registros anteriores
+						if (!estadoEjg.isEmpty()) {
+
+							ScsEstadoejg cambiarFechaBaja = new ScsEstadoejg();
+
+							// Hacemos el update de la columna FechaBaja del EJG
+							for (ScsEstadoejg scsEstadoejg : estadoEjg) {
+
+								LOGGER.info("Actualizamos el EJG con año/numero: " + scsEstadoejg.getAnio() + "/"
+										+ scsEstadoejg.getNumero() + " para ponerle FECHABAJA");
+
+								cambiarFechaBaja.setAnio(scsEstadoejg.getAnio());
+								cambiarFechaBaja.setNumero(scsEstadoejg.getNumero());
+								cambiarFechaBaja.setIdinstitucion(scsEstadoejg.getIdinstitucion());
+								cambiarFechaBaja.setIdtipoejg(scsEstadoejg.getIdtipoejg());
+								cambiarFechaBaja.setIdestadoporejg(scsEstadoejg.getIdestadoporejg());
+								cambiarFechaBaja.setFechabaja(new Date());
+
+								response = scsEstadoejgExtendsMapper.updateByPrimaryKeySelective(cambiarFechaBaja);
+
+							}
+
+						}
+
+						LOGGER.info("Borramos la relación entre el EJG y la remesa");
+
+						// Borramos la relación entre el ejg y la remesa
+
+						CajgEjgremesaExample ejgRemesaExample = new CajgEjgremesaExample();
+						ejgRemesaExample.createCriteria().andIdejgremesaEqualTo(Long.valueOf(ejg.getIdEjgRemesa()));
+						response = cajgEjgremesaExtendsMapper.deleteByExample(ejgRemesaExample);
+
+					}
+
+				}
+
+			} catch (Exception e) {
+				response = 0;
+				error.setCode(400);
+				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				deleteResponseDTO.setStatus(SigaConstants.KO);
+				LOGGER.info("Se ha producido un error en BBDD contacte con su administrador");
+				throw e;
+			}
+
+	
+			if (error.getCode() == null) {
+				error.setCode(200);
+				error.setDescription("Se han borrado los expedientes correctamente");
+				deleteResponseDTO.setStatus(SigaConstants.OK);
+				LOGGER.info("Se han borrado los expedientes correctamente");
+			}
+
+			deleteResponseDTO.setError(error);
+
+			LOGGER.info(
+					"borrarExpedientesRemesa() / ScsRemesasExtendsMapper.borrarExpedientesRemesa() -> Salida a ScsRemesasExtendsMapper para eliminar los expedientes de la remesa");
+
+		}
+		LOGGER.info("getLabel() -> Salida del servicio para eliminar los expedientes");
+
+		return deleteResponseDTO;
 	}
 
 }

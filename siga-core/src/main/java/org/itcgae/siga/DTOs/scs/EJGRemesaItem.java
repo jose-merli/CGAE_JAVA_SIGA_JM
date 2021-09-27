@@ -15,7 +15,16 @@ public class EJGRemesaItem {
 	private int incidenciasAntesEnvio;
 	private int incidenciasDespuesEnvio;
 	private String incidencias;
-	
+	private int idEjgRemesa;
+		
+	public int getIdEjgRemesa() {
+		return idEjgRemesa;
+	}
+
+	public void setIdEjgRemesa(int idEjgRemesa) {
+		this.idEjgRemesa = idEjgRemesa;
+	}
+
 	public String getIdentificadorEJG() {
 		return identificadorEJG;
 	}

@@ -190,7 +190,7 @@ public class ScsRemesasExtendsProvider {
 		}
 
 		if (remesasBusquedaItem.getEstado() != null) {
-			sql.WHERE("est.idestado = " + remesasBusquedaItem.getEstado()); // estado
+			sql.WHERE("est.idestado like '%" + remesasBusquedaItem.getEstado() + "%'"); // estado
 		}
 
 		if (remesasBusquedaItem.getFechaGeneracionDesde() != null
@@ -327,6 +327,7 @@ public class ScsRemesasExtendsProvider {
 		estadoRemesa.FROM("CAJG_RESPUESTA_EJGREMESA ER");
 		estadoRemesa.WHERE("ER.IDEJGREMESA = ejgremesa.IDEJGREMESA");
 		
+		sql.SELECT("ejgremesa.idejgremesa");
 		sql.SELECT("ejg.idinstitucion || '-' || ejg.idtipoejg || '-' || ejg.anio || '-' || ejg.numero IDENTIFICADOR");
 		sql.SELECT("ejg.idinstitucion");
 		sql.SELECT("ejg.idtipoejg");
