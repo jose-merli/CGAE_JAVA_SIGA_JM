@@ -163,7 +163,8 @@ public class ServiciosServiceImpl implements IServiciosService {
 	}
 
 	@Override
-	public DeleteResponseDTO reactivarBorradoFisicoLogicoServicios(ListaServiciosDTO listadoServicios, HttpServletRequest request) {
+	@Transactional
+	public DeleteResponseDTO reactivarBorradoFisicoLogicoServicios(ListaServiciosDTO listadoServicios, HttpServletRequest request) throws Exception {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
 		int status = 0;
@@ -203,9 +204,18 @@ public class ServiciosServiceImpl implements IServiciosService {
 						//Borrado logico --> Actualizamos la fechabaja del servicio a la actual (sysdate)
 						//Borrado fisico --> Eliminamos el registro del servicio y posteriormente el identificador
 						if(idPeticionDTO.getIdpeticionUso().size() > 0 ) { //Borrado logico ya que comprobarUsoServicio devolvio resultado por lo que el servicio tiene alguna solicitud
-							status = pysTiposServiciosExtendsMapper.borradoLogicoServicios(usuarios.get(0), servicio, idInstitucion);
+							status = pysTiposServiciosExtendsMapper.borradoLogicoServicios(usuarios.get(0), servicio, idInstitucion);			
+							
+							String resultado[] = ejecucionPlsServicios.ejecutarPL_ServiciosAutomaticosProcesoBaja(idInstitucion, servicio.getIdtiposervicios(), servicio.getIdservicio(), servicio.getIdserviciosinstitucion(), usuarios.get(0));
+							 
+							 if (!resultado[0].equalsIgnoreCase("0")) {
+						            LOGGER.error("Error en PL = " + (String) resultado[1]);
+						            throw new Exception("Ha ocurrido un error al ejecutar el proceso de suscripción automática. Error en PL = " + (String) resultado[1]);				          
+						      }
+							
 							if(status == 0) {
 								deleteResponseDTO.setStatus(SigaConstants.KO);
+								throw new Exception("Error al realizar el borrado logico de un servicio");
 							}else if(status == 1) {
 								deleteResponseDTO.setStatus(SigaConstants.OK);
 							}
@@ -215,6 +225,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 							
 							if(status == 0) {
 								deleteResponseDTO.setStatus(SigaConstants.KO);
+								throw new Exception("Error al realizar el borrado fisico de un servicio");
 							}else if(status == 1) {
 								deleteResponseDTO.setStatus(SigaConstants.OK);
 							}
@@ -414,6 +425,120 @@ public class ServiciosServiceImpl implements IServiciosService {
 		LOGGER.info("nuevoServicio() -> Salida del servicio para crear un servicio");
 
 		return insertResponseDTO;
+	}
+	
+	@Override
+	public DeleteResponseDTO editarServicio(ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		int status = 0;
+		
+
+		LOGGER.info("editarServicio() -> Entrada al servicio para modificar un servicio");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"editarServicio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"editarServicio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"editarServicio() / pysServiciosInstitucionMapper.editarServicio() -> Entrada a pysServiciosInstitucionMapper para modificar un servicio");
+					
+						PysServiciosinstitucion servicioInstitucion = new PysServiciosinstitucion();
+							
+						servicioInstitucion.setIdinstitucion(idInstitucion);
+						servicioInstitucion.setIdtiposervicios((short) servicio.getIdtiposervicios());
+						servicioInstitucion.setIdservicio((long) servicio.getIdservicio());
+						servicioInstitucion.setIdserviciosinstitucion((long) servicio.getIdserviciosinstitucion());					
+						
+						servicioInstitucion.setDescripcion(servicio.getDescripcion());
+						servicioInstitucion.setSolicitarbaja(servicio.getPermitirbaja());
+						servicioInstitucion.setSolicitaralta(servicio.getPermitiralta());
+						servicioInstitucion.setFechamodificacion(new Date());
+						servicioInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
+						servicioInstitucion.setCuentacontable(servicio.getCuentacontable());
+						
+						servicioInstitucion.setIdconsulta((long) servicio.getIdconsulta());
+						
+						if(servicio.getIdconsulta() != 0 && servicio.getIdconsulta() != servicio.getServiciooriginal().getIdconsulta()) {
+							String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, servicio.getIdconsulta());
+							criterios = criterios.replace("<SELECT>", "");
+							criterios = criterios.replace("</SELECT>", "");
+							criterios = criterios.replace("<FROM>", "");
+							criterios = criterios.replace("</FROM>", "");
+							criterios = criterios.replace("<WHERE>", "");
+							criterios = criterios.replace("</WHERE>", "");
+
+							servicioInstitucion.setCriterios(criterios);
+						}
+					
+						
+						if(servicio.getCodigoext() != null) {
+							servicioInstitucion.setCodigoext(servicio.getCodigoext());
+						}else {  
+							servicioInstitucion.setCodigoext(servicio.getIdtiposervicios() + "|" + servicio.getIdservicio() + "|" + servicioInstitucion.getIdserviciosinstitucion());
+						}
+					
+						
+						status = pysServiciosInstitucionMapper.updateByPrimaryKeySelective(servicioInstitucion);
+						
+						if(servicio.getAutomatico() != null) {
+							if(servicio.getAutomatico().equals("1") && status == 1 && servicio.getIdconsulta() != servicio.getServiciooriginal().getIdconsulta()) {
+								LOGGER.info(
+										"editarServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Entrada a ejecucionPlsServicios para comenzar el proceso de suscripcion automatica de servicios");
+							
+								
+								 String resultado[] = ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio(idInstitucion, servicio.getIdtiposervicios(), servicio.getIdservicio(), String.valueOf(servicio.getIdserviciosinstitucion()), usuarios.get(0));
+								 
+								 if (!resultado[0].equalsIgnoreCase("0")) {
+							            LOGGER.error("Error en PL = " + (String) resultado[1]);
+							            throw new Exception("Ha ocurrido un error al ejecutar el proceso de suscripción automática. Error en PL = " + (String) resultado[1]);				          
+							      }
+								 
+									LOGGER.info(
+											"editarServicio() / ejecucionPlsServicios.ejecutarPL_SuscripcionAutomaticaServicio() -> Salida de ejecucionPlsServicios, proceso de suscripcion automatica de servicios terminado");
+							}
+						}
+					
+					if(status == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						throw new Exception("No se ha podido editar el registro en PYS_SERVICIOSINSTITUCION");
+					}else if(status == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+					
+					LOGGER.info(
+							"editarServicio() / pysServiciosInstitucionMapper.editarServicio() -> Salida de pysServiciosInstitucionMapper para modificar un servicio");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ServiciosServiceImpl.editarServicio() -> Se ha producido un error al modificar un servicio",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		deleteResponseDTO.setError(error);
+
+		LOGGER.info("editarServicio() -> Salida del servicio para modificar un servicio");
+
+		return deleteResponseDTO;
 	}
 	
 	@Override

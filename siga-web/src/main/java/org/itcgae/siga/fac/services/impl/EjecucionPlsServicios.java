@@ -40,12 +40,6 @@ public class EjecucionPlsServicios {
     	Date date = new Date();
     	
         Object[] paramIn = new Object[6];
-//        paramIn[0] = String.valueOf(idInstitucion); // IDINSTITUCION
-//        paramIn[1] = String.valueOf(idTipoServicios); // IDTIPOSERVICIOS
-//        paramIn[2] = String.valueOf(idServicio); // IDSERVICIO
-//        paramIn[3] = idServiciosInstitucion; // IDSERVICIOSINSTITUCION
-//        paramIn[4] = new Timestamp(date.getTime()).toString(); // FECHAPROCESO
-//        paramIn[5] = usuario.getIdusuario().toString(); // IDUSUARIO
     
         java.util.Date utilDate = new Date();
         java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
@@ -70,6 +64,39 @@ public class EjecucionPlsServicios {
 
         return resultado;
     }
+    
+    /**
+     * PL para el proceso de baja de servicios
+     */
+    public String[] ejecutarPL_ServiciosAutomaticosProcesoBaja(short idInstitucion, int idTipoServicios, int idServicio, int idServiciosInstitucion, AdmUsuarios usuario) throws Exception {
+    	Date date = new Date();
+    	
+        Object[] paramIn = new Object[6];
+    
+        java.util.Date utilDate = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+        
+        paramIn[0] = idInstitucion; // IDINSTITUCION
+        paramIn[1] = idTipoServicios; // IDTIPOSERVICIOS
+        paramIn[2] = idServicio; // IDSERVICIO
+        paramIn[3] = idServiciosInstitucion; // IDSERVICIOSINSTITUCION
+        paramIn[4] = sqlDate; // FECHAPROCESO
+        paramIn[5] = usuario.getIdusuario(); // IDUSUARIO
+
+        String resultado[] = new String[2];
+
+        //El primer parametro ?????? son el numero de parametros entradas/salidas del PL
+        //El segundo parametro el numero de parametros de salida del PL
+        resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_BAJA_SERVICIO(?,?,?,?,?,?,?,?)}", 2, paramIn);
+
+        if (!resultado[0].equalsIgnoreCase("0")) {
+            LOGGER.error("Error en PL = " + (String) resultado[1]);
+            throw new Exception("Ha ocurrido un error al ejecutar el proceso de baja del servicio. Error en PL = " + (String) resultado[1]);
+        }
+
+        return resultado;
+    }
+
 
     
     /**

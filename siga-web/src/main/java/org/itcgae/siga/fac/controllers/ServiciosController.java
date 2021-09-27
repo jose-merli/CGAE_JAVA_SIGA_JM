@@ -37,7 +37,7 @@ public class ServiciosController {
 	}
 	
 	@PostMapping(value="/pys/reactivarBorradoFisicoLogicoServicios")
-	ResponseEntity<DeleteResponseDTO> reactivarBorradoFisicoLogicoServicios(@RequestBody ListaServiciosDTO listadoServicios, HttpServletRequest request){
+	ResponseEntity<DeleteResponseDTO> reactivarBorradoFisicoLogicoServicios(@RequestBody ListaServiciosDTO listadoServicios, HttpServletRequest request) throws Exception{
 		DeleteResponseDTO response = serviciosService.reactivarBorradoFisicoLogicoServicios(listadoServicios, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
@@ -52,6 +52,12 @@ public class ServiciosController {
 	ResponseEntity<InsertResponseDTO> nuevoServicio(@RequestBody ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
 		InsertResponseDTO response = serviciosService.nuevoServicio(servicio, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value="/pys/editarServicio")
+	ResponseEntity<DeleteResponseDTO> editarServicio(@RequestBody ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
+		DeleteResponseDTO response = serviciosService.editarServicio(servicio, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/pys/detalleServicio")
