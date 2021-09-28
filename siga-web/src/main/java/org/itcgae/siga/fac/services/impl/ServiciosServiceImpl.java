@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.IdPeticionDTO;
@@ -948,5 +949,65 @@ public class ServiciosServiceImpl implements IServiciosService {
 		LOGGER.info("crearEditarFormaPago() -> Salida del servicio para crear/editar formas de pago y editar los campos restantes del servicio");
 
 		return insertResponseDTO;
+	}
+
+	@Override
+	@Transactional
+	public DeleteResponseDTO borrarSuscripcionesBajas(BorrarSuscripcionBajaItem borrarSuscripcionBajaItem, HttpServletRequest request) throws Exception {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		int status = 0;
+		
+		LOGGER.info("borrarSuscripcionesBajas() -> Entrada al servicio para borrar suscripciones o bajas del servicio");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"borrarSuscripcionesBajas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"borrarSuscripcionesBajas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"borrarSuscripcionesBajas() / ejecucionPlsServicios.ejecutarPL_ServiciosAutomaticosProcesoEliminarSuscripcion() -> Entrada al servicio para borrar suscripciones o bajas del servicio");
+					
+							String resultado[] = ejecucionPlsServicios.ejecutarPL_ServiciosAutomaticosProcesoEliminarSuscripcion(idInstitucion, borrarSuscripcionBajaItem, usuarios.get(0));
+							 
+							 if (!resultado[0].equalsIgnoreCase("0")) {
+								 deleteResponseDTO.setStatus(SigaConstants.KO);					       
+						      }else if(resultado[0].equalsIgnoreCase("0")){
+						    	  deleteResponseDTO.setStatus(SigaConstants.OK);	
+						      }
+										
+					LOGGER.info(
+							"borrarSuscripcionesBajas() / ejecucionPlsServicios.ejecutarPL_ServiciosAutomaticosProcesoEliminarSuscripcion() -> Salida al servicio para borrar suscripciones o bajas del servicio");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ServiciosServiceImpl.borrarSuscripcionesBajas() -> Se ha producido un error al borrar suscripciones o bajas del servicio",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		
+		deleteResponseDTO.setError(error);
+
+		LOGGER.info("borrarSuscripcionesBajas() -> Salida del servicio para borrar suscripciones o bajas del servicio");
+
+		return deleteResponseDTO;
 	}
 }

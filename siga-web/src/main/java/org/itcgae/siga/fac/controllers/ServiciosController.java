@@ -2,6 +2,7 @@ package org.itcgae.siga.fac.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
@@ -82,5 +83,11 @@ public class ServiciosController {
 	ResponseEntity<InsertResponseDTO> crearEditarFormaPago(@RequestBody ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
 		InsertResponseDTO response = serviciosService.crearEditarFormaPago(servicio, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value="/pys/borrarSuscripcionesBajas")
+	ResponseEntity<DeleteResponseDTO> borrarSuscripcionesBajas(@RequestBody BorrarSuscripcionBajaItem borrarSuscripcionBajaItem, HttpServletRequest request) throws Exception{
+		DeleteResponseDTO response = serviciosService.borrarSuscripcionesBajas(borrarSuscripcionBajaItem, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 }
