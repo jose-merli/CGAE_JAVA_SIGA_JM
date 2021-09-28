@@ -441,6 +441,41 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 								envio.setUsumodificacion(usuario.getIdusuario());
 								_envEnviosMapper.updateByPrimaryKey(envio);
 							}
+							
+							// Obtenemos la plantilla de envio
+							EnvPlantillasenviosKey keyPlantilla = new EnvPlantillasenviosKey();
+							keyPlantilla.setIdinstitucion(enviosProgramadosDto[i].getIdInstitucion());
+							keyPlantilla.setIdplantillaenvios(Integer.valueOf(enviosProgramadosDto[i].getIdPlantillaEnvios()));
+							keyPlantilla.setIdtipoenvios(Short.valueOf(enviosProgramadosDto[i].getIdTipoEnvios()));
+							EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(keyPlantilla);
+							
+							if (plantilla == null || plantilla.getIdplantillaenvios() == null) {
+								LOGGER.error("No se ha encontrado la plantilla de envío en el sistema");
+							} else {
+							
+								if (plantilla.getIdpersona() == null) {
+									LOGGER.error("La plantilla de envío no tiene un remitente asociado");
+								}
+								
+								if (plantilla.getIddireccion() == null) {
+									LOGGER.error("La plantilla de envío no tiene una dirección de envío asociada");
+								}
+								
+								// Obtenemos la direccion del remitente de la plantilla
+								CenDireccionesKey keyDireccion = new CenDireccionesKey();
+								keyDireccion.setIddireccion(plantilla.getIddireccion());
+								keyDireccion.setIdpersona(plantilla.getIdpersona());
+								keyDireccion.setIdinstitucion(enviosProgramadosDto[i].getIdInstitucion());
+								CenDirecciones remitente = _cenDireccionesMapper.selectByPrimaryKey(keyDireccion);
+								
+								if (remitente == null) {
+									LOGGER.error("No se ha encontrado la dirección del remitente");
+								} else {
+									if (remitente.getFechabaja() != null) {
+										LOGGER.error("La dirección del remitente se encuentra de baja en el sistema.");
+									}
+								}
+							}
 						}
 
 					}
@@ -449,6 +484,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					respuesta.setMessage("Updates correcto");
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
 					respuesta.setMessage("Error");
