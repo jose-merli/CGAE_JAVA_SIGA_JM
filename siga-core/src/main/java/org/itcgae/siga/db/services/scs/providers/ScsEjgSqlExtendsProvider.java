@@ -152,9 +152,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			if (ejgItem.isUltimoEstado()) {
 				sql.WHERE("estado.idestadoejg IN (" + ejgItem.getEstadoEJG() + ")");
 			} else {
-				String[] estados = ejgItem.getEstadoEJG().split(",");
 				sql.WHERE("MAESTROESTADO.FECHA_BAJA IS NULL");
-				sql.WHERE("MAESTROESTADO.IDESTADOEJG IN (" + estados + ")");
+				sql.WHERE("MAESTROESTADO.IDESTADOEJG IN (" + ejgItem.getEstadoEJG() + ")");
 			}
 		}
 		// SPP-1054@DTT.JAMARTIN@28/09/2021@FIN
