@@ -18,7 +18,16 @@ public class RemesasBusquedaItem {
 	private Date fechaGeneracionHasta;
 	private Date fechaEnvioHasta;
 	private Date fechaRecepcionHasta;
+	private boolean ficha;
 	
+	public boolean isFicha() {
+		return ficha;
+	}
+
+	public void setFicha(boolean ficha) {
+		this.ficha = ficha;
+	}
+
 	public int getIdRemesa() {
 		return idRemesa;
 	}

@@ -243,7 +243,12 @@ public class ScsRemesasExtendsProvider {
 		}
 		
 		sql.WHERE("rem.idinstitucion = " + idInstitucion.toString());
-		sql.WHERE("rem.idestado = 0");
+		
+		if(remesasBusquedaItem.isFicha()) {
+			sql.WHERE("rem.idestado = 0 OR rem.idestado = 6");
+		}else{
+			sql.WHERE("rem.idestado = 0");
+		}
 		
 		if (remesasBusquedaItem.getIdRemesa() != 0) {
 			sql.WHERE("rem.fechamodificacion = (" + subquery.toString() + ")");
