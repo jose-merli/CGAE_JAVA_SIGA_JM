@@ -3,6 +3,7 @@ package org.itcgae.siga.fac.services;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
@@ -24,7 +25,8 @@ public interface IServiciosService {
 	//public ComboDTO comboCondicionSuscripcion(HttpServletRequest request, int idConsulta);
 	public ComboDTO comboCondicionSuscripcion(HttpServletRequest request);
 	public InsertResponseDTO crearEditarFormaPago(ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception;
-	public DeleteResponseDTO borrarSuscripcionesBajas(BorrarSuscripcionBajaItem borrarSuscripcionBajaItem, HttpServletRequest request) throws Exception;;
+	public DeleteResponseDTO borrarSuscripcionesBajas(BorrarSuscripcionBajaItem borrarSuscripcionBajaItem, HttpServletRequest request) throws Exception;
+	//public FichaTarjetaPreciosDTO detalleTarjetaPrecios(HttpServletRequest request, int idTipoServicio, int idServicio, int idServiciosInstitucion);
 	
 
 }

@@ -3,6 +3,7 @@ package org.itcgae.siga.fac.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
@@ -90,4 +91,10 @@ public class ServiciosController {
 		DeleteResponseDTO response = serviciosService.borrarSuscripcionesBajas(borrarSuscripcionBajaItem, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
+	
+//	@GetMapping(value = "/pys/detalleTarjetaPrecios")
+//	ResponseEntity<FichaTarjetaPreciosDTO> detalleTarjetaPrecios(HttpServletRequest request, @RequestParam int idTipoServicio, @RequestParam int idServicio, @RequestParam int idServiciosInstitucion) { 
+//		FichaTarjetaPreciosDTO response = serviciosService.detalleTarjetaPrecios(request, idTipoServicio, idServicio, idServiciosInstitucion);
+//		return new ResponseEntity<FichaTarjetaPreciosDTO>(response, HttpStatus.OK);
+//	}
 }

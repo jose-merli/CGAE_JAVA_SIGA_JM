@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.IdPeticionDTO;
@@ -40,6 +41,7 @@ import org.itcgae.siga.db.mappers.PysServiciosinstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTiposProductosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTiposServiciosExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.PysPreciosserviciosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosinstitucionExtendsMapper;
 import org.itcgae.siga.fac.services.IServiciosService;
@@ -73,6 +75,9 @@ public class ServiciosServiceImpl implements IServiciosService {
 	
 	@Autowired
 	private EjecucionPlsServicios ejecucionPlsServicios;
+	
+	@Autowired
+	private PysPreciosserviciosExtendsMapper pysPreciosServiciosExtendsMapper;
 	
 	
 	@Override
@@ -1010,4 +1015,79 @@ public class ServiciosServiceImpl implements IServiciosService {
 
 		return deleteResponseDTO;
 	}
+	
+//	@Override
+//	public FichaTarjetaPreciosDTO detalleTarjetaPrecios(HttpServletRequest request, int idTipoServicio, int idServicio, int idServiciosInstitucion) {
+//		FichaTarjetaPreciosDTO fichaTarjetaPagosDTO = new FichaTarjetaPreciosDTO();
+//		Error error = new Error();
+//
+//		LOGGER.info("detalleTarjetaPrecios() -> Entrada al servicio para recuperar los detalles necesarios para la tarjeta precios");
+//
+//		// Conseguimos información del usuario logeado
+//		String token = request.getHeader("Authorization");
+//		String dni = UserTokenUtils.getDniFromJWTToken(token);
+//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+//
+//		try {
+//			if (idInstitucion != null) {
+//				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+//				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+//
+//				LOGGER.info(
+//						"detalleTarjetaPrecios() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+//
+//				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+//
+//				LOGGER.info(
+//						"detalleTarjetaPrecios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+//
+//				if (usuarios != null && !usuarios.isEmpty()) {
+//					LOGGER.info(
+//							"detalleTarjetaPrecios() / pysPreciosServiciosExtendsMapper.detalleTarjetaPrecios() -> Entrada a pysPreciosServiciosExtendsMapper para recuperar los detalles necesarios para la tarjeta precios");
+//
+//					fichaTarjetaPagosDTO = pysPreciosServiciosExtendsMapper
+//							.detalleTarjetaPrecios(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion);
+//
+//					LOGGER.info(
+//							"detalleTarjetaPrecios() / pysPreciosServiciosExtendsMapper.detalleTarjetaPrecios() -> Salida de pysPreciosServiciosExtendsMapper para recuperar los detalles necesarios para la tarjeta precios");
+//					
+//					LOGGER.info(
+//							"detalleTarjetaPrecios() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para para recuperar los detalles necesarios para la tarjeta precios");
+//					List<Integer> listaFormasDePagoInternet = pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion);
+//					
+//					if(listaFormasDePagoInternet != null && !listaFormasDePagoInternet.isEmpty()) {
+//						servicioDetalleDTO.setFormasdepagointernet(listaFormasDePagoInternet);
+//					}
+//					
+//					LOGGER.info(
+//							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio() -> Salida a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de internet");
+//					
+//					LOGGER.info(
+//							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
+//					List<Integer> listaFormasDePagoSecretaria = pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion);
+//					
+//					if(listaFormasDePagoSecretaria != null && !listaFormasDePagoSecretaria.isEmpty()) {
+//						servicioDetalleDTO.setFormasdepagosecretaria(listaFormasDePagoSecretaria);
+//					}
+//					
+//					LOGGER.info(
+//							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio() -> Salida a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
+//				}
+//
+//			}
+//		} catch (Exception e) {
+//			LOGGER.error(
+//					"ProductosServiceImpl.detalleServicio() -> Se ha producido un error al obtener el los detalles del servicio",
+//					e);
+//			error.setCode(500);
+//			error.setDescription("general.mensaje.error.bbdd");
+//		}
+//
+//		servicioDetalleDTO.setError(error);
+//
+//		LOGGER.info("detalleServicio() -> Salida del servicio para obtener los detalles del servicio");
+//
+//		return servicioDetalleDTO;
+//	}
+	
 }
