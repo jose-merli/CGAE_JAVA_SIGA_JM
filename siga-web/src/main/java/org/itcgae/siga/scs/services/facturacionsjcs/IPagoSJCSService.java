@@ -56,4 +56,6 @@ public interface IPagoSJCSService {
     UpdateResponseDTO cerrarPago(String idPago, HttpServletRequest request);
 
     UpdateResponseDTO cerrarPagoManual(String idPago, List<String> idsParaEnviar, HttpServletRequest request);
+
+    UpdateResponseDTO deshacerCierre(String idPago, HttpServletRequest request);
 }

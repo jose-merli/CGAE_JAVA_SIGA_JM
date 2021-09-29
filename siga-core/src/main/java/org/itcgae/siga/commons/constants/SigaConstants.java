@@ -1139,6 +1139,7 @@ public class SigaConstants {
 	public static final int CASO_MVASOCIADOAFACTURACION = 3;
 	
 	public static final String PATH_PREVISIONES_BD = "PATH_PREVISIONES_BD";
+	public static final String PATH_PREVISIONES = "PATH_PREVISIONES";
 	public static final String MODULO_FCS = "FCS";
 	public static final String MODULO_CER = "CER";
 	public static final String CONTADOR_ABONOS_PAGOSJG = "FAC_ABONOS_FCS";

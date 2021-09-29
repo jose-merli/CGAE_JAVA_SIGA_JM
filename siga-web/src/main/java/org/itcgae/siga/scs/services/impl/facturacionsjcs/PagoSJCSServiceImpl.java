@@ -131,6 +131,9 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
     @Autowired
     private FacHistoricofacturaExtendsMapper facHistoricofacturaExtendsMapper;
 
+    @Autowired
+    private FcsCobrosRetencionjudicialMapper fcsCobrosRetencionjudicialMapper;
+
     @Override
     public PagosjgDTO buscarPagos(PagosjgItem pagosItem, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
@@ -645,40 +648,67 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                 if (null != usuarios && !usuarios.isEmpty()) {
 
-                    FcsPagosEstadospagosExample fcsPagosEstadospagosExample = new FcsPagosEstadospagosExample();
-                    fcsPagosEstadospagosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-                            .andIdpagosjgEqualTo(Integer.valueOf(pagosjgItem.getIdPagosjg()));
+                    FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+                    fcsPagosjgKey.setIdpagosjg(Integer.valueOf(pagosjgItem.getIdPagosjg()));
+                    fcsPagosjgKey.setIdinstitucion(idInstitucion);
 
-                    LOGGER.info(
-                            "PagoSJCSServiceImpl.deletePago() -> fcsPagosEstadospagosMapper.deleteByExample() -> Se procede a eliminar los estados del pago: "
-                                    + pagosjgItem.getIdPagosjg());
-                    fcsPagosEstadospagosMapper.deleteByExample(fcsPagosEstadospagosExample);
+                    FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+                    // Obtenemos el idFacturacion
+                    Integer idFacturacion = pago.getIdfacturacion();
+
+                    // Recupero el nombre de los ficheros asociados a la facturacion
+                    Hashtable nombreFicheros = utilidadesFacturacionSJCS.getNombreFicherosPago(idInstitucion, idFacturacion, pago.getIdpagosjg(), null);
+
+                    // deshaciendo los cobros de retenciones judiciales
+                    FcsCobrosRetencionjudicialExample fcsCobrosRetencionjudicialExample = new FcsCobrosRetencionjudicialExample();
+                    fcsCobrosRetencionjudicialExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                            .andIdpagosjgEqualTo(pago.getIdpagosjg());
+
+                    List<FcsCobrosRetencionjudicial> vAuxCobrosRetencionJudicial = fcsCobrosRetencionjudicialMapper.selectByExample(fcsCobrosRetencionjudicialExample);
+                    if ((vAuxCobrosRetencionJudicial != null) && (!vAuxCobrosRetencionJudicial.isEmpty())) {
+                        fcsCobrosRetencionjudicialMapper.deleteByExample(fcsCobrosRetencionjudicialExample);
+                    }
 
                     FcsPagoGrupofactHitoExample fcsPagoGrupofactHitoExample = new FcsPagoGrupofactHitoExample();
                     fcsPagoGrupofactHitoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-                            .andIdpagosjgEqualTo(Integer.valueOf(pagosjgItem.getIdPagosjg()));
+                            .andIdpagosjgEqualTo(pago.getIdpagosjg());
 
-                    LOGGER.info(
-                            "PagoSJCSServiceImpl.deletePago() -> fcsPagoGrupofactHitoMapper.deleteByExample() -> Se procede a eliminar los conceptos del pago: "
-                                    + pagosjgItem.getIdPagosjg());
-                    fcsPagoGrupofactHitoMapper.deleteByExample(fcsPagoGrupofactHitoExample);
-
-                    FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
-                    fcsPagosjgKey.setIdinstitucion(idInstitucion);
-                    fcsPagosjgKey.setIdpagosjg(Integer.valueOf(pagosjgItem.getIdPagosjg()));
-
-                    LOGGER.info(
-                            "PagoSJCSServiceImpl.deletePago() -> fcsPagosjgExtendsMapper.deleteByPrimaryKey() -> Se procede a eliminar el pago: " + pagosjgItem.getIdPagosjg());
-                    int response = fcsPagosjgExtendsMapper.deleteByPrimaryKey(fcsPagosjgKey);
-                    LOGGER.info(
-                            "PagoSJCSServiceImpl.deletePago() -> fcsPagosjgExtendsMapper.deleteByPrimaryKey() -> Respues de la eliminación del pago: " + pagosjgItem.getIdPagosjg() + " = " + response);
-
-                    if (response == 1) {
-                        deleteResponseDTO.setStatus(SigaConstants.OK);
-                    } else {
-                        deleteResponseDTO.setStatus(SigaConstants.KO);
-                        error.setDescription("general.message.error.realiza.accion");
+                    List<FcsPagoGrupofactHito> vAuxPagoGrupoFactHito = fcsPagoGrupofactHitoMapper.selectByExample(fcsPagoGrupofactHitoExample);
+                    if ((vAuxPagoGrupoFactHito != null) && (!vAuxPagoGrupoFactHito.isEmpty())) {
+                        fcsPagoGrupofactHitoMapper.deleteByExample(fcsPagoGrupofactHitoExample);
                     }
+
+                    FcsAplicaMovimientosvariosExample fcsAplicaMovimientosvariosExample = new FcsAplicaMovimientosvariosExample();
+                    fcsAplicaMovimientosvariosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                            .andIdpagosjgEqualTo(pago.getIdpagosjg());
+
+                    List<FcsAplicaMovimientosvarios> vAuxMovimientosAplicados = fcsAplicaMovimientosvariosMapper.selectByExample(fcsAplicaMovimientosvariosExample);
+                    if ((vAuxMovimientosAplicados != null) && (!vAuxMovimientosAplicados.isEmpty())) {
+                        fcsAplicaMovimientosvariosMapper.deleteByExample(fcsAplicaMovimientosvariosExample);
+                    }
+
+                    FcsPagoColegiadoExample fcsPagoColegiadoExample = new FcsPagoColegiadoExample();
+                    fcsPagoColegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                            .andIdpagosjgEqualTo(pago.getIdpagosjg());
+
+                    List<FcsPagoColegiado> vAuxPagoColegiado = fcsPagoColegiadoExtendsMapper.selectByExample(fcsPagoColegiadoExample);
+                    if ((vAuxPagoColegiado != null) && (!vAuxPagoColegiado.isEmpty())) {
+                        fcsPagoColegiadoExtendsMapper.deleteByExample(fcsPagoColegiadoExample);
+                    }
+
+                    FcsPagosEstadospagosExample fcsPagosEstadospagosExample = new FcsPagosEstadospagosExample();
+                    fcsPagosEstadospagosExample.createCriteria().andIdpagosjgEqualTo(pago.getIdpagosjg())
+                            .andIdinstitucionEqualTo(idInstitucion);
+
+                    fcsPagosEstadospagosMapper.deleteByExample(fcsPagosEstadospagosExample);
+
+                    //Borramos: se hace borrado en cascada de todos los apuntes, movimientos varios, estados, criterios pago y cobros de retenciones judiciales
+                    if (fcsPagosjgExtendsMapper.deleteByPrimaryKey(fcsPagosjgKey) == 1) {
+                        // borrado fisico de ficheros del servidor web
+                        utilidadesFacturacionSJCS.borrarFicheros(idInstitucion, nombreFicheros);
+                    }
+
+                    deleteResponseDTO.setStatus(SigaConstants.OK);
 
                 }
 
@@ -3632,5 +3662,60 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
 
         }
+    }
+
+    @Override
+    public UpdateResponseDTO deshacerCierre(String idPago, HttpServletRequest request) {
+
+        LOGGER.info("PagoSJCSServiceImpl.deshacerCierre() -> Entrada al servicio para deshacer el cierre del pago: " + idPago);
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+        Error error = new Error();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+                LOGGER.info("PagoSJCSServiceImpl.deshacerCierre() -> admUsuariosExtendsMapper.selectByExample() ->" +
+                        " Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info("PagoSJCSServiceImpl.deshacerCierre() -> admUsuariosExtendsMapper.selectByExample() ->" +
+                        " Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    // INICIO -> PONEMOS EL PAGO EN ESTADO EJECUTADO
+                    FcsPagosEstadospagos record = new FcsPagosEstadospagos();
+                    record.setIdinstitucion(idInstitucion);
+                    record.setIdpagosjg(Integer.valueOf(idPago));
+                    record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
+                    record.setFechaestado(new Date());
+                    record.setFechamodificacion(new Date());
+                    record.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+                    fcsPagosEstadospagosMapper.insertSelective(record);
+                    // FIN -> PONEMOS EL PAGO EN ESTADO EJECUTADO
+
+                }
+            }
+
+        } catch (Exception e) {
+            updateResponseDTO.setStatus(SigaConstants.KO);
+            error.setCode(500);
+            error.setDescription("general.message.error.realiza.accion");
+        }
+
+        updateResponseDTO.setError(error);
+
+        LOGGER.info("PagoSJCSServiceImpl.deshacerCierre() -> Salida del servicio para deshacer el cierre del pago: " + idPago);
+
+        return updateResponseDTO;
     }
 }

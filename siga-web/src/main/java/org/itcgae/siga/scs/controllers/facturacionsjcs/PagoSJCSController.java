@@ -158,4 +158,10 @@ public class PagoSJCSController {
         UpdateResponseDTO response = iPagoSJCSService.cerrarPagoManual(cerrarPagoDTO.getIdPago(), cerrarPagoDTO.getIdsParaEnviar(), request);
         return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/deshacerCierre")
+    ResponseEntity<UpdateResponseDTO> deshacerCierre(@RequestParam String idPago, HttpServletRequest request) {
+        UpdateResponseDTO response = iPagoSJCSService.deshacerCierre(idPago, request);
+        return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+    }
 }
