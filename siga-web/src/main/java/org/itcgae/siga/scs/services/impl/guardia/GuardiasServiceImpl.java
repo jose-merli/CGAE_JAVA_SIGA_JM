@@ -96,6 +96,8 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBajastemporales;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.FcsFacturacionjg;
+import org.itcgae.siga.db.entities.FcsFacturacionjgExample;
 import org.itcgae.siga.db.entities.GenFicheroKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
@@ -118,6 +120,10 @@ import org.itcgae.siga.db.entities.ScsInscripcionguardia;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
+import org.itcgae.siga.db.entities.ScsPermutaCabecera;
+import org.itcgae.siga.db.entities.ScsPermutaCabeceraExample;
+import org.itcgae.siga.db.entities.ScsPermutaguardias;
+import org.itcgae.siga.db.entities.ScsPermutaguardiasExample;
 import org.itcgae.siga.db.entities.ScsProgCalendarios;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
@@ -129,10 +135,13 @@ import org.itcgae.siga.db.mappers.ScsGrupoguardiacolegiadoSqlProvider;
 import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoMapper;
 import org.itcgae.siga.db.mappers.ScsHcoConfProgCalendariosMapper;
 import org.itcgae.siga.db.mappers.ScsHcoConfProgCalendariosSqlProvider;
+import org.itcgae.siga.db.mappers.ScsPermutaCabeceraMapper;
+import org.itcgae.siga.db.mappers.ScsPermutaguardiasMapper;
 import org.itcgae.siga.db.mappers.ScsProgCalendariosMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsCabeceraguardiasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupoguardiaExtendsMapper;
@@ -281,6 +290,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 	@Autowired
 	private ScsCabeceraguardiasExtendsMapper scsCabeceraguardiasExtendsMapper;
  
+	@Autowired
+	private ScsPermutaCabeceraMapper scsPermutaCabeceraMapper;
+	
+	@Autowired
+	private ScsPermutaguardiasMapper scsPermutaguardiasMapper;
+	
+	@Autowired
+	private FcsFacturacionJGExtendsMapper fcsFacturacionJGExtendsMapper;
 
 	@Override
 	public GuardiasDTO searchGuardias(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -6749,17 +6766,20 @@ public class GuardiasServiceImpl implements GuardiasService {
 				
 				List<GuardiasItem> guardiasColegiado = scsCabeceraguardiasExtendsMapper.busquedaGuardiasColegiado(guardiaItem, idInstitucion.toString());
 				
-				for(GuardiasItem guardia: guardiasColegiado) {
-					
-					GuardiasItem guardias = new GuardiasItem();
-					
-					
-					guardias.setIdTurno(guardia.getIdTurno());
-					guardias.setIdGuardia(guardia.getIdGuardia());
-					guardias.setIdPersonaUltimo(guardia.getIdPersonaUltimo());
+				Date fechaActural = new Date();
+				
+				for(GuardiasItem guardiaCol: guardiasColegiado) {
 					
 					
-					List<GuardiasItem> guardiasTurno = scsGuardiasturnoExtendsMapper.searchGuardias2(guardias,
+					//obtenemos el tipo de dias por guardia.
+					GuardiasItem diasGuardias = new GuardiasItem();
+					
+					
+					diasGuardias.setIdTurno(guardiaCol.getIdTurno());
+					diasGuardias.setIdGuardia(guardiaCol.getIdGuardia());
+					
+					
+					List<GuardiasItem> guardiasTurno = scsGuardiasturnoExtendsMapper.searchGuardias2(diasGuardias,
 							idInstitucion.toString(), usuarios.get(0).getIdlenguaje(), tamMaximo);
 					
 					if(guardiasTurno != null && guardiasTurno.size() > 0) {
@@ -6768,11 +6788,104 @@ public class GuardiasServiceImpl implements GuardiasService {
 									+ it.getSeleccionFestivos()).replace("null", ""));
 							return it;
 						}).collect(Collectors.toList());
-						guardia.setTipoDiasGuardia(guardiasTurno.get(0).getTipoDia());
+						guardiaCol.setTipoDiasGuardia(guardiasTurno.get(0).getTipoDia());
 					}else {
-						guardia.setTipoDiasGuardia("Sin dias en la Guardia.");
+						guardiaCol.setTipoDiasGuardia("Sin dias en la Guardia.");
 					}
-
+					
+					
+					//obtenemos la posicion de un colegiado para un grupo en caso de que esta guardia este en un grupo.
+					ScsGrupoguardiacolegiadoExample example = new ScsGrupoguardiacolegiadoExample();
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(Integer.parseInt(guardiaCol.getIdTurno()))
+					.andIdguardiaEqualTo(Integer.parseInt(guardiaCol.getIdGuardia())).andIdpersonaEqualTo(Long.parseLong(guardiaCol.getIdPersona()));
+					List<ScsGrupoguardiacolegiado> grupos = scsGrupoguardiacolegiadoExtendsMapper.selectByExample(example);
+					if(grupos == null || grupos.isEmpty()) {
+						guardiaCol.setOrdenGrupo("Sin Grupo");
+					}else {
+						guardiaCol.setOrdenGrupo(grupos.get(0).getOrden().toString());
+					}
+					
+					//obtenemos el estado para de la guardia.
+					
+//					if(guardiaCol.getFechahasta() == null || guardiaCol.getFechahasta().getTime() >= fechaActural.getTime()) {
+//						guardiaCol.setEstadoGuardia("Pendiente de Realizar.");
+//					}
+//					
+//					if((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("0")){
+//						guardiaCol.setEstadoGuardia("Realizada y no validada.");
+//					}
+//					
+//					if(((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("1"))  && guardiaCol.getFacturado() == null ){
+//						guardiaCol.setEstadoGuardia("Realizada y validada.");
+//						
+//					}
+//					if(guardiaCol.getFacturado() != null && guardiaCol.getFacturado().equals("1")) {
+//						
+//						FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
+//						facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdfacturacionEqualTo(guardiaCol.getIdFacturacion());
+//						
+//						List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper.selectByExample(facturacionExample);
+//						if(!facturas.isEmpty()) {
+//							guardiaCol.setEstadoGuardia("Facturada - " + facturas.get(0).getNombre());
+//						}
+//						
+//					}
+					
+					
+					ScsPermutaCabeceraExample permutaExample = new ScsPermutaCabeceraExample();
+					permutaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(Integer.parseInt(guardiaCol.getIdTurno()))
+					.andIdguardiaEqualTo(Integer.parseInt(guardiaCol.getIdGuardia())).andIdpersonaEqualTo(Long.parseLong(guardiaCol.getIdPersona()))
+					.andIdcalendarioguardiasEqualTo(Integer.parseInt(guardiaCol.getIdCalendarioGuardias()));
+					
+					List<ScsPermutaCabecera> tienePermutaCabecera = scsPermutaCabeceraMapper.selectByExample(permutaExample);
+					
+					if(!tienePermutaCabecera.isEmpty()) {
+						ScsPermutaguardiasExample permutaGuardiaExample = new ScsPermutaguardiasExample();
+						permutaGuardiaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdPerCabSolicitanteEqualTo(tienePermutaCabecera.get(0).getIdPermutaCabecera());
+						
+						List<ScsPermutaguardias> tienePermutaGuardia = scsPermutaguardiasMapper.selectByExample(permutaGuardiaExample);
+						
+						if(!tienePermutaGuardia.isEmpty()) {
+							if(tienePermutaGuardia.get(0).getFechaconfirmacion() == null) {
+								guardiaCol.setEstadoGuardia("Permuta Solicidata.");
+							}else {
+								if(guardiaCol.getFechahasta() == null) {
+									guardiaCol.setEstadoGuardia("Pendiente de Realizar.");
+								}
+								
+								if((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("0")){
+									guardiaCol.setEstadoGuardia("Realizada y no validada.");
+								}
+								
+								if(((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("1"))  && guardiaCol.getFacturado() == null ){
+									guardiaCol.setEstadoGuardia("Realizada y validada.");
+									
+								}
+								if((guardiaCol.getFacturado() != null && guardiaCol.getFacturado().equals("1")) && ((guardiaCol.getFechahasta() != null) && guardiaCol.getValidada().equals("1"))) {
+									
+									FcsFacturacionjgExample facturacionExample = new FcsFacturacionjgExample();
+									facturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdfacturacionEqualTo(guardiaCol.getIdFacturacion());
+									
+									List<FcsFacturacionjg> facturas = fcsFacturacionJGExtendsMapper.selectByExample(facturacionExample);
+									if(!facturas.isEmpty()) {
+										guardiaCol.setEstadoGuardia("Facturada - " + facturas.get(0).getNombre());
+									}
+									
+								}
+							}
+						}else {
+							guardiaCol.setEstadoGuardia("Sin permuta asociada.");
+						}
+					}else {
+						guardiaCol.setEstadoGuardia("Sin permuta asociada.");
+					}
+					
+					
+					
+					
+					
+					
 					
 				}
 				

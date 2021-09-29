@@ -62,6 +62,10 @@ public class GuardiasItem {
 	private String grupoGuardiaColegiado;
 	private String idPersona;
 	private Date fechaValidacion;
+	private String estadoGuardia;
+	private String idCalendarioGuardias;
+	private String facturado;
+	private Integer idFacturacion;
 
 	public String getSepararGuardia() {
 		return separarGuardia;
@@ -514,6 +518,34 @@ public class GuardiasItem {
 	public void setFechaValidacion(Date fechaValidacion) {
 		this.fechaValidacion = fechaValidacion;
 	}
+	public String getEstadoGuardia() {
+		return estadoGuardia;
+	}
+
+	public void setEstadoGuardia(String estadoGuardia) {
+		this.estadoGuardia = estadoGuardia;
+	}
+	public String getIdCalendarioGuardias() {
+		return idCalendarioGuardias;
+	}
+
+	public void setIdCalendarioGuardias(String idCalendarioGuardias) {
+		this.idCalendarioGuardias = idCalendarioGuardias;
+	}
+	public String getFacturado() {
+		return facturado;
+	}
+
+	public void setFacturado(String facturado) {
+		this.facturado = facturado;
+	}
+	public Integer getIdFacturacion() {
+		return idFacturacion;
+	}
+
+	public void setIdFacturacion(Integer idFacturacion) {
+		this.idFacturacion = idFacturacion;
+	}
 	
 	@Override
 	public int hashCode() {
@@ -548,6 +580,10 @@ public class GuardiasItem {
 		result = prime * result + ((grupoGuardiaColegiado == null) ? 0 : grupoGuardiaColegiado.hashCode());
 		result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
 		result = prime * result + ((fechaValidacion == null) ? 0 : fechaValidacion.hashCode());
+		result = prime * result + ((estadoGuardia == null) ? 0 : estadoGuardia.hashCode());
+		result = prime * result + ((idCalendarioGuardias == null) ? 0 : idCalendarioGuardias.hashCode());
+		result = prime * result + ((facturado == null) ? 0 : facturado.hashCode());
+		result = prime * result + ((idFacturacion == null) ? 0 : idFacturacion.hashCode());
 		return result;
 	}
 
@@ -705,6 +741,26 @@ public class GuardiasItem {
 				return false;
 		} else if (!fechaValidacion.equals(other.fechaValidacion))
 			return false;
+		if (estadoGuardia == null) {
+			if (other.estadoGuardia != null)
+				return false;
+		} else if (!estadoGuardia.equals(other.estadoGuardia))
+			return false;
+		if (idCalendarioGuardias == null) {
+			if (other.idCalendarioGuardias != null)
+				return false;
+		} else if (!idCalendarioGuardias.equals(other.idCalendarioGuardias))
+			return false;
+		if (facturado == null) {
+			if (other.facturado != null)
+				return false;
+		} else if (!facturado.equals(other.facturado))
+			return false;
+		if (idFacturacion == null) {
+			if (other.idFacturacion != null)
+				return false;
+		} else if (!idFacturacion.equals(other.idFacturacion))
+			return false;
 		return true;
 	}
 
@@ -718,14 +774,10 @@ public class GuardiasItem {
 				+ ", tipoGuardia=" + tipoGuardia + ", tipoDia=" + tipoDia + ", letradosGuardia=" + letradosGuardia
 				+ ", letradosIns=" + letradosIns + ", fechabaja=" + fechabaja + ", numColegiado=" + numColegiado + ", fechaalta=" + fechaalta +
 				", validada=" + validada + ", ordenGrupo=" + ordenGrupo +", fechadesde=" + fechadesde +", fechahasta=" + fechahasta +
-				", grupoGuardiaColegiado=" + grupoGuardiaColegiado + ", idPersona=" + idPersona + ", fechaValidacion=" + fechaValidacion + "]";
+				", grupoGuardiaColegiado=" + grupoGuardiaColegiado + ", idPersona=" + idPersona + ", fechaValidacion=" + fechaValidacion +
+				", estadoGuardia=" + estadoGuardia + ", idCalendarioGuardias=" + idCalendarioGuardias +", facturado=" + facturado +
+				", idFacturacion =" + idFacturacion +"]";
 	}
-
-	
-
-	
-
-	
 
 	
 
