@@ -14,9 +14,13 @@ public class ScheduledFacturacionServiceImpl implements IScheduledFacturacionSer
 	
 	@Autowired
 	private IFacturacionSJCSServices facturacionServices;
-	
-		
-	
-	
-	
+
+	//@Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacion}")
+	@Override
+	public void ejecutaFacturacionSJCS() {
+		LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> ENTRA ejecutaFacturacionSJCS");
+		facturacionServices.ejecutaFacturacionSJCS();
+		LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> SALE ejecutaFacturacionSJCS");
+	}
+
 }

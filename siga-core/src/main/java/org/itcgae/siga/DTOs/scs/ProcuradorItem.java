@@ -6,34 +6,56 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ProcuradorItem {
-
+	
 		private String idProcurador;
 		private String nombre;
 		private String apellido1;
 		private String apellido2;
+		private String nombreApe;
 		private String nColegiado;
+		
 		private String idColProcurador;
+		private String nombreColProcurador;
+		
 		private String domicilio;
 		private String idInstitucion;
-		private Long usuModificacion;
-		private Date fechaModificacion;
 		private String codigoPostal;
 		private String idPoblacion;
 		private String idProvincia;
+		private String nombrePoblacion;
+		private String nombreProvincia;
+		
 		private boolean historico;
 		private Date fechabaja;
+		
 		private String fax1;
 		private String telefono1;
 		private String telefono2;
 		private String codigoExt;
 		private String email;
-		private String nombrePoblacion;
-		private String nombreProvincia;
-		private String nombreApe;
 		
+		private String numerodesignacion;
+		private Date fechaDesigna;
+		private String observaciones;
+		private String motivosRenuncia;
+		private Date fecharenunciasolicita;
+		private String numeroTotalProcuradores;
 		
+		private Short anio;
+		private String idTurno;
+		private String numero;
 		
+		private Long usuModificacion;
+		private Date fechaModificacion;
 		
+		public String getIdTurno() {
+			return idTurno;
+		}
+
+		public void setIdTurno(String idTurno) {
+			this.idTurno = idTurno;
+		}
+
 		public String getNombreApe() {
 			return nombreApe;
 		}
@@ -365,6 +387,118 @@ public class ProcuradorItem {
 			this.nombreProvincia = nombreProvincia;
 		}
 
+		/**
+		 * @return the fechabaja
+		 */
+//		public Date getFechabaja() {
+//			return fechabaja;
+//		}
+
+		/**
+		 * @param fechabaja the fechabaja to set
+		 */
+//		public void setFechabaja(Date fechabaja) {
+//			this.fechabaja = fechabaja;
+//		}
+
+		/**
+		 * @return the numero
+		 */
+		public String getNumero() {
+			return numero;
+		}
+
+		/**
+		 * @param numero the numero to set
+		 */
+		public void setNumero(String numero) {
+			this.numero = numero;
+		}
+
+		/**
+		 * @return the numerodesignacion
+		 */
+		public String getNumerodesignacion() {
+			return numerodesignacion;
+		}
+
+		/**
+		 * @param numerodesignacion the numerodesignacion to set
+		 */
+		public void setNumerodesignacion(String numerodesignacion) {
+			this.numerodesignacion = numerodesignacion;
+		}
+
+		/**
+		 * @return the fechaDesigna
+		 */
+		public Date getFechaDesigna() {
+			return fechaDesigna;
+		}
+
+		/**
+		 * @param fechaDesigna the fechaDesigna to set
+		 */
+		public void setFechaDesigna(Date fechaDesigna) {
+			this.fechaDesigna = fechaDesigna;
+		}
+
+		/**
+		 * @return the observaciones
+		 */
+		public String getObservaciones() {
+			return observaciones;
+		}
+
+		/**
+		 * @param observaciones the observaciones to set
+		 */
+		public void setObservaciones(String observaciones) {
+			this.observaciones = observaciones;
+		}
+
+		/**
+		 * @return the motivosRenuncia
+		 */
+		public String getMotivosRenuncia() {
+			return motivosRenuncia;
+		}
+
+		/**
+		 * @param motivosRenuncia the motivosRenuncia to set
+		 */
+		public void setMotivosRenuncia(String motivosRenuncia) {
+			this.motivosRenuncia = motivosRenuncia;
+		}
+
+		/**
+		 * @return the fecharenunciasolicita
+		 */
+		public Date getFecharenunciasolicita() {
+			return fecharenunciasolicita;
+		}
+
+		/**
+		 * @param fecharenunciasolicita the fecharenunciasolicita to set
+		 */
+		public void setFecharenunciasolicita(Date fecharenunciasolicita) {
+			this.fecharenunciasolicita = fecharenunciasolicita;
+		}
+
+		/**
+		 * @return the numeroTotalProcuradores
+		 */
+		public String getNumeroTotalProcuradores() {
+			return numeroTotalProcuradores;
+		}
+
+		/**
+		 * @param numeroTotalProcuradores the numeroTotalProcuradores to set
+		 */
+		public void setNumeroTotalProcuradores(String numeroTotalProcuradores) {
+			this.numeroTotalProcuradores = numeroTotalProcuradores;
+		}
+
 		@Override
 		public boolean equals(java.lang.Object o) {
 			if (this == o) {
@@ -389,7 +523,8 @@ public class ProcuradorItem {
 					&& Objects.equals(this.codigoExt, prisionItem.codigoExt)
 					&& Objects.equals(this.email, prisionItem.email)
 					&& Objects.equals(this.nombrePoblacion, prisionItem.nombrePoblacion)
-					&& Objects.equals(this.nombreProvincia, prisionItem.nombreProvincia);
+					&& Objects.equals(this.nombreProvincia, prisionItem.nombreProvincia)
+					&& Objects.equals(this.numero, prisionItem.numero);
 
 		}
 
@@ -399,7 +534,7 @@ public class ProcuradorItem {
 		public int hashCode() {
 			return Objects.hash(idProcurador, nombre, domicilio, usuModificacion, fechaModificacion, codigoPostal,
 					idPoblacion, idProvincia, idInstitucion, historico, fechabaja, telefono1, telefono2,
-					codigoExt, email, nombrePoblacion, nombreProvincia);
+					codigoExt, email, nombrePoblacion, nombreProvincia, numero);
 		}
 
 		@Override
@@ -424,6 +559,7 @@ public class ProcuradorItem {
 			sb.append("    email: ").append(toIndentedString(email)).append("\n");
 			sb.append("    nombrePoblacion: ").append(toIndentedString(nombrePoblacion)).append("\n");
 			sb.append("    nombreProvincia: ").append(toIndentedString(nombreProvincia)).append("\n");
+			sb.append("    numero: ").append(toIndentedString(numero)).append("\n");
 
 			sb.append("}");
 			return sb.toString();
@@ -438,5 +574,21 @@ public class ProcuradorItem {
 				return "null";
 			}
 			return o.toString().replace("\n", "\n    ");
+		}
+
+		public String getNombreColProcurador() {
+			return nombreColProcurador;
+		}
+
+		public void setNombreColProcurador(String nombreColProcurador) {
+			this.nombreColProcurador = nombreColProcurador;
+		}
+
+		public Short getAnio() {
+			return anio;
+		}
+
+		public void setAnio(Short anio) {
+			this.anio = anio;
 		}
 	}

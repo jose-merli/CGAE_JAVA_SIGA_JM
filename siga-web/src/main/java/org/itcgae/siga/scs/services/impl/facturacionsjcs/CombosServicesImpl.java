@@ -215,8 +215,8 @@ public class CombosServicesImpl implements ICombosServices {
 		return comboEstadosFact;
 	}
 
-	public ComboDTO comboPagoEstados(HttpServletRequest request) {
 
+	public ComboDTO comboPagoEstados(HttpServletRequest request) {
 		LOGGER.info("comboPagoEstados() -> Entrada del servicio para obtener los estados de los pagos");
 
 		String token = request.getHeader("Authorization");
@@ -255,6 +255,51 @@ public class CombosServicesImpl implements ICombosServices {
 		
 		LOGGER.info("comboPagoEstados() -> Salida del servicio para obtener los estados de los pagos");
 		
+		return comboEstadosFact;
+	}
+
+	@Override
+	public ComboDTO comboColegiosProcuradores(HttpServletRequest request) {
+
+		LOGGER.info("comboColegiosProcuradores() -> Entrada del servicio para obtener el listado de colegios de un procurador");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboEstadosFact = new ComboDTO();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"comboColegiosProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"comboColegiosProcuradores() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				LOGGER.info(
+						"comboColegiosProcuradores() / fcsPagosjgExtendsMapper.getComboFactColegio() -> Entrada a fcsPagosjgExtendsMapper para obtener el listado de colegios de un procurador");
+
+				List<ComboItem> comboItems = fcsPagosjgExtendsMapper.comboPagosColegio(usuario.getIdlenguaje(), idInstitucion);
+				comboEstadosFact.setCombooItems(comboItems);
+
+				LOGGER.info(
+						"comboPagosColegio() / fcsPagosjgExtendsMapper.getComboFactColegio() -> Salida a fcsPagosjgExtendsMapper para obtener el listado de colegios de un procurador");
+			} else {
+				LOGGER.warn(
+						"comboColegiosProcuradores() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("comboColegiosProcuradores() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("comboColegiosProcuradores() -> Salida del servicio para obtener el listado de colegios de un procurador");
 		return comboEstadosFact;
 	}
 	

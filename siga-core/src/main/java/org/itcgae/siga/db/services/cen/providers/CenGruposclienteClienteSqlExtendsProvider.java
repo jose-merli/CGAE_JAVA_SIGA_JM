@@ -52,7 +52,30 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO AND GENR.idLenguaje = '1'");
 		sql.WHERE("per.idpersona = '"+idPersona+"'");
 //		sql.WHERE("cli.FECHA_BAJA > sysdate");
-		sql.WHERE("cli.idinstitucion = '"+idInstitucion+"'");
+		sql.WHERE(" cli.idinstitucion in ('2000', '"+ idInstitucion  + "')");
+		//sql.WHERE("cli.idinstitucion = '"+idInstitucion+"'");
+		sql.ORDER_BY("GENR.descripcion");
+		return sql.toString();
+	}
+	
+	public String selectGruposPersonaJuridicaLenguaje(String idPersona, String idInstitucion, String idLenguaje) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("cli.idgrupo");
+		sql.SELECT("INITCAP(GENR.DESCRIPCION) as DESCRIPCION");
+		sql.SELECT("NVL(TO_CHAR(cli.fecha_inicio, 'dd/MM/yyyy'),TO_CHAR(TO_DATE('01/01/1980','DD/MM/YYYY'),'DD/MM/YYYY')) as FECHA_INICIO");
+		sql.SELECT("TO_CHAR(cli.fecha_baja, 'dd/MM/yyyy') as FECHA_BAJA");
+		sql.SELECT("cli.IDINSTITUCION_GRUPO as IDINSTITUCION");
+		sql.FROM("CEN_GRUPOSCLIENTE_CLIENTE cli");
+		sql.INNER_JOIN("cen_persona per on cli.idpersona = per.idpersona ");
+		sql.INNER_JOIN("CEN_GRUPOSCLIENTE GRUCLI on cli.idGrupo = GRUCLI.idGrupo and cli.idinstitucion_grupo = grucli.idinstitucion");
+		if(idLenguaje != null) {
+			sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO AND GENR.idLenguaje = '"+ idLenguaje + "'");
+		} else {
+			sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO AND GENR.idLenguaje = '1'");
+		}
+		sql.WHERE("per.idpersona = '"+idPersona+"'");
+		sql.WHERE(" cli.idinstitucion in ('2000', '"+ idInstitucion  + "')");
 		sql.ORDER_BY("GENR.descripcion");
 		return sql.toString();
 	}

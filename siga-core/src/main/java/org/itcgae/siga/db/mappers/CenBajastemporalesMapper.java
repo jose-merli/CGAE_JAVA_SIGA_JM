@@ -48,12 +48,12 @@ public interface CenBajastemporalesMapper {
 	 */
 	@Insert({ "insert into CEN_BAJASTEMPORALES (IDINSTITUCION, IDPERSONA, ", "FECHABT, TIPO, ",
 			"FECHADESDE, FECHAHASTA, ", "FECHAALTA, DESCRIPCION, ", "USUMODIFICACION, FECHAMODIFICACION, ",
-			"VALIDADO, FECHAESTADO)", "values (#{idinstitucion,jdbcType=DECIMAL}, #{idpersona,jdbcType=DECIMAL}, ",
+			"VALIDADO, FECHAESTADO, ELIMINADO)", "values (#{idinstitucion,jdbcType=DECIMAL}, #{idpersona,jdbcType=DECIMAL}, ",
 			"#{fechabt,jdbcType=TIMESTAMP}, #{tipo,jdbcType=VARCHAR}, ",
 			"#{fechadesde,jdbcType=TIMESTAMP}, #{fechahasta,jdbcType=TIMESTAMP}, ",
 			"#{fechaalta,jdbcType=TIMESTAMP}, #{descripcion,jdbcType=VARCHAR}, ",
 			"#{usumodificacion,jdbcType=DECIMAL}, #{fechamodificacion,jdbcType=TIMESTAMP}, ",
-			"#{validado,jdbcType=CHAR}, #{fechaestado,jdbcType=TIMESTAMP})" })
+			"#{validado,jdbcType=CHAR}, #{fechaestado,jdbcType=TIMESTAMP}, #{eliminado,jdbcType=DECIMAL})" })
 	int insert(CenBajastemporales record);
 
 	/**

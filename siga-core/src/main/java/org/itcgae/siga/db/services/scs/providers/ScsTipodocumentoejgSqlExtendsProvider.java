@@ -99,4 +99,19 @@ public class ScsTipodocumentoejgSqlExtendsProvider extends ScsTipodocumentoejgSq
                     return sql.toString();
           }
           
+          public String comboTipoDocumentacion(String idLenguaje, Short idInstitucion) {
+      		SQL sql = new SQL();
+      		
+      		sql.SELECT("TIPODOCUMENTOEJG.IDTIPODOCUMENTOEJG");
+      		sql.SELECT("catalogoTIPODOCUMENTOEJG.DESCRIPCION");
+
+      		sql.FROM("scs_TIPODOCUMENTOEJG TIPODOCUMENTOEJG");
+      		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoTIPODOCUMENTOEJG on catalogoTIPODOCUMENTOEJG.idrecurso = TIPODOCUMENTOEJG.DESCRIPCION and catalogoTIPODOCUMENTOEJG.idlenguaje ="+idLenguaje);
+      		sql.WHERE("TIPODOCUMENTOEJG.fechabaja is null");
+      		sql.WHERE("TIPODOCUMENTOEJG.idinstitucion ='"+String.valueOf(idInstitucion)+"'");
+      		sql.WHERE("TIPODOCUMENTOEJG.IDTIPODOCUMENTOEJG is not null");
+      		sql.WHERE("catalogoTIPODOCUMENTOEJG.DESCRIPCION is not null");
+      		sql.ORDER_BY("descripcion");
+      		return sql.toString();
+      	}
 }

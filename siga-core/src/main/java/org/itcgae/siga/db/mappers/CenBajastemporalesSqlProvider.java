@@ -216,9 +216,13 @@ public class CenBajastemporalesSqlProvider {
 		if (record.getFechaestado() != null) {
 			sql.SET("FECHAESTADO = #{fechaestado,jdbcType=TIMESTAMP}");
 		}
+		if (record.getEliminado()==1) {
+			sql.SET("ELIMINADO = #{eliminado,jdbcType=DECIMAL}");
+		}
 		sql.WHERE("IDINSTITUCION = #{idinstitucion,jdbcType=DECIMAL}");
 		sql.WHERE("IDPERSONA = #{idpersona,jdbcType=DECIMAL}");
 		sql.WHERE("FECHABT = #{fechabt,jdbcType=TIMESTAMP}");
+		
 		return sql.toString();
 	}
 

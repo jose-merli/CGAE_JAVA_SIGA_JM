@@ -7,9 +7,13 @@ import org.itcgae.siga.DTOs.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -57,7 +61,7 @@ public class CombosGeneralesController {
 	}
 	
 	@GetMapping("/partidasPresupuestarias")
-	public ResponseEntity<ComboDTO> comboPartidasPresupuestarias(String importe, HttpServletRequest request) {
+	public ResponseEntity<ComboDTO> comboPartidasPresupuestarias(HttpServletRequest request, String importe) {
 		ComboDTO response = comboService.getComboPartidasPresupuestarias(request, importe);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
@@ -115,6 +119,12 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping("/guardiasNoGrupo")
+	public ResponseEntity<ComboDTO> comboGuardiasNoGrupo(HttpServletRequest request, String idTurno) {
+		ComboDTO response = comboService.comboGuardiasNoGrupo(request, idTurno);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping("/comboTipoDesignacion")
 	public ResponseEntity<ComboDTO> comboTipoDesignacion(HttpServletRequest request) {
 		ComboDTO response = comboService.comboTipoDesignacion(request);
@@ -142,5 +152,36 @@ public class CombosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping("/comboJuzgadoDesignaciones")
+	public ResponseEntity<ComboDTO> comboJuzgadoDesignaciones(HttpServletRequest request) {
+		ComboDTO response = comboService.comboJuzgadoDesignaciones(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	/**
+	 * 
+	 * @param idInstitucion
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/comboJuzgadoPorInstitucion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ComboDTO> comboJuzgadoPorInstitucion(@RequestBody String idInstitucion, HttpServletRequest request) {
+		ComboDTO response = comboService.comboJuzgadoPorInstitucion(idInstitucion, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+
+	@GetMapping(value = "/comboAcreditacionesPorModulo")
+	public ResponseEntity<ComboDTO> comboAcreditacionesPorModulo(@RequestParam("idModulo") String idModulo,
+			@RequestParam("idTurno") String idTurno, HttpServletRequest request) {
+		ComboDTO response = comboService.comboAcreditacionesPorModulo(request, idModulo, idTurno);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/comboTipoDocumentacionDesigna")
+	public ResponseEntity<ComboDTO> comboTipoDocumentacionDesigna(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTipoDocumentacionDesigna(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 
 }

@@ -38,7 +38,8 @@ public interface ScsProcuradorExtendsMapper extends ScsProcuradorMapper{
 		@Result(column = "NOMBREPOBLACION", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "EMAIL", property = "email", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBREAPE", property = "nombreApe", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "NOMBREAPE", property = "nombreApe", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombreColProcurador", property = "nombreColProcurador", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ProcuradorItem> searchProcuradores(ProcuradorItem procuradorItem, Short idInstitucion);
 

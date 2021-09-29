@@ -39,6 +39,18 @@ public interface CenGruposclienteClienteExtendsMapper extends CenGruposclienteCl
 	//List<ComboItem> selectGruposPersonaJuridica(String idPersona, String idInstitucion);
 	List<ComboEtiquetasItem> selectGruposPersonaJuridica(String idPersona, String idInstitucion);
 	
+	@SelectProvider(type = CenGruposclienteClienteSqlExtendsProvider.class, method = "selectGruposPersonaJuridicaLenguaje")
+	@Results({
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGRUPO", property = "idGrupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHA_INICIO", property = "fechaInicio", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.DATE)
+	})
+
+	//List<ComboItem> selectGruposPersonaJuridica(String idPersona, String idInstitucion);
+	List<ComboEtiquetasItem> selectGruposPersonaJuridicaLenguaje(String idPersona, String idInstitucion, String idLenguaje);
+	
 	@SelectProvider(type = CenGruposclienteClienteSqlExtendsProvider.class, method = "selectGrupos")
 	@Results({
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),

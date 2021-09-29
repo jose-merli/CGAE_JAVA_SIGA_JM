@@ -144,8 +144,8 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		//sqlPrincipal.FROM(sql.toString());
 		
 		sqlPrincipal.FROM( "(" + sql.toString() + ") DIRECCIONES");
-		
 		sqlPrincipal.ORDER_BY("ordenlist");
+		
 		
 		return sqlPrincipal.toString();
 	}
@@ -274,11 +274,76 @@ public String selectDireccionesSolEsp(String idPersona, String idDireccion,Strin
 	
 	
 	
-
+	public String getDireccionLetradoSalidaOficio(String idPersona, String idInstitucion) {
+		
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql2.SELECT(" DIR.domicilio DOMICILIO_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.codigopostal CP_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.idpoblacion IDPOBLACION_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.poblacionextranjera POBLACION_DESPACHO_LETRADO ");					
+		sql2.SELECT(" DIR.idprovincia IDPROVINCIA_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.telefono1 TELEFONO1_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.telefono2 TELEFONO2_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.fax1 FAX1_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.fax2 FAX2_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.correoelectronico EMAIL_DESPACHO_LETRADO ");
+		sql2.SELECT(" DIR.movil MOVIL_DESPACHO_LETRADO");
+		sql2.SELECT(" (SELECT NOMBRE FROM CEN_PROVINCIAS WHERE IDPROVINCIA = DIR.idprovincia) PROVINCIA_DESPACHO_LETRADO");
+		sql2.FROM(" CEN_DIRECCIONES DIR, " +
+				" CEN_DIRECCION_TIPODIRECCION TIP ");
+		sql2.WHERE("dir.idinstitucion = tip.idinstitucion ");
+		sql2.WHERE("dir.idpersona = tip.idpersona  ");
+		sql2.WHERE("dir.iddireccion = tip.iddireccion ");
+		sql2.WHERE("tip.idtipodireccion = 2 ");
+		sql2.WHERE("dir.fechabaja is null ");
+		sql2.WHERE("dir.idinstitucion = " + idInstitucion );
+		sql2.WHERE("dir.idpersona = " + idPersona);
+		sql2.ORDER_BY("dir.fechamodificacion DESC ");
+		sql.SELECT("* FROM ("+ sql2 + ")" );
+		
+		sql.WHERE(" ROWNUM = 1 "); 
+		
+		return sql.toString();
+	}
 	
+	public String getDireccionPersonalSalidaOficio(String idPersona, String idInstitucion) {
+		
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql2.SELECT(" DIR.domicilio DOMICILIO_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.codigopostal CP_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.idpoblacion IDPOBLACION_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.poblacionextranjera POBLACION_GUARDIA_LETRADO ");					
+		sql2.SELECT(" DIR.idprovincia IDPROVINCIA_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.telefono1 TELEFONO1_GUARDIA_LETRADO "); 
+		sql2.SELECT(" DIR.telefono2 TELEFONO2_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.fax1 FAX1_GUARDIA_LETRADO ");
+		sql2.SELECT(" DIR.fax2 FAX2_GUARDIA_LETRADO "); 
+		sql2.SELECT(" DIR.correoelectronico EMAIL_GUARDIA_LETRADO "); 
+		sql2.SELECT(" DIR.movil MOVIL_GUARDIA_LETRADO");
+		sql2.SELECT(" (SELECT NOMBRE FROM CEN_PROVINCIAS WHERE IDPROVINCIA = DIR.idprovincia) PROVINCIA_GUARDIA_LETRADO");
+		sql2.FROM(" CEN_DIRECCIONES DIR, " +
+				" CEN_DIRECCION_TIPODIRECCION TIP ");
+		sql2.WHERE("dir.idinstitucion = tip.idinstitucion ");
+		sql2.WHERE("dir.idpersona = tip.idpersona  ");
+		sql2.WHERE("dir.iddireccion = tip.iddireccion ");
+		sql2.WHERE("tip.idtipodireccion = 2 ");
+		sql2.WHERE("dir.fechabaja is null ");
+		sql2.WHERE("dir.idinstitucion = " + idInstitucion );
+		sql2.WHERE("dir.idpersona = " + idPersona);
+		sql2.ORDER_BY("dir.fechamodificacion DESC ");
+		
+		sql.SELECT("* FROM ("+ sql2 + ")" );
+		
+		sql.WHERE("  ROWNUM = 1 "); 
+		
+		return sql.toString();
+	}
 	
-	
-	
+		
 	
 	
 	

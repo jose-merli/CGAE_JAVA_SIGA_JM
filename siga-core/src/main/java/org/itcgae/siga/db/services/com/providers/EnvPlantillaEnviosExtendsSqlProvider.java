@@ -129,7 +129,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSql
 			sql.WHERE("IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
 		}
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("") ){
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
+			sql.WHERE(filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
 		}
 		if(!UtilidadesString.esCadenaVacia(idPlantilla)){
 			sql.WHERE("idPlantillaEnvios = '" + idPlantilla +"'");

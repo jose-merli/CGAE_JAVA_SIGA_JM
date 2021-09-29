@@ -41,7 +41,7 @@ public class ScsMateriaSqlExtendsProvider extends ScsMateriaSqlProvider {
 
 		sql.SELECT("IDMATERIA, NOMBRE");
 		sql.FROM("SCS_MATERIA");
-		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"' AND IDAREA ='"+idArea+"'");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"' AND IDAREA IN ("+idArea+")");
 		sql.ORDER_BY("NOMBRE");
 		
 		return sql.toString();

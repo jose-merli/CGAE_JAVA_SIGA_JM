@@ -47,7 +47,7 @@ public class EnvDocumentosSqlProvider {
 			sql.VALUES("IDENVIO", "#{idenvio,jdbcType=DECIMAL}");
 		}
 		if (record.getIddocumento() != null) {
-			sql.VALUES("IDDOCUMENTO", "#{iddocumento,jdbcType=DECIMAL}");
+		sql.VALUES("IDDOCUMENTO", "#{iddocumento,jdbcType=DECIMAL}");
 		}
 		if (record.getDescripcion() != null) {
 			sql.VALUES("DESCRIPCION", "#{descripcion,jdbcType=VARCHAR}");

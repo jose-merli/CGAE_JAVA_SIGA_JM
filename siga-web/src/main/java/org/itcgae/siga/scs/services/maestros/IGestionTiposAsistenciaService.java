@@ -29,4 +29,6 @@ public interface IGestionTiposAsistenciaService {
 
 	public InsertResponseDTO createTiposAsistencia(TiposAsistenciaItem tiposAsistenciaItem, HttpServletRequest request);
 
+	public ComboDTO getComboAsistencia(HttpServletRequest request);
+
 }

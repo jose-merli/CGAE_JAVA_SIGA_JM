@@ -1,15 +1,18 @@
 package org.itcgae.siga.scs.services.impl.componentesGenerales;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ColegiadoJGDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSDTO;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -26,6 +29,8 @@ import org.itcgae.siga.scs.services.componentesGenerales.IBusquedaColegiadosExpr
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.jayway.jsonpath.internal.filter.ValueNode.UndefinedNode;
 
 @Service
 public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosExpressService {
@@ -239,4 +244,6 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 		LOGGER.info("busquedaColegiadosExpress.comboTurnos() -> Salida del servicio para obtener los turnos");
 		return comboDTO;
 	}
+
 }
+
