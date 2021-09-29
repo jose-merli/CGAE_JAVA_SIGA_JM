@@ -411,6 +411,10 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 @Results({})
 	 String deleteguardiaFromConjuntoGuardias(String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item);
 	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="deleteguardiaFromLog")
+	 @Results({})
+	 String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item);
+	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="deleteGuardiaFromCalendario")
 	 @Results({})
 	 String deleteGuardiaFromCalendario(String idCalendar, String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item);
@@ -1077,7 +1081,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "cambiarUltimoCola2")
 			@Results({
 				@Result(column = "IDPERSONA_ULTIMO", property="IDPERSONA_ULTIMO", jdbcType = JdbcType.VARCHAR),
-				@Result(column = "IDGRUPOGUARDIACOLEGIADO_ULTIMO", property = "IDGRUPOGUARDIACOLEGIADO_ULTIMO", jdbcType = JdbcType.VARCHAR),
+				@Result(column = "IDGRUPOGUARDIA_ULTIMO", property = "IDGRUPOGUARDIACOLEGIADO_ULTIMO", jdbcType = JdbcType.VARCHAR),
 				@Result(column = "FECHASUSCRIPCION_ULTIMO", property = "FECHASUSCRIPCION_ULTIMO", jdbcType = JdbcType.VARCHAR),
 				@Result(column = "USUMODIFICACION", property = "USUMODIFICACION", jdbcType = JdbcType.VARCHAR),
 				@Result(column = "FECHAMODIFICACION", property = "FECHAMODIFICACION", jdbcType = JdbcType.VARCHAR)})
@@ -1087,8 +1091,8 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "validaGuardiaLetradoPeriodo")
 			@Results({
-				@Result(column = "EXISTEGUARDIA", property="EXISTEGUARDIA", jdbcType = JdbcType.VARCHAR)})
-			String validaGuardiaLetradoPeriodo(String idPersona, String idInstitucion, String idTurno, String idGuardia, String fechaInicio, String fechaFin);
+				@Result(column = "EXISTEGUARDIA", property="EXISTEGUARDIA", jdbcType = JdbcType.DECIMAL)})
+			int validaGuardiaLetradoPeriodo(String idPersona, String idInstitucion, String idTurno, String idGuardia, String fechaInicio, String fechaFin);
 			
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getInstitucionParam")
 			@Results({

@@ -110,10 +110,10 @@ public class ScsGuardiascolegiadoSqlProvider {
 			sql.VALUES("IDPERSONA", record.getIdpersona().toString());
 		}
 		if (fechaInicioPSt != null) {
-			sql.VALUES("FECHAINICIO", "'" + fechaInicioPSt + "'");
+			sql.VALUES("FECHAINICIO", "TO_DATE('" +fechaInicioPSt+ "', 'YYYY-MM-DD HH24:MI:SS')");
 		}
 		if (fechaFinPSt != null) {
-			sql.VALUES("FECHAFIN", "'" + fechaFinPSt + "'");
+			sql.VALUES("FECHAFIN", "TO_DATE('" +fechaFinPSt+ "', 'YYYY-MM-DD HH24:MI:SS')");
 		}
 		if (record.getDiasguardia() != null) {
 			sql.VALUES("DIASGUARDIA", record.getDiasguardia().toString());
@@ -122,7 +122,7 @@ public class ScsGuardiascolegiadoSqlProvider {
 			sql.VALUES("DIASACOBRAR", record.getDiasacobrar().toString());
 		}
 		if (record.getFechamodificacion() != null) {
-			sql.VALUES("FECHAMODIFICACION", "'" + today + "'");
+			sql.VALUES("FECHAMODIFICACION", "TO_DATE('" +today+ "', 'YYYY-MM-DD HH24:MI:SS')");
 		}
 		if (record.getUsumodificacion() != null) {
 			sql.VALUES("USUMODIFICACION", record.getUsumodificacion().toString());

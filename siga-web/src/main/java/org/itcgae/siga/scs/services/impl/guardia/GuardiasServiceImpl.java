@@ -2896,9 +2896,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 							"insertGuardiaToCalendar() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
 					String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(idCalendar, idInstitucion.toString());
 					itemList.forEach(item -> {
+//						String response3 = scsGuardiasturnoExtendsMapper.deleteguardiaFromLog(idConjuntoGuardia, idInstitucion.toString(), today, item);
 						String response = scsGuardiasturnoExtendsMapper.deleteguardiaFromConjuntoGuardias(idConjuntoGuardia, idInstitucion.toString(), today, item);
 						String response2 = scsGuardiasturnoExtendsMapper.deleteGuardiaFromCalendario(idCalendar, idConjuntoGuardia, idInstitucion.toString(), today, item);
-						if ((response == null || response2 == null)  && error.getDescription() == null)
+						if (response2 == null || response == null  && error.getDescription() == null)
 						{
 							error.setCode(400);
 							insertResponseDTO.setStatus(SigaConstants.KO);
@@ -3002,7 +3003,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						 hco.setUsumodificacion(usuarios.get(0).getUsumodificacion());
 						 hco.setFechamodificacion(new Date());
 						 int response3 = scsHcoConfProgCalendariosMapper.updateByPrimaryKeySelective(hco);
-//						String response3 = scsGuardiasturnoExtendsMapper.updateCalendarioProgramado3(calendarioItem,  idInstitucion.toString());
+					String response4 = scsGuardiasturnoExtendsMapper.updateCalendarioProgramado3(calendarioItem,  idInstitucion.toString());
 						if (response3 == 0 && error.getDescription() == null)
 						{
 							error.setCode(400);
@@ -3100,7 +3101,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario: 0 */1 * * *}")
 	@Override
 	public InsertResponseDTO generarCalendarioAsync () {
-		LOGGER.info("generarCalendario() -> Entrada al servicio para búsqueda de las guardias");
+		LOGGER.info("generarCalendarioAsync() -> Entrada al servicio para búsqueda de las guardias");
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		GuardiasTurnoItem guardiaBean = new GuardiasTurnoItem();
 		List<DatosCalendarioProgramadoItem> programacionItemListFull = new ArrayList<>();
@@ -3110,7 +3111,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 					String today = formatter.format(new Date());
 					LOGGER.info(
-							"generarCalendario() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
+							"generarCalendarioAsync() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
 					
 					List<DatosCalendarioProgramadoItem> programacionItemList = scsGuardiasturnoExtendsMapper.getAllCalendariosProgramadosSigaClassiquePendiente ();
 					if (programacionItemList != null && !programacionItemList.isEmpty()) {
@@ -3171,7 +3172,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								int idCalendario =  crearCalendario(guardiaBean, programacionItem, hcoConfProgCalendariosItem.getIdinstitucion(), hcoConfProgCalendariosItem.getIdturno(),
 										hcoConfProgCalendariosItem.getIdguardia(), programacionItem.getFechaDesde(), programacionItem.getFechaHasta(), textoAutomatico, null, null, null);
 								if(idCalendario<=0) {
-									throw new Exception("Error al crear el Calendario de guardias");
+									throw new Exception("generarCalendarioAsync: Error al crear el Calendario de guardias");
 								}
 								
 								inicializaParaGenerarCalendario(new Integer(hcoConfProgCalendariosItem.getIdinstitucion()),new Integer(hcoConfProgCalendariosItem.getIdturno()),
@@ -3201,7 +3202,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 						} catch (Exception e) {
 							LOGGER.error(
-							"generarCalendario() -> Se ha producido un error al trabajar con el histórico",
+							"generarCalendarioAsync() -> Se ha producido un error al trabajar con el histórico",
 							e);
 							if(hcoConfProgCalendariosItem!=null){
 								hcoConfProgCalendariosItem.setEstado(PROCESADO_CON_ERRORES);
@@ -3217,10 +3218,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}
 						});
 					}
-						LOGGER.info("generarCalendario() -> Entrada para obtener los datos del calendario");
+						LOGGER.info("generarCalendarioAsync() -> Entrada para obtener los datos del calendario");
 		} catch (Exception e) {
 			LOGGER.error(
-					"generarCalendario() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
+					"generarCalendarioAsync() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -3411,12 +3412,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 				}
 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 			String today = formatter.format(new Date());
-			String OLD_FORMAT = "yyyy-MM-dd HH:mm:ss.S";
-			String NEW_FORMAT = "dd/MM/yyyy";
-			fechaSuscUltimoAnterior = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaSuscUltimoAnterior);
+			String NEW_FORMAT = "yyyy-MM-dd HH:mm:ss";
+			String OLD_FORMAT2 = "yyyy-MM-dd HH:mm:ss.S";
+			String OLD_FORMAT = "dd/MM/yyyy";
+//			if (!fechaSuscUltimoAnterior.isEmpty()) {
+//			fechaSuscUltimoAnterior = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaSuscUltimoAnterior);
+//			}
 			
 			try {
-				scsGuardiasturnoExtendsMapper.insertarRegistroCalendarioGuardias(idTurnoPrincipal, idGuardiaPrincipal, idCalendarioPrincipal, observaciones, idTurno, idGuardia, fechaHasta, fechaDesde, idcalendarioguardias, idInstitucion, idPersonaUltimoAnterior, today, fechaSuscUltimoAnterior, idGrupoGuardiaColegiadoAnterior, usuModificacion1.toString());
+				scsGuardiasturnoExtendsMapper.insertarRegistroCalendarioGuardias(idTurnoPrincipal, idGuardiaPrincipal, idCalendarioPrincipal, observaciones, idTurno, idGuardia, changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaHasta), changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaDesde), idcalendarioguardias, idInstitucion, idPersonaUltimoAnterior, changeDateFormat(OLD_FORMAT, NEW_FORMAT, today) , changeDateFormat(OLD_FORMAT2, NEW_FORMAT, fechaSuscUltimoAnterior), idGrupoGuardiaColegiadoAnterior, usuModificacion1.toString());
 				return Integer.parseInt(idcalendarioguardias);
 			}catch(Exception e) {
 				return 0;
@@ -4993,7 +4997,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (letrado.getInscripcionGuardia()!= null) {
 				idInstitucion = letrado.getInscripcionGuardia().getIdInstitucion().toString();
 				idGuardia = letrado.getInscripcionGuardia().getIdGuardia().toString();
-				idTurno = letrado.getInscripcionGuardia().getIdTurno().toString();
+				idTurno = letrado.getInscripcionGuardia().getIdturno().toString();
 				idPersona = letrado.getInscripcionGuardia().getIdPersona().toString();
 			}else if (letrado.getInscripcionTurno()!= null) {
 				idInstitucion = letrado.getInscripcionTurno().getIdinstitucion().toString();
@@ -6056,7 +6060,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					if (letrado.getInscripcionGuardia() != null) {
 						beanCabeceraGuardias.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
 						//beanCabeceraGuardias.setIdturno(letrado.getIdturno());
-						beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdTurno()));
+						beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
 						//beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
 						beanCabeceraGuardias.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
 						//beanCabeceraGuardias.setIdpersona(letrado.getIdpersona());
@@ -6117,13 +6121,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 						throw new Exception("gratuita.calendarios.guardias.mensaje.existe");
 
 					if (letrado.getInscripcionGuardia() != null) {
-						scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias , fechaInicioPSt, fechaFinPSt, today, letrado.getInscripcionGuardia().getIdInstitucion(), letrado.getInscripcionGuardia().getIdTurno(), letrado.getInscripcionGuardia().getIdGuardia(), letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
+						scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias , fechaInicioPSt, fechaFinPSt, today, letrado.getInscripcionGuardia().getIdInstitucion(), letrado.getInscripcionGuardia().getIdturno(), letrado.getInscripcionGuardia().getIdGuardia(), letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
 					}else if(letrado.getInscripcionTurno() != null) {
 						scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias , fechaInicioPSt, fechaFinPSt, today, letrado.getInscripcionTurno().getIdinstitucion().toString(), letrado.getInscripcionTurno().getIdturno().toString(), null, letrado.getInscripcionTurno().getIdpersona().toString(), fechaAlta);
+					}else {
+						scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias , fechaInicioPSt, fechaFinPSt, today, letrado.getInscripcionGuardia().getIdInstitucion(), letrado.getInscripcionGuardia().getIdturno(), letrado.getInscripcionGuardia().getIdGuardia(), letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
 					}
-
-					scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias , fechaInicioPSt, fechaFinPSt, today, letrado.getInscripcionGuardia().getIdInstitucion(), letrado.getInscripcionGuardia().getIdturno(), letrado.getInscripcionGuardia().getIdGuardia(), letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
-
 					//Paso2: inserto un registro por dia de guardia en cada guardia:
 					iter = alDiasPeriodo.iterator();
 					while (iter.hasNext()) {
@@ -6132,7 +6135,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						beanGuardiasColegiado = new ScsGuardiascolegiado();
 						if (letrado.getInscripcionGuardia() != null) {
 							beanGuardiasColegiado.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
-							beanGuardiasColegiado.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdTurno()));
+							beanGuardiasColegiado.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
 							beanGuardiasColegiado.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
 							beanGuardiasColegiado.setIdpersona(new Long(letrado.getInscripcionGuardia().getIdPersona()));
 						}else if (letrado.getInscripcionTurno()!= null) {
@@ -6141,18 +6144,21 @@ public class GuardiasServiceImpl implements GuardiasService {
 							beanGuardiasColegiado.setIdguardia(null);
 							beanGuardiasColegiado.setIdpersona(new Long(letrado.getInscripcionTurno().getIdpersona()));
 						}
+						
+						String NEW_FORMAT2 = "yyyy-MM-dd HH:mm:ss";
+						String OLD_FORMAT2 = "dd/MM/yyyy";
 //						beanGuardiasColegiado.setIdinstitucion(letrado.getIdinstitucion());
 //						beanGuardiasColegiado.setIdturno(letrado.getIdturno());
 //						beanGuardiasColegiado.setIdguardia(letrado.getIdguardia());
 //						beanGuardiasColegiado.setIdpersona(letrado.getIdpersona());
 						beanGuardiasColegiado.setFechainicio(new Date(fechaInicioPeriodo));
-						fechaInicioPSt = fechaInicioPeriodo;
+						fechaInicioPSt = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2,fechaInicioPeriodo);
 						beanGuardiasColegiado.setFechafin(new Date(fechaPeriodo));
-						fechaFinPSt = fechaPeriodo;
+						fechaFinPSt = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2,fechaPeriodo);
 						beanGuardiasColegiado.setDiasguardia(new Long(beanGuardiasTurno1.getDiasGuardia().longValue()));
 						beanGuardiasColegiado.setDiasacobrar(new Long(beanGuardiasTurno1.getDiasPagados().longValue()));
 						beanGuardiasColegiado.setFechamodificacion(new Date());	
-						today = formatter.format(new Date());
+						today = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2,formatter.format(new Date()));
 						beanGuardiasColegiado.setUsumodificacion(usuModificacion1);
 						beanGuardiasColegiado.setReserva("N");
 						beanGuardiasColegiado.setObservaciones("-");
@@ -6221,9 +6227,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String consulta = "";
 		
 		try {
-			String cabecera = scsGuardiasturnoExtendsMapper.validaGuardiaLetradoPeriodo(idPersona.toString(),  idInstitucion.toString(),  idTurno.toString(),  idGuardia.toString(),  fechaInicio,  fechaFin);
+			int cabecera = scsGuardiasturnoExtendsMapper.validaGuardiaLetradoPeriodo(idPersona.toString(),  idInstitucion.toString(),  idTurno.toString(),  idGuardia.toString(),  fechaInicio,  fechaFin);
 				
-				if(cabecera.equals("0"))
+				if(cabecera == 0)
 					existeGuardiaLetrado=false;
 				else
 					existeGuardiaLetrado=true;
