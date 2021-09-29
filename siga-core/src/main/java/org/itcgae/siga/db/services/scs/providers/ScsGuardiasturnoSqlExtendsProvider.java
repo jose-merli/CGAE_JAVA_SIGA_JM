@@ -592,10 +592,10 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 			sql.SET("LOG_GENERACION_NAME = '" + logName + "'");
 			}
 			if (fechaIni != null && !fechaIni.isEmpty()) {
-			sql.WHERE("VCE.FECHACADESDE = TO_DATE('" + fechaIni+ "', 'dd/MM/yyyy')");
+			sql.WHERE("VCE.FECHADESDE = TO_DATE('" + fechaIni+ "', 'dd/MM/yyyy')");
 			}
 			if (fechaFin != null && !fechaFin.isEmpty()) {
-			sql.WHERE("VCE.FECHACALHASTA = TO_DATE('" + fechaFin + "', 'dd/MM/yyyy')");
+			sql.WHERE("VCE.FECHAHASTA = TO_DATE('" + fechaFin + "', 'dd/MM/yyyy')");
 			}
 			if (idCG != null && !idCG.isEmpty()) {
 			sql.WHERE("VCE.IDCALENDARIOPROGRAMADO = " + idCG);
@@ -811,6 +811,27 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 //		if (idConjuntoGuardia != null) {
 //			sql2.WHERE("USUMODIFICACION IN " + "( " + subquery.toString() + " )");
 //		}
+		return sql2.toString();
+		
+	}
+	
+public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item){
+		
+
+		SQL sql2 = new SQL();
+		sql2.DELETE_FROM("SCS_CALENDARIOS_PROG_LOG");
+		if (idConjuntoGuardia != null) {
+			sql2.WHERE("IDCONJUNTOGUARDIA = " + idConjuntoGuardia);
+		}
+		if (idInstitucion != null) {
+			sql2.WHERE("IDINSTITUCION = "+ idInstitucion);
+		}
+		if (item.getIdTurno() != null) {
+			sql2.WHERE("IDTURNO = "+ item.getIdTurno());
+		}
+		if (item.getIdGuardia()!= null) {
+			sql2.WHERE("IDGUARDIA = "+ item.getIdGuardia());
+		}
 		return sql2.toString();
 		
 	}
@@ -1363,18 +1384,33 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	}
 	
 	public String updateCalendarioProgramado3(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion) {
+//		SQL sql = new SQL();
+//		sql.UPDATE("CG");
+//
+//		if (calendarioItem.getIdTurno() != null) {
+//			sql.SET("CG.IDTURNO = " + calendarioItem.getIdTurno());
+//		}
+//		if (calendarioItem.getIdGuardia() != null) {
+//			sql.SET("CG.IDGUARDIA = " + calendarioItem.getIdGuardia());
+//		}
+//		sql.FROM("SCS_CONF_CONJUNTO_GUARDIAS CG");
+//		sql.JOIN("SCS_PROG_CALENDARIOS PC ON CG.IDINSTITUCION = PC.IDINSTITUCION AND CG.IDCONJUNTOGUARDIA = PC.IDCONJUNTOGUARDIA");
+//		sql.WHERE("PC.IDPROGCALENDARIO = " + calendarioItem.getIdCalendarioProgramado());
+//		return sql.toString();
+		
 		SQL sql = new SQL();
 		sql.UPDATE("CG");
 
 		if (calendarioItem.getIdTurno() != null) {
-			sql.SET("CG.IDTURNO = " + calendarioItem.getIdTurno());
+			sql.SET("CG.FECHAINICIO"+ calendarioItem.getFechaDesde());
 		}
 		if (calendarioItem.getIdGuardia() != null) {
-			sql.SET("CG.IDGUARDIA = " + calendarioItem.getIdGuardia());
+			sql.SET("CG.FECHAFIN"+ calendarioItem.getFechaHasta());
 		}
-		sql.FROM("SCS_CONF_CONJUNTO_GUARDIAS CG");
-		sql.JOIN("SCS_PROG_CALENDARIOS PC ON CG.IDINSTITUCION = PC.IDINSTITUCION AND CG.IDCONJUNTOGUARDIA = PC.IDCONJUNTOGUARDIA");
-		sql.WHERE("PC.IDPROGCALENDARIO = " + calendarioItem.getIdCalendarioProgramado());
+		sql.FROM("SCS_CALENDARIOGUARDIAS");
+		
+		sql.WHERE("CG.IDTURNO=" + calendarioItem.getIdTurno());
+		sql.WHERE("CG.IDGUARDIA=" + calendarioItem.getIdGuardia());
 		return sql.toString();
 
 	}
@@ -1944,12 +1980,12 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	        sql.INSERT_INTO("SCS_CALENDARIOGUARDIAS");
 	        if (observaciones != null)
 			sql.VALUES("OBSERVACIONES ", "'" + observaciones + "'");
-	        if (idPersonaUltimoAnterior != null)
+	        if (idPersonaUltimoAnterior != null && !idPersonaUltimoAnterior.isEmpty())
 			sql.VALUES("IDPERSONA_ULTIMOANTERIOR", idPersonaUltimoAnterior);
 	        if (today != null)
-			sql.VALUES("FECHAMODIFICACION", "'" +today+ "'");
-	        if (fechaSuscUltimoAnterior != null)
-			sql.VALUES("FECHASUSC_ULTIMOANTERIOR", "'" +fechaSuscUltimoAnterior+ "'");
+			sql.VALUES("FECHAMODIFICACION", "TO_DATE('" +today+ "', 'YYYY-MM-DD HH24:MI:SS')");
+	        if (fechaSuscUltimoAnterior != null && ! fechaSuscUltimoAnterior.isEmpty())
+			sql.VALUES("FECHASUSC_ULTIMOANTERIOR", "TO_DATE('" +fechaSuscUltimoAnterior+ "', 'YYYY-MM-DD HH24:MI:SS')");
 	        if (idTurno != null)
 			sql.VALUES("IDTURNO", idTurno);
 	        if (usuModif != null)
@@ -1957,13 +1993,13 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	        if (idGuardia != null)
 			sql.VALUES("IDGUARDIA", idGuardia);
 	        if (fechaHasta != null)
-			sql.VALUES("FECHAFIN", "'" +fechaHasta+ "'");
+			sql.VALUES("FECHAFIN", "TO_DATE('" +fechaHasta+ "', 'YYYY-MM-DD HH24:MI:SS')");
 	        if (idGrupoUltimoAnterior != null && !idGrupoUltimoAnterior.isEmpty())
 			sql.VALUES("IDGRUPOGUARDIA_ULTIMOANTERIOR", idGrupoUltimoAnterior);
 	        if (idInstitucion != null)
 			sql.VALUES("IDINSTITUCION", idInstitucion);
 	        if (fechaDesde != null)
-			sql.VALUES("FECHAINICIO", "'" +fechaDesde+ "'");
+			sql.VALUES("FECHAINICIO", "TO_DATE('" +fechaDesde+ "', 'YYYY-MM-DD HH24:MI:SS')");
 	        if (idCalendarioProgramado != null)
 			sql.VALUES("IDCALENDARIOGUARDIAS", idCalendarioProgramado);
 			if (idTurnoPrincipal != null) {
@@ -3028,30 +3064,29 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	public String cambiarUltimoCola2(String sIdinstitucion, String sIdTurno, String sIdGuardia, String sIdpersona, String sIdGrupoGuardiaColegiado_Ultimo, 
 			String sFechaSusc, String usu) {
 		SQL sql = new SQL();
-		sql.SELECT("IDPERSONA_ULTIMO, IDGRUPOGUARDIACOLEGIADO_ULTIMO, FECHASUSCRIPCION_ULTIMO, USUMODIFICACION, FECHAMODIFICACION");
-		sql.FROM("SCS_GUARDIASTURNO");
-		if (sIdinstitucion != null) {
-		sql.WHERE("IDINSTITUCION = " + sIdinstitucion);
-		}
-		if (sIdTurno != null) {
-		sql.WHERE("IDTURNO = " + sIdTurno);
-		}
-		if (sIdGuardia != null) {
-		sql.WHERE("IDGUARDIA = " + sIdGuardia);
-		}
-		if (sIdpersona != null) {
-		sql.WHERE("IDPERSONA_ULTIMO = " + sIdpersona);
-		}
-		if (sIdGrupoGuardiaColegiado_Ultimo != null) {
-		sql.WHERE("IDGRUPOGUARDIA_ULTIMO = " + sIdGrupoGuardiaColegiado_Ultimo);
+		sql.UPDATE("SCS_GUARDIASTURNO");
+		if (sIdGrupoGuardiaColegiado_Ultimo != null && sIdGrupoGuardiaColegiado_Ultimo != "null" && !sIdGrupoGuardiaColegiado_Ultimo.isEmpty() ) {
+		sql.SET("IDGRUPOGUARDIA_ULTIMO = " + sIdGrupoGuardiaColegiado_Ultimo);
 		}
 		if (sFechaSusc != null) {
-		sql.WHERE("FECHASUSCRIPCION_ULTIMO = '" + sFechaSusc + "'");
+		sql.SET("FECHASUSCRIPCION_ULTIMO = '" + sFechaSusc + "'");
 		}
 		if (usu != null) {
-		sql.WHERE("USUMODIFICACION = " + usu);
+		sql.SET("USUMODIFICACION = " + usu);
 		}
-		//sql.WHERE("IDINSTITUCION = SYSDATE"); FECHAMODIFICACION???? DUDA!!!
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+
+		sql.WHERE("IDINSTITUCION = " + sIdinstitucion);
+
+		sql.WHERE("IDTURNO = " + sIdTurno);
+
+		sql.WHERE("IDGUARDIA = " + sIdGuardia);
+		
+		if (sIdpersona != null && sIdpersona != "null" && !sIdpersona.isEmpty() ) {
+		sql.WHERE("IDPERSONA_ULTIMO = " + sIdpersona);
+		}
+
+		
 	return sql.toString();
 	}
 	
