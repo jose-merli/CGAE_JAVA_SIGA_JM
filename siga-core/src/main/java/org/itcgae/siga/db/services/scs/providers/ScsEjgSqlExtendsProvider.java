@@ -147,28 +147,17 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
             sql.WHERE("ejg.origenapertura IN (" + ejgItem.getCreadoDesde() + ")");
         if (ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != "")
             sql.WHERE("regexp_like(EJG.NUMEROPROCEDIMIENTO,'" + ejgItem.getProcedimiento() + "')");
-        if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "")
-            if (ejgItem.isUltimoEstado()) {
-                sql.WHERE("estado.idestadoejg IN (" + ejgItem.getEstadoEJG() + ")");
-            } else {
-
-                String[] estados = ejgItem.getEstadoEJG().split(",");
-                int maximoEstado;
-
-                if (estados.length > 1) {
-                    maximoEstado = Arrays.stream(estados).map(Integer::parseInt).max(Comparator.naturalOrder()).get();
-                } else {
-                    maximoEstado = Integer.parseInt(estados[0]);
-                }
-
-                SQL subQuery = new SQL();
-                subQuery.SELECT("IDESTADOEJG");
-                subQuery.FROM("SCS_MAESTROESTADOSEJG");
-                subQuery.WHERE("FECHA_BAJA IS NULL");
-                subQuery.WHERE("IDESTADOEJG >= " + maximoEstado);
-
-                sql.WHERE("estado.idestadoejg IN (" + subQuery.toString() + ")");
-            }
+        // SPP-1054@DTT.JAMARTIN@28/09/2021@INICIO
+        if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "") {
+			if (ejgItem.isUltimoEstado()) {
+				sql.WHERE("estado.idestadoejg IN (" + ejgItem.getEstadoEJG() + ")");
+			} else {
+				String[] estados = ejgItem.getEstadoEJG().split(",");
+				sql.WHERE("MAESTROESTADO.FECHA_BAJA IS NULL");
+				sql.WHERE("MAESTROESTADO.IDESTADOEJG IN (" + estados + ")");
+			}
+		}
+		// SPP-1054@DTT.JAMARTIN@28/09/2021@FIN
         if (ejgItem.getFechaAperturaDesd() != null) {
             fechaAperturaDesd = dateFormat.format(ejgItem.getFechaAperturaDesd());
             sql.WHERE("EJG.FECHAAPERTURA >= TO_DATE( '" + fechaAperturaDesd + "','DD/MM/RRRR')");
