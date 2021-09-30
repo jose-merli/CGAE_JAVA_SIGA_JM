@@ -64,14 +64,13 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 							"comboEstadoFactura() / pysPeticioncomprasuscripcionExtendsMapper.comboEstadoFactura() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para recuperar el combo de estados de factura");
 
 					String idioma = usuarios.get(0).getIdlenguaje();
-					List<ComboItem> listaComboIva = pysPeticioncomprasuscripcionExtendsMapper
-							.comboEstadoFactura(idioma);
+					List<ComboItem> listaComboEstadosFactura = pysPeticioncomprasuscripcionExtendsMapper.comboEstadoFactura(idioma);
 
 					LOGGER.info(
 							"comboEstadoFactura() / pysPeticioncomprasuscripcionExtendsMapper.comboEstadoFactura() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para recuperar el combo de estados de factura");
 
-					if (listaComboIva != null && listaComboIva.size() > 0) {
-						comboDTO.setCombooItems(listaComboIva);
+					if (listaComboEstadosFactura != null && listaComboEstadosFactura.size() > 0) {
+						comboDTO.setCombooItems(listaComboEstadosFactura);
 					}
 				}
 
@@ -151,6 +150,8 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 		LOGGER.info(
 				"getListaCompraProductos() -> Salida del servicio para obtener las peticiones de compra que cumplan las condiciones");
 
+		listaCompraProductos.setError(error);
+		
 		return listaCompraProductos;
 		
 	}

@@ -1,6 +1,10 @@
 package org.itcgae.siga.db.services.fac.providers;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
@@ -138,7 +142,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 		// Para obtener las formas de pago comunes entre los productos de la compra. Se
 		// devuelven los idformapago concatenados con comas para su gestion.
-		if (peticion.getProductos() != null) {
+		if (peticion.getProductos() != null && peticion.getProductos().length > 0) {
 			SQL sqlPagos = new SQL();
 			// Con listagg logramos que los distintos ids de formas de pago se muestren en
 			// unica fila
@@ -234,32 +238,33 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		return sql.toString();
 	}
 	
-	public String getListaCompras(FiltrosCompraProductosItem filtro, Short idInstitucion, String idioma) {
+	public String getListaCompras(FiltrosCompraProductosItem filtro, Short idInstitucion, String idioma) throws ParseException {
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT("pet.fecha as fechaSolicitud");
-		sql.SELECT("pet.idPeticion as nSolicitud");
-		sql.SELECT("per.nifcif as nIdentificacion");
-		sql.SELECT("col.NCOLEGIADO \r\n");
-		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as apellidosnombre \r\n");
-		sql.SELECT("FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) as concepto \r\n");
-		sql.SELECT("FIRST_VALUE(prodSol.idformapago) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) as idformapago \r\n");
-		sql.SELECT("f_siga_getrecurso(formPago.descripcion, "+ idioma +") as desFormaPago");
-		sql.SELECT("F_siga_formatonumero(ROUND(prodIns.VALOR*TIVA.VALOR/100)+prodIns.VALOR, 2) AS impTotal \r\n");
+		sql.SELECT_DISTINCT("pet.fecha as fechaSolicitud");
+		sql.SELECT_DISTINCT("pet.idPeticion as nSolicitud");
+		sql.SELECT_DISTINCT("per.nifcif as nIdentificacion");
+		sql.SELECT_DISTINCT("col.NCOLEGIADO \r\n");
+		sql.SELECT_DISTINCT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as apellidosnombre \r\n");
+		sql.SELECT_DISTINCT("CASE WHEN COUNT(*) OVER (ORDER BY prodIns.descripcion) >1 THEN FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) || '...'\r\n"
+				+ "ELSE FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) END as concepto \r\n");
+		sql.SELECT_DISTINCT("FIRST_VALUE(prodSol.idformapago) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) as idformapago \r\n");
+		sql.SELECT_DISTINCT("f_siga_getrecurso(formPago.descripcion, "+ idioma +") as desFormaPago");
+		sql.SELECT_DISTINCT("F_siga_formatonumero(ROUND(prodIns.VALOR*TIVA.VALOR/100)+prodIns.VALOR, 2) AS impTotal \r\n");
 		
-		sql.SELECT("CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
+		sql.SELECT_DISTINCT("CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
 				+ "ELSE null END as fechaDenegada \r\n");
-		sql.SELECT("CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
+		sql.SELECT_DISTINCT("CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
 				+ "ELSE null END as fechaSolicitadaAnulacion \r\n");
-		sql.SELECT("compra.fecha as fechaEfectiva");
-		sql.SELECT("compra.fechaBaja as fechaAnulada");
-		sql.SELECT("f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'" + idioma + "') AS estadoFactura");
+		sql.SELECT_DISTINCT("compra.fecha as fechaEfectiva");
+		sql.SELECT_DISTINCT("compra.fechaBaja as fechaAnulada");
+		sql.SELECT_DISTINCT("f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'" + idioma + "') AS estadoFactura");
 		
 		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION pet");
 		
 		sql.INNER_JOIN("PYS_productosSolicitados prodSol on prodSol.idinstitucion=pet.idInstitucion and prodSol.idpeticion=pet.idPeticion");
-		sql.INNER_JOIN("pys_formapago formPago on formPago.idformapago = prodSol.idformapago");
+		sql.LEFT_OUTER_JOIN("pys_formapago formPago on formPago.idformapago = prodSol.idformapago");
 		sql.LEFT_OUTER_JOIN("pys_compra compra on compra.idinstitucion = pet.idinstitucion and compra.idpeticion = pet.idpeticion");
 		sql.INNER_JOIN("cen_persona per on per.idpersona = pet.idpersona");
 		sql.LEFT_OUTER_JOIN("cen_colegiado col on col.idpersona = pet.idpersona and col.idinstitucion = pet.idinstitucion");
@@ -271,23 +276,28 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.LEFT_OUTER_JOIN("fac_estadoFactura estFact on estFact.idestado = fact.estado");
 		
 		sql.WHERE("pet.idinstitucion = "+idInstitucion.toString());
+		sql.WHERE("rownum <= 200");
 		
 		if(filtro.getIdEstadoSolicitud() != null) {
 			switch(filtro.getIdEstadoSolicitud()) {
 				case "1":
-					sql.WHERE("fechaDenega is null and fechaAprobada is null");
+					sql.WHERE("CASE WHEN compra.fecha is null THEN petBaja.fecha\r\n"
+							+ "				ELSE null END is null and compra.fecha is null");
 					break;
 				case "2":
-					sql.WHERE("fechaDenegada is not null");
+					sql.WHERE("CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
+							+ "				ELSE null END is not null");
 					break;
 				case "3":
-					sql.WHERE("fechaAprobada is not null and fechaSolicitadaAnulacion is null");
+					sql.WHERE("compra.fecha is not null and CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
+							+ "				ELSE null END is null");
 					break;
 				case "4":
-					sql.WHERE("fechaSolicitadaAnulacion is not null and fechaAnulada is null");
+					sql.WHERE("CASE WHEN compra.fecha is not null THEN petBaja.fecha \r\n"
+							+ "				ELSE null END is not null and compra.fechaBaja is null");
 					break;
 				case "5":
-					sql.WHERE("fechaAnulada is not null");
+					sql.WHERE("compra.fechaBaja is not null");
 					break;
 			}
 		}
@@ -298,20 +308,34 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		if(filtro.getDescProd() != null && filtro.getDescProd().trim() != "")sql.WHERE("prodIns.descripcion like '%"+filtro.getDescProd()+"%'");
 		
-		if(filtro.getFechaSolicitudDesde() != null)sql.WHERE("pet.fecha >= to_date('"+filtro.getFechaSolicitudDesde()+"','DD-MM-YY')");
+		if(filtro.getFechaSolicitudDesde() != null) {
+			DateFormat dateFormatFront = new SimpleDateFormat(
+		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
+			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
+			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
+			sql.WHERE("pet.fecha >= to_date('"+strDate+"','dd/MM/YY')");
+		}
 
-		if(filtro.getFechaSolicitudHasta() != null)sql.WHERE("pet.fecha <= to_date('"+filtro.getFechaSolicitudHasta()+"','DD-MM-YY')");
+		if(filtro.getFechaSolicitudHasta() != null) {
+			DateFormat dateFormatFront = new SimpleDateFormat(
+		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
+			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
+			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
+			sql.WHERE("pet.fecha <= to_date('"+strDate+"','dd/MM/YY')");
+		}
 			
 		if(filtro.getIdTipoProducto() != null)sql.WHERE("prodSol.idProductoInstitucion = "+filtro.getIdTipoProducto());
 
 		if(filtro.getIdCategoria() != null)sql.WHERE("prodSol.idTipoProducto = "+filtro.getIdCategoria());
+		
+		if(filtro.getIdEstadoFactura() != null)sql.WHERE("fact.estado = "+filtro.getIdEstadoFactura());
 //		private String importe; // valor aplicado durante la compra (importe total)
 		
 		return sql.toString();
 		
 	}
 	
-	public String comboestadoFactura(String idioma) {
+	public String comboEstadoFactura(String idioma) {
 		SQL sql = new SQL();
 		
 		sql.SELECT("IDestado AS ID");

@@ -252,8 +252,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			if (usuarios != null && !usuarios.isEmpty()) {
 				
 				//Si no es un colegiado se lanza un error ya que no deberia tener acceso a este servicio.
-				if(letrado.equals("N"))
-					throw new Exception("El usuario conectado no es un colegiado y no deberia tener acceso a este servicio");
+//				if(letrado.equals("N"))
+//					throw new Exception("El usuario conectado no es un colegiado y no deberia tener acceso a este servicio");
 				
 				GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 
@@ -610,43 +610,53 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					LOGGER.info(
 							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.updateByPrimaryKey() -> Salida de pysPeticioncomprasuscripcionMapper para aprobar una solicitud de compra");
 
-					LOGGER.info(
-							"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una solicitud de compra");
+					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
+					
+					// Al necesitar aprobación, se crea el registro de compra
+					// inmediatamente
+					if (aprobNecesaria.getValor() == "S") {
 
-					PysCompra compra = new PysCompra();
-
-					compra.setFecha(new Date());
-					compra.setFechamodificacion(new Date());
-					compra.setIdinstitucion(idInstitucion);
-					compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
-					compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
-					compra.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-					for (ListaProductosItem producto : ficha.getProductos()) {
-
-						compra.setIdproducto((long) producto.getIdproducto());
-						compra.setIdtipoproducto((short) producto.getIdtipoproducto());
-						compra.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
-						compra.setDescripcion(producto.getDescripcion());
-						if(compra.getIdformapago()!=null)compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
-						else compra.setIdformapago(null);
-						//Revisar posteriormente
-						compra.setCantidad(1);
-						if(producto.getValor()!=null) {
-							compra.setImporteunitario(new BigDecimal(String.join(".",producto.getValor().split(",")[0],producto.getValor().split(",")[1].substring(0, 2))));
+					
+						LOGGER.info(
+								"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una solicitud de compra");
+	
+						PysCompra compra = new PysCompra();
+	
+						compra.setFecha(new Date());
+						compra.setFechamodificacion(new Date());
+						compra.setIdinstitucion(idInstitucion);
+						compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+						compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
+						compra.setUsumodificacion(usuarios.get(0).getIdusuario());
+	
+						for (ListaProductosItem producto : ficha.getProductos()) {
+	
+							compra.setIdproducto((long) producto.getIdproducto());
+							compra.setIdtipoproducto((short) producto.getIdtipoproducto());
+							compra.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+							compra.setDescripcion(producto.getDescripcion());
+							if(compra.getIdformapago()!=null)compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
+							else compra.setIdformapago(null);
+							//Revisar posteriormente
+							compra.setCantidad(1);
+							if(producto.getValor()!=null) {
+								compra.setImporteunitario(new BigDecimal(String.join(".",producto.getValor().split(",")[0],producto.getValor().split(",")[1].substring(0, 2))));
+							}
+							else compra.setImporteunitario(new BigDecimal(0));
+							compra.setNofacturable(ficha.getNoFact());
+	
+							response = pysCompraMapper.insert(compra);
+							if (response == 0)
+								throw new Exception("Error al insertar un registro de compra en la BBDD.");
 						}
-						else compra.setImporteunitario(new BigDecimal(0));
-						compra.setNofacturable(ficha.getNoFact());
+						
+						LOGGER.info(
+								"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de compra");
 
-						response = pysCompraMapper.insert(compra);
-						if (response == 0)
-							throw new Exception("Error al insertar un registro de compra en la BBDD.");
 					}
 				}
 
-				LOGGER.info(
-						"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de compra");
-
+				
 				updateResponseDTO.setStatus("200");
 			}
 //		} catch (Exception e) {
