@@ -2937,15 +2937,21 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 record.setComisaria(datos.getComisaria());
                 record.setCalidad(datos.getCalidad());
 
-                // Datos pre-designacion
-                record.setNumeroprocedimiento(dni);
-                record.setAnioprocedimiento(idInstitucion);
+				// Datos pre-designacion
+				// SIGARNV-2429@DTT.JAMARTIN@30/09/2021@INICIO
+				record.setNumeroprocedimiento(datos.getNumAnnioProcedimiento());
+				// record.setAnioprocedimiento(datos.getAnnio());
+				// SIGARNV-2429@DTT.JAMARTIN@30/09/2021@FIN
                 record.setNig(datos.getNig());
                 if (datos.getJuzgado() != null)
                     record.setJuzgado(Long.parseLong(datos.getJuzgado()));
                 else
                     record.setJuzgado(null);
-                record.setIdpretension( datos.getIdPretension());
+             // SIGARNV-2429@DTT.JAMARTIN@30/09/2021@INICIO
+                if(datos.getIdPretension() != null && datos.getIdPretension() != 0) {
+                	record.setIdpretension( datos.getIdPretension());
+               	}
+             // SIGARNV-2429@DTT.JAMARTIN@30/09/2021@FIN
                 record.setObservaciones(datos.getObservaciones());
                 record.setDelitos(datos.getDelitos());
 
