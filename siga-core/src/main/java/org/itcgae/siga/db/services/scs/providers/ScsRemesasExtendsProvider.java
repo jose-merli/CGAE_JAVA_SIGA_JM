@@ -424,6 +424,8 @@ public class ScsRemesasExtendsProvider {
 		if (!UtilidadesString.esCadenaVacia(tipoPCAJG)) {
 			sql.WHERE("tipaccest.tipo_pcajg = " + tipoPCAJG);
 		}
+		
+		sql.ORDER_BY("tipaccest.idtipoaccionremesa");
 
 		return sql.toString();
 	}
