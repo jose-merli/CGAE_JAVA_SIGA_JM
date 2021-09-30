@@ -14,6 +14,8 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.CheckAccionesRemesas;
+import org.itcgae.siga.DTOs.scs.CheckAccionesRemesasDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
@@ -37,6 +39,8 @@ import org.itcgae.siga.db.entities.CajgRemesaKey;
 import org.itcgae.siga.db.entities.CajgRemesaestados;
 import org.itcgae.siga.db.entities.CajgRemesaestadosExample;
 import org.itcgae.siga.db.entities.CajgRemesaestadosKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
@@ -49,6 +53,7 @@ import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.mappers.CajgRemesaestadosMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cajg.mappers.CajgEjgremesaExtendsMapper;
@@ -89,6 +94,10 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 	@Autowired
 	private AdmContadorExtendsMapper admContadorExtendsMapper;
+	
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
+	
 
 	@Override
 	public ComboDTO comboEstado(HttpServletRequest request) {
@@ -781,6 +790,89 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		LOGGER.info("getLabel() -> Salida del servicio para eliminar los expedientes");
 
 		return deleteResponseDTO;
+	}
+
+	public GenParametros getTipoPCAJG(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		GenParametros parametro = new GenParametros();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getTipoPCAJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+
+			LOGGER.info(
+					"getTipoPCAJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			LOGGER.info(
+					"getTipoPCAJG() / genParametrosMapper.selectByPrimaryKey() -> Entrada a GenParametrosMapper para obtener el tipo de PCAJG de la institucion logeada");
+			GenParametrosKey key = new GenParametrosKey();
+
+			key.setIdinstitucion(idInstitucion);
+			key.setModulo("SCS");
+			key.setParametro("PCAJG_TIPO");
+
+			parametro = genParametrosMapper.selectByPrimaryKey(key);
+			
+			LOGGER.info(
+					"getTipoPCAJG() / genParametrosMapper.selectByPrimaryKey() -> Entrada a GenParametrosMapper para obtener el tipo de PCAJG de la institucion logeada" + parametro.getValor());
+			
+			LOGGER.info(
+					"getTipoPCAJG() / genParametrosMapper.selectByPrimaryKey() -> Salida a GenParametrosMapper para obtener el tipo de PCAJG de la institucion logeada");
+
+		}
+		LOGGER.info("getLabel() -> Salida del servicio para obtener el tipo de PCAJG de la institucion logeada");
+		return parametro;
+	}
+
+	@Override
+	public CheckAccionesRemesasDTO checkAcciones(RemesasItem remesasItem, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		CheckAccionesRemesasDTO checkAccionesRemesasDTO = new CheckAccionesRemesasDTO();
+		List<CheckAccionesRemesas> checkAccionesRemesasItems = null;
+		GenParametros parametro = new GenParametros();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"checkAcciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+
+			LOGGER.info(
+					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			LOGGER.info(
+					"checkAcciones() / ScsRemesasExtendsMapper.checkAcciones() -> Entrada a ScsRemesasExtendsMapper para obtener las acciones posibles para la institucion");
+			
+			parametro = getTipoPCAJG(request);
+
+			checkAccionesRemesasItems = scsRemesasExtendsMapper.checkAcciones(remesasItem, idInstitucion, usuarios.get(0).getIdlenguaje(), parametro.getValor());
+
+			LOGGER.info(
+					"checkAcciones() / ScsRemesasExtendsMapper.checkAcciones() -> Salida a ScsRemesasExtendsMapper para obtener las acciones posibles para la institucion");
+
+			if (checkAccionesRemesasItems != null) {
+				checkAccionesRemesasDTO.setCheckAccionesRemesas(checkAccionesRemesasItems);
+			}
+
+		}
+		LOGGER.info("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
+		return checkAccionesRemesasDTO;
 	}
 
 }

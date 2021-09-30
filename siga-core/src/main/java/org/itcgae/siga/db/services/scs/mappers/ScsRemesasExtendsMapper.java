@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.CheckAccionesRemesas;
 import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaItem;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
@@ -87,4 +88,11 @@ public interface ScsRemesasExtendsMapper{
 		@Result(column = "INCIDENCIAS_DESPUES_ENVIO", property = "incidenciasDespuesEnvio", jdbcType = JdbcType.NUMERIC)
 	})
 	List<EJGRemesaItem> getEJGRemesa(RemesasItem remesasItem, Short idInstitucion);
+	
+	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "checkAcciones")
+	@Results({
+		@Result(column = "IDTIPOACCIONREMESA", property = "idTipoAccionRemesa", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<CheckAccionesRemesas> checkAcciones(RemesasItem remesasItem, Short idInstitucion, String idlenguaje, String tipoPCAJG);
 }

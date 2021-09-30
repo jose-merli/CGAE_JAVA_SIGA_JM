@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.CheckAccionesRemesasDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
@@ -17,6 +18,7 @@ import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.entities.AdmContador;
+import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.scs.services.ejg.IBusquedaRemesas;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -95,5 +97,13 @@ public class RemesasController {
 		DeleteResponseDTO response = busquedaRemesas.borrarExpedientesRemesa(remesasBusquedaItem, request);
 		LOGGER.info("Termina el método borrarExpedientesRemesa");
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/checkAcciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CheckAccionesRemesasDTO> checkAcciones(@RequestBody RemesasItem remesasItem, HttpServletRequest request) {
+		LOGGER.info("Entra en el método checkAcciones");
+		CheckAccionesRemesasDTO response = busquedaRemesas.checkAcciones(remesasItem, request);
+		LOGGER.info("Termina el método checkAcciones");
+		return new ResponseEntity<CheckAccionesRemesasDTO>(response, HttpStatus.OK);
 	}
 }
