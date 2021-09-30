@@ -137,6 +137,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
         sql2.SELECT(" SCS_SALTOSCOMPENSACIONES.MOTIVOS AS MOTIVO");
         sql2.SELECT(" SCS_SALTOSCOMPENSACIONES.FECHACUMPLIMIENTO AS FECHAUSO");
         sql2.SELECT(" SCS_SALTOSCOMPENSACIONES.FECHA_ANULACION");
+        sql2.SELECT(" CEN_PERSONA.IDPERSONA");
         
         sql2.FROM(" SCS_SALTOSCOMPENSACIONES");
         
@@ -197,7 +198,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
         sql.WHERE("IDINSTITUCION =" + idInstitucion);
         
         if (!UtilidadesString.esCadenaVacia(salto.getIdTurno())) {
-        	sql.WHERE(" IDTURNO =" + salto.getIdTurno());
+        	sql.WHERE(" IDTURNO IN (" + salto.getIdTurno() + ")");
         }
         
         sql.WHERE("IDGUARDIA IS NULL");
