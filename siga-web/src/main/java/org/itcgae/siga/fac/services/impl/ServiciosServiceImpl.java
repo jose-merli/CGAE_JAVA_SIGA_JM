@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
 import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.IdPeticionDTO;
@@ -33,10 +34,12 @@ import org.itcgae.siga.db.entities.PysFormapagoproducto;
 import org.itcgae.siga.db.entities.PysFormapagoproductoKey;
 import org.itcgae.siga.db.entities.PysFormapagoservicios;
 import org.itcgae.siga.db.entities.PysFormapagoserviciosKey;
+import org.itcgae.siga.db.entities.PysPreciosservicios;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoserviciosMapper;
+import org.itcgae.siga.db.mappers.PysPreciosserviciosMapper;
 import org.itcgae.siga.db.mappers.PysServiciosinstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTiposProductosExtendsMapper;
@@ -49,6 +52,7 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class ServiciosServiceImpl implements IServiciosService {
@@ -78,6 +82,9 @@ public class ServiciosServiceImpl implements IServiciosService {
 	
 	@Autowired
 	private PysPreciosserviciosExtendsMapper pysPreciosServiciosExtendsMapper;
+	
+	@Autowired
+	private PysPreciosserviciosMapper pysPreciosServiciosMapper;
 	
 	
 	@Override
@@ -321,6 +328,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int status = 0;
+		int statusPrecioPorDefecto = 0;
 		
 		LOGGER.info("nuevoServicio() -> Entrada al servicio para crear un servicio (PYS_SERVICIOSINSTITUCION)");
 
@@ -393,6 +401,43 @@ public class ServiciosServiceImpl implements IServiciosService {
 					}else if(status == 1) {
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
+					
+					//Por defecto, al crear un Servicio, se creará una línea de Precio CERO, periodo MENSUAL y sin condiciones.
+					if(status == 1) {
+						LOGGER.info(
+								"nuevoServicio() / pysPreciosServiciosMapper -> Entrada a pysPreciosServiciosMapper para crear el precio por defecto del servicio");
+						
+						PysPreciosservicios pysPreciosServicios = new PysPreciosservicios();
+						
+						pysPreciosServicios.setIdinstitucion(idInstitucion);
+						pysPreciosServicios.setIdtiposervicios((short) servicio.getIdtiposervicios());
+						pysPreciosServicios.setIdservicio ((long) servicio.getIdservicio());
+						pysPreciosServicios.setIdserviciosinstitucion(Long.parseLong(idOrdenacion.getNewId()));
+						pysPreciosServicios.setIdperiodicidad((short) 1);//Mensual
+						
+						NewIdDTO idOrdenacionPreciosServicios = pysPreciosServiciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion, pysPreciosServicios.getIdservicio(), pysPreciosServicios.getIdserviciosinstitucion(), pysPreciosServicios.getIdperiodicidad());
+						pysPreciosServicios.setIdpreciosservicios(Short.parseShort(idOrdenacionPreciosServicios.getNewId())); //tengo que obtenerlo con max id
+						
+						pysPreciosServicios.setValor(new BigDecimal(0));//A cero el precio por defecto
+						pysPreciosServicios.setCriterios("SELECT IDINSTITUCION, IDPERSONA FROM CEN_CLIENTE WHERE IDINSTITUCION = "+idInstitucion+"  AND IDPERSONA = @IDPERSONA@");//PROVISIONAL
+						pysPreciosServicios.setFechamodificacion(new Date());
+						pysPreciosServicios.setUsumodificacion(usuarios.get(0).getIdusuario());
+						pysPreciosServicios.setPordefecto("1");
+						pysPreciosServicios.setDescripcion("Precio por defecto");
+					
+						statusPrecioPorDefecto = pysPreciosServiciosMapper.insertSelective(pysPreciosServicios);
+						
+						if(statusPrecioPorDefecto == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							throw new Exception("No se ha podido crear el precio por defecto para el servicio");
+						}else if(statusPrecioPorDefecto == 1) {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+						
+						LOGGER.info(
+								"nuevoServicio() / pysPreciosServiciosMapper -> Salida de pysPreciosServiciosMapper para crear el precio por defecto del servicio");
+					}
+					
 					
 					if(servicio.getAutomatico() != null) {
 						if(servicio.getAutomatico().equals("1") && status == 1) {
@@ -918,8 +963,6 @@ public class ServiciosServiceImpl implements IServiciosService {
 				servicioInstitucion.setFacturacionponderada(servicio.getFacturacionponderada());
 				servicioInstitucion.setIniciofinalponderado(servicio.getIniciofinalponderado());
 				
-				//SOLO SI LA OPCION INICIOFINALPONDERADO ES P, LLAMAR A PL?
-				
 				servicioInstitucion.setFechamodificacion(new Date());
 				servicioInstitucion.setUsumodificacion(usuarios.get(0).getIdusuario());
 				
@@ -1016,78 +1059,118 @@ public class ServiciosServiceImpl implements IServiciosService {
 		return deleteResponseDTO;
 	}
 	
-//	@Override
-//	public FichaTarjetaPreciosDTO detalleTarjetaPrecios(HttpServletRequest request, int idTipoServicio, int idServicio, int idServiciosInstitucion) {
-//		FichaTarjetaPreciosDTO fichaTarjetaPagosDTO = new FichaTarjetaPreciosDTO();
-//		Error error = new Error();
-//
-//		LOGGER.info("detalleTarjetaPrecios() -> Entrada al servicio para recuperar los detalles necesarios para la tarjeta precios");
-//
-//		// Conseguimos información del usuario logeado
-//		String token = request.getHeader("Authorization");
-//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-//
-//		try {
-//			if (idInstitucion != null) {
-//				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-//				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-//
-//				LOGGER.info(
-//						"detalleTarjetaPrecios() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-//
-//				LOGGER.info(
-//						"detalleTarjetaPrecios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//				if (usuarios != null && !usuarios.isEmpty()) {
-//					LOGGER.info(
-//							"detalleTarjetaPrecios() / pysPreciosServiciosExtendsMapper.detalleTarjetaPrecios() -> Entrada a pysPreciosServiciosExtendsMapper para recuperar los detalles necesarios para la tarjeta precios");
-//
-//					fichaTarjetaPagosDTO = pysPreciosServiciosExtendsMapper
-//							.detalleTarjetaPrecios(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion);
-//
-//					LOGGER.info(
-//							"detalleTarjetaPrecios() / pysPreciosServiciosExtendsMapper.detalleTarjetaPrecios() -> Salida de pysPreciosServiciosExtendsMapper para recuperar los detalles necesarios para la tarjeta precios");
-//					
-//					LOGGER.info(
-//							"detalleTarjetaPrecios() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para para recuperar los detalles necesarios para la tarjeta precios");
-//					List<Integer> listaFormasDePagoInternet = pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion);
-//					
-//					if(listaFormasDePagoInternet != null && !listaFormasDePagoInternet.isEmpty()) {
-//						servicioDetalleDTO.setFormasdepagointernet(listaFormasDePagoInternet);
-//					}
-//					
-//					LOGGER.info(
-//							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoInternetByServicio() -> Salida a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de internet");
-//					
-//					LOGGER.info(
-//							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio() -> Entrada a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
-//					List<Integer> listaFormasDePagoSecretaria = pysServiciosInstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio(idTipoServicio, idServicio, idServiciosInstitucion, idInstitucion);
-//					
-//					if(listaFormasDePagoSecretaria != null && !listaFormasDePagoSecretaria.isEmpty()) {
-//						servicioDetalleDTO.setFormasdepagosecretaria(listaFormasDePagoSecretaria);
-//					}
-//					
-//					LOGGER.info(
-//							"detalleServicio() / PysServiciosinstitucionExtendsMapper.obtenerFormasDePagoSecretariaByServicio() -> Salida a PysServiciosinstitucionExtendsMapper para obtener las formas de pago de secretaria");
-//				}
-//
-//			}
-//		} catch (Exception e) {
-//			LOGGER.error(
-//					"ProductosServiceImpl.detalleServicio() -> Se ha producido un error al obtener el los detalles del servicio",
-//					e);
-//			error.setCode(500);
-//			error.setDescription("general.mensaje.error.bbdd");
-//		}
-//
-//		servicioDetalleDTO.setError(error);
-//
-//		LOGGER.info("detalleServicio() -> Salida del servicio para obtener los detalles del servicio");
-//
-//		return servicioDetalleDTO;
-//	}
+	@Override
+	public FichaTarjetaPreciosDTO detalleTarjetaPrecios(HttpServletRequest request, ServicioDetalleDTO servicio) {
+		FichaTarjetaPreciosDTO fichaTarjetaPreciosDTO = new FichaTarjetaPreciosDTO();
+		Error error = new Error();
+
+		LOGGER.info("detalleTarjetaPrecios() -> Entrada al servicio para recuperar los detalles necesarios para la tarjeta precios");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"detalleTarjetaPrecios() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"detalleTarjetaPrecios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"detalleTarjetaPrecios() / pysPreciosServiciosExtendsMapper.detalleTarjetaPrecios() -> Entrada a pysPreciosServiciosExtendsMapper para recuperar los detalles necesarios para la tarjeta precios");
+					String idioma = usuarios.get(0).getIdlenguaje();
+					NewIdDTO idServicioInstitucion = pysServiciosInstitucionExtendsMapper.getIdServicioInstitucion(servicio, idInstitucion);	
+				
+					List<FichaTarjetaPreciosItem> fichaTarjetaPreciosLista = pysPreciosServiciosExtendsMapper
+							.detalleTarjetaPrecios(servicio.getIdtiposervicios(), servicio.getIdservicio(), Integer.parseInt(idServicioInstitucion.getNewId()), idInstitucion, idioma);
+
+					LOGGER.info(
+							"detalleTarjetaPrecios() / pysPreciosServiciosExtendsMapper.detalleTarjetaPrecios() -> Salida de pysPreciosServiciosExtendsMapper para recuperar los detalles necesarios para la tarjeta precios");
+					
+					if (fichaTarjetaPreciosLista != null && fichaTarjetaPreciosLista.size() > 0) {
+						fichaTarjetaPreciosDTO.setFichaTarjetaPreciosItem(fichaTarjetaPreciosLista);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ServiciosServiceImpl.detalleTarjetaPrecios() -> Se ha producido un error al obtener los detalles necesarios para la tarjeta precios",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		fichaTarjetaPreciosDTO.setError(error);
+
+		LOGGER.info("detalleTarjetaPrecios() -> Salida del servicio para obtener los detalles necesarios para la tarjeta precios");
+
+		return fichaTarjetaPreciosDTO;
+	}
+	
+	@Override
+	public ComboDTO comboPeriodicidad(HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+
+		LOGGER.info("comboPeriodicidad() -> Entrada al servicio para recuperar el combo de periodicidades");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"comboPeriodicidad() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"comboPeriodicidad() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"comboPeriodicidad() / PysPreciosserviciosExtendsMapper.comboPeriodicidad() -> Entrada a PysPreciosserviciosExtendsMapper para recuperar el combo de periodicidades");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<ComboItem> listaComboPeriodicidades = pysPreciosServiciosExtendsMapper.comboPeriodicidad(idioma);
+
+					LOGGER.info(
+							"comboPeriodicidad() / PysPreciosserviciosExtendsMapper.comboPeriodicidad() -> Salida de PysPreciosserviciosExtendsMapper para recuperar el combo de periodicidades");
+
+					if (listaComboPeriodicidades != null && listaComboPeriodicidades.size() > 0) {
+						comboDTO.setCombooItems(listaComboPeriodicidades);
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"TiposProductosServiceImpl.comboPeriodicidad() -> Se ha producido un error al recuperar el combo de periodicidades",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboPeriodicidad() -> Salida del servicio para recuperar el combo de periodicidades");
+
+		return comboDTO;
+	}
 	
 }

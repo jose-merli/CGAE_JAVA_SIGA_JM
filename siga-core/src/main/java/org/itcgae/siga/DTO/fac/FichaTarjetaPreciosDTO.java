@@ -1,58 +1,36 @@
 package org.itcgae.siga.DTO.fac;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.itcgae.siga.DTOs.gen.Error;
 
 public class FichaTarjetaPreciosDTO {
-	private int precio;
-	private int periodicidad;
-	private String descripcion;
-	private int condicion;
-	
+
+	private List<FichaTarjetaPreciosItem> fichaTarjetaPreciosItem = new ArrayList<FichaTarjetaPreciosItem>();
 	private Error error = null;
 	
+	public List<FichaTarjetaPreciosItem> getFichaTarjetaPreciosItem() {
+		return fichaTarjetaPreciosItem;
+	}
+	public void setFichaTarjetaPreciosItem(List<FichaTarjetaPreciosItem> fichaTarjetaPreciosItem) {
+		this.fichaTarjetaPreciosItem = fichaTarjetaPreciosItem;
+	}
 	public Error getError() {
 		return error;
 	}
 	public void setError(Error error) {
 		this.error = error;
 	}
-	public int getPrecio() {
-		return precio;
-	}
-	public void setPrecio(int precio) {
-		this.precio = precio;
-	}
-	public int getPeriodicidad() {
-		return periodicidad;
-	}
-	public void setPeriodicidad(int periodicidad) {
-		this.periodicidad = periodicidad;
-	}
-	public String getDescripcion() {
-		return descripcion;
-	}
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
-	public int getCondicion() {
-		return condicion;
-	}
-	public void setCondicion(int condicion) {
-		this.condicion = condicion;
-	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + condicion;
-		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
 		result = prime * result + ((error == null) ? 0 : error.hashCode());
-		result = prime * result + periodicidad;
-		result = prime * result + precio;
+		result = prime * result + ((fichaTarjetaPreciosItem == null) ? 0 : fichaTarjetaPreciosItem.hashCode());
 		return result;
 	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -62,29 +40,22 @@ public class FichaTarjetaPreciosDTO {
 		if (getClass() != obj.getClass())
 			return false;
 		FichaTarjetaPreciosDTO other = (FichaTarjetaPreciosDTO) obj;
-		if (condicion != other.condicion)
-			return false;
-		if (descripcion == null) {
-			if (other.descripcion != null)
-				return false;
-		} else if (!descripcion.equals(other.descripcion))
-			return false;
 		if (error == null) {
 			if (other.error != null)
 				return false;
 		} else if (!error.equals(other.error))
 			return false;
-		if (periodicidad != other.periodicidad)
-			return false;
-		if (precio != other.precio)
+		if (fichaTarjetaPreciosItem == null) {
+			if (other.fichaTarjetaPreciosItem != null)
+				return false;
+		} else if (!fichaTarjetaPreciosItem.equals(other.fichaTarjetaPreciosItem))
 			return false;
 		return true;
 	}
 	
 	@Override
 	public String toString() {
-		return "FichaTarjetaPagosDTO [precio=" + precio + ", periodicidad=" + periodicidad + ", descripcion="
-				+ descripcion + ", condicion=" + condicion + ", error=" + error + "]";
+		return "FichaTarjetaPreciosDTO [fichaTarjetaPreciosItem=" + fichaTarjetaPreciosItem + ", error=" + error + "]";
 	}
 	
 	

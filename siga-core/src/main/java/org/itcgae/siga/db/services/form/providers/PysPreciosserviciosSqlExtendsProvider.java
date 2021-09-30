@@ -41,5 +41,45 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 		
 		return sql.toString();
 	}
+	
+	public String detalleTarjetaPrecios(int idTipoServicio, int idServicio, int idServiciosInstitucion, Short idInstitucion, String idioma) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT(" CONCAT(preciosserv.valor,'€') precio");
+		sql.SELECT(" preciosserv.idperiodicidad periodicidad");
+		sql.SELECT(" f_siga_getrecurso(preciosserv.descripcion," + idioma + ") descripcionprecio");
+		sql.SELECT(" preciosserv.idconsulta condicion");
+		sql.SELECT(" f_siga_getrecurso(perio.descripcion," + idioma +") descripcionperiodicidad");
+		sql.SELECT(" CASE WHEN f_siga_getrecurso(consul.descripcion," + idioma +") IS NOT NULL THEN f_siga_getrecurso(consul.descripcion," + idioma +") ELSE 'No tiene condición' END descripcionconsulta");
+		sql.SELECT(" pordefecto");
+		
+		sql.FROM(" pys_preciosservicios preciosserv");
+		sql.FROM(" pys_periodicidad perio");
+		sql.FROM(" con_consulta consul");
+		
+		sql.WHERE(" preciosserv.idinstitucion = " + idInstitucion);
+		sql.WHERE(" preciosserv.idtiposervicios = " + idTipoServicio);
+		sql.WHERE(" preciosserv.idserviciosinstitucion = " + idServiciosInstitucion);
+		sql.WHERE(" preciosserv.idservicio = " + idServicio);
+		sql.WHERE(" perio.idperiodicidad (+) = preciosserv.idperiodicidad");
+		sql.WHERE(" consul.idinstitucion (+) = preciosserv.idinstitucion");
+		sql.WHERE(" consul.idconsulta (+) = preciosserv.idconsulta");
+		
+		sql.ORDER_BY(" preciosserv.descripcion");
+		
+		return sql.toString();
+	}
+	
+	public String comboPeriodicidad(String idioma) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDPERIODICIDAD ID");
+		sql.SELECT("f_siga_getrecurso (DESCRIPCION,'" + idioma + "') DESCRIPCION");
+		
+		sql.FROM("PYS_PERIODICIDAD");
+		
+		return sql.toString();
+	}
 
 }

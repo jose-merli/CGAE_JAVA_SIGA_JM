@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
 import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
@@ -92,9 +93,16 @@ public class ServiciosController {
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	
-//	@GetMapping(value = "/pys/detalleTarjetaPrecios")
-//	ResponseEntity<FichaTarjetaPreciosDTO> detalleTarjetaPrecios(HttpServletRequest request, @RequestParam int idTipoServicio, @RequestParam int idServicio, @RequestParam int idServiciosInstitucion) { 
-//		FichaTarjetaPreciosDTO response = serviciosService.detalleTarjetaPrecios(request, idTipoServicio, idServicio, idServiciosInstitucion);
-//		return new ResponseEntity<FichaTarjetaPreciosDTO>(response, HttpStatus.OK);
-//	}
+	@PostMapping(value = "/pys/detalleTarjetaPrecios")
+	ResponseEntity<FichaTarjetaPreciosDTO> detalleTarjetaPrecios(HttpServletRequest request, @RequestBody ServicioDetalleDTO servicio) { 
+		FichaTarjetaPreciosDTO response = serviciosService.detalleTarjetaPrecios(request, servicio);
+		return new ResponseEntity<FichaTarjetaPreciosDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/combo/comboPeriodicidad")
+	ResponseEntity<ComboDTO> comboPeriodicidad(HttpServletRequest request) { 
+		ComboDTO response = serviciosService.comboPeriodicidad(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 }
