@@ -10,17 +10,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class ScheduledFacturacionServiceImpl implements IScheduledFacturacionService {
 
-	private Logger LOGGER = Logger.getLogger(ScheduledFacturacionServiceImpl.class);
-	
-	@Autowired
-	private IFacturacionSJCSServices facturacionServices;
+    private Logger LOGGER = Logger.getLogger(ScheduledFacturacionServiceImpl.class);
 
-	//@Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacion}")
-	@Override
-	public void ejecutaFacturacionSJCS() {
-		LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> ENTRA ejecutaFacturacionSJCS");
-		facturacionServices.ejecutaFacturacionSJCS();
-		LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> SALE ejecutaFacturacionSJCS");
-	}
+    @Autowired
+    private IFacturacionSJCSServices facturacionServices;
+
+    @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacion}")
+    @Override
+    public void ejecutaFacturacionSJCS() {
+        LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> ENTRA ejecutaFacturacionSJCS");
+        facturacionServices.ejecutaFacturacionSJCS();
+        LOGGER.info("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> SALE ejecutaFacturacionSJCS");
+    }
 
 }

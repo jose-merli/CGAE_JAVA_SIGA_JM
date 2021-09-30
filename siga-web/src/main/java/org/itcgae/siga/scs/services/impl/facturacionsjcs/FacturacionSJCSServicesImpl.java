@@ -21,14 +21,12 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -128,6 +126,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
     @Autowired
     private AdmConfigMapper admConfigMapper;
+
+    @Autowired
+    private UtilidadesFacturacionSJCS utilidadesFacturacionSJCS;
 
     @Override
     public FacturacionDTO buscarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
@@ -1007,21 +1008,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     LOGGER.info("simularFacturacion() -> Guardar datos para simular facturacion");
                     response = insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(),
                             idInstitucion, Integer.valueOf(idFacturacion), usuario.getIdusuario());
-                    /*
-                     * NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(idInstitucion,
-                     * idFacturacion); Short idOrdenEstado = (short)
-                     * (Integer.parseInt(idP.getNewId())+1); Short idEstado =
-                     * ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo().shortValue();
-                     *
-                     * record.setIdinstitucion(idInstitucion);
-                     * record.setIdestadofacturacion(idEstado);
-                     * record.setIdfacturacion(Integer.parseInt(idFacturacion));
-                     * record.setFechaestado(new Date()); record.setFechamodificacion(new Date());
-                     * record.setUsumodificacion(usuario.getIdusuario());
-                     * record.setIdordenestado(idOrdenEstado);
-                     *
-                     * response = fcsFactEstadosfacturacionMapper.insert(record);
-                     */
+
                     LOGGER.info("simularFacturacion() -> Salida guardar datos para simular facturacion");
                 } catch (Exception e) {
                     LOGGER.error("ERROR: FacturacionServicesImpl.simularFacturacion() >  Al simular la facturacion.",
@@ -1791,245 +1778,16 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         return resultado[0];
     }
 
-    @Transactional
-    void ejecutarRegularizacionJG(FcsFacturacionjg item, CenInstitucion institucion) throws Exception {
-        try {
-            // proceso de facturacion
+    public void ejecutarRegularizacionJG(FcsFacturacionjg item, CenInstitucion institucion) throws Exception {
 
-            double importeTotal = 0;
-            Double importeOficio = null, importeGuardia = null, importeSOJ = null, importeEJG = null;
-
-            // parametros de entrada
-            Object[] param_in_facturacion = new Object[4];
-            param_in_facturacion[0] = item.getIdinstitucion().toString(); // IDINSTITUCION
-            param_in_facturacion[1] = item.getIdfacturacion().toString(); // IDFACTURACION
-            param_in_facturacion[2] = item.getUsumodificacion().toString(); // USUMODIFICACION
-            param_in_facturacion[3] = institucion.getIdlenguaje();
-
-            String resultado[] = null;
-
-            //////////////////////////////////
-            // TURNOS DE OFICIO rgg 29-03-2005
-            resultado = new String[3];
-            try {
-                resultado = callPLProcedure(
-                        "{call PKG_SIGA_REGULARIZACION_SJCS.PROC_FCS_REGULAR_TURNOS_OFI(?,?,?,?,?,?,?)}", 3,
-                        param_in_facturacion);
-                if (!resultado[1].equals("0")) {
-                    LOGGER.error("Error en PL = " + (String) resultado[2]);
-                    throw new Exception("Ha ocurrido un error al ejecutar la regularización de Turnos de Oficio: "
-                            + (String) resultado[2]);
-                }
-            } catch (IOException | NamingException | SQLException e) {
-                LOGGER.error(
-                        "Error en PL al ejecutar la regularización de Turnos de Oficio = " + (String) resultado[2]);
-                throw new Exception("Ha ocurrido un error al ejecutar la regularización de Turnos de Oficio", e);
-            }
-
-            importeOficio = new Double(resultado[0].replaceAll(",", "."));
-            importeTotal += importeOficio.doubleValue();
-
-            //////////////////////////////////
-            // GUARDIAS PRESENCIALES rgg 29-03-2005
-            resultado = new String[3];
-            try {
-                resultado = callPLProcedure(
-                        "{call PKG_SIGA_REGULARIZACION_SJCS.PROC_FCS_REGULAR_GUARDIAS(?,?,?,?,?,?,?)}", 3,
-                        param_in_facturacion);
-                if (!resultado[1].equals("0")) {
-                    LOGGER.error("Error en PL = " + (String) resultado[2]);
-                    throw new Exception(
-                            "Ha ocurrido un error al ejecutar la regularización de Guardias: " + (String) resultado[2]);
-                }
-            } catch (IOException | NamingException | SQLException e) {
-                LOGGER.error("Error en PL al ejecutar la regularización de Guardias = " + (String) resultado[2]);
-                throw new Exception("Ha ocurrido un error al ejecutar la regularización de Guardias", e);
-            }
-
-            importeGuardia = new Double((String) resultado[0].replaceAll(",", "."));
-            importeTotal += importeGuardia.doubleValue();
-
-            //////////////////////////////////
-            // SOJ rgg 29-03-2005
-            resultado = new String[3];
-            try {
-                resultado = callPLProcedure("{call PKG_SIGA_REGULARIZACION_SJCS.PROC_FCS_REGULAR_SOJ(?,?,?,?,?,?,?)}",
-                        3, param_in_facturacion);
-                if (!resultado[1].equals("0")) {
-                    LOGGER.error("Error en PL al ejecutar la regularización de SOJ= " + (String) resultado[2]);
-                    throw new Exception(
-                            "Ha ocurrido un error al ejecutar la regularización de SOJ: " + (String) resultado[2]);
-                }
-            } catch (IOException | NamingException | SQLException e) {
-                LOGGER.error("Error en PL al ejecutar la regularización de SOJ = " + (String) resultado[2]);
-                throw new Exception("Ha ocurrido un error al ejecutar la regularización de SOJ", e);
-            }
-
-            importeSOJ = new Double((String) resultado[0].replaceAll(",", "."));
-            importeTotal += importeSOJ.doubleValue();
-
-            //////////////////////////////////
-            // EJG rgg 29-03-2005
-            resultado = new String[3];
-            try {
-                resultado = callPLProcedure("{call PKG_SIGA_REGULARIZACION_SJCS.PROC_FCS_REGULAR_EJG(?,?,?,?,?,?,?)}",
-                        3, param_in_facturacion);
-                if (!resultado[1].equals("0")) {
-                    LOGGER.error("Error en PL = " + (String) resultado[2]);
-                    throw new Exception(
-                            "Ha ocurrido un error al ejecutar la regularización de Expedientes de Justicia Gratuita: "
-                                    + (String) resultado[2]);
-                }
-            } catch (IOException | NamingException | SQLException e) {
-                LOGGER.error("Error en PL al ejecutar la regularización de EJG= " + (String) resultado[2]);
-                throw new Exception("Ha ocurrido un error al ejecutar la regularización de EJG", e);
-            }
-
-            importeEJG = new Double(((String) resultado[0]).replaceAll(",", "."));
-            importeTotal += importeEJG.doubleValue();
-
-            actualizarTotales(item, importeEJG, importeGuardia, importeOficio, importeSOJ, importeTotal);
-
-            // Exportacion de datos a EXCEL
-            // UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
-            exportarDatosFacturacion(item, SigaConstants.USUMODIFICACION_0, institucion);
-        } catch (Exception ex) {
-            LOGGER.error("Error en la ejecución de la Facturación SJCS. idinstitucion=" + item.getIdinstitucion()
-                    + " idfacturacion=" + item.getIdfacturacion());
-            throw new Exception("Error en la ejecución de la Facturación SJCS. idinstitucion=" + item.getIdinstitucion()
-                    + " idfacturacion=" + item.getIdfacturacion(), ex);
-        }
+        FcsFacturacionjg item2 = utilidadesFacturacionSJCS.ejecutarRegularizacionJG(item, institucion);
+        // Exportacion de datos a EXCEL
+        // UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
+        exportarDatosFacturacion(item2, SigaConstants.USUMODIFICACION_0, institucion);
     }
 
-    @Transactional
-    void ejecutarFacturacionJG(FcsFacturacionjg itemFac, CenInstitucion institucion) throws Exception {
-
-        // Fichero de log
-        StringDTO config = genParametrosMapper.selectParametroPorInstitucion("PATH_PREVISIONES_BD",
-                SigaConstants.IDINSTITUCION_0);// .selectByExample(example);
-
-        String pathFicheros = config.getValor();
-
-        String sNombreFichero = pathFicheros + File.separator + "LOG_ERROR_" + itemFac.getIdinstitucion() + "_"
-                + itemFac.getIdfacturacion() + ".log";
-        File ficheroLog = new File(sNombreFichero);
-        if (ficheroLog != null && ficheroLog.exists()) {
-            ficheroLog.delete();
-        }
-
-        try {
-
-            boolean prevision = false;
-
-            // proceso de facturacion
-            double importeTotal = 0;
-            Double importeOficio = null, importeGuardia = null, importeSOJ = null, importeEJG = null;
-
-            //////////////////////////////////
-            // TURNOS DE OFICIO rgg 16-03-2005
-
-            Object[] param_in_facturacion = new Object[3];
-            param_in_facturacion[0] = itemFac.getIdinstitucion().toString(); // IDINSTITUCION
-            param_in_facturacion[1] = itemFac.getIdfacturacion().toString(); // IDFACTURACION
-            param_in_facturacion[2] = itemFac.getUsumodificacion().toString(); // USUMODIFICACION
-
-            String resultado[] = new String[3];
-            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_TURNOS_OFI(?,?,?,?,?,?)}", 3,
-                    param_in_facturacion);
-            if (!resultado[2].equalsIgnoreCase("Fin correcto ")) {
-                LOGGER.error("Error en PL = " + (String) resultado[2]);
-                throw new Exception("Ha ocurrido un error al ejecutar la facturación de Turnos de Oficio: "
-                        + (String) resultado[2]);
-            }
-            importeOficio = new Double(resultado[0].replaceAll(",", "."));
-            importeTotal += importeOficio.doubleValue();
-
-            //////////////////////////////////
-            // GUARDIAS rgg 22-03-2005
-
-            param_in_facturacion = new Object[3];
-            param_in_facturacion[0] = itemFac.getIdinstitucion().toString(); // IDINSTITUCION
-            param_in_facturacion[1] = itemFac.getIdfacturacion().toString(); // IDFACTURACION
-            param_in_facturacion[2] = itemFac.getUsumodificacion().toString(); // USUMODIFICACION
-
-            resultado = new String[3];
-            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_GUARDIAS(?,?,?,?,?,?)}", 3,
-                    param_in_facturacion);
-            if (!resultado[2].equalsIgnoreCase("El proceso:PROC_FCS_FACTURAR_GUARDIAS ha finalizado correctamente")) {
-                LOGGER.error("Error en PL = " + (String) resultado[2]);
-                throw new Exception(
-                        "Ha ocurrido un error al ejecutar la facturación de Guardias: " + (String) resultado[2]);
-            }
-            importeGuardia = new Double(resultado[0].replaceAll(",", "."));
-            importeTotal += importeGuardia.doubleValue();
-
-            //////////////////////////////////
-            // EXPEDIENTES SOJ rgg 22-03-2005
-
-            param_in_facturacion = new Object[3];
-            param_in_facturacion[0] = itemFac.getIdinstitucion().toString(); // IDINSTITUCION
-            param_in_facturacion[1] = itemFac.getIdfacturacion().toString(); // IDFACTURACION
-            param_in_facturacion[2] = itemFac.getUsumodificacion().toString(); // USUMODIFICACION
-
-            resultado = new String[3];
-            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_SOJ(?,?,?,?,?,?)}", 3,
-                    param_in_facturacion);
-            if (!resultado[2].equalsIgnoreCase("Fin correcto")) {
-                LOGGER.error("Error en PL = " + (String) resultado[2]);
-                throw new Exception(
-                        "Ha ocurrido un error al ejecutar la facturación de Expedientes de Orientación Jurídica: "
-                                + (String) resultado[2]);
-            }
-            importeSOJ = new Double(resultado[0].replaceAll(",", "."));
-            importeTotal += importeSOJ.doubleValue();
-
-            //////////////////////////////////
-            // EXPEDIENTES EJG rgg 22-03-2005
-
-            param_in_facturacion = new Object[3];
-            param_in_facturacion[0] = itemFac.getIdinstitucion().toString(); // IDINSTITUCION
-            param_in_facturacion[1] = itemFac.getIdfacturacion().toString(); // IDFACTURACION
-            param_in_facturacion[2] = itemFac.getUsumodificacion().toString(); // USUMODIFICACION
-
-            resultado = new String[3];
-            resultado = callPLProcedure("{call PKG_SIGA_FACTURACION_SJCS.PROC_FCS_FACTURAR_EJG (?,?,?,?,?,?)}", 3,
-                    param_in_facturacion);
-            if (!resultado[2].equalsIgnoreCase("Fin correcto")) {
-                LOGGER.error("Error en PL = " + (String) resultado[2]);
-                throw new Exception(
-                        "Ha ocurrido un error al ejecutar la facturación de Expedientes de Justicia Gratuita: "
-                                + (String) resultado[2]);
-            }
-
-            importeEJG = new Double(resultado[0].replaceAll(",", "."));
-            importeTotal += importeEJG.doubleValue();
-
-            if (prevision) {
-                //////////////////////////////////////
-                /// CREAMOS EL INFORME
-                // ArrayList filtrosInforme = getFiltrosInforme(itemFac, institucion);
-                // File fichero = getFicheroGenerado(institucion,
-                ////////////////////////////////////// SigaConstants.I_INFORMEFACTSJCS,null,
-                ////////////////////////////////////// filtrosInforme);
-                // itemFac.setNombrefisico(fichero.getPath());
-
-                // TODO Esta funcionalidad llamará al módulo de comunicaciones cuando esté
-                // desarrollado
-
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            }
-
-            actualizarTotales(itemFac, importeEJG, importeGuardia, importeOficio, importeSOJ, importeTotal);
-
-            // Exportacion de datos a EXCEL: Se ha comentado este metodo por que no se
-            // quiere utilizar
-            // UtilidadesFacturacionSJCS.exportarDatosFacturacion(new
-            // Integer(idInstitucion), new Integer(idFacturacion), this.usrbean);
-
-        } catch (Exception e) {
-            LOGGER.error("Error al ejecutar facturacion SJCS.", e);
-            throw e;
-        }
+    public void ejecutarFacturacionJG(FcsFacturacionjg itemFac, CenInstitucion institucion) throws Exception {
+        utilidadesFacturacionSJCS.ejecutarFacturacionJG(itemFac, institucion);
     }
 
     @Transactional
@@ -2142,5 +1900,4 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             con = null;
         }
     }
-
 }

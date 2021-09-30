@@ -3691,10 +3691,16 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                 if (null != usuarios && !usuarios.isEmpty()) {
 
+                    FcsPagosjgKey fcsPagosjgKey = new FcsPagosjgKey();
+                    fcsPagosjgKey.setIdpagosjg(Integer.valueOf(idPago));
+                    fcsPagosjgKey.setIdinstitucion(idInstitucion);
+
+                    FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
+
                     // INICIO -> PONEMOS EL PAGO EN ESTADO EJECUTADO
                     FcsPagosEstadospagos record = new FcsPagosEstadospagos();
                     record.setIdinstitucion(idInstitucion);
-                    record.setIdpagosjg(Integer.valueOf(idPago));
+                    record.setIdpagosjg(pago.getIdpagosjg());
                     record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
                     record.setFechaestado(new Date());
                     record.setFechamodificacion(new Date());
@@ -3702,6 +3708,10 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
                     fcsPagosEstadospagosMapper.insertSelective(record);
                     // FIN -> PONEMOS EL PAGO EN ESTADO EJECUTADO
+
+                    // INICIO -> BORRAMOS LOS FICHEROS BANCARIOS
+                    Hashtable nombreFicheros = utilidadesFacturacionSJCS.getNombreFicherosPago(idInstitucion, pago.getIdfacturacion(), pago.getIdpagosjg(), null);
+                    utilidadesFacturacionSJCS.borrarFicheros(idInstitucion, nombreFicheros);
 
                 }
             }
@@ -3718,4 +3728,5 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
 
         return updateResponseDTO;
     }
+
 }
