@@ -1233,7 +1233,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		
 		if(item.isMuestraPendiente()) {
-			sql.append(" AND act.validada = 0");
+			sql.append(" AND (act.validada = 0 OR act.validada IS NULL)");
 		}
 		
 		if (item.getJustificacionDesde() != null) {

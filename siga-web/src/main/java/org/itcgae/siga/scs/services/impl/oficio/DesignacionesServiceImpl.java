@@ -632,7 +632,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						record.setAnioprocedimiento(Short.parseShort(item.getAnioProcedimiento()));
 					}
 
-					if (item.getFechaJustificacion() != null && !item.getFechaJustificacion().trim().isEmpty()) {
+					if (item.getFechaJustificacion() != null && !item.getFechaJustificacion().trim().isEmpty() 
+							&& !item.getFechaJustificacion().equals("true") && !item.getFechaJustificacion().equals("false")) {
 						fecha = formatter.parse(item.getFechaJustificacion());
 						record.setFechajustificacion(fecha);
 					}
