@@ -626,7 +626,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					
 					// Al necesitar aprobación, se crea el registro de compra
 					// inmediatamente
-					if (aprobNecesaria.getValor() == "S") {
+					if (aprobNecesaria.getValor().equals("S")) {
 
 					
 						LOGGER.info(
@@ -647,16 +647,32 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							compra.setIdtipoproducto((short) producto.getIdtipoproducto());
 							compra.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
 							compra.setDescripcion(producto.getDescripcion());
-							if(compra.getIdformapago()!=null)compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
-							else compra.setIdformapago(null);
+							if(compra.getIdformapago()!=null) {
+								compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
+							}
+							else {
+								compra.setIdformapago(null);
+							}
 							//Revisar posteriormente
 							compra.setCantidad(1);
 							if(producto.getValor()!=null) {
 								compra.setImporteunitario(new BigDecimal(String.join(".",producto.getValor().split(",")[0],producto.getValor().split(",")[1].substring(0, 2))));
 							}
-							else compra.setImporteunitario(new BigDecimal(0));
-							compra.setNofacturable(ficha.getNoFact());
-	
+							else {
+								compra.setImporteunitario(new BigDecimal(0));
+							}
+							if(ficha.getNoFact() != null) {
+								compra.setNofacturable(ficha.getNoFact());
+							}
+							else {
+								PysProductossolicitadosExample productosExample = new PysProductossolicitadosExample();
+
+								productosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(solicitud.getIdpeticion());
+
+								compra.setNofacturable(pysProductossolicitadosMapper
+										.selectByExample(productosExample).get(0).getNofacturable());
+							}
+							
 							response = pysCompraMapper.insert(compra);
 							if (response == 0)
 								throw new Exception("Error al insertar un registro de compra en la BBDD.");
@@ -1066,7 +1082,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					if(peticion.getFechaDenegada() != null || peticion.getFechaAceptada() != null) {
 						error.setDescription(error.getDescription()+" "+peticion.getnSolicitud()+",");
 					}
-					else this.aprobarCompra(request, peticion);
+					else {
+						peticion.setProductos(pysPeticioncomprasuscripcionExtendsMapper.getProductosSolicitadosPeticion(usuarios.get(0).getIdlenguaje(), idInstitucion, peticion));
+						this.aprobarCompra(request, peticion);
+					}
 				}
 
 				if(!error.getDescription().equals(""))error.setDescription(error.getDescription().substring(0, error.getDescription().length()-1));

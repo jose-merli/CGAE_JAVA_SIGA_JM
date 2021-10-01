@@ -133,6 +133,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 			sql.INNER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = prin.idtipoiva");
 		}
+		
+		sql.WHERE("rownum = 1");
 
 		return sql.toString();
 	}
@@ -382,23 +384,23 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 	public String getProductosSolicitadosPeticion(String idioma, Short idInstitucion, FichaCompraSuscripcionItem peticion) {
 		SQL sql = new SQL();
 		
-		sql.SELECT(" PRIN.IDPRODUCTO");
-		sql.SELECT(" PRIN.IDTIPOPRODUCTO");
-		sql.SELECT(" PRIN.IDPRODUCTOINSTITUCION");
-		sql.SELECT(" PRIN.DESCRIPCION");
-		sql.SELECT(" PRIN.FECHABAJA");
-		sql.SELECT("count(fopa1.idformapago) AS NUM_FORMAS_PAGO\r\n"
+		sql.SELECT_DISTINCT(" PRIN.IDPRODUCTO");
+		sql.SELECT_DISTINCT(" PRIN.IDTIPOPRODUCTO");
+		sql.SELECT_DISTINCT(" PRIN.IDPRODUCTOINSTITUCION");
+		sql.SELECT_DISTINCT(" PRIN.DESCRIPCION");
+		sql.SELECT_DISTINCT(" PRIN.FECHABAJA");
+		sql.SELECT_DISTINCT("count(fopa1.idformapago) AS NUM_FORMAS_PAGO\r\n"
 				+ ", case when count(fopa1.idformapago)<=3 \r\n"
 				+ " then LISTAGG(f_siga_getrecurso(fo.descripcion,"+idioma+") , ', ') WITHIN GROUP (ORDER BY prin.descripcion)\r\n"
 				+ " else to_char(count(fopa1.idformapago))\r\n"
 				+ " end FORMAS_PAGO");
-		sql.SELECT(" concat(F_siga_formatonumero(PRIN.VALOR,2), ' €') AS VALOR");
-		sql.SELECT(" F_SIGA_GETRECURSO (TPRODUCTO.DESCRIPCION,"+idioma+") AS CATEGORIA");
-		sql.SELECT(" PRODUC.DESCRIPCION AS TIPO");
-		sql.SELECT(" TIVA.DESCRIPCION AS IVA");
-		sql.SELECT(" concat(F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2), ' €') AS PRECIO_IVA");
-		sql.SELECT(" PRIN.IDCONTADOR");
-		sql.SELECT(" PRIN.NOFACTURABLE");
+		sql.SELECT_DISTINCT(" concat(F_siga_formatonumero(PRIN.VALOR,2), ' €') AS VALOR");
+		sql.SELECT_DISTINCT(" F_SIGA_GETRECURSO (TPRODUCTO.DESCRIPCION,"+idioma+") AS CATEGORIA");
+		sql.SELECT_DISTINCT(" PRODUC.DESCRIPCION AS TIPO");
+		sql.SELECT_DISTINCT(" TIVA.DESCRIPCION AS IVA");
+		sql.SELECT_DISTINCT(" concat(F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2), ' €') AS PRECIO_IVA");
+		sql.SELECT_DISTINCT(" PRIN.IDCONTADOR");
+		sql.SELECT_DISTINCT(" PRIN.NOFACTURABLE");
 		
 		sql.FROM(" pys_productosinstitucion prin, pys_formapagoproducto fopa1, pys_formapago fo, pys_tipoiva tiva, pys_tiposproductos tproducto, pys_productos produc");
 		sql.FROM("pys_productossolicitados prodSol");
@@ -419,14 +421,6 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.WHERE(" prodSol.idinstitucion(+) = prin.idinstitucion");
 		sql.WHERE("prodSol.idpeticion = "+peticion.getnSolicitud());
 		sql.WHERE("prodSol.idproducto(+) = prin.idproducto and prodSol.idtipoproducto(+) = prin.idtipoproducto and prodSol.idproductoinstitucion(+) = prin.idproductoinstitucion");
-		
-		if(peticion.getIdFormaPagoSeleccionada() != null && peticion.getIdFormaPagoSeleccionada() != "") {
-			sql.WHERE(" fopa2.idinstitucion = prin.idinstitucion");
-			sql.WHERE(" fopa2.idtipoproducto = prin.idtipoproducto");
-			sql.WHERE(" fopa2.idproducto = prin.idproducto");
-			sql.WHERE(" fopa2.idproductoinstitucion = prin.idproductoinstitucion");
-			sql.WHERE(" fopa2.IDFORMAPAGO = '" + peticion.getIdFormaPagoSeleccionada() + "'");
-		}
 		
 		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, tiva.valor, prin.idcontador, PRIN.NOFACTURABLE");
 
