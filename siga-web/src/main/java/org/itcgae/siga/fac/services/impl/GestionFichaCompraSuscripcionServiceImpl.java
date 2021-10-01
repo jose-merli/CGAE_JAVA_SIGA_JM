@@ -919,30 +919,20 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						.selectByPrimaryKey(solicitudKey);
 				
 				
-				LOGGER.info(
-						"denegarPeticion() / pysPeticioncomprasuscripcionMapper.selectByExample() -> Entrada a pysPeticioncomprasuscripcionMapper para obtener el idpeticion más alto.");
-
-				PysPeticioncomprasuscripcionExample peticionExample = new PysPeticioncomprasuscripcionExample();
-				
-				
-				peticionExample.setOrderByClause("IDPETICION DESC");
-				peticionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionaltaGreaterThanOrEqualTo(Long.valueOf(nSolicitud));
-				
-				List<PysPeticioncomprasuscripcion> antiguasPeticiones = pysPeticioncomprasuscripcionMapper.selectByExample(peticionExample);
-						
-				LOGGER.info(
-						"denegarPeticion() / pysPeticioncomprasuscripcionMapper.selectByExample() -> Salida de pysPeticioncomprasuscripcionMapper para obtener el idpeticion más alto.");
-
 				PysPeticioncomprasuscripcion solicitudBaja = new PysPeticioncomprasuscripcion();
 
 				solicitudBaja.setFecha(new Date());
 				solicitudBaja.setFechamodificacion(new Date());
 				solicitudBaja.setIdinstitucion(idInstitucion);
 				solicitudBaja.setIdpersona(solicitudAlta.getIdpersona());
-				solicitudBaja.setIdpeticion(antiguasPeticiones.get(0).getIdpeticion()+1);
+				solicitudBaja.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcionExtendsMapper.selectMaxIdPeticion(idInstitucion).getNewId())+1);
 				solicitudBaja.setIdpeticionalta((Long.valueOf(nSolicitud)));
 				solicitudBaja.setUsumodificacion(usuarios.get(0).getIdusuario());
 				solicitudBaja.setTipopeticion("B");
+				solicitudBaja.setIdestadopeticion((short) 20);
+				Long fechaActual = new Date().getTime();
+				solicitudBaja.setNumOperacion(
+						"1" + idInstitucion.toString() + solicitudAlta.getIdpersona() + fechaActual.toString());
 
 				response = pysPeticioncomprasuscripcionMapper.insert(solicitudBaja);
 				if (response == 0)
