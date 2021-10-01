@@ -832,7 +832,11 @@ public class WSCommons {
 										}
 										datosProfesional.setProfesional(profesional);
 									}
-									integranteFisico.setDatosProfesional(datosProfesional);
+									
+									if (integrante.getNumColegiado() != null) {
+										integranteFisico.setDatosProfesional(datosProfesional);
+									}
+									
 									integranteUnitario.setIntegranteFisico(integranteFisico);
 									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
 									integranteUnitario.setPublicar(Boolean.TRUE);

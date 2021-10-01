@@ -64,6 +64,8 @@ import org.itcgae.siga.db.entities.EnvEnvioprogramado;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosExample;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModClasecomunicaciones;
@@ -478,8 +480,19 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				String idClaseComunicacion = dialogo.getIdClaseComunicacion();
 				
 				List<KeyItem> listaKey = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
-				
 								
+				EnvPlantillasenviosKey keyPlantilla = new EnvPlantillasenviosKey();
+				keyPlantilla.setIdplantillaenvios(Integer.parseInt(modelosComunicacionItem.getIdPlantillaEnvio()));
+				keyPlantilla.setIdtipoenvios(Short.parseShort(modelosComunicacionItem.getIdTipoEnvio()));
+				keyPlantilla.setIdinstitucion(Short.valueOf(dialogo.getIdInstitucion()));
+				EnvPlantillasenviosWithBLOBs plantilla = _envPlantillaEnviosExtendsMapper.selectByPrimaryKey(keyPlantilla);
+				
+				//Comprobamos si la plantilla especificada contiene remitente	
+				if(plantilla.getIdpersona() == null) {
+					String mensaje = "La plantilla especificada no tiene remitente"; 
+					LOGGER.warn(mensaje);
+					throw new BusinessException(mensaje);
+				}
 				
 				// Obtenemos la plantilla de envio seleccionada en el modelo
 				List<ConsultaItem> listaConsultasPlantillaEnvio = null;
@@ -1008,9 +1021,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.debug("El formato de salida es Excel");
 				}
 				
+				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Consulta a la tabla MOD_PLANTILLADOCUMENTO - INICIO");
 				example.createCriteria().andIdplantilladocumentoIn(idValues).andIdiomaEqualTo(usuario.getIdlenguaje());
 				List<ModPlantilladocumento> listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
+				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Consulta a la tabla MOD_PLANTILLADOCUMENTO - FIN");
 				
+				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existen multiples plantillas asociadas al informe  - INICIO");
 				if(listaPlantilla != null && listaPlantilla.size() == 1){
 					ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
 					nombrePlantilla = plantillaDoc.getPlantilla();
@@ -1022,6 +1038,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.error("No hay plantilla asociada para el informe en el idioma del usuario");
 					throw new BusinessException("No hay plantilla asociada para el informe en el idioma del usuario");
 				}
+				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existen multiples plantillas asociadas al informe  - FIN");
 			}
 			LOGGER.info("Rendimiento inicio ejecucion consultas " );
 			
