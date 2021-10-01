@@ -1021,9 +1021,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.debug("El formato de salida es Excel");
 				}
 				
+				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Consulta a la tabla MOD_PLANTILLADOCUMENTO - INICIO");
 				example.createCriteria().andIdplantilladocumentoIn(idValues).andIdiomaEqualTo(usuario.getIdlenguaje());
 				List<ModPlantilladocumento> listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
+				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Consulta a la tabla MOD_PLANTILLADOCUMENTO - FIN");
 				
+				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existen multiples plantillas asociadas al informe  - INICIO");
 				if(listaPlantilla != null && listaPlantilla.size() == 1){
 					ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
 					nombrePlantilla = plantillaDoc.getPlantilla();
@@ -1035,6 +1038,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.error("No hay plantilla asociada para el informe en el idioma del usuario");
 					throw new BusinessException("No hay plantilla asociada para el informe en el idioma del usuario");
 				}
+				LOGGER.info("SIGARNV-631 ejecutaPlantillas() -> Comprobamos si existen multiples plantillas asociadas al informe  - FIN");
 			}
 			LOGGER.info("Rendimiento inicio ejecucion consultas " );
 			
