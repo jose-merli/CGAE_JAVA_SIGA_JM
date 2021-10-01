@@ -64,8 +64,22 @@ public class GestionFichaCompraSuscripcionController {
 	}
 	
 	@PostMapping(value = "/pys/denegarPeticion")
-	ResponseEntity<InsertResponseDTO>  denegarPeticion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
-		InsertResponseDTO response = gestionFichaCompraSuscripcionService.denegarPeticion(request, ficha);
+	ResponseEntity<InsertResponseDTO>  denegarPeticion(HttpServletRequest request, @RequestBody String nSolicitud) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.denegarPeticion(request, nSolicitud);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/pys/aprobarCompraMultiple")
+	ResponseEntity<InsertResponseDTO> aprobarCompraMultiple(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem[] peticiones) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.aprobarCompraMultiple(request, peticiones);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/pys/denegarPeticionMultiple")
+	ResponseEntity<InsertResponseDTO> denegarPeticionMultiple(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem[] peticiones) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.denegarPeticionMultiple(request, peticiones);
 		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}

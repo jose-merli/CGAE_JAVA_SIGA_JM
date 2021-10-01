@@ -14,7 +14,7 @@ import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionSqlProvider;
 
 public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticioncomprasuscripcionSqlProvider {
 
-	public String getFichaCompraSuscripcion(FichaCompraSuscripcionItem peticion, boolean esColegiado) {
+	public String getFichaCompraSuscripcion(FichaCompraSuscripcionItem peticion, boolean esColegiado, Short idInstitucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("pet.idinstitucion");
@@ -46,7 +46,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		else {
 			sql.SELECT("CASE WHEN suscripcion.fecha is null THEN petBaja.fecha \r\n"
 					+ "ELSE null END as fechaDenegada \r\n");
-			sql.SELECT("CASE WHEN suscripcion.fecha is not null petBaja.fecha \r\n"
+			sql.SELECT("CASE WHEN suscripcion.fecha is not null THEN petBaja.fecha \r\n"
 					+ "ELSE null END as fechaSolicitadaAnulacion \r\n");
 			sql.SELECT("suscripcion.fechasuscripcion as fechaAceptada");
 			sql.SELECT("suscripcion.fechaBaja as fechaAnulada");
@@ -62,12 +62,12 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.INNER_JOIN(
 				"adm_usuarios usuario ON (pet.usumodificacion = usuario.idusuario and pet.idinstitucion = usuario.idinstitucion)");
 
-		sql.WHERE("pet.idinstitucion = " + peticion.getIdInstitucion());
+		sql.WHERE("pet.idinstitucion = " + idInstitucion);
 		sql.WHERE("pet.idpeticion = " + peticion.getnSolicitud());
 
 		// Para obtener las formas de pago comunes entre los productos de la compra. Se
 		// devuelven los idformapago concatenados con comas para se gestion.
-		if (peticion.getProductos() != null) {
+		if (peticion.getProductos() != null && peticion.getProductos().length > 0) {
 			SQL sqlPagos = new SQL();
 			// Con listagg logramos que los distintos ids de formas de pago se muestren en
 			// unica fila
@@ -76,6 +76,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 			// OBTENEMOS LAS FORMAS DE PAGO COMUNES
 			String fromPagosComunes = "(";
+			String innerJoinProductos = "pys_productosinstitucion prin on prin.idinstitucion = pet.idinstitucion  and (";
 			for (ListaProductosItem producto : peticion.getProductos()) {
 				fromPagosComunes += "select pago.idformapago\r\n"
 						+ "				from pys_productosinstitucion prod\r\n"
@@ -87,17 +88,50 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 						else fromPagosComunes += " and pago.internet = 'S'";
 						fromPagosComunes += " and (prod.idproducto = " + producto.getIdproducto() + " and prod.idtipoproducto="
 						+ producto.getIdtipoproducto() + " and prod.idproductoinstitucion="
-						+ producto.getIdproductoinstitucion() + "\r\n";
-				fromPagosComunes += "intersection\r\n";
+						+ producto.getIdproductoinstitucion() + ") \r\n";
+				fromPagosComunes += "intersect\r\n";
+				
+				innerJoinProductos += "(prin.idproducto = "+producto.getIdproducto()+" and prin.idtipoproducto="+producto.getIdtipoproducto()+
+						" and prin.idproductoinstitucion="+producto.getIdproductoinstitucion()+") OR";
+				
 			}
+			//Se elimina el ultimo OR
+			sql.INNER_JOIN(innerJoinProductos.substring(0, innerJoinProductos.length() - 2) + ")");
+			
 			// Se elimina la ultima interseccion
-			sqlPagos.FROM(fromPagosComunes.substring(0, fromPagosComunes.length() - 16) + ")) formasPagoComunes");
+			sqlPagos.FROM(fromPagosComunes.substring(0, fromPagosComunes.length() - 13) + ") formasPagoComunes");
 
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 			
-			sql.SELECT("(SELECT idformapago FROM pys_productossolicitados prodSol where prodSol.idinstitucion ="+peticion.getIdInstitucion()+" and prodSol.idpeticion = "+peticion.getnSolicitud()+" and ROWNUM <=1) as idFormaPagoSeleccionada");
-			
+			//Obtenemos el id de la forma de pago utilizada.
+			sql.SELECT("FIRST_VALUE(prodSol.idformapago) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) as idFormaPagoSeleccionada");
+				
 			sql.INNER_JOIN("pys_productossolicitados prodSol on prodSol.idinstitucion = pet.idinstitucion and prodSol.idpeticion = pet.idpeticion");
+			
+			
+			//Obtención de importes de productos
+			sql.SELECT("F_siga_formatonumero(PRIN.VALOR,2) AS totalNeto");
+			sql.SELECT("F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100), 2),2) as totalIVA");
+			sql.SELECT("F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2) AS impTotal");
+				//Importe total menos Anticipos (pysanticiposletrado) menos Suma de lo pagado en las facturas (fac_factura) asociadas
+				sql.SELECT("F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR - "
+						+ "COALESCE((SELECT SUM(importeInicial)\r\n"
+						+ "FROM pys_anticipoletrado "
+						+ "where idpersona = "+peticion.getIdPersona()+"),0) - "
+								+ "COALESCE((SELECT SUM(fact.IMPTOTALPAGADO)\r\n"
+								+ "FROM fac_factura fact\r\n"
+								+ "INNER JOIN pys_compra on pys_compra.idfactura = fact.idfactura and pys_compra.idpeticion = "+peticion.getnSolicitud()+" and pys_compra.idinstitucion = fact.idinstitucion\r\n"
+								+ "WHERE fact.idinstitucion = "+peticion.getIdInstitucion()+"),0), 2),2) AS pendPago");
+				//Solo se puden comprobar las facturas en el caso que haya habido un registro de compra.
+				//Pendiente de optimizacion por SQL
+				if(peticion.getFechaAceptada() != null) {
+				sql.LEFT_OUTER_JOIN("fac_factura fact on fact.idfactura = compras.IDFACTURA");
+				}
+			
+			else sql.SELECT("F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2) AS pendPago");
+			
+
+			sql.INNER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = prin.idtipoiva");
 		}
 
 		return sql.toString();
@@ -179,11 +213,10 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 			
 			//Obtenemos el id de la forma de pago utilizada.
-			if(peticion.getIdEstadoPeticion() != null) {
-				sql.SELECT("FIRST(prodSol.idformapago) as idFormaPagoSeleccionada");
+			sql.SELECT("FIRST(prodSol.idformapago) as idFormaPagoSeleccionada");
 				
-				sql.INNER_JOIN("pys_productossolicitados prodSol on prodSol.idinstitucion = pet.idinstitucion and prodSol.idpeticion = pet.idpeticion");
-			}
+			sql.LEFT_OUTER_JOIN("pys_productossolicitados prodSol on prodSol.idinstitucion = pet.idinstitucion and prodSol.idpeticion = pet.idpeticion");
+			
 			
 			//Obtención de importes de productos
 			sql.SELECT("F_siga_formatonumero(PRIN.VALOR,2) AS totalNeto");
@@ -201,7 +234,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 								+ "WHERE fact.idinstitucion = "+peticion.getIdInstitucion()+"),0), 2),2) AS pendPago");
 				//Solo se puden comprobar las facturas en el caso que haya habido un registro de compra.
 				//Pendiente de optimizacion por SQL
-				if(peticion.getIdEstadoPeticion() != null && !peticion.getIdEstadoPeticion().equals("10")) {
+				if(peticion.getFechaAceptada() != null) {
 				sql.LEFT_OUTER_JOIN("fac_factura fact on fact.idfactura = compras.IDFACTURA");
 				}
 			}
@@ -306,7 +339,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		if(filtro.getnSolicitud() != null && filtro.getnSolicitud().trim() != "")sql.WHERE("pet.idpeticion like '%"+filtro.getnSolicitud()+"%'");
 		
-		if(filtro.getDescProd() != null && filtro.getDescProd().trim() != "")sql.WHERE("prodIns.descripcion like '%"+filtro.getDescProd()+"%'");
+		if(filtro.getDescProd() != null && filtro.getDescProd().trim() != "")sql.WHERE("convert(UPPER(prodIns.descripcion) , 'US7ASCII' ) like convert(UPPER('%"+filtro.getDescProd()+"%') , 'US7ASCII' )");
 		
 		if(filtro.getFechaSolicitudDesde() != null) {
 			DateFormat dateFormatFront = new SimpleDateFormat(
@@ -320,7 +353,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			DateFormat dateFormatFront = new SimpleDateFormat(
 		            "EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
-			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
+			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getFechaSolicitudHasta().toString()).getTime());
 			sql.WHERE("pet.fecha <= to_date('"+strDate+"','dd/MM/YY')");
 		}
 			
@@ -342,6 +375,62 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT("f_siga_getrecurso_etiqueta(DESCRIPCION,'" + idioma + "') AS DESCRIPCION");
 		
 		sql.FROM("fac_estadoFactura");
+		
+		return sql.toString();
+	}
+	
+	public String getProductosSolicitadosPeticion(String idioma, Short idInstitucion, FichaCompraSuscripcionItem peticion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" PRIN.IDPRODUCTO");
+		sql.SELECT(" PRIN.IDTIPOPRODUCTO");
+		sql.SELECT(" PRIN.IDPRODUCTOINSTITUCION");
+		sql.SELECT(" PRIN.DESCRIPCION");
+		sql.SELECT(" PRIN.FECHABAJA");
+		sql.SELECT("count(fopa1.idformapago) AS NUM_FORMAS_PAGO\r\n"
+				+ ", case when count(fopa1.idformapago)<=3 \r\n"
+				+ " then LISTAGG(f_siga_getrecurso(fo.descripcion,"+idioma+") , ', ') WITHIN GROUP (ORDER BY prin.descripcion)\r\n"
+				+ " else to_char(count(fopa1.idformapago))\r\n"
+				+ " end FORMAS_PAGO");
+		sql.SELECT(" concat(F_siga_formatonumero(PRIN.VALOR,2), ' €') AS VALOR");
+		sql.SELECT(" F_SIGA_GETRECURSO (TPRODUCTO.DESCRIPCION,"+idioma+") AS CATEGORIA");
+		sql.SELECT(" PRODUC.DESCRIPCION AS TIPO");
+		sql.SELECT(" TIVA.DESCRIPCION AS IVA");
+		sql.SELECT(" concat(F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2), ' €') AS PRECIO_IVA");
+		sql.SELECT(" PRIN.IDCONTADOR");
+		sql.SELECT(" PRIN.NOFACTURABLE");
+		
+		sql.FROM(" pys_productosinstitucion prin, pys_formapagoproducto fopa1, pys_formapago fo, pys_tipoiva tiva, pys_tiposproductos tproducto, pys_productos produc");
+		sql.FROM("pys_productossolicitados prodSol");
+		if(peticion.getIdFormaPagoSeleccionada() != null && peticion.getIdFormaPagoSeleccionada() != "")
+			sql.FROM(" pys_formapagoproducto fopa2");
+		
+		sql.WHERE(" PRIN.IDINSTITUCION = '" + idInstitucion +"'");
+		sql.WHERE(" fopa1.idinstitucion(+) = prin.idinstitucion");
+		sql.WHERE(" fopa1.idtipoproducto(+) = prin.idtipoproducto");
+		sql.WHERE(" fopa1.idproducto(+) = prin.idproducto");
+		sql.WHERE(" fopa1.idproductoinstitucion(+) = prin.idproductoinstitucion");
+		sql.WHERE(" fo.idformapago (+) = fopa1.idformapago");
+		sql.WHERE(" tiva.idtipoiva (+) = prin.idtipoiva");
+		sql.WHERE(" tproducto.idtipoproducto (+) = prin.idtipoproducto");
+		sql.WHERE(" produc.idproducto (+) = prin.idproducto");
+		sql.WHERE(" produc.idtipoproducto (+) = prin.idtipoproducto");
+		sql.WHERE(" produc.idinstitucion (+) = prin.idinstitucion");
+		sql.WHERE(" prodSol.idinstitucion(+) = prin.idinstitucion");
+		sql.WHERE("prodSol.idpeticion = "+peticion.getnSolicitud());
+		sql.WHERE("prodSol.idproducto(+) = prin.idproducto and prodSol.idtipoproducto(+) = prin.idtipoproducto and prodSol.idproductoinstitucion(+) = prin.idproductoinstitucion");
+		
+		if(peticion.getIdFormaPagoSeleccionada() != null && peticion.getIdFormaPagoSeleccionada() != "") {
+			sql.WHERE(" fopa2.idinstitucion = prin.idinstitucion");
+			sql.WHERE(" fopa2.idtipoproducto = prin.idtipoproducto");
+			sql.WHERE(" fopa2.idproducto = prin.idproducto");
+			sql.WHERE(" fopa2.idproductoinstitucion = prin.idproductoinstitucion");
+			sql.WHERE(" fopa2.IDFORMAPAGO = '" + peticion.getIdFormaPagoSeleccionada() + "'");
+		}
+		
+		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, tiva.valor, prin.idcontador, PRIN.NOFACTURABLE");
+
+		sql.ORDER_BY(" PRIN.DESCRIPCION");
 		
 		return sql.toString();
 	}

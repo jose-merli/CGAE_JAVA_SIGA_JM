@@ -8,12 +8,15 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
+import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
 import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
+import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionMapper;
 import org.itcgae.siga.db.services.fac.providers.PySTipoIvaSqlExtendsProvider;
+import org.itcgae.siga.db.services.fac.providers.PySTiposProductosSqlExtendsProvider;
 import org.itcgae.siga.db.services.fac.providers.PysPeticioncomprasuscripcionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -43,7 +46,7 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			//TARJETA FORMAS DE PAGO
 			@Result(column = "idformaspagocomunes", property = "idFormasPagoComunes", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idFormaPagoSeleccionada", property = "idFormaPagoSeleccionada", jdbcType = JdbcType.VARCHAR)})
-	FichaCompraSuscripcionItem getFichaCompraSuscripcion(FichaCompraSuscripcionItem ficha, boolean esColegiado);
+	FichaCompraSuscripcionItem getFichaCompraSuscripcion(FichaCompraSuscripcionItem ficha, boolean esColegiado, Short idInstitucion);
 	
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getNuevaFichaCompraSuscripcion")
 	@Results({ 
@@ -102,4 +105,22 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ComboItem> comboEstadoFactura(String idioma);
+	
+	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getProductosSolicitadosPeticion")
+	@Results({
+		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDPRODUCTOINSTITUCION", property = "idproductoinstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CATEGORIA", property = "categoria", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IVA", property = "iva", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PRECIO_IVA", property = "precioiva", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FORMAS_PAGO", property = "formapago", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOFACTURABLE", property = "noFacturable", jdbcType = JdbcType.VARCHAR)
+		}) 
+	ListaProductosItem[] getProductosSolicitadosPeticion(String idioma, Short idInstitucion, FichaCompraSuscripcionItem peticion);
+	
 }

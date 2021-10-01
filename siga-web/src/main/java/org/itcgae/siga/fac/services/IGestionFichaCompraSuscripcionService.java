@@ -20,5 +20,11 @@ public interface IGestionFichaCompraSuscripcionService {
 
 	public UpdateResponseDTO aprobarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha);
 
-	public InsertResponseDTO denegarPeticion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
+	public InsertResponseDTO denegarPeticionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception;
+
+	public InsertResponseDTO aprobarCompraMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception;
+
+	public InsertResponseDTO denegarPeticion(HttpServletRequest request, String nSolicitud) throws Exception;
 }
