@@ -1,5 +1,6 @@
 package org.itcgae.siga.DTO.fac;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -30,10 +31,10 @@ public class ServicioDetalleDTO {
 	private int valoriva;
 	private String tipo;
 	
-	private List<Integer> formasdepagointernet;
-	private List<Integer> formasdepagosecretaria;
-	private List<Integer> formasdepagointernetoriginales;
-	private List<Integer> formasdepagosecretariaoriginales;
+	private List<Integer> formasdepagointernet = new ArrayList<>();
+	private List<Integer> formasdepagosecretaria = new ArrayList<>();
+	private List<Integer> formasdepagointernetoriginales = new ArrayList<>();
+	private List<Integer> formasdepagosecretariaoriginales = new ArrayList<>();
 	private boolean editar;
 	private ServicioDetalleDTO serviciooriginal;
 	

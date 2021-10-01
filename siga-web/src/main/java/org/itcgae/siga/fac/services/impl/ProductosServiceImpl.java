@@ -900,12 +900,8 @@ public class ProductosServiceImpl implements IProductosService{
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"editarProducto() / pysProductosMapper.editarProducto() -> Entrada a pysProductosMapper para modificar un producto");
-					
-					//AL EDITAR PRODUCTOS HAY QUE USAR LA CONSULTA QUE TE TRAE EL IDORDENACION YA QUE AL CAMBIAR TIPO O CATEGORIA SE PUEDE REPETIR LA PK DE 4 CAMPOS AL HABER IDPRODUCTOSINSTITUCION REPETIDOS
-					//NewIdDTO idOrdenacion = pysProductosInstitucionExtendsMapper.getIndiceMaxProducto(producto, idInstitucion);
-					//productoInstitucion.setIdproductoinstitucion(Long.parseLong(idOrdenacion.getNewId()));
-					if(producto.getProductooriginal().getIdtipoproducto() == producto.getIdtipoproducto() && producto.getProductooriginal().getIdproducto() == producto.getIdproducto()) {
+							"editarProducto() / pysProductosInstitucionMapper.editarProducto() -> Entrada a pysProductosInstitucionMapper para modificar un producto");				
+	
 						PysProductosinstitucion productoInstitucion = new PysProductosinstitucion();
 							
 						productoInstitucion.setIdinstitucion(idInstitucion);
@@ -929,14 +925,15 @@ public class ProductosServiceImpl implements IProductosService{
 						productoInstitucion.setIdcontador(producto.getIdcontador());
 						productoInstitucion.setNofacturable(producto.getNofacturable());
 						productoInstitucion.setIdtipoiva(producto.getIdtipoiva());
-						productoInstitucion.setCodigoext(producto.getCodigoext());
+						if(producto.getCodigoext() != null) {
+							productoInstitucion.setCodigoext(producto.getCodigoext());
+						}else {
+							productoInstitucion.setCodigoext(producto.getIdtipoproducto() + "|" + producto.getIdproducto() + "|" + producto.getIdproductoinstitucion());
+						}
 						productoInstitucion.setCodigoTraspasonav(producto.getCodigo_traspasonav());
 						productoInstitucion.setOrden((long) producto.getOrden());
 						
-						status = pysProductosInstitucionMapper.updateByPrimaryKey(productoInstitucion);
-					}else {
-						System.out.println("FSDKFLSDKFSDLKFLSDKSDF");
-					}
+						status = pysProductosInstitucionMapper.updateByPrimaryKey(productoInstitucion);				
 					
 					if(status == 0) {
 						deleteResponseDTO.setStatus(SigaConstants.KO);
@@ -945,13 +942,13 @@ public class ProductosServiceImpl implements IProductosService{
 					}
 					
 					LOGGER.info(
-							"editarProducto() / pysProductosMapper.editarProducto() -> Salida de pysProductosMapper para modificar un producto");
+							"editarProducto() / pysProductosInstitucionMapper.editarProducto() -> Salida de pysProductosInstitucionMapper para modificar un producto");
 				}
 
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"ProductosServiceImpl.modificarProducto() -> Se ha producido un error al modificar un producto",
+					"ProductosServiceImpl.editarProducto() -> Se ha producido un error al modificar un producto",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -959,7 +956,7 @@ public class ProductosServiceImpl implements IProductosService{
 
 		deleteResponseDTO.setError(error);
 
-		LOGGER.info("modificarProducto() -> Salida del servicio para modificar un producto");
+		LOGGER.info("editarProducto() -> Salida del servicio para modificar un producto");
 
 		return deleteResponseDTO;
 	}
