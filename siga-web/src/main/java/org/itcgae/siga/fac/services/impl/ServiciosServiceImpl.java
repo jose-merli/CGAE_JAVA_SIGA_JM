@@ -19,6 +19,7 @@ import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTO.fac.ListadoTipoServicioDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
@@ -36,6 +37,7 @@ import org.itcgae.siga.db.entities.PysFormapagoservicios;
 import org.itcgae.siga.db.entities.PysFormapagoserviciosKey;
 import org.itcgae.siga.db.entities.PysPreciosservicios;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
+import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoserviciosMapper;
@@ -415,8 +417,8 @@ public class ServiciosServiceImpl implements IServiciosService {
 						pysPreciosServicios.setIdserviciosinstitucion(Long.parseLong(idOrdenacion.getNewId()));
 						pysPreciosServicios.setIdperiodicidad((short) 1);//Mensual
 						
-						NewIdDTO idOrdenacionPreciosServicios = pysPreciosServiciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion, pysPreciosServicios.getIdservicio(), pysPreciosServicios.getIdserviciosinstitucion(), pysPreciosServicios.getIdperiodicidad());
-						pysPreciosServicios.setIdpreciosservicios(Short.parseShort(idOrdenacionPreciosServicios.getNewId())); //tengo que obtenerlo con max id
+						NewIdDTO idOrdenacionPreciosServicios = pysPreciosServiciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion, pysPreciosServicios.getIdtiposervicios(), pysPreciosServicios.getIdservicio(), pysPreciosServicios.getIdserviciosinstitucion(), pysPreciosServicios.getIdperiodicidad());
+						pysPreciosServicios.setIdpreciosservicios(Short.parseShort(idOrdenacionPreciosServicios.getNewId())); 
 						
 						pysPreciosServicios.setValor(new BigDecimal(0));//A cero el precio por defecto
 						pysPreciosServicios.setCriterios("SELECT IDINSTITUCION, IDPERSONA FROM CEN_CLIENTE WHERE IDINSTITUCION = "+idInstitucion+"  AND IDPERSONA = @IDPERSONA@");//PROVISIONAL
@@ -1092,6 +1094,10 @@ public class ServiciosServiceImpl implements IServiciosService {
 				
 					List<FichaTarjetaPreciosItem> fichaTarjetaPreciosLista = pysPreciosServiciosExtendsMapper
 							.detalleTarjetaPrecios(servicio.getIdtiposervicios(), servicio.getIdservicio(), Integer.parseInt(idServicioInstitucion.getNewId()), idInstitucion, idioma);
+					
+					for (FichaTarjetaPreciosItem fichaTarjetaPreciosItem : fichaTarjetaPreciosLista) {
+						fichaTarjetaPreciosItem.setIdperiodicidadoriginal(fichaTarjetaPreciosItem.getIdperiodicidad());
+					}
 
 					LOGGER.info(
 							"detalleTarjetaPrecios() / pysPreciosServiciosExtendsMapper.detalleTarjetaPrecios() -> Salida de pysPreciosServiciosExtendsMapper para recuperar los detalles necesarios para la tarjeta precios");
@@ -1173,4 +1179,98 @@ public class ServiciosServiceImpl implements IServiciosService {
 		return comboDTO;
 	}
 	
+	@Override
+	public InsertResponseDTO crearEditarPrecios(FichaTarjetaPreciosDTO listaPrecios, HttpServletRequest request) {
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int status = 0;
+		
+
+		LOGGER.info("crearEditarPrecios() -> Entrada al servicio para crear/editar precios");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"crearEditarPrecios() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"crearEditarPrecios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"crearEditarPrecios() / pysPreciosServiceMapper.crearEditarPrecios() -> Entrada a pysPreciosServiceMapper para crear/editar precios");
+
+					for (FichaTarjetaPreciosItem precio : listaPrecios.getFichaTarjetaPreciosItem()) {
+						if(precio.getNuevo().equals("1")) {
+							PysPreciosservicios pysPreciosServicios = new PysPreciosservicios();
+							
+							pysPreciosServicios.setIdinstitucion(idInstitucion);
+							pysPreciosServicios.setIdtiposervicios((short) precio.getIdtiposervicios());
+							pysPreciosServicios.setIdservicio ((long) precio.getIdservicio());
+							pysPreciosServicios.setIdserviciosinstitucion((long) precio.getIdserviciosinstitucion());
+							pysPreciosServicios.setIdperiodicidad((short) precio.getIdperiodicidad());
+							
+							NewIdDTO idOrdenacionPreciosServicios = pysPreciosServiciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion, pysPreciosServicios.getIdtiposervicios(), pysPreciosServicios.getIdservicio(), pysPreciosServicios.getIdserviciosinstitucion(), pysPreciosServicios.getIdperiodicidad());
+							pysPreciosServicios.setIdpreciosservicios(Short.parseShort(idOrdenacionPreciosServicios.getNewId()));
+							
+							pysPreciosServicios.setValor(new BigDecimal(precio.getPrecio()));						
+							
+							String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, precio.getIdcondicion());
+							criterios = criterios.replace("<SELECT>", "");
+							criterios = criterios.replace("</SELECT>", "");
+							criterios = criterios.replace("<FROM>", "");
+							criterios = criterios.replace("</FROM>", "");
+							criterios = criterios.replace("<WHERE>", "");
+							criterios = criterios.replace("</WHERE>", "");
+								
+							pysPreciosServicios.setCriterios(criterios);							
+							
+							pysPreciosServicios.setFechamodificacion(new Date());
+							pysPreciosServicios.setUsumodificacion(usuarios.get(0).getIdusuario());
+							pysPreciosServicios.setPordefecto("0");
+							pysPreciosServicios.setDescripcion(precio.getDescripcionprecio());
+						
+							status = pysPreciosServiciosMapper.insertSelective(pysPreciosServicios);
+							
+							if(status == 0) {
+								insertResponseDTO.setStatus(SigaConstants.KO);
+							}else if(status == 1) {
+								insertResponseDTO.setStatus(SigaConstants.OK);
+							}
+						}else {
+							
+						}
+						
+					}
+				
+					
+					LOGGER.info(
+							"crearEditarPrecios() / pysPreciosServiceMapper.crearEditarPrecios() -> Salida de pysPreciosServiceMapper para crear/editar precios");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ServiciosServiceImpl.crearEditarPrecios() -> Se ha producido un error al crear/editar precios",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+		
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("crearEditarPrecios() -> Salida del servicio para crear/editar precios");
+
+		return insertResponseDTO;
+	}
 }

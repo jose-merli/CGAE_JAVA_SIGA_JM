@@ -1,8 +1,11 @@
 package org.itcgae.siga.DTO.fac;
 
-import org.itcgae.siga.DTOs.gen.Error;
-
 public class FichaTarjetaPreciosItem {
+	
+	private int idpreciosservicios;
+	private int idserviciosinstitucion;
+	private int idtiposervicios;
+	private int idservicio;
 	private String precio;
 	private int idperiodicidad;
 	private String descripcionprecio;
@@ -11,6 +14,22 @@ public class FichaTarjetaPreciosItem {
 	private String descripcionconsulta;
 	private String pordefecto;
 	
+	private int idperiodicidadoriginal;
+	private String nuevo;
+
+	
+	public String getNuevo() {
+		return nuevo;
+	}
+	public void setNuevo(String nuevo) {
+		this.nuevo = nuevo;
+	}
+	public int getIdperiodicidadoriginal() {
+		return idperiodicidadoriginal;
+	}
+	public void setIdperiodicidadoriginal(int idperiodicidadoriginal) {
+		this.idperiodicidadoriginal = idperiodicidadoriginal;
+	}
 	public String getPrecio() {
 		return precio;
 	}
@@ -22,6 +41,30 @@ public class FichaTarjetaPreciosItem {
 	}
 	public void setIdperiodicidad(int idperiodicidad) {
 		this.idperiodicidad = idperiodicidad;
+	}
+	public int getIdserviciosinstitucion() {
+		return idserviciosinstitucion;
+	}
+	public void setIdserviciosinstitucion(int idserviciosinstitucion) {
+		this.idserviciosinstitucion = idserviciosinstitucion;
+	}
+	public int getIdtiposervicios() {
+		return idtiposervicios;
+	}
+	public void setIdtiposervicios(int idtiposervicios) {
+		this.idtiposervicios = idtiposervicios;
+	}
+	public int getIdservicio() {
+		return idservicio;
+	}
+	public void setIdservicio(int idservicio) {
+		this.idservicio = idservicio;
+	}
+	public int getIdpreciosservicios() {
+		return idpreciosservicios;
+	}
+	public void setIdpreciosservicios(int idpreciosservicios) {
+		this.idpreciosservicios = idpreciosservicios;
 	}
 	public String getDescripcionprecio() {
 		return descripcionprecio;
@@ -63,6 +106,12 @@ public class FichaTarjetaPreciosItem {
 		result = prime * result + ((descripcionprecio == null) ? 0 : descripcionprecio.hashCode());
 		result = prime * result + idcondicion;
 		result = prime * result + idperiodicidad;
+		result = prime * result + idperiodicidadoriginal;
+		result = prime * result + idpreciosservicios;
+		result = prime * result + idservicio;
+		result = prime * result + idserviciosinstitucion;
+		result = prime * result + idtiposervicios;
+		result = prime * result + ((nuevo == null) ? 0 : nuevo.hashCode());
 		result = prime * result + ((pordefecto == null) ? 0 : pordefecto.hashCode());
 		result = prime * result + ((precio == null) ? 0 : precio.hashCode());
 		return result;
@@ -96,6 +145,21 @@ public class FichaTarjetaPreciosItem {
 			return false;
 		if (idperiodicidad != other.idperiodicidad)
 			return false;
+		if (idperiodicidadoriginal != other.idperiodicidadoriginal)
+			return false;
+		if (idpreciosservicios != other.idpreciosservicios)
+			return false;
+		if (idservicio != other.idservicio)
+			return false;
+		if (idserviciosinstitucion != other.idserviciosinstitucion)
+			return false;
+		if (idtiposervicios != other.idtiposervicios)
+			return false;
+		if (nuevo == null) {
+			if (other.nuevo != null)
+				return false;
+		} else if (!nuevo.equals(other.nuevo))
+			return false;
 		if (pordefecto == null) {
 			if (other.pordefecto != null)
 				return false;
@@ -111,10 +175,12 @@ public class FichaTarjetaPreciosItem {
 	
 	@Override
 	public String toString() {
-		return "FichaTarjetaPreciosItem [precio=" + precio + ", idperiodicidad=" + idperiodicidad
-				+ ", descripcionprecio=" + descripcionprecio + ", idcondicion=" + idcondicion
-				+ ", descripcionperiodicidad=" + descripcionperiodicidad + ", descripcionconsulta="
-				+ descripcionconsulta + ", pordefecto=" + pordefecto + "]";
+		return "FichaTarjetaPreciosItem [idpreciosservicios=" + idpreciosservicios + ", idserviciosinstitucion="
+				+ idserviciosinstitucion + ", idtiposervicios=" + idtiposervicios + ", idservicio=" + idservicio
+				+ ", precio=" + precio + ", idperiodicidad=" + idperiodicidad + ", descripcionprecio="
+				+ descripcionprecio + ", idcondicion=" + idcondicion + ", descripcionperiodicidad="
+				+ descripcionperiodicidad + ", descripcionconsulta=" + descripcionconsulta + ", pordefecto="
+				+ pordefecto + ", idperiodicidadoriginal=" + idperiodicidadoriginal + ", nuevo=" + nuevo + "]";
 	}
-
+	
 }

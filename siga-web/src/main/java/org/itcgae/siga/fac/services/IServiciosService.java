@@ -9,6 +9,7 @@ import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
+import org.itcgae.siga.DTO.fac.ListadoTipoServicioDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
@@ -30,6 +31,7 @@ public interface IServiciosService {
 	public DeleteResponseDTO borrarSuscripcionesBajas(BorrarSuscripcionBajaItem borrarSuscripcionBajaItem, HttpServletRequest request) throws Exception;
 	public FichaTarjetaPreciosDTO detalleTarjetaPrecios(HttpServletRequest request, ServicioDetalleDTO servicio);
 	public ComboDTO comboPeriodicidad(HttpServletRequest request);
+	public InsertResponseDTO crearEditarPrecios(FichaTarjetaPreciosDTO listaPrecios, HttpServletRequest request);
 	
 
 }

@@ -24,7 +24,7 @@ public interface PysPreciosserviciosExtendsMapper extends PysPreciosserviciosMap
 	@Results({
 		@Result(column = "IDPRECIOSERVICIO", property = "newId", jdbcType = JdbcType.VARCHAR),
 	})
-	NewIdDTO selectMaxIdPrecioServicio(Short idInstitucion, Long idServicio, Long idServicioInstitucion, Short idPeriocidad);
+	NewIdDTO selectMaxIdPrecioServicio(Short idInstitucion, short idTipoServicio, Long idServicio, Long idServicioInstitucion, Short idPeriocidad);
 	
 	@SelectProvider(type = PysPreciosserviciosSqlExtendsProvider.class, method = "selectPricesCourse")
 	@Results({
@@ -37,6 +37,10 @@ public interface PysPreciosserviciosExtendsMapper extends PysPreciosserviciosMap
 	
 	@SelectProvider(type = PysPreciosserviciosSqlExtendsProvider.class, method = "detalleTarjetaPrecios")
 	@Results({
+		@Result(column = "idpreciosservicios", property = "idperiodicidad", jdbcType = JdbcType.INTEGER),
+		@Result(column = "idserviciosinstitucion", property = "idserviciosinstitucion", jdbcType = JdbcType.INTEGER),
+		@Result(column = "idtiposervicios", property = "idtiposervicios", jdbcType = JdbcType.INTEGER),
+		@Result(column = "idservicio", property = "idservicio", jdbcType = JdbcType.INTEGER),
 		@Result(column = "precio", property = "precio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "periodicidad", property = "idperiodicidad", jdbcType = JdbcType.INTEGER),
 		@Result(column = "descripcionprecio", property = "descripcionprecio", jdbcType = JdbcType.VARCHAR),
@@ -46,7 +50,6 @@ public interface PysPreciosserviciosExtendsMapper extends PysPreciosserviciosMap
 		@Result(column = "pordefecto", property = "pordefecto", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FichaTarjetaPreciosItem> detalleTarjetaPrecios(int idTipoServicio, int idServicio, int idServiciosInstitucion, Short idInstitucion, String idioma);
-
 	
 	@SelectProvider(type = PysPreciosserviciosSqlExtendsProvider.class, method = "comboPeriodicidad")
 	@Results({ 

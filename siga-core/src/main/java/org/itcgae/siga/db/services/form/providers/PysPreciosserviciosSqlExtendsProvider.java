@@ -1,18 +1,20 @@
 package org.itcgae.siga.db.services.form.providers;
 
+import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.db.mappers.PysPreciosserviciosSqlProvider;
 
 public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSqlProvider {
 
-	public String selectMaxIdPrecioServicio(Short idInstitucion, Long idServicio, Long idServicioInstitucion, Short idPeriocidad) {
+	public String selectMaxIdPrecioServicio(Short idInstitucion, short idTipoServicio, Long idServicio, Long idServicioInstitucion, Short idPeriocidad) {
 
 		SQL sql = new SQL();
 
 		sql.SELECT("NVL(max(IDPRECIOSSERVICIOS) +1, 1) AS IDPRECIOSERVICIO");
 		sql.FROM("PYS_PRECIOSSERVICIOS");
 		sql.WHERE("idInstitucion =" + idInstitucion);
-		sql.WHERE("idTipoServicios = 5");
+		sql.WHERE("idtiposervicios = " + idTipoServicio);
 		sql.WHERE("idServicio = " + idServicio);
 		sql.WHERE("idserviciosinstitucion = " + idServicioInstitucion);
 		sql.WHERE("IDPERIODICIDAD = " + idPeriocidad );
@@ -46,6 +48,10 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 
 		SQL sql = new SQL();
 
+		sql.SELECT(" idpreciosservicios"); 
+		sql.SELECT(" idserviciosinstitucion");
+		sql.SELECT(" idtiposervicios");
+		sql.SELECT(" idservicio");
 		sql.SELECT(" CONCAT(preciosserv.valor,'€') precio");
 		sql.SELECT(" preciosserv.idperiodicidad periodicidad");
 		sql.SELECT(" f_siga_getrecurso(preciosserv.descripcion," + idioma + ") descripcionprecio");
