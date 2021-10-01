@@ -1629,22 +1629,41 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 ScsEjgWithBLOBs ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 
                 // Modificamos el objeto obtenido
-
-                if (!ejg.getFechaapertura().equals(datos.getFechaApertura())) {
-                    insertAuditoriaEJG("fecha de apertura", ejg.getFechaapertura().toString(),
-                            datos.getFechaApertura().toString(), usuarios.get(0), (ScsEjg) ejg);
+				// SIGARNV-2438@DTT.JAMARTIN@01/10/2021@INICIO
+                if (datos.getFechaApertura() != null && !datos.getFechaApertura().equals(ejg.getFechaapertura())) {
+                    if(ejg.getFechaapertura() != null) {
+	                	insertAuditoriaEJG("fecha de apertura", ejg.getFechaapertura().toString(),
+	                            datos.getFechaApertura().toString(), usuarios.get(0), (ScsEjg) ejg);
+                    } else {
+                    	insertAuditoriaEJG("fecha de apertura", null,
+	                            datos.getFechaApertura().toString(), usuarios.get(0), (ScsEjg) ejg);
+                    }
                     ejg.setFechaapertura(datos.getFechaApertura());
                 }
-                if (!ejg.getFechapresentacion().equals(datos.getFechapresentacion())) {
-                    insertAuditoriaEJG("fecha de presentacion", ejg.getFechapresentacion().toString(),
-                            datos.getFechapresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
-                    ejg.setFechapresentacion(datos.getFechapresentacion());
-                }
-                if (!ejg.getFechapresentacion().equals(datos.getFechapresentacion())) {
-                    insertAuditoriaEJG("fecha limite de presentacion", ejg.getFechalimitepresentacion().toString(),
-                            datos.getFechalimitepresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
-                    ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
-                }
+				
+            	if (datos.getFechapresentacion() != null && !datos.getFechapresentacion().equals(ejg.getFechapresentacion())) {
+            		if(ejg.getFechapresentacion() !=null) {
+	            		insertAuditoriaEJG("fecha de presentacion", ejg.getFechapresentacion().toString(),
+	            				datos.getFechapresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
+            		} else {
+            			insertAuditoriaEJG("fecha de presentacion", null,
+	            				datos.getFechapresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
+            		}
+            		ejg.setFechapresentacion(datos.getFechapresentacion());
+            	}
+            	
+            	if (datos.getFechalimitepresentacion() != null && !datos.getFechalimitepresentacion().equals(ejg.getFechalimitepresentacion())) {
+            		if(ejg.getFechalimitepresentacion() != null) {
+	            		insertAuditoriaEJG("fecha limite de presentacion", ejg.getFechalimitepresentacion().toString(),
+								datos.getFechalimitepresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
+            		} else {
+            			insertAuditoriaEJG("fecha limite de presentacion", null,
+								datos.getFechalimitepresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
+            		}
+					ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
+				}
+				// SIGARNV-2438@DTT.JAMARTIN@01/10/2021@FIN
+            	
                 if (datos.getTipoEJGColegio() != null) {
                     if (ejg.getIdtipoejgcolegio() != Short.parseShort(datos.getTipoEJGColegio())) {
                         if (ejg.getIdtipoejgcolegio() != null)
