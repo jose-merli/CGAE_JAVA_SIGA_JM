@@ -3258,18 +3258,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				throw new Exception("gratuita.modalRegistro_DefinirCalendarioGuardia.literal.errorLetradosSuficientes");
 			}
 
-			int punteroUltimo = 0;
-
-			if (punteroListaLetrados.getValor() == 0)
-				punteroUltimo = alLetradosOrdenados.size() - 1;
-			else
-				punteroUltimo = punteroListaLetrados.getValor() - 1;
-
-			unLetrado = alLetradosOrdenados.get(punteroUltimo);
-
 			// actualizando el ultimo letrado en la guardia solo si no es de la lista de
 			// compensaciones
-			if (unLetrado.getSaltoocompensacion() == null) {
+			if (letradoGuardia.getSaltoocompensacion() == null) {
+				int punteroUltimo = 0;
+	
+				if (punteroListaLetrados.getValor() == 0)
+					punteroUltimo = alLetradosOrdenados.size() - 1;
+				else
+					punteroUltimo = punteroListaLetrados.getValor() - 1;
+	
+				unLetrado = alLetradosOrdenados.get(punteroUltimo);
 
 				scsDesignacionesExtendsMapper.cambiarUltimoCola(unLetrado.getIdinstitucion().toString(),
 						unLetrado.getIdturno().toString(), unLetrado.getIdpersona().toString(),
@@ -3596,6 +3595,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				letradoSeleccionado.setIdpersona(elem.getIdpersona());
 				letradoSeleccionado.setIdinstitucion(Short.valueOf(elem.getIdinstitucion().toString()));
+				letradoSeleccionado.setIdSaltoCompensacion(elem.getIdSaltoCompensacion());
 				letradoSeleccionado.setIdturno(elem.getIdturno());
 				letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
 				letradoSeleccionado.setSaltoocompensacion("C");
@@ -3913,6 +3913,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		scsSaltoscompensaciones.setSaltoocompensacion(saltoOCompensacion);
 		Date fechaBBDD = new SimpleDateFormat("yyyy-MM-dd").parse(diasGuardia.get(0).toString());
 		scsSaltoscompensaciones.setFechacumplimiento(fechaBBDD);
+		scsSaltoscompensaciones.setIdsaltosturno(Long.valueOf(letradoGuardia.getIdSaltoCompensacion()));
 		if (idGuardia != null) {
 			scsSaltoscompensaciones.setIdcalendarioguardias(idCalendarioGuardiasInt);
 		}

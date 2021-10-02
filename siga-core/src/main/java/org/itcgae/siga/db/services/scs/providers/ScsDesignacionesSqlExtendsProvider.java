@@ -3043,7 +3043,19 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String getCompensaciones(String idInstitucion, String idTurno, String fecha) {
 
 		SQL sql = new SQL();
-		sql.SELECT(" * ");
+		sql.SELECT(" IDINSTITUCION "); 
+		sql.SELECT(" IDTURNO ");
+		sql.SELECT(" IDSALTOSTURNO ");
+		sql.SELECT(" IDPERSONA ");
+		sql.SELECT(" SALTOOCOMPENSACION ");
+		sql.SELECT(" FECHA ");
+		sql.SELECT(" IDGUARDIA ");
+		sql.SELECT(" MOTIVOS ");
+		sql.SELECT(" FECHACUMPLIMIENTO ");
+		sql.SELECT(" IDCALENDARIOGUARDIAS ");
+		sql.SELECT(" IDCALENDARIOGUARDIASCREACION ");
+		sql.SELECT(" TIPOMANUAL ");
+		sql.SELECT(" FECHA_ANULACION ");
 		sql.FROM(" SCS_SALTOSCOMPENSACIONES ");
 		sql.WHERE(" IDINSTITUCION ='" + idInstitucion + "'");
 		if (idTurno != null && !idTurno.equals("")) {
@@ -3052,6 +3064,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" IDGUARDIA IS NULL ");
 		sql.WHERE(" SALTOOCOMPENSACION = 'C' ");
 		sql.WHERE(" FECHACUMPLIMIENTO is NULL ");
+		sql.WHERE(" FECHA <= SYSDATE ");
 		sql.ORDER_BY("FECHA, IDSALTOSTURNO");
 
 		return sql.toString();
