@@ -2,10 +2,16 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.scs.RemesaResultadoDTO;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
+import org.itcgae.siga.db.entities.AdmBotonaccion;
+import org.itcgae.siga.db.entities.CajgRemesa;
+
+import com.ibm.wsdl.util.StringUtils;
 
 public class ScsRemesasResultadosExtendsProvider {
 	
@@ -117,6 +123,34 @@ public class ScsRemesasResultadosExtendsProvider {
 		LOGGER.info(sql.toString());
 		return sql.toString();
 	}
+	
+	public String insertSelective(RemesasResultadoItem remesasResultadoItem, Short idInstitucion, Integer idUsuario) {
+		SQL sql = new SQL();
+
+		sql.INSERT_INTO("CAJG_REMESARESOLUCION");
+
+		sql.VALUES("IDREMESARESOLUCION", "(Select max(idremesaresolucion) + 1  from cajg_remesaresolucion)");
+		sql.VALUES("IDINSTITUCION", "'" + String.valueOf(idInstitucion) + "'");
+		sql.VALUES("PREFIJO", "'" + remesasResultadoItem.getPrefijoRemesa() + "'");
+		if(!("").equals(remesasResultadoItem.getNumeroRemesa())) {
+			sql.VALUES("NUMERO", "'" + remesasResultadoItem.getNumeroRemesa() + "'");
+		} else {
+			sql.VALUES("NUMERO", "'0000'");
+		}
+		sql.VALUES("SUFIJO", "'" + remesasResultadoItem.getSufijoRemesa() + "'");
+		sql.VALUES("OBSERVACIONES", "'" + remesasResultadoItem.getObservacionesRemesaResultado() + "'");
+		sql.VALUES("FECHARESOLUCION", "SYSDATE");
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", "'" + idUsuario + "'");
+		sql.VALUES("NOMBREFICHERO", "'" + remesasResultadoItem.getNombreFichero() + "'");
+		sql.VALUES("FECHACARGA", "SYSDATE");
+		sql.VALUES("LOGGENERADO", "'0'");
+		sql.VALUES("IDTIPOREMESA", "'3'");
+		sql.VALUES("IDREMESA", "null");
+
+		return sql.toString();
+	}
+
 	
 	
 }

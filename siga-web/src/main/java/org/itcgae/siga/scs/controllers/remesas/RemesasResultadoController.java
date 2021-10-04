@@ -5,8 +5,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.RemesaResultadoDTO;
+import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
+import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.scs.services.ejg.IRemesasResultados;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -40,6 +44,21 @@ public class RemesasResultadoController {
 	ResponseEntity<InputStreamResource> descargarFicheros(@RequestBody List<RemesasResultadoItem> listaRemesasResultadoItem, HttpServletRequest request) {
 		ResponseEntity<InputStreamResource> response = remesasResultados.descargarFicheros(listaRemesasResultadoItem,request);
 		return response;
+	}
+	
+	@RequestMapping(value = "/recuperarDatosContador", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<AdmContador> recuperarDatosContador(HttpServletRequest request) {
+		AdmContador response = remesasResultados.recuperarDatosContador(request);
+		return new ResponseEntity<AdmContador>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/guardarRemesaResultado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestBody RemesasResultadoItem remesasResultadoItem, HttpServletRequest request) {
+		UpdateResponseDTO response = remesasResultados.guardarRemesaResultado(remesasResultadoItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

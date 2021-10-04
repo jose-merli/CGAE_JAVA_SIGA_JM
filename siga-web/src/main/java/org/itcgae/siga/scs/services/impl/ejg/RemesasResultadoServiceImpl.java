@@ -7,11 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -20,14 +15,20 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.RemesaResultadoDTO;
-import org.itcgae.siga.DTOs.scs.RemesasResultadoFicheroItem;
+import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmContador;
+import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRemesasResultadoExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IRemesasResultados;
@@ -53,6 +54,9 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
     
     @Autowired
     private GenPropertiesMapper genPropertiesMapper;
+    
+	@Autowired
+	private AdmContadorExtendsMapper admContadorExtendsMapper;
 	
 	@Override
 	public RemesaResultadoDTO buscarRemesasResultado(RemesasResultadoItem remesasResultadoItem, HttpServletRequest request) {
@@ -189,6 +193,61 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 
         return path;
 		
+    }
+    
+    @Override
+    public AdmContador recuperarDatosContador(HttpServletRequest request){
+    	
+    	String token = request.getHeader("Authorization");
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		AdmContadorExample admContadorExample = new AdmContadorExample();
+		admContadorExample.createCriteria().andIdcontadorEqualTo(SigaConstants.CONTADOR_REMESAS_RESULTADOS)
+				.andIdinstitucionEqualTo(idInstitucion);
+
+		List<AdmContador> counterList = admContadorExtendsMapper.selectByExample(admContadorExample);
+		AdmContador counter = new AdmContador();
+
+		if (null != counterList && counterList.size() > 0) {
+			counter = counterList.get(0);
+		}
+
+		return counter;
+    }
+    
+    
+    @Override
+	public UpdateResponseDTO guardarRemesaResultado(RemesasResultadoItem remesasResultadoItem, HttpServletRequest request) {
+    	
+    	UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		Integer idRemesa = 0;
+		int response = 0;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"guardarRemesaResultado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"guardarRemesaResultado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			if(usuarios.size() > 0) {
+				response = scsRemesasResultadoExtendsMapper.insertSelective(remesasResultadoItem, idInstitucion, usuarios.get(0).getIdusuario());
+			}
+		}
+		
+		
+    	
+    	return new UpdateResponseDTO();
     }
     
 }

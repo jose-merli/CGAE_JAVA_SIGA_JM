@@ -2,12 +2,15 @@ package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoFicheroItem;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
+import org.itcgae.siga.db.entities.CajgRemesa;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasResultadosExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -41,5 +44,9 @@ public interface ScsRemesasResultadoExtendsMapper {
 	})
 	List<RemesasResultadoFicheroItem> buscarLineasFichero(int idRemesaResultado, Short idInstitucion);
 	
+	
+	@InsertProvider(type = ScsRemesasResultadosExtendsProvider.class, method = "insertSelective")
+	int insertSelective(RemesasResultadoItem remesasResultadoItem, Short idInstitucion, Integer idUsuario);
+
 	
 }
