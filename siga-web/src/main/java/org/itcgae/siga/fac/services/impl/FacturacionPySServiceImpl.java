@@ -1,13 +1,13 @@
 package org.itcgae.siga.fac.services.impl;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.fac.services.IFacturacionService;
+import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FacturacionServiceImpl implements IFacturacionService {
+public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
-	private Logger LOGGER = Logger.getLogger(FacturacionServiceImpl.class);
+	private Logger LOGGER = Logger.getLogger(FacturacionPySServiceImpl.class);
 
 //	@Autowired
 //	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;

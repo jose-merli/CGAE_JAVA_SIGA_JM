@@ -1,16 +1,16 @@
 package org.itcgae.siga.fac.controllers;
 
-import org.itcgae.siga.fac.services.IFacturacionService;
+import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/facturacion")
-public class FacturacionController {
+@RequestMapping(value = "/facturacionPyS")
+public class FacturacionPySController {
 	
 	@Autowired 
-	private IFacturacionService facturacionService;
+	private IFacturacionPySService facturacionService;
 	
 //	@GetMapping(value = "/pys/listadoTipoServicio")
 //	ResponseEntity<ListadoTipoServicioDTO> listadoTipoServicio(HttpServletRequest request) { 
