@@ -21,7 +21,9 @@ import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.ListadoTipoServicioDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
+import org.itcgae.siga.DTO.fac.ServicioDTO;
 import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
+import org.itcgae.siga.DTO.fac.TiposServiciosItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -36,6 +38,7 @@ import org.itcgae.siga.db.entities.PysFormapagoproductoKey;
 import org.itcgae.siga.db.entities.PysFormapagoservicios;
 import org.itcgae.siga.db.entities.PysFormapagoserviciosKey;
 import org.itcgae.siga.db.entities.PysPreciosservicios;
+import org.itcgae.siga.db.entities.PysPreciosserviciosKey;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
 import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
@@ -1184,6 +1187,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		int status = 0;
+		int statusEliminacionPrecio = 0;
 		
 
 		LOGGER.info("crearEditarPrecios() -> Entrada al servicio para crear/editar precios");
@@ -1223,24 +1227,58 @@ public class ServiciosServiceImpl implements IServiciosService {
 							NewIdDTO idOrdenacionPreciosServicios = pysPreciosServiciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion, pysPreciosServicios.getIdtiposervicios(), pysPreciosServicios.getIdservicio(), pysPreciosServicios.getIdserviciosinstitucion(), pysPreciosServicios.getIdperiodicidad());
 							pysPreciosServicios.setIdpreciosservicios(Short.parseShort(idOrdenacionPreciosServicios.getNewId()));
 							
-							pysPreciosServicios.setValor(new BigDecimal(precio.getPrecio()));						
 							
-							String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, precio.getIdcondicion());
-							criterios = criterios.replace("<SELECT>", "");
-							criterios = criterios.replace("</SELECT>", "");
-							criterios = criterios.replace("<FROM>", "");
-							criterios = criterios.replace("</FROM>", "");
-							criterios = criterios.replace("<WHERE>", "");
-							criterios = criterios.replace("</WHERE>", "");
-								
-							pysPreciosServicios.setCriterios(criterios);							
+							if(precio.getPrecio().contains("€")) {
+								String valor = precio.getPrecio();
+								valor = valor.replace("€","");
+								precio.setPrecio(valor);
+							}
+												
+							if(precio.getPrecio().contains(",")) {
+								String valor = precio.getPrecio();
+								valor = valor.replace(",",".");
+								precio.setPrecio(valor);
+							}
+							
+							pysPreciosServicios.setValor(new BigDecimal(Double.valueOf(precio.getPrecio())));						
+							
+							if(precio.getIdcondicion() != 0) {
+								String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, precio.getIdcondicion());
+								criterios = criterios.replace("<SELECT>", "");
+								criterios = criterios.replace("</SELECT>", "");
+								criterios = criterios.replace("<FROM>", "");
+								criterios = criterios.replace("</FROM>", "");
+								criterios = criterios.replace("<WHERE>", "");
+								criterios = criterios.replace("</WHERE>", "");
+									
+								pysPreciosServicios.setCriterios(criterios);
+							}
 							
 							pysPreciosServicios.setFechamodificacion(new Date());
 							pysPreciosServicios.setUsumodificacion(usuarios.get(0).getIdusuario());
 							pysPreciosServicios.setPordefecto("0");
 							pysPreciosServicios.setDescripcion(precio.getDescripcionprecio());
+							pysPreciosServicios.setIdconsulta((long) precio.getIdcondicion());
 						
+							if(Double.parseDouble(precio.getPrecio()) >= 0 && precio.getIdperiodicidad() != 0 && precio.getIdcondicion() != 0) {
 							status = pysPreciosServiciosMapper.insertSelective(pysPreciosServicios);
+							}else {
+							
+								if(Integer.parseInt(precio.getPrecio()) < 0) {
+									LOGGER.info(
+											"crearEditarPrecios() / El precio no puede ser menor de 0");
+								}
+								
+								if(precio.getIdperiodicidad() == 0) {
+									LOGGER.info(
+											"crearEditarPrecios() / El precio tiene que tener una periodicidad obligatoriamente");
+								}
+								
+								if(precio.getIdcondicion() == 0) {
+									LOGGER.info(
+											"crearEditarPrecios() / El precio tiene que tener una condicion obligatoriamente excepto si es el por defecto creado al crear el servicio en tarjeta datos generales");
+								}
+							}
 							
 							if(status == 0) {
 								insertResponseDTO.setStatus(SigaConstants.KO);
@@ -1249,11 +1287,151 @@ public class ServiciosServiceImpl implements IServiciosService {
 							}
 						}else {
 							
+							//Al editar un precio debido a que la periodicidad es PK lo eliminaremos e insertaremos de nuevo
+							PysPreciosserviciosKey preciosServiciosKey = new PysPreciosserviciosKey();
+							
+							preciosServiciosKey.setIdinstitucion(idInstitucion);
+							preciosServiciosKey.setIdperiodicidad((short) precio.getIdperiodicidadoriginal());
+							preciosServiciosKey.setIdpreciosservicios((short) precio.getIdpreciosservicios());
+							preciosServiciosKey.setIdservicio((long) precio.getIdservicio());
+							preciosServiciosKey.setIdserviciosinstitucion((long) precio.getIdserviciosinstitucion());
+							preciosServiciosKey.setIdtiposervicios((short) precio.getIdtiposervicios());
+						
+							statusEliminacionPrecio = pysPreciosServiciosMapper.deleteByPrimaryKey(preciosServiciosKey);
+				
+							if(statusEliminacionPrecio == 1) {
+								//Al hacer la insercion se distinguira entre el precio por defecto y el resto ya que en el precio por defecto no hay condicion.
+								if(precio.getPordefecto().equals("1")){
+									PysPreciosservicios pysPreciosServicios = new PysPreciosservicios();
+									
+									pysPreciosServicios.setIdinstitucion(idInstitucion);
+									pysPreciosServicios.setIdtiposervicios((short) precio.getIdtiposervicios());
+									pysPreciosServicios.setIdservicio ((long) precio.getIdservicio());
+									pysPreciosServicios.setIdserviciosinstitucion((long) precio.getIdserviciosinstitucion());
+									pysPreciosServicios.setIdperiodicidad((short) precio.getIdperiodicidad());
+									
+									NewIdDTO idOrdenacionPreciosServicios = pysPreciosServiciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion, pysPreciosServicios.getIdtiposervicios(), pysPreciosServicios.getIdservicio(), pysPreciosServicios.getIdserviciosinstitucion(), pysPreciosServicios.getIdperiodicidad());
+									pysPreciosServicios.setIdpreciosservicios(Short.parseShort(idOrdenacionPreciosServicios.getNewId()));
+									
+									if(precio.getPrecio().contains("€")) {
+										String valor = precio.getPrecio();
+										valor = valor.replace("€","");
+										precio.setPrecio(valor);
+									}
+									
+									if(precio.getPrecio().contains(",")) {
+										String valor = precio.getPrecio();
+										valor = valor.replace(",",".");
+										precio.setPrecio(valor);
+									}
+									
+									pysPreciosServicios.setValor(new BigDecimal(Double.valueOf(precio.getPrecio())));
+									pysPreciosServicios.setCriterios("SELECT IDINSTITUCION, IDPERSONA FROM CEN_CLIENTE WHERE IDINSTITUCION = "+idInstitucion+"  AND IDPERSONA = @IDPERSONA@");//PROVISIONAL
+									pysPreciosServicios.setFechamodificacion(new Date());
+									pysPreciosServicios.setUsumodificacion(usuarios.get(0).getIdusuario());
+									pysPreciosServicios.setPordefecto("1");
+									pysPreciosServicios.setDescripcion(precio.getDescripcionprecio());
+								
+									if(Double.parseDouble(precio.getPrecio()) >= 0 && precio.getIdperiodicidad() != 0) {
+										status = pysPreciosServiciosMapper.insertSelective(pysPreciosServicios);
+									}else {
+										
+										if(Integer.parseInt(precio.getPrecio()) < 0) {
+											LOGGER.info(
+													"crearEditarPrecios() / El precio no puede ser menor de 0");
+										}
+										
+										if(precio.getIdperiodicidad() == 0) {
+											LOGGER.info(
+													"crearEditarPrecios() / El precio tiene que tener una periodicidad obligatoriamente");
+										}
+										
+									}
+									
+									if(status == 0) {
+										insertResponseDTO.setStatus(SigaConstants.KO);
+									}else if(status == 1) {
+										insertResponseDTO.setStatus(SigaConstants.OK);
+									}
+									
+								}else {
+									PysPreciosservicios pysPreciosServicios = new PysPreciosservicios();
+									
+									pysPreciosServicios.setIdinstitucion(idInstitucion);
+									pysPreciosServicios.setIdtiposervicios((short) precio.getIdtiposervicios());
+									pysPreciosServicios.setIdservicio ((long) precio.getIdservicio());
+									pysPreciosServicios.setIdserviciosinstitucion((long) precio.getIdserviciosinstitucion());
+									pysPreciosServicios.setIdperiodicidad((short) precio.getIdperiodicidad());
+									
+									
+									NewIdDTO idOrdenacionPreciosServicios = pysPreciosServiciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion, pysPreciosServicios.getIdtiposervicios(), pysPreciosServicios.getIdservicio(), pysPreciosServicios.getIdserviciosinstitucion(), pysPreciosServicios.getIdperiodicidad());
+									pysPreciosServicios.setIdpreciosservicios(Short.parseShort(idOrdenacionPreciosServicios.getNewId())); 
+											
+									if(precio.getPrecio().contains("€")) {
+										String valor = precio.getPrecio();
+										valor = valor.replace("€","");
+										precio.setPrecio(valor);
+									}
+									
+									if(precio.getPrecio().contains(",")) {
+										String valor = precio.getPrecio();
+										valor = valor.replace(",",".");
+										precio.setPrecio(valor);
+									}
+									
+									pysPreciosServicios.setValor(new BigDecimal(Double.valueOf(precio.getPrecio())));						
+									
+									if(precio.getIdcondicion() != 0) {
+										String criterios = pysServiciosInstitucionExtendsMapper.getCriterioByIdConsulta(idInstitucion, precio.getIdcondicion());
+										criterios = criterios.replace("<SELECT>", "");
+										criterios = criterios.replace("</SELECT>", "");
+										criterios = criterios.replace("<FROM>", "");
+										criterios = criterios.replace("</FROM>", "");
+										criterios = criterios.replace("<WHERE>", "");
+										criterios = criterios.replace("</WHERE>", "");
+										
+										pysPreciosServicios.setCriterios(criterios);	
+									}
+									
+									pysPreciosServicios.setFechamodificacion(new Date());
+									pysPreciosServicios.setUsumodificacion(usuarios.get(0).getIdusuario());
+									pysPreciosServicios.setDescripcion(precio.getDescripcionprecio());
+									pysPreciosServicios.setIdconsulta((long) precio.getIdcondicion());
+								
+									if(Double.parseDouble(precio.getPrecio()) >= 0 && precio.getIdperiodicidad() != 0 && precio.getIdcondicion() != 0) {
+										status = pysPreciosServiciosMapper.insertSelective(pysPreciosServicios);
+										}else {
+										
+											if(Integer.parseInt(precio.getPrecio()) < 0) {
+												LOGGER.info(
+														"crearEditarPrecios() / El precio no puede ser menor de 0");
+											}
+											
+											if(precio.getIdperiodicidad() == 0) {
+												LOGGER.info(
+														"crearEditarPrecios() / El precio tiene que tener una periodicidad obligatoriamente");
+											}
+											
+											if(precio.getIdcondicion() == 0) {
+												LOGGER.info(
+														"crearEditarPrecios() / El precio tiene que tener una condicion obligatoriamente excepto si es el por defecto creado al crear el servicio en tarjeta datos generales");
+											}
+										}
+									
+									if(status == 0) {
+										insertResponseDTO.setStatus(SigaConstants.KO);
+									}else if(status == 1) {
+										insertResponseDTO.setStatus(SigaConstants.OK);
+									}
+								}
+							}else {
+								insertResponseDTO.setStatus(SigaConstants.KO);
+							}
+							
 						}
 						
 					}
-				
-					
+								
 					LOGGER.info(
 							"crearEditarPrecios() / pysPreciosServiceMapper.crearEditarPrecios() -> Salida de pysPreciosServiceMapper para crear/editar precios");
 				}
@@ -1272,5 +1450,78 @@ public class ServiciosServiceImpl implements IServiciosService {
 		LOGGER.info("crearEditarPrecios() -> Salida del servicio para crear/editar precios");
 
 		return insertResponseDTO;
+	}
+	
+	@Override
+	public DeleteResponseDTO eliminarPrecio(FichaTarjetaPreciosDTO precios, HttpServletRequest request) {
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		int status = 0;
+		
+
+		LOGGER.info("eliminarPrecio() -> Entrada al servicio para eliminar precios del servicio");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"eliminarPrecio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"eliminarPrecio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"eliminarPrecio() / pysPreciosServiceMapper.eliminarPrecio() -> Entrada a pysPreciosServiceMapper para eliminar precios del servicio");
+
+					for (FichaTarjetaPreciosItem precio : precios.getFichaTarjetaPreciosItem()) {
+						PysPreciosserviciosKey preciosServiciosKey = new PysPreciosserviciosKey();
+						
+						preciosServiciosKey.setIdinstitucion(idInstitucion);
+						preciosServiciosKey.setIdperiodicidad((short) precio.getIdperiodicidad());
+						preciosServiciosKey.setIdpreciosservicios((short) precio.getIdpreciosservicios());
+						preciosServiciosKey.setIdservicio((long) precio.getIdservicio());
+						preciosServiciosKey.setIdserviciosinstitucion((long) precio.getIdserviciosinstitucion());
+						preciosServiciosKey.setIdtiposervicios((short) precio.getIdtiposervicios());
+					
+						status = pysPreciosServiciosMapper.deleteByPrimaryKey(preciosServiciosKey);
+
+					}
+					
+					if(status == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+					}else if(status == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+					
+
+					LOGGER.info(
+							"eliminarPrecio() / pysPreciosServiceMapper.eliminarPrecio() -> Salida de pysPreciosServiceMapper para eliminar precios del servicio");
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ServiciosServiceImpl.eliminarPrecio() -> Se ha producido un error al eliminar precios del servicio",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		
+		deleteResponseDTO.setError(error);
+
+		LOGGER.info("eliminarPrecio() -> Salida del servicio para eliminar precios del servicio");
+
+		return deleteResponseDTO;
 	}
 }

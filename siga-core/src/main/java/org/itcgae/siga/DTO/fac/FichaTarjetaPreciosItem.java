@@ -15,7 +15,7 @@ public class FichaTarjetaPreciosItem {
 	private String pordefecto;
 	
 	private int idperiodicidadoriginal;
-	private String nuevo;
+	private String nuevo = "0";
 
 	
 	public String getNuevo() {
