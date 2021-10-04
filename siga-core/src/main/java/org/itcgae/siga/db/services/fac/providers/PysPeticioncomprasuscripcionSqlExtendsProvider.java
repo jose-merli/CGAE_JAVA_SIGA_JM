@@ -125,7 +125,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				//Solo se puden comprobar las facturas en el caso que haya habido un registro de compra.
 				//Pendiente de optimizacion por SQL
 				if(peticion.getFechaAceptada() != null) {
-				sql.LEFT_OUTER_JOIN("fac_factura fact on fact.idfactura = compras.IDFACTURA");
+				sql.LEFT_OUTER_JOIN("fac_factura fact on fact.idfactura = compra.IDFACTURA");
 				}
 			
 			else sql.SELECT("F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2) AS pendPago");
@@ -215,7 +215,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 			
 			//Obtenemos el id de la forma de pago utilizada.
-			sql.SELECT("FIRST(prodSol.idformapago) as idFormaPagoSeleccionada");
+			sql.SELECT("FIRST_VALUE(prodSol.idformapago) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) as idFormaPagoSeleccionada");
 				
 			sql.LEFT_OUTER_JOIN("pys_productossolicitados prodSol on prodSol.idinstitucion = pet.idinstitucion and prodSol.idpeticion = pet.idpeticion");
 			
