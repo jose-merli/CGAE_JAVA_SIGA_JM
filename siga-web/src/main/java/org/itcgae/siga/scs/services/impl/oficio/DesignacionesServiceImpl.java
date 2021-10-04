@@ -3000,11 +3000,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						InsertResponseDTO responseNColegiado = new InsertResponseDTO();
 						if (idPersona == null || idPersona == "") {
+							idPersona = scsDesignacionesExtendsMapper
+									.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
+							//idPersona = scsDesignacionesExtendsMapper
+							//		.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
 							NoColegiadoItem noColegiadoItem = new NoColegiadoItem();
 							noColegiadoItem.setIdTipoIdentificacion("10");
 							noColegiadoItem.setNif(designaItem.getNif());
-							noColegiadoItem.setIdInstitucion(null);
-							noColegiadoItem.setIdPersona(null);
+							noColegiadoItem.setIdInstitucion(designa.getIdinstitucion().toString());
+							noColegiadoItem.setIdPersona(idPersona);
 							noColegiadoItem.setNombre(designaItem.getNombreColegiado());
 							noColegiadoItem.setSoloNombre(designaItem.getNombreColegiado());
 							noColegiadoItem.setApellidos1(designaItem.getApellido1Colegiado());

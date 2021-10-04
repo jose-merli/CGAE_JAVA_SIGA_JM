@@ -631,7 +631,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			// jbd // inc7744 // Cambiamos el order by porque parece que afecta a la query
 			// cuando se busca por colegiado
 			// sql+=" order by des.idturno, des.anio desc, des.numero desc";
-			sql += "  order by des.idturno, des.anio desc, des.numero desc ";
+			sql += "  order by des.idturno, des.anio desc, des.codigo desc ";
 			// No utilizamos la clase Paginador para la busqueda de letrados porque al
 			// filtrar por residencia la sql no devolvia bien los
 			// datos que eran de tipo varchar (devolvía n veces el mismo resultado),
