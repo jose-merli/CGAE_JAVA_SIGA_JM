@@ -264,7 +264,7 @@ public class UtilidadesFacturacionSJCS {
             ejecucionPlsPago.ejecutarPLExportarGuardias(idInstitucion.toString(), idFacturacion.toString(), null, (idPersona == null ? "" : idPersona.toString()),
                     pathFicheros, nombreFicheros.get(SigaConstants.HITO_GENERAL_GUARDIA).toString(), beanLenguajeIntitucion.getIdlenguaje(), usuario);
         } catch (Exception e) {
-            throw new FacturacionSJCSException("Error al exportar datos", e, getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.exportDatos"));
+            throw new FacturacionSJCSException("Error al exportar datos", e, "messages.factSJCS.error.exportDatos");
         }
     }
 

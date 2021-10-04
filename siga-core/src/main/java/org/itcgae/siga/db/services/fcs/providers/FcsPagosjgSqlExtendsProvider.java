@@ -780,5 +780,4 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
 
         return query.toString();
     }
-
 }

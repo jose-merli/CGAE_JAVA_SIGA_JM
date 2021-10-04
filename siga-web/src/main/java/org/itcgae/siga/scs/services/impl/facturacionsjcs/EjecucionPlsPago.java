@@ -45,7 +45,7 @@ public class EjecucionPlsPago {
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Turnos de Justicia Gratuita. Error en PL = " + (String) resultado[3],
-                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoTurnosSJCS"));
+                    "messages.factSJCS.error.pagoTurnosSJCS");
         }
 
         return resultado;
@@ -68,7 +68,7 @@ public class EjecucionPlsPago {
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Guardias de Justicia Gratuita. Error en PL = " + (String) resultado[3],
-                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoGuardiasSJCS"));
+                    "messages.factSJCS.error.pagoGuardiasSJCS");
         }
 
         return resultado;
@@ -91,7 +91,7 @@ public class EjecucionPlsPago {
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Expedientes SOJ de Justicia Gratuita. Error en PL = " + (String) resultado[3],
-                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoExpedientesSogSJCS"));
+                    "messages.factSJCS.error.pagoExpedientesSogSJCS");
         }
 
         return resultado;
@@ -114,7 +114,7 @@ public class EjecucionPlsPago {
         if (!resultado[1].equalsIgnoreCase("0")) {
             LOGGER.error("Error en PL = " + (String) resultado[3]);
             throw new FacturacionSJCSException("Ha ocurrido un error al ejecutar el Pago de Expedientes EJG de Justicia Gratuita. Error en PL = " + (String) resultado[3],
-                    utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.pagoExpedientesEjgSJCS"));
+                    "messages.factSJCS.error.pagoExpedientesEjgSJCS");
         }
 
         return resultado;
@@ -199,7 +199,7 @@ public class EjecucionPlsPago {
             }
 
         } catch (Exception e) {
-            throw new FacturacionSJCSException("Error al exportar datos", e, utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.exportDatos"));
+            throw new FacturacionSJCSException("Error al exportar datos", e, "messages.factSJCS.error.exportDatos");
         }
 
         // Resultado del PL
@@ -230,7 +230,7 @@ public class EjecucionPlsPago {
             }
 
         } catch (Exception e) {
-            throw new FacturacionSJCSException("Error al exportar datos", e, utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "messages.factSJCS.error.exportDatos"));
+            throw new FacturacionSJCSException("Error al exportar datos", e, "messages.factSJCS.error.exportDatos");
         }
 
         // Resultado del PL

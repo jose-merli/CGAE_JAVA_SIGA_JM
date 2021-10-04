@@ -1790,25 +1790,6 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         utilidadesFacturacionSJCS.ejecutarFacturacionJG(itemFac, institucion);
     }
 
-    @Transactional
-    private void actualizarTotales(FcsFacturacionjg item, Double importeEJG, Double importeGuardia,
-                                   Double importeOficio, Double importeSOJ, double importeTotal) throws Exception {
-        //////////////////////////////////
-        // ACTUALIZO LOS TOTALES
-        item.setImporteejg(new BigDecimal(importeEJG));
-        item.setImporteguardia(new BigDecimal(importeGuardia));
-        item.setImporteoficio(new BigDecimal(importeOficio));
-        item.setImportesoj(new BigDecimal(importeSOJ));
-        item.setImportetotal(new BigDecimal(importeTotal));
-        try {
-            fcsFacturacionjgMapper.updateByPrimaryKey(item);
-        } catch (Exception ex) {
-            LOGGER.error("Ha ocurrido un error al almacenar los importes resultado de la facturacion");
-            throw new Exception("Ha ocurrido un error al almacenar los importes resultado de la facturacion", ex);
-        }
-
-    }
-
     /**
      * Recupera el datasource con los datos de conexión sacados del fichero de
      * configuracion
