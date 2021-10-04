@@ -10,7 +10,6 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.*;
-import org.itcgae.siga.com.services.IModelosYcomunicacionesService;
 import org.itcgae.siga.scs.services.guardia.AsistenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -83,6 +82,17 @@ public class AsistenciaController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/buscarAsistenciasExpress", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<TarjetaAsistenciaResponseDTO> searchAsistenciasExpress(HttpServletRequest request, @RequestBody FiltroAsistenciaItem filtro) {
+		TarjetaAsistenciaResponseDTO response = null;
+		try {
+			response = asistenciaService.searchAsistenciasExpress(request, filtro);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<TarjetaAsistenciaResponseDTO>(response, HttpStatus.OK);
+	}
+
 	@PostMapping(value = "/buscarAsistencias", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<TarjetaAsistenciaResponseDTO> searchAsistencias(HttpServletRequest request, @RequestBody FiltroAsistenciaItem filtro) {
 		TarjetaAsistenciaResponseDTO response = null;
@@ -142,14 +152,47 @@ public class AsistenciaController {
 	}
 	
 	@PostMapping(value = "/guardarAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<InsertResponseDTO> guardarAsistencia(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias) {
+	public ResponseEntity<InsertResponseDTO> guardarAsistencia(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias, @RequestParam(required = false) String idAsistenciaCopy) {
 		InsertResponseDTO response = null;
 		try {
-			response = asistenciaService.guardarAsistencia(request, asistencias);
+			response = asistenciaService.guardarAsistencia(request, asistencias, idAsistenciaCopy);
 		}catch(Exception e) {
 			throw e;
 		}
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/eliminarAsistencia", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<DeleteResponseDTO> eliminarAsistencia(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias) {
+		DeleteResponseDTO response = null;
+		try {
+			response = asistenciaService.eliminarAsistencias(request, asistencias);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/isUnicaAsistenciaPorGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<StringDTO> isUnicaAsistenciaPorGuardia(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias) {
+		StringDTO response = null;
+		try {
+			response = asistenciaService.isUnicaAsistenciaPorGuardia(request, asistencias);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/desvalidarGuardiasAsistencias", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UpdateResponseDTO> desvalidarGuardiaAsistencia(HttpServletRequest request, @RequestBody List<TarjetaAsistenciaResponseItem> asistencias) {
+		UpdateResponseDTO response = null;
+		try {
+			response = asistenciaService.desvalidarGuardiaAsistencia(request, asistencias);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping(value="/getDefaultTipoAsistenciaColegio")
