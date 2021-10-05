@@ -1,6 +1,6 @@
 package org.itcgae.siga.DTOs.scs;
 
-public class FiltroAsistenciaItem {
+public class FiltroAsistenciaItem implements Comparable<FiltroAsistenciaItem> {
 
 	private String diaGuardia;
 	private String idGuardia;
@@ -9,6 +9,26 @@ public class FiltroAsistenciaItem {
 	private String idLetradoGuardia;
 	private boolean isSustituto;
 	private String idTipoAsistencia;
+	private String numColegiado;
+	private String idComisaria;
+	private String idJuzgado;
+	private String idProcedimiento;
+	private String idEstadoAsistencia;
+	private String idOrigenAsistencia;
+	private String idActuacionValidada;
+	private String idEstadoAsistido;
+	private String idTipoActuacion;
+	private String numDiligencia;
+	private String numProcedimiento;
+	private String anio;
+	private String numero;
+	private String fechaAsistenciaDesde;
+	private String fechaAsistenciaHasta;
+	private String nif;
+	private String apellidos;
+	private String nombre;
+	private String nig;
+
 	
 	public String getDiaGuardia() {
 		return diaGuardia;
@@ -52,6 +72,159 @@ public class FiltroAsistenciaItem {
 	public void setIdTipoAsistencia(String idTipoAsistencia) {
 		this.idTipoAsistencia = idTipoAsistencia;
 	}
+
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+
+	public String getIdComisaria() {
+		return idComisaria;
+	}
+
+	public void setIdComisaria(String idComisaria) {
+		this.idComisaria = idComisaria;
+	}
+
+	public String getIdJuzgado() {
+		return idJuzgado;
+	}
+
+	public void setIdJuzgado(String idJuzgado) {
+		this.idJuzgado = idJuzgado;
+	}
+
+	public String getIdProcedimiento() {
+		return idProcedimiento;
+	}
+
+	public void setIdProcedimiento(String idProcedimiento) {
+		this.idProcedimiento = idProcedimiento;
+	}
+
+	public String getIdEstadoAsistencia() {
+		return idEstadoAsistencia;
+	}
+
+	public void setIdEstadoAsistencia(String idEstadoAsistencia) {
+		this.idEstadoAsistencia = idEstadoAsistencia;
+	}
+
+	public String getIdOrigenAsistencia() {
+		return idOrigenAsistencia;
+	}
+
+	public void setIdOrigenAsistencia(String idOrigenAsistencia) {
+		this.idOrigenAsistencia = idOrigenAsistencia;
+	}
+
+	public String getIdActuacionValidada() {
+		return idActuacionValidada;
+	}
+
+	public void setIdActuacionValidada(String idActuacionValidada) {
+		this.idActuacionValidada = idActuacionValidada;
+	}
+
+	public String getIdEstadoAsistido() {
+		return idEstadoAsistido;
+	}
+
+	public void setIdEstadoAsistido(String idEstadoAsistido) {
+		this.idEstadoAsistido = idEstadoAsistido;
+	}
+
+	public String getIdTipoActuacion() {
+		return idTipoActuacion;
+	}
+
+	public void setIdTipoActuacion(String idTipoActuacion) {
+		this.idTipoActuacion = idTipoActuacion;
+	}
+
+	public String getNumDiligencia() {
+		return numDiligencia;
+	}
+
+	public void setNumDiligencia(String numDiligencia) {
+		this.numDiligencia = numDiligencia;
+	}
+
+	public String getNumProcedimiento() {
+		return numProcedimiento;
+	}
+
+	public void setNumProcedimiento(String numProcedimiento) {
+		this.numProcedimiento = numProcedimiento;
+	}
+
+	public String getAnio() {
+		return anio;
+	}
+
+	public void setAnio(String anio) {
+		this.anio = anio;
+	}
+
+	public String getNumero() {
+		return numero;
+	}
+
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
+
+	public String getFechaAsistenciaDesde() {
+		return fechaAsistenciaDesde;
+	}
+
+	public void setFechaAsistenciaDesde(String fechaAsistenciaDesde) {
+		this.fechaAsistenciaDesde = fechaAsistenciaDesde;
+	}
+
+	public String getFechaAsistenciaHasta() {
+		return fechaAsistenciaHasta;
+	}
+
+	public void setFechaAsistenciaHasta(String fechaAsistenciaHasta) {
+		this.fechaAsistenciaHasta = fechaAsistenciaHasta;
+	}
+
+	public String getNif() {
+		return nif;
+	}
+
+	public void setNif(String nif) {
+		this.nif = nif;
+	}
+
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getNig() {
+		return nig;
+	}
+
+	public void setNig(String nig) {
+		this.nig = nig;
+	}
+
 	@Override
 	public String toString() {
 		return "AsistenciaItem [diaGuardia=" + diaGuardia + ", idGuardia=" + idGuardia + ", idTurno=" + idTurno
@@ -108,5 +281,30 @@ public class FiltroAsistenciaItem {
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public int compareTo(FiltroAsistenciaItem that) {
+		if (this.getAnio() == null && that.getAnio() == null) {
+			// pass
+		} else if (this.getAnio() == null) {
+			return -1;
+		} else if (that.getAnio() == null) {
+			return 1;
+		} else {
+			int anioComparison = this.getAnio().compareTo(that.getAnio());
+			if (anioComparison != 0) {
+				return anioComparison < 0 ? -1 : 1;
+			}
+		}
+
+		if (this.getNumero() == null && that.getNumero() == null) {
+			return 0;
+		} else if (this.getNumero() == null) {
+			return -1;
+		} else if (that.getNumero() == null) {
+			return 1;
+		} else {
+			return this.getNumero().compareTo(that.getNumero());
+		}
+	}
 }

@@ -25,7 +25,7 @@ public interface AsistenciaService {
 	
 	public ComboDTO getColegiadosGuardiaDia (HttpServletRequest request, String idTurno, String idGuardia, String guardiaDia);
 	
-	public TarjetaAsistenciaResponseDTO searchAsistencias (HttpServletRequest request, FiltroAsistenciaItem filtro);
+	public TarjetaAsistenciaResponseDTO searchAsistenciasExpress(HttpServletRequest request, FiltroAsistenciaItem filtro);
 
 	public ComboDTO getJuzgados (HttpServletRequest request, String idTurno);
 	
@@ -37,7 +37,7 @@ public interface AsistenciaService {
 	
 	public StringDTO getDefaultTipoAsistenciaColegio (HttpServletRequest request);
 	
-	public InsertResponseDTO guardarAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
+	public InsertResponseDTO guardarAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy);
 
 	public UpdateResponseDTO updateEstadoAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
 	
@@ -71,6 +71,8 @@ public interface AsistenciaService {
 
 	public DocumentacionAsistenciaDTO searchDocumentacion(HttpServletRequest request, String anioNumero, String idActuacion);
 
+	public TarjetaAsistenciaResponseDTO searchAsistencias(HttpServletRequest request, FiltroAsistenciaItem filtro);
+
 	public InsertResponseDTO subirDocumentoAsistencia(MultipartHttpServletRequest request);
 
 	public DeleteResponseDTO eliminarDocumentoAsistencia(HttpServletRequest request, List<DocumentacionAsistenciaItem> documentos, String anioNumero);
@@ -86,4 +88,10 @@ public interface AsistenciaService {
 	public UpdateResponseDTO updateEstadoActuacion(HttpServletRequest request, List<ActuacionAsistenciaItem> actuaciones, String anioNumero);
 
 	public DeleteResponseDTO eliminarActuaciones (HttpServletRequest request, List<ActuacionAsistenciaItem> actuaciones, String anioNumero);
+
+	public DeleteResponseDTO eliminarAsistencias (HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias);
+
+	public StringDTO isUnicaAsistenciaPorGuardia(HttpServletRequest request,  List<TarjetaAsistenciaResponseItem> asistencias);
+
+	public UpdateResponseDTO desvalidarGuardiaAsistencia(HttpServletRequest request,  List<TarjetaAsistenciaResponseItem> asistencias);
 }

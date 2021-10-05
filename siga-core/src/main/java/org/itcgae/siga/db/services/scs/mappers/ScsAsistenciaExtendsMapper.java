@@ -66,7 +66,7 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 	    int eliminarRelacionAsistenciaDes(String idinstitucion, String anio, String numero);
 
 
-	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "searchAsistencias")
+	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "searchAsistenciasExpress")
 	@Results({
 			@Result(column = "anio", property = "anio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
@@ -87,7 +87,30 @@ public interface ScsAsistenciaExtendsMapper extends ScsAsistenciaMapper{
 			@Result(column = "ejgidtipoejg", property = "idTipoEjg", jdbcType = JdbcType.VARCHAR)
 
 	})
-	List<TarjetaAsistenciaItem> searchAsistencias(FiltroAsistenciaItem filtro, Short idInstitucion);
+	List<TarjetaAsistenciaItem> searchAsistenciasExpress(FiltroAsistenciaItem filtro, Short idInstitucion);
+
+	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "searchAsistencias")
+	@Results({
+			@Result(column = "anio", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numero", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechahora", property = "fechaAsistencia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idguardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idturno", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombreGuardia", property = "descripcionGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombreTurno", property = "descripcionTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idpersonajg", property = "idPersonaJg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "asistido", property = "asistido", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idestadoasistencia", property = "estado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "estadoasistencia", property = "descripcionEstado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idpersonacolegiado", property = "idLetradoGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "letrado", property = "nombreColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "actuacionesvalidadas", property = "validada", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPOASISTENCIACOLEGIO", property = "idTipoAsistenciaColegio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechacierre", property = "fechaCierre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechasolicitud", property = "fechaSolicitud", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "REQUERIDAVALIDACION", property = "guardiaRequeridaValidacion", jdbcType = JdbcType.VARCHAR),
+	})
+	List<TarjetaAsistenciaResponseItem> searchAsistencias(FiltroAsistenciaItem filtro, Short idInstitucion, Integer idLenguaje, Integer tamMax);
 
 	@SelectProvider(type = ScsAsistenciaSqlExtendsProvider.class, method = "getNextNumeroAsistencia")
 	@Results({
