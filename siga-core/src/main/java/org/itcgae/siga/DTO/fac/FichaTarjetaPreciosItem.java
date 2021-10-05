@@ -16,8 +16,17 @@ public class FichaTarjetaPreciosItem {
 	
 	private int idperiodicidadoriginal;
 	private String nuevo = "0";
+	
+	
+	private double valor;
 
 	
+	public double getValor() {
+		return valor;
+	}
+	public void setValor(double valor) {
+		this.valor = valor;
+	}
 	public String getNuevo() {
 		return nuevo;
 	}
@@ -114,6 +123,9 @@ public class FichaTarjetaPreciosItem {
 		result = prime * result + ((nuevo == null) ? 0 : nuevo.hashCode());
 		result = prime * result + ((pordefecto == null) ? 0 : pordefecto.hashCode());
 		result = prime * result + ((precio == null) ? 0 : precio.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(valor);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
 	
@@ -170,6 +182,8 @@ public class FichaTarjetaPreciosItem {
 				return false;
 		} else if (!precio.equals(other.precio))
 			return false;
+		if (Double.doubleToLongBits(valor) != Double.doubleToLongBits(other.valor))
+			return false;
 		return true;
 	}
 	
@@ -180,7 +194,8 @@ public class FichaTarjetaPreciosItem {
 				+ ", precio=" + precio + ", idperiodicidad=" + idperiodicidad + ", descripcionprecio="
 				+ descripcionprecio + ", idcondicion=" + idcondicion + ", descripcionperiodicidad="
 				+ descripcionperiodicidad + ", descripcionconsulta=" + descripcionconsulta + ", pordefecto="
-				+ pordefecto + ", idperiodicidadoriginal=" + idperiodicidadoriginal + ", nuevo=" + nuevo + "]";
+				+ pordefecto + ", idperiodicidadoriginal=" + idperiodicidadoriginal + ", nuevo=" + nuevo + ", valor="
+				+ valor + "]";
 	}
 	
 }

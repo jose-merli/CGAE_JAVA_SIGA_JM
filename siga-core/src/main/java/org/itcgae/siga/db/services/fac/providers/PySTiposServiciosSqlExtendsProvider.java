@@ -77,6 +77,10 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 				+ " 1\r\n"
 				+ " ) )\r\n"
 				+ " ) precio");
+		sql.SELECT(" valor_minimo valorminimo");
+		sql.SELECT(" f_siga_getrecurso(perio_min.descripcion, 1) periodominimo");
+		sql.SELECT(" valor_maximo valormaximo");
+		sql.SELECT(" f_siga_getrecurso(perio_max.descripcion, 1) periodomaximo");
 		sql.SELECT(" servin.idinstitucion");
 		sql.SELECT(" servin.idservicio");
 		sql.SELECT(" servin.idtiposervicios");

@@ -152,11 +152,12 @@ public class ServiciosServiceImpl implements IServiciosService {
 					}
 					
 					for (ListaServiciosItem servicio : listaServiciosProcesada) {
-						if(servicio.getAutomatico().equals("1")) {
-							servicio.setAutomatico("Automático");
-						}else if(servicio.getAutomatico().equals("0")) {
-							servicio.setAutomatico("Manual");
-						}
+						if(servicio.getValorminimo() != null) {
+						servicio.setPrecioperiodicidad(String.valueOf(servicio.getValorminimo()) + "/" + servicio.getPeriodominimo() + " - " + String.valueOf(servicio.getValormaximo()) + "/" + servicio.getPeriodomaximo());
+						}else {
+							servicio.setPrecioperiodicidad("Sin precio");						}
+						
+					
 					}
 					
 					if (listaServiciosProcesada != null && listaServiciosProcesada.size() > 0) {
@@ -1100,6 +1101,7 @@ public class ServiciosServiceImpl implements IServiciosService {
 					
 					for (FichaTarjetaPreciosItem fichaTarjetaPreciosItem : fichaTarjetaPreciosLista) {
 						fichaTarjetaPreciosItem.setIdperiodicidadoriginal(fichaTarjetaPreciosItem.getIdperiodicidad());
+						fichaTarjetaPreciosItem.setPrecio(String.valueOf(fichaTarjetaPreciosItem.getValor()));					
 					}
 
 					LOGGER.info(

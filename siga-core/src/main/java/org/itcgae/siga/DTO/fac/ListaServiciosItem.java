@@ -2,6 +2,9 @@ package org.itcgae.siga.DTO.fac;
 
 import java.util.Date;
 
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.type.JdbcType;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class ListaServiciosItem {
@@ -21,6 +24,37 @@ public class ListaServiciosItem {
 	private String precioperiodicidad;
 	private String formapago;
 	
+	
+	private Double valorminimo;
+	private String periodominimo;
+	private Double valormaximo;
+	private String periodomaximo;
+	
+	
+	public Double getValorminimo() {
+		return valorminimo;
+	}
+	public void setValorminimo(Double valorminimo) {
+		this.valorminimo = valorminimo;
+	}
+	public String getPeriodominimo() {
+		return periodominimo;
+	}
+	public void setPeriodominimo(String periodominimo) {
+		this.periodominimo = periodominimo;
+	}
+	public Double getValormaximo() {
+		return valormaximo;
+	}
+	public void setValormaximo(Double valormaximo) {
+		this.valormaximo = valormaximo;
+	}
+	public String getPeriodomaximo() {
+		return periodomaximo;
+	}
+	public void setPeriodomaximo(String periodomaximo) {
+		this.periodomaximo = periodomaximo;
+	}
 	public int getIdinstitucion() {
 		return idinstitucion;
 	}
@@ -114,8 +148,12 @@ public class ListaServiciosItem {
 		result = prime * result + idtipoiva;
 		result = prime * result + idtiposervicios;
 		result = prime * result + ((iva == null) ? 0 : iva.hashCode());
+		result = prime * result + ((periodomaximo == null) ? 0 : periodomaximo.hashCode());
+		result = prime * result + ((periodominimo == null) ? 0 : periodominimo.hashCode());
 		result = prime * result + ((precioperiodicidad == null) ? 0 : precioperiodicidad.hashCode());
 		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
+		result = prime * result + ((valormaximo == null) ? 0 : valormaximo.hashCode());
+		result = prime * result + ((valorminimo == null) ? 0 : valorminimo.hashCode());
 		return result;
 	}
 	
@@ -168,6 +206,16 @@ public class ListaServiciosItem {
 				return false;
 		} else if (!iva.equals(other.iva))
 			return false;
+		if (periodomaximo == null) {
+			if (other.periodomaximo != null)
+				return false;
+		} else if (!periodomaximo.equals(other.periodomaximo))
+			return false;
+		if (periodominimo == null) {
+			if (other.periodominimo != null)
+				return false;
+		} else if (!periodominimo.equals(other.periodominimo))
+			return false;
 		if (precioperiodicidad == null) {
 			if (other.precioperiodicidad != null)
 				return false;
@@ -178,6 +226,16 @@ public class ListaServiciosItem {
 				return false;
 		} else if (!tipo.equals(other.tipo))
 			return false;
+		if (valormaximo == null) {
+			if (other.valormaximo != null)
+				return false;
+		} else if (!valormaximo.equals(other.valormaximo))
+			return false;
+		if (valorminimo == null) {
+			if (other.valorminimo != null)
+				return false;
+		} else if (!valorminimo.equals(other.valorminimo))
+			return false;
 		return true;
 	}
 	
@@ -187,7 +245,9 @@ public class ListaServiciosItem {
 				+ ", idtiposervicios=" + idtiposervicios + ", idserviciosinstitucion=" + idserviciosinstitucion
 				+ ", descripcion=" + descripcion + ", fechabaja=" + fechabaja + ", automatico=" + automatico
 				+ ", idtipoiva=" + idtipoiva + ", categoria=" + categoria + ", tipo=" + tipo + ", iva=" + iva
-				+ ", precioperiodicidad=" + precioperiodicidad + ", formapago=" + formapago + "]";
+				+ ", precioperiodicidad=" + precioperiodicidad + ", formapago=" + formapago + ", valorminimo="
+				+ valorminimo + ", periodominimo=" + periodominimo + ", valormaximo=" + valormaximo + ", periodomaximo="
+				+ periodomaximo + "]";
 	}
 	
 }

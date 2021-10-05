@@ -52,7 +52,7 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 		sql.SELECT(" idserviciosinstitucion");
 		sql.SELECT(" idtiposervicios");
 		sql.SELECT(" idservicio");
-		sql.SELECT(" CONCAT(preciosserv.valor,'€') precio");
+		sql.SELECT(" preciosserv.valor precio");
 		sql.SELECT(" preciosserv.idperiodicidad periodicidad");
 		sql.SELECT(" f_siga_getrecurso(preciosserv.descripcion," + idioma + ") descripcionprecio");
 		sql.SELECT(" preciosserv.idconsulta condicion");
