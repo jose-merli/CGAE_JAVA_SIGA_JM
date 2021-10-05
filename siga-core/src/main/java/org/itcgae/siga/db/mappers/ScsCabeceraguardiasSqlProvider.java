@@ -555,4 +555,5 @@ public class ScsCabeceraguardiasSqlProvider {
 			sql.WHERE(sb.toString());
 		}
 	}
+	
 }
