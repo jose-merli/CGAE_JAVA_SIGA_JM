@@ -100,7 +100,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 
 		if (asuntosJusticiableItem.getNumero() != null && !asuntosJusticiableItem.getNumero().trim().isEmpty()) {
-			sql.WHERE("designaciones.numero = " + asuntosJusticiableItem.getNumero().trim());
+			sql.WHERE("designaciones.codigo = " + asuntosJusticiableItem.getNumero().trim());
 		}
 		
 		if (asuntosJusticiableItem.getIdEstadoDesigna() != null) {
