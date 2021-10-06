@@ -3002,8 +3002,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						if (idPersona == null || idPersona == "") {
 							idPersona = scsDesignacionesExtendsMapper
 									.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
-							//idPersona = scsDesignacionesExtendsMapper
-							//		.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
+							if(idPersona == null || idPersona.isEmpty()) {
+								idPersona = scsDesignacionesExtendsMapper
+										.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
+							}
 							NoColegiadoItem noColegiadoItem = new NoColegiadoItem();
 							noColegiadoItem.setIdTipoIdentificacion("10");
 							noColegiadoItem.setNif(designaItem.getNif());

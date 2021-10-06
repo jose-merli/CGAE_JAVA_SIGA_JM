@@ -174,7 +174,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					"                                  AND l.idturno = des.idturno\r\n" + 
 					"    LEFT OUTER JOIN cen_colegiado           colegiado ON colegiado.idinstitucion = l.idinstitucion\r\n" + 
 					"                                    AND colegiado.idpersona = l.idpersona\r\n" + 
-					"    LEFT OUTER JOIN cen_persona             persona ON colegiado.idpersona = persona.idpersona\r\n";
+					"    LEFT OUTER JOIN cen_persona             persona ON l.idpersona = persona.idpersona\r\n";
 			sql += 	"    JOIN scs_turno               turno ON des.idturno = turno.idturno\r\n" + 
 					"                            AND des.idinstitucion = turno.idinstitucion\r\n" + 
 					"    LEFT OUTER JOIN scs_juzgado             juzgado ON des.idjuzgado = juzgado.idjuzgado\r\n" + 
@@ -2967,8 +2967,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("PERSONA.NIFCIF");
 		sql.SELECT("SCS_DESIGNASLETRADO.observaciones");
 		sql.FROM("SCS_DESIGNASLETRADO");
-		sql.JOIN(
-				"CEN_COLEGIADO ON CEN_COLEGIADO.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA AND CEN_COLEGIADO.IDINSTITUCION=SCS_DESIGNASLETRADO.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN(" CEN_COLEGIADO ON CEN_COLEGIADO.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA AND CEN_COLEGIADO.IDINSTITUCION=SCS_DESIGNASLETRADO.IDINSTITUCION");
 		sql.JOIN("CEN_PERSONA PERSONA ON PERSONA.IDPERSONA=SCS_DESIGNASLETRADO.IDPERSONA");
 		sql.WHERE("SCS_DESIGNASLETRADO.NUMERO = '" + designa.getNumero() + "'");
 		sql.WHERE("SCS_DESIGNASLETRADO.IDTURNO = '" + designa.getIdturno() + "'");
