@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTO.fac;
 
 import java.util.Date;
+import java.util.List;
 
 public class FichaCompraSuscripcionItem {
 
@@ -33,7 +34,7 @@ public class FichaCompraSuscripcionItem {
 	
 	private String idEstadoPeticion;
 
-    private ListaProductosItem[] productos;
+    private List<ListaProductosCompraItem> productos;
 	
 	public String getIdInstitucion() {
 		return idInstitucion;
@@ -77,10 +78,10 @@ public class FichaCompraSuscripcionItem {
 	public void setnSolicitud(String nSolicitud) {
 		this.nSolicitud = nSolicitud;
 	}
-	public ListaProductosItem[] getProductos() {
+	public List<ListaProductosCompraItem> getProductos() {
 		return productos;
 	}
-	public void setProductos(ListaProductosItem[] productos) {
+	public void setProductos(List<ListaProductosCompraItem> productos) {
 		this.productos = productos;
 	}
 	public String getIdFormasPagoComunes() {

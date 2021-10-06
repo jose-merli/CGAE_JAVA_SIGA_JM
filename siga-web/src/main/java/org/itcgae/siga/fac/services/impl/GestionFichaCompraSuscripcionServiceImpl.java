@@ -9,8 +9,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.fac.ComboProductosPorDescripcionItem;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionDTO;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
+import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -120,7 +124,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 	@Autowired
 	private AdmContadorMapper admContadorMapper;
-
+	
+	
 	@Override
 	public FichaCompraSuscripcionItem getFichaCompraSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
 
@@ -188,14 +193,14 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					}
 					//Para obtener toda la informacion de una compra/suscripcion ya creada
 					else { 
-						ListaProductosItem[] productos = null;
+						List<ListaProductosCompraItem> productos = null;
 						
 						//Si se viene de otra pantalla a consultar la ficha de compra
-						if(ficha.getProductos().length==0) {
-							productos = pysPeticioncomprasuscripcionExtendsMapper.getProductosSolicitadosPeticion(usuarios.get(0).getIdlenguaje(), idInstitucion, ficha);
+						if(ficha.getProductos().size()==0) {
+							productos = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, ficha.getnSolicitud());
 							ficha.setProductos(productos);
 						}
-						else if(ficha.getProductos().length>0){
+						else if(ficha.getProductos().size()>0){
 							productos = ficha.getProductos();
 						}
 						LOGGER.info(
@@ -317,18 +322,18 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				productoSolicitado.setFechamodificacion(new Date());
 				productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-				for (ListaProductosItem producto : ficha.getProductos()) {
+				for (ListaProductosCompraItem producto : ficha.getProductos()) {
 					
 					productoSolicitado.setIdproducto((long) producto.getIdproducto());
 					productoSolicitado.setIdtipoproducto((short) producto.getIdtipoproducto());
 					productoSolicitado.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
-					if(producto.getValor()!=null) {
-						productoSolicitado.setValor(new BigDecimal(String.join(".",producto.getValor().split(",")[0],producto.getValor().split(",")[1].substring(0, 2))));
+					if(producto.getPrecioUnitario()!=null) {
+						productoSolicitado.setValor(new BigDecimal(producto.getPrecioUnitario()));
 					}
 					else productoSolicitado.setValor(null);
 					
 					//REVISAR: A revisar ya que no tenemos tarjeta productos implmentada todavia
-					productoSolicitado.setCantidad(1);
+					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
 					productoSolicitado.setAceptado("A");
 					
 					productoSolicitado.setNofacturable(producto.getNoFacturable());
@@ -357,7 +362,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
 					compra.setUsumodificacion(usuarios.get(0).getIdusuario());
 
-					for (ListaProductosItem producto : ficha.getProductos()) {
+					for (ListaProductosCompraItem producto : ficha.getProductos()) {
 
 						compra.setIdproducto((long) producto.getIdproducto());
 						compra.setIdtipoproducto((short) producto.getIdtipoproducto());
@@ -641,7 +646,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
 						compra.setUsumodificacion(usuarios.get(0).getIdusuario());
 	
-						for (ListaProductosItem producto : ficha.getProductos()) {
+						for (ListaProductosCompraItem producto : ficha.getProductos()) {
 	
 							compra.setIdproducto((long) producto.getIdproducto());
 							compra.setIdtipoproducto((short) producto.getIdtipoproducto());
@@ -653,10 +658,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							else {
 								compra.setIdformapago(null);
 							}
-							//Revisar posteriormente
-							compra.setCantidad(1);
-							if(producto.getValor()!=null) {
-								compra.setImporteunitario(new BigDecimal(String.join(".",producto.getValor().split(",")[0],producto.getValor().split(",")[1].substring(0, 2))));
+							compra.setCantidad(Integer.valueOf(producto.getCantidad()));
+							if(producto.getPrecioUnitario()!=null) {
+								compra.setImporteunitario(new BigDecimal(producto.getPrecioUnitario()));
 							}
 							else {
 								compra.setImporteunitario(new BigDecimal(0));
@@ -1073,7 +1077,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						error.setDescription(error.getDescription()+" "+peticion.getnSolicitud()+",");
 					}
 					else {
-						peticion.setProductos(pysPeticioncomprasuscripcionExtendsMapper.getProductosSolicitadosPeticion(usuarios.get(0).getIdlenguaje(), idInstitucion, peticion));
+						peticion.setProductos(pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, peticion.getnSolicitud()));
 						this.aprobarCompra(request, peticion);
 					}
 				}
@@ -1099,4 +1103,180 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 		return insertResponseDTO;
 	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO updateProductosPeticion(HttpServletRequest request, FichaCompraSuscripcionItem peticion)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info("updateProductosPeticion() -> Entrada al servicio para actualizar los productos solicitados asociados con una solicitud");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"updateProductosPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateProductosPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"updateProductosPeticion() / pysPeticioncomprasuscripcionMapper.deleteByExample() -> Entrada a pysProductossolicitadosMapper para eliminar los productos solicitados asociados con una solicitud");
+
+				PysProductossolicitadosExample prodExample = new PysProductossolicitadosExample();
+				
+				prodExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(Long.valueOf(peticion.getnSolicitud()));
+				
+				response = pysProductossolicitadosMapper.deleteByExample(prodExample);
+				if(response == 0) {
+					throw new Exception("Eror al eliminar los productos solicitados de la petición");
+				}
+				
+				LOGGER.info(
+						"updateProductosPeticion() / pysProductossolicitadosMapper.deleteByExaple() -> Salida de pysProductossolicitadosMapper para eliminar los productos solicitados asociados con una solicitud");
+
+
+				LOGGER.info(
+						"updateProductosPeticion() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para insertar los productos solicitados asociados con una solicitud");
+				
+				PysProductossolicitados productoSolicitado = new PysProductossolicitados();
+
+				productoSolicitado.setIdinstitucion(idInstitucion);
+				productoSolicitado.setIdpersona(Long.valueOf(peticion.getIdPersona()));
+				productoSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
+				if(productoSolicitado.getIdformapago()!=null) {
+					productoSolicitado.setIdformapago(Short.valueOf(peticion.getIdFormaPagoSeleccionada()));
+					//En el caso que la forma de pago sea domiciliación bancaria
+					if(peticion.getIdFormaPagoSeleccionada().equals("20"))productoSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
+					else productoSolicitado.setIdcuenta(null);
+				}
+				else productoSolicitado.setIdformapago(null);
+				productoSolicitado.setFechamodificacion(new Date());
+				productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+				for (ListaProductosCompraItem producto : peticion.getProductos()) {
+					
+					productoSolicitado.setIdproducto((long) producto.getIdproducto());
+					productoSolicitado.setIdtipoproducto((short) producto.getIdtipoproducto());
+					productoSolicitado.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+					if(producto.getPrecioUnitario()!=null) {
+						productoSolicitado.setValor(new BigDecimal(producto.getPrecioUnitario()));
+					}
+					else productoSolicitado.setValor(null);
+					
+					//REVISAR: A revisar ya que no tenemos tarjeta productos implmentada todavia
+					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
+					productoSolicitado.setAceptado("A");
+					
+					productoSolicitado.setNofacturable(producto.getNoFacturable());
+					productoSolicitado.setFecharecepcionsolicitud(new Date());
+					//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
+					//, por lo tanto, la actual.
+					productoSolicitado.setIdinstitucionorigen(idInstitucion);
+
+					response = pysProductossolicitadosMapper.insert(productoSolicitado);
+					if (response == 0)
+						throw new Exception("Error al insertar un producto solicitado en la BBDD.");
+				}
+
+				LOGGER.info(
+						"updateProductosPeticion() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para insertar los productos solicitados asociados con una solicitud");
+			}
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.info("updateProductosPeticion() -> Salida del servicio para actualizar los productos solicitados asociados con una solicitud");
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	public ListaProductosCompraDTO getListaProductosCompra(HttpServletRequest request, String idPeticion){
+
+		ListaProductosCompraDTO listaProductosCompra = new ListaProductosCompraDTO();
+		Error error = new Error();
+
+		LOGGER.info("getListaProductosCompra() -> Entrada al servicio para obtener la informacion de los productos de una peticion");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"getListaProductosCompra() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getListaProductosCompra() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				
+				LOGGER.info(
+						"getListaProductosCompra() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para obtener la informacion de los productos de una peticion");
+
+				List<ListaProductosCompraItem> productosCompra = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, idPeticion);
+
+				listaProductosCompra.setListaProductosCompraItems(productosCompra);
+				
+				error.setCode(200);
+				
+				listaProductosCompra.setError(error);
+				
+				LOGGER.info(
+						"getListaProductosCompra() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para obtener la informacion de los productos de una peticion");
+			}
+
+			LOGGER.info(
+					"getListaProductosCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para obtener la informacion de los productos de una peticion");
+
+		}
+		LOGGER.info("getListaProductosCompra() -> Salida del servicio para obtener la informacion de los productos de una peticion");
+
+		return listaProductosCompra;
+	}
+	
+	@Override
+	public String getPermisoModificarImporteProducto(HttpServletRequest request) 
+	{
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+				
+		GenParametrosKey genKey = new GenParametrosKey();
+
+		genKey.setModulo("PYS");
+		genKey.setIdinstitucion(idInstitucion);
+		genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO_PRODUCTOS");
+
+		return genParametrosMapper.selectByPrimaryKey(genKey).getValor();
+	}
+	
 }

@@ -14,3 +14,4 @@ application:
     /pys/denegarPeticion: [39]
     /pys/savePagoCompraSuscripcion: [39]
     /pys/solicitarSuscripcion: [39]
+    /pys/updateProductosPeticion: [39]

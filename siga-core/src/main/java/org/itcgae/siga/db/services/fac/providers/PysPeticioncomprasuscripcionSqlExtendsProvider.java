@@ -9,6 +9,7 @@ import java.util.Locale;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionSqlProvider;
 
@@ -67,7 +68,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 		// Para obtener las formas de pago comunes entre los productos de la compra. Se
 		// devuelven los idformapago concatenados con comas para se gestion.
-		if (peticion.getProductos() != null && peticion.getProductos().length > 0) {
+		if (peticion.getProductos() != null && peticion.getProductos().size() > 0) {
 			SQL sqlPagos = new SQL();
 			// Con listagg logramos que los distintos ids de formas de pago se muestren en
 			// unica fila
@@ -77,7 +78,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			// OBTENEMOS LAS FORMAS DE PAGO COMUNES
 			String fromPagosComunes = "(";
 			String innerJoinProductos = "pys_productosinstitucion prin on prin.idinstitucion = pet.idinstitucion  and (";
-			for (ListaProductosItem producto : peticion.getProductos()) {
+			for (ListaProductosCompraItem producto : peticion.getProductos()) {
 				fromPagosComunes += "select pago.idformapago\r\n"
 						+ "				from pys_productosinstitucion prod\r\n"
 						+ "				inner join pys_formapagoproducto pago on pago.idinstitucion = prod.idinstitucion and prod.idproducto = pago.idproducto \r\n"
@@ -178,7 +179,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 		// Para obtener las formas de pago comunes entre los productos de la compra. Se
 		// devuelven los idformapago concatenados con comas para su gestion.
-		if (peticion.getProductos() != null && peticion.getProductos().length > 0) {
+		if (peticion.getProductos() != null && peticion.getProductos().size() > 0) {
 			SQL sqlPagos = new SQL();
 			// Con listagg logramos que los distintos ids de formas de pago se muestren en
 			// unica fila
@@ -188,7 +189,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			// OBTENEMOS LAS FORMAS DE PAGO COMUNES
 			String fromPagosComunes = "(";
 			String innerJoinProductos = "pys_productosinstitucion prin on prin.idinstitucion = pet.idinstitucion  and (";
-			for (ListaProductosItem producto : peticion.getProductos()) {
+			for (ListaProductosCompraItem producto : peticion.getProductos()) {
 				fromPagosComunes += "select pago.idformapago\r\n"
 						+ "				from pys_productosinstitucion prod\r\n"
 						+ "				inner join pys_formapagoproducto pago on pago.idinstitucion = prod.idinstitucion and prod.idproducto = pago.idproducto \r\n"
@@ -286,7 +287,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				+ "ELSE FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) END as concepto \r\n");
 		sql.SELECT_DISTINCT("FIRST_VALUE(prodSol.idformapago) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) as idformapago \r\n");
 		sql.SELECT_DISTINCT("f_siga_getrecurso(formPago.descripcion, "+ idioma +") as desFormaPago");
-		sql.SELECT_DISTINCT("F_siga_formatonumero(ROUND(prodIns.VALOR*TIVA.VALOR/100)+prodIns.VALOR, 2) AS impTotal \r\n");
+		sql.SELECT_DISTINCT("(prodIns.VALOR*prodSol.cantidad)*(1+TIVA.VALOR/100) AS impTotal \r\n");
 		
 		sql.SELECT_DISTINCT("CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
 				+ "ELSE null END as fechaDenegada \r\n");
@@ -424,6 +425,40 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, tiva.valor, prin.idcontador, PRIN.NOFACTURABLE");
 
+		sql.ORDER_BY(" PRIN.DESCRIPCION");
+		
+		return sql.toString();
+	}
+	
+	public String getListaProductosCompra(Short idInstitucion, String idPeticion) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT(" PRodSol.observaciones");
+		sql.SELECT_DISTINCT(" case when PRodSol.orden is null then rownum \r\n"
+				+ "else prodSol.orden end as orden");
+		sql.SELECT_DISTINCT(" PRin.descripcion");
+		sql.SELECT_DISTINCT(" PRodSol.cantidad");
+		sql.SELECT_DISTINCT(" PRodSol.valor");
+		sql.SELECT_DISTINCT("TIVA.VALOR as IVA");
+//		sql.SELECT_DISTINCT("F_siga_formatonumero(ROUND(prin.VALOR*TIVA.VALOR/100)+prin.VALOR, 2) AS total \r\n");
+		sql.SELECT_DISTINCT("PRodSol.idproducto");
+		sql.SELECT_DISTINCT("PRodSol.idtipoproducto");
+		sql.SELECT_DISTINCT("PRodSol.idproductoinstitucion");
+		sql.SELECT_DISTINCT("PRodSol.idpeticion");
+		sql.SELECT_DISTINCT(" PRIN.NOFACTURABLE");
+		
+		
+		sql.FROM(" pys_productosinstitucion prin, pys_tipoiva tiva");
+		sql.FROM("pys_productossolicitados prodSol");
+		
+		sql.WHERE(" PRIN.IDINSTITUCION = '" + idInstitucion +"'");
+		sql.WHERE(" tiva.idtipoiva (+) = prin.idtipoiva");
+		sql.WHERE(" prodSol.idinstitucion(+) = prin.idinstitucion");
+		sql.WHERE("prodSol.idpeticion = "+idPeticion);
+		sql.WHERE("prodSol.idproducto(+) = prin.idproducto and prodSol.idtipoproducto(+) = prin.idtipoproducto and prodSol.idproductoinstitucion(+) = prin.idproductoinstitucion");
+
+		
 		sql.ORDER_BY(" PRIN.DESCRIPCION");
 		
 		return sql.toString();

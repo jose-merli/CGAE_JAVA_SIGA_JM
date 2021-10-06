@@ -1,8 +1,12 @@
 package org.itcgae.siga.fac.services;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 
@@ -27,4 +31,11 @@ public interface IGestionFichaCompraSuscripcionService {
 			throws Exception;
 
 	public InsertResponseDTO denegarPeticion(HttpServletRequest request, String nSolicitud) throws Exception;
+
+	public InsertResponseDTO updateProductosPeticion(HttpServletRequest request, FichaCompraSuscripcionItem peticion)
+			throws Exception;
+
+	public ListaProductosCompraDTO getListaProductosCompra(HttpServletRequest request, String idPeticion);
+
+	public String getPermisoModificarImporteProducto(HttpServletRequest request);
 }

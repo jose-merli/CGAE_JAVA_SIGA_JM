@@ -11,6 +11,7 @@ import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
 import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
@@ -123,4 +124,20 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 		}) 
 	ListaProductosItem[] getProductosSolicitadosPeticion(String idioma, Short idInstitucion, FichaCompraSuscripcionItem peticion);
 	
+	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getListaProductosCompra")
+	@Results({
+		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDPRODUCTOINSTITUCION", property = "idproductoinstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALOR", property = "precioUnitario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "orden", property = "orden", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "cantidad", property = "cantidad", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "total", property = "total", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IVA", property = "iva", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "obervaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idPeticion", property = "idPeticion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOFACTURABLE", property = "noFacturable", jdbcType = JdbcType.VARCHAR)
+		}) 
+	List<ListaProductosCompraItem> getListaProductosCompra(Short idInstitucion, String idPeticion);
 }
