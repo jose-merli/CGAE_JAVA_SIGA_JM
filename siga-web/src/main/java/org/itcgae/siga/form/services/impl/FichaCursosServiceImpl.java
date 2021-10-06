@@ -2546,8 +2546,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					+ idInstitucion + " AND IDPERSONA = @IDPERSONA@");
 			pysPreciosservicios.setPordefecto("1");
 			NewIdDTO idPrecioServicio = pysPreciosserviciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion,
-					cursoItem.getIdtiposervicio(), pysServiciosinstitucion.getIdserviciosinstitucion(),
+					 cursoItem.getIdtiposervicio().shortValue(), pysServiciosinstitucion.getIdservicio(), pysServiciosinstitucion.getIdserviciosinstitucion(),
 					SigaConstants.PERIOCIDAD_1MES);
+			
 			pysPreciosservicios.setIdpreciosservicios(Short.valueOf(idPrecioServicio.getNewId()));
 
 			LOGGER.info(
