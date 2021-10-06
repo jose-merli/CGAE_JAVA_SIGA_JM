@@ -6,22 +6,12 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.cen.MaxIdDto;
-import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.ActasItem;
-import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
-import org.itcgae.siga.DTOs.scs.AsuntosEjgItem;
-import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
-import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
-import org.itcgae.siga.DTOs.scs.EjgItem;
-import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
-import org.itcgae.siga.DTOs.scs.ProcuradorItem;
-import org.itcgae.siga.DTOs.scs.RelacionesItem;
-import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
+
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsActaSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsEjgSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsEjgComisionSqlExtendsProvider;
 
 public interface ScsActaExtendsMapper extends ScsEjgMapper {
 
@@ -29,18 +19,19 @@ public interface ScsActaExtendsMapper extends ScsEjgMapper {
 	@Results({
 
 			@Result(column = "IDACTA", property = "idActa", jdbcType = JdbcType.NUMERIC),
-			// @Result(column = "IDINSTITUCION", property = "institucion", jdbcType =
-			// JdbcType.VARCHAR),
 			@Result(column = "NUMEROACTA", property = "numeroActa", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHARESOLUCION", property = "fechaResolucion", jdbcType = JdbcType.DATE),
 			@Result(column = "FECHAREUNION", property = "fechaReunion", jdbcType = JdbcType.DATE),
 			@Result(column = "IDPRESIDENTE", property = "idPresidente", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "IDSECRETARIO", property = "idSecretario", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NOMBREPRESIDENTE", property = "nombrePresidente", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBRESECRETARIO", property = "nombreSecretario", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "NOMBRESECRETARIO", property = "nombreSecretario", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ANIOACTA", property = "anio", jdbcType = JdbcType.NUMERIC)
 
 	})
 	List<ActasItem> busquedaActas(ActasItem actasItem, Short idInstitucion);
+
 //
 //	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "comprobarBorrarActas")
 //	@Results({ @Result(column = "ID", property = "idActa", jdbcType = JdbcType.VARCHAR) })
@@ -48,7 +39,7 @@ public interface ScsActaExtendsMapper extends ScsEjgMapper {
 //
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "comprobarGuardarActaPonente")
 	@Results({ @Result(column = "contar", property = "contar", jdbcType = JdbcType.NUMERIC) })
-	String comprobarGuardarActaPonente(ActasItem actasItem, Short idInstitucion);
+	int comprobarGuardarActaPonente(ActasItem actasItem, Short idInstitucion);
 
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "comprobarGuardarActaSufijo")
 	@Results({ @Result(column = "contar", property = "contar", jdbcType = JdbcType.VARCHAR) })
@@ -56,8 +47,9 @@ public interface ScsActaExtendsMapper extends ScsEjgMapper {
 
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "comboSufijoActa")
 	@Results({ @Result(column = "valor", property = "value", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "valor", property = "label", jdbcType = JdbcType.DATE) })
+			@Result(column = "valor", property = "label", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboSufijoActa(Short idInstitucion);
+
 //
 //	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "guardarActa")
 //	int guardarActa(ActasItem actasItem);
@@ -114,9 +106,19 @@ public interface ScsActaExtendsMapper extends ScsEjgMapper {
 			@Result(column = "NUMEROACTA", property = "anio", jdbcType = JdbcType.DATE),
 			@Result(column = "OBSERVACIONES", property = "anio", jdbcType = JdbcType.DATE) })
 	ActasItem getActa(ActasItem actasItem, Short idInstitucion);
+
 //
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "getEstadosEjg")
 	@Results({ @Result(column = "IDESTADOPOREJG", property = "IDESTADOPOREJG", jdbcType = JdbcType.VARCHAR) })
 	String getEstadosEjg(Short idinstitucion, Short idtipoejg, Short anio, Long numero);
+
+	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "obtenerIdActa")
+	@Results({ @Result(column = "IDACTA", property = "IDACTA", jdbcType = JdbcType.VARCHAR) })
+	int obtenerIdActa(ActasItem actasItem, Short idInstitucion);
+
+	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "obtenerNumActa")
+	@Results({ @Result(column = "NUMEROACTA", property = "NUMEROACTA", jdbcType = JdbcType.VARCHAR) })
+	List<String> obtenerNumActa(ActasItem actasItem, Short valueOf);
+
 
 }

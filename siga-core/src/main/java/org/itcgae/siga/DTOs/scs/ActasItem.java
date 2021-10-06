@@ -20,6 +20,17 @@ public class ActasItem {
 	private Date fechaReunion;
 	private Date horaInicio;
 	private Date horaFin;
+	private String idInstitucion;
+	
+	
+
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
 
 	public String getNombreSecretario() {
 		return nombreSecretario;
