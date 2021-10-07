@@ -64,7 +64,9 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "IDTIPOTURNO", property = "idtipoturno", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "VISIBLEMOVIL", property = "visiblemovil", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.DECIMAL),
-			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
+			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "NLETRADOS", property = "nletrados", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombrepartidosjudiciales", property = "nombrepartidosjudiciales", jdbcType = JdbcType.VARCHAR),})
 	List<TurnosItem> busquedaTurnos(TurnosItem turnosItem, Short idInstitucion);
 
 	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "busquedaFichaTurnos")

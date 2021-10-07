@@ -1519,11 +1519,11 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 							grupo.setIdinstitucion(inscripcion.getIdinstitucion());
 							grupo.setFechamodificacion(new Date());
 							grupo.setFechasuscripcion(new Date());
-							grupo.setIdgrupoguardiacolegiado(Long.parseLong(cargaMasivaDatosGCItem.getGrupo()));
+							//grupo.setIdgrupoguardiacolegiado();
 							grupo.setOrden(Integer.parseInt(cargaMasivaDatosGCItem.getOrden()));
-							grupo.setIdgrupoguardia(idgrupoguardia);
-							grupo.setUsucreacion(usucreacion);
-							grupo.setUsumodificacion(usumodificacion);
+							grupo.setIdgrupoguardia(Long.parseLong(cargaMasivaDatosGCItem.getGrupo()));
+//							grupo.setUsucreacion(usucreacion);
+//							grupo.setUsumodificacion(usumodificacion);
 							scsGrupoguardiacolegiadoSqlMapper.insertSelective(grupo);
 						});
 						

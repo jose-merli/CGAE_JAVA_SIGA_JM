@@ -54,6 +54,7 @@ public class GuardiasItem {
 	private Date fechaalta;
 	private Date fechadesde;
 	private Date fechahasta;
+	private Date fechasustitucion;
 	private boolean historico;
 	private String separarGuardia;
 	private String numColegiado;
@@ -66,6 +67,10 @@ public class GuardiasItem {
 	private String idCalendarioGuardias;
 	private String facturado;
 	private Integer idFacturacion;
+	private String observacionesAnulacion;
+	private String comensustitucion;
+	private String letradosustituido;
+	private String sustituto;
 
 	public String getSepararGuardia() {
 		return separarGuardia;
@@ -546,7 +551,46 @@ public class GuardiasItem {
 	public void setIdFacturacion(Integer idFacturacion) {
 		this.idFacturacion = idFacturacion;
 	}
+	public String getObservacionesAnulacion() {
+		return observacionesAnulacion;
+	}
+
+	public void setObservacionesAnulacion(String observacionesAnulacion) {
+		this.observacionesAnulacion = observacionesAnulacion;
+	}
+	public Date getFechasustitucion() {
+		return fechasustitucion;
+	}
+
+	public void setFechasustitucion(Date fechasustitucion) {
+		this.fechasustitucion = fechasustitucion;
+	}
+	public String getComensustitucion() {
+		return comensustitucion;
+	}
+
+	public void setComensustitucion(String comensustitucion) {
+		this.comensustitucion = comensustitucion;
+	}
+
 	
+	
+	public String getLetradosustituido() {
+		return letradosustituido;
+	}
+
+	public void setLetradosustituido(String letradosustituido) {
+		this.letradosustituido = letradosustituido;
+	}
+
+	public String getSustituto() {
+		return sustituto;
+	}
+
+	public void setSustituto(String sustituto) {
+		this.sustituto = sustituto;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -584,6 +628,11 @@ public class GuardiasItem {
 		result = prime * result + ((idCalendarioGuardias == null) ? 0 : idCalendarioGuardias.hashCode());
 		result = prime * result + ((facturado == null) ? 0 : facturado.hashCode());
 		result = prime * result + ((idFacturacion == null) ? 0 : idFacturacion.hashCode());
+		result = prime * result + ((observacionesAnulacion == null) ? 0 : observacionesAnulacion.hashCode());
+		result = prime * result + ((fechasustitucion == null) ? 0 : fechasustitucion.hashCode());
+		result = prime * result + ((comensustitucion == null) ? 0 : comensustitucion.hashCode());
+		result = prime * result + ((letradosustituido == null) ? 0 : letradosustituido.hashCode());
+		result = prime * result + ((sustituto == null) ? 0 : sustituto.hashCode());
 		return result;
 	}
 
@@ -761,6 +810,31 @@ public class GuardiasItem {
 				return false;
 		} else if (!idFacturacion.equals(other.idFacturacion))
 			return false;
+		if (observacionesAnulacion == null) {
+			if (other.observacionesAnulacion != null)
+				return false;
+		} else if (!observacionesAnulacion.equals(other.observacionesAnulacion))
+			return false;
+		if (fechasustitucion == null) {
+			if (other.fechasustitucion != null)
+				return false;
+		} else if (!fechasustitucion.equals(other.fechasustitucion))
+			return false;
+		if (comensustitucion == null) {
+			if (other.comensustitucion != null)
+				return false;
+		} else if (!comensustitucion.equals(other.comensustitucion))
+			return false;
+		if (letradosustituido == null) {
+			if (other.letradosustituido != null)
+				return false;
+		} else if (!letradosustituido.equals(other.letradosustituido))
+			return false;
+		if (sustituto == null) {
+			if (other.sustituto != null)
+				return false;
+		} else if (!sustituto.equals(other.sustituto))
+			return false;
 		return true;
 	}
 
@@ -776,9 +850,12 @@ public class GuardiasItem {
 				", validada=" + validada + ", ordenGrupo=" + ordenGrupo +", fechadesde=" + fechadesde +", fechahasta=" + fechahasta +
 				", grupoGuardiaColegiado=" + grupoGuardiaColegiado + ", idPersona=" + idPersona + ", fechaValidacion=" + fechaValidacion +
 				", estadoGuardia=" + estadoGuardia + ", idCalendarioGuardias=" + idCalendarioGuardias +", facturado=" + facturado +
-				", idFacturacion =" + idFacturacion +"]";
+				", idFacturacion =" + idFacturacion + ", observacionesAnulacion =" + observacionesAnulacion +", fechasustitucion =" + fechasustitucion +
+				", comensustitucion =" + comensustitucion + ", letradosustituido =" + letradosustituido + ", sustituto =" + sustituto +"]";
 	}
 
 	
+
+
 
 }

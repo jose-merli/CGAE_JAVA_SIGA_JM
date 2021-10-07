@@ -48,6 +48,15 @@ public class TarjetaAsistenciaResponseItem implements Comparable<TarjetaAsistenc
 	private String numJustificadas;
 	private String numFacturadas;
 	private boolean diaDespuesDisabled;
+	private String guardiaRequeridaValidacion;
+
+	public String getGuardiaRequeridaValidacion() {
+		return guardiaRequeridaValidacion;
+	}
+
+	public void setGuardiaRequeridaValidacion(String guardiaRequeridaValidacion) {
+		this.guardiaRequeridaValidacion = guardiaRequeridaValidacion;
+	}
 
 	public String getIdTipoEjg() {
 		return idTipoEjg;

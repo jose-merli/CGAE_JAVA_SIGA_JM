@@ -6,6 +6,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.FiltroAsistenciaItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.ScsActuacionasistencia;
 import org.itcgae.siga.db.mappers.ScsAsistenciaSqlProvider;
@@ -207,7 +208,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		return sql.toString();
 	}
 
-	public String searchAsistencias(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion) {
+	public String searchAsistenciasExpress(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion) {
 
 		SQL sql = new SQL();
 
@@ -680,5 +681,226 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		}
 		SQL.ORDER_BY("aa.idactuacion");
 		return SQL.toString();
+	}
+
+	public String searchAsistencias(FiltroAsistenciaItem filtroAsistenciaItem, Short idInstitucion, Integer idLenguaje, Integer tamMax) {
+		SQL SQL = new SQL();
+		SQL SQL_PADRE = new SQL();
+		SQL.SELECT_DISTINCT("a.anio",
+				"a.numero",
+				"TO_CHAR(a.fechahora,'DD/MM/YYYY HH24:MI') fechahora",
+				"a.idguardia",
+				"g.nombre nombreGuardia",
+				"a.idturno",
+				"t.nombre nombreTurno",
+				"a.idpersonajg",
+				"CASE" +
+						" WHEN a.idpersonajg is not null" +
+						" then pjg.apellido1 || ' ' || pjg.apellido2 || ', ' || pjg.nombre" +
+						" else ''" +
+						" end asistido",
+				"a.idestadoasistencia",
+				"f_siga_getrecurso (ea.descripcion,"+idLenguaje+") estadoasistencia",
+				"a.idpersonacolegiado",
+				"p.apellidos1 || ' ' || p.apellidos2 || ', ' || p.nombre letrado",
+				"CASE" +
+				" WHEN UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) is null" +
+				"    THEN 'VACÍO'" +
+				" ELSE" +
+				"    UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) " +
+				"END actuacionesvalidadas",
+				"a.IDTIPOASISTENCIACOLEGIO",
+				"a.fechacierre",
+				"a.fechasolicitud",
+				"g.REQUERIDAVALIDACION");
+		SQL.FROM("scs_asistencia a");
+
+		SQL.INNER_JOIN("scs_guardiasturno g on a.idguardia = g.idguardia and a.idinstitucion = g.idinstitucion and a.idturno = g.idturno",
+				"scs_turno t on a.idturno = t.idturno and a.idinstitucion = t.idinstitucion",
+				"scs_estadoasistencia ea on a.idestadoasistencia = ea.idestadoasistencia",
+				"cen_persona p on p.idpersona = a.idpersonacolegiado");
+		SQL.WHERE("a.idinstitucion = "+idInstitucion);
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getAnio())){
+			SQL.WHERE("a.anio='"+filtroAsistenciaItem.getAnio()+"'");
+		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNumero())){
+			SQL.WHERE("a.numero='"+filtroAsistenciaItem.getNumero()+"'");
+		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getFechaAsistenciaDesde())){
+			SQL.WHERE("a.fechahora >= TO_DATE('"+filtroAsistenciaItem.getFechaAsistenciaDesde()+"','DD/MM/YYYY HH24:MI')");
+		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getFechaAsistenciaHasta())){
+			SQL.WHERE("a.fechahora <= TO_DATE('"+filtroAsistenciaItem.getFechaAsistenciaHasta()+"','DD/MM/YYYY HH24:MI')");
+		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdTurno())){
+			SQL.WHERE("a.idturno ='"+filtroAsistenciaItem.getIdTurno()+"'");
+		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdGuardia())){
+			SQL.WHERE("a.idguardia='"+filtroAsistenciaItem.getIdGuardia()+"'");
+		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdLetradoGuardia())){
+			SQL.WHERE("a.idpersonacolegiado = '"+filtroAsistenciaItem.getIdLetradoGuardia()+"'");
+		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdTipoAsistenciaColegiado())){
+			SQL.WHERE("a.IDTIPOASISTENCIACOLEGIO = '"+filtroAsistenciaItem.getIdTipoAsistenciaColegiado()+"'");
+		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdOrigenAsistencia())){
+			SQL.WHERE("a.idorigenasistencia='"+filtroAsistenciaItem.getIdOrigenAsistencia()+"'");
+		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdEstadoAsistencia())){
+			SQL.WHERE("a.idestadoasistencia='"+filtroAsistenciaItem.getIdEstadoAsistencia()+"'");
+		}
+		if("N".equals(filtroAsistenciaItem.getIdActuacionValidada())){
+			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) = 'NO'");
+		}else if("S".equals(filtroAsistenciaItem.getIdActuacionValidada())){
+			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) = 'SI'");
+		}else if("SA".equals(filtroAsistenciaItem.getIdActuacionValidada())){
+			SQL.WHERE("UPPER(F_SIGA_ACTUACIONESASIST(a.idinstitucion,a.anio, a.numero)) is null");
+		}
+		if(UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdEstadoAsistido())){
+			SQL.LEFT_OUTER_JOIN("scs_personajg pjg on pjg.idinstitucion = a.idinstitucion and pjg.idpersona = a.idpersonajg");
+			if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNif())) {
+				SQL.WHERE("UPPER(pjg.nif)=UPPER('" + filtroAsistenciaItem.getNif() + "')");
+			}
+			if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNombre())) {
+				SQL.WHERE("UPPER(pjg.nombre)=UPPER('" + filtroAsistenciaItem.getNombre() + "')");
+			}
+			if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getApellidos())) {
+				if (filtroAsistenciaItem.getApellidos().contains(" ")) {
+					String[] apellidos = filtroAsistenciaItem.getApellidos().split(" ");
+					if (apellidos.length == 2) {
+						SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + apellidos[0] + "')");
+						SQL.WHERE("UPPER(pjg.apellido2)=UPPER('" + apellidos[1] + "')");
+					} else if (apellidos.length == 1) {
+						SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + apellidos[0] + "')");
+					}
+				} else {
+					SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + filtroAsistenciaItem.getApellidos() + "')");
+				}
+			}
+		}else{
+
+			switch (filtroAsistenciaItem.getIdEstadoAsistido()){
+				case SigaConstants.JUSTICIABLE_ROL_SOLICITANTE:
+					SQL.LEFT_OUTER_JOIN("scs_personajg pjg on pjg.idinstitucion = a.idinstitucion and pjg.idpersona = a.idpersonajg");
+					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNif())) {
+						SQL.WHERE("UPPER(pjg.nif)=UPPER('" + filtroAsistenciaItem.getNif() + "')");
+					}
+					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNombre())) {
+						SQL.WHERE("UPPER(pjg.nombre)=UPPER('" + filtroAsistenciaItem.getNombre() + "')");
+					}
+					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getApellidos())) {
+						if (filtroAsistenciaItem.getApellidos().contains(" ")) {
+							String[] apellidos = filtroAsistenciaItem.getApellidos().split(" ");
+							if (apellidos.length == 2) {
+								SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + apellidos[0] + "')");
+								SQL.WHERE("UPPER(pjg.apellido2)=UPPER('" + apellidos[1] + "')");
+							} else if (apellidos.length == 1) {
+								SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + apellidos[0] + "')");
+							}
+						} else {
+							SQL.WHERE("UPPER(pjg.apellido1)=UPPER('" + filtroAsistenciaItem.getApellidos() + "')");
+						}
+					}
+					break;
+				case SigaConstants.JUSTICIABLE_ROL_CONTRARIO:
+					SQL.LEFT_OUTER_JOIN("scs_personajg pjg on pjg.idinstitucion = a.idinstitucion and pjg.idpersona = a.idpersonajg");
+					//Buscamos un contrario de la asistencia, por lo que nos vamos a la tabla de contrarios, sacamos el id persona y volvemos a innerjoin con la tabla de justiciables filtrando por el idpersona de la tabla de contrarios
+					SQL.INNER_JOIN(
+							"scs_contrariosasistencia contrario on contrario.idinstitucion = a.idinstitucion and contrario.anio = a.anio and contrario.numero = a.numero");
+					SQL.INNER_JOIN(
+							"scs_personajg perjgcontrario on perjgcontrario.idpersona = contrario.idpersona AND perjgcontrario.IDINSTITUCION = contrario.IDINSTITUCION");
+					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNif())) {
+						SQL.WHERE("UPPER(perjgcontrario.nif)=UPPER('" + filtroAsistenciaItem.getNif() + "')");
+					}
+					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNombre())) {
+						SQL.WHERE("UPPER(perjgcontrario.nombre)='" + filtroAsistenciaItem.getNombre() + "'");
+					}
+					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getApellidos())) {
+						if (filtroAsistenciaItem.getApellidos().contains(" ")) {
+							String[] apellidos = filtroAsistenciaItem.getApellidos().split(" ");
+							if (apellidos.length == 2) {
+								SQL.WHERE("UPPER(perjgcontrario.apellido1)=UPPER('" + apellidos[0] + "')");
+								SQL.WHERE("UPPER(perjgcontrario.apellido2)=UPPER('" + apellidos[1] + "')");
+							} else if (apellidos.length == 1) {
+								SQL.WHERE("UPPER(perjgcontrario.apellido1)=UPPER('" + apellidos[0] + "')");
+							}
+						} else {
+							SQL.WHERE("UPPER(perjgcontrario.apellido1)=UPPER('" + filtroAsistenciaItem.getApellidos() + "')");
+						}
+					}
+					break;
+				case SigaConstants.JUSTICIABLE_ROL_REPRESENTANTE:
+					SQL.INNER_JOIN("scs_personajg pjg on pjg.idinstitucion = a.idinstitucion and pjg.idpersona = a.idpersonajg");
+					//Buscamos el representante del asistido, para ello volvemos a hacer un innerjoin con scs_personajg relacionando el idrepresentante del asistido con el idpersona del representante y filtramos
+					SQL.INNER_JOIN("scs_personajg representante on pjg.idrepresentantejg = representante.idpersona and pjg.idinstitucion = representante.idinstitucion");
+					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNif())) {
+						SQL.WHERE("UPPER(representante.nif)=UPPER('" + filtroAsistenciaItem.getNif() + "')");
+					}
+					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNombre())) {
+						SQL.WHERE("UPPER(representante.nombre)=UPPER('" + filtroAsistenciaItem.getNombre() + "')");
+					}
+					if (!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getApellidos())) {
+						if (filtroAsistenciaItem.getApellidos().contains(" ")) {
+							String[] apellidos = filtroAsistenciaItem.getApellidos().split(" ");
+							if (apellidos.length == 2) {
+								SQL.WHERE("UPPER(representante.apellido1)=UPPER('" + apellidos[0] + "')");
+								SQL.WHERE("UPPER(representante.apellido2)=UPPER('" + apellidos[1] + "')");
+							} else if (apellidos.length == 1) {
+								SQL.WHERE("UPPER(representante.apellido1)=UPPER('" + apellidos[0] + "')");
+							}
+						} else {
+							SQL.WHERE("UPPER(representante.apellido1)=UPPER('" + filtroAsistenciaItem.getApellidos() + "')");
+						}
+					}
+					break;
+				/*case SigaConstants.JUSTICIABLE_ROL_UNIDADFAMILIAR: //No hay unidad familiar en Asistencias
+					break;*/
+			}
+
+		}
+		if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNig())
+			|| !UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNumDiligencia())
+			|| !UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNumProcedimiento())
+			|| !UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdProcedimiento())
+			|| !UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdComisaria())
+			|| !UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdJuzgado())
+			|| !UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdTipoActuacion())){ //Si hay algun dato de actuaciones relleno, hacemos left outer join con scs_actuacionasistencia
+
+			SQL.LEFT_OUTER_JOIN("scs_actuacionasistencia aa on aa.anio = a.anio and aa.numero = a.numero and a.idinstitucion = aa.idinstitucion");
+
+			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNig())){  //Es un campo de scs_actuacionasistencia
+				SQL.WHERE("aa.nig='"+filtroAsistenciaItem.getNig()+"'");
+			}
+			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNumDiligencia())){ //Es un campo de scs_asistencia
+				SQL.WHERE("a.numerodiligencia ='"+filtroAsistenciaItem.getNumDiligencia()+"'");
+			}
+			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getNumProcedimiento())){ //Es un campo de scs_asistencia
+				SQL.WHERE("a.NUMEROPROCEDIMIENTO ='"+filtroAsistenciaItem.getNumProcedimiento()+"'");
+			}
+			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdProcedimiento())){ //Es un campo de scs_asistencia
+				SQL.WHERE("a.idpretension ='"+filtroAsistenciaItem.getIdProcedimiento()+"'");
+			}
+			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdComisaria())){ //Es un campo de scs_actuacionasistencia
+				SQL.WHERE("aa.idcomisaria ='"+filtroAsistenciaItem.getIdComisaria()+"'");
+			}
+			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdJuzgado())){ //Es un campo de scs_actuacionasistencia
+				SQL.WHERE("aa.idjuzgado ='"+filtroAsistenciaItem.getIdJuzgado()+"'");
+			}
+			if(!UtilidadesString.esCadenaVacia(filtroAsistenciaItem.getIdTipoActuacion())){ //Es un campo de scs_actuacionasistencia
+				SQL.WHERE("aa.IDTIPOACTUACION ='"+filtroAsistenciaItem.getIdTipoActuacion()+"'");
+			}
+
+		}
+		SQL.ORDER_BY("a.anio","a.numero");
+		SQL_PADRE.SELECT(" *");
+		SQL_PADRE.FROM("( " + SQL.toString() + " )");
+		if(tamMax != null && tamMax > 0) {
+			tamMax += 1;
+			SQL_PADRE.WHERE(" ROWNUM <= " + tamMax);
+		}
+
+
+		return SQL_PADRE.toString();
 	}
 }

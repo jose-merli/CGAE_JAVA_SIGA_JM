@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaService {
 
-    private final Logger LOGGER = Logger.getLogger(AsistenciaServiceImpl.class);
+    private final Logger LOGGER = Logger.getLogger(ActuacionAsistenciaServiceImpl.class);
 
     @Autowired
     private ScsAsistenciaExtendsMapper scsAsistenciaExtendsMapper;
@@ -325,8 +325,13 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                     if(UtilidadesString.esCadenaVacia(datosGenerales.getIdActuacion())){
                         NewIdDTO newIdActuacion = scsActuacionasistenciaExtendsMapper.getNewIdActuacion(idInstitucion, anioNumero);
                         ScsActuacionasistencia newActuacion = new ScsActuacionasistencia();
-                        newActuacion.setIdactuacion(Long.valueOf(newIdActuacion.getNewId()));
-                        datosGenerales.setIdActuacion(newIdActuacion.getNewId());
+                        if(newIdActuacion != null) {
+                            datosGenerales.setIdActuacion(newIdActuacion.getNewId());
+                            newActuacion.setIdactuacion(Long.valueOf(newIdActuacion.getNewId()));
+                        }else{ //si es null es porque es la primera actuacion
+                            datosGenerales.setIdActuacion("1");
+                            newActuacion.setIdactuacion((long)1);
+                        }
                         newActuacion.setAnio(scsAsistencia.getAnio());
                         newActuacion.setNumero(scsAsistencia.getNumero());
                         newActuacion.setIdinstitucion(scsAsistencia.getIdinstitucion());
@@ -719,7 +724,11 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                         AdmUsuarios usuario = admUsuariosExtendsMapper.selectByPrimaryKey(admUsuariosKey);
                         historico.setFecha(scsActuacionasistencia.getFechacreacion());
                         historico.setAccion("Crear");
-                        historico.setUsuario(usuario.getDescripcion());
+                        if(usuario != null) {
+                            historico.setUsuario(usuario.getDescripcion());
+                        }else{
+                            historico.setUsuario("Usuario desconocido");
+                        }
                         historicoItems.add(historico);
 
                         if(scsActuacionasistencia.getFechamodificacion() != null){
@@ -730,6 +739,8 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             historico.setAccion("Modificar");
                             if(usuario != null) {
                                 historico.setUsuario(usuario.getDescripcion());
+                            }else{
+                                historico.setUsuario("Usuario desconocido");
                             }
                             historicoItems.add(historico);
                         }
@@ -742,6 +753,8 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             historico.setAccion("Justificar");
                             if(usuario != null) {
                                 historico.setUsuario(usuario.getDescripcion());
+                            }else{
+                                historico.setUsuario("Usuario desconocido");
                             }
                             historicoItems.add(historico);
                         }
@@ -754,6 +767,8 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             historico.setAccion("Validar");
                             if(usuario != null) {
                                 historico.setUsuario(usuario.getDescripcion());
+                            }else{
+                                historico.setUsuario("Usuario desconocido");
                             }
                             historicoItems.add(historico);
                         }

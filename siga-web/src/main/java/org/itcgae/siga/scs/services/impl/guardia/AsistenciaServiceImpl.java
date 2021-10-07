@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.services.impl.guardia;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jdk.nashorn.internal.objects.NativeArray;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -35,6 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -312,7 +314,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	}
 
 	@Override
-	public TarjetaAsistenciaResponseDTO searchAsistencias(HttpServletRequest request, FiltroAsistenciaItem filtro) {
+	public TarjetaAsistenciaResponseDTO searchAsistenciasExpress(HttpServletRequest request, FiltroAsistenciaItem filtro) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -342,7 +344,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							&& !properties.isEmpty()) {
 						filtro.setIdTipoAsistencia(properties.get(0).getValor());
 						
-						List<TarjetaAsistenciaItem> tarjetaAsistenciaItems = scsAsistenciaExtendsMapper.searchAsistencias(filtro, idInstitucion);
+						List<TarjetaAsistenciaItem> tarjetaAsistenciaItems = scsAsistenciaExtendsMapper.searchAsistenciasExpress(filtro, idInstitucion);
 						
 						if(tarjetaAsistenciaItems != null
 								&& !tarjetaAsistenciaItems.isEmpty()) {
@@ -744,7 +746,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				asistenciaBBDD.setNumero(Long.valueOf(asistencia.getNumero()));
 			}
 			
-			if(!UtilidadesString.esCadenaVacia(asistencia.getFiltro().getDiaGuardia())) {
+			if(asistencia.getFiltro() != null && !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getDiaGuardia())) {
 				asistenciaBBDD.setFechahora(new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFiltro().getDiaGuardia()));
 			} else {
 				asistenciaBBDD.setFechahora(new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(asistencia.getFechaAsistencia()));
@@ -765,19 +767,19 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				asistenciaBBDD.setIdpersonajg(Long.valueOf(idPersonaJg));
 			}
 			asistenciaBBDD.setIdinstitucion(idInstitucion);
-			if(!UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdTurno())) {
+			if(asistencia.getFiltro() != null && !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdTurno())) {
 				asistenciaBBDD.setIdturno(Integer.valueOf(asistencia.getFiltro().getIdTurno()));
 			} else {
 				asistenciaBBDD.setIdturno(Integer.valueOf(asistencia.getIdTurno()));
 			}
 			
-			if(!UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdGuardia())) {
+			if(asistencia.getFiltro() != null && !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdGuardia())) {
 				asistenciaBBDD.setIdguardia(Integer.valueOf(asistencia.getFiltro().getIdGuardia()));
 			} else {
 				asistenciaBBDD.setIdguardia(Integer.valueOf(asistencia.getIdGuardia()));
 			}
 			
-			if(!UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdLetradoGuardia())) {
+			if(asistencia.getFiltro() != null && !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdLetradoGuardia())) {
 				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getFiltro().getIdLetradoGuardia()));
 			} else {
 				asistenciaBBDD.setIdpersonacolegiado(Long.valueOf(asistencia.getIdLetradoGuardia()));
@@ -791,10 +793,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				asistenciaBBDD.setIdtipoasistencia(Short.valueOf(tipoAsistenciaGeneral));
 			}
 			
-			if(!UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdTipoAsistenciaColegiado())) {
+			if(asistencia.getFiltro() != null && !UtilidadesString.esCadenaVacia(asistencia.getFiltro().getIdTipoAsistenciaColegiado())) {
 				asistenciaBBDD.setIdtipoasistenciacolegio(Short.valueOf(asistencia.getFiltro().getIdTipoAsistenciaColegiado()));
 			}else if(!UtilidadesString.esCadenaVacia(asistencia.getIdTipoAsistenciaColegio())) {
-				asistenciaBBDD.setIdtipoasistencia(Short.valueOf(asistencia.getIdTipoAsistenciaColegio()));
+				asistenciaBBDD.setIdtipoasistencia((short)6); //Guardia 24 h. Asist. al detenido (procedimiento penal general)
 				asistenciaBBDD.setIdtipoasistenciacolegio(Short.valueOf(asistencia.getIdTipoAsistenciaColegio()));
 			}
 			
@@ -1115,7 +1117,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 	@Override
 	public InsertResponseDTO guardarAsistencia(HttpServletRequest request,
-			List<TarjetaAsistenciaResponseItem> asistencias) {
+			List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -1141,8 +1143,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						
 						TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = asistencias.get(i);
 						
-						if(UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getAnio())
-								&& UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getNumero())) {
+						if(UtilidadesString.esCadenaVacia(tarjetaAsistenciaResponseItem.getNumero())) {
 
 							//Insertamos asistencia
 							ScsAsistencia asistencia = fromTarjetaAsistenciaItemToScsAsistencia(asistencias.get(i), null, null, null, null, idInstitucion, usuarios.get(0));
@@ -1173,6 +1174,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										scsSolicitudAceptada.setFechamodificacion(new Date());
 										
 										inserted += scsSolicitudAceptadaExtendsMapper.updateByPrimaryKeySelective(scsSolicitudAceptada);
+									}
+									//Si viene relleno el idAsistenciaCopy deberemos copiar los datos de dicha asistencia
+									if(!UtilidadesString.esCadenaVacia(idAsistenciaCopy)){
+										duplicarAsistencia(asistencia,idAsistenciaCopy, idInstitucion);
 									}
 									
 							}
@@ -1717,6 +1722,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsCabeceraguardias.setPosicion((short)(scsCabeceraguardias.getPosicion().shortValue()+1));
 					scsCabeceraguardias.setFechamodificacion(new Date());
 					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFechavalidacion(new Date());
 					scsCabeceraguardias.setUsumodificacion(0);
 
 					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
@@ -1777,6 +1783,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 					//Las metemos validadas
 					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFechavalidacion(new Date());
 					scsCabeceraguardias.setUsumodificacion(0);
 
 					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
@@ -2858,6 +2865,86 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	}
 
 	@Override
+	public TarjetaAsistenciaResponseDTO searchAsistencias(HttpServletRequest request, FiltroAsistenciaItem filtro) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Integer tamMaximo;
+		List<GenParametros> tamMax = new ArrayList<>();
+		TarjetaAsistenciaResponseDTO tarjetaAsistenciaResponseDTO = new TarjetaAsistenciaResponseDTO();
+		List<TarjetaAsistenciaResponseItem> asistencias = new ArrayList<>();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"searchAsistencias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"searchAsistencias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()
+						&& filtro != null) {
+
+                    GenParametrosExample genParametrosExample = new GenParametrosExample();
+
+                    genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+                            .andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+                            .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+                    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+                    LOGGER.info(
+                            "PreAsistenciaServiceImpl.searchRelaciones() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+                    tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+                    LOGGER.info(
+                            "AsistenciaServiceImpl.searchRelaciones() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+                    if (tamMax != null) {
+                        tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+                    } else {
+                        tamMaximo = null;
+                    }
+
+					if(!UtilidadesString.esCadenaVacia(filtro.getNumColegiado())){
+						List<ColegiadoJGItem> colegiados = cenPersonaExtendsMapper.busquedaColegiadoExpress(filtro.getNumColegiado(),idInstitucion.toString());
+						if(colegiados != null
+							&& !colegiados.isEmpty()){
+							filtro.setIdLetradoGuardia(colegiados.get(0).getIdPersona());
+						}
+					}
+					asistencias = scsAsistenciaExtendsMapper.searchAsistencias(filtro, idInstitucion, Integer.parseInt(usuarios.get(0).getIdlenguaje()), tamMaximo);
+
+					if (tamMaximo != null && asistencias != null && !asistencias.isEmpty() && asistencias.size() > tamMaximo) {
+						error.setCode(200);
+						error.setDescription("La consulta devuelve más de " + tamMaximo
+								+ " resultados, pero se muestran sólo los " + tamMaximo
+								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+						tarjetaAsistenciaResponseDTO.setError(error);
+						asistencias.remove(asistencias.size() - 1);
+					}
+					tarjetaAsistenciaResponseDTO.setResponseItems(asistencias);
+				}
+
+			}
+		}catch(Exception e) {
+			LOGGER.error("searchAsistencias() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al buscar las asistencias: " + e);
+			error.description("Error al buscar las asistencias: " + e);
+			tarjetaAsistenciaResponseDTO.setError(error);
+		}
+		return tarjetaAsistenciaResponseDTO;
+	}
+
+	@Override
 	public InsertResponseDTO subirDocumentoAsistencia(MultipartHttpServletRequest request) {
 
 		String token = request.getHeader("Authorization");
@@ -3670,12 +3757,259 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return deleteResponseDTO;
 	}
 
+	@Override
+	public DeleteResponseDTO eliminarAsistencias(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"eliminarAsistencias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"eliminarAsistencias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()
+						&& asistencias != null
+						&& !asistencias.isEmpty()) {
+					//Consultamos las actuaciones para verificar si no están facturadas, en caso de que lo estén mandamos mensaje de error controlado
+					for(TarjetaAsistenciaResponseItem asistencia : asistencias) {
+
+						ScsActuacionasistenciaExample scsActuacionasistenciaExample = new ScsActuacionasistenciaExample();
+						scsActuacionasistenciaExample.createCriteria()
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andAnioEqualTo(Short.valueOf(asistencia.getAnio()))
+								.andNumeroEqualTo(Long.valueOf(asistencia.getNumero()));
+						List<ScsActuacionasistencia> actuaciones =  scsActuacionasistenciaExtendsMapper.selectByExample(scsActuacionasistenciaExample);
+						if(actuaciones != null
+							&& !actuaciones.isEmpty()
+							&& actuaciones.stream().anyMatch(actuacion -> "1".equals(actuacion.getFacturado()))){
+								error.setCode(500);
+								error.setDescription("No se pueden eliminar las actuaciones que están facturadas");
+								error.setMessage("No se pueden eliminar las actuaciones que están facturadas");
+								deleteResponseDTO.setError(error);
+								break;
+						}
+					}
+					//Si no ha habido error, borramos
+					if(deleteResponseDTO.getError() == null){
+						for(TarjetaAsistenciaResponseItem asistencia : asistencias) {
+
+							//Borramos la documentacion
+							ScsDocumentacionasiExample scsDocumentacionasiExample = new ScsDocumentacionasiExample();
+							scsDocumentacionasiExample.createCriteria()
+									.andIdinstitucionEqualTo(idInstitucion)
+									.andAnioEqualTo(Short.valueOf(asistencia.getAnio()))
+									.andNumeroEqualTo(Long.valueOf(asistencia.getNumero()));
+
+							affectedRows += scsDocumentacionasiMapper.deleteByExample(scsDocumentacionasiExample);
+
+							//Borramos las actuaciones
+							ScsActuacionasistenciaExample scsActuacionasistenciaExample = new ScsActuacionasistenciaExample();
+							scsActuacionasistenciaExample.createCriteria()
+									.andIdinstitucionEqualTo(idInstitucion)
+									.andAnioEqualTo(Short.valueOf(asistencia.getAnio()))
+									.andNumeroEqualTo(Long.valueOf(asistencia.getNumero()));
+
+							affectedRows += scsActuacionasistenciaExtendsMapper.deleteByExample(scsActuacionasistenciaExample);
+
+							//Borramos los contrarios
+							ScsContrariosasistenciaExample scsContrariosasistenciaExample = new ScsContrariosasistenciaExample();
+							scsContrariosasistenciaExample.createCriteria()
+									.andIdinstitucionEqualTo(idInstitucion)
+									.andAnioEqualTo(Short.valueOf(asistencia.getAnio()))
+									.andNumeroEqualTo(Long.valueOf(asistencia.getNumero()));
+
+							affectedRows += scsContrariosasistenciaMapper.deleteByExample(scsContrariosasistenciaExample);
+
+							//Borramos los delitos
+							ScsDelitosasistenciaExample scsDelitosasistenciaExample = new ScsDelitosasistenciaExample();
+							scsDelitosasistenciaExample.createCriteria()
+									.andIdinstitucionEqualTo(idInstitucion)
+									.andAnioEqualTo(Short.valueOf(asistencia.getAnio()))
+									.andNumeroEqualTo(Long.valueOf(asistencia.getNumero()));
+							affectedRows += scsDelitosasistenciaMapper.deleteByExample(scsDelitosasistenciaExample);
+
+							//Por ultimo, borramos la asistencia
+							ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+							scsAsistenciaKey.setIdinstitucion(idInstitucion);
+							scsAsistenciaKey.setAnio(Short.valueOf(asistencia.getAnio()));
+							scsAsistenciaKey.setNumero(Long.valueOf(asistencia.getNumero()));
+							affectedRows += scsAsistenciaExtendsMapper.deleteByPrimaryKey(scsAsistenciaKey);
+
+						}
+					}
+
+					if(affectedRows > 0){
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}else if (deleteResponseDTO.getError() == null){
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se actualizo ningun registro");
+						deleteResponseDTO.setError(error);
+					}
+
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("eliminarAsistencias() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al eliminar fisicamente las asistencias: " + e);
+			error.description("Error al eliminar fisicamente las asistencias: " + e);
+			deleteResponseDTO.setError(error);
+		}
+		return deleteResponseDTO;
+	}
+
+	@Override
+	public StringDTO isUnicaAsistenciaPorGuardia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		StringDTO stringDTO = new StringDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"isUnicaAsistenciaPorGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"isUnicaAsistenciaPorGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()) {
+
+					for(TarjetaAsistenciaResponseItem asistencia : asistencias){
+
+						ScsCabeceraguardiasKey scsCabeceraguardiasKey = new ScsCabeceraguardiasKey();
+						scsCabeceraguardiasKey.setIdguardia(Integer.valueOf(asistencia.getIdGuardia()));
+						scsCabeceraguardiasKey.setIdinstitucion(idInstitucion);
+						scsCabeceraguardiasKey.setIdpersona(Long.valueOf(asistencia.getIdLetradoGuardia()));
+						scsCabeceraguardiasKey.setIdturno(Integer.valueOf(asistencia.getIdTurno()));
+						scsCabeceraguardiasKey.setFechainicio(SigaConstants.DATE_FORMAT.parse(asistencia.getFechaAsistencia()));
+
+						ScsCabeceraguardias scsCabeceraguardias = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(scsCabeceraguardiasKey);
+
+						if(scsCabeceraguardias != null){
+							ScsAsistenciaExample scsAsistenciaExample =  new ScsAsistenciaExample();
+							scsAsistenciaExample.createCriteria()
+									.andIdguardiaEqualTo(scsCabeceraguardias.getIdguardia())
+									.andIdturnoEqualTo(scsCabeceraguardias.getIdturno())
+									.andFechahoraBetween(scsCabeceraguardias.getFechainicio(), scsCabeceraguardias.getFechaFin())
+									.andIdpersonacolegiadoEqualTo(scsCabeceraguardias.getIdpersona());
+							long numAsistencias = scsAsistenciaExtendsMapper.countByExample(scsAsistenciaExample);
+							if(numAsistencias == 0) {
+								stringDTO.setValor("S");
+								break;
+							}
+						}
+					}
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("isUnicaAsistenciaPorGuardia() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al obtener el numero de asistencias: " + e);
+			error.description("Error al obtener el numero de asistencias: " + e);
+		}
+		return stringDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO desvalidarGuardiaAsistencia(HttpServletRequest request, List<TarjetaAsistenciaResponseItem> asistencias) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int affectedRows = 0;
+		long numAsistencias = 0;
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"desvalidarGuardiaAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"desvalidarGuardiaAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if(usuarios != null
+						&& !usuarios.isEmpty()) {
+
+					for(TarjetaAsistenciaResponseItem asistencia : asistencias){
+
+						ScsCabeceraguardiasKey scsCabeceraguardiasKey = new ScsCabeceraguardiasKey();
+						scsCabeceraguardiasKey.setIdguardia(Integer.valueOf(asistencia.getIdGuardia()));
+						scsCabeceraguardiasKey.setIdinstitucion(idInstitucion);
+						scsCabeceraguardiasKey.setIdpersona(Long.valueOf(asistencia.getIdLetradoGuardia()));
+						scsCabeceraguardiasKey.setIdturno(Integer.valueOf(asistencia.getIdTurno()));
+						scsCabeceraguardiasKey.setFechainicio(SigaConstants.DATE_FORMAT.parse(asistencia.getFechaAsistencia()));
+
+						ScsCabeceraguardias scsCabeceraguardias = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(scsCabeceraguardiasKey);
+
+						if(scsCabeceraguardias != null){
+							ScsAsistenciaExample scsAsistenciaExample =  new ScsAsistenciaExample();
+							scsAsistenciaExample.createCriteria()
+									.andIdguardiaEqualTo(scsCabeceraguardias.getIdguardia())
+									.andIdturnoEqualTo(scsCabeceraguardias.getIdturno())
+									.andFechahoraBetween(scsCabeceraguardias.getFechainicio(), scsCabeceraguardias.getFechaFin())
+									.andIdpersonacolegiadoEqualTo(scsCabeceraguardias.getIdpersona());
+							numAsistencias = scsAsistenciaExtendsMapper.countByExample(scsAsistenciaExample);
+							if(numAsistencias == 0) {
+								affectedRows += scsCabeceraguardiasExtendsMapper.desvalidarGuardiaColegiado(scsCabeceraguardias);
+							}
+						}
+					}
+
+					if (affectedRows > 0 || numAsistencias != 0) {
+						updateResponseDTO.setStatus(SigaConstants.OK);
+					} else {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setCode(500);
+						error.setDescription("No se actualizo ningun registro");
+						updateResponseDTO.setError(error);
+					}
+
+
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("desvalidarGuardiaAsistencia() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al actualizar el estado de la actuacion: " + e);
+			error.description("Error al actualizar el estado de la actuacion: " + e);
+			updateResponseDTO.setError(error);
+		}
+		return updateResponseDTO;
+	}
+
 
 	/**
 	 * Metodo encargado de actualizar la designa con los datos de la asistencia
 	 * @param scsAsistencia
 	 * @return
 	 */
+	@Transactional
 	private int updateDesignaConAsistencia(ScsAsistencia scsAsistencia){
 		int affectedRows = 0;
 		ScsDesignaKey scsDesignaKey = new ScsDesignaKey();
@@ -3810,6 +4144,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 * @param scsAsistencia
 	 * @return
 	 */
+	@Transactional
 	private int updateEJGconAsistencia (ScsAsistencia scsAsistencia){
 		int affectedRows = 0;
 		ScsEjgKey scsEjgKey = new ScsEjgKey();
@@ -4102,5 +4437,65 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 
 		return isFacturada;
+	}
+
+	@Transactional
+	private void duplicarAsistencia(ScsAsistencia newAsistencia, String idAsistenciaCopy, Short idInstitucion){
+		ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
+		scsAsistenciaKey.setAnio(Short.valueOf(idAsistenciaCopy.split("/")[0]));
+		scsAsistenciaKey.setNumero(Long.valueOf(idAsistenciaCopy.split("/")[1]));
+		scsAsistenciaKey.setIdinstitucion(idInstitucion);
+		ScsAsistencia scsAsistenciaOld = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
+
+		newAsistencia.setObservaciones(scsAsistenciaOld.getObservaciones());
+		newAsistencia.setDatosdefensajuridica(scsAsistenciaOld.getDatosdefensajuridica());
+		newAsistencia.setIncidencias(scsAsistenciaOld.getIncidencias());
+		newAsistencia.setJuzgado(scsAsistenciaOld.getJuzgado());
+		newAsistencia.setJuzgadoidinstitucion(scsAsistenciaOld.getJuzgadoidinstitucion());
+		newAsistencia.setComisaria(scsAsistenciaOld.getComisaria());
+		newAsistencia.setComisariaidinstitucion(scsAsistenciaOld.getComisariaidinstitucion());
+		newAsistencia.setIdorigenasistencia(scsAsistenciaOld.getIdorigenasistencia());
+		newAsistencia.setIdpretension(scsAsistenciaOld.getIdpretension());
+		newAsistencia.setNig(scsAsistenciaOld.getNig());
+		newAsistencia.setNumeroprocedimiento(scsAsistenciaOld.getNumeroprocedimiento());
+		newAsistencia.setIdpersonajg(scsAsistenciaOld.getIdpersonajg());
+		newAsistencia.setDelitosimputados(scsAsistenciaOld.getDelitosimputados());
+
+		scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(newAsistencia);
+
+		ScsContrariosasistenciaExample scsContrariosasistenciaExample = new ScsContrariosasistenciaExample();
+		scsContrariosasistenciaExample.createCriteria()
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andAnioEqualTo(scsAsistenciaOld.getAnio())
+				.andNumeroEqualTo(scsAsistenciaOld.getNumero())
+				.andFechabajaIsNotNull();
+		List<ScsContrariosasistencia> contrarios = scsContrariosasistenciaMapper.selectByExample(scsContrariosasistenciaExample);
+
+		if(contrarios != null && !contrarios.isEmpty()){
+			for (int i = 0; i < contrarios.size(); i++) {
+				ScsContrariosasistencia contrario = contrarios.get(i);
+				contrario.setAnio(newAsistencia.getAnio());
+				contrario.setNumero(newAsistencia.getNumero());
+
+				scsContrariosasistenciaMapper.insert(contrario);
+			}
+		}
+
+		ScsDelitosasistenciaExample scsDelitosasistenciaExample = new ScsDelitosasistenciaExample();
+		scsDelitosasistenciaExample.createCriteria()
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andAnioEqualTo(scsAsistenciaOld.getAnio())
+				.andNumeroEqualTo(scsAsistenciaOld.getNumero());
+		List<ScsDelitosasistencia> delitos = scsDelitosasistenciaMapper.selectByExample(scsDelitosasistenciaExample);
+		if(delitos != null && !delitos.isEmpty()){
+			for (int i = 0; i < delitos.size(); i++) {
+				ScsDelitosasistencia delito = delitos.get(i);
+				delito.setAnio(newAsistencia.getAnio());
+				delito.setNumero(newAsistencia.getNumero());
+				delito.setIdinstitucion(newAsistencia.getIdinstitucion());
+				delito.setFechamodificacion(new Date());
+				scsDelitosasistenciaMapper.insert(delito);
+			}
+		}
 	}
 }
