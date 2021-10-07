@@ -289,4 +289,12 @@ siga-core/target/
 siga-web/.sts4-cache/
 >>>>>>> origin/EJG
 siga-core/.sts4-cache/classpath-data.json
+<<<<<<< HEAD
 siga-web/.sts4-cache/
+=======
+.idea/
+siga-parent.iml
+siga-core/siga-core.iml
+siga-web/siga-web.iml
+.gradle/
+>>>>>>> origin/EJG

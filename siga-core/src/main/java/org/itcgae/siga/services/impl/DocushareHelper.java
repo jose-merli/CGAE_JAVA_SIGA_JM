@@ -215,7 +215,7 @@ public class DocushareHelper {
 				log.debug("new path: " +path);
 				String[] titles = path.split(";");
 				log.debug("DSCollection.title: " +DSCollection.title);
-				log.debug("titles: " +titles);
+				log.debug("titles: " +titles.toString());
 				log.debug("DSSelectSet.NO_PROPERTIES: " +DSSelectSet.NO_PROPERTIES);
 				DSObject dsObject = dssession.getResolvedObject(DSCollection.title, titles, DSSelectSet.NO_PROPERTIES);
 				log.debug("dsObject: " +dsObject);
@@ -602,14 +602,20 @@ public class DocushareHelper {
 			String idExpedientes = config.get(0).getValor();
 			log.debug("ID_DOCUSHARE=" + idExpedientes + " para el colegio " + idinstitucion);
 			
+			log.info("Obtencion de dsCollectionParent");
 			DSCollection dsCollectionParent = (DSCollection) dssession.getObject(new DSHandle(idExpedientes));			
-
+			log.info("Parent obtenido");
+			
+			log.info("Manipulacion de coleccion");
 			DSClass collectionClass = dssession.getDSClass(DSCollection.classname);
 			DSProperties collectionPrototype = collectionClass.createPrototype();
 			collectionPrototype.setPropValue(DSCollection.title, collectionTitle);
 			collectionPrototype.setPropValue(DSCollection.summary, collectionSummary);
+			log.info("Salida de manipulacion de obtencion");
 
+			log.info("Obtencion de identificadorDS");
 			DSHandle dsHandle = dssession.createObject(collectionPrototype, DSLinkDesc.containment, dsCollectionParent, null, null);
+			log.info("Valor de identificadorDS "+dsHandle.toString());
 			identificadorDS = dsHandle.toString();
 		
 		} catch (Exception e) {

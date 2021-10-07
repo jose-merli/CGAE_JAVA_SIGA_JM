@@ -525,7 +525,31 @@ public class SigaConstants {
 		ASISTENCIA_MODIFICACION(new Short("105"), "Asistencia. Modificación"),
 		ASISTENCIA_ALTA_DE_ACTUACIONES(new Short("106"), "Asistencia. Alta de Actuaciones"),
 		DESIGNACION_MODIFICACION_DE_ACTUACIONES(new Short("107"), "Designación. Modificación de Actuaciones"),
-		DESIGNACION_ELIMINACION_DE_ACTUACIONES(new Short("108"), "Designación. Eliminación de Actuaciones");
+		DESIGNACION_ELIMINACION_DE_ACTUACIONES(new Short("108"), "Designación. Eliminación de Actuaciones"),
+		EJG_CREACION_NUEVO_EJG(new Short("120"), "EJG. Creación nuevo EJG"),
+		EJG_MODIFICACION_DATOS_GENERALES(new Short("121"), "EJG. Modificación datos generales"),
+		EJG_MODIFICACION_SERVICIOS_TRAMITACION(new Short("122"), "EJG. Modificación servicios de tramitación"),
+		EJG_ANADIR_FAMILIAR_NUEVO(new Short("123"), "EJG. Se añade un familiar nuevo"),
+		EJG_BORRAR_FAMILIAR(new Short("124"), "EJG. Se borra un familiar"),
+		EJG_ACTIVAR_FAMILIAR_BORRADO(new Short("125"), "EJG. Se activa un familiar borrado"),
+		EJG_ANADIR_ESTADO_MANUALMENTE(new Short("126"), "EJG. Añadido estado manualmente"),
+		EJG_ESTADO_BORRADO_MANUALMENTE(new Short("127"), "EJG. Estado borrado manualmente"),
+		EJG_ESTADO_MODIFICADO(new Short("128"), "EJG. Estado modificado"),
+		EJG_DOCUMENTO_ANADIDO(new Short("129"), "EJG. Documento añadido"),
+		EJG_DOCUMENTO_ELIMINADO(new Short("130"), "EJG. Documento eliminado"),
+		EJG_DOCUMENTO_MODIFICADO(new Short("131"), "EJG. Documento modificado"),
+		EJG_FICHERO_ANADIDO_A_UN_DOCUMENTO(new Short("132"), "EJG. Fichero añadido a un documento"),
+		EJG_FICHERO_ELIMINADO_DE_UN_DOCUMENTO(new Short("133"), "EJG. Fichero eliminado de un documentoEJG. Fichero eliminado de un documento"),
+		EJG_CREACION_DICTAMEN(new Short("134"), "EJG. Creacion de un dictamen"),
+		EJG_ELIMINACION_DICTAMEN(new Short("135"), "EJG. Eliminación de un dictamen"),
+		EJG_MODIFICACION_DICTAMEN(new Short("136"), "EJG. Modificación de un dictamen"),
+		EJG_CREACION_RESOLUCION(new Short("137"), "EJG. Eliminación de un dictamen"),
+		EJG_MODIFICACION_IMPUGNACION(new Short("138"), "EJG. Modificación de una impugnación"),
+		EJG_DESIGNACION_ASOCIADA(new Short("139"), "EJG. Designación asociada"),
+		EJG_ASISTENCIA_ASOCIADA(new Short("140"), "EJG. Asistencia asociada"),
+		EJG_SOJ_ASOCIADO(new Short("141"), "EJG. SOJ asociado"),
+		EJG_RELACION_ELIMINADA(new Short("142"), "EJG. Relación eliminada");
+
 
 		private final Short idTipoCambio;
 		private final String descripcionTipoCambio;
@@ -1121,11 +1145,11 @@ public class SigaConstants {
 	//EEJG
 	public static String EEJG_IDSISTEMA ="";
 	public static String EEJG_URLWS ="";
-	public static String SIGAFRONT_VERSION = "202106111700";
-	public static String SIGAWEB_VERSION = "1.0.72_3";
+	public static String SIGAFRONT_VERSION = "202109071016";
+	public static String SIGAWEB_VERSION = "1.0.73_2";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";
 	public static final String ACREDITACION_TIPO_COMPLETA = "3";
-	
+
 }

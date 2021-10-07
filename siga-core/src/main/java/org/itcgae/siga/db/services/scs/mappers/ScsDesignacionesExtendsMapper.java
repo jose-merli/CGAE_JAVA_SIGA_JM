@@ -196,6 +196,8 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "ANIOPROCEDIMIENTNO", property = "anioProcedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR), 
 			@Result(column = "VALIDARJUSTIFICACIONES", property = "validarjustificaciones", jdbcType = JdbcType.VARCHAR)})
+//	List<JustificacionExpressItem> busquedaJustificacionExpresPendientes(JustificacionExpressItem item,
+//			String idInstitucion, String longitudCodEJG, String idPersona,  String fechaDesde, String fechaHasta);
 	List<JustificacionExpressItem> busquedaJustificacionExpresPendientes(JustificacionExpressItem item,
 			String idInstitucion, String longitudCodEJG, String idPersona, String idFavorable, String idDesfavorable, String fechaDesde, String fechaHasta);
 
@@ -563,9 +565,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getSaltos")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
 		    @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
-	        @Result(column = "IDSALTOSTURNOS", property = "idsaltosturnos", jdbcType = JdbcType.NUMERIC),
+	        @Result(column = "IDSALTOSTURNO", property = "idSaltoCompensacion", jdbcType = JdbcType.NUMERIC),
 		    @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "SALTOCOMPENSACION", property = "saltoocompensacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "SALTOOCOMPENSACION", property = "saltoocompensacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.DATE),
 			@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "MOTIVOS", property = "motivos", jdbcType = JdbcType.VARCHAR),
@@ -583,9 +585,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getCompensaciones")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
 		    @Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.NUMERIC),
-	        @Result(column = "IDSALTOSTURNOS", property = "idsaltosturnos", jdbcType = JdbcType.NUMERIC),
+	        @Result(column = "IDSALTOSTURNO", property = "idSaltoCompensacion", jdbcType = JdbcType.NUMERIC),
 		    @Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "SALTOCOMPENSACION", property = "saltoocompensacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "SALTOOCOMPENSACION", property = "saltoocompensacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.DATE),
 			@Result(column = "IDGUARDIA", property = "idguardia", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "MOTIVOS", property = "motivos", jdbcType = JdbcType.VARCHAR),
