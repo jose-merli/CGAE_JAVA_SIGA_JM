@@ -883,7 +883,39 @@ public class SigaConstants {
 			BT_FECHAI, BT_FECHAF);
 	public static final List<String> CAMPOSLOGBT = Arrays.asList(BT_NCOLEGIADO, BT_NIF, BT_TIPO, BT_MOTIVO, BT_FECHAI,
 			BT_FECHAF, ERRORES);
+	
+	// CARGA MASIVA INSCRIPCIONES - Guardia
+		public static final String TURNO = "TURNO";
+		public static final String GUARDIAFIELD = "GUARDIA";
+		public static final String NCOLEGIADO = "Nº COLEGIADO";
+		public static final String FECHAEFECTIVA = "FECHA EFECTIVA";
+		public static final String TIPO = "TIPO";
+		public static final String GRUPO = "GRUPO";
+		public static final String ORDEN = "ORDEN";
 
+		public static final String nombreFicheroModeloI = "PlantillaMasivaDatosI";
+
+		public static final List<String> CAMPOSMODEL_I = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				FECHAEFECTIVA, TIPO, GRUPO, ORDEN);
+		public static final List<String> CAMPOSLOGI = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO, FECHAEFECTIVA,
+				TIPO, GRUPO, ORDEN, ERRORES);
+		// CARGA MASIVA GRUPOS COLA - Guardia
+		public static final String nombreFicheroModeloGC = "PlantillaMasivaDatosGC";
+		public static final List<String> CAMPOSMODEL_GC = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				 GRUPO, ORDEN);
+		public static final List<String> CAMPOSLOGGC = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				 GRUPO, ORDEN, ERRORES);
+		// CARGA MASIVA CALENDARIOS - Guardia
+
+		public static final String FECHAI = "FECHA INICIO";
+		public static final String FECHAF = "FECHA FIN";
+
+		public static final String nombreFicheroModeloC = "PlantillaMasivaDatosC";
+
+		public static final List<String> CAMPOSMODEL_C = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				FECHAI, FECHAF);
+		public static final List<String> CAMPOSLOGC = Arrays.asList(TURNO, GUARDIAFIELD, NCOLEGIADO,
+				FECHAI, FECHAF, ERRORES);
 	// AGENDA
 	public static final long CALENDARIO_GENERAL = 1;
 	public static final long CALENDARIO_LABORAL = 2;

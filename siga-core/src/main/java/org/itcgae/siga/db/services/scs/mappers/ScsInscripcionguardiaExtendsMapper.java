@@ -22,7 +22,9 @@ import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.TrabajosSJCSInsGuardiaItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ScsInscripcionguardia;
 import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
+import org.itcgae.siga.db.mappers.ScsInscripcionguardiaSqlProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsGuardiasturnoSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsInscripcionguardiaSqlExtendsProvider;
 
@@ -296,7 +298,27 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 			int usuario);
 
 
-	
+    
+    @SelectProvider(type=ScsInscripcionguardiaSqlProvider.class, method="getInscripcionByTurnoGuardiaNcolegiado")
+    @Results({
+        @Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="IDPERSONA", property="idpersona", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="IDTURNO", property="idturno", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="IDGUARDIA", property="idguardia", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="FECHASUSCRIPCION", property="fechasuscripcion", jdbcType=JdbcType.TIMESTAMP, id=true),
+        @Result(column="FECHAMODIFICACION", property="fechamodificacion", jdbcType=JdbcType.TIMESTAMP),
+        @Result(column="USUMODIFICACION", property="usumodificacion", jdbcType=JdbcType.DECIMAL),
+        @Result(column="FECHABAJA", property="fechabaja", jdbcType=JdbcType.TIMESTAMP),
+        @Result(column="OBSERVACIONESSUSCRIPCION", property="observacionessuscripcion", jdbcType=JdbcType.VARCHAR),
+        @Result(column="OBSERVACIONESBAJA", property="observacionesbaja", jdbcType=JdbcType.VARCHAR),
+        @Result(column="FECHASOLICITUDBAJA", property="fechasolicitudbaja", jdbcType=JdbcType.TIMESTAMP),
+        @Result(column="FECHAVALIDACION", property="fechavalidacion", jdbcType=JdbcType.TIMESTAMP),
+        @Result(column="OBSERVACIONESVALIDACION", property="observacionesvalidacion", jdbcType=JdbcType.VARCHAR),
+        @Result(column="FECHADENEGACION", property="fechadenegacion", jdbcType=JdbcType.TIMESTAMP),
+        @Result(column="OBSERVACIONESDENEGACION", property="observacionesdenegacion", jdbcType=JdbcType.VARCHAR),
+        @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR)
+    })
+    List<ScsInscripcionguardia> getInscripcionByTurnoGuardiaNcolegiado(String usuModif, String idTurno, String idGuardia, String numColegiado);
 
 
 
