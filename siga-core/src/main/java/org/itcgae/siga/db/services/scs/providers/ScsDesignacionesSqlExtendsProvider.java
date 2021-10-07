@@ -147,7 +147,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		sql.WHERE("ROWNUM <= " + tamMax);
 
-		sql.ORDER_BY("designaciones.anio desc, designaciones.numero DESC");
+		sql.ORDER_BY("designaciones.anio desc, designaciones.codigo DESC");
 		return sql.toString();
 	}
 
