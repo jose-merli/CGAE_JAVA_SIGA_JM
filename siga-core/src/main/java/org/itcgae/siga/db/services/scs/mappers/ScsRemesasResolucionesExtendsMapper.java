@@ -6,7 +6,9 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
+import org.itcgae.siga.db.services.scs.providers.ScsRemesasExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasResolucionesExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -27,5 +29,12 @@ public interface ScsRemesasResolucionesExtendsMapper {
 		@Result(column = "IDREMESA", property = "idRemesa", jdbcType = JdbcType.NUMERIC)
 	})
 	List<RemesasResolucionItem> buscarRemesasResoluciones(RemesasResolucionItem remesasResolucionItem, int idInstitucion);
+	
+	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class, method = "getMaxIdRemesaResolucion")
+	@Results({
+		@Result(column = "IDREMESARESOLUCION", property = "idRemesaResolucion", jdbcType = JdbcType.VARCHAR)
+	})
+	RemesasResolucionItem getMaxIdRemesaResolucion(Short idInstitucion);
 
+	
 }

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/remesasResultado")
@@ -53,7 +54,7 @@ public class RemesasResultadoController {
 	}
 	
 	@RequestMapping(value = "/guardarRemesaResultado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestBody RemesasResultadoItem remesasResultadoItem, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestBody RemesasResultadoItem remesasResultadoItem, MultipartHttpServletRequest request) {
 		UpdateResponseDTO response = remesasResultados.guardarRemesaResultado(remesasResultadoItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
