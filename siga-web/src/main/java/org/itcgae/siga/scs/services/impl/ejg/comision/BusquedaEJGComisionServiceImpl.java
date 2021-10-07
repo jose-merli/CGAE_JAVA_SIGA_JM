@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.impl.ejg.comision;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -696,17 +697,31 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 				comboItems = scsEjgComisionExtendsMapper.comboPresidente(usuarios.get(0).getIdlenguaje());
 
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 				LOGGER.info(
-						"comboPresidente() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+						"comboPresidente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
+				if (1 > 0) {
+
+					LOGGER.info(
+							"comboPresidente() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+
+					comboItems = scsEjgComisionExtendsMapper.comboPresidente(usuarios.get(0).getIdlenguaje());
+
+					LOGGER.info(
+							"comboPresidente() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+
+					if (comboItems != null) {
+						comboDTO.setCombooItems(comboItems);
+					}
 				}
-			}
 
+			}
+			LOGGER.info("comboPresidente() -> Salida del servicio para obtener los tipos ejg");
 		}
-		LOGGER.info("comboPresidente() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
+
 	}
 
 	@Override
@@ -755,12 +770,12 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			throws SigaExceptions {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
+
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = null;
-		String resultado = "00";
 
 		LOGGER.info("Entra en el metodo editarActaAnio con la institucion " + idInstitucion);
 
@@ -873,7 +888,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 					}
 				}
-			}else {
+			} else {
 				error.setCode(500);
 				error.setDescription("No existen actas asociadas al ejg");
 				updateResponseDTO.setStatus(SigaConstants.KO);
@@ -999,7 +1014,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						throw new SigaExceptions("No se ha podido ejecutar el triggersEjgUpdatesPonente");
 					}
 					int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
-					
+
 					LOGGER.info("Respuesta al actualizar" + response);
 
 				} else {
@@ -1118,14 +1133,12 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		return scsEstadoejg;
 	}
 
-	private int ponerFechaBajaEstadosEjg(ScsEjg scsEjg, Short idInstitucion)
-			throws SigaExceptions {
+	private int ponerFechaBajaEstadosEjg(ScsEjg scsEjg, Short idInstitucion) throws SigaExceptions {
 
 		ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
 
 		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
-				.andIdinstitucionEqualTo(idInstitucion)
-				.andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
+				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
 				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
 
 		estadoejgExample.setOrderByClause("FECHAMODIFICACION DESC");
@@ -1208,6 +1221,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		}
 
 		return scsEjgItem;
+
 	}
 
 }

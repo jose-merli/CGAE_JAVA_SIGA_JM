@@ -116,5 +116,23 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 			@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboPresidente(String string);
 
+<<<<<<< HEAD
 	
+=======
+	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "busquedaActas")
+	@Results({
+
+			@Result(column = "IDACTA", property = "idActa", jdbcType = JdbcType.NUMERIC),
+			//@Result(column = "IDINSTITUCION", property = "institucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROACTA", property = "numeroActa", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHARESOLUCION", property = "fechaResolucion", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHAREUNION", property = "fechaReunion", jdbcType = JdbcType.DATE),
+			@Result(column = "IDPRESIDENTE", property = "idPresidente", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDSECRETARIO", property = "idSecretario", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NOMBREPRESIDENTE", property = "nombrePresidente", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRESECRETARIO", property = "nombreSecretario", jdbcType = JdbcType.VARCHAR)
+
+	})
+	List<ActasItem> busquedaActas(ActasItem actasItem, Short idInstitucion);
+>>>>>>> 8ace3de8a (Commit con cambios en ejgcomision)
 }
