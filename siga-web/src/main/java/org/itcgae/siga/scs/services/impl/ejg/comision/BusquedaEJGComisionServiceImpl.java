@@ -1,6 +1,5 @@
 package org.itcgae.siga.scs.services.impl.ejg.comision;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;

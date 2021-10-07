@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
@@ -33,7 +32,21 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sqlPresidente.toString();
 	}
 
-	
+	public String comboAnioActa(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("to_clob(IDINSTITUCION ||',' || ANIOACTA || ',' || IDACTA) as value");
+		sql.SELECT("anioacta||'/'||numeroacta as DESCRIPCION");
+		sql.FROM("SCS_ACTACOMISION");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("FECHARESOLUCION IS NULL");
+		sql.ORDER_BY("IDINSTITUCION,ANIOACTA,IDACTA");
+
+		LOGGER.info(sql.toString());
+
+		return sql.toString();
+	}
 
 	public String comboResolucion(Short idLenguaje, String idInstitucion) {
 
