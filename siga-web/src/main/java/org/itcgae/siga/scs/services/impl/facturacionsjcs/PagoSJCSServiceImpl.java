@@ -3156,20 +3156,22 @@ public class PagoSJCSServiceImpl implements IPagoSJCSService {
                     FcsPagosjg pago = fcsPagosjgExtendsMapper.selectByPrimaryKey(fcsPagosjgKey);
 
                     // INICIO -> PONEMOS EL PAGO EN ESTADO EJECUTADO
-                    FcsPagosEstadospagos record = new FcsPagosEstadospagos();
-                    record.setIdinstitucion(idInstitucion);
-                    record.setIdpagosjg(pago.getIdpagosjg());
-                    record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
-                    record.setFechaestado(new Date());
-                    record.setFechamodificacion(new Date());
-                    record.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-                    fcsPagosEstadospagosMapper.insertSelective(record);
+//                    FcsPagosEstadospagos record = new FcsPagosEstadospagos();
+//                    record.setIdinstitucion(idInstitucion);
+//                    record.setIdpagosjg(pago.getIdpagosjg());
+//                    record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
+//                    record.setFechaestado(new Date());
+//                    record.setFechamodificacion(new Date());
+//                    record.setUsumodificacion(usuarios.get(0).getIdusuario());
+//
+//                    fcsPagosEstadospagosMapper.insertSelective(record);
                     // FIN -> PONEMOS EL PAGO EN ESTADO EJECUTADO
 
                     // INICIO -> BORRAMOS LOS FICHEROS BANCARIOS
-                    Hashtable nombreFicheros = utilidadesFacturacionSJCS.getNombreFicherosPago(idInstitucion, pago.getIdfacturacion(), pago.getIdpagosjg(), null);
-                    utilidadesFacturacionSJCS.borrarFicheros(idInstitucion, nombreFicheros);
+//                    Hashtable nombreFicheros = utilidadesFacturacionSJCS.getNombreFicherosPago(idInstitucion, pago.getIdfacturacion(), pago.getIdpagosjg(), null);
+//                    utilidadesFacturacionSJCS.borrarFicheros(idInstitucion, nombreFicheros);
+
+                    ejecucionPlsPago.ejecutarPLDeshacerCierre(idInstitucion, new Date());
 
                 }
             }

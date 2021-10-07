@@ -15,6 +15,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.*;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -237,6 +238,29 @@ public class EjecucionPlsPago {
         return resultado[0];
     }
 
+    public String ejecutarPLDeshacerCierre(Short idInstitucion, Date fechaPago) throws FacturacionSJCSException {
+
+        String[] resultado;
+
+        try {
+
+            Object[] param_in = new Object[2];
+            param_in[0] = idInstitucion;
+            param_in[1] = fechaPago;
+
+            resultado = callPLProcedure("{call PROC_FACSJCS_DESCIERREPAGO (?,?,?,?)}", 2, param_in);
+
+            if (!resultado[0].equalsIgnoreCase("0")) {
+                LOGGER.error("Error en PL = " + (String) resultado[1]);
+            }
+
+        } catch (Exception e) {
+            throw new FacturacionSJCSException("Error al ejecutar el PL de deshacer cierre", e);
+        }
+
+        return resultado[0];
+    }
+
     /**
      * Recupera el datasource con los datos de conexión sacados del fichero de
      * configuracion
@@ -288,8 +312,13 @@ public class EjecucionPlsPago {
 
             // input Parameters
             for (int i = 0; i < size; i++) {
-
-                cs.setString(i + 1, (String) inParameters[i]);
+                if (inParameters[i] instanceof Date) {
+                    cs.setDate(i + 1, new java.sql.Date(((Date) inParameters[i]).getTime()));
+                } else if (inParameters[i] instanceof Short) {
+                    cs.setShort(i + 1, (Short) inParameters[i]);
+                } else {
+                    cs.setString(i + 1, (String) inParameters[i]);
+                }
             }
             // output Parameters
             for (int i = 0; i < outParameters; i++) {

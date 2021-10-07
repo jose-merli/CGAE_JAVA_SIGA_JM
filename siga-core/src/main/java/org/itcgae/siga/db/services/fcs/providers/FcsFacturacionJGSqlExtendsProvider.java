@@ -470,7 +470,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
         sql.WHERE("fac.idinstitucion = importes.idinstitucion");
         sql.WHERE("fac.idinstitucion = grupo.idinstitucion");
         sql.WHERE("fac.idfacturacion = grupo.idfacturacion");
-        sql.WHERE("fac.visible = '1'");
+//        sql.WHERE("fac.visible = '1'");
         sql.WHERE("fac.idinstitucion = " + idInstitucion);
 
         if (!UtilidadesString.esCadenaVacia(cartasFacturacionPagosItem.getIdFacturacion())) {
