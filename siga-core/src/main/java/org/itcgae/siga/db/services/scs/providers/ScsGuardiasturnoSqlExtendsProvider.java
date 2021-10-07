@@ -3225,7 +3225,6 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		return sql.toString();
 	}
 	
-<<<<<<< HEAD
 	public String getGuardiasToProgByDates(String fechaDesde, String fechaHasta, String idInstitucion) {
 		SQL sql = new SQL();
 		sql.SELECT("COUNT (*) GUARDIAS");

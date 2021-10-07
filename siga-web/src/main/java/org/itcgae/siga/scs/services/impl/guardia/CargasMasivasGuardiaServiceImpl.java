@@ -84,6 +84,7 @@ import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargaMasivaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsBajasTemporalesExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsGrupoguardiacolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionguardiaExtendsMapper;
@@ -157,7 +158,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 	private ScsGuardiasturnoExtendsMapper scsGuardiasturnoExtendsMapper;
 	
 	@Autowired
-	private ScsGrupoguardiacolegiadoSqlProvider scsGrupoguardiacolegiadoSqlMapper;
+	private ScsGrupoguardiacolegiadoExtendsMapper scsGrupoguardiacolegiadoSqlMapper;
 	
 	private static final String ESTADO_PENDIENTE = "5"; 
 	@Override

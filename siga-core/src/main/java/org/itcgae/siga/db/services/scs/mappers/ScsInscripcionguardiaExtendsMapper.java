@@ -299,7 +299,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 
 
     
-    @SelectProvider(type=ScsInscripcionguardiaSqlProvider.class, method="getInscripcionByTurnoGuardiaNcolegiado")
+    @SelectProvider(type=ScsInscripcionguardiaSqlExtendsProvider.class, method="getInscripcionByTurnoGuardiaNcolegiado")
     @Results({
         @Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),
         @Result(column="IDPERSONA", property="idpersona", jdbcType=JdbcType.DECIMAL, id=true),
