@@ -1,4 +1,4 @@
-package org.itcgae.siga.scs.services.oficio;
+package org.itcgae.siga.scs.services.guardia;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.FileDataDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -26,7 +27,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 @Primary
-public interface IGestionCargasMasivasOficio {
+public interface CargasMasivasGuardiaService {
 	
 	public ResponseEntity<InputStreamResource>  descargarModelo(HttpServletRequest requestCargasMasivas, String turnos, String guardias, String tipo) 
 			throws IOException, EncryptedDocumentException, InvalidFormatException;
@@ -34,12 +35,15 @@ public interface IGestionCargasMasivasOficio {
 	public File createExcelFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector, String tipo)
 			throws BusinessException;
 
-	public DeleteResponseDTO uploadFileIT(MultipartHttpServletRequest request) throws IllegalStateException, IOException, Exception;
+	public DeleteResponseDTO uploadFileI(HttpServletRequest request, FileDataDTO body) throws IllegalStateException, IOException;
 
-	public DeleteResponseDTO uploadFileBT(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
+	public DeleteResponseDTO uploadFileGC(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
+	
+	public DeleteResponseDTO uploadFileC(MultipartHttpServletRequest request, String fechaDesde, String fechaHasta, String observaciones) throws IllegalStateException, IOException;
 
 	public ResponseEntity<InputStreamResource> downloadLogFile(CargaMasivaItem cargaMasivaItem, HttpServletRequest request)
 			throws SigaExceptions;
+
 
 
 }

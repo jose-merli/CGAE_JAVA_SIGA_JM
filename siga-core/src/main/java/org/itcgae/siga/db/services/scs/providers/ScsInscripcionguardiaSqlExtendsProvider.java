@@ -1388,4 +1388,31 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		"gen_recursos_catalogos.idlenguaje = 1");
 		return sql.toString();
 	}
+	
+    
+    public String getInscripcionByTurnoGuardiaNcolegiado(String usuModif, String idTurno, String idGuardia, String numColegiado) {
+    
+	    SQL sql2 = new SQL();
+	    	sql2.SELECT("IDPERSONA");
+	    	sql2.FROM("CEN_COLEGIADO");
+	    	if (!numColegiado.isEmpty() && numColegiado != null) {
+	    		sql2.WHERE("NCOLEGIADO = " + numColegiado);
+	    	}
+	    SQL sql = new SQL();
+	    sql.SELECT("*");
+	    sql.FROM("SCS_INSCRIPCIONGUARDIA");
+	    if (!usuModif.isEmpty() && usuModif != null) {
+	    sql.WHERE("USUMODIFICACION = "+ usuModif);
+	    }
+	    if (!idTurno.isEmpty() && idTurno != null) {
+	    sql.WHERE("IDTURNO = " + idTurno);
+	    }
+	    sql.WHERE("IDPERSONA in ( " + sql2 + ")");
+	    if (!idGuardia.isEmpty() && idGuardia != null) {
+	    sql.WHERE("IDGUARDIA = "+ idGuardia);
+	    }
+	    sql.WHERE("FECHABAJA IS NULL");
+   // sql.SELECT("FECHASUSCRIPCION");
+	    return sql.toString();
+    }
 }
