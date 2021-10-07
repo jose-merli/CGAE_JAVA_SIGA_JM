@@ -2923,7 +2923,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					// SCS_INSCRIPCIONTURNO por idPersona idinstitucion idturno.
 					ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
 					String numeroColegiado = designaItem.getNumColegiado();
-					if (StringUtils.isEmpty(numeroColegiado)) {
+					if (StringUtils.isEmpty(numeroColegiado)&& !designaItem.getArt27().equals("1")) {
 						// Se realiza busqueda en la cola de oficio
 
 						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -2991,20 +2991,22 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 //								idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
 //
 //							}
-						} else {
-							idPersona = scsDesignacionesExtendsMapper
-									.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
-							idPersona = scsDesignacionesExtendsMapper
-									.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
-						}
-
-						InsertResponseDTO responseNColegiado = new InsertResponseDTO();
-						if (idPersona == null || idPersona == "") {
+						} /*else {
 							idPersona = scsDesignacionesExtendsMapper
 									.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
 							if(idPersona == null || idPersona.isEmpty()) {
 								idPersona = scsDesignacionesExtendsMapper
-										.obtenerNumNoColegiado(designa.getIdinstitucion().toString(), idPersona);
+									.obtenerNumNoColegiado(String.valueOf(designaItem.getIdInstitucion()), idPersona);
+							}
+						}*/
+
+						InsertResponseDTO responseNColegiado = new InsertResponseDTO();
+						if (idPersona == null || idPersona == "" ) {
+							idPersona = scsDesignacionesExtendsMapper
+									.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
+							if(idPersona == null || idPersona.isEmpty()) {
+								idPersona = scsDesignacionesExtendsMapper
+										.obtenerNumNoColegiado(String.valueOf(designaItem.getIdInstitucion()), idPersona);
 							}
 							NoColegiadoItem noColegiadoItem = new NoColegiadoItem();
 							noColegiadoItem.setIdTipoIdentificacion("10");
