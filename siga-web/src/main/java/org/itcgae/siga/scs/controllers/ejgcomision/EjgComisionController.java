@@ -3,11 +3,13 @@ package org.itcgae.siga.scs.controllers.ejgcomision;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ActualizarAnioActaItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 
 import org.itcgae.siga.DTOs.scs.EjgItem;
-
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJGComision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -73,6 +75,23 @@ public class EjgComisionController {
 		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/filtros-ejg/editarActaAnio", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> editarActaAnio(@RequestBody ActualizarAnioActaItem actualizarAnioActaItem, HttpServletRequest request) throws SigaExceptions {
+		UpdateResponseDTO response = busquedaEJGComision.editarActaAnio(actualizarAnioActaItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-ejg/editarResolucionFundamento", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> editarResolucionFundamento(@RequestBody EjgItem ejgItem , HttpServletRequest request) throws Exception {
+		UpdateResponseDTO response = busquedaEJGComision.editarResolucionFundamento(ejgItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}	
+	
+	@RequestMapping(value = "/filtros-ejg/editarPonente", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> editarPonente(@RequestBody EjgItem ejgItem , HttpServletRequest request) throws Exception {
+		UpdateResponseDTO response = busquedaEJGComision.editarPonente(ejgItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}	
 
 	@GetMapping(value = "/filtros-ejg/comboDictamenComision", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboDictamen(HttpServletRequest request) {

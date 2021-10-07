@@ -3,9 +3,13 @@ package org.itcgae.siga.scs.services.ejg;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ActasItem;
+import org.itcgae.siga.DTOs.scs.ActualizarAnioActaItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 
 public interface IBusquedaEJGComision {
 
@@ -40,6 +44,13 @@ public interface IBusquedaEJGComision {
 	ComboDTO comboPresidente(HttpServletRequest request);
 
 	ComboDTO comboSecretario(HttpServletRequest request);
+
+	UpdateResponseDTO editarActaAnio(ActualizarAnioActaItem actualizarAnioActaItem, HttpServletRequest request) throws SigaExceptions;
+
+	UpdateResponseDTO editarResolucionFundamento(EjgItem ejgItem, HttpServletRequest request) throws Exception;
+
+	UpdateResponseDTO editarPonente(EjgItem ejgItem, HttpServletRequest request) throws SigaExceptions;
+
 
 
 	

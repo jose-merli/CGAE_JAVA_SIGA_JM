@@ -1,32 +1,50 @@
 package org.itcgae.siga.scs.services.impl.ejg.comision;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.assertj.core.api.ShortArrayAssert;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.ActualizarAnioActaItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.ScsActacomision;
+import org.itcgae.siga.db.entities.ScsActacomisionKey;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgActa;
+import org.itcgae.siga.db.entities.ScsEjgActaExample;
+import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsEstadoejg;
+import org.itcgae.siga.db.entities.ScsEstadoejgExample;
+import org.itcgae.siga.db.mappers.ScsActacomisionMapper;
+import org.itcgae.siga.db.mappers.ScsEjgActaMapper;
+import org.itcgae.siga.db.mappers.ScsEjgMapper;
+import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsActaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgComisionExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJGComision;
+import org.itcgae.siga.scs.services.impl.ejg.GestionEJGServiceImpl;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
@@ -38,6 +56,18 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	private ScsEjgComisionExtendsMapper scsEjgComisionExtendsMapper;
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	@Autowired
+	private ScsEjgActaMapper scsEjgActaMapper;
+	@Autowired
+	private ScsActacomisionMapper scsActacomisionMapper;
+	@Autowired
+	private ScsEstadoejgMapper scsEstadoejgMapper;
+	@Autowired
+	private ScsEjgMapper scsEjgMapper;
+	@Autowired
+	private ScsActaExtendsMapper scsActaExtendsMapper;
+	@Autowired
+	GestionEJGServiceImpl gestionEJGServiceImpl;
 
 	@Override
 	public ComboDTO comboDictamen(HttpServletRequest request) {
@@ -718,6 +748,466 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		}
 		LOGGER.info("comboSecretario() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO editarActaAnio(ActualizarAnioActaItem actualizarAnioActaItem, HttpServletRequest request)
+			throws SigaExceptions {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = null;
+		String resultado = "00";
+
+		LOGGER.info("Entra en el metodo editarActaAnio con la institucion " + idInstitucion);
+
+		if (idInstitucion != null) {
+			LOGGER.info(
+					"guardarEditarSelecionados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			LOGGER.info("intentamos conseguir el idEstado por ejg");
+
+			String idEstadoPorEjg = scsActaExtendsMapper.getEstadosEjg(
+					Short.valueOf(actualizarAnioActaItem.getIdInstitucionEjgActa()),
+					Short.valueOf(actualizarAnioActaItem.getIdTipoEJG()),
+					Short.valueOf(actualizarAnioActaItem.getAnioEjg()),
+					Long.valueOf(actualizarAnioActaItem.getNumeroEjg()));
+
+			if (idEstadoPorEjg == null) {
+				throw new SigaExceptions("Ha ocurrido un error a la hora de actualizar el acta");
+			}
+
+			LOGGER.info("el idEstado por ejg es " + idEstadoPorEjg);
+
+			ScsEstadoejg scsEstadoEjg;
+
+			LOGGER.info("intentamos conseguir el ejg");
+			ScsEjg scsEjg = obtenerEjg(actualizarAnioActaItem, idInstitucion);
+
+			LOGGER.info("intentamos conseguir el estado del ejg");
+
+			scsEstadoEjg = obtenerEstadoEjg(scsEjg, idEstadoPorEjg, idInstitucion);
+
+			LOGGER.info("intentamos conseguir la lista de ejg y actas asociadas");
+			List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(scsEjg, idInstitucion);
+			if (!listaEjgAsociadosActa.isEmpty()) {
+				LOGGER.info("La lista tiene este tamaño " + listaEjgAsociadosActa.size());
+
+				if (actualizarAnioActaItem.getBorrar() == 0) {
+
+					for (ScsEjgActa scsEjgActa : listaEjgAsociadosActa) {
+						LOGGER.info("Si borrar es 0 entro en el for");
+
+						LOGGER.info("ID DEL ACTA EN LA RELACION EJGACTA = " + scsEjgActa.getIdinstitucionacta());
+
+						ScsActacomision acta = new ScsActacomision();
+
+						if (scsEjgActa.getIdinstitucionacta() == idInstitucion) {
+
+							acta = obtenerActa(scsEjgActa, idInstitucion);
+
+							if (acta.getFecharesolucion() == null) {
+								LOGGER.info("La fecha resolucion del acta es nula");
+
+								LOGGER.info("Datos del scsEstadoEjg -> idInstitucion " + scsEstadoEjg.getIdinstitucion()
+										+ " idTipoEjg -> " + scsEstadoEjg.getIdtipoejg() + " anio -> "
+										+ scsEstadoEjg.getAnio() + " numero -> " + scsEstadoEjg.getNumero()
+										+ " idEstadoporEjg ->" + scsEstadoEjg.getIdestadoejg());
+								scsEstadoEjg.setObservaciones(
+										scsEstadoEjg.getObservaciones() + " Expediente excluido del acta "
+												+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+								LOGGER.info(scsEstadoEjg.getObservaciones());
+								scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
+							}
+						}
+
+					}
+					LOGGER.info("Seteando las observaciones");
+
+					String[] parts = actualizarAnioActaItem.getAnioIdActa().split("/");
+					String anioActa = parts[0];
+					String idActa = parts[1];
+
+					scsEstadoEjg.setObservaciones(scsEstadoEjg.getObservaciones()
+							+ " Expediente incluido masivamente en el acta " + anioActa + "/" + idActa);
+					LOGGER.info("observacion segunda fuera del for " + scsEstadoEjg.getObservaciones());
+
+					ScsEjgActa scsEjgActaNuevo = new ScsEjgActa();
+
+					LOGGER.info("Creando la nueva relacion acta y ejg");
+
+					scsEjgActaNuevo.setNumeroejg(Long.valueOf(scsEjg.getNumero()));
+					scsEjgActaNuevo.setIdtipoejg(scsEjg.getIdtipoejg());
+					scsEjgActaNuevo.setAnioejg(scsEjg.getAnio());
+					scsEjgActaNuevo.setIdinstitucionejg(idInstitucion);
+					scsEjgActaNuevo.setIdinstitucionacta(idInstitucion);
+					scsEjgActaNuevo.setAnioacta(Short.valueOf(anioActa));
+					scsEjgActaNuevo.setIdacta(Long.valueOf(idActa));
+					scsEjgActaNuevo.setFechamodificacion(new Date());
+					scsEjgActaNuevo.setUsumodificacion(0);
+					scsEjg.setIdacta(Long.valueOf(idActa));
+					scsEjg.setAnioacta(Short.valueOf(Short.valueOf(anioActa)));
+					scsEjg.setUsumodificacion(0);
+					scsEjg.setUsucreacion(0);
+
+					LOGGER.info("Guardando");
+					scsEjgActaMapper.insert(scsEjgActaNuevo);
+					scsEjgMapper.updateByPrimaryKey(scsEjg);
+					scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
+
+				} else {
+					for (ScsEjgActa scsEjgActa : listaEjgAsociadosActa) {
+
+						ScsActacomision acta = obtenerActa(scsEjgActa, idInstitucion);
+
+						if (acta.getFecharesolucion() == null) {
+							scsEstadoEjg.setObservaciones(
+									scsEstadoEjg.getObservaciones() + "Expediente excluido masivamente del acta "
+											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+							scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
+							scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
+						}
+
+					}
+				}
+			}else {
+				error.setCode(500);
+				error.setDescription("No existen actas asociadas al ejg");
+				updateResponseDTO.setStatus(SigaConstants.KO);
+			}
+
+			LOGGER.info(
+					"guardarEditarSelecionados() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+
+		} else {
+			error.setCode(500);
+			error.setDescription("El idInstitucion es nulo");
+		}
+		LOGGER.info("guardarEditarSelecionados() -> Salida del servicio para obtener los tipos ejg");
+		updateResponseDTO.setError(error);
+		return updateResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO editarResolucionFundamento(EjgItem ejgItem, HttpServletRequest request) throws Exception {
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String resultado = "00";
+		Error error = new Error();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+
+		if (idInstitucion != null) {
+
+			LOGGER.info("intentamos conseguir el ejg");
+
+			ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
+
+			LOGGER.info("intentamos conseguir el estado del ejg");
+
+			// uso getbis para saber si tengo que borrar o no
+			if (ejgItem.getBis()) {
+				scsEjg.setIdtiporatificacionejg(null);
+				scsEjg.setIdfundamentojuridico(null);
+			} else
+			// uso tipo dictamen para traer los datos de la resolucion
+			if (ejgItem.getIdTipoDictamen() != null && ejgItem.getFundamentoJuridico() != null) {
+
+				int response = actualizarFecharesolucioncajg(idInstitucion, usuario, scsEjg);
+
+				if (response == 0)
+					throw (new Exception(
+							"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
+									+ " asociada a un EJG"));
+
+				scsEjg.setIdtiporatificacionejg(ejgItem.getIdTipoDictamen());
+			}
+
+			scsEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
+
+			LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL -> ");
+			LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL anio -> " + scsEjg.getAnio());
+			LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idtipoejg -> " + scsEjg.getIdtipoejg());
+			LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idinstitucion-> " + scsEjg.getIdinstitucion());
+			LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL numero -> " + scsEjg.getNumero());
+
+			scsEjgMapper.updateByPrimaryKey(scsEjg);
+
+			LOGGER.info(
+					"guardarEditarSelecionados() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+
+		} else {
+			error.setCode(500);
+			error.setDescription("El idInstitucion es nulo");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		}
+
+		updateResponseDTO.setError(error);
+		return updateResponseDTO;
+	}
+
+	@Override
+	@Transactional
+	public UpdateResponseDTO editarPonente(EjgItem ejgItem, HttpServletRequest request) throws SigaExceptions {
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = null;
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+
+		if (idInstitucion != null) {
+			LOGGER.info("ESTAMOS AQUIIIIIIIIIIIIIIIIII");
+			LOGGER.info("intentamos conseguir el ejg" + ejgItem.getBis());
+
+			ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
+
+			LOGGER.info("intentamos conseguir el estado del ejg " + ejgItem.getBis());
+
+			if (ejgItem.getBis()) {
+				LOGGER.info("Si hay que borrar entramos aqui");
+				ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
+			} else {
+				if (ejgItem.getPonente() != null && ejgItem.getFechaPonenteDesd() != null) {
+
+					ResolucionEJGItem resolEjg = new ResolucionEJGItem();
+					resolEjg.setAnio(scsEjg.getAnio());
+					resolEjg.setIdTipoEJG(scsEjg.getIdtipoejg());
+					resolEjg.setNumero(scsEjg.getNumero());
+					resolEjg.setFechaPresentacionPonente(ejgItem.getFechaPonenteDesd());
+					resolEjg.setIdPonente(Integer.valueOf(ejgItem.getPonente()));
+
+					scsEjg.setFechapresentacionponente(ejgItem.getFechaPonenteDesd());
+					scsEjg.setIdponente(Integer.valueOf(ejgItem.getPonente()));
+
+					try {
+						gestionEJGServiceImpl.triggersEjgUpdatesPonente(resolEjg, usuario, idInstitucion);
+					} catch (Exception e) {
+						LOGGER.info("No se ha podido ejecutar el triggersEjgUpdatesPonente");
+						throw new SigaExceptions("No se ha podido ejecutar el triggersEjgUpdatesPonente");
+					}
+					int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
+					
+					LOGGER.info("Respuesta al actualizar" + response);
+
+				} else {
+					error.setCode(500);
+					error.setDescription("Ponente o Fecha Ponente es nula");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+
+				}
+			}
+
+		} else {
+			error.setCode(500);
+			error.setDescription("El idInstitucion es nulo");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+
+		}
+		updateResponseDTO.setError(error);
+		return updateResponseDTO;
+	}
+
+	/**
+	 * @param ejgItem
+	 * @param idInstitucion
+	 */
+	private List<ScsEjgActa> obtenerEjgActa(ScsEjg scsEjg, Short idInstitucion) {
+
+		ScsEjgActaExample scsEjgActaExample = new ScsEjgActaExample();
+
+		scsEjgActaExample.createCriteria().andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
+				.andNumeroejgEqualTo(Long.valueOf(scsEjg.getNumero())).andIdinstitucionejgEqualTo(idInstitucion)
+				.andIdinstitucionactaEqualTo(idInstitucion).andAnioejgEqualTo(Short.valueOf(scsEjg.getAnio()));
+
+		List<ScsEjgActa> listaEjgAsociadosActa = scsEjgActaMapper.selectByExample(scsEjgActaExample);
+
+		return listaEjgAsociadosActa;
+	}
+
+	private int actualizarFecharesolucioncajg(Short idInstitucion, AdmUsuarios usuario, ScsEjg ejgItem)
+			throws Exception {
+		int response;
+
+		ResolucionEJGItem resolEjg = new ResolucionEJGItem();
+
+		resolEjg.setAnio(ejgItem.getAnio());
+
+		resolEjg.setIdInstitucion(ejgItem.getIdinstitucion());
+
+		resolEjg.setIdTipoEJG(ejgItem.getIdtipoejg());
+
+		resolEjg.setNumero(ejgItem.getNumero());
+
+		resolEjg.setIdTiporatificacionEJG(ejgItem.getIdtiporatificacionejg());
+
+		try {
+			response = gestionEJGServiceImpl.triggersEjgUpdatesResol(resolEjg, usuario, idInstitucion);
+		} catch (Exception e) {
+			LOGGER.info("No se ha podido ejecutar el triggersEjgUpdatesResol");
+			throw new SigaExceptions("No se ha podido ejecutar el triggersEjgUpdatesResol");
+		}
+
+		return response;
+	}
+
+	private ScsActacomision obtenerActa(ScsEjgActa scsEjgActa, Short idInstitucion) throws SigaExceptions {
+
+		LOGGER.info("Anio acta no nula = " + scsEjgActa.getAnioacta());
+		LOGGER.info("Id Acta no nula = " + scsEjgActa.getIdacta());
+
+		ScsActacomision acta = new ScsActacomision();
+
+		ScsActacomisionKey key = new ScsActacomisionKey();
+
+		key.setAnioacta(Short.valueOf(scsEjgActa.getAnioacta()));
+
+		key.setIdacta(Long.valueOf(scsEjgActa.getIdacta()));
+
+		key.setIdinstitucion(Short.valueOf(idInstitucion));
+
+		try {
+			acta = scsActacomisionMapper.selectByPrimaryKey(key);
+
+		} catch (Exception e) {
+			LOGGER.info("No se encuentra el acta en la base de datos");
+			throw new SigaExceptions("No se encuentra el acta en la base de datos");
+		}
+
+		return acta;
+	}
+
+	private ScsEstadoejg obtenerEstadoEjg(ScsEjg scsEjg, String idEstadoPorEjg, Short idInstitucion)
+			throws SigaExceptions {
+
+		ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
+
+		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
+				.andIdestadoporejgEqualTo(Long.valueOf(idEstadoPorEjg)).andIdinstitucionEqualTo(idInstitucion)
+				.andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
+				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero()));
+
+		estadoejgExample.setOrderByClause("FECHAMODIFICACION DESC");
+
+		List<ScsEstadoejg> estadoejgObject = scsEstadoejgMapper.selectByExample(estadoejgExample);
+
+		try {
+			estadoejgObject = scsEstadoejgMapper.selectByExample(estadoejgExample);
+		} catch (Exception e) {
+			LOGGER.info("No se encuentra el estado para el ejg seleccionado");
+			throw new SigaExceptions("No se encuentra el estado para el ejg seleccionado");
+		}
+		ScsEstadoejg scsEstadoejg;
+		if (!estadoejgObject.isEmpty()) {
+			scsEstadoejg = estadoejgObject.get(0);
+		} else {
+			throw new SigaExceptions("No existen estados para este ejg");
+		}
+		return scsEstadoejg;
+	}
+
+	private int ponerFechaBajaEstadosEjg(ScsEjg scsEjg, Short idInstitucion)
+			throws SigaExceptions {
+
+		ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
+
+		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
+				.andIdinstitucionEqualTo(idInstitucion)
+				.andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
+				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
+
+		estadoejgExample.setOrderByClause("FECHAMODIFICACION DESC");
+
+		List<ScsEstadoejg> estadoejgObject;
+
+		try {
+			estadoejgObject = scsEstadoejgMapper.selectByExample(estadoejgExample);
+		} catch (Exception e) {
+			LOGGER.info("No se encuentran los estaodos para este ejg");
+			throw new SigaExceptions("No se encuentran los estaodos para este ejg");
+
+		}
+
+		if (!estadoejgObject.isEmpty()) {
+			LOGGER.info("tamaño de la lista " + estadoejgObject.size());
+			for (ScsEstadoejg scsEstadoejg : estadoejgObject) {
+				if (scsEstadoejg.getIdestadoejg() == 20) {
+					scsEstadoejg.setFechabaja(new Date());
+					int resultado = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoejg);
+					LOGGER.info("Se ha actualizado la fecha de baja? " + resultado);
+				}
+			}
+		}
+		return estadoejgObject.size();
+	}
+
+	private ScsEjg obtenerEjg(ActualizarAnioActaItem actualizarAnioActaItem, Short idInstitucion)
+			throws SigaExceptions {
+
+		ScsEjgKey ejgkey = new ScsEjgKey();
+
+		ejgkey.setAnio(Short.valueOf(actualizarAnioActaItem.getAnioEjg()));
+
+		ejgkey.setIdinstitucion(idInstitucion);
+
+		ejgkey.setIdtipoejg(Short.valueOf(actualizarAnioActaItem.getIdTipoEJG()));
+
+		ejgkey.setNumero(Long.valueOf(actualizarAnioActaItem.getNumeroEjg()));
+
+		ScsEjg scsEjgItem = scsEjgMapper.selectByPrimaryKey(ejgkey);
+
+		try {
+			scsEjgItem = scsEjgMapper.selectByPrimaryKey(ejgkey);
+
+		} catch (Exception e) {
+			LOGGER.info("No se encuentra el ejg en la base de datos");
+			throw new SigaExceptions("No se encuentra el ejg en la base de datos");
+
+		}
+
+		return scsEjgItem;
+	}
+
+	private ScsEjg obtenerEjg(EjgItem ejgItem, Short idInstitucion) throws SigaExceptions {
+
+		ScsEjgKey ejgkey = new ScsEjgKey();
+
+		ejgkey.setAnio(Short.valueOf(ejgItem.getAnnio()));
+
+		ejgkey.setIdinstitucion(idInstitucion);
+
+		ejgkey.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
+
+		ejgkey.setNumero(Long.valueOf(ejgItem.getNumero()));
+
+		LOGGER.info("EJGKEY: anio idinstitucion tipoejg numero " + ejgkey.getAnio().toString() + " "
+				+ ejgkey.getIdinstitucion().toString() + " " + ejgkey.getIdtipoejg().toString() + " "
+				+ ejgkey.getNumero().toString());
+
+		ScsEjg scsEjgItem;
+
+		try {
+			scsEjgItem = scsEjgMapper.selectByPrimaryKey(ejgkey);
+
+		} catch (Exception e) {
+			LOGGER.info("No se encuentra el ejg en la base de datos");
+			throw new SigaExceptions("No se encuentra el ejg en la base de datos");
+
+		}
+
+		return scsEjgItem;
 	}
 
 }

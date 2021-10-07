@@ -11,6 +11,7 @@ import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 	private Logger LOGGER = Logger.getLogger(ScsEjgComisionSqlExtendsProvider.class);
 
+
 	public String obligatoriedadResolucion(Short idInstitucion) {
 
 		SQL sql = new SQL();

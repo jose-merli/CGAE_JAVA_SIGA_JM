@@ -9,6 +9,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsActaSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsEjgComisionSqlExtendsProvider;
 
 public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {

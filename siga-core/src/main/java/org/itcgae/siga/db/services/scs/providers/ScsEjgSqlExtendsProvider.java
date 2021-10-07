@@ -1470,13 +1470,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + "') || ' ' ||\r\n" + "				           (Select f_Siga_Getrecurso(Nombre, '" + idLenguaje
                 + "')\r\n" + "				              From Scs_Ponente\r\n"
                 + "				             Where Idinstitucion = '" + idInstitucion + "'\r\n"
-                + "	                        And Idtipodictamenejg = " + idPonente + ") as observaciones");
+                + "	                        And  Idponente = " + idPonente + ") as observaciones");
 
         sql.FROM("Scs_Estadoejg");
-
         // Para coger solo un resultado
         sql.WHERE("ROWNUM = 1");
-
         return sql.toString();
     }
 

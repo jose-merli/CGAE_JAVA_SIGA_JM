@@ -136,11 +136,6 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 			List<ActasItem> listaActasItem = scsActaExtendsMapper.busquedaActas(actasItem,
 					Short.valueOf(idInstitucion));
 
-			for (ActasItem ActasItem : listaActasItem) {
-
-				LOGGER.info("ver si mapea el anio al objeto o que le pasa " + ActasItem.getAnio());
-			}
-
 			if (listaActasItem != null) {
 
 				// Guardamos la lista de actas en el objeto DTO

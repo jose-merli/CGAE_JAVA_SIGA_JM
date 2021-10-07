@@ -33,6 +33,7 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.DocushareHelper;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Service
+@Configurable
 public class GestionEJGServiceImpl implements IGestionEJG {
     private Logger LOGGER = Logger.getLogger(BusquedaDocumentacionEjgServiceImpl.class);
 
@@ -5401,7 +5403,22 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         ejgKey.setIdtipoejg(Short.valueOf(resolEjg.getIdTipoEJG()));
         ejgKey.setNumero(Long.valueOf(resolEjg.getNumero()));
 
+        LOGGER.info(
+                "RESOLEJG: anio idinstitucion tipoejg numero " + resolEjg.getAnio() + " " + idInstitucion + " " + resolEjg.getIdTipoEJG() + " " + resolEjg.getNumero());
+
+        LOGGER.info(
+                "EJGKEY: anio idinstitucion tipoejg numero " + ejgKey.getAnio().toString() + " " + ejgKey.getIdinstitucion().toString() + " " + ejgKey.getIdtipoejg().toString() + " " + ejgKey.getNumero().toString());
+
+        LOGGER.info("****** scsejgmapper ******** "+scsEjgMapper);
+        
+        ScsEjgExample scsEjgEx = new ScsEjgExample();
+        scsEjgEx.createCriteria().andIdinstitucionactaEqualTo((short)2078);
+        LOGGER.info("****avc****"+scsEjgMapper.countByExample(scsEjgEx));
+        
         ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+
+        LOGGER.info(
+                "Si que conseguimos el ejg ");
 
         // 3.1 Si cambia el ponente o la fecha presentacion ponente y no eran nulos
         // antes
@@ -5413,6 +5430,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 && (ejg.getFechapresentacionponente() != null && ejg.getIdponente() != null)
                 || (resolEjg.getFechaPresentacionPonente() != null && resolEjg.getIdPonente() != null)) {
 
+        	  LOGGER.info(
+                      "entramos en el if ");
             ScsEstadoejgExample estadoEjgExample = new ScsEstadoejgExample();
 
             estadoEjgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
@@ -5421,13 +5440,19 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     .andIdestadoejgEqualTo((short) 0) // Remitida apertura a CAJG-Reparto Ponente ===
                     // scs_maestroestadosejg.idestadoejg=0
                     .andAutomaticoEqualTo("1").andFechabajaIsNull();
-
+            LOGGER.info(
+                    "creamos criteria ");
             List<ScsEstadoejg> estadoPonente = scsEstadoejgMapper.selectByExample(estadoEjgExample);
 
+            LOGGER.info(
+                    "obtenemos lista criteria");
             if (!estadoPonente.isEmpty()) {
                 estadoPonente.get(0).setFechabaja(new Date());
-
+                LOGGER.info(
+                        "Si la lista no es nula intentamos updatear ");
                 response = scsEstadoejgMapper.updateByExample(estadoPonente.get(0), estadoEjgExample);
+                LOGGER.info(
+                        "updateamos ");
                 if (response == 0)
                     throw (new Exception("Error en triggersEjgUpdatesPonente 3.1"));
             }
@@ -5436,7 +5461,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
             if (resolEjg.getFechaPresentacionPonente() != null && resolEjg.getIdPonente() != null) {
                 // Se inserta el estado "Remitida apertura a CAJG-Reparto Ponente" y se pone en
                 // las observacions el nombre del ponente.
-
+            	  LOGGER.info(
+                          "fecha y idponente no nulos ");
                 ScsEstadoejg newEstadoPonente = new ScsEstadoejg();
 
                 newEstadoPonente.setIdinstitucion(idInstitucion);
@@ -5448,18 +5474,38 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 newEstadoPonente.setFechainicio(resolEjg.getFechaPresentacionPonente());
                 newEstadoPonente.setFechamodificacion(new Date());
                 newEstadoPonente.setUsumodificacion(usuario.getIdusuario());
-
+                LOGGER.info(
+                        "Completamos datos para el key ");
+                
+                LOGGER.info(
+                        "Completamos datos para el key " + idInstitucion);
+                
+                LOGGER.info(
+                        "Completamos datos para el key " + usuario.getIdlenguaje());
+                
+                LOGGER.info(
+                        "Completamos datos para el key " + resolEjg.getIdPonente());
+                
                 // Se realiza una consulta SQL para obtener las observaciones asociadas
                 newEstadoPonente.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgPonente(idInstitucion,
                         usuario.getIdlenguaje(), resolEjg.getIdPonente()));
+                
+                LOGGER.info(
+                        "seteamos las observaciones ");
+                
+                LOGGER.info(
+                        "ejg: anio idinstitucion tipoejg numero " + ejg.getAnio().toString() + " " + ejg.getIdinstitucion().toString() + " " + ejg.getIdtipoejg().toString() + " " + ejg.getNumero().toString());
 
                 // obtenemos el maximo de idestadoporejg
                 newEstadoPonente.setIdestadoporejg(getNewIdestadoporejg(ejg, idInstitucion));
-
+                LOGGER.info(
+                        "seteamos el id estado por ejg ");
                 newEstadoPonente.setAutomatico("1");
                 newEstadoPonente.setPropietariocomision("1");
 
                 response = scsEstadoejgMapper.insert(newEstadoPonente);
+                LOGGER.info(
+                        "Creamos el registro ");
                 if (response == 0)
                     throw (new Exception("Error en triggersEjgUpdatesPonente 3.2"));
             }
