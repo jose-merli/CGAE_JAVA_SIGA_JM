@@ -53,6 +53,9 @@ import org.itcgae.siga.db.entities.CajgProcedimientoremesaresolExample;
 import org.itcgae.siga.db.entities.CajgRemesaresolucion;
 import org.itcgae.siga.db.entities.CajgRemesaresolucionKey;
 import org.itcgae.siga.db.entities.CajgRemesaresolucionfichero;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
@@ -63,6 +66,7 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRemesasResolucionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRemesasResultadoExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IRemesasResultados;
@@ -110,6 +114,9 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 	
 	@Autowired
 	private CajgProcedimientoremesaresolMapper cajgProcedimientoremesaresolMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
 	@Override
 	public RemesaResultadoDTO buscarRemesasResultado(RemesasResultadoItem remesasResultadoItem, HttpServletRequest request) {
@@ -272,7 +279,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
     
  
     @Override
-	public UpdateResponseDTO guardarRemesaResultado(RemesasResultadoItem remesasResultadoItem, MultipartHttpServletRequest request)  {
+	public UpdateResponseDTO guardarRemesaResultado(RemesasResolucionItem remesasResolucionItem, MultipartHttpServletRequest request)  {
     	
     	UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -294,14 +301,29 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 			LOGGER.info(
 					"guardarRemesaResultado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			
+			
+			LOGGER.info(
+					"guardarRemesaResultado() / cajgProcedimientoremesaresolMapper.selectByExample() -> Entrada a cajgProcedimientoremesaresolMapper para obtener información del procedimiento");
+
+			CajgProcedimientoremesaresolExample procedimientoExample = new CajgProcedimientoremesaresolExample();
+			procedimientoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtiporemesaEqualTo(new Short("3"));
+			List<CajgProcedimientoremesaresol> procedimientos;
+			
+			procedimientos = cajgProcedimientoremesaresolMapper.selectByExample(procedimientoExample);
+			
+			LOGGER.info(
+					"guardarRemesaResultado() / cajgProcedimientoremesaresolMapper.selectByExample() -> Salida de cajgProcedimientoremesaresolMapper para obtener información del procedimiento");
+			
 			Iterator<String> itr = request.getFileNames();
 			MultipartFile file = request.getFile(itr.next());
 			String fileName = file.getOriginalFilename();
 			boolean conFichero = (!fileName.isEmpty()) ? true : false; 					
-			String path = getDirectorioFicheroRemesa(idInstitucion,remesasResultadoItem.getIdRemesaResultado());
+			String path = getDirectorioFicheroRemesa(idInstitucion,remesasResolucionItem.getIdRemesaResolucion());
+
 			
-			if(remesasResultadoItem.getIdRemesa() == 0) {
+			if(remesasResolucionItem.getIdRemesa() == 0) {
 				try {
+					
 					// Dejado por Ruben
 					//response = scsRemesasResultadoExtendsMapper.insertSelective(remesasResultadoItem, idInstitucion, usuarios.get(0).getIdusuario());		
 				
@@ -320,9 +342,9 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 					remesaResolucion.setIdinstitucion(idInstitucion);
 					remesaResolucion.setPrefijo(adm.getPrefijo());
 					remesaResolucion.setSufijo(adm.getSufijo());
-					remesaResolucion.setFechacarga(remesasResultadoItem.getFechaResolucionRemesaResultado());
-					remesaResolucion.setFecharesolucion(remesasResultadoItem.getFechaResolucionRemesaResultado());
-					remesaResolucion.setObservaciones(remesasResultadoItem.getObservacionesRemesaResultado());
+					remesaResolucion.setFechacarga(remesasResolucionItem.getFechaCarga());
+					remesaResolucion.setFecharesolucion(remesasResolucionItem.getFechaResolucion());
+					remesaResolucion.setObservaciones(remesasResolucionItem.getObservaciones());
 					remesaResolucion.setNombrefichero((conFichero) ? fileName : "");
 					remesaResolucion.setFechamodificacion(new Date());
 					
@@ -334,9 +356,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 					
 					if(response == 1 && conFichero) {
 						
-						
-								
-						LOGGER.debug("uploadFile() -> Guardar el archivo");	 
+						LOGGER.debug("guardarRemesaResultado() -> Guardar el archivo");	 
 						 
 						if(guardarFichero(path,file)) {
 							
@@ -345,31 +365,23 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 							LOGGER.info(
 									"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
 							
-							insertRemesaResolucionFichero(idInstitucion, remesaResolucionID,file,path);
+								insertRemesaResolucionFichero(idInstitucion, remesaResolucionID,file,path);
 							
 							
 							LOGGER.info(
 									"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
 							
+						
 							LOGGER.info(
 									"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a la llamada al PL");
 							
 							//3 Llamamos al PL
-							CajgProcedimientoremesaresolExample procedimientoExample = new CajgProcedimientoremesaresolExample();
-							procedimientoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtiporemesaEqualTo(new Short("3"));
-							List<CajgProcedimientoremesaresol> procedimientos;
-							
-							try {
-								procedimientos = cajgProcedimientoremesaresolMapper.selectByExample(procedimientoExample);
 								invocarProcedimiento(procedimientos.get(0).getConsulta(), idInstitucion, remesaResolucionID, procedimientos.get(0).getDelimitador(), fileName,usuarios.get(0).getIdusuario() );
-							} catch (Exception e) {
-								LOGGER.info("No se encuentran el procedimiento");
-								throw new SigaExceptions("No se encuentran el procedimiento");
-							}
 							
 							LOGGER.info(
 									"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida de la llamada al PL");
-						
+							
+							
 						}	
 					}
 		
@@ -378,25 +390,107 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 					updateResponseDTO.setStatus(SigaConstants.KO);
-					
-				}if(response==0 && !conFichero) {
+
+				}if(response==1 && !conFichero) {
+					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
+					error.setCode(200);
+					error.setDescription("Remesa añadida correctamente");
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
+				if (response == 0) {
+					error.setCode(400);
+					if (error.getDescription() == null) {
+						error.setDescription("No se ha añadido la remesa resolucion");
+					}
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} if(response == 1 &&  conFichero) {
+					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
+					error.setCode(200);
+					error.setDescription("Remesa añadida correctamente");
 					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
 					
 			}//Fin Guardar - Inicio Actualizar
 			else {
-				//Inicio Actualizar - Item Entrada RemesaResultadoItem, siendo mejor RemesaResolucionItem.
-				CajgRemesaresolucionKey remesaResolucionKey = new CajgRemesaresolucionKey();
-				remesaResolucionKey.setIdinstitucion(idInstitucion);
-				//remesaResolucionKey.setIdremesaresolucion(remesasResultadoItem)
-				
+				try {
+					LOGGER.info(
+							"guardarRemesaResultado() / cajgRemesaresolucionMapper.selectByPrimaryKey(example) -> Entrada a cajgRemesaresolucionMapper para buscar la remesaResolucion a actualizar");
+					
+					//Inicio Actualizar - Item Entrada RemesaResultadoItem, siendo mejor RemesaResolucionItem.
+					CajgRemesaresolucionKey remesaResolucionKey = new CajgRemesaresolucionKey();
+					remesaResolucionKey.setIdinstitucion(idInstitucion);
+					remesaResolucionKey.setIdremesaresolucion(Long.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
+					
+					CajgRemesaresolucion cajgRemesaresolucion = cajgRemesaresolucionMapper.selectByPrimaryKey(remesaResolucionKey);
+					
+					LOGGER.info(
+							"guardarRemesaResultado() / cajgRemesaresolucionMapper.selectByPrimaryKey(example) -> Entrada a cajgRemesaresolucionMapper para buscar la remesaResolucion a actualizar");
+					
+					if(cajgRemesaresolucion != null) {
+						LOGGER.info(
+								"guardarRemesaResultado() / cajgRemesaresolucionMapper.updateByPrimaryKeySelective(example) -> Entrada a cajgRemesaresolucionMapper para actulizar la remesaResolucion");
+						
+						cajgRemesaresolucion.setFechamodificacion(new Date());
+						cajgRemesaresolucion.setFecharesolucion(remesasResolucionItem.getFechaResolucion());
+						cajgRemesaresolucion.setObservaciones(remesasResolucionItem.getObservaciones());
+						if(conFichero) {
+							cajgRemesaresolucion.setNombrefichero(fileName);
+						}
+						response = cajgRemesaresolucionMapper.updateByPrimaryKeySelective(cajgRemesaresolucion);
+						
+						if(conFichero) {
+								if(guardarFichero(path,file)) {
+								
+								LOGGER.info(
+										"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
+								
+									insertRemesaResolucionFichero(idInstitucion, remesasResolucionItem,file,path);
+								
+								
+								LOGGER.info(
+										"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
+								
+							
+								LOGGER.info(
+										"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a la llamada al PL");
+								
+								//3 Llamamos al PL
+									invocarProcedimiento(procedimientos.get(0).getConsulta(), idInstitucion, remesasResolucionItem, procedimientos.get(0).getDelimitador(), fileName,usuarios.get(0).getIdusuario() );
+								
+								LOGGER.info(
+										"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida de la llamada al PL");
+								}							
+						}			
+					}
+				}catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+
+				}if(response==1 && !conFichero) {
+					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
+					error.setCode(200);
+					error.setDescription("Remesa actualizada correctamente");
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
+				if (response == 0) {
+					error.setCode(400);
+					if (error.getDescription() == null) {
+						error.setDescription("No se ha actualizado la remesa resolucion");
+					}
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} if(response == 1 &&  conFichero) {
+					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
+					error.setCode(200);
+					error.setDescription("Remesa resolucion con fichero editado correctamente");
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
+
 				
 			}
-			
-			
+				
 		}//Fin IF idInstitucion
-		
-		
     	
     	return updateResponseDTO;
     }
@@ -438,10 +532,13 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 	}
 	
 	private Boolean comprobacionFichero(File file) {
-		// Creates an InputStream
+		
+		GenParametrosExample genParametro = new GenParametrosExample();
+		genParametro.createCriteria().andParametroEqualTo(SigaConstants.MAX_NUM_LINEAS_FICHERO);
+		 List<GenParametros> parametros = genParametrosExtendsMapper.selectByExample(genParametro);
+
 		FileInputStream fis;
-		//MAX se debera recoger de la BD ?
-		int MAX = 10000;
+		int MAX = Integer.parseInt(parametros.get(0).getValor());
 
 		try {
 			int numLineas = 0;
@@ -474,6 +571,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 		} 
 		return true;
 	}
+	
 	
 	private void insertRemesaResolucionFichero(Short idInstitucion, RemesasResolucionItem remesaResolucionID, MultipartFile  fileIn,String path ) {
 
@@ -517,8 +615,10 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+		
 	
 	}
+	
 	
 	
 	private DataSource getOracleDataSource() throws IOException, NamingException {
@@ -593,6 +693,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 			con = null;
 		}
 	}
+	
     
 	private String invocarProcedimiento(String nomPL, Short idInstitucion,RemesasResolucionItem remesaRemesasResolucionItem,String delimitador,String fileName,int idUsuario) throws Exception {
 		Object[] param_in;
@@ -642,12 +743,12 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 			stream.write(file.getBytes());
 
 		} catch (FileNotFoundException e) {
-			LOGGER.error("uploadFile() -> Error al buscar la imagen del logotipo en el directorio indicado", e);
+			LOGGER.error("uploadFile() -> Error al buscar fichero en el directorio indicado", e);
 		} catch (IOException ioe) {
-			LOGGER.error("uploadFile() -> Error al guardar la imagen del logotipo en el directorio indicado", ioe);
+			LOGGER.error("uploadFile() -> Error al guardar fichero en el directorio indicado", ioe);
 		} finally {
 			// close the stream
-			LOGGER.debug("uploadFile() -> Cierre del stream de la imagen del logotipo");
+			LOGGER.debug("uploadFile() -> Cierre del stream del fichero");
 			stream.close();
 		}
 		
