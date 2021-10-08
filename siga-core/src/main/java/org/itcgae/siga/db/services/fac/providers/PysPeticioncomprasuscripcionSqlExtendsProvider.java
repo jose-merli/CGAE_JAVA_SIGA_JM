@@ -287,7 +287,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				+ "ELSE FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) END as concepto \r\n");
 		sql.SELECT_DISTINCT("FIRST_VALUE(prodSol.idformapago) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) as idformapago \r\n");
 		sql.SELECT_DISTINCT("f_siga_getrecurso(formPago.descripcion, "+ idioma +") as desFormaPago");
-		sql.SELECT_DISTINCT("(prodIns.VALOR*prodSol.cantidad)*(1+TIVA.VALOR/100) AS impTotal \r\n");
+		//sql.SELECT_DISTINCT("(prodIns.VALOR*prodSol.cantidad)*(1+TIVA.VALOR/100) AS impTotal \r\n");
 		
 		sql.SELECT_DISTINCT("CASE WHEN compra.fecha is null THEN petBaja.fecha \r\n"
 				+ "ELSE null END as fechaDenegada \r\n");
@@ -423,7 +423,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.WHERE("prodSol.idpeticion = "+peticion.getnSolicitud());
 		sql.WHERE("prodSol.idproducto(+) = prin.idproducto and prodSol.idtipoproducto(+) = prin.idtipoproducto and prodSol.idproductoinstitucion(+) = prin.idproductoinstitucion");
 		
-		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, tiva.valor, prin.idcontador, PRIN.NOFACTURABLE");
+		//sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, tiva.valor, prin.idcontador, PRIN.NOFACTURABLE");
 
 		sql.ORDER_BY(" PRIN.DESCRIPCION");
 		
@@ -440,7 +440,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT(" PRin.descripcion");
 		sql.SELECT_DISTINCT(" PRodSol.cantidad");
 		sql.SELECT_DISTINCT(" PRodSol.valor");
-		sql.SELECT_DISTINCT("TIVA.VALOR as IVA");
+		sql.SELECT_DISTINCT(" PRodSol.idtipoiva as idtipoiva");
+		sql.SELECT_DISTINCT("TIVA.descripcion as IVA");
+		sql.SELECT_DISTINCT("TIVA.valor as valorIva");
 //		sql.SELECT_DISTINCT("F_siga_formatonumero(ROUND(prin.VALOR*TIVA.VALOR/100)+prin.VALOR, 2) AS total \r\n");
 		sql.SELECT_DISTINCT("PRodSol.idproducto");
 		sql.SELECT_DISTINCT("PRodSol.idtipoproducto");
@@ -453,7 +455,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.FROM("pys_productossolicitados prodSol");
 		
 		sql.WHERE(" PRIN.IDINSTITUCION = '" + idInstitucion +"'");
-		sql.WHERE(" tiva.idtipoiva (+) = prin.idtipoiva");
+		sql.WHERE(" tiva.idtipoiva (+) = prodSol.idtipoiva");
 		sql.WHERE(" prodSol.idinstitucion(+) = prin.idinstitucion");
 		sql.WHERE("prodSol.idpeticion = "+idPeticion);
 		sql.WHERE("prodSol.idproducto(+) = prin.idproducto and prodSol.idtipoproducto(+) = prin.idtipoproducto and prodSol.idproductoinstitucion(+) = prin.idproductoinstitucion");

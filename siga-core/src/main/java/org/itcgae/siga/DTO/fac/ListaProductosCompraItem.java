@@ -10,6 +10,8 @@ public class ListaProductosCompraItem {
 	private String iva;
 	private String total;
 	private String noFacturable;
+	private String idtipoiva;
+	private String valorIva;
 	
 	private int idproducto;
 	private int idtipoproducto;
@@ -95,5 +97,17 @@ public class ListaProductosCompraItem {
 	}
 	public void setNoFacturable(String noFacturable) {
 		this.noFacturable = noFacturable;
+	}
+	public String getIdtipoiva() {
+		return idtipoiva;
+	}
+	public void setIdtipoiva(String idtipoiva) {
+		this.idtipoiva = idtipoiva;
+	}
+	public String getValorIva() {
+		return valorIva;
+	}
+	public void setValorIva(String valorIva) {
+		this.valorIva = valorIva;
 	}
 }

@@ -9,7 +9,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.fac.ComboProductosPorDescripcionItem;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionDTO;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
@@ -331,11 +330,14 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						productoSolicitado.setValor(new BigDecimal(producto.getPrecioUnitario()));
 					}
 					else productoSolicitado.setValor(null);
+					productoSolicitado.setIdtipoiva(Integer.valueOf(producto.getIdtipoiva()));
 					
-					//REVISAR: A revisar ya que no tenemos tarjeta productos implmentada todavia
-					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
+					
+					//REVISAR: 
 					productoSolicitado.setAceptado("A");
 					
+					productoSolicitado.setOrden(Short.valueOf(producto.getOrden()));
+					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
 					productoSolicitado.setNofacturable(producto.getNoFacturable());
 					productoSolicitado.setFecharecepcionsolicitud(new Date());
 					//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
@@ -370,6 +372,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						compra.setDescripcion(producto.getDescripcion());
 						if(ficha.getIdFormaPagoSeleccionada()!=null)compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
 						else compra.setIdformapago(null);
+						compra.setIdtipoiva(Integer.valueOf(producto.getIdtipoiva()));
 
 						response = pysCompraMapper.insert(compra);
 						if (response == 0)
@@ -659,6 +662,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								compra.setIdformapago(null);
 							}
 							compra.setCantidad(Integer.valueOf(producto.getCantidad()));
+							compra.setIdtipoiva(Integer.valueOf(producto.getIdtipoiva()));
 							if(producto.getPrecioUnitario()!=null) {
 								compra.setImporteunitario(new BigDecimal(producto.getPrecioUnitario()));
 							}
@@ -1179,16 +1183,20 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						productoSolicitado.setValor(new BigDecimal(producto.getPrecioUnitario()));
 					}
 					else productoSolicitado.setValor(null);
+					productoSolicitado.setIdtipoiva(Integer.valueOf(producto.getIdtipoiva()));
 					
-					//REVISAR: A revisar ya que no tenemos tarjeta productos implmentada todavia
-					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
+					//REVISAR: 
 					productoSolicitado.setAceptado("A");
 					
+					productoSolicitado.setOrden(Short.valueOf(producto.getOrden()));
+					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
 					productoSolicitado.setNofacturable(producto.getNoFacturable());
 					productoSolicitado.setFecharecepcionsolicitud(new Date());
 					//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
 					//, por lo tanto, la actual.
 					productoSolicitado.setIdinstitucionorigen(idInstitucion);
+					
+					//productoSolicitado.set
 
 					response = pysProductossolicitadosMapper.insert(productoSolicitado);
 					if (response == 0)

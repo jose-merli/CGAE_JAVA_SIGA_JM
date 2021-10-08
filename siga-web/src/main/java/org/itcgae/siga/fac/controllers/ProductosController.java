@@ -9,6 +9,7 @@ import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.db.entities.PysTipoiva;
 import org.itcgae.siga.fac.services.IProductosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -96,4 +97,9 @@ public class ProductosController {
 		return new ResponseEntity<ListaCodigosPorColegioDTO>(response, HttpStatus.OK);
 	}
 
+	@GetMapping(value = "/pys/getIvaDetail")
+	ResponseEntity<PysTipoiva> getIvaDetail(HttpServletRequest request, String idTipoIva) { 
+		PysTipoiva response = productosService.getIvaDetail(request, idTipoIva);
+		return new ResponseEntity<PysTipoiva>(response, HttpStatus.OK);
+	}
 }

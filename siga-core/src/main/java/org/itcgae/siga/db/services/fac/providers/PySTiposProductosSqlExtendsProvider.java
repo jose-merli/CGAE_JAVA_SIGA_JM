@@ -88,6 +88,8 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		sql.SELECT(" concat(F_siga_formatonumero(PRIN.VALOR,2), ' €') AS VALOR");
 		sql.SELECT(" F_SIGA_GETRECURSO (TPRODUCTO.DESCRIPCION,"+idioma+") AS CATEGORIA");
 		sql.SELECT(" PRODUC.DESCRIPCION AS TIPO");
+		sql.SELECT(" tiva.idtipoiva as idtipoiva");
+		sql.SELECT(" TIVA.valor as valorIva");
 		sql.SELECT(" TIVA.DESCRIPCION AS IVA");
 		sql.SELECT(" concat(F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2), ' €') AS PRECIO_IVA");
 		sql.SELECT(" PRIN.IDCONTADOR");
@@ -138,7 +140,9 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		if(filtroProductoItem.getPrecioHasta() != null && filtroProductoItem.getPrecioHasta() != "")
 			sql.WHERE(" ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2)  <= " + Float.parseFloat(filtroProductoItem.getPrecioHasta()) + "");
 		
-		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, tiva.valor, prin.idcontador, PRIN.NOFACTURABLE");
+		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, "
+				+ "prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, "
+				+ "tiva.valor, prin.idcontador, PRIN.NOFACTURABLE, tiva.idtipoiva,  TIVA.DESCRIPCION");
 
 		sql.ORDER_BY(" PRIN.DESCRIPCION");
 		
