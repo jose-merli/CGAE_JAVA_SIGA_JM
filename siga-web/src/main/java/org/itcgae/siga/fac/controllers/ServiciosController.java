@@ -11,7 +11,9 @@ import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
+import org.itcgae.siga.DTO.fac.ListadoTipoServicioDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
+import org.itcgae.siga.DTO.fac.ServicioDTO;
 import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -105,4 +107,15 @@ public class ServiciosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value="/pys/crearEditarPrecios")
+	ResponseEntity<InsertResponseDTO> crearEditarPrecios(@RequestBody FichaTarjetaPreciosDTO listaPrecios, HttpServletRequest request){
+		InsertResponseDTO response = serviciosService.crearEditarPrecios(listaPrecios, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value="/pys/eliminarPrecios")
+	ResponseEntity<DeleteResponseDTO> eliminarPrecio(@RequestBody FichaTarjetaPreciosDTO precios, HttpServletRequest request){
+		DeleteResponseDTO response = serviciosService.eliminarPrecio(precios, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
 }

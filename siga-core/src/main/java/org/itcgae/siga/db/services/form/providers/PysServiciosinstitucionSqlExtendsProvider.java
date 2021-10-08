@@ -217,8 +217,6 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		sql.WHERE(" idconsulta = " + idConsulta);
 
 		return sql.toString();
-		
-		//select sentencia from con_consulta where idobjetivo = 3 and idclase = 1 and idinstitucion = 2005 and idconsulta = 44;
 
 	}
 	
