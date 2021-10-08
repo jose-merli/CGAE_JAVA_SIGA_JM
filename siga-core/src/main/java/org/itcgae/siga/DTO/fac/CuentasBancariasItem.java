@@ -1,11 +1,13 @@
 package org.itcgae.siga.DTO.fac;
 
+import java.util.Date;
+
 public class CuentasBancariasItem {
 	 private String nombre;
 	 private String bancoCodigo;
 	 private String codBanco;
 	 private String codSucursal;
-	 private String fechaBaja;
+	 private Date fechaBaja;
 	 private String IBAN;
 	 private String descripcion;
 	 private String sjcs;
@@ -38,10 +40,10 @@ public class CuentasBancariasItem {
 	public void setCodSucursal(String codSucursal) {
 		this.codSucursal = codSucursal;
 	}
-	public String getFechaBaja() {
+	public Date getFechaBaja() {
 		return fechaBaja;
 	}
-	public void setFechaBaja(String fechaBaja) {
+	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
 	public String getIBAN() {

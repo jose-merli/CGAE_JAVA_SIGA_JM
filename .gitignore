@@ -289,3 +289,4 @@ siga-parent.iml
 siga-core/siga-core.iml
 siga-web/siga-web.iml
 .gradle/
+/bin/
