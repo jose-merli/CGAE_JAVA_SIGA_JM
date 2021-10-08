@@ -1,11 +1,16 @@
 package org.itcgae.siga.scs.services.guardia;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioDTO;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
@@ -15,7 +20,7 @@ public interface GuardiasColegiadoService {
 	//obtener datos para las tarjetas de la ficha
 	public GuardiasDTO getGuardiaColeg(GuardiasItem guardiasItem, HttpServletRequest request);
 	public TurnosDTO getTurnoGuardiaColeg(TurnosItem turnosItem, HttpServletRequest request);
-	//public GuardiasDTO getCalendarioColeg(GuardiasItem guardiasItem, HttpServletRequest request);
+	public List<DatosCalendarioItem> getCalendarioColeg(String[] datosCalendarioItem, HttpServletRequest request);
 	public ColegiadoDTO getColegiado(ColegiadoItem guardiasItem, HttpServletRequest request);
 	//public PermutaDTO getPemutasColeg(PermutaItem permutaItem, HttpServletRequest request);
 	
@@ -24,7 +29,7 @@ public interface GuardiasColegiadoService {
 	public InsertResponseDTO  insertGuardiaColeg(GuardiasItem guardiasItem, HttpServletRequest request);
 	
 	//acciones tarjeta Sustituciones Guardias de Colegiado
-	public UpdateResponseDTO  sustituirGuardiaColeg(GuardiasItem guardiasItem, HttpServletRequest request);
+	public UpdateResponseDTO  sustituirGuardiaColeg(String[] datos, HttpServletRequest request);
 	
 	//acciones tarjeta Permutas Guardias de Colegiado.
 	//public UpdateResponseDTO  validarPermuta(PermutaDTO permutaDTO, HttpServletRequest request);

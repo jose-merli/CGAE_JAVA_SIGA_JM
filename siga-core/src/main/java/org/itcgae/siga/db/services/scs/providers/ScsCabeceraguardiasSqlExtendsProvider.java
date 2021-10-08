@@ -2,10 +2,14 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.ScsCabeceraguardias;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasSqlProvider;
 
@@ -184,6 +188,127 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 	public String getPermutaGuardiaColegiado(GuardiasItem guardiaItem) {
 		SQL sql = new SQL();
 		
+		
+		
+		return sql.toString();
+	}
+	public String sustituirLetrado(String institucion,String idTurno,String idGuardia,String fechadesde,String idPersona,String newLetrado,String fechaSustitucion,String comensustitucion) {
+		SQL sql = new SQL();
+		Date fechaInicioConv;
+		Date fechaSusConv;
+		String fechaInicio;
+		String fechaSus;
+		
+		fechaInicioConv = new Date(Long.parseLong(fechadesde));
+		fechaSusConv = new Date(Long.parseLong(fechaSustitucion));
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		fechaInicio = dateFormat.format(fechaInicioConv);
+		fechaSus = dateFormat.format(fechaSusConv);
+		
+		sql.UPDATE("SCS_CABECERAGUARDIAS");
+		
+		if (!UtilidadesString.esCadenaVacia(comensustitucion)) {
+			sql.SET("COMENSUSTITUCION = '"+ comensustitucion +"'");
+		}
+		
+		sql.SET("SUSTITUTO = '"+ 1 +"'");
+		sql.SET("IDPERSONA = " + newLetrado);
+		sql.SET("LETRADOSUSTITUIDO = " + idPersona);
+		sql.SET("FECHASUSTITUCION =  TO_DATE('" + fechaSus + "', 'DD/MM/RRRR')");
+		
+		sql.WHERE("IDINSTITUCION = "+ institucion);
+		sql.WHERE("IDTURNO = " + idTurno);
+		sql.WHERE("IDGUARDIA = " + idGuardia);
+		sql.WHERE("IDPERSONA = " + idPersona);
+		sql.WHERE("FECHAINICIO = TO_DATE('" + fechaInicio + "', 'DD/MM/RRRR')");
+		return sql.toString();
+	}
+	
+	public String sustituirLetradoPermutaCabecera(String institucion,String idPersona,String newLetrado, String idPerCab) {
+		SQL sql = new SQL();
+	
+		
+		sql.UPDATE("SCS_PERMUTA_CABECERA");
+		
+		sql.SET("IDPERSONA = " + newLetrado);
+		
+		
+		sql.WHERE("IDINSTITUCION = "+ institucion);
+		
+		sql.WHERE("ID_PERMUTA_CABECERA = " + idPerCab);
+		return sql.toString();
+	}
+	
+	
+	public String getCalendarioGuardiaColegiado(String institucion,String idTurno,String idGuardia,String idcalendarioguardias) {
+		SQL sql = new SQL();
+		
+		sql.SELECT( "            t.nombre nombreturno,"
+				+ "            gt.nombre nombreguardia,"
+				+ "            cg.fechainicio,"
+				+ "            cg.fechafin,"
+				+ "            cg.observaciones,"
+				+ "            DECODE("
+				+ "                gt.numeroletradosguardia,"
+				+ "                0,"
+				+ "                DECODE("
+				+ "                    ("
+				+ "                        SELECT"
+				+ "                            COUNT(1) total"
+				+ "                        FROM"
+				+ "                            scs_calendarioguardias calg"
+				+ "                        WHERE"
+				+ "                                calg.idinstitucion = cg.idinstitucion"
+				+ "                            AND"
+				+ "                                calg.idturno = cg.idturno"
+				+ "                            AND"
+				+ "                                calg.idguardia = cg.idguardia),0, 2, 3),"
+				+ "                DECODE("
+				+ "                    ("
+				+ "                        SELECT"
+				+ "                            COUNT(1) total"
+				+ "                        FROM"
+				+ "                            scs_cabeceraguardias cag"
+				+ "                        WHERE"
+				+ "                                cag.idinstitucion = cg.idinstitucion"
+				+ "                            AND"
+				+ "                                cag.idturno = cg.idturno"
+				+ "                            AND"
+				+ "                                cag.idguardia = cg.idguardia"
+				+ "                            AND"
+				+ "                                cag.idcalendarioguardias = cg.idcalendarioguardias ), 0, 2,3 )) estado,"
+				+ "            cg.idturno,"
+				+ "            cg.idguardia,"
+				+ "            cg.idcalendarioguardias,"
+				+ "            cg.idinstitucion");
+		sql.FROM("scs_calendarioguardias cg,"
+				+ "            scs_guardiasturno gt,"
+				+ "            scs_turno t");
+		sql.WHERE(""
+				+ "				cg.idinstitucion = " + institucion
+				+ "            AND"
+				+ "                cg.idturno = " + idTurno
+				+ "            AND"
+				+ "                cg.idguardia = " +idGuardia
+				+ "            AND"
+				+ "                gt.idinstitucion = "+ institucion
+				+ "            AND"
+				+ "                gt.idturno = " + idTurno
+				+ "             AND"
+				+ "                gt.idguardia = "+idGuardia
+				+ "                AND"
+				+ "                t.idinstitucion = " + institucion
+				+ "                AND"
+				+ "                t.idturno = " + idTurno
+				+ "            AND "
+				+ "                cg.idcalendarioguardias = " + idcalendarioguardias);
+		sql.ORDER_BY("nombreturno,"
+				+ "    nombreguardia,"
+				+ "    fechainicio,"
+				+ "    fechafin");
+	
+		 
 		
 		
 		return sql.toString();

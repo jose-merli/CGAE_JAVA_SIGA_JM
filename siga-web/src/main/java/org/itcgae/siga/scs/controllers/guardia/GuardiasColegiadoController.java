@@ -9,12 +9,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioDTO;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
@@ -62,8 +68,14 @@ public class GuardiasColegiadoController {
 	}
 	
 	@PostMapping(value = "/sustituirGuardiaColeg", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> sustituirGuardiaColeg(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request) {
-		UpdateResponseDTO response = guardiasColegiadoService.sustituirGuardiaColeg(guardiasItem, request);
+	ResponseEntity<UpdateResponseDTO> sustituirGuardiaColeg(@RequestBody String[] datos, HttpServletRequest request) {
+		UpdateResponseDTO response = guardiasColegiadoService.sustituirGuardiaColeg(datos, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/getCalendarioColeg", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<List<DatosCalendarioItem>> getCalendarioColeg(@RequestBody String[] datosCalendarioItem, HttpServletRequest request) {
+		List<DatosCalendarioItem> response = guardiasColegiadoService.getCalendarioColeg(datosCalendarioItem, request);
+		return new ResponseEntity<List<DatosCalendarioItem>>(response, HttpStatus.OK);
 	}
 }
