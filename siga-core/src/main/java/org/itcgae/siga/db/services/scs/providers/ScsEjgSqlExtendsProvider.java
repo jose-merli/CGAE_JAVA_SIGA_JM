@@ -1,5 +1,9 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
@@ -8,10 +12,6 @@ import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
-
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
 
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 	
@@ -151,28 +151,16 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
             sql.WHERE("ejg.origenapertura IN (" + ejgItem.getCreadoDesde() + ")");
         if (ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != "")
             sql.WHERE("regexp_like(EJG.NUMEROPROCEDIMIENTO,'" + ejgItem.getProcedimiento() + "')");
-        if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "")
-            if (ejgItem.isUltimoEstado()) {
-                sql.WHERE("estado.idestadoejg IN (" + ejgItem.getEstadoEJG() + ")");
-            } else {
-
-                String[] estados = ejgItem.getEstadoEJG().split(",");
-                int maximoEstado;
-
-                if (estados.length > 1) {
-                    maximoEstado = Arrays.stream(estados).map(Integer::parseInt).max(Comparator.naturalOrder()).get();
-                } else {
-                    maximoEstado = Integer.parseInt(estados[0]);
-                }
-
-                SQL subQuery = new SQL();
-                subQuery.SELECT("IDESTADOEJG");
-                subQuery.FROM("SCS_MAESTROESTADOSEJG");
-                subQuery.WHERE("FECHA_BAJA IS NULL");
-                subQuery.WHERE("IDESTADOEJG >= " + maximoEstado);
-
-                sql.WHERE("estado.idestadoejg IN (" + subQuery.toString() + ")");
-            }
+        // SPP-1054@DTT.JAMARTIN@28/09/2021@INICIO
+        if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "") {
+			if (ejgItem.isUltimoEstado()) {
+				sql.WHERE("estado.idestadoejg IN (" + ejgItem.getEstadoEJG() + ")");
+			} else {
+				sql.WHERE("MAESTROESTADO.FECHA_BAJA IS NULL");
+				sql.WHERE("MAESTROESTADO.IDESTADOEJG IN (" + ejgItem.getEstadoEJG() + ")");
+			}
+		}
+		// SPP-1054@DTT.JAMARTIN@28/09/2021@FIN
         if (ejgItem.getFechaAperturaDesd() != null) {
             fechaAperturaDesd = dateFormat.format(ejgItem.getFechaAperturaDesd());
             sql.WHERE("EJG.FECHAAPERTURA >= TO_DATE( '" + fechaAperturaDesd + "','DD/MM/RRRR')");
@@ -393,7 +381,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                     sql.INNER_JOIN(
                             "SCS_EJGDESIGNA EJGDESIGNA ON EJGDESIGNA.IDINSTITUCION = EJG.idinstitucion and EJGDESIGNA.idtipoejg = ejg.idtipoejg and EJGDESIGNA.ANIOEJG = ejg.anio and EJGDESIGNA.numeroejg = ejg.numero");
                     sql.INNER_JOIN(
-                            "SCS_DESIGNA DESIGNA ON EJGDESIGNA.IDINSTITUCION = DESIGNA.idinstitucion and EJGDESIGNA.IDTURNO = DESIGNA.IDTURNO and EJGDESIGNA.ANIO = DESIGNA.ANIO and EJGDESIGNA.numero = DESIGNA.NUMERO");
+                            "SCS_DESIGNA DESIGNA ON EJGDESIGNA.IDINSTITUCION = DESIGNA.idinstitucion and EJGDESIGNA.IDTURNO = DESIGNA.IDTURNO and EJGDESIGNA.ANIODESIGNA = DESIGNA.ANIO and EJGDESIGNA.numerodesigna = DESIGNA.NUMERO");
                     sql.INNER_JOIN(
                             "SCS_DESIGNASLETRADO DESIGNALETRADO ON DESIGNALETRADO.idinstitucion = DESIGNA.idinstitucion  and DESIGNALETRADO.idturno = DESIGNA.idturno and DESIGNALETRADO.anio = DESIGNA.anio and DESIGNALETRADO.numero = DESIGNA.numero");
                     if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
@@ -879,7 +867,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
         sql.WHERE("ejg.idinstitucion = " + idInstitucion);
         sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
-        sql.WHERE("ejg.numejg =" + ejgItem.getNumero());
+        sql.WHERE("ejg.numero =" + ejgItem.getNumero());
         sql.WHERE("ejg.idtipoejg = " + ejgItem.getTipoEJG());
 
         return sql.toString();
@@ -1197,6 +1185,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + sqlAsistencia_1.toString() + ") nombreletrado," + "(" + sqlAsistencia_4.toString() + ") interesado,"
                 + "nvl( numerodiligencia, 'Sin número' ) || ' / ' || nvl( numeroprocedimiento,'Sin número' ) dilnigproc,"
                 + "NULL resolucion");
+        sqlAsistencia.SELECT("NULL IDPERSONAJG");
 
         sqlAsistencia.FROM("scs_asistencia");
         sqlAsistencia.WHERE("ejganio = " + item.getAnnio());
@@ -1248,6 +1237,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + sqlSOJ_3.toString() + ") des_tipo," + "(" + sqlSOJ_1.toString() + ") nombreletrado,"
 
                 + "(" + sqlSOJ_4.toString() + ") interesado," + "NULL dilnigproc," + "NULL resolucion");
+
+        sqlSOJ.SELECT("scs_soj.IDPERSONAJG");
 
         sqlSOJ.FROM("scs_soj");
         sqlSOJ.WHERE("ejganio = " + item.getAnnio());
@@ -1333,6 +1324,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + "nvl( numerodiligencia,'Sin número') || ' / ' || nvl( numeroprocedimiento,'Sin número') dilnigproc,"
                 + " f_siga_getrecurso(res.descripcion,1) resolucion");
 
+        sqlDesigna.SELECT("NULL IDPERSONAJG");
+
         sqlDesigna.FROM("scs_ejg ejg "
                 + "LEFT OUTER JOIN scs_tiporesolucion res ON ejg.idtiporatificacionejg = res.idtiporesolucion,"
                 + " scs_ejgdesigna ejgd");
@@ -1357,6 +1350,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + "( per.apellidos1 || ' ' || per.apellidos2 || ',' || per.nombre) nombreletrado,"
 
                 + "NULL interesado," + "NULL dilnigproc," + "exp.DESCRIPCIONRESOLUCION resolucion");
+
+        sqlExpediente.SELECT("NULL IDPERSONAJG");
 
         sqlExpediente.FROM("   exp_expediente exp," + "            exp_denunciado den," + "            cen_persona per,"
                 + "            exp_tipoexpediente ext");
@@ -1542,5 +1537,37 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
         return sql.toString();
     }
+    
+    public String getIdEcomCola() {
+        SQL sql = new SQL();
 
+        sql.SELECT("SEQ_ECOM_COLA.CURRVAL");
+        sql.FROM("DUAL");
+
+        return sql.toString();
+    }
+    
+    public String getDatosExpInsos(EjgItem ejgItem) {
+    	SQL sql = new SQL();
+    	SQL sqlIdpersona = new SQL();
+    	
+    	sqlIdpersona.SELECT("p.IDPERSONA");
+    	sqlIdpersona.FROM("CEN_PERSONA p, SCS_DESIGNASLETRADO desle");
+    	sqlIdpersona.WHERE("desle.IDINSTITUCION = des.idinstitucion and desle.IDTURNO = des.idturno and desle.ANIO = des.anio "
+    			+ "and desle.NUMERO = des.numero and p.IDPERSONA = desle.IDPERSONA and desle.IDPERSONA = "
+    			+ "F_SIGA_GETIDLETRADO_DESIGNA(desle.idInstitucion,desle.idTurno,desle.anio,desle.NUMERO) and rownum = 1");
+    	
+    	sql.SELECT("e.numero, e.numejg, e.idtipoejg, e.anio, e.idinstitucion, des.idjuzgado, des.idpretension, d.idturno, NVL(des.idprocedimiento, '') idprocedimiento,"
+    			+ "("+sqlIdpersona.toString()+") idpersona, pjg.idpersona idpersonasolicitante, pjg.nif nifsolicitante, pjg.nombre nombresolicitante, pjg.apellido1 apellido1solicitante, "
+    					+ "NVL(pjg.apellido2,'') apellido2solicitante, des.numprocedimiento");
+    	sql.FROM("SCS_EJG e");
+    	sql.INNER_JOIN("SCS_EJGDESIGNA d ON (d.idinstitucion=e.idInstitucion and d.anioejg=e.anio and d.idtipoejg=e.idtipoejg and d.numeroejg=e.numero)");
+    	sql.INNER_JOIN("SCS_DESIGNA des ON (d.idinstitucion=des.idInstitucion and d.aniodesigna=des.anio and d.idturno=des.idturno "
+    			+ "and d.numerodesigna=des.numero)");
+    	sql.LEFT_OUTER_JOIN("SCS_PERSONAJG pjg ON (e.idpersonajg=pjg.idpersona)");
+    	sql.WHERE("e.idinstitucion="+ejgItem.getidInstitucion()+" and e.anio="+ejgItem.getAnnio()+" and e.idtipoejg="+ejgItem.getTipoEJG()+
+    			" and e.numero="+ejgItem.getNumero());
+    	
+    	return sql.toString();
+    }
 }
