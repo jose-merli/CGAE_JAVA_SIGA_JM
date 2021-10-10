@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosEjgItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.ExpInsosItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
@@ -236,8 +237,8 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "FECHA", property = "fechaasunto", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "RESOLUCION", property = "resolucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
-			//@Result(column = "DATOSINTERES", property = "datosinteres", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDSJCS", property = "idsjcs", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONAJG", property = "idpersonajg", jdbcType = JdbcType.VARCHAR)
 
 	})
 	List<RelacionesItem> getRelacionesEJG(EjgItem item);
@@ -275,12 +276,6 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
-//			@Result(column = "NUMERODESIGNACION", property = "numerodesignacion", jdbcType = JdbcType.VARCHAR),
-//			@Result(column = "FECHADESIGNA", property = "fechaDesigna", jdbcType = JdbcType.VARCHAR),
-//			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-//			@Result(column = "MOTIVOSRENUNCIA", property = "motivosRenuncia", jdbcType = JdbcType.VARCHAR),
-//			@Result(column = "FECHARENUNCIASOLICITA", property = "fecharenunciasolicita", jdbcType = JdbcType.VARCHAR),
-//			@Result(column = "FECHARENUNCIA", property = "fechabaja", jdbcType = JdbcType.DATE) 
 	})
 	List<ProcuradorItem> busquedaProcuradorEJG(String idProcurador, String idinstitucion);// String num, String idturno,
 	
@@ -311,4 +306,33 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getObservacionEstadoEjgResolDev")
 	@Results({ @Result(column = "observaciones", jdbcType = JdbcType.VARCHAR), })
 	String getObservacionEstadoEjgResolDev(String idLenguaje);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getIdEcomCola")
+	int getIdEcomCola();
+	
+	/**
+	 * getDatosExpInsos
+	 * 
+	 * @param ejgitem
+	 * @return
+	 */
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getDatosExpInsos")
+	@Results({ @Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEJG", property = "numEJG", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ANIO", property = "anioEJG", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPOEJG", property = "idTipoEJG", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPRETENSION", property = "idPretension", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONASOLICITANTE", property = "idpersonasolicitante", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIFSOLICITANTE", property = "nifsolicitante", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRESOLICITANTE", property = "nombresolicitante", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDO1SOLICITANTE", property = "apellido1solicitante", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDO2SOLICITANTE", property = "apellido2solicitante", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMPROCEDIMIENTO", property = "numprocedimiento", jdbcType = JdbcType.VARCHAR),
+	})	
+	List<ExpInsosItem> getDatosExpInsos(EjgItem item);
 }

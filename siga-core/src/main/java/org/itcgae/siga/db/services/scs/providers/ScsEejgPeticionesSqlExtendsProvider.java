@@ -54,7 +54,7 @@ public class ScsEejgPeticionesSqlExtendsProvider extends ScsEejgPeticionesSqlPro
 			sql.WHERE("fechaconsulta=(SELECT MAX(p2.FECHACONSULTA) from scs_eejg_peticiones p2 where p.nif=p2.nif)");
 		
 		}else {
-			sql.WHERE("fechaconsulta=(SELECT MAX(p2.FECHACONSULTA) from scs_eejg_peticiones p2 where p.nif=p2.nif)");
+			sql.WHERE("fechaconsulta=(SELECT MAX(p2.FECHACONSULTA) from scs_eejg_peticiones p2 where p2.idinstitucion = p.idinstitucion AND p2.anio = p.anio AND p2.numero = p.numero AND p2.idtipoejg = p.idtipoejg)");
 		}
 		
 		return sql.toString();

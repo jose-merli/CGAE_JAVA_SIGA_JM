@@ -40,6 +40,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -166,6 +167,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
     @Autowired
     private IEEJGServices eejgService;
+    
+    @Autowired
+    private EEJGServiceImpl eejgServiceImpl;
 
     @Autowired
     private ScsPersonajgMapper scsPersonajgMapper;
@@ -747,20 +751,50 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 try {
                     // [ejg.idInstitucion, justiciable.idpersona, ejg.annio, ejg.tipoEJG,
                     // ejg.numero]
+                	
+                	ScsUnidadfamiliarejgExample exampleFamiliar = new ScsUnidadfamiliarejgExample();
+                	exampleFamiliar.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.parseLong(item.get(1)))
+                	.andAnioEqualTo(Short.parseShort(item.get(2))).andIdtipoejgEqualTo(Short.parseShort(item.get(3))).andNumeroEqualTo(Long.parseLong(item.get(4)));
+                    
+                    List<ScsUnidadfamiliarejg> uf = scsUnidadfamiliarejgMapper.selectByExample(exampleFamiliar);
+                    
+                    
                     ScsUnidadfamiliarejg familiar = new ScsUnidadfamiliarejg();
+                    
+                    
+                    
+                    if(!uf.isEmpty() ){
+                    	if(uf.get(0).getFechabaja() != null) {
+                    		familiar.setIdinstitucion(idInstitucion);
+                            familiar.setIdpersona(Long.parseLong(item.get(1)));
+                            familiar.setAnio(Short.parseShort(item.get(2)));
+                            familiar.setIdtipoejg(Short.parseShort(item.get(3)));
+                            familiar.setNumero(Long.parseLong(item.get(4)));
 
-                    familiar.setIdinstitucion(idInstitucion);
-                    familiar.setIdpersona(Long.parseLong(item.get(1)));
-                    familiar.setAnio(Short.parseShort(item.get(2)));
-                    familiar.setIdtipoejg(Short.parseShort(item.get(3)));
-                    familiar.setNumero(Long.parseLong(item.get(4)));
+                            familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
+                            familiar.setFechamodificacion(new Date());
+                        	familiar.setFechabaja(null);
+                        	familiar.setSolicitante((short) 0);
+                        	response = scsUnidadfamiliarejgMapper.updateByPrimaryKey(familiar);
+                    	}else {
+                    		response = 0;
+                    	}
+                    	
+                    }else {
+                    	 familiar.setIdinstitucion(idInstitucion);
+                         familiar.setIdpersona(Long.parseLong(item.get(1)));
+                         familiar.setAnio(Short.parseShort(item.get(2)));
+                         familiar.setIdtipoejg(Short.parseShort(item.get(3)));
+                         familiar.setNumero(Long.parseLong(item.get(4)));
 
-                    familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
-                    familiar.setFechamodificacion(new Date());
+                         familiar.setUsumodificacion(usuarios.get(0).getIdusuario());
+                         familiar.setFechamodificacion(new Date());
 
-                    familiar.setSolicitante((short) 0);
+                         familiar.setSolicitante((short) 0);
 
-                    response = scsUnidadfamiliarejgMapper.insert(familiar);
+                         response = scsUnidadfamiliarejgMapper.insert(familiar);
+                    }
+                   
 
                     if (response != 1) {
                         responsedto.setStatus(SigaConstants.KO);
@@ -1071,7 +1105,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
     @Override
     public ResolucionEJGItem getResolucion(EjgItem ejgItem, HttpServletRequest request) {
-        // TODO Auto-generated method stub
+
         LOGGER.info("getResolucion() -> Entrada al servicio para obtener el colegiado");
         ResolucionEJGItem resolucion = new ResolucionEJGItem();
         String token = request.getHeader("Authorization");
@@ -1276,12 +1310,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                                         // obtenemos los datos del fichero
                                         LOGGER.debug(
                                                 "GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo datos para el informe...");
-                                        Map<Integer, Map<String, String>> mapInformeEejg = eejgService
+                                        Map<Integer, Map<String, String>> mapInformeEejg = eejgServiceImpl
                                                 .getDatosInformeEejg(ejg, peticion);
 
                                         LOGGER.debug(
                                                 "GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo el informe...");
-                                        DatosDocumentoItem documento = eejgService.getInformeEejg(mapInformeEejg,
+                                        DatosDocumentoItem documento = eejgServiceImpl.getInformeEejg(mapInformeEejg,
                                                 ejg.getidInstitucion());
 
                                         ficheros.add(documento);
@@ -1595,22 +1629,41 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 ScsEjgWithBLOBs ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 
                 // Modificamos el objeto obtenido
-
-                if (!ejg.getFechaapertura().equals(datos.getFechaApertura())) {
-                    insertAuditoriaEJG("fecha de apertura", ejg.getFechaapertura().toString(),
-                            datos.getFechaApertura().toString(), usuarios.get(0), (ScsEjg) ejg);
+				// SIGARNV-2438@DTT.JAMARTIN@01/10/2021@INICIO
+                if (datos.getFechaApertura() != null && !datos.getFechaApertura().equals(ejg.getFechaapertura())) {
+                    if(ejg.getFechaapertura() != null) {
+	                	insertAuditoriaEJG("fecha de apertura", ejg.getFechaapertura().toString(),
+	                            datos.getFechaApertura().toString(), usuarios.get(0), (ScsEjg) ejg);
+                    } else {
+                    	insertAuditoriaEJG("fecha de apertura", null,
+	                            datos.getFechaApertura().toString(), usuarios.get(0), (ScsEjg) ejg);
+                    }
                     ejg.setFechaapertura(datos.getFechaApertura());
                 }
-                if (!ejg.getFechapresentacion().equals(datos.getFechapresentacion())) {
-                    insertAuditoriaEJG("fecha de presentacion", ejg.getFechapresentacion().toString(),
-                            datos.getFechapresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
-                    ejg.setFechapresentacion(datos.getFechapresentacion());
-                }
-                if (!ejg.getFechapresentacion().equals(datos.getFechapresentacion())) {
-                    insertAuditoriaEJG("fecha limite de presentacion", ejg.getFechalimitepresentacion().toString(),
-                            datos.getFechalimitepresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
-                    ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
-                }
+				
+            	if (datos.getFechapresentacion() != null && !datos.getFechapresentacion().equals(ejg.getFechapresentacion())) {
+            		if(ejg.getFechapresentacion() !=null) {
+	            		insertAuditoriaEJG("fecha de presentacion", ejg.getFechapresentacion().toString(),
+	            				datos.getFechapresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
+            		} else {
+            			insertAuditoriaEJG("fecha de presentacion", null,
+	            				datos.getFechapresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
+            		}
+            		ejg.setFechapresentacion(datos.getFechapresentacion());
+            	}
+            	
+            	if (datos.getFechalimitepresentacion() != null && !datos.getFechalimitepresentacion().equals(ejg.getFechalimitepresentacion())) {
+            		if(ejg.getFechalimitepresentacion() != null) {
+	            		insertAuditoriaEJG("fecha limite de presentacion", ejg.getFechalimitepresentacion().toString(),
+								datos.getFechalimitepresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
+            		} else {
+            			insertAuditoriaEJG("fecha limite de presentacion", null,
+								datos.getFechalimitepresentacion().toString(), usuarios.get(0), (ScsEjg) ejg);
+            		}
+					ejg.setFechalimitepresentacion(datos.getFechalimitepresentacion());
+				}
+				// SIGARNV-2438@DTT.JAMARTIN@01/10/2021@FIN
+            	
                 if (datos.getTipoEJGColegio() != null) {
                     if (ejg.getIdtipoejgcolegio() != Short.parseShort(datos.getTipoEJGColegio())) {
                         if (ejg.getIdtipoejgcolegio() != null)
@@ -2217,33 +2270,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 record.setNumero(Long.parseLong(datos.getNumero()));
                 record.setIdtipoejg(Short.parseShort(datos.getIdtipoejg()));
 
-                if (record.getIdestadoejg() != Short.parseShort(datos.getIdEstadoejg())) {
-                    GenRecursosCatalogosKey oldLabelRecursoKey = new GenRecursosCatalogosKey();
-
-                    oldLabelRecursoKey.setIdlenguaje(usuarios.get(0).getIdlenguaje());
-                    oldLabelRecursoKey.setIdrecurso(labelEstado.getDescripcion());
-
-                    GenRecursosCatalogos oldLabelRecurso = genRecursosCatalogosMapper
-                            .selectByPrimaryKey(labelRecursoKey);
-
-                    insertAuditoriaEJG("Estado Actualizado (Tipo estado)", oldLabelRecurso.getDescripcion(),
-                            labelRecurso.getDescripcion(), usuarios.get(0), ejg);
-                    record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
-
-                }
-                if (record.getFechainicio() != datos.getFechaInicio()) {
-                    insertAuditoriaEJG("Estado Actualizado (FechaInicio)", record.getFechainicio().toString(),
-                            datos.getFechaInicio().toString(), usuarios.get(0), ejg);
-
-                    record.setFechainicio(datos.getFechaInicio());
-                }
-                if (record.getObservaciones() != datos.getObservaciones()) {
-                    insertAuditoriaEJG("Estado Actualizado (Observaciones)", record.getObservaciones().toString(),
-                            datos.getObservaciones().toString(), usuarios.get(0), ejg);
-
-                    record.setObservaciones(datos.getObservaciones());
-                }
-
+                record.setIdestadoejg(Short.parseShort(datos.getIdEstadoejg()));
+                record.setFechainicio(datos.getFechaInicio());
+                record.setObservaciones(datos.getObservaciones());
+                
                 record.setFechamodificacion(new Date());
                 record.setUsumodificacion(usuarios.get(0).getIdusuario());
                 record.setIdestadoporejg(Long.parseLong(datos.getIdestadoporejg()));
@@ -2502,7 +2532,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 if (nuevo)
                     response = scsEjgResolucionMapper.insertSelective(ejgResolucion);
                 else
-                    response = scsEjgResolucionMapper.updateByPrimaryKey(ejgResolucion);
+                    response = scsEjgResolucionMapper.updateByPrimaryKeyWithBLOBs(ejgResolucion);
                 if (response == 0)
                     throw (new Exception("Error al insertar o actualizar la parte de la resolucion asociada al EJG"));
 
@@ -2926,15 +2956,21 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 record.setComisaria(datos.getComisaria());
                 record.setCalidad(datos.getCalidad());
 
-                // Datos pre-designacion
-                record.setNumeroprocedimiento(dni);
-                record.setAnioprocedimiento(idInstitucion);
+				// Datos pre-designacion
+				// SIGARNV-2429@DTT.JAMARTIN@30/09/2021@INICIO
+				record.setNumeroprocedimiento(datos.getNumAnnioProcedimiento());
+				// record.setAnioprocedimiento(datos.getAnnio());
+				// SIGARNV-2429@DTT.JAMARTIN@30/09/2021@FIN
                 record.setNig(datos.getNig());
                 if (datos.getJuzgado() != null)
                     record.setJuzgado(Long.parseLong(datos.getJuzgado()));
                 else
                     record.setJuzgado(null);
-                record.setIdpretension(datos.getIdPretension());
+             // SIGARNV-2429@DTT.JAMARTIN@30/09/2021@INICIO
+                if(datos.getIdPretension() != null && datos.getIdPretension() != 0) {
+                	record.setIdpretension( datos.getIdPretension());
+               	}
+             // SIGARNV-2429@DTT.JAMARTIN@30/09/2021@FIN
                 record.setObservaciones(datos.getObservaciones());
                 record.setDelitos(datos.getDelitos());
 
@@ -4134,7 +4170,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
     @Override
     @Transactional
     public InsertResponseDTO crearDocumentacionEjg(EjgDocumentacionItem documentacionEjgItem,
-                                                   HttpServletRequest request) {
+                                                   HttpServletRequest request) throws Exception {
 
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -4142,8 +4178,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
         Error error = new Error();
         int response = 1;
-
-        try {
+        //Se comentan el try y el catch para que @Transactional funcione adecuadamente
+//        try {
 
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
             exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -4211,26 +4247,30 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                             nuevoId = scsEjgExtendsMapper.getNewIdDocumentacionEjg(idInstitucion);
                             scsDocumentacionejg.setIddocumentacion(Integer.valueOf(nuevoId.getIdMax().toString()));
                             response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
+                            if (response == 0)
+                                throw (new Exception("Error al introducir la nueva documentación en el EJG"));
                         }
                     }
                 } else {
                     scsDocumentacionejg.setIddocumento(Short.valueOf(documentacionEjgItem.getIdDocumento()));
                     response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
+                    if (response == 0)
+                        throw (new Exception("Error al introducir la nueva documentación en el EJG"));
                 }
 
             }
 
-        } catch (Exception e) {
-            LOGGER.error(
-                    "GestionEJGServiceImpl.crearDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg",
-                    e);
-            error.setCode(500);
-            error.setDescription("general.mensaje.error.bbdd");
-            error.setMessage(e.getMessage());
-            insertResponseDTO.setError(error);
-            insertResponseDTO.setStatus(SigaConstants.KO);
-            response = 0;
-        }
+//        } catch (Exception e) {
+//            LOGGER.error(
+//                    "GestionEJGServiceImpl.crearDocumentacionEjg() -> Se ha producido un error al subir un fichero perteneciente al ejg",
+//                    e);
+//            error.setCode(500);
+//            error.setDescription("general.mensaje.error.bbdd");
+//            error.setMessage(e.getMessage());
+//            insertResponseDTO.setError(error);
+//            insertResponseDTO.setStatus(SigaConstants.KO);
+//            response = 0;
+//        }
 
         if (response == 1) {
             insertResponseDTO.setStatus(SigaConstants.OK);
@@ -4546,21 +4586,41 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 String extension = FilenameUtils.getExtension(nombreFichero);
 
                 String idDocumentacion = request.getParameter("idPersona");
-
-                Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
-                        nombreFichero, extension);
-
+                
                 // Actualizamos la documentacion modificada
                 ScsDocumentacionejg scsDocumentacionejg = new ScsDocumentacionejg();
 
                 scsDocumentacionejg.setUsumodificacion(usuarios.get(0).getIdusuario());
                 scsDocumentacionejg.setFechamodificacion(new Date());
                 scsDocumentacionejg.setIdinstitucion(idInstitucion);
-                scsDocumentacionejg.setIdfichero(idFile);
-                scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDocumentacion));
                 scsDocumentacionejg.setNombrefichero(nombreFichero);
+                
+                //En el caso que se haya seleccionado "Todos" en el desplegable "Documento",
+                //se pasan varios idDocumentacion y se introduce el fichero en cada uno de ellos
+                if (idDocumentacion.contains(",")) {
+                	String[] documentaciones = idDocumentacion.split(",");
+                	for(String idDoc:documentaciones) {
+                		//Se introduce el fichero varias veces para que si se se borra en una de las documentaciones,
+                		//el resto no se vean afectadas
+	                	Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+	                            nombreFichero, extension);
+	                    
+	                    scsDocumentacionejg.setIdfichero(idFile);
+	                    scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDoc));
+	                    
+	                    response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
+                	}
+                } else {
+                	Long idFile = uploadFileEjg(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+                            nombreFichero, extension);
+                    
+                    scsDocumentacionejg.setIdfichero(idFile);
+                    scsDocumentacionejg.setIddocumentacion(Integer.valueOf(idDocumentacion));
+                    
+                    response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
+                }
 
-                response = scsDocumentacionejgMapper.updateByPrimaryKeySelective(scsDocumentacionejg);
+                
 
             }
         } catch (Exception e) {
@@ -4716,7 +4776,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 // peticion de EEJG.
                 EcomCola ecomCola = new EcomCola();
 
-                // ecomCola.setIdecomcola(null);
                 ecomCola.setIdestadocola(Short.parseShort("1"));
                 ecomCola.setIdoperacion(81);
                 ecomCola.setReintento(0);
@@ -4729,18 +4788,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 ecomColaMapper.insertSelective(ecomCola);
 
                 // obtener el ultimo idcomcola de la tabla ECOM_COLA.
-                EcomColaExample example = new EcomColaExample();
-                example.setOrderByClause("IDECOMCOLA DESC");
-                example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdestadocolaEqualTo((short) 1)
-                        .andIdoperacionEqualTo(81);
-
-                List<EcomCola> listEcomCola = ecomColaMapper.selectByExample(example);
-
-                if (listEcomCola.size() > 0) {
-                    idComCola = listEcomCola.get(0).getIdecomcola() + 56;
-                } else {
-                    idComCola = 0;
-                }
+                idComCola = scsEjgExtendsMapper.getIdEcomCola();
 
                 // primer insert a la tabla ECOM_COLA_PARAMETROS con los datos idComCola, clave
                 // y valor para saber la institucion que hacer el insert.
@@ -5151,13 +5199,56 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         key.setIdtipoejg(Short.valueOf(ejgItem.getTipoEJG()));
         key.setNumero(Long.valueOf(ejgItem.getNumero()));
 
-        ScsEjg config = scsEjgMapper.selectByPrimaryKey(key);
+        ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(key);
 
-        identificadorDS = config.getIdentificadords();
+        if (ejg.getIdentificadords() == null) {
+        	
+            // longitud maxima para num
+            GenParametrosExample genParametrosExample = new GenParametrosExample();
+            genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
+                    .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+            genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-        List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, "");
-        docushareDTO.setDocuShareObjectVO(docus);
+            List<GenParametros> listParam = genParametrosExtendsMapper.selectByExample(genParametrosExample);
 
+            String longitudEJG = listParam.get(0).getValor();
+
+            // Alteramos el numero para que todos los numeros de las carpetas de una
+            // institucion tengan la misma longitud.
+
+            String numero = ejgItem.getNumero();
+
+            int numCeros = Integer.parseInt(longitudEJG) - ejgItem.getNumero().length();
+
+            String ceros = "";
+            for (int i = 0; i < numCeros; i++) {
+                ceros += "0";
+            }
+
+            ceros += numero;
+
+            // Año EJG/Num EJG. Se realiza el proceso anterior para no utilizar numEjg ya que no es una clave unica
+            //y mantener el formato de DocuShare.
+            String title = ejgItem.getAnnio() + "/" + ceros;
+            
+			LOGGER.debug("ValorEjgDocu : " + title);
+			identificadorDS = docushareHelper.buscaCollectionEjg(title, idInstitucion);
+			if (null != identificadorDS) {
+				ejg.setIdentificadords(identificadorDS);
+				scsEjgMapper.updateByPrimaryKey(ejg);
+			}
+		} else {
+			LOGGER.debug("IdentificadorDS : " + ejg.getIdentificadords());
+			identificadorDS = ejg.getIdentificadords();
+		}
+		LOGGER.debug("IdentificadorDS : " + identificadorDS);
+		// EJG - ALICANTE
+		// identificadorDS = "Collection-691";
+		if (identificadorDS != null) {
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, identificadorDS);
+			docushareDTO.setDocuShareObjectVO(docus);
+			docushareDTO.setIdentificadorDS(identificadorDS);
+		}
         return docushareDTO;
     }
 
@@ -5184,9 +5275,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     "insertCollectionEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
             if (null != usuarios && usuarios.size() > 0) {
-                AdmUsuarios usuario = usuarios.get(0);
 
-                // longitud maxima para num ejg
+                // longitud maxima para num
                 GenParametrosExample genParametrosExample = new GenParametrosExample();
                 genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
                         .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
@@ -5197,8 +5287,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 String longitudEJG = listParam.get(0).getValor();
 
                 // Alteramos el numero para que todos los numeros de las carpetas de una
-                // institucion tengan
-                // la misma longitud.
+                // institucion tengan la misma longitud.
 
                 String numero = ejgItem.getNumero();
 
@@ -5211,10 +5300,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
                 ceros += numero;
 
-                // Año EJG/Num EJG
-                String carpeta = ejgItem.getAnnio() + "/" + ceros;
+                // Año EJG/Num EJG. Se realiza el proceso anterior para no utilizar numEjg ya que no es una clave unica
+                //y mantener el formato de DocuShare.
+                String title = ejgItem.getAnnio() + "/" + ceros;
 
-                idDS = docushareHelper.createCollectionEjg(idInstitucion, carpeta, "");
+                idDS = docushareHelper.createCollectionEjg(idInstitucion, title, "");
+                
+                LOGGER.info(
+                        "insertCollectionEjg() / docushareHelper.createCollectionEjg() -> Valor de idDS obtenido: "+idDS);
+
 
                 ScsEjgKey key = new ScsEjgKey();
 
@@ -5227,7 +5321,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
                 ejg.setIdentificadords(idDS);
                 ejg.setFechamodificacion(new Date());
-                ejg.setUsumodificacion(usuario.getIdusuario());
+                ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
 
                 LOGGER.info(
                         "insertCollectionEjg() / scsEjgMapper.updateByPrimaryKey() -> Entrada a scsEjgMapper para modificar el identificador para DocuShare del EJG");
@@ -5244,8 +5338,66 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         LOGGER.info("insertCollectionEjg() -> Salida al servicio para la insertar una nueva colección");
 
         return idDS;
-
     }
+    
+    
+    @Override
+	public DocushareDTO searchListDirEjg(int numPagina, DocuShareObjectVO docu, HttpServletRequest request)
+			throws Exception {
+		DocushareDTO docushareDTO = new DocushareDTO();
+		String identificadorDS = null;
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ScsEjgKey key = new ScsEjgKey();
+
+        key.setIdinstitucion(idInstitucion);
+        key.setAnio(Short.valueOf(docu.getAnio()));
+        key.setIdtipoejg(Short.valueOf(docu.getIdTipoEjg()));
+        key.setNumero(Long.valueOf(docu.getNumero()));
+
+        ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(key);
+
+        if (ejg.getIdentificadords() == null) {
+        	
+            // longitud maxima para num
+            GenParametrosExample genParametrosExample = new GenParametrosExample();
+            genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
+                    .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+            genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+            List<GenParametros> listParam = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+            String longitudEJG = listParam.get(0).getValor();
+
+            // Alteramos el numero para que todos los numeros de las carpetas de una
+            // institucion tengan la misma longitud.
+
+            String numero = docu.getNumero();
+
+            int numCeros = Integer.parseInt(longitudEJG) - numero.length();
+
+            String ceros = "";
+            for (int i = 0; i < numCeros; i++) {
+                ceros += "0";
+            }
+
+            ceros += numero;
+
+            // Año EJG/Num EJG. Se realiza el proceso anterior para no utilizar numEjg ya que no es una clave unica
+            //y mantener el formato de DocuShare.
+            String title = docu.getAnio() + "/" + ceros;
+            
+			LOGGER.debug("ValorEjgDocu : " + title);
+			identificadorDS = docushareHelper.buscaCollectionEjg(title, idInstitucion);
+		} else {
+			identificadorDS = ejg.getIdentificadords();
+		}
+		if (identificadorDS != null) {
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, docu.getParent());
+			docushareDTO.setDocuShareObjectVO(docus);
+		}
+		return docushareDTO;
+	}
 
     public int triggersEjgUpdatesFApertura(EjgItem ejgItem, AdmUsuarios usuario, short idInstitucion) throws Exception {
 
@@ -5710,124 +5862,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
         if (response == 0)
             throw (new Exception("Error en triggersEjgInsert() 1"));
 
-        // 2. Estado a partir de fechadictamen
-//		if (ejg.getFechadictamen() != null && ejg.getIdtipodictamenejg() != null) {
-//			ScsEstadoejg newEstadoDict = new ScsEstadoejg();
-//
-//			newEstadoDict.setIdinstitucion(idInstitucion);
-//			newEstadoDict.setIdtipoejg(ejg.getIdtipoejg());
-//			newEstadoDict.setAnio(ejg.getAnio());
-//			newEstadoDict.setNumero(ejg.getNumero());
-//			newEstadoDict.setIdestadoejg((short) 6); // Dictaminado === scs_maestroestadosejg.idestado=6
-//			newEstadoDict.setFechainicio(ejg.getFechadictamen());
-//			newEstadoDict.setFechamodificacion(new Date());
-//			newEstadoDict.setUsumodificacion(usuario.getIdusuario());
-//
-//			// Se realiza una consulta SQL para obtener las observaciones asociadas
-//			newEstadoDict.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgDictamen(idInstitucion,
-//					usuario.getIdlenguaje(), ejgItem.getIdTipoDictamen()));
-//
-//			// Obtenemos el maximo de idestadoporejg
-//			newEstadoDict.setIdestadoporejg(getNewIdestadoporejg(ejg, idInstitucion));
-//
-//			newEstadoDict.setAutomatico("1");
-//
-//			response = scsEstadoejgMapper.insert(newEstadoDict);
-//			if (response == 0)
-//				throw (new Exception("Error en triggersEjgInsert() 2"));
-//		}
-//
-//		// 3 En el caso que los datos de ponente no fueran nulos
-//		if (resolEjg.getFechaPresentacionPonente() != null && resolEjg.getIdPonente() != null) {
-//			// Se inserta el estado "Remitida apertura a CAJG-Reparto Ponente" y se pone en
-//			// las observacions el nombre del ponente.
-//
-//			ScsEstadoejg newEstadoPonente = new ScsEstadoejg();
-//
-//			newEstadoPonente.setIdinstitucion(idInstitucion);
-//			newEstadoPonente.setIdtipoejg(ejg.getIdtipoejg());
-//			newEstadoPonente.setAnio(ejg.getAnio());
-//			newEstadoPonente.setNumero(ejg.getNumero());
-//			newEstadoPonente.setIdestadoejg((short) 0); // Remitida apertura a CAJG-Reparto Ponente ===
-//														// scs_maestroestadosejg.idestado=0
-//			newEstadoPonente.setFechainicio(resolEjg.getFechaPresentacionPonente());
-//			newEstadoPonente.setFechamodificacion(new Date());
-//			newEstadoPonente.setUsumodificacion(usuario.getIdusuario());
-//
-//			// Se realiza una consulta SQL para obtener las observaciones asociadas
-//			newEstadoPonente.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgPonente(idInstitucion,
-//					usuario.getIdlenguaje(), resolEjg.getIdPonente()));
-//
-//			// obtenemos el maximo de idestadoporejg
-//			newEstadoPonente.setIdestadoporejg(getNewIdestadoporejg(ejg, idInstitucion));
-//
-//			newEstadoPonente.setAutomatico("1");
-//
-//			response = scsEstadoejgMapper.insert(newEstadoPonente);
-//			if (response == 0)
-//				throw (new Exception("Error en triggersEjgInsert() 3"));
-//		}
-//
-//		// 4 En el caso que los datos de resolucion no fueran nulos
-//		if (resolEjg.getFechaResolucionCAJG() != null && resolEjg.getIdTiporatificacionEJG() != null) {
-//			// Se inserta el estado Resuelto comisión y se pone en las observacions el tipo
-//			// de resolcuion.
-//
-//			ScsEstadoejg newEstadoResol = new ScsEstadoejg();
-//
-//			newEstadoResol.setIdinstitucion(idInstitucion);
-//			newEstadoResol.setIdtipoejg(ejg.getIdtipoejg());
-//			newEstadoResol.setAnio(ejg.getAnio());
-//			newEstadoResol.setNumero(ejg.getNumero());
-//			newEstadoResol.setIdestadoejg((short) 10); // Resuelto Comisión === scs_maestroestadosejg.idestado=10
-//			newEstadoResol.setFechainicio(resolEjg.getFechaResolucionCAJG());
-//			newEstadoResol.setFechamodificacion(new Date());
-//			newEstadoResol.setUsumodificacion(usuario.getIdusuario());
-//
-//			// Se realiza una consulta SQL para obtener las observaciones asociadas
-//			newEstadoResol.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgResol(idInstitucion,
-//					usuario.getIdlenguaje(), resolEjg.getIdTiporatificacionEJG()));
-//
-//			// Obtenemos el maximo de idestadoporejg
-//			newEstadoResol.setIdestadoporejg(getNewIdestadoporejg(ejg, idInstitucion));
-//
-//			newEstadoResol.setAutomatico("1");
-//
-//			response = scsEstadoejgMapper.insert(newEstadoResol);
-//			if (response == 0)
-//				throw (new Exception("Error en triggersEjgInsert() 4"));
-//		}
-//
-//		// 5 En el caso que los datos del auto no fueran nulos
-//		if (ejgItem.getFechaAuto() != null && resolEjg.getTipoResolucionCAJG() != null) {
-//			// Se inserta el estado Resuelta impugnación y se pone en las observaciones el
-//			// tipo de resolucion.
-//
-//			ScsEstadoejg newEstadoImpug = new ScsEstadoejg();
-//
-//			newEstadoImpug.setIdinstitucion(idInstitucion);
-//			newEstadoImpug.setIdtipoejg(ejg.getIdtipoejg());
-//			newEstadoImpug.setAnio(ejg.getAnio());
-//			newEstadoImpug.setNumero(ejg.getNumero());
-//			newEstadoImpug.setIdestadoejg((short) 13); // Resuelta Impugnación === scs_maestroestadosejg.idestado=13
-//			newEstadoImpug.setFechainicio(ejgItem.getFechaAuto());
-//			newEstadoImpug.setFechamodificacion(new Date());
-//			newEstadoImpug.setUsumodificacion(usuario.getIdusuario());
-//
-//			// Se realiza una consulta SQL para obtener las observaciones asociadas
-//			newEstadoImpug.setObservaciones(scsEjgExtendsMapper.getObservacionEstadoEjgImpug(idInstitucion,
-//					usuario.getIdlenguaje(), resolEjg.getTipoResolucionCAJG()));
-//
-//			// Obtenemos el maximo de idestadoporejg
-//			newEstadoImpug.setIdestadoporejg(getNewIdestadoporejg(ejg, idInstitucion));
-//
-//			newEstadoImpug.setAutomatico("1");
-//
-//			response = scsEstadoejgMapper.insert(newEstadoImpug);
-//			if (response == 0)
-//				throw (new Exception("Error en triggersEjgInsert() 5"));
-//		}
-
         return response;
     }
 
@@ -5855,23 +5889,23 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
     private void insertAuditoriaEJG(String campo, String valorPre, String valorPost, AdmUsuarios usuario, ScsEjg item) {
 
-        ScsAuditoriaejg entradaAuditoriaEjg = new ScsAuditoriaejg();
-
-        entradaAuditoriaEjg.setIdinstitucion(item.getIdinstitucion());
-        entradaAuditoriaEjg.setAnio(item.getAnio());
-        entradaAuditoriaEjg.setNumero(item.getNumero());
-        entradaAuditoriaEjg.setIdtipoejg(item.getIdtipoejg());
-
-        entradaAuditoriaEjg.setCampo(campo);
-        entradaAuditoriaEjg.setValorpre(valorPre);
-        entradaAuditoriaEjg.setValorpost(valorPost);
-        // Revisar que se esta asignando la hora correctamente
-        entradaAuditoriaEjg.setFechahoracambio(new Date());
-
-        entradaAuditoriaEjg.setFechamodificacion(new Date());
-        entradaAuditoriaEjg.setUsumodificacion(usuario.getIdusuario());
-
-        int response = scsAuditoriaejgMapper.insert(entradaAuditoriaEjg);
+//        ScsAuditoriaejg entradaAuditoriaEjg = new ScsAuditoriaejg();
+//
+//        entradaAuditoriaEjg.setIdinstitucion(item.getIdinstitucion());
+//        entradaAuditoriaEjg.setAnio(item.getAnio());
+//        entradaAuditoriaEjg.setNumero(item.getNumero());
+//        entradaAuditoriaEjg.setIdtipoejg(item.getIdtipoejg());
+//
+//        entradaAuditoriaEjg.setCampo(campo);
+//        entradaAuditoriaEjg.setValorpre(valorPre);
+//        entradaAuditoriaEjg.setValorpost(valorPost);
+//        // Revisar que se esta asignando la hora correctamente
+//        entradaAuditoriaEjg.setFechahoracambio(new Date());
+//
+//        entradaAuditoriaEjg.setFechamodificacion(new Date());
+//        entradaAuditoriaEjg.setUsumodificacion(usuario.getIdusuario());
+//
+//        int response = scsAuditoriaejgMapper.insert(entradaAuditoriaEjg);
     }
 
     private String getDescripcionEjg(ScsEjg ejbAnterior, ScsEjg ejgNuevo, String accion) {
@@ -6072,5 +6106,41 @@ public class GestionEJGServiceImpl implements IGestionEJG {
     private void addDato(StringBuilder sb, String descripcion, BigDecimal valor) {
         addDato(sb, descripcion, (valor != null ? valor.toString() : ""));
     }
+    
+    @Override
+	public ExpInsosDTO getDatosExpInsos(EjgItem ejgItem, HttpServletRequest request) {
+    	ExpInsosDTO result = new ExpInsosDTO();
+    	
+    	 String token = request.getHeader("Authorization");
+         String dni = UserTokenUtils.getDniFromJWTToken(token);
+         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
+         if (idInstitucion != null) {
+             LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> Entrada para obtener información del usuario logeado");
+
+             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+             exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+             List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+             LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> Salida de obtener información del usuario logeado");
+
+             if (usuarios != null && usuarios.size() > 0) {
+                 LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> Entrada para obtener los datos del expediente de insostenibilidad");
+
+                 try {
+                	 if(ejgItem!=null)
+                		 result.setExpInsosItems(scsEjgExtendsMapper.getDatosExpInsos(ejgItem));
+                	 else
+                		 LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> ejgItem vacío. "); 
+                 }catch (Exception e) {
+                     LOGGER.debug("GestionEJGServiceImpl.getDatosExpInsos() -> Se ha producido un error. ", e);
+                 }
+             }
+         }
+         
+         LOGGER.info(
+                 "guardarServiciosTramitacion() -> Salida del servicio para actualizar turno, guardia y letrado asociados a un EJG.");
+    	
+		return result;
+    }
 }
