@@ -12,7 +12,6 @@ import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsEstadoejgSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsTipoEJGColegioSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +34,6 @@ public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
                   @Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
               })
               List<ComboItem> comboEstadoEjg(Short idLenguaje);
-          
               
             @SelectProvider(type = ScsEstadoejgSqlExtendsProvider.class, method = "getEstados")
           	@Results({ 
@@ -58,6 +56,5 @@ public interface ScsEstadoejgExtendsMapper extends ScsEstadoejgMapper{
 
           	})
           	List<EstadoEjgItem> getEstados(EjgItem ejgItem, String idInstitucion, String idLenguaje);
-            
           
 }

@@ -53,7 +53,7 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
     
     public String getEstados(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
-
+		
         sql.SELECT("estado.fechainicio," + 
         		" estado.fechamodificacion," + 
         		" estado.idestadoejg," + 
@@ -67,15 +67,17 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
         		" estado.FECHABAJA,"+
         		"estado.IDESTADOPOREJG,"+
         		" maestro.visiblecomision," + 
-        		" persona.nombre," + 
-        		" persona.apellidos1," + 
-        		" persona.apellidos2");
-		sql.SELECT("persona.apellidos1 || ' ' || persona.apellidos2 || ', ' || persona.nombre AS usuariomod");
+        		" NULL nombre," + 
+        		" NULL apellidos1," + 
+        		" NULL apellidos2," +
+        		" usuario.descripcion AS usuariomod");
+		//sql.SELECT("persona.apellidos1 || ' ' || persona.apellidos2 || ', ' || persona.nombre AS usuariomod");
 
         sql.FROM("scs_estadoejg estado");
         sql.INNER_JOIN("scs_maestroestadosejg maestro on (estado.idestadoejg=maestro.idestadoejg)");
         sql.INNER_JOIN("gen_recursos_catalogos recursos on (maestro.descripcion=recursos.idrecurso)");
         sql.INNER_JOIN("cen_persona persona on (estado.usumodificacion=persona.idpersona)");
+        sql.INNER_JOIN("adm_usuarios usuario ON (estado.usumodificacion = usuario.idusuario and estado.idinstitucion = usuario.idinstitucion)");
 
         if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
             sql.WHERE("estado.anio = '" + ejgItem.getAnnio() + "'");

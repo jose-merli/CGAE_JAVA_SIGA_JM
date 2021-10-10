@@ -55,7 +55,7 @@ public class CargasMasivasOficioController {
 	}
 	
 	@RequestMapping(value = "/cargasMasivasOficio/uploadFileIT", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<DeleteResponseDTO> uploadFileIT(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+	public ResponseEntity<DeleteResponseDTO> uploadFileIT(MultipartHttpServletRequest request) throws Exception{
 		DeleteResponseDTO response = iGestionCargasMasivasOficio.uploadFileIT(request);
 		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
