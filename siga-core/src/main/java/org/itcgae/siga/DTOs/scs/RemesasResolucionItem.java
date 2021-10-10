@@ -17,6 +17,11 @@ public class RemesasResolucionItem {
 	private Date fechaResolucionHasta;
 	private int idRemesa;
 	
+	
+	//RESULTADO
+	private Date fechaResolucion;
+	private Date fechaCarga;
+	
 	//GETTERS
 	@JsonProperty("idRemesaResolucion")
 	public int getIdRemesaResolucion() {
@@ -68,6 +73,16 @@ public class RemesasResolucionItem {
 		return idRemesa;
 	}
 	
+	@JsonProperty("fechaResolucion")
+	public Date getFechaResolucion() {
+		return fechaResolucion;
+	}
+	
+	@JsonProperty("fechaCarga")
+	public Date getFechaCarga() {
+		return fechaCarga;
+	}
+
 	//SETTERS
 	public void setIdRemesaResolucion(int idRemesaResolucion) {
 		this.idRemesaResolucion = idRemesaResolucion;
@@ -107,6 +122,14 @@ public class RemesasResolucionItem {
 
 	public void setIdRemesa(int idRmesa) {
 		this.idRemesa = idRmesa;
+	}
+
+	public void setFechaResolucion(Date fechaResolucion) {
+		this.fechaResolucion = fechaResolucion;
+	}
+
+	public void setFechaCarga(Date fechaCarga) {
+		this.fechaCarga = fechaCarga;
 	}
 
 
