@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
@@ -46,6 +48,7 @@ import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IColaEnvios;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
+import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ENVIOS_MASIVOS_LOG_EXTENSION;
@@ -207,6 +210,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	@Autowired
 	private IPFDService pfdService;
+	
+	@Autowired
+	private IEnviosService _enviosService;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -622,12 +628,30 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
 					respuesta.setMessage("Error");
+					// Se genera un log con los errores ocurridos durante el proceso de envíos masivos
+					generaLogGenerico(idInstitucion, envio, e.getMessage());
 				}
 
 			}
 		}
 		LOGGER.info("enviar() -> Salida del servicio para enviar");
 		return respuesta;
+	}
+
+	/**
+	 * Genera un fichero excel de log genérico.
+	 */
+	private void generaLogGenerico(Short idInstitucion, EnvEnvios envio, String error) {
+		Sheet sheet = null;
+		
+		try {
+			sheet = _enviosService.creaLogGenericoExcel(envio);
+			_enviosService.insertaExcelRowLogGenerico(envio, sheet, error);
+		} catch (Exception e) {
+			LOGGER.error("EnviosMasivosServiceImpl -- > generaLogGenerico: " + e);
+		} finally {
+			_enviosService.writeCloseLogFileGenerico(Short.valueOf(idInstitucion), envio.getIdenvio(), sheet);
+		}
 	}
 
 	@Override
