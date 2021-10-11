@@ -42,6 +42,7 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.itcgae.siga.scs.services.oficio.IDesignacionesService;
@@ -706,7 +707,7 @@ public class DesignacionesController {
 	@RequestMapping(value = "/designas/updateLetradoDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateLetradoDesigna(
 			@RequestBody String[] item,
-			HttpServletRequest request) throws ParseException {
+			HttpServletRequest request) throws Exception {
 		
 		String anio = item[0].substring(1, 5);
 		
@@ -714,7 +715,7 @@ public class DesignacionesController {
 		designa.setAnio(Short.parseShort(anio));
 		designa.setIdturno(Integer.parseInt(item[1]));
 		designa.setNumero(Long.parseLong(item[2]));
-		
+		designa.setArt27(item[12]);
 		
 		ScsDesignasletrado letradoSaliente = new ScsDesignasletrado();
 		letradoSaliente.setIdpersona(Long.parseLong(item[3]));
@@ -1043,5 +1044,14 @@ public class DesignacionesController {
 		designa.setNumero(Integer.valueOf(numero));
 		EjgDesignaDTO response = designacionesService.getEjgDesigna(designa, request);
 		return new ResponseEntity<EjgDesignaDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getEJG", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ScsEjg> comboTipoEJG(HttpServletRequest request, String numEjg, String anioEjg) {
+		EjgItem item = new EjgItem();
+		item.setAnnio(anioEjg);
+		item.numEjg(numEjg);
+		ScsEjg response = designacionesService.getEJG(item, request);
+		return new ResponseEntity<ScsEjg>(response, HttpStatus.OK);
 	}
 }

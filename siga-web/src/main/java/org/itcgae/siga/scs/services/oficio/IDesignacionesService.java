@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
@@ -22,6 +23,7 @@ import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
+import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListDTO;
@@ -36,6 +38,7 @@ import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
+import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -182,7 +185,7 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO updateDesigna(DesignaItem designaItem, HttpServletRequest request);
 
 	public UpdateResponseDTO updateLetradoDesigna(ScsDesigna designa, ScsDesignasletrado letradoSaliente,
-			ScsDesignasletrado letradoEntrante, Boolean checkCompensacion , Boolean checkSaltoEntrante , HttpServletRequest request);
+			ScsDesignasletrado letradoEntrante, Boolean checkCompensacion , Boolean checkSaltoEntrante , HttpServletRequest request) throws Exception;
 	
 	
 	public DocumentoDesignaDTO getDocumentosPorDesigna(DocumentoDesignaItem documentoDesignaItem,
@@ -214,5 +217,7 @@ public interface IDesignacionesService {
 	public UpdateResponseDTO asociarAsistenciaDesigna(List<String> designaItem, HttpServletRequest request);
 	
 	UpdateResponseDTO eliminarRelacionAsistenciaDesigna(RelacionesItem datos, HttpServletRequest request);
+
+	ScsEjg getEJG(EjgItem item, HttpServletRequest request);
 	
 }

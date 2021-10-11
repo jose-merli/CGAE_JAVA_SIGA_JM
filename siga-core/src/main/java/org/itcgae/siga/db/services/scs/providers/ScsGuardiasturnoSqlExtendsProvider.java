@@ -40,7 +40,24 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		return sql.toString();
 	}
-	
+	public String searchNombreTurnoGuardiaNoAbrev(String idInstitucion, String nombreGuardia) {
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("SCS_TURNO.nombre AS nombreTurno");
+
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDTURNO AS idturno");
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.IDGUARDIA AS idguardia");
+		sql.SELECT_DISTINCT("SCS_GUARDIASTURNO.NOMBRE AS nombreGuardia");
+		sql.FROM("SCS_GUARDIASTURNO");
+
+		sql.JOIN(
+				"SCS_TURNO ON SCS_TURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO AND SCS_GUARDIASTURNO.IDINSTITUCION = SCS_TURNO.IDINSTITUCION");
+		sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("SCS_GUARDIASTURNO.FECHABAJA is null");
+		sql.WHERE("SCS_GUARDIASTURNO.nombre ='"+nombreGuardia+"'");
+
+		return sql.toString();
+	}
 	public String searchGuardias2(GuardiasItem guardiaItem, String idInstitucion, String idLenguaje, Integer tamMax) {
 		SQL sql = new SQL();
 
@@ -258,6 +275,25 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		if (idInstitucion != null &&  !idInstitucion.isEmpty()) {
 			sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		}
+		sql.ORDER_BY("nombre");
+
+		return sql.toString();
+	}
+
+	public String comboGuardiasNoBaja(String idTurno, String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("NOMBRE");
+		sql.SELECT("IDGUARDIA");
+
+		sql.FROM("SCS_GUARDIASTURNO");
+		if (idTurno != null &&  !idTurno.isEmpty()) {
+			sql.WHERE("IDTURNO IN (" + idTurno + ")");
+		}
+		if (idInstitucion != null &&  !idInstitucion.isEmpty()) {
+			sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		}
+		sql.WHERE("FECHABAJA IS NULL");
 		sql.ORDER_BY("nombre");
 
 		return sql.toString();
@@ -1488,6 +1524,22 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 
 		return sql.toString();
 
+	}
+
+	public String getLastProgramacion( String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT_DISTINCT("MAX(IDPROGCALENDARIO)");
+		sql.FROM("SCS_PROG_CALENDARIOS");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		return sql.toString();
+	}
+
+	public String getLastCalendar( String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT_DISTINCT("MAX(IDCALENDARIOGUARDIAS)");
+		sql.FROM("SCS_CALENDARIOGUARDIAS");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		return sql.toString();
 	}
 
 	
@@ -3180,4 +3232,171 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		SQL.WHERE(new String[]{"gt.idturno = '" + idTurno + "'", "gt.idguardia = '" + idGuardia + "'", "gt.idinstitucion = " + idInstitucion});
 		return SQL.toString();
 	}
+
+	public String getGuardiasToProgByDates(String fechaDesde, String fechaHasta, String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("COUNT (*) GUARDIAS");
+		sql.FROM("SCS_GUARDIASCOLEGIADO");
+		sql.WHERE("FECHAINICIO >= TO_DATE(' " + fechaDesde + "', 'dd/MM/yyyy')");
+		sql.WHERE("FECHAFIN <= TO_DATE(' " + fechaHasta + "', 'dd/MM/yyyy')");
+		return sql.toString();
+	}
+
+	public String getConjuntoGuardiaFromGuardiaTurno(String idGuardia, String idTurno, String idInstitucion) {
+	SQL sql = new SQL();
+
+	 sql.SELECT("CG.IDCONJUNTOGUARDIA");
+       sql.FROM("SCS_CONF_CONJUNTO_GUARDIAS CG");
+       sql.JOIN("scs_guardiasturno  g on CG.idguardia = g.idguardia and CG.idinstitucion = g.idinstitucion");
+       sql.WHERE("CG.idinstitucion = " + idInstitucion);
+       sql.WHERE("CG.idTurno = " + idTurno);
+       sql.WHERE("g.idGuardia = " + idGuardia);
+       sql.WHERE("g.idGuardia = CG.idGuardia");
+       return sql.toString();
+	}
+
+	public String getIdGuardiaByName( String name) {
+		SQL sql = new SQL();
+		sql.SELECT("IDGUARDIA");
+		sql.FROM("SCS_GUARDIASTURNO");
+		sql.WHERE("NOMBRE = '"+ name + "'");
+		return sql.toString();
+	}
+
+	public String getIdTurnoByName( String name) {
+		SQL sql = new SQL();
+		sql.SELECT("IDTURNO");
+		sql.FROM("SCS_TURNO");
+		sql.WHERE("NOMBRE = '"+ name+ "'");
+		return sql.toString();
+	}
+	public String insertHistoricoCalendario(String idCalendar, String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item, String usuModif) {
+		SQL sql2 = new SQL();
+		sql2.INSERT_INTO("SCS_HCO_CONF_PROG_CALENDARIOS H");
+		if (idCalendar != null) {
+			sql2.VALUES("IDPROGCALENDARIO", idCalendar);
+		}
+		if (idConjuntoGuardia != null) {
+			sql2.VALUES("IDCONJUNTOGUARDIA", idConjuntoGuardia);
+		}
+		if (idInstitucion != null) {
+			sql2.VALUES("IDINSTITUCION", idInstitucion);
+		}
+		if (item.getIdTurno() != null) {
+			sql2.VALUES("IDTURNO", item.getIdTurno());
+		}
+		if (item.getIdGuardia()!= null) {
+			sql2.VALUES("IDGUARDIA", item.getIdGuardia());
+		}
+		if (item.getOrden() != null) {
+			sql2.VALUES("ORDEN", item.getOrden());
+		}
+		if (today != null) {
+			sql2.VALUES("FECHAMODIFICACION", "'" + today + "'");
+		}
+		if (usuModif != null) {
+			sql2.VALUES("USUMODIFICACION", usuModif);
+		}
+
+	//	if (item.getGenerado() != null) {
+	//		sql2.VALUES("ESTADO", DECODE(PG.ESTADO, 2, 'No', 'Si'));
+	//	}
+		return sql2.toString();
+	}
+
+	public String getGuardiaColeg(GuardiasItem guardiaItem, String idInstitucion, String idLenguaje) {
+		SQL sql = new SQL();
+
+		sql.SELECT("SCS_TURNO.NOMBRE AS turno");
+
+		sql.SELECT("SCS_GUARDIASTURNO.IDTURNO AS idturno");
+		sql.SELECT("SCS_GUARDIASTURNO.IDGUARDIA AS idguardia");
+		sql.SELECT("SCS_GUARDIASTURNO.NOMBRE AS nombre");
+
+		sql.SELECT("GEN_RECURSOS_CATALOGOS.DESCRIPCION AS tipodeguardia");
+
+		sql.SELECT("SCS_TURNO.GUARDIAS AS obligatoriedad");
+
+		sql.SELECT("CONCAT(SCS_GUARDIASTURNO.DIASGUARDIA,' días') AS duracion");
+
+		sql.SELECT(
+				"DECODE(SCS_GUARDIASTURNO.PORGRUPOS,0,TO_CHAR(SCS_GUARDIASTURNO.NUMEROLETRADOSGUARDIA),'G') AS NUMEROLETRADOSGUARDIA");
+
+		sql.SELECT("SCS_TURNO.VALIDARJUSTIFICACIONES AS VALIDARJUSTIFICACIONES");
+
+		sql.SELECT("(SELECT COUNT(*) FROM SCS_INSCRIPCIONGUARDIA WHERE "
+				+ "(SCS_INSCRIPCIONGUARDIA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION AND "
+				+ "SCS_GUARDIASTURNO.IDTURNO = SCS_INSCRIPCIONGUARDIA.IDTURNO AND SCS_GUARDIASTURNO.IDGUARDIA = SCS_INSCRIPCIONGUARDIA.IDGUARDIA "
+				+ "AND SCS_INSCRIPCIONGUARDIA.FECHABAJA IS NULL)) AS numeroletradosinscritos");
+
+		sql.SELECT("CASE \r\n"
+				+ "		WHEN  'LMXJVSD' LIKE CONCAT('%',CONCAT(SELECCIONLABORABLES,'%')) AND LENGTH(SELECCIONLABORABLES)>1 \r\n"
+				+ "			AND SUBSTR(SELECCIONLABORABLES,1,1) = 'L' AND SUBSTR(SELECCIONLABORABLES,LENGTH(SELECCIONLABORABLES),1) IN ('V','S','D') THEN \r\n"
+				+ "			(CONCAT(CONCAT(SUBSTR(SELECCIONLABORABLES,1,1), '-'), SUBSTR(SELECCIONLABORABLES,LENGTH(SELECCIONLABORABLES),1)))\r\n"
+				+ "		WHEN LENGTH(SELECCIONLABORABLES) = 1 THEN\r\n" + "			SELECCIONLABORABLES\r\n"
+				+ "		ELSE SELECCIONLABORABLES\r\n" + "		END AS diaslaborables");
+
+		sql.SELECT("CASE \r\n"
+				+ "		WHEN  'LMXJVSD' LIKE CONCAT('%',CONCAT(SELECCIONFESTIVOS,'%')) AND LENGTH(SELECCIONFESTIVOS)>1 \r\n"
+				+ "			AND SUBSTR(SELECCIONFESTIVOS,1,1) = 'L' AND SUBSTR(SELECCIONFESTIVOS,LENGTH(SELECCIONFESTIVOS),1) IN ('V','S','D') THEN \r\n"
+				+ "			(CONCAT(CONCAT(SUBSTR(SELECCIONFESTIVOS,1,1), '-'), SUBSTR(SELECCIONFESTIVOS,LENGTH(SELECCIONFESTIVOS),1)))\r\n"
+				+ "		WHEN LENGTH(SELECCIONFESTIVOS) = 1 THEN\r\n" + "			SELECCIONFESTIVOS\r\n"
+				+ "		ELSE SELECCIONFESTIVOS\r\n" + "		END AS diasfestivos");
+
+		sql.SELECT("SCS_GUARDIASTURNO.FECHABAJA AS FECHABAJA");
+
+		sql.FROM("SCS_GUARDIASTURNO");
+
+		sql.JOIN(
+				"SCS_TURNO ON SCS_TURNO.IDTURNO = SCS_GUARDIASTURNO.IDTURNO AND SCS_GUARDIASTURNO.IDINSTITUCION = SCS_TURNO.IDINSTITUCION");
+
+		sql.JOIN("SCS_TIPOSGUARDIAS ON SCS_TIPOSGUARDIAS.IDTIPOGUARDIA = SCS_GUARDIASTURNO.IDTIPOGUARDIA");
+
+		sql.LEFT_OUTER_JOIN(
+				"GEN_RECURSOS_CATALOGOS ON GEN_RECURSOS_CATALOGOS.IDRECURSO = SCS_TIPOSGUARDIAS.DESCRIPCION AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE = '"
+						+ idLenguaje + "'");
+
+		// JOINS
+
+		// FILTRO AREA
+		if (guardiaItem.getArea() != null && guardiaItem.getArea() != "") {
+			sql.LEFT_OUTER_JOIN(
+					"SCS_AREA ON SCS_AREA.IDAREA = SCS_TURNO.IDAREA AND SCS_AREA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION");
+
+			// FILTRO AREA | MATERIA
+			if (guardiaItem.getMateria() != null && guardiaItem.getMateria() != "")
+				sql.LEFT_OUTER_JOIN(
+						"SCS_MATERIA ON SCS_MATERIA.IDAREA = SCS_AREA.IDAREA AND SCS_MATERIA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION");
+		}
+		// FILTRO GRUPOZONA
+		if (guardiaItem.getGrupoZona() != null && guardiaItem.getGrupoZona() != "") {
+
+			sql.LEFT_OUTER_JOIN(
+					"SCS_ZONA ON SCS_ZONA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION AND SCS_ZONA.IDZONA = SCS_TURNO.IDZONA");
+
+			// FILTRO GRUPOZONA | ZONA
+			if (guardiaItem.getZona() != null && guardiaItem.getZona() != "")
+				sql.LEFT_OUTER_JOIN(
+						"SCS_SUBZONA ON SCS_ZONA.IDZONA = SCS_SUBZONA.IDZONA AND SCS_SUBZONA.IDINSTITUCION = SCS_GUARDIASTURNO.IDINSTITUCION");
+		}
+		// ----------------------------------------
+
+		// WHERE
+		sql.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = '" + idInstitucion + "'");
+
+		// FILTRO POR TURNO
+		if (guardiaItem.getIdTurno() != null && guardiaItem.getIdTurno() != "")
+			sql.WHERE("SCS_GUARDIASTURNO.IDTURNO = " + guardiaItem.getIdTurno());
+
+		if (guardiaItem.getIdGuardia() != null && guardiaItem.getIdGuardia() != "")
+			sql.WHERE("SCS_GUARDIASTURNO.IDGUARDIA = " + guardiaItem.getIdGuardia());
+
+
+		sql.ORDER_BY("SCS_TURNO.NOMBRE, SCS_GUARDIASTURNO.NOMBRE");
+
+
+		return sql.toString();
+	}
+
+
 }

@@ -827,6 +827,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
 		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
 
+		sql.SELECT_DISTINCT("inst.abreviatura as colegioResultado");
+		
+		
 		sql1.SELECT("partidojudicial.nombre");
 		sql1.FROM("cen_partidojudicial partidojudicial");
 		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
@@ -834,7 +837,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql1.INNER_JOIN(
 				"CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
 						+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
-
+		
 		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
 		sql1.WHERE("direcciones.idpersona = dir.idpersona");
 		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");

@@ -8,6 +8,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
 import org.itcgae.siga.db.entities.ScsCabeceraguardias;
@@ -67,4 +69,31 @@ public interface ScsCabeceraguardiasExtendsMapper extends ScsCabeceraguardiasMap
 	})
 	List<ScsCabeceraguardias> getPermutaGuardiaColegiado(GuardiasItem guardiaItem);
 	
+	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "sustituirLetrado")
+	int sustituirLetrado(String institucion,String idTurno,String idGuardia,String fechadesde,String idPersona,String newLetrado,String fechaSustitucion,String comensustitucion);
+	
+	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "sustituirLetradoPermutaCabecera")
+	int sustituirLetradoPermutaCabecera(String institucion,String idPersona,String newLetrado, String idPerCab);
+	
+	@SelectProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "getCalendarioGuardiaColegiado")
+	@Results({ @Result(column = "institucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombreturno", property = "turno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "nombreguardia", property = "guardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idTurno", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idGuardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechainicio", property = "fechaDesde", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechafin", property = "fechaHasta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "generado", property = "generado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechaProgramacion", property = "fechaProgramacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "listaGuardias", property = "listaGuardias", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idCalG", property = "idCalG", jdbcType = JdbcType.INTEGER),
+			@Result(column = "numGuardias", property = "numGuardias", jdbcType = JdbcType.INTEGER),
+			@Result(column = "idCalendarioProgramado", property = "idCalendarioProgramado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "facturado", property = "facturado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "asistenciasAsociadas", property = "asistenciasAsociadas", jdbcType = JdbcType.VARCHAR)})
+	
+	List<DatosCalendarioProgramadoItem> getCalendarioGuardiaColegiado(String institucion,String idTurno,String idGuardia,String idcalendarioguardias);
 }

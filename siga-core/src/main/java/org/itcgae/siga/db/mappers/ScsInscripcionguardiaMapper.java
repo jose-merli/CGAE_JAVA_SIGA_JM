@@ -206,4 +206,5 @@ public interface ScsInscripcionguardiaMapper {
           "and FECHASUSCRIPCION = #{fechasuscripcion,jdbcType=TIMESTAMP}"
     })
     int updateByPrimaryKey(ScsInscripcionguardia record);
+
 }
