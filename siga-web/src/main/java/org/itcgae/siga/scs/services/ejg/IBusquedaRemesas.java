@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.scs.CheckAccionesRemesasDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
+import org.itcgae.siga.DTOs.scs.RemesaAccionItem;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
@@ -37,6 +38,8 @@ public interface IBusquedaRemesas {
 
 	DeleteResponseDTO borrarExpedientesRemesa(List<EJGRemesaItem> remesasBusquedaItem, HttpServletRequest request);
 
-	CheckAccionesRemesasDTO checkAcciones(RemesasItem remesasItem, HttpServletRequest request);
+	CheckAccionesRemesasDTO getAcciones(RemesasItem remesasItem, HttpServletRequest request);
+
+	InsertResponseDTO ejecutaOperacionRemesa(RemesaAccionItem remesaAccionItem, HttpServletRequest request);
 	
 }

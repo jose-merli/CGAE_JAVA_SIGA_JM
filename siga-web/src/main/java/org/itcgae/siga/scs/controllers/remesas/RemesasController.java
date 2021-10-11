@@ -13,12 +13,11 @@ import org.itcgae.siga.DTOs.scs.CheckAccionesRemesasDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaDTO;
 import org.itcgae.siga.DTOs.scs.EJGRemesaItem;
 import org.itcgae.siga.DTOs.scs.EstadoRemesaDTO;
+import org.itcgae.siga.DTOs.scs.RemesaAccionItem;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.entities.AdmContador;
-import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.scs.services.ejg.IBusquedaRemesas;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -99,11 +98,20 @@ public class RemesasController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/checkAcciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<CheckAccionesRemesasDTO> checkAcciones(@RequestBody RemesasItem remesasItem, HttpServletRequest request) {
+	@RequestMapping(value = "/getAcciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CheckAccionesRemesasDTO> getAcciones(@RequestBody RemesasItem remesasItem, HttpServletRequest request) {
 		LOGGER.info("Entra en el método checkAcciones");
-		CheckAccionesRemesasDTO response = busquedaRemesas.checkAcciones(remesasItem, request);
+		CheckAccionesRemesasDTO response = busquedaRemesas.getAcciones(remesasItem, request);
 		LOGGER.info("Termina el método checkAcciones");
 		return new ResponseEntity<CheckAccionesRemesasDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/ejecutaOperacionRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> ejecutaOperacionRemesa(@RequestBody RemesaAccionItem remesaAccionItem, HttpServletRequest request) {
+		LOGGER.info("Entra en el método ejecutaOperacionRemesa");
+		InsertResponseDTO response = busquedaRemesas.ejecutaOperacionRemesa(remesaAccionItem, request);
+		LOGGER.info("Termina el método ejecutaOperacionRemesa");
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
 }

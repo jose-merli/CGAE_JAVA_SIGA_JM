@@ -380,7 +380,7 @@ public class ScsRemesasExtendsProvider {
 		return sql.toString();
 	}
 
-	public String checkAcciones(RemesasItem remesasItem, Short idInstitucion, String idlenguaje, String tipoPCAJG) {
+	public String getAcciones(RemesasItem remesasItem, Short idInstitucion, String idlenguaje, String tipoPCAJG) {
 		SQL sql = new SQL();
 		int estado;
 
