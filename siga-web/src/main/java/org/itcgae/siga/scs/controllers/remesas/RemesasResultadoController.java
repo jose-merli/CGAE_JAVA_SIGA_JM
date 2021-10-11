@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.RemesaResultadoDTO;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
+import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.scs.services.ejg.IRemesasResultados;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/remesasResultado")
@@ -53,8 +55,8 @@ public class RemesasResultadoController {
 	}
 	
 	@RequestMapping(value = "/guardarRemesaResultado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestBody RemesasResultadoItem remesasResultadoItem, HttpServletRequest request) {
-		UpdateResponseDTO response = remesasResultados.guardarRemesaResultado(remesasResultadoItem, request);
+	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestBody RemesasResolucionItem remesasResolucionItem, MultipartHttpServletRequest request) {
+		UpdateResponseDTO response = remesasResultados.guardarRemesaResultado(remesasResolucionItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else

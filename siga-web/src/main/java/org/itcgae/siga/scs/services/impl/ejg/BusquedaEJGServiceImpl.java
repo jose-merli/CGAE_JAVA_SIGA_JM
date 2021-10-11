@@ -145,7 +145,6 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 		InsertResponseDTO responsedto = new InsertResponseDTO();
 		int response = 0;
 		int responseEstado= 0;
-		Error error = null;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);

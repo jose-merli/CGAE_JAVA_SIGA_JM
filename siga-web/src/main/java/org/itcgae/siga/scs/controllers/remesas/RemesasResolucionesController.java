@@ -24,7 +24,7 @@ public class RemesasResolucionesController {
 	@Autowired
 	private IRemesasResoluciones remesasResoluciones;
 	
-	@RequestMapping(value = "/buscarRemesasResoluciones", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/buscarRemesasResoluciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<RemesaResolucionDTO> buscarRemesas(@RequestBody RemesasResolucionItem remesasResolucionItem, HttpServletRequest request) {
 		LOGGER.info("Entra en el método buscarRemesasResoluciones");  
 		RemesaResolucionDTO response = remesasResoluciones.buscarRemesasResoluciones(remesasResolucionItem, request);

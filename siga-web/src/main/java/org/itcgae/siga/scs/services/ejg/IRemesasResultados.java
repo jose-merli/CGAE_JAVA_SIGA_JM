@@ -6,10 +6,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.scs.RemesaResultadoDTO;
+import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IRemesasResultados {
 	
@@ -20,6 +22,6 @@ public interface IRemesasResultados {
 	
 	AdmContador recuperarDatosContador(HttpServletRequest request);
 	
-	UpdateResponseDTO guardarRemesaResultado(RemesasResultadoItem remesasResultadoItem, HttpServletRequest request);
+	UpdateResponseDTO guardarRemesaResultado(RemesasResolucionItem remesasResolucionItem, MultipartHttpServletRequest request);
 
 }

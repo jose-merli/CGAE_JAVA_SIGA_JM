@@ -1116,5 +1116,6 @@ public class SigaConstants {
 	public static final String ACREDITACION_TIPO_COMPLETA = "3";
 	
 	public static final String CONTADOR_REMESAS_RESULTADOS= "REMESARESULTEJG";
+	public static final String MAX_NUM_LINEAS_FICHERO = "MAX_NUM_LINEAS_FICH";
 
 }
