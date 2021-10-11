@@ -43,6 +43,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -6690,6 +6691,39 @@ public class GuardiasServiceImpl implements GuardiasService {
 		
 		upd.setStatus(inscripciones);
 		return upd;
+	}
+
+	public StringDTO getTipoDiaGuardia(HttpServletRequest request, String idTurno, String idGuardia) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		StringDTO stringDTO = new StringDTO();
+		Error error = new Error();
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+				this.LOGGER.info("getTipoDiaGuardia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = this.admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				this.LOGGER.info("getTipoDiaGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				if (usuarios != null && !usuarios.isEmpty()) {
+					org.itcgae.siga.DTO.scs.GuardiasItem guardia = this.scsGuardiasturnoExtendsMapper.getTipoDiaGuardia(idTurno, idGuardia, idInstitucion);
+					if (guardia != null) {
+						guardia.setTipoDia("Labor. " + guardia.getSeleccionLaborables() + ", Fest. " + guardia.getSeleccionFestivos());
+						String tipoDiaNoNull = guardia.getTipoDia().replace("null", "");
+						stringDTO.setValor(tipoDiaNoNull);
+					}
+				}
+			}
+		} catch (Exception var13) {
+			this.LOGGER.error("getTipoDia() / ERROR: " + var13.getMessage(), var13);
+			error.setCode(500);
+			error.setMessage("Error al buscar los dias laborales y festivos de la guardia: " + var13);
+			error.description("Error al buscar los dias laborales y festivos de la guardia: " + var13);
+		}
+
+		return stringDTO;
 	}
 
 	@Override

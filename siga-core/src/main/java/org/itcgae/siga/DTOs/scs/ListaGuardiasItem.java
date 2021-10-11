@@ -10,6 +10,24 @@ public class ListaGuardiasItem {
     private String idTipo;
     private String idGrupoZona;
     private String idZona;
+    private String observaciones;
+    private String tipoDesc;
+
+    public String getTipoDesc() {
+        return tipoDesc;
+    }
+
+    public void setTipoDesc(String tipoDesc) {
+        this.tipoDesc = tipoDesc;
+    }
+
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
+    }
 
     public String getIdLista() {
         return idLista;

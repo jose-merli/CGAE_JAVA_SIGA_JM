@@ -66,6 +66,24 @@ public class GuardiasItem {
 	private String idCalendarioGuardias;
 	private String facturado;
 	private Integer idFacturacion;
+	private String idListaGuardia;
+	private String orden;
+
+	public String getIdListaGuardia() {
+		return idListaGuardia;
+	}
+
+	public void setIdListaGuardia(String idListaGuardia) {
+		this.idListaGuardia = idListaGuardia;
+	}
+
+	public String getOrden() {
+		return orden;
+	}
+
+	public void setOrden(String orden) {
+		this.orden = orden;
+	}
 
 	public String getSepararGuardia() {
 		return separarGuardia;

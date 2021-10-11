@@ -1113,4 +1113,16 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "checkHistorico")
 			@Results({})
 			 String checkHistorico(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion);
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getTipoDiaGuardia")
+	@Results({
+		@Result(
+			column = "diaslaborables",
+			property = "seleccionLaborables",
+			jdbcType = JdbcType.VARCHAR
+	), @Result(
+			column = "diasfestivos",
+			property = "seleccionFestivos",
+			jdbcType = JdbcType.VARCHAR
+	)})
+	GuardiasItem getTipoDiaGuardia(String idTurno, String idGuardia, Short idInstitucion);
 }
