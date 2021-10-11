@@ -2096,7 +2096,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql2 = new SQL();
 
 		sql2.SELECT(
-				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
+				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.anio, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
 		sql2.SELECT("dp.idprocurador");
 		sql2.SELECT("dp.idinstitucion_proc");
 		

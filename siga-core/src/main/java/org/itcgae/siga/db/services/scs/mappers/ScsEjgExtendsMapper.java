@@ -238,7 +238,8 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "RESOLUCION", property = "resolucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDSJCS", property = "idsjcs", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPERSONAJG", property = "idpersonajg", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "IDPERSONAJG", property = "idpersonajg", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechadesignacion", property = "fechaDesignacion", jdbcType = JdbcType.TIMESTAMP),
 
 	})
 	List<RelacionesItem> getRelacionesEJG(EjgItem item);

@@ -1182,6 +1182,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + "nvl( numerodiligencia, 'Sin número' ) || ' / ' || nvl( numeroprocedimiento,'Sin número' ) dilnigproc,"
                 + "NULL resolucion");
         sqlAsistencia.SELECT("NULL IDPERSONAJG");
+        sqlAsistencia.SELECT("NULL fechaDesignacion");
 
         sqlAsistencia.FROM("scs_asistencia");
         sqlAsistencia.WHERE("ejganio = " + item.getAnnio());
@@ -1235,6 +1236,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + "(" + sqlSOJ_4.toString() + ") interesado," + "NULL dilnigproc," + "NULL resolucion");
 
         sqlSOJ.SELECT("scs_soj.IDPERSONAJG");
+        sqlSOJ.SELECT("NULL fechaDesignacion");
 
         sqlSOJ.FROM("scs_soj");
         sqlSOJ.WHERE("ejganio = " + item.getAnnio());
@@ -1321,6 +1323,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + " f_siga_getrecurso(res.descripcion,1) resolucion");
 
         sqlDesigna.SELECT("NULL IDPERSONAJG");
+        sqlDesigna.SELECT("(SELECT fechaentrada FROM scs_designa des WHERE des.anio = ejgd.aniodesigna AND des.numero = ejgd.numerodesigna AND des.idturno = ejgd.idturno) fechadesignacion");
 
         sqlDesigna.FROM("scs_ejg ejg "
                 + "LEFT OUTER JOIN scs_tiporesolucion res ON ejg.idtiporatificacionejg = res.idtiporesolucion,"
@@ -1348,6 +1351,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 + "NULL interesado," + "NULL dilnigproc," + "exp.DESCRIPCIONRESOLUCION resolucion");
 
         sqlExpediente.SELECT("NULL IDPERSONAJG");
+        sqlExpediente.SELECT("NULL fechaDesignacion");
 
         sqlExpediente.FROM("   exp_expediente exp," + "            exp_denunciado den," + "            cen_persona per,"
                 + "            exp_tipoexpediente ext");
