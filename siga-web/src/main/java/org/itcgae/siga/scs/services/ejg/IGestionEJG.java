@@ -7,14 +7,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.scs.AsuntosAsistenciaItem;
-import org.itcgae.siga.DTOs.scs.AsuntosSOJItem;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
-import org.itcgae.siga.DTOs.scs.DesignaItem;
-import org.itcgae.siga.DTOs.scs.DocumentoEjgItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -22,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.EjgDocumentacionItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.EstadoEjgDTO;
 import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
+import org.itcgae.siga.DTOs.scs.ExpInsosDTO;
 import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoDTO;
 import org.itcgae.siga.DTOs.scs.ListaContrarioEJGJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
@@ -35,7 +33,6 @@ import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IGestionEJG {
@@ -99,6 +96,8 @@ public interface IGestionEJG {
 	UpdateResponseDTO borrarFamiliar(List<UnidadFamiliarEJGItem> datos, HttpServletRequest request) throws Exception;
 	
 	RelacionesDTO getRelacionesEJG(EjgItem item, HttpServletRequest request);
+	
+	ResponseEntity<InputStreamResource> descargarDocumentoResolucion(String docReslucion, HttpServletRequest request);
 
 	ComboDTO comboSituaciones(HttpServletRequest request);
 
@@ -141,9 +140,9 @@ public interface IGestionEJG {
 
 	ComboDTO comboDocumentos(String idTipoDocumentacion, HttpServletRequest request);
 
-	InsertResponseDTO subirDocumentoEjg(MultipartHttpServletRequest request);
+	InsertResponseDTO subirDocumentoEjg(MultipartHttpServletRequest request) throws Exception;
 
-	InsertResponseDTO crearDocumentacionEjg(EjgDocumentacionItem documentacionEjgItem, HttpServletRequest request);
+	InsertResponseDTO crearDocumentacionEjg(EjgDocumentacionItem documentacionEjgItem, HttpServletRequest request) throws Exception;
 
 	UpdateResponseDTO actualizarDocumentacionEjg(EjgDocumentacionItem documentoEjgItem, HttpServletRequest request);
 
@@ -172,4 +171,8 @@ public interface IGestionEJG {
 	UpdateResponseDTO guardarResolucion(ResolucionEJGItem datos, HttpServletRequest request) throws Exception;
 
 	Boolean getHabilitarActa(HttpServletRequest request);
+	
+	ExpInsosDTO getDatosExpInsos(EjgItem ejgItem, HttpServletRequest request);
+
+	DocushareDTO searchListDirEjg(int numPagina, DocuShareObjectVO docu, HttpServletRequest request) throws Exception;
 }

@@ -600,7 +600,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				// 2. Se asignan el letrado y el solicitante principal del EJG al SOJ.
 
 				LOGGER.info("BusquedaAsuntosServiceImpl.copyEjg2Soj() -> Copiando informacion del EJG al SOJ.");
-				soj.setIdpersona(ejg.getIdpersona());
+//				soj.setIdpersona(ejg.getIdpersona());
 				soj.setIdpersonajg(ejg.getIdpersonajg());
 
 				soj.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -786,8 +786,8 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyEjg2Asis() -> Copiando informacion del EJG a la asistencia.");
 
-				if (ejg.getIdpersona() != null)
-					asis.setIdpersonacolegiado(ejg.getIdpersona());
+//				if (ejg.getIdpersona() != null)
+//					asis.setIdpersonacolegiado(ejg.getIdpersona());
 				asis.setIdpersonajg(ejg.getIdpersonajg());
 
 				asis.setJuzgado(ejg.getJuzgado());
@@ -1340,11 +1340,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						.andAnioEqualTo(designa.getAnio()).andNumeroEqualTo(designa.getNumero())
 						.andIdturnoEqualTo(designa.getIdturno());
 
-				List<ScsDesignasletrado> letradoDesigna = scsDesignasletradoMapper
-						.selectByExample(letradoDesignaExample);
+//				List<ScsDesignasletrado> letradoDesigna = scsDesignasletradoMapper
+//						.selectByExample(letradoDesignaExample);
 
-				if (!letradoDesigna.isEmpty())
-					asis.setIdpersonacolegiado(letradoDesigna.get(0).getIdpersona());
+//				if (!letradoDesigna.isEmpty())
+//					asis.setIdpersonacolegiado(letradoDesigna.get(0).getIdpersona());
 
 				asis.setJuzgado(designa.getIdjuzgado());
 				asis.setJuzgadoidinstitucion(designa.getIdinstitucionJuzg());
@@ -1599,6 +1599,9 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				// 3. Se asignan los valores de defensa juridica de EJG
 
+				LOGGER.info(
+						"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Iniciando la introduccion de los valores de defensa juridica del EJG");
+
 //					PRE
 				ejg.setNumeroprocedimiento(designa.getNumprocedimiento());
 				ejg.setNig(designa.getNig());
@@ -1606,7 +1609,20 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				ejg.setIdpretension(designa.getIdpretension());
 				ejg.setJuzgado(designa.getIdjuzgado());
 
-				// Se asocia el ultimo letrado asignado.
+				ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
+				ejg.setFechamodificacion(new Date());
+				
+				response = scsEjgMapper.updateByPrimaryKey(ejg);
+				if (response == 0)
+					throw (new Exception("Error al introducir los valores de defensa juridica del EJG"));
+				
+				LOGGER.info(
+						"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Saliendo la introduccion de los valores de defensa juridica del EJG");
+
+				// 4. Se asocia al EJG el ultimo letrado asignado en la designacion.
+
+				LOGGER.info(
+						"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Iniciando la copia de letrado de la designacion al EJG");
 
 				ScsDesignasletradoExample letradosDesignaExample = new ScsDesignasletradoExample();
 
@@ -1616,20 +1632,26 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 						.andIdturnoEqualTo(designa.getIdturno());
 
 				// Buscamos el ultmo letrado designado en la designa.
-				List<ScsDesignasletrado> letradosDesigna = scsDesignasletradoMapper
-						.selectByExample(letradosDesignaExample);
+//				List<ScsDesignasletrado> letradosDesigna = scsDesignasletradoMapper
+//						.selectByExample(letradosDesignaExample);
+				
+				// Cuidado ya que puede dar error al no cumpli una restriccion
+				// de clave secundaria si el letrado seleccionado en la designacion se hizo por art 27,
+				// que permite seleccionar fuera de la institucion activando la restriccion SEG_COLEGIADO_FK de la tabla SCS_EJG.
+//				if (!letradosDesigna.isEmpty())
+//					ejg.setIdpersona(letradosDesigna.get(0).getIdpersona());
+//				else
+//					ejg.setIdpersona(null);
+				
+				response = scsEjgMapper.updateByPrimaryKey(ejg);
+				if (response == 0)
+					throw (new Exception("Error al introducir un letrado en el EJG proveniente de la designacion"));
 
-				if (!letradosDesigna.isEmpty())
-					ejg.setIdpersona(letradosDesigna.get(0).getIdpersona());
-				else
-					ejg.setIdpersona(null);
 
-				ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
-				ejg.setFechamodificacion(new Date());
-
-				// Se busca el id del letrado asignado
-
-				// 4. Se debe introducir el procurador seleccionado en la designacion.
+				LOGGER.info(
+						"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Finalizada la copia de letrado de la designacion al EJG");
+				
+				// 5. Se debe introducir el procurador seleccionado en la designacion.
 
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Iniciando la introduccion del procurador de la designacion al EJG");
@@ -1664,8 +1686,15 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				if (response == 0)
 					throw (new Exception("Error al introducir un procurador en el EJG proveniente de la designacion"));
 
-				// 5. Se debe insertar los interesados seleccionados en la designacion en Unidad
+				LOGGER.info(
+						"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Finalizada la introduccion del procurador de la designacion al EJG");
+				
+				// 6. Se debe insertar los interesados seleccionados en la designacion en Unidad
 				// Familiar del EJG.
+				
+				LOGGER.info(
+						"BusquedaAsuntosServiceImpl.copyDesigna2Ejg() -> Iniciando la introduccion de los interesados de la designacion a la unidad Familiar del EJG");
+
 
 				ScsUnidadfamiliarejgExample familiaresEJGExample = new ScsUnidadfamiliarejgExample();
 
@@ -1796,33 +1825,33 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Designacion y SOJ seleccionados.");
 
-				// 2. Se asignan el letrado y el solicitante principal del EJG al SOJ.
+				// 2. Se asignan el letrado  principal de la designacion al SOJ.
 
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Copiando informacion de la designacion al SOJ.");
 
 				ScsDesignasletradoExample letradosDesignaExample = new ScsDesignasletradoExample();
 
-				letradosDesignaExample.setOrderByClause("FECHADESIGNA DESC");
-				letradosDesignaExample.createCriteria().andAnioEqualTo(designa.getAnio())
-						.andNumeroEqualTo(designa.getNumero()).andIdinstitucionEqualTo(idInstitucion)
-						.andIdturnoEqualTo(designa.getIdturno());
+//				letradosDesignaExample.setOrderByClause("FECHADESIGNA DESC");
+//				letradosDesignaExample.createCriteria().andAnioEqualTo(designa.getAnio())
+//						.andNumeroEqualTo(designa.getNumero()).andIdinstitucionEqualTo(idInstitucion)
+//						.andIdturnoEqualTo(designa.getIdturno());
 
 				// Buscamos el ultmo letrado designado en la designa.
-				List<ScsDesignasletrado> letradosDesigna = scsDesignasletradoMapper
-						.selectByExample(letradosDesignaExample);
+//				List<ScsDesignasletrado> letradosDesigna = scsDesignasletradoMapper
+//						.selectByExample(letradosDesignaExample);
 
-				if (!letradosDesigna.isEmpty())
-					soj.setIdpersona(letradosDesigna.get(0).getIdpersona());
-				else
-					soj.setIdpersona(null);
+//				if (!letradosDesigna.isEmpty())
+//					soj.setIdpersona(letradosDesigna.get(0).getIdpersona());
+//				else
+//					soj.setIdpersona(null);
 
 				soj.setUsumodificacion(usuarios.get(0).getIdusuario());
 				soj.setFechamodificacion(new Date());
 
 				response = scsSojMapper.updateByPrimaryKey(soj);
 				if (response == 0)
-					throw (new Exception("Error en copyDesigna2Soj() al copiar los datos del EJG al SOJ."));
+					throw (new Exception("Error en copyDesigna2Soj() al copiar los datos de la designacion al SOJ."));
 
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Informacion copiada de la designacion al SOJ.");
@@ -1990,7 +2019,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyAsis2Soj() -> Copiando informacion de la asistencia al SOJ.");
-				soj.setIdpersona(asis.getIdpersonacolegiado());
+//				soj.setIdpersona(asis.getIdpersonacolegiado());
 				soj.setIdpersonajg(asis.getIdpersonajg());
 
 				soj.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -2232,7 +2261,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> Copiando informacion de la asistencia al EJG.");
 
-				ejg.setIdpersona(asis.getIdpersonacolegiado());
+//				ejg.setIdpersona(asis.getIdpersonacolegiado());
 				ejg.setIdpersonajg(asis.getIdpersonajg());
 
 				ejg.setJuzgado(asis.getJuzgado());

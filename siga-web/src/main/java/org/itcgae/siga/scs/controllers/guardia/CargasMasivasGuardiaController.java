@@ -1,4 +1,4 @@
-package org.itcgae.siga.scs.controllers.oficio;
+package org.itcgae.siga.scs.controllers.guardia;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,6 +11,7 @@ import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.itcgae.siga.DTO.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.FileDataDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
@@ -26,6 +27,7 @@ import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
+import org.itcgae.siga.scs.services.guardia.CargasMasivasGuardiaService;
 import org.itcgae.siga.scs.services.oficio.IGestionCargasMasivasOficio;
 import org.itcgae.siga.scs.services.oficio.IGestionInscripcionesService;
 import org.itcgae.siga.scs.services.oficio.IGestionTurnosService;
@@ -42,37 +44,45 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
-@RequestMapping(value = "/oficio")
-public class CargasMasivasOficioController {
+@RequestMapping(value = "/guardia")
+public class CargasMasivasGuardiaController {
 
 	@Autowired
-	private IGestionCargasMasivasOficio iGestionCargasMasivasOficio;
+	private CargasMasivasGuardiaService cargasMasivasGuardiaService;
 	
-	@RequestMapping(value = "/cargasMasivasOficio/descargarModelo",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	@RequestMapping(value = "/cargasMasivasGuardia/descargarModelo",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	public ResponseEntity<InputStreamResource> descargarModelo(HttpServletRequest request,@RequestBody String[] turnos) throws IOException, EncryptedDocumentException, InvalidFormatException {
-		ResponseEntity<InputStreamResource> response = iGestionCargasMasivasOficio.descargarModelo(request, turnos[0], turnos[1], turnos[2]);
+		ResponseEntity<InputStreamResource> response = cargasMasivasGuardiaService.descargarModelo(request, turnos[0], turnos[1], turnos[2]);
 		return response;
 	}
 	
-	@RequestMapping(value = "/cargasMasivasOficio/uploadFileIT", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<DeleteResponseDTO> uploadFileIT(MultipartHttpServletRequest request) throws Exception{
-		DeleteResponseDTO response = iGestionCargasMasivasOficio.uploadFileIT(request);
+	@RequestMapping(value = "/cargasMasivasGuardia/uploadFileI", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<DeleteResponseDTO> uploadFileI(HttpServletRequest request,@RequestBody FileDataDTO body) throws IllegalStateException, IOException{
+		DeleteResponseDTO response = cargasMasivasGuardiaService.uploadFileI(request, body);
 		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
-	@RequestMapping(value = "/cargasMasivasOficio/uploadFileBT", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<DeleteResponseDTO> uploadFileBT(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
-		DeleteResponseDTO response = iGestionCargasMasivasOficio.uploadFileBT(request);
+	@RequestMapping(value = "/cargasMasivasGuardia/uploadFileGC", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<DeleteResponseDTO> uploadFileGC(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+		DeleteResponseDTO response = cargasMasivasGuardiaService.uploadFileGC(request);
 		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
-	@RequestMapping(value = "/cargasMasivasOficio/download", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "/cargasMasivasGuardia/uploadFileC", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<DeleteResponseDTO> uploadFileC(@RequestParam("fechaDesde") String fechaDesde, @RequestParam("fechaHasta") String fechaHasta, @RequestParam("observaciones") String observaciones, MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+		DeleteResponseDTO response = cargasMasivasGuardiaService.uploadFileC(request, fechaDesde, fechaHasta, observaciones);
+		if (response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "/cargasMasivasGuardia/download", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<InputStreamResource> downloadLogFile(@RequestBody CargaMasivaItem cargaMasivaItem, HttpServletRequest request) throws SigaExceptions {
-		ResponseEntity<InputStreamResource> response = iGestionCargasMasivasOficio.downloadLogFile(cargaMasivaItem, request);
+		ResponseEntity<InputStreamResource> response = cargasMasivasGuardiaService.downloadLogFile(cargaMasivaItem, request);
 		return response;
 	}
 }

@@ -103,4 +103,6 @@ public interface ComboService {
 	public ComboDTO comboTipoActuacionAsistencia(HttpServletRequest request, String anioNumero, String idTipoAsistencia);
 
 	public ComboDTO comboOrigenContacto(HttpServletRequest request);
+
+	public ComboDTO comboGuardiasNoBaja(HttpServletRequest request, String idTurno);
 }

@@ -9,6 +9,11 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.JuzgadoItem;
+import org.itcgae.siga.DTOs.scs.JuzgadoItem;
+import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.db.entities.ScsTiporesolucion;
 import org.itcgae.siga.db.mappers.ScsJuzgadoMapper;
 import org.itcgae.siga.db.mappers.ScsTiporesolucionMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsJuzgadoSqlExtendsProvider;
@@ -27,6 +32,13 @@ public interface ScsTiporesolucionExtendsMapper extends ScsTiporesolucionMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getResoluciones(String idLenguaje);
+	
+	@SelectProvider(type = ScsTiporesolucionSqlExtendsProvider.class, method = "getResoluciones")
+	@Results({
+		@Result(column = "IDTIPORESOLUCION", property = "idtiporesolucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ScsTiporesolucion> getResolucionesEJG(String idLenguaje);
 	
 
 }
