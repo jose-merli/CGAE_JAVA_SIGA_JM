@@ -11,9 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionDTO;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
+import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
+import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -308,46 +310,48 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				LOGGER.info(
 						"solicitarCompra() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para crear una solicitud de compra");
 
-				PysProductossolicitados productoSolicitado = new PysProductossolicitados();
-
-				productoSolicitado.setIdinstitucion(idInstitucion);
-				productoSolicitado.setIdpersona(Long.valueOf(ficha.getIdPersona()));
-				productoSolicitado.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
-				if(productoSolicitado.getIdformapago()!=null)productoSolicitado.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
-				else productoSolicitado.setIdformapago(null);
-				//En el caso que la forma de pago sea domiciliación bancaria
-				if(ficha.getIdFormaPagoSeleccionada().equals("20"))productoSolicitado.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
-				else productoSolicitado.setIdcuenta(null);
-				productoSolicitado.setFechamodificacion(new Date());
-				productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-				for (ListaProductosCompraItem producto : ficha.getProductos()) {
-					
-					productoSolicitado.setIdproducto((long) producto.getIdproducto());
-					productoSolicitado.setIdtipoproducto((short) producto.getIdtipoproducto());
-					productoSolicitado.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
-					if(producto.getPrecioUnitario()!=null) {
-						productoSolicitado.setValor(new BigDecimal(producto.getPrecioUnitario()));
-					}
-					else productoSolicitado.setValor(null);
-					productoSolicitado.setIdtipoiva(Integer.valueOf(producto.getIdtipoiva()));
-					
-					
-					//REVISAR: 
-					productoSolicitado.setAceptado("A");
-					
-					productoSolicitado.setOrden(Short.valueOf(producto.getOrden()));
-					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
-					productoSolicitado.setNofacturable(producto.getNoFacturable());
-					productoSolicitado.setFecharecepcionsolicitud(new Date());
-					//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
-					//, por lo tanto, la actual.
-					productoSolicitado.setIdinstitucionorigen(idInstitucion);
-
-					response = pysProductossolicitadosMapper.insert(productoSolicitado);
-					if (response == 0)
-						throw new Exception("Error al insertar un producto solicitado en la BBDD.");
-				}
+				this.updateProductosPeticion(request, ficha);
+				
+//				PysProductossolicitados productoSolicitado = new PysProductossolicitados();
+//
+//				productoSolicitado.setIdinstitucion(idInstitucion);
+//				productoSolicitado.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+//				productoSolicitado.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
+//				if(productoSolicitado.getIdformapago()!=null)productoSolicitado.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
+//				else productoSolicitado.setIdformapago(null);
+//				//En el caso que la forma de pago sea domiciliación bancaria
+//				if(ficha.getIdFormaPagoSeleccionada().equals("20"))productoSolicitado.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
+//				else productoSolicitado.setIdcuenta(null);
+//				productoSolicitado.setFechamodificacion(new Date());
+//				productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
+//
+//				for (ListaProductosCompraItem producto : ficha.getProductos()) {
+//					
+//					productoSolicitado.setIdproducto((long) producto.getIdproducto());
+//					productoSolicitado.setIdtipoproducto((short) producto.getIdtipoproducto());
+//					productoSolicitado.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+//					if(producto.getPrecioUnitario()!=null) {
+//						productoSolicitado.setValor(new BigDecimal(producto.getPrecioUnitario()));
+//					}
+//					else productoSolicitado.setValor(null);
+//					productoSolicitado.setIdtipoiva(Integer.valueOf(producto.getIdtipoiva()));
+//					
+//					
+//					//REVISAR: 
+//					productoSolicitado.setAceptado("A");
+//					
+//					productoSolicitado.setOrden(Short.valueOf(producto.getOrden()));
+//					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
+//					productoSolicitado.setNofacturable(producto.getNoFacturable());
+//					productoSolicitado.setFecharecepcionsolicitud(new Date());
+//					//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
+//					//, por lo tanto, la actual.
+//					productoSolicitado.setIdinstitucionorigen(idInstitucion);
+//
+//					response = pysProductossolicitadosMapper.insert(productoSolicitado);
+//					if (response == 0)
+//						throw new Exception("Error al insertar un producto solicitado en la BBDD.");
+//				}
 
 				LOGGER.info(
 						"solicitarCompra() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para crear una solicitud de compra");
@@ -1146,16 +1150,18 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				PysProductossolicitadosExample prodExample = new PysProductossolicitadosExample();
 				
 				prodExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(Long.valueOf(peticion.getnSolicitud()));
-				
+				//para comprobar que hay productos a eliminar
+				List<PysProductossolicitados> productosViejos = pysProductossolicitadosMapper.selectByExample(prodExample);
 				response = pysProductossolicitadosMapper.deleteByExample(prodExample);
-				if(response == 0) {
+				//La segunda condicion es para evitar que se lance una excepcion al intentar eliminar un conjunto vacio
+				if(response == 0 && productosViejos != null) {
 					throw new Exception("Eror al eliminar los productos solicitados de la petición");
 				}
 				
 				LOGGER.info(
 						"updateProductosPeticion() / pysProductossolicitadosMapper.deleteByExaple() -> Salida de pysProductossolicitadosMapper para eliminar los productos solicitados asociados con una solicitud");
 
-
+				
 				LOGGER.info(
 						"updateProductosPeticion() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para insertar los productos solicitados asociados con una solicitud");
 				
@@ -1165,10 +1171,22 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				productoSolicitado.setIdpersona(Long.valueOf(peticion.getIdPersona()));
 				productoSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
 				if(productoSolicitado.getIdformapago()!=null) {
-					productoSolicitado.setIdformapago(Short.valueOf(peticion.getIdFormaPagoSeleccionada()));
+					//Si se ha seleccionado como forma de pago "No facturable"
+					if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
+						productoSolicitado.setIdformapago(null);
+						productoSolicitado.setNofacturable("1");
+					}
+					else{
+						productoSolicitado.setIdformapago(Short.valueOf(peticion.getIdFormaPagoSeleccionada()));
+						productoSolicitado.setNofacturable("0");
+					}
 					//En el caso que la forma de pago sea domiciliación bancaria
-					if(peticion.getIdFormaPagoSeleccionada().equals("20"))productoSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
-					else productoSolicitado.setIdcuenta(null);
+					if(peticion.getIdFormaPagoSeleccionada().equals("20")) {
+						productoSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
+					}
+					else {
+						productoSolicitado.setIdcuenta(null);
+					}
 				}
 				else productoSolicitado.setIdformapago(null);
 				productoSolicitado.setFechamodificacion(new Date());
@@ -1190,11 +1208,11 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					
 					productoSolicitado.setOrden(Short.valueOf(producto.getOrden()));
 					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
-					productoSolicitado.setNofacturable(producto.getNoFacturable());
 					productoSolicitado.setFecharecepcionsolicitud(new Date());
 					//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
 					//, por lo tanto, la actual.
 					productoSolicitado.setIdinstitucionorigen(idInstitucion);
+					productoSolicitado.setObservaciones(producto.getObservaciones());
 					
 					//productoSolicitado.set
 
@@ -1286,5 +1304,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 		return genParametrosMapper.selectByPrimaryKey(genKey).getValor();
 	}
+	
 	
 }

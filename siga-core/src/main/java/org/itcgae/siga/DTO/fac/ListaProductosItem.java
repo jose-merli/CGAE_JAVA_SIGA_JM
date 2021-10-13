@@ -21,6 +21,9 @@ public class ListaProductosItem {
 	private String noFacturable;
 	private String idtipoiva;
 	private String valorIva;
+	private Date fechaBajaIva;
+	private String idFormasPago;
+	private String formasPagoInternet;
 	
 	public int getIdproducto() {
 		return idproducto;
@@ -202,6 +205,24 @@ public class ListaProductosItem {
 	}
 	public void setNoFacturable(String noFacturable) {
 		this.noFacturable = noFacturable;
+	}
+	public Date getFechaBajaIva() {
+		return fechaBajaIva;
+	}
+	public void setFechaBajaIva(Date fechaBajaIva) {
+		this.fechaBajaIva = fechaBajaIva;
+	}
+	public String getIdFormasPago() {
+		return idFormasPago;
+	}
+	public void setIdFormasPago(String idFormasPago) {
+		this.idFormasPago = idFormasPago;
+	}
+	public String getFormasPagoInternet() {
+		return formasPagoInternet;
+	}
+	public void setFormasPagoInternet(String formasPagoInternet) {
+		this.formasPagoInternet = formasPagoInternet;
 	}
 	
 }
