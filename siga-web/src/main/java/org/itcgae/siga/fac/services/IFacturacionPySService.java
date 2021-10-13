@@ -4,10 +4,17 @@ package org.itcgae.siga.fac.services;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IFacturacionPySService {
 	
 	public CuentasBancariasDTO getCuentasBancarias(HttpServletRequest request);
+	public ComboDTO comboCuentasBancarias(HttpServletRequest request);
+	public ComboDTO comboSufijos(HttpServletRequest request);
+	public ComboDTO comboEtiquetas(HttpServletRequest request);
+	public ComboDTO comboDestinatarios(HttpServletRequest request);
+	public ComboDTO comboContadores(HttpServletRequest request);
+	public ComboDTO comboContadoresRectificativas(HttpServletRequest request);	
 
 }
  

@@ -142,5 +142,17 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 	    		+ "");
 		return query.toString();
 	}
-
+	
+	public String comboCuentasBancarias(Short idInstitucion) {
+		SQL query = new SQL();
+		
+		query.SELECT("bi.bancos_codigo");
+		query.SELECT("bi.iban");
+		query.FROM("FAC_BANCOINSTITUCION bi");
+		query.WHERE("bi.idinstitucion=" + idInstitucion);
+		query.ORDER_BY("bi.bancos_codigo");
+		
+		return query.toString();
+	}
+	
 }

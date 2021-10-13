@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.FacBancoinstitucionMapper;
 import org.itcgae.siga.db.services.fac.providers.FacBancoinstitucionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -29,5 +30,12 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 		@Result(column = "NUM_FICHEROS", property = "numFicheros", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR)}) 
 	List<CuentasBancariasItem> getCuentasBancarias(Short idInstitucion);
+	
+	
+	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "comboCuentasBancarias")
+	@Results({ 
+		@Result(column = "BANCOS_CODIGO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IBAN", property = "label", jdbcType = JdbcType.VARCHAR)}) 
+	List<ComboItem> comboCuentasBancarias(Short idInstitucion);
 	
 }
