@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
@@ -184,6 +185,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 			envio.setFechamodificacion(new Date());
 			_envEnviosMapper.updateByPrimaryKey(envio);
 			e.printStackTrace();
+			// Se genera un log con los errores ocurridos
+			generaLogGenerico(envio.getIdinstitucion(), envio, e.getMessage());
 		}
 		
 	}
@@ -851,6 +854,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 		// Realizamos el envio por SMS para cada destiantario
 		boolean hayError = false;
 		int buroSMSenviados = 0;
+		String mensajeError = "Error al enviar el sms";
 		
 		for(EnvDestinatariosBurosms envDestinatariosBurosms: listEnvDestinatariosBurosms) {
 			String[] dest = new String[1];
@@ -879,7 +883,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 					}
 				}else{
 					hayError = true;
-					LOGGER.error("Error al enviar el sms al destinatario: " + envDestinatariosBurosms.getMovil());
+					mensajeError = "Error al enviar el sms al destinatario: " + envDestinatariosBurosms.getMovil();
+					LOGGER.error(mensajeError);
 					
 				}
 			}catch(Exception e) {
@@ -890,9 +895,16 @@ public class ColaEnviosImpl implements IColaEnvios {
 		}
 		
 		if(hayError) {
-			envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);			
+			envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
+			generaLogGenerico(envio.getIdinstitucion(), envio, mensajeError);
 		}else{
 			envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+			if (buroSMSenviados == 0) {
+				generaLogGenerico(envio.getIdinstitucion(), envio, "No se ha realizado el envío");
+			} else {
+				generaLogGenerico(envio.getIdinstitucion(), envio, SigaConstants.OK);
+			}
+			
 		}
 		
 		envio.setFechamodificacion(new Date());
@@ -929,6 +941,22 @@ public class ColaEnviosImpl implements IColaEnvios {
 		envDocumentos.setFechamodificacion(new Date());
 		envDocumentosMapper.insert(envDocumentos);
 		return envDocumentos;		
+	}
+	
+	/**
+	 * Genera un fichero excel de log genérico.
+	 */
+	private void generaLogGenerico(Short idInstitucion, EnvEnvios envio, String error) {
+		Sheet sheet = null;
+		
+		try {
+			sheet = _enviosService.creaLogGenericoExcel(envio);
+			_enviosService.insertaExcelRowLogGenerico(envio, sheet, error);
+		} catch (Exception e) {
+			LOGGER.error("ColaEnviosImpl -- > generaLogGenerico: " + e);
+		} finally {
+			_enviosService.writeCloseLogFileGenerico(Short.valueOf(idInstitucion), envio.getIdenvio(), sheet);
+		}
 	}
 
 	private void addDestBuroSMS(boolean isBuroSMS, List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms, Long idenvio,
