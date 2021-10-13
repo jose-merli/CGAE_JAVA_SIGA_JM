@@ -70,4 +70,6 @@ public interface IConsultasService {
 	
 	public ConstructorConsultasDTO constructorConsultas(HttpServletRequest request, ConsultaItem consulta);
 	
+	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta);
+	
 }

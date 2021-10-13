@@ -218,4 +218,29 @@ public class ConConsultasExtendsSqlProvider {
 		sql.WHERE("cc.IDINSTITUCION = '" + idInstitucion + "' AND cc.IDCONSULTA = " + idConsulta);
 		return sql.toString();
 	}
+	
+public String obtenerDatosConsulta(String idLenguaje, Short idInstitucion, String idConsulta){
+		
+		SQL sql = new SQL();
+		sql.SELECT(" criterio_con.ORDEN");
+		sql.SELECT(" criterio_con.OPERADOR conector");
+		sql.SELECT(" criterio_con.ABRIRPAR");
+		sql.SELECT(" campo_con.NOMBREENCONSULTA");
+		sql.SELECT(" f_siga_getrecurso(operacion_con.DESCRIPCION, " + idLenguaje + ") operador");
+		sql.SELECT(" criterio_con.VALOR");
+		sql.SELECT(" criterio_con.CERRARPAR");
+		sql.SELECT("cc.IDCLASECOMUNICACION");
+
+		sql.FROM(" CON_CRITERIOCONSULTA criterio_con");
+		sql.FROM(" CON_CAMPOCONSULTA campo_con");
+		sql.FROM(" CON_OPERACIONCONSULTA operacion_con");
+		
+		sql.WHERE(" criterio_con.idinstitucion = " + idInstitucion);
+		sql.WHERE(" criterio_con.idconsulta = " + idConsulta);
+		sql.WHERE(" campo_con.idcampo (+) = criterio_con.idcampo");
+		sql.WHERE(" operacion_con.idoperacion (+) = criterio_con.idoperacion");
+		
+		return sql.toString();
+	}
+
 }
