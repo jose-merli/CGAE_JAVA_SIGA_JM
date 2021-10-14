@@ -2822,10 +2822,10 @@ public class ConsultasServiceImpl implements IConsultasService {
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
+			constructorConsultasDTO.setError(error);
 		}
 
-		constructorConsultasDTO.setError(error);
-
+		
 		LOGGER.info("obtenerDatosConsulta() -> Salida del servicio para obtener los datos de la consulta necesarios para precargarla en el constructor de datos");
 
 		return constructorConsultasDTO;
