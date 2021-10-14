@@ -30,7 +30,6 @@ public class FichaCompraSuscripcionItem {
 	private String impTotal;
 	private String pendPago;
     private String cuentaBancSelecc;
-    private String noFact;
 	
 	private String idEstadoPeticion;
 
@@ -137,12 +136,6 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setPendPago(String pendPago) {
 		this.pendPago = pendPago;
-	}
-	public String getNoFact() {
-		return noFact;
-	}
-	public void setNoFact(String noFact) {
-		this.noFact = noFact;
 	}
 	public Date getFechaPendiente() {
 		return fechaPendiente;
