@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
+import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
+import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -15,6 +17,7 @@ import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenGruposclienteExample;
 import org.itcgae.siga.db.entities.FacSufijo;
 import org.itcgae.siga.db.entities.FacSufijoExample;
+import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenGruposclienteClienteMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
@@ -23,6 +26,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoFormaPagoExtendsMapper;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -54,6 +58,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	@Autowired
 	private AdmContadorMapper admContadorMapper;
+	
+	@Autowired
+	private FacSeriefacturacionExtendsMapper facSeriefacturacionExtendsMapper;
 
 	@Override
 	public CuentasBancariasDTO getCuentasBancarias(HttpServletRequest request) {
@@ -273,7 +280,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					//Logica
 					comboItems = cenGruposclienteExtendsMapper.comboEtiquetas(idioma, idInstitucion);
 					
-					//comprobar primero si la lista de cuentas bancarias viene vacia
 					comboDTO.setCombooItems(comboItems);
 					
 				}
@@ -300,7 +306,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		List<ComboItem> comboItems;
 		Error error = new Error();
 
-		LOGGER.info("comboEtiquetas() -> Entrada al servicio para recuperar el combo de destinatarios");
+		LOGGER.info("comboDestinatarios() -> Entrada al servicio para recuperar el combo de destinatarios");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -313,28 +319,27 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
 				LOGGER.info(
-						"FacturacionPySServiceImpl.comboEtiquetas() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"FacturacionPySServiceImpl.comboDestinatarios() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 				LOGGER.info(
-						"comboEtiquetas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"comboDestinatarios() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"comboEtiquetas() / facBancoInstitucionExtendsMapper.comboEtiquetas() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de destinatarios");
+							"comboDestinatarios() / facBancoInstitucionExtendsMapper.comboDestinatarios() -> Entrada a facBancoInstitucionExtendsMapper para obtener el combo de destinatarios");
 					
 					//Logica
 					comboItems = cenGruposclienteClienteExtendsMapper.comboDestinatarios(idInstitucion);
 					
-					//comprobar primero si la lista de cuentas bancarias viene vacia
 					comboDTO.setCombooItems(comboItems);
 					
 				}
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"FacturacionPySServiceImpl.comboEtiquetas() -> Se ha producido un error al obtener el combo de destinatarios",
+					"FacturacionPySServiceImpl.comboDestinatarios() -> Se ha producido un error al obtener el combo de destinatarios",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -342,7 +347,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		comboDTO.setError(error);
 
-		LOGGER.info("comboEtiquetas() -> Salida del servicio para obtener el combo de destinatarios");
+		LOGGER.info("comboDestinatarios() -> Salida del servicio para obtener el combo de destinatarios");
 		
 		return comboDTO;
 	}
@@ -380,10 +385,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					
 					//Logica
 					AdmContadorExample exampleContador = new AdmContadorExample();
-					exampleContador.or()
-						.andIdinstitucionEqualTo(idInstitucion).andIdtablaNotEqualTo("FAC_ABONO");
-					exampleContador.or()
-						.andIdcontadorEqualTo("FAC_ABONOS_FCS");
+					exampleContador.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtablaEqualTo("FAC_FACTURA");
 					exampleContador.setOrderByClause("NOMBRE");
 					
 					List<AdmContador> contadores = admContadorMapper.selectByExample(exampleContador);
@@ -405,7 +407,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"FacturacionPySServiceImpl.comboEtiquetas() -> Se ha producido un error al obtener el combo de contadores",
+					"FacturacionPySServiceImpl.comboContadores() -> Se ha producido un error al obtener el combo de contadores",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -413,7 +415,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		comboDTO.setError(error);
 
-		LOGGER.info("comboEtiquetas() -> Salida del servicio para obtener el combo de contadores");
+		LOGGER.info("comboContadores() -> Salida del servicio para obtener el combo de contadores");
 		
 		return comboDTO;
 	}
@@ -487,6 +489,51 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("comboContadoresRectificativas() -> Salida del servicio para obtener el combo de contadores rectificativas");
 		
 		return comboDTO;
+	}
+	
+	@Override
+	public SeriesFacturacionDTO getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem, HttpServletRequest request) {
+		LOGGER.info("getSeriesFacturacion() -> Entrada al servicio para buscar series de facturación");
+
+		Error error = new Error();
+		SeriesFacturacionDTO seriesFacturacionDTO = new SeriesFacturacionDTO();
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		try {
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"getSeriesFacturacion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"getSeriesFacturacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					List<SerieFacturacionItem> serieFacturacionItems = facSeriefacturacionExtendsMapper.getSeriesFacturacion(serieFacturacionItem, idInstitucion);
+					seriesFacturacionDTO.setSerieFacturacionItems(serieFacturacionItems);
+				} else {
+					LOGGER.warn(
+							"getSeriesFacturacion() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
+			} else {
+				LOGGER.warn("getSeriesFacturacion() -> idInstitucion del token nula");
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.getSeriesFacturacion() -> Se ha producido un error al obtener las series de facturación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+		seriesFacturacionDTO.setError(error);
+		
+		LOGGER.info("getSeriesFacturacion() -> Salida del servicio para buscar series de facturación");
+		return seriesFacturacionDTO;
 	}
 	
 }
