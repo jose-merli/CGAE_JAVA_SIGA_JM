@@ -12,7 +12,9 @@ import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionMod;
 import org.itcgae.siga.DTOs.scs.HistoricoInscripcionDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionesDisponiblesDTO;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesResponseDTO;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.scs.services.guardia.InscripcionService;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,7 +45,7 @@ public class InscripcionController {
 
 	@PostMapping(value = "/denegarInscripciones", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> denegarInscripciones(@RequestBody List<BusquedaInscripcionMod> denegarbody, HttpServletRequest request){
-		UpdateResponseDTO response= inscripcionService.denegarInscripciones(denegarbody, request);
+		UpdateResponseDTO response= inscripcionService.denegarInscripcion(denegarbody, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
@@ -85,8 +88,9 @@ public class InscripcionController {
         return new ResponseEntity<Boolean>(response, HttpStatus.OK);
 	}
 	
+	
 	@PostMapping(value = "/insertarInscripciones", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<InsertResponseDTO> insertarInscripciones(@RequestBody InscripcionGuardiaItem inscripcion,
+	public ResponseEntity<InsertResponseDTO> insertarInscripciones(@RequestBody BusquedaInscripcionItem inscripcion,
 			HttpServletRequest request) {
 		InsertResponseDTO response = inscripcionService.insertarInscripciones(inscripcion, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -94,7 +98,7 @@ public class InscripcionController {
 	}
 
 	@PostMapping(value = "/historicoInscripcion", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<HistoricoInscripcionDTO> historicoInscripcion(@RequestBody InscripcionGuardiaItem inscripcion,
+	public ResponseEntity<HistoricoInscripcionDTO> historicoInscripcion(@RequestBody BusquedaInscripcionItem inscripcion,
 			HttpServletRequest request) {
 		HistoricoInscripcionDTO response = inscripcionService.historicoInscripcion(inscripcion, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -102,7 +106,7 @@ public class InscripcionController {
 	}
 
 	@PostMapping(value = "/inscripcionesDisponibles", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<InscripcionesDisponiblesDTO> inscripcionesDisponibles(@RequestBody InscripcionGuardiaItem inscripcion,
+	public ResponseEntity<InscripcionesDisponiblesDTO> inscripcionesDisponibles(@RequestBody BusquedaInscripcionItem inscripcion,
 			HttpServletRequest request) {
 		InscripcionesDisponiblesDTO response = inscripcionService.inscripcionesDisponibles(inscripcion, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -110,18 +114,33 @@ public class InscripcionController {
 	}
 
 	@PostMapping(value = "/inscripcionPorguardia", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<InscripcionesDisponiblesDTO> inscripcionPorguardia(@RequestBody InscripcionGuardiaItem inscripcion,
+	public ResponseEntity<InscripcionesDisponiblesDTO> inscripcionPorguardia(@RequestBody BusquedaInscripcionItem inscripcion,
 			HttpServletRequest request) {
 		InscripcionesDisponiblesDTO response = inscripcionService.inscripcionPorguardia(inscripcion, request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 
 	}
 	
-	@GetMapping(value = "/inscripcionesCombo", produces = MediaType.APPLICATION_JSON_VALUE, params = {"idGuardia"})
-	public ResponseEntity<ComboDTO> comboInscripciones(HttpServletRequest request, @RequestParam String idGuardia) {
+	@PostMapping(value = "/inscripcionesCombo", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ComboDTO> comboInscripciones(HttpServletRequest request, @RequestBody String idGuardia) {
 		ComboDTO comboLetrados = inscripcionService.comboLetrados(request, idGuardia);
 		return new ResponseEntity<>(comboLetrados, HttpStatus.OK);
 
 		
+	}
+	
+	@PostMapping(value = "/updateInscripcion", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateInscripcion(@RequestBody BusquedaInscripcionMod updateInscripcion, HttpServletRequest request){
+		UpdateResponseDTO response= inscripcionService.updateInscripcion(updateInscripcion, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/insertSolicitarAlta", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> insertSolicitarAlta(@RequestBody InscripcionesDTO inscripcionesDTO, HttpServletRequest request) {
+		InsertResponseDTO response = inscripcionService.insertSolicitarAlta(inscripcionesDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

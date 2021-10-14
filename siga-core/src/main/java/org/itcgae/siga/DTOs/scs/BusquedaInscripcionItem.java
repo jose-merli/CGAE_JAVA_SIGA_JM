@@ -36,9 +36,16 @@ public class BusquedaInscripcionItem {
 	private String description;
 	private String infoURL;
 	private String errorDetail;
+	private String descripcion_obligatoriedad;
 	
 	
 	
+	public String getDescripcion_obligatoriedad() {
+		return descripcion_obligatoriedad;
+	}
+	public void setDescripcion_obligatoriedad(String descripcion_obligatoriedad) {
+		this.descripcion_obligatoriedad = descripcion_obligatoriedad;
+	}
 	public String getValidarjustificaciones() {
 		return validarjustificaciones;
 	}

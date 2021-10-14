@@ -279,7 +279,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		return sql.toString();
 	}
-	
+
 	public String comboGuardiasNoBaja(String idTurno, String idInstitucion) {
 		SQL sql = new SQL();
 
@@ -1525,7 +1525,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		return sql.toString();
 
 	}
-	
+
 	public String getLastProgramacion( String idInstitucion) {
 		SQL sql = new SQL();
 		sql.SELECT_DISTINCT("MAX(IDPROGCALENDARIO)");
@@ -1533,7 +1533,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		return sql.toString();
 	}
-	
+
 	public String getLastCalendar( String idInstitucion) {
 		SQL sql = new SQL();
 		sql.SELECT_DISTINCT("MAX(IDCALENDARIOGUARDIAS)");
@@ -1541,7 +1541,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		return sql.toString();
 	}
-	
+
 	
 	public String getGuardiasVinculadas(String idGuardia, String idTurno, String idInstitucion) {
 
@@ -1627,49 +1627,56 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 	public String searchLetradosInscripcion(String idInstitucion, String idGuardia) {
 		
 		SQL sql = new SQL();
-		SQL sql2 = new SQL();
 		
-		sql2.SELECT(
-				"( CASE WHEN SCS_INSCRIPCIONGUARDIA.Fechavalidacion IS NOT NULL AND TRUNC(SCS_INSCRIPCIONGUARDIA.Fechavalidacion) <= NVL(SYSDATE, SCS_INSCRIPCIONGUARDIA.Fechavalidacion) AND (SCS_INSCRIPCIONGUARDIA.Fechabaja IS NULL OR TRUNC(SCS_INSCRIPCIONGUARDIA.Fechabaja) > NVL(SYSDATE, '01/01/1900')) THEN '1' ELSE '0' END) Activo");
-		sql2.SELECT("CEN_PERSONA.Idpersona");
-		sql2.SELECT("CEN_PERSONA.Nombre");
-		sql2.SELECT("CEN_PERSONA.Apellidos1");
-		sql2.SELECT("DECODE(CEN_PERSONA.Apellidos2, NULL, '', ' ' || CEN_PERSONA.Apellidos2) apellidos2");
-		sql2.SELECT(
-				"CEN_PERSONA.Apellidos1 || DECODE(CEN_PERSONA.Apellidos2, NULL, '', ' ' || CEN_PERSONA.Apellidos2) ALFABETICOAPELLIDOS");
-		sql2.SELECT(
-				"DECODE(CEN_COLEGIADO.Comunitario, '1', CEN_COLEGIADO.Ncomunitario, CEN_COLEGIADO.Ncolegiado) NUMEROCOLEGIADO");
-		sql2.SELECT(
-				"DECODE(SCS_GUARDIASTURNO.Porgrupos, '1', SCS_GRUPOGUARDIACOLEGIADO.IDGRUPOGUARDIACOLEGIADO, NULL) AS Idgrupoguardiacolegiado");
-		sql2.SELECT(
-				"DECODE(SCS_GUARDIASTURNO.Porgrupos, '1', SCS_GRUPOGUARDIACOLEGIADO.IDGRUPOGUARDIA, NULL) AS Grupo");
-		sql2.SELECT("DECODE(SCS_GUARDIASTURNO.Porgrupos, '1', SCS_GRUPOGUARDIA.NUMEROGRUPO, NULL) AS numeroGrupo");
-		sql2.SELECT("DECODE(SCS_GUARDIASTURNO.Porgrupos, '1', SCS_GRUPOGUARDIACOLEGIADO.ORDEN, NULL) AS Ordengrupo");
+		sql.SELECT("cen_persona.idpersona");
+		sql.SELECT("cen_persona.nombre");
+		sql.SELECT("cen_persona.apellidos1");
+		sql.SELECT("decode(cen_persona.apellidos2, NULL, '', ' ' || cen_persona.apellidos2) apellidos2");
+		sql.SELECT("cen_persona.apellidos1 || decode(cen_persona.apellidos2, NULL, '', ' ' || cen_persona.apellidos2) alfabeticoapellidos");
+		sql.SELECT("decode(cen_colegiado.comunitario, '1', cen_colegiado.ncomunitario, cen_colegiado.ncolegiado) numerocolegiado");
+		sql.SELECT("scs_grupoguardiacolegiado.idgrupoguardiacolegiado   AS idgrupoguardiacolegiado");
+		sql.SELECT("scs_grupoguardiacolegiado.idgrupoguardia            AS grupo");
+		sql.SELECT("scs_grupoguardia.numerogrupo                        AS numerogrupo");
+		sql.SELECT("scs_grupoguardiacolegiado.orden                     AS ordengrupo");
 		
-		sql2.FROM("SCS_INSCRIPCIONGUARDIA");
+		sql.FROM("scs_grupoguardiacolegiado");
+		sql.JOIN("scs_grupoguardia ON scs_grupoguardiacolegiado.idgrupoguardia = scs_grupoguardia.idgrupoguardia"
+				+ "                AND scs_grupoguardia.idturno = scs_grupoguardiacolegiado.idturno"
+				+ "                AND scs_grupoguardia.idguardia = scs_grupoguardiacolegiado.idguardia"
+				+ "                AND scs_grupoguardia.idinstitucion = scs_grupoguardiacolegiado.idinstitucion"
+				+ "");
 		
-		sql2.LEFT_OUTER_JOIN(
-				"SCS_GUARDIASTURNO ON SCS_INSCRIPCIONGUARDIA.Idinstitucion = SCS_GUARDIASTURNO.Idinstitucion AND SCS_INSCRIPCIONGUARDIA.Idturno = SCS_GUARDIASTURNO.Idturno AND SCS_INSCRIPCIONGUARDIA.Idguardia = SCS_GUARDIASTURNO.Idguardia");
-		sql2.LEFT_OUTER_JOIN(
-				"CEN_COLEGIADO ON SCS_INSCRIPCIONGUARDIA.Idinstitucion = CEN_COLEGIADO.Idinstitucion AND SCS_INSCRIPCIONGUARDIA.Idpersona = CEN_COLEGIADO.Idpersona");
-		sql2.LEFT_OUTER_JOIN("CEN_PERSONA ON CEN_COLEGIADO.Idpersona = CEN_PERSONA.Idpersona");
-		sql2.LEFT_OUTER_JOIN(
-				"SCS_GRUPOGUARDIACOLEGIADO ON SCS_INSCRIPCIONGUARDIA.Idinstitucion = SCS_GRUPOGUARDIACOLEGIADO.Idinstitucion AND SCS_INSCRIPCIONGUARDIA.Idturno = SCS_GRUPOGUARDIACOLEGIADO.Idturno AND SCS_INSCRIPCIONGUARDIA.Idguardia = SCS_GRUPOGUARDIACOLEGIADO.Idguardia AND SCS_INSCRIPCIONGUARDIA.Idpersona = SCS_GRUPOGUARDIACOLEGIADO.Idpersona AND SCS_INSCRIPCIONGUARDIA.Fechasuscripcion = SCS_GRUPOGUARDIACOLEGIADO.Fechasuscripcion");
-		sql2.LEFT_OUTER_JOIN(
-				"SCS_GRUPOGUARDIA ON SCS_GRUPOGUARDIACOLEGIADO.Idgrupoguardia = SCS_GRUPOGUARDIA.Idgrupoguardia");
+		sql.JOIN("scs_guardiasturno ON scs_guardiasturno.idturno = scs_grupoguardiacolegiado.idturno"
+				+ "                                         AND scs_guardiasturno.idguardia = scs_grupoguardiacolegiado.idguardia"
+				+ "                                         AND scs_guardiasturno.idinstitucion = scs_grupoguardiacolegiado.idinstitucion");
 		
-		sql2.WHERE("SCS_INSCRIPCIONGUARDIA.Fechavalidacion IS NOT NULL");
-		sql2.WHERE("SCS_INSCRIPCIONGUARDIA.Fechabaja IS NULL OR SCS_INSCRIPCIONGUARDIA.Fechabaja >= SYSDATE");
-		sql2.WHERE("SCS_GUARDIASTURNO.Idinstitucion = '" + idInstitucion + "'");
-		sql2.WHERE("SCS_GUARDIASTURNO.Idguardia = '" + idGuardia + "'");
+		sql.JOIN("scs_inscripcionguardia ON scs_inscripcionguardia.idinstitucion = scs_grupoguardiacolegiado.idinstitucion"
+				+ "                                              AND scs_inscripcionguardia.idturno = scs_grupoguardiacolegiado.idturno"
+				+ "                                              AND scs_inscripcionguardia.idguardia = scs_grupoguardiacolegiado.idguardia"
+				+ "                                              AND scs_inscripcionguardia.idpersona = scs_grupoguardiacolegiado.idpersona");
 		
-		sql2.ORDER_BY(
-				"numeroGrupo, ordengrupo, SCS_INSCRIPCIONGUARDIA.FECHASUSCRIPCION, SCS_INSCRIPCIONGUARDIA.Idpersona");
+		sql.JOIN("cen_persona ON cen_persona.idpersona = scs_grupoguardiacolegiado.idpersona");
 		
-		sql.SELECT("*");
-		sql.FROM("( " + sql2.toString() + " )");
-		sql.WHERE("ACTIVO = 1");
+		sql.JOIN("cen_colegiado ON cen_colegiado.idpersona = scs_grupoguardiacolegiado.idpersona AND cen_colegiado.idinstitucion = scs_grupoguardiacolegiado.idinstitucion");
 		
+		sql.WHERE("scs_grupoguardiacolegiado.idinstitucion ="+idInstitucion);
+		
+		sql.WHERE("scs_guardiasturno.porgrupos = '1'");
+		
+		sql.WHERE("scs_guardiasturno.idguardia ="+idGuardia);
+		
+		sql.WHERE("scs_guardiasturno.idinstitucion ="+idInstitucion);
+		
+		sql.WHERE("scs_inscripcionguardia.fechavalidacion IS NOT NULL");
+		
+		sql.WHERE("scs_inscripcionguardia.fechabaja IS NULL OR scs_inscripcionguardia.fechabaja >= sysdate");
+		
+		sql.WHERE("trunc(scs_inscripcionguardia.fechavalidacion) <= nvl(sysdate, scs_inscripcionguardia.fechavalidacion)");
+		
+		sql.WHERE("scs_inscripcionguardia.fechabaja IS NULL OR trunc(scs_inscripcionguardia.fechabaja) > nvl(sysdate, '01/01/1900')");
+		
+		sql.ORDER_BY("numerogrupo, ordengrupo , scs_inscripcionguardia.fechasuscripcion, scs_inscripcionguardia.idpersona");
+	
 		return sql.toString();
 	}
 
@@ -3224,7 +3231,15 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("FECHAFIN <= TO_DATE(' " + programacion.getFechaHasta() + "', 'dd/MM/yyyy')");
 		return sql.toString();
 	}
-	
+
+	public String getTipoDiaGuardia(String idTurno, String idGuardia, Short idInstitucion) {
+		SQL SQL = new SQL();
+		SQL.SELECT(new String[]{"CASE  WHEN  'LMXJVSD' LIKE CONCAT('%',CONCAT(gt.SELECCIONLABORABLES,'%')) AND LENGTH(gt.SELECCIONLABORABLES)>1  AND SUBSTR(gt.SELECCIONLABORABLES,1,1) = 'L' AND SUBSTR(gt.SELECCIONLABORABLES,LENGTH(gt.SELECCIONLABORABLES),1) IN ('V','S','D') THEN  (CONCAT(CONCAT(SUBSTR(gt.SELECCIONLABORABLES,1,1), '-'), SUBSTR(gt.SELECCIONLABORABLES,LENGTH(gt.SELECCIONLABORABLES),1)))  WHEN LENGTH(gt.SELECCIONLABORABLES) = 1 THEN gt.SELECCIONLABORABLES  ELSE gt.SELECCIONLABORABLES END AS diaslaborables", "CASE  WHEN  'LMXJVSD' LIKE CONCAT('%',CONCAT(SELECCIONFESTIVOS,'%')) AND LENGTH(SELECCIONFESTIVOS)>1  AND SUBSTR(SELECCIONFESTIVOS,1,1) = 'L' AND SUBSTR(SELECCIONFESTIVOS,LENGTH(SELECCIONFESTIVOS),1) IN ('V','S','D') THEN  (CONCAT(CONCAT(SUBSTR(SELECCIONFESTIVOS,1,1), '-'), SUBSTR(SELECCIONFESTIVOS,LENGTH(SELECCIONFESTIVOS),1))) WHEN LENGTH(SELECCIONFESTIVOS) = 1 THEN SELECCIONFESTIVOS  ELSE SELECCIONFESTIVOS END AS diasfestivos"});
+		SQL.FROM("SCS_GUARDIASTURNO gt");
+		SQL.WHERE(new String[]{"gt.idturno = '" + idTurno + "'", "gt.idguardia = '" + idGuardia + "'", "gt.idinstitucion = " + idInstitucion});
+		return SQL.toString();
+	}
+
 	public String getGuardiasToProgByDates(String fechaDesde, String fechaHasta, String idInstitucion) {
 		SQL sql = new SQL();
 		sql.SELECT("COUNT (*) GUARDIAS");
@@ -3233,10 +3248,10 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("FECHAFIN <= TO_DATE(' " + fechaHasta + "', 'dd/MM/yyyy')");
 		return sql.toString();
 	}
-	
+
 	public String getConjuntoGuardiaFromGuardiaTurno(String idGuardia, String idTurno, String idInstitucion) {
-	SQL sql = new SQL();	
-	
+	SQL sql = new SQL();
+
 	 sql.SELECT("CG.IDCONJUNTOGUARDIA");
        sql.FROM("SCS_CONF_CONJUNTO_GUARDIAS CG");
        sql.JOIN("scs_guardiasturno  g on CG.idguardia = g.idguardia and CG.idinstitucion = g.idinstitucion");
@@ -3246,17 +3261,17 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
        sql.WHERE("g.idGuardia = CG.idGuardia");
        return sql.toString();
 	}
-	
+
 	public String getIdGuardiaByName( String name) {
-		SQL sql = new SQL();	
+		SQL sql = new SQL();
 		sql.SELECT("IDGUARDIA");
 		sql.FROM("SCS_GUARDIASTURNO");
 		sql.WHERE("NOMBRE = '"+ name + "'");
 		return sql.toString();
 	}
-	
+
 	public String getIdTurnoByName( String name) {
-		SQL sql = new SQL();	
+		SQL sql = new SQL();
 		sql.SELECT("IDTURNO");
 		sql.FROM("SCS_TURNO");
 		sql.WHERE("NOMBRE = '"+ name+ "'");
@@ -3289,7 +3304,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if (usuModif != null) {
 			sql2.VALUES("USUMODIFICACION", usuModif);
 		}
-		
+
 	//	if (item.getGenerado() != null) {
 	//		sql2.VALUES("ESTADO", DECODE(PG.ESTADO, 2, 'No', 'Si'));
 	//	}
@@ -3379,7 +3394,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		// FILTRO POR TURNO
 		if (guardiaItem.getIdTurno() != null && guardiaItem.getIdTurno() != "")
 			sql.WHERE("SCS_GUARDIASTURNO.IDTURNO = " + guardiaItem.getIdTurno());
-		
+
 		if (guardiaItem.getIdGuardia() != null && guardiaItem.getIdGuardia() != "")
 			sql.WHERE("SCS_GUARDIASTURNO.IDGUARDIA = " + guardiaItem.getIdGuardia());
 
@@ -3389,6 +3404,6 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 
 		return sql.toString();
 	}
-	
+
 
 }
