@@ -334,7 +334,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                 sql.WHERE(
                         "solicitante.anio = ejg.anio and solicitante.numero = ejg.numero AND solicitante.solicitante = 1");
                 sql.INNER_JOIN(
-                        "scs_personajg perjgsolicitante on perjgsolicitante.idrepresentanteejg = solicitante.idpersona AND perjgsolicitante.IDINSTITUCION = unidadFamiliar.IDINSTITUCION");
+                        "scs_personajg perjgsolicitante on perjgsolicitante.idrepresentanteejg = solicitante.idpersona AND perjgsolicitante.IDINSTITUCION = solicitante.IDINSTITUCION");
                 if (ejgItem.getNif() != null && ejgItem.getNif() != "")
                     sql.WHERE("PERJUNIDADFAMILIAR.NIF = '" + ejgItem.getNif() + "'");
                 if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
