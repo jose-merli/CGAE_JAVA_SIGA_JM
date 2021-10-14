@@ -85,6 +85,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
         sql.SELECT("ejg.idpersonajg");
         sql.SELECT("perjg.NIF");
+        sql.SELECT("(SELECT NCOLEGIADO FROM CEN_COLEGIADO WHERE PER.IDPERSONA = CEN_COLEGIADO.IDPERSONA) AS NCOLEGIADO");
 
         // from
         sql.FROM("scs_ejg ejg");
@@ -528,6 +529,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.SELECT("ejg.dictamen as observacionesDictamen");
         // REGTEL
         sql.SELECT("ejg.identificadords");
+        sql.SELECT("(SELECT NCOLEGIADO FROM CEN_COLEGIADO WHERE PER.IDPERSONA = CEN_COLEGIADO.IDPERSONA) AS NCOLEGIADO");
         // from
         sql.FROM("scs_ejg ejg");
         // joins

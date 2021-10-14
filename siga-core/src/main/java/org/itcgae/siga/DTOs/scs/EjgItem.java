@@ -1041,14 +1041,6 @@ public class EjgItem {
         this.guardia = guardia;
     }
 
-    /**
-     *
-     **/
-    public EjgItem numColegiado(String numColegiado) {
-        this.numColegiado = numColegiado;
-        return this;
-    }
-
     @JsonProperty("numColegiado")
     public String getNumColegiado() {
         return numColegiado;
