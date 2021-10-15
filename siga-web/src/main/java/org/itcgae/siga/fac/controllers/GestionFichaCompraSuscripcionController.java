@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
+import org.itcgae.siga.DTO.fac.ListaFacturasPeticionDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
@@ -56,13 +57,6 @@ public class GestionFichaCompraSuscripcionController {
 		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-
-	@PostMapping(value = "/pys/savePagoCompraSuscripcion")
-	ResponseEntity<UpdateResponseDTO> savePagoCompraSuscripcion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
-		UpdateResponseDTO response = gestionFichaCompraSuscripcionService.savePagoCompraSuscripcion(request, ficha);
-		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
 	
 	@PostMapping(value = "/pys/denegarPeticion")
 	ResponseEntity<InsertResponseDTO>  denegarPeticion(HttpServletRequest request, @RequestBody String nSolicitud) throws Exception {
@@ -103,5 +97,12 @@ public class GestionFichaCompraSuscripcionController {
 		InsertResponseDTO response = gestionFichaCompraSuscripcionService.updateProductosPeticion(request, peticiones);
 		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping(value = "/pys/getFacturasPeticion")
+	ResponseEntity<ListaFacturasPeticionDTO> getFacturasPeticion(HttpServletRequest request, String idPeticion) throws Exception {
+		ListaFacturasPeticionDTO response = gestionFichaCompraSuscripcionService.getFacturasPeticion(request, idPeticion);
+		if(response.getError() == null) return new ResponseEntity<ListaFacturasPeticionDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<ListaFacturasPeticionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
