@@ -13,6 +13,8 @@ import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionDTO;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
+import org.itcgae.siga.DTO.fac.ListaFacturasPeticionDTO;
+import org.itcgae.siga.DTO.fac.ListaFacturasPeticionItem;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
@@ -30,6 +32,8 @@ import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.FacFactura;
+import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.PysCompra;
@@ -47,6 +51,7 @@ import org.itcgae.siga.db.entities.PysSuscripcionExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.PysCompraMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
@@ -83,6 +88,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
+	
+	@Autowired
+	private FacFacturaMapper facFacturaMapper;
 
 	@Autowired
 	private PySTipoIvaExtendsMapper pysTipoIvaExtendsMapper;
@@ -658,9 +666,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		// Se comentan el try y el catch para que la anotación @Transactional funcione
-		// correctamente
-//		try {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -717,14 +722,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 			insertResponseDTO.setStatus("200");
 		}
-//		} catch (Exception e) {
-//			LOGGER.error(
-//					"GestionFichaCompraSuscripcionServiceImpl.solicitarSuscripcion() -> Se ha producido un error al crear una solicitud de suscripción",
-//					e);
-//			error.setCode(500);
-//			error.setDescription("general.mensaje.error.bbdd");
-//			insertResponseDTO.setStatus("500");
-//		}
 
 		insertResponseDTO.setError(error);
 		LOGGER.info("denegarPeticion() -> Salida del servicio para crear una solicitud de suscripción");
@@ -1058,6 +1055,96 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO_PRODUCTOS");
 
 		return genParametrosMapper.selectByPrimaryKey(genKey).getValor();
+	}
+	
+	
+	@Override
+	public ListaFacturasPeticionDTO getFacturasPeticion(HttpServletRequest request, String nSolicitud){
+
+		ListaFacturasPeticionDTO listaFacturasDTO = new ListaFacturasPeticionDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info("denegarPeticion() -> Entrada al servicio para crear la denegación de la petición");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"denegarPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"denegarPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"denegarPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear la denegación de la petición");
+
+					PysCompraExample compraExample = new PysCompraExample();
+					
+					compraExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud));	
+					
+					List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(compraExample);
+					
+					List<String> idFacturasPeticion = new ArrayList<String>();
+					
+					for(PysCompra compra : comprasPeticion) {
+						if(compra.getIdfactura() != null) idFacturasPeticion.add(compra.getIdfactura());
+					}
+					
+					if(!idFacturasPeticion.isEmpty()) {
+						FacFacturaExample facturaExample = new FacFacturaExample();
+						
+						facturaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdfacturaIn(null);
+						
+						List<FacFactura> facturasPeticion = facFacturaMapper.selectByExample(facturaExample);
+						
+						List<ListaFacturasPeticionItem> facturasListaPeticion = new ArrayList<ListaFacturasPeticionItem>();
+						
+						for(FacFactura factura : facturasPeticion) {
+							ListaFacturasPeticionItem f = new ListaFacturasPeticionItem();
+							f.setFechaFactura(factura.getFechaemision());
+							f.setEstado(factura.getEstado());
+							f.setImporte(factura.getImptotal());// Preguntar sobre a que importe se refiere
+							f.setnFactura(factura.getNumerofactura());
+							f.setTipo("Factura"); //Como se distingue una factura de una anulación?
+							facturasListaPeticion.add(f);
+						}
+					}
+					
+					LOGGER.info(
+							"denegarPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear la denegación de la petición");
+
+					LOGGER.info(
+							"denegarPeticion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para crear la denegación de la petición");
+				}
+
+				LOGGER.info(
+						"denegarPeticion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de suscripción");
+
+				
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"getFichaCompraSuscripcion() -> Se ha producido un error al obtener el los detalles de la compra/suscripcion",
+					e);
+			error.setCode(500);
+			error.setDescription(e.getMessage());
+			listaFacturasDTO.setError(error);
+		}
+
+		LOGGER.info("denegarPeticion() -> Salida del servicio para crear una solicitud de suscripción");
+
+		return listaFacturasDTO;
 	}
 	
 	
