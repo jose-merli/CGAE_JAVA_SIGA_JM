@@ -6,7 +6,7 @@ import org.itcgae.siga.db.mappers.FacSeriefacturacionSqlProvider;
 
 public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSqlProvider {
 	
-	public String getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem, Short idInstitucion) {
+	public String getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem, Short idInstitucion, String idioma) {
 		SQL sql = new SQL();
 		
 		// Select
@@ -21,9 +21,9 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		sql.SELECT("(s.sufijo || ' - ' || s.concepto ) sufijo");
 		sql.SELECT("s.idsufijo");
 		sql.SELECT("fp.idformapago");
-		sql.SELECT("( SELECT f_siga_getrecurso(descripcion,1)\r\n"
-				+ "		FROM PYS_FORMAPAGO \r\n"
-				+ "		WHERE idformapago=fP.idformapago\r\n"
+		sql.SELECT("( SELECT f_siga_getrecurso(descripcion,'" + idioma + "') "
+				+ "		FROM PYS_FORMAPAGO "
+				+ "		WHERE idformapago=fP.idformapago "
 				+ "	) formapago");
 		sql.SELECT("sf.generarpdf");
 		sql.SELECT("sf.enviofacturas");
@@ -39,7 +39,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		sql.LEFT_OUTER_JOIN("fac_sufijo s ON (s.idsufijo = sfb.idsufijo AND s.idinstitucion = sf.idinstitucion)");
 		
 		// Where obligatorio
-		sql.WHERE("sf.idinstitucion = " + idInstitucion);
+		sql.WHERE("sf.idinstitucion = '" + idInstitucion + "'");
 		
 		// Where opcionales
 		if (serieFacturacionItem.getAbreviatura() != null && serieFacturacionItem.getAbreviatura() != "")
@@ -47,10 +47,10 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		if (serieFacturacionItem.getDescripcion() != null && serieFacturacionItem.getDescripcion() != "")
 			sql.WHERE("upper(sf.descripcion) LIKE upper('%" + serieFacturacionItem.getDescripcion() + "%')");
 		if (serieFacturacionItem.getCuentaBancaria() != null && serieFacturacionItem.getCuentaBancaria() != "")
-			sql.WHERE("bi.bancos_codigo = " + serieFacturacionItem.getCuentaBancaria());
+			sql.WHERE("bi.bancos_codigo = '" + serieFacturacionItem.getCuentaBancaria() + "'");
 		
 		if (serieFacturacionItem.getSufijo() != null && serieFacturacionItem.getSufijo() != "")
-			sql.WHERE("s.idsufijo = " + serieFacturacionItem.getSufijo());
+			sql.WHERE("s.idsufijo = '" + serieFacturacionItem.getSufijo() + "'");
 		
 		if (serieFacturacionItem.getTiposProductos() != null && !serieFacturacionItem.getTiposProductos().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
@@ -89,9 +89,9 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 											+ "AND idpersona IN (" + String.join(", ", serieFacturacionItem.getConsultasDestinatarios()) + ")))");
 		
 		if (serieFacturacionItem.getContadorFacturas() != null && serieFacturacionItem.getContadorFacturas() != "")
-			sql.WHERE("sf.idcontador = " + serieFacturacionItem.getContadorFacturas());
+			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getContadorFacturas() + "'");
 		if (serieFacturacionItem.getContadorFacturasRectificativas() != null && serieFacturacionItem.getContadorFacturasRectificativas() != "")
-			sql.WHERE("sf.idcontador = " + serieFacturacionItem.getContadorFacturasRectificativas());
+			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getContadorFacturasRectificativas() + "'");
 		
 		// Order by
 		sql.ORDER_BY("sf.idseriefacturacion");

@@ -9,7 +9,11 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
 import org.itcgae.siga.db.services.fac.providers.FacSeriefacturacionExtendsSqlProvider;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
+@Service
+@Primary
 public interface FacSeriefacturacionExtendsMapper extends FacSeriefacturacionMapper {
 
 	@SelectProvider(type = FacSeriefacturacionExtendsSqlProvider.class, method = "getSeriesFacturacion")
@@ -28,6 +32,6 @@ public interface FacSeriefacturacionExtendsMapper extends FacSeriefacturacionMap
 		@Result(column = "enviofacturas", property = "envioFacturas", jdbcType = JdbcType.BOOLEAN),
 		@Result(column = "traspasofacturas", property = "traspasoFacturas", jdbcType = JdbcType.BOOLEAN)
 	})
-	List<SerieFacturacionItem> getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem, Short idInstitucion);
+	List<SerieFacturacionItem> getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem, Short idInstitucion, String idioma);
 	
 }

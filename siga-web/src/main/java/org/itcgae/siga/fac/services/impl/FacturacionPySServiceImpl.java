@@ -2,11 +2,14 @@ package org.itcgae.siga.fac.services.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
+import org.itcgae.siga.DTO.fac.TiposIncluidosItem;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
@@ -26,8 +29,10 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacFacturacionsuscripcionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PySTipoFormaPagoExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.PysCompraExtendsMapper;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +66,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	
 	@Autowired
 	private FacSeriefacturacionExtendsMapper facSeriefacturacionExtendsMapper;
+	
+	@Autowired
+	private FacFacturacionsuscripcionExtendsMapper facFacturacionsuscripcionExtendsMapper;
+
+	@Autowired
+	private PysCompraExtendsMapper pysCompraExtendsMapper;
 
 	@Override
 	public CuentasBancariasDTO getCuentasBancarias(HttpServletRequest request) {
@@ -513,7 +524,29 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 						"getSeriesFacturacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (null != usuarios && usuarios.size() > 0) {
-					List<SerieFacturacionItem> serieFacturacionItems = facSeriefacturacionExtendsMapper.getSeriesFacturacion(serieFacturacionItem, idInstitucion);
+					String idioma = usuarios.get(0).getIdlenguaje();
+					List<SerieFacturacionItem> serieFacturacionItems = facSeriefacturacionExtendsMapper.getSeriesFacturacion(serieFacturacionItem, idInstitucion, idioma);
+
+					if (null != serieFacturacionItems && !serieFacturacionItems.isEmpty()) {
+						List<TiposIncluidosItem> tiposIncluidos = new ArrayList<>();
+
+						LOGGER.info("getSeriesFacturacion() -> Obteniendo los tipos de servicios para la institución");
+						tiposIncluidos.addAll(facFacturacionsuscripcionExtendsMapper.getTiposServicios(idInstitucion, idioma));
+						LOGGER.info("getSeriesFacturacion() -> Obteniendo los tipos de productos para la institución");
+						tiposIncluidos.addAll(pysCompraExtendsMapper.getTiposProductos(idInstitucion, idioma));
+
+						for (SerieFacturacionItem serieItem : serieFacturacionItems) {
+							String idSerieFacturacion = serieItem.getIdSerieFacturacion();
+
+							List<String> tiposIncluidosSerie = tiposIncluidos.stream()
+									.filter(t -> idSerieFacturacion.equals(t.getIdSerieFacturacion()))
+									.map(t -> t.getDescripcion())
+									.collect(Collectors.toList());
+
+							serieItem.setTiposIncluidos(tiposIncluidosSerie);
+						}
+					}
+
 					seriesFacturacionDTO.setSerieFacturacionItems(serieFacturacionItems);
 				} else {
 					LOGGER.warn(

@@ -2,6 +2,7 @@ package org.itcgae.siga.DTO.fac;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class SerieFacturacionItem {
 	
@@ -16,7 +17,6 @@ public class SerieFacturacionItem {
 	private String idSufijo;
 	private String sufijo;
 	private List<String> tiposIncluidos;
-	private String fasesAutomaticas;
 	private Boolean generarPDF;
 	private Boolean envioFacturas;
 	private Boolean traspasoFacturas;
@@ -95,12 +95,6 @@ public class SerieFacturacionItem {
 	public void setTiposIncluidos(List<String> tiposIncluidos) {
 		this.tiposIncluidos = tiposIncluidos;
 	}
-	public String getFasesAutomaticas() {
-		return fasesAutomaticas;
-	}
-	public void setFasesAutomaticas(String fasesAutomaticas) {
-		this.fasesAutomaticas = fasesAutomaticas;
-	}
 	public Boolean getGenerarPDF() {
 		return generarPDF;
 	}
@@ -155,5 +149,62 @@ public class SerieFacturacionItem {
 	public void setContadorFacturasRectificativas(String contadorFacturasRectificativas) {
 		this.contadorFacturasRectificativas = contadorFacturasRectificativas;
 	}
-	
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		SerieFacturacionItem that = (SerieFacturacionItem) o;
+		return Objects.equals(idSerieFacturacion, that.idSerieFacturacion) &&
+				Objects.equals(observaciones, that.observaciones) &&
+				Objects.equals(fechaBaja, that.fechaBaja) &&
+				Objects.equals(idFormaPago, that.idFormaPago) &&
+				Objects.equals(formaPago, that.formaPago) &&
+				Objects.equals(abreviatura, that.abreviatura) &&
+				Objects.equals(descripcion, that.descripcion) &&
+				Objects.equals(cuentaBancaria, that.cuentaBancaria) &&
+				Objects.equals(idSufijo, that.idSufijo) &&
+				Objects.equals(sufijo, that.sufijo) &&
+				Objects.equals(tiposIncluidos, that.tiposIncluidos) &&
+				Objects.equals(generarPDF, that.generarPDF) &&
+				Objects.equals(envioFacturas, that.envioFacturas) &&
+				Objects.equals(traspasoFacturas, that.traspasoFacturas) &&
+				Objects.equals(tiposProductos, that.tiposProductos) &&
+				Objects.equals(tiposServicios, that.tiposServicios) &&
+				Objects.equals(etiquetas, that.etiquetas) &&
+				Objects.equals(consultasDestinatarios, that.consultasDestinatarios) &&
+				Objects.equals(contadorFacturas, that.contadorFacturas) &&
+				Objects.equals(contadorFacturasRectificativas, that.contadorFacturasRectificativas);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idSerieFacturacion, observaciones, fechaBaja, idFormaPago, formaPago, abreviatura, descripcion, cuentaBancaria, idSufijo, sufijo, tiposIncluidos, generarPDF, envioFacturas, traspasoFacturas, tiposProductos, tiposServicios, etiquetas, consultasDestinatarios, contadorFacturas, contadorFacturasRectificativas);
+	}
+
+	@Override
+	public String toString() {
+		return "SerieFacturacionItem{" +
+				"idSerieFacturacion='" + idSerieFacturacion + '\'' +
+				", observaciones='" + observaciones + '\'' +
+				", fechaBaja=" + fechaBaja +
+				", idFormaPago='" + idFormaPago + '\'' +
+				", formaPago='" + formaPago + '\'' +
+				", abreviatura='" + abreviatura + '\'' +
+				", descripcion='" + descripcion + '\'' +
+				", cuentaBancaria='" + cuentaBancaria + '\'' +
+				", idSufijo='" + idSufijo + '\'' +
+				", sufijo='" + sufijo + '\'' +
+				", tiposIncluidos=" + tiposIncluidos +
+				", generarPDF=" + generarPDF +
+				", envioFacturas=" + envioFacturas +
+				", traspasoFacturas=" + traspasoFacturas +
+				", tiposProductos=" + tiposProductos +
+				", tiposServicios=" + tiposServicios +
+				", etiquetas=" + etiquetas +
+				", consultasDestinatarios=" + consultasDestinatarios +
+				", contadorFacturas='" + contadorFacturas + '\'' +
+				", contadorFacturasRectificativas='" + contadorFacturasRectificativas + '\'' +
+				'}';
+	}
 }
