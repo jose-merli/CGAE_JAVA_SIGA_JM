@@ -213,8 +213,8 @@ public class ConsultasController {
 	}
 	
 	@PostMapping(value = "/pys/constructorConsultas")
-	ResponseEntity<ConstructorConsultasDTO> constructorConsultas(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
-		ConstructorConsultasDTO response = _consultasService.constructorConsultas(request, consulta);
+	ResponseEntity<ConstructorConsultasDTO> constructorConsultas(HttpServletRequest request, @RequestBody ConstructorConsultasDTO constructorConsultasDTO) {
+		ConstructorConsultasDTO response = _consultasService.constructorConsultas(request, constructorConsultasDTO);
 		if (response.getError() == null)
 			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
 		else

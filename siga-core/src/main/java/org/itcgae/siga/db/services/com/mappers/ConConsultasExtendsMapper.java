@@ -53,7 +53,7 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 	@Results({
 		@Result(column = "IDMAX", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})
-	NewIdDTO selectMaxIDConsulta();
+	NewIdDTO selectMaxIDConsulta(short idInstitucion);
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasPlantilla")
 	@Results({

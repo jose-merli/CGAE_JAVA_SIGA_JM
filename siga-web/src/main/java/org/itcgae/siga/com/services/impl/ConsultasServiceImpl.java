@@ -367,7 +367,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
 					key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
 					ConConsulta conConsulta = _conConsultaMapper.selectByPrimaryKey(key);
-					NewIdDTO id = _conConsultasExtendsMapper.selectMaxIDConsulta();
+					NewIdDTO id = _conConsultasExtendsMapper.selectMaxIDConsulta(idInstitucion);
 					conConsulta.setIdconsulta(Long.valueOf(id.getNewId()));
 
 					String descripcion = consulta.getNombre() + SigaConstants.SUFIJO_CONSULTA_COM_DUPLICADO;
@@ -568,7 +568,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					boolean camposIncorrectos = false;
 					if (consultaDTO.getIdConsulta() == null) {
 						ConConsulta consulta = new ConConsulta();
-						NewIdDTO maxId = _conConsultasExtendsMapper.selectMaxIDConsulta();
+						NewIdDTO maxId = _conConsultasExtendsMapper.selectMaxIDConsulta(idInstitucion);
 						consulta.setIdconsulta(Long.valueOf(maxId.getNewId()));
 						consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
 						consulta.setIdinstitucion(idInstitucion);
@@ -2624,7 +2624,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	}
 
 	@Override
-	public ConstructorConsultasDTO constructorConsultas(HttpServletRequest request, ConsultaItem consulta) {
+	public ConstructorConsultasDTO constructorConsultas(HttpServletRequest request, ConstructorConsultasDTO constructorConsultasDTO) {
 //		
 //		//TABLAS --> CON_CONSULTA, CON_CRITERIOCONSULTA, PYS_SERVICIOSINSTITUCION
 //
@@ -2633,137 +2633,110 @@ public class ConsultasServiceImpl implements IConsultasService {
 ////		Es decir, al finalizar la creación de la consulta y guardarla, se volverá a este formulario y se establecerá el combo 
 ////		“Condición de suscripción” con la condición recién creada.
 //		
-		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
-//		Error error = new Error();
-//		int statusInsercionCriteriosConsulta;
-//
-//		LOGGER.info("constructorConsultas() -> Entrada al servicio para crear nuevas consultas (condiciones) del constructor de consultas");
-//
-//		// Conseguimos información del usuario logeado
-//		String token = request.getHeader("Authorization");
-//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-//
-//		try {
-//			if (idInstitucion != null) {
-//				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-//				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-//
-//				LOGGER.info(
-//						"constructorConsultas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-//
-//				LOGGER.info(
-//						"constructorConsultas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//				if (usuarios != null && !usuarios.isEmpty()) {
-//					LOGGER.info(
-//							"constructorConsultas() / pysTiposServiciosExtendsMapper.searchListadoServicios() -> Entrada a pysTiposServiciosExtendsMapper para obtener el listado de servicios segun la busqueda");
-//
-//					String idioma = usuarios.get(0).getIdlenguaje();
-//					//Insert en Con_Consulta la nueva condicion de suscripcion
-//					ConConsulta conConsulta = new ConConsulta();
-//					
-//					conConsulta.setIdinstitucion(idInstitucion);
-//					//conConsulta.getIdconsulta() obtener un nuevo id
-//					//conConsulta.setDescripcion();
-//					
-////					IDINSTITUCION
-////					IDCONSULTA
-////					DESCRIPCION
-////					GENERAL
-////					TIPOCONSULTA
-////					IDMODULO
-////					FECHAMODIFICACION
-////					USUMODIFICACION
-////					BASES
-////					IDTABLA
-////					ESEXPERTA
-////					SENTENCIA
-////					OBSERVACIONES
-////					FECHABAJA
-////					IDOBJETIVO
-////					IDCLASE
-////					IDCLASECOMUNICACION
-//					
-//					//Inserto en con_criterioconsulta los campos recibidos del constructor de consultas
-//					for (int i  = 0; i < constructorConsultasDTO.getConstructorConsultasItem().size(); i++) {
-//						ConCriterioconsulta conCriterioConsulta = new ConCriterioconsulta();
-//						
-//						conCriterioConsulta.setIdinstitucion(idInstitucion);
-//						conCriterioConsulta.setOrden((short) (i + 1));
-//						conCriterioConsulta.setValor(constructorConsultasDTO.getConstructorConsultasItem().get(i).getValor());
-//						
-//						
-//					
-////						IDCONSULTA
-////						IDOPERACION
-////						IDCAMPO
-////						FECHAMODIFICACION
-////						USUMODIFICACION
-////						OPERADOR
-////						SEPARADORINICIO
-////						VALORDESC
-////						SEPARADORFIN
-////						ABRIRPAR
-////						CERRARPAR
-//						
-//						statusInsercionCriteriosConsulta = conCriterioConsultaMapper.insertSelective(conCriterioConsulta);
-//					}
-//
-//					LOGGER.info(
-//							"searchListadoServicios() / pysTiposServiciosExtendsMapper.searchListadoServicios() -> Salida de pysTiposServiciosExtendsMapper para obtener el listado de servicios segun la busqueda");
-//
-//					//Necesario para agrupar los servicios, ya que la sql devuelve los servicios repetidos con distintas formas de pago, con esto se pretende agrupar las formas de pago del servicio en una sola linea (info mas detallada en el funcional)
-//					List<ListaServiciosItem> listaServiciosProcesada = new ArrayList<ListaServiciosItem>();
-//					int numFormasDePago = 1; //Numero de servicios que añades cuando realmente son el mismo pero con diferentes formas de pago
-//					for (int i = 0; i < listaServicios.size(); i++) {
-//						
-//						if(i == 0) {
-//							listaServiciosProcesada.add(listaServicios.get(i));
-//						}else if((listaServicios.get(i).getIdtiposervicios() == listaServicios.get(i - 1).getIdtiposervicios()) && (listaServicios.get(i).getIdservicio() == listaServicios.get(i - 1).getIdservicio()) && (listaServicios.get(i).getIdserviciosinstitucion() == listaServicios.get(i - 1).getIdserviciosinstitucion())) //Comprueba que el servicio actual es distinto al anterior no el mismo con distinta forma de pago 
-//						{
-//							//Este if comprueba si es el 3 servicio identico excepto por la forma de pago al primero que añadiste (es decir este seria el 4 por lo que al tener mas de 3 formas de pago se ha de mostrar el numero)
-//							if(numFormasDePago > 2) {
-//								listaServiciosProcesada.get(listaServiciosProcesada.size() - 1).setFormapago(String.valueOf(numFormasDePago));
-//							}else {
-//								listaServiciosProcesada.get(listaServiciosProcesada.size() - 1).setFormapago(listaServiciosProcesada.get(listaServiciosProcesada.size() - 1).getFormapago() + ", " + listaServicios.get(i).getFormapago());						
-//							}
-//							numFormasDePago++;
-//					
-//						}else{
-//							numFormasDePago = 0;
-//							listaServiciosProcesada.add(listaServicios.get(i));
-//						}
-//					}
-//					
-//					for (ListaServiciosItem servicio : listaServiciosProcesada) {
-//						if(servicio.getValorminimo() != null) {
-//						servicio.setPrecioperiodicidad(String.valueOf(servicio.getValorminimo()) + "/" + servicio.getPeriodominimo() + " - " + String.valueOf(servicio.getValormaximo()) + "/" + servicio.getPeriodomaximo());
-//						}else {
-//							servicio.setPrecioperiodicidad("Sin precio");						}
-//						
-//					
-//					}
-//					
-//					if (listaServiciosProcesada != null && listaServiciosProcesada.size() > 0) {
-//						listaServiciosDTO.setListaServiciosItems(listaServiciosProcesada);
-//					}
-//				}
-//
-//			}
-//		} catch (Exception e) {
-//			LOGGER.error(
-//					"ServicioserviceImpl.searchListadoServicios() -> Se ha producido un error al obtener el listado de servicios segun la busqueda",
-//					e);
-//			error.setCode(500);
-//			error.setDescription("general.mensaje.error.bbdd");
-//		}
-//
-//		listaServiciosDTO.setError(error);
-//
-//		LOGGER.info("searchListadoServicios() -> Salida del servicio para obtener el listado de servicios segun la busqueda");
+		Error error = new Error();
+		int statusInsercionCriteriosConsulta;
+
+		LOGGER.info("constructorConsultas() -> Entrada al servicio para crear nuevas consultas (condiciones) del constructor de consultas");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"constructorConsultas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"constructorConsultas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"constructorConsultas() / ConConsultaMapper.insertSelective() -> Entrada a pysTiposServiciosExtendsMapper para obtener el listado de servicios segun la busqueda");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+					//Insert en Con_Consulta la nueva condicion de suscripcion
+					ConConsulta conConsulta = new ConConsulta();
+					
+					conConsulta.setIdinstitucion(idInstitucion);
+					
+					NewIdDTO newIdDTO = new NewIdDTO();
+					newIdDTO = _conConsultasExtendsMapper.selectMaxIDConsulta(idInstitucion);
+					conConsulta.setIdconsulta(Long.valueOf(newIdDTO.getNewId()));	
+					
+					//conConsulta.setDescripcion(); //inicializada poniendo como nombre el nombre del servicio actual (pys_serviciosinstitucion.descripcion) + ESPACIO + el nombre del precio (pys_preciosservicios.descripcion) 
+			
+					//conConsulta.setGeneral();//investigar
+					conConsulta.setTipoconsulta("P");//P = Interna de Productos y Servicios
+					conConsulta.setIdmodulo((short) 9);//9 = Productos y servicios
+					conConsulta.setFechamodificacion(new Date());
+					conConsulta.setUsumodificacion(usuarios.get(0).getIdusuario());
+					conConsulta.setEsexperta("0");
+					
+					//conConsulta.setSentencia();//Montarla con los datos traidos del constructor consultas
+
+					conConsulta.setIdobjetivo((long) 3);//Confirmar
+					conConsulta.setIdclase((long) 1);//Confirmar
+					conConsulta.setIdclasecomunicacion((short) 5);//Confirmar
+					
+					_conConsultaMapper.insertSelective(conConsulta);
+					
+					
+					//Inserto en con_criterioconsulta los campos recibidos del constructor de consultas
+					for (int i  = 0; i < constructorConsultasDTO.getConstructorConsultasItem().size(); i++) {
+						ConCriterioconsulta conCriterioConsulta = new ConCriterioconsulta();
+						
+						conCriterioConsulta.setIdinstitucion(idInstitucion);
+						conCriterioConsulta.setOrden((short) (i + 1));
+						conCriterioConsulta.setValor(constructorConsultasDTO.getConstructorConsultasItem().get(i).getValor());
+						conCriterioConsulta.setIdconsulta(Long.valueOf(newIdDTO.getNewId()));
+						
+						//conCriterioConsulta.setIdoperacion(null);//Conseguir el id llamando a con_operacionconsulta
+						//conCriterioConsulta.setIdcampo(null);//Conseguir el id llamando a con_campoconsulta
+						
+						conCriterioConsulta.setFechamodificacion(new Date());
+						conCriterioConsulta.setUsumodificacion(usuarios.get(0).getIdusuario());
+						conCriterioConsulta.setOperador(constructorConsultasDTO.getConstructorConsultasItem().get(i).getConector());
+						
+
+//						IDCAMPO
+//						FECHAMODIFICACION
+//						USUMODIFICACION
+//						OPERADOR
+//						SEPARADORINICIO
+//						VALORDESC
+//						SEPARADORFIN
+//						ABRIRPAR
+//						CERRARPAR
+						
+						
+						statusInsercionCriteriosConsulta = conCriterioConsultaMapper.insertSelective(conCriterioConsulta);
+					}
+
+					LOGGER.info(
+							"searchListadoServicios() / pysTiposServiciosExtendsMapper.searchListadoServicios() -> Salida de pysTiposServiciosExtendsMapper para obtener el listado de servicios segun la busqueda");
+
+				
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ServicioserviceImpl.searchListadoServicios() -> Se ha producido un error al obtener el listado de servicios segun la busqueda",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		//listaServiciosDTO.setError(error);
+
+		LOGGER.info("searchListadoServicios() -> Salida del servicio para obtener el listado de servicios segun la busqueda");
 
 		return constructorConsultasDTO;
 	}
