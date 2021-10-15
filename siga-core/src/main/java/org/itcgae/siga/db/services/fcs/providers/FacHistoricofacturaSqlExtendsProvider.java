@@ -3,6 +3,9 @@ package org.itcgae.siga.db.services.fcs.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.mappers.FacHistoricofacturaSqlProvider;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class FacHistoricofacturaSqlExtendsProvider extends FacHistoricofacturaSqlProvider {
 
     public String insertarHistoricoFacParametros(String idInstitucion, String idFactura, Integer idTipoAccion,
@@ -115,6 +118,30 @@ public class FacHistoricofacturaSqlExtendsProvider extends FacHistoricofacturaSq
         sql2.WHERE("IDFACTURA = " + idFactura);
 
         return sql.toString().concat(sql2.toString());
+    }
+
+    public String deleteDeshacerCierre(Short idInstitucion, List<Integer> idPagos) {
+
+        SQL subQuery2 = new SQL();
+        subQuery2.SELECT("IDABONO");
+        subQuery2.FROM("FAC_ABONO");
+        subQuery2.WHERE("IDINSTITUCION = " + idInstitucion);
+        subQuery2.WHERE("IDPAGOSJG IN (" + idPagos.stream().map(a -> a.toString()).collect(Collectors.joining(",")) + ")");
+
+        SQL subQuery = new SQL();
+        subQuery.SELECT("IDINSTITUCION");
+        subQuery.SELECT("IDFACTURA");
+        subQuery.SELECT("IDPAGOPORCAJA");
+        subQuery.FROM("FAC_PAGOSPORCAJA");
+        subQuery.WHERE("IDINSTITUCION = " + idInstitucion);
+        subQuery.WHERE("IDABONO IN ( " + subQuery2.toString() + " )");
+
+
+        SQL query = new SQL();
+        query.DELETE_FROM("FAC_HISTORICOFACTURA");
+        query.WHERE("(IDINSTITUCION, IDFACTURA, IDPAGOPORCAJA) IN ( " + subQuery.toString() + " )");
+
+        return query.toString();
     }
 
 }

@@ -14,6 +14,7 @@ import org.itcgae.siga.db.services.fcs.providers.FcsPagosjgSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -219,4 +220,7 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
             @Result(column = "NOMBREFAC", property = "nombreFac", jdbcType = JdbcType.VARCHAR),
     })
     PagosjgItem getPago(String idPago, Short idInstitucion, String idLenguaje);
+
+    @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getFechaEstadoPago")
+    Date getFechaEstadoPago(Short idInstitucion, Integer idPago);
 }

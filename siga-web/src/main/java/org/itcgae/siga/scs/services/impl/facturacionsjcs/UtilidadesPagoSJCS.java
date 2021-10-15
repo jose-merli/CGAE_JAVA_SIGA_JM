@@ -6,11 +6,14 @@ import org.itcgae.siga.DTOs.scs.MovimientoVarioDTO;
 import org.itcgae.siga.DTOs.scs.PerteneceAunaSociedadDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.mappers.FacDisqueteabonosMapper;
 import org.itcgae.siga.db.mappers.FcsAplicaMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FcsPagoColegiadoExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FcsPagosjgExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
+import org.itcgae.siga.db.services.env.mappers.EnvEnvioprogramadoExtendsMapper;
+import org.itcgae.siga.db.services.env.mappers.EnvProgrampagosExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.*;
 import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UtilidadesPagoSJCS {
@@ -48,6 +52,41 @@ public class UtilidadesPagoSJCS {
 
     @Autowired
     private UtilidadesFacturacionSJCS utilidadesFacturacionSJCS;
+
+    @Autowired
+    private FacAbonoExtendsMapper facAbonoExtendsMapper;
+
+    @Autowired
+    private FacAbonoincluidoendisqueteExtendsMapper facAbonoincluidoendisqueteExtendsMapper;
+
+    @Autowired
+    private FacDisqueteabonosMapper facDisqueteabonosMapper;
+
+    @Autowired
+    private EnvEnvioprogramadoExtendsMapper envEnvioprogramadoExtendsMapper;
+
+    @Autowired
+    private EnvEnviosExtendsMapper envEnviosExtendsMapper;
+
+    @Autowired
+    private EnvProgrampagosExtendsMapper envProgrampagosExtendsMapper;
+
+    @Autowired
+    private FacLineaabonoExtendsMapper facLineaabonoExtendsMapper;
+
+    @Autowired
+    private FacHistoricofacturaExtendsMapper facHistoricofacturaExtendsMapper;
+
+    @Autowired
+    private FacPagosporcajaExtendsMapper facPagosporcajaExtendsMapper;
+
+    @Autowired
+    private FacPagoabonoefectivoExtendsMapper facPagoabonoefectivoExtendsMapper;
+
+    @Autowired
+    private AdmContadorExtendsMapper admContadorExtendsMapper;
+
+    private static List<Integer> listaPagosDeshacerCierre = new ArrayList<>();
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -662,5 +701,156 @@ public class UtilidadesPagoSJCS {
         bCalculo = bCalculo.multiply(bdSigno); // Control final del signo
 
         return bCalculo.doubleValue();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deshacerCierre(FcsPagosjg pago, Short idInstitucion, AdmUsuarios usuario) throws Exception {
+
+        LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> Entrada al servicio para deshacer el cierre del pago");
+
+        listaPagosDeshacerCierre = new ArrayList<>();
+        recursivaDeshacerCierre(idInstitucion, pago.getIdpagosjg());
+
+        // 3 - HACEMOS EL PASO 2 POR CADA PAGO ENCONTRADO
+
+        List<Integer> idPagos = new ArrayList<>();
+        idPagos.add(pago.getIdpagosjg());
+        idPagos.addAll(listaPagosDeshacerCierre);
+
+        if (null != idPagos && !idPagos.isEmpty()) {
+
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facLineaabonoExtendsMapper.deleteDeshacerCierre() -> Eliminamos las lineas de abono");
+            facLineaabonoExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
+
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facHistoricofacturaExtendsMapper.deleteDeshacerCierre() -> Eliminamos el historico de factura");
+            facHistoricofacturaExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
+
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facPagosporcajaExtendsMapper.deleteDeshacerCierre() -> Eliminamos los pagos por caja");
+            facPagosporcajaExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
+
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facPagoabonoefectivoExtendsMapper.deleteDeshacerCierre() -> Eliminamos los pagos en efectivo");
+            facPagoabonoefectivoExtendsMapper.deleteDeshacerCierre(idInstitucion, idPagos);
+
+        }
+
+        LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.hayAbonoPosterior() -> Comprobamos si hay abonos posteriores a los relacionados con nuestro pago");
+        List<FacAbono> hayAbonoPosterior = facAbonoExtendsMapper.hayAbonoPosterior(idInstitucion, pago.getIdpagosjg());
+
+        if (hayAbonoPosterior.isEmpty()) {
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> facAbonoExtendsMapper.getAbonoAnterior() -> Si no hay abono posterior buscamos el abono anterior al primero relacionado" +
+                    "con nuestro pago");
+            List<Long> abonoAnterior = facAbonoExtendsMapper.getAbonoAnterior(idInstitucion, hayAbonoPosterior.get(0).getFecha());
+
+            AdmContador admContador = new AdmContador();
+            admContador.setIdcontador(SigaConstants.CONTADOR_ABONOS_PAGOSJG);
+            admContador.setIdinstitucion(idInstitucion);
+
+            if (abonoAnterior.isEmpty()) {
+                admContador.setContador(0L);
+            } else {
+                admContador.setContador(abonoAnterior.get(0));
+            }
+
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> admContadorExtendsMapper.updateByPrimaryKeySelective() -> Actualizamos el contador");
+            admContadorExtendsMapper.updateByPrimaryKeySelective(admContador);
+        }
+
+        LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> acAbonoExtendsMapper.deleteByExample() -> Eliminamos los abonos relacionados con los pagos obtenidos");
+        FacAbonoExample facAbonoExample = new FacAbonoExample();
+        facAbonoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpagosjgIn(idPagos);
+        facAbonoExtendsMapper.deleteByExample(facAbonoExample);
+
+        for (Integer idpagoJG : idPagos) {
+
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> fcsPagosjgExtendsMapper.getFechaEstadoPago() -> Obtenemos la fecha del estado de pago");
+            Date fechaPago = fcsPagosjgExtendsMapper.getFechaEstadoPago(idInstitucion, idpagoJG);
+
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> ejecucionPlsPago.ejecutarPLDeshacerCierre() -> Ejecutamos el procedimiento de base de datos");
+            ejecucionPlsPago.ejecutarPLDeshacerCierre(idInstitucion, fechaPago);
+
+            LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() ->fcsPagosEstadospagosMapper.updateByPrimaryKeySelective() -> Actualizamos el estado de pago a ejecutado");
+            FcsPagosEstadospagos record = new FcsPagosEstadospagos();
+            record.setIdinstitucion(idInstitucion);
+            record.setIdpagosjg(idpagoJG);
+            record.setIdestadopagosjg(Short.valueOf(SigaConstants.ESTADO_PAGO_EJECUTADO));
+            record.setFechaestado(new Date());
+            record.setFechamodificacion(new Date());
+            record.setUsumodificacion(usuario.getIdusuario());
+            fcsPagosEstadospagosMapper.updateByPrimaryKeySelective(record);
+
+        }
+
+        if (null != idPagos && !idPagos.isEmpty()) {
+            eliminarComunicacionesAbonosPagos(idInstitucion, idPagos);
+        }
+
+        LOGGER.info("UtilidadesPagoSJCS.deshacerCierre() -> Salida del servicio para deshacer el cierre del pago");
+    }
+
+    private void recursivaDeshacerCierre(Short idInstitucion, Integer idpagosJG) {
+
+        LOGGER.info("UtilidadesPagoSJCS.recursivaDeshacerCierre() -> Entrada la función recursiva de deshacer cierre");
+
+        List<Integer> listaPagosDiferentesAlBuscado = new ArrayList<>();
+
+        LOGGER.info("UtilidadesPagoSJCS.recursivaDeshacerCierre() -> Obtenemos los abonos relacionados con nuestro pago");
+        List<Long> listaIdAbonos = facAbonoExtendsMapper.getIdAbonosPorPago(idInstitucion, idpagosJG);
+
+        LOGGER.info("UtilidadesPagoSJCS.recursivaDeshacerCierre() -> Obtenemos los disquetes en los que se encuentran dichos abonos");
+        List<Long> listaIdDisquetes = new ArrayList<>();
+        if (null != listaIdAbonos && !listaIdAbonos.isEmpty()) {
+            listaIdDisquetes = facAbonoincluidoendisqueteExtendsMapper.getDisquetesPorAbonos(idInstitucion, listaIdAbonos);
+        }
+
+        listaIdDisquetes.forEach(disquete -> {
+
+            LOGGER.info("UtilidadesPagoSJCS.recursivaDeshacerCierre() -> Comprobamos si hay más pagos diferentes al nuestro en los disquetes");
+            listaPagosDiferentesAlBuscado.addAll(facAbonoincluidoendisqueteExtendsMapper.getRestoPagosDisquete(idInstitucion, disquete, idpagosJG));
+
+            LOGGER.info("UtilidadesPagoSJCS.recursivaDeshacerCierre() -> Restablecemos los valores de los abonos y dejamos cada uno de ellos en estado pendiente de pagar por banco");
+            int response = facAbonoExtendsMapper.restableceValoresAbono(idInstitucion, disquete);
+
+            LOGGER.info("UtilidadesPagoSJCS.recursivaDeshacerCierre() -> Borramos los abonos incluidos en el disquete");
+            FacAbonoincluidoendisqueteExample facAbonoincluidoendisqueteExample = new FacAbonoincluidoendisqueteExample();
+            facAbonoincluidoendisqueteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIddisqueteabonoEqualTo(disquete);
+            facAbonoincluidoendisqueteExtendsMapper.deleteByExample(facAbonoincluidoendisqueteExample);
+
+            LOGGER.info("UtilidadesPagoSJCS.recursivaDeshacerCierre() -> Borramos el disquete");
+            FacDisqueteabonosExample facDisqueteabonosExample = new FacDisqueteabonosExample();
+            facDisqueteabonosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIddisqueteabonoEqualTo(disquete);
+            facDisqueteabonosMapper.deleteByExample(facDisqueteabonosExample);
+        });
+
+        listaPagosDeshacerCierre.addAll(listaPagosDiferentesAlBuscado);
+
+        for (Integer p : listaPagosDiferentesAlBuscado) {
+            recursivaDeshacerCierre(idInstitucion, p);
+        }
+
+        LOGGER.info("UtilidadesPagoSJCS.recursivaDeshacerCierre() -> Salida de la función recursiva de deshacer cierre");
+    }
+
+    private void eliminarComunicacionesAbonosPagos(Short idInstitucion, List<Integer> idPagos) {
+
+        LOGGER.info("UtilidadesPagoSJCS.eliminarComunicacionesAbonosPagos() -> Entrada al servicio de eliminar comunicaciones");
+
+        List<String> idPagosString = idPagos.stream().map(p -> p.toString()).collect(Collectors.toList());
+
+        envProgrampagosExtendsMapper.disableConstraint();
+
+        envEnvioprogramadoExtendsMapper.eliminarEnviosPago(idInstitucion, idPagosString);
+
+        envEnviosExtendsMapper.eliminarEnviosPago(idInstitucion, idPagosString);
+
+        EnvProgrampagosExample envProgrampagosExample = new EnvProgrampagosExample();
+        envProgrampagosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+                .andIdpagoIn(idPagos);
+
+        envProgrampagosExtendsMapper.deleteByExample(envProgrampagosExample);
+
+        envProgrampagosExtendsMapper.enableConstraint();
+
+        LOGGER.info("UtilidadesPagoSJCS.eliminarComunicacionesAbonosPagos() -> Salida del servicio de eliminar comunicaciones");
+
     }
 }
