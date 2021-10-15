@@ -23,6 +23,8 @@ import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
+import org.itcgae.siga.DTOs.scs.PermutaDTO;
+import org.itcgae.siga.DTOs.scs.PermutaItem;
 import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.scs.services.guardia.GuardiasColegiadoService;
@@ -55,6 +57,12 @@ public class GuardiasColegiadoController {
 		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/getIdConjuntoGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<String> getIdConjuntoGuardia(@RequestBody String idGuardia, HttpServletRequest request) {
+		String response = guardiasColegiadoService.getIdConjuntoGuardia(idGuardia, request);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
+	}
+	
 	@PostMapping(value = "/updateGuardiaColeg", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateGuardiaColeg(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request) {
 		UpdateResponseDTO response = guardiasColegiadoService.updateGuardiaColeg(guardiasItem, request);
@@ -77,5 +85,11 @@ public class GuardiasColegiadoController {
 	ResponseEntity<List<DatosCalendarioItem>> getCalendarioColeg(@RequestBody String[] datosCalendarioItem, HttpServletRequest request) {
 		List<DatosCalendarioItem> response = guardiasColegiadoService.getCalendarioColeg(datosCalendarioItem, request);
 		return new ResponseEntity<List<DatosCalendarioItem>>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/getPermutasColegiado", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PermutaDTO> getPermutasColegiado(@RequestBody PermutaItem permutaItem, HttpServletRequest request) {
+		PermutaDTO response = guardiasColegiadoService.getPemutasColeg(permutaItem, request);
+		return new ResponseEntity<PermutaDTO>(response, HttpStatus.OK);
 	}
 }

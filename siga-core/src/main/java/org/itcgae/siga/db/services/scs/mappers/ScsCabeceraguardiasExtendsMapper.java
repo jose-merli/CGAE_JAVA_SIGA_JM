@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
@@ -70,10 +71,13 @@ public interface ScsCabeceraguardiasExtendsMapper extends ScsCabeceraguardiasMap
 	List<ScsCabeceraguardias> getPermutaGuardiaColegiado(GuardiasItem guardiaItem);
 	
 	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "sustituirLetrado")
-	int sustituirLetrado(String institucion,String idTurno,String idGuardia,String fechadesde,String idPersona,String newLetrado,String fechaSustitucion,String comensustitucion);
+	int sustituirLetrado(String institucion,String idTurno,String idGuardia,String fechadesde,Long idPersona,Long newLetrado,String fechaSustitucion,String comensustitucion);
 	
 	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "sustituirLetradoPermutaCabecera")
-	int sustituirLetradoPermutaCabecera(String institucion,String idPersona,String newLetrado, String idPerCab);
+	int sustituirLetradoPermutaCabecera(String institucion,String idTurno, String idGuardia,Long idPersona,Long newLetrado,Long idPerCab,Date fecha);
+	
+	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "sustituirLetradoPermutaGuardia")
+	int sustituirLetradoPermutaGuardia(String institucion,String idTurno, String idGuardia,Long idPersona,Long newLetrado,Long numeroPermuta, boolean esSolicitante);
 	
 	@SelectProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "getCalendarioGuardiaColegiado")
 	@Results({ @Result(column = "institucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
@@ -96,4 +100,7 @@ public interface ScsCabeceraguardiasExtendsMapper extends ScsCabeceraguardiasMap
 			@Result(column = "asistenciasAsociadas", property = "asistenciasAsociadas", jdbcType = JdbcType.VARCHAR)})
 	
 	List<DatosCalendarioProgramadoItem> getCalendarioGuardiaColegiado(String institucion,String idTurno,String idGuardia,String idcalendarioguardias);
+	
+	@SelectProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "tieneGuardia")
+	int tieneGuardia(String institucion,Long idPersona) ;
 }

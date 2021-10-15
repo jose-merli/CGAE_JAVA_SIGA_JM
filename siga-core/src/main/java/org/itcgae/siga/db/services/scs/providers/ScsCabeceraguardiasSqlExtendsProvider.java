@@ -192,7 +192,7 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		
 		return sql.toString();
 	}
-	public String sustituirLetrado(String institucion,String idTurno,String idGuardia,String fechadesde,String idPersona,String newLetrado,String fechaSustitucion,String comensustitucion) {
+	public String sustituirLetrado(String institucion,String idTurno,String idGuardia,String fechadesde,Long idPersona,Long newLetrado,String fechaSustitucion,String comensustitucion) {
 		SQL sql = new SQL();
 		Date fechaInicioConv;
 		Date fechaSusConv;
@@ -217,6 +217,7 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		sql.SET("LETRADOSUSTITUIDO = " + idPersona);
 		sql.SET("FECHASUSTITUCION =  TO_DATE('" + fechaSus + "', 'DD/MM/RRRR')");
 		
+		
 		sql.WHERE("IDINSTITUCION = "+ institucion);
 		sql.WHERE("IDTURNO = " + idTurno);
 		sql.WHERE("IDGUARDIA = " + idGuardia);
@@ -225,9 +226,11 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		return sql.toString();
 	}
 	
-	public String sustituirLetradoPermutaCabecera(String institucion,String idPersona,String newLetrado, String idPerCab) {
+	public String sustituirLetradoPermutaCabecera(String institucion,String idTurno, String idGuardia,Long idPersona,Long newLetrado, Long idPerCab, Date fecha) {
 		SQL sql = new SQL();
-	
+		String fechaTrans;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		fechaTrans = dateFormat.format(fecha);
 		
 		sql.UPDATE("SCS_PERMUTA_CABECERA");
 		
@@ -235,8 +238,34 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		
 		
 		sql.WHERE("IDINSTITUCION = "+ institucion);
-		
+		sql.WHERE("IDPERSONA = " + idPersona);
 		sql.WHERE("ID_PERMUTA_CABECERA = " + idPerCab);
+		sql.WHERE("IDTURNO = "+ idTurno);
+		sql.WHERE("IDGUARDIA = "+ idGuardia);
+		sql.WHERE("FECHA = TO_DATE('" + fechaTrans + "', 'DD/MM/RRRR')");
+		return sql.toString();
+	}
+	
+	public String sustituirLetradoPermutaGuardia(String institucion,String idTurno, String idGuardia,Long idPersona,Long newLetrado, Long numeroPermuta, boolean esSolicitante) {
+		SQL sql = new SQL();
+	
+		
+		sql.UPDATE("SCS_PERMUTAGUARDIAS");
+		
+		if(esSolicitante == true) {
+			sql.SET("IDPERSONA_SOLICITANTE = " + newLetrado);
+			sql.WHERE("IDINSTITUCION = "+ institucion);
+			sql.WHERE("IDPERSONA_SOLICITANTE = "+ idPersona);
+			sql.WHERE("IDTURNO_SOLICITANTE = "+ idTurno);
+			sql.WHERE("IDGUARDIA_SOLICITANTE = "+ idGuardia);
+		}else {
+			sql.SET("IDPERSONA_CONFIRMADOR = " + newLetrado);
+			sql.WHERE("IDINSTITUCION = "+ institucion);
+			sql.WHERE("IDPERSONA_CONFIRMADOR = "+ idPersona);
+			sql.WHERE("IDTURNO_CONFIRMADOR = "+ idTurno);
+			sql.WHERE("IDGUARDIA_CONFIRMADOR = "+ idGuardia);
+		}
+		sql.WHERE("NUMERO = " + numeroPermuta);
 		return sql.toString();
 	}
 	
@@ -311,6 +340,18 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 		 
 		
 		
+		return sql.toString();
+	}
+	
+	public String tieneGuardia(String institucion,Long idPersona) {
+		SQL sql = new SQL();
+		
+		sql.SELECT ("COUNT(*) NUMGUARDIAS");
+		sql.FROM("SCS_CABECERAGUARDIAS");
+		sql.WHERE("IDINSTITUCION= " + institucion);
+		sql.WHERE("IDPERSONA= " + idPersona);
+		sql.WHERE("SYSDATE BETWEEN TRUNC(FECHAINICIO) AND TRUNC(FECHA_FIN)");
+	
 		return sql.toString();
 	}
 	
