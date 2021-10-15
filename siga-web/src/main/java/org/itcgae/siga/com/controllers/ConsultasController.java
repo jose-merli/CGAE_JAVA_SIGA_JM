@@ -6,7 +6,10 @@ import java.io.FileNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.fac.FiltroServicioItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
+import org.itcgae.siga.DTOs.com.ConstructorConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
@@ -23,6 +26,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -205,6 +210,24 @@ public class ConsultasController {
 			return new ResponseEntity<CamposDinamicosDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<CamposDinamicosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}	
+	}
+	
+	@PostMapping(value = "/pys/constructorConsultas")
+	ResponseEntity<ConstructorConsultasDTO> constructorConsultas(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
+		ConstructorConsultasDTO response = _consultasService.constructorConsultas(request, consulta);
+		if (response.getError() == null)
+			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping(value = "/pys/obtenerDatosConsulta")
+	ResponseEntity<ConstructorConsultasDTO> obtenerDatosConsulta(HttpServletRequest request, @RequestParam String idConsulta) { 
+		ConstructorConsultasDTO response = _consultasService.obtenerDatosConsulta(request, idConsulta);
+		if (response.getError() == null)
+			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }
