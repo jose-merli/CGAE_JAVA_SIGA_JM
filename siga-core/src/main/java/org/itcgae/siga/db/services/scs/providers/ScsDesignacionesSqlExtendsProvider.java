@@ -38,7 +38,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		sql.SELECT("designaciones.idinstitucion,"
 				+ "    designaciones.anio,"
-				+ "    designaciones.numero,"
+//				+ "    designaciones.numero,"
+				+ "    designaciones.codigo as numero,"
 				+ "    ( 'D' || designaciones.anio || '/' || designaciones.numero) asunto,"
 				+ "    ( nvl( turno.abreviatura, '' ) || '/') turnoguardia,"
 				+ "    ( nvl( persona.nombre, '' ) || ' ' || nvl( persona.apellidos1, '' ) || ' ' || nvl( persona.apellidos2, '' ) ) letrado,"
@@ -143,6 +144,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if (asuntosJusticiableItem.getNumeroProcedimiento() != null && !asuntosJusticiableItem.getNumeroProcedimiento().trim().isEmpty()) {
 			sql.WHERE("designaciones.numprocedimiento   = '" + asuntosJusticiableItem.getNumeroProcedimiento().trim() + "'");
+		}
+		
+		if(asuntosJusticiableItem.getIdTurno() != null && !asuntosJusticiableItem.getIdTurno().isEmpty()) {
+			sql.WHERE("turno.idturno   = '" + asuntosJusticiableItem.getIdTurno() + "'");
+		}
+		
+		if(asuntosJusticiableItem.getnColegiado() != null && !asuntosJusticiableItem.getnColegiado().isEmpty()) {
+			sql.WHERE("colegiado.ncolegiado = '" + asuntosJusticiableItem.getnColegiado() + "'");
 		}
 		
 		sql.WHERE("ROWNUM <= " + tamMax);
