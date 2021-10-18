@@ -1,8 +1,13 @@
 package org.itcgae.siga.fac.services;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
+import org.itcgae.siga.DTO.fac.ListaFacturasPeticionDTO;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 
@@ -14,7 +19,24 @@ public interface IGestionFichaCompraSuscripcionService {
 	
 	public InsertResponseDTO solicitarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
 
-	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha);
+	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
 
-	public UpdateResponseDTO savePagoCompraSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception;
+	public UpdateResponseDTO aprobarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha);
+
+	public InsertResponseDTO denegarPeticionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception;
+
+	public InsertResponseDTO aprobarCompraMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception;
+
+	public InsertResponseDTO denegarPeticion(HttpServletRequest request, String nSolicitud) throws Exception;
+
+	public InsertResponseDTO updateProductosPeticion(HttpServletRequest request, FichaCompraSuscripcionItem peticion)
+			throws Exception;
+
+	public ListaProductosCompraDTO getListaProductosCompra(HttpServletRequest request, String idPeticion);
+
+	public String getPermisoModificarImporteProducto(HttpServletRequest request);
+
+	ListaFacturasPeticionDTO getFacturasPeticion(HttpServletRequest request, String nSolicitud);
 }

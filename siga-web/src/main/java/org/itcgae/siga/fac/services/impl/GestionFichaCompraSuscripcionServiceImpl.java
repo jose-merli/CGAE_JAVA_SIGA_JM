@@ -11,6 +11,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionDTO;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
+import org.itcgae.siga.DTO.fac.FiltroProductoItem;
+import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
+import org.itcgae.siga.DTO.fac.ListaFacturasPeticionDTO;
+import org.itcgae.siga.DTO.fac.ListaFacturasPeticionItem;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
+import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -25,6 +32,8 @@ import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.FacFactura;
+import org.itcgae.siga.db.entities.FacFacturaExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.PysCompra;
@@ -42,6 +51,7 @@ import org.itcgae.siga.db.entities.PysSuscripcionExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.PysCompraMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
@@ -78,6 +88,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
+	
+	@Autowired
+	private FacFacturaMapper facFacturaMapper;
 
 	@Autowired
 	private PySTipoIvaExtendsMapper pysTipoIvaExtendsMapper;
@@ -120,7 +133,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 	@Autowired
 	private AdmContadorMapper admContadorMapper;
-
+	
+	
+	@Override
 	public FichaCompraSuscripcionItem getFichaCompraSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
 
 		FichaCompraSuscripcionItem fichaCompleta = null;
@@ -183,14 +198,24 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 						fichaCompleta.setIdInstitucion(idInstitucion.toString());
 						fichaCompleta.setProductos(ficha.getProductos());
-						fichaCompleta.setIdFormaPagoSeleccionada(fichaCompleta.getIdFormasPagoComunes().split(",")[0]);
+						if(fichaCompleta.getIdFormasPagoComunes() != null)fichaCompleta.setIdFormaPagoSeleccionada(fichaCompleta.getIdFormasPagoComunes().split(",")[0]);
 					}
 					//Para obtener toda la informacion de una compra/suscripcion ya creada
 					else { 
+						List<ListaProductosCompraItem> productos = null;
+						
+						//Si se viene de otra pantalla a consultar la ficha de compra
+						if(ficha.getProductos().size()==0) {
+							productos = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, ficha.getnSolicitud());
+							ficha.setProductos(productos);
+						}
+						else if(ficha.getProductos().size()>0){
+							productos = ficha.getProductos();
+						}
 						LOGGER.info(
 								"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion() -> Entrada a PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la compra/suscripcion");
 
-						fichaCompleta = pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion(ficha, !letrado.equals("N"));
+						fichaCompleta = pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion(ficha, !letrado.equals("N"), idInstitucion);
 						
 						
 						LOGGER.info(
@@ -198,7 +223,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					
 
 						fichaCompleta.setIdInstitucion(idInstitucion.toString());
-						fichaCompleta.setProductos(ficha.getProductos());
+						if(productos != null)fichaCompleta.setProductos(productos);
 					}
 				}
 
@@ -215,6 +240,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		return fichaCompleta;
 	}
 
+	@Override
 	@Transactional
 	public InsertResponseDTO solicitarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha)
 			throws Exception {
@@ -232,9 +258,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		//Este String sirve para saber si el usuario conectado es una colegiado o no.
 		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
 
-		// Se comentan el try y el catch para que la anotación @Transactional funcione
-		// correctamente
-//		try {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -250,13 +273,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			if (usuarios != null && !usuarios.isEmpty()) {
 				
 				//Si no es un colegiado se lanza un error ya que no deberia tener acceso a este servicio.
-				if(letrado.equals("N"))
-					throw new Exception("El usuario conectado no es un colegiado y no deberia tener acceso a este servicio");
+//				if(letrado.equals("N"))
+//					throw new Exception("El usuario conectado no es un colegiado y no deberia tener acceso a este servicio");
 				
-				LOGGER.info(
-						"getFichaCompraSuscripcion() / cenColegiadoMapper.selectByPrimaryKey() -> Salida de CenColegiadoMapper para comprobar si el usuario logeado es un colegiado asociado a la institucion");
-
-
 				GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 
 				LOGGER.info(
@@ -296,43 +315,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				LOGGER.info(
 						"solicitarCompra() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para crear una solicitud de compra");
 
-				PysProductossolicitados productoSolicitado = new PysProductossolicitados();
-
-				productoSolicitado.setIdinstitucion(idInstitucion);
-				productoSolicitado.setIdpersona(Long.valueOf(ficha.getIdPersona()));
-				productoSolicitado.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
-				if(productoSolicitado.getIdformapago()!=null)productoSolicitado.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
-				else productoSolicitado.setIdformapago(null);
-				//En el caso que la forma de pago sea domiciliación bancaria
-				if(ficha.getIdFormaPagoSeleccionada().equals("20"))productoSolicitado.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
-				else productoSolicitado.setIdcuenta(null);
-				productoSolicitado.setFechamodificacion(new Date());
-				productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-				for (ListaProductosItem producto : ficha.getProductos()) {
-					
-					productoSolicitado.setIdproducto((long) producto.getIdproducto());
-					productoSolicitado.setIdtipoproducto((short) producto.getIdtipoproducto());
-					productoSolicitado.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
-					if(producto.getValor()!=null) {
-						productoSolicitado.setValor(new BigDecimal(String.join(".",producto.getValor().split(",")[0],producto.getValor().split(",")[1].substring(0, 2))));
-					}
-					else productoSolicitado.setValor(null);
-					
-					//REVISAR: A revisar ya que no tenemos tarjeta productos implmentada todavia
-					productoSolicitado.setCantidad(1);
-					productoSolicitado.setAceptado("A");
-					
-					productoSolicitado.setNofacturable(producto.getNoFacturable());
-					productoSolicitado.setFecharecepcionsolicitud(new Date());
-					//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
-					//, por lo tanto, la actual.
-					productoSolicitado.setIdinstitucionorigen(idInstitucion);
-
-					response = pysProductossolicitadosMapper.insert(productoSolicitado);
-					if (response == 0)
-						throw new Exception("Error al insertar un producto solicitado en la BBDD.");
-				}
+				this.updateProductosPeticion(request, ficha);
 
 				LOGGER.info(
 						"solicitarCompra() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para crear una solicitud de compra");
@@ -340,28 +323,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				// Al no necesitar aprobación, se crea el registro de compra
 				// inmediatamente
 				if (aprobNecesaria.getValor() == "N") {
-					PysCompra compra = new PysCompra();
-
-					compra.setFecha(new Date());
-					compra.setFechamodificacion(new Date());
-					compra.setIdinstitucion(idInstitucion);
-					compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
-					compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
-					compra.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-					for (ListaProductosItem producto : ficha.getProductos()) {
-
-						compra.setIdproducto((long) producto.getIdproducto());
-						compra.setIdtipoproducto((short) producto.getIdtipoproducto());
-						compra.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
-						compra.setDescripcion(producto.getDescripcion());
-						if(ficha.getIdFormaPagoSeleccionada()!=null)compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
-						else compra.setIdformapago(null);
-
-						response = pysCompraMapper.insert(compra);
-						if (response == 0)
-							throw new Exception("Error al insertar un registro de compra en la BBDD.");
-					}
+					
+					this.aprobarCompra(request, ficha);
 
 				}
 
@@ -369,14 +332,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			}
 
 		}
-//		} catch (Exception e) {
-//			LOGGER.error(
-//					"GestionFichaCompraSuscripcionServiceImpl.solicitarCompra() -> Se ha producido un error al crear una solicitud de compra",
-//					e);
-//			error.setCode(500);
-//			error.setDescription("general.mensaje.error.bbdd");
-//			insertResponseDTO.setStatus("500");
-//		}
 
 		insertResponseDTO.setError(error);
 		LOGGER.info("solicitarCompra() -> Salida del servicio para crear una solicitud de compra");
@@ -394,6 +349,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		return genParametrosMapper.selectByPrimaryKey(genKey);
 	}
 
+	@Override
 	@Transactional
 	public InsertResponseDTO solicitarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha)
 			throws Exception {
@@ -436,7 +392,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				solicitud.setIdpersona(Long.valueOf(ficha.getIdPersona()));
 				solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
 				solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
-				solicitud.setTipopeticion("B");
+				solicitud.setTipopeticion("A");
 
 				response = pysPeticioncomprasuscripcionMapper.insert(solicitud);
 				if (response == 0)
@@ -478,6 +434,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		return insertResponseDTO;
 	}
 
+	@Override
 	@Transactional
 	public UpdateResponseDTO aprobarSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
 
@@ -517,7 +474,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					solicitud.setIdpersona(Long.valueOf(ficha.getIdPersona()));
 					solicitud.setIdpeticion((Long.valueOf(ficha.getnSolicitud())));
 					solicitud.setUsumodificacion(usuarios.get(0).getIdusuario());
-					solicitud.setTipopeticion("B");
+					solicitud.setTipopeticion("A");
 
 					response = pysPeticioncomprasuscripcionMapper.insert(solicitud);
 					if (response == 0)
@@ -560,8 +517,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		return updateResponseDTO;
 	}
 
+	@Override
 	@Transactional
-	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) {
+	public UpdateResponseDTO aprobarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha) throws Exception {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -574,7 +532,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		try {
+//		try {
 			if (idInstitucion != null) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -589,8 +547,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.updateByPrimaryKey() -> Entrada a pysPeticioncomprasuscripcionMapper para aprobar una solicitud de compra");
-
+							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.selectByPrimaryKey() -> Entrada a pysPeticioncomprasuscripcionMapper para extraer la peticion asociada");
+					
 					PysPeticioncomprasuscripcionKey solicitudKey = new PysPeticioncomprasuscripcionKey();
 
 					solicitudKey.setIdinstitucion(idInstitucion);
@@ -599,222 +557,87 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					PysPeticioncomprasuscripcion solicitud = pysPeticioncomprasuscripcionMapper
 							.selectByPrimaryKey(solicitudKey);
 
-					solicitud.setIdestadopeticion((short) 20);
-
-					response = pysPeticioncomprasuscripcionMapper.updateByPrimaryKey(solicitud);
-					if (response == 0)
-						throw new Exception("Error al modificar la solicitud de compra en la BBDD para su aprobación.");
-
 					LOGGER.info(
-							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.updateByPrimaryKey() -> Salida de pysPeticioncomprasuscripcionMapper para aprobar una solicitud de compra");
+							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.selectByPrimaryKey() -> Salida de pysPeticioncomprasuscripcionMapper para extraer la peticion asociada");
 
-					LOGGER.info(
-							"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una solicitud de compra");
-
-					PysCompra compra = new PysCompra();
-
-					compra.setFecha(new Date());
-					compra.setFechamodificacion(new Date());
-					compra.setIdinstitucion(idInstitucion);
-					compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
-					compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
-					compra.setUsumodificacion(usuarios.get(0).getIdusuario());
-
-					for (ListaProductosItem producto : ficha.getProductos()) {
-
-						compra.setIdproducto((long) producto.getIdproducto());
-						compra.setIdtipoproducto((short) producto.getIdtipoproducto());
-						compra.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
-						compra.setDescripcion(producto.getDescripcion());
-						if(compra.getIdformapago()!=null)compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
-						else compra.setIdformapago(null);
-
-						response = pysCompraMapper.insert(compra);
-						if (response == 0)
-							throw new Exception("Error al insertar un registro de compra en la BBDD.");
+					if(solicitud==null) {
+						this.solicitarCompra(request, ficha);
 					}
-				}
+					
+					//En el caso que se realice la aprobación desde la pantalla "Compra de productos"
+					if(ficha.getIdPersona()==null) {
+						ficha.setIdPersona(solicitud.getIdpersona().toString());
+					}
 
-				LOGGER.info(
-						"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de compra");
+					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
+					
+					// Al necesitar aprobación, se crea el registro de compra
+					// inmediatamente. Esto es a diferencia del servicio de solicitud.
+					if (aprobNecesaria.getValor().equals("S")) {
 
-				updateResponseDTO.setStatus("200");
-			}
-		} catch (Exception e) {
-			LOGGER.error(
-					"GestionFichaCompraSuscripcionServiceImpl.aprobarCompra() -> Se ha producido un error al aprobar una solicitud de compra",
-					e);
-			error.setCode(500);
-			error.setDescription("general.mensaje.error.bbdd");
-			updateResponseDTO.setStatus("500");
-		}
-
-		updateResponseDTO.setError(error);
-		LOGGER.info("aprobarCompra() -> Salida del servicio para aprobar una solicitud de compra");
-
-		return updateResponseDTO;
-	}
+					
+						LOGGER.info(
+								"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una solicitud de compra");
 	
-	@Transactional
-	public UpdateResponseDTO savePagoCompraSuscripcion(HttpServletRequest request, FichaCompraSuscripcionItem ficha)
-			throws Exception {
-
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		Error error = new Error();
-		int response = 0;
-
-		LOGGER.info(
-				"savePagoCompraSuscripcion() -> Entrada al servicio para actualizar información de pago de una compra/suscripción");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-//		try {
-			if (idInstitucion != null) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-
-				LOGGER.info(
-						"savePagoCompraSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-				LOGGER.info(
-						"savePagoCompraSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (usuarios != null && !usuarios.isEmpty()) {
-
-					if (ficha.getProductos() != null) {
-						
-						LOGGER.info(
-								"savePagoCompraSuscripcion() / pysProductossolicitadosMapper.updateByPrimaryKey() -> Entrada a pysProductossolicitadosMapper para actualizar información de pago de las compras asociadas a la peticion");
-
-						//Se actualizan las solicitud es de productos asociadas a la peticion
-						PysProductossolicitadosExample productosSolicitadosExample = new PysProductossolicitadosExample();
-
-						productosSolicitadosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdpeticionEqualTo(Long.valueOf(ficha.getnSolicitud()));
-
-						List<PysProductossolicitados> productosSolicitados = pysProductossolicitadosMapper.selectByExample(productosSolicitadosExample);
-
-						for (PysProductossolicitados productoSolicitado : productosSolicitados) {
-							if(productoSolicitado.getIdformapago()!=null)productoSolicitado.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
-							else productoSolicitado.setIdformapago(null);
-							// En el caso que se trate de una domiciliación bancaria
-							if (ficha.getIdFormaPagoSeleccionada().equals("20"))
-								productoSolicitado.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
-							else
-								productoSolicitado.setIdcuenta(null);
-							productoSolicitado.setNofacturable(ficha.getNoFact());
+						PysCompra compra = new PysCompra();
+	
+						compra.setFecha(new Date());
+						compra.setFechamodificacion(new Date());
+						compra.setIdinstitucion(idInstitucion);
+						compra.setIdpersona(Long.valueOf(ficha.getIdPersona()));
+						compra.setIdpeticion(Long.valueOf(ficha.getnSolicitud()));
+						compra.setUsumodificacion(usuarios.get(0).getIdusuario());
+	
+						for (ListaProductosCompraItem producto : ficha.getProductos()) {
+	
+							compra.setIdproducto((long) producto.getIdproducto());
+							compra.setIdtipoproducto((short) producto.getIdtipoproducto());
+							compra.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+							compra.setDescripcion(producto.getDescripcion());
+							//Si se ha seleccionado como forma de pago "No facturable"
+							if(ficha.getIdFormaPagoSeleccionada().equals("-1")) {
+								//productoSolicitado.setIdformapago(null);
+								//Al no poder poner a nulo la forma de pago se el asigna el valor del 
+								//elemento del combo equivalente a "No facturable" en el combo de formas de pago del front
+								compra.setIdformapago((short) 20);
+								compra.setNofacturable("1");
+							}
+							else{
+								compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
+								compra.setNofacturable("0");
+							}
+							if(ficha.getIdFormaPagoSeleccionada().equals("20")) {
+								compra.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
+							}
+							else {
+								compra.setIdcuenta(null);
+							}
+							compra.setCantidad(Integer.valueOf(producto.getCantidad()));
+							compra.setIdtipoiva(Integer.valueOf(producto.getIdtipoiva()));
+							if(producto.getPrecioUnitario()!=null) {
+								compra.setImporteunitario(new BigDecimal(producto.getPrecioUnitario()));
+							}
+							else {
+								compra.setImporteunitario(new BigDecimal(0));
+							}
 							
-							response = pysProductossolicitadosMapper.updateByPrimaryKey(productoSolicitado);
-							if(response == 0) throw new Exception("Eror al actualizar la información de pago de una solicitud de producto");
+							response = pysCompraMapper.insert(compra);
+							if (response == 0)
+								throw new Exception("Error al insertar un registro de compra en la BBDD.");
 						}
 						
 						LOGGER.info(
-								"savePagoCompraSuscripcion() / pysProductossolicitadosMapper.updateByPrimaryKey() -> Entrada a pysProductossolicitadosMapper para actualizar información de pago de las compras asociadas a la peticion");
-					
+								"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de compra");
 
-						LOGGER.info(
-								"savePagoCompraSuscripcion() / pysCompraMapper.updateByPrimaryKey() -> Entrada a pysCompraMapper para actualizar información de pago de las compras asociadas a la peticion");
-
-						//Se actualizan los registros de compra asociados a la peticion
-						PysCompraExample comprasExample = new PysCompraExample();
-
-						comprasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdpeticionEqualTo(Long.valueOf(ficha.getnSolicitud()));
-
-						List<PysCompra> compras = pysCompraMapper.selectByExample(comprasExample);
-
-						for (PysCompra compra : compras) {
-							if(compra.getIdformapago()!=null)compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
-							else compra.setIdformapago(null);
-							// En el caso que se trate de una domiciliación bancaria
-							if (ficha.getIdFormaPagoSeleccionada().equals("20"))
-								compra.setIdcuentadeudor(Short.valueOf(ficha.getCuentaBancSelecc()));
-							else
-								compra.setIdcuentadeudor(null);
-							compra.setNofacturable(ficha.getNoFact());
-							
-							response = pysCompraMapper.updateByPrimaryKey(compra);
-							if(response == 0) throw new Exception("Eror al actualizar la información de pago de una compra");
-						}
-						
-						LOGGER.info(
-								"savePagoCompraSuscripcion() / pysCompraMapper.updateByPrimaryKey() -> Entrada a pysCompraMapper para actualizar información de pago de las compras asociadas a la peticion");
-					}
-					//Para modificaciones a servicios
-					else {
-						
-						LOGGER.info(
-								"savePagoCompraSuscripcion() / pysServiciossolicitadosMapper.updateByPrimaryKey() -> Entrada a pysServiciossolicitadosMapper para actualizar información de pago de las peticiones de suscripciones asociadas a la peticion");
-
-						//Se actualizan las solicitud es de productos asociadas a la peticion
-						PysServiciossolicitadosExample serviciosSolicitadosExample = new PysServiciossolicitadosExample();
-
-						serviciosSolicitadosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdpeticionEqualTo(Long.valueOf(ficha.getnSolicitud()));
-
-						List<PysServiciossolicitados> serviciosSolicitados = pysServiciossolicitadosMapper.selectByExample(serviciosSolicitadosExample);
-
-						for (PysServiciossolicitados servicioSolicitado : serviciosSolicitados) {
-							if(servicioSolicitado.getIdformapago()!=null)servicioSolicitado.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
-							else servicioSolicitado.setIdformapago(null);
-							// En el caso que se trate de una domiciliación bancaria
-							if (ficha.getIdFormaPagoSeleccionada().equals("20"))
-								servicioSolicitado.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
-							else
-								servicioSolicitado.setIdcuenta(null);
-							//serviciosSolicitado.setNofacturable(ficha.getNoFact());
-							
-							response = pysServiciossolicitadosMapper.updateByPrimaryKey(servicioSolicitado);
-							if(response == 0) throw new Exception("Eror al actualizar la información de pago de una solicitud de suscripcion");
-						}
-						
-						LOGGER.info(
-								"savePagoCompraSuscripcion() / pysServiciossolicitadosMapper.updateByPrimaryKey() -> Entrada a pysServiciossolicitadosMapper para actualizar información de pago de las suscripciones asociadas a la peticion");
-					
-
-						LOGGER.info(
-								"savePagoCompraSuscripcion() / pysCompraMapper.updateByPrimaryKey() -> Entrada a pysCompraMapper para actualizar información de pago de las suscripciones asociadas a la peticion");
-
-						//Se actualizan los registros de suscripciones asociadas a la peticion
-						PysSuscripcionExample suscripcionExample = new PysSuscripcionExample();
-
-						suscripcionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdpeticionEqualTo(Long.valueOf(ficha.getnSolicitud()));
-
-						List<PysSuscripcion> suscripciones = pysSuscripcionMapper.selectByExample(suscripcionExample);
-
-						for (PysSuscripcion suscripcion : suscripciones) {
-							if(suscripcion.getIdformapago()!=null)suscripcion.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
-							else suscripcion.setIdformapago(null);
-							// En el caso que se trate de una domiciliación bancaria
-							if (ficha.getIdFormaPagoSeleccionada().equals("20"))
-								suscripcion.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
-							else
-								suscripcion.setIdcuenta(null);
-							//suscripcion.setNofacturable(ficha.getNoFact());
-							
-							response = pysSuscripcionMapper.updateByPrimaryKey(suscripcion);
-							if(response == 0) throw new Exception("Eror al actualizar la información de pago de una suscripcion");
-						}
-						
-						LOGGER.info(
-								"savePagoCompraSuscripcion() / pysSuscripcionMapper.updateByPrimaryKey() -> Entrada a pysSuscripcionMapper para actualizar información de pago de las compras asociadas a la peticion");
-						
 					}
 				}
-				LOGGER.info(
-						"savePagoCompraSuscripcion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para actualizar información de pago de una compra/suscripción");
 
+				
 				updateResponseDTO.setStatus("200");
 			}
 //		} catch (Exception e) {
 //			LOGGER.error(
-//					"GestionFichaCompraSuscripcionServiceImpl.savePagoCompraSuscripcion() -> Se ha producido un error al actualizar información de pago de una compra/suscripción",
+//					"GestionFichaCompraSuscripcionServiceImpl.aprobarCompra() -> Se ha producido un error al aprobar una solicitud de compra",
 //					e);
 //			error.setCode(500);
 //			error.setDescription("general.mensaje.error.bbdd");
@@ -822,8 +645,507 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 //		}
 
 		updateResponseDTO.setError(error);
-		LOGGER.info("savePagoCompraSuscripcion() -> Salida del servicio para aprobar una solicitud de compra");
+		LOGGER.info("aprobarCompra() -> Salida del servicio para aprobar una solicitud de compra");
 
-		return new UpdateResponseDTO();
+		return updateResponseDTO;
 	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO denegarPeticion(HttpServletRequest request, String nSolicitud)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info("denegarPeticion() -> Entrada al servicio para crear la denegación de la petición");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"denegarPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"denegarPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"denegarPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear la denegación de la petición");
+
+				PysPeticioncomprasuscripcionKey solicitudKey = new PysPeticioncomprasuscripcionKey();
+
+				solicitudKey.setIdinstitucion(idInstitucion);
+				solicitudKey.setIdpeticion(Long.valueOf(nSolicitud));
+
+				PysPeticioncomprasuscripcion solicitudAlta = pysPeticioncomprasuscripcionMapper
+						.selectByPrimaryKey(solicitudKey);
+				
+				
+				PysPeticioncomprasuscripcion solicitudBaja = new PysPeticioncomprasuscripcion();
+
+				solicitudBaja.setFecha(new Date());
+				solicitudBaja.setFechamodificacion(new Date());
+				solicitudBaja.setIdinstitucion(idInstitucion);
+				solicitudBaja.setIdpersona(solicitudAlta.getIdpersona());
+				solicitudBaja.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcionExtendsMapper.selectMaxIdPeticion(idInstitucion).getNewId())+1);
+				solicitudBaja.setIdpeticionalta((Long.valueOf(nSolicitud)));
+				solicitudBaja.setUsumodificacion(usuarios.get(0).getIdusuario());
+				solicitudBaja.setTipopeticion("B");
+				solicitudBaja.setIdestadopeticion((short) 20);
+				Long fechaActual = new Date().getTime();
+				solicitudBaja.setNumOperacion(
+						"1" + idInstitucion.toString() + solicitudAlta.getIdpersona() + fechaActual.toString());
+
+				response = pysPeticioncomprasuscripcionMapper.insert(solicitudBaja);
+				if (response == 0)
+					throw new Exception("Error al insertar la denegación de la petición en la BBDD.");
+
+				LOGGER.info(
+						"denegarPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear la denegación de la petición");
+
+				LOGGER.info(
+						"denegarPeticion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para crear la denegación de la petición");
+			}
+
+			LOGGER.info(
+					"denegarPeticion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de suscripción");
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.info("denegarPeticion() -> Salida del servicio para crear una solicitud de suscripción");
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO denegarPeticionMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info("denegarPeticionMultiple() -> Entrada al servicio para crear la denegación de una o varias peticiones");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"denegarPeticionMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"denegarPeticionMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"denegarPeticionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear la denegación de una o varias peticiones");
+
+				//Se guardaran aqui los numeros de solicitud de aquellas solicitudes no validas por el estado en el que vienen
+				error.setDescription("");
+				for(FichaCompraSuscripcionItem peticion : peticiones) {
+					if(peticion.getFechaDenegada() != null || peticion.getFechaAceptada() != null) {
+						error.setDescription(error.getDescription()+" "+peticion.getnSolicitud()+",");
+					}
+					else this.denegarPeticion(request, peticion.getnSolicitud());
+				}
+
+				if(!error.getDescription().equals(""))error.setDescription(error.getDescription().substring(0, error.getDescription().length()-1));
+				
+				
+				LOGGER.info(
+						"denegarPeticionMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear la denegación de una o varias peticiones");
+
+				LOGGER.info(
+						"denegarPeticionMultiple() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para crear la denegación de una o varias peticiones");
+			}
+
+			LOGGER.info(
+					"denegarPeticionMultiple() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de una o varias peticiones");
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.info("denegarPeticionMultiple() -> Salida del servicio para crear la denegación de una petición");
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO aprobarCompraMultiple(HttpServletRequest request, FichaCompraSuscripcionItem[] peticiones)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info("aprobarCompraMultiple() -> Entrada al servicio para aprobar una o varias peticiones de compra");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"aprobarCompraMultiple() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"aprobarCompraMultiple() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"aprobarCompraMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para aprobar una o varias peticiones de compra");
+
+				//Se guardaran aqui los numeros de solicitud de aquellas solicitudes no validas por el estado en el que vienen
+				error.setDescription("");
+				for(FichaCompraSuscripcionItem peticion : peticiones) {
+					if(peticion.getFechaDenegada() != null || peticion.getFechaAceptada() != null) {
+						error.setDescription(error.getDescription()+" "+peticion.getnSolicitud()+",");
+					}
+					else {
+						peticion.setProductos(pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, peticion.getnSolicitud()));
+						this.aprobarCompra(request, peticion);
+					}
+				}
+
+				if(!error.getDescription().equals(""))error.setDescription(error.getDescription().substring(0, error.getDescription().length()-1));
+				
+				
+				LOGGER.info(
+						"aprobarCompraMultiple() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para aprobar una o varias peticiones de compra");
+
+				LOGGER.info(
+						"aprobarCompraMultiple() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una o varias peticiones de compra");
+			}
+
+			LOGGER.info(
+					"aprobarCompraMultiple() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de una o varias peticiones de compra");
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.info("aprobarCompraMultiple() -> Salida del servicio para aprobar una o varias peticiones de compra");
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO updateProductosPeticion(HttpServletRequest request, FichaCompraSuscripcionItem peticion)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info("updateProductosPeticion() -> Entrada al servicio para actualizar los productos solicitados asociados con una solicitud");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"updateProductosPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateProductosPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"updateProductosPeticion() / pysPeticioncomprasuscripcionMapper.deleteByExample() -> Entrada a pysProductossolicitadosMapper para eliminar los productos solicitados asociados con una solicitud");
+
+				PysProductossolicitadosExample prodExample = new PysProductossolicitadosExample();
+				
+				prodExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(Long.valueOf(peticion.getnSolicitud()));
+				//para comprobar que hay productos a eliminar
+				List<PysProductossolicitados> productosViejos = pysProductossolicitadosMapper.selectByExample(prodExample);
+				response = pysProductossolicitadosMapper.deleteByExample(prodExample);
+				//La segunda condicion es para evitar que se lance una excepcion al intentar eliminar un conjunto vacio
+				if(response == 0 && !productosViejos.isEmpty()) {
+					throw new Exception("Eror al eliminar los productos solicitados de la petición");
+				}
+				
+				LOGGER.info(
+						"updateProductosPeticion() / pysProductossolicitadosMapper.deleteByExaple() -> Salida de pysProductossolicitadosMapper para eliminar los productos solicitados asociados con una solicitud");
+
+				
+				LOGGER.info(
+						"updateProductosPeticion() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para insertar los productos solicitados asociados con una solicitud");
+				
+				PysProductossolicitados productoSolicitado = new PysProductossolicitados();
+
+				productoSolicitado.setIdinstitucion(idInstitucion);
+				productoSolicitado.setIdpersona(Long.valueOf(peticion.getIdPersona()));
+				productoSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
+				//Si se ha seleccionado como forma de pago "No facturable"
+				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
+					//productoSolicitado.setIdformapago(null);
+					//De forma temporal se utilizara el id 20
+					productoSolicitado.setIdformapago((short) 20);
+					productoSolicitado.setNofacturable("1");
+				}
+				else{
+					productoSolicitado.setIdformapago(Short.valueOf(peticion.getIdFormaPagoSeleccionada()));
+					productoSolicitado.setNofacturable("0");
+				}
+				//En el caso que la forma de pago sea domiciliación bancaria
+				if(peticion.getIdFormaPagoSeleccionada().equals("20")) {
+					productoSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
+				}
+				else {
+					productoSolicitado.setIdcuenta(null);
+				}
+				
+				productoSolicitado.setFechamodificacion(new Date());
+				productoSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+				for (ListaProductosCompraItem producto : peticion.getProductos()) {
+					
+					productoSolicitado.setIdproducto((long) producto.getIdproducto());
+					productoSolicitado.setIdtipoproducto((short) producto.getIdtipoproducto());
+					productoSolicitado.setIdproductoinstitucion((long) producto.getIdproductoinstitucion());
+					if(producto.getPrecioUnitario()!=null) {
+						productoSolicitado.setValor(new BigDecimal(producto.getPrecioUnitario()));
+					}
+					else productoSolicitado.setValor(null);
+					productoSolicitado.setIdtipoiva(Integer.valueOf(producto.getIdtipoiva()));
+					
+					//REVISAR: 
+					productoSolicitado.setAceptado("A");
+					
+					productoSolicitado.setOrden(Short.valueOf(producto.getOrden()));
+					productoSolicitado.setCantidad(Integer.valueOf(producto.getCantidad()));
+					productoSolicitado.setFecharecepcionsolicitud(new Date());
+					//DUDA: Se le supone que se refiere a la misma institucion desde la cual se realiza la peticion
+					//, por lo tanto, la actual.
+					productoSolicitado.setIdinstitucionorigen(idInstitucion);
+					productoSolicitado.setObservaciones(producto.getObservaciones());
+					
+					//productoSolicitado.set
+
+					response = pysProductossolicitadosMapper.insert(productoSolicitado);
+					if (response == 0)
+						throw new Exception("Error al insertar un producto solicitado en la BBDD.");
+				}
+
+				LOGGER.info(
+						"updateProductosPeticion() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para insertar los productos solicitados asociados con una solicitud");
+			}
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.info("updateProductosPeticion() -> Salida del servicio para actualizar los productos solicitados asociados con una solicitud");
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	public ListaProductosCompraDTO getListaProductosCompra(HttpServletRequest request, String idPeticion){
+
+		ListaProductosCompraDTO listaProductosCompra = new ListaProductosCompraDTO();
+		Error error = new Error();
+
+		LOGGER.info("getListaProductosCompra() -> Entrada al servicio para obtener la informacion de los productos de una peticion");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"getListaProductosCompra() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getListaProductosCompra() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				
+				LOGGER.info(
+						"getListaProductosCompra() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para obtener la informacion de los productos de una peticion");
+
+				List<ListaProductosCompraItem> productosCompra = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, idPeticion);
+
+				listaProductosCompra.setListaProductosCompraItems(productosCompra);
+				
+				error.setCode(200);
+				
+				listaProductosCompra.setError(error);
+				
+				LOGGER.info(
+						"getListaProductosCompra() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para obtener la informacion de los productos de una peticion");
+			}
+
+			LOGGER.info(
+					"getListaProductosCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para obtener la informacion de los productos de una peticion");
+
+		}
+		LOGGER.info("getListaProductosCompra() -> Salida del servicio para obtener la informacion de los productos de una peticion");
+
+		return listaProductosCompra;
+	}
+	
+	@Override
+	public String getPermisoModificarImporteProducto(HttpServletRequest request) 
+	{
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+				
+		GenParametrosKey genKey = new GenParametrosKey();
+
+		genKey.setModulo("PYS");
+		genKey.setIdinstitucion(idInstitucion);
+		genKey.setParametro("MODIFICAR_IMPORTE_UNITARIO_PRODUCTOS");
+
+		return genParametrosMapper.selectByPrimaryKey(genKey).getValor();
+	}
+	
+	
+	@Override
+	public ListaFacturasPeticionDTO getFacturasPeticion(HttpServletRequest request, String nSolicitud){
+
+		ListaFacturasPeticionDTO listaFacturasDTO = new ListaFacturasPeticionDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info("denegarPeticion() -> Entrada al servicio para crear la denegación de la petición");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"denegarPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"denegarPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"denegarPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear la denegación de la petición");
+
+					PysCompraExample compraExample = new PysCompraExample();
+					
+					compraExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud));	
+					
+					List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(compraExample);
+					
+					List<String> idFacturasPeticion = new ArrayList<String>();
+					
+					for(PysCompra compra : comprasPeticion) {
+						if(compra.getIdfactura() != null) idFacturasPeticion.add(compra.getIdfactura());
+					}
+					
+					if(!idFacturasPeticion.isEmpty()) {
+						FacFacturaExample facturaExample = new FacFacturaExample();
+						
+						facturaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdfacturaIn(null);
+						
+						List<FacFactura> facturasPeticion = facFacturaMapper.selectByExample(facturaExample);
+						
+						List<ListaFacturasPeticionItem> facturasListaPeticion = new ArrayList<ListaFacturasPeticionItem>();
+						
+						for(FacFactura factura : facturasPeticion) {
+							ListaFacturasPeticionItem f = new ListaFacturasPeticionItem();
+							f.setFechaFactura(factura.getFechaemision());
+							f.setEstado(factura.getEstado());
+							f.setImporte(factura.getImptotal());// Preguntar sobre a que importe se refiere
+							f.setnFactura(factura.getNumerofactura());
+							f.setTipo("Factura"); //Como se distingue una factura de una anulación?
+							facturasListaPeticion.add(f);
+						}
+					}
+					
+					LOGGER.info(
+							"denegarPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear la denegación de la petición");
+
+					LOGGER.info(
+							"denegarPeticion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para crear la denegación de la petición");
+				}
+
+				LOGGER.info(
+						"denegarPeticion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de suscripción");
+
+				
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"getFichaCompraSuscripcion() -> Se ha producido un error al obtener el los detalles de la compra/suscripcion",
+					e);
+			error.setCode(500);
+			error.setDescription(e.getMessage());
+			listaFacturasDTO.setError(error);
+		}
+
+		LOGGER.info("denegarPeticion() -> Salida del servicio para crear una solicitud de suscripción");
+
+		return listaFacturasDTO;
+	}
+	
+	
 }

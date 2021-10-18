@@ -19,6 +19,11 @@ public class ListaProductosItem {
 	private String precioiva;
 	private String formapago;
 	private String noFacturable;
+	private String idtipoiva;
+	private String valorIva;
+	private Date fechaBajaIva;
+	private String idFormasPago;
+	private String formasPagoInternet;
 	
 	public int getIdproducto() {
 		return idproducto;
@@ -93,12 +98,6 @@ public class ListaProductosItem {
 		this.formapago = formapago;
 	}
 	
-	public String getNoFacturable() {
-		return noFacturable;
-	}
-	public void setNoFacturable(String noFacturable) {
-		this.noFacturable = noFacturable;
-	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -186,7 +185,44 @@ public class ListaProductosItem {
 		return "ListaProductosItem [idproducto=" + idproducto + ", idtipoproducto=" + idtipoproducto
 				+ ", idproductoinstitucion=" + idproductoinstitucion + ", idcontador=" + idcontador + ", descripcion="
 				+ descripcion + ", valor=" + valor + ", fechabaja=" + fechabaja + ", tipo=" + tipo + ", categoria="
-				+ categoria + ", iva=" + iva + ", precioiva=" + precioiva + ", formapago=" + formapago + "]";
+				+ categoria + ", iva=" + iva + ", precioiva=" + precioiva + ", formapago=" + formapago + ", idtipoiva=" 
+				+ idtipoiva + ", valorIva=" + valorIva + ", noFacturable=" + noFacturable + "]";
+	}
+	public String getIdtipoiva() {
+		return idtipoiva;
+	}
+	public void setIdtipoiva(String idtipoiva) {
+		this.idtipoiva = idtipoiva;
+	}
+	public String getValorIva() {
+		return valorIva;
+	}
+	public void setValorIva(String valorIva) {
+		this.valorIva = valorIva;
+	}
+	public String getNoFacturable() {
+		return noFacturable;
+	}
+	public void setNoFacturable(String noFacturable) {
+		this.noFacturable = noFacturable;
+	}
+	public Date getFechaBajaIva() {
+		return fechaBajaIva;
+	}
+	public void setFechaBajaIva(Date fechaBajaIva) {
+		this.fechaBajaIva = fechaBajaIva;
+	}
+	public String getIdFormasPago() {
+		return idFormasPago;
+	}
+	public void setIdFormasPago(String idFormasPago) {
+		this.idFormasPago = idFormasPago;
+	}
+	public String getFormasPagoInternet() {
+		return formasPagoInternet;
+	}
+	public void setFormasPagoInternet(String formasPagoInternet) {
+		this.formasPagoInternet = formasPagoInternet;
 	}
 	
 }

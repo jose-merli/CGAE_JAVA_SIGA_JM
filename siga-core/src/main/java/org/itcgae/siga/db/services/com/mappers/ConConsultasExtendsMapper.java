@@ -10,12 +10,16 @@ import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.FiltroServicioItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTOs.com.ConstructorConsultasItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.services.com.providers.ConConsultasExtendsSqlProvider;
+import org.itcgae.siga.db.services.fac.providers.PySTiposServiciosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +53,7 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 	@Results({
 		@Result(column = "IDMAX", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})
-	NewIdDTO selectMaxIDConsulta();
+	NewIdDTO selectMaxIDConsulta(short idInstitucion);
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasPlantilla")
 	@Results({
@@ -122,4 +126,17 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 	})
 	List<ComboItemConsulta> selectConsultasDisponiblesFiltro(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro);
 
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerDatosConsulta")
+	@Results({
+		@Result(column = "ORDEN", property = "orden", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "CONECTOR", property = "conector", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ABRIRPAR", property = "abrirparentesis", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREENCONSULTA", property = "campo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OPERADOR", property = "operador", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CERRARPAR", property = "cerrarparentesis", jdbcType = JdbcType.VARCHAR)
+		
+		}) 
+	List<ConstructorConsultasItem> obtenerDatosConsulta(String idioma, Short idInstitucion, String idConsulta);
+	
 }	

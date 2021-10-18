@@ -7,8 +7,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
+import org.itcgae.siga.DTOs.com.ConstructorConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
@@ -64,4 +67,9 @@ public interface IConsultasService {
 	public String quitarEtiquetas(String sentencia);
 
 	public List<Map<String, Object>> ejecutarConsultaConClavesLog(String sentencia, AdmUsuarios usuario,Long modelosComunicacionItem, Long consulta, Short idInstitucion,String descripcion) throws Exception;
+	
+	public ConstructorConsultasDTO constructorConsultas(HttpServletRequest request, ConstructorConsultasDTO constructorConsultasDTO);
+	
+	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta);
+	
 }

@@ -85,17 +85,23 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 				+ " then LISTAGG(f_siga_getrecurso(fo.descripcion,"+idioma+") , ', ') WITHIN GROUP (ORDER BY prin.descripcion)\r\n"
 				+ " else to_char(count(fopa1.idformapago))\r\n"
 				+ " end FORMAS_PAGO");
+		sql.SELECT("LISTAGG(fo.idformapago, ',') WITHIN GROUP (ORDER BY fo.idformapago) as idformaspago");
+		sql.SELECT("LISTAGG(fo.internet, ',') WITHIN GROUP (ORDER BY fo.idformapago) as formaspagoInternet");
 		sql.SELECT(" concat(F_siga_formatonumero(PRIN.VALOR,2), ' €') AS VALOR");
 		sql.SELECT(" F_SIGA_GETRECURSO (TPRODUCTO.DESCRIPCION,"+idioma+") AS CATEGORIA");
 		sql.SELECT(" PRODUC.DESCRIPCION AS TIPO");
+		sql.SELECT(" tiva.idtipoiva as idtipoiva");
+		sql.SELECT(" TIVA.valor as valorIva");
 		sql.SELECT(" TIVA.DESCRIPCION AS IVA");
+		sql.SELECT(" TIVA.FECHABAJA AS fechaBajaIva");
 		sql.SELECT(" concat(F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2), ' €') AS PRECIO_IVA");
 		sql.SELECT(" PRIN.IDCONTADOR");
 		sql.SELECT(" PRIN.NOFACTURABLE");
 		
 		sql.FROM(" pys_productosinstitucion prin, pys_formapagoproducto fopa1, pys_formapago fo, pys_tipoiva tiva, pys_tiposproductos tproducto, pys_productos produc");
-		if(filtroProductoItem.getFormaPago() != null && filtroProductoItem.getFormaPago() != "")
+		if(filtroProductoItem.getFormaPago() != null && filtroProductoItem.getFormaPago() != "") {
 			sql.FROM(" pys_formapagoproducto fopa2");
+		}
 		
 		sql.WHERE(" PRIN.IDINSTITUCION = '" + idInstitucion +"'");
 		sql.WHERE(" fopa1.idinstitucion(+) = prin.idinstitucion");
@@ -108,7 +114,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		sql.WHERE(" produc.idproducto (+) = prin.idproducto");
 		sql.WHERE(" produc.idtipoproducto (+) = prin.idtipoproducto");
 		sql.WHERE(" produc.idinstitucion (+) = prin.idinstitucion");
-		
+
 		if(filtroProductoItem.getCategoria() != null && filtroProductoItem.getCategoria() != "")
 			sql.WHERE(" PRIN.IDTIPOPRODUCTO = '" + filtroProductoItem.getCategoria() + "'");
 		
@@ -138,7 +144,10 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		if(filtroProductoItem.getPrecioHasta() != null && filtroProductoItem.getPrecioHasta() != "")
 			sql.WHERE(" ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2)  <= " + Float.parseFloat(filtroProductoItem.getPrecioHasta()) + "");
 		
-		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, tiva.valor, prin.idcontador, PRIN.NOFACTURABLE");
+		sql.GROUP_BY(" prin.idproducto, prin.idtipoproducto, prin.idproductoinstitucion, prin.fechabaja, "
+				+ "prin.valor, tproducto.descripcion, produc.descripcion, prin.descripcion, tiva.descripcion, "
+				+ "tiva.valor, prin.idcontador, PRIN.NOFACTURABLE, tiva.idtipoiva,  TIVA.DESCRIPCION,"
+				+ "tiva.fechabaja");
 
 		sql.ORDER_BY(" PRIN.DESCRIPCION");
 		

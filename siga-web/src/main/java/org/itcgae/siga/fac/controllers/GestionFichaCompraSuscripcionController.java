@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
+import org.itcgae.siga.DTO.fac.ListaFacturasPeticionDTO;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
@@ -55,11 +57,52 @@ public class GestionFichaCompraSuscripcionController {
 		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-
-	@PostMapping(value = "/pys/savePagoCompraSuscripcion")
-	ResponseEntity<UpdateResponseDTO> savePagoCompraSuscripcion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
-		UpdateResponseDTO response = gestionFichaCompraSuscripcionService.savePagoCompraSuscripcion(request, ficha);
-		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	
+	@PostMapping(value = "/pys/denegarPeticion")
+	ResponseEntity<InsertResponseDTO>  denegarPeticion(HttpServletRequest request, @RequestBody String nSolicitud) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.denegarPeticion(request, nSolicitud);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/pys/aprobarCompraMultiple")
+	ResponseEntity<InsertResponseDTO> aprobarCompraMultiple(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem[] peticiones) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.aprobarCompraMultiple(request, peticiones);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/pys/denegarPeticionMultiple")
+	ResponseEntity<InsertResponseDTO> denegarPeticionMultiple(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem[] peticiones) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.denegarPeticionMultiple(request, peticiones);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping(value = "/pys/getListaProductosCompra")
+	ResponseEntity<ListaProductosCompraDTO> getListaProductosCompra(HttpServletRequest request, String idPeticion) throws Exception {
+		ListaProductosCompraDTO response = gestionFichaCompraSuscripcionService.getListaProductosCompra(request, idPeticion);
+		if(response.getError().getCode()==200) return new ResponseEntity<ListaProductosCompraDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<ListaProductosCompraDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping(value = "/pys/getPermisoModificarImporteProducto")
+	ResponseEntity<String> getPermisoModificarImporteProducto(HttpServletRequest request) throws Exception {
+		String response = gestionFichaCompraSuscripcionService.getPermisoModificarImporteProducto(request);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/pys/updateProductosPeticion")
+	ResponseEntity<InsertResponseDTO> updateProductosPeticion(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem peticiones) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.updateProductosPeticion(request, peticiones);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping(value = "/pys/getFacturasPeticion")
+	ResponseEntity<ListaFacturasPeticionDTO> getFacturasPeticion(HttpServletRequest request, String idPeticion) throws Exception {
+		ListaFacturasPeticionDTO response = gestionFichaCompraSuscripcionService.getFacturasPeticion(request, idPeticion);
+		if(response.getError() == null) return new ResponseEntity<ListaFacturasPeticionDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<ListaFacturasPeticionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

@@ -71,7 +71,7 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		sql.SELECT(" PYS_SERVICIOSINSTITUCION.SOLICITARALTA");
 		sql.SELECT(" PYS_SERVICIOSINSTITUCION.CUENTACONTABLE");
 		sql.SELECT(" PYS_SERVICIOSINSTITUCION.FECHABAJA");
-		//sql.SELECT(" PYS_SERVICIOSINSTITUCION.NOFACTURABLE");
+		sql.SELECT(" PYS_SERVICIOSINSTITUCION.NOFACTURABLE");
 		sql.SELECT(" PYS_SERVICIOSINSTITUCION.IDTIPOIVA");
 		sql.SELECT(" PYS_SERVICIOSINSTITUCION.CODIGOEXT");
 		
@@ -82,11 +82,8 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		sql.SELECT(" PYS_TIPOIVA.VALOR AS VALORIVA");
 		sql.SELECT(" F_SIGA_GETRECURSO (PYS_TIPOSERVICIOS.DESCRIPCION, 1) AS CATEGORIA");
 		
-
-//		CRITERIOS
-//		FACTURACIONPONDERADA
-
-		
+		sql.SELECT(" PYS_SERVICIOSINSTITUCION.INICIOFINALPONDERADO");
+		sql.SELECT(" PYS_SERVICIOSINSTITUCION.FACTURACIONPONDERADA");
 		
 		sql.FROM( "PYS_SERVICIOSINSTITUCION");
 		
@@ -220,8 +217,6 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		sql.WHERE(" idconsulta = " + idConsulta);
 
 		return sql.toString();
-		
-		//select sentencia from con_consulta where idobjetivo = 3 and idclase = 1 and idinstitucion = 2005 and idconsulta = 44;
 
 	}
 	

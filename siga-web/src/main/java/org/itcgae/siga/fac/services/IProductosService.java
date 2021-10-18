@@ -9,6 +9,7 @@ import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.db.entities.PysTipoiva;
 
 public interface IProductosService {
 	public ComboDTO comboIva(HttpServletRequest request);
@@ -23,4 +24,5 @@ public interface IProductosService {
 	public ListaProductosDTO searchListadoProductos(HttpServletRequest request, FiltroProductoItem filtroProductoItem);
 	public DeleteResponseDTO reactivarBorradoFisicoLogicoProductos(ListaProductosDTO listadoProductos, HttpServletRequest request);
 	public ListaCodigosPorColegioDTO obtenerCodigosPorColegio(HttpServletRequest request);
+	public PysTipoiva getIvaDetail(HttpServletRequest request, String idTipoIva);
 }

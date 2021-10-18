@@ -57,6 +57,8 @@ public interface PysServiciosinstitucionExtendsMapper extends PysServiciosinstit
 		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "AUTOMATICO", property = "automatico", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCONSULTA", property = "idconsulta", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "INICIOFINALPONDERADO", property = "iniciofinalponderado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FACTURACIONPONDERADA", property = "facturacionponderada", jdbcType = JdbcType.VARCHAR)
 		}) 
 	ServicioDetalleDTO detalleServicio(int idTipoServicio, int idServicio, int idServiciosInstitucion, Short idInstitucion);
 	

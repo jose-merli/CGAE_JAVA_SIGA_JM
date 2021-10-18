@@ -29,6 +29,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.PysFormapagoproducto;
 import org.itcgae.siga.db.entities.PysFormapagoproductoKey;
 import org.itcgae.siga.db.entities.PysProductosinstitucion;
+import org.itcgae.siga.db.entities.PysTipoiva;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
 import org.itcgae.siga.db.mappers.PysProductosinstitucionMapper;
@@ -900,12 +901,8 @@ public class ProductosServiceImpl implements IProductosService{
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"editarProducto() / pysProductosMapper.editarProducto() -> Entrada a pysProductosMapper para modificar un producto");
-					
-					//AL EDITAR PRODUCTOS HAY QUE USAR LA CONSULTA QUE TE TRAE EL IDORDENACION YA QUE AL CAMBIAR TIPO O CATEGORIA SE PUEDE REPETIR LA PK DE 4 CAMPOS AL HABER IDPRODUCTOSINSTITUCION REPETIDOS
-					//NewIdDTO idOrdenacion = pysProductosInstitucionExtendsMapper.getIndiceMaxProducto(producto, idInstitucion);
-					//productoInstitucion.setIdproductoinstitucion(Long.parseLong(idOrdenacion.getNewId()));
-					if(producto.getProductooriginal().getIdtipoproducto() == producto.getIdtipoproducto() && producto.getProductooriginal().getIdproducto() == producto.getIdproducto()) {
+							"editarProducto() / pysProductosInstitucionMapper.editarProducto() -> Entrada a pysProductosInstitucionMapper para modificar un producto");				
+	
 						PysProductosinstitucion productoInstitucion = new PysProductosinstitucion();
 							
 						productoInstitucion.setIdinstitucion(idInstitucion);
@@ -929,14 +926,15 @@ public class ProductosServiceImpl implements IProductosService{
 						productoInstitucion.setIdcontador(producto.getIdcontador());
 						productoInstitucion.setNofacturable(producto.getNofacturable());
 						productoInstitucion.setIdtipoiva(producto.getIdtipoiva());
-						productoInstitucion.setCodigoext(producto.getCodigoext());
+						if(producto.getCodigoext() != null) {
+							productoInstitucion.setCodigoext(producto.getCodigoext());
+						}else {
+							productoInstitucion.setCodigoext(producto.getIdtipoproducto() + "|" + producto.getIdproducto() + "|" + producto.getIdproductoinstitucion());
+						}
 						productoInstitucion.setCodigoTraspasonav(producto.getCodigo_traspasonav());
 						productoInstitucion.setOrden((long) producto.getOrden());
 						
-						status = pysProductosInstitucionMapper.updateByPrimaryKey(productoInstitucion);
-					}else {
-						System.out.println("FSDKFLSDKFSDLKFLSDKSDF");
-					}
+						status = pysProductosInstitucionMapper.updateByPrimaryKey(productoInstitucion);				
 					
 					if(status == 0) {
 						deleteResponseDTO.setStatus(SigaConstants.KO);
@@ -945,13 +943,13 @@ public class ProductosServiceImpl implements IProductosService{
 					}
 					
 					LOGGER.info(
-							"editarProducto() / pysProductosMapper.editarProducto() -> Salida de pysProductosMapper para modificar un producto");
+							"editarProducto() / pysProductosInstitucionMapper.editarProducto() -> Salida de pysProductosInstitucionMapper para modificar un producto");
 				}
 
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"ProductosServiceImpl.modificarProducto() -> Se ha producido un error al modificar un producto",
+					"ProductosServiceImpl.editarProducto() -> Se ha producido un error al modificar un producto",
 					e);
 			error.setCode(500);
 			error.setDescription("general.mensaje.error.bbdd");
@@ -959,7 +957,7 @@ public class ProductosServiceImpl implements IProductosService{
 
 		deleteResponseDTO.setError(error);
 
-		LOGGER.info("modificarProducto() -> Salida del servicio para modificar un producto");
+		LOGGER.info("editarProducto() -> Salida del servicio para modificar un producto");
 
 		return deleteResponseDTO;
 	}
@@ -1108,5 +1106,56 @@ public class ProductosServiceImpl implements IProductosService{
 		LOGGER.info("obtenerCodigosPorColegio() -> Salida del servicio para recuperar el listado de codigos en una institucion concreta");
 
 		return listaCodigosPorColegioDTO;
+	}
+	
+	public PysTipoiva getIvaDetail(HttpServletRequest request, String idTipoIva){
+		PysTipoiva resultado = null;
+		Error error = new Error();
+
+		LOGGER.info("getIvaDetail() -> Entrada al servicio para recuperar la información de un tipo iva");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"getIvaDetail() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"getIvaDetail() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"getIvaDetail() / pysTipoIvaExtendsMapper.selectByPrimaryKey() -> Entrada a pysTipoIvaExtendsMapper para recuperar la información de un tipo iva");
+
+					resultado = pysTipoIvaExtendsMapper.selectByPrimaryKey(Integer.valueOf(idTipoIva));
+					
+					LOGGER.info(
+							"getIvaDetail() / pysTipoIvaExtendsMapper.selectByPrimaryKey() -> Salida de pysTipoIvaExtendsMapper para recuperar la información de un tipo iva");
+
+					
+				
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"ProductosServiceImpl.getIvaDetail() -> Se ha producido un error al recuperar la información de un tipo iva",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		LOGGER.info("getIvaDetail() -> Salida del servicio para recuperar la información de un tipo iva");
+
+		return resultado;
 	}
 }

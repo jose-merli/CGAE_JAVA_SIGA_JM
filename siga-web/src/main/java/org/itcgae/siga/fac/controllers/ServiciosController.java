@@ -2,13 +2,18 @@ package org.itcgae.siga.fac.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.fac.BorrarSuscripcionBajaItem;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosDTO;
+import org.itcgae.siga.DTO.fac.FichaTarjetaPreciosItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTO.fac.ListadoTipoProductoDTO;
+import org.itcgae.siga.DTO.fac.ListadoTipoServicioDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
+import org.itcgae.siga.DTO.fac.ServicioDTO;
 import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -37,7 +42,7 @@ public class ServiciosController {
 	}
 	
 	@PostMapping(value="/pys/reactivarBorradoFisicoLogicoServicios")
-	ResponseEntity<DeleteResponseDTO> reactivarBorradoFisicoLogicoServicios(@RequestBody ListaServiciosDTO listadoServicios, HttpServletRequest request){
+	ResponseEntity<DeleteResponseDTO> reactivarBorradoFisicoLogicoServicios(@RequestBody ListaServiciosDTO listadoServicios, HttpServletRequest request) throws Exception{
 		DeleteResponseDTO response = serviciosService.reactivarBorradoFisicoLogicoServicios(listadoServicios, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
@@ -52,6 +57,12 @@ public class ServiciosController {
 	ResponseEntity<InsertResponseDTO> nuevoServicio(@RequestBody ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
 		InsertResponseDTO response = serviciosService.nuevoServicio(servicio, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value="/pys/editarServicio")
+	ResponseEntity<DeleteResponseDTO> editarServicio(@RequestBody ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
+		DeleteResponseDTO response = serviciosService.editarServicio(servicio, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/pys/detalleServicio")
@@ -76,5 +87,35 @@ public class ServiciosController {
 	ResponseEntity<InsertResponseDTO> crearEditarFormaPago(@RequestBody ServicioDetalleDTO servicio, HttpServletRequest request) throws Exception{
 		InsertResponseDTO response = serviciosService.crearEditarFormaPago(servicio, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value="/pys/borrarSuscripcionesBajas")
+	ResponseEntity<DeleteResponseDTO> borrarSuscripcionesBajas(@RequestBody BorrarSuscripcionBajaItem borrarSuscripcionBajaItem, HttpServletRequest request) throws Exception{
+		DeleteResponseDTO response = serviciosService.borrarSuscripcionesBajas(borrarSuscripcionBajaItem, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/pys/detalleTarjetaPrecios")
+	ResponseEntity<FichaTarjetaPreciosDTO> detalleTarjetaPrecios(HttpServletRequest request, @RequestBody ServicioDetalleDTO servicio) { 
+		FichaTarjetaPreciosDTO response = serviciosService.detalleTarjetaPrecios(request, servicio);
+		return new ResponseEntity<FichaTarjetaPreciosDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/combo/comboPeriodicidad")
+	ResponseEntity<ComboDTO> comboPeriodicidad(HttpServletRequest request) { 
+		ComboDTO response = serviciosService.comboPeriodicidad(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value="/pys/crearEditarPrecios")
+	ResponseEntity<InsertResponseDTO> crearEditarPrecios(@RequestBody FichaTarjetaPreciosDTO listaPrecios, HttpServletRequest request){
+		InsertResponseDTO response = serviciosService.crearEditarPrecios(listaPrecios, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value="/pys/eliminarPrecios")
+	ResponseEntity<DeleteResponseDTO> eliminarPrecio(@RequestBody FichaTarjetaPreciosDTO precios, HttpServletRequest request){
+		DeleteResponseDTO response = serviciosService.eliminarPrecio(precios, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 }
