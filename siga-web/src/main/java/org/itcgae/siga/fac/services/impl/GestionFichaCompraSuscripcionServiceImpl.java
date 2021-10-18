@@ -1024,7 +1024,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			if (usuarios != null && !usuarios.isEmpty()) {
 				
 				LOGGER.info(
-						"getListaProductosCompra() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para obtener la informacion de los productos de una peticion");
+						"getListaProductosCompra() / pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
 
 				List<ListaProductosCompraItem> productosCompra = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, idPeticion);
 
@@ -1035,12 +1035,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				listaProductosCompra.setError(error);
 				
 				LOGGER.info(
-						"getListaProductosCompra() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para obtener la informacion de los productos de una peticion");
+						"getListaProductosCompra() / pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
 			}
-
-			LOGGER.info(
-					"getListaProductosCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para obtener la informacion de los productos de una peticion");
-
 		}
 		LOGGER.info("getListaProductosCompra() -> Salida del servicio para obtener la informacion de los productos de una peticion");
 

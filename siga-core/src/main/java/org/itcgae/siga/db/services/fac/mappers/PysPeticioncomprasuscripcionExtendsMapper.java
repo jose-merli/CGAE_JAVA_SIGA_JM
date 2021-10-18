@@ -107,23 +107,6 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 		}) 
 	List<ComboItem> comboEstadoFactura(String idioma);
 	
-	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getProductosSolicitadosPeticion")
-	@Results({
-		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "IDTIPOPRODUCTO", property = "idtipoproducto", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "IDPRODUCTOINSTITUCION", property = "idproductoinstitucion", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
-		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "CATEGORIA", property = "categoria", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IVA", property = "iva", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "PRECIO_IVA", property = "precioiva", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FORMAS_PAGO", property = "formapago", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOFACTURABLE", property = "noFacturable", jdbcType = JdbcType.VARCHAR)
-		}) 
-	ListaProductosItem[] getProductosSolicitadosPeticion(String idioma, Short idInstitucion, FichaCompraSuscripcionItem peticion);
-	
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getListaProductosCompra")
 	@Results({
 		@Result(column = "IDPRODUCTO", property = "idproducto", jdbcType = JdbcType.NUMERIC),
