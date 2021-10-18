@@ -3493,6 +3493,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     ScsContrariosejg contrario = scsContrariosejgMapper.selectByPrimaryKey(key);
 
                     contrario.setNombrerepresentanteejg(item.getNombrerepresentanteejg());
+                    contrario.setIdrepresentanteejg(item.getIdrepresentanteejg());
 
                     contrario.setFechamodificacion(new Date());
                     contrario.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -3504,7 +3505,27 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
                     LOGGER.info(
                             "updateRepresentanteContrarioEJG() / scsContrariosejgMapper.updateByPrimaryKey() -> Salida de scsContrariosejgMapper para actualizar el representante de un contrario ejg.");
+                    
+                    // Obtenemos el justiciable
+                    ScsPersonajgKey perKey = new ScsPersonajgKey();
+                    
+                    perKey.setIdinstitucion(Short.parseShort(idInstitucion.toString()));
+                    perKey.setIdpersona(item.getIdpersona());
+                    
+                    ScsPersonajg per = scsPersonajgMapper.selectByPrimaryKey(perKey);
+                    
+                    // Le asignamos la id de su representante
+                    per.setIdrepresentantejg(item.getIdrepresentanteejg());
 
+                    LOGGER.info(
+                            "updateRepresentanteContrarioEJG() / scsPersonajgMapper.updateByPrimaryKey() -> Entrada a scsPersonajgMapper para actualizar el id de representante de una persona ejg.");
+                    
+                    // Actualizamos el justiciable
+                    scsPersonajgMapper.updateByPrimaryKey(per);
+                    
+                    LOGGER.info(
+                            "updateRepresentanteContrarioEJG() / scsPersonajgMapper.updateByPrimaryKey() -> Salida a scsPersonajgMapper para actualizar el id de representante de una persona ejg.");
+                    
                     // }
 
                 } catch (Exception e) {
