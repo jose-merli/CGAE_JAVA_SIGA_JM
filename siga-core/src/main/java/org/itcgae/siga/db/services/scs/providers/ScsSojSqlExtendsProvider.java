@@ -17,7 +17,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 
 		sql.SELECT("soj.idinstitucion," 
 				+ "    soj.anio," 
-				+ "    soj.numero," 
+				+ "    soj.numsoj numero," 
 				+ "    soj.numsoj codigo,"
 				+ "    soj.estado," 
 				+ "		soj.fechaapertura,"
@@ -28,11 +28,12 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado");
 		sql.FROM("    scs_soj soj\r\n");
 		sql.JOIN("scs_personajg pjg ON ( pjg.idpersona = soj.idpersonajg AND pjg.idinstitucion = soj.idinstitucion)");
-		sql.LEFT_OUTER_JOIN("cen_persona per ON (soj.idpersona = per.idpersona)");
+		sql.JOIN("cen_persona per ON (soj.idpersona = per.idpersona)");
 		sql.JOIN("scs_turno t ON ( t.idturno = soj.idturno AND t.idinstitucion = soj.idinstitucion)");
 		sql.JOIN(
 				"scs_guardiasturno g ON ( soj.idturno = g.idturno AND soj.idinstitucion = g.idinstitucion AND soj.idguardia = g.idguardia)");
 		sql.JOIN("scs_tiposoj ts ON ( ts.idtiposoj = soj.idtiposoj )");
+		sql.JOIN("scs_tiposojcolegio tsc on (tsc.idtiposojcolegio = soj.idtiposojcolegio and tsc.idinstitucion = soj.idinstitucion)");
 		sql.WHERE("soj.idinstitucion = "+asuntosJusticiableItem.getIdInstitucion());
 
 		if (asuntosJusticiableItem.getAnio() != null && !asuntosJusticiableItem.getAnio().trim().isEmpty()) {
@@ -40,7 +41,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 		}
 
 		if (asuntosJusticiableItem.getNumero() != null && !asuntosJusticiableItem.getNumero().trim().isEmpty()) {
-			sql.WHERE("soj.numero = " + asuntosJusticiableItem.getNumero().trim());
+			sql.WHERE("soj.numsoj = " + asuntosJusticiableItem.getNumero().trim());
 		}
 
 		if (asuntosJusticiableItem.getIdTipoSoj() != null && !asuntosJusticiableItem.getIdTipoSoj().trim().isEmpty()) {
@@ -79,7 +80,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 		if (asuntosJusticiableItem.getIdPersonaColegiado() != null) {
 			sql.WHERE("soj.idpersona = " + asuntosJusticiableItem.getIdPersonaColegiado());
 		}
-		sql.WHERE("ROWNUM <= " + tamMax);
+		
 
 		sql.ORDER_BY("soj.anio desc, soj.numero DESC");
 //				+ "    AND\r\n"
@@ -169,7 +170,12 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 //		}
 		
 //		return sqlOrder.toString();
-		return sql.toString();
+		
+		SQL sqlLimit = new SQL();
+		sqlLimit.SELECT("*");
+		sqlLimit.FROM("(" + sql.toString() + ")");
+		sqlLimit.WHERE("ROWNUM <= " + tamMax);
+		return sqlLimit.toString();
 	}
 
 	public String getAsuntoTipoSoj(AsuntosClaveJusticiableItem asuntoClave, String idLenguaje) {

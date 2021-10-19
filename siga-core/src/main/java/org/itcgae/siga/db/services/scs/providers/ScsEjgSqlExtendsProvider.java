@@ -680,7 +680,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
         SQL sql = new SQL();
 
-        sql.SELECT("ejg.idinstitucion, ejg.anio, ejg.numero, ( 'E' || ejg.anio || '/' || ejg.numejg) asunto,"
+        sql.SELECT("ejg.idinstitucion, ejg.anio, ejg.numejg numero, ( 'E' || ejg.anio || '/' || ejg.numejg) asunto,"
                 + "(nvl(t.abreviatura,'') || '/' || nvl(g.nombre,'')) turnoguardia,ejg.idtipoejg,"
                 + "f_siga_getrecurso(nvl(te.descripcion,'')," + idLenguaje + ") tipoejg,"
                 + "(nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
@@ -1229,7 +1229,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
         // consulta para obtener la relacion de SOJ con los datos de las consultas
         // anteriores.
-        sqlSOJ.SELECT("TRIM('SOJ') sjcs," + "TO_CHAR('S'||anio||'/'||numero) idsjcs," + "fechaapertura fecha,"
+        sqlSOJ.SELECT("TRIM('SOJ') sjcs," + "TO_CHAR('S'||anio||'/'||numsoj) idsjcs," + "fechaapertura fecha,"
                 + "            idinstitucion idinstitucion," + "            anio anio," + "            numero numero,"
                 + "            scs_soj.idpersona idletrado," + "TO_CHAR(idturno) idturno,"
                 + "TO_CHAR(idtiposoj) idtipo," + " numsoj codigo," + "(" + sqlSOJ_2.toString() + ") des_turno," + "("
@@ -1260,7 +1260,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_2.SELECT("TO_CHAR(idtipodesignacolegio)");
         sqlDesigna_2.FROM("scs_designa");
         sqlDesigna_2.WHERE("anio = ejgd.aniodesigna");
-        sqlDesigna_2.WHERE("numero = ejgd.numerodesigna");
+        sqlDesigna_2.WHERE("codigo = ejgd.numerodesigna");
         sqlDesigna_2.WHERE("idturno = ejgd.idturno");
         sqlDesigna_2.WHERE("idinstitucion = ejgd.idinstitucion");
 
@@ -1268,7 +1268,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_3.SELECT(" codigo");
         sqlDesigna_3.FROM("scs_designa");
         sqlDesigna_3.WHERE("anio = ejgd.aniodesigna");
-        sqlDesigna_3.WHERE("numero = ejgd.numerodesigna");
+        sqlDesigna_3.WHERE("codigo = ejgd.numerodesigna");
         sqlDesigna_3.WHERE("idturno = ejgd.idturno");
         sqlDesigna_3.WHERE("idinstitucion = ejgd.idinstitucion");
 
@@ -1282,7 +1282,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_5.SELECT("f_siga_getrecurso(descripcion, 1)");
         sqlDesigna_5.FROM(" scs_designa a, scs_tipodesignacolegio b");
         sqlDesigna_5.WHERE("a.anio = ejgd.aniodesigna ");
-        sqlDesigna_5.WHERE("a.numero = ejgd.numerodesigna ");
+        sqlDesigna_5.WHERE("a.codigo = ejgd.numerodesigna ");
         sqlDesigna_5.WHERE("a.idturno = ejgd.idturno");
         sqlDesigna_5.WHERE("a.idinstitucion =  " + item.getidInstitucion());
         sqlDesigna_5.WHERE("a.idinstitucion = b.idinstitucion");

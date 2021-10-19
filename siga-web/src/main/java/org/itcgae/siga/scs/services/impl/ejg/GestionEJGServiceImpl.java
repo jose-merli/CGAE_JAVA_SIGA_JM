@@ -4996,20 +4996,24 @@ public class GestionEJGServiceImpl implements IGestionEJG {
             if (usuarios != null && usuarios.size() > 0) {
                 LOGGER.debug("GestionEJGServiceImpl.asociarSOJ() -> Entrada para asociar un EJG a un SOJ");
                 try {
+                	
+                	ScsSojExample example = new ScsSojExample();
+                	example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtiposojEqualTo(Short.parseShort(datos.get(3)))
+                		.andAnioEqualTo(Short.parseShort(datos.get(1))).andNumsojEqualTo(datos.get(2));
 
                     ScsSoj record = new ScsSoj();
                     record.setFechamodificacion(new Date());
                     record.setUsumodificacion(usuarios.get(0).getIdusuario());
-                    record.setIdinstitucion(idInstitucion);
-                    record.setNumero(Long.parseLong(datos.get(2)));
-                    record.setAnio(Short.parseShort(datos.get(1)));
-                    record.setIdtiposoj(Short.parseShort(datos.get(3)));
+                    //record.setIdinstitucion(idInstitucion);
+                    //record.setNumsoj(datos.get(2));
+                    //record.setAnio(Short.parseShort(datos.get(1)));
+                    //record.setIdtiposoj(Short.parseShort(datos.get(3)));
 
                     record.setEjganio(Short.parseShort(datos.get(5)));
                     record.setEjgidtipoejg(Short.parseShort(datos.get(4)));
                     record.setEjgnumero(Long.parseLong(datos.get(6)));
 
-                    response = scsSojMapper.updateByPrimaryKeySelective(record);
+                    response = scsSojMapper.updateByExampleSelective(record, example);
 
                 } catch (Exception e) {
                     LOGGER.debug(
