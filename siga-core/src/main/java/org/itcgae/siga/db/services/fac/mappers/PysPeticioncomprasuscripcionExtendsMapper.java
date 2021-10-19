@@ -46,7 +46,8 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			@Result(column = "fechaAnulada", property = "fechaAnulada", jdbcType = JdbcType.DATE),
 			//TARJETA FORMAS DE PAGO
 			@Result(column = "idformaspagocomunes", property = "idFormasPagoComunes", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idFormaPagoSeleccionada", property = "idFormaPagoSeleccionada", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "idFormaPagoSeleccionada", property = "idFormaPagoSeleccionada", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idCuentaBancSeleccionada", property = "cuentaBancSelecc", jdbcType = JdbcType.VARCHAR)})
 	FichaCompraSuscripcionItem getFichaCompraSuscripcion(FichaCompraSuscripcionItem ficha, boolean esColegiado, Short idInstitucion);
 	
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getNuevaFichaCompraSuscripcion")
