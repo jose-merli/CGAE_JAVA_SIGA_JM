@@ -171,11 +171,11 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 		
 //		return sqlOrder.toString();
 		
-		SQL sqlLimit = new SQL();
-		sqlLimit.SELECT("*");
-		sqlLimit.FROM("(" + sql.toString() + ")");
-		sqlLimit.WHERE("ROWNUM <= " + tamMax);
-		return sqlLimit.toString();
+		SQL sqlPpal = new SQL();
+		sqlPpal.SELECT("*");
+		sqlPpal.FROM("("+sql.toString()+") consulta");
+		sqlPpal.WHERE("ROWNUM <= " + tamMax);
+		return sqlPpal.toString();
 	}
 
 	public String getAsuntoTipoSoj(AsuntosClaveJusticiableItem asuntoClave, String idLenguaje) {

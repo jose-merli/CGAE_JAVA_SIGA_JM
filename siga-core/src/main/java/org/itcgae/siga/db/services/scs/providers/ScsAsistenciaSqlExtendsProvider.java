@@ -90,9 +90,14 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 			sql.WHERE("a.idpersonacolegiado = " + asuntosJusticiableItem.getIdPersonaColegiado());
 		}
 		
-		sql.WHERE("ROWNUM <= " + tamMax);
+		//sql.WHERE("ROWNUM <= " + tamMax);
 
 		sql.ORDER_BY("a.anio desc, a.numero DESC");
+		
+		SQL sqlPpal = new SQL();
+		sqlPpal.SELECT("*");
+		sqlPpal.FROM("("+sql.toString()+") consulta");
+		sqlPpal.WHERE("ROWNUM <= " + tamMax);
 		
 //		SQL sqlOrder = new SQL();
 //
@@ -167,7 +172,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 //		}
 //
 //		return sqlOrder.toString();
-		return sql.toString();
+		return sqlPpal.toString();
 	}
 
 	public String getAsuntoTipoAsistencia(AsuntosClaveJusticiableItem asuntoClave, String idLenguaje) {

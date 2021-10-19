@@ -747,7 +747,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
             sql.WHERE("ejg.idpersona = " + asuntosJusticiableItem.getIdPersonaColegiado());
         }
 
-        sql.WHERE("ROWNUM <= " + tamMax);
+        //sql.WHERE("ROWNUM <= " + tamMax);
 
         sql.ORDER_BY("ejg.anio desc, ejg.numero DESC");
 
@@ -809,8 +809,13 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
          * " )"); if (tamMax != null) { Integer tamMaxNumber = tamMax + 1;
          * sqlOrder.WHERE("rownum <= " + tamMaxNumber); }
          */
+        
+        SQL sqlPpal = new SQL();
+		sqlPpal.SELECT("*");
+		sqlPpal.FROM("("+sql.toString()+") consulta");
+		sqlPpal.WHERE("ROWNUM <= " + tamMax);
 
-        return sql.toString();
+        return sqlPpal.toString();
     }
 
     public String getDictamen(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
