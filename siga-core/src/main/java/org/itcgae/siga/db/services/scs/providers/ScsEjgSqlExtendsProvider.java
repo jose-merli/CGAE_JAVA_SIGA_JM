@@ -1083,14 +1083,6 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlEstadosEnvio.WHERE("estado.idestado = e.idestado");
         sqlEstadosEnvio.WHERE("cat.idlenguaje = '" + idLenguaje + "'");
 
-        sql3.SELECT("c.idenviosalida");
-        sql3.SELECT("c.idinstitucion");
-        sql3.FROM("scs_comunicaciones c");
-        sql3.WHERE("c.idinstitucion = '" + idInstitucion + "'");
-        sql3.WHERE("c.ejganio = " + anio);
-        sql3.WHERE("c.ejgidtipo = " + idTipo);
-        sql3.WHERE("c.ejgnumero = '" + num + "'");
-
         sql2.SELECT("e.*");
         sql2.SELECT("(dest.nombre || ' ' || dest.apellidos1 || ' ' || dest.apellidos2) AS destinatario");
         sql2.SELECT("(" + sqlTipoEnvio.toString() + ") as tipoenvio");
@@ -1098,9 +1090,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql2.SELECT("nvl(camposenviosasunto.valor, plantilla.asunto) AS asunto");
         sql2.SELECT("nvl(camposenvioscuerpo.valor, plantilla.cuerpo) AS cuerpo");
         sql2.FROM("env_envios e");
-        sql2.LEFT_OUTER_JOIN(
+        sql2.JOIN("scs_comunicaciones c on e.idenvio = c.idenviosalida and e.idinstitucion = c.idinstitucion");
+        sql2.JOIN(
                 "env_destinatarios dest on (dest.idenvio=e.idenvio and dest.idinstitucion =e.idinstitucion)");
-        sql2.LEFT_OUTER_JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '" + idInstitucion
+        sql2.JOIN("env_plantillasenvios plantilla ON (plantilla.idinstitucion = '" + idInstitucion
                 + "' AND plantilla.idplantillaenvios = e.idplantillaenvios"
                 + " AND plantilla.idtipoenvios = e.idtipoenvios)");
         sql2.LEFT_OUTER_JOIN(
@@ -1111,7 +1104,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                         + " AND camposenvioscuerpo.idcampo = 2)");
 
         sql2.WHERE("e.fechabaja IS NULL");
-        sql2.WHERE("(e.idenvio,e.idinstitucion) IN (" + sql3.toString() + ")");
+        sql2.WHERE("c.idinstitucion = '" + idInstitucion + "'");
+        sql2.WHERE("c.ejganio = " + anio);
+        sql2.WHERE("c.ejgidtipo = " + idTipo);
+        sql2.WHERE("c.ejgnumero = '" + num + "'");
 
         sql.SELECT("*");
         sql.FROM("(" + sql2.toString() + ")");

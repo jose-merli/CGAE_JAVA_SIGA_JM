@@ -3076,7 +3076,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                         "busquedaComunicaciones() / scsDesignacionesExtendsMapper.busquedaComunicaciones() -> Entrada a scsDesignacionesExtendsMapper para obtener las comunicaciones");
 
                 // obtenemos los datos de la comunicacion
-                enviosMasivosItem = scsEjgExtendsMapper.getComunicaciones(item.getNumEjg(), item.getAnnio(),
+                enviosMasivosItem = scsEjgExtendsMapper.getComunicaciones(item.getNumero(), item.getAnnio(),
                         item.getTipoEJG(), idInstitucion, usuarios.get(0).getIdlenguaje());
 
                 LOGGER.info(
