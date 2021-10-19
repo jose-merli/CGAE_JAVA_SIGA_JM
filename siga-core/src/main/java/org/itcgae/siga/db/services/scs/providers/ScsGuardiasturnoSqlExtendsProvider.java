@@ -60,6 +60,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 	}
 	public String searchGuardias2(GuardiasItem guardiaItem, String idInstitucion, String idLenguaje, Integer tamMax) {
 		SQL sql = new SQL();
+		//La inscripcion en el turno obliga a inscribirse en guardias: 2- A elegir; 1-Todas o ninguna; 0-Obligatorias
 
 		sql.SELECT("SCS_TURNO.NOMBRE AS turno");
 
@@ -69,7 +70,11 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		sql.SELECT("GEN_RECURSOS_CATALOGOS.DESCRIPCION AS tipodeguardia");
 
-		sql.SELECT("SCS_TURNO.GUARDIAS AS obligatoriedad");
+		sql.SELECT("CASE \n" +
+				"            WHEN SCS_TURNO.GUARDIAS = 0 THEN 'Obligatorias'\n" +
+				"            WHEN SCS_TURNO.GUARDIAS = 1 THEN 'Todas o ninguna'\n" +
+				"            ELSE 'A elegir'\n" +
+				"        END AS obligatoriedad");
 
 		sql.SELECT("CONCAT(SCS_GUARDIASTURNO.DIASGUARDIA,' días') AS duracion");
 
@@ -184,8 +189,8 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 			sql.WHERE("SCS_TURNO.IDTIPOTURNO IN (" + guardiaItem.getTipoTurno() + ")");
 
 		// FILTRO POR TIPOGUARDIA
-		if (guardiaItem.getTipoGuardia() != null && guardiaItem.getTipoGuardia() != "")
-			sql.WHERE("SCS_GUARDIASTURNO.IDTIPOGUARDIA IN (" + guardiaItem.getTipoGuardia() + ")");
+		if (guardiaItem.getIdTipoGuardia() != null && guardiaItem.getIdTipoGuardia() != "")
+			sql.WHERE("SCS_GUARDIASTURNO.IDTIPOGUARDIA IN (" + guardiaItem.getIdTipoGuardia() + ")");
 
 		sql.ORDER_BY("SCS_TURNO.NOMBRE, SCS_GUARDIASTURNO.NOMBRE");
 

@@ -436,6 +436,30 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 							LOGGER.info(
 									"deleteGuardias() / scsGuardiasturnoExtendsMapper.updateByPrimaryKey() -> Salida de scsGuardiasturnoExtendsMapper para dar de baja a una guardia");
+							LOGGER.info(
+									"deleteGuardias() / scsInscripcionguardiaExtendsMapper.updateByPrimaryKey() -> Entrada de scsInscripcionguardiaExtendsMapper para dar de baja las inscripciones de una guardia");
+							//Tambien damos de baja las inscripciones a la guardia
+							ScsInscripcionguardiaExample scsInscripcionguardiaExample = new ScsInscripcionguardiaExample();
+							scsInscripcionguardiaExample.createCriteria()
+									.andIdinstitucionEqualTo(idInstitucion)
+									.andIdguardiaEqualTo(guardia.getIdguardia())
+									.andIdturnoEqualTo(guardia.getIdturno())
+									.andFechabajaIsNull().andFechavalidacionIsNotNull().andFechadenegacionIsNull();
+							List<ScsInscripcionguardia> inscripcionesActivas = scsInscripcionguardiaExtendsMapper.selectByExample(scsInscripcionguardiaExample);
+							if(inscripcionesActivas != null && !inscripcionesActivas.isEmpty()){
+
+								inscripcionesActivas.forEach(inscripcion -> {
+									inscripcion.setFechabaja(new Date());
+									inscripcion.setFechamodificacion(new Date());
+									inscripcion.setUsumodificacion(usuario.getIdusuario());
+									scsInscripcionguardiaExtendsMapper.updateByPrimaryKey(inscripcion);
+								});
+
+							}
+
+							LOGGER.info(
+									"deleteGuardias() / scsInscripcionguardiaExtendsMapper.updateByPrimaryKey() -> Salida de scsInscripcionguardiaExtendsMapper para dar de baja las inscripciones de una guardia");
+
 						}
 					}
 
@@ -825,7 +849,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								"updateGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear Configuracion de calendario de guardias");
 						guardia.setDiasguardia(Short.valueOf(guardiasItem.getDiasGuardia()));
 						guardia.setTipodiasguardia(guardiasItem.getTipoDiasGuardia());
-						if (guardiasItem.getDiasPeriodo() != null)
+						if (!UtilidadesString.esCadenaVacia(guardiasItem.getDiasPeriodo()))
 							guardia.setDiasperiodo(Short.valueOf(guardiasItem.getDiasPeriodo()));
 						guardia.setTipodiasperiodo(guardiasItem.getTipoDiasPeriodo());
 						guardia.setSeleccionfestivos(guardiasItem.getSeleccionFestivos());
@@ -837,6 +861,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 					guardia.setFechamodificacion(new Date());
 					guardia.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
 					response = scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
+
+					if(response > 0){
+						updateResponseDTO.setStatus(SigaConstants.OK);
+						updateResponseDTO.setId(guardia.getIdguardia().toString());
+					}
 
 				} catch (Exception e) {
 					LOGGER.error(e);
@@ -1063,7 +1092,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 	@Override
-	public GuardiasDTO tarjetaIncompatibilidades(String idGuardia, HttpServletRequest request) {
+	public GuardiasDTO tarjetaIncompatibilidades(String idGuardia, String idTurno, HttpServletRequest request) {
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1088,8 +1117,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				//guardias = scsIncompatibilidadguardiasExtendsMapper.tarjetaIncompatibilidades(idGuardia,
 						//idInstitucion.toString());
-				guardias = scsIncompatibilidadguardiasExtendsMapper.tarjetaIncompatibilidades(idGuardia,
-						"2003");
+				guardias = scsIncompatibilidadguardiasExtendsMapper.tarjetaIncompatibilidades(idGuardia, idTurno,
+						idInstitucion.toString());
 				guardias = guardias.stream().map(it -> {
 					it.setTipoDia(("Selección: Labor. " + it.getSeleccionLaborables() + ", Fest. "
 							+ it.getSeleccionFestivos()).replace("null", ""));
@@ -1532,7 +1561,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 //				guardias = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades(guardiasItem,
 //						"2003"); //borrar
 				String numIcompatibilidades = guardias.get(0).getIncompatibilidades();
-				guardias2 = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades2(guardiasItem, "2003");
+				guardias2 = scsIncompatibilidadguardiasExtendsMapper.resumenIncompatibilidades2(guardiasItem, idInstitucion.toString());
 				guardias2.forEach(guardia -> {
 					guardia.setIncompatibilidades(numIcompatibilidades);
 					guardia.setTipoDia(("Selección: Labor. " + guardia.getSeleccionLaborables() + ", Fest. "
@@ -2154,14 +2183,27 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				//datos = scsGuardiasturnoExtendsMapper.getCalendarioProgramado(calendarioProgBody, idInstitucion.toString());
 				String OLD_FORMAT = "yyyy'-'MM'-'dd'T'HH':'mm':'ss";
+				String OLD_FORMAT1 = "yyyy-MM-dd HH:mm:ss";
 				String NEW_FORMAT = "dd/MM/yyyy";
 				String NEW_FORMAT1 = "dd/MM/yyyy HH:mm:ss";
+				//2017-02-06 00:00:00.0
 				if (calendarioProgBody.getFechaCalendarioDesde() != null) {
-					String fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT, calendarioProgBody.getFechaCalendarioDesde());
+                    String fecha = null;
+				    if(!calendarioProgBody.getFechaCalendarioDesde().contains("T")){
+                        fecha = changeDateFormat(OLD_FORMAT1, NEW_FORMAT, calendarioProgBody.getFechaCalendarioDesde());
+                    }else{
+                        fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT, calendarioProgBody.getFechaCalendarioDesde());
+                    }
+
 					calendarioProgBody.setFechaCalendarioDesde(fecha);
 				}
 				if (calendarioProgBody.getFechaCalendarioHasta()!= null) {
-					String fecha= changeDateFormat(OLD_FORMAT, NEW_FORMAT, calendarioProgBody.getFechaCalendarioHasta());
+                    String fecha = null;
+                    if(!calendarioProgBody.getFechaCalendarioHasta().contains("T")){
+                        fecha = changeDateFormat(OLD_FORMAT1, NEW_FORMAT, calendarioProgBody.getFechaCalendarioHasta());
+                    }else{
+                        fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT, calendarioProgBody.getFechaCalendarioHasta());
+                    }
 					calendarioProgBody.setFechaCalendarioHasta(fecha);
 				}
 				if (calendarioProgBody.getFechaProgramadaDesde()!= null) {
