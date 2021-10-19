@@ -20,6 +20,8 @@ public class ScsRemesasExtendsProvider {
 		sql.SELECT("F_SIGA_GETRECURSO(DESCRIPCION, " + idLenguaje + ") as DESCRIPCION");
 		sql.FROM("CAJG_TIPOESTADOREMESA");
 		sql.ORDER_BY("IDESTADO");
+		
+		LOGGER.info(sql.toString());
 
 		return sql.toString();
 	}
@@ -95,7 +97,7 @@ public class ScsRemesasExtendsProvider {
 		subquery8.WHERE("ejgr.idinstitucion = rem.idinstitucion");
 		subquery8.WHERE("anio = " + remesasBusquedaItem.getAnnioEJG());
 
-		fechaGeneracion.SELECT("1");
+		fechaGeneracion.SELECT("fecharemesa");
 		fechaGeneracion.FROM("cajg_remesaestados est");
 		fechaGeneracion.WHERE("est.idinstitucion = rem.idinstitucion");
 		fechaGeneracion.WHERE("est.idremesa = rem.idremesa");
@@ -112,7 +114,7 @@ public class ScsRemesasExtendsProvider {
 			fechaGeneracion.WHERE("TRUNC(est.fecharemesa) <= TO_DATE('" + fechaGeneracionHasta + "', 'DD/MM/RRRR')");
 		}
 
-		fechaEnvio.SELECT("1");
+		fechaEnvio.SELECT("fecharemesa");
 		fechaEnvio.FROM("cajg_remesaestados est");
 		fechaEnvio.WHERE("est.idinstitucion = rem.idinstitucion");
 		fechaEnvio.WHERE("est.idremesa = rem.idremesa");
@@ -129,7 +131,7 @@ public class ScsRemesasExtendsProvider {
 			fechaEnvio.WHERE("TRUNC(est.fecharemesa) <= TO_DATE('" + fechaEnvioHasta + "', 'DD/MM/RRRR')");
 		}
 
-		fechaRecepcion.SELECT("1");
+		fechaRecepcion.SELECT("fecharemesa");
 		fechaRecepcion.FROM("cajg_remesaestados est");
 		fechaRecepcion.WHERE("est.idinstitucion = rem.idinstitucion");
 		fechaRecepcion.WHERE("est.idremesa = rem.idremesa");
@@ -169,6 +171,8 @@ public class ScsRemesasExtendsProvider {
 		sql.FROM("cajg_tipoestadoremesa tipoest");
 
 		sql.WHERE("rem.idinstitucion = " + idInstitucion.toString()); // colegio logado
+		
+		sql.WHERE("est.idremesa = rem.idremesa");
 
 		sql.WHERE("est.fechamodificacion = (" + fechamodificacion.toString() + ")");
 
@@ -426,6 +430,19 @@ public class ScsRemesasExtendsProvider {
 		}
 		
 		sql.ORDER_BY("tipaccest.idtipoaccionremesa");
+		
+		LOGGER.info(sql.toString());
+
+		return sql.toString();
+	}
+	
+	public String getMaxIdRespuesta(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(idrespuesta)+1 as IDRESPUESTA");
+		sql.FROM("cajg_respuesta_ejgremesa");
+
+		LOGGER.info(sql.toString());
 
 		return sql.toString();
 	}

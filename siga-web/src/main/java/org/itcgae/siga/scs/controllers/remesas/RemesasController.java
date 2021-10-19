@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.controllers.remesas;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +22,8 @@ import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.scs.services.ejg.IBusquedaRemesas;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RemesasController {
 
 	private Logger LOGGER = Logger.getLogger(RemesasController.class);
+	List<String> cabecera = Arrays.asList(HttpHeaders.CONTENT_DISPOSITION);
 
 	@Autowired
 	private IBusquedaRemesas busquedaRemesas;
@@ -112,6 +117,17 @@ public class RemesasController {
 		InsertResponseDTO response = busquedaRemesas.ejecutaOperacionRemesa(remesaAccionItem, request);
 		LOGGER.info("Termina el método ejecutaOperacionRemesa");
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/descargarLogErrores", method = RequestMethod.POST, produces = "application/vnd.ms-excel")
+	ResponseEntity<InputStreamResource> descargarLogErrores(@RequestBody RemesaAccionItem remesaAccionItem, HttpServletRequest request) {
+		LOGGER.info("Entra en el método descargarLogErrores");
+		InputStreamResource response = busquedaRemesas.descargarLogErrores(remesaAccionItem, request);
+		LOGGER.info("Termina el método descargarLogErrores");
+		HttpHeaders header = new HttpHeaders();
+		header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ErrorRemesa" + remesaAccionItem.getIdRemesa()+ ".xls");
+		header.setAccessControlExposeHeaders(cabecera);
+		return new ResponseEntity<InputStreamResource>(response, header, HttpStatus.OK);
 	}
 	
 }

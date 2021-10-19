@@ -95,4 +95,10 @@ public interface ScsRemesasExtendsMapper{
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<CheckAccionesRemesas> getAcciones(RemesasItem remesasItem, Short idInstitucion, String idlenguaje, String tipoPCAJG);
+	
+	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "getMaxIdRespuesta")
+	@Results({
+		@Result(column = "IDRESPUESTA", property = "idRemesa", jdbcType = JdbcType.NUMERIC)
+	})
+	RemesasItem getMaxIdRespuesta();
 }
