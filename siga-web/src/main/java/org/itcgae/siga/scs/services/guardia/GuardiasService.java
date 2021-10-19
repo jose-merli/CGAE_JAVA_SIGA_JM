@@ -58,7 +58,7 @@ public interface GuardiasService {
 
 	public GuardiasItem resumenGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
 
-	public GuardiasDTO tarjetaIncompatibilidades(String idGuardia, HttpServletRequest request);
+	public GuardiasDTO tarjetaIncompatibilidades(String idGuardia, String idTurno, HttpServletRequest request);
 
 	public ComboDTO getBaremos(String idGuardia, HttpServletRequest request);
 

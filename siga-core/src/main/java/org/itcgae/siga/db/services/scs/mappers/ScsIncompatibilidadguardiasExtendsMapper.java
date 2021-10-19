@@ -23,7 +23,7 @@ public interface ScsIncompatibilidadguardiasExtendsMapper extends ScsIncompatibi
 		@Result(column = "SELECCIONFESTIVOS", property = "seleccionFestivos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "MOTIVOS", property = "descripcion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<GuardiasItem> tarjetaIncompatibilidades(String idGuardia, String idInstitucion);
+	List<GuardiasItem> tarjetaIncompatibilidades(String idGuardia, String idTurno, String idInstitucion);
 	
 	@SelectProvider(type = ScsIncompatibilidadguardiasSqlExtendsProvider.class, method = "resumenIncompatibilidades")
 	@Results({ 

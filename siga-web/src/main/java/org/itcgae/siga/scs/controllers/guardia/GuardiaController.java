@@ -121,9 +121,9 @@ public class GuardiaController {
 		return new ResponseEntity<GuardiasItem>(response, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "/busquedaGuardia/tarjetaIncompatibilidades", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<GuardiasDTO> tarjetaIncompatibilidades(@RequestBody String idGuardia, HttpServletRequest request) {
-		GuardiasDTO response = guardiasService.tarjetaIncompatibilidades(idGuardia, request);
+	@GetMapping(value = "/busquedaGuardia/tarjetaIncompatibilidades")
+	ResponseEntity<GuardiasDTO> tarjetaIncompatibilidades(HttpServletRequest request, @RequestParam String idGuardia, @RequestParam String idTurno) {
+		GuardiasDTO response = guardiasService.tarjetaIncompatibilidades(idGuardia, idTurno, request);
 		return new ResponseEntity<GuardiasDTO>(response, HttpStatus.OK);
 	}
 
