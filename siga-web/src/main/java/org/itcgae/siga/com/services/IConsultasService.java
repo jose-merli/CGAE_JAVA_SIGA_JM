@@ -18,11 +18,13 @@ import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.com.QueryBuilderDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.json.JSONObject;
 
 public interface IConsultasService {
 
@@ -68,7 +70,7 @@ public interface IConsultasService {
 
 	public List<Map<String, Object>> ejecutarConsultaConClavesLog(String sentencia, AdmUsuarios usuario,Long modelosComunicacionItem, Long consulta, Short idInstitucion,String descripcion) throws Exception;
 	
-	public ConstructorConsultasDTO constructorConsultas(HttpServletRequest request, ConstructorConsultasDTO constructorConsultasDTO);
+	public ConstructorConsultasDTO constructorConsultas(HttpServletRequest request, QueryBuilderDTO queryBuilderDTO);
 	
 	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta);
 	

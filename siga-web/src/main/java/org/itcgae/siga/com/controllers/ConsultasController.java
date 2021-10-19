@@ -16,10 +16,12 @@ import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.com.QueryBuilderDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IConsultasService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -213,8 +215,8 @@ public class ConsultasController {
 	}
 	
 	@PostMapping(value = "/pys/constructorConsultas")
-	ResponseEntity<ConstructorConsultasDTO> constructorConsultas(HttpServletRequest request, @RequestBody ConstructorConsultasDTO constructorConsultasDTO) {
-		ConstructorConsultasDTO response = _consultasService.constructorConsultas(request, constructorConsultasDTO);
+	ResponseEntity<ConstructorConsultasDTO> constructorConsultas(HttpServletRequest request, @RequestBody QueryBuilderDTO queryBuilderDTO) {
+		ConstructorConsultasDTO response = _consultasService.constructorConsultas(request, queryBuilderDTO);
 		if (response.getError() == null)
 			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
 		else

@@ -43,6 +43,7 @@ import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.com.KeyItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
+import org.itcgae.siga.DTOs.com.QueryBuilderDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -95,6 +96,7 @@ import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExte
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -367,7 +369,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
 					key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
 					ConConsulta conConsulta = _conConsultaMapper.selectByPrimaryKey(key);
-					NewIdDTO id = _conConsultasExtendsMapper.selectMaxIDConsulta(idInstitucion);
+					NewIdDTO id = _conConsultasExtendsMapper.selectMaxIDConsulta();
 					conConsulta.setIdconsulta(Long.valueOf(id.getNewId()));
 
 					String descripcion = consulta.getNombre() + SigaConstants.SUFIJO_CONSULTA_COM_DUPLICADO;
@@ -568,7 +570,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					boolean camposIncorrectos = false;
 					if (consultaDTO.getIdConsulta() == null) {
 						ConConsulta consulta = new ConConsulta();
-						NewIdDTO maxId = _conConsultasExtendsMapper.selectMaxIDConsulta(idInstitucion);
+						NewIdDTO maxId = _conConsultasExtendsMapper.selectMaxIDConsulta();
 						consulta.setIdconsulta(Long.valueOf(maxId.getNewId()));
 						consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
 						consulta.setIdinstitucion(idInstitucion);
@@ -2624,17 +2626,11 @@ public class ConsultasServiceImpl implements IConsultasService {
 	}
 
 	@Override
-	public ConstructorConsultasDTO constructorConsultas(HttpServletRequest request, ConstructorConsultasDTO constructorConsultasDTO) {
-//		
-//		//TABLAS --> CON_CONSULTA, CON_CRITERIOCONSULTA, PYS_SERVICIOSINSTITUCION
-//
-//		//Hay que crear la nueva consulta en con_consulta con la nueva sentenciaponiendo como nombre el nombre del servicio
-////		actual, como objetivo CONDICIONAL y como clase CENSO, y asignándola como condición de suscripción de este servicio.
-////		Es decir, al finalizar la creación de la consulta y guardarla, se volverá a este formulario y se establecerá el combo 
-////		“Condición de suscripción” con la condición recién creada.
-//		
+	public ConstructorConsultasDTO constructorConsultas(HttpServletRequest request, QueryBuilderDTO queryBuilderDTO) {
+		
 		Error error = new Error();
 		int statusInsercionCriteriosConsulta;
+		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
 
 		LOGGER.info("constructorConsultas() -> Entrada al servicio para crear nuevas consultas (condiciones) del constructor de consultas");
 
@@ -2661,13 +2657,18 @@ public class ConsultasServiceImpl implements IConsultasService {
 							"constructorConsultas() / ConConsultaMapper.insertSelective() -> Entrada a pysTiposServiciosExtendsMapper para obtener el listado de servicios segun la busqueda");
 
 					String idioma = usuarios.get(0).getIdlenguaje();
+//					//Hay que crear la nueva consulta en con_consulta con la nueva sentencia poniendo como nombre el nombre del servicio
+////				actual, como objetivo CONDICIONAL y como clasecomunicacion CENSO, y asignándola como condición de suscripción de este servicio.
+////				Es decir, al finalizar la creación de la consulta y guardarla, se volverá a este formulario y se establecerá el combo 
+////				“Condición de suscripción” con la condición recién creada.
+//				
 					//Insert en Con_Consulta la nueva condicion de suscripcion
 					ConConsulta conConsulta = new ConConsulta();
 					
 					conConsulta.setIdinstitucion(idInstitucion);
 					
 					NewIdDTO newIdDTO = new NewIdDTO();
-					newIdDTO = _conConsultasExtendsMapper.selectMaxIDConsulta(idInstitucion);
+					newIdDTO = _conConsultasExtendsMapper.selectMaxIDConsulta();
 					conConsulta.setIdconsulta(Long.valueOf(newIdDTO.getNewId()));	
 					
 					//conConsulta.setDescripcion(); //inicializada poniendo como nombre el nombre del servicio actual (pys_serviciosinstitucion.descripcion) + ESPACIO + el nombre del precio (pys_preciosservicios.descripcion) 
@@ -2690,19 +2691,19 @@ public class ConsultasServiceImpl implements IConsultasService {
 					
 					//Inserto en con_criterioconsulta los campos recibidos del constructor de consultas
 					for (int i  = 0; i < constructorConsultasDTO.getConstructorConsultasItem().size(); i++) {
-						ConCriterioconsulta conCriterioConsulta = new ConCriterioconsulta();
-						
-						conCriterioConsulta.setIdinstitucion(idInstitucion);
-						conCriterioConsulta.setOrden((short) (i + 1));
-						conCriterioConsulta.setValor(constructorConsultasDTO.getConstructorConsultasItem().get(i).getValor());
-						conCriterioConsulta.setIdconsulta(Long.valueOf(newIdDTO.getNewId()));
-						
-						//conCriterioConsulta.setIdoperacion(null);//Conseguir el id llamando a con_operacionconsulta
-						//conCriterioConsulta.setIdcampo(null);//Conseguir el id llamando a con_campoconsulta
-						
-						conCriterioConsulta.setFechamodificacion(new Date());
-						conCriterioConsulta.setUsumodificacion(usuarios.get(0).getIdusuario());
-						conCriterioConsulta.setOperador(constructorConsultasDTO.getConstructorConsultasItem().get(i).getConector());
+//						ConCriterioconsulta conCriterioConsulta = new ConCriterioconsulta();
+//						
+//						conCriterioConsulta.setIdinstitucion(idInstitucion);
+//						conCriterioConsulta.setOrden((short) (i + 1));
+//						conCriterioConsulta.setValor(constructorConsultasDTO.getConstructorConsultasItem().get(i).getValor());
+//						conCriterioConsulta.setIdconsulta(Long.valueOf(newIdDTO.getNewId()));
+//						
+//						//conCriterioConsulta.setIdoperacion(null);//Conseguir el id llamando a con_operacionconsulta
+//						//conCriterioConsulta.setIdcampo(null);//Conseguir el id llamando a con_campoconsulta
+//						
+//						conCriterioConsulta.setFechamodificacion(new Date());
+//						conCriterioConsulta.setUsumodificacion(usuarios.get(0).getIdusuario());
+//						conCriterioConsulta.setOperador(constructorConsultasDTO.getConstructorConsultasItem().get(i).getConector());
 						
 
 //						IDCAMPO
@@ -2716,7 +2717,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 //						CERRARPAR
 						
 						
-						statusInsercionCriteriosConsulta = conCriterioConsultaMapper.insertSelective(conCriterioConsulta);
+						//statusInsercionCriteriosConsulta = conCriterioConsultaMapper.insertSelective(conCriterioConsulta);
 					}
 
 					LOGGER.info(
@@ -2738,6 +2739,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		LOGGER.info("searchListadoServicios() -> Salida del servicio para obtener el listado de servicios segun la busqueda");
 
+		
 		return constructorConsultasDTO;
 	}
 	

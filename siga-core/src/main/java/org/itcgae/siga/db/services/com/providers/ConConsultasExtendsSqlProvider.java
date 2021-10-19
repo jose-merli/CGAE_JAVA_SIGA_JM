@@ -74,12 +74,12 @@ public class ConConsultasExtendsSqlProvider {
 		
 		if(filtros.getGenerica() != null && !filtros.getGenerica().trim().equals("")){
 			if(filtros.getGenerica().equals("N")){
-				sql.WHERE("((CONSULTA.GENERAL = 'N' OR CONSULTA.GENERAL = 'n' OR CONSULTA.GENERAL = '0') AND CONSULTA.IDINSTITUCION = '" + idInstitucion +"')");
+				sql.WHERE("( (UPPER(CONSULTA.GENERAL) = 'N' OR CONSULTA.GENERAL = '0') AND (CONSULTA.IDINSTITUCION = " + idInstitucion + ") )");
 			}else if(filtros.getGenerica().equals("S")){
-				sql.WHERE("((CONSULTA.GENERAL = 'S' OR CONSULTA.GENERAL = 's' OR  CONSULTA.GENERAL = '1') AND CONSULTA.IDINSTITUCION = '2000')");
+				sql.WHERE("( (UPPER(CONSULTA.GENERAL) = 'S' OR CONSULTA.GENERAL = '1') AND (CONSULTA.IDINSTITUCION = " + idInstitucion + ") )");
 			}
 		}else {
-			sql.WHERE("((CONSULTA.IDINSTITUCION = '2000' AND (UPPER(CONSULTA.GENERAL) = 'S'  OR  CONSULTA.GENERAL = '1')) OR (CONSULTA.IDINSTITUCION = '" + idInstitucion +"' AND (UPPER(CONSULTA.GENERAL) = 'N'  OR  CONSULTA.GENERAL = '0')))");
+			sql.WHERE("( ( (upper(CONSULTA.GENERAL) = 'S' OR  CONSULTA.GENERAL = '1') AND (CONSULTA.IDINSTITUCION = 2000 OR CONSULTA.IDINSTITUCION = "+ idInstitucion + ") ) OR (UPPER(CONSULTA.GENERAL) = 'N' OR CONSULTA.GENERAL = '0') AND (CONSULTA.IDINSTITUCION = " + idInstitucion + ")  )");
 		}
 		
 		sql.ORDER_BY("CONSULTA.DESCRIPCION");
@@ -229,7 +229,6 @@ public String obtenerDatosConsulta(String idLenguaje, Short idInstitucion, Strin
 		sql.SELECT(" f_siga_getrecurso(operacion_con.DESCRIPCION, " + idLenguaje + ") operador");
 		sql.SELECT(" criterio_con.VALOR");
 		sql.SELECT(" criterio_con.CERRARPAR");
-		sql.SELECT("cc.IDCLASECOMUNICACION");
 
 		sql.FROM(" CON_CRITERIOCONSULTA criterio_con");
 		sql.FROM(" CON_CAMPOCONSULTA campo_con");
