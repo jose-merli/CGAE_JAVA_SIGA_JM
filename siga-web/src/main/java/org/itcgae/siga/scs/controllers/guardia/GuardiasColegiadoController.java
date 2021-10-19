@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -17,7 +19,10 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesResponse;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
@@ -91,5 +96,29 @@ public class GuardiasColegiadoController {
 	ResponseEntity<PermutaDTO> getPermutasColegiado(@RequestBody PermutaItem permutaItem, HttpServletRequest request) {
 		PermutaDTO response = guardiasColegiadoService.getPemutasColeg(permutaItem, request);
 		return new ResponseEntity<PermutaDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/getTurnoInscrito")
+	ResponseEntity<ComboDTO> getTurnoInscrito(String idPersona, HttpServletRequest request){
+		ComboDTO response= guardiasColegiadoService.getTurnoInscrito(idPersona, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/getGuardiaDestinoInscrito")
+	ResponseEntity<ComboDTO> getGuardiaDestinoInscrito(String idTurno, HttpServletRequest request){
+		ComboDTO response= guardiasColegiadoService.getGuardiaDestinoInscrito(idTurno, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/permutarGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> permutarGuardia(@RequestBody PermutaItem permutaItem, HttpServletRequest request){
+		InsertResponseDTO response= guardiasColegiadoService.permutarGuardia(permutaItem, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/validarPermuta", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> validarPermuta(@RequestBody List<PermutaItem> permutas, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasColegiadoService.validarPermuta(permutas, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 }

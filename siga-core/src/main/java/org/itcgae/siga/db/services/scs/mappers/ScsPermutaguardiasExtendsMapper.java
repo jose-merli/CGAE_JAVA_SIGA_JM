@@ -6,9 +6,12 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.PermutaItem;
 import org.itcgae.siga.db.mappers.ScsPermutaguardiasMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsPermutaguardiasSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsTurnosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -29,5 +32,15 @@ public interface ScsPermutaguardiasExtendsMapper extends ScsPermutaguardiasMappe
 		@Result(column = "IDGUARDIA_CONFIRMADOR", property = "idguardiaConfirmador", jdbcType = JdbcType.VARCHAR)
 	})
 	List<PermutaItem> getPermutaColeg(PermutaItem permutaItem, Short idInstitucion);
+	
+	@SelectProvider(type = ScsPermutaguardiasSqlExtendsProvider.class, method = "getTurnoInscrito")
+	@Results({ @Result(column = "IDTURNO", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
+	List<ComboItem> getTurnoInscrito(Long idpersona, Short idinstitucion);
 
+	
+	@SelectProvider(type = ScsPermutaguardiasSqlExtendsProvider.class, method = "getGuardiaDestinoInscrito")
+	@Results({ @Result(column = "IDGUARDIA", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
+	List<ComboItem> getGuardiaDestinoInscrito(String idTurno, Short idinstitucion);
 }
