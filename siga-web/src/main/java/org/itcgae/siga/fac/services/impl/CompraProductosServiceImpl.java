@@ -9,6 +9,8 @@ import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
 import org.itcgae.siga.DTO.fac.ListaCompraProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
+import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -30,6 +32,9 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private GestionFichaCompraSuscripcionServiceImpl gestionFichaCompraSuscripcionServiceImpl;
 	
 	@Autowired
 	private PysPeticioncomprasuscripcionExtendsMapper pysPeticioncomprasuscripcionExtendsMapper;
@@ -131,7 +136,20 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 							else if(compraProductos.getFechaEfectiva() != null) compraProductos.setIdEstadoSolicitud("3");
 							else if(compraProductos.getFechaDenegada() != null) compraProductos.setIdEstadoSolicitud("2");
 							else compraProductos.setIdEstadoSolicitud("1");
+							
+							List<ListaProductosCompraItem> productosCompra = gestionFichaCompraSuscripcionServiceImpl.getListaProductosCompra(request, compraProductos.getnSolicitud()).getListaProductosCompraItems();
+							
+							Float totalCompra = (float) 0;
+							for(ListaProductosCompraItem productoCompra : productosCompra) {
+								//(prodSol.VALOR*prodSol.cantidad)*(1+TIVA.VALOR/100)
+								totalCompra =  ((Float.parseFloat(productoCompra.getPrecioUnitario())*Float.parseFloat(productoCompra.getCantidad()))*(1+(Float.parseFloat(productoCompra.getValorIva())/100)));
+							}
+							
+							compraProductos.setImporte(totalCompra.toString());
+						
 						}
+						
+						
 						
 						LOGGER.info(
 								"getListaCompraProductos() / pysPeticioncomprasuscripcionExtendsMapper.getListaCompras() -> Salida de PysPeticioncomprasuscripcionExtendsMapper para obtener las peticiones de compra que cumplan las condiciones");

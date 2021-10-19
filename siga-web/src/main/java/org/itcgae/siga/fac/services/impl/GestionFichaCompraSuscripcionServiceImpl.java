@@ -34,6 +34,9 @@ import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.FacFactura;
 import org.itcgae.siga.db.entities.FacFacturaExample;
+import org.itcgae.siga.db.entities.FacFacturaKey;
+import org.itcgae.siga.db.entities.FacFacturacionsuscripcion;
+import org.itcgae.siga.db.entities.FacFacturacionsuscripcionExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.PysCompra;
@@ -52,6 +55,7 @@ import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
+import org.itcgae.siga.db.mappers.FacFacturacionsuscripcionMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.PysCompraMapper;
 import org.itcgae.siga.db.mappers.PysFormapagoproductoMapper;
@@ -109,6 +113,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 	@Autowired
 	private PysProductosinstitucionExtendsMapper pysProductosInstitucionExtendsMapper;
+	
+	@Autowired
+	private FacFacturacionsuscripcionMapper facFacturacionsuscripcionMapper;
 
 	@Autowired
 	private PysProductosinstitucionMapper pysProductosInstitucionMapper;
@@ -599,14 +606,14 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								//productoSolicitado.setIdformapago(null);
 								//Al no poder poner a nulo la forma de pago se el asigna el valor del 
 								//elemento del combo equivalente a "No facturable" en el combo de formas de pago del front
-								compra.setIdformapago((short) 20);
+								compra.setIdformapago((short) 80);
 								compra.setNofacturable("1");
 							}
 							else{
 								compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
 								compra.setNofacturable("0");
 							}
-							if(ficha.getIdFormaPagoSeleccionada().equals("20")) {
+							if(ficha.getIdFormaPagoSeleccionada().equals("80")) {
 								compra.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
 							}
 							else {
@@ -924,9 +931,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				productoSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
 				//Si se ha seleccionado como forma de pago "No facturable"
 				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
-					//productoSolicitado.setIdformapago(null);
-					//De forma temporal se utilizara el id 20
-					productoSolicitado.setIdformapago((short) 20);
+					//De forma temporal se utilizara el id 80 que se refiere a pago por domiciliacion bancaria 
+					//que no tendra cuenta bancaria seleccionada.
+					productoSolicitado.setIdformapago((short) 80);
 					productoSolicitado.setNofacturable("1");
 				}
 				else{
@@ -934,7 +941,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					productoSolicitado.setNofacturable("0");
 				}
 				//En el caso que la forma de pago sea domiciliación bancaria
-				if(peticion.getIdFormaPagoSeleccionada().equals("20")) {
+				if(peticion.getIdFormaPagoSeleccionada().equals("80")) {
 					productoSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
 				}
 				else {
@@ -1017,7 +1024,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			if (usuarios != null && !usuarios.isEmpty()) {
 				
 				LOGGER.info(
-						"getListaProductosCompra() / pysProductossolicitadosMapper.insert() -> Entrada a pysProductossolicitadosMapper para obtener la informacion de los productos de una peticion");
+						"getListaProductosCompra() / pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
 
 				List<ListaProductosCompraItem> productosCompra = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, idPeticion);
 
@@ -1028,12 +1035,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				listaProductosCompra.setError(error);
 				
 				LOGGER.info(
-						"getListaProductosCompra() / pysProductossolicitadosMapper.insert() -> Salida de pysProductossolicitadosMapper para obtener la informacion de los productos de una peticion");
+						"getListaProductosCompra() / pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
 			}
-
-			LOGGER.info(
-					"getListaProductosCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para obtener la informacion de los productos de una peticion");
-
 		}
 		LOGGER.info("getListaProductosCompra() -> Salida del servicio para obtener la informacion de los productos de una peticion");
 
@@ -1065,7 +1068,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("denegarPeticion() -> Entrada al servicio para crear la denegación de la petición");
+		LOGGER.info("getFacturasPeticion() -> Entrada al servicio para crear la denegación de la petición");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1078,71 +1081,140 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
 				LOGGER.info(
-						"denegarPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"getFacturasPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 				LOGGER.info(
-						"denegarPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"getFacturasPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (usuarios != null && !usuarios.isEmpty()) {
 					LOGGER.info(
-							"denegarPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para crear la denegación de la petición");
+							"getFacturasPeticion() / pysCompraMapper.selectByExample() -> Entrada a pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
 
+					
 					PysCompraExample compraExample = new PysCompraExample();
 					
-					compraExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud));	
+					compraExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud)).andIdinstitucionEqualTo(idInstitucion);	
 					
+					//Se comprueba si la peticion es de compra o de suscripcion
 					List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(compraExample);
-					
+
 					List<String> idFacturasPeticion = new ArrayList<String>();
 					
-					for(PysCompra compra : comprasPeticion) {
-						if(compra.getIdfactura() != null) idFacturasPeticion.add(compra.getIdfactura());
-					}
+
+					LOGGER.info(
+							"getFacturasPeticion() / pysCompraMapper.selectByExample() -> Salida de pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
 					
-					if(!idFacturasPeticion.isEmpty()) {
-						FacFacturaExample facturaExample = new FacFacturaExample();
+					//Si la peticion tiene alguna compra asociada se extraen las facturas de las compras
+					if(!comprasPeticion.isEmpty()) {
+						for(PysCompra compra : comprasPeticion) {
+							if(compra.getIdfactura() != null) idFacturasPeticion.add(compra.getIdfactura());
+						}
 						
-						facturaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdfacturaIn(null);
-						
-						List<FacFactura> facturasPeticion = facFacturaMapper.selectByExample(facturaExample);
-						
-						List<ListaFacturasPeticionItem> facturasListaPeticion = new ArrayList<ListaFacturasPeticionItem>();
-						
-						for(FacFactura factura : facturasPeticion) {
-							ListaFacturasPeticionItem f = new ListaFacturasPeticionItem();
-							f.setFechaFactura(factura.getFechaemision());
-							f.setEstado(factura.getEstado());
-							f.setImporte(factura.getImptotal());// Preguntar sobre a que importe se refiere
-							f.setnFactura(factura.getNumerofactura());
-							f.setTipo("Factura"); //Como se distingue una factura de una anulación?
-							facturasListaPeticion.add(f);
+						if(!idFacturasPeticion.isEmpty()) {
+							FacFacturaExample facturaExample = new FacFacturaExample();
+							
+							facturaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdfacturaIn(idFacturasPeticion);
+							
+
+							LOGGER.info(
+									"getFacturasPeticion() / facFacturaMapper.selectByExample() -> Entrada a facFacturaMapper para recuperar las posibles facturas asociadas a la peticion de compra");
+							
+							List<FacFactura> facturasPeticion = facFacturaMapper.selectByExample(facturaExample);
+							
+							LOGGER.info(
+									"getFacturasPeticion() / facFacturaMapper.selectByExample() ->Salida de facFacturaMapper para recuperar las posibles facturas asociadas a la peticion de compra");
+							
+							List<ListaFacturasPeticionItem> facturasListaPeticion = new ArrayList<ListaFacturasPeticionItem>();
+							
+							for(FacFactura factura : facturasPeticion) {
+								ListaFacturasPeticionItem f = new ListaFacturasPeticionItem();
+								f.setFechaFactura(factura.getFechaemision());
+								f.setEstado(factura.getEstado());
+								f.setImporte(factura.getImptotal());// Preguntar sobre a que importe se refiere
+								f.setnFactura(factura.getNumerofactura());
+								f.setTipo("Factura"); //Como se distingue una factura de una anulación?
+								facturasListaPeticion.add(f);
+							}
+							
+							listaFacturasDTO.setListaFacturasPeticionItem(facturasListaPeticion);
 						}
 					}
-					
-					LOGGER.info(
-							"denegarPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para crear la denegación de la petición");
+					else {
+						PysSuscripcionExample suscripcionExample = new PysSuscripcionExample();
+						
+						suscripcionExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud)).andIdinstitucionEqualTo(idInstitucion);
 
-					LOGGER.info(
-							"denegarPeticion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para crear la denegación de la petición");
+						LOGGER.info(
+								"getFacturasPeticion() / pysSuscripcionMapper.selectByExample() -> Entrada a pysSuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
+						
+						List<PysSuscripcion> suscripcionesPeticion = pysSuscripcionMapper.selectByExample(suscripcionExample);
+						
+						LOGGER.info(
+								"getFacturasPeticion() / pysSuscripcionMapper.selectByExample() -> Entrada a pysSuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
+						
+						//Si la peticion tiene alguna suscripcion asociada se extraen las facturas de las suscripciones
+						if(!suscripcionesPeticion.isEmpty()) {
+							
+							List<FacFacturacionsuscripcion> facturasPeticion = new ArrayList<FacFacturacionsuscripcion>();
+							
+							for(PysSuscripcion suscripcion : suscripcionesPeticion) {
+								FacFacturacionsuscripcionExample facturaExample = new FacFacturacionsuscripcionExample();
+								
+								facturaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtiposerviciosEqualTo(suscripcion.getIdtiposervicios())
+								.andIdservicioEqualTo(suscripcion.getIdservicio()).andIdserviciosinstitucionEqualTo(suscripcion.getIdserviciosinstitucion())
+								.andIdsuscripcionEqualTo(suscripcion.getIdsuscripcion());
+							
+								LOGGER.info(
+										"getFacturasPeticion() / facFacturacionsuscripcionMapper.selectByExample() -> Entrada a facFacturacionsuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
+								
+								List<FacFacturacionsuscripcion> facturasSuscripcion = facFacturacionsuscripcionMapper.selectByExample(facturaExample);
+								
+								LOGGER.info(
+										"getFacturasPeticion() / facFacturacionsuscripcionMapper.selectByExample() -> Entrada a facFacturacionsuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
+								
+								facturasPeticion.addAll(facturasSuscripcion);
+								
+							}
+							
+							FacFacturaKey facKey = new FacFacturaKey();
+							
+							facKey.setIdinstitucion(idInstitucion);
+
+							List<ListaFacturasPeticionItem> facturasListaPeticion = new ArrayList<ListaFacturasPeticionItem>();
+							
+							for(FacFacturacionsuscripcion facturaSus : facturasPeticion) {
+								
+								facKey.setIdfactura(facturaSus.getIdfactura());
+								
+								FacFactura facturaPeticion = facFacturaMapper.selectByPrimaryKey(facKey);
+								
+								ListaFacturasPeticionItem f = new ListaFacturasPeticionItem();
+								
+								f.setFechaFactura(facturaPeticion.getFechaemision());
+								f.setEstado(facturaPeticion.getEstado());
+								f.setImporte(facturaPeticion.getImptotal());
+								f.setnFactura(facturaPeticion.getNumerofactura());
+								f.setTipo("Factura"); // Como se distingue una factura de una anulación?
+								facturasListaPeticion.add(f);
+							}
+							
+							listaFacturasDTO.setListaFacturasPeticionItem(facturasListaPeticion);
+						}
+					}
 				}
-
-				LOGGER.info(
-						"denegarPeticion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para crear una solicitud de suscripción");
-
-				
 			}
 		} catch (Exception e) {
 			LOGGER.error(
-					"getFichaCompraSuscripcion() -> Se ha producido un error al obtener el los detalles de la compra/suscripcion",
+					"getFacturasPeticion() -> Se ha producido un error al obtener el los detalles de la compra/suscripcion",
 					e);
 			error.setCode(500);
 			error.setDescription(e.getMessage());
 			listaFacturasDTO.setError(error);
 		}
 
-		LOGGER.info("denegarPeticion() -> Salida del servicio para crear una solicitud de suscripción");
+		LOGGER.info("getFacturasPeticion() -> Salida del servicio para obtener las facturas de una petición");
 
 		return listaFacturasDTO;
 	}
