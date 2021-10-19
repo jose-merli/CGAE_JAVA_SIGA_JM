@@ -1,6 +1,7 @@
 package org.itcgae.siga.fac.services.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,27 +12,18 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TiposIncluidosItem;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
-import org.itcgae.siga.db.entities.AdmContador;
-import org.itcgae.siga.db.entities.AdmContadorExample;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenGruposclienteCliente;
-import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
-import org.itcgae.siga.db.entities.CenGruposclienteExample;
-import org.itcgae.siga.db.entities.FacSufijo;
-import org.itcgae.siga.db.entities.FacSufijoExample;
-import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
-import org.itcgae.siga.db.mappers.CenGruposclienteClienteMapper;
+import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
-import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacFacturacionsuscripcionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
-import org.itcgae.siga.db.services.fac.mappers.PySTipoFormaPagoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PysCompraExtendsMapper;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -72,6 +64,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private PysCompraExtendsMapper pysCompraExtendsMapper;
+
+	@Autowired
+	private FacFacturaMapper facFacturaMapper;
 
 	@Override
 	public CuentasBancariasDTO getCuentasBancarias(HttpServletRequest request) {
@@ -567,6 +562,131 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		
 		LOGGER.info("getSeriesFacturacion() -> Salida del servicio para buscar series de facturación");
 		return seriesFacturacionDTO;
+	}
+
+	@Override
+	public DeleteResponseDTO eliminaSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) {
+		LOGGER.info("eliminaSerieFacturacion() -> Entrada al servicio para eliminar series de facturación");
+
+		Error error = new Error();
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"eliminaSerieFacturacion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"eliminaSerieFacturacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					for (SerieFacturacionItem serieFacturacion : serieFacturacionItems) {
+						FacFacturaExample facturaExample = new FacFacturaExample();
+						facturaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdseriefacturacionEqualTo(Long.valueOf(serieFacturacion.getIdSerieFacturacion()));
+
+						FacSeriefacturacionExample seriefacturacionExample = new FacSeriefacturacionExample();
+						seriefacturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdseriefacturacionEqualTo(Long.valueOf(serieFacturacion.getIdSerieFacturacion()));
+
+						long numFacturas = facFacturaMapper.countByExample(facturaExample);
+						if (numFacturas == 0) {
+							LOGGER.info("eliminaSerieFacturacion() -> Baja física de la serie de facturación con idseriefacturacion=" + serieFacturacion.getIdSerieFacturacion());
+
+							facSeriefacturacionExtendsMapper.deleteByExample(seriefacturacionExample);
+						} else {
+							LOGGER.info("eliminaSerieFacturacion() -> Baja lógica de la serie de facturación con idseriefacturacion=" + serieFacturacion.getIdSerieFacturacion());
+
+							FacSeriefacturacion sf = new FacSeriefacturacion();
+							sf.setFechabaja(new Date());
+							facSeriefacturacionExtendsMapper.updateByExampleSelective(sf, seriefacturacionExample);
+						}
+					}
+
+				} else {
+					LOGGER.warn(
+							"eliminaSerieFacturacion() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
+			} else {
+				LOGGER.warn("eliminaSerieFacturacion() -> idInstitucion del token nula");
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.eliminaSerieFacturacion() -> Se ha producido un error al eliminar las series de facturación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+		deleteResponseDTO.setError(error);
+
+		LOGGER.info("eliminaSerieFacturacion() -> Salida del servicio para eliminar series de facturación");
+		return deleteResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO reactivarSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) {
+		LOGGER.info("reactivarSerieFacturacion() -> Entrada al servicio para reactivar series de facturación");
+
+		Error error = new Error();
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"reactivarSerieFacturacion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"reactivarSerieFacturacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					String idioma = usuarios.get(0).getIdlenguaje();
+
+					for (SerieFacturacionItem serieFacturacion : serieFacturacionItems) {
+						LOGGER.info("reactivarSerieFacturacion() -> Reactivando serie facturación con id=" + serieFacturacion.getIdSerieFacturacion());
+
+						FacSeriefacturacionExample seriefacturacionExample = new FacSeriefacturacionExample();
+						seriefacturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdseriefacturacionEqualTo(Long.valueOf(serieFacturacion.getIdSerieFacturacion()));
+
+						List<FacSeriefacturacion> sfResults = facSeriefacturacionExtendsMapper.selectByExample(seriefacturacionExample);
+						if (null != sfResults && !sfResults.isEmpty()) {
+							FacSeriefacturacion sfToUpdate = sfResults.get(0);
+							sfToUpdate.setFechabaja(null);
+							facSeriefacturacionExtendsMapper.updateByExample(sfToUpdate, seriefacturacionExample);
+						} else {
+							LOGGER.warn("reactivarSerieFacturacion() -> No existe serie facturación con id=" + serieFacturacion.getIdSerieFacturacion());
+						}
+					}
+
+				} else {
+					LOGGER.warn(
+							"reactivarSerieFacturacion() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
+			} else {
+				LOGGER.warn("reactivarSerieFacturacion() -> idInstitucion del token nula");
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.reactivarSerieFacturacion() -> Se ha producido un error al reactivar las series de facturación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("reactivarSerieFacturacion() -> Salida del servicio para reactivar series de facturación");
+		return updateResponseDTO;
 	}
 	
 }

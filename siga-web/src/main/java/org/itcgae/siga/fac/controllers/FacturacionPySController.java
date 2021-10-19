@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/facturacionPyS")
@@ -72,6 +76,18 @@ public class FacturacionPySController {
 	ResponseEntity<SeriesFacturacionDTO> getSeriesFacturacion(@RequestBody SerieFacturacionItem serieFacturacionItem, HttpServletRequest request) {
 		SeriesFacturacionDTO response = facturacionService.getSeriesFacturacion(serieFacturacionItem, request);
 		return new ResponseEntity<SeriesFacturacionDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/eliminaSerieFacturacion")
+	ResponseEntity<DeleteResponseDTO> getSeriesFacturacion(@RequestBody List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) {
+		DeleteResponseDTO response = facturacionService.eliminaSerieFacturacion(serieFacturacionItems, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/reactivarSerieFacturacion")
+	ResponseEntity<UpdateResponseDTO> reactivarSerieFacturacion(@RequestBody List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) {
+		UpdateResponseDTO response = facturacionService.reactivarSerieFacturacion(serieFacturacionItems, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 }
