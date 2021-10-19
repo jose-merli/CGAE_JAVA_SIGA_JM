@@ -606,14 +606,14 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								//productoSolicitado.setIdformapago(null);
 								//Al no poder poner a nulo la forma de pago se el asigna el valor del 
 								//elemento del combo equivalente a "No facturable" en el combo de formas de pago del front
-								compra.setIdformapago((short) 20);
+								compra.setIdformapago((short) 80);
 								compra.setNofacturable("1");
 							}
 							else{
 								compra.setIdformapago(Short.valueOf(ficha.getIdFormaPagoSeleccionada()));
 								compra.setNofacturable("0");
 							}
-							if(ficha.getIdFormaPagoSeleccionada().equals("20")) {
+							if(ficha.getIdFormaPagoSeleccionada().equals("80")) {
 								compra.setIdcuenta(Short.valueOf(ficha.getCuentaBancSelecc()));
 							}
 							else {
@@ -931,9 +931,9 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				productoSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
 				//Si se ha seleccionado como forma de pago "No facturable"
 				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
-					//productoSolicitado.setIdformapago(null);
-					//De forma temporal se utilizara el id 20
-					productoSolicitado.setIdformapago((short) 20);
+					//De forma temporal se utilizara el id 80 que se refiere a pago por domiciliacion bancaria 
+					//que no tendra cuenta bancaria seleccionada.
+					productoSolicitado.setIdformapago((short) 80);
 					productoSolicitado.setNofacturable("1");
 				}
 				else{
@@ -941,7 +941,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					productoSolicitado.setNofacturable("0");
 				}
 				//En el caso que la forma de pago sea domiciliación bancaria
-				if(peticion.getIdFormaPagoSeleccionada().equals("20")) {
+				if(peticion.getIdFormaPagoSeleccionada().equals("80")) {
 					productoSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
 				}
 				else {
