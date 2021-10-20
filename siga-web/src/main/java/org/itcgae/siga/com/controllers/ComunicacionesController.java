@@ -4,20 +4,24 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.DTOs.com.NuevaComunicacionItem;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IComunicacionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -142,4 +146,12 @@ public class ComunicacionesController {
 		
 		return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.OK);
     }	
+	
+	@RequestMapping(value = "/saveNuevaComm",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> saveNuevaComm(HttpServletRequest request, @RequestBody NuevaComunicacionItem nuevaComm) throws SigaExceptions, NumberFormatException, IOException {
+		
+		InsertResponseDTO response = _comunicacionesService.saveNuevaComm(request, nuevaComm);
+
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
 }
