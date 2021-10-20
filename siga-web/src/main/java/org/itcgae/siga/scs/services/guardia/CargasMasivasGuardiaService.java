@@ -35,11 +35,11 @@ public interface CargasMasivasGuardiaService {
 	public File createExcelFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector, String tipo)
 			throws BusinessException;
 
-	public DeleteResponseDTO uploadFileI(HttpServletRequest request, FileDataDTO body) throws IllegalStateException, IOException;
+	public DeleteResponseDTO uploadFileI( String fechaSolicitud, MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 
 	public DeleteResponseDTO uploadFileGC(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 	
-	public DeleteResponseDTO uploadFileC(MultipartHttpServletRequest request, String fechaDesde, String fechaHasta, String observaciones) throws IllegalStateException, IOException;
+	public DeleteResponseDTO uploadFileC(MultipartHttpServletRequest request, String fechaDesde, String fechaHasta, String observaciones) throws IllegalStateException, IOException, Exception;
 
 	public ResponseEntity<InputStreamResource> downloadLogFile(CargaMasivaItem cargaMasivaItem, HttpServletRequest request)
 			throws SigaExceptions;

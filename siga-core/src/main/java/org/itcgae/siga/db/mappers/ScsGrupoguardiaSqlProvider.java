@@ -283,4 +283,34 @@ public class ScsGrupoguardiaSqlProvider {
 			sql.WHERE(sb.toString());
 		}
 	}
+	
+	public String getLastId() {
+		SQL sql = new SQL();
+		
+		sql.SELECT("MAX(IDGRUPOGUARDIA) AS IDGRUPOGUARDIA");
+		sql.FROM("SCS_GRUPOGUARDIA");
+		
+		return sql.toString();
+	}
+	
+	public String getGrupoGuardiaByUniqueKey(ScsGrupoguardia record) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("COUNT(*)");
+		sql.FROM("SCS_GRUPOGUARDIA");
+		if (record.getIdinstitucion() != null) {
+		sql.WHERE("IDINSTITUCION = " + record.getIdinstitucion());
+		}
+		if (record.getIdturno() != null) {
+		sql.WHERE("IDTURNO = " + record.getIdturno());
+		}
+		if (record.getIdguardia() != null) {
+		sql.WHERE("IDGUARDIA = " + record.getIdguardia());
+		}
+		if (record.getNumerogrupo() != null) {
+		sql.WHERE("NUMEROGRUPO = " + record.getNumerogrupo());
+		}
+		
+		return sql.toString();
+	}
 }

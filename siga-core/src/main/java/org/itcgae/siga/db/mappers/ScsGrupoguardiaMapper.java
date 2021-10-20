@@ -14,8 +14,10 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.ScsGrupoguardia;
 import org.itcgae.siga.db.entities.ScsGrupoguardiaExample;
+import org.itcgae.siga.db.services.scs.providers.ScsGrupoguardiacolegiadoSqlExtendsProvider;
 
 public interface ScsGrupoguardiaMapper {
 
@@ -130,4 +132,11 @@ public interface ScsGrupoguardiaMapper {
 			"USUMODIFICACION = #{usumodificacion,jdbcType=DECIMAL}",
 			"where IDGRUPOGUARDIA = #{idgrupoguardia,jdbcType=DECIMAL}" })
 	int updateByPrimaryKey(ScsGrupoguardia record);
+	
+	
+	@SelectProvider(type=ScsGrupoguardiaSqlProvider.class, method ="getLastId")
+	@Results({
+		@Result(column="IDGRUPOGUARDIA", property="newId")
+	})
+	public NewIdDTO getLastId();
 }
