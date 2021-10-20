@@ -257,7 +257,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         if (ejgItem.getAsunto() != null && ejgItem.getAsunto() != "")
             sql.WHERE("EJG.OBSERVACIONES LIKE '%" + ejgItem.getAsunto() + "%'");
         if (ejgItem.getNig() != null && ejgItem.getNig() != "")
-            sql.WHERE("regexp_like(EJG.NIG,'" + ejgItem.getNig() + "'))");
+            sql.WHERE("EJG.NIG like '%" + ejgItem.getNig() + "%'");
         if (ejgItem.getPerceptivo() != null && ejgItem.getPerceptivo() != "")
             sql.WHERE("EJG.IDPRECEPTIVO = " + ejgItem.getPerceptivo());
         if (ejgItem.getCalidad() != null && ejgItem.getCalidad() != "")
@@ -448,15 +448,18 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
             sql.WHERE("PET.ESTADO IN (" + String.join(",", ejgItem.getEstadosSolicitudExpEco()) + ")");
         }
 
+        sql.ORDER_BY("ejg.anio DESC, ejg.numejg DESC");
+        
+        SQL sqlPpal = new SQL();
+		sqlPpal.SELECT("*");
+		sqlPpal.FROM("("+sql.toString()+") consulta");
         if (tamMaximo != null) {
             Integer tamMaxNumber = tamMaximo + 1;
-            sql.WHERE("rownum <= " + tamMaxNumber);
-
+            sqlPpal.WHERE("rownum <= " + tamMaxNumber);
         }
 
-        sql.ORDER_BY("TURNO ASC, GUARDIA.NOMBRE ASC");
+        return sqlPpal.toString();
 
-        return sql.toString();
     }
 
     public String datosEJG(EjgItem ejgItem, String idInstitucion, String idLenguaje) {
