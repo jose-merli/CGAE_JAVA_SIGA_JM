@@ -224,8 +224,18 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 			for (int i = 0; i < remesasItems.size(); i++) {
 				nRegistro = "";
-				nRegistro += remesasItems.get(i).getPrefijo() + "" + remesasItems.get(i).getNumero() + ""
-						+ remesasItems.get(i).getSufijo();
+				if(remesasItems.get(i).getPrefijo() != null) {
+					nRegistro += remesasItems.get(i).getPrefijo();
+				}
+				
+				if(remesasItems.get(i).getNumero() != null) {
+					nRegistro += remesasItems.get(i).getNumero();
+				}
+
+				if(remesasItems.get(i).getSufijo() != null) {
+					nRegistro += remesasItems.get(i).getSufijo();
+				}
+				
 				remesasItems.get(i).setnRegistro(Integer.parseInt(nRegistro));
 			}
 
@@ -1336,7 +1346,8 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ByteArrayInputStream byteInput = null;
+		byte[] buf = {};
+		ByteArrayInputStream byteInput = new ByteArrayInputStream(buf);
 		
 		//if(validarAccion(remesaAccionItem, request, "Descargar Log")) {
 			

@@ -178,16 +178,16 @@ public class ScsRemesasExtendsProvider {
 
 		sql.WHERE("tipoest.idestado = est.idestado");
 
-		if (remesasBusquedaItem.getNumero() != 0) {
-			sql.WHERE("rem.numero= " + remesasBusquedaItem.getNumero()); // numero
+		if (remesasBusquedaItem.getNumero() != null) {
+			sql.WHERE("rem.numero= '" + remesasBusquedaItem.getNumero() + "'"); // numero
 		}
 
-		if (remesasBusquedaItem.getPrefijo() != 0) {
-			sql.WHERE("rem.prefijo = " + remesasBusquedaItem.getPrefijo()); // prefijo
+		if (remesasBusquedaItem.getPrefijo() != null) {
+			sql.WHERE("rem.prefijo = '" + remesasBusquedaItem.getPrefijo()  + "'"); // prefijo
 		}
 
-		if (remesasBusquedaItem.getSufijo() != 0) {
-			sql.WHERE("rem.sufijo = " + remesasBusquedaItem.getSufijo()); // sufijo
+		if (remesasBusquedaItem.getSufijo() != null) {
+			sql.WHERE("rem.sufijo = '" + remesasBusquedaItem.getSufijo()  + "'"); // sufijo
 		}
 
 		if (remesasBusquedaItem.getDescripcion() != null) {

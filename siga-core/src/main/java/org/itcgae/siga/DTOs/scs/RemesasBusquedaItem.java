@@ -5,9 +5,9 @@ import java.sql.Date;
 public class RemesasBusquedaItem {
 	
 	private int idRemesa;
-	private int prefijo;
-	private int numero; 
-	private int sufijo;
+	private String prefijo;
+	private String numero; 
+	private String sufijo;
 	private String descripcion;
 	private int numeroEJG; 
 	private int annioEJG;
@@ -36,27 +36,27 @@ public class RemesasBusquedaItem {
 		this.idRemesa = idRemesa;
 	}
 
-	public int getPrefijo() {
+	public String getPrefijo() {
 		return prefijo;
 	}
 	
-	public void setPrefijo(int prefijo) {
+	public void setPrefijo(String prefijo) {
 		this.prefijo = prefijo;
 	}
 	
-	public int getNumero() {
+	public String getNumero() {
 		return numero;
 	}
 	
-	public void setNumero(int numero) {
+	public void setNumero(String numero) {
 		this.numero = numero;
 	}
 	
-	public int getSufijo() {
+	public String getSufijo() {
 		return sufijo;
 	}
 	
-	public void setSufijo(int sufijo) {
+	public void setSufijo(String sufijo) {
 		this.sufijo = sufijo;
 	}
 

@@ -6,9 +6,9 @@ public class RemesasItem {
 	
 	private int idRemesa;
 	private int idInstitucion;
-	private int prefijo;
-	private int numero; 
-	private int sufijo;
+	private String prefijo;
+	private String numero; 
+	private String sufijo;
 	private int nRegistro;
 	private String descripcion;
 	private Date fechaGeneracion;
@@ -28,27 +28,27 @@ public class RemesasItem {
 		this.idRemesa = idRemesa;
 	}
 
-	public int getPrefijo() {
+	public String getPrefijo() {
 		return prefijo;
 	}
 	
-	public void setPrefijo(int prefijo) {
+	public void setPrefijo(String prefijo) {
 		this.prefijo = prefijo;
 	}
 	
-	public int getNumero() {
+	public String getNumero() {
 		return numero;
 	}
 	
-	public void setNumero(int numero) {
+	public void setNumero(String numero) {
 		this.numero = numero;
 	}
 	
-	public int getSufijo() {
+	public String getSufijo() {
 		return sufijo;
 	}
 	
-	public void setSufijo(int sufijo) {
+	public void setSufijo(String sufijo) {
 		this.sufijo = sufijo;
 	}
 

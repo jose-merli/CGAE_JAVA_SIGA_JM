@@ -32,9 +32,9 @@ public interface ScsRemesasExtendsMapper{
 	@Results({
 		@Result(column = "IDREMESA", property = "idRemesa", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "PREFIJO", property = "prefijo", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "SUFIJO", property = "sufijo", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "PREFIJO", property = "prefijo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SUFIJO", property = "sufijo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHA_GENERACION", property = "fechaGeneracion", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHA_ENVIO", property = "fechaEnvio", jdbcType = JdbcType.DATE),
