@@ -36,17 +36,12 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
         SQL sql = new SQL();
 
-        String condicionAnnioNumActas = " (EXISTS (SELECT 1 FROM scs_ejg_acta ejgacta, scs_actacomision ac"
-                + " WHERE ejgacta.idinstitucionacta = ac.idinstitucion" + " AND ejgacta.idacta = ac.idacta"
-                + " AND   ejgacta.anioacta = ac.anioacta" + " AND   ejgacta.idinstitucionejg = ejg.idinstitucion"
-                + " AND   ejgacta.anioejg = ejg.anio" + " AND   ejgacta.idtipoejg = ejg.idtipoejg"
-                + " AND   ejgacta.numeroejg = ejg.numero" + " AND   ac.idinstitucion = " + idInstitucion;
+        String condicionAnnioNumActas = " ac.idinstitucion = " + idInstitucion;
 
         if (ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
             condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.anioacta = " + ejgItem.getAnnioActa();
         if (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")
             condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.numeroacta = " + ejgItem.getNumActa();
-        condicionAnnioNumActas = condicionAnnioNumActas + "))";
 
         String condicionNumRegRemesa = " (EXISTS (SELECT 1 FROM cajg_ejgremesa ejgremesa, cajg_remesa remesa"
                 + " WHERE ejgremesa.idinstitucionremesa = remesa.idinstitucion"
@@ -86,7 +81,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
         sql.SELECT("ejg.idpersonajg");
         sql.SELECT("perjg.NIF");
-        sql.SELECT("(SELECT NCOLEGIADO FROM CEN_COLEGIADO WHERE PER.IDPERSONA = CEN_COLEGIADO.IDPERSONA) AS NCOLEGIADO");
+        sql.SELECT("col.NCOLEGIADO AS NCOLEGIADO");
 
         // from
         sql.FROM("scs_ejg ejg");
@@ -95,6 +90,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.LEFT_OUTER_JOIN("cen_persona per on per.idpersona = ejg.idpersona");
         sql.LEFT_OUTER_JOIN(
                 "scs_personajg perjg on perjg.idpersona = ejg.idpersonajg AND perjg.IDINSTITUCION = EJG.IDINSTITUCION");
+        sql.LEFT_OUTER_JOIN("cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
         sql.LEFT_OUTER_JOIN(
                 "SCS_TURNO  TURNO ON TURNO.IDINSTITUCION =EJG.IDINSTITUCION AND TURNO.IDTURNO =EJG.GUARDIATURNO_IDTURNO");
         sql.LEFT_OUTER_JOIN(
@@ -122,7 +118,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.INNER_JOIN("SCS_MAESTROESTADOSEJG MAESTROESTADO ON ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG");
         sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = '"
                 + idLenguaje + "'");
-
+        if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "") || (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
+        	sql.JOIN("scs_ejg_acta ejgacta ON ejgacta.idinstitucionejg = ejg.idinstitucion AND ejgacta.anioejg = ejg.anio AND ejgacta.idtipoejg = ejg.idtipoejg AND ejgacta.numeroejg = ejg.numero");
+        	sql.JOIN("scs_actacomision ac ON ejgacta.idinstitucionacta = ac.idinstitucion AND ejgacta.idacta = ac.idacta AND ejgacta.anioacta = ac.anioacta");
+        }
         sql.WHERE("ejg.idinstitucion = " + idInstitucion);
         if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
             sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
@@ -278,9 +277,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
                     + "','DD/MM/RRRR')");
         }
         if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
-            sql.WHERE("regexp_like(EJG.NUMERO_CAJG || EJG.ANIOCAJG,'" + ejgItem.getNumCAJG() + "')");
-        if (ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
+            sql.WHERE("EJG.NUMERO_CAJG = " + ejgItem.getNumCAJG());
+        if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "") || (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
             sql.WHERE(condicionAnnioNumActas);
+        }
         if (ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != ""
                 || ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != ""
                 || ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
