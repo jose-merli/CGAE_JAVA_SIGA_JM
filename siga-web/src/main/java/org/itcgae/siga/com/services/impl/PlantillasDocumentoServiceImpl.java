@@ -339,7 +339,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						ModModeloPlantilladocumentoExample modModeloPlantillaExample = new ModModeloPlantilladocumentoExample();
 						modModeloPlantillaExample.createCriteria()
 								.andIdinformeEqualTo(Long.parseLong(plantillaDoc.getIdInforme()))
-								.andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+								.andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion()))
+								.andFechabajaIsNull();
 						List<ModModeloPlantilladocumento> listaPlantillaDoc = modModeloPlantilladocumentoMapper
 								.selectByExample(modModeloPlantillaExample);
 
