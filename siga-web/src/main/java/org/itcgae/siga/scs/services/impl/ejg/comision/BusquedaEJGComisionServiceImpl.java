@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.impl.ejg.comision;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -207,20 +208,17 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboFundamentoJuridComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboFundamentoJuridComision() / scsTipofundamentosSqlExtendsMapper.ComboFundamentoJurid() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener combo");
 
-				LOGGER.info(
-						"comboFundamentoJuridComision() / scsTipofundamentosSqlExtendsMapper.ComboFundamentoJurid() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener combo");
+			comboItems = scsEjgComisionExtendsMapper.comboFundamentoJuridComision(
+					Short.valueOf(usuarios.get(0).getIdlenguaje()), idInstitucion.toString(), resolucion);
 
-				comboItems = scsEjgComisionExtendsMapper.comboFundamentoJuridComision(
-						Short.valueOf(usuarios.get(0).getIdlenguaje()), idInstitucion.toString(), resolucion);
+			LOGGER.info(
+					"comboFundamentoJuridComision() / scsTipofundamentosSqlExtendsMapper.ComboFundamentoJurid() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener combo");
 
-				LOGGER.info(
-						"comboFundamentoJuridComision() / scsTipofundamentosSqlExtendsMapper.ComboFundamentoJurid() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener combo");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
 
 		}
@@ -240,10 +238,6 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		String idUltimoEstado = "";
 
-		if (ejgItem.getColegio() != null) {
-			idInstitucion = Short.valueOf(ejgItem.getColegio());
-		}
-
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -253,49 +247,44 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"busquedaEJGComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-				usuario.setIdinstitucion(idInstitucion);
-				GenParametrosExample genParametrosExample = new GenParametrosExample();
-				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-				LOGGER.info(
-						"busquedaEJGComision() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			AdmUsuarios usuario = usuarios.get(0);
+			usuario.setIdinstitucion(idInstitucion);
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"busquedaEJGComision() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
-				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
 
-				LOGGER.info(
-						"busquedaEJGComision() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			LOGGER.info(
+					"busquedaEJGComision() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
-				LOGGER.info(
-						"busquedaEJGComision() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
-				if (tamMax != null) {
-					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-				} else {
-					tamMaximo = null;
-				}
-
-				idUltimoEstado = scsEjgComisionExtendsMapper.idUltimoEstado(ejgItem, idInstitucion.toString());
-
-				LOGGER.info(
-						"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
-				ejgDTO.setEjgItems(scsEjgComisionExtendsMapper.busquedaEJGComision(idUltimoEstado, ejgItem,
-						idInstitucion.toString(), tamMaximo, "1".toString()));
-				LOGGER.info(
-						"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
-				if (ejgDTO.getEjgItems() != null && tamMaximo != null && ejgDTO.getEjgItems().size() > tamMaximo) {
-					error.setCode(200);
-					error.setDescription("La consulta devuelve más de " + tamMaximo
-							+ " resultados, pero se muestran sólo los " + tamMaximo
-							+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
-					ejgDTO.setError(error);
-				}
+			LOGGER.info(
+					"busquedaEJGComision() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
 			} else {
-				LOGGER.warn(
-						"busquedaEJGComision() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-								+ dni + " e idInstitucion = " + idInstitucion);
+				tamMaximo = null;
 			}
+
+			idUltimoEstado = scsEjgComisionExtendsMapper.idUltimoEstado(ejgItem, idInstitucion.toString());
+
+			LOGGER.info(
+					"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
+			ejgDTO.setEjgItems(scsEjgComisionExtendsMapper.busquedaEJGComision(idUltimoEstado, ejgItem,
+					idInstitucion.toString(), tamMaximo, "1".toString()));
+			LOGGER.info(
+					"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
+			if (ejgDTO.getEjgItems() != null && tamMaximo != null && ejgDTO.getEjgItems().size() > tamMaximo) {
+				error.setCode(200);
+				error.setDescription("La consulta devuelve más de " + tamMaximo
+						+ " resultados, pero se muestran sólo los " + tamMaximo
+						+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+				ejgDTO.setError(error);
+			}
+
 		} else {
 			LOGGER.warn("busquedaEJGComision() -> idInstitucion del token nula");
 		}
@@ -326,20 +315,18 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboTipoColegioEjgComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboTipoColegioEjgComision() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
 
-				LOGGER.info(
-						"comboTipoColegioEjgComision() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
+			comboItems = scsEjgComisionExtendsMapper.comboColegioEjgComision(idInstitucion.toString());
 
-				comboItems = scsEjgComisionExtendsMapper.comboColegioEjgComision(idInstitucion.toString());
+			LOGGER.info(
+					"comboTipoColegioEjgComision() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
 
-				LOGGER.info(
-						"comboTipoColegioEjgComision() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
+
 		}
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
@@ -366,20 +353,17 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboTipoEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboTipoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
 
-				LOGGER.info(
-						"comboTipoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
+			comboItems = scsEjgComisionExtendsMapper.comboTipoColegioEjg(Short.valueOf(usuarios.get(0).getIdlenguaje()),
+					idInstitucion.toString());
 
-				comboItems = scsEjgComisionExtendsMapper
-						.comboTipoColegioEjg(Short.valueOf(usuarios.get(0).getIdlenguaje()), idInstitucion.toString());
+			LOGGER.info(
+					"comboTipoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
 
-				LOGGER.info(
-						"comboTipoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
 
 		}
@@ -409,20 +393,17 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboTipoEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboTipoEJG() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboTipoEJG() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+			comboItems = scsEjgComisionExtendsMapper.comboFundamentoCalificacion(
+					Short.valueOf(usuarios.get(0).getIdlenguaje()), idInstitucion.toString(), list_dictamen);
 
-				comboItems = scsEjgComisionExtendsMapper.comboFundamentoCalificacion(
-						Short.valueOf(usuarios.get(0).getIdlenguaje()), idInstitucion.toString(), list_dictamen);
+			LOGGER.info(
+					"comboTipoEJG() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboTipoEJG() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
 
 		}
@@ -451,20 +432,17 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboEstadoEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboEstadoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
 
-				LOGGER.info(
-						"comboEstadoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Entrada a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
+			comboItems = scsEjgComisionExtendsMapper.comboEstadoEjg(Short.valueOf(usuarios.get(0).getIdlenguaje()),
+					idInstitucion.toString(), resolucion);
 
-				comboItems = scsEjgComisionExtendsMapper.comboEstadoEjg(Short.valueOf(usuarios.get(0).getIdlenguaje()),
-						idInstitucion.toString(), resolucion);
+			LOGGER.info(
+					"comboEstadoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
 
-				LOGGER.info(
-						"comboEstadoEJG() / scsTipoEjgextendsMapper.comboTipoejg() -> Salida a sqScsTipodictamenejgExtendsMapper para obtener los tipos ejg");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
 
 		}
@@ -494,20 +472,18 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboJuzgados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboJuzgados() / scsJuzgadoextendsMapper.getResoluciones() -> Entrada a scsImpugnacionEjgextendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboJuzgados() / scsJuzgadoextendsMapper.getResoluciones() -> Entrada a scsImpugnacionEjgextendsMapper para obtener los combo");
+			comboItems = scsEjgComisionExtendsMapper.comboJuzgados(idInstitucion.toString());
 
-				comboItems = scsEjgComisionExtendsMapper.comboJuzgados(idInstitucion.toString());
+			LOGGER.info(
+					"comboJuzgados() / scsJuzgadoextendsMapper.getResoluciones() -> Salida a scsImpugnacionEjgextendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboJuzgados() / scsJuzgadoextendsMapper.getResoluciones() -> Salida a scsImpugnacionEjgextendsMapper para obtener los combo");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
+
 		}
 		LOGGER.info("comboJuzgados() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
@@ -535,20 +511,18 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboTurnosTipo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboTurnosTipo() / scsTurnosextendsMapper.getResoluciones() -> Entrada a scsImpugnacionEjgextendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboTurnosTipo() / scsTurnosextendsMapper.getResoluciones() -> Entrada a scsImpugnacionEjgextendsMapper para obtener los combo");
+			comboItems = scsEjgComisionExtendsMapper.comboTurnosTipo(idInstitucion.toString(), idtipoturno);
 
-				comboItems = scsEjgComisionExtendsMapper.comboTurnosTipo(idInstitucion.toString(), idtipoturno);
+			LOGGER.info(
+					"comboTurnosTipo() / scsTurnosextendsMapper.getResoluciones() -> Salida a scsImpugnacionEjgextendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboTurnosTipo() / scsTurnosextendsMapper.getResoluciones() -> Salida a scsImpugnacionEjgextendsMapper para obtener los combo");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
+
 		}
 		LOGGER.info("comboTurnosTipo() -> Salida del servicio para obtener los tipos ejg");
 		return comboDTO;
@@ -571,19 +545,16 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboAnioActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboAnioActa() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboAnioActa() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+			comboItems = scsEjgComisionExtendsMapper.comboAnioActa(idInstitucion);
 
-				comboItems = scsEjgComisionExtendsMapper.comboAnioActa(idInstitucion);
+			LOGGER.info(
+					"comboAnioActa() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboAnioActa() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
 
 		}
@@ -610,20 +581,17 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboAnioActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboAnioActa() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboAnioActa() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+			comboItems = scsEjgComisionExtendsMapper.comboResolucion(Short.valueOf(usuarios.get(0).getIdlenguaje()),
+					idInstitucion.toString());
 
-				comboItems = scsEjgComisionExtendsMapper.comboResolucion(Short.valueOf(usuarios.get(0).getIdlenguaje()),
-						idInstitucion.toString());
+			LOGGER.info(
+					"comboAnioActa() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboAnioActa() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
 
 		}
@@ -648,19 +616,16 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"obligatoriedadResolucion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"obligatoriedadResolucion() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"obligatoriedadResolucion() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+			comboItems = scsEjgComisionExtendsMapper.obligatoriedadResolucion(idInstitucion);
 
-				comboItems = scsEjgComisionExtendsMapper.obligatoriedadResolucion(idInstitucion);
+			LOGGER.info(
+					"obligatoriedadResolucion() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"obligatoriedadResolucion() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
 
 		}
@@ -689,34 +654,27 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboPresidente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboPresidente() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboPresidente() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+			comboItems = scsEjgComisionExtendsMapper.comboPresidente(usuarios.get(0).getIdlenguaje());
 
-				comboItems = scsEjgComisionExtendsMapper.comboPresidente(usuarios.get(0).getIdlenguaje());
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"comboPresidente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-				exampleUsuarios.createCriteria().andNifEqualTo(dni)
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				LOGGER.info(
-						"comboPresidente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info(
+					"comboPresidente() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				if (1 > 0) {
+			comboItems = scsEjgComisionExtendsMapper.comboPresidente(usuarios.get(0).getIdlenguaje());
 
-					LOGGER.info(
-							"comboPresidente() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+			LOGGER.info(
+					"comboPresidente() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-					comboItems = scsEjgComisionExtendsMapper.comboPresidente(usuarios.get(0).getIdlenguaje());
-
-					LOGGER.info(
-							"comboPresidente() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
-
-					if (comboItems != null) {
-						comboDTO.setCombooItems(comboItems);
-					}
-				}
-
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
+
 			LOGGER.info("comboPresidente() -> Salida del servicio para obtener los tipos ejg");
 		}
 		return comboDTO;
@@ -744,19 +702,16 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboSecretario() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (1 > 0) {
+			LOGGER.info(
+					"comboSecretario() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboSecretario() / scsFundamentoscalificacionExtendsMapper.comboDic() -> Entrada a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+			comboItems = scsEjgComisionExtendsMapper.comboPresidente(usuarios.get(0).getIdlenguaje());
 
-				comboItems = scsEjgComisionExtendsMapper.comboPresidente(usuarios.get(0).getIdlenguaje());
+			LOGGER.info(
+					"comboSecretario() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
 
-				LOGGER.info(
-						"comboSecretario() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
-
-				if (comboItems != null) {
-					comboDTO.setCombooItems(comboItems);
-				}
+			if (comboItems != null) {
+				comboDTO.setCombooItems(comboItems);
 			}
 
 		}
@@ -765,88 +720,84 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	}
 
 	@Override
-	public UpdateResponseDTO editarActaAnio(ActualizarAnioActaItem actualizarAnioActaItem, HttpServletRequest request)
-			throws SigaExceptions {
+	public UpdateResponseDTO editarActaAnio(List<EjgItem> ejgItems, HttpServletRequest request) {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 
 		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = null;
+
+		int resultado;
 
 		LOGGER.info("Entra en el metodo editarActaAnio con la institucion " + idInstitucion);
 
 		if (idInstitucion != null) {
-			LOGGER.info(
-					"guardarEditarSelecionados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			try {
 
-			LOGGER.info("intentamos conseguir el idEstado por ejg");
+				for (EjgItem ejgItem : ejgItems) {
 
-			String idEstadoPorEjg = scsActaExtendsMapper.getEstadosEjg(
-					Short.valueOf(actualizarAnioActaItem.getIdInstitucionEjgActa()),
-					Short.valueOf(actualizarAnioActaItem.getIdTipoEJG()),
-					Short.valueOf(actualizarAnioActaItem.getAnioEjg()),
-					Long.valueOf(actualizarAnioActaItem.getNumeroEjg()));
+					ScsEstadoejg scsEstadoEjg;
 
-			if (idEstadoPorEjg == null) {
-				throw new SigaExceptions("Ha ocurrido un error a la hora de actualizar el acta");
-			}
+					LOGGER.info("intentamos conseguir el ejg");
 
-			LOGGER.info("el idEstado por ejg es " + idEstadoPorEjg);
+					ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
 
-			ScsEstadoejg scsEstadoEjg;
+					LOGGER.info("intentamos conseguir el estado del ejg");
 
-			LOGGER.info("intentamos conseguir el ejg");
-			ScsEjg scsEjg = obtenerEjg(actualizarAnioActaItem, idInstitucion);
+					scsEstadoEjg = obtenerEstadoEjg(scsEjg, idInstitucion);
 
-			LOGGER.info("intentamos conseguir el estado del ejg");
+					List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(scsEjg, idInstitucion);
 
-			scsEstadoEjg = obtenerEstadoEjg(scsEjg, idEstadoPorEjg, idInstitucion);
+					if (!listaEjgAsociadosActa.isEmpty()) {
 
-			LOGGER.info("intentamos conseguir la lista de ejg y actas asociadas");
-			List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(scsEjg, idInstitucion);
-			if (!listaEjgAsociadosActa.isEmpty()) {
-				LOGGER.info("La lista tiene este tamaño " + listaEjgAsociadosActa.size());
+						LOGGER.info("La lista tiene este tamaño " + listaEjgAsociadosActa.size());
 
-				if (actualizarAnioActaItem.getBorrar() == 0) {
+						for (ScsEjgActa scsEjgActa : listaEjgAsociadosActa) {
 
-					for (ScsEjgActa scsEjgActa : listaEjgAsociadosActa) {
-						LOGGER.info("Si borrar es 0 entro en el for");
+							LOGGER.info("Si borrar es 0 entro en el for " + listaEjgAsociadosActa.size());
 
-						LOGGER.info("ID DEL ACTA EN LA RELACION EJGACTA = " + scsEjgActa.getIdinstitucionacta());
+							LOGGER.info("ID DEL ACTA EN LA RELACION EJGACTA = " + scsEjgActa.getIdinstitucionacta());
 
-						ScsActacomision acta = new ScsActacomision();
+							ScsActacomision acta = new ScsActacomision();
 
-						if (scsEjgActa.getIdinstitucionacta() == idInstitucion) {
+							if (scsEjgActa.getIdinstitucionacta() == idInstitucion) {
 
-							acta = obtenerActa(scsEjgActa, idInstitucion);
+								acta = obtenerActa(scsEjgActa, idInstitucion);
 
-							if (acta.getFecharesolucion() == null) {
-								LOGGER.info("La fecha resolucion del acta es nula");
+								if (acta.getFecharesolucion() == null) {
 
-								LOGGER.info("Datos del scsEstadoEjg -> idInstitucion " + scsEstadoEjg.getIdinstitucion()
-										+ " idTipoEjg -> " + scsEstadoEjg.getIdtipoejg() + " anio -> "
-										+ scsEstadoEjg.getAnio() + " numero -> " + scsEstadoEjg.getNumero()
-										+ " idEstadoporEjg ->" + scsEstadoEjg.getIdestadoejg());
-								scsEstadoEjg.setObservaciones(
-										scsEstadoEjg.getObservaciones() + " Expediente excluido del acta "
-												+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-								LOGGER.info(scsEstadoEjg.getObservaciones());
-								scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
+									LOGGER.info("La fecha resolucion del acta es nula");
+
+									LOGGER.info(
+											"Datos del scsEstadoEjg -> idInstitucion " + scsEstadoEjg.getIdinstitucion()
+													+ " idTipoEjg -> " + scsEstadoEjg.getIdtipoejg() + " anio -> "
+													+ scsEstadoEjg.getAnio() + " numero -> " + scsEstadoEjg.getNumero()
+													+ " idEstadoporEjg ->" + scsEstadoEjg.getIdestadoejg());
+
+									scsEstadoEjg.setObservaciones(
+											scsEstadoEjg.getObservaciones() + " Expediente excluido del acta "
+													+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+
+									LOGGER.info(scsEstadoEjg.getObservaciones());
+
+									resultado = scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
+
+									if (resultado == 0) {
+										throw (new SigaExceptions(
+												"Error no se ha podido borrar la relacion entre el Ejg y acta"));
+									}
+								}
 							}
+
 						}
 
 					}
 					LOGGER.info("Seteando las observaciones");
 
-					String[] parts = actualizarAnioActaItem.getAnioIdActa().split("/");
-					String anioActa = parts[0];
-					String idActa = parts[1];
+					scsEstadoEjg.setObservaciones(
+							scsEstadoEjg.getObservaciones() + " Expediente incluido masivamente en el acta "
+									+ ejgItem.getAnnioActa() + "/" + ejgItem.getNumActa());
 
-					scsEstadoEjg.setObservaciones(scsEstadoEjg.getObservaciones()
-							+ " Expediente incluido masivamente en el acta " + anioActa + "/" + idActa);
 					LOGGER.info("observacion segunda fuera del for " + scsEstadoEjg.getObservaciones());
 
 					ScsEjgActa scsEjgActaNuevo = new ScsEjgActa();
@@ -858,44 +809,44 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					scsEjgActaNuevo.setAnioejg(scsEjg.getAnio());
 					scsEjgActaNuevo.setIdinstitucionejg(idInstitucion);
 					scsEjgActaNuevo.setIdinstitucionacta(idInstitucion);
-					scsEjgActaNuevo.setAnioacta(Short.valueOf(anioActa));
-					scsEjgActaNuevo.setIdacta(Long.valueOf(idActa));
+					scsEjgActaNuevo.setAnioacta(Short.valueOf(ejgItem.getAnnioActa()));
+					scsEjgActaNuevo.setIdacta(Long.valueOf(ejgItem.getNumActa()));
 					scsEjgActaNuevo.setFechamodificacion(new Date());
 					scsEjgActaNuevo.setUsumodificacion(0);
-					scsEjg.setIdacta(Long.valueOf(idActa));
-					scsEjg.setAnioacta(Short.valueOf(Short.valueOf(anioActa)));
+					scsEjg.setIdacta(Long.valueOf(ejgItem.getNumActa()));
+					scsEjg.setAnioacta(Short.valueOf(Short.valueOf(ejgItem.getAnnioActa())));
 					scsEjg.setUsumodificacion(0);
 					scsEjg.setUsucreacion(0);
 
 					LOGGER.info("Guardando");
-					scsEjgActaMapper.insert(scsEjgActaNuevo);
-					scsEjgMapper.updateByPrimaryKey(scsEjg);
-					scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
 
-				} else {
-					for (ScsEjgActa scsEjgActa : listaEjgAsociadosActa) {
+					resultado = scsEjgActaMapper.insert(scsEjgActaNuevo);
 
-						ScsActacomision acta = obtenerActa(scsEjgActa, idInstitucion);
-
-						if (acta.getFecharesolucion() == null) {
-							scsEstadoEjg.setObservaciones(
-									scsEstadoEjg.getObservaciones() + "Expediente excluido masivamente del acta "
-											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-							scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
-							scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
-						}
-
+					updateResponseDTO.setStatus(SigaConstants.OK);
+					if (resultado == 0) {
+						throw (new SigaExceptions("Error no se ha podido crear la relacion entre el Ejg y acta"));
 					}
+
+					resultado = scsEjgMapper.updateByPrimaryKey(scsEjg);
+
+					if (resultado == 0) {
+						throw (new SigaExceptions("Error no se ha podido actualizar el ejg"));
+					}
+
+					resultado = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
+
+					if (resultado == 0) {
+						throw (new SigaExceptions("Error no se ha podido actualizar el estado del Ejg"));
+					}
+
 				}
-			} else {
-				error.setCode(500);
-				error.setDescription("No existen actas asociadas al ejg");
+			} catch (SigaExceptions e) {
+				if (error.getCode() == null) {
+					error.setCode(500);
+				}
+				error.setDescription(e.getMsg());
 				updateResponseDTO.setStatus(SigaConstants.KO);
 			}
-
-			LOGGER.info(
-					"guardarEditarSelecionados() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
-
 		} else {
 			error.setCode(500);
 			error.setDescription("El idInstitucion es nulo");
@@ -906,13 +857,95 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	}
 
 	@Override
-	public UpdateResponseDTO editarResolucionFundamento(EjgItem ejgItem, HttpServletRequest request) throws Exception {
+	public UpdateResponseDTO borrarActaAnio(List<EjgItem> ejgItems, HttpServletRequest request) {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int resultado;
+
+		LOGGER.info("Entra en el metodo editarActaAnio con la institucion " + idInstitucion);
+
+		if (idInstitucion != null) {
+			try {
+				for (EjgItem ejgItem : ejgItems) {
+
+					ScsEstadoejg scsEstadoEjg;
+
+					LOGGER.info("intentamos conseguir el ejg");
+
+					ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
+
+					LOGGER.info("intentamos conseguir el estado del ejg");
+
+					scsEstadoEjg = obtenerEstadoEjg(scsEjg, idInstitucion);
+
+					List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(scsEjg, idInstitucion);
+
+					if (!listaEjgAsociadosActa.isEmpty()) {
+
+						LOGGER.info("La lista tiene este tamaño " + listaEjgAsociadosActa.size());
+
+						for (ScsEjgActa scsEjgActa : listaEjgAsociadosActa) {
+
+							LOGGER.info("Si borrar es 1 entro en el for " + listaEjgAsociadosActa.size());
+
+							ScsActacomision acta = obtenerActa(scsEjgActa, idInstitucion);
+
+							if (acta.getFecharesolucion() == null) {
+
+								LOGGER.info("El estado que voy a actualizar es:   " + scsEstadoEjg.getIdestadoejg());
+
+								scsEstadoEjg.setObservaciones(
+										scsEstadoEjg.getObservaciones() + "Expediente excluido masivamente del acta "
+												+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+
+								acta.setFecharesolucion(new Date());
+
+								scsActacomisionMapper.updateByPrimaryKey(acta);
+
+								LOGGER.info("VOY A BORRAR A  " + listaEjgAsociadosActa.size());
+
+								resultado = scsEjgActaMapper.deleteByPrimaryKey(scsEjgActa);
+								if (resultado == 0) {
+									throw (new SigaExceptions(
+											"Error no se ha podido borrar la relacion entre el Ejg y acta"));
+								}
+								resultado = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoEjg);
+
+								if (resultado == 0) {
+									throw (new SigaExceptions("Error no se ha podido actualizar el estado del Ejg"));
+								}
+
+							}
+						}
+					}
+
+				}
+			} catch (SigaExceptions e) {
+				if (error.getCode() == null) {
+					error.setCode(500);
+				}
+				error.setDescription(e.getMsg());
+				updateResponseDTO.setStatus(SigaConstants.KO);
+			}
+
+			LOGGER.info("guardarEditarSelecionados() -> Salida del servicio para obtener los tipos ejg");
+			updateResponseDTO.setError(error);
+		}
+		return updateResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO editarResolucionFundamento(List<EjgItem> ejgItems, HttpServletRequest request)
+			throws Exception {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String resultado = "00";
 		Error error = new Error();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -922,42 +955,82 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		if (idInstitucion != null) {
 
 			LOGGER.info("intentamos conseguir el ejg");
+			for (EjgItem ejgItem : ejgItems) {
 
-			ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
+				LOGGER.info("INFORMACION DEL EJG QUE HE ENVIADO SUPUESTAMENTE " + ejgItem.getNumero());
 
-			LOGGER.info("intentamos conseguir el estado del ejg");
+				ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
 
-			// uso getbis para saber si tengo que borrar o no
-			if (ejgItem.getBis()) {
+				LOGGER.info("intentamos conseguir el estado del ejg");
+
+				// uso tipo dictamen para traer los datos de la resolucion
+
+				if (ejgItem.getIdTipoDictamen() != null && ejgItem.getFundamentoJuridico() != null) {
+
+					int response = actualizarFecharesolucioncajg(idInstitucion, usuario, scsEjg);
+
+					if (response == 0)
+						throw (new Exception(
+								"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
+										+ " asociada a un EJG"));
+
+					scsEjg.setIdtiporatificacionejg(ejgItem.getIdTipoDictamen());
+					scsEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
+				}
+
+				LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL -> ");
+				LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL anio -> " + scsEjg.getAnio());
+				LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idtipoejg -> " + scsEjg.getIdtipoejg());
+				LOGGER.info(
+						"INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idinstitucion-> " + scsEjg.getIdinstitucion());
+				LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL numero -> " + scsEjg.getNumero());
+
+				scsEjgMapper.updateByPrimaryKey(scsEjg);
+				updateResponseDTO.setStatus(SigaConstants.OK);
+
+				LOGGER.info(
+						"guardarEditarSelecionados() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
+			}
+		} else {
+			error.setCode(500);
+			error.setDescription("El idInstitucion es nulo");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		}
+
+		updateResponseDTO.setError(error);
+		return updateResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO borrarResolucionFundamento(List<EjgItem> ejgItems, HttpServletRequest request)
+			throws Exception {
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+
+		if (idInstitucion != null) {
+
+			LOGGER.info("intentamos conseguir el ejg");
+			for (EjgItem ejgItem : ejgItems) {
+
+				ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
+
+				LOGGER.info("intentamos conseguir el estado del ejg");
+
 				scsEjg.setIdtiporatificacionejg(null);
 				scsEjg.setIdfundamentojuridico(null);
-			} else
-			// uso tipo dictamen para traer los datos de la resolucion
-			if (ejgItem.getIdTipoDictamen() != null && ejgItem.getFundamentoJuridico() != null) {
 
-				int response = actualizarFecharesolucioncajg(idInstitucion, usuario, scsEjg);
+				scsEjgMapper.updateByPrimaryKey(scsEjg);
 
-				if (response == 0)
-					throw (new Exception(
-							"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
-									+ " asociada a un EJG"));
-
-				scsEjg.setIdtiporatificacionejg(ejgItem.getIdTipoDictamen());
+				updateResponseDTO.setStatus(SigaConstants.OK);
 			}
-
-			scsEjg.setIdfundamentojuridico(Short.valueOf(ejgItem.getFundamentoJuridico()));
-
-			LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL -> ");
-			LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL anio -> " + scsEjg.getAnio());
-			LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idtipoejg -> " + scsEjg.getIdtipoejg());
-			LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL idinstitucion-> " + scsEjg.getIdinstitucion());
-			LOGGER.info("INFORMACION EJG PARA ENCONTRAR CLAVE PRINCIPAL numero -> " + scsEjg.getNumero());
-
-			scsEjgMapper.updateByPrimaryKey(scsEjg);
-
-			LOGGER.info(
-					"guardarEditarSelecionados() / scsFundamentoscalificacionExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para obtener los combo");
-
 		} else {
 			error.setCode(500);
 			error.setDescription("El idInstitucion es nulo");
@@ -970,13 +1043,13 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO editarPonente(EjgItem ejgItem, HttpServletRequest request) throws SigaExceptions {
+	public UpdateResponseDTO editarPonente(List<EjgItem> ejgItems, HttpServletRequest request) throws SigaExceptions {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		Error error = null;
+		Error error = new Error();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
@@ -984,49 +1057,117 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		if (idInstitucion != null) {
 			LOGGER.info("ESTAMOS AQUIIIIIIIIIIIIIIIIII");
-			LOGGER.info("intentamos conseguir el ejg" + ejgItem.getBis());
+			for (EjgItem ejgItem : ejgItems) {
 
-			ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
+				ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
 
-			LOGGER.info("intentamos conseguir el estado del ejg " + ejgItem.getBis());
+				ScsEstadoejg scsEstadoEjg = new ScsEstadoejg();
 
-			if (ejgItem.getBis()) {
-				LOGGER.info("Si hay que borrar entramos aqui");
-				ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
-			} else {
-				if (ejgItem.getPonente() != null && ejgItem.getFechaPonenteDesd() != null) {
+				LOGGER.info("intentamos conseguir el estado del ejg " + ejgItem.getBis());
 
-					ResolucionEJGItem resolEjg = new ResolucionEJGItem();
-					resolEjg.setAnio(scsEjg.getAnio());
-					resolEjg.setIdTipoEJG(scsEjg.getIdtipoejg());
-					resolEjg.setNumero(scsEjg.getNumero());
-					resolEjg.setFechaPresentacionPonente(ejgItem.getFechaPonenteDesd());
-					resolEjg.setIdPonente(Integer.valueOf(ejgItem.getPonente()));
-
-					scsEjg.setFechapresentacionponente(ejgItem.getFechaPonenteDesd());
-					scsEjg.setIdponente(Integer.valueOf(ejgItem.getPonente()));
-
-					try {
-						gestionEJGServiceImpl.triggersEjgUpdatesPonente(resolEjg, usuario, idInstitucion);
-					} catch (Exception e) {
-						LOGGER.info("No se ha podido ejecutar el triggersEjgUpdatesPonente");
-						throw new SigaExceptions("No se ha podido ejecutar el triggersEjgUpdatesPonente");
-					}
-					int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
-
-					LOGGER.info("Respuesta al actualizar" + response);
-
+				if (ejgItem.getBis()) {
+					LOGGER.info("Si hay que borrar entramos aqui");
+					ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
 				} else {
-					error.setCode(500);
-					error.setDescription("Ponente o Fecha Ponente es nula");
-					updateResponseDTO.setStatus(SigaConstants.KO);
+					if (ejgItem.getPonente() != null && ejgItem.getFechaPonenteDesd() != null && scsEjg != null) {
 
+						ResolucionEJGItem resolEjg = new ResolucionEJGItem();
+						resolEjg.setAnio(scsEjg.getAnio());
+						resolEjg.setIdTipoEJG(scsEjg.getIdtipoejg());
+						resolEjg.setNumero(scsEjg.getNumero());
+						resolEjg.setFechaPresentacionPonente(ejgItem.getFechaPonenteDesd());
+						resolEjg.setIdPonente(Integer.valueOf(ejgItem.getPonente()));
+
+						LOGGER.info("Datos del ponente que vamos a actualizar primero la fecha y despues el id ponente "
+								+ ejgItem.getFechaPonenteDesd() + " " + ejgItem.getPonente());
+
+						scsEjg.setFechapresentacionponente(ejgItem.getFechaPonenteDesd());
+						scsEjg.setIdponente(Integer.valueOf(ejgItem.getPonente()));
+
+						ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
+
+						scsEstadoEjg.setNumero(Long.valueOf(scsEjg.getNumero()));
+						scsEstadoEjg.setIdtipoejg(scsEjg.getIdtipoejg());
+						scsEstadoEjg.setAnio(scsEjg.getAnio());
+						scsEstadoEjg.setIdinstitucion(Short.valueOf(idInstitucion));
+						scsEstadoEjg.setFechamodificacion(new Date());
+						scsEstadoEjg.setFechainicio(new Date());
+						scsEstadoEjg.setUsumodificacion(0);
+						scsEstadoEjg.setAutomatico("0");
+						scsEstadoEjg.setIdestadoejg(Short.valueOf("20"));
+						scsEstadoEjg.setIdestadoporejg(obtenerUltimoEstadoEjg(scsEjg, idInstitucion) + 1);
+
+						scsEstadoEjg.setObservaciones(scsEjgComisionExtendsMapper
+								.getEtiquetasPonente(Short.valueOf(usuarios.get(0).getIdlenguaje())));
+
+						scsEstadoejgMapper.insert(scsEstadoEjg);
+
+						try {
+							gestionEJGServiceImpl.triggersEjgUpdatesPonente(resolEjg, usuario, idInstitucion);
+						} catch (Exception e) {
+							LOGGER.info("No se ha podido ejecutar el triggersEjgUpdatesPonente");
+							throw new SigaExceptions("No se ha podido ejecutar el triggersEjgUpdatesPonente");
+						}
+
+						int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
+
+						LOGGER.info("Respuesta al actualizar" + response);
+
+					} else {
+						error.setCode(500);
+						error.setDescription("Falta alguno de los datos para cambiar de ponente");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+
+					}
 				}
 			}
-
 		} else {
 			error.setCode(500);
 			error.setDescription("El idInstitucion es nulo");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+
+		}
+		updateResponseDTO.setError(error);
+		return updateResponseDTO;
+	}
+
+	@Override
+	@Transactional
+	public UpdateResponseDTO borrarPonente(List<EjgItem> ejgItems, HttpServletRequest request) throws SigaExceptions {
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error error = new Error();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+
+		if (idInstitucion != null) {
+			LOGGER.info("ESTAMOS AQUIIIIIIIIIIIIIIIIII");
+			for (EjgItem ejgItem : ejgItems) {
+
+				ScsEjg scsEjg = obtenerEjg(ejgItem, idInstitucion);
+
+				ScsEstadoejg scsEstadoEjg = new ScsEstadoejg();
+
+				LOGGER.info("intentamos conseguir el estado del ejg " + ejgItem.getBis());
+
+				LOGGER.info("Si hay que borrar entramos aqui");
+				ponerFechaBajaEstadosEjg(scsEjg, idInstitucion);
+
+				scsEjg.setIdponente(null);
+				scsEjg.setFechapresentacionponente(null);
+
+				int response = scsEjgMapper.updateByPrimaryKey(scsEjg);
+
+				LOGGER.info("Respuesta al borrar el ponente" + response);
+			}
+		} else {
+			error.setCode(500);
+			error.setDescription("Falta alguno de los datos para cambiar de ponente");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 
 		}
@@ -1041,6 +1182,8 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	private List<ScsEjgActa> obtenerEjgActa(ScsEjg scsEjg, Short idInstitucion) {
 
 		ScsEjgActaExample scsEjgActaExample = new ScsEjgActaExample();
+
+		LOGGER.info("datos ejg a buscar " + scsEjg.getAnio() + " " + scsEjg.getNumero() + " " + scsEjg.getIdtipoejg());
 
 		scsEjgActaExample.createCriteria().andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
 				.andNumeroejgEqualTo(Long.valueOf(scsEjg.getNumero())).andIdinstitucionejgEqualTo(idInstitucion)
@@ -1103,25 +1246,34 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		return acta;
 	}
 
-	private ScsEstadoejg obtenerEstadoEjg(ScsEjg scsEjg, String idEstadoPorEjg, Short idInstitucion)
-			throws SigaExceptions {
+	private ScsEstadoejg obtenerEstadoEjg(ScsEjg scsEjg, Short idInstitucion) throws SigaExceptions {
 
 		ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
 
+		LOGGER.info("Datos para filtrar el estado ejg " + scsEjg.getAnio() + " ");
+
 		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
-				.andIdestadoporejgEqualTo(Long.valueOf(idEstadoPorEjg)).andIdinstitucionEqualTo(idInstitucion)
-				.andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
-				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero()));
+				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
+				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
 
 		estadoejgExample.setOrderByClause("FECHAMODIFICACION DESC");
 
-		List<ScsEstadoejg> estadoejgObject = scsEstadoejgMapper.selectByExample(estadoejgExample);
+		List<ScsEstadoejg> estadoejgObject;
+
+		LOGGER.info("AQUI BUSCANDO EL ESTADO DEL EJG");
 
 		try {
 			estadoejgObject = scsEstadoejgMapper.selectByExample(estadoejgExample);
+			LOGGER.info("AQUI BUSCANDO EL ESTADO DEL EJG PARA SABER EL TAMAÑO " + estadoejgObject.size());
+
 		} catch (Exception e) {
 			LOGGER.info("No se encuentra el estado para el ejg seleccionado");
 			throw new SigaExceptions("No se encuentra el estado para el ejg seleccionado");
+		}
+
+		for (ScsEstadoejg scsEstadoejg : estadoejgObject) {
+			LOGGER.info("Informacion de los estados");
+			LOGGER.info(scsEstadoejg.getIdestadoporejg());
 		}
 		ScsEstadoejg scsEstadoejg;
 		if (!estadoejgObject.isEmpty()) {
@@ -1130,6 +1282,32 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			throw new SigaExceptions("No existen estados para este ejg");
 		}
 		return scsEstadoejg;
+	}
+
+	private Long obtenerUltimoEstadoEjg(ScsEjg scsEjg, Short idInstitucion) throws SigaExceptions {
+
+		ScsEstadoejgExample estadoejgExample = new ScsEstadoejgExample();
+
+		LOGGER.info("Datos para filtrar el estado ejg " + scsEjg.getAnio() + " ");
+
+		estadoejgExample.createCriteria().andAnioEqualTo(Short.valueOf(scsEjg.getAnio()))
+				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
+				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
+
+		estadoejgExample.setOrderByClause("FECHAMODIFICACION DESC");
+
+		List<ScsEstadoejg> estadoejgObject;
+
+		try {
+			estadoejgObject = scsEstadoejgMapper.selectByExample(estadoejgExample);
+			LOGGER.info("AQUI BUSCANDO EL ESTADO DEL EJG PARA SABER EL TAMAÑO " + estadoejgObject.size());
+
+		} catch (Exception e) {
+			LOGGER.info("No se encuentra el estado para el ejg seleccionado");
+			throw new SigaExceptions("No se encuentra el estado para el ejg seleccionado");
+		}
+
+		return estadoejgObject.get(0).getIdestadoporejg();
 	}
 
 	private int ponerFechaBajaEstadosEjg(ScsEjg scsEjg, Short idInstitucion) throws SigaExceptions {
@@ -1165,34 +1343,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		return estadoejgObject.size();
 	}
 
-	private ScsEjg obtenerEjg(ActualizarAnioActaItem actualizarAnioActaItem, Short idInstitucion)
-			throws SigaExceptions {
-
-		ScsEjgKey ejgkey = new ScsEjgKey();
-
-		ejgkey.setAnio(Short.valueOf(actualizarAnioActaItem.getAnioEjg()));
-
-		ejgkey.setIdinstitucion(idInstitucion);
-
-		ejgkey.setIdtipoejg(Short.valueOf(actualizarAnioActaItem.getIdTipoEJG()));
-
-		ejgkey.setNumero(Long.valueOf(actualizarAnioActaItem.getNumeroEjg()));
-
-		ScsEjg scsEjgItem = scsEjgMapper.selectByPrimaryKey(ejgkey);
-
-		try {
-			scsEjgItem = scsEjgMapper.selectByPrimaryKey(ejgkey);
-
-		} catch (Exception e) {
-			LOGGER.info("No se encuentra el ejg en la base de datos");
-			throw new SigaExceptions("No se encuentra el ejg en la base de datos");
-
-		}
-
-		return scsEjgItem;
-	}
-
 	private ScsEjg obtenerEjg(EjgItem ejgItem, Short idInstitucion) throws SigaExceptions {
+
+		LOGGER.info(
+				"IDINSTITUCION DEL EJG Y EL QUE SALE DEL TOKEN " + ejgItem.getidInstitucion() + " " + idInstitucion);
 
 		ScsEjgKey ejgkey = new ScsEjgKey();
 

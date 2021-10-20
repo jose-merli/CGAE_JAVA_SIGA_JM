@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.controllers.ejgcomision;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -74,23 +76,44 @@ public class EjgComisionController {
 	}
 
 	@RequestMapping(value = "/filtros-ejg/editarActaAnio", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> editarActaAnio(@RequestBody ActualizarAnioActaItem actualizarAnioActaItem,
+	ResponseEntity<UpdateResponseDTO> editarActaAnio(@RequestBody List<EjgItem> ejgItem,
 			HttpServletRequest request) throws SigaExceptions {
-		UpdateResponseDTO response = busquedaEJGComision.editarActaAnio(actualizarAnioActaItem, request);
+		UpdateResponseDTO response = busquedaEJGComision.editarActaAnio(ejgItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-ejg/borrarActaAnio", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> borrarActaAnio(@RequestBody List<EjgItem> ejgItem,
+			HttpServletRequest request) throws SigaExceptions {
+		UpdateResponseDTO response = busquedaEJGComision.borrarActaAnio(ejgItem, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/filtros-ejg/editarResolucionFundamento", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> editarResolucionFundamento(@RequestBody EjgItem ejgItem,
+	ResponseEntity<UpdateResponseDTO> editarResolucionFundamento(@RequestBody List<EjgItem> ejgItem,
 			HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = busquedaEJGComision.editarResolucionFundamento(ejgItem, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/filtros-ejg/borrarResolucionFundamento", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> borrarResolucionFundamento(@RequestBody List<EjgItem> ejgItem,
+			HttpServletRequest request) throws Exception {
+		UpdateResponseDTO response = busquedaEJGComision.borrarResolucionFundamento(ejgItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/filtros-ejg/editarPonente", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> editarPonente(@RequestBody EjgItem ejgItem, HttpServletRequest request)
+	ResponseEntity<UpdateResponseDTO> editarPonente(@RequestBody List<EjgItem> ejgItem, HttpServletRequest request)
 			throws Exception {
 		UpdateResponseDTO response = busquedaEJGComision.editarPonente(ejgItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-ejg/borrarPonente", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> borrarPonente(@RequestBody List<EjgItem> ejgItem, HttpServletRequest request)
+			throws Exception {
+		UpdateResponseDTO response = busquedaEJGComision.borrarPonente(ejgItem, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 

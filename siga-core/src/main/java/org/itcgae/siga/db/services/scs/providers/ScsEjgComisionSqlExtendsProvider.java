@@ -32,6 +32,17 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		return sqlPresidente.toString();
 	}
 
+	public String getEtiquetasPonente(Short idLenguaje) {
+
+		SQL sqlPresidente = new SQL();
+		sqlPresidente.SELECT("f_Siga_Getrecurso_Etiqueta('gratuita.ejg.estado.literal.automatico'," + idLenguaje
+				+ ") || ' ' ||f_Siga_Getrecurso_Etiqueta('gratuita.operarRatificacion.literal.ponente', " + idLenguaje
+				+ ") as nombre");
+		sqlPresidente.FROM("dual");
+		LOGGER.info("*******************getEtiquetasPonente********************" + sqlPresidente.toString());
+		return sqlPresidente.toString();
+	}
+
 	public String comboAnioActa(Short idInstitucion) {
 
 		SQL sql = new SQL();
@@ -43,7 +54,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.WHERE("FECHARESOLUCION IS NULL");
 		sql.ORDER_BY("IDINSTITUCION,ANIOACTA,IDACTA");
 
-		LOGGER.info(sql.toString());
+		LOGGER.info("*******************comboAnioActa********************" + sql.toString());
 
 		return sql.toString();
 	}
@@ -63,6 +74,8 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.WHERE("tiporesolucion.fecha_baja is null");
 
 		sql.ORDER_BY("catalogoResolucion.descripcion");
+		LOGGER.info("*******************comboResolucion********************" + sql.toString());
+
 		return sql.toString();
 	}
 
@@ -209,9 +222,13 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("idfundamento as ID");
 		sql.SELECT("F_SIGA_GETRECURSO(DESCRIPCION, 1) as DESCRIPCION");
 		sql.FROM("SCS_TIPOFUNDAMENTOS");
+		if(resolucion != null) {
 		sql.WHERE("fecha_baja is null AND IDINSTITUCION =" + idInstitucion + "  AND IDTIPORESOLUCION =" + resolucion
 				+ " OR IDTIPORESOLUCION = NULL");
+		}else{
+		sql.WHERE("fecha_baja is null AND IDINSTITUCION =" + idInstitucion);
 		sql.ORDER_BY("DESCRIPCION");
+		}
 		LOGGER.info("*******************comboFundamentoJuridComision********************" + sql.toString());
 		return sql.toString();
 	}
@@ -339,7 +356,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ idLenguaje + "'");
 
 		// where
-		sql.WHERE("ejg.idinstitucion = 2005"); // + idInstitucion
+		sql.WHERE("ejg.idinstitucion = " + idInstitucion);
 		if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
 			sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
 		if (ejgItem.getNumero() != null && ejgItem.getNumero() != "")

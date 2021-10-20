@@ -1,6 +1,8 @@
 package org.itcgae.siga.scs.services.ejg;
 
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -45,11 +47,17 @@ public interface IBusquedaEJGComision {
 
 	ComboDTO comboSecretario(HttpServletRequest request);
 
-	UpdateResponseDTO editarActaAnio(ActualizarAnioActaItem actualizarAnioActaItem, HttpServletRequest request) throws SigaExceptions;
+	UpdateResponseDTO editarActaAnio(List<EjgItem> ejgItem, HttpServletRequest request) throws SigaExceptions;
 
-	UpdateResponseDTO editarResolucionFundamento(EjgItem ejgItem, HttpServletRequest request) throws Exception;
+	UpdateResponseDTO editarResolucionFundamento(List<EjgItem>ejgItem, HttpServletRequest request) throws Exception;
 
-	UpdateResponseDTO editarPonente(EjgItem ejgItem, HttpServletRequest request) throws SigaExceptions;
+	UpdateResponseDTO editarPonente(List<EjgItem>ejgItem, HttpServletRequest request) throws SigaExceptions;
+
+	UpdateResponseDTO borrarResolucionFundamento(List<EjgItem>ejgItem, HttpServletRequest request) throws Exception;
+
+	UpdateResponseDTO borrarPonente(List<EjgItem> ejgItem, HttpServletRequest request) throws SigaExceptions;
+
+	UpdateResponseDTO borrarActaAnio(List<EjgItem> ejgItem, HttpServletRequest request);
 
 
 
