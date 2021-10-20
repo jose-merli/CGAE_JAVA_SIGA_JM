@@ -17,6 +17,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
     public String busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
         String dictamenCad = "";
         boolean indiferente = false;
+        boolean sinDictamen = false;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String fechaAperturaDesd;
         String fechaAperturaHast;
@@ -188,16 +189,26 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         if (ejgItem.getDictamen() != null && !ejgItem.getDictamen().isEmpty()) {
             String[] selectedDict = ejgItem.getDictamen().split(",");
             for (String dictamen : selectedDict) {
-                if (!dictamen.equals("-1")) {
+                if (!dictamen.equals("-1") && !dictamen.equals("0")) {
                     dictamenCad += dictamen + ",";
-                } else {
+                } else if(dictamen.equals("0")){
+                	sinDictamen = true;
+                }else {
                     indiferente = true;
                 }
             }
 
             if (!indiferente) {
-                dictamenCad = dictamenCad.substring(0, (dictamenCad.length() - 1));
-                sql.WHERE("EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ")");
+            	if(dictamenCad.length()>0) {
+            		dictamenCad = dictamenCad.substring(0, (dictamenCad.length() - 1));
+                   	if(sinDictamen) {
+                    	sql.WHERE("(EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ") OR EJG.IDTIPODICTAMENEJG IS NULL)");
+                    }else {
+                    	sql.WHERE("EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ")");
+                    }
+                }else if(sinDictamen) {
+                	sql.WHERE("EJG.IDTIPODICTAMENEJG IS NULL");
+                }
             }
 
         }
