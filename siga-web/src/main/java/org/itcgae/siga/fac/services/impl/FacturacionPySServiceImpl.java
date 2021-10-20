@@ -523,18 +523,17 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					List<SerieFacturacionItem> serieFacturacionItems = facSeriefacturacionExtendsMapper.getSeriesFacturacion(serieFacturacionItem, idInstitucion, idioma);
 
 					if (null != serieFacturacionItems && !serieFacturacionItems.isEmpty()) {
-						List<TiposIncluidosItem> tiposIncluidos = new ArrayList<>();
-
-						LOGGER.info("getSeriesFacturacion() -> Obteniendo los tipos de servicios para la institución");
-						tiposIncluidos.addAll(facFacturacionsuscripcionExtendsMapper.getTiposServicios(idInstitucion, idioma));
-						LOGGER.info("getSeriesFacturacion() -> Obteniendo los tipos de productos para la institución");
-						tiposIncluidos.addAll(pysCompraExtendsMapper.getTiposProductos(idInstitucion, idioma));
 
 						for (SerieFacturacionItem serieItem : serieFacturacionItems) {
 							String idSerieFacturacion = serieItem.getIdSerieFacturacion();
+							List<TiposIncluidosItem> tiposIncluidos = new ArrayList<>();
+
+							LOGGER.info("getSeriesFacturacion() -> Obteniendo los tipos de servicios para idInstitucion=" + idInstitucion + ", idSerieFacturacion=" + idSerieFacturacion);
+							tiposIncluidos.addAll(facFacturacionsuscripcionExtendsMapper.getTiposServicios(idSerieFacturacion, idInstitucion, idioma));
+							LOGGER.info("getSeriesFacturacion() -> Obteniendo los tipos de productos para idInstitucion=" + idInstitucion + ", idSerieFacturacion=" + idSerieFacturacion);
+							tiposIncluidos.addAll(pysCompraExtendsMapper.getTiposProductos(idSerieFacturacion, idInstitucion, idioma));
 
 							List<String> tiposIncluidosSerie = tiposIncluidos.stream()
-									.filter(t -> idSerieFacturacion.equals(t.getIdSerieFacturacion()))
 									.map(t -> t.getDescripcion())
 									.collect(Collectors.toList());
 
@@ -593,18 +592,32 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 						FacSeriefacturacionExample seriefacturacionExample = new FacSeriefacturacionExample();
 						seriefacturacionExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdseriefacturacionEqualTo(Long.valueOf(serieFacturacion.getIdSerieFacturacion()));
 
-						long numFacturas = facFacturaMapper.countByExample(facturaExample);
-						if (numFacturas == 0) {
-							LOGGER.info("eliminaSerieFacturacion() -> Baja física de la serie de facturación con idseriefacturacion=" + serieFacturacion.getIdSerieFacturacion());
+						List<FacSeriefacturacion> sfResults = facSeriefacturacionExtendsMapper.selectByExample(seriefacturacionExample);
+						if (null != sfResults && !sfResults.isEmpty()) {
+							FacSeriefacturacion sfToUpdate = sfResults.get(0);
 
-							facSeriefacturacionExtendsMapper.deleteByExample(seriefacturacionExample);
+							if (sfToUpdate.getFechabaja() == null) {
+								long numFacturas = facFacturaMapper.countByExample(facturaExample);
+								if (numFacturas == 0) {
+									LOGGER.info("eliminaSerieFacturacion() -> Baja física de la serie de facturación con idseriefacturacion=" + serieFacturacion.getIdSerieFacturacion());
+
+									facSeriefacturacionExtendsMapper.deleteByExample(seriefacturacionExample);
+								} else {
+									LOGGER.info("eliminaSerieFacturacion() -> Baja lógica de la serie de facturación con idseriefacturacion=" + serieFacturacion.getIdSerieFacturacion());
+
+									FacSeriefacturacion sf = new FacSeriefacturacion();
+									sf.setFechabaja(new Date());
+									facSeriefacturacionExtendsMapper.updateByExampleSelective(sf, seriefacturacionExample);
+								}
+							} else {
+								LOGGER.warn("eliminaSerieFacturacion() -> Ya se encontraba eliminada la serie de facturación con id=" + serieFacturacion.getIdSerieFacturacion());
+							}
 						} else {
-							LOGGER.info("eliminaSerieFacturacion() -> Baja lógica de la serie de facturación con idseriefacturacion=" + serieFacturacion.getIdSerieFacturacion());
+							LOGGER.warn("eliminaSerieFacturacion() -> No existe serie facturación con id=" + serieFacturacion.getIdSerieFacturacion());
 
-							FacSeriefacturacion sf = new FacSeriefacturacion();
-							sf.setFechabaja(new Date());
-							facSeriefacturacionExtendsMapper.updateByExampleSelective(sf, seriefacturacionExample);
 						}
+
+
 					}
 
 				} else {
@@ -661,8 +674,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 						List<FacSeriefacturacion> sfResults = facSeriefacturacionExtendsMapper.selectByExample(seriefacturacionExample);
 						if (null != sfResults && !sfResults.isEmpty()) {
 							FacSeriefacturacion sfToUpdate = sfResults.get(0);
-							sfToUpdate.setFechabaja(null);
-							facSeriefacturacionExtendsMapper.updateByExample(sfToUpdate, seriefacturacionExample);
+							if (sfToUpdate.getFechabaja() != null) {
+								sfToUpdate.setFechabaja(null);
+								facSeriefacturacionExtendsMapper.updateByExample(sfToUpdate, seriefacturacionExample);
+							} else {
+								LOGGER.warn("reactivarSerieFacturacion() -> Ya se encontraba activa la serie de facturación con id=" + serieFacturacion.getIdSerieFacturacion());
+							}
 						} else {
 							LOGGER.warn("reactivarSerieFacturacion() -> No existe serie facturación con id=" + serieFacturacion.getIdSerieFacturacion());
 						}

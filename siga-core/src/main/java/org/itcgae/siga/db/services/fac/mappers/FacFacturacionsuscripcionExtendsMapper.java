@@ -19,11 +19,11 @@ import org.springframework.stereotype.Service;
 public interface FacFacturacionsuscripcionExtendsMapper extends FacFacturacionsuscripcionMapper {
 
 	@SelectProvider(type = FacFacturacionsuscripcionExtendsSqlProvider.class, method = "getTiposServicios")
-	@Results({ 
+	@Results({
 		@Result(column = "idtiposervicios", property = "idTipoIncluido", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idseriefacturacion", property = "idSerieFacturacion", jdbcType = JdbcType.NUMERIC)
 	})
-	List<TiposIncluidosItem> getTiposServicios(Short idInstitucion, String idioma);
+	List<TiposIncluidosItem> getTiposServicios(String idSerieFacturacion, Short idInstitucion, String idioma);
 	
 }

@@ -5,7 +5,7 @@ import org.itcgae.siga.db.mappers.PysCompraSqlProvider;
 
 public class PysCompraExtendsSqlProvider extends PysCompraSqlProvider {
 
-	public String getTiposProductos(Short idInstitucion, String idioma) {
+	public String getTiposProductos(String idSerieFacturacion, Short idInstitucion, String idioma) {
 		SQL sql = new SQL();
 
 		// Select
@@ -23,6 +23,7 @@ public class PysCompraExtendsSqlProvider extends PysCompraSqlProvider {
 
 		// Where
 		sql.WHERE("c.idinstitucion = " + idInstitucion);
+		sql.WHERE("sf.idseriefacturacion = '" + idSerieFacturacion + "'");
 
 		// Order by
 		sql.ORDER_BY("sf.idseriefacturacion, c.idtipoproducto");
