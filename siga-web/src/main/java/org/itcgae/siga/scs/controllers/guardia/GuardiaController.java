@@ -16,6 +16,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
@@ -50,12 +51,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 
@@ -125,9 +121,9 @@ public class GuardiaController {
 		return new ResponseEntity<GuardiasItem>(response, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "/busquedaGuardia/tarjetaIncompatibilidades", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<GuardiasDTO> tarjetaIncompatibilidades(@RequestBody String idGuardia, HttpServletRequest request) {
-		GuardiasDTO response = guardiasService.tarjetaIncompatibilidades(idGuardia, request);
+	@GetMapping(value = "/busquedaGuardia/tarjetaIncompatibilidades")
+	ResponseEntity<GuardiasDTO> tarjetaIncompatibilidades(HttpServletRequest request, @RequestParam String idGuardia, @RequestParam String idTurno) {
+		GuardiasDTO response = guardiasService.tarjetaIncompatibilidades(idGuardia, idTurno, request);
 		return new ResponseEntity<GuardiasDTO>(response, HttpStatus.OK);
 	}
 
@@ -417,6 +413,12 @@ public class GuardiaController {
 	ResponseEntity<DeleteResponseDTO> eliminarGuardiaColegiado(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request){
 		DeleteResponseDTO response= guardiasService.eliminarGuardiaColegiado(guardiasItem, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping({"/searchTipoDiaGuardia"})
+	ResponseEntity<StringDTO> getTipoDiaGuardia(HttpServletRequest request, @RequestParam String idTurno, @RequestParam String idGuardia) {
+		StringDTO response = this.guardiasService.getTipoDiaGuardia(request, idTurno, idGuardia);
+		return new ResponseEntity(response, HttpStatus.OK);
 	}
 	
 //	@PostMapping(value = "/solicitarBajaInscripcion", produces = MediaType.APPLICATION_JSON_VALUE)

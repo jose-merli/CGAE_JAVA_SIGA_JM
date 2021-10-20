@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.GrupoGuardiaColegiadoItem;
 import org.itcgae.siga.DTOs.scs.GuardiasTurnosItem;
 import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
 import org.itcgae.siga.DTOs.scs.TrabajosSJCSInsGuardiaItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -84,16 +85,16 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 	List<ComboItem> comboGuardiasInscritoLetrado(Short idInstitucion, String idPersona, String idTurno);
 	
 	@InsertProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "insertarInscripcion")
-	int insertarInscripcion(Short idInstitucion, InscripcionGuardiaItem inscripcion, AdmUsuarios admUsuarios);
+	int insertarInscripcion(Short idInstitucion, BusquedaInscripcionItem inscripcion, AdmUsuarios admUsuarios);
 
-	@Results({
-		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+	/*@Results({
+		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHASUSCRIPCION", property = "fechaSuscripcion", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHASUSCRIPCION", property = "fechasolicitud", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.DATE),
 		@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.DATE),
 		@Result(column = "OBSERVACIONESSUSCRIPCION", property = "observacionessuscripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBSERVACIONESBAJA", property = "observacionesbaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHASOLICITUDBAJA", property = "fechasolicitudbaja", jdbcType = JdbcType.DATE),
@@ -102,9 +103,9 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "FECHADENEGACION", property = "fechadenegacion", jdbcType = JdbcType.DATE),
 		@Result(column = "OBSERVACIONESDENEGACION", property = "observacionesdenegacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBSERVACIONESVALBAJA", property = "observacionesvalbaja", jdbcType = JdbcType.VARCHAR)
-	})
+	})*/
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "buscarInscripcion")
-	List<InscripcionGuardiaItem> buscarInscripcion(Short idInstitucion, InscripcionGuardiaItem inscripcion,
+	List<InscripcionGuardiaItem> buscarInscripcion(Short idInstitucion, BusquedaInscripcionItem inscripcion,
 			AdmUsuarios admUsuarios);
 
 	@Results({
@@ -129,7 +130,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "descripcion_obligatoriedad", property = "descripcionObligatoriedad", jdbcType = JdbcType.VARCHAR)
 	})
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "inscripcionesDisponibles")
-	List<GestionInscripcion> inscripcionesDisponibles(Short idInstitucion, AdmUsuarios admUsuarios);
+	List<GestionInscripcion> inscripcionesDisponibles(Short idInstitucion, AdmUsuarios admUsuarios, BusquedaInscripcionItem inscripcion);
 
 	@Results({
 		@Result(column = "idguardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
@@ -153,7 +154,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "descripcion_obligatoriedad", property = "descripcionObligatoriedad", jdbcType = JdbcType.VARCHAR)
 	})
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "inscripcionPorguardia")
-	List<GestionInscripcion> inscripcionPorguardia(Short idInstitucion, AdmUsuarios admUsuarios, String guardia);
+	List<GestionInscripcion> inscripcionPorguardia(Short idInstitucion, AdmUsuarios admUsuarios, String guardia, String idpersona);
 
 
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "listadoInscripciones")
@@ -206,7 +207,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 	@InsertProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "InsertObjetoValidarInscripcion")	
 	@Results({
 	})
-	int getInsertObjetoValidarInscripcion(BusquedaInscripcionMod inscripcion, int usuario, GrupoGuardiaColegiadoItem objetoFK, String FECHABAJA,String fECHADENEGACIONNUEVA, String fECHASOLICITUDBAJANUEVA, String fECHASOLICITUDNUEVA, String fECHAVALIDACIONNUEVA);
+	int getInsertObjetoValidarInscripcion(BusquedaInscripcionMod inscripcion, int usuario, GrupoGuardiaColegiadoItem objetoFK, String FECHASOLICITUD, String FECHABAJA,String fECHADENEGACIONNUEVA, String fECHASOLICITUDBAJANUEVA, String fECHASOLICITUDNUEVA, String fECHAVALIDACIONNUEVA);
 
 	
 	@UpdateProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "validarDenegarSBajaCFechaInscripciones")
@@ -237,7 +238,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 
 
 	@InsertProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "insertarObjetoFKGrupoColegiado")
-	int getInsertFKGrupoGuardiaColegiado(GrupoGuardiaColegiadoItem objetoFK, int usuario, String fECHASOLICITUDNUEVA, String fECHACREACIONNUEVA);
+	int getInsertFKGrupoGuardiaColegiado(GrupoGuardiaColegiadoItem objetoFK, int usuario, String FECHASOLICITUD,String fECHASOLICITUDNUEVA, String fECHACREACIONNUEVA);
 
 
 
@@ -297,8 +298,6 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 
 	int getCFechaInscripciones(BusquedaInscripcionMod a, String string, String fECHABAJA, String fECHAVALIDACIONNUEVA,
 			int usuario);
-
-
     
     @SelectProvider(type=ScsInscripcionguardiaSqlExtendsProvider.class, method="getInscripcionByTurnoGuardiaNcolegiado")
     @Results({
@@ -320,6 +319,9 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
         @Result(column="OBSERVACIONESVALBAJA", property="observacionesvalbaja", jdbcType=JdbcType.VARCHAR)
     })
     List<ScsInscripcionguardia> getInscripcionByTurnoGuardiaNcolegiado(String usuModif, String idTurno, String idGuardia, String numColegiado);
+
+	@UpdateProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "DenegarInscripciones")
+	int getDegenarInscripcion(BusquedaInscripcionMod a, String string, String fECHADENEGACIONNUEVA, int usuario);
 
 
 

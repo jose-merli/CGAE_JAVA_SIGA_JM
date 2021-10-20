@@ -71,6 +71,24 @@ public class GuardiasItem {
 	private String comensustitucion;
 	private String letradosustituido;
 	private String sustituto;
+	private String idListaGuardia;
+	private String orden;
+
+	public String getIdListaGuardia() {
+		return idListaGuardia;
+	}
+
+	public void setIdListaGuardia(String idListaGuardia) {
+		this.idListaGuardia = idListaGuardia;
+	}
+
+	public String getOrden() {
+		return orden;
+	}
+
+	public void setOrden(String orden) {
+		this.orden = orden;
+	}
 
 	public String getSepararGuardia() {
 		return separarGuardia;
@@ -573,8 +591,8 @@ public class GuardiasItem {
 		this.comensustitucion = comensustitucion;
 	}
 
-	
-	
+
+
 	public String getLetradosustituido() {
 		return letradosustituido;
 	}
@@ -854,7 +872,7 @@ public class GuardiasItem {
 				", comensustitucion =" + comensustitucion + ", letradosustituido =" + letradosustituido + ", sustituto =" + sustituto +"]";
 	}
 
-	
+
 
 
 

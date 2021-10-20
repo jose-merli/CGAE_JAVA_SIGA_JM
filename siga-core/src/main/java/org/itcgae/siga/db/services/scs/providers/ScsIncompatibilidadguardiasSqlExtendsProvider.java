@@ -9,7 +9,7 @@ import org.itcgae.siga.db.mappers.ScsIncompatibilidadguardiasSqlProvider;
 
 public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatibilidadguardiasSqlProvider{
 
-	public String tarjetaIncompatibilidades(String idGuardia, String idInstitucion) {
+	public String tarjetaIncompatibilidades(String idGuardia, String idTurno, String idInstitucion) {
 		// SQL auxiliar para el UNION
 		
 		SQL sqlUnion = new SQL();
@@ -41,7 +41,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		sqlUnion.JOIN("SCS_GUARDIASTURNO guardi ON incomp.idguardia = guardi.idguardia AND INCOMP.idturno = guardi.idturno AND INCOMP.idinstitucion = guardi.idinstitucion");
 		sqlUnion.JOIN("SCS_TURNO turnos ON turnos.idturno = guardi.idturno AND turnos.idinstitucion = guardi.idinstitucion");
 		
-		sqlUnion.WHERE("(incomp.IDGUARDIA = "+idGuardia+" AND incomp.IDINSTITUCION = "+idInstitucion);
+		sqlUnion.WHERE("(incomp.IDGUARDIA = "+idGuardia+" AND incomp.IDINSTITUCION = "+idInstitucion+" AND turnos.IDTURNO = "+idTurno);
 		
 		
 		
@@ -75,7 +75,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		sql.JOIN("SCS_GUARDIASTURNO guardi ON incomp.idguardia = guardi.idguardia AND INCOMP.idturno = guardi.idturno AND INCOMP.idinstitucion = guardi.idinstitucion");
 		sql.JOIN("SCS_TURNO turnos ON turnos.idturno = guardi.idturno AND turnos.idinstitucion = guardi.idinstitucion");
 		
-		sql.WHERE("incomp.IDGUARDIA_INCOMPATIBLE = "+idGuardia+" AND incomp.IDINSTITUCION = "+idInstitucion + ") UNION "+sqlUnion.toString());
+		sql.WHERE("incomp.IDGUARDIA_INCOMPATIBLE = "+idGuardia+" AND incomp.IDINSTITUCION = "+idInstitucion + " AND incomp.IDTURNO_INCOMPATIBLE = " + idTurno + ") UNION "+sqlUnion.toString());
 		return sql.toString();
 	}
 	

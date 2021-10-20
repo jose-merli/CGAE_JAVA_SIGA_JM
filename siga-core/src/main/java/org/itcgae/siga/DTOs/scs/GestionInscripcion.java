@@ -22,6 +22,7 @@ public class GestionInscripcion {
 	private String obligatoriedadInscripcion;
 	private String descripcionObligatoriedad;
 	
+
 	public String getIdGuardia() {
 		return idGuardia;
 	}

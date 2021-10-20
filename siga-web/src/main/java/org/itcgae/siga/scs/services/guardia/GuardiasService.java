@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
@@ -57,7 +58,7 @@ public interface GuardiasService {
 
 	public GuardiasItem resumenGuardia(GuardiasItem guardiasItem, HttpServletRequest request);
 
-	public GuardiasDTO tarjetaIncompatibilidades(String idGuardia, HttpServletRequest request);
+	public GuardiasDTO tarjetaIncompatibilidades(String idGuardia, String idTurno, HttpServletRequest request);
 
 	public ComboDTO getBaremos(String idGuardia, HttpServletRequest request);
 
@@ -157,5 +158,7 @@ public interface GuardiasService {
 	UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarBody, HttpServletRequest request);
 
 	UpdateResponseDTO validarInscripciones(BusquedaInscripcionItem validarBody, HttpServletRequest request);
+
+	public StringDTO getTipoDiaGuardia(HttpServletRequest var1, String var2, String var3);
 
 }
