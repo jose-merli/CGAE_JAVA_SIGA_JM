@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActasDTO;
 import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.db.entities.ScsActacomision;
 
 
 public interface IBusquedaActa {
@@ -28,5 +29,7 @@ public interface IBusquedaActa {
 	public UpdateResponseDTO abrirActa(ActasItem actasItem, HttpServletRequest request) throws SigaExceptions;
 
 	public UpdateResponseDTO cerrarActa(ActasItem actasItem, HttpServletRequest request) throws Exception;
+
+	public ScsActacomision getActa(ActasItem actasItem, HttpServletRequest request);
 	
 }

@@ -446,12 +446,13 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 				// Con este dato sabremos si actualizar o crear un nuevo registro mas tarde
 				actualizar = false;
 			}
+			
+			LOGGER.info("Estoy aqui para ver el objeto actasItem "+actasItem);
+			LOGGER.info("Estoy aqui para ver el objeto actasItem "+actasItem.getAnio() + " " + actasItem.getFechaReunion()+ " " + actasItem.getFechaResolucion() + " "  + actasItem.getPendientes());
 
 			// Comprobamos que se cumplen los requisitos de cada campo
-			if (actasItem.getAnio() != null && actasItem.getAnio().equalsIgnoreCase(String.valueOf(year))
-					&& actasItem.getFechaReunion() != null && actasItem.getFechaResolucion() != null
-					&& actasItem.getMiembros().length() <= 4000 && actasItem.getPendientes() != null
-					&& actasItem.getPendientes().length() <= 4000) {
+			if (actasItem.getAnio() != null && actasItem.getFechaReunion() != null && actasItem.getFechaResolucion() != null
+				&& actasItem.getPendientes() != null) {
 //				&& scsActaExtendsMapper.comprobarGuardarActaSufijo(actasItem,
 //						Short.valueOf("2011")) == null
 //				&& scsActaExtendsMapper.comprobarGuardarActaPonente(actasItem, Short.valueOf("2011")) == 0
@@ -508,27 +509,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					} else {
 						acta.setNumeroacta(actasItem.getNumeroActa() + actasItem.getSufijo());
 					}
-				}
-
-//					LOGGER.info("EL NUMERO DEL ACTA ES: " + numActa);
-//
-//					if (numActa.matches("[0-9]+")) {
-//						LOGGER.info("SI SOLO TIENE NUMEROS");
-//						numActaInt = Integer.parseInt(numActa); 
-//						LOGGER.info("NUMERO ACTA VA A SER " + numActaInt);
-//						acta.setNumeroacta(String.valueOf(numActaInt + 1));
-//					}else {
-//						LOGGER.info("SI  TIENE LETRAS TAMBIEN");
-//						numActaInt = Integer.parseInt(numActa.substring(0, 2));
-//						LOGGER.info("SUBESTRING NUMERO " + numActa);
-//						letrasActa = numActa.substring(2, numActa.length());
-//						LOGGER.info("SACO LAS LETRAS " + letrasActa);
-//						numActa = String.valueOf(numActaInt + 1);
-//						numActa += letrasActa;
-//						LOGGER.info("SE LE SUMA UNO Y SE LE UNEN LAS LETRAS");
-//						acta.setNumeroacta(numActa);
-//
-//					}				
+				}			
 
 				if (actasItem.getHoraInicio() != null) {
 					acta.setHorainicioreunion(actasItem.getHoraInicio());
@@ -1206,6 +1187,87 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		return updateResponseDTO;
 	}
+	
+	@Override
+	public ScsActacomision getActa(ActasItem actasItem, HttpServletRequest request) {
+		
+		LOGGER.info("comboSufijoActa() -> Entrada al servicio para obtener el colegiado");
+
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		String resultado = "0";
+
+		ScsActacomision acta = new ScsActacomision();
+
+		// Si la institucion del token es nula, no ejecutaremos nada del código
+
+		if (null != idInstitucion) {
+
+			// Vamos a obtener el usuario para poder sacar sus datos y usarlos en el método
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"comboSufijoActa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"comboSufijoActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			AdmUsuarios usuario = usuarios.get(0);
+
+			usuario.setIdinstitucion(idInstitucion);
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+
+			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+			LOGGER.info(
+					"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el combo de sufijos para actas");
+
+			// Obtenemos el combo de sufijos para el acta
+
+			acta = obtenerActa(actasItem, Short.valueOf("2011"));
+			
+			List<ScsEjgActa> listaEjgActaRelacionado = obtenerEjgActa(acta);
+			
+			
+			
+			if (!listaEjgActaRelacionado.isEmpty()) {
+				acta.setUsumodificacion(listaEjgActaRelacionado.size());
+			}
+			
+
+			LOGGER.info(
+					"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener el combo de sufijos para actas");
+
+
+
+		} else {
+
+			error.setCode(500);
+
+			error.setDescription("Fallo a la hora de devolver los sufijos, idInstitucion del token nula");
+
+			LOGGER.warn("comboSufijoActa() -> idInstitucion del token nula");
+
+		}
+
+		LOGGER.info("getLabel() -> Salida del servicio para obtener los sufijos de las actas");
+
+		return acta;
+	}
 
 	/**
 	 * @param idInstitucion
@@ -1328,6 +1390,9 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 	}
 
 	private ScsActacomision obtenerActa(ActasItem actasItem, Short idInstitucion) {
+		
+		LOGGER.info("DATOS DEL ACTA QUE SE ESTA ENVIANDO DESDE EL FRONT" + actasItem.getAnio() + " " + actasItem.getIdActa() + " " + actasItem.getIdInstitucion());
+
 
 		ScsActacomision acta = null;
 
@@ -1337,7 +1402,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		key.setIdacta(Long.valueOf(actasItem.getIdActa()));
 
-		key.setIdinstitucion(Short.valueOf(idInstitucion));
+		key.setIdinstitucion(Short.valueOf(actasItem.getIdInstitucion()));
 
 		try {
 			acta = scsActacomisionMapper.selectByPrimaryKey(key);
@@ -1450,5 +1515,9 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		return listaEjgActa;
 	}
+
+	
+
+	
 
 }

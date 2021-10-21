@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActasDTO;
 import org.itcgae.siga.DTOs.scs.ActasItem;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.db.entities.ScsActacomision;
 import org.itcgae.siga.scs.services.acta.IBusquedaActa;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,12 @@ public class ActaController {
 	ResponseEntity<ComboDTO> comboSufijoActa(HttpServletRequest request) throws SigaExceptions {
 		ComboDTO response = actas.comboSufijoActa(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-acta/getActa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ScsActacomision> getActa(@RequestBody ActasItem actasItem, HttpServletRequest request) throws SigaExceptions {
+		ScsActacomision response = actas.getActa(actasItem,request);
+		return new ResponseEntity<ScsActacomision>(response, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/filtros-acta/guardarActa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
