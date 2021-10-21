@@ -1,14 +1,14 @@
 package org.itcgae.siga.scs.controllers.remesas;
 
+import java.sql.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.RemesaResultadoDTO;
-import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
 import org.itcgae.siga.db.entities.AdmContador;
@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
@@ -54,9 +56,24 @@ public class RemesasResultadoController {
 		return new ResponseEntity<AdmContador>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/guardarRemesaResultado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestBody RemesasResolucionItem remesasResolucionItem, MultipartHttpServletRequest request) {
-		UpdateResponseDTO response = remesasResultados.guardarRemesaResultado(remesasResolucionItem, request);
+	@RequestMapping(value = "/guardarRemesaResultado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestParam int idRemesa,
+													@RequestParam("observaciones") String observaciones,
+													@RequestParam("nombreFichero") String nombreFichero,
+													@RequestParam("fechaCarga") String fechaCarga,
+													@RequestParam("fechaResolucion") String fechaResolucion,
+													MultipartHttpServletRequest  request){
+		LOGGER.info("----ENTRA METODO GUARDAR RESULTADO-----");
+		RemesasResolucionItem remesasResolucionItem = new RemesasResolucionItem();
+		if(idRemesa != 0) {
+			remesasResolucionItem.setIdRemesa(idRemesa);
+		}
+		remesasResolucionItem.setObservaciones(observaciones);
+		remesasResolucionItem.setNombreFichero(nombreFichero);
+		remesasResolucionItem.setFechaCarga(Date.valueOf(fechaCarga));
+		remesasResolucionItem.setFechaResolucion(Date.valueOf(fechaResolucion));
+
+		UpdateResponseDTO response = remesasResultados.guardarRemesaResultado(remesasResolucionItem,  request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else

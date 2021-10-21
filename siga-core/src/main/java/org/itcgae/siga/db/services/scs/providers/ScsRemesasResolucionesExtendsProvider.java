@@ -79,4 +79,15 @@ public class ScsRemesasResolucionesExtendsProvider {
 		LOGGER.info(sql.toString());
 		return sql.toString();
 	}
+	
+	public String getMaxIdRemesaResolucionFichero(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDREMESARESOLUCIONFICHERO) as IDREMESARESOLUCIONFICHERO");
+		sql.FROM("cajg_remesaresolucionfichero");
+		sql.WHERE("idinstitucion = " + idInstitucion.toString());
+
+		LOGGER.info(sql.toString());
+		return sql.toString();
+	}
 }

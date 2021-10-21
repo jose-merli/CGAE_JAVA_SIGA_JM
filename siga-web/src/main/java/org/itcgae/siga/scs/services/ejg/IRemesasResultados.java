@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IRemesasResultados {
