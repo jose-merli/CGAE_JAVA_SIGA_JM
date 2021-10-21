@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
@@ -137,6 +138,17 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 		@Result(column = "CERRARPAR", property = "cerrarparentesis", jdbcType = JdbcType.VARCHAR)
 		
 		}) 
-	List<ConstructorConsultasItem> obtenerDatosConsulta(String idioma, Short idInstitucion, String idConsulta);
+	List<ConstructorConsultasItem> obtenerDatosConsulta(Short idInstitucion, String idConsulta);
 	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerConsulta")
+	String obtenerConsulta(Short idInstitucion, String idConsulta);
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerConfigColumnasQueryBuilder")
+	@Results({
+		@Result(column = "TIPOCAMPO", property = "tipocampo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREENCONSULTA", property = "nombreenconsulta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SELECTAYUDA", property = "selectayuda", jdbcType = JdbcType.VARCHAR)
+		
+		}) 
+	List<ConfigColumnasQueryBuilderItem> obtenerConfigColumnasQueryBuilder();
 }	

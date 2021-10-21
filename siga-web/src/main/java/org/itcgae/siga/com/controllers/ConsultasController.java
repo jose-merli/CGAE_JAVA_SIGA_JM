@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderDTO;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
@@ -230,6 +231,15 @@ public class ConsultasController {
 			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping(value = "/pys/obtenerConfigColumnasQueryBuilder")
+	ResponseEntity<ConfigColumnasQueryBuilderDTO> obtenerConfigColumnasQueryBuilder(HttpServletRequest request) { 
+		ConfigColumnasQueryBuilderDTO response = _consultasService.obtenerConfigColumnasQueryBuilder(request);
+		if (response.getError() == null)
+			return new ResponseEntity<ConfigColumnasQueryBuilderDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConfigColumnasQueryBuilderDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }
