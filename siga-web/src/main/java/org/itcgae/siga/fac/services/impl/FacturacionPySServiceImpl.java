@@ -529,15 +529,34 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 							List<TiposIncluidosItem> tiposIncluidos = new ArrayList<>();
 
 							LOGGER.info("getSeriesFacturacion() -> Obteniendo los tipos de servicios para idInstitucion=" + idInstitucion + ", idSerieFacturacion=" + idSerieFacturacion);
-							tiposIncluidos.addAll(facFacturacionsuscripcionExtendsMapper.getTiposServicios(idSerieFacturacion, idInstitucion, idioma));
+							List<TiposIncluidosItem> tiposServicios = facFacturacionsuscripcionExtendsMapper.getTiposServicios(idSerieFacturacion, idInstitucion, idioma);
 							LOGGER.info("getSeriesFacturacion() -> Obteniendo los tipos de productos para idInstitucion=" + idInstitucion + ", idSerieFacturacion=" + idSerieFacturacion);
-							tiposIncluidos.addAll(pysCompraExtendsMapper.getTiposProductos(idSerieFacturacion, idInstitucion, idioma));
+							List<TiposIncluidosItem> tiposProductos = pysCompraExtendsMapper.getTiposProductos(idSerieFacturacion, idInstitucion, idioma);
+
+							tiposIncluidos.addAll(tiposServicios);
+							tiposIncluidos.addAll(tiposProductos);
 
 							List<String> tiposIncluidosSerie = tiposIncluidos.stream()
 									.map(t -> t.getDescripcion())
 									.collect(Collectors.toList());
 
+							List<ComboItem> tiposServiciosSerie = tiposServicios.stream().map(t -> {
+								ComboItem item = new ComboItem();
+								item.setLabel(t.getDescripcion());
+								item.setValue(t.getIdTipoIncluido());
+								return item;
+							}).collect(Collectors.toList());
+
+							List<ComboItem> tiposProductosSerie = tiposProductos.stream().map(t -> {
+								ComboItem item = new ComboItem();
+								item.setLabel(t.getDescripcion());
+								item.setValue(t.getIdTipoIncluido());
+								return item;
+							}).collect(Collectors.toList());
+
 							serieItem.setTiposIncluidos(tiposIncluidosSerie);
+							serieItem.setTiposServicios(tiposServiciosSerie);
+							serieItem.setTiposProductos(tiposProductosSerie);
 						}
 					}
 
