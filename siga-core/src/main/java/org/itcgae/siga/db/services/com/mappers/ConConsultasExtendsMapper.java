@@ -16,9 +16,11 @@ import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.services.com.providers.ConClaseComunicacionesExtendsSqlProvider;
 import org.itcgae.siga.db.services.com.providers.ConConsultasExtendsSqlProvider;
 import org.itcgae.siga.db.services.fac.providers.PySTiposServiciosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -151,4 +153,10 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 		
 		}) 
 	List<ConfigColumnasQueryBuilderItem> obtenerConfigColumnasQueryBuilder();
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerCombosQueryBuilder")
+	@Results({@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> obtenerCombosQueryBuilder(ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem, String idioma, Short idInstitucion);
 }	

@@ -10,6 +10,7 @@ import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderDTO;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
@@ -242,4 +243,12 @@ public class ConsultasController {
 			return new ResponseEntity<ConfigColumnasQueryBuilderDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	@PostMapping(value = "/pys/obtenerCombosQueryBuilder")
+	ResponseEntity<ComboDTO> obtenerCombosQueryBuilder(HttpServletRequest request, @RequestBody ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem) { 
+		ComboDTO response = _consultasService.obtenerCombosQueryBuilder(request, configColumnasQueryBuilderItem);
+		if (response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }

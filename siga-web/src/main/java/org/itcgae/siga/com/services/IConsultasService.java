@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderDTO;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
@@ -76,5 +77,7 @@ public interface IConsultasService {
 	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta);
 	
 	public ConfigColumnasQueryBuilderDTO obtenerConfigColumnasQueryBuilder(HttpServletRequest request);
+	
+	public ComboDTO obtenerCombosQueryBuilder(HttpServletRequest request, ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem);
 	
 }

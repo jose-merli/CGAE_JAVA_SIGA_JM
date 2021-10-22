@@ -2941,4 +2941,38 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		return configColumnasQueryBuilderDTO;
 	}
+	
+	@Override
+	public ComboDTO obtenerCombosQueryBuilder(HttpServletRequest request, ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem) {
+		LOGGER.info(
+				"obtenerCombosQueryBuilder() -> Entrada al servicio para obtener el combo de la columna seleccionada en el constructor de consultas");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			String idioma = usuarios.get(0).getIdlenguaje();
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				comboItems = _conConsultasExtendsMapper.obtenerCombosQueryBuilder(configColumnasQueryBuilderItem, idioma, idInstitucion);
+
+				comboDTO.setCombooItems(comboItems);
+
+			}
+		}
+
+		LOGGER.info("obtenerCombosQueryBuilder() -> Salida del servicio para obtener el combo de la columna seleccionada en el constructor de consultas");
+
+		return comboDTO;
+	}
 }

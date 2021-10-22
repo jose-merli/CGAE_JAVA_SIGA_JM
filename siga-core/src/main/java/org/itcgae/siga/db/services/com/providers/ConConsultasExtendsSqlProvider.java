@@ -4,6 +4,7 @@ package org.itcgae.siga.db.services.com.providers;
 import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 
 public class ConConsultasExtendsSqlProvider {
@@ -269,4 +270,17 @@ public class ConConsultasExtendsSqlProvider {
 		return sql.toString();
 	}
 	
+	public String obtenerCombosQueryBuilder(ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem, String idioma, Short idInstitucion){
+	
+		if(configColumnasQueryBuilderItem.getSelectayuda().contains("@IDIOMA@")) {
+			configColumnasQueryBuilderItem.setSelectayuda(configColumnasQueryBuilderItem.getSelectayuda().replace("@IDIOMA@", idioma));
+		}
+		
+		if(configColumnasQueryBuilderItem.getSelectayuda().contains("@IDINSTITUCION@")) {
+			configColumnasQueryBuilderItem.setSelectayuda(configColumnasQueryBuilderItem.getSelectayuda().replace("@IDINSTITUCION@", idInstitucion.toString()));
+		}
+	
+		return configColumnasQueryBuilderItem.getSelectayuda();
+	}
+
 }
