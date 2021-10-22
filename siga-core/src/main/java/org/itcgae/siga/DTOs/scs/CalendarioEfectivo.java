@@ -144,6 +144,7 @@ public class CalendarioEfectivo {
 
 		} // while
 	} // generarCalendarioEfectivo ()
+	
 
 	/** Genera el Calendario Efectivo si no aplica periodo */
 	private void generarCalendarioEfectivoSinPeriodo() {
@@ -200,7 +201,7 @@ public class CalendarioEfectivo {
 	} // generarCalendarioEfectivoSinPeriodo ()
 
 	/** Devuelve la fecha en la que debe comenzar segun la unidad de tiempo */
-	private Date inicializarUnidadDeTiempo(int unidades, Date fechaInicio) {
+	public Date inicializarUnidadDeTiempo(int unidades, Date fechaInicio) {
 		Date fechaInicioSiguientePeriodo = (Date) fechaInicio.clone();
 
 		// Para operar con la fecha:
@@ -217,7 +218,7 @@ public class CalendarioEfectivo {
 	 * Devuelve la fecha del siguiente inicio segun la unidad de tiempo y la
 	 * cantidad
 	 */
-	private Date calcularInicioSiguiente(int unidades,
+	public Date calcularInicioSiguiente(int unidades,
 			Date fechaInicioAnterior, int duracion, Date fechaFin) {
 		// empezando por la fecha inicio anterior
 		Date fechaInicioSiguientePeriodo = (Date) fechaInicioAnterior.clone();
@@ -241,7 +242,7 @@ public class CalendarioEfectivo {
 	 * Comprueba si la unidad de tiempo del primer argumento termina el dia de
 	 * la fecha del segundo argumento
 	 */
-	private boolean manyanaTerminaLaUnidadDeTiempo(int unidades,
+	public boolean manyanaTerminaLaUnidadDeTiempo(int unidades,
 			Date punteroFecha) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(punteroFecha);
@@ -282,7 +283,7 @@ public class CalendarioEfectivo {
 	 * puede ser una de las recogidas en java.util.Calendar (DATE, WEEK_OF_YEAR,
 	 * MONTH, YEAR) o CalendarioEfectivo.QUINCENA
 	 */
-	private Date incrementar(Date fecha, int unidades, int incremento) {
+	public Date incrementar(Date fecha, int unidades, int incremento) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(fecha);
 

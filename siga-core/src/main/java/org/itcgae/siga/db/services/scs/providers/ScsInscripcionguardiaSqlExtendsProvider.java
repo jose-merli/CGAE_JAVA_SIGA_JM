@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
 import org.itcgae.siga.db.mappers.ScsInscripcionguardiaSqlProvider;
 
 public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguardiaSqlProvider{
@@ -325,23 +326,25 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		return sql.toString();
 	}
 
-	public String searchGrupoGuardia(Short idInstitucion, String idGuardia) {
+	public String searchGrupoGuardia(Short idInstitucion, String idGuardia, String idPersona) {
 
 		SQL sql = new SQL();
 
 		sql.SELECT("SCS_GRUPOGUARDIA.NUMEROGRUPO");
 		sql.SELECT("SCS_GRUPOGUARDIA.IDGUARDIA");
-		sql.SELECT("SCS_GRUPOGUARDIACOLEGIADO.ORDEN");
-		sql.SELECT("SCS_GRUPOGUARDIACOLEGIADO.IDPERSONA");
+		sql.SELECT("gcolegiado.ORDEN");
+		sql.SELECT("gcolegiado.IDPERSONA");
 
 		sql.FROM("SCS_GRUPOGUARDIA");
-		sql.INNER_JOIN("SCS_GRUPOGUARDIACOLEGIADO gcolegiado on SCS_GRUPOGUARDIA.IDINSTITUCION =  SCS_GRUPOGUARDIACOLEGIADO.IDINSTITUCION"
-				+ "AND SCS_GRUPOGUARDIA.IDGRUPOGUARDIA =  SCS_GRUPOGUARDIACOLEGIADO.IDGRUPOGUARDIA");
+		sql.INNER_JOIN("SCS_GRUPOGUARDIACOLEGIADO gcolegiado on SCS_GRUPOGUARDIA.IDINSTITUCION =  gcolegiado.IDINSTITUCION"
+				+ " AND SCS_GRUPOGUARDIA.IDGRUPOGUARDIA =  gcolegiado.IDGRUPOGUARDIACOLEGIADO");
 
 		sql.WHERE("SCS_GRUPOGUARDIA.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("SCS_GRUPOGUARDIA.IDGUARDIA IN (" + idGuardia + ")");
-		
-		sql.ORDER_BY("SCS_GRUPOGUARDIA.NUMEROCOLEGIADO");
+		if (idPersona != null) {
+		sql.WHERE("gcolegiado.IDPERSONA = " +  idPersona);
+		}
+		sql.ORDER_BY("SCS_GRUPOGUARDIA.NUMEROGRUPO");
 
 
 		return sql.toString();
@@ -530,12 +533,12 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 
 		sql.SELECT("SCS_GRUPOGUARDIA.NUMEROGRUPO");
 		sql.SELECT("SCS_GRUPOGUARDIA.IDGUARDIA");
-		sql.SELECT("SCS_GRUPOGUARDIACOLEGIADO.ORDEN");
-		sql.SELECT("SCS_GRUPOGUARDIACOLEGIADO.IDPERSONA");
+		sql.SELECT("gcolegiado.ORDEN");
+		sql.SELECT("gcolegiado.IDPERSONA");
 
 		sql.FROM("SCS_GRUPOGUARDIA");
-		sql.INNER_JOIN("SCS_GRUPOGUARDIACOLEGIADO gcolegiado on SCS_GRUPOGUARDIA.IDINSTITUCION =  SCS_GRUPOGUARDIACOLEGIADO.IDINSTITUCION"
-				+ "AND SCS_GRUPOGUARDIA.IDGRUPOGUARDIA =  SCS_GRUPOGUARDIACOLEGIADO.IDGRUPOGUARDIA");
+		sql.INNER_JOIN("SCS_GRUPOGUARDIACOLEGIADO gcolegiado on SCS_GRUPOGUARDIA.IDINSTITUCION =  gcolegiado.IDINSTITUCION"
+				+ " AND SCS_GRUPOGUARDIA.IDGRUPOGUARDIA =  gcolegiado.IDGRUPOGUARDIACOLEGIADO");
 
 		sql.WHERE("SCS_GRUPOGUARDIA.idinstitucion = '" + idInstitucion + "'");
 		//sql.WHERE("SCS_GRUPOGUARDIA.idPersona = '" + idPersona + "'");
@@ -1452,9 +1455,9 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 	    SQL sql = new SQL();
 	    sql.SELECT("*");
 	    sql.FROM("SCS_INSCRIPCIONGUARDIA");
-	    if (!usuModif.isEmpty() && usuModif != null) {
-	    sql.WHERE("USUMODIFICACION = "+ usuModif);
-	    }
+//	    if (!usuModif.isEmpty() && usuModif != null) {
+//	    sql.WHERE("USUMODIFICACION = "+ usuModif);
+//	    }
 	    if (!idTurno.isEmpty() && idTurno != null) {
 	    sql.WHERE("IDTURNO = " + idTurno);
 	    }
@@ -1466,4 +1469,77 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
    // sql.SELECT("FECHASUSCRIPCION");
 	    return sql.toString();
     }
+    
+    
+	public String checkInscripcionesRangoFecha(BusquedaInscripcionMod inscripciones, String idInstitucion,String fechaInicio, String fechaFin) {
+		
+		SQL sql = new SQL();
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		
+		sql.SELECT("*");
+		sql.FROM("scs_inscripcionguardia");
+		
+		if(fechaFin != null) {
+			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/RRRR') <= TO_DATE('"+fechaFin+"','DD,MM/RRRR')");
+		}
+		if(fechaInicio != null) {
+			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/RRRR') >= TO_DATE('"+fechaInicio+"','DD,MM/RRRR')");
+		}
+		
+		if(idInstitucion != null) {
+			sql.WHERE("IDINSTITUCION ="+ idInstitucion);
+		}
+		
+		if(inscripciones.getIdpersona() != null) {
+			sql.WHERE("IDPERSONA ="+ inscripciones.getIdpersona());
+		}
+		
+		if(inscripciones.getIdturno() != null) {
+			sql.WHERE("IDTURNO ="+ inscripciones.getIdturno());
+		}
+		
+		if(inscripciones.getIdguardia() != null) {
+			sql.WHERE("IDGUARDIA ="+ inscripciones.getIdguardia());
+		}
+		if(fechaInicio != null) {
+		//fechavalidacion <= fechaInicio && (fechabaja >= fechafin || fechabaja is null)
+			sql.WHERE("TO_CHAR(FECHAVALIDACION,'DD/MM/RRRR') <= TO_DATE('"+fechaInicio+"','DD,MM/RRRR')");
+		}
+		if(fechaFin != null) {
+			sql.WHERE("TO_CHAR(FECHABAJA,'DD/MM/RRRR') >= TO_DATE('"+fechaFin+"','DD,MM/RRRR') OR FECHABAJA IS NULL"); //nvl(fechabaja, 'fechafin')
+		}
+		sql.WHERE("ROWNUM <= 200");
+		return sql.toString();
+	}
+	
+	
+	
+	public String getColegiadosInscritosGuardia(ScsInscripcionguardiaKey key) {
+		// TODO Auto-generated method stub
+		SQL sql = new SQL();
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        String today = formatter.format(new Date());
+        
+		sql.SELECT("IDPERSONA");
+		sql.FROM("SCS_GRUPOGUARDIACOLEGIADO");
+		
+		if(String.valueOf(key.getIdinstitucion()) != null ) {
+			sql.WHERE("IDINSTITUCION = " +  "'"+String.valueOf(key.getIdinstitucion())+"'");
+		}
+		
+		if(String.valueOf(key.getIdturno()) != null) {
+			sql.WHERE("IDTURNO = "+ String.valueOf(key.getIdturno()));
+		}
+		
+		if(String.valueOf(key.getIdguardia()) != null) {
+			sql.WHERE("IDGUARDIA = "+ String.valueOf(key.getIdguardia()));
+		}
+		
+		if(key.getFechasuscripcion() != null) {
+			sql.WHERE("FECHASUSCRIPCION = " +"TO_DATE('"+today+"','DD/MM/YYYY')");
+		}
+		
+		
+		return sql.toString();
+	}
 }

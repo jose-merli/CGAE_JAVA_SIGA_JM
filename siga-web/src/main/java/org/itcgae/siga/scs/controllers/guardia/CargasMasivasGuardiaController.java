@@ -57,8 +57,8 @@ public class CargasMasivasGuardiaController {
 	}
 	
 	@RequestMapping(value = "/cargasMasivasGuardia/uploadFileI", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<DeleteResponseDTO> uploadFileI(HttpServletRequest request,@RequestBody FileDataDTO body) throws IllegalStateException, IOException{
-		DeleteResponseDTO response = cargasMasivasGuardiaService.uploadFileI(request, body);
+	public ResponseEntity<DeleteResponseDTO> uploadFileI( @RequestParam("fechaSolicitud") String fechaSolicitud, MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+		DeleteResponseDTO response = cargasMasivasGuardiaService.uploadFileI(fechaSolicitud, request);
 		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
@@ -73,11 +73,19 @@ public class CargasMasivasGuardiaController {
 	}
 	
 	@RequestMapping(value = "/cargasMasivasGuardia/uploadFileC", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<DeleteResponseDTO> uploadFileC(@RequestParam("fechaDesde") String fechaDesde, @RequestParam("fechaHasta") String fechaHasta, @RequestParam("observaciones") String observaciones, MultipartHttpServletRequest request) throws IllegalStateException, IOException{
-		DeleteResponseDTO response = cargasMasivasGuardiaService.uploadFileC(request, fechaDesde, fechaHasta, observaciones);
-		if (response.getStatus().equals(SigaConstants.OK))
-			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
+	public ResponseEntity<DeleteResponseDTO> uploadFileC(@RequestParam("fechaDesde") String fechaDesde, @RequestParam("fechaHasta") String fechaHasta, @RequestParam("observaciones") String observaciones, MultipartHttpServletRequest request) throws IllegalStateException, IOException, Exception{
+		DeleteResponseDTO response;
+		try {
+			response = cargasMasivasGuardiaService.uploadFileC(request, fechaDesde, fechaHasta, observaciones);
+			if (response.getStatus().equals(SigaConstants.OK))
+				return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+			else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 	
 	@RequestMapping(value = "/cargasMasivasGuardia/download", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

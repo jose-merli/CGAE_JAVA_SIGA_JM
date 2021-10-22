@@ -1166,11 +1166,12 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getIdGuardiaByName")
 			@Results({})
-			String getIdGuardiaByName( String name);
 
+			List<String> getIdGuardiaByName( String name);
+			
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getIdTurnoByName")
 			@Results({})
-			String getIdTurnoByName( String name);
+			List<String> getIdTurnoByName( String name);
 
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "insertHistoricoCalendario")
 			@Results({})

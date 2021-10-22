@@ -8,7 +8,7 @@ import java.util.Vector;
 public class PeriodoEfectivoItem {
 
 	    //ATRIBUTOS
-	    private TreeSet ConjuntoDias;
+	    public TreeSet ConjuntoDias;
 	    
 	    
 	    //CONSTRUCTORES

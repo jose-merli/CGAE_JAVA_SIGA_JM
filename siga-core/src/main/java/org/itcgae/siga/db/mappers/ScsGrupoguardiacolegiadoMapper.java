@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.db.entities.ScsGrupoguardia;
 import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiado;
 import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiadoExample;
 import org.apache.ibatis.annotations.SelectKey;
@@ -144,4 +145,8 @@ public interface ScsGrupoguardiacolegiadoMapper {
 			"USUMODIFICACION = #{usumodificacion,jdbcType=DECIMAL}",
 			"where IDGRUPOGUARDIACOLEGIADO = #{idgrupoguardiacolegiado,jdbcType=DECIMAL}" })
 	int updateByPrimaryKey(ScsGrupoguardiacolegiado record);
+	
+	@SelectProvider(type = ScsGrupoguardiaSqlProvider.class, method = "getGrupoGuardiaByUniqueKey")
+	@Results({})
+	int getGrupoGuardiaByUniqueKey(ScsGrupoguardia record);
 }

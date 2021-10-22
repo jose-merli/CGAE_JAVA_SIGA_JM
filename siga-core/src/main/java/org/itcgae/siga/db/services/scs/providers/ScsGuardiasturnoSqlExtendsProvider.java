@@ -2225,9 +2225,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			sql.WHERE("cal.FECHA >=  TO_DATE('" + fechaInicio + "','DD/MM/YYYY')" );
 		}
 		if(idInstitucion1 != null || idInstitucion2 != null) {
-			sql.WHERE("cal.IDINSTITUCION = " + idInstitucion1 + " OR cal.IDINSTITUCION = " + idInstitucion2);
+			sql.WHERE("( cal.IDINSTITUCION = " + idInstitucion1 + " OR cal.IDINSTITUCION = " + idInstitucion2 + ")");
 		}
-			sql.WHERE("cal.IDPARTIDO IS NULL OR  cal.IDPARTIDO IN (" + subquery + " )");
+			sql.WHERE("( cal.IDPARTIDO IS NULL OR cal.IDPARTIDO IN (" + subquery + " ) )");
 
 			//sql.ORDER_BY("IDINSTITUCION, IDTURNO, IDGUARDIA, IDCALENDARIOGUARDIAS");
 		return sql.toString();
@@ -3272,6 +3272,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.SELECT("IDGUARDIA");
 		sql.FROM("SCS_GUARDIASTURNO");
 		sql.WHERE("NOMBRE = '"+ name + "'");
+//		sql.WHERE("FECHABAJA IS NULL");
 		return sql.toString();
 	}
 
@@ -3280,6 +3281,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.SELECT("IDTURNO");
 		sql.FROM("SCS_TURNO");
 		sql.WHERE("NOMBRE = '"+ name+ "'");
+//		sql.WHERE("FECHABAJA IS NULL");
 		return sql.toString();
 	}
 	public String insertHistoricoCalendario(String idCalendar, String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item, String usuModif) {
