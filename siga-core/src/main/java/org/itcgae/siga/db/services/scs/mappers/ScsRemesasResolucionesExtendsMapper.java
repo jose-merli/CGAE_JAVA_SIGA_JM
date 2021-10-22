@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
+import org.itcgae.siga.db.entities.CajgRemesaresolucionfichero;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasResolucionesExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -36,5 +37,12 @@ public interface ScsRemesasResolucionesExtendsMapper {
 	})
 	RemesasResolucionItem getMaxIdRemesaResolucion(Short idInstitucion);
 
+	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class, method = "getMaxIdRemesaResolucionFichero")
+	@Results({
+		@Result(column = "IDREMESARESOLUCIONFICHERO", property = "idremesaresolucionfichero", jdbcType = JdbcType.INTEGER)
+	})
+	CajgRemesaresolucionfichero getMaxIdRemesaResolucionFichero(Short idInstitucion);
+
+	
 	
 }
