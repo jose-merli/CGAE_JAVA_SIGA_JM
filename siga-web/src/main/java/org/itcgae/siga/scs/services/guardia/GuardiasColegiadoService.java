@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.scs.ComboGuardiasFuturasDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
@@ -33,14 +34,14 @@ public interface GuardiasColegiadoService {
 	public InsertResponseDTO  insertGuardiaColeg(GuardiasItem guardiasItem, HttpServletRequest request);
 	
 	//acciones tarjeta Sustituciones Guardias de Colegiado
-	public UpdateResponseDTO  sustituirGuardiaColeg(String[] datos, HttpServletRequest request);
+	public UpdateResponseDTO  sustituirGuardiaColeg(String[] datos, HttpServletRequest request) throws Exception;
 	public String getIdConjuntoGuardia(String idGuardia, HttpServletRequest request);
 	public ComboDTO getTurnoInscrito(String idPersona, HttpServletRequest request);
-	public ComboDTO getGuardiaDestinoInscrito(String idTurno, HttpServletRequest request);
+	public ComboGuardiasFuturasDTO getGuardiaDestinoInscrito(GuardiasItem guardiaItem, HttpServletRequest request);
 	
 	//acciones tarjeta Permutas Guardias de Colegiado.
-	public UpdateResponseDTO  validarPermuta(List<PermutaItem> permutas, HttpServletRequest request);
-	public InsertResponseDTO permutarGuardia(PermutaItem permutaItem, HttpServletRequest request);
+	public UpdateResponseDTO  validarPermuta(List<PermutaItem> permutas, HttpServletRequest request) throws Exception;
+	public InsertResponseDTO permutarGuardia(PermutaItem permutaItem, HttpServletRequest request) throws Exception;
 	
 
 }

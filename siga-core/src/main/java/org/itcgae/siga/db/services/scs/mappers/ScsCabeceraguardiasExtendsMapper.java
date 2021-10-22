@@ -70,14 +70,6 @@ public interface ScsCabeceraguardiasExtendsMapper extends ScsCabeceraguardiasMap
 	})
 	List<ScsCabeceraguardias> getPermutaGuardiaColegiado(GuardiasItem guardiaItem);
 	
-	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "sustituirLetrado")
-	int sustituirLetrado(String institucion,String idTurno,String idGuardia,String fechadesde,Long idPersona,Long newLetrado,String fechaSustitucion,String comensustitucion);
-	
-	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "sustituirLetradoPermutaCabecera")
-	int sustituirLetradoPermutaCabecera(String institucion,String idTurno, String idGuardia,Long idPersona,Long newLetrado,Long idPerCab,Date fecha);
-	
-	@UpdateProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "sustituirLetradoPermutaGuardia")
-	int sustituirLetradoPermutaGuardia(String institucion,String idTurno, String idGuardia,Long idPersona,Long newLetrado,Long numeroPermuta, boolean esSolicitante);
 	
 	@SelectProvider(type = ScsCabeceraguardiasSqlExtendsProvider.class, method = "getCalendarioGuardiaColegiado")
 	@Results({ @Result(column = "institucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
