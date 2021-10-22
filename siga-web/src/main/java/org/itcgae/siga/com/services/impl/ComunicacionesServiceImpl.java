@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -50,6 +51,7 @@ import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
@@ -426,6 +428,21 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 
             if (usuarios != null && usuarios.size() > 0) {
             	
+            	//Se comprueba si la institución desde la que se llama al servicio tiene 
+            	//el parametro "INTEGRACIONCONPNJ" activado
+            	//REVISAR SI HAY IMPLEMENTACIÓN MÁS OPTIMA EN LA BBDD
+            	GenParametrosExample parametroExample = new GenParametrosExample();
+            	
+            	parametroExample.setOrderByClause("IDINSTITUCION DESC");
+            	parametroExample.createCriteria().andIdinstitucionIn(Arrays.asList(idInstitucion, (short) 0))
+            	.andParametroEqualTo("INTEGRACIONCONPNJ").andModuloEqualTo(SigaConstants.MODULO_COM);
+            	
+            	List<GenParametros> parametrosInt = genParametrosMapper.selectByExample(parametroExample);
+            	
+            	//Esto indica que la institución actual no deberia tener acceso a este servicio
+            	if(parametrosInt.get(0).getValor().equals("0")) {
+            		throw new SigaExceptions("La institucion actual no tiene acceso a servicios del modulo PNJ");
+            	}
 
                 String nuevaCommJson = request.getParameter("nuevaComunicacion");
 

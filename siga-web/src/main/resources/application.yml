@@ -14,3 +14,6 @@ application:
     /pys/denegarPeticion: [39]
     /pys/savePagoCompraSuscripcion: [39]
     /pys/solicitarSuscripcion: [39]
+
+     # Permisos para el módulo de PNJ
+    /comunicaciones/saveNuevaComm: [30D1]
