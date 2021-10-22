@@ -2,6 +2,9 @@ package org.itcgae.siga.DTOs.com;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 public class NuevaComunicacionItem {
 	private String juzgado;
@@ -10,8 +13,8 @@ public class NuevaComunicacionItem {
 	private String mensaje;
 	private String numProcedimiento;
 	private String nig;
-	private String idClaseComunicacion;
-	private File[] docs;
+	private String idModeloComunicacion;
+	private List<MultipartFile> docs;
 	
 	public String getJuzgado() {
 		return juzgado;
@@ -49,16 +52,16 @@ public class NuevaComunicacionItem {
 	public void setNig(String nig) {
 		this.nig = nig;
 	}
-	public String getIdClaseComunicacion() {
-		return idClaseComunicacion;
+	public String getIdModeloComunicacion() {
+		return idModeloComunicacion;
 	}
-	public void setIdClaseComunicacion(String idClaseComunicacion) {
-		this.idClaseComunicacion = idClaseComunicacion;
+	public void setIdModeloComunicacion(String idModeloComunicacion) {
+		this.idModeloComunicacion = idModeloComunicacion;
 	}
-	public File[] getDocs() {
+	public List<MultipartFile> getDocs() {
 		return docs;
 	}
-	public void setDocs(File[] docs) {
+	public void setDocs(List<MultipartFile> docs) {
 		this.docs = docs;
 	}
 }

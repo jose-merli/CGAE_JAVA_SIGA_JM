@@ -174,6 +174,7 @@ public class SigaConstants {
 	public static final String MODULO_ADM = "ADM";
 	public static final String MODULO_ENV = "ENV";
 	public static final String MODULO_GEN = "GEN";
+	public static final String MODULO_COM = "COM";
 
 	public static final String TIPO_CEN_PERSONA = "CEN_PERSONA";
 

@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/comunicaciones")
@@ -148,9 +149,9 @@ public class ComunicacionesController {
     }	
 	
 	@RequestMapping(value = "/saveNuevaComm",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> saveNuevaComm(HttpServletRequest request, @RequestBody NuevaComunicacionItem nuevaComm) throws SigaExceptions, NumberFormatException, IOException {
+	ResponseEntity<InsertResponseDTO> saveNuevaComm(MultipartHttpServletRequest request) throws SigaExceptions, NumberFormatException, IOException {
 		
-		InsertResponseDTO response = _comunicacionesService.saveNuevaComm(request, nuevaComm);
+		InsertResponseDTO response = _comunicacionesService.saveNuevaComm(request);
 
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}

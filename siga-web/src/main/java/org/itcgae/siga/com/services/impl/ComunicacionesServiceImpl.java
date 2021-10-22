@@ -1,15 +1,19 @@
 package org.itcgae.siga.com.services.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -32,26 +36,39 @@ import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.ENVIOS_MASIVOS_LOG_EXTENSION;
+import org.itcgae.siga.commons.constants.SigaConstants.GEN_PARAMETROS;
+import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.EcomCola;
+import org.itcgae.siga.db.entities.EcomColaExample;
+import org.itcgae.siga.db.entities.EcomColaParametros;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvEnvios;
+import org.itcgae.siga.db.entities.EnvEnviosKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.ScsDocumentacionejg;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
+import org.itcgae.siga.db.mappers.EcomColaMapper;
+import org.itcgae.siga.db.mappers.EcomColaParametrosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDestinatariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +76,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Service
 @Transactional(timeout=2400)
@@ -104,6 +124,15 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 	@Autowired
 	private FicherosServiceImpl ficherosServiceImpl;
+	
+	@Autowired
+	private EcomColaParametrosMapper ecomColaParametrosMapper;
+	
+	@Autowired
+	private EcomColaMapper ecomColaMapper;
+	
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
 	
 
 	/**Realiza la busqueda de comunicaciones **/
@@ -375,7 +404,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 	@Transactional
 	@Override
-    public InsertResponseDTO saveNuevaComm (HttpServletRequest request, NuevaComunicacionItem nuevaComm) throws SigaExceptions, NumberFormatException, IOException {
+    public InsertResponseDTO saveNuevaComm (MultipartHttpServletRequest request) throws SigaExceptions, NumberFormatException, IOException {
 		LOGGER.info("saveNuevaComm() -> Entrada al servicio para insertar una nueva comunicación");
         InsertResponseDTO responsedto = new InsertResponseDTO();
         int response = 0;
@@ -385,36 +414,134 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
         if (idInstitucion != null) {
-            LOGGER.debug(
+            LOGGER.info(
                     "ComunicacionesServiceImpl.saveNuevaComm() -> Entrada para obtener información del usuario logeado");
 
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
             exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
             List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-            LOGGER.debug(
+            LOGGER.info(
                     "ComunicacionesServiceImpl.saveNuevaComm() -> Salida de obtener información del usuario logeado");
 
             if (usuarios != null && usuarios.size() > 0) {
-                LOGGER.debug(
+            	
+
+                String nuevaCommJson = request.getParameter("nuevaComunicacion");
+
+        		ObjectMapper objectMapper = new ObjectMapper();
+        		
+                NuevaComunicacionItem nuevaComm = objectMapper.readValue(nuevaCommJson,
+						new TypeReference<NuevaComunicacionItem>() {
+						});
+
+                Iterator<String> itr = request.getFileNames();
+            	
+                List<MultipartFile> docs = new ArrayList<MultipartFile>();
+                
+                while (itr.hasNext()) {
+                	MultipartFile file = request.getFile(itr.next());
+                	docs = nuevaComm.getDocs();
+                	docs.add(file);
+                	nuevaComm.setDocs(docs);
+                }
+
+                LOGGER.info(
                         "ComunicacionesServiceImpl.saveNuevaComm() -> Entrada para insertar insertar una nueva comunicación");
                 	
+                	EcomCola elementoCola = new EcomCola();
+
+                	EcomColaExample ecomColaExample = new EcomColaExample();
+                	
+                	ecomColaExample.createCriteria();
+                	
+                	long newIdEcomCola = ecomColaMapper.countByExample(ecomColaExample) + 1;
+                	
+                	elementoCola.setIdecomcola(newIdEcomCola);
+                	
+                	elementoCola.setFechacreacion(new Date());
+                	elementoCola.setIdinstitucion(idInstitucion);
+                	elementoCola.setIdestadocola((short) 1);//Todos los elementos nuevos de la cola eCOM se inicializan con estado uno para que eCOM los procese
+                	elementoCola.setIdoperacion(80); //Referencia al servicio creado por Jesus Roman (ECOM_OPERACION)
+                	elementoCola.setReintento(0);//Numero de reintentos realizados
+                	elementoCola.setFechamodificacion(new Date());
+                	elementoCola.setUsumodificacion(usuarios.get(0).getIdusuario());
+                	
+                	LOGGER.info(
+                            "ComunicacionesServiceImpl.saveNuevaComm() / ecomColaMapper.insert() -> Entrada a ecomColaMapper para insertar una fila en la cola eCOM");
+
+                	response = ecomColaMapper.insert(elementoCola);
+                	
+                	LOGGER.info(
+                            "ComunicacionesServiceImpl.saveNuevaComm() / ecomColaMapper.insert() -> Salida de ecomColaMapper para insertar una fila en la cola eCOM");
+
+                	if(response == 0) {
+                		throw new SigaExceptions("Error al insertar el envio de una nueva comunicación en la cola de eCOM");
+                	}
+                	
+                	
+                	LOGGER.info(
+                            "ComunicacionesServiceImpl.saveNuevaComm() / insertParametrosNewComm() -> Entrada insertParametrosNewComm() para insertar los parametros para la nueva fila de eCOM");
+
+                	
+                	//Insertamos los distintos parametros de eCOM a partir de los campos rellenados 
+                	//del formulario de la nueva comunicación
+                	insertParametrosNewComm(nuevaComm, newIdEcomCola, idInstitucion);
+                	
+                	LOGGER.info(
+                            "ComunicacionesServiceImpl.saveNuevaComm() / insertParametrosNewComm() -> Salida de insertParametrosNewComm() para insertar los parametros para la nueva fila de eCOM");
+
                 	EnvEnvios nuevoEnvio = new EnvEnvios();
 
                 	nuevoEnvio.setUsumodificacion(usuarios.get(0).getIdusuario());
                 	nuevoEnvio.setFechamodificacion(new Date());
-                	nuevoEnvio.setIdinstitucion(idInstitucion);
+                	if(nuevaComm.getIdModeloComunicacion() != null) {
+                		nuevoEnvio.setIdmodelocomunicacion(Long.valueOf(nuevaComm.getIdModeloComunicacion()));
+                	}
+                	else {
+                		nuevoEnvio.setIdmodelocomunicacion(null);
+                	}
                 	
                 	Long newIdEnvio = Long.valueOf(envEnviosExtendsMapper.selectMaxIDEnvio().getNewId());
                 	nuevoEnvio.setIdenvio(newIdEnvio);
+                	nuevoEnvio.setFecha(new Date());
+                	//REVISAR CRITERIA DE ASIGNACION DE LOS SIGUIENTES PARAMETROS
+                	nuevoEnvio.setDescripcion(nuevaComm.getAsunto());
+                	nuevoEnvio.setIdinstitucion(idInstitucion);
+                	nuevoEnvio.setGenerardocumento("0");
+                	nuevoEnvio.setImprimiretiquetas("0");
+                	nuevoEnvio.setIdplantillaenvios(null);//CRAR NUEVA PLANTILLA(?)
+                	nuevoEnvio.setIdestado((short) 1);//Estado "Pendiente Manual"
+                	nuevoEnvio.setIdtipoenvios((short) 1); //Tipo envio "Correo electronico"
+                	
+                	LOGGER.info(
+                            "ComunicacionesServiceImpl.saveNuevaComm() / envEnviosMapper.insert() -> Entrada a envEnviosMapper para insertar un nuevo envio asociado a la nueva comunicación");
 
+                	
                 	response = envEnviosMapper.insert(nuevoEnvio);
                 	
+                	LOGGER.info(
+                            "ComunicacionesServiceImpl.saveNuevaComm() / envEnviosMapper.insert() -> Salida de envEnviosMapper para insertar un nuevo envio asociado a la nueva comunicación");
+
                 	if(response == 0) {
-                		throw new SigaExceptions("Error al insertar una nueva comunicación");
+                		throw new SigaExceptions("Error al insertar el envio de una nueva comunicación");
                 	}
                 	
-                	this.subirDocumentosNewComm(request, nuevaComm, newIdEnvio);
+                	
+                	
+                	if(!nuevaComm.getDocs().isEmpty()) {
+                		LOGGER.info(
+                                "ComunicacionesServiceImpl.saveNuevaComm() / subirDocumentosNewComm() -> Entrada a subirDocumentosNewComm para insertar los documentos asociados a la comunicación");
+
+                		
+                		this.subirDocumentosNewComm(request, nuevaComm, newIdEnvio);
+                		
+                		LOGGER.info(
+                                "ComunicacionesServiceImpl.saveNuevaComm() / subirDocumentosNewComm() -> Salida de subirDocumentosNewComm para insertar los documentos asociados a la comunicación");
+
+                	}
+                	
+                	
                 	
                     LOGGER.debug(
                             "ComunicacionesServiceImpl.saveNuevaComm() -> Salida del servicio para insertar una nueva comunicación");
@@ -431,7 +558,6 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
         InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-        Error error = new Error();
         int response = 0;
 
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -451,18 +577,24 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
         		newDocComm.setUsumodificacion(usuarios.get(0).getIdusuario());
         		newDocComm.setIdenvio(idEnvio);
         		newDocComm.setIdinstitucion(idInstitucion);
-        		newDocComm.setPathdocumento(getDirectorioDocumentoCom(idInstitucion));
+        		newDocComm.setPathdocumento(getPathFicheroNuevaCom(idInstitucion, idEnvio));
 
-            	for(File doc : nuevaComm.getDocs()) {
+        		Short i = 1;
+            	for(MultipartFile doc : nuevaComm.getDocs()) {
             		
-            		newDocComm.setIddocumento(Short.valueOf(uploadFileCom(Files.readAllBytes(doc.toPath()), usuarios.get(0).getIdusuario(), idInstitucion, doc.getName(), FilenameUtils.getExtension(doc.getName())).toString()));
+//            		newDocComm.setIddocumento(Short.valueOf(uploadFileCom(Files.readAllBytes(doc.toPath()), usuarios.get(0).getIdusuario(), 
+//            				idInstitucion, doc.getName(), FilenameUtils.getExtension(doc.getName()), idEnvio).toString()));
+            		newDocComm.setIddocumento(i);
             		newDocComm.setDescripcion(doc.getName());
+            		
+            		uploadFileCom(idEnvio, idInstitucion, nuevaComm.getDocs());
             		
             		envDocumentosMapper.insert(newDocComm);
             		
             		if(response == 0) {
                 		throw new SigaExceptions("Error al insertar la documentación asociada a una nueva comunicación");
                 	}
+            		i++;
             	}
                 
 
@@ -471,50 +603,225 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
         return insertResponseDTO;
     }
     
-    private Long uploadFileCom(byte[] bytes, Integer idUsuario, Short idInstitucion, String nombreFichero,
-            String extension) {
-
-		FicheroVo ficheroVo = new FicheroVo();
-		
-		String directorioFichero = getDirectorioDocumentoCom(idInstitucion);
-		ficheroVo.setDirectorio(directorioFichero);
-		ficheroVo.setNombre(nombreFichero);
-		ficheroVo.setDescripcion("Fichero asociado al envio " + ficheroVo.getNombre());
-		
-		ficheroVo.setIdinstitucion(idInstitucion);
-		ficheroVo.setFichero(bytes);
-		ficheroVo.setExtension(extension.toLowerCase());
-		
-		ficheroVo.setUsumodificacion(idUsuario);
-		ficheroVo.setFechamodificacion(new Date());
-		ficherosServiceImpl.insert(ficheroVo);
-		
-		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
-		
-		return ficheroVo.getIdfichero();
-	}
+//    private Long uploadFileCom(byte[] bytes, Integer idUsuario, Short idInstitucion, String nombreFichero,
+//            String extension, Long idEnvio) {
+//
+//		FicheroVo ficheroVo = new FicheroVo();
+//		
+//		String directorioFichero = getPathFicheroNuevaCom(idInstitucion, idEnvio);
+//		ficheroVo.setDirectorio(directorioFichero);
+//		ficheroVo.setNombre(nombreFichero);
+//		ficheroVo.setDescripcion("Fichero asociado al envio " + ficheroVo.getNombre());
+//		
+//		ficheroVo.setIdinstitucion(idInstitucion);
+//		ficheroVo.setFichero(bytes);
+//		ficheroVo.setExtension(extension.toLowerCase());
+//		
+//		ficheroVo.setUsumodificacion(idUsuario);
+//		ficheroVo.setFechamodificacion(new Date());
+//		ficherosServiceImpl.insert(ficheroVo);
+//		
+//		SIGAServicesHelper.uploadFichero(directorioFichero, ficheroVo.getNombre(), ficheroVo.getFichero());
+//		
+//		return ficheroVo.getIdfichero();
+//	}
     
-    private String getDirectorioDocumentoCom(Short idInstitucion) {
-
-        // Extraemos el path para los ficheros
-        GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
-        genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
-        List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
-        String path = genPropertiesPath.get(0).getValor();
-
-        StringBuffer directorioFichero = new StringBuffer(path);
-        directorioFichero.append(idInstitucion);
-        directorioFichero.append(File.separator);
-
-        // Extraemos el path concreto para los documentos de los nuevos comunicar
-        //Falta por determinar el nombre del parametro
-        
-        //GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
-        //genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.expedientesJG");
-//        List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
-//        directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
-
-        return directorioFichero.toString();
+    private void insertParametrosNewComm(NuevaComunicacionItem nuevaComm, long newIdEcomCola, Short idInstitucion) throws SigaExceptions {
+    	int response = 0;
+    	
+    	EcomColaParametros parametro = new EcomColaParametros();
+    	
+    	parametro.setIdecomcola(newIdEcomCola);
+    	
+    	if(nuevaComm.getAsunto() != null && nuevaComm.getAsunto().trim() != "") {
+        	parametro.setClave("Asunto");
+        	parametro.setValor(nuevaComm.getAsunto());
+        	
+        	response = ecomColaParametrosMapper.insert(parametro);
+        	
+        	if(response == 0) {
+        		throw new SigaExceptions("Error al insertar el campo \"Asunto\" como parametro en la cola eCOM para una nueva comunicación");
+        	}
+    	}
+    	
+    	if(nuevaComm.getFechaEfecto() != null) {
+        	parametro.setClave("Fecha Efecto");
+        	parametro.setValor(nuevaComm.getFechaEfecto().toString());
+        	
+        	response = ecomColaParametrosMapper.insert(parametro);
+        	
+        	if(response == 0) {
+        		throw new SigaExceptions("Error al insertar el campo \"Fecha Efecto\" como parametro en la cola eCOM para una nueva comunicación");
+        	}
+    	}
+    	
+    	//COmprobar si se debe procesar para obtener el OJ de destino
+    	if(nuevaComm.getJuzgado() != null) {
+        	parametro.setClave("Juzgado");
+        	parametro.setValor(nuevaComm.getJuzgado());
+        	
+        	response = ecomColaParametrosMapper.insert(parametro);
+        	
+        	if(response == 0) {
+        		throw new SigaExceptions("Error al insertar el campo \"Juzgado\" como parametro en la cola eCOM para una nueva comunicación");
+        	}
+    	}
+    	
+    	if(nuevaComm.getMensaje() != null && nuevaComm.getMensaje().trim() != "") {
+        	parametro.setClave("Mensaje");
+        	parametro.setValor(nuevaComm.getMensaje());
+        	
+        	response = ecomColaParametrosMapper.insert(parametro);
+        	
+        	if(response == 0) {
+        		throw new SigaExceptions("Error al insertar el campo \"Mensaje\" como parametro en la cola eCOM para una nueva comunicación");
+        	}
+    	}
+    	
+    	if(nuevaComm.getNig() != null && nuevaComm.getNig().trim() != "") {
+        	parametro.setClave("NIG");
+        	parametro.setValor(nuevaComm.getNig());
+        	
+        	response = ecomColaParametrosMapper.insert(parametro);
+        	
+        	if(response == 0) {
+        		throw new SigaExceptions("Error al insertar el campo \"NIG\" como parametro en la cola eCOM para una nueva comunicación");
+        	}
+    	}
+    	
+    	if(nuevaComm.getNumProcedimiento() != null && nuevaComm.getNumProcedimiento().trim() != "") {
+        	parametro.setClave("N Procedimiento");
+        	parametro.setValor(nuevaComm.getNumProcedimiento());
+        	
+        	response = ecomColaParametrosMapper.insert(parametro);
+        	
+        	if(response == 0) {
+        		throw new SigaExceptions("Error al insertar el campo \"N Procedimiento\" como parametro en la cola eCOM para una nueva comunicación");
+        	}
+    	}
+    	
+    	
+        parametro.setClave("IDINSTITUCION");
+        parametro.setValor(idInstitucion.toString());
+        	
+        response = ecomColaParametrosMapper.insert(parametro);
+        	
+        if(response == 0) {
+        	throw new SigaExceptions("Error al insertar el campo \"IDINSTITUCION\" como parametro en la cola eCOM para una nueva comunicación");
+        }
     }
+    
+
+    private ResponseDocumentoDTO uploadFileCom(Long idEnvio, Short idInstitucion, List<MultipartFile> docs) throws IOException, SigaExceptions {
+		LOGGER.info("uploadFile() -> Entrada al servicio para subir un documento de envio");
+
+		ResponseDocumentoDTO response = new ResponseDocumentoDTO();
+
+				String pathFichero = getPathFicheroNuevaCom(idInstitucion, idEnvio);
+
+				// 1. Coger archivo del request
+				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
+				for(MultipartFile file : docs) {
+	
+					String fileNameOriginal = file.getName();
+					String fName = Long.toString(System.currentTimeMillis());
+	
+					try {
+	
+						File serverFile = new File(pathFichero);
+						serverFile.mkdirs();
+	
+						SIGAHelper.addPerm777(serverFile);
+	
+						serverFile = new File(serverFile, fName);
+						LOGGER.info("uploadFile() -> Ruta del fichero subido: " + serverFile.getAbsolutePath());
+						if (serverFile.exists()) {
+							LOGGER.error("Ya existe el fichero: " + serverFile.getAbsolutePath());
+							throw new FileAlreadyExistsException("El fichero ya existe");
+						}
+						// stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+						// stream.write(file.getBytes());
+						FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
+						response.setNombreDocumento(fileNameOriginal);
+						response.setRutaDocumento(fName);
+					} catch (FileNotFoundException e) {
+						Error error = new Error();
+						error.setCode(500);
+						error.setDescription(e.getMessage());
+						response.setError(error);
+						throw new SigaExceptions("uploadFile() -> Error al buscar el documento de envio en el directorio indicado"+e);
+					} catch (FileAlreadyExistsException ex) {
+						Error error = new Error();
+						error.setCode(400);
+						error.setDescription(ex.getMessage());
+						response.setError(error);
+						throw new SigaExceptions("uploadFile() -> El fichero ya existe en el filesystem"+ ex);
+					} catch (IOException ioe) {
+						Error error = new Error();
+						error.setCode(500);
+						error.setDescription(ioe.getMessage());
+						response.setError(error);
+						throw new SigaExceptions("uploadFile() -> Error al guardar el documento de envio en el directorio indicado"+
+								ioe);
+					} catch (Exception ioe) {
+						Error error = new Error();
+						error.setCode(500);
+						error.setDescription(ioe.getMessage());
+						response.setError(error);
+						throw new SigaExceptions("uploadFile() -> Error al guardar el documento de envio en el directorio indicado" +
+								ioe);
+					} finally {
+						// close the stream
+						LOGGER.info("uploadFile() -> Cierre del stream del documento");
+						// stream.close();
+					}
+				}
+			
+		
+
+		LOGGER.info("uploadFile() -> Salida del servicio para subir un documento de envio");
+		return response;
+	}
+	
+	private String getPathFicheroNuevaCom(Short idInstitucion, Long idEnvio) {
+		String pathFichero = null;
+
+		GenParametrosKey genParametrosKey = new GenParametrosKey();
+		genParametrosKey.setIdinstitucion(SigaConstants.IDINSTITUCION_0_SHORT);
+		genParametrosKey.setModulo(SigaConstants.MODULO_COM);
+		genParametrosKey.setParametro(GEN_PARAMETROS.PATH_DOCUMENTOSADJUNTOS.name());
+
+		GenParametros genParametros = genParametrosMapper.selectByPrimaryKey(genParametrosKey);
+
+		if (genParametros == null || genParametros.getValor() == null || genParametros.getValor().trim().equals("")) {
+			String error = "La ruta de ficheros de plantilla no está configurada correctamente";
+			LOGGER.error(error);
+			throw new BusinessException(error);
+		}
+
+		// Recuperamos el idenvio para construir la ruta a partir de la fecha de
+		// creación
+		EnvEnviosKey envEnviosKey = new EnvEnviosKey();
+		envEnviosKey.setIdinstitucion(idInstitucion);
+		envEnviosKey.setIdenvio(idEnvio);
+		EnvEnvios envEnvios = envEnviosMapper.selectByPrimaryKey(envEnviosKey);
+
+		if (envEnvios == null) {
+			String error = "No se ha encontrado el envío con idEnvio = " + idEnvio + " para la institución "
+					+ idInstitucion;
+			LOGGER.error(error);
+			throw new BusinessException(error);
+		}
+
+		Calendar cal = Calendar.getInstance();
+		// seteamos la fecha de creación del envío
+		cal.setTime(envEnvios.getFecha());
+
+		pathFichero = genParametros.getValor().trim() + SigaConstants.pathSeparator + String.valueOf(idInstitucion)
+				+ SigaConstants.pathSeparator + cal.get(Calendar.YEAR) + SigaConstants.pathSeparator
+				+ (cal.get(Calendar.MONTH) + 1) + SigaConstants.pathSeparator + idEnvio;
+
+		return pathFichero;
+	}
 }
 

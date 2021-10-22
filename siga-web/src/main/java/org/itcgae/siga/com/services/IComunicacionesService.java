@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IComunicacionesService {
 
@@ -26,6 +27,7 @@ public interface IComunicacionesService {
 	public DestinatariosDTO detalleDestinatarios(HttpServletRequest request,String idEnvio);
 	public ResponseFileDTO descargarDocumento(HttpServletRequest request, ResponseDocumentoDTO documentoDTO);
 	public String descargarCertificado(HttpServletRequest request, String idEnvio);
-	public InsertResponseDTO saveNuevaComm(HttpServletRequest request, NuevaComunicacionItem nuevaComm) throws SigaExceptions, NumberFormatException, IOException;
+	public InsertResponseDTO saveNuevaComm(MultipartHttpServletRequest request)
+			throws SigaExceptions, NumberFormatException, IOException;
 	
 }
