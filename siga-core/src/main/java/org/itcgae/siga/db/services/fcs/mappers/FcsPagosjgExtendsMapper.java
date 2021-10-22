@@ -223,4 +223,5 @@ public interface FcsPagosjgExtendsMapper extends FcsPagosjgMapper {
 
     @SelectProvider(type = FcsPagosjgSqlExtendsProvider.class, method = "getFechaEstadoPago")
     Date getFechaEstadoPago(Short idInstitucion, Integer idPago);
+
 }

@@ -1,21 +1,26 @@
 package org.itcgae.siga.scs.services.facturacionsjcs;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
-public interface ICombosServices {
-	
-	public ComboDTO comboFactEstados(HttpServletRequest request);
-	
-	public ComboDTO comboFactConceptos(HttpServletRequest request);
-	
-	public ComboDTO comboFactColegio(HttpServletRequest request);
-	
-	public ComboDTO comboPagosColegio(HttpServletRequest request);
-	public ComboDTO comboColegiosProcuradores(HttpServletRequest request);
+import javax.servlet.http.HttpServletRequest;
 
-	public ComboDTO comboPagoEstados(HttpServletRequest request);
-	
-	public ComboDTO comboFacturaciones(HttpServletRequest request);	
+public interface ICombosServices {
+
+    ComboDTO comboFactEstados(HttpServletRequest request);
+
+    ComboDTO comboFactConceptos(HttpServletRequest request);
+
+    ComboDTO comboFactColegio(HttpServletRequest request);
+
+    ComboDTO comboPagosColegio(HttpServletRequest request);
+
+    ComboDTO comboColegiosProcuradores(HttpServletRequest request);
+
+    ComboDTO comboPagoEstados(HttpServletRequest request);
+
+    ComboDTO comboFacturaciones(HttpServletRequest request);
+
+    ComboDTO getComboDestinatarios(HttpServletRequest request);
+
+    ComboDTO getComboPagosRetenciones(HttpServletRequest request);
 }
