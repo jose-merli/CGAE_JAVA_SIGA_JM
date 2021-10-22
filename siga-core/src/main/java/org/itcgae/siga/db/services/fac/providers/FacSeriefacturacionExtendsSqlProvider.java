@@ -5,6 +5,8 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionSqlProvider;
 
+import java.util.stream.Collectors;
+
 public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSqlProvider {
 	
 	public String getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem, Short idInstitucion, String idioma) {
@@ -13,6 +15,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		// Select
 		sql.SELECT("sf.idinstitucion");
 		sql.SELECT("sf.idseriefacturacion");
+		sql.SELECT("bi.bancos_codigo");
 		sql.SELECT("bi.iban");
 		sql.SELECT("sf.nombreabreviado");
 		sql.SELECT("sf.descripcion");
@@ -47,38 +50,38 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 			sql.WHERE("upper(sf.nombreabreviado) LIKE upper('%" + serieFacturacionItem.getAbreviatura() + "%')");
 		if (serieFacturacionItem.getDescripcion() != null && serieFacturacionItem.getDescripcion() != "")
 			sql.WHERE("upper(sf.descripcion) LIKE upper('%" + serieFacturacionItem.getDescripcion() + "%')");
-		if (serieFacturacionItem.getCuentaBancaria() != null && serieFacturacionItem.getCuentaBancaria() != "")
-			sql.WHERE("bi.bancos_codigo = '" + serieFacturacionItem.getCuentaBancaria() + "'");
+		if (serieFacturacionItem.getIdCuentaBancaria() != null && serieFacturacionItem.getIdCuentaBancaria() != "")
+			sql.WHERE("bi.bancos_codigo = '" + serieFacturacionItem.getIdCuentaBancaria() + "'");
 		
-		if (serieFacturacionItem.getSufijo() != null && serieFacturacionItem.getSufijo() != "")
-			sql.WHERE("s.idsufijo = '" + serieFacturacionItem.getSufijo() + "'");
+		if (serieFacturacionItem.getIdSufijo() != null && serieFacturacionItem.getSufijo() != "")
+			sql.WHERE("s.idsufijo = '" + serieFacturacionItem.getIdSufijo() + "'");
 		
-		if (serieFacturacionItem.getTiposProductos() != null && !serieFacturacionItem.getTiposProductos().isEmpty())
+		if (serieFacturacionItem.getIdTiposProductos() != null && !serieFacturacionItem.getIdTiposProductos().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
 					+ "SELECT DISTINCT f.idseriefacturacion "
 						+ "FROM fac_factura f "
 						+ "INNER JOIN pys_compra c ON ( "
 							+ "c.idfactura = f.idfactura "
 							+ "AND c.idinstitucion = f.idinstitucion "
-							+ "AND c.idtipoproducto IN (" + String.join(", ", serieFacturacionItem.getTiposProductos()) + ")))");
+							+ "AND c.idtipoproducto IN (" + String.join(", ", serieFacturacionItem.getIdTiposProductos()) + ")))");
 		
-		if (serieFacturacionItem.getTiposServicios() != null && !serieFacturacionItem.getTiposServicios().isEmpty())
+		if (serieFacturacionItem.getIdTiposServicios() != null && !serieFacturacionItem.getIdTiposServicios().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
 					+ "SELECT DISTINCT f.idseriefacturacion "
 						+ "FROM fac_factura f "
 						+ "INNER JOIN fac_facturacionsuscripcion fs ON ( "
 							+ "fs.idfactura = f.idfactura "
 							+ "AND fs.idinstitucion = f.idinstitucion "
-							+ "AND fs.idtiposervicios IN (" + String.join(", ", serieFacturacionItem.getTiposServicios()) + ")))");
+							+ "AND fs.idtiposervicios IN (" + String.join(", ", serieFacturacionItem.getIdTiposServicios()) + ")))");
 		
-		if (serieFacturacionItem.getEtiquetas() != null && !serieFacturacionItem.getEtiquetas().isEmpty())
+		if (serieFacturacionItem.getIdEtiquetas() != null && !serieFacturacionItem.getIdEtiquetas().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
 					+ "SELECT DISTINCT ti.idseriefacturacion "
 						+ "FROM fac_tipocliincluidoenseriefac ti "
 						+ "WHERE ti.idinstitucion = sf.idinstitucion "
-							+ "AND ti.idgrupo IN (" + String.join(", ", serieFacturacionItem.getEtiquetas()) + "))");
+							+ "AND ti.idgrupo IN (" + String.join(", ", serieFacturacionItem.getIdEtiquetas()) + "))");
 		
-		if (serieFacturacionItem.getConsultasDestinatarios() != null && !serieFacturacionItem.getConsultasDestinatarios().isEmpty())
+		if (serieFacturacionItem.getIdConsultasDestinatarios() != null && !serieFacturacionItem.getIdConsultasDestinatarios().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
 						+ "SELECT ti.idseriefacturacion "
 							+ "FROM fac_tipocliincluidoenseriefac ti "
@@ -87,12 +90,12 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 									+ "SELECT gcc.idgrupo "
 										+ "FROM cen_gruposcliente_cliente gcc "
 										+ "WHERE gcc.idinstitucion = sf.idinstitucion "
-											+ "AND idpersona IN (" + String.join(", ", serieFacturacionItem.getConsultasDestinatarios()) + ")))");
+											+ "AND idpersona IN (" + String.join(", ", serieFacturacionItem.getIdConsultasDestinatarios()) + ")))");
 		
-		if (serieFacturacionItem.getContadorFacturas() != null && serieFacturacionItem.getContadorFacturas() != "")
-			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getContadorFacturas() + "'");
-		if (serieFacturacionItem.getContadorFacturasRectificativas() != null && serieFacturacionItem.getContadorFacturasRectificativas() != "")
-			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getContadorFacturasRectificativas() + "'");
+		if (serieFacturacionItem.getIdContadorFacturas() != null && serieFacturacionItem.getIdContadorFacturas() != "")
+			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getIdContadorFacturas() + "'");
+		if (serieFacturacionItem.getIdContadorFacturasRectificativas() != null && serieFacturacionItem.getIdContadorFacturasRectificativas() != "")
+			sql.WHERE("sf.idcontador = '" + serieFacturacionItem.getIdContadorFacturasRectificativas() + "'");
 		
 		// Order by
 		sql.ORDER_BY("sf.idseriefacturacion");

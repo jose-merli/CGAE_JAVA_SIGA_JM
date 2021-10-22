@@ -5,7 +5,7 @@ import org.itcgae.siga.db.mappers.FacFacturacionsuscripcionSqlProvider;
 
 public class FacFacturacionsuscripcionExtendsSqlProvider extends FacFacturacionsuscripcionSqlProvider {
 
-	public String getTiposServicios(Short idInstitucion, String idioma) {
+	public String getTiposServicios(String idSerieFacturacion, Short idInstitucion, String idioma) {
 		SQL sql = new SQL();
 
 		// Select
@@ -23,6 +23,7 @@ public class FacFacturacionsuscripcionExtendsSqlProvider extends FacFacturacions
 
 		// Where
 		sql.WHERE("fs.idinstitucion = " + idInstitucion);
+		sql.WHERE("sf.idseriefacturacion = '" + idSerieFacturacion + "'");
 
 		// Order by
 		sql.ORDER_BY("sf.idseriefacturacion, fs.idtiposervicios");

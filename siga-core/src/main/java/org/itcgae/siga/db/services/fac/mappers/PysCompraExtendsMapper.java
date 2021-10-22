@@ -23,6 +23,6 @@ public interface PysCompraExtendsMapper extends PysCompraMapper {
 		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idseriefacturacion", property = "idSerieFacturacion", jdbcType = JdbcType.NUMERIC)
 		})
-	List<TiposIncluidosItem> getTiposProductos(Short idInstitucion, String idioma);
+	List<TiposIncluidosItem> getTiposProductos(String idSerieFacturacion, Short idInstitucion, String idioma);
 	
 }
