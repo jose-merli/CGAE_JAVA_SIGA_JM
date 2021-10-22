@@ -33,5 +33,8 @@ public interface FacSeriefacturacionExtendsMapper extends FacSeriefacturacionMap
 		@Result(column = "traspasofacturas", property = "traspasoFacturas", jdbcType = JdbcType.BOOLEAN)
 	})
 	List<SerieFacturacionItem> getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem, Short idInstitucion, String idioma);
-	
+
+	@SelectProvider(type = FacSeriefacturacionExtendsSqlProvider.class, method = "getUsoSufijo")
+	int getUsoSufijo(int idInstitucion, String codigoBanco);
+
 }

@@ -3,19 +3,25 @@ package org.itcgae.siga.DTO.fac;
 import java.util.Date;
 
 public class CuentasBancariasItem {
-	 private String nombre;
-	 private String bancoCodigo;
-	 private String codBanco;
-	 private String codSucursal;
-	 private Date fechaBaja;
-	 private String IBAN;
-	 private String descripcion;
-	 private String sjcs;
-	 private String comisionImporte;
-	 private String numUsos;
-	 private String  numFicheros;
-	 
-	 
+	private short id;
+	private String nombre;
+	private String bancoCodigo;
+	private String codBanco;
+	private String codSucursal;
+	private Date fechaBaja;
+	private String IBAN;
+	private String descripcion;
+	private String sjcs;
+	private String comisionImporte;
+	private String numUsos;
+	private String  numFicheros;
+
+	public short getId() {
+		return id;
+	}
+	public void setId(short id) {
+		this.id = id;
+	}
 	public String getNombre() {
 		return nombre;
 	}

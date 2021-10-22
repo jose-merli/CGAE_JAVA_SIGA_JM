@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.fac.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionSqlProvider;
 
@@ -98,4 +99,86 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		
 		return sql.toString();
 	}
+
+	public String getUsoSufijo(int idInstitucion, String codigoBanco) {
+		SQL sql = new SQL();
+
+		sql.SELECT("COUNT(1)");
+		sql.FROM("( " + getConsultaUsoSufijo(idInstitucion, codigoBanco));
+
+		Logger LOGGER = Logger.getLogger(FacSeriefacturacionExtendsSqlProvider.class);
+		LOGGER.info(sql.toString());
+
+		return sql.toString();
+	}
+
+	private String getConsultaUsoSufijo(int idInstitucion, String codigoBanco) {
+
+		String principal;
+		SQL pagos = new SQL();
+		SQL series = new SQL();
+
+		// Consulta de los pagos
+		pagos.SELECT("'PAGOS SJCS' tipo");
+		pagos.SELECT("sf.idseriefacturacion");
+		pagos.SELECT("sf.nombreabreviado abreviatura");
+		pagos.SELECT("sf.descripcion");
+		pagos.SELECT("s.sufijo || ' - ' || s.concepto sufijo ");
+
+		// Subsonsulta 1 de los pagos
+		pagos.SELECT("( SELECT COUNT(1) " +
+				"FROM fcs_pagosjg p " +
+				"WHERE p.idinstitucion = sfb.idinstitucion " +
+					"AND p.bancos_codigo = sfb.bancos_codigo " +
+					"AND p.idpagosjg IN ( " +
+						"SELECT DISTINCT a.idpagosjg " +
+						"FROM fac_abono a " +
+						"WHERE a.idinstitucion = sf.idinstitucion " +
+							"AND a.estado NOT IN ( " +
+								"SELECT idestado " +
+								"FROM fac_estadoabono " +
+								"WHERE UPPER(descripcion) LIKE '%PAGADO%') " +
+				")) num_pendientes"
+		);
+
+		pagos.FROM("fac_seriefacturacion sf");
+		pagos.INNER_JOIN("fac_seriefacturacion_banco sfb ON (sf.idinstitucion = sfb.idinstitucion " +
+				"AND sf.idseriefacturacion = sfb.idseriefacturacion)");
+		pagos.LEFT_OUTER_JOIN("fac_sufijo s ON (sfb.idinstitucion = s.idinstitucion " +
+				"AND sfb.idsufijo = s.idsufijo)");
+		pagos.WHERE("sf.idinstitucion = " + idInstitucion + " AND sfb.bancos_codigo = " + codigoBanco);
+
+		// Consulta de los select
+		series.SELECT("'SERIE' tipo");
+		series.SELECT("sf.idseriefacturacion");
+		series.SELECT("sf.nombreabreviado abreviatura");
+		series.SELECT("sf.descripcion");
+		series.SELECT("s.sufijo || ' - ' || s.concepto sufijo");
+
+		// Subsonsulta 1 de las series
+		series.SELECT("( " +
+				"SELECT COUNT(f.idfactura) " +
+				"FROM fac_factura f, fac_estadofactura ef " +
+				"WHERE f.idinstitucion = sf.idinstitucion " +
+					"AND f.idseriefacturacion = sf.idseriefacturacion " +
+					"AND f.estado NOT IN ( " +
+						"SELECT idestado " +
+						"FROM fac_estadofactura " +
+						"WHERE upper(descripcion) LIKE '%PAGADO%' " +
+                        ")) num_pendientes"
+		);
+
+		series.FROM("fac_seriefacturacion sf");
+		series.INNER_JOIN("fac_seriefacturacion_banco sfb ON (sf.idinstitucion = sfb.idinstitucion " +
+							"AND sf.idseriefacturacion = sfb.idseriefacturacion)");
+		series.LEFT_OUTER_JOIN("fac_sufijo s ON (sfb.idinstitucion = s.idinstitucion " +
+								"AND sfb.idsufijo = s.idsufijo)");
+		series.WHERE("sf.idinstitucion = " + idInstitucion + " AND sfb.bancos_codigo = " + codigoBanco + ")");
+
+		principal = pagos + " UNION " + series;
+
+		return principal;
+
+	}
+
 }
