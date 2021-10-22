@@ -4183,6 +4183,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
             case ".txt":
                 mime = "text/plain";
                 break;
+            case ".csv":
+	            mime = "text/csv";
+	            break;
+            case ".xls":
+                mime = "application/vnd.ms-excel";
+                break;
+            case ".xlsx":
+                mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            break;
         }
 
         return mime;
@@ -4714,11 +4723,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
                     String tipoMime = getMimeType(extension);
 
-                    headers.setContentType(MediaType.parseMediaType(tipoMime));
-                    headers.set("Content-Disposition",
-                            "attachment; filename=\"" + listadocumentoEjgItem.get(0).getNombreFichero() + "\"");
-                    headers.setContentLength(file.length());
-
+                    if(tipoMime == "") {
+                    	throw new Exception("Error: el documento contiene una extensión no soportada");
+                    }else {
+	                    headers.setContentType(MediaType.parseMediaType(tipoMime));
+	                    headers.set("Content-Disposition",
+	                            "attachment; filename=\"" + listadocumentoEjgItem.get(0).getNombreFichero() + "\"");
+	                    headers.setContentLength(file.length());
+                    }
                 } else {
                     fileStream = getZipFileDocumentosEjg(listadocumentoEjgItem, idInstitucion);
 
@@ -4740,6 +4752,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     e);
             res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        } finally {
+        	try {
+				fileStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
         }
 
         return res;
