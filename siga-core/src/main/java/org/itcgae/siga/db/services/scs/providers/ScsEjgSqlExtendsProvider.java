@@ -1181,18 +1181,21 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlAsistencia_1.WHERE("ejgnumero =" + item.getNumero());
         sqlAsistencia_1.WHERE("ejgidtipoejg =" + item.getTipoEJG());
         sqlAsistencia_1.WHERE("idinstitucion =" + item.getidInstitucion());
+        sqlAsistencia_1.WHERE("ROWNUM<2");
 
         // consulta para obtener la des_turno en consulta asistencia
         sqlAsistencia_2.SELECT("abreviatura");
         sqlAsistencia_2.FROM("scs_turno");
         sqlAsistencia_2.WHERE("idturno = scs_asistencia.idturno");
         sqlAsistencia_2.WHERE("idinstitucion = scs_asistencia.idinstitucion");
+        sqlAsistencia_2.WHERE("ROWNUM<2");
 
         // consulta para obtener la des_tipo en consulta asistencia
         sqlAsistencia_3.SELECT("f_siga_getrecurso( s.descripcion, 1)");
         sqlAsistencia_3.FROM("scs_tipoasistenciacolegio s");
         sqlAsistencia_3.WHERE("scs_asistencia.idinstitucion = s.idinstitucion");
         sqlAsistencia_3.WHERE("scs_asistencia.idtipoasistenciacolegio = s.idtipoasistenciacolegio");
+        sqlAsistencia_3.WHERE("ROWNUM<2");
 
         // consulta para obtener el interesado en consulta asistencia
         sqlAsistencia_4
@@ -1204,6 +1207,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlAsistencia_4.WHERE("scs_asistencia.idinstitucion = " + item.getidInstitucion());
         sqlAsistencia_4.WHERE("scs_asistencia.anio = " + item.getAnnio());
         sqlAsistencia_4.WHERE("scs_asistencia.numero =" + item.getNumero());
+        sqlAsistencia_4.WHERE("ROWNUM<2");
 
         // consulta para obtener la relacion de asistencias con los datos de las
         // consultas anteriores.
@@ -1234,17 +1238,20 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlSOJ_1.WHERE("ejgnumero =" + item.getNumero());
         sqlSOJ_1.WHERE("ejgidtipoejg =" + item.getTipoEJG());
         sqlSOJ_1.WHERE("idinstitucion =" + item.getidInstitucion());
+        sqlSOJ_1.WHERE("ROWNUM<2");
 
         // consulta para obtener la des_turno en consulta SOJ
         sqlSOJ_2.SELECT("abreviatura");
         sqlSOJ_2.FROM("scs_turno");
         sqlSOJ_2.WHERE("idturno = scs_soj.idturno");
         sqlSOJ_2.WHERE("idinstitucion = scs_soj.idinstitucion");
+        sqlSOJ_2.WHERE("ROWNUM<2");
 
         // consulta para obtener la des_tipo en consulta SOJ
         sqlSOJ_3.SELECT(" f_siga_getrecurso( descripcion, 1) AS descripcion");
         sqlSOJ_3.FROM("scs_tiposoj");
         sqlSOJ_3.WHERE("scs_tiposoj.idtiposoj = scs_soj.idtiposoj");
+        sqlSOJ_3.WHERE("ROWNUM<2");
 
         // consulta para obtener el interesado en consulta SOJ
         sqlSOJ_4.SELECT("scs_personajg.apellido1\r\n" + "                     || CASE\r\n"
@@ -1259,6 +1266,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlSOJ_4.WHERE("scs_soj.idinstitucion = " + item.getidInstitucion());
         sqlSOJ_4.WHERE("scs_soj.anio = " + item.getAnnio());
         sqlSOJ_4.WHERE("scs_soj.numero =" + item.getNumero());
+        sqlSOJ_4.WHERE("ROWNUM<2");
 
         // consulta para obtener la relacion de SOJ con los datos de las consultas
         // anteriores.
@@ -1288,6 +1296,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_1.WHERE("ejg.numero =" + item.getNumero());
         sqlDesigna_1.WHERE("ejg.idtipoejg =" + item.getTipoEJG());
         sqlDesigna_1.WHERE("ejg.idinstitucion =" + item.getidInstitucion());
+        sqlDesigna_1.WHERE("ROWNUM<2");
 
         // consulta para obtener el idtipo en consulta DESIGNA
         sqlDesigna_2.SELECT("TO_CHAR(idtipodesignacolegio)");
@@ -1296,6 +1305,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_2.WHERE("codigo = ejgd.numerodesigna");
         sqlDesigna_2.WHERE("idturno = ejgd.idturno");
         sqlDesigna_2.WHERE("idinstitucion = ejgd.idinstitucion");
+        sqlDesigna_2.WHERE("ROWNUM<2");
 
         // consulta para obtener el codigo en consulta Designa
         sqlDesigna_3.SELECT(" codigo");
@@ -1304,12 +1314,14 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_3.WHERE("codigo = ejgd.numerodesigna");
         sqlDesigna_3.WHERE("idturno = ejgd.idturno");
         sqlDesigna_3.WHERE("idinstitucion = ejgd.idinstitucion");
+        sqlDesigna_3.WHERE("ROWNUM<2");
 
         // consulta para obtener el des_turno en consulta Designa
         sqlDesigna_4.SELECT("abreviatura");
         sqlDesigna_4.FROM("scs_turno");
         sqlDesigna_4.WHERE("idturno = ejgd.idturno ");
         sqlDesigna_4.WHERE("idinstitucion = ejg.idinstitucion ");
+        sqlDesigna_4.WHERE("ROWNUM<2");
 
         // consulta para obtener el des_tipo en consulta Designa
         sqlDesigna_5.SELECT("f_siga_getrecurso(descripcion, 1)");
@@ -1320,6 +1332,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_5.WHERE("a.idinstitucion =  " + item.getidInstitucion());
         sqlDesigna_5.WHERE("a.idinstitucion = b.idinstitucion");
         sqlDesigna_5.WHERE("a.idtipodesignacolegio = b.idtipodesignacolegio");
+        sqlDesigna_5.WHERE("ROWNUM<2");
 
         // consulta para obtener el interesado en consulta asistencia
         sqlDesigna_6.SELECT("scs_personajg.apellido1\r\n" + "                     || CASE\r\n"
@@ -1334,6 +1347,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_6.WHERE("scs_ejg.idinstitucion = " + item.getidInstitucion());
         sqlDesigna_6.WHERE("scs_ejg.anio = " + item.getAnnio());
         sqlDesigna_6.WHERE("scs_ejg.numero =" + item.getNumero());
+        sqlDesigna_6.WHERE("ROWNUM<2");
 
         // datos de interes de la consulta DESIGNA
         sqlDesigna_7.SELECT("'Juzgado: ' || scs_juzgado.nombre");
@@ -1343,6 +1357,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_7.WHERE("scs_ejg.anio = " + item.getAnnio());
         sqlDesigna_7.WHERE("scs_ejg.numero = " + item.getNumero());
         sqlDesigna_7.WHERE("scs_ejg.idinstitucion = " + item.getidInstitucion());
+        sqlDesigna_7.WHERE("ROWNUM<2");
 
         // consulta para obtener la relacion de DESIGNA con los datos de las consultas
         // anteriores.
