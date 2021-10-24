@@ -145,8 +145,20 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
             sql.WHERE("ejg.idtipoejgcolegio IN (" + ejgItem.getTipoEJGColegio() + ")");
         if (ejgItem.getCreadoDesde() != null && ejgItem.getCreadoDesde() != "")
             sql.WHERE("ejg.origenapertura IN (" + ejgItem.getCreadoDesde() + ")");
-        if (ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != "")
-            sql.WHERE("regexp_like(EJG.NUMEROPROCEDIMIENTO,'" + ejgItem.getProcedimiento() + "')");
+        if (ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != ""){
+        	SQL sqlProc = new SQL();
+        	sqlProc.SELECT("idprocedimiento");
+        	sqlProc.FROM("scs_designa des");
+        	sqlProc.JOIN("scs_ejgdesigna   ejgdes ON des.anio = ejgdes.aniodesigna AND des.numero = ejgdes.numerodesigna\r\n" + 
+        			"                                                  AND des.idinstitucion = ejgdes.idinstitucion\r\n" + 
+        			"                                                  AND des.idturno = ejgdes.idturno ");
+        	sqlProc.WHERE("ejgdes.idinstitucion = ejg.idinstitucion");
+        	sqlProc.WHERE("ejgdes.anioejg = ejg.anio");
+        	sqlProc.WHERE("ejgdes.numeroejg = ejg.numero");
+        	sqlProc.WHERE("ejgdes.idtipoejg = ejg.idtipoejg");
+        	sqlProc.WHERE("des.idprocedimiento="+ejgItem.getProcedimiento());
+        	sql.WHERE("EXISTS ("+sqlProc.toString()+")");
+        }
         // SPP-1054@DTT.JAMARTIN@28/09/2021@INICIO
         if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "") {
 			if (ejgItem.isUltimoEstado()) {
@@ -250,9 +262,13 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         }
         if (ejgItem.getJuzgado() != null && ejgItem.getJuzgado() != "")
             sql.WHERE("EJG.JUZGADO = " + ejgItem.getJuzgado());
-        if (ejgItem.getNumAnnioProcedimiento() != null && ejgItem.getNumAnnioProcedimiento() != "")
-            sql.WHERE("EJG.NUMEROPROCEDIMIENTO LIKE '%"
-                    + ejgItem.getNumAnnioProcedimiento() + "%'");
+        if (ejgItem.getNumAnnioProcedimiento() != null && ejgItem.getNumAnnioProcedimiento() != "") {
+        	String procedimiento[] = ejgItem.getNumAnnioProcedimiento().split("/");
+        	sql.WHERE("EJG.NUMEROPROCEDIMIENTO LIKE '%"
+                    + procedimiento[0] + "%'");
+            sql.WHERE("EJG.ANIOPROCEDIMIENTO LIKE '%"
+                    + procedimiento[1] + "%'");
+        }
         if (ejgItem.getAsunto() != null && ejgItem.getAsunto() != "")
             sql.WHERE("EJG.OBSERVACIONES LIKE '%" + ejgItem.getAsunto() + "%'");
         if (ejgItem.getNig() != null && ejgItem.getNig() != "")
