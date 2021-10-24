@@ -3764,7 +3764,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                         "busquedaProcuradorEJG() / scsEjgExtendsMapper.busquedaProcuradorEJG() -> Entrada a scsEjgExtendsMapper para obtener los procuradores");
 
                 procuradorItemList = scsEjgExtendsMapper.busquedaProcuradorEJG(ejg.getIdProcurador(),
-                        idInstitucion.toString());
+                        ejg.getIdInstitucionProc().toString());
 
                 LOGGER.info(
                         "busquedaProcuradorEJG() / scsEjgExtendsMapper.busquedaProcuradorEJG -> Salida a scsEjgExtendsMapper para obtener los procuradores");
