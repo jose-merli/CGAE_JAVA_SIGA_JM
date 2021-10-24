@@ -44,7 +44,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
             condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.numeroacta = " + ejgItem.getNumActa();
 
         String condicionNumRegRemesa = " (EXISTS (SELECT 1 FROM cajg_ejgremesa ejgremesa, cajg_remesa remesa"
-                + " WHERE ejgremesa.idinstitucionremesa = remesa.idinstitucion"
+                + " WHERE ejgremesa.idinstitucionremesa = remesa.idinstitucion and ejgremesa.idremesa = remesa.idremesa"
                 + " AND ejgremesa.idinstitucion = ejg.idinstitucion" + " AND   ejgremesa.anio = ejg.anio"
                 + " AND   ejgremesa.idtipoejg = ejg.idtipoejg" + " AND   ejgremesa.numero = ejg.numero"
                 + " AND   remesa.idinstitucion = " + idInstitucion;
