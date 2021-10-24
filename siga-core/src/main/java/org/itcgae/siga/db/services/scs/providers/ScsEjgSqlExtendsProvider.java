@@ -263,11 +263,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         if (ejgItem.getJuzgado() != null && ejgItem.getJuzgado() != "")
             sql.WHERE("EJG.JUZGADO = " + ejgItem.getJuzgado());
         if (ejgItem.getNumAnnioProcedimiento() != null && ejgItem.getNumAnnioProcedimiento() != "") {
-        	String procedimiento[] = ejgItem.getNumAnnioProcedimiento().split("/");
         	sql.WHERE("EJG.NUMEROPROCEDIMIENTO LIKE '%"
-                    + procedimiento[0] + "%'");
-            sql.WHERE("EJG.ANIOPROCEDIMIENTO LIKE '%"
-                    + procedimiento[1] + "%'");
+                    + ejgItem.getNumAnnioProcedimiento() + "%'");
         }
         if (ejgItem.getAsunto() != null && ejgItem.getAsunto() != "")
             sql.WHERE("EJG.OBSERVACIONES LIKE '%" + ejgItem.getAsunto() + "%'");
