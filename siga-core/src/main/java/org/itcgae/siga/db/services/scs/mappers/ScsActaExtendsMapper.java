@@ -18,16 +18,16 @@ public interface ScsActaExtendsMapper extends ScsEjgMapper {
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "busquedaActas")
 	@Results({
 
-			@Result(column = "IDACTA", property = "idActa", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "NUMEROACTA", property = "numeroActa", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHARESOLUCION", property = "fechaResolucion", jdbcType = JdbcType.DATE),
-			@Result(column = "FECHAREUNION", property = "fechaReunion", jdbcType = JdbcType.DATE),
-			@Result(column = "IDPRESIDENTE", property = "idPresidente", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "IDSECRETARIO", property = "idSecretario", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "NOMBREPRESIDENTE", property = "nombrePresidente", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBRESECRETARIO", property = "nombreSecretario", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ANIOACTA", property = "anio", jdbcType = JdbcType.NUMERIC)
+			@Result(column = "IDACTA", property = "idacta", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NUMEROACTA", property = "numeroacta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHARESOLUCION", property = "fecharesolucion", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHAREUNION", property = "fechareunion", jdbcType = JdbcType.DATE),
+			@Result(column = "IDPRESIDENTE", property = "idpresidente", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDSECRETARIO", property = "idsecretario", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NOMBREPRESIDENTE", property = "nombrepresidente", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRESECRETARIO", property = "nombresecretario", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ANIOACTA", property = "anioacta", jdbcType = JdbcType.NUMERIC)
 
 	})
 	List<ActasItem> busquedaActas(ActasItem actasItem, Short idInstitucion);
@@ -39,7 +39,7 @@ public interface ScsActaExtendsMapper extends ScsEjgMapper {
 //
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "comprobarGuardarActaPonente")
 	@Results({ @Result(column = "contar", property = "contar", jdbcType = JdbcType.NUMERIC) })
-	int comprobarGuardarActaPonente(ActasItem actasItem, Short idInstitucion);
+	String comprobarGuardarActaPonente(ActasItem actasItem, Short idInstitucion);
 
 	@SelectProvider(type = ScsActaSqlExtendsProvider.class, method = "comprobarGuardarActaSufijo")
 	@Results({ @Result(column = "contar", property = "contar", jdbcType = JdbcType.VARCHAR) })

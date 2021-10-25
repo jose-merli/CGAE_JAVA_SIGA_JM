@@ -1,6 +1,8 @@
 package org.itcgae.siga.scs.services.acta;
 
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
@@ -18,8 +20,6 @@ public interface IBusquedaActa {
 
 	public ActasDTO busquedaActas(ActasItem actasItem, HttpServletRequest request) throws SigaExceptions;
 
-	public DeleteResponseDTO borrarActas(ActasItem actasItem, HttpServletRequest request) throws SigaExceptions;
-
 	public ComboDTO comboSufijoActa(HttpServletRequest request) throws SigaExceptions;
 
 	public InsertResponseDTO guardarActa(ActasItem actasItem, HttpServletRequest request) throws SigaExceptions;
@@ -31,5 +31,7 @@ public interface IBusquedaActa {
 	public UpdateResponseDTO cerrarActa(ActasItem actasItem, HttpServletRequest request) throws Exception;
 
 	public ScsActacomision getActa(ActasItem actasItem, HttpServletRequest request);
+
+	public DeleteResponseDTO borrarActas(List<ActasItem> actasItem, HttpServletRequest request) throws SigaExceptions;
 	
 }

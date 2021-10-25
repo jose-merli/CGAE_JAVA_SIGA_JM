@@ -162,8 +162,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 		return actasDTO;
 	}
 
-	@Override
-	public DeleteResponseDTO borrarActas(ActasItem actasItem, HttpServletRequest request) throws SigaExceptions {
+	public DeleteResponseDTO borrarActas(List<ActasItem> actasItems, HttpServletRequest request) throws SigaExceptions {
 
 		LOGGER.info("borrarActas() -> Entrada al servicio para obtener el colegiado");
 
@@ -206,76 +205,81 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-			// Comprobamos que los datos del acta que vienen no son nulos
-			if (actasItem.getAnio() != null && actasItem.getIdActa() != null && idInstitucion != null) {
+			for (ActasItem actasItem : actasItems) {
 
-				// Obtenemos el acta que vamos a borrar
-				ScsActacomision acta = obtenerActa(actasItem, Short.valueOf("2011"));
+				// Comprobamos que los datos del acta que vienen no son nulos
+				if (actasItem.getAnioacta() != null && actasItem.getIdacta() != null && idInstitucion != null) {
 
-				if (acta != null) {
-					// Obtenemos el listado de EJG asociados al Acta
-					List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(acta);
+					// Obtenemos el acta que vamos a borrar
+					ScsActacomision acta = obtenerActa(actasItem, Short.valueOf(actasItem.getIdinstitucion()));
 
-					// Comprobamos que la lista esta vacia o nula ya que si tiene elementos
-					// asociados al acta no vamos a
-					if (listaEjgAsociadosActa.isEmpty() || listaEjgAsociadosActa == null) {
+					if (acta != null) {
+						// Obtenemos el listado de EJG asociados al Acta
+						List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(acta);
 
-						LOGGER.info(
-								"borrarActas() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsActaExtendsMapper para obtener las actas");
+						// Comprobamos que la lista esta vacia o nula ya que si tiene elementos
+						// asociados al acta no vamos a
 
-						int response = scsActacomisionMapper.deleteByPrimaryKey(acta);
+						try {
 
-						if (response == 1) {
+							if (listaEjgAsociadosActa.isEmpty() || listaEjgAsociadosActa == null) {
 
-							deleteResponseDTO.setStatus(SigaConstants.OK);
+								LOGGER.info(
+										"borrarActas() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsActaExtendsMapper para obtener las actas");
 
-							LOGGER.info("borrarActas() -> OK. Acta eliminada correctamente");
+								int response = scsActacomisionMapper.deleteByPrimaryKey(acta);
 
-						} else {
-							deleteResponseDTO.setStatus(SigaConstants.KO);
+								if (response == 1) {
 
-							error.setCode(500);
+									deleteResponseDTO.setStatus(SigaConstants.OK);
 
-							error.setDescription("Acta NO eliminada correctamente");
+									LOGGER.info("borrarActas() -> OK. Acta eliminada correctamente");
 
-							deleteResponseDTO.setStatus(SigaConstants.KO);
+								} else {
+									deleteResponseDTO.setStatus(SigaConstants.KO);
 
-							LOGGER.warn("borrarActas() -> KO. Acta NO eliminada correctamente");
+									error.setCode(500);
 
+									error.setDescription("Acta NO eliminada correctamente");
+
+									deleteResponseDTO.setStatus(SigaConstants.KO);
+
+									LOGGER.warn("borrarActas() -> KO. Acta NO eliminada correctamente");
+
+								}
+
+								LOGGER.info(
+										"borrarActas() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsActaExtendsMapper para obtener lista de Actas");
+							} else {
+
+								deleteResponseDTO.setStatus(SigaConstants.KO);
+
+								error.setCode(500);
+
+								error.setDescription("Acta " + acta.getAnioacta() + "/" + acta.getNumeroacta()
+										+ " NO eliminada porque tiene elementos asociados");
+
+								deleteResponseDTO.setStatus(SigaConstants.KO);
+
+								throw new SigaExceptions(
+										"Ha ocurrido un error a la hora de borrar el actas, el acta tiene elementos asociados");
+							}
+
+						} catch (SigaExceptions e) {
+							LOGGER.info("El acta tiene elementos asociados, no se ha podido borrar");
 						}
-
-						LOGGER.info(
-								"borrarActas() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsActaExtendsMapper para obtener lista de Actas");
 					} else {
-
-						deleteResponseDTO.setStatus(SigaConstants.KO);
-
-						error.setCode(500);
-
-						error.setDescription("Acta NO eliminada porque tiene elementos asociados");
-
-						deleteResponseDTO.setStatus(SigaConstants.KO);
-
-						LOGGER.info("El acta tiene elementos asociados, no se ha podido borrar");
-
-						LOGGER.warn("borrarActas() -> KO. Acta NO eliminada correctamente");
-
-						throw new SigaExceptions(
-								"Ha ocurrido un error a la hora de borrar el actas, el acta tiene elementos asociados");
-
+						throw new SigaExceptions("El acta es nula");
 					}
+
 				} else {
-					throw new SigaExceptions("El acta es nula");
+					error.setCode(500);
+
+					error.setDescription("Faltan datos para encontrar el acta que se desea borrar");
+
+					deleteResponseDTO.setStatus(SigaConstants.KO);
 				}
-
-			} else {
-				error.setCode(500);
-
-				error.setDescription("Faltan datos para encontrar el acta que se desea borrar");
-
-				deleteResponseDTO.setStatus(SigaConstants.KO);
 			}
-
 		} else {
 			deleteResponseDTO.setStatus(SigaConstants.KO);
 
@@ -426,15 +430,15 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-			int year = Calendar.getInstance().get(Calendar.YEAR);
-
 			ScsActacomision acta = null;
 
 			// Obtenemos el acta que vamos a guardar si los campos de su clave primaria no
 			// son nulos, si son nulos crearemos el acta
 
-			if (actasItem.getAnio() != null && actasItem.getIdActa() != null) {
-				acta = obtenerActa(actasItem, Short.valueOf("2011"));
+			if (actasItem.getAnioacta() != null && actasItem.getIdacta() != null) {
+
+				acta = obtenerActa(actasItem, Short.valueOf(actasItem.getIdinstitucion()));
+
 			}
 
 			// Si es nulo significa que vamos a guardar un acta que es nueva por lo cual
@@ -446,92 +450,85 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 				// Con este dato sabremos si actualizar o crear un nuevo registro mas tarde
 				actualizar = false;
 			}
-			
-			LOGGER.info("Estoy aqui para ver el objeto actasItem "+actasItem);
-			LOGGER.info("Estoy aqui para ver el objeto actasItem "+actasItem.getAnio() + " " + actasItem.getFechaReunion()+ " " + actasItem.getFechaResolucion() + " "  + actasItem.getPendientes());
+
+			LOGGER.info("Estoy aqui para ver el objeto actasItem " + actasItem);
+			LOGGER.info("Estoy aqui para ver el objeto actasItem " + actasItem.getAnioacta() + " "
+					+ actasItem.getFechareunion() + " " + actasItem.getFecharesolucion() + " "
+					+ actasItem.getPendientes());
 
 			// Comprobamos que se cumplen los requisitos de cada campo
-			if (actasItem.getAnio() != null && actasItem.getFechaReunion() != null && actasItem.getFechaResolucion() != null
-				&& actasItem.getPendientes() != null) {
-//				&& scsActaExtendsMapper.comprobarGuardarActaSufijo(actasItem,
-//						Short.valueOf("2011")) == null
-//				&& scsActaExtendsMapper.comprobarGuardarActaPonente(actasItem, Short.valueOf("2011")) == 0
+			if (actasItem.getAnioacta() != null && ((actualizar == true
+					&& actasItem.getAnioacta() != String.valueOf(Calendar.getInstance().get(Calendar.YEAR))) || actualizar == false)
+					&& actasItem.getFechareunion() != null
+					&& actasItem.getFecharesolucion() != null
+					&& scsActaExtendsMapper.comprobarGuardarActaSufijo(actasItem,Short.valueOf(actasItem.getIdinstitucion())) == null
+					&& scsActaExtendsMapper.comprobarGuardarActaPonente(actasItem, Short.valueOf(actasItem.getIdinstitucion())) != null) {
+								
 				LOGGER.info(
 						"guardarActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para guardar el acta");
 
-				if (actasItem.getAnio() != null) {
-					acta.setAnioacta(Short.valueOf(actasItem.getAnio()));
+				
+					acta.setAnioacta(Short.valueOf(actasItem.getAnioacta()));
 
-				}
-				if (actasItem.getIdActa() != null) {
-					acta.setIdacta(Long.valueOf(actasItem.getIdActa()));
-					LOGGER.info("ACTA ES DISTINTO DE NULO");
-				} else {
+				if(actualizar == false) {
 					int idActa;
 					try {
-						idActa = scsActaExtendsMapper.obtenerIdActa(actasItem, Short.valueOf("2011"));
+						idActa = scsActaExtendsMapper.obtenerIdActa(actasItem, Short.valueOf(actasItem.getIdacta()));
 						LOGGER.info("EL id DEL ACTA ES" + idActa);
-						actasItem.setIdActa(String.valueOf(idActa));
+						actasItem.setIdacta(String.valueOf(idActa));
 						acta.setIdacta(Long.valueOf(idActa + 1));
 					} catch (Exception e) {
 						LOGGER.info("EL id DEL ACTA ES 1 si no encuentro el numero acta como lo busco");
 						idActa = 1;
 						acta.setIdacta(Long.valueOf(idActa));
-						actasItem.setIdActa(String.valueOf(idActa));
+						actasItem.setIdacta(String.valueOf(idActa));
 					}
-
 				}
 
-				acta.setIdinstitucion(Short.valueOf("2011"));
-
-				LOGGER.info(" NUMERO ACTA" + actasItem.getNumeroActa());
-				LOGGER.info(" SUFIJO ACTA" + actasItem.getSufijo());
-
-				if (actasItem.getNumeroActa() != null && actasItem.getSufijo() != null) {
+				//Tengo que cambiarlo
+				acta.setIdinstitucion(Short.valueOf(actasItem.getIdinstitucion()));
+//
+//				LOGGER.info(" NUMERO ACTA" + actasItem.getNumeroacta());
+//				LOGGER.info(" SUFIJO ACTA" + actasItem.getSufijo());
+//
+				if (actasItem.getNumeroacta() != null && actasItem.getSufijo() != null) {
 					LOGGER.info("DENTRO DE NUMERO ACTA");
-					acta.setNumeroacta(actasItem.getNumeroActa() + actasItem.getSufijo());
-
-					String letrasActa;
-					int numActaInt;
-
 					LOGGER.info("VAMOS A OBTENER EL NUMERO DEL ACTA");
 
-					List<String> numActa = scsActaExtendsMapper.obtenerNumActa(actasItem, Short.valueOf("2011"));
+					List<String> numActa = scsActaExtendsMapper.obtenerNumActa(actasItem,
+							Short.valueOf(actasItem.getIdacta()));
 
-					for (String ejg : numActa) {
-						LOGGER.info("Lista de numerosdeactas");
-						LOGGER.info(ejg);
-					}
-
-					if (numActa.contains(actasItem.getNumeroActa() + actasItem.getSufijo())) {
+					
+					if (!numActa.isEmpty() && numActa.contains(actasItem.getNumeroacta() + actasItem.getSufijo())) {
 						throw new SigaExceptions(
 								"Ya existe un acta con ese numero, por favor introduzca uno mas grande");
 					} else {
-						acta.setNumeroacta(actasItem.getNumeroActa() + actasItem.getSufijo());
+						acta.setNumeroacta(actasItem.getNumeroacta() + actasItem.getSufijo());
 					}
-				}			
+				}
 
-				if (actasItem.getHoraInicio() != null) {
-					acta.setHorainicioreunion(actasItem.getHoraInicio());
+				if (actasItem.getHorainicio() != null) {
+					acta.setHorainicioreunion(actasItem.getHorainicio());
 
 				}
-				if (actasItem.getHoraFin() != null) {
-					acta.setHorafinreunion(actasItem.getHoraFin());
+				if (actasItem.getHorafin() != null) {
+					acta.setHorafinreunion(actasItem.getHorafin());
 
 				}
-				if (actasItem.getIdPresidente() != null) {
-					acta.setIdpresidente(Integer.parseInt(actasItem.getIdPresidente()));
+				if (actasItem.getIdpresidente() != null) {
+					acta.setIdpresidente(Integer.parseInt(actasItem.getIdpresidente()));
 
 				}
-				if (actasItem.getIdSecretario() != null) {
-					acta.setIdsecretario(Integer.parseInt(actasItem.getIdSecretario()));
+				if (actasItem.getIdsecretario() != null) {
+					acta.setIdsecretario(Integer.parseInt(actasItem.getIdsecretario()));
 
 				}
-				if (actasItem.getMiembros() != null) {
-					acta.setMiembroscomision(actasItem.getMiembros());
+				if (actasItem.getMiembroscomision() != null) {
+					acta.setMiembroscomision(actasItem.getMiembroscomision());
 
 				}
 				if (actasItem.getObservaciones() != null) {
+					LOGGER.info("ESTAS SON LAS OBSERVACIONES " + actasItem.getObservaciones());
 					acta.setObservaciones(actasItem.getObservaciones());
 
 				}
@@ -539,17 +536,16 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					acta.setPendientes(actasItem.getPendientes());
 
 				}
-				if (actasItem.getFechaReunion() != null) {
-					acta.setFechareunion(actasItem.getFechaReunion());
+				if (actasItem.getFechareunion() != null) {
+					acta.setFechareunion(actasItem.getFechareunion());
 
 				}
-				if (actasItem.getFechaResolucion() != null) {
-					acta.setFecharesolucion(actasItem.getFechaResolucion());
+				if (actasItem.getFecharesolucion() != null) {
+					acta.setFecharesolucion(actasItem.getFecharesolucion());
 
 				}
 				if (usuario.getIdusuario() != null) {
 					acta.setUsumodificacion(usuario.getIdusuario());
-
 				}
 
 				acta.setFechamodificacion(new Date());
@@ -560,6 +556,8 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 				// Actualizamos o creamos dependiendo del booleano
 				if (actualizar == true) {
+					LOGGER.info(
+							"ACTUALIZA " + acta.getIdacta() + " " + acta.getNumeroacta() + " " + acta.getAnioacta() + " " + acta.getIdinstitucion());
 					response = scsActacomisionMapper.updateByPrimaryKey(acta);
 					if (response == 0) {
 						throw new SigaExceptions("Ha ocurrido un error a la hora de actualizar el acta");
@@ -567,7 +565,8 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					insertResponseDTO.setStatus(SigaConstants.OK);
 
 				} else {
-
+					LOGGER.info(
+							"INSERTA");
 					response = scsActacomisionMapper.insert(acta);
 
 					if (response == 0) {
@@ -577,6 +576,11 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					insertResponseDTO.setStatus(SigaConstants.OK);
 				}
 
+				response = scsActacomisionMapper.updateByPrimaryKey(acta);
+
+				if (response == 0) {
+					throw new SigaExceptions("Ha ocurrido un error a la hora de actualizar el acta");
+				}
 				LOGGER.info(
 						"guardarActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para guardar el acta");
 
@@ -589,16 +593,18 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 				LOGGER.info("guardarActa() No se han cumplido los requisitos para guardar el acta");
 			}
 
-		} else {
+		}else
 
-			LOGGER.warn("guardarActa() -> idInstitucion del token nula");
-		}
+	{
 
-		LOGGER.info("getLabel() -> Salida del servicio para guardar el Acta");
+		LOGGER.warn("guardarActa() -> idInstitucion del token nula");
+	}
 
-		insertResponseDTO.setError(error);
+	LOGGER.info("getLabel() -> Salida del servicio para guardar el Acta");
 
-		return insertResponseDTO;
+	insertResponseDTO.setError(error);
+
+	return insertResponseDTO;
 	}
 
 	@Override
@@ -831,11 +837,11 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 			LOGGER.info("abrirActa() / buscando el acta ");
 
-			LOGGER.info("abrirActa() / valores para buscar el acta = " + actasItem.getAnio() + " id acta = "
-					+ actasItem.getIdActa());
+			LOGGER.info("abrirActa() / valores para buscar el acta = " + actasItem.getAnioacta() + " id acta = "
+					+ actasItem.getIdacta());
 
 			// Buscamos el acta que vamos a abrir
-			ScsActacomision acta = obtenerActa(actasItem, Short.valueOf("2011"));
+			ScsActacomision acta = obtenerActa(actasItem,Short.valueOf(actasItem.getIdinstitucion()));
 
 			LOGGER.info("abrirActa() / el acta es: " + acta.getAnioacta() + acta.getIdinstitucion() + acta.getIdacta());
 			LOGGER.info("abrirActa() / y tiene la fecha resolucion a : " + acta.getFecharesolucion());
@@ -843,6 +849,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 			// Miramos que la fecha de resolucion sea distinta de nula ya que significa que
 			// esta
 			// cerrada, de lo contrario no hariamos nada porque ya esta abierta
+			try {
 			if (acta.getFecharesolucion() != null) {
 
 				LOGGER.info("abrirActa() / acta encontrada");
@@ -873,9 +880,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 						// Utilizamos este booleano para saber si existen mas actas asociadas a este ejg
 						// y estan abiertas
 						boolean masActasAbiertas = false;
-						// String donde guardaremos la informacion si la hay del acta que esta abierta
-						// para el ejg
-
+						
 						ejg.setFecharesolucioncajg(null);
 
 						LOGGER.info("abrirActa() / valores ejg institucion = " + ejg.getIdinstitucion()
@@ -903,20 +908,19 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 									informacionEjgActaAbierta += " - Ejg " + ejg.getAnio() + "/" + ejg.getNumero()
 											+ " abierto para el acta " + actaComision.getAnioacta() + "/"
 											+ actaComision.getNumeroacta() + " - ";
+									error.setCode(500);
+									error.setDescription(informacionEjgActaAbierta);
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									throw new SigaExceptions("El objeto de estado para el ejg es nulo");
 								}
 
 							}
-						} else {
-
-							error.setCode(500);
-
-							error.setDescription("La lista de objetos scs_ejg_acta esta vacia");
 						}
-
 						if (masActasAbiertas == false) {
 
 							acta.setFecharesolucion(null);
 							scsActacomisionMapper.updateByPrimaryKey(acta);
+							updateResponseDTO.setStatus(SigaConstants.OK);
 
 							String idEstadoPorEjg = scsActaExtendsMapper.getEstadosEjg(ejg.getIdinstitucion(),
 									ejg.getIdtipoejg(), ejg.getAnio(), ejg.getNumero());
@@ -951,28 +955,23 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 									LOGGER.info("ha actualizado el registro????? " + resultado);
 								}
 							} else {
-
 								error.setCode(500);
-
 								error.setDescription("El objeto de estado para el ejg es nulo");
+								updateResponseDTO.setStatus(SigaConstants.KO);
+								throw new SigaExceptions("El objeto de estado para el ejg es nulo");
 
 							}
 
-						} else {
-
-							error.setCode(500);
-
-							error.setDescription(informacionEjgActaAbierta);
-
-						}
+						} 
 
 					}
 
 				} else {
 					acta.setFecharesolucion(null);
 					scsActacomisionMapper.updateByPrimaryKey(acta);
-
+					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
+			
 
 				LOGGER.info(
 						"abrirActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de Actas");
@@ -980,15 +979,17 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 			} else {
 
 				error.setCode(500);
-
 				error.setDescription("El acta ya esta abierta");
-
+				updateResponseDTO.setStatus(SigaConstants.KO);
 			}
-
+			}catch(SigaExceptions e) {
+				LOGGER.info(
+						"Nos se ha podido completar el abrir el acta " + e.getMsg());
+			}
 		} else {
 			error.setCode(500);
-
 			error.setDescription("el id de la instuticon es nulo");
+			updateResponseDTO.setStatus(SigaConstants.KO);
 		}
 
 		LOGGER.info("getLabel() -> Salida del servicio para obtener la lista de Actas");
@@ -1048,7 +1049,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					"cerrarActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener las actas");
 
 			// Obtenemos el acta que vamos a cerrar
-			ScsActacomision acta = obtenerActa(actasItem, Short.valueOf("2011"));
+			ScsActacomision acta = obtenerActa(actasItem,Short.valueOf(actasItem.getIdinstitucion()));
 
 			if (acta.getFecharesolucion() == null) {
 
@@ -1170,7 +1171,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 					}
 
 				}
-			}else {
+			} else {
 				error.setCode(500);
 				error.setDescription("El acta ya esta cerrada");
 			}
@@ -1187,10 +1188,10 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	public ScsActacomision getActa(ActasItem actasItem, HttpServletRequest request) {
-		
+
 		LOGGER.info("comboSufijoActa() -> Entrada al servicio para obtener el colegiado");
 
 		Error error = new Error();
@@ -1200,8 +1201,6 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		String resultado = "0";
 
 		ScsActacomision acta = new ScsActacomision();
 
@@ -1238,21 +1237,16 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 			// Obtenemos el combo de sufijos para el acta
 
-			acta = obtenerActa(actasItem, Short.valueOf("2011"));
-			
+			acta = obtenerActa(actasItem, Short.valueOf(actasItem.getIdinstitucion()));
+
 			List<ScsEjgActa> listaEjgActaRelacionado = obtenerEjgActa(acta);
-			
-			
-			
+
 			if (!listaEjgActaRelacionado.isEmpty()) {
 				acta.setUsumodificacion(listaEjgActaRelacionado.size());
 			}
-			
 
 			LOGGER.info(
 					"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener el combo de sufijos para actas");
-
-
 
 		} else {
 
@@ -1305,14 +1299,14 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 	 */
 	private int actualizarEstado(ActasItem actasItem, ScsEjg ejgItem, List<ScsEstadoejg> listaEstadoEjg)
 			throws ParseException {
-		
-		int resultado;
-		
-		ScsEstadoejg scsEstadoejg = listaEstadoEjg.get(0);
-		
-		LOGGER.info("obtengo el objeto estado para el ejg " +scsEstadoejg.getIdtipoejg() + " "+ scsEstadoejg.getAnio() +" "+ scsEstadoejg.getNumero() +" " + scsEstadoejg.getIdestadoporejg() );
 
-		
+		int resultado;
+
+		ScsEstadoejg scsEstadoejg = listaEstadoEjg.get(0);
+
+		LOGGER.info("obtengo el objeto estado para el ejg " + scsEstadoejg.getIdtipoejg() + " " + scsEstadoejg.getAnio()
+				+ " " + scsEstadoejg.getNumero() + " " + scsEstadoejg.getIdestadoporejg());
+
 		scsEstadoejg.setIdestadoporejg(Long.valueOf(10));
 
 		scsEstadoejg.setAnio(Short.valueOf(ejgItem.getAnio()));
@@ -1325,7 +1319,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-		Date fechaResolucion = actasItem.getFechaResolucion();
+		Date fechaResolucion = actasItem.getFecharesolucion();
 
 		Date fechaSinHora;
 
@@ -1378,11 +1372,8 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		ScsEjgActaExample scsEjgActaExample = new ScsEjgActaExample();
 
-		scsEjgActaExample.createCriteria().andIdactaEqualTo(acta.getIdacta());
-
-		scsEjgActaExample.createCriteria().andIdinstitucionactaEqualTo(acta.getIdinstitucion());
-
-		scsEjgActaExample.createCriteria().andAnioactaEqualTo(acta.getAnioacta());
+		scsEjgActaExample.createCriteria().andIdinstitucionactaEqualTo(acta.getIdinstitucion())
+				.andIdactaEqualTo(acta.getIdacta()).andAnioactaEqualTo(acta.getAnioacta());
 
 		List<ScsEjgActa> listaEjgAsociadosActa = scsEjgActaMapper.selectByExample(scsEjgActaExample);
 
@@ -1390,19 +1381,19 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 	}
 
 	private ScsActacomision obtenerActa(ActasItem actasItem, Short idInstitucion) {
-		
-		LOGGER.info("DATOS DEL ACTA QUE SE ESTA ENVIANDO DESDE EL FRONT" + actasItem.getAnio() + " " + actasItem.getIdActa() + " " + actasItem.getIdInstitucion());
 
+		LOGGER.info("DATOS DEL ACTA QUE SE ESTA ENVIANDO DESDE EL FRONT" + actasItem.getAnioacta() + " "
+				+ actasItem.getIdacta() + " " + actasItem.getIdinstitucion());
 
 		ScsActacomision acta = null;
 
 		ScsActacomisionKey key = new ScsActacomisionKey();
 
-		key.setAnioacta(Short.valueOf(actasItem.getAnio()));
+		key.setAnioacta(Short.valueOf(actasItem.getAnioacta()));
 
-		key.setIdacta(Long.valueOf(actasItem.getIdActa()));
+		key.setIdacta(Long.valueOf(actasItem.getIdacta()));
 
-		key.setIdinstitucion(Short.valueOf(actasItem.getIdInstitucion()));
+		key.setIdinstitucion(Short.valueOf(actasItem.getIdinstitucion()));
 
 		try {
 			acta = scsActacomisionMapper.selectByPrimaryKey(key);
@@ -1515,9 +1506,5 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		return listaEjgActa;
 	}
-
-	
-
-	
 
 }

@@ -16,13 +16,13 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		String fechaReunion = "0";
 		String fechaResolucion = "0";
 
-		if (actasItem.getFechaReunion() != null) {
-			fechaReunion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechaReunion());
+		if (actasItem.getFechareunion() != null) {
+			fechaReunion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechareunion());
 
 		}
 
-		if (actasItem.getFechaResolucion() != null) {
-			fechaResolucion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechaResolucion());
+		if (actasItem.getFecharesolucion() != null) {
+			fechaResolucion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFecharesolucion());
 		}
 
 		SQL sql = new SQL();
@@ -37,12 +37,12 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		sql.WHERE("SEC.IDPONENTE (+) = ACT.IDSECRETARIO");
 		sql.WHERE("SEC.IDINSTITUCION (+) = ACT.IDINSTITUCION");
 
-		if (actasItem.getAnio() != null) {
-			sql.WHERE("ACT.ANIOACTA='" + actasItem.getAnio() + "'");
+		if (actasItem.getAnioacta() != null) {
+			sql.WHERE("ACT.ANIOACTA='" + actasItem.getAnioacta() + "'");
 		}
 
-		if (actasItem.getNumeroActa() != null) {
-			sql.WHERE("ACT.NUMEROACTA LIKE'" + actasItem.getNumeroActa() + "'");
+		if (actasItem.getNumeroacta() != null) {
+			sql.WHERE("ACT.NUMEROACTA LIKE'" + actasItem.getNumeroacta() + "'");
 		}
 
 		if (fechaResolucion != "0") {
@@ -52,13 +52,13 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 			sql.WHERE("FECHAREUNION = '" + fechaReunion + "'");
 		}
 
-		if (actasItem.getIdPresidente() != null) {
-			sql.WHERE("ACT.IDPRESIDENTE ='" + actasItem.getIdPresidente() + "'");
+		if (actasItem.getIdpresidente() != null) {
+			sql.WHERE("ACT.IDPRESIDENTE ='" + actasItem.getIdpresidente() + "'");
 
 		}
 
-		if (actasItem.getIdSecretario() != null) {
-			sql.WHERE("ACT.IDSECRETARIO ='" + actasItem.getIdSecretario() + "'");
+		if (actasItem.getIdsecretario() != null) {
+			sql.WHERE("ACT.IDSECRETARIO ='" + actasItem.getIdsecretario() + "'");
 		}
 
 		// ORDER BY ACT.ANIOACTA DESC, TO_NUMBER(regexp_replace(NUMEROACTA, '\\D', ''))
@@ -73,7 +73,7 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		SQL sql = new SQL();
 		sql.SELECT("NUMEROACTA");
 		sql.FROM("SCS_ACTACOMISION");
-		sql.WHERE("ANIOACTA = " + actasItem.getAnio());
+		sql.WHERE("ANIOACTA = " + actasItem.getAnioacta());
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		LOGGER.info("*******************obtenerNumActa********************" + sql.toString());
 		return sql.toString();
@@ -83,7 +83,7 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 
 		SQL sql = new SQL();
 		sql.SELECT("*");
-		sql.FROM("(SELECT IDACTA FROM SCS_ACTACOMISION WHERE ANIOACTA = " + actasItem.getAnio()
+		sql.FROM("(SELECT IDACTA FROM SCS_ACTACOMISION WHERE ANIOACTA = " + actasItem.getAnioacta()
 				+ " AND IDINSTITUCION = " + idInstitucion + " ORDER BY IDACTA desc)");
 
 		sql.WHERE("ROWNUM <=  1");
@@ -97,9 +97,9 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		SQL sql = new SQL();
 		sql.SELECT("IDACTA");
 		sql.FROM("SCS_EJG_ACTA");
-		sql.WHERE("IDACTA =" + actasItem.getIdActa());
+		sql.WHERE("IDACTA =" + actasItem.getIdacta());
 		sql.WHERE("IDINSTITUCION =" + idInstitucion);
-		sql.WHERE("ANIOACTA =" + actasItem.getAnio());
+		sql.WHERE("ANIOACTA =" + actasItem.getAnioacta());
 
 		LOGGER.info("*******************comprobarBorrarActas********************" + sql.toString());
 		return sql.toString();
@@ -109,9 +109,9 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 
 		SQL sql = new SQL();
 		sql.DELETE_FROM("SCS_ACTASCOMISION");
-		sql.WHERE("IDACTA =" + actasItem.getIdActa());
+		sql.WHERE("IDACTA =" + actasItem.getIdacta());
 		sql.WHERE("IDINSTITUCION =" + idInstitucion);
-		sql.WHERE("ANIOACTA =" + actasItem.getAnio());
+		sql.WHERE("ANIOACTA =" + actasItem.getAnioacta());
 
 		LOGGER.info("*******************borrarActas********************" + sql.toString());
 		return sql.toString();
@@ -134,7 +134,7 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		SQL sql = new SQL();
 		sql.SELECT("COUNT (1) as contar");
 		sql.FROM("SCS_PONENTE");
-		sql.WHERE("IDPONENTE =" + actasItem.getIdPresidente() + " OR IDPONENTE = " + actasItem.getIdPresidente());
+		sql.WHERE("IDPONENTE =" + actasItem.getIdpresidente() + " OR IDPONENTE = " + actasItem.getIdpresidente());
 		sql.WHERE("IDINSTITUCION =" + idInstitucion);
 
 		LOGGER.info("*******************comprobarGuardarActaPonente********************" + sql.toString());
@@ -147,92 +147,31 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		sql.SELECT("1 as contar");
 		sql.FROM("GEN_PARAMETROS");
 		sql.WHERE("PARAMETRO = 'CAJG_SUFIJO_ACTAS'");
-		sql.WHERE("valor = " + actasItem.getNumeroActa() + actasItem.getSufijo());
+		if(actasItem.getSufijo() != null) {
+			sql.WHERE("valor = '" + actasItem.getNumeroacta() + actasItem.getSufijo()+ "'");
+		}else {
+			sql.WHERE("valor = '" + actasItem.getNumeroacta() + "'");
+		}
 		sql.WHERE("IDINSTITUCION =" + idInstitucion);
 
 		LOGGER.info("*******************comprobarGuardarActaSufijo********************" + sql.toString());
 		return sql.toString();
 	}
 
-//	public String anadirEJGPendientesCAJG(ActasItem actasItem, Short idInstitucion) {
-//
-//		SQL sql = new SQL();
-//		sql.SELECT("1 as contar");
-//		sql.FROM("GEN_PARAMETROS");
-//		sql.WHERE("PARAMETRO = 'CAJG_SUFIJO_ACTAS'");
-//		sql.WHERE("valor = " + actasItem.getNumeroActa() + actasItem.getSufijo());
-//		sql.WHERE("IDINSTITUCION =" + idInstitucion);
-//
-//		LOGGER.info("*******************anadirEJGPendientesCAJG********************" + sql.toString());
-//		return sql.toString();
-//	}
-
-//	public String guardarActa(ActasItem actasItem) {
-//
-//		SQL sql = new SQL();
-//		sql.UPDATE("SCS_ACTACOMISION");
-//		sql.SET("ANIOACTA = " + actasItem.getAnio());
-//		sql.SET("NUMEROACTA = " + actasItem.getNumeroActa() + actasItem.getSufijo());
-//		sql.SET("FECHAREUNION = " + actasItem.getFechaReunion());
-//		sql.SET("HORAINICIOREUNION = " + actasItem.getHoraInicio());
-//		sql.SET("HORAFINREUNION = " + actasItem.getHoraFin());
-//		sql.SET("FECHARESOLUCION = " + actasItem.getFechaResolucion());
-//		sql.SET("IDPRESIDENTE = " + actasItem.getIdPresidente());
-//		sql.SET("IDSECRETARIO = " + actasItem.getIdSecretario());
-//		sql.SET("MIEMBROSCOMISION = " + actasItem.getMiembros());
-//		sql.SET("OBSERVACIONES = " + actasItem.getObservaciones());
-//		sql.SET("PENDIENTES = " + actasItem.getPendientes());
-//
-//		LOGGER.info("*******************guardarActa********************" + sql.toString());
-//		return sql.toString();
-//	}
-
-//	public String abrirActa(ActasItem actasItem, Short idInstitucion) {
-//
-//		SQL sql = new SQL();
-//		sql.UPDATE("SCS_ACTACOMISION");
-//		sql.SET("FECHARESOLUCION = NULL");
-//
-//		LOGGER.info("*******************abrirActa********************" + sql.toString());
-//		return sql.toString();
-//	}
 
 	public String detectarEjgAsociadoActa(ActasItem actasItem, Short idInstitucion) {
 
 		SQL sql = new SQL();
 		sql.SELECT("ANIO,NUMERO,IDINSTITUCION,IDTIPOEJG");
 		sql.FROM("SCS_EJG");
-		sql.WHERE("IDACTA =" + actasItem.getIdActa());
+		sql.WHERE("IDACTA =" + actasItem.getIdacta());
 		sql.WHERE("IDINSTITUCIONACTA = " + idInstitucion);
-		sql.WHERE("ANIOACTA =" + actasItem.getAnio());
+		sql.WHERE("ANIOACTA =" + actasItem.getAnioacta());
 
 		LOGGER.info("*******************detectarEjgAsociadoActa********************" + sql.toString());
 		return sql.toString();
 	}
 
-//	public String actualizarEjg(EjgItem ejgItem) {
-//
-//		SQL sql = new SQL();
-//		sql.UPDATE("SCS_EJG");
-//		sql.SET("FECHARESOLUCIONCAJG = NULL");
-//		LOGGER.info("*******************abrirActa********************" + sql.toString());
-//		return sql.toString();
-//	}
-
-//	public String actualizarEstadoEjg(EjgItem ejgItem, EstadoEjgItem estadoEjgItem) {
-//
-//		SQL sql = new SQL();
-//		sql.UPDATE("SCS_ESTADOEJG");
-//		sql.SET("FECHABAJA =" + estadoEjgItem.getFechabaja());
-//		sql.WHERE("ANIO = " + ejgItem.getAnnio());
-//		sql.WHERE("NUMERO = " + ejgItem.getNumero());
-//		sql.WHERE("IDINSTITUCION = " + ejgItem.getidInstitucion());
-//		sql.WHERE("IDTIPOEJG = " + ejgItem.getTipoEJG());
-//		sql.WHERE("IDESTADOEJG=10");
-//
-//		LOGGER.info("*******************actualizarEstadoEjg********************" + sql.toString());
-//		return sql.toString();
-//	}
 
 	public String getEstadosEjg(Short idinstitucion, Short idtipoejg, Short anio, Long numero) {
 
@@ -250,84 +189,7 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		return sql.toString();
 	}
 
-//	public String expedientesRetirados(ActasItem actasItem, Short idInstitucion) {
-//
-//		SQL sql = new SQL();
-//		sql.SELECT("ANIO,NUMERO,IDINSTITUCION,IDTIPOEJG");
-//		sql.FROM("SCS_EJG");
-//		sql.WHERE("IDACTA =" + actasItem.getIdActa());
-//		sql.WHERE("IDINSTITUCIONACTA = " + idInstitucion);
-//		sql.WHERE("ANIOACTA =" + actasItem.getAnio());
-//		sql.WHERE("IDTIPORATIFICACIONEJG = 4");
-//		sql.WHERE("IDTIPORATIFICACIONEJG = 6");
-//
-//		LOGGER.info("*******************expedientesRetirados********************" + sql.toString());
-//		return sql.toString();
-//	}
 
-//	public String updatePendientes(ActasItem actasItem, String pendientes) {
-//
-//		SQL sql = new SQL();
-//		sql.UPDATE("SCS_ACTACOMISION");
-//		sql.SET("PENDIENTES =" + pendientes);
-//
-//		LOGGER.info("*******************abrirActa********************" + sql.toString());
-//		return sql.toString();
-//	}
-
-//	public String desvincularActa(EjgItem ejgItem, ActasItem actasItem, Short idInstitucion) {
-//
-//		SQL sql = new SQL();
-//		sql.DELETE_FROM("SCS_EJGACTA");
-//		sql.WHERE("IDACTA =" + actasItem.getIdActa());
-//		sql.WHERE("IDINSTITUCION =" + idInstitucion);
-//		sql.WHERE("ANIOACTA =" + actasItem.getAnio());
-//		sql.WHERE("ANIO = " + ejgItem.getAnnio());
-//		sql.WHERE("NUMERO = " + ejgItem.getNumero());
-//		sql.WHERE("IDINSTITUCION = " + ejgItem.getidInstitucion());
-//		sql.WHERE("IDTIPOEJG = " + ejgItem.getTipoEJG());
-//
-//		LOGGER.info("*******************borrarActas********************" + sql.toString());
-//		return sql.toString();
-//	}
-
-//	public String cambiarEstadoEjg(EstadoEjgItem estadoEjgItem, String resolucion, String estado) {
-//
-//		SQL sql = new SQL();
-//		sql.UPDATE("SCS_ESTADOEJG");
-//		if (resolucion == "4") {
-//			sql.SET("OBSERVACIONES = Expediente pendiente de la CAJG. Se retira del acta " + estado);
-//
-//		} else {
-//			sql.SET("OBSERVACIONES = Expediente retirado del acta " + estado);
-//		}
-//		sql.WHERE("ANIO = " + estadoEjgItem.getAnio());
-//		sql.WHERE("NUMERO = " + estadoEjgItem.getNumero());
-//		sql.WHERE("IDINSTITUCION = " + estadoEjgItem.getIdinstitucion());
-//		sql.WHERE("IDTIPOEJG = " + estadoEjgItem.getIdtipoejg());
-//		LOGGER.info("*******************abrirActa********************" + sql.toString());
-//		return sql.toString();
-//	}
-
-//	public String getUltimoEstadoEjg(EjgItem ejgItem, Short idInstitucion, String resolucion) {
-//
-//		SQL sql = new SQL();
-//		sql.SELECT("ANIO,NUMERO,IDINSTITUCION,IDTIPOEJG");
-//		sql.FROM("SCS_ESTADOEJG");
-//		sql.WHERE("ANIO = " + ejgItem.getAnnio());
-//		sql.WHERE("NUMERO = " + ejgItem.getNumero());
-//		sql.WHERE("IDINSTITUCION = " + ejgItem.getidInstitucion());
-//		sql.WHERE("IDTIPOEJG = " + ejgItem.getTipoEJG());
-//		if (resolucion == "4") {
-//			sql.WHERE("IDESTADOPOREJG = 9 ");
-//
-//		} else {
-//			sql.WHERE("IDESTADOPOREJG = 21");
-//		}
-//		sql.ORDER_BY("FECHAMODIFICACION");
-//		LOGGER.info("*******************getUltimoEstadoEjg********************" + sql.toString());
-//		return sql.toString();
-//	}
 
 	public String getActa(ActasItem actasItem, Short idInstitucion) {
 
@@ -335,9 +197,9 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		sql.SELECT(
 				"IDACTA, IDINSTITUCION,ANIOACTA,FECHAREUNION,FECHARESOLUCION,HORAINICIOREUNION,HORAFINREUNION,IDPRESIDENTE,IDSECRETARIO,MIEMBROSCOMISION,FECHAMODIFICACION,USUMODIFICACION,PENDIENTES,IDINTERCAMBIO,FECHAINTERCAMBIO,NUMEROACTA,OBSERVACIONES");
 		sql.FROM("SCS_ACTACOMISION");
-		sql.WHERE("IDACTA =" + actasItem.getIdActa());
+		sql.WHERE("IDACTA =" + actasItem.getIdacta());
 		sql.WHERE("IDINSTITUCION =" + idInstitucion);
-		sql.WHERE("ANIOACTA =" + actasItem.getAnio());
+		sql.WHERE("ANIOACTA =" + actasItem.getAnioacta());
 
 		LOGGER.info("*******************comprobarBorrarActas********************" + sql.toString());
 		return sql.toString();

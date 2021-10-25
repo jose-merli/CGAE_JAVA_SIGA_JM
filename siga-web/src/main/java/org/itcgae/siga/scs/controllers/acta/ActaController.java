@@ -1,5 +1,7 @@
 package org.itcgae.siga.scs.controllers.acta;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
@@ -24,19 +26,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/acta")
 public class ActaController {
-	
 
 	@Autowired
 	private IBusquedaActa actas;
 
 	@RequestMapping(value = "/filtros-acta/busquedaActas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ActasDTO> busquedaActas(@RequestBody ActasItem actasItem, HttpServletRequest request) throws SigaExceptions {
+	ResponseEntity<ActasDTO> busquedaActas(@RequestBody ActasItem actasItem, HttpServletRequest request)
+			throws SigaExceptions {
 		ActasDTO response = actas.busquedaActas(actasItem, request);
 		return new ResponseEntity<ActasDTO>(response, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/filtros-acta/borrarActas", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> borrarActas(@RequestBody ActasItem actasItem, HttpServletRequest request) throws SigaExceptions {
+	@RequestMapping(value = "/filtros-acta/borrarActas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> borrarActas(@RequestBody List<ActasItem> actasItem, HttpServletRequest request)
+			throws SigaExceptions {
 		DeleteResponseDTO response = actas.borrarActas(actasItem, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
@@ -46,15 +49,17 @@ public class ActaController {
 		ComboDTO response = actas.comboSufijoActa(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/filtros-acta/getActa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ScsActacomision> getActa(@RequestBody ActasItem actasItem, HttpServletRequest request) throws SigaExceptions {
-		ScsActacomision response = actas.getActa(actasItem,request);
+	ResponseEntity<ScsActacomision> getActa(@RequestBody ActasItem actasItem, HttpServletRequest request)
+			throws SigaExceptions {
+		ScsActacomision response = actas.getActa(actasItem, request);
 		return new ResponseEntity<ScsActacomision>(response, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/filtros-acta/guardarActa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> guardarActa(@RequestBody ActasItem actasItem, HttpServletRequest request) throws SigaExceptions {
+	ResponseEntity<InsertResponseDTO> guardarActa(@RequestBody ActasItem actasItem, HttpServletRequest request)
+			throws SigaExceptions {
 		InsertResponseDTO response = actas.guardarActa(actasItem, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
@@ -67,13 +72,15 @@ public class ActaController {
 	}
 
 	@RequestMapping(value = "/filtros-acta/abrirActa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> abrirActa(@RequestBody ActasItem actasItem, HttpServletRequest request) throws SigaExceptions {
+	ResponseEntity<UpdateResponseDTO> abrirActa(@RequestBody ActasItem actasItem, HttpServletRequest request)
+			throws SigaExceptions {
 		UpdateResponseDTO response = actas.abrirActa(actasItem, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/filtros-acta/cerrarActa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> cerrarActa(@RequestBody ActasItem actasItem, HttpServletRequest request) throws Exception {
+	ResponseEntity<UpdateResponseDTO> cerrarActa(@RequestBody ActasItem actasItem, HttpServletRequest request)
+			throws Exception {
 		UpdateResponseDTO response = actas.cerrarActa(actasItem, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
