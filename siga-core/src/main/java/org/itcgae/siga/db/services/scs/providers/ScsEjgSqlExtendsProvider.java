@@ -61,7 +61,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         condicionNumRegRemesa = condicionNumRegRemesa + "))";
 
         // select
-        sql.SELECT("ejg.anio");
+        sql.SELECT("DISTINCT ejg.anio");
         sql.SELECT("ejg.idinstitucion");
         sql.SELECT("ejg.idtipoejg");
         sql.SELECT("ejg.numero");
@@ -75,7 +75,32 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.SELECT("ejg.fechamodificacion");
         sql.SELECT(
                 "(CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) as NOMBREletrado");
-        sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
+        if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "" && !ejgItem.isUltimoEstado()) {
+	        SQL sqlEstado = new SQL();
+	        SQL sqlEstado2 = new SQL();
+	        sqlEstado2.SELECT("MAX(idestadoporejg)");
+	        sqlEstado2.FROM("scs_estadoejg estado2");
+	        sqlEstado2.WHERE("estado.idinstitucion = estado2.idinstitucion");
+	        sqlEstado2.WHERE("estado.idtipoejg = estado2.idtipoejg");
+	        sqlEstado2.WHERE("estado.anio = estado2.anio");
+	        sqlEstado2.WHERE("estado.numero = estado2.numero");
+	        sqlEstado2.WHERE("estado2.fechabaja IS NULL");
+	        
+	        sqlEstado.SELECT("rec.descripcion AS estadoejg");
+	        sqlEstado.FROM("scs_estadoejg estado");
+	        sqlEstado.JOIN("scs_maestroestadosejg maestroestado ON estado.idestadoejg = maestroestado.idestadoejg");
+	        sqlEstado.JOIN("gen_recursos_catalogos rec ON rec.idrecurso = maestroestado.descripcion AND rec.idlenguaje = '" + idLenguaje + "'");
+	        sqlEstado.WHERE("estado.idestadoporejg = (" + sqlEstado2.toString() + ")");
+	        
+	        sqlEstado.WHERE("estado.idinstitucion = " + idInstitucion);
+	        sqlEstado.WHERE("estado.anio = EJG.ANIO");
+	        sqlEstado.WHERE("estado.numero = EJG.NUMERO");
+	        sqlEstado.WHERE("idtipoejg = EJG.IDTIPOEJG");
+	        
+	        sql.SELECT("(" + sqlEstado.toString() + ") ESTADOEJG");
+        }else {
+        	sql.SELECT("REC.DESCRIPCION AS ESTADOEJG");
+        }
         sql.SELECT(
                 "(CASE WHEN perjg.nombre is  NULL THEN '' ELSE perjg.apellido1 || ' ' || perjg.apellido2 || ', ' || perjg.nombre END) as NOMBRESOLICITANTE");
         sql.SELECT("EJG.NUMEROPROCEDIMIENTO");
@@ -98,7 +123,6 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "" && !ejgItem.isUltimoEstado()) {
             sql.JOIN("SCS_ESTADOEJG ESTADO " +
                     "ON ESTADO.IDINSTITUCION = EJG.IDINSTITUCION " +
-                    "AND ESTADO.IDTIPOEJG = EJG.IDTIPOEJG " +
                     "AND ESTADO.IDTIPOEJG = EJG.IDTIPOEJG " +
                     "AND ESTADO.ANIO = EJG.ANIO " +
                     "AND ESTADO.NUMERO = EJG.NUMERO " +
