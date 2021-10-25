@@ -197,6 +197,10 @@ public class ScsRemesasExtendsProvider {
 		if (remesasBusquedaItem.getEstado() != null) {
 			sql.WHERE("est.idestado like '%" + remesasBusquedaItem.getEstado() + "%'"); // estado
 		}
+		
+		if(remesasBusquedaItem.getIdRemesa() != 0) {
+			sql.WHERE("rem.idremesa = " + remesasBusquedaItem.getIdRemesa()); // idremesa
+		}
 
 		if (remesasBusquedaItem.getFechaGeneracionDesde() != null
 				|| remesasBusquedaItem.getFechaGeneracionHasta() != null) {
