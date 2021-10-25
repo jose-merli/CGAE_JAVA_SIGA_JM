@@ -73,7 +73,7 @@ public class ScsRemesasExtendsProvider {
 		subquery3.WHERE("est.idestado = a.idestado");
 		subquery3.WHERE("rownum=1");
 
-		subquery5.SELECT("count(1)");
+		subquery5.SELECT("count(distinct ejgr.idejgremesa)");
 		subquery5.FROM("cajg_ejgremesa ejgr");
 		subquery5.FROM("cajg_respuesta_ejgremesa resp");
 		subquery5.WHERE("ejgr.idinstitucion = rem.idinstitucion");
@@ -179,15 +179,15 @@ public class ScsRemesasExtendsProvider {
 		sql.WHERE("tipoest.idestado = est.idestado");
 
 		if (remesasBusquedaItem.getNumero() != null) {
-			sql.WHERE("rem.numero= '" + remesasBusquedaItem.getNumero() + "'"); // numero
+			sql.WHERE("rem.numero like '%" + remesasBusquedaItem.getNumero() + "%'"); // numero
 		}
 
 		if (remesasBusquedaItem.getPrefijo() != null) {
-			sql.WHERE("rem.prefijo = '" + remesasBusquedaItem.getPrefijo()  + "'"); // prefijo
+			sql.WHERE("rem.prefijo like '%" + remesasBusquedaItem.getPrefijo()  + "%'"); // prefijo
 		}
 
 		if (remesasBusquedaItem.getSufijo() != null) {
-			sql.WHERE("rem.sufijo = '" + remesasBusquedaItem.getSufijo()  + "'"); // sufijo
+			sql.WHERE("rem.sufijo like '%" + remesasBusquedaItem.getSufijo()  + "%'"); // sufijo
 		}
 
 		if (remesasBusquedaItem.getDescripcion() != null) {

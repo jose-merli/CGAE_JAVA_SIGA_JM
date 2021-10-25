@@ -4,7 +4,14 @@ public class RemesaAccionItem {
 	
 	private int idRemesa;
 	private int accion;
+	private String descripcion;
 	
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
 	public int getIdRemesa() {
 		return idRemesa;
 	}

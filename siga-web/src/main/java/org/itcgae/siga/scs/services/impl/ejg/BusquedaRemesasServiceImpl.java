@@ -236,7 +236,15 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					nRegistro += remesasItems.get(i).getSufijo();
 				}
 				
-				remesasItems.get(i).setnRegistro(Integer.parseInt(nRegistro));
+				if(nRegistro.length() < 5) {
+					String ceros = "";
+					for(; (nRegistro.length() - ceros.length()) < 5;) {
+						ceros += "0";
+					}
+					nRegistro = ceros + nRegistro;
+				}
+				
+				remesasItems.get(i).setnRegistro(nRegistro);
 			}
 
 			LOGGER.info(
@@ -974,8 +982,8 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			
 			GenRecursos gr = genRecursosMapper.selectByPrimaryKey(grKey);
 
-			if (remesaAccionItem.getAccion() == 1) {
-				validar = validarAccion(remesaAccionItem, request, "Validar Remesa");
+			if (remesaAccionItem.getAccion() == 1 || remesaAccionItem.getAccion() == 2) {
+				validar = validarAccion(remesaAccionItem, request, remesaAccionItem.getDescripcion());
 				
 				if(validar) {
 					insertResponseDTO = validaEnviaExpedientes(idInstitucion, Long.valueOf(remesaAccionItem.getIdRemesa()), remesaAccionItem.getAccion(), parametro.getValor(), gr.getDescripcion(), request);
@@ -986,8 +994,6 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 					insertResponseDTO.setStatus(SigaConstants.OK);
 					insertResponseDTO.setError(error);
 				}
-			}else if(remesaAccionItem.getAccion() == 2) {
-				
 			}
 
 			LOGGER.info(
