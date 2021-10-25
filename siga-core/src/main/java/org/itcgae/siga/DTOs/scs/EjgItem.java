@@ -743,7 +743,7 @@ public class EjgItem {
         return this;
     }
 
-    @JsonProperty("NIG")
+    @JsonProperty("nig")
     public String getNig() {
         return NIG;
     }
