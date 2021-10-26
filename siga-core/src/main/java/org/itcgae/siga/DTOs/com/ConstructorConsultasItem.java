@@ -9,9 +9,16 @@ public class ConstructorConsultasItem {
 	private String abrirparentesis;
 	private String campo; //columna NOMBREENCONSULTA en con_campoconsulta
 	private String operador; //Igual a, distinto de (se encuentran en con_operacionconsulta)
+	private String simbolo;
 	private String valor;
 	private String cerrarparentesis;
 	
+	public String getSimbolo() {
+		return simbolo;
+	}
+	public void setSimbolo(String simbolo) {
+		this.simbolo = simbolo;
+	}
 	public int getOrden() {
 		return orden;
 	}
@@ -56,7 +63,7 @@ public class ConstructorConsultasItem {
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(abrirparentesis, campo, cerrarparentesis, conector, operador, orden, valor);
+		return Objects.hash(abrirparentesis, campo, cerrarparentesis, conector, operador, orden, simbolo, valor);
 	}
 	
 	@Override
@@ -71,18 +78,14 @@ public class ConstructorConsultasItem {
 		return Objects.equals(abrirparentesis, other.abrirparentesis) && Objects.equals(campo, other.campo)
 				&& Objects.equals(cerrarparentesis, other.cerrarparentesis) && Objects.equals(conector, other.conector)
 				&& Objects.equals(operador, other.operador) && orden == other.orden
-				&& Objects.equals(valor, other.valor);
+				&& Objects.equals(simbolo, other.simbolo) && Objects.equals(valor, other.valor);
 	}
 	
 	@Override
 	public String toString() {
 		return "ConstructorConsultasItem [orden=" + orden + ", conector=" + conector + ", abrirparentesis="
-				+ abrirparentesis + ", campo=" + campo + ", operador=" + operador + ", valor=" + valor
-				+ ", cerrarparentesis=" + cerrarparentesis + ", getOrden()=" + getOrden() + ", getConector()="
-				+ getConector() + ", getAbrirparentesis()=" + getAbrirparentesis() + ", getCampo()=" + getCampo()
-				+ ", getOperador()=" + getOperador() + ", getValor()=" + getValor() + ", getCerrarparentesis()="
-				+ getCerrarparentesis() + ", hashCode()=" + hashCode() + ", getClass()=" + getClass() + ", toString()="
-				+ super.toString() + "]";
+				+ abrirparentesis + ", campo=" + campo + ", operador=" + operador + ", simbolo=" + simbolo + ", valor="
+				+ valor + ", cerrarparentesis=" + cerrarparentesis + "]";
 	}
 	
 }

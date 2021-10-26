@@ -136,11 +136,12 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 		@Result(column = "ABRIRPAR", property = "abrirparentesis", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREENCONSULTA", property = "campo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OPERADOR", property = "operador", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SIMBOLO", property = "simbolo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CERRARPAR", property = "cerrarparentesis", jdbcType = JdbcType.VARCHAR)
 		
 		}) 
-	List<ConstructorConsultasItem> obtenerDatosConsulta(Short idInstitucion, String idConsulta);
+	List<ConstructorConsultasItem> obtenerDatosConsulta(String idioma, Short idInstitucion, String idConsulta);
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerConsulta")
 	String obtenerConsulta(Short idInstitucion, String idConsulta);

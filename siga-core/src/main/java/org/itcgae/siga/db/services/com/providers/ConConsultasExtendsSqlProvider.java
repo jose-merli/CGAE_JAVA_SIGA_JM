@@ -228,6 +228,7 @@ public class ConConsultasExtendsSqlProvider {
 			sql.SELECT(" criterio_con.ABRIRPAR");
 			sql.SELECT(" campo_con.NOMBREENCONSULTA");
 			sql.SELECT(" f_siga_getrecurso(operacion_con.DESCRIPCION, " + idLenguaje + ") operador");
+			sql.SELECT("  operacion_con.SIMBOLO");
 			sql.SELECT(" criterio_con.VALOR");
 			sql.SELECT(" criterio_con.CERRARPAR");
 	

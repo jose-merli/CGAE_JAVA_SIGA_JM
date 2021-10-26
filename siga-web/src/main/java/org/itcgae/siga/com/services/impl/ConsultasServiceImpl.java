@@ -2742,69 +2742,6 @@ public class ConsultasServiceImpl implements IConsultasService {
 		return constructorConsultasDTO;
 	}
 	
-//	@Override
-//	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta) {
-//		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
-//		Error error = new Error();
-//
-//
-//		LOGGER.info("obtenerDatosConsulta() -> Entrada al servicio para precargar la consulta ya existente en el constructor de consultas");
-//
-//		// Conseguimos información del usuario logeado
-//		String token = request.getHeader("Authorization");
-//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-//
-//		try {
-//			if (idInstitucion != null) {
-//				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-//				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-//			
-//
-//				LOGGER.info(
-//						"obtenerDatosConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-//				
-//
-//				LOGGER.info(
-//						"obtenerDatosConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//				if (usuarios != null && !usuarios.isEmpty()) {
-//					LOGGER.info(
-//							"obtenerDatosConsulta() / ConConsultasExtendsMapper.obtenerDatosConsulta() -> Entrada a ConConsultasExtendsMapper para precargar la consulta ya existente en el constructor de consultas");
-//
-//					String idioma = usuarios.get(0).getIdlenguaje();
-//					
-//					List<ConstructorConsultasItem> constructorDeConsultasList = _conConsultasExtendsMapper.obtenerDatosConsulta(idioma, idInstitucion, idConsulta);
-//				
-//				
-//
-//					if (constructorDeConsultasList != null && constructorDeConsultasList.size() > 0) {
-//						constructorConsultasDTO.setConstructorConsultasItem(constructorDeConsultasList);
-//					}
-//
-//					LOGGER.info(
-//							"obtenerDatosConsulta() / ConConsultasExtendsMapper.obtenerDatosConsulta() -> Salida de ConConsultasExtendsMapper para precargar la consulta ya existente en el constructor de consultas");
-//
-//				}
-//			}
-//			
-//		} catch (Exception e) {
-//			LOGGER.error(
-//					"ConsultasServiceImpl.obtenerDatosConsulta() -> Se ha producido un error al obtener los datos de la consulta necesarios para precargarla en el constructor de datos",
-//					e);
-//			error.setCode(500);
-//			error.setDescription("general.mensaje.error.bbdd");
-//			constructorConsultasDTO.setError(error);
-//		}
-//
-//		
-//		LOGGER.info("obtenerDatosConsulta() -> Salida del servicio para obtener los datos de la consulta necesarios para precargarla en el constructor de datos");
-//
-//		return constructorConsultasDTO;
-//	}
-	
 	@Override
 	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta) {
 		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
@@ -2839,32 +2776,48 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 					String idioma = usuarios.get(0).getIdlenguaje();
 					
-					constructorConsultasDTO.setConsulta(_conConsultasExtendsMapper.obtenerConsulta(idInstitucion, idConsulta));
-					
-					if(constructorConsultasDTO.getConsulta().contains("<SELECT>")) {
-						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("<SELECT>", ""));
+					List<ConstructorConsultasItem> constructorDeConsultasList = _conConsultasExtendsMapper.obtenerDatosConsulta(idioma, idInstitucion, idConsulta);
+				
+					String consulta = "";
+					if (constructorDeConsultasList != null && constructorDeConsultasList.size() > 0) {
+						for (ConstructorConsultasItem constructorConsultasItem : constructorDeConsultasList) {
+							//CONECTOR
+							if(constructorConsultasItem.getConector().equals("Y")  || constructorConsultasItem.getConector().equals("AND")) {
+								consulta = consulta + "AND";						 
+							}else if(constructorConsultasItem.getConector().equals("O")  || constructorConsultasItem.getConector().equals("OR")) {
+								consulta = consulta + "OR";
+							}
+							
+							//ABRIRPAR
+							if(constructorConsultasItem.getAbrirparentesis().equals("1")) {
+								consulta = consulta + "(";						 
+							}
+							
+							//NOMBREENCONSULTA
+							consulta = consulta + constructorConsultasItem.getCampo();
+							
+							//SIMBOLO
+							consulta = consulta + constructorConsultasItem.getSimbolo().toUpperCase();
+							
+							//VALOR 
+							consulta = consulta +  constructorConsultasItem.getValor();
+							
+							//CERRARPAR
+							if(constructorConsultasItem.getCerrarparentesis().equals("1")) {
+								consulta = consulta + ")";						 
+							}
+							
+						}
 					}
 					
-					if(constructorConsultasDTO.getConsulta().contains("</SELECT>")) {
-						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("</SELECT>", ""));
+					constructorConsultasDTO.setConsulta(consulta);
+
+					if (constructorDeConsultasList != null && constructorDeConsultasList.size() > 0) {
+						constructorConsultasDTO.setConstructorConsultasItem(constructorDeConsultasList);
 					}
 					
-					if(constructorConsultasDTO.getConsulta().contains("<FROM>")) {
-						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("<FROM>", ""));
-					}
 					
-					if(constructorConsultasDTO.getConsulta().contains("</FROM>")) {
-						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("</FROM>", ""));
-					}
-					
-					if(constructorConsultasDTO.getConsulta().contains("<WHERE>")) {
-						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("<WHERE>", ""));
-					}
-					
-					if(constructorConsultasDTO.getConsulta().contains("</WHERE>")) {
-						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("</WHERE>", ""));
-					}
-			
+
 					LOGGER.info(
 							"obtenerDatosConsulta() / ConConsultasExtendsMapper.obtenerDatosConsulta() -> Salida de ConConsultasExtendsMapper para precargar la consulta ya existente en el constructor de consultas");
 
@@ -2885,6 +2838,87 @@ public class ConsultasServiceImpl implements IConsultasService {
 
 		return constructorConsultasDTO;
 	}
+	
+//	@Override
+//	public ConstructorConsultasDTO obtenerConsulta(HttpServletRequest request, String idConsulta) {
+//		ConstructorConsultasDTO constructorConsultasDTO = new ConstructorConsultasDTO();
+//		Error error = new Error();
+//
+//
+//		LOGGER.info("obtenerDatosConsulta() -> Entrada al servicio para precargar la consulta ya existente en el constructor de consultas");
+//
+//		// Conseguimos información del usuario logeado
+//		String token = request.getHeader("Authorization");
+//		String dni = UserTokenUtils.getDniFromJWTToken(token);
+//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+//
+//		try {
+//			if (idInstitucion != null) {
+//				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+//				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+//			
+//
+//				LOGGER.info(
+//						"obtenerDatosConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+//
+//				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+//				
+//
+//				LOGGER.info(
+//						"obtenerDatosConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+//
+//				if (usuarios != null && !usuarios.isEmpty()) {
+//					LOGGER.info(
+//							"obtenerDatosConsulta() / ConConsultasExtendsMapper.obtenerDatosConsulta() -> Entrada a ConConsultasExtendsMapper para precargar la consulta ya existente en el constructor de consultas");
+//
+//					String idioma = usuarios.get(0).getIdlenguaje();
+//					
+//					constructorConsultasDTO.setConsulta(_conConsultasExtendsMapper.obtenerConsulta(idInstitucion, idConsulta));
+//					
+//					if(constructorConsultasDTO.getConsulta().contains("<SELECT>")) {
+//						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("<SELECT>", ""));
+//					}
+//					
+//					if(constructorConsultasDTO.getConsulta().contains("</SELECT>")) {
+//						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("</SELECT>", ""));
+//					}
+//					
+//					if(constructorConsultasDTO.getConsulta().contains("<FROM>")) {
+//						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("<FROM>", ""));
+//					}
+//					
+//					if(constructorConsultasDTO.getConsulta().contains("</FROM>")) {
+//						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("</FROM>", ""));
+//					}
+//					
+//					if(constructorConsultasDTO.getConsulta().contains("<WHERE>")) {
+//						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("<WHERE>", ""));
+//					}
+//					
+//					if(constructorConsultasDTO.getConsulta().contains("</WHERE>")) {
+//						constructorConsultasDTO.setConsulta(constructorConsultasDTO.getConsulta().replace("</WHERE>", ""));
+//					}
+//			
+//					LOGGER.info(
+//							"obtenerDatosConsulta() / ConConsultasExtendsMapper.obtenerDatosConsulta() -> Salida de ConConsultasExtendsMapper para precargar la consulta ya existente en el constructor de consultas");
+//
+//				}
+//			}
+//			
+//		} catch (Exception e) {
+//			LOGGER.error(
+//					"ConsultasServiceImpl.obtenerDatosConsulta() -> Se ha producido un error al obtener los datos de la consulta necesarios para precargarla en el constructor de datos",
+//					e);
+//			error.setCode(500);
+//			error.setDescription("general.mensaje.error.bbdd");
+//			constructorConsultasDTO.setError(error);
+//		}
+//
+//		
+//		LOGGER.info("obtenerDatosConsulta() -> Salida del servicio para obtener los datos de la consulta necesarios para precargarla en el constructor de datos");
+//
+//		return constructorConsultasDTO;
+//	}
 
 	@Override
 	public ConfigColumnasQueryBuilderDTO obtenerConfigColumnasQueryBuilder(HttpServletRequest request) {
