@@ -9,24 +9,21 @@ public class PysCompraExtendsSqlProvider extends PysCompraSqlProvider {
 		SQL sql = new SQL();
 
 		// Select
-		sql.SELECT_DISTINCT("c.idtipoproducto");
-		sql.SELECT_DISTINCT("f_siga_getrecurso( p.descripcion, '" + idioma + "' ) descripcion");
-		sql.SELECT_DISTINCT("sf.idseriefacturacion");
+		sql.SELECT_DISTINCT("ft.idtipoproducto");
+		sql.SELECT_DISTINCT("f_siga_getrecurso( pt.descripcion, '" + idioma + "' ) descripcion");
 
 		// From
-		sql.FROM("pys_compra c");
+		sql.FROM("fac_tiposproduincluenfactu ft");
 
 		// Joins
-		sql.INNER_JOIN("fac_factura f ON ( f.idfactura = c.idfactura AND f.idinstitucion = c.idinstitucion )");
-		sql.INNER_JOIN("pys_tiposproductos p ON ( p.idtipoproducto = c.idtipoproducto )");
-		sql.INNER_JOIN("fac_seriefacturacion sf ON ( f.idseriefacturacion = sf.idseriefacturacion AND sf.idinstitucion = c.idinstitucion )");
+		sql.INNER_JOIN("pys_tiposproductos pt ON (  ft.idtipoproducto = pt.idtipoproducto )");
 
 		// Where
-		sql.WHERE("c.idinstitucion = " + idInstitucion);
-		sql.WHERE("sf.idseriefacturacion = '" + idSerieFacturacion + "'");
+		sql.WHERE("ft.idinstitucion = " + idInstitucion);
+		sql.WHERE("ft.idseriefacturacion = '" + idSerieFacturacion + "'");
 
 		// Order by
-		sql.ORDER_BY("sf.idseriefacturacion, c.idtipoproducto");
+		sql.ORDER_BY("ft.idtipoproducto");
 
 		return sql.toString();
 	}

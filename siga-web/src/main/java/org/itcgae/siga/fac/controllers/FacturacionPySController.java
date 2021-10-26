@@ -13,11 +13,7 @@ import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -91,6 +87,18 @@ public class FacturacionPySController {
 	@PostMapping(value = "/reactivarSerieFacturacion")
 	ResponseEntity<UpdateResponseDTO> reactivarSerieFacturacion(@RequestBody List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) {
 		UpdateResponseDTO response = facturacionService.reactivarSerieFacturacion(serieFacturacionItems, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/comboPlanificacion")
+	ResponseEntity<ComboDTO> comboPlanificacion(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
+		ComboDTO response = facturacionService.comboPlanificacion(idSerieFacturacion, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/guardarSerieFacturacion")
+	ResponseEntity<UpdateResponseDTO> guardarSerieFacturacion(@RequestBody SerieFacturacionItem serieFacturacion, HttpServletRequest request) {
+		UpdateResponseDTO response = facturacionService.guardarSerieFacturacion(serieFacturacion, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	

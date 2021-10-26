@@ -9,24 +9,21 @@ public class FacFacturacionsuscripcionExtendsSqlProvider extends FacFacturacions
 		SQL sql = new SQL();
 
 		// Select
-		sql.SELECT_DISTINCT("fs.idtiposervicios");
-		sql.SELECT_DISTINCT("f_siga_getrecurso( ts.descripcion, '" + idioma + "' ) descripcion");
-		sql.SELECT_DISTINCT("sf.idseriefacturacion");
+		sql.SELECT_DISTINCT("ft.idtiposervicios");
+		sql.SELECT_DISTINCT("f_siga_getrecurso( pt.descripcion, '" + idioma + "' ) descripcion");
 
 		// From
-		sql.FROM("fac_facturacionsuscripcion fs");
+		sql.FROM("fac_tiposservinclsenfact ft");
 
 		// Joins
-		sql.INNER_JOIN("pys_tiposervicios ts ON ( fs.idtiposervicios = ts.idtiposervicios )");
-		sql.INNER_JOIN("fac_factura f ON ( f.idinstitucion = fs.idinstitucion AND f.idfactura = fs.idfactura )");
-		sql.INNER_JOIN("fac_seriefacturacion sf ON ( sf.idinstitucion = fs.idinstitucion AND sf.idseriefacturacion = f.idseriefacturacion )");
+		sql.INNER_JOIN("pys_tiposervicios pt ON ( ft.idtiposervicios = pt.idtiposervicios )");
 
 		// Where
-		sql.WHERE("fs.idinstitucion = " + idInstitucion);
-		sql.WHERE("sf.idseriefacturacion = '" + idSerieFacturacion + "'");
+		sql.WHERE("ft.idinstitucion = " + idInstitucion);
+		sql.WHERE("ft.idseriefacturacion = '" + idSerieFacturacion + "'");
 
 		// Order by
-		sql.ORDER_BY("sf.idseriefacturacion, fs.idtiposervicios");
+		sql.ORDER_BY("ft.idtiposervicios");
 
 		return sql.toString();
 	}

@@ -538,4 +538,36 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.WHERE("(colegiado.comunitario = 0 and COLEGIADO.ncolegiado = '"+colegiadoJGItem+"') OR (colegiado.comunitario = 1 and COLEGIADO.NCOMUNITARIO = '"+colegiadoJGItem+"')");
 		return sql.toString();
 	}
+	
+	public String getDestinatariosSerie(Short idInstitucion, String idSerieFacturacion) {
+		SQL sql = new SQL();
+		
+		// Select
+		sql.SELECT("p.idpersona");
+		sql.SELECT("p.nombre");
+		sql.SELECT("p.apellidos1");
+		sql.SELECT("p.apellidos2");
+		sql.SELECT("p.nifcif");
+		sql.SELECT("d.movil");
+		sql.SELECT("d.correoelectronico");
+		sql.SELECT("d.domicilio");
+		
+		// From
+		sql.FROM("cen_persona p");
+		
+		// Joins
+		sql.INNER_JOIN("cen_cliente c ON ( c.idpersona = p.idpersona )");
+		sql.INNER_JOIN("cen_direcciones d ON ( d.idpersona = p.idpersona AND d.idinstitucion = c.idinstitucion )");
+		sql.INNER_JOIN("cen_gruposcliente_cliente gcc ON ( gcc.idinstitucion = c.idinstitucion AND gcc.idpersona = c.idpersona )");
+		sql.LEFT_OUTER_JOIN("cen_colegiado co ON ( co.idpersona = p.idpersona AND co.idinstitucion = c.idinstitucion )");
+		
+		// Where
+		sql.WHERE("c.idinstitucion = " + idInstitucion);
+		sql.WHERE("gcc.idgrupo IN ( SELECT idgrupo FROM fac_tipocliincluidoenseriefac WHERE idseriefacturacion = '" + idSerieFacturacion + "')");
+		
+		// Order by
+		sql.ORDER_BY("p.nombre");
+
+		return sql.toString();
+	}
 }

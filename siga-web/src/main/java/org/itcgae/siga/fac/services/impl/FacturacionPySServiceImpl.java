@@ -2,8 +2,10 @@ package org.itcgae.siga.fac.services.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -11,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
-import org.itcgae.siga.DTO.fac.TiposIncluidosItem;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.db.entities.*;
@@ -19,6 +20,7 @@ import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
+import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
 import org.itcgae.siga.db.mappers.FacSufijoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class FacturacionPySServiceImpl implements IFacturacionPySService {
@@ -73,6 +76,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
     @Autowired
     private PysCompraExtendsMapper pysCompraExtendsMapper;
+    
+    @Autowired
+    private FacSeriefacturacionBancoMapper facSeriefacturacionBancoMapper;
 
     @Override
     public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias, HttpServletRequest request) {
@@ -600,37 +606,19 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 						for (SerieFacturacionItem serieItem : serieFacturacionItems) {
 							String idSerieFacturacion = serieItem.getIdSerieFacturacion();
-							List<TiposIncluidosItem> tiposIncluidos = new ArrayList<>();
 
 							LOGGER.info("getSeriesFacturacion() -> Obteniendo los tipos de servicios para idInstitucion=" + idInstitucion + ", idSerieFacturacion=" + idSerieFacturacion);
-							List<TiposIncluidosItem> tiposServicios = facFacturacionsuscripcionExtendsMapper.getTiposServicios(idSerieFacturacion, idInstitucion, idioma);
+							List<ComboItem> tiposServicios = facFacturacionsuscripcionExtendsMapper.getTiposServicios(idSerieFacturacion, idInstitucion, idioma);
 							LOGGER.info("getSeriesFacturacion() -> Obteniendo los tipos de productos para idInstitucion=" + idInstitucion + ", idSerieFacturacion=" + idSerieFacturacion);
-							List<TiposIncluidosItem> tiposProductos = pysCompraExtendsMapper.getTiposProductos(idSerieFacturacion, idInstitucion, idioma);
+							List<ComboItem> tiposProductos = pysCompraExtendsMapper.getTiposProductos(idSerieFacturacion, idInstitucion, idioma);
 
-							tiposIncluidos.addAll(tiposServicios);
-							tiposIncluidos.addAll(tiposProductos);
-
-							List<String> tiposIncluidosSerie = tiposIncluidos.stream()
-									.map(t -> t.getDescripcion())
+							List<String> tiposIncluidos = Stream.concat(tiposServicios.stream(), tiposProductos.stream())
+									.map(t -> t.getLabel())
 									.collect(Collectors.toList());
 
-							List<ComboItem> tiposServiciosSerie = tiposServicios.stream().map(t -> {
-								ComboItem item = new ComboItem();
-								item.setLabel(t.getDescripcion());
-								item.setValue(t.getIdTipoIncluido());
-								return item;
-							}).collect(Collectors.toList());
-
-							List<ComboItem> tiposProductosSerie = tiposProductos.stream().map(t -> {
-								ComboItem item = new ComboItem();
-								item.setLabel(t.getDescripcion());
-								item.setValue(t.getIdTipoIncluido());
-								return item;
-							}).collect(Collectors.toList());
-
-							serieItem.setTiposIncluidos(tiposIncluidosSerie);
-							serieItem.setTiposServicios(tiposServiciosSerie);
-							serieItem.setTiposProductos(tiposProductosSerie);
+							serieItem.setTiposIncluidos(tiposIncluidos);
+							serieItem.setTiposServicios(tiposServicios);
+							serieItem.setTiposProductos(tiposProductos);
 						}
 					}
 
@@ -657,6 +645,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	@Transactional
 	public DeleteResponseDTO eliminaSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) {
 		LOGGER.info("eliminaSerieFacturacion() -> Entrada al servicio para eliminar series de facturación");
 
@@ -735,6 +724,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO reactivarSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) {
 		LOGGER.info("reactivarSerieFacturacion() -> Entrada al servicio para reactivar series de facturación");
 
@@ -798,5 +788,257 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("reactivarSerieFacturacion() -> Salida del servicio para reactivar series de facturación");
 		return updateResponseDTO;
 	}
+
+	@Override
+	public ComboDTO comboPlanificacion(String idSerieFacturacion, HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+
+		List<ComboItem> comboItems;
+		Error error = new Error();
+
+		LOGGER.info("comboPlanificacion() -> Entrada al servicio para recuperar el combo de contadores rectificativas");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null && idSerieFacturacion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"FacturacionPySServiceImpl.comboPlanificacion() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"comboPlanificacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"comboPlanificacion() / fac.comboPlanificacion() -> Entrada a facSeriefacturacionExtendsMapper para obtener el combo de planificación");
+
+					//Logica
+					FacSeriefacturacionExample exampleSerieFacturacion = new FacSeriefacturacionExample();
+					exampleSerieFacturacion.createCriteria()
+							.andIdinstitucionEqualTo(idInstitucion)
+							.andIdseriefacturacionNotEqualTo(Long.valueOf(idSerieFacturacion))
+							.andFechabajaIsNotNull();
+					exampleSerieFacturacion.setOrderByClause("descripcion");
+
+					List<FacSeriefacturacion> seriesFacturacion = facSeriefacturacionExtendsMapper.selectByExample(exampleSerieFacturacion);
+
+					if (seriesFacturacion != null) {
+						comboItems = new ArrayList<>();
+						for (FacSeriefacturacion serieFacturacion : seriesFacturacion) {
+							ComboItem comboItem = new ComboItem();
+							comboItem.setValue(serieFacturacion.getIdseriefacturacion().toString());
+							comboItem.setLabel(serieFacturacion.getNombreabreviado());
+
+							comboItems.add(comboItem);
+						}
+
+						comboDTO.setCombooItems(comboItems);
+					}
+
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.comboPlanificacion() -> Se ha producido un error al obtener el combo de planificación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboPlanificacion() -> Salida del servicio para obtener el combo de planificación");
+
+		return comboDTO;
+	}
+
+	@Override
+	@Transactional
+	public UpdateResponseDTO guardarSerieFacturacion(SerieFacturacionItem serieFacturacion, HttpServletRequest request) {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		int response = 0;
+		Error error = new Error();
+
+		LOGGER.info("guardarSerieFacturacion() -> Entrada al servicio para recuperar el combo de contadores rectificativas");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"FacturacionPySServiceImpl.guardarSerieFacturacion() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"guardarSerieFacturacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				Integer idUsuario = usuarios.get(0).getIdusuario();
+				LOGGER.info(
+						"comboPlanificacion() / facSeriefacturacionExtendsMapper.selectByExample() -> Entrada a facSeriefacturacionExtendsMapper para obtener el combo de planificación");
+
+				//Logica
+
+				// 1. Actualizar FAC_SERIEFACTURACION
+				Long idSerieFacturacion = Long.parseLong(serieFacturacion.getIdSerieFacturacion());
+				
+				FacSeriefacturacionKey serieKey = new FacSeriefacturacionKey();
+				serieKey.setIdinstitucion(idInstitucion);
+				serieKey.setIdseriefacturacion(idSerieFacturacion);
+				
+				FacSeriefacturacion serieToUpdate = facSeriefacturacionExtendsMapper.selectByPrimaryKey(serieKey);
+				
+				if (serieToUpdate != null) {
+
+					if (serieFacturacion.getAbreviatura() != null
+							&& !serieFacturacion.getAbreviatura().trim().isEmpty()
+							&& serieFacturacion.getAbreviatura().length() <= 20)
+						serieToUpdate.setNombreabreviado(serieFacturacion.getAbreviatura());
+
+					if (serieFacturacion.getDescripcion() != null
+							&& !serieFacturacion.getDescripcion().trim().isEmpty()
+							&& serieFacturacion.getDescripcion().length() <= 100)
+						serieToUpdate.setDescripcion(serieFacturacion.getDescripcion());
+
+					serieToUpdate.setIdseriefacturacionprevia(Long.parseLong(serieFacturacion.getIdSerieFacturacionPrevia()));
+
+					if (serieFacturacion.getObservaciones() == null
+							|| (serieFacturacion.getObservaciones() != null
+								&& serieFacturacion.getObservaciones().length() <= 4000))
+					serieToUpdate.setObservaciones(serieFacturacion.getObservaciones());
+
+					if (serieFacturacion.getSerieGenerica()) {
+						serieToUpdate.setTiposerie("G");
+					} else {
+						serieToUpdate.setTiposerie(null);
+					}
+
+					serieToUpdate.setUsumodificacion(idUsuario);
+					serieToUpdate.setFechamodificacion(new Date());
+					response = facSeriefacturacionExtendsMapper.updateByPrimaryKeySelective(serieToUpdate);
+
+					// 2. Actualizar FAC_SERIEFACTURACION_BANCO
+					FacSeriefacturacionBancoKey serieBancoKey = new FacSeriefacturacionBancoKey();
+					serieBancoKey.setIdinstitucion(idInstitucion);
+					serieBancoKey.setIdseriefacturacion(idSerieFacturacion);
+					
+					FacSeriefacturacionBanco serieBancoToUpdate = facSeriefacturacionBancoMapper.selectByPrimaryKey(serieBancoKey);
+					boolean isNewBanco = serieBancoToUpdate == null;
+					
+					if (isNewBanco) {
+						serieBancoToUpdate = new FacSeriefacturacionBanco();
+						serieBancoToUpdate.setIdinstitucion(idInstitucion);
+						serieBancoToUpdate.setIdseriefacturacion(idSerieFacturacion);
+					}
+					
+					serieBancoToUpdate.setBancosCodigo(serieFacturacion.getIdCuentaBancaria());
+					
+					if (serieFacturacion.getIdSufijo() != null && !serieFacturacion.getIdSufijo().trim().isEmpty())
+						serieBancoToUpdate.setIdsufijo(Short.parseShort(serieFacturacion.getIdSufijo()));
+					else
+						serieBancoToUpdate.setIdsufijo(null);
+							
+					serieBancoToUpdate.setUsumodificacion(idUsuario);
+					serieBancoToUpdate.setFechamodificacion(new Date());
+				
+					if (!isNewBanco) {
+						FacSeriefacturacionBancoExample bancoExample = new FacSeriefacturacionBancoExample();
+						bancoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdseriefacturacionEqualTo(idSerieFacturacion);
+						response = facSeriefacturacionBancoMapper.updateByExample(serieBancoToUpdate, bancoExample);
+					} else {
+						response = facSeriefacturacionBancoMapper.insert(serieBancoToUpdate);
+					}	
+
+					// 3. Actualizar tipos de productos
+					/*
+					for (String idTipoProductoStr : serieFacturacion.getIdTiposProductos()) {
+						
+					}
+					*/
+
+					// 4. Actualizar tipos de servicios
+
+					
+				}
+
+			}
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("guardarSerieFacturacion() -> Salida del servicio para obtener el combo de planificación");
+
+		return updateResponseDTO;
+	}
+	
+	/*
+	@Override
+	public ComboDTO getEtiquetasSerie(String idSerieFacturacion, HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+
+		List<ComboItem> comboItems;
+		Error error = new Error();
+
+		LOGGER.info("getEtiquetasSerie() -> Entrada al servicio para recuperar el combo de contadores rectificativas");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null && idSerieFacturacion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"FacturacionPySServiceImpl.comboPlanificacion() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"comboPlanificacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"comboPlanificacion() / fac.comboPlanificacion() -> Entrada a facSeriefacturacionExtendsMapper para obtener el combo de planificación");
+
+					//Logica
+					List<FacSeriefacturacion> seriesFacturacion = facSeriefacturacionExtendsMapper.selectByExample(exampleSerieFacturacion);
+
+					
+
+					comboDTO.setCombooItems(comboItems);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.comboPlanificacion() -> Se ha producido un error al obtener el combo de planificación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboPlanificacion() -> Salida del servicio para obtener el combo de planificación");
+
+		return comboDTO;
+	}
+	*/
 
 }

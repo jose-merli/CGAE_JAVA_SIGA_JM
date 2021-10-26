@@ -6,11 +6,9 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.fac.TiposIncluidosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.FacFacturacionsuscripcionMapper;
 import org.itcgae.siga.db.services.fac.providers.FacFacturacionsuscripcionExtendsSqlProvider;
-import org.itcgae.siga.db.services.fac.providers.PySTipoFormaPagoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +18,9 @@ public interface FacFacturacionsuscripcionExtendsMapper extends FacFacturacionsu
 
 	@SelectProvider(type = FacFacturacionsuscripcionExtendsSqlProvider.class, method = "getTiposServicios")
 	@Results({
-		@Result(column = "idtiposervicios", property = "idTipoIncluido", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "idseriefacturacion", property = "idSerieFacturacion", jdbcType = JdbcType.NUMERIC)
+		@Result(column = "idtiposervicios", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "descripcion", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<TiposIncluidosItem> getTiposServicios(String idSerieFacturacion, Short idInstitucion, String idioma);
+	List<ComboItem> getTiposServicios(String idSerieFacturacion, Short idInstitucion, String idioma);
 	
 }

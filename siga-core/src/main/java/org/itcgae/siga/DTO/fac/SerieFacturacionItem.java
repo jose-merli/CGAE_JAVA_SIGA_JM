@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class SerieFacturacionItem {
-	
+
 	private String idSerieFacturacion;
 	private String observaciones;
 	private Date fechaBaja;
@@ -37,6 +37,9 @@ public class SerieFacturacionItem {
 
 	private String idContadorFacturas;
 	private String idContadorFacturasRectificativas;
+
+	private String idSerieFacturacionPrevia;
+	private Boolean serieGenerica;
 
 	public String getIdSerieFacturacion() {
 		return idSerieFacturacion;
@@ -238,6 +241,22 @@ public class SerieFacturacionItem {
 		this.idContadorFacturasRectificativas = idContadorFacturasRectificativas;
 	}
 
+	public String getIdSerieFacturacionPrevia() {
+		return idSerieFacturacionPrevia;
+	}
+
+	public void setIdSerieFacturacionPrevia(String idSerieFacturacionPrevia) {
+		this.idSerieFacturacionPrevia = idSerieFacturacionPrevia;
+	}
+
+	public Boolean getSerieGenerica() {
+		return serieGenerica;
+	}
+
+	public void setSerieGenerica(Boolean serieGenerica) {
+		this.serieGenerica = serieGenerica;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -267,12 +286,14 @@ public class SerieFacturacionItem {
 				Objects.equals(idConsultasDestinatarios, that.idConsultasDestinatarios) &&
 				Objects.equals(consultasDestinatarios, that.consultasDestinatarios) &&
 				Objects.equals(idContadorFacturas, that.idContadorFacturas) &&
-				Objects.equals(idContadorFacturasRectificativas, that.idContadorFacturasRectificativas);
+				Objects.equals(idContadorFacturasRectificativas, that.idContadorFacturasRectificativas) &&
+				Objects.equals(idSerieFacturacionPrevia, that.idSerieFacturacionPrevia) &&
+				Objects.equals(serieGenerica, that.serieGenerica);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idSerieFacturacion, observaciones, fechaBaja, abreviatura, descripcion, tiposIncluidos, idCuentaBancaria, cuentaBancaria, idSufijo, sufijo, idFormaPago, formaPago, generarPDF, envioFacturas, traspasoFacturas, idTiposProductos, tiposProductos, idTiposServicios, tiposServicios, idEtiquetas, etiquetas, idConsultasDestinatarios, consultasDestinatarios, idContadorFacturas, idContadorFacturasRectificativas);
+		return Objects.hash(idSerieFacturacion, observaciones, fechaBaja, abreviatura, descripcion, tiposIncluidos, idCuentaBancaria, cuentaBancaria, idSufijo, sufijo, idFormaPago, formaPago, generarPDF, envioFacturas, traspasoFacturas, idTiposProductos, tiposProductos, idTiposServicios, tiposServicios, idEtiquetas, etiquetas, idConsultasDestinatarios, consultasDestinatarios, idContadorFacturas, idContadorFacturasRectificativas, idSerieFacturacionPrevia, serieGenerica);
 	}
 
 	@Override
@@ -303,6 +324,8 @@ public class SerieFacturacionItem {
 				", consultasDestinatarios=" + consultasDestinatarios +
 				", idContadorFacturas='" + idContadorFacturas + '\'' +
 				", idContadorFacturasRectificativas='" + idContadorFacturasRectificativas + '\'' +
+				", idSerieFacturacionPrevia='" + idSerieFacturacionPrevia + '\'' +
+				", serieGenerica=" + serieGenerica +
 				'}';
 	}
 

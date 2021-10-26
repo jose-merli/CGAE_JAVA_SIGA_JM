@@ -32,6 +32,8 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		sql.SELECT("sf.generarpdf");
 		sql.SELECT("sf.enviofacturas");
 		sql.SELECT("sf.traspasofacturas");
+		sql.SELECT("sf.idseriefacturacionprevia");
+		sql.SELECT("(CASE WHEN sf.tiposerie = 'G' then 1 else 0 end) serieGenerica");
 		
 		// From
 		sql.FROM("fac_seriefacturacion sf");
@@ -58,21 +60,19 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		
 		if (serieFacturacionItem.getIdTiposProductos() != null && !serieFacturacionItem.getIdTiposProductos().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
-					+ "SELECT DISTINCT f.idseriefacturacion "
-						+ "FROM fac_factura f "
-						+ "INNER JOIN pys_compra c ON ( "
-							+ "c.idfactura = f.idfactura "
-							+ "AND c.idinstitucion = f.idinstitucion "
-							+ "AND c.idtipoproducto IN (" + String.join(", ", serieFacturacionItem.getIdTiposProductos()) + ")))");
+					+ "SELECT DISTINCT tpf.idseriefacturacion "
+						+ "FROM fac_tiposproduincluenfactu tpf "
+						+ "INNER JOIN pys_tiposproductos tp ON ( tpf.idtipoproducto = tp.idtipoproducto ) "
+						+ "WHERE tpf.idinstitucion = sf.idinstitucion "
+							+ "AND tpf.idtipoproducto IN (" + String.join(", ", serieFacturacionItem.getIdTiposProductos()) + "))");
 		
 		if (serieFacturacionItem.getIdTiposServicios() != null && !serieFacturacionItem.getIdTiposServicios().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
-					+ "SELECT DISTINCT f.idseriefacturacion "
-						+ "FROM fac_factura f "
-						+ "INNER JOIN fac_facturacionsuscripcion fs ON ( "
-							+ "fs.idfactura = f.idfactura "
-							+ "AND fs.idinstitucion = f.idinstitucion "
-							+ "AND fs.idtiposervicios IN (" + String.join(", ", serieFacturacionItem.getIdTiposServicios()) + ")))");
+					+ "SELECT DISTINCT tsf.idseriefacturacion "
+						+ "FROM fac_tiposservinclsenfact tsf "
+						+ "INNER JOIN pys_tiposervicios ts ON ( tsf.idtiposervicios = ts.idtiposervicios ) "
+						+ "WHERE tsf.idinstitucion = sf.idinstitucion "
+							+ "AND ts.idtiposervicios IN (" + String.join(", ", serieFacturacionItem.getIdTiposServicios()) + "))");
 		
 		if (serieFacturacionItem.getIdEtiquetas() != null && !serieFacturacionItem.getIdEtiquetas().isEmpty())
 			sql.WHERE("sf.idseriefacturacion IN ( "
