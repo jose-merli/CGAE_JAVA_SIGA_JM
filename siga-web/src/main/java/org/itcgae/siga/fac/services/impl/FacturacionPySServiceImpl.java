@@ -932,17 +932,17 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					response = facSeriefacturacionExtendsMapper.updateByPrimaryKeySelective(serieToUpdate);
 
 					// 2. Actualizar FAC_SERIEFACTURACION_BANCO
-					FacSeriefacturacionBancoKey serieBancoKey = new FacSeriefacturacionBancoKey();
-					serieBancoKey.setIdinstitucion(idInstitucion);
-					serieBancoKey.setIdseriefacturacion(idSerieFacturacion);
+					FacSeriefacturacionBancoExample bancoExample = new FacSeriefacturacionBancoExample();
+					bancoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdseriefacturacionEqualTo(idSerieFacturacion);
+					List<FacSeriefacturacionBanco> serieBancoItems = facSeriefacturacionBancoMapper.selectByExample(bancoExample);
+					boolean isNewBanco = serieBancoItems == null && serieBancoItems.isEmpty();
 					
-					FacSeriefacturacionBanco serieBancoToUpdate = facSeriefacturacionBancoMapper.selectByPrimaryKey(serieBancoKey);
-					boolean isNewBanco = serieBancoToUpdate == null;
-					
+					FacSeriefacturacionBanco serieBancoToUpdate = new FacSeriefacturacionBanco();
 					if (isNewBanco) {
-						serieBancoToUpdate = new FacSeriefacturacionBanco();
 						serieBancoToUpdate.setIdinstitucion(idInstitucion);
 						serieBancoToUpdate.setIdseriefacturacion(idSerieFacturacion);
+					} else {
+						serieBancoToUpdate = serieBancoItems.get(0);
 					}
 					
 					serieBancoToUpdate.setBancosCodigo(serieFacturacion.getIdCuentaBancaria());
@@ -956,8 +956,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					serieBancoToUpdate.setFechamodificacion(new Date());
 				
 					if (!isNewBanco) {
-						FacSeriefacturacionBancoExample bancoExample = new FacSeriefacturacionBancoExample();
-						bancoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdseriefacturacionEqualTo(idSerieFacturacion);
 						response = facSeriefacturacionBancoMapper.updateByExample(serieBancoToUpdate, bancoExample);
 					} else {
 						response = facSeriefacturacionBancoMapper.insert(serieBancoToUpdate);
