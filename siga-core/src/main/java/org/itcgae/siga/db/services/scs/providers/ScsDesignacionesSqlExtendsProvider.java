@@ -38,11 +38,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		
 		sql.SELECT("designaciones.idinstitucion,"
 				+ "    designaciones.anio,"
-				+ "    designaciones.numero,"
+//				+ "    designaciones.numero,"
+				+ "    designaciones.codigo as numero,"
 				+ "    ( 'D' || designaciones.anio || '/' || designaciones.numero) asunto,"
 				+ "    ( nvl( turno.abreviatura, '' ) || '/') turnoguardia,"
 				+ "    ( nvl( persona.nombre, '' ) || ' ' || nvl( persona.apellidos1, '' ) || ' ' || nvl( persona.apellidos2, '' ) ) letrado,"
-				+ "    ( nvl( per.nombre, '' ) || ' ' || nvl( per.apellido1, '' ) || ' ' || nvl( per.apellido2, '' ) ) interesado,"
+//				+ "    ( nvl( per.nombre, '' ) || ' ' || nvl( per.apellido1, '' ) || ' ' || nvl( per.apellido2, '' ) ) interesado,"
 				+ "    NVL(designaciones.nig, '') nig,"
 				+ "    NVL(designaciones.numprocedimiento, '') numeroprocedimiento,"
 				+ "    NVL(designaciones.estado, '') estado,"
@@ -72,14 +73,14 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.JOIN("scs_juzgado juzgado ON"
 				+ "    (designaciones.idjuzgado = juzgado.idjuzgado"
 				+ "        AND designaciones.idinstitucion = juzgado.idinstitucion)");
-		sql.JOIN("scs_defendidosdesigna defendidoDesigna ON"
-				+ "    (defendidoDesigna.anio = designaciones.anio"
-				+ "        AND defendidoDesigna.numero = designaciones.numero"
-				+ "        AND defendidoDesigna.idinstitucion = designaciones.idinstitucion"
-				+ "        AND defendidoDesigna.idturno = designaciones.idturno)");
-		sql.JOIN("scs_personajg per ON"
-				+ "    (defendidoDesigna.idinstitucion = per.idinstitucion\r\n"
-				+ "        AND defendidoDesigna.idpersona = per.idpersona)");
+//		sql.JOIN("scs_defendidosdesigna defendidoDesigna ON"
+//				+ "    (defendidoDesigna.anio = designaciones.anio"
+//				+ "        AND defendidoDesigna.numero = designaciones.numero"
+//				+ "        AND defendidoDesigna.idinstitucion = designaciones.idinstitucion"
+//				+ "        AND defendidoDesigna.idturno = designaciones.idturno)");
+//		sql.JOIN("scs_personajg per ON"
+//				+ "    (defendidoDesigna.idinstitucion = per.idinstitucion\r\n"
+//				+ "        AND defendidoDesigna.idpersona = per.idpersona)");
 		
 		sql.WHERE("designaciones.idinstitucion = "+asuntosJusticiableItem.getIdInstitucion());
 		sql.WHERE("( designaLetrado.fechadesigna IS NULL"
@@ -145,10 +146,22 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.WHERE("designaciones.numprocedimiento   = '" + asuntosJusticiableItem.getNumeroProcedimiento().trim() + "'");
 		}
 		
-		sql.WHERE("ROWNUM <= " + tamMax);
-
-		sql.ORDER_BY("designaciones.anio desc, designaciones.numero DESC");
-		return sql.toString();
+		if(asuntosJusticiableItem.getIdTurno() != null && !asuntosJusticiableItem.getIdTurno().isEmpty()) {
+			sql.WHERE("turno.idturno   = '" + asuntosJusticiableItem.getIdTurno() + "'");
+		}
+		
+		if(asuntosJusticiableItem.getnColegiado() != null && !asuntosJusticiableItem.getnColegiado().isEmpty()) {
+			sql.WHERE("colegiado.ncolegiado = '" + asuntosJusticiableItem.getnColegiado() + "'");
+		}
+		
+		sql.ORDER_BY("designaciones.anio desc, designaciones.codigo DESC");
+		
+		SQL sqlPpal = new SQL();
+		sqlPpal.SELECT("*");
+		sqlPpal.FROM("("+sql.toString()+") consulta");
+		sqlPpal.WHERE("ROWNUM <= " + tamMax);
+		
+		return sqlPpal.toString();
 	}
 
 	public String busquedaDesignaciones(DesignaItem designaItem, Short idInstitucion, Integer tamMax) throws Exception {
@@ -2096,7 +2109,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql2 = new SQL();
 
 		sql2.SELECT(
-				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
+				"p.ncolegiado, p.nombre, p.apellidos1, p.apellidos2, dp.anio, dp.numerodesignacion, dp.fechadesigna, dp.observaciones, dp.motivosrenuncia,dp.fecharenuncia, dp.fecharenunciasolicita");
 		sql2.SELECT("dp.idprocurador");
 		sql2.SELECT("dp.idinstitucion_proc");
 		

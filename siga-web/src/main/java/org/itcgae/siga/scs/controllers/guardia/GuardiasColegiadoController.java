@@ -21,11 +21,13 @@ import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
+import org.itcgae.siga.DTOs.scs.ComboGuardiasFuturasDTO;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesResponse;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioDTO;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
+import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.PermutaDTO;
@@ -81,9 +83,12 @@ public class GuardiasColegiadoController {
 	}
 	
 	@PostMapping(value = "/sustituirGuardiaColeg", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> sustituirGuardiaColeg(@RequestBody String[] datos, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> sustituirGuardiaColeg(@RequestBody String[] datos, HttpServletRequest request) throws Exception {
 		UpdateResponseDTO response = guardiasColegiadoService.sustituirGuardiaColeg(datos, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if (response != null) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@PostMapping(value = "/getCalendarioColeg", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -104,21 +109,27 @@ public class GuardiasColegiadoController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/getGuardiaDestinoInscrito")
-	ResponseEntity<ComboDTO> getGuardiaDestinoInscrito(String idTurno, HttpServletRequest request){
-		ComboDTO response= guardiasColegiadoService.getGuardiaDestinoInscrito(idTurno, request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	@PostMapping(value = "/getGuardiaDestinoInscrito", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboGuardiasFuturasDTO> getGuardiaDestinoInscrito(@RequestBody GuardiasItem guardiaItem, HttpServletRequest request){
+		ComboGuardiasFuturasDTO response= guardiasColegiadoService.getGuardiaDestinoInscrito(guardiaItem, request);
+		return new ResponseEntity<ComboGuardiasFuturasDTO>(response, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/permutarGuardia", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> permutarGuardia(@RequestBody PermutaItem permutaItem, HttpServletRequest request){
+	ResponseEntity<InsertResponseDTO> permutarGuardia(@RequestBody PermutaItem permutaItem, HttpServletRequest request) throws Exception{
 		InsertResponseDTO response= guardiasColegiadoService.permutarGuardia(permutaItem, request);
-		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		if (response != null) {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		} else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@PostMapping(value = "/validarPermuta", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> validarPermuta(@RequestBody List<PermutaItem> permutas, HttpServletRequest request){
+	ResponseEntity<UpdateResponseDTO> validarPermuta(@RequestBody List<PermutaItem> permutas, HttpServletRequest request) throws Exception{
 		UpdateResponseDTO response= guardiasColegiadoService.validarPermuta(permutas, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if (response != null) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
