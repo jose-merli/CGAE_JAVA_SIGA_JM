@@ -97,7 +97,7 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 		@Result(column = "OTROSBIENES", property = "otrosBienes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "representante", property = "representante", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "direccionRepresentante", property = "direccionRepresentante", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "nifRepresentante", property = "nifRepresentante", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "solicitantePpal", property = "solicitantePpal", jdbcType = JdbcType.VARCHAR),
 		
 
 	})
