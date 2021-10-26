@@ -3480,7 +3480,23 @@ public class GuardiasServiceImpl implements GuardiasService {
 //			}
 			
 			try {
-				scsGuardiasturnoExtendsMapper.insertarRegistroCalendarioGuardias(idTurnoPrincipal, idGuardiaPrincipal, idCalendarioPrincipal, observaciones, idTurno, idGuardia, changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaHasta), changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaDesde), idcalendarioguardias, idInstitucion, idPersonaUltimoAnterior, changeDateFormat(OLD_FORMAT, NEW_FORMAT, today) , changeDateFormat(OLD_FORMAT2, NEW_FORMAT, fechaSuscUltimoAnterior), idGrupoGuardiaColegiadoAnterior, usuModificacion1.toString());
+				String fechaHastaOK = null;
+				if (!fechaHasta.isEmpty() && fechaHasta != null) {
+					fechaHastaOK = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaHasta);
+				}
+				String fechaDesdeOK = null;
+				if (!fechaDesde.isEmpty() && fechaDesde != null) {
+					fechaDesdeOK = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaDesde);
+				}
+				String todayOK = null;
+				if (!today.isEmpty() && today != null) {
+				    todayOK = changeDateFormat(OLD_FORMAT, NEW_FORMAT, today);
+				}
+				String fechaSuscUltimoAnteriorOK = null;
+				if (!fechaSuscUltimoAnterior.isEmpty() && fechaSuscUltimoAnterior != null) {
+					fechaSuscUltimoAnteriorOK = changeDateFormat(OLD_FORMAT2, NEW_FORMAT, fechaSuscUltimoAnterior);
+				}
+				scsGuardiasturnoExtendsMapper.insertarRegistroCalendarioGuardias(idTurnoPrincipal, idGuardiaPrincipal, idCalendarioPrincipal, observaciones, idTurno, idGuardia, fechaHastaOK, fechaDesdeOK, idcalendarioguardias, idInstitucion, idPersonaUltimoAnterior, todayOK , fechaSuscUltimoAnteriorOK, idGrupoGuardiaColegiadoAnterior, usuModificacion1.toString());
 				return Integer.parseInt(idcalendarioguardias);
 			}catch(Exception e) {
 				return 0;
@@ -4388,7 +4404,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 			}else {
 				idGrupoGuardiaUltimo2 = idGrupoGuardiaUltimo.toString();
 			}
-			fechaSuscripcionUltimo = new SimpleDateFormat("yyy-MM-dd HH:mm:ss.S").parse(beanGuardia.getFechaSuscripcion_Ultimo());
+			if (beanGuardia.getFechaSuscripcion_Ultimo() != null && !beanGuardia.getFechaSuscripcion_Ultimo().isEmpty()) {
+				fechaSuscripcionUltimo = new SimpleDateFormat("yyy-MM-dd HH:mm:ss.S").parse(beanGuardia.getFechaSuscripcion_Ultimo());
+			}else {
+				fechaSuscripcionUltimo = null;
+			}
 			
 			// obteniendo ordenacion de la guardia
 			if (idOrdenacionColas == null)

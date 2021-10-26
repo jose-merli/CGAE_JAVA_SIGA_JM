@@ -241,7 +241,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 					"		WHERE\r\n" + 
 					"			tabla_nueva.orden <= tabla_nueva2.orden\r\n" + 
 					"		ORDER BY\r\n" + 
-					"			tabla_nueva.orden ASC) ) consulta_total");
+					"			tabla_nueva.orden ASC) ) consulta_total  ORDER BY ORDEN");
 		else 
 			sql.SELECT("ROWNUM AS orden_cola, consulta.* FROM (SELECT(CASE\r\n" + 
 					"                                 WHEN Ins.Fechavalidacion IS NOT NULL\r\n" + 

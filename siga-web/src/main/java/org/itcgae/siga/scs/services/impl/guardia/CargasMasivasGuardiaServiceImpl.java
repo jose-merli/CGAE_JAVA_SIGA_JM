@@ -727,7 +727,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 					if (cargaMasivaDatosITItem.getErrores() == null) {
 						int z=1;
 						//En el caso que se haya introducido un tipo alta
-						if(cargaMasivaDatosITItem.getTipo()=="ALTA") {
+						if(cargaMasivaDatosITItem.getTipo().equals("ALTA")) {
 							
 							TurnosItem t = new TurnosItem();
 							t.setIdturno(cargaMasivaDatosITItem.getIdTurno());
@@ -1802,6 +1802,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									
 								}
 							}
+				} else {
+					error.setMessage("No existen la guardia y el turno de alta en el sistema.");
+					deleteResponseDTO.setStatus(SigaConstants.KO); 
 				}
 						
 					} else {
@@ -1822,7 +1825,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 				
 				if(cargaMasivaDatosBTItems.isEmpty()) {
 					error.setMessage("No existen registros en el fichero.");
-					deleteResponseDTO.setStatus(SigaConstants.OK); 
+					deleteResponseDTO.setStatus(SigaConstants.KO); 
 				}else {
 					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGC, datosLog);
 
