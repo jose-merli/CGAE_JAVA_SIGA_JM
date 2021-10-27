@@ -74,10 +74,15 @@ public class InscripcionController {
 	}
 	
 	@PostMapping(value = "/eliminarSaltosCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> eliminarSaltosCompensaciones(@RequestBody List<BusquedaInscripcionMod> eliminarSaltosCompensaciones, HttpServletRequest request){
+	ResponseEntity<DeleteResponseDTO> eliminarSaltosCompensaciones(@RequestBody List<BusquedaInscripcionMod> eliminarSaltosCompensaciones, HttpServletRequest request) throws Exception{
 		DeleteResponseDTO response= inscripcionService.eliminarSaltosCompensaciones(eliminarSaltosCompensaciones, request);
-        return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-	} 
+		if (response.getStatus() == "OK") {
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.CONFLICT);
+		}
+			}
+	
 	
 	@PostMapping(value = "/buscarTrabajosSJCS", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Boolean> buscarTrabajosSJCS(@RequestBody List<BusquedaInscripcionMod> buscarTrabajosSJCS, HttpServletRequest request){

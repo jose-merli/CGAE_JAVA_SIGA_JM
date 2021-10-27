@@ -557,6 +557,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 							if (respCabGuar == 0) {
 								error.setCode(400);
 								updateResponseDTO.setStatus(SigaConstants.KO);
+								throw (new Exception("Error al permutar la guardia"));
 							} else {
 
 								error.setCode(200);
@@ -1207,6 +1208,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 					error.setCode(400);
 					error.setDescription("Existen permutas ya validadas en la seleccion.");
 					updateResponseDTO.setStatus(SigaConstants.KO);
+					
 				}
 
 				if (responseUpdate != 0) {
