@@ -82,8 +82,8 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "NOMBREletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ejg.idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER)
+			@Result(column = "numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER)
 
 	})
 	List<EjgItem> busquedaEJG(EjgItem ejgItem, String string, Integer tamMaximo, String idLenguaje);
@@ -111,7 +111,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "nombreletrado", property = "apellidosYNombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "ejg.numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "dictamen", property = "dictamenSing", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "resolucion", property = "resolucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "resolauto", property = "impugnacionDesc", jdbcType = JdbcType.VARCHAR),
@@ -151,7 +151,8 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "idTipoDictamenEJG", property = "idTipoDictamen", jdbcType = JdbcType.INTEGER),
 			@Result(column = "IDFUNDAMENTOCALIF", property = "fundamentoCalif", jdbcType = JdbcType.INTEGER),
 			@Result(column = "observacionesDictamen", property = "dictamen", jdbcType = JdbcType.CLOB),
-			@Result(column = "identificadords", property = "identificadords", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "identificadords", property = "identificadords", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR)})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String string, String idLenguaje);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getDictamen")
