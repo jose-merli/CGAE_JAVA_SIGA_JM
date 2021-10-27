@@ -14,6 +14,7 @@ public class NuevaComunicacionItem {
 	private String numProcedimiento;
 	private String nig;
 	private String idModeloComunicacion;
+	private String idPlantillaEnvios;
 	private List<MultipartFile> docs;
 	
 	public String getJuzgado() {
@@ -63,5 +64,11 @@ public class NuevaComunicacionItem {
 	}
 	public void setDocs(List<MultipartFile> docs) {
 		this.docs = docs;
+	}
+	public String getIdPlantillaEnvios() {
+		return idPlantillaEnvios;
+	}
+	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
+		this.idPlantillaEnvios = idPlantillaEnvios;
 	}
 }

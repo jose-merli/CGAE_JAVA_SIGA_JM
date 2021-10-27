@@ -28,6 +28,6 @@ public interface IComunicacionesService {
 	public ResponseFileDTO descargarDocumento(HttpServletRequest request, ResponseDocumentoDTO documentoDTO);
 	public String descargarCertificado(HttpServletRequest request, String idEnvio);
 	public InsertResponseDTO saveNuevaComm(MultipartHttpServletRequest request)
-			throws SigaExceptions, NumberFormatException, IOException;
+			throws SigaExceptions, NumberFormatException, IOException, Exception;
 	
 }

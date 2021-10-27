@@ -149,7 +149,7 @@ public class ComunicacionesController {
     }	
 	
 	@RequestMapping(value = "/saveNuevaComm",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> saveNuevaComm(MultipartHttpServletRequest request) throws SigaExceptions, NumberFormatException, IOException {
+	ResponseEntity<InsertResponseDTO> saveNuevaComm(MultipartHttpServletRequest request) throws SigaExceptions, NumberFormatException, IOException, Exception {
 		
 		InsertResponseDTO response = _comunicacionesService.saveNuevaComm(request);
 
