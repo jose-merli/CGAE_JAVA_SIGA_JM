@@ -3130,8 +3130,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 					//idConjunto: 
 						calendarioItem.setIdCalG(idConjuntoGuardia);
 					}
-					String response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
-						if (response == null && error.getDescription() == null)
+					int response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
+					if (response == 0)
 						{
 							error.setCode(400);
 							insertResponseDTO.setStatus(SigaConstants.KO);
