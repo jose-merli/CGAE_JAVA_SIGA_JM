@@ -38,9 +38,13 @@ public class InscripcionController {
 	private InscripcionService inscripcionService;
 	
 	@PostMapping(value = "/validarInscripciones", produces = MediaType.APPLICATION_JSON_VALUE)	
-	ResponseEntity<UpdateResponseDTO> validarInscripciones(@RequestBody List<BusquedaInscripcionMod> validarbody, HttpServletRequest request){
+	ResponseEntity<UpdateResponseDTO> validarInscripciones(@RequestBody List<BusquedaInscripcionMod> validarbody, HttpServletRequest request) throws Exception{
 		UpdateResponseDTO response= inscripcionService.validarInscripciones(validarbody, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if (response != null) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		} else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	
 	}
 
 	@PostMapping(value = "/denegarInscripciones", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -70,10 +74,15 @@ public class InscripcionController {
 	}
 	
 	@PostMapping(value = "/eliminarSaltosCompensaciones", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> eliminarSaltosCompensaciones(@RequestBody List<BusquedaInscripcionMod> eliminarSaltosCompensaciones, HttpServletRequest request){
+	ResponseEntity<DeleteResponseDTO> eliminarSaltosCompensaciones(@RequestBody List<BusquedaInscripcionMod> eliminarSaltosCompensaciones, HttpServletRequest request) throws Exception{
 		DeleteResponseDTO response= inscripcionService.eliminarSaltosCompensaciones(eliminarSaltosCompensaciones, request);
-        return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-	} 
+		if (response.getStatus() == "OK") {
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.CONFLICT);
+		}
+			}
+	
 	
 	@PostMapping(value = "/buscarTrabajosSJCS", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Boolean> buscarTrabajosSJCS(@RequestBody List<BusquedaInscripcionMod> buscarTrabajosSJCS, HttpServletRequest request){

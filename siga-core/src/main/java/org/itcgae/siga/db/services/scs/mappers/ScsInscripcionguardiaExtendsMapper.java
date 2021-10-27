@@ -127,7 +127,8 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "nombre_guardia", property = "nombreGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "descripcion_tipo_guardia", property = "descripcionNombreGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "obligatoriedad_inscripcion", property = "obligatoriedadInscripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "descripcion_obligatoriedad", property = "descripcionObligatoriedad", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "descripcion_obligatoriedad", property = "descripcionObligatoriedad", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechasuscripcion", property = "fechasolicitud", jdbcType = JdbcType.VARCHAR)
 	})
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "inscripcionesDisponibles")
 	List<GestionInscripcion> inscripcionesDisponibles(Short idInstitucion, AdmUsuarios admUsuarios, BusquedaInscripcionItem inscripcion);
@@ -151,7 +152,8 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "nombre_guardia", property = "nombreGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "descripcion_tipo_guardia", property = "descripcionNombreGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "obligatoriedad_inscripcion", property = "obligatoriedadInscripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "descripcion_obligatoriedad", property = "descripcionObligatoriedad", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "descripcion_obligatoriedad", property = "descripcionObligatoriedad", jdbcType = JdbcType.VARCHAR),
+		
 	})
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "inscripcionPorguardia")
 	List<GestionInscripcion> inscripcionPorguardia(Short idInstitucion, AdmUsuarios admUsuarios, String guardia, String idpersona);
@@ -246,20 +248,25 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getSaltoCompensacionesActivo")
 	@Results({ 
 	})
-	List<SaltoCompGuardiaItem> getBuscarSaltoCompensancion(String idInstitucion, String idturno, String idguardia, String idpersona,
-			String saltos);
+	List<SaltoCompGuardiaItem> getBuscarSaltoCompensancion(String idInstitucion, String idturno, String idguardia, String idpersona);
 
 
 
 	@DeleteProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "eliminarSaltoCompensacion")
-	int getEliminarSaltoCompensancion(String string, String idturno, String idguardia, String idpersona, String saltos);
+	int getEliminarSaltoCompensancion(String idinstitucion, String idturno, String idguardia, String idpersona);
 
 
 
-	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "buscarTrabajosSJCS")
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "busquedaTrabajosGuardias")
 	@Results({ 
 	})
-	List<TrabajosSJCSInsGuardiaItem> getBuscarTrabajosSJCS(String idInstitucion, String idturno, String idguardia, String idpersona, String fECHADESDE, String fECHAHASTA);
+	List<TrabajosSJCSInsGuardiaItem> busquedaTrabajosGuardias(String idpersona,String idturno,String idguardia ,Short idInstitucion,String fechaActual);
+	
+	
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "busquedaTrabajosPendientes")
+	@Results({ 
+	})
+	List<TrabajosSJCSInsGuardiaItem> busquedaTrabajosPendientes(String idpersona,String idturno ,Short idInstitucion,String fechaActual);
 
 
 
