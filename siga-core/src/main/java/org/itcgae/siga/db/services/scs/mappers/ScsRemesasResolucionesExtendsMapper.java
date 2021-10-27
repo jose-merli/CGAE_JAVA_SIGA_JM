@@ -9,6 +9,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
 import org.itcgae.siga.db.entities.CajgRemesaresolucionfichero;
+import org.itcgae.siga.db.entities.EcomOperacionTipoaccion;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasResolucionesExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -20,7 +21,7 @@ public interface ScsRemesasResolucionesExtendsMapper {
 
 	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class ,method = "buscarRemesasResoluciones")
 	@Results({
-		@Result(column = "IDREMESARESOLUCION", property = "idRemesaResultado", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDREMESARESOLUCION", property = "idRemesaResolucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "PREFIJO", property = "numRemesaPrefijo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SUFIJO", property = "numRemesaSufijo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
@@ -43,6 +44,10 @@ public interface ScsRemesasResolucionesExtendsMapper {
 	})
 	CajgRemesaresolucionfichero getMaxIdRemesaResolucionFichero(Short idInstitucion);
 
-	
-	
+	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class, method = "ecomOperacionTipoAccion")
+	@Results({
+		@Result(column = "IDOPERACION", property = "idoperacion", jdbcType = JdbcType.INTEGER)
+	})
+	List<EcomOperacionTipoaccion> ecomOperacionTipoAccion(String tipoCAJG);
+
 }

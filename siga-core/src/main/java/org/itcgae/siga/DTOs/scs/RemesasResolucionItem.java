@@ -1,6 +1,6 @@
 package org.itcgae.siga.DTOs.scs;
 
-import java.sql.Date;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -40,6 +40,7 @@ import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.GestorContadores;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
@@ -96,6 +97,9 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
     
     @Autowired
     private GenPropertiesMapper genPropertiesMapper;
+    
+    @Autowired
+    private GestorContadores gestorContadores;
     
 	@Autowired
 	private AdmContadorExtendsMapper admContadorExtendsMapper;
@@ -247,6 +251,8 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
         genPropertiesExamplePG.createCriteria().andParametroEqualTo("cajg.directorioCAJGJava");
         List<GenProperties> genPropertiesPathP = genPropertiesMapper.selectByExample(genPropertiesExamplePG);
         path += genPropertiesPathP.get(0).getValor();
+      //Para local
+        path = "C:\\Users\\kvargasnunez\\Desktop\\Server";
         path += File.separator + idInstitucion + File.separator + "remesaResoluciones";		
         path += File.separator + idRemesaResolucion;
         
@@ -262,18 +268,9 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
     	String token = request.getHeader("Authorization");
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		AdmContadorExample admContadorExample = new AdmContadorExample();
-		admContadorExample.createCriteria().andIdcontadorEqualTo(SigaConstants.CONTADOR_REMESAS_RESULTADOS)
-				.andIdinstitucionEqualTo(idInstitucion);
+		AdmContador adm = gestorContadores.getContador(idInstitucion,SigaConstants.CONTADOR_REMESAS_RESULTADOS);
 
-		List<AdmContador> counterList = admContadorExtendsMapper.selectByExample(admContadorExample);
-		AdmContador counter = new AdmContador();
-
-		if (null != counterList && counterList.size() > 0) {
-			counter = counterList.get(0);
-		}
-
-		return counter;
+		return adm;
     }
     
  
@@ -337,16 +334,13 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 					//1- Insert en la tabla CAJG_REMESARESOLUCION
 					CajgRemesaresolucion remesaResolucion = new CajgRemesaresolucion(); 
 					
-					AdmContador adm = new AdmContador();
-					
-					
-					adm = getUltimoRegitroRemesaResolucion(request);
+					AdmContador adm = gestorContadores.getContador(idInstitucion,SigaConstants.CONTADOR_REMESAS_RESULTADOS);
 					
 					remesaResolucion.setIdremesaresolucion(Long.valueOf(remesaResolucionID.getIdRemesaResolucion()));
 					remesaResolucion.setIdinstitucion(idInstitucion);
 					remesaResolucion.setPrefijo(adm.getPrefijo());
 					remesaResolucion.setSufijo(adm.getSufijo());
-					// Como sacar Dato ? remesaResolucion.setNumero();
+					remesaResolucion.setNumero(String.valueOf(gestorContadores.getSiguienteNumContador(adm)));
 					remesaResolucion.setFechacarga(remesasResolucionItem.getFechaCarga());
 					remesaResolucion.setFecharesolucion(remesasResolucionItem.getFechaResolucion());
 					remesaResolucion.setObservaciones(remesasResolucionItem.getObservaciones());
@@ -357,6 +351,10 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 					remesaResolucion.setIdtiporemesa(new Short("3"));
 					
 					response = cajgRemesaresolucionMapper.insert(remesaResolucion);
+					
+					//Actualizar contador.
+					
+					gestorContadores.setContador(adm,remesaResolucion.getNumero());
 					
 					LOGGER.info(
 							"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion");
@@ -384,7 +382,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 									"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a la llamada al PL");
 							
 							//3 Llamamos al PL
-								invocarProcedimiento(procedimientos.get(0).getConsulta(), idInstitucion, remesaResolucionID, procedimientos.get(0).getDelimitador(), fileName,usuarios.get(0).getIdusuario() );
+								response = invocarProcedimiento(procedimientos.get(0).getConsulta(), idInstitucion, remesaResolucionID, procedimientos.get(0).getDelimitador(), fileName,usuarios.get(0).getIdusuario() );
 							
 							LOGGER.info(
 									"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida de la llamada al PL");
@@ -402,8 +400,9 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 				}if(response==1 && !conFichero) {
 					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
 					error.setCode(200);
-					error.setDescription("Remesa añadida correctamente");
+					error.setDescription("Inserted");
 					updateResponseDTO.setStatus(SigaConstants.OK);
+					updateResponseDTO.setError(error);
 				}
 				if (response == 0) {
 					error.setCode(400);
@@ -411,11 +410,13 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 						error.setDescription("No se ha añadido la remesa resolucion");
 					}
 					updateResponseDTO.setStatus(SigaConstants.KO);
+					updateResponseDTO.setError(error);
 				} if(response == 1 &&  conFichero) {
 					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
 					error.setCode(200);
-					error.setDescription("Remesa añadida correctamente");
+					error.setDescription("Inserted");
 					updateResponseDTO.setStatus(SigaConstants.OK);
+					updateResponseDTO.setError(error);
 				}
 					
 			}//Fin Guardar - Inicio Actualizar
@@ -459,28 +460,32 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 										"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida a CajgRemesaResolucionExtendsMapper para insertar una remesa resolucion fichero");
 								
 							
-								LOGGER.info(
-										"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a la llamada al PL");
-								
-								//3 Llamamos al PL
-									invocarProcedimiento(procedimientos.get(0).getConsulta(), idInstitucion, remesasResolucionItem, procedimientos.get(0).getDelimitador(), fileName,usuarios.get(0).getIdusuario() );
-								
-								LOGGER.info(
-										"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida de la llamada al PL");
+					
 								}							
-						}			
+						}
+						LOGGER.info(
+								"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Entrada a la llamada al PL");
+						
+						//3 Llamamos al PL
+						response = 	invocarProcedimiento(procedimientos.get(0).getConsulta(), idInstitucion, remesasResolucionItem, procedimientos.get(0).getDelimitador(), fileName,usuarios.get(0).getIdusuario() );
+						
+						LOGGER.info(
+								"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida de la llamada al PL");
+						
 					}
 				}catch (Exception e) {
 					response = 0;
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 					updateResponseDTO.setStatus(SigaConstants.KO);
+					updateResponseDTO.setError(error);
 
 				}if(response==1 && !conFichero) {
 					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
 					error.setCode(200);
-					error.setDescription("Remesa actualizada correctamente");
+					error.setDescription("Updated");
 					updateResponseDTO.setStatus(SigaConstants.OK);
+					updateResponseDTO.setError(error);
 				}
 				if (response == 0) {
 					error.setCode(400);
@@ -488,11 +493,13 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 						error.setDescription("No se ha actualizado la remesa resolucion");
 					}
 					updateResponseDTO.setStatus(SigaConstants.KO);
+					updateResponseDTO.setError(error);
 				} if(response == 1 &&  conFichero) {
 					updateResponseDTO.setId(String.valueOf(remesasResolucionItem.getIdRemesaResolucion()));
 					error.setCode(200);
-					error.setDescription("Remesa resolucion con fichero editado correctamente");
+					error.setDescription("Updated");
 					updateResponseDTO.setStatus(SigaConstants.OK);
+					updateResponseDTO.setError(error);
 				}
 
 				
@@ -502,42 +509,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
     	
     	return updateResponseDTO;
     }
-   
-	private AdmContador getUltimoRegitroRemesaResolucion(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		AdmContador contador = new AdmContador();
 
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"getUltimoRegitroRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
-
-			LOGGER.info(
-					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			LOGGER.info(
-					"getUltimoRegitroRemesa() / admContadorExtendsMapper.getUltimoRegitroRemesaResolucion() -> Entrada a AdmContadorExtendsMapper para obtener el ultimo registro de las remesas resolucion");
-			AdmContadorKey key = new AdmContadorKey();
-
-			key.setIdinstitucion(idInstitucion);
-			key.setIdcontador(SigaConstants.CONTADOR_REMESAS_RESULTADOS);
-
-			contador = admContadorExtendsMapper.selectByPrimaryKey(key);
-
-			LOGGER.info(
-					"getUltimoRegitroRemesa() / admContadorExtendsMapper.getUltimoRegitroRemesaResolucion() -> Salida a AdmContadorExtendsMapper para obtener el ultimo registro de las remesas resolucion");
-
-		}
-		return contador;
-	}
 	
 	private Boolean comprobacionFichero(File file) {
 		
@@ -596,7 +568,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 		FileInputStream fis;
 
 		try {
-			File fileServer = new File(path, fileIn.getName());
+			File fileServer = new File(path, fileIn.getOriginalFilename());
 			fis = new FileInputStream(fileServer.getPath());
 			InputStreamReader isr = new InputStreamReader(fis);
 			BufferedReader br = new BufferedReader(isr);
@@ -612,7 +584,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 						remesaResolucionFichero.setIdinstitucion(idInstitucion);
 						remesaResolucionFichero.setNumerolinea(numLinea);
 						remesaResolucionFichero.setLinea(linea);
-						cajgRemesaresolucionficheroMapper.insertSelective(remesaResolucionFichero);
+						cajgRemesaresolucionficheroMapper.insert(remesaResolucionFichero);
 					}
 				}
 			br.close();
@@ -648,12 +620,10 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 	}
 	
 
-	private String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters)
+	private int  callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters)
 			throws IOException, NamingException, SQLException {
-		String result[] = null;
+		int result = 0;
 
-		if (outParameters > 0)
-			result = new String[outParameters];
 		DataSource ds = getOracleDataSource();
 		Connection con = ds.getConnection();
 		try {
@@ -673,32 +643,30 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 			for (int intento = 1; intento <= 2; intento++) {
 				try {
 					cs.execute();
+					result = 1;
 					break;
 
 				} catch (SQLTimeoutException tex) {
-					throw tex;
-
+					result = 0;
+					throw tex;					
 				} catch (SQLException ex) {
 					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la
-																		// segunda vez deberia funcionar)
+						result = 0;								// segunda vez deberia funcionar)
 						throw ex;
 					}
 				}
 
 			}
 
-			for (int i = 0; i < outParameters; i++) {
-				result[i] = cs.getString(i + size + 1);
-			}
 			cs.close();
 			return result;
 
 		} catch (SQLTimeoutException ex) {
-			return null;
+			return 0;
 		} catch (SQLException ex) {
-			return null;
+			return 0;
 		} catch (Exception e) {
-			return null;
+			return 0;
 		} finally {
 			con.close();
 			con = null;
@@ -706,28 +674,28 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 	}
 	
     
-	private String invocarProcedimiento(String nomPL, Short idInstitucion,RemesasResolucionItem remesaRemesasResolucionItem,String delimitador,String fileName,int idUsuario) throws Exception {
+	private int invocarProcedimiento(String nomPL, Short idInstitucion,RemesasResolucionItem remesaRemesasResolucionItem,String delimitador,String fileName,int idUsuario) throws Exception {
 		Object[] param_in;
-		String resultado[] = null;
+		int resultado =0;
 		
 		try {
-	    	param_in = new Object[4];
-			param_in[0] = idInstitucion;
-			param_in[1] = remesaRemesasResolucionItem.getIdRemesaResolucion();
+	    	param_in = new Object[5];
+			param_in[0] = String.valueOf(idInstitucion);
+			param_in[1] = String.valueOf(remesaRemesasResolucionItem.getIdRemesaResolucion());
 			param_in[2] = delimitador;
 			param_in[3] = fileName;
-			param_in[4] = idUsuario;
+			param_in[4] = String.valueOf(idUsuario);
 			
 			// Ejecucion del PL
-			resultado = callPLProcedure("{call PKG_SIGA_TRATARESOLUCIONES."+nomPL+" (?,?,?,?,?)}", 2, param_in);
-	    	if (!resultado[0].equalsIgnoreCase("0")) {
-	    		LOGGER.error("Error en PL = "+(String)resultado[1]);
+			resultado = callPLProcedure("{call "+nomPL+" (?,?,?,?,?)}", 0, param_in);
+	    	if (resultado != 1) {
+	    		LOGGER.error("Error en el PL = "+nomPL);
 	    	}
 			
 		}catch (Exception e) {
 			throw new Exception ("Error al ejecutar Procedimiento: " + e.getMessage());		
 		}
-		return resultado[0];
+		return resultado;
 	}
 	
 	private Boolean guardarFichero(String path,MultipartFile file) throws IOException {
@@ -739,7 +707,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 		try {
 			File aux = new File(path);
 			aux.mkdirs();
-			serverFile = new File(path, file.getName());
+			serverFile = new File(path, file.getOriginalFilename());
 			stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 			stream.write(file.getBytes());
 
