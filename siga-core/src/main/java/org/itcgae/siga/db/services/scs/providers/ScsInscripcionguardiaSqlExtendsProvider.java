@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.scs.BusquedaInscripcionMod;
 import org.itcgae.siga.DTOs.scs.GrupoGuardiaColegiadoItem;
 import org.itcgae.siga.DTOs.scs.InscripcionDatosEntradaDTO;
 import org.itcgae.siga.DTOs.scs.InscripcionGuardiaItem;
+import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
@@ -699,41 +700,41 @@ public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscrip
 			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/RRRR')= TO_DATE('"+FECHASOLICITUD+"','DD,MM/RRRR')");
 		}
 		
-		if(inscripciones.getFechabaja() != null) {
-			sql.WHERE("TO_CHAR(FECHABAJA,'DD/MM/RRRR')= TO_DATE('"+FECHABAJA+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getObservacionessolicitud() != null) {
-			sql.WHERE("OBSERVACIONESSUSCRIPCION ='"+inscripciones.getObservacionessolicitud()+"'");
-		}
-		
-		if(inscripciones.getObservacionesbaja() != null) {
-			sql.WHERE("OBSERVACIONESBAJA ='"+inscripciones.getObservacionesbaja()+"'");
-		}
-		
-		if(inscripciones.getFechasolicitudbaja() != null) {
-			sql.WHERE("TO_CHAR(FECHASOLICITUDBAJA,'DD/MM/RRRR')= TO_DATE('"+FECHASOLICITUDBAJA+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getFechavalidacion() != null) {
-			sql.WHERE("TO_CHAR(FECHAVALIDACION,'DD/MM/RRRR')= TO_DATE('"+FECHAVALIDACION+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getObservacionesvalidacion() != null) {
-			sql.WHERE("OBSERVACIONESVALIDACION ='"+inscripciones.getObservacionesvalidacion()+"'");
-		}
-		
-		if(inscripciones.getFechadenegacion() != null) {
-			sql.WHERE("TO_CHAR(FECHADENEGACION,'DD/MM/RRRR')= TO_DATE('"+FECHADENEGACION+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getObservacionesdenegacion() != null) {
-			sql.WHERE("OBSERVACIONESDENEGACION ='"+inscripciones.getObservacionesdenegacion()+"'");
-		}
-		
-		if(inscripciones.getObservacionesvalbaja() != null) {
-			sql.WHERE("OBSERVACIONESVALBAJA ='"+inscripciones.getObservacionesvalbaja()+"'");
-		}
+//		if(inscripciones.getFechabaja() != null) {
+//			sql.WHERE("TO_CHAR(FECHABAJA,'DD/MM/RRRR')= TO_DATE('"+FECHABAJA+"','DD,MM/RRRR')");
+//		}
+//		
+//		if(inscripciones.getObservacionessolicitud() != null) {
+//			sql.WHERE("OBSERVACIONESSUSCRIPCION ='"+inscripciones.getObservacionessolicitud()+"'");
+//		}
+//		
+//		if(inscripciones.getObservacionesbaja() != null) {
+//			sql.WHERE("OBSERVACIONESBAJA ='"+inscripciones.getObservacionesbaja()+"'");
+//		}
+//		
+//		if(inscripciones.getFechasolicitudbaja() != null) {
+//			sql.WHERE("TO_CHAR(FECHASOLICITUDBAJA,'DD/MM/RRRR')= TO_DATE('"+FECHASOLICITUDBAJA+"','DD,MM/RRRR')");
+//		}
+//		
+//		if(inscripciones.getFechavalidacion() != null) {
+//			sql.WHERE("TO_CHAR(FECHAVALIDACION,'DD/MM/RRRR')= TO_DATE('"+FECHAVALIDACION+"','DD,MM/RRRR')");
+//		}
+//		
+//		if(inscripciones.getObservacionesvalidacion() != null) {
+//			sql.WHERE("OBSERVACIONESVALIDACION ='"+inscripciones.getObservacionesvalidacion()+"'");
+//		}
+//		
+//		if(inscripciones.getFechadenegacion() != null) {
+//			sql.WHERE("TO_CHAR(FECHADENEGACION,'DD/MM/RRRR')= TO_DATE('"+FECHADENEGACION+"','DD,MM/RRRR')");
+//		}
+//		
+//		if(inscripciones.getObservacionesdenegacion() != null) {
+//			sql.WHERE("OBSERVACIONESDENEGACION ='"+inscripciones.getObservacionesdenegacion()+"'");
+//		}
+//		
+//		if(inscripciones.getObservacionesvalbaja() != null) {
+//			sql.WHERE("OBSERVACIONESVALBAJA ='"+inscripciones.getObservacionesvalbaja()+"'");
+//		}
 		
 		return sql.toString();
 	}
@@ -818,7 +819,7 @@ public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscrip
 		return sql.toString();
 	}
 	
-	public String eliminarSaltoCompensacion(String idinstitucion, String idturno,String idguardia, String idpersona, String saltos) {
+	public String eliminarSaltoCompensacion(String idinstitucion, String idturno,String idguardia, String idpersona) {
 			
 			SQL sql = new SQL();
 							
@@ -840,9 +841,7 @@ public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscrip
 				sql.WHERE("IDGUARDIA ="+ idguardia);
 			}
 			
-			if(saltos != null && !saltos.isEmpty()) {
-				sql.WHERE("SALTOOCOMPENSACION ="+ saltos);
-			}
+			
 			
 			
 			return sql.toString();
@@ -920,6 +919,55 @@ public String UpdateInscripcionGuardia(String idinstitucion, String idturno,Stri
 		return sql.toString();
 	}
 	
+	public String busquedaTrabajosGuardias(String idpersona,String idturno,String idguardia ,Short idInstitucion,String fechaActual) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT("TO_CHAR(gc.fechainicio,'dd/mm/yyyy')\r\n" + 
+				"    || ' - '\r\n" + 
+				"    || TO_CHAR(gc.fecha_fin,'dd/mm/yyyy') fecha,\r\n" + 
+				"    gt.nombre incidencia,\r\n" + 
+				"    'Guardia' descripcion");
+		sql.FROM("scs_cabeceraguardias gc,\r\n" + 
+				"    scs_guardiasturno gt");
+		sql.WHERE("gc.idinstitucion = gt.idinstitucion\r\n" + 
+				"    AND   gc.idturno = gt.idturno\r\n" + 
+				"    AND   gc.idguardia = gt.idguardia\r\n" + 
+				"    AND   gc.idinstitucion = '"+idInstitucion+"'" + 
+				"    AND   gc.idpersona = '"+idpersona+"'"+ 
+				"    AND   trunc(gc.fecha_fin) > '"+fechaActual+"'" + 
+				"    AND   gc.idturno = '"+idturno+"'"+ 
+				"	AND gc.idguardia= "+idguardia);
+		sql.ORDER_BY("gc.fechainicio DESC");
+		
+		
+		return sql.toString();
+	}
+	
+	public String busquedaTrabajosPendientes(String idpersona,String idturno ,Short idInstitucion,String fechaActual) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT("des.anio\r\n" + 
+				"    || '/'\r\n" + 
+				"    || des.codigo incidencia,\r\n" + 
+				"    TO_CHAR(des.fechaentrada,'dd/mm/yyyy') fecha,\r\n" + 
+				"    'Designación' descripcion");
+		sql.FROM("scs_designa des,\r\n" + 
+				"    scs_designasletrado deslet");
+		sql.WHERE("des.idinstitucion = '"+idInstitucion+"'" + 
+				"    AND   des.estado <> ' f '    AND   deslet.idpersona = '"+idpersona +"'" + 
+				"    AND   deslet.fecharenuncia IS NULL\r\n" + 
+				"    AND   deslet.idturno = '"+idturno +"'" + 
+				"    AND   des.idinstitucion = deslet.idinstitucion" + 
+				"    AND   des.idturno = deslet.idturno" + 
+				"    AND   des.anio = deslet.anio" + 
+				"    AND   des.numero = deslet.numero" + 
+				"    AND   trunc(des.fechaentrada) > '"+fechaActual+"'");		
+		
+		return sql.toString();
+	}
+	
 	public String buscarTrabajosSJCS(String idinstitucion, String idturno,String idguardia, String idpersona, String fechadesde,String fechahasta) {
 		
 		SQL sql = new SQL();
@@ -932,7 +980,7 @@ public String UpdateInscripcionGuardia(String idinstitucion, String idturno,Stri
 
 		
 		SQL subQuerysql = new SQL();
-		subQuerysql.SELECT("to_char(gc.fechainicio, 'dd/mm/yyyy') || ' - ' || to_char(gc.fecha_fin, 'dd/mm/yyyy') fecha,gt.nombre incidencia, ("+subQuerysql1+") descripcion");
+		subQuerysql.SELECT("to_date(gc.fechainicio, 'dd/mm/yyyy') || ' - ' || to_date(gc.fecha_fin, 'dd/mm/yyyy') fecha,gt.nombre incidencia, ("+subQuerysql1+") descripcion");
 		subQuerysql.FROM("scs_cabeceraguardias gc");
 		subQuerysql.FROM("scs_guardiasturno  gt");
 		subQuerysql.WHERE("gc.idinstitucion = gt.idinstitucion");
@@ -960,7 +1008,7 @@ public String UpdateInscripcionGuardia(String idinstitucion, String idturno,Stri
 
 		
 		SQL subQuerysql2 = new SQL();
-		subQuerysql2.SELECT("des.anio || '/'  || des.codigo incidencia,to_char(des.fechaentrada, 'dd/mm/yyyy') fecha, ("+subQuerysql1+") descripcion");
+		subQuerysql2.SELECT("des.anio || '/'  || des.codigo incidencia,to_date(des.fechaentrada, 'dd/mm/yyyy') fecha, ("+subQuerysql1+") descripcion");
 		subQuerysql2.FROM("scs_designa des");
 		subQuerysql2.FROM("scs_designasletrado  deslet");
 		
