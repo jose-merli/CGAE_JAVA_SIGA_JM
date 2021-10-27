@@ -2461,11 +2461,11 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		return sql.toString();
 	}
 	
-	public String getSaltosCompensacionesGrupo(String saltoOcompensacion, String idTurno, String idInstitucion, String idGuardia) {
+	public String getSaltosCompensacionesGrupo(String idTurno, String idInstitucion, String idGuardia) {
 		SQL sql = new SQL();
 		sql.SELECT("*");
 		sql.FROM("SCS_SALTOCOMPENSACIONGRUPO");
-		sql.WHERE("SALTOOCOMPENSACION = '" + saltoOcompensacion + "'");
+		//sql.WHERE("SALTOOCOMPENSACION = '" + saltoOcompensacion + "'");
 		sql.WHERE("FECHACUMPLIMIENTO is null");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("IDTURNO = " + idTurno);
@@ -2970,7 +2970,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 	}
 	
 	
-	public String getSaltoCompensacionesActivo( String s_idinstitucion, String s_idturno, String s_idguardia, String s_idpersona, String s_saltocompensacion) {
+	public String getSaltoCompensacionesActivo( String s_idinstitucion, String s_idturno, String s_idguardia, String s_idpersona) {
 	
 		StringBuilder where = new StringBuilder();
 	
@@ -2998,13 +2998,13 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			where.append("=");
 			where.append(s_idpersona);
 		}
-		if (s_saltocompensacion.charAt(0) != ' ') {
-			where.append("   AND ");
-			where.append("SALTOOCOMPENSACION");
-			where.append("= '");
-			where.append(s_saltocompensacion.charAt(0));
-			where.append("'");
-		}
+//		if (s_saltocompensacion.charAt(0) != ' ') {
+//			where.append("   AND ");
+//			where.append("SALTOOCOMPENSACION");
+//			where.append("= '");
+//			where.append(s_saltocompensacion.charAt(0));
+//			where.append("'");
+//		}
 			where.append("   AND ");
 			where.append("FECHACUMPLIMIENTO");
 			where.append(" IS NULL ");

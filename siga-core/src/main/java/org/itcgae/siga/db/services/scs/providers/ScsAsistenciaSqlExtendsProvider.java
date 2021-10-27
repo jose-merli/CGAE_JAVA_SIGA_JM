@@ -679,7 +679,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		}else{
 			SQL.WHERE("aa.anulacion = '0' or aa.anulacion is null");
 		}
-		SQL.ORDER_BY("aa.idactuacion");
+		SQL.ORDER_BY("aa.fecha desc","aa.idactuacion desc");
 		return SQL.toString();
 	}
 

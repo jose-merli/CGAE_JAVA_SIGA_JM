@@ -4752,11 +4752,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     e);
             res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
                     HttpStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-        	try {
+            try {
 				fileStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (IOException ex) {
+				ex.printStackTrace();
 			}
         }
 

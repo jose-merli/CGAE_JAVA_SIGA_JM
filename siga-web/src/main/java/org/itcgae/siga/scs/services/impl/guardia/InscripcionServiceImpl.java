@@ -192,7 +192,6 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 					if (objeto != null) {
 
-						upd.setStatus(SigaConstants.KO);
 
 						if (objetoFK != null) {
 
@@ -250,7 +249,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 			}
 		}
 
-		if (contadorKO == 0) {
+		if (contadorKO != 0) {
 			upd.setStatus(SigaConstants.OK);
 		} else {
 			upd.setStatus(SigaConstants.KO);
@@ -509,13 +508,13 @@ public class InscripcionServiceImpl implements InscripcionService {
 					int usuario = usuarios.get(0).getIdusuario();
 
 					saltosList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(idInstitucion.toString(),
-							idturno, idguardia, idpersona, saltos);
+							idturno, idguardia, idpersona);
 
-					compensacionesList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(
-							idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
-
-					if (saltosList.size() == 0 || compensacionesList.size() == 0)
-						contadorKO++;
+//					compensacionesList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(
+//							idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
+//
+//					if (saltosList.size() != 0)
+//						contadorKO++;
 				}
 
 				LOGGER.info(
@@ -525,10 +524,12 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 		boolean existe;
 
-		if (contadorKO == 0)
-			existe = true;
-		else
+		if (saltosList.isEmpty()) {
 			existe = false;
+		}else {
+			existe = true;
+		}
+			
 
 		return existe; // luego cuando vaya al front si data es igual a true significa que hay saltos y
 						// compensaciones, si no es que no hay.
@@ -539,13 +540,19 @@ public class InscripcionServiceImpl implements InscripcionService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		List<TrabajosSJCSInsGuardiaItem> trabajosSJCSList = new ArrayList<TrabajosSJCSInsGuardiaItem>();
+		List<TrabajosSJCSInsGuardiaItem> trabajosSJCSListGuardias = new ArrayList<TrabajosSJCSInsGuardiaItem>();
+		List<TrabajosSJCSInsGuardiaItem> trabajosSJCSListPendientes = new ArrayList<TrabajosSJCSInsGuardiaItem>();
 
 		int contadorKO = 0;
 		int saltosN = 0;
 		int compensacionesN = 0;
+		int tienetrabajos = 0;
 
 		UpdateResponseDTO upd = new UpdateResponseDTO();
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String fechaActual;
+		Date fecha = new Date();
+		fechaActual = dateFormat.format(fecha);
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -570,11 +577,13 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 					int usuario = usuarios.get(0).getIdusuario();
 
-					trabajosSJCSList = inscripcionGuardiaExtensdsMapper.getBuscarTrabajosSJCS(idInstitucion.toString(),
-							idturno, idguardia, idpersona, FECHADESDE, FECHAHASTA);
-
-					if (trabajosSJCSList.size() != 0)
+					trabajosSJCSListGuardias= inscripcionGuardiaExtensdsMapper.busquedaTrabajosGuardias(idpersona,idturno, idguardia ,idInstitucion, fechaActual);
+					trabajosSJCSListPendientes = inscripcionGuardiaExtensdsMapper.busquedaTrabajosPendientes(idpersona, idturno, idInstitucion, fechaActual);
+					
+					if(trabajosSJCSListGuardias.size()>0 || trabajosSJCSListPendientes.size() >0) {
 						contadorKO++;
+					}
+				
 				}
 
 				LOGGER.info("buscarTrabajosSJCS() -> Salida ya con los datos de los trabajos SJCS recogidos");
@@ -583,10 +592,11 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 		boolean existe;
 
-		if (contadorKO == 1)
+		if (contadorKO > 0 ) {
 			existe = true;
-		else
+		}else {
 			existe = false;
+		}
 
 		return existe;
 	}
@@ -708,8 +718,9 @@ public class InscripcionServiceImpl implements InscripcionService {
 	}
 
 	@Override
+	@Transactional
 	public DeleteResponseDTO eliminarSaltosCompensaciones(List<BusquedaInscripcionMod> eliminarSaltosCompensaciones,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws Exception {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -734,11 +745,11 @@ public class InscripcionServiceImpl implements InscripcionService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("eliminarSaltosCompensaciones() -> Entrada para borrar los datos correspondientes");
 
-				for (BusquedaInscripcionMod a : eliminarSaltosCompensaciones) {
+				for (BusquedaInscripcionMod inscripcion : eliminarSaltosCompensaciones) {
 
-					String idturno = a.getIdturno();
-					String idguardia = a.getIdguardia();
-					String idpersona = a.getIdpersona();
+					String idturno = inscripcion.getIdturno();
+					String idguardia = inscripcion.getIdguardia();
+					String idpersona = inscripcion.getIdpersona();
 					String saltos = "S";
 					String compensaciones = "C";
 
@@ -747,24 +758,27 @@ public class InscripcionServiceImpl implements InscripcionService {
 					// buscar primero los saltos y si hay que los borre, que primero busque para que
 					// no de error de eliminación si no hay
 					saltosList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(idInstitucion.toString(),
-							idturno, idguardia, idpersona, saltos);
+							idturno, idguardia, idpersona);
 
 					if (saltosList.size() > 0) {
 						// query de eliminar saltos
+						
 						saltosN = inscripcionGuardiaExtensdsMapper.getEliminarSaltoCompensancion(
-								idInstitucion.toString(), idturno, idguardia, idpersona, saltos);
+								idInstitucion.toString(), idturno, idguardia, idpersona);
 					}
-					// lo mismo para las compensaciones
-					compensacionesList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(
-							idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
-					if (compensacionesList.size() > 0) {
-						// query de eliminar compensaciones
-						compensacionesN = inscripcionGuardiaExtensdsMapper.getEliminarSaltoCompensancion(
-								idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
-					}
+//					// lo mismo para las compensaciones
+//					compensacionesList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(
+//							idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
+//					if (compensacionesList.size() > 0) {
+//						// query de eliminar compensaciones
+//						compensacionesN = inscripcionGuardiaExtensdsMapper.getEliminarSaltoCompensancion(
+//								idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
+//					}
 
-					if (saltosN == 0 || compensacionesN == 0)
+					if (saltosN != 0 || compensacionesN != 0) {
 						contadorKO++;
+					}
+						
 				}
 
 				LOGGER.info(
@@ -772,10 +786,15 @@ public class InscripcionServiceImpl implements InscripcionService {
 			}
 		}
 
-		if (contadorKO == 1)
-			drp.setStatus(SigaConstants.OK);
-		else
+		if (contadorKO != 0) {
 			drp.setStatus(SigaConstants.KO);
+			throw (new Exception());
+		}
+			
+		else {
+			drp.setStatus(SigaConstants.OK);
+		}
+			
 
 		return drp;
 

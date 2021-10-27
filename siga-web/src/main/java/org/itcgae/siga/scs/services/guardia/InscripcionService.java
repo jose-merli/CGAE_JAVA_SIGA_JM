@@ -41,7 +41,7 @@ public interface InscripcionService {
 			HttpServletRequest request);
 
 	public DeleteResponseDTO eliminarSaltosCompensaciones(List<BusquedaInscripcionMod> eliminarSaltosCompensaciones,
-			HttpServletRequest request);
+			HttpServletRequest request) throws Exception;
 
 	public Boolean buscarTrabajosSJCS(List<BusquedaInscripcionMod> buscarTrabajosSJCS, HttpServletRequest request);
 

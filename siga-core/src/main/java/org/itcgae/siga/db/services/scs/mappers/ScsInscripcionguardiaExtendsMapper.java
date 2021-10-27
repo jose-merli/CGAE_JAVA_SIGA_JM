@@ -248,20 +248,25 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getSaltoCompensacionesActivo")
 	@Results({ 
 	})
-	List<SaltoCompGuardiaItem> getBuscarSaltoCompensancion(String idInstitucion, String idturno, String idguardia, String idpersona,
-			String saltos);
+	List<SaltoCompGuardiaItem> getBuscarSaltoCompensancion(String idInstitucion, String idturno, String idguardia, String idpersona);
 
 
 
 	@DeleteProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "eliminarSaltoCompensacion")
-	int getEliminarSaltoCompensancion(String string, String idturno, String idguardia, String idpersona, String saltos);
+	int getEliminarSaltoCompensancion(String idinstitucion, String idturno, String idguardia, String idpersona);
 
 
 
-	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "buscarTrabajosSJCS")
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "busquedaTrabajosGuardias")
 	@Results({ 
 	})
-	List<TrabajosSJCSInsGuardiaItem> getBuscarTrabajosSJCS(String idInstitucion, String idturno, String idguardia, String idpersona, String fECHADESDE, String fECHAHASTA);
+	List<TrabajosSJCSInsGuardiaItem> busquedaTrabajosGuardias(String idpersona,String idturno,String idguardia ,Short idInstitucion,String fechaActual);
+	
+	
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "busquedaTrabajosPendientes")
+	@Results({ 
+	})
+	List<TrabajosSJCSInsGuardiaItem> busquedaTrabajosPendientes(String idpersona,String idturno ,Short idInstitucion,String fechaActual);
 
 
 
