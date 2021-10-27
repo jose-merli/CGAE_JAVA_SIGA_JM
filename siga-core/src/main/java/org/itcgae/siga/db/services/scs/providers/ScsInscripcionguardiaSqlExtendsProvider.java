@@ -390,22 +390,28 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 			 subQuerysql4.WHERE("tur2.idturno in ("+ inscripciones.getIdturno()+")");
 	        }
 		
-		sql.SELECT("( CASE WHEN ins.fechadenegacion IS NOT NULL"
-                + "     AND ins.fechabaja IS NOT NULL"
-                + "     AND ins.fechasolicitudbaja IS NOT NULL"
-                + "     AND ins.fechavalidacion IS NOT NULL THEN '4' /*Denegada*/ "
-                + "WHEN ins.fechadenegacion IS NULL AND ins.fechabaja IS NOT NULL"
-                + "     AND ins.fechasolicitudbaja IS NOT NULL"
-                + "     AND ins.fechavalidacion IS NOT NULL THEN '3' /*Baja*/"
-                + "WHEN ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL"
-                + "     AND ins.fechasolicitudbaja IS NOT NULL"
-                + "     AND ins.fechavalidacion IS NOT NULL THEN '2' /*Pendiente de Baja*/"
-                + "WHEN ins.fechadenegacion IS NULL AND ins.fechabaja IS NULL"
-                + "     AND ins.fechasolicitudbaja IS NULL"
-                + "     AND ins.fechavalidacion IS NOT NULL THEN '1' /*Alta*/"
-                + "ELSE '0' /*Pendiente de Alta*/" + " END) estado");
+		sql.SELECT("(CASE"
+				+ "            WHEN ins.fechadenegacion IS NOT NULL"
+				+ "                 AND ins.fechabaja IS NOT NULL"
+				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
+				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '4'"
+				+ "            WHEN ins.fechadenegacion IS NULL"
+				+ "                 AND ins.fechabaja IS NOT NULL"
+				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
+				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '3'"
+				+ "            WHEN ins.fechadenegacion IS NULL"
+				+ "                 AND ins.fechabaja IS NULL"
+				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
+				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '2'"
+				+ "            WHEN ins.fechadenegacion IS NULL"
+				+ "                 AND ins.fechabaja IS NULL"
+				+ "                 AND ins.fechasolicitudbaja IS NULL"
+				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '1'"
+				+ "            ELSE '0' "
+				+ "        END"
+				+ "    ) estado");
 		
-		sql.SELECT("tur.nombre");
+		sql.SELECT("tur.nombre nombreturno");
 		sql.SELECT("tur.abreviatura abreviatura");
 		sql.SELECT("tur.validarinscripciones");	
 		sql.SELECT("tur.validarjustificaciones");
@@ -440,10 +446,10 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sql.SELECT("DECODE(tur.guardias,0,'Obligatorias',DECODE(tur.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad");
 
         sql.FROM("scs_inscripcionguardia ins");
+        sql.INNER_JOIN("SCS_GUARDIASTURNO guar on guar.IDGUARDIA = ins.IDGUARDIA and guar.IDINSTITUCION = ins.IDINSTITUCION");
         sql.INNER_JOIN("cen_colegiado col ON col.idpersona = ins.idpersona AND col.idinstitucion = ins.idinstitucion");
         sql.INNER_JOIN("cen_persona per ON per.idpersona = col.idpersona");
         sql.INNER_JOIN("scs_turno tur ON tur.idturno = ins.idturno AND tur.idinstitucion = ins.idinstitucion");
-        sql.INNER_JOIN("scs_guardiasturno guar ON guar.idturno = tur.idturno AND guar.idinstitucion = ins.idinstitucion");
 
  
         if(idInstitucion != null) {
@@ -499,14 +505,12 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
         
         sql.WHERE("ins.fechasuscripcion = (" + subQuerysql + ")");
         
-        sql.WHERE("guar.nombre = (" + subQuerysql2 + ")");
-        
-        sql.WHERE("guar.descripcion = (" + subQuerysql3 + ")");
+//        sql.WHERE("guar.nombre = (" + subQuerysql2 + ")");
+//        
+//        sql.WHERE("guar.descripcion = (" + subQuerysql3 + ")");
         
         sql.WHERE("tur.validarjustificaciones = (" + subQuerysql4 + ")");
-        
-        sql.WHERE("fechadenegacion IS NULL");
-        sql.WHERE("fechavalidacion IS NOT NULL");
+
         
         if(inscripciones.getaFechaDe() != null) {
         	sql.WHERE("ins.fechasuscripcion >= TO_DATE('" + inscripciones.getaFechaDe() + "','DD/MM/RRRR')");
@@ -518,6 +522,10 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
         
         if(inscripciones.getFechaHasta() != null) {
         	 sql.WHERE("ins.fechasuscripcion <= TO_DATE('" + inscripciones.getFechaHasta() + "','DD/MM/RRRR')");
+        }
+        
+        if(inscripciones.getnColegiado() != null) {
+        	sql.WHERE("col.ncolegiado = " + inscripciones.getnColegiado());
         }
         
         sql.WHERE("ROWNUM <= 200");
@@ -1363,7 +1371,8 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		"scs_guardiasturno.nombre AS nombre_guardia",
 		"gen_recursos_catalogos.descripcion AS descripcion_tipo_guardia",
 		"scs_turno.guardias AS obligatoriedad_inscripcion",
-		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad");
+		"DECODE(scs_turno.guardias,0,'Obligatorias',DECODE(scs_turno.guardias,2,'A elegir','Todas o ninguna') ) AS descripcion_obligatoriedad,"
+		+ "scs_inscripcionguardia.fechasuscripcion");
 		
 		sql.FROM("scs_inscripcionguardia");
 		//Left Join
@@ -1380,12 +1389,12 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		//Left Join
 		sql.JOIN("gen_recursos_catalogos ON scs_tiposguardias.descripcion = gen_recursos_catalogos.idrecurso");
 		
-		sql.WHERE("scs_guardiasturno.porgrupos = 1",
-		"scs_guardiasturno.fechabaja IS NULL",
-		"scs_turno.fechabaja IS NULL",
-		"scs_inscripcionguardia.idpersona = " + inscripcion.getIdpersona(),
-		"scs_inscripcionguardia.idinstitucion = " + idInstitucion,
-		"gen_recursos_catalogos.idlenguaje = 1"
+		sql.WHERE("scs_guardiasturno.porgrupos = 1"
+				+ " AND scs_guardiasturno.fechabaja IS NULL"
+				+ " AND scs_turno.fechabaja IS NULL"
+				+ " AND scs_inscripcionguardia.idpersona <> " + inscripcion.getIdpersona()
+				+ " AND scs_inscripcionguardia.idinstitucion = " + idInstitucion
+				+ " AND gen_recursos_catalogos.idlenguaje = 1"
 		);
 		return sql.toString();
 	}

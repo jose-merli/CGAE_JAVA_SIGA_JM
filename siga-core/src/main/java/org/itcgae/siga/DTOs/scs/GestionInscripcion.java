@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
+import java.util.Date;
+
 public class GestionInscripcion {
 
 	private String idGuardia;
@@ -21,6 +23,7 @@ public class GestionInscripcion {
 	private String descripcionNombreGuardia;
 	private String obligatoriedadInscripcion;
 	private String descripcionObligatoriedad;
+	private Date fechasolicitud;
 	
 
 	public String getIdGuardia() {
@@ -174,6 +177,13 @@ public class GestionInscripcion {
 	public void setDescripcionObligatoriedad(String descripcionObligatoriedad) {
 		this.descripcionObligatoriedad = descripcionObligatoriedad;
 	}
+	public Date getFechasolicitud() {
+		return fechasolicitud;
+	}
+
+	public void setFechasolicitud(Date fechasolicitud) {
+		this.fechasolicitud = fechasolicitud;
+	}
 
 	@Override
 	public String toString() {
@@ -183,6 +193,8 @@ public class GestionInscripcion {
 				+ nombreZona + ", idSubzona=" + idSubzona + ", nombreSubzona=" + nombreSubzona + ", idArea=" + idArea
 				+ ", nombreArea=" + nombreArea + ", idMateria=" + idMateria + ", nombreMateria=" + nombreMateria
 				+ ", descripcionNombreGuardia=" + descripcionNombreGuardia + ", obligatoriedadInscripcion="
-				+ obligatoriedadInscripcion + ", descripcionObligatoriedad=" + descripcionObligatoriedad + "]";
+				+ obligatoriedadInscripcion + ", descripcionObligatoriedad=" + descripcionObligatoriedad + ", fechasolicitud=" + fechasolicitud +"]";
 	}
+
+
 }

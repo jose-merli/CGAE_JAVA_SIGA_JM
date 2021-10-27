@@ -29,7 +29,7 @@ public interface InscripcionService {
 
 	public ComboDTO comboLetrados(HttpServletRequest request, String idGuardia);
 	
-	public UpdateResponseDTO validarInscripciones(List<BusquedaInscripcionMod> validarbody, HttpServletRequest request);
+	public UpdateResponseDTO validarInscripciones(List<BusquedaInscripcionMod> validarbody, HttpServletRequest request) throws Exception;
 	
 	public UpdateResponseDTO denegarInscripcion(List<BusquedaInscripcionMod> denegarbody, HttpServletRequest request);
 	
