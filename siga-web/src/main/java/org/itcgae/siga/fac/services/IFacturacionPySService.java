@@ -3,10 +3,7 @@ package org.itcgae.siga.fac.services;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
-import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
-import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
-import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
+import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -28,5 +25,9 @@ public interface IFacturacionPySService {
 	public UpdateResponseDTO reactivarSerieFacturacion(List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request);
     public ComboDTO comboPlanificacion(String idSerieFacturacion, HttpServletRequest request);
     public UpdateResponseDTO guardarSerieFacturacion(SerieFacturacionItem serieFacturacion, HttpServletRequest request);
+	public ComboDTO getEtiquetasSerie(String idSerieFacturacion, HttpServletRequest request);
+	public DestinatariosSeriesDTO getDestinatariosSeries(String idSerieFacturacion, HttpServletRequest request);
+	public ComboDTO comboPlantillasEnvio(HttpServletRequest request);
+
 }
  

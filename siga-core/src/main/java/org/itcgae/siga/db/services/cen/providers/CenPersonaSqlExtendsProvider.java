@@ -539,7 +539,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		return sql.toString();
 	}
 	
-	public String getDestinatariosSerie(Short idInstitucion, String idSerieFacturacion) {
+	public String getDestinatariosSeries(Short idInstitucion, String idSerieFacturacion) {
 		SQL sql = new SQL();
 		
 		// Select

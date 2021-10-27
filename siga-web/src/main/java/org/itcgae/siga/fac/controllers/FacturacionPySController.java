@@ -2,10 +2,7 @@ package org.itcgae.siga.fac.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
-import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
-import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
-import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
+import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -100,6 +97,24 @@ public class FacturacionPySController {
 	ResponseEntity<UpdateResponseDTO> guardarSerieFacturacion(@RequestBody SerieFacturacionItem serieFacturacion, HttpServletRequest request) {
 		UpdateResponseDTO response = facturacionService.guardarSerieFacturacion(serieFacturacion, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/getEtiquetasSerie")
+	ResponseEntity<ComboDTO> getEtiquetasSerie(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
+		ComboDTO response = facturacionService.getEtiquetasSerie(idSerieFacturacion, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/getDestinatariosSeries")
+	ResponseEntity<DestinatariosSeriesDTO> getDestinatariosSeries(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
+		DestinatariosSeriesDTO response = facturacionService.getDestinatariosSeries(idSerieFacturacion, request);
+		return new ResponseEntity<DestinatariosSeriesDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/comboPlantillasEnvio")
+	ResponseEntity<ComboDTO> getDestinatariosSeries(HttpServletRequest request) {
+		ComboDTO response = facturacionService.comboPlantillasEnvio(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
 }

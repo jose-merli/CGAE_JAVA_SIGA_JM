@@ -165,4 +165,26 @@ public class EnvPlantillaEnviosExtendsSqlProvider extends EnvPlantillasenviosSql
 		
 		return sql.toString();
 	}
+
+	public String comboPlantillasEnvio(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		// Select
+		sql.SELECT("e.idplantillaenvios");
+		sql.SELECT("e.nombre");
+
+		// From
+		sql.FROM("env_plantillasenvios e");
+
+		// Where
+		sql.WHERE("e.idinstitucion = " + idInstitucion);
+		sql.WHERE("e.idtipoenvios = ( SELECT  idtipoenvios FROM env_tipoenvios WHERE upper(f_siga_getrecurso(nombre, 1)) LIKE '%ELEC%NICO%' )");
+		sql.WHERE("fechabaja IS NULL");
+
+		// Order by
+		sql.ORDER_BY("e.nombre");
+
+
+		return sql.toString();
+	}
 }

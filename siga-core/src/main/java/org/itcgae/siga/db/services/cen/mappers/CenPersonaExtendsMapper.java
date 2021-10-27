@@ -181,7 +181,7 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	})
 	List<ColegiadoJGItem> busquedaColegiadoExpress(String colegiadoJGItem, String idInstitucion);
 	
-	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDestinatariosSerie")
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getDestinatariosSeries")
 	@Results({
 		@Result(column = "idpersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
@@ -192,6 +192,6 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "correoelectronico", property = "correoElectronico", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "domicilio", property = "domicilio", jdbcType = JdbcType.VARCHAR),
 	})
-	List<DestinatariosSeriesItem> getDestinatariosSerie(Short idInstitucion, String idSerieFacturacion);
+	List<DestinatariosSeriesItem> getDestinatariosSeries(Short idInstitucion, String idSerieFacturacion);
 	
 }
