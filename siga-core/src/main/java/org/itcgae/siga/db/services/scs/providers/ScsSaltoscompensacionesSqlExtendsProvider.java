@@ -92,11 +92,11 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.WHERE("IDGUARDIA IS NOT NULL");
 
 		if (!UtilidadesString.esCadenaVacia(salto.getFechaDesde())) {
-			sql.WHERE("TRUNC(FECHA) >= TRUNC(TO_DATE(" + salto.getFechaDesde() + ", 'YYYY/MM/DD HH24:MI:SS'))");
+			sql.WHERE("TRUNC(FECHA) >= TRUNC(TO_DATE('" + salto.getFechaDesde() + "', 'DD/MM/YYYY'))");
 		}
 
 		if (!UtilidadesString.esCadenaVacia(salto.getFechaHasta())) {
-			sql.WHERE("TRUNC(FECHA) <= TRUNC(TO_DATE(" + salto.getFechaHasta() + ", 'YYYY/MM/DD HH24:MI:SS'))");
+			sql.WHERE("TRUNC(FECHA) <= TRUNC(TO_DATE('" + salto.getFechaHasta() + "', 'DD/MM/YYYY'))");
 		}
 
 		sql.ORDER_BY("FECHA DESC, IDSALTOSTURNO DESC");

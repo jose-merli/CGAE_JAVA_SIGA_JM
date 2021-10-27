@@ -149,6 +149,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	@Autowired
 	private ScsHitofacturableguardiaExtendsMapper scsHitofacturableguardiaExtendsMapper;
 
+	@Autowired
+	private ScsTipoactuacionExtendsMapper scsTipoactuacionExtendsMapper;
+
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
 		String token = request.getHeader("Authorization");
@@ -515,6 +518,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return comboDTO;
 	}
 
+	@Transactional
 	@Override
 	public DeleteResponseDTO guardarAsistenciasExpres(HttpServletRequest request,
 			List<TarjetaAsistenciaResponseItem> asistencias) {
@@ -1115,6 +1119,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return idTipoAsistencia;
 	}
 
+	@Transactional
 	@Override
 	public InsertResponseDTO guardarAsistencia(HttpServletRequest request,
 			List<TarjetaAsistenciaResponseItem> asistencias, String idAsistenciaCopy) {
@@ -1174,6 +1179,32 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										scsSolicitudAceptada.setFechamodificacion(new Date());
 										
 										inserted += scsSolicitudAceptadaExtendsMapper.updateByPrimaryKeySelective(scsSolicitudAceptada);
+
+
+										List<ComboItem> tiposActuaciones = scsTipoactuacionExtendsMapper.getComboActuacion(asistencia.getIdtipoasistencia().toString(),usuarios.get(0).getIdlenguaje(),idInstitucion);
+
+										//Además le creamos su primera actuacion
+										ScsActuacionasistencia scsActuacionasistencia = new ScsActuacionasistencia();
+										scsActuacionasistencia.setAnio(asistencia.getAnio());
+										scsActuacionasistencia.setNumero(asistencia.getNumero());
+										scsActuacionasistencia.setIdinstitucion(idInstitucion);
+										scsActuacionasistencia.setIdactuacion((long)1);
+										scsActuacionasistencia.setIdtipoactuacion(Short.valueOf(tiposActuaciones.get(0).getValue()));
+										scsActuacionasistencia.setFecha(asistencia.getFechahora());
+										scsActuacionasistencia.setIdtipoasistencia(asistencia.getIdtipoasistencia());
+										scsActuacionasistencia.setIdcomisaria(asistencia.getComisaria());
+										scsActuacionasistencia.setIdinstitucionComis(asistencia.getComisariaidinstitucion());
+										scsActuacionasistencia.setIdjuzgado(asistencia.getJuzgado());
+										scsActuacionasistencia.setIdinstitucionJuzg(asistencia.getJuzgadoidinstitucion());
+										scsActuacionasistencia.setNig(asistencia.getNig());
+										scsActuacionasistencia.setDiadespues("N");
+										scsActuacionasistencia.setValidada("0");
+										scsActuacionasistencia.setAcuerdoextrajudicial((short)0);
+										scsActuacionasistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+										scsActuacionasistencia.setFechamodificacion(new Date());
+										scsActuacionasistencia.setUsucreacion(usuarios.get(0).getIdusuario());
+										scsActuacionasistencia.setFechacreacion(new Date());
+										inserted += scsActuacionasistenciaExtendsMapper.insert(scsActuacionasistencia);
 									}
 									//Si viene relleno el idAsistenciaCopy deberemos copiar los datos de dicha asistencia
 									if(!UtilidadesString.esCadenaVacia(idAsistenciaCopy)){
@@ -1533,7 +1564,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							}
 
 							//Primera Relacion
-							List<RelacionesItem> relaciones = scsAsistenciaExtendsMapper.searchRelaciones(anio,numero,idInstitucion,Integer.valueOf(usuarios.get(0).getIdlenguaje()).intValue(),1);
+							List<RelacionesItem> relaciones = scsAsistenciaExtendsMapper.searchRelaciones(anio,numero,idInstitucion,Integer.valueOf(usuarios.get(0).getIdlenguaje()).intValue(),2);
 							if(relaciones != null
                                 && !relaciones.isEmpty()){
 							    asistenciaResponse.setPrimeraRelacion(relaciones.get(0));

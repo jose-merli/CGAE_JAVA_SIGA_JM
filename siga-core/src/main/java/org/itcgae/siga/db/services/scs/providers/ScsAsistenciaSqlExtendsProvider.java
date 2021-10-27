@@ -565,11 +565,11 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 
 
 		SQL_PADRE.SELECT(" *");
-		SQL_PADRE.FROM("( " + SQL_DESIGNAS.toString() + "UNION " + SQL_EJG.toString() +" )");
+		SQL_PADRE.FROM("( " + SQL_EJG.toString() + " UNION " + SQL_DESIGNAS.toString() +" )");
 		if(tamMax != null && tamMax > 0) {
 			SQL_PADRE.WHERE(" ROWNUM <= " + tamMax);
 		}
-		SQL_PADRE.ORDER_BY("sjcs",
+		SQL_PADRE.ORDER_BY( "sjcs DESC",
 				"idinstitucion",
 				"anio DESC",
 				"codigo DESC");
