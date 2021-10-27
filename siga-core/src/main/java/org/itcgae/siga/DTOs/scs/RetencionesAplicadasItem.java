@@ -10,8 +10,6 @@ public class RetencionesAplicadasItem {
     private String tipoRetencion;
     private String numColegiado;
     private String nombre;
-    private String apellidos1;
-    private String apellidos2;
     private String idDestinatario;
     private String nombreDestinatario;
     private String desDestinatario;
@@ -20,8 +18,7 @@ public class RetencionesAplicadasItem {
     private Date fechaRetencion;
     private String importeRetenido;
     private String idPagosjg;
-    private String mes;
-    private String anio;
+    private String anioMes;
     private String pagoRelacionado;
     private String abonoRelacionado;
     private String idCobro;
@@ -30,5 +27,6 @@ public class RetencionesAplicadasItem {
     private String idPersona;
     private String fechaDesde;
     private String fechaHasta;
+    private String importePago;
 
 }

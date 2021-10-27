@@ -4,9 +4,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.scs.RetencionesAplicadasItem;
-import org.itcgae.siga.DTOs.scs.RetencionesItem;
-import org.itcgae.siga.DTOs.scs.RetencionesRequestDTO;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.db.mappers.FcsRetencionesJudicialesMapper;
 import org.itcgae.siga.db.services.fcs.providers.FcsRetencionesJudicialesSqlExtendsProvider;
 import org.springframework.stereotype.Service;
@@ -39,8 +37,6 @@ public interface FcsRetencionesJudicialesExtendsMapper extends FcsRetencionesJud
             @Result(column = "TIPORETENCION", property = "tipoRetencion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
             @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDDESTINATARIO", property = "idDestinatario", jdbcType = JdbcType.VARCHAR),
             @Result(column = "NOMBREDESTINATARIO", property = "nombreDestinatario", jdbcType = JdbcType.VARCHAR),
             @Result(column = "DESCDESTINATARIO", property = "desDestinatario", jdbcType = JdbcType.VARCHAR),
@@ -49,8 +45,7 @@ public interface FcsRetencionesJudicialesExtendsMapper extends FcsRetencionesJud
             @Result(column = "FECHARETENCION", property = "fechaRetencion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTERETENIDO", property = "importeRetenido", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDPAGOSJG", property = "idPagosjg", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "MES", property = "mes", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ANIOMES", property = "anioMes", jdbcType = JdbcType.VARCHAR),
             @Result(column = "PAGORELACIONADO", property = "pagoRelacionado", jdbcType = JdbcType.VARCHAR),
             @Result(column = "ABONORELACIONADO", property = "abonoRelacionado", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDCOBRO", property = "idCobro", jdbcType = JdbcType.VARCHAR),
@@ -58,7 +53,24 @@ public interface FcsRetencionesJudicialesExtendsMapper extends FcsRetencionesJud
             @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
             @Result(column = "FECHADESDE", property = "fechaDesde", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "FECHAHASTA", property = "fechaHasta", jdbcType = JdbcType.VARCHAR)
+            @Result(column = "FECHAHASTA", property = "fechaHasta", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTEPAGO", property = "importePago", jdbcType = JdbcType.VARCHAR)
     })
     List<RetencionesAplicadasItem> searchRetencionesAplicadas(Short idInstitucion, RetencionesRequestDTO retencionesRequestDTO, Integer tamMaximo);
+
+    @SelectProvider(type = FcsRetencionesJudicialesSqlExtendsProvider.class, method = "getAplicacionesRetenciones")
+    @Results({
+            @Result(column = "ANIOMES", property = "anioMes", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "TIPORETENCION", property = "tipoRetencion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTEANTAPLICARETENCION", property = "importeAntAplicaRetencion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTEANTRETENIDO", property = "importeAntRetenido", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTEAPLICARETENCION", property = "importeAplicaRetencion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTERETENIDO", property = "importeRetenido", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTETOTAPLICARETENCION", property = "importeTotAplicaRetencion", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTETOTRETENIDO", property = "importeTotRetenido", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "IMPORTESMI", property = "importeSmi", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "COLEGIADO", property = "colegiado", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "NOMBREPAGO", property = "nombrePago", jdbcType = JdbcType.VARCHAR)
+    })
+    List<AplicacionRetencionItem> getAplicacionesRetenciones(Short idInstitucion, AplicacionRetencionRequestDTO aplicacionRetencionRequestDTO);
 }

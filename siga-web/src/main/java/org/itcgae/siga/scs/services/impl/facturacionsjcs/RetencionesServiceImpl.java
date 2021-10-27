@@ -3,10 +3,9 @@ package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.scs.RetencionesDTO;
-import org.itcgae.siga.DTOs.scs.RetencionesItem;
-import org.itcgae.siga.DTOs.scs.RetencionesRequestDTO;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -95,7 +94,7 @@ public class RetencionesServiceImpl implements IRetencionesService {
                     retencionesDTO.setRetencionesItemList(retencionesItems);
 
                 } else {
-                    LOGGER.warn("PagoSJCSServiceImpl.buscarPagos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                    LOGGER.warn("RetencionesServiceImpl.searchRetenciones() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
                             + dni + " e idInstitucion = " + idInstitucion);
                 }
             } else {
@@ -103,7 +102,7 @@ public class RetencionesServiceImpl implements IRetencionesService {
             }
 
         } catch (Exception e) {
-            LOGGER.error("RetencionesServiceImpl.searchRetenciones() -> Se ha producido un error en la busqueda de rtenciones", e);
+            LOGGER.error("RetencionesServiceImpl.searchRetenciones() -> Se ha producido un error en la busqueda de retenciones", e);
             error.setCode(500);
             error.setDescription("general.mensaje.error.bbdd");
         }
@@ -146,6 +145,8 @@ public class RetencionesServiceImpl implements IRetencionesService {
                 fcsRetencionesJudicialesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
                         .andIdretencionIn(retencionesNoAplicadas);
 
+                LOGGER.info("RetencionesServiceImpl.deleteRetenciones() -> fcsRetencionesJudicialesExtendsMapper.deleteByExample() -> " +
+                        "Eliminamos las retenciones no aplicadas");
                 fcsRetencionesJudicialesExtendsMapper.deleteByExample(fcsRetencionesJudicialesExample);
             }
 
@@ -157,6 +158,8 @@ public class RetencionesServiceImpl implements IRetencionesService {
                 FcsRetencionesJudiciales fcsRetencionesJudiciales = new FcsRetencionesJudiciales();
                 fcsRetencionesJudiciales.setFechafin(new Date());
 
+                LOGGER.info("RetencionesServiceImpl.deleteRetenciones() -> fcsRetencionesJudicialesExtendsMapper.updateByExampleSelective() -> " +
+                        "Establecemos fecha de fin a las retenciones aplicadas");
                 fcsRetencionesJudicialesExtendsMapper.updateByExampleSelective(fcsRetencionesJudiciales, fcsRetencionesJudicialesExample);
             }
 
@@ -172,6 +175,145 @@ public class RetencionesServiceImpl implements IRetencionesService {
         LOGGER.info("RetencionesServiceImpl.deleteRetenciones() -> Salida del servicio de eliminacion de retenciones");
 
         return deleteResponseDTO;
+    }
+
+    @Override
+    public RetencionesAplicadasDTO searchRetencionesAplicadas(RetencionesRequestDTO retencionesRequestDTO, HttpServletRequest request) {
+
+        LOGGER.info("RetencionesServiceImpl.searchRetencionesAplicadas() -> Entrada al servicio de busqueda de retenciones aplicadas");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        List<GenParametros> tamMax = null;
+        Integer tamMaximo = null;
+        Error error = new Error();
+        RetencionesAplicadasDTO retencionesAplicadasDTO = new RetencionesAplicadasDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info(
+                        "RetencionesServiceImpl.searchRetencionesAplicadas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "RetencionesServiceImpl.searchRetencionesAplicadas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    GenParametrosExample genParametrosExample = new GenParametrosExample();
+                    genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+                            .andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+                    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+                    LOGGER.info("RetencionesServiceImpl.searchRetencionesAplicadas() / genParametrosMapper.selectByExample() -> Entrada a genParametrosExtendsMapper " +
+                            "para obtener tamaño máximo consulta");
+
+                    tamMax = genParametrosMapper.selectByExample(genParametrosExample);
+
+                    LOGGER.info("RetencionesServiceImpl.searchRetencionesAplicadas() / genParametrosMapper.selectByExample() -> Salida a genParametrosExtendsMapper para " +
+                            "obtener tamaño máximo consulta");
+
+                    if (tamMax != null) {
+                        tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+                    } else {
+                        tamMaximo = null;
+                    }
+
+                    LOGGER.info("RetencionesServiceImpl.searchRetencionesAplicadas() -> fcsRetencionesJudicialesExtendsMapper.searchRetencionesAplicadas() -> Inicio de consulta de retenciones aplicadas");
+                    List<RetencionesAplicadasItem> retencionesAplicadasItemList = fcsRetencionesJudicialesExtendsMapper.searchRetencionesAplicadas(idInstitucion, retencionesRequestDTO, tamMaximo);
+                    LOGGER.info("RetencionesServiceImpl.searchRetencionesAplicadas() -> fcsRetencionesJudicialesExtendsMapper.searchRetencionesAplicadas()-> Fin de consulta de retenciones aplicadas");
+
+                    if (null != retencionesAplicadasItemList && retencionesAplicadasItemList.size() > tamMaximo) {
+                        retencionesAplicadasItemList.remove(retencionesAplicadasItemList.size() - 1);
+                        error.setCode(200);
+                        error.setDescription("general.message.consulta.resultados");
+                    }
+
+                    retencionesAplicadasDTO.setRetencionesAplicadasItemList(retencionesAplicadasItemList);
+
+                } else {
+                    LOGGER.warn("RetencionesServiceImpl.searchRetencionesAplicadas() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                            + dni + " e idInstitucion = " + idInstitucion);
+                }
+            } else {
+                LOGGER.warn("RetencionesServiceImpl.searchRetencionesAplicadas() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("RetencionesServiceImpl.searchRetencionesAplicadas() -> Se ha producido un error en la busqueda de retenciones aplicadas", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        retencionesAplicadasDTO.setError(error);
+
+        LOGGER.info("RetencionesServiceImpl.searchRetencionesAplicadas() -> Salida del servicio de busqueda de retenciones aplicadas");
+
+        return retencionesAplicadasDTO;
+    }
+
+    @Override
+    public AplicacionRetencionDTO getAplicacionesRetenciones(AplicacionRetencionRequestDTO aplicacionRetencionRequestDTO, HttpServletRequest request) {
+
+        LOGGER.info("RetencionesServiceImpl.getAplicacionesRetenciones() -> Entrada al servicio para obtener las aplicaciones de la retencion");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        AplicacionRetencionDTO aplicacionRetencionDTO = new AplicacionRetencionDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info(
+                        "RetencionesServiceImpl.getAplicacionesRetenciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "RetencionesServiceImpl.getAplicacionesRetenciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    if (!UtilidadesString.esCadenaVacia(aplicacionRetencionRequestDTO.getIdPersona()) && !UtilidadesString.esCadenaVacia(aplicacionRetencionRequestDTO.getFechaPagoDesde())
+                            && !UtilidadesString.esCadenaVacia(aplicacionRetencionRequestDTO.getFechaPagoHasta())) {
+
+                        LOGGER.info("RetencionesServiceImpl.getAplicacionesRetenciones() / fcsRetencionesJudicialesExtendsMapper.getAplicacionesRetenciones() -> Inicio de la consulta para la busqueda de las aplicaciones de la retencion");
+                        List<AplicacionRetencionItem> aplicacionRetencionItemList = fcsRetencionesJudicialesExtendsMapper.getAplicacionesRetenciones(idInstitucion, aplicacionRetencionRequestDTO);
+                        LOGGER.info("RetencionesServiceImpl.getAplicacionesRetenciones() / fcsRetencionesJudicialesExtendsMapper.getAplicacionesRetenciones() -> Fin de la consulta para la busqueda de las aplicaciones de la retencion");
+                        aplicacionRetencionDTO.setAplicacionRetencionItemList(aplicacionRetencionItemList);
+
+                    } else {
+                        LOGGER.error("RetencionesServiceImpl.getAplicacionesRetenciones() -> Alguno de los parámetro de entrada no encontrados");
+                    }
+
+                } else {
+                    LOGGER.warn("RetencionesServiceImpl.getAplicacionesRetenciones() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                            + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("RetencionesServiceImpl.getAplicacionesRetenciones() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("RetencionesServiceImpl.getAplicacionesRetenciones() -> Se ha producido un error en obtencion de las aplicaciones de la retencion", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        aplicacionRetencionDTO.setError(error);
+
+        LOGGER.info("RetencionesServiceImpl.getAplicacionesRetenciones() -> Salida del servicio para obtener las aplicaciones de la retencion");
+
+        return aplicacionRetencionDTO;
     }
 
 }

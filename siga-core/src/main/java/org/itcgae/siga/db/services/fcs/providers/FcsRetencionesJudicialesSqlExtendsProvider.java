@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.fcs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.scs.AplicacionRetencionRequestDTO;
 import org.itcgae.siga.DTOs.scs.RetencionesRequestDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.FcsRetencionesJudicialesSqlProvider;
@@ -183,21 +184,6 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         return superQuery.toString();
     }
 
-    public String searchAplicacionRetenciones(Short idInstitucion) {
-
-        SQL sql = new SQL();
-        sql.SELECT("FECHADESDE");
-        sql.SELECT("FECHAHASTA");
-        sql.SELECT("FECHAESTADO");
-        sql.SELECT("IMPORTEPAGADO");
-        sql.SELECT("NOMBRE");
-        sql.FROM("FCS_PAGOSJG");
-        sql.WHERE("IDINSTITUCION = " + idInstitucion);
-        sql.WHERE("IDPAGOSJG IN ");
-
-        return sql.toString();
-    }
-
     public String searchRetencionesAplicadas(Short idInstitucion, RetencionesRequestDTO retencionesRequestDTO, Integer tamMaximo) {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -206,9 +192,7 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
 
         sql.SELECT("RET.TIPORETENCION");
         sql.SELECT("F_SIGA_CALCULONCOLEGIADO(COB.IDINSTITUCION,COB.IDPERSONA) NCOLEGIADO");
-        sql.SELECT("PER.NOMBRE");
-        sql.SELECT("PER.APELLIDOS1");
-        sql.SELECT("PER.APELLIDOS2");
+        sql.SELECT("(PER.APELLIDOS2 || ' ' || PER.APELLIDOS1 || ', ' || PER.NOMBRE) NOMBRE");
         sql.SELECT("RET.IDDESTINATARIO");
         sql.SELECT("DEST.NOMBRE NOMBREDESTINATARIO");
         sql.SELECT("RET.DESCDESTINATARIO");
@@ -217,8 +201,7 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         sql.SELECT("COB.FECHARETENCION");
         sql.SELECT("COB.IMPORTERETENIDO");
         sql.SELECT("COB.IDPAGOSJG");
-        sql.SELECT("LPAD(COB.MES, 2, '0') MES");
-        sql.SELECT("COB.ANIO");
+        sql.SELECT("COB.ANIO || '/' || LPAD(COB.MES, 2, '0') ANIOMES");
         sql.SELECT("PAGO.NOMBRE PAGORELACIONADO");
         sql.SELECT("ABONO.NUMEROABONO ABONORELACIONADO");
         sql.SELECT("COB.IDCOBRO");
@@ -227,6 +210,7 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         sql.SELECT("COB.IDPERSONA");
         sql.SELECT("TO_CHAR(PAGO.FECHADESDE,'dd/mm/yyyy') FECHADESDE");
         sql.SELECT("TO_CHAR(PAGO.FECHAHASTA,'dd/mm/yyyy') FECHAHASTA");
+        sql.SELECT("(PCOL.IMPOFICIO + PCOL.IMPASISTENCIA + PCOL.IMPSOJ + PCOL.IMPEJG) IMPORTEPAGO");
 
         sql.FROM("FCS_COBROS_RETENCIONJUDICIAL COB");
         sql.FROM("FCS_RETENCIONES_JUDICIALES RET");
@@ -247,7 +231,7 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         sql.WHERE("PCOL.IDINSTITUCION = ABONO.IDINSTITUCION(+)");
         sql.WHERE("PCOL.IDPAGOSJG = ABONO.IDPAGOSJG(+)");
         sql.WHERE("PCOL.IDINSTITUCION = PAGO.IDINSTITUCION");
-        sql.WHERE("COL.IDPAGOSJG = PAGO.IDPAGOSJG");
+        sql.WHERE("PCOL.IDPAGOSJG = PAGO.IDPAGOSJG");
         sql.WHERE("PCOL.IDPERORIGEN = PER.IDPERSONA");
         sql.WHERE("COB.IDINSTITUCION = " + idInstitucion);
         if (!UtilidadesString.esCadenaVacia(retencionesRequestDTO.getIdPersona())) {
@@ -274,6 +258,10 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
             sql.WHERE("ABONO.NUMEROABONO = '" + retencionesRequestDTO.getNumeroAbono() + "'");
         }
 
+        if (!retencionesRequestDTO.isHistorico()) {
+            sql.WHERE("(RET.FECHAFIN IS NULL OR TRUNC(RET.FECHAFIN) >= TRUNC(SYSDATE))");
+        }
+
         sql.ORDER_BY("PER.APELLIDOS1");
         sql.ORDER_BY("PER.APELLIDOS2");
         sql.ORDER_BY("PER.NOMBRE");
@@ -285,7 +273,7 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
 
         SQL superQuery = new SQL();
         superQuery.SELECT("*");
-        superQuery.FROM("(" + sql.toString() + "");
+        superQuery.FROM("(" + sql.toString() + ")");
 
         if (tamMaximo != null) {
             Integer tamMaxNumber = tamMaximo + 1;
@@ -293,6 +281,110 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         }
 
         return superQuery.toString();
+    }
+
+    public String getAplicacionesRetenciones(Short idInstitucion, AplicacionRetencionRequestDTO aplicacionRetencionRequestDTO) {
+
+        SQL importeAntAplicaRetencion = new SQL();
+        importeAntAplicaRetencion.SELECT("NVL(SUM(COB2.IMPORTEAPLICARETENCION), 0)");
+        importeAntAplicaRetencion.FROM("FCS_COBROS_RETENCIONJUDICIAL COB2");
+        importeAntAplicaRetencion.FROM("FCS_RETENCIONES_JUDICIALES RET2");
+        importeAntAplicaRetencion.WHERE("COB2.IDINSTITUCION = COB.IDINSTITUCION");
+        importeAntAplicaRetencion.WHERE("COB2.IDPERSONA = COB.IDPERSONA");
+        importeAntAplicaRetencion.WHERE("COB2.MES = COB.MES");
+        importeAntAplicaRetencion.WHERE("COB2.ANIO = COB.ANIO");
+        importeAntAplicaRetencion.WHERE("COB2.IDINSTITUCION = RET2.IDINSTITUCION");
+        importeAntAplicaRetencion.WHERE("COB2.IDRETENCION = RET2.IDRETENCION");
+        importeAntAplicaRetencion.WHERE("RET2.TIPORETENCION = 'L'");
+        importeAntAplicaRetencion.WHERE("COB2.IDPAGOSJG < COB.IDPAGOSJG");
+
+        SQL importeAntRetenido = new SQL();
+        importeAntRetenido.SELECT("NVL(SUM(COB2.IMPORTERETENIDO), 0)");
+        importeAntRetenido.FROM("FCS_COBROS_RETENCIONJUDICIAL COB2");
+        importeAntRetenido.FROM("FCS_RETENCIONES_JUDICIALES RET2");
+        importeAntRetenido.WHERE("COB2.IDINSTITUCION = COB.IDINSTITUCION");
+        importeAntRetenido.WHERE("COB2.IDPERSONA = COB.IDPERSONA");
+        importeAntRetenido.WHERE("COB2.MES = COB.MES");
+        importeAntRetenido.WHERE("COB2.ANIO = COB.ANIO");
+        importeAntRetenido.WHERE("COB2.IDINSTITUCION = RET2.IDINSTITUCION");
+        importeAntRetenido.WHERE("COB2.IDRETENCION = RET2.IDRETENCION");
+        importeAntRetenido.WHERE("RET2.TIPORETENCION = 'L'");
+        importeAntRetenido.WHERE("COB2.IDPAGOSJG < COB.IDPAGOSJG");
+
+        SQL importeTotAplicaRetencion = new SQL();
+        importeTotAplicaRetencion.SELECT("NVL(SUM(COB2.IMPORTEAPLICARETENCION), 0)");
+        importeTotAplicaRetencion.FROM("FCS_COBROS_RETENCIONJUDICIAL COB2");
+        importeTotAplicaRetencion.FROM("FCS_RETENCIONES_JUDICIALES RET2");
+        importeTotAplicaRetencion.WHERE("COB2.IDINSTITUCION = COB.IDINSTITUCION");
+        importeTotAplicaRetencion.WHERE("COB2.IDPERSONA = COB.IDPERSONA");
+        importeTotAplicaRetencion.WHERE("COB2.MES = COB.MES");
+        importeTotAplicaRetencion.WHERE("COB2.ANIO = COB.ANIO");
+        importeTotAplicaRetencion.WHERE("COB2.IDINSTITUCION = RET2.IDINSTITUCION");
+        importeTotAplicaRetencion.WHERE("COB2.IDRETENCION = RET2.IDRETENCION");
+        importeTotAplicaRetencion.WHERE("RET2.TIPORETENCION = 'L'");
+        importeTotAplicaRetencion.WHERE("COB2.IDPAGOSJG < COB.IDPAGOSJG");
+
+        SQL importeTotRetenido = new SQL();
+        importeTotRetenido.SELECT("NVL(SUM(COB2.IMPORTERETENIDO), 0)");
+        importeTotRetenido.FROM("FCS_COBROS_RETENCIONJUDICIAL COB2");
+        importeTotRetenido.FROM("FCS_RETENCIONES_JUDICIALES RET2");
+        importeTotRetenido.WHERE("COB2.IDINSTITUCION = COB.IDINSTITUCION");
+        importeTotRetenido.WHERE("COB2.IDPERSONA = COB.IDPERSONA");
+        importeTotRetenido.WHERE("COB2.MES = COB.MES");
+        importeTotRetenido.WHERE("COB2.ANIO = COB.ANIO");
+        importeTotRetenido.WHERE("COB2.IDINSTITUCION = RET2.IDINSTITUCION");
+        importeTotRetenido.WHERE("COB2.IDRETENCION = RET2.IDRETENCION");
+        importeTotRetenido.WHERE("RET2.TIPORETENCION = 'L'");
+        importeTotRetenido.WHERE("COB2.IDPAGOSJG <= COB.IDPAGOSJG");
+
+        SQL importeSmi = new SQL();
+        importeSmi.SELECT("SMI.VALOR");
+        importeSmi.FROM("FCS_SMI SMI");
+        importeSmi.WHERE("SMI.ANIO = COB.ANIO");
+
+        SQL colegiado = new SQL();
+        colegiado.SELECT("C.NCOLEGIADO || ' ' || P.NOMBRE || ' ' || P.APELLIDOS1 || ' ' || NVL(P.APELLIDOS2, '')");
+        colegiado.FROM("CEN_PERSONA P");
+        colegiado.FROM("CEN_COLEGIADO C");
+        colegiado.WHERE("COB.IDINSTITUCION = C.IDINSTITUCION");
+        colegiado.WHERE("COB.IDPERSONA = C.IDPERSONA");
+        colegiado.WHERE("C.IDPERSONA = P.IDPERSONA");
+
+
+        SQL queryPrincipal = new SQL();
+        queryPrincipal.SELECT("COB.ANIO || '/' || LPAD(COB.MES, 2, '0') ANIOMES");
+        queryPrincipal.SELECT("RET.TIPORETENCION AS TIPORETENCION");
+        queryPrincipal.SELECT("(F_SIGA_FORMATONUMERO((" + importeAntAplicaRetencion.toString() + "), 2)) AS IMPORTEANTAPLICARETENCION");
+        queryPrincipal.SELECT("(F_SIGA_FORMATONUMERO((" + importeAntRetenido.toString() + "), 2)) AS IMPORTEANTRETENIDO");
+        queryPrincipal.SELECT("(F_SIGA_FORMATONUMERO(COB.IMPORTEAPLICARETENCION, 2)) AS IMPORTEAPLICARETENCION");
+        queryPrincipal.SELECT("(F_SIGA_FORMATONUMERO(COB.IMPORTERETENIDO, 2)) AS IMPORTERETENIDO");
+        queryPrincipal.SELECT("(F_SIGA_FORMATONUMERO((" + importeTotAplicaRetencion.toString() + ") + COB.IMPORTEAPLICARETENCION, 2)) AS IMPORTETOTAPLICARETENCION");
+        queryPrincipal.SELECT("(F_SIGA_FORMATONUMERO((" + importeTotRetenido.toString() + "), 2)) AS IMPORTETOTRETENIDO");
+        queryPrincipal.SELECT("(F_SIGA_FORMATONUMERO((" + importeSmi.toString() + "), 2)) AS IMPORTESMI");
+        queryPrincipal.SELECT("(" + colegiado.toString() + ") AS COLEGIADO");
+        queryPrincipal.SELECT("(PG.NOMBRE || ' (' || TO_CHAR(PG.FECHADESDE, 'DD/MM/YY') || '-' || TO_CHAR(PG.FECHAHASTA, 'DD/MM/YY') || ')') AS NOMBREPAGO");
+        queryPrincipal.FROM("FCS_COBROS_RETENCIONJUDICIAL COB");
+        queryPrincipal.FROM("FCS_RETENCIONES_JUDICIALES RET");
+        queryPrincipal.FROM("FCS_PAGO_COLEGIADO PAGCOL");
+        queryPrincipal.FROM("FCS_PAGOSJG PG");
+        queryPrincipal.WHERE("COB.IDINSTITUCION = PAGCOL.IDINSTITUCION");
+        queryPrincipal.WHERE("COB.IDPAGOSJG = PAGCOL.IDPAGOSJG");
+        queryPrincipal.WHERE("COB.IDPERSONA = PAGCOL.IDPERORIGEN");
+        queryPrincipal.WHERE("PAGCOL.IDINSTITUCION = PG.IDINSTITUCION");
+        queryPrincipal.WHERE("PAGCOL.IDPAGOSJG = PG.IDPAGOSJG");
+        queryPrincipal.WHERE("COB.IDINSTITUCION = RET.IDINSTITUCION");
+        queryPrincipal.WHERE("COB.IDRETENCION = RET.IDRETENCION");
+        queryPrincipal.WHERE("COB.IDINSTITUCION = " + idInstitucion);
+        queryPrincipal.WHERE("COB.IDPERSONA = " + aplicacionRetencionRequestDTO.getIdPersona());
+        queryPrincipal.WHERE("RET.TIPORETENCION = 'L'");
+        queryPrincipal.WHERE("TO_DATE('01' || LPAD(COB.MES, 2, '0') || COB.ANIO, 'DDMMYYYY') BETWEEN TO_DATE('01' || TO_CHAR(TO_DATE('" + aplicacionRetencionRequestDTO.getFechaPagoDesde() + "', 'DD/MM/YYYY'), 'MMYYYY'), 'DDMMYYYY')");
+        queryPrincipal.WHERE("TO_DATE('01' || TO_CHAR(TO_DATE('" + aplicacionRetencionRequestDTO.getFechaPagoHasta() + "', 'DD/MM/YYYY'), 'MMYYYY'), 'DDMMYYYY')");
+        queryPrincipal.ORDER_BY("COB.ANIO");
+        queryPrincipal.ORDER_BY("COB.MES");
+        queryPrincipal.ORDER_BY("COB.IDPAGOSJG");
+        queryPrincipal.ORDER_BY("COB.IDCOBRO");
+
+        return queryPrincipal.toString();
     }
 
 }

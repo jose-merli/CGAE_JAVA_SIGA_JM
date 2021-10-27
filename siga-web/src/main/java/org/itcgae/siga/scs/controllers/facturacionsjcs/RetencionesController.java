@@ -1,9 +1,7 @@
 package org.itcgae.siga.scs.controllers.facturacionsjcs;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
-import org.itcgae.siga.DTOs.scs.RetencionesDTO;
-import org.itcgae.siga.DTOs.scs.RetencionesItem;
-import org.itcgae.siga.DTOs.scs.RetencionesRequestDTO;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.scs.services.facturacionsjcs.IRetencionesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +31,18 @@ public class RetencionesController {
     public ResponseEntity<DeleteResponseDTO> deleteRetenciones(@RequestBody List<RetencionesItem> retencionesItemList, HttpServletRequest request) {
         DeleteResponseDTO response = iRetencionesService.deleteRetenciones(retencionesItemList, request);
         return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/searchRetencionesAplicadas")
+    public ResponseEntity<RetencionesAplicadasDTO> searchRetencionesAplicadas(@RequestBody RetencionesRequestDTO retencionesRequestDTO, HttpServletRequest request) {
+        RetencionesAplicadasDTO response = iRetencionesService.searchRetencionesAplicadas(retencionesRequestDTO, request);
+        return new ResponseEntity<RetencionesAplicadasDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/getAplicacionesRetenciones")
+    public ResponseEntity<AplicacionRetencionDTO> getAplicacionesRetenciones(@RequestBody AplicacionRetencionRequestDTO aplicacionRetencionRequestDTO, HttpServletRequest request) {
+        AplicacionRetencionDTO response = iRetencionesService.getAplicacionesRetenciones(aplicacionRetencionRequestDTO, request);
+        return new ResponseEntity<AplicacionRetencionDTO>(response, HttpStatus.OK);
     }
 
 }
