@@ -351,7 +351,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                         if(!UtilidadesString.esCadenaVacia(datosGenerales.getJuzgado())){
                             newActuacion.setIdjuzgado(Long.valueOf(datosGenerales.getJuzgado()));
                             newActuacion.setIdinstitucionJuzg(idInstitucion);
-                        }else if(!UtilidadesString.esCadenaVacia(datosGenerales.getJuzgado())){
+                        }else if(!UtilidadesString.esCadenaVacia(datosGenerales.getComisaria())){
                             newActuacion.setIdcomisaria(Long.valueOf(datosGenerales.getComisaria()));
                             newActuacion.setIdinstitucionComis(idInstitucion);
                         }
