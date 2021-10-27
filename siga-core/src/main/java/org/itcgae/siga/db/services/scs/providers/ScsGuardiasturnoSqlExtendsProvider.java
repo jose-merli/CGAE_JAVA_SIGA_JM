@@ -1489,7 +1489,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			sql.VALUES("IDINSTITUCION", idInstitucion);
 		}
 		if (calendarioItem.getFechaProgramacion() != null) {
-			sql.VALUES("FECHAPROGRAMACION", "TO_DATE('" + calendarioItem.getFechaProgramacion() + "','DD/MM/YYYY')");
+			sql.VALUES("FECHAPROGRAMACION", "TO_DATE('" + calendarioItem.getFechaProgramacion() + "','DD/MM/YYYY HH24:MI:SS')");
 		}
 		if (calendarioItem.getFechaDesde() != null) {
 			sql.VALUES("FECHACALINICIO", "TO_DATE('" + calendarioItem.getFechaDesde() + "','DD/MM/YYYY')");

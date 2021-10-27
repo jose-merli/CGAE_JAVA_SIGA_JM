@@ -703,8 +703,9 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "else null end as direccionRepresentante");
 		sql.SELECT("case when pjg.idrepresentantejg is not null then repre.nif\r\n"
 				+ "else null end as nifRepresentante");
-		
+		sql.SELECT("ejg.idpersonajg as solicitanteppal");
 		sql.FROM("scs_unidadfamiliarejg uf");
+		sql.JOIN("scs_ejg ejg on ejg.anio = uf.anio AND ejg.numero = uf.numero AND ejg.idtipoejg = uf.idtipoejg AND ejg.idinstitucion = uf.idinstitucion");
 		
 		sql.INNER_JOIN("scs_personajg pjg on (uf.idpersona=pjg.idpersona and uf.idinstitucion=pjg.idinstitucion)");
 		sql.LEFT_OUTER_JOIN("scs_personajg repre on (repre.idpersona =  pjg.idrepresentantejg AND repre.idinstitucion=pjg.idinstitucion)");
