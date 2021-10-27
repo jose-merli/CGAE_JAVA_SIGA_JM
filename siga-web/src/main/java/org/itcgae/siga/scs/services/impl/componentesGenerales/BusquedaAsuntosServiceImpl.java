@@ -44,7 +44,6 @@ import org.itcgae.siga.db.entities.ScsDesignaExample;
 import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsDesignaprocurador;
 import org.itcgae.siga.db.entities.ScsDesignaprocuradorExample;
-import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsDesignasletradoExample;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgKey;
@@ -66,7 +65,6 @@ import org.itcgae.siga.db.mappers.ScsDelitosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaprocuradorMapper;
-import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsSojMapper;
@@ -96,9 +94,6 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 	@Autowired
 	private ScsEjgExtendsMapper scsEjgExtendsMapper;
-
-	@Autowired
-	private ScsDesignasletradoMapper scsDesignasletradoMapper;
 
 	@Autowired
 	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
@@ -1821,7 +1816,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				designaKey.setIdturno(Integer.valueOf(datos.get(4)));
 				designaKey.setNumero(Long.parseLong(datos.get(6)));
 
-				ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
+				scsDesignaMapper.selectByPrimaryKey(designaKey);
 
 				LOGGER.info("BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Designacion y SOJ seleccionados.");
 
@@ -1830,7 +1825,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				LOGGER.info(
 						"BusquedaAsuntosServiceImpl.copyDesigna2Soj() -> Copiando informacion de la designacion al SOJ.");
 
-				ScsDesignasletradoExample letradosDesignaExample = new ScsDesignasletradoExample();
+				new ScsDesignasletradoExample();
 
 //				letradosDesignaExample.setOrderByClause("FECHADESIGNA DESC");
 //				letradosDesignaExample.createCriteria().andAnioEqualTo(designa.getAnio())

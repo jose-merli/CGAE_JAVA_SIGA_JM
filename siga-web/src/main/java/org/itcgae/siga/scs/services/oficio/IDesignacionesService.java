@@ -8,7 +8,6 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItemDTO;
-import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaDTO;
@@ -16,10 +15,7 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
-import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
-import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
-import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
@@ -169,7 +165,7 @@ public interface IDesignacionesService {
 	
 	public DeleteResponseDTO deleteDesigna(List<DesignaItem> item, HttpServletRequest request);
 
-	public ScsDesigna busquedaDesignaActual(ScsDesigna designa, HttpServletRequest request);
+	public DesignaItem busquedaDesignaActual(ScsDesigna designa, HttpServletRequest request);
 
 	public List<ListaLetradosDesignaItem> busquedaLetradosDesigna(ScsDesigna item, HttpServletRequest request);
 			

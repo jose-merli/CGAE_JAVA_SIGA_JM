@@ -35,6 +35,7 @@ import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsDesigna;
+import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsDesignacionesSqlExtendsProvider;
@@ -815,4 +816,44 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 		})
 	List<DatosCartaAcreditacionItem> getDatosEjgResolucionFavorable(String idInstitucion, String idTurno, String anio,
 			String numero);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaDesignaActual")
+	@Results({ @Result(column = "ANIO", property = "ano", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
+			@Result(column = "FECHAENTRADA", property = "fechaEntradaInicio", jdbcType = JdbcType.DATE),
+			@Result(column = "NOMBRE", property = "nombreTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMPROCEDIMIENTO", property = "numProcedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREJUZGADO", property = "nombreJuzgado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PROCEDIMIENTO", property = "nombreProcedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREPERSONA", property = "nombreColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDO1PERSONA", property = "apellido1Colegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDO2PERSONA", property = "apellido2Colegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPODESIGNACOLEGIO", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAOFICIOJUZGADO", property = "fechaOficioJuzgado", jdbcType = JdbcType.DATE),
+			@Result(column = "DELITOS", property = "delitos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHARECEPCIONCOLEGIO", property = "fechaRecepcionColegio", jdbcType = JdbcType.DATE),
+			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAJUICIO", property = "fechaJuicio", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "DEFENSAJURIDICA", property = "defensaJuridica", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREINTERESADO", property = "nombreInteresado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDO1", property = "apellido1Interesado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDO2", property = "apellido2Interesado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPODESIGNACOLEGIO", property = "idTipoDesignaColegio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDMODULO", property = "idModulo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPRETENSION", property = "idPretension", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ART27", property = "art27", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "VALIDADA", property = "validada", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)})
+	List<DesignaItem> busquedaDesignaActual(ScsDesignaKey key);
 }

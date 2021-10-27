@@ -1,6 +1,5 @@
 package org.itcgae.siga.scs.controllers.oficio;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,15 +18,11 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
-import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
-import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
-import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
-import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListDTO;
@@ -654,7 +649,7 @@ public class DesignacionesController {
 	
 //	[ designa.ano,  designa.idTurno, designa.numero]
 	@RequestMapping(value = "/designas/busquedaDesignacionActual", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ScsDesigna>  busquedaDesignaActual(
+	ResponseEntity<DesignaItem>  busquedaDesignaActual(
 //			@RequestBody ScsDesigna designa,
 			@RequestBody String[] item,
 			HttpServletRequest request) {
@@ -662,13 +657,13 @@ public class DesignacionesController {
 		String ano = item[0].substring(1, 5);
 		designa.setAnio((short) Integer.parseInt(ano));
 		designa.setIdturno(Integer.parseInt(item[1]));
-		designa.setNumero((long) Integer.parseInt(item[2]));
-		ScsDesigna response = designacionesService.busquedaDesignaActual(designa, request);
+        designa.setNumero((long) Integer.parseInt(item[2]));
+        DesignaItem response = designacionesService.busquedaDesignaActual(designa, request);
 		if (response != null) {
-			return new ResponseEntity<ScsDesigna>(response, HttpStatus.OK);
+			return new ResponseEntity<DesignaItem>(response, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<ScsDesigna>(
-					new ScsDesigna(), HttpStatus.OK);
+			return new ResponseEntity<DesignaItem>(
+					new DesignaItem(), HttpStatus.OK);
 		}
 	}
 	
