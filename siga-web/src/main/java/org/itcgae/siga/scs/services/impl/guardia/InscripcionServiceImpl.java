@@ -203,7 +203,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 									FECHASOLICITUD);
 
 
-							if (deleteFK == 1) {
+							if (deleteFK != 0) {
 
 								int delete = inscripcionGuardiaExtensdsMapper.getDeleteObjetoFrontValidarInscripcion(objeto,
 										FECHABAJA, FECHADENEGACION, FECHASOLICITUD, FECHASOLICITUDBAJA, FECHAVALIDACION,
@@ -396,15 +396,13 @@ public class InscripcionServiceImpl implements InscripcionService {
 					inscripciones = inscripcionGuardiaExtensdsMapper.getDegenarInscripcion(a, idInstitucion.toString(),
 							FECHADENEGACIONNUEVA, usuario);
 
-					if (inscripciones == 0)
-						contadorKO++;
 				}
 
 				LOGGER.info("denegarInscripcion() -> Salida ya con los datos modificados");
 			}
 		}
 
-		if (contadorKO == 0)
+		if (inscripciones != 0)
 			upd.setStatus(SigaConstants.OK);
 		else
 			upd.setStatus(SigaConstants.KO);
