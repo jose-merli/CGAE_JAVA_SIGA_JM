@@ -344,7 +344,18 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 					String nombreFichero = documentoDTO.getNombreDocumento();
 					String idEnvio = documentoDTO.getIdEnvio();
 					
-					File file = new File(filePath, nombreFichero);
+					File file = null;
+					
+					//Para diferenciar entre los dos sistemas de guardado (Como en envios masivos o no)
+					if(filePath.contains("\\")) {
+						String[] partsPath = filePath.split("\\\\");
+						filePath = String.join("\\",Arrays.copyOf(partsPath, partsPath.length-1));
+						file = new File(filePath, partsPath[partsPath.length-1]);
+					}
+					else {
+	                    file = new File(filePath, nombreFichero);
+					}
+					
 					
 					if(!file.exists()) {
 						file = null;
@@ -561,7 +572,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
             	
             	destinatario.setIdinstitucion(idInstitucion);
             	destinatario.setIdenvio(newIdEnvio);
-            	destinatario.setIdpersona(juzgadoSelecc.getIdjuzgado()); //REVISAR: Se introduce el id del juzgado como el idpersona
+            	destinatario.setIdpersona(-juzgadoSelecc.getIdjuzgado()); //REVISAR: Se introduce el id del juzgado NEGATIVO como el idpersona para diferenciar
             	destinatario.setTipodestinatario("SCS_JUZGADO"); //Se introduce la tabla SCS_JUZGADO al realizar un envio a una organismo judicial
             	destinatario.setNombre(juzgadoSelecc.getNombre());
             	destinatario.setDomicilio(juzgadoSelecc.getDomicilio());
@@ -606,26 +617,30 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
             	}
             	
             	//NIG
-            	campo.setIdcampo((short) 7);
-            	campo.setTipocampo("A");
-            	campo.setValor(nuevaComm.getNig());
-            	
-            	response = envCamposenviosMapper.insert(campo);
-            	
-            	if(response == 0) {
-            		throw new SigaExceptions("Error al insertar el campo \"Cuerpo\" como campo del envio para una nueva comunicación");
+            	if(nuevaComm.getNig() != null && nuevaComm.getNig().trim() != "") {
+	            	campo.setIdcampo((short) 7);
+	            	campo.setTipocampo("A");
+	            	campo.setValor(nuevaComm.getNig());
+	            	
+	            	response = envCamposenviosMapper.insert(campo);
+	            	
+	            	if(response == 0) {
+	            		throw new SigaExceptions("Error al insertar el campo \"Nig\" como campo del envio para una nueva comunicación");
+	            	}
             	}
             	
             	
             	//N PROCEDIMIENTO
-            	campo.setIdcampo((short) 8);
-            	campo.setTipocampo("A");
-            	campo.setValor(nuevaComm.getNumProcedimiento());
-            	
-            	response = envCamposenviosMapper.insert(campo);
-            	
-            	if(response == 0) {
-            		throw new SigaExceptions("Error al insertar el campo \"Cuerpo\" como campo del envio para una nueva comunicación");
+            	if(nuevaComm.getNumProcedimiento() != null && nuevaComm.getNumProcedimiento().trim() != "") {
+	            	campo.setIdcampo((short) 8);
+	            	campo.setTipocampo("A");
+	            	campo.setValor(nuevaComm.getNumProcedimiento());
+	            	
+	            	response = envCamposenviosMapper.insert(campo);
+	            	
+	            	if(response == 0) {
+	            		throw new SigaExceptions("Error al insertar el campo \"N Procedimiento\" como campo del envio para una nueva comunicación");
+	            	}
             	}
             	
             	LOGGER.info(
@@ -764,7 +779,8 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
     	
     	
     	 parametro.setClave("TIPOMENSAJE");
-         parametro.setValor("30");
+    	 //VALORES: 30 (ESTANDAR), 31 (TURNO OFICIO), 32 (HONORARIOS PROFESIONALES) Y 33 (JUSTICIA GRATUITA)
+         parametro.setValor(nuevaComm.getIdTipoMensaje());
          	
          response = ecomColaParametrosMapper.insert(parametro);
          	

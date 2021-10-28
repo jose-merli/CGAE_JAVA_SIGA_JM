@@ -16,4 +16,4 @@ application:
     /pys/solicitarSuscripcion: [39]
 
      # Permisos para el módulo de PNJ
-    /comunicaciones/saveNuevaComm: [30D1]
+    /comunicaciones/saveNuevaComm: [30G]

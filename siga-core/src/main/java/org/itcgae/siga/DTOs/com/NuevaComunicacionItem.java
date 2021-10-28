@@ -15,6 +15,7 @@ public class NuevaComunicacionItem {
 	private String nig;
 	private String idModeloComunicacion;
 	private String idPlantillaEnvios;
+	private String idTipoMensaje;
 	private List<MultipartFile> docs;
 	
 	public String getJuzgado() {
@@ -70,5 +71,11 @@ public class NuevaComunicacionItem {
 	}
 	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
 		this.idPlantillaEnvios = idPlantillaEnvios;
+	}
+	public String getIdTipoMensaje() {
+		return idTipoMensaje;
+	}
+	public void setIdTipoMensaje(String idTipoMensaje) {
+		this.idTipoMensaje = idTipoMensaje;
 	}
 }

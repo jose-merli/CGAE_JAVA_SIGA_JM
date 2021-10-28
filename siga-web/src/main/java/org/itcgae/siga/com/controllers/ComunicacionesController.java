@@ -110,13 +110,24 @@ public class ComunicacionesController {
     		e.printStackTrace();    
 		}	  
 		headers = new HttpHeaders();
-		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-		headers.add("Pragma", "no-cache");
-		headers.add("Expires", "0");
-		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
+//		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+//		headers.add("Pragma", "no-cache");
+//		headers.add("Expires", "0");
+//		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
+        headers.set("Content-Disposition",
+                "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
+        headers.setContentLength(file.length());
 		System.out.println("The length of the file is : "+file.length());
 		  
-		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+		if(file != null) {
+			return new ResponseEntity<InputStreamResource>(resource, headers,
+                HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<InputStreamResource>(resource, headers,
+	                HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		//return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
     }
 	
 	@RequestMapping(value="/detalle/descargarCertificado", method=RequestMethod.POST, produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
