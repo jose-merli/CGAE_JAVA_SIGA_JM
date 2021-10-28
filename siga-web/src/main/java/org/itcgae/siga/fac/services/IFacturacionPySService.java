@@ -28,6 +28,8 @@ public interface IFacturacionPySService {
 	public ComboDTO getEtiquetasSerie(String idSerieFacturacion, HttpServletRequest request);
 	public DestinatariosSeriesDTO getDestinatariosSeries(String idSerieFacturacion, HttpServletRequest request);
 	public ComboDTO comboPlantillasEnvio(HttpServletRequest request);
+	public ComboDTO getFormasPagosDisponiblesSeries(HttpServletRequest request);
+	public ComboDTO getFormasPagosSerie(String idSerieFacturacion, HttpServletRequest request);
 
 }
  

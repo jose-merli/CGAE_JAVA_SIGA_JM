@@ -25,6 +25,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.*;
+import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
     @Autowired
     private EnvPlantillaEnviosExtendsMapper envPlantillaEnviosExtendsMapper;
+
+    @Autowired
+    private PysFormapagoExtendsMapper pysFormapagoExtendsMapper;
+
+    @Autowired
+	private FacFormapagoserieExtendsMapper facFormapagoserieExtendsMapper;
 
     @Override
     public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias, HttpServletRequest request) {
@@ -830,7 +837,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					exampleSerieFacturacion.createCriteria()
 							.andIdinstitucionEqualTo(idInstitucion)
 							.andIdseriefacturacionNotEqualTo(Long.valueOf(idSerieFacturacion))
-							.andFechabajaIsNotNull();
+							.andFechabajaIsNull();
 					exampleSerieFacturacion.setOrderByClause("descripcion");
 
 					List<FacSeriefacturacion> seriesFacturacion = facSeriefacturacionExtendsMapper.selectByExample(exampleSerieFacturacion);
@@ -919,7 +926,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 							&& serieFacturacion.getDescripcion().length() <= 100)
 						serieToUpdate.setDescripcion(serieFacturacion.getDescripcion());
 
-					serieToUpdate.setIdseriefacturacionprevia(Long.parseLong(serieFacturacion.getIdSerieFacturacionPrevia()));
+					if (serieFacturacion.getIdSerieFacturacionPrevia() != null && !serieFacturacion.getIdSerieFacturacionPrevia().trim().isEmpty())
+						serieToUpdate.setIdseriefacturacionprevia(Long.parseLong(serieFacturacion.getIdSerieFacturacionPrevia()));
+					else
+						serieToUpdate.setIdseriefacturacionprevia(null);
 
 					if (serieFacturacion.getObservaciones() == null
 							|| (serieFacturacion.getObservaciones() != null
@@ -1147,6 +1157,118 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		comboDTO.setError(error);
 
 		LOGGER.info("comboPlantillasEnvio() -> Salida del servicio para obtener el combo de platillas envio");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO getFormasPagosDisponiblesSeries(HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+
+		List<ComboItem> comboItems;
+		Error error = new Error();
+
+		LOGGER.info("getFormasPagosDisponiblesSeries() -> Entrada al servicio para recuperar todas las formas de pago");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.debug(
+						"FacturacionPySServiceImpl.getFormasPagosDisponiblesSeries() -> Entrada a admUsuariosExtendsMapper para obtener todas las formas de pago");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.debug(
+						"comboPlantillasEnvio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.debug(
+							"comboPlantillasEnvio() / pysFormapagoExtendsMapper.getWayToPayWithIdFormapago() -> Entrada a pysFormapagoExtendsMapper para obtener todas las formas de pago");
+
+					//Logica
+					String idioma = usuarios.get(0).getIdlenguaje();
+					comboItems = pysFormapagoExtendsMapper.getWayToPayWithIdFormapago(idioma);
+
+					LOGGER.debug(
+							"comboPlantillasEnvio() / pysFormapagoExtendsMapper.getWayToPayWithIdFormapago() -> Saliendo de pysFormapagoExtendsMapper para obtener todas las formas de pago");
+
+					comboDTO.setCombooItems(comboItems);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.getFormasPagosDisponiblesSeries() -> Se ha producido un error al obtener todas las formas de pago",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("getFormasPagosDisponiblesSeries() -> Salida del servicio para obtener todas las formas de pago");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO getFormasPagosSerie(String idSerieFacturacion, HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+
+		List<ComboItem> comboItems;
+		Error error = new Error();
+
+		LOGGER.info("getFormasPagosSerie() -> Entrada al servicio para recuperar las formas de pago de la serie de facturación");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.debug(
+						"FacturacionPySServiceImpl.getFormasPagosSerie() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.debug(
+						"getFormasPagosSerie() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.debug(
+							"getFormasPagosSerie() / facFormapagoserieExtendsMapper.getFormasPagosSerie() -> Entrada a facFormapagoserieExtendsMapper para obtener las formas de pago de la serie de facturación");
+
+					//Logica
+					String idioma = usuarios.get(0).getIdlenguaje();
+					comboItems = facFormapagoserieExtendsMapper.getFormasPagosSerie(idSerieFacturacion, idInstitucion, idioma);
+
+					LOGGER.debug(
+							"getFormasPagosSerie() / facFormapagoserieExtendsMapper.getFormasPagosSerie() -> Saliendo de facFormapagoserieExtendsMapper para obtener las formas de pago de la serie de facturación");
+
+					comboDTO.setCombooItems(comboItems);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.getFormasPagosSerie() -> Se ha producido un error al obtener las formas de pago de la serie de facturación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("getFormasPagosSerie() -> Salida del servicio para obtener las formas de pago de la serie de facturación");
 
 		return comboDTO;
 	}
