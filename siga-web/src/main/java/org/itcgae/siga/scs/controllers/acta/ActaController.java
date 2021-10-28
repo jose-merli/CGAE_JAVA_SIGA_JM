@@ -30,12 +30,6 @@ public class ActaController {
 	@Autowired
 	private IBusquedaActa actas;
 
-	@RequestMapping(value = "/filtros-acta/busquedaActas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ActasDTO> busquedaActas(@RequestBody ActasItem actasItem, HttpServletRequest request)
-			throws SigaExceptions {
-		ActasDTO response = actas.busquedaActas(actasItem, request);
-		return new ResponseEntity<ActasDTO>(response, HttpStatus.OK);
-	}
 
 	@RequestMapping(value = "/filtros-acta/borrarActas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> borrarActas(@RequestBody List<ActasItem> actasItem, HttpServletRequest request)
@@ -83,6 +77,13 @@ public class ActaController {
 			throws Exception {
 		UpdateResponseDTO response = actas.cerrarActa(actasItem, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-acta/busquedaActas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ActasDTO> busquedaActas(@RequestBody ActasItem actasItem, HttpServletRequest request)
+			throws SigaExceptions {
+		ActasDTO response = actas.busquedaActas(actasItem, request);
+		return new ResponseEntity<ActasDTO>(response, HttpStatus.OK);
 	}
 
 }

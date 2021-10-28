@@ -20,7 +20,8 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 			fechaReunion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFechareunion());
 
 		}
-
+		LOGGER.info("*******************fechaResolucion********************" + actasItem.getFecharesolucion() + " "
+				+ actasItem.getAnioacta() + " " + actasItem.getIdpresidente());
 		if (actasItem.getFecharesolucion() != null) {
 			fechaResolucion = new SimpleDateFormat("dd/MM/yy").format(actasItem.getFecharesolucion());
 		}
@@ -31,7 +32,7 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 						+ "ACT.FECHAREUNION as FECHAREUNION, ACT.IDPRESIDENTE as IDPRESIDENTE, ACT.IDSECRETARIO as IDSECRETARIO,"
 						+ " f_siga_getrecurso(PRE.NOMBRE,1) AS NOMBREPRESIDENTE , f_siga_getrecurso(SEC.NOMBRE,1) AS NOMBRESECRETARIO   ");
 		sql.FROM("SCS_ACTACOMISION ACT, SCS_PONENTE PRE, SCS_PONENTE SEC");
-		// sql.WHERE("ACT.IDINSTITUCION like '" + idInstitucion + "'");
+		sql.WHERE("ACT.IDINSTITUCION like '" + idInstitucion + "'");
 		sql.WHERE("PRE.IDPONENTE (+) = ACT.IDPRESIDENTE");
 		sql.WHERE("PRE.IDINSTITUCION (+) = ACT.IDINSTITUCION");
 		sql.WHERE("SEC.IDPONENTE (+) = ACT.IDSECRETARIO");
@@ -46,6 +47,7 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		}
 
 		if (fechaResolucion != "0") {
+			LOGGER.info("*******************fechaResolucion********************" + fechaResolucion);
 			sql.WHERE("FECHARESOLUCION = '" + fechaResolucion + "'");
 		}
 		if (fechaReunion != "0") {
@@ -147,9 +149,9 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		sql.SELECT("1 as contar");
 		sql.FROM("GEN_PARAMETROS");
 		sql.WHERE("PARAMETRO = 'CAJG_SUFIJO_ACTAS'");
-		if(actasItem.getSufijo() != null) {
-			sql.WHERE("valor = '" + actasItem.getNumeroacta() + actasItem.getSufijo()+ "'");
-		}else {
+		if (actasItem.getSufijo() != null) {
+			sql.WHERE("valor = '" + actasItem.getNumeroacta() + actasItem.getSufijo() + "'");
+		} else {
 			sql.WHERE("valor = '" + actasItem.getNumeroacta() + "'");
 		}
 		sql.WHERE("IDINSTITUCION =" + idInstitucion);
@@ -157,7 +159,6 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		LOGGER.info("*******************comprobarGuardarActaSufijo********************" + sql.toString());
 		return sql.toString();
 	}
-
 
 	public String detectarEjgAsociadoActa(ActasItem actasItem, Short idInstitucion) {
 
@@ -172,7 +173,6 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		return sql.toString();
 	}
 
-
 	public String getEstadosEjg(Short idinstitucion, Short idtipoejg, Short anio, Long numero) {
 
 		SQL sql = new SQL();
@@ -183,13 +183,11 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 		sql.WHERE("IDINSTITUCION = " + idinstitucion);
 		sql.WHERE("IDTIPOEJG = " + idtipoejg);
 		sql.WHERE("ROWNUM <=  1");
-		sql.ORDER_BY("FECHAMODIFICACION DESC");
+		sql.ORDER_BY("IDESTADOPOREJG DESC");
 
 		LOGGER.info("*******************getEstadosEjg********************" + sql.toString());
 		return sql.toString();
 	}
-
-
 
 	public String getActa(ActasItem actasItem, Short idInstitucion) {
 

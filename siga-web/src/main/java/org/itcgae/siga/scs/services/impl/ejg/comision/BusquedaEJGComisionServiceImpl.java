@@ -1,6 +1,5 @@
 package org.itcgae.siga.scs.services.impl.ejg.comision;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -12,7 +11,6 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.scs.ActualizarAnioActaItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
@@ -37,7 +35,6 @@ import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsActaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgComisionExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJGComision;
 import org.itcgae.siga.scs.services.impl.ejg.GestionEJGServiceImpl;
@@ -65,8 +62,6 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	private ScsEstadoejgMapper scsEstadoejgMapper;
 	@Autowired
 	private ScsEjgMapper scsEjgMapper;
-	@Autowired
-	private ScsActaExtendsMapper scsActaExtendsMapper;
 	@Autowired
 	GestionEJGServiceImpl gestionEJGServiceImpl;
 
@@ -274,7 +269,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
 			ejgDTO.setEjgItems(scsEjgComisionExtendsMapper.busquedaEJGComision(idUltimoEstado, ejgItem,
-					idInstitucion.toString(), tamMaximo, "1".toString()));
+					idInstitucion.toString(), tamMaximo, "1"));
 			LOGGER.info(
 					"busquedaEJGComision() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
 			if (ejgDTO.getEjgItems() != null && tamMaximo != null && ejgDTO.getEjgItems().size() > tamMaximo) {
@@ -384,7 +379,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			LOGGER.info(
 					"comboTipoEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
@@ -423,7 +418,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			LOGGER.info(
 					"comboEstadoEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
@@ -576,7 +571,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 			LOGGER.info(
 					"comboAnioActa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
 					"comboAnioActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
@@ -648,7 +643,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					"comboPresidente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
@@ -659,7 +654,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 			comboItems = scsEjgComisionExtendsMapper.comboPresidente(usuarios.get(0).getIdlenguaje());
 
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			LOGGER.info(
 					"comboPresidente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
@@ -696,7 +691,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 					"comboSecretario() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
@@ -948,7 +943,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 
@@ -1011,7 +1006,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 
@@ -1051,7 +1046,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 
@@ -1141,7 +1136,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 
@@ -1294,7 +1289,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
 				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
 
-		estadoejgExample.setOrderByClause("FECHAMODIFICACION DESC");
+		estadoejgExample.setOrderByClause("IDESTADOPOREJG DESC");
 
 		List<ScsEstadoejg> estadoejgObject;
 
@@ -1318,7 +1313,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 				.andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.valueOf(scsEjg.getIdtipoejg()))
 				.andNumeroEqualTo(Long.valueOf(scsEjg.getNumero())).andFechabajaIsNull();
 
-		estadoejgExample.setOrderByClause("FECHAMODIFICACION DESC");
+		estadoejgExample.setOrderByClause("IDESTADOPOREJG DESC");
 
 		List<ScsEstadoejg> estadoejgObject;
 

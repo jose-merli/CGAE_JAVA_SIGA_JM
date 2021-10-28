@@ -35,13 +35,14 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 			@Result(column = "ejg.idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER)
 
 	})
-	List<EjgItem> busquedaEJGComision(String idUltimoEstado, EjgItem ejgItem, String string, Integer tamMaximo, String idLenguaje);
+	List<EjgItem> busquedaEJGComision(String idUltimoEstado, EjgItem ejgItem, String string, Integer tamMaximo,
+			String idLenguaje);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "comboColegioEjgComision")
 	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR), })
 	List<ComboItem> comboColegioEjgComision(String idinstitucion);
-	
+
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "idUltimoEstado")
 	@Results({})
 	String idUltimoEstado(EjgItem ejgItem, String idinstitucion);
@@ -99,26 +100,22 @@ public interface ScsEjgComisionExtendsMapper extends ScsEjgMapper {
 	List<ComboItem> comboAnioActa(Short idInstitucion);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "comboResolucion")
-	@Results({ 
-			@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> comboResolucion(Short idLenguaje,String idInstitucionp);
+	List<ComboItem> comboResolucion(Short idLenguaje, String idInstitucionp);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "obligatoriedadResolucion")
-	@Results({ 
-			@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> obligatoriedadResolucion(Short idInstitucion);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "comboPresidente")
-	@Results({ 
-			@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> comboPresidente(String string);
 
 	@SelectProvider(type = ScsEjgComisionSqlExtendsProvider.class, method = "getEtiquetasPonente")
-	@Results({ 
-			@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR) })
+	@Results({ @Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR) })
 	String getEtiquetasPonente(Short idLenguaje);
 
 }
