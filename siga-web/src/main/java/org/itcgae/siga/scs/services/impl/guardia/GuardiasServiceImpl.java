@@ -1353,12 +1353,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 								grupoColegiado.setIdturno(Integer.valueOf(guardiasItem.getIdTurno()));
 								grupoColegiado.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
 
-								NewIdDTO idP = scsGrupoguardiacolegiadoExtendsMapper.getLastId();
+								//NewIdDTO idP = scsGrupoguardiacolegiadoExtendsMapper.getLastId();
 
-								if (idP == null)
+								/*if (idP == null)
 									grupoColegiado.setIdgrupoguardiacolegiado((long) 1);
 								else
-									grupoColegiado.setIdgrupoguardiacolegiado(Long.parseLong(idP.getNewId()) + 1);
+									grupoColegiado.setIdgrupoguardiacolegiado(Long.parseLong(idP.getNewId()) + 1);*/
 
 								// Si se encontro un grupo se inserta sino se crea uno nuevo y se asigna.
 								if (grupoColegiado.getIdgrupoguardia() != null)
@@ -1652,15 +1652,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 					}
 					List<InscripcionGuardiaItem> inscripcionesGrupoNuevo = new ArrayList<InscripcionGuardiaItem>();
 					// Obtenemos el ultimo id generado en los grupos
-					NewIdDTO idGrupoDTO = scsGrupoguardiaExtendsMapper.getLastId();
+					//NewIdDTO idGrupoDTO = scsGrupoguardiaExtendsMapper.getLastId();
 					Integer idGrupo = 0;
 
 					ScsGrupoguardia grupo = null;
 					ScsGrupoguardiacolegiado grupoColegiado = null;
 					ScsGrupoguardiacolegiadoExample scsGrupoguardiacolegiadoExample = new ScsGrupoguardiacolegiadoExample();
 
-					if (idGrupoDTO != null)
-						idGrupo = Integer.valueOf(idGrupoDTO.getNewId());
+					/*if (idGrupoDTO != null)
+						idGrupo = Integer.valueOf(idGrupoDTO.getNewId());*/
 
 					// Comprobamos si hay algun grupo nuevo
 					ScsGrupoguardiaExample grupoGuardiaExample = new ScsGrupoguardiaExample();
@@ -3030,7 +3030,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						pc.setFechaprogramacion(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(calendarioItem.getFechaProgramacion()));
 					}
 					if (calendarioItem.getIdCalG() != null) {
-						pc.setIdconjuntoguardia(Long.valueOf(calendarioItem.getIdCalG()));
+						pc.setIdconjuntoguardia(Short.valueOf(calendarioItem.getIdCalG()));
 					}
 					if (calendarioItem.getIdCalendarioProgramado() != null) {
 						pc.setIdprogcalendario(Long.valueOf(calendarioItem.getIdCalendarioProgramado()));

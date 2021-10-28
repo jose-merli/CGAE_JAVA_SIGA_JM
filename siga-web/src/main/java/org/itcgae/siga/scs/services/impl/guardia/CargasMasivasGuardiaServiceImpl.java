@@ -1729,7 +1729,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									List<ScsInscripcionguardia> listInscrip = scsInscripcionguardiaExtendsMapper.getInscripcionByTurnoGuardiaNcolegiado(usuarios.get(0).getIdusuario().toString(), cargaMasivaDatosGCItem.getIdTurno(), cargaMasivaDatosGCItem.getIdGuardia(), cargaMasivaDatosGCItem.getnColegiado());
 			
 									//INSERTAMOS GRUPOGUARDIA
-									NewIdDTO lastIdGG = scsGrupoguardiaMapper.getLastId();
+									//NewIdDTO lastIdGG = scsGrupoguardiaMapper.getLastId();
 									listInscrip.forEach(inscripcion -> {
 										ScsGrupoguardia grupo = new ScsGrupoguardia();
 										grupo.setFechacreacion(new Date());
@@ -1742,7 +1742,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			//							grupo.setIdgrupoguardiacolegiado(Long.parseLong(lastIdGGC.getNewId()) + 1);
 			//							grupo.setOrden(Integer.parseInt(cargaMasivaDatosGCItem.getOrden()));
 										grupo.setNumerogrupo(Integer.parseInt(cargaMasivaDatosGCItem.getGrupo()));
-										grupo.setIdgrupoguardia(Long.parseLong(lastIdGG.getNewId()) + 1);
+										//grupo.setIdgrupoguardia(Long.parseLong(lastIdGG.getNewId()) + 1);
 										grupo.setUsucreacion(Integer.parseInt(usuarios.get(0).getIdusuario().toString()));
 										grupo.setUsumodificacion(Integer.parseInt(usuarios.get(0).getIdusuario().toString()));
 										
@@ -1754,7 +1754,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 										}
 										NewIdDTO lastIdGGnew = scsGrupoguardiaMapper.getLastId();
 										//INSERTAMOS GRUPOGUARDIACOLEGIADO
-										NewIdDTO lastIdGGC = scsGrupoguardiacolegiadoExtendMapper.getLastId();
+										//NewIdDTO lastIdGGC = scsGrupoguardiacolegiadoExtendMapper.getLastId();
 										ScsGrupoguardiacolegiado grupoGC = new ScsGrupoguardiacolegiado();
 										grupoGC.setFechacreacion(new Date());
 										grupoGC.setIdguardia(inscripcion.getIdguardia());
@@ -1762,9 +1762,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 										grupoGC.setIdpersona(inscripcion.getIdpersona());
 										grupoGC.setIdinstitucion(inscripcion.getIdinstitucion());
 										grupoGC.setFechamodificacion(new Date());
-										grupoGC.setIdgrupoguardiacolegiado(Long.parseLong(lastIdGGC.getNewId()) + 1);
+										//grupoGC.setIdgrupoguardiacolegiado(Long.parseLong(lastIdGGC.getNewId()) + 1);
 										grupoGC.setOrden(Integer.parseInt(cargaMasivaDatosGCItem.getOrden()));
-										grupoGC.setIdgrupoguardia(Long.parseLong(lastIdGGnew.getNewId()));
+										grupoGC.setIdgrupoguardia(Long.valueOf(lastIdGGnew.getNewId()));
 										grupoGC.setUsucreacion(Integer.parseInt(usuarios.get(0).getIdusuario().toString()));
 										grupoGC.setUsumodificacion(Integer.parseInt(usuarios.get(0).getIdusuario().toString()));
 										grupoGC.setFechasuscripcion(inscripcion.getFechasuscripcion());
