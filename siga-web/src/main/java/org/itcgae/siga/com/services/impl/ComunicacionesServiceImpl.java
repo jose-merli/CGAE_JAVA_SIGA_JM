@@ -780,7 +780,12 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
     	
     	 parametro.setClave("TIPOMENSAJE");
     	 //VALORES: 30 (ESTANDAR), 31 (TURNO OFICIO), 32 (HONORARIOS PROFESIONALES) Y 33 (JUSTICIA GRATUITA)
-         parametro.setValor(nuevaComm.getIdTipoMensaje());
+         if(nuevaComm.getIdTipoMensaje() != null) {
+        	 parametro.setValor(nuevaComm.getIdTipoMensaje());
+         }
+         else {
+        	 throw new SigaExceptions("Se debe introducir un valor de \"idTipoMensaje\" para poder crear un nuevo envío telemático");
+         }
          	
          response = ecomColaParametrosMapper.insert(parametro);
          	
