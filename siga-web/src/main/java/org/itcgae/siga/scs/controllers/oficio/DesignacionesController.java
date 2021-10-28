@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.controllers.oficio;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -18,11 +19,15 @@ import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaRequestDTO;
 import org.itcgae.siga.DTOs.scs.ActuacionesJustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
+import org.itcgae.siga.DTOs.scs.ComunicacionesDTO;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.EstadoEjgItem;
 import org.itcgae.siga.DTOs.scs.JustificacionExpressItem;
 import org.itcgae.siga.DTOs.scs.LetradoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.ListDTO;
@@ -959,6 +964,36 @@ public class DesignacionesController {
 	ResponseEntity<EnviosMasivosDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
 		EnviosMasivosDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
 		return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/subirDocumentoActDesigna", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<InsertResponseDTO> subirDocumentoActDesigna(MultipartHttpServletRequest request) {
+		InsertResponseDTO response = designacionesService.subirDocumentoActDesigna(request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/getDocumentosPorActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DocumentoActDesignaDTO> getDocumentosPorActDesigna(
+			@RequestBody DocumentoActDesignaItem documentoActDesignaItem, HttpServletRequest request) {
+		DocumentoActDesignaDTO response = designacionesService.getDocumentosPorActDesigna(documentoActDesignaItem,
+				request);
+		return new ResponseEntity<DocumentoActDesignaDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/descargarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
+			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
+		ResponseEntity<InputStreamResource> response = designacionesService
+				.descargarDocumentosActDesigna(listaDocumentoActDesignaItem, request);
+		return response;
+	}
+	
+	@PostMapping(value = "/designas/eliminarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> eliminarDocumentosActDesigna(
+			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
+		DeleteResponseDTO response = designacionesService.eliminarDocumentosActDesigna(listaDocumentoActDesignaItem,
+				request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/designas/getDocumentosPorDesigna", produces = MediaType.APPLICATION_JSON_VALUE)

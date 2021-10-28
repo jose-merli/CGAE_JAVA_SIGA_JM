@@ -408,7 +408,11 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "                 AND ins.fechabaja IS NULL"
 				+ "                 AND ins.fechasolicitudbaja IS NULL"
 				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '1'"
-				+ "            ELSE '0' "
+				+ "            WHEN ins.fechadenegacion IS NULL"
+				+ "                 AND ins.fechabaja IS NULL"
+				+ "                 AND ins.fechasolicitudbaja IS NULL"
+				+ "					AND ins.fechasuscripcion IS NOT NULL"
+				+ "                 AND ins.fechavalidacion IS NULL THEN '0'"
 				+ "        END"
 				+ "    ) estado");
 		
@@ -477,7 +481,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		                if(i>0) condestados+=" or ";
 		                // Pendiente de alta
 		                if(estados[i].equals("0")) {
-		                    condestados+=" (ins.fechavalidacion is null and ins.fechadenegacion is null)" ;
+		                    condestados+=" (ins.fechavalidacion is null and ins.fechadenegacion is null and ins.fechasuscripcion is not null)" ;
 		                }
 		                // Alta
 		                else if(estados[i].equals("1")) {
@@ -1490,7 +1494,7 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		//Left Join
 		sql.JOIN("gen_recursos_catalogos ON scs_tiposguardias.descripcion = gen_recursos_catalogos.idrecurso");
 		
-		sql.WHERE("scs_guardiasturno.porgrupos = 1",
+		sql.WHERE(
 		"scs_guardiasturno.fechabaja IS NULL",
 		"scs_turno.fechabaja IS NULL",
 		"scs_inscripcionguardia.idpersona = " + idpersona,
