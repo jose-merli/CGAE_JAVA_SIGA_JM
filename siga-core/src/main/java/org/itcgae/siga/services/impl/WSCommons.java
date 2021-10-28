@@ -47,6 +47,7 @@ import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
@@ -114,6 +115,7 @@ import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.Integran
 import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.IntegranteSociedad.IntegranteFisico;
 import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.IntegranteSociedad.IntegranteJuridico;
 import org.itcgae.sspp.ws.registroSociedades.ProfesionalAbogadoDocument.ProfesionalAbogado;
+import org.itcgae.sspp.ws.registroSociedades.ProfesionalAbogadoPropioDocument.ProfesionalAbogadoPropio;
 import org.itcgae.sspp.ws.registroSociedades.ProfesionalDocument.Profesional;
 import org.itcgae.sspp.ws.registroSociedades.RegistroSociedadDocument.RegistroSociedad;
 import org.itcgae.sspp.ws.registroSociedades.SociedadActualizacionDocument.SociedadActualizacion;
@@ -154,6 +156,9 @@ public class WSCommons {
 	
 	@Autowired
 	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
+	
+	@Autowired
+	private CenDatoscolegialesestadoExtendsMapper cenDatoscolegialesestadoExtendsMapper;
 
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
@@ -808,33 +813,59 @@ public class WSCommons {
 									integranteFisico.setDatosPersona(datosPersona);
 									DatosProfesional datosProfesional = DatosProfesional.Factory.newInstance();
 									Colegio colegio = Colegio.Factory.newInstance();
-									colegio.setCodigoColegio(integrante.getCodigocolegio());
-									colegio.setDescripcionColegio(integrante.getDescripcionColegio());
-									if(integrante.getProfesionalAbogado().equals("1")){
-										ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
-										profesionalAbogado.setColegio(colegio);
-										profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
-										datosProfesional.setProfesionalAbogado(profesionalAbogado);
-									}else{
-										Profesional profesional = Profesional.Factory.newInstance();
-										if(integrante.getCodigocolegio()!=null){
-											profesional.setColegio(colegio);
-										}else{
-											profesional.setNombreColegio(integrante.getDescripcionColegio());
-										}
-										profesional.setNumColegiado(integrante.getNumColegiado());
-										if(integrante.getProfesion()!= null){
+									colegio.setCodigoColegio(integrante.getCodigoColegioCliente());
+									colegio.setDescripcionColegio(integrante.getDescripcionColegioCliente());
+									
+									int estadoColegial = 0;
+
+									// Obtenemos el estado colegial del integrante
+									CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
+									cenDatoscolegialesestadoExample.createCriteria()
+											.andIdinstitucionEqualTo(Short.valueOf(integrante.getIdInstitucionCliente()))
+											.andIdpersonaEqualTo(Long.valueOf(integrante.getIdPersona()));
+									cenDatoscolegialesestadoExample.setOrderByClause("fechaestado desc");
+
+									List<CenDatoscolegialesestado> cenDatoscolegialesestadosList = cenDatoscolegialesestadoExtendsMapper
+											.selectByExample(cenDatoscolegialesestadoExample);
+									
+									if (!cenDatoscolegialesestadosList.isEmpty()) {
+										estadoColegial = cenDatoscolegialesestadosList.get(0).getIdestado().intValue();
+									}
+									
+									if (integrante.getProfesion() != null) {
+										if(integrante.getProfesionalAbogado().equals("1")){
+											if (integrante.getCodigocolegio().equals(integrante.getCodigoColegioCliente())) {
+												ProfesionalAbogadoPropio profesionalAbogadoPropio =  ProfesionalAbogadoPropio.Factory.newInstance();
+												profesionalAbogadoPropio.setColegio(colegio);
+												profesionalAbogadoPropio.setNumColegiado(integrante.getNumColegiado());
+												profesionalAbogadoPropio.setIdentificacion(identificacion);
+												datosProfesional.setProfesionalAbogadoPropio(profesionalAbogadoPropio);
+											} else {
+												ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
+												profesionalAbogado.setColegio(colegio);
+												profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
+												datosProfesional.setProfesionalAbogado(profesionalAbogado);
+											}
+											
+										}else if (estadoColegial == 0){
+											Profesional profesional = Profesional.Factory.newInstance();
+											if(integrante.getCodigoColegioCliente()!=null){
+												profesional.setColegio(colegio);
+											}else{
+												profesional.setNombreColegio(integrante.getDescripcionColegioCliente());
+											}
+											profesional.setNumColegiado(integrante.getNumColegiado());
 											if(integrante.getProfesion().length()>20){
 												profesional.setProfesion(integrante.getProfesion().substring(0, 19));
 											}else{
 												profesional.setProfesion(integrante.getProfesion());
 											}
+											datosProfesional.setProfesional(profesional);
 										}
-										datosProfesional.setProfesional(profesional);
-									}
-									
-									if (integrante.getNumColegiado() != null) {
-										integranteFisico.setDatosProfesional(datosProfesional);
+										
+										if (integrante.getNumColegiado() != null) {
+											integranteFisico.setDatosProfesional(datosProfesional);
+										}
 									}
 									
 									integranteUnitario.setIntegranteFisico(integranteFisico);
