@@ -167,4 +167,16 @@ public interface ScsConfConjuntoGuardiasMapper {
           "and IDGUARDIA = #{idguardia,jdbcType=DECIMAL}"
     })
     int updateByPrimaryKey(ScsConfConjuntoGuardias record);
+    
+    @SelectProvider(type=ScsConfConjuntoGuardiasSqlProvider.class, method="selectConfById")
+    @Results({
+        @Result(column="IDCONJUNTOGUARDIA", property="idconjuntoguardia", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="IDINSTITUCION", property="idinstitucion", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="IDTURNO", property="idturno", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="IDGUARDIA", property="idguardia", jdbcType=JdbcType.DECIMAL, id=true),
+        @Result(column="ORDEN", property="orden", jdbcType=JdbcType.DECIMAL),
+        @Result(column="FECHAMODIFICACION", property="fechamodificacion", jdbcType=JdbcType.TIMESTAMP),
+        @Result(column="USUMODIFICACION", property="usumodificacion", jdbcType=JdbcType.DECIMAL)
+    })
+    List<ScsConfConjuntoGuardias> selectConfById(String idConjuntoGuardia, String fechaModif, String usuModif);
 }

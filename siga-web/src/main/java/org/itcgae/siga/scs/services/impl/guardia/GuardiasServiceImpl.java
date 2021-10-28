@@ -107,6 +107,7 @@ import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ScsCabeceraguardias;
 import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
+import org.itcgae.siga.db.entities.ScsConfConjuntoGuardias;
 import org.itcgae.siga.db.entities.ScsDocumentacionasi;
 import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
 import org.itcgae.siga.db.entities.ScsGrupoguardia;
@@ -130,6 +131,7 @@ import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasMapper;
+import org.itcgae.siga.db.mappers.ScsConfConjuntoGuardiasMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
 import org.itcgae.siga.db.mappers.ScsGrupoguardiacolegiadoMapper;
 import org.itcgae.siga.db.mappers.ScsGrupoguardiacolegiadoSqlProvider;
@@ -299,6 +301,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 	
 	@Autowired
 	private FcsFacturacionJGExtendsMapper fcsFacturacionJGExtendsMapper;
+	
+	@Autowired
+	private ScsConfConjuntoGuardiasMapper scsConfConjuntoGuardiasMapper;
 
 	@Override
 	public GuardiasDTO searchGuardias(GuardiasItem guardiasItem, HttpServletRequest request) {
@@ -3130,8 +3135,28 @@ public class GuardiasServiceImpl implements GuardiasService {
 					//idConjunto: 
 						calendarioItem.setIdCalG(idConjuntoGuardia);
 					}
-					String response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
-						if (response == null && error.getDescription() == null)
+					int response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
+					 List<ScsConfConjuntoGuardias> confList = scsConfConjuntoGuardiasMapper.selectConfById(calendarioItem.getIdCalG(), today,  usuario.getIdusuario().toString());
+					 confList.forEach(conf -> {
+						 ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
+							historico.setEstado(new Short(calendarioItem.getEstado()));
+							historico.setFechamodificacion(new Date());
+							historico.setIdconjuntoguardia(new Long(calendarioItem.getIdCalG()));
+							historico.setIdguardia(conf.getIdguardia());
+							historico.setIdinstitucion(idInstitucion);
+							String idCalendarioProgramado = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
+							historico.setIdprogcalendario(new Long(idCalendarioProgramado));
+							historico.setIdturno(conf.getIdturno());
+							//OBTENER ORDEN DE SCS_CONF_CONJUNTO_GUARDIAS
+							if (conf.getOrden() != null) {
+								historico.setOrden(new Integer(conf.getOrden()));
+							}
+							historico.setUsumodificacion(usuario.getIdusuario());
+							int response2 = scsHcoConfProgCalendariosMapper.insertSelective(historico);
+					 });
+					
+					
+					if (response == 0)
 						{
 							error.setCode(400);
 							insertResponseDTO.setStatus(SigaConstants.KO);
@@ -3158,7 +3183,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return insertResponseDTO;
 		}
 	
-	@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario: 0 */1 * * *}")
+	@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario: 0 * 0/1 * * *}")
 	@Override
 	public InsertResponseDTO generarCalendarioAsync () {
 		LOGGER.info("generarCalendarioAsync() -> Entrada al servicio para búsqueda de las guardias");

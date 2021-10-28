@@ -1,9 +1,6 @@
 package org.itcgae.siga.db.services.scs.providers;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
@@ -1329,18 +1326,21 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_1.SELECT(
                 "cen_persona.apellidos2\r\n" + "             || ' '\r\n" + "             || cen_persona.apellidos1\r\n"
                         + "             || ','\r\n" + "             || cen_persona.nombre ");
-        sqlDesigna_1.FROM("scs_ejg ejg\r\n" + "             JOIN cen_persona ON cen_persona.idpersona = ejg.idpersona");
-        sqlDesigna_1.WHERE("ejg.anio =" + item.getAnnio());
-        sqlDesigna_1.WHERE("ejg.numero =" + item.getNumero());
-        sqlDesigna_1.WHERE("ejg.idtipoejg =" + item.getTipoEJG());
-        sqlDesigna_1.WHERE("ejg.idinstitucion =" + item.getidInstitucion());
-        sqlDesigna_1.WHERE("ROWNUM<2");
-
+        sqlDesigna_1.FROM("scs_designasletrado des JOIN cen_persona ON cen_persona.idpersona = des.idpersona");
+        sqlDesigna_1.WHERE("des.anio = ejgd.aniodesigna");
+        sqlDesigna_1.WHERE("des.numero = ejgd.numerodesigna");
+        sqlDesigna_1.WHERE("des.idturno = ejgd.idturno");
+        sqlDesigna_1.WHERE("FECHADESIGNA = (SELECT MAX(FECHADESIGNA) \r\n" + 
+        					"					FROM scs_designasletrado des2\r\n" + 
+        					"					WHERE des.idinstitucion = des2.idinstitucion\r\n" + 
+        					"					AND des.anio = des2.anio\r\n" + 
+        					"					AND des.numero = des2.numero\r\n" + 
+        					"					AND des.idturno = des2.idturno)");
         // consulta para obtener el idtipo en consulta DESIGNA
         sqlDesigna_2.SELECT("TO_CHAR(idtipodesignacolegio)");
         sqlDesigna_2.FROM("scs_designa");
         sqlDesigna_2.WHERE("anio = ejgd.aniodesigna");
-        sqlDesigna_2.WHERE("codigo = ejgd.numerodesigna");
+        sqlDesigna_2.WHERE("numero = ejgd.numerodesigna");
         sqlDesigna_2.WHERE("idturno = ejgd.idturno");
         sqlDesigna_2.WHERE("idinstitucion = ejgd.idinstitucion");
         sqlDesigna_2.WHERE("ROWNUM<2");
@@ -1349,7 +1349,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_3.SELECT(" codigo");
         sqlDesigna_3.FROM("scs_designa");
         sqlDesigna_3.WHERE("anio = ejgd.aniodesigna");
-        sqlDesigna_3.WHERE("codigo = ejgd.numerodesigna");
+        sqlDesigna_3.WHERE("numero = ejgd.numerodesigna");
         sqlDesigna_3.WHERE("idturno = ejgd.idturno");
         sqlDesigna_3.WHERE("idinstitucion = ejgd.idinstitucion");
         sqlDesigna_3.WHERE("ROWNUM<2");
@@ -1365,7 +1365,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sqlDesigna_5.SELECT("f_siga_getrecurso(descripcion, 1)");
         sqlDesigna_5.FROM(" scs_designa a, scs_tipodesignacolegio b");
         sqlDesigna_5.WHERE("a.anio = ejgd.aniodesigna ");
-        sqlDesigna_5.WHERE("a.codigo = ejgd.numerodesigna ");
+        sqlDesigna_5.WHERE("a.numero = ejgd.numerodesigna ");
         sqlDesigna_5.WHERE("a.idturno = ejgd.idturno");
         sqlDesigna_5.WHERE("a.idinstitucion =  " + item.getidInstitucion());
         sqlDesigna_5.WHERE("a.idinstitucion = b.idinstitucion");

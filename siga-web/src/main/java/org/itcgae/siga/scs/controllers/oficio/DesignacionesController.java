@@ -654,7 +654,7 @@ public class DesignacionesController {
 	
 //	[ designa.ano,  designa.idTurno, designa.numero]
 	@RequestMapping(value = "/designas/busquedaDesignacionActual", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ScsDesigna>  busquedaDesignaActual(
+	ResponseEntity<DesignaItem>  busquedaDesignaActual(
 //			@RequestBody ScsDesigna designa,
 			@RequestBody String[] item,
 			HttpServletRequest request) {
@@ -662,13 +662,13 @@ public class DesignacionesController {
 		String ano = item[0].substring(1, 5);
 		designa.setAnio((short) Integer.parseInt(ano));
 		designa.setIdturno(Integer.parseInt(item[1]));
-		designa.setNumero((long) Integer.parseInt(item[2]));
-		ScsDesigna response = designacionesService.busquedaDesignaActual(designa, request);
+        designa.setNumero((long) Integer.parseInt(item[2]));
+        DesignaItem response = designacionesService.busquedaDesignaActual(designa, request);
 		if (response != null) {
-			return new ResponseEntity<ScsDesigna>(response, HttpStatus.OK);
+			return new ResponseEntity<DesignaItem>(response, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<ScsDesigna>(
-					new ScsDesigna(), HttpStatus.OK);
+			return new ResponseEntity<DesignaItem>(
+					new DesignaItem(), HttpStatus.OK);
 		}
 	}
 	
@@ -964,6 +964,36 @@ public class DesignacionesController {
 	ResponseEntity<EnviosMasivosDTO> busquedaComunicaciones(@RequestBody List<String> comunicaciones, HttpServletRequest request) {
 		EnviosMasivosDTO response = designacionesService.busquedaComunicaciones(comunicaciones, request);
 		return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/subirDocumentoActDesigna", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<InsertResponseDTO> subirDocumentoActDesigna(MultipartHttpServletRequest request) {
+		InsertResponseDTO response = designacionesService.subirDocumentoActDesigna(request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/getDocumentosPorActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DocumentoActDesignaDTO> getDocumentosPorActDesigna(
+			@RequestBody DocumentoActDesignaItem documentoActDesignaItem, HttpServletRequest request) {
+		DocumentoActDesignaDTO response = designacionesService.getDocumentosPorActDesigna(documentoActDesignaItem,
+				request);
+		return new ResponseEntity<DocumentoActDesignaDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/designas/descargarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
+			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
+		ResponseEntity<InputStreamResource> response = designacionesService
+				.descargarDocumentosActDesigna(listaDocumentoActDesignaItem, request);
+		return response;
+	}
+	
+	@PostMapping(value = "/designas/eliminarDocumentosActDesigna", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> eliminarDocumentosActDesigna(
+			@RequestBody List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
+		DeleteResponseDTO response = designacionesService.eliminarDocumentosActDesigna(listaDocumentoActDesignaItem,
+				request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/designas/getDocumentosPorDesigna", produces = MediaType.APPLICATION_JSON_VALUE)

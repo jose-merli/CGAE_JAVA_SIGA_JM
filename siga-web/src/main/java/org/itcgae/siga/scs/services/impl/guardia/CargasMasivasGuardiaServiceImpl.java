@@ -1978,7 +1978,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									calendarioItem.setObservaciones(observaciones);
 									//generamos programacion por cada guardia
 									//ScsProgCalendariosSqlProvider.insertSelective(ScsProgCalendarios record)
-									String  res = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
+									int  res = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
 
 										String idProgramacion = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
 										//generamos un calendario por cada guardia asociada a esa programacion	

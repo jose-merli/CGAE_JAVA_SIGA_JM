@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -486,9 +487,9 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 
 	 String updateConfCalendarioProgramado2(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion);
 	 
-	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="generateCalendarioProgramado")
+	 @InsertProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="generateCalendarioProgramado")
 	 @Results({})
-	 String generateCalendarioProgramado(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion, String today, String usuModif);
+	 int generateCalendarioProgramado(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion, String today, String usuModif);
 	 
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="insertarHistorico")

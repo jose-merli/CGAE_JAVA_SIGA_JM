@@ -40,7 +40,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -166,9 +165,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
     private ScsMaestroestadosejgMapper scsMaestroestadosejgMapper;
 
     @Autowired
-    private IEEJGServices eejgService;
-    
-    @Autowired
     private EEJGServiceImpl eejgServiceImpl;
 
     @Autowired
@@ -179,9 +175,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
     @Autowired
     private ScsContrariosejgExtendsMapper scsContrariosejgExtendsMapper;
-
-    @Autowired
-    private ScsAuditoriaejgMapper scsAuditoriaejgMapper;
 
     @Autowired
     private ScsContrariosejgMapper scsContrariosejgMapper;
@@ -212,9 +205,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
     @Autowired
     private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
-
-    @Autowired
-    private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
 
     @Override
     public EjgDTO datosEJG(EjgItem ejgItem, HttpServletRequest request) {
@@ -4896,6 +4886,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                     TurnosItem turnosItem = new TurnosItem();
                     String turnoDesc = datos.get(7).substring(0, datos.get(7).length() - 1);
                     turnosItem.setAbreviatura(turnoDesc);
+                    turnosItem.setHistorico(true);
                     List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
                     record.setIdturno(Integer.parseInt(turnos.get(0).getIdturno()));
 
