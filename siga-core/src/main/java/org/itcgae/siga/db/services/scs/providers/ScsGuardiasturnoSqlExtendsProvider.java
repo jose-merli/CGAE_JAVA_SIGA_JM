@@ -1326,7 +1326,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("CG.IDINSTITUCION = " + idInstitucion);
 		}
 		sql.WHERE("EXISTS (" + sql2 +" )");
-		sql.WHERE("rownum <= 200");
+		//sql.WHERE("rownum <= 200");
 		//sql.ORDER_BY("(PC.FECHAPROGRAMACION, PC.FECHACALINICIO, PC.FECHACALFIN) desc");
 		sql.ORDER_BY("PC.FECHACALINICIO desc, PC.FECHACALFIN desc, PC.FECHAPROGRAMACION desc");
 //		String consulta_siga_classique = "SELECT HPC.IDTURNO as idTurno, HPC.IDGUARDIA as idGuardia, PC.IDPROGCALENDARIO as idCalendarioProgramado,  PC.IDCONJUNTOGUARDIA AS idCalG,  PC.IDINSTITUCION  ,  PC.FECHAPROGRAMACION AS FECHAPROGRAMACION,  PC.FECHACALINICIO  AS fechaDesde,  PC.FECHACALFIN   AS fechaHasta   ,  PC.ESTADO AS GENERADO, "+
@@ -1502,6 +1502,9 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		}
 		if (calendarioItem.getEstado() != null) {
 			sql.VALUES("ESTADO", "'" + calendarioItem.getEstado() + "'");
+		}
+		if (calendarioItem.getObservaciones() != null) {
+			sql.VALUES("OBSERVACIONES", "'" + calendarioItem.getObservaciones() + "'");
 		}
 		if (today != null) {
 			sql.VALUES("FECHAMODIFICACION", "TO_DATE('" + today + "','DD/MM/YYYY')");
