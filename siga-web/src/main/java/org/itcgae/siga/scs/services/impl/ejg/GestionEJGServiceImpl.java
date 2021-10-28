@@ -2010,7 +2010,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
                     ScsUnidadfamiliarejg record = scsUnidadfamiliarejgMapper.selectByPrimaryKey(key);
 
-                    record.clone();
+                    ScsUnidadfamiliarejg record2 = record.clone();
 
                     // Modificamos el objeto
 
@@ -2250,7 +2250,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
                 labelRecursoKey.setIdlenguaje(usuarios.get(0).getIdlenguaje());
                 labelRecursoKey.setIdrecurso(labelEstado.getDescripcion());
 
-                genRecursosCatalogosMapper.selectByPrimaryKey(labelRecursoKey);
+                GenRecursosCatalogos labelRecurso = genRecursosCatalogosMapper.selectByPrimaryKey(labelRecursoKey);
 
                 ScsEstadoejg record = new ScsEstadoejg();
                 response = 0;
@@ -3132,6 +3132,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
         ResponseEntity<InputStreamResource> res = null;
         HttpHeaders headers = new HttpHeaders();
+        File fichero = null;
+
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
