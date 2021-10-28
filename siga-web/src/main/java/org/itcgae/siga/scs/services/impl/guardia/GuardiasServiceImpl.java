@@ -3158,7 +3158,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return insertResponseDTO;
 		}
 	
-	@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario: 0 */1 * * *}")
+	@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario: 0 * 0/1 * * *}")
 	@Override
 	public InsertResponseDTO generarCalendarioAsync () {
 		LOGGER.info("generarCalendarioAsync() -> Entrada al servicio para búsqueda de las guardias");
