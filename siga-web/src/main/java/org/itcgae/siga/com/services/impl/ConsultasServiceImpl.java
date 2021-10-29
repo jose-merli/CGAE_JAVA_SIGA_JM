@@ -2664,8 +2664,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 					LOGGER.info(
 							"constructorConsultas() / ConCriterioConsultaMapper.deleteByPrimaryKey() -> Eliminado con exito el registro en con_criterioconsulta con PK --> idconsulta: " + rule.getIdconsulta() + ", orden: " + rule.getOrden() + ", idinstitucion: " + idInstitucion);
 				}
-				
-				
+						
 			}
 		}
 		
@@ -2697,6 +2696,9 @@ public class ConsultasServiceImpl implements IConsultasService {
 					
 					conCriterioConsultaInsertar.setIdinstitucion(idInstitucion);
 					conCriterioConsultaInsertar.setIdconsulta(Long.valueOf(queryBuilderDTO.getIdconsulta()));
+					
+					queryBuilderDTO.getConsulta().replace("(", "( ");
+					queryBuilderDTO.getConsulta().replace(")", " )");
 					
 					String[] criteriosLista = queryBuilderDTO.getConsulta().split(" ");
 					boolean ruleFormada = false;
@@ -2749,6 +2751,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 							if(statusInsertConCriterioConsulta == 0) {
 								throw new Exception("No se ha podido realizar la insercion parcial de la consulta en la tabla con_criterioconsulta, fallo en la rule num:" + numRulesFormadas);						
 							}else if(statusInsertConCriterioConsulta == 1) {
+								ruleFormada = false;
 								LOGGER.info(
 										"constructorConsultas() / ConCriterioConsultaMapper.insertSelective() -> Se ha podido realizar la insercion parcial de la consulta en la tabla con_criterioconsulta, numero de inserciones: " + numRulesFormadas);
 							}
@@ -2756,7 +2759,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 							
 							LOGGER.info(
 									"constructorConsultas() / ConCriterioConsultaMapper.insertSelective() -> Salida de ConCriterioConsultaMapper para guardar la consulta sql enviada desde el constructor de consultas");
-							ruleFormada = false;					
+											
 						}
 					}
 				
