@@ -131,9 +131,11 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerDatosConsulta")
 	@Results({
+		@Result(column = "IDCONSULTA", property = "idconsulta", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "ORDEN", property = "orden", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "CONECTOR", property = "conector", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ABRIRPAR", property = "abrirparentesis", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCAMPO", property = "idcampo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREENCONSULTA", property = "campo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OPERADOR", property = "operador", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SIMBOLO", property = "simbolo", jdbcType = JdbcType.VARCHAR),
@@ -149,6 +151,7 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerConfigColumnasQueryBuilder")
 	@Results({
 		@Result(column = "TIPOCAMPO", property = "tipocampo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCAMPO", property = "idcampo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREENCONSULTA", property = "nombreenconsulta", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SELECTAYUDA", property = "selectayuda", jdbcType = JdbcType.VARCHAR)
 		

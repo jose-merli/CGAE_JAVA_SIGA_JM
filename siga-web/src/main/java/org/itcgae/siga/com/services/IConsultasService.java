@@ -72,9 +72,13 @@ public interface IConsultasService {
 
 	public List<Map<String, Object>> ejecutarConsultaConClavesLog(String sentencia, AdmUsuarios usuario,Long modelosComunicacionItem, Long consulta, Short idInstitucion,String descripcion) throws Exception;
 	
-	public ConstructorConsultasDTO constructorConsultas(HttpServletRequest request, QueryBuilderDTO queryBuilderDTO);
+	public QueryBuilderDTO constructorConsultas(HttpServletRequest request, QueryBuilderDTO queryBuilderDTO) throws Exception;
 	
+	//SQL
 	public ConstructorConsultasDTO obtenerDatosConsulta(HttpServletRequest request, String idConsulta);
+	
+	//JSON
+	public ConstructorConsultasDTO obtenerConsultaJSON(HttpServletRequest request, String idConsulta);
 	
 	public ConfigColumnasQueryBuilderDTO obtenerConfigColumnasQueryBuilder(HttpServletRequest request);
 	

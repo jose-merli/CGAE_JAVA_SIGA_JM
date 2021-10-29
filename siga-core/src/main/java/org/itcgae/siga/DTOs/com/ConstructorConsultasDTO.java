@@ -11,6 +11,8 @@ public class ConstructorConsultasDTO {
 	private List <ConstructorConsultasItem> constructorConsultasItem = new ArrayList <ConstructorConsultasItem>();
 	private String consulta;
 	
+	private Error error = null;
+	
 	public String getConsulta() {
 		return consulta;
 	}
@@ -18,7 +20,6 @@ public class ConstructorConsultasDTO {
 		this.consulta = consulta;
 	}
 
-	private Error error = null;
 	
 	public List<ConstructorConsultasItem> getConstructorConsultasItem() {
 		return constructorConsultasItem;

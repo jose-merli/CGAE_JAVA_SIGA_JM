@@ -4,21 +4,17 @@ import java.util.Objects;
 
 public class ConstructorConsultasItem {
 	
+	private int idconsulta;
 	private int orden; 
 	private String conector; //AND (Y) U OR (O), columna OPERADOR en con_criterioconsulta
 	private String abrirparentesis;
+	private String idcampo;
 	private String campo; //columna NOMBREENCONSULTA en con_campoconsulta
 	private String operador; //Igual a, distinto de (se encuentran en con_operacionconsulta)
 	private String simbolo;
 	private String valor;
 	private String cerrarparentesis;
 	
-	public String getSimbolo() {
-		return simbolo;
-	}
-	public void setSimbolo(String simbolo) {
-		this.simbolo = simbolo;
-	}
 	public int getOrden() {
 		return orden;
 	}
@@ -34,8 +30,20 @@ public class ConstructorConsultasItem {
 	public String getAbrirparentesis() {
 		return abrirparentesis;
 	}
+	public int getIdconsulta() {
+		return idconsulta;
+	}
+	public void setIdconsulta(int idconsulta) {
+		this.idconsulta = idconsulta;
+	}
 	public void setAbrirparentesis(String abrirparentesis) {
 		this.abrirparentesis = abrirparentesis;
+	}
+	public String getIdcampo() {
+		return idcampo;
+	}
+	public void setIdcampo(String idcampo) {
+		this.idcampo = idcampo;
 	}
 	public String getCampo() {
 		return campo;
@@ -49,6 +57,12 @@ public class ConstructorConsultasItem {
 	public void setOperador(String operador) {
 		this.operador = operador;
 	}
+	public String getSimbolo() {
+		return simbolo;
+	}
+	public void setSimbolo(String simbolo) {
+		this.simbolo = simbolo;
+	}
 	public String getValor() {
 		return valor;
 	}
@@ -58,14 +72,12 @@ public class ConstructorConsultasItem {
 	public String getCerrarparentesis() {
 		return cerrarparentesis;
 	}
-	public void setCerrarparentesis(String cerrarparentesis) {
-		this.cerrarparentesis = cerrarparentesis;
-	}
+	
 	@Override
 	public int hashCode() {
-		return Objects.hash(abrirparentesis, campo, cerrarparentesis, conector, operador, orden, simbolo, valor);
+		return Objects.hash(abrirparentesis, campo, cerrarparentesis, conector, idcampo, idconsulta, operador, orden,
+				simbolo, valor);
 	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -77,15 +89,22 @@ public class ConstructorConsultasItem {
 		ConstructorConsultasItem other = (ConstructorConsultasItem) obj;
 		return Objects.equals(abrirparentesis, other.abrirparentesis) && Objects.equals(campo, other.campo)
 				&& Objects.equals(cerrarparentesis, other.cerrarparentesis) && Objects.equals(conector, other.conector)
+				&& Objects.equals(idcampo, other.idcampo) && idconsulta == other.idconsulta
 				&& Objects.equals(operador, other.operador) && orden == other.orden
 				&& Objects.equals(simbolo, other.simbolo) && Objects.equals(valor, other.valor);
+	}
+	public void setCerrarparentesis(String cerrarparentesis) {
+		this.cerrarparentesis = cerrarparentesis;
 	}
 	
 	@Override
 	public String toString() {
-		return "ConstructorConsultasItem [orden=" + orden + ", conector=" + conector + ", abrirparentesis="
-				+ abrirparentesis + ", campo=" + campo + ", operador=" + operador + ", simbolo=" + simbolo + ", valor="
-				+ valor + ", cerrarparentesis=" + cerrarparentesis + "]";
+		return "ConstructorConsultasItem [idconsulta=" + idconsulta + ", orden=" + orden + ", conector=" + conector
+				+ ", abrirparentesis=" + abrirparentesis + ", idcampo=" + idcampo + ", campo=" + campo + ", operador="
+				+ operador + ", simbolo=" + simbolo + ", valor=" + valor + ", cerrarparentesis=" + cerrarparentesis
+				+ "]";
 	}
+
+	
 	
 }

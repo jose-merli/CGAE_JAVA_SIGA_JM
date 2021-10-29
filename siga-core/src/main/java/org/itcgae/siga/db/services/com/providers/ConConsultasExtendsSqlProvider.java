@@ -223,9 +223,11 @@ public class ConConsultasExtendsSqlProvider {
 	public String obtenerDatosConsulta(String idLenguaje, Short idInstitucion, String idConsulta){
 			
 			SQL sql = new SQL();
+			sql.SELECT(" criterio_con.IDCONSULTA");
 			sql.SELECT(" criterio_con.ORDEN");
 			sql.SELECT(" criterio_con.OPERADOR conector");
 			sql.SELECT(" criterio_con.ABRIRPAR");
+			sql.SELECT(" campo_con.IDCAMPO");
 			sql.SELECT(" campo_con.NOMBREENCONSULTA");
 			sql.SELECT(" f_siga_getrecurso(operacion_con.DESCRIPCION, " + idLenguaje + ") operador");
 			sql.SELECT("  operacion_con.SIMBOLO");
@@ -240,6 +242,7 @@ public class ConConsultasExtendsSqlProvider {
 			sql.WHERE(" criterio_con.idconsulta = " + idConsulta);
 			sql.WHERE(" campo_con.idcampo (+) = criterio_con.idcampo");
 			sql.WHERE(" operacion_con.idoperacion (+) = criterio_con.idoperacion");
+			sql.ORDER_BY(" orden");
 			
 			return sql.toString();
 		}
@@ -261,6 +264,7 @@ public class ConConsultasExtendsSqlProvider {
 		SQL sql = new SQL();
 		
 		sql.SELECT(" distinct CASE tipocampo WHEN 'D' THEN 'date' WHEN 'A' THEN 'string' WHEN 'N' THEN 'number' END AS tipocampo");
+		sql.SELECT(" idcampo");
 		sql.SELECT(" nombreenconsulta");
 		sql.SELECT(" selectayuda");
 		

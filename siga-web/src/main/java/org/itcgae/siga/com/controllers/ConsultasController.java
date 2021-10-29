@@ -217,17 +217,28 @@ public class ConsultasController {
 	}
 	
 	@PostMapping(value = "/pys/constructorConsultas")
-	ResponseEntity<ConstructorConsultasDTO> constructorConsultas(HttpServletRequest request, @RequestBody QueryBuilderDTO queryBuilderDTO) {
-		ConstructorConsultasDTO response = _consultasService.constructorConsultas(request, queryBuilderDTO);
+	ResponseEntity<QueryBuilderDTO> constructorConsultas(HttpServletRequest request, @RequestBody QueryBuilderDTO queryBuilderDTO) throws Exception {
+		QueryBuilderDTO response = _consultasService.constructorConsultas(request, queryBuilderDTO);
+		if (response.getError() == null)
+			return new ResponseEntity<QueryBuilderDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<QueryBuilderDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	//SQL
+	@GetMapping(value = "/pys/obtenerDatosConsulta")
+	ResponseEntity<ConstructorConsultasDTO> obtenerDatosConsulta(HttpServletRequest request, @RequestParam String idConsulta) { 
+		ConstructorConsultasDTO response = _consultasService.obtenerDatosConsulta(request, idConsulta);
 		if (response.getError() == null)
 			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@GetMapping(value = "/pys/obtenerDatosConsulta")
-	ResponseEntity<ConstructorConsultasDTO> obtenerDatosConsulta(HttpServletRequest request, @RequestParam String idConsulta) { 
-		ConstructorConsultasDTO response = _consultasService.obtenerDatosConsulta(request, idConsulta);
+	//JSON
+	@GetMapping(value = "/pys/obtenerConsultaJSON")
+	ResponseEntity<ConstructorConsultasDTO> obtenerConsultaJSON(HttpServletRequest request, @RequestParam String idConsulta) { 
+		ConstructorConsultasDTO response = _consultasService.obtenerConsultaJSON(request, idConsulta);
 		if (response.getError() == null)
 			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
 		else
