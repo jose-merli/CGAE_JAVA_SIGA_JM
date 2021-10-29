@@ -897,6 +897,15 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					keyEnvio.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
 					keyEnvio.setIdinstitucion(idInstitucion);
 					EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
+					
+					/* Si el envío tenía una fecha programada, se le asigna una nueva para prevenir
+					 * que la fecha programada sea posterior a la fecha de creación del envío.
+					 */
+					
+					if (envio.getFechaprogramada()!= null) {
+						envio.setFechaprogramada(new Date());
+					}
+					
 					Long idEnvio = envio.getIdenvio();
 					envio.setIdplantillaenvios(plantillaEnvio.getIdplantillaenvios());
 					envio.setFechamodificacion(new Date());
