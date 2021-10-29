@@ -50,7 +50,6 @@ import org.itcgae.siga.scs.services.acta.IBusquedaActa;
 import org.itcgae.siga.scs.services.impl.ejg.GestionEJGServiceImpl;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
-import org.itcgae.sspp.ws.ecosclient.wsdl.soap.encoding.Int;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,40 +119,41 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 			LOGGER.info(
 					"busquedaActas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if (usuarios != null && usuarios.size() > 0) {
 
-			AdmUsuarios usuario = usuarios.get(0);
+				AdmUsuarios usuario = usuarios.get(0);
 
-			usuario.setIdinstitucion(idInstitucion);
+				usuario.setIdinstitucion(idInstitucion);
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
 
-			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-			LOGGER.info(
-					"busquedaActas() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsActaExtendsMapper para obtener las actas");
+				LOGGER.info(
+						"busquedaActas() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsActaExtendsMapper para obtener las actas");
 
-			// Buscamos las actas con una query customizada
+				// Buscamos las actas con una query customizada
 
-			List<ActasItem> listaActasItem = scsActaExtendsMapper.busquedaActas(actasItem,
-					Short.valueOf(idInstitucion));
+				List<ActasItem> listaActasItem = scsActaExtendsMapper.busquedaActas(actasItem,
+						Short.valueOf(idInstitucion));
 
-			if (listaActasItem != null) {
+				if (listaActasItem != null) {
 
-				// Guardamos la lista de actas en el objeto DTO
+					// Guardamos la lista de actas en el objeto DTO
 
-				actasDTO.actasItem(listaActasItem);
+					actasDTO.actasItem(listaActasItem);
 
-			} else {
-				error.setCode(500);
-				error.setDescription("Ha ocurrido un error a la hora de buscar las actas");
+				} else {
+					error.setCode(500);
+					error.setDescription("Ha ocurrido un error a la hora de buscar las actas");
+				}
+
+				LOGGER.info(
+						"busquedaActas() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsActaExtendsMapper para obtener lista de Actas");
 			}
-
-			LOGGER.info(
-					"busquedaActas() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsActaExtendsMapper para obtener lista de Actas");
-
 		} else {
 
 			LOGGER.warn("busquedaActas() -> idInstitucion del token nula");
@@ -197,91 +197,93 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 			LOGGER.info(
 					"borrarActas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if (usuarios != null && usuarios.size() > 0) {
 
-			AdmUsuarios usuario = usuarios.get(0);
+				AdmUsuarios usuario = usuarios.get(0);
 
-			usuario.setIdinstitucion(idInstitucion);
+				usuario.setIdinstitucion(idInstitucion);
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
 
-			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-			for (ActasItem actasItem : actasItems) {
+				for (ActasItem actasItem : actasItems) {
 
-				// Comprobamos que los datos del acta que vienen no son nulos
-				if (actasItem.getAnioacta() != null && actasItem.getIdacta() != null && idInstitucion != null) {
+					// Comprobamos que los datos del acta que vienen no son nulos
+					if (actasItem.getAnioacta() != null && actasItem.getIdacta() != null && idInstitucion != null) {
 
-					// Obtenemos el acta que vamos a borrar
-					ScsActacomision acta = obtenerActa(actasItem, idInstitucion);
+						// Obtenemos el acta que vamos a borrar
+						ScsActacomision acta = obtenerActa(actasItem, idInstitucion);
 
-					if (acta != null) {
-						// Obtenemos el listado de EJG asociados al Acta
-						List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(acta);
+						if (acta != null) {
+							// Obtenemos el listado de EJG asociados al Acta
+							List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(acta);
 
-						// Comprobamos que la lista esta vacia o nula ya que si tiene elementos
-						// asociados al acta no vamos a
+							// Comprobamos que la lista esta vacia o nula ya que si tiene elementos
+							// asociados al acta no vamos a
 
-						try {
+							try {
 
-							if (listaEjgAsociadosActa.isEmpty() || listaEjgAsociadosActa == null) {
+								if (listaEjgAsociadosActa.isEmpty() || listaEjgAsociadosActa == null) {
 
-								LOGGER.info(
-										"borrarActas() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsActaExtendsMapper para obtener las actas");
+									LOGGER.info(
+											"borrarActas() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsActaExtendsMapper para obtener las actas");
 
-								int response = scsActacomisionMapper.deleteByPrimaryKey(acta);
+									int response = scsActacomisionMapper.deleteByPrimaryKey(acta);
 
-								if (response == 1) {
+									if (response == 1) {
 
-									deleteResponseDTO.setStatus(SigaConstants.OK);
+										deleteResponseDTO.setStatus(SigaConstants.OK);
 
-									LOGGER.info("borrarActas() -> OK. Acta eliminada correctamente");
+										LOGGER.info("borrarActas() -> OK. Acta eliminada correctamente");
 
+									} else {
+										deleteResponseDTO.setStatus(SigaConstants.KO);
+
+										error.setCode(500);
+
+										error.setDescription("Acta NO eliminada correctamente");
+
+										deleteResponseDTO.setStatus(SigaConstants.KO);
+
+										LOGGER.warn("borrarActas() -> KO. Acta NO eliminada correctamente");
+
+									}
+
+									LOGGER.info(
+											"borrarActas() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsActaExtendsMapper para obtener lista de Actas");
 								} else {
+
 									deleteResponseDTO.setStatus(SigaConstants.KO);
 
 									error.setCode(500);
 
-									error.setDescription("Acta NO eliminada correctamente");
+									error.setDescription("Acta " + acta.getAnioacta() + "/" + acta.getNumeroacta()
+											+ " NO eliminada porque tiene elementos asociados");
 
 									deleteResponseDTO.setStatus(SigaConstants.KO);
 
-									LOGGER.warn("borrarActas() -> KO. Acta NO eliminada correctamente");
-
+									throw new SigaExceptions(
+											"Ha ocurrido un error a la hora de borrar el actas, el acta tiene elementos asociados");
 								}
 
-								LOGGER.info(
-										"borrarActas() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsActaExtendsMapper para obtener lista de Actas");
-							} else {
-
-								deleteResponseDTO.setStatus(SigaConstants.KO);
-
-								error.setCode(500);
-
-								error.setDescription("Acta " + acta.getAnioacta() + "/" + acta.getNumeroacta()
-										+ " NO eliminada porque tiene elementos asociados");
-
-								deleteResponseDTO.setStatus(SigaConstants.KO);
-
-								throw new SigaExceptions(
-										"Ha ocurrido un error a la hora de borrar el actas, el acta tiene elementos asociados");
+							} catch (SigaExceptions e) {
+								LOGGER.info("El acta tiene elementos asociados, no se ha podido borrar");
 							}
-
-						} catch (SigaExceptions e) {
-							LOGGER.info("El acta tiene elementos asociados, no se ha podido borrar");
+						} else {
+							throw new SigaExceptions("El acta es nula");
 						}
+
 					} else {
-						throw new SigaExceptions("El acta es nula");
+						error.setCode(500);
+
+						error.setDescription("Faltan datos para encontrar el acta que se desea borrar");
+
+						deleteResponseDTO.setStatus(SigaConstants.KO);
 					}
-
-				} else {
-					error.setCode(500);
-
-					error.setDescription("Faltan datos para encontrar el acta que se desea borrar");
-
-					deleteResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
 		} else {
@@ -336,38 +338,40 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 			LOGGER.info(
 					"comboSufijoActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if (usuarios != null && usuarios.size() > 0) {
 
-			AdmUsuarios usuario = usuarios.get(0);
+				AdmUsuarios usuario = usuarios.get(0);
 
-			usuario.setIdinstitucion(idInstitucion);
+				usuario.setIdinstitucion(idInstitucion);
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
 
-			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-			LOGGER.info(
-					"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el combo de sufijos para actas");
+				LOGGER.info(
+						"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el combo de sufijos para actas");
 
-			// Obtenemos el combo de sufijos para el acta
+				// Obtenemos el combo de sufijos para el acta
 
-			comboItems = scsActaExtendsMapper.comboSufijoActa(idInstitucion);
+				comboItems = scsActaExtendsMapper.comboSufijoActa(idInstitucion);
 
-			LOGGER.info(
-					"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener el combo de sufijos para actas");
+				LOGGER.info(
+						"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener el combo de sufijos para actas");
 
-			if (comboItems != null) {
+				if (comboItems != null) {
 
-				comboDTO.setCombooItems(comboItems);
+					comboDTO.setCombooItems(comboItems);
 
-			} else {
+				} else {
 
-				error.setCode(500);
+					error.setCode(500);
 
-				error.setDescription("El listado de combos es nulo");
+					error.setDescription("El listado de combos es nulo");
 
+				}
 			}
 
 		} else {
@@ -406,6 +410,8 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		int response;
 
+		ScsActacomision acta = null;
+
 		// Si la institucion del token es nula, no ejecutaremos nada del código
 
 		if (null != idInstitucion) {
@@ -424,167 +430,172 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 			LOGGER.info(
 					"guardarActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			AdmUsuarios usuario = usuarios.get(0);
+			if (usuarios != null && usuarios.size() > 0) {
 
-			usuario.setIdinstitucion(idInstitucion);
+				AdmUsuarios usuario = usuarios.get(0);
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
+				usuario.setIdinstitucion(idInstitucion);
 
-			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
 
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
-			ScsActacomision acta = null;
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-			// Obtenemos el acta que vamos a guardar si los campos de su clave primaria no
-			// son nulos, si son nulos crearemos el acta
+				// Obtenemos el acta que vamos a guardar si los campos de su clave primaria no
+				// son nulos, si son nulos crearemos el acta
 
-			if (actasItem.getAnioacta() != null && actasItem.getIdacta() != null) {
+				if (actasItem.getAnioacta() != null && actasItem.getIdacta() != null) {
+					LOGGER.info("NO DEBERIA ENTRAR AQUI SI VA A CREAR UN NUEVO ACTA ");
+					acta = obtenerActa(actasItem, idInstitucion);
 
-				acta = obtenerActa(actasItem, idInstitucion);
-
-			}
-
-			// Si es nulo significa que vamos a guardar un acta que es nueva por lo cual
-			// debemos crear un objeto nuevo
-			if (acta == null) {
-
-				acta = new ScsActacomision();
-
-				// Con este dato sabremos si actualizar o crear un nuevo registro mas tarde
-				actualizar = false;
-			}
-
-			LOGGER.info("Estoy aqui para ver el objeto actasItem " + actasItem);
-			LOGGER.info("Estoy aqui para ver el objeto actasItem " + actasItem.getAnioacta() + " "
-					+ actasItem.getFechareunion() + " " + actasItem.getFecharesolucion() + " "
-					+ actasItem.getPendientes());
-
-			// Comprobamos que se cumplen los requisitos de cada campo
-			if (actasItem.getAnioacta() != null
-					&& ((actualizar == true
-							&& actasItem.getAnioacta() != String.valueOf(Calendar.getInstance().get(Calendar.YEAR)))
-							|| actualizar == false)
-					&& actasItem.getFechareunion() != null && actasItem.getFecharesolucion() != null
-					&& scsActaExtendsMapper.comprobarGuardarActaSufijo(actasItem, idInstitucion) == null
-					&& scsActaExtendsMapper.comprobarGuardarActaPonente(actasItem, idInstitucion) != null) {
-
-				LOGGER.info(
-						"guardarActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para guardar el acta");
-
-				acta.setAnioacta(Short.valueOf(actasItem.getAnioacta()));
-
-				if (actualizar == false) {
-					int idActa;
-					try {
-						idActa = scsActaExtendsMapper.obtenerIdActa(actasItem, Short.valueOf(actasItem.getIdacta()));
-						LOGGER.info("EL id DEL ACTA ES" + idActa);
-						actasItem.setIdacta(String.valueOf(idActa));
-						acta.setIdacta(Long.valueOf(idActa + 1));
-					} catch (Exception e) {
-						LOGGER.info("EL id DEL ACTA ES 1 si no encuentro el numero acta como lo busco");
-						idActa = 1;
-						acta.setIdacta(Long.valueOf(idActa));
-						actasItem.setIdacta(String.valueOf(idActa));
-					}
 				}
 
-				// Tengo que cambiarlo
-				acta.setIdinstitucion(idInstitucion);
+				// Si es nulo significa que vamos a guardar un acta que es nueva por lo cual
+				// debemos crear un objeto nuevo
+				if (acta == null) {
+					LOGGER.info(" DEBERIA ENTRAR AQUI SI VA A CREAR UN NUEVO ACTA ");
+					acta = new ScsActacomision();
+
+					// Con este dato sabremos si actualizar o crear un nuevo registro mas tarde
+					actualizar = false;
+				}
+
+				LOGGER.info("Estoy aqui para ver el objeto actasItem " + actasItem);
+				LOGGER.info("Estoy aqui para ver el objeto actasItem " + actasItem.getAnioacta() + " "
+						+ actasItem.getFechareunion() + " " + actasItem.getFecharesolucion() + " "
+						+ actasItem.getPendientes());
+
+				// Comprobamos que se cumplen los requisitos de cada campo
+				if (actasItem.getAnioacta() != null
+						&& ((actualizar == true
+								&& actasItem.getAnioacta() != String.valueOf(Calendar.getInstance().get(Calendar.YEAR)))
+								|| actualizar == false)
+						&& actasItem.getFechareunion() != null && actasItem.getFecharesolucion() != null
+						&& scsActaExtendsMapper.comprobarGuardarActaSufijo(actasItem, idInstitucion) == null
+						&& scsActaExtendsMapper.comprobarGuardarActaPonente(actasItem, idInstitucion) != null) {
+
+					LOGGER.info(
+							"guardarActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para guardar el acta");
+
+					acta.setAnioacta(Short.valueOf(actasItem.getAnioacta()));
+
+					if (actualizar == false) {
+						int idActa;
+						
+							idActa = scsActaExtendsMapper.obtenerIdActa(actasItem,
+									Short.valueOf(actasItem.getIdacta()));
+							LOGGER.info("EL id DEL ACTA ES" + idActa);
+							actasItem.setIdacta(String.valueOf(idActa));
+							acta.setIdacta(Long.valueOf(idActa + 1));
+					}
+
+					// Tengo que cambiarlo
+					acta.setIdinstitucion(idInstitucion);
 
 //
-				if (actasItem.getNumeroacta() != null && actasItem.getSufijo() != null) {
-					LOGGER.info("DENTRO DE NUMERO ACTA");
-					LOGGER.info("VAMOS A OBTENER EL NUMERO DEL ACTA");
+					if (actasItem.getNumeroacta() != null && actasItem.getSufijo() != null) {
+						LOGGER.info("DENTRO DE NUMERO ACTA");
+						LOGGER.info("VAMOS A OBTENER EL NUMERO DEL ACTA");
 
-					List<String> numActa = scsActaExtendsMapper.obtenerNumActa(actasItem,
-							Short.valueOf(actasItem.getIdacta()));
+						List<String> numActa = scsActaExtendsMapper.obtenerNumActa(actasItem,
+								Short.valueOf(actasItem.getIdacta()));
 
-					if (!numActa.isEmpty() && numActa.contains(actasItem.getNumeroacta() + actasItem.getSufijo())) {
-						throw new SigaExceptions(
-								"Ya existe un acta con ese numero, por favor introduzca uno mas grande");
-					} else {
-						acta.setNumeroacta(actasItem.getNumeroacta() + actasItem.getSufijo());
+						if (!numActa.isEmpty() && numActa.contains(actasItem.getNumeroacta() + actasItem.getSufijo())) {
+
+							throw new SigaExceptions(
+									"Ya existe un acta con ese numero, por favor introduzca uno mas grande");
+						} else {
+							acta.setNumeroacta(actasItem.getNumeroacta() + actasItem.getSufijo());
+						}
+					} else if (actasItem.getNumeroacta() != null && actasItem.getSufijo() == null) {
+						List<String> numActa = scsActaExtendsMapper.obtenerNumActa(actasItem,
+								Short.valueOf(actasItem.getIdacta()));
+
+						if (!numActa.isEmpty() && numActa.contains(actasItem.getNumeroacta())) {
+
+							throw new SigaExceptions(
+									"Ya existe un acta con ese numero, por favor introduzca uno mas grande");
+						} else {
+							acta.setNumeroacta(actasItem.getNumeroacta());
+						}
 					}
-				}
 
-				if (actasItem.getHorainicio() != null) {
-					acta.setHorainicioreunion(actasItem.getHorainicio());
+					if (actasItem.getHorainicio() != null) {
+						acta.setHorainicioreunion(actasItem.getHorainicio());
 
-				}
-				if (actasItem.getHorafin() != null) {
-					acta.setHorafinreunion(actasItem.getHorafin());
+					}
+					if (actasItem.getHorafin() != null) {
+						acta.setHorafinreunion(actasItem.getHorafin());
 
-				}
-				if (actasItem.getIdpresidente() != null) {
-					acta.setIdpresidente(Integer.parseInt(actasItem.getIdpresidente()));
+					}
+					if (actasItem.getIdpresidente() != null) {
+						acta.setIdpresidente(Integer.parseInt(actasItem.getIdpresidente()));
 
-				}
-				if (actasItem.getIdsecretario() != null) {
-					acta.setIdsecretario(Integer.parseInt(actasItem.getIdsecretario()));
+					}
+					if (actasItem.getIdsecretario() != null) {
+						acta.setIdsecretario(Integer.parseInt(actasItem.getIdsecretario()));
 
-				}
-				if (actasItem.getMiembroscomision() != null) {
-					acta.setMiembroscomision(actasItem.getMiembroscomision());
+					}
+					if (actasItem.getMiembroscomision() != null) {
+						acta.setMiembroscomision(actasItem.getMiembroscomision());
 
-				}
-				if (actasItem.getObservaciones() != null) {
-					LOGGER.info("ESTAS SON LAS OBSERVACIONES " + actasItem.getObservaciones());
-					acta.setObservaciones(actasItem.getObservaciones());
+					}
+					if (actasItem.getObservaciones() != null) {
+						acta.setObservaciones(actasItem.getObservaciones());
+					}
+					if (actasItem.getPendientes() != null) {
+						acta.setPendientes(actasItem.getPendientes());
 
-				}
-				if (actasItem.getPendientes() != null) {
-					acta.setPendientes(actasItem.getPendientes());
+					}
+					if (actasItem.getFechareunion() != null) {
+						acta.setFechareunion(actasItem.getFechareunion());
 
-				}
-				if (actasItem.getFechareunion() != null) {
-					acta.setFechareunion(actasItem.getFechareunion());
+					}
+					if (actasItem.getFecharesolucion() != null) {
+						acta.setFecharesolucion(actasItem.getFecharesolucion());
 
-				}
-				if (actasItem.getFecharesolucion() != null) {
-					acta.setFecharesolucion(actasItem.getFecharesolucion());
+					}
+					if (usuario.getIdusuario() != null) {
+						acta.setUsumodificacion(usuario.getIdusuario());
+					}
 
-				}
-				if (usuario.getIdusuario() != null) {
-					acta.setUsumodificacion(usuario.getIdusuario());
-				}
+					acta.setFechamodificacion(new Date());
 
-				acta.setFechamodificacion(new Date());
+					acta.setFechaintercambio(null);
 
-				acta.setFechaintercambio(null);
+					acta.setIdintercambio(null);
 
-				acta.setIdintercambio(null);
+					// Actualizamos o creamos dependiendo del booleano
+					if (actualizar == true) {
+						LOGGER.info("ACTUALIZA " + acta.getIdacta() + " " + acta.getNumeroacta() + " "
+								+ acta.getAnioacta() + " " + acta.getIdinstitucion());
+						response = scsActacomisionMapper.updateByPrimaryKey(acta);
+						if (response == 0) {
+							throw new SigaExceptions("Ha ocurrido un error a la hora de actualizar el acta");
+						}
+						insertResponseDTO.setStatus(SigaConstants.OK);
 
-				// Actualizamos o creamos dependiendo del booleano
-				if (actualizar == true) {
-					LOGGER.info("ACTUALIZA " + acta.getIdacta() + " " + acta.getNumeroacta() + " " + acta.getAnioacta()
-							+ " " + acta.getIdinstitucion());
+					} else {
+						LOGGER.info("INSERTA");
+						response = scsActacomisionMapper.insert(acta);
+
+						if (response == 0) {
+							throw new SigaExceptions("Ha ocurrido un error a la hora de guardar el acta");
+						}
+
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+
 					response = scsActacomisionMapper.updateByPrimaryKey(acta);
+
 					if (response == 0) {
 						throw new SigaExceptions("Ha ocurrido un error a la hora de actualizar el acta");
 					}
-					insertResponseDTO.setStatus(SigaConstants.OK);
-
-				} else {
-					LOGGER.info("INSERTA");
-					response = scsActacomisionMapper.insert(acta);
-
-					if (response == 0) {
-						throw new SigaExceptions("Ha ocurrido un error a la hora de guardar el acta");
-					}
-
-					insertResponseDTO.setStatus(SigaConstants.OK);
+					LOGGER.info(
+							"guardarActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para guardar el acta");
 				}
-
-				response = scsActacomisionMapper.updateByPrimaryKey(acta);
-
-				if (response == 0) {
-					throw new SigaExceptions("Ha ocurrido un error a la hora de actualizar el acta");
-				}
-				LOGGER.info(
-						"guardarActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para guardar el acta");
-
 			} else {
 
 				error.setCode(500);
@@ -603,6 +614,7 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 		LOGGER.info("getLabel() -> Salida del servicio para guardar el Acta");
 
+		error.setInfoURL(acta.getIdacta().toString());
 		insertResponseDTO.setError(error);
 
 		return insertResponseDTO;
@@ -638,74 +650,121 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			AdmUsuarios usuario = usuarios.get(0);
+			if (usuarios != null && usuarios.size() > 0) {
 
-			usuario.setIdinstitucion(idInstitucion);
+				AdmUsuarios usuario = usuarios.get(0);
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
+				usuario.setIdinstitucion(idInstitucion);
 
-			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
 
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
-			LOGGER.info("DATOS ACTA PARA BUSCAR ****************" + actasItem.getIdacta() + " "
-					+ actasItem.getNumeroacta() + " " + actasItem.getIdinstitucion());
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-			// Obtenemos el acta con la que vamos a trabajar
-			ScsActacomision acta = obtenerActa(actasItem, idInstitucion);
+				LOGGER.info("DATOS ACTA PARA BUSCAR ****************" + actasItem.getIdacta() + " "
+						+ actasItem.getNumeroacta() + " " + actasItem.getIdinstitucion());
 
-			// Obtenemos la lista de ejg asociados al acta gracias a la tabla scs_ejg_acta
-			List<ScsEjgActa> listaEjgActa = obtenerEjgActa(acta);
+				// Obtenemos el acta con la que vamos a trabajar
+				ScsActacomision acta = obtenerActa(actasItem, idInstitucion);
 
-			LOGGER.info("esta vacio la lista? ****************" + listaEjgActa.isEmpty());
+				// Obtenemos la lista de ejg asociados al acta gracias a la tabla scs_ejg_acta
+				List<ScsEjgActa> listaEjgActa = obtenerEjgActa(acta);
 
-			if (!listaEjgActa.isEmpty()) {
+				LOGGER.info("esta vacio la lista? ****************" + listaEjgActa.isEmpty());
 
-				// recorreremos toda la lista para sacar los ejg que esten asociados al acata
-				// para tratarlos
-				for (ScsEjgActa scsEjgActa : listaEjgActa) {
+				if (!listaEjgActa.isEmpty()) {
 
-					// Obtenemos el ejg
-					ScsEjg ejgItem = obtenerEjg(scsEjgActa);
+					// recorreremos toda la lista para sacar los ejg que esten asociados al acata
+					// para tratarlos
+					for (ScsEjgActa scsEjgActa : listaEjgActa) {
 
-					if (ejgItem != null) {
+						// Obtenemos el ejg
+						ScsEjg ejgItem = obtenerEjg(scsEjgActa);
 
-						// Pendientes guardara el nombre de todos los ejg asociados a ese acta
-						pendientes += scsEjgActa.getAnioacta() + "/" + scsEjgActa.getNumeroejg() + ",";
+						if (ejgItem != null) {
 
-						// Obtendremos los objetos resolucion asociados al ejg para modificarlo
-						ScsEjgResolucion scsEjgResolucionItem = obtenerEjgResolucion(ejgItem);
+							// Pendientes guardara el nombre de todos los ejg asociados a ese acta
+							pendientes += scsEjgActa.getAnioacta() + "/" + scsEjgActa.getNumeroejg() + ",";
 
-						// Solo nos interesaran los ejg que tengan el tipo ratificacion 4 o 6
-						if (scsEjgResolucionItem != null && scsEjgResolucionItem.getIdtiporatificacionejg() != null) {
-							if (scsEjgResolucionItem.getIdtiporatificacionejg() == Short.valueOf("4")) {
+							// Obtendremos los objetos resolucion asociados al ejg para modificarlo
+							ScsEjgResolucion scsEjgResolucionItem = obtenerEjgResolucion(ejgItem);
 
-								LOGGER.info("El objeto ejg es: " + scsEjgActa.getAnioejg() + " "
-										+ scsEjgActa.getIdinstitucionejg() + " " + scsEjgActa.getIdtipoejg() + " "
-										+ scsEjgActa.getNumeroejg());
+							// Solo nos interesaran los ejg que tengan el tipo ratificacion 4 o 6
+							if (scsEjgResolucionItem != null
+									&& scsEjgResolucionItem.getIdtiporatificacionejg() != null) {
+								if (scsEjgResolucionItem.getIdtiporatificacionejg() == Short.valueOf("4")) {
 
-								LOGGER.info("Si el ejg es 4");
+									LOGGER.info("El objeto ejg es: " + scsEjgActa.getAnioejg() + " "
+											+ scsEjgActa.getIdinstitucionejg() + " " + scsEjgActa.getIdtipoejg() + " "
+											+ scsEjgActa.getNumeroejg());
 
-								// Buscaremos el estado de ese ejg
-								ScsEstadoejgExample exampleEstado = new ScsEstadoejgExample();
+									LOGGER.info("Si el ejg es 4");
 
-								exampleEstado.createCriteria().andIdinstitucionEqualTo(ejgItem.getIdinstitucion())
-										.andIdtipoejgEqualTo(ejgItem.getIdtipoejg()).andAnioEqualTo(ejgItem.getAnio())
-										.andNumeroEqualTo(ejgItem.getNumero())
-										.andIdestadoporejgEqualTo(Long.valueOf("9"));
+									// Buscaremos el estado de ese ejg
+									ScsEstadoejgExample exampleEstado = new ScsEstadoejgExample();
 
-								exampleEstado.setOrderByClause("FECHAMODIFICACION DESC");
+									exampleEstado.createCriteria().andIdinstitucionEqualTo(ejgItem.getIdinstitucion())
+											.andIdtipoejgEqualTo(ejgItem.getIdtipoejg())
+											.andAnioEqualTo(ejgItem.getAnio()).andNumeroEqualTo(ejgItem.getNumero())
+											.andIdestadoporejgEqualTo(Long.valueOf("9"));
 
-								List<ScsEstadoejg> listaEstadoEjg = scsEstadoejgMapper.selectByExample(exampleEstado);
+									exampleEstado.setOrderByClause("FECHAMODIFICACION DESC");
 
-								LOGGER.info("Tamaño lista estado ejg" + listaEstadoEjg.size());
-								// Sacaremos el primer elemento ya que sera el ultimo registro actualizado, por
-								// lo cual sera el que este activo
-								if (!listaEstadoEjg.isEmpty()) {
+									List<ScsEstadoejg> listaEstadoEjg = scsEstadoejgMapper
+											.selectByExample(exampleEstado);
+
+									LOGGER.info("Tamaño lista estado ejg" + listaEstadoEjg.size());
+									// Sacaremos el primer elemento ya que sera el ultimo registro actualizado, por
+									// lo cual sera el que este activo
+									if (!listaEstadoEjg.isEmpty()) {
+										ScsEstadoejg scsEstadoejg = listaEstadoEjg.get(0);
+
+										LOGGER.info("Añadiendo observaciones");
+										scsEstadoejg
+												.setObservaciones("Expediente pendiente de la CAJG. Se retira del acta "
+														+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+
+										LOGGER.info("Updateando el estado ejg");
+
+										response = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoejg);
+
+										if (response == 0) {
+											throw new SigaExceptions("No se han actualizado el estado del ejg");
+										}
+
+										updateResponseDTO.setStatus(SigaConstants.OK);
+									}
+
+								} else if (ejgItem.getNumeroresolucion() == "6") {
+
+									LOGGER.info("Si el ejg es 6");
+
+									LOGGER.info("El objeto ejg es: " + scsEjgActa.getAnioejg() + " "
+											+ scsEjgActa.getIdinstitucionejg() + " " + scsEjgActa.getIdtipoejg() + " "
+											+ scsEjgActa.getNumeroejg());
+
+									ScsEstadoejgExample exampleEstado = new ScsEstadoejgExample();
+
+									exampleEstado.createCriteria().andIdinstitucionEqualTo(ejgItem.getIdinstitucion())
+											.andIdtipoejgEqualTo(ejgItem.getIdtipoejg())
+											.andAnioEqualTo(ejgItem.getAnio()).andNumeroEqualTo(ejgItem.getNumero())
+											.andIdestadoporejgEqualTo(Long.valueOf("21"));
+									exampleEstado.setOrderByClause("FECHAMODIFICACION DESC");
+									LOGGER.info("Se busca el estado ejg");
+
+									List<ScsEstadoejg> listaEstadoEjg = scsEstadoejgMapper
+											.selectByExample(exampleEstado);
+
+									LOGGER.info("Tamaño lista estado ejg" + listaEstadoEjg.size());
+
+									// Sacaremos el primer elemento ya que sera el ultimo registro actualizado, por
+									// lo cual sera el que este activo
 									ScsEstadoejg scsEstadoejg = listaEstadoEjg.get(0);
 
 									LOGGER.info("Añadiendo observaciones");
+
 									scsEstadoejg.setObservaciones("Expediente pendiente de la CAJG. Se retira del acta "
 											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
 
@@ -718,74 +777,34 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 									}
 
 									updateResponseDTO.setStatus(SigaConstants.OK);
+
 								}
-
-							} else if (ejgItem.getNumeroresolucion() == "6") {
-
-								LOGGER.info("Si el ejg es 6");
-
-								LOGGER.info("El objeto ejg es: " + scsEjgActa.getAnioejg() + " "
-										+ scsEjgActa.getIdinstitucionejg() + " " + scsEjgActa.getIdtipoejg() + " "
-										+ scsEjgActa.getNumeroejg());
-
-								ScsEstadoejgExample exampleEstado = new ScsEstadoejgExample();
-
-								exampleEstado.createCriteria().andIdinstitucionEqualTo(ejgItem.getIdinstitucion())
-										.andIdtipoejgEqualTo(ejgItem.getIdtipoejg()).andAnioEqualTo(ejgItem.getAnio())
-										.andNumeroEqualTo(ejgItem.getNumero())
-										.andIdestadoporejgEqualTo(Long.valueOf("21"));
-								exampleEstado.setOrderByClause("FECHAMODIFICACION DESC");
-								LOGGER.info("Se busca el estado ejg");
-
-								List<ScsEstadoejg> listaEstadoEjg = scsEstadoejgMapper.selectByExample(exampleEstado);
-
-								LOGGER.info("Tamaño lista estado ejg" + listaEstadoEjg.size());
-
-								// Sacaremos el primer elemento ya que sera el ultimo registro actualizado, por
-								// lo cual sera el que este activo
-								ScsEstadoejg scsEstadoejg = listaEstadoEjg.get(0);
-
-								LOGGER.info("Añadiendo observaciones");
-
-								scsEstadoejg.setObservaciones("Expediente pendiente de la CAJG. Se retira del acta "
-										+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-
-								LOGGER.info("Updateando el estado ejg");
-
-								response = scsEstadoejgMapper.updateByPrimaryKey(scsEstadoejg);
-
-								if (response == 0) {
-									throw new SigaExceptions("No se han actualizado el estado del ejg");
-								}
-
-								updateResponseDTO.setStatus(SigaConstants.OK);
 
 							}
 
 						}
 
+						response = borrarActa(acta, ejgItem);
+
+						if (response == 0) {
+							throw new SigaExceptions("No se han podido borrar la relacion entre el acta y el ejg");
+						}
+
+						LOGGER.info("Seteando las observaciones");
+
+						acta.setObservaciones(pendientes);
+
+						error.setDescription(acta.getPendientes());
+
+						LOGGER.info("Updateando el acta");
+
+						response = scsActacomisionMapper.updateByPrimaryKey(acta);
+
+						if (response == 0) {
+							throw new SigaExceptions("No se han actualizado el acta");
+						}
+						updateResponseDTO.setStatus(SigaConstants.OK);
 					}
-
-					response = borrarActa(acta, ejgItem);
-
-					if (response == 0) {
-						throw new SigaExceptions("No se han podido borrar la relacion entre el acta y el ejg");
-					}
-
-					LOGGER.info("Seteando las observaciones");
-
-					acta.setObservaciones(pendientes);
-
-					error.setDescription(acta.getPendientes());
-
-					LOGGER.info("Updateando el acta");
-
-					response = scsActacomisionMapper.updateByPrimaryKey(acta);
-
-					if (response == 0) {
-						throw new SigaExceptions("No se han actualizado el acta");
-					}
-					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
 			} else {
 				LOGGER.info("ENTRO EN EL ELSE ****************");
@@ -845,175 +864,186 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 			LOGGER.info(
 					"abrirActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			AdmUsuarios usuario = usuarios.get(0);
+			if (usuarios != null && usuarios.size() > 0) {
 
-			usuario.setIdinstitucion(idInstitucion);
+				AdmUsuarios usuario = usuarios.get(0);
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
+				usuario.setIdinstitucion(idInstitucion);
 
-			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
 
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
-			LOGGER.info("abrirActa() / buscando el acta ");
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-			LOGGER.info("abrirActa() / valores para buscar el acta = " + actasItem.getAnioacta() + " id acta = "
-					+ actasItem.getIdacta());
+				LOGGER.info("abrirActa() / buscando el acta ");
 
-			// Buscamos el acta que vamos a abrir
-			ScsActacomision acta = obtenerActa(actasItem, idInstitucion);
+				LOGGER.info("abrirActa() / valores para buscar el acta = " + actasItem.getAnioacta() + " id acta = "
+						+ actasItem.getIdacta());
 
-			LOGGER.info("abrirActa() / el acta es: " + acta.getAnioacta() + acta.getIdinstitucion() + acta.getIdacta());
-			LOGGER.info("abrirActa() / y tiene la fecha resolucion a : " + acta.getFecharesolucion());
+				// Buscamos el acta que vamos a abrir
+				ScsActacomision acta = obtenerActa(actasItem, idInstitucion);
 
-			// Miramos que la fecha de resolucion sea distinta de nula ya que significa que
-			// esta
-			// cerrada, de lo contrario no hariamos nada porque ya esta abierta
-			try {
-				if (acta.getFecharesolucion() != null) {
+				LOGGER.info(
+						"abrirActa() / el acta es: " + acta.getAnioacta() + acta.getIdinstitucion() + acta.getIdacta());
+				LOGGER.info("abrirActa() / y tiene la fecha resolucion a : " + acta.getFecharesolucion());
 
-					LOGGER.info("abrirActa() / acta encontrada");
+				// Miramos que la fecha de resolucion sea distinta de nula ya que significa que
+				// esta
+				// cerrada, de lo contrario no hariamos nada porque ya esta abierta
+				try {
+					if (acta.getFecharesolucion() != null) {
 
-					LOGGER.info("abrirActa() / buscando los ejg asociados al acta");
+						LOGGER.info("abrirActa() / acta encontrada");
 
-					LOGGER.info("abrirActa() / valores acta institucion = " + acta.getIdinstitucion() + " id acta = "
-							+ acta.getIdacta() + " anioacta =  " + acta.getAnioacta());
+						LOGGER.info("abrirActa() / buscando los ejg asociados al acta");
 
-					List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(acta);
+						LOGGER.info("abrirActa() / valores acta institucion = " + acta.getIdinstitucion()
+								+ " id acta = " + acta.getIdacta() + " anioacta =  " + acta.getAnioacta());
 
-					// Buscamos los ejg asociados al acta
+						List<ScsEjgActa> listaEjgAsociadosActa = obtenerEjgActa(acta);
 
-					if (!listaEjgAsociadosActa.isEmpty()) {
+						// Buscamos los ejg asociados al acta
 
-						LOGGER.info("tamaño de la lista de ejg asociados" + listaEjgAsociadosActa.size());
-						for (ScsEjgActa scsEjgActalista : listaEjgAsociadosActa) {
+						if (!listaEjgAsociadosActa.isEmpty()) {
 
-							List<ScsEjg> ejgItemLista = obtenerListaEjg(scsEjgActalista);
+							LOGGER.info("tamaño de la lista de ejg asociados" + listaEjgAsociadosActa.size());
+							for (ScsEjgActa scsEjgActalista : listaEjgAsociadosActa) {
 
-							if (!ejgItemLista.isEmpty()) {
-								for (ScsEjg ejg : ejgItemLista) {
+								List<ScsEjg> ejgItemLista = obtenerListaEjg(scsEjgActalista);
 
-									// Utilizamos este booleano para saber si existen mas actas asociadas a este ejg
-									// y estan abiertas
-									boolean masActasAbiertas = false;
+								if (!ejgItemLista.isEmpty()) {
+									for (ScsEjg ejg : ejgItemLista) {
 
-									LOGGER.info("abrirActa() / valores ejg institucion = " + ejg.getIdinstitucion()
-											+ " idtipoejg =  " + ejg.getIdtipoejg() + " anio =  " + ejg.getAnio()
-											+ " numero =  " + ejg.getNumero());
+										// Utilizamos este booleano para saber si existen mas actas asociadas a este ejg
+										// y estan abiertas
+										boolean masActasAbiertas = false;
 
-									LOGGER.info("abrirActa() / buscando los estadosejg del ejg en cuestion");
+										LOGGER.info("abrirActa() / valores ejg institucion = " + ejg.getIdinstitucion()
+												+ " idtipoejg =  " + ejg.getIdtipoejg() + " anio =  " + ejg.getAnio()
+												+ " numero =  " + ejg.getNumero());
 
-									// Obtenemos la relaciones con las actas para este ejg
-									List<ScsEjgActa> listaEjgActa = obtenerEjgActa(ejg);
+										LOGGER.info("abrirActa() / buscando los estadosejg del ejg en cuestion");
 
-									LOGGER.info("abrirActa() / TAMAÑO DE LA LISTA CON LA RELACION EJGACTA "
-											+ listaEjgActa.size());
+										// Obtenemos la relaciones con las actas para este ejg
+										List<ScsEjgActa> listaEjgActa = obtenerEjgActa(ejg);
 
-									if (!listaEjgActa.isEmpty()) {
+										LOGGER.info("abrirActa() / TAMAÑO DE LA LISTA CON LA RELACION EJGACTA "
+												+ listaEjgActa.size());
 
-										// Recorremos la lista de ejg y actas asociados en busqueda de un acta abierta
-										for (ScsEjgActa scsEjgActa : listaEjgActa) {
+										if (!listaEjgActa.isEmpty()) {
 
-											// Sacamos las actas asociadas al ejg
-											ScsActacomision actaComision = obtenerActa(scsEjgActa);
+											// Recorremos la lista de ejg y actas asociados en busqueda de un acta
+											// abierta
+											for (ScsEjgActa scsEjgActa : listaEjgActa) {
 
-											// Si la fecha resolucion esta a nula significa que el acta esta abierta
-											if (actaComision.getFecharesolucion() == null) {
-												LOGGER.info(
-														"ENTRO EN LA CREACION DEL MENSAJE PARA DECIR QUE ACTA ESTA ABIERTA Y CERRAR EL PROCESO");
+												// Sacamos las actas asociadas al ejg
+												ScsActacomision actaComision = obtenerActa(scsEjgActa);
 
-												masActasAbiertas = true;
+												// Si la fecha resolucion esta a nula significa que el acta esta abierta
+												if (actaComision.getFecharesolucion() == null) {
+													LOGGER.info(
+															"ENTRO EN LA CREACION DEL MENSAJE PARA DECIR QUE ACTA ESTA ABIERTA Y CERRAR EL PROCESO");
 
-												informacionEjgActaAbierta += " - Ejg " + ejg.getAnio() + "/"
-														+ ejg.getNumero() + " abierto para el acta "
-														+ actaComision.getAnioacta() + "/"
-														+ actaComision.getNumeroacta() + " - ";
-												error.setCode(500);
-												error.setDescription(informacionEjgActaAbierta);
-												updateResponseDTO.setStatus(SigaConstants.KO);
-												throw new SigaExceptions("El objeto de estado para el ejg es nulo");
-											}
+													masActasAbiertas = true;
 
-										}
-									}
-
-									if (masActasAbiertas == false) {
-
-										LOGGER.info(
-												"AQUI LLEGA SI TODO HA SALIDO BIEN Y COGEMOS Y PONEMOS LA FECHA RESOLUCIONCAJ DEL EJG A NULO");
-										ejg.setFecharesolucioncajg(null);
-										scsEjgMapper.updateByPrimaryKey(ejg);
-
-										String idEstadoPorEjg = scsActaExtendsMapper.getEstadosEjg(
-												ejg.getIdinstitucion(), ejg.getIdtipoejg(), ejg.getAnio(),
-												ejg.getNumero());
-
-										LOGGER.info("ejg.getIdinstitucion()" + ejg.getIdinstitucion());
-										LOGGER.info("Long.valueOf(idEstadoPorEjg)" + Long.valueOf(idEstadoPorEjg));
-										LOGGER.info("ejg.getIdinstitucion()" + ejg.getIdinstitucion());
-										LOGGER.info("ejg.getIdtipoejg()" + ejg.getIdtipoejg());
-										LOGGER.info("ejg.getIdtipoejg()" + ejg.getIdtipoejg());
-
-										// Buscamos el estado del ejg
-										ScsEstadoejg estadoejgObject = obtenerEstadoEjg(ejg, idEstadoPorEjg);
-
-										LOGGER.info("busquedaActas() / encontrado los estadosejg del ejg en cuestion");
-
-										if (estadoejgObject != null) {
-
-											LOGGER.info("scsestadoejg no es nulo ");
-
-											if (estadoejgObject.getIdestadoejg().equals(Short.valueOf("10"))) {
-
-												LOGGER.info("scsestadoejg tiene el idestadopor ejg a 10  ");
-
-												estadoejgObject.setFechabaja(new Date());
-
-												int resultado = scsEstadoejgMapper.updateByPrimaryKey(estadoejgObject);
-
-												if (resultado == 0) {
-													throw new SigaExceptions("No se han actualizado el estado del ejg");
+													informacionEjgActaAbierta += " - Ejg " + ejg.getAnio() + "/"
+															+ ejg.getNumero() + " abierto para el acta "
+															+ actaComision.getAnioacta() + "/"
+															+ actaComision.getNumeroacta() + " - ";
+													error.setCode(500);
+													error.setDescription(informacionEjgActaAbierta);
+													updateResponseDTO.setStatus(SigaConstants.KO);
+													throw new SigaExceptions("El objeto de estado para el ejg es nulo");
 												}
 
-												LOGGER.info("ha actualizado el registro????? " + resultado);
 											}
-										} else {
-											error.setCode(500);
-											error.setDescription("El objeto de estado para el ejg es nulo");
-											updateResponseDTO.setStatus(SigaConstants.KO);
-											throw new SigaExceptions("El objeto de estado para el ejg es nulo");
-
 										}
-									}
 
+										if (masActasAbiertas == false) {
+
+											LOGGER.info(
+													"AQUI LLEGA SI TODO HA SALIDO BIEN Y COGEMOS Y PONEMOS LA FECHA RESOLUCIONCAJ DEL EJG A NULO");
+											ejg.setFecharesolucioncajg(null);
+											scsEjgMapper.updateByPrimaryKey(ejg);
+
+											String idEstadoPorEjg = scsActaExtendsMapper.getEstadosEjg(
+													ejg.getIdinstitucion(), ejg.getIdtipoejg(), ejg.getAnio(),
+													ejg.getNumero());
+
+											LOGGER.info("ejg.getIdinstitucion()" + ejg.getIdinstitucion());
+											LOGGER.info("Long.valueOf(idEstadoPorEjg)" + Long.valueOf(idEstadoPorEjg));
+											LOGGER.info("ejg.getIdinstitucion()" + ejg.getIdinstitucion());
+											LOGGER.info("ejg.getIdtipoejg()" + ejg.getIdtipoejg());
+											LOGGER.info("ejg.getIdtipoejg()" + ejg.getIdtipoejg());
+
+											// Buscamos el estado del ejg
+											ScsEstadoejg estadoejgObject = obtenerEstadoEjg(ejg, idEstadoPorEjg);
+
+											LOGGER.info(
+													"busquedaActas() / encontrado los estadosejg del ejg en cuestion");
+
+											if (estadoejgObject != null) {
+
+												LOGGER.info("scsestadoejg no es nulo ");
+
+												if (estadoejgObject.getIdestadoejg().equals(Short.valueOf("10"))) {
+
+													LOGGER.info("scsestadoejg tiene el idestadopor ejg a 10  ");
+
+													estadoejgObject.setFechabaja(new Date());
+
+													int resultado = scsEstadoejgMapper
+															.updateByPrimaryKey(estadoejgObject);
+
+													if (resultado == 0) {
+														throw new SigaExceptions(
+																"No se han actualizado el estado del ejg");
+													}
+
+													LOGGER.info("ha actualizado el registro????? " + resultado);
+												}
+											} else {
+												error.setCode(500);
+												error.setDescription("El objeto de estado para el ejg es nulo");
+												updateResponseDTO.setStatus(SigaConstants.KO);
+												throw new SigaExceptions("El objeto de estado para el ejg es nulo");
+
+											}
+										}
+
+									}
 								}
 							}
+
+							LOGGER.info("AQUI LLEGA SI TODO HA SALIDO BIEN Y COGEMOS ABRIMOS EL ACTA");
+							acta.setFecharesolucion(null);
+							scsActacomisionMapper.updateByPrimaryKey(acta);
+							updateResponseDTO.setStatus(SigaConstants.OK);
+
+						} else {
+							acta.setFecharesolucion(null);
+							scsActacomisionMapper.updateByPrimaryKey(acta);
+							updateResponseDTO.setStatus(SigaConstants.OK);
 						}
-						LOGGER.info("AQUI LLEGA SI TODO HA SALIDO BIEN Y COGEMOS ABRIMOS EL ACTA");
-						acta.setFecharesolucion(null);
-						scsActacomisionMapper.updateByPrimaryKey(acta);
-						updateResponseDTO.setStatus(SigaConstants.OK);
+
+						LOGGER.info(
+								"abrirActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de Actas");
+
 					} else {
-						acta.setFecharesolucion(null);
-						scsActacomisionMapper.updateByPrimaryKey(acta);
-						updateResponseDTO.setStatus(SigaConstants.OK);
+
+						error.setCode(500);
+						error.setDescription("El acta ya esta abierta");
+						updateResponseDTO.setStatus(SigaConstants.KO);
 					}
 
-					LOGGER.info(
-							"abrirActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de Actas");
+				} catch (SigaExceptions e) {
+					LOGGER.info("AQUI ESTA EL CATCH DE QUE ALGO HA SALIDO MAL****************");
+					LOGGER.info("Nos se ha podido completar el abrir el acta " + e.getMsg());
+					LOGGER.info("AQUI ESTA EL CATCH DE QUE ALGO HA SALIDO MAL****************");
 
-				} else {
-
-					error.setCode(500);
-					error.setDescription("El acta ya esta abierta");
-					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
-			} catch (SigaExceptions e) {
-				LOGGER.info("AQUI ESTA EL CATCH DE QUE ALGO HA SALIDO MAL****************");
-				LOGGER.info("Nos se ha podido completar el abrir el acta " + e.getMsg());
-				LOGGER.info("AQUI ESTA EL CATCH DE QUE ALGO HA SALIDO MAL****************");
-
 			}
 		} else {
 			error.setCode(500);
@@ -1063,175 +1093,182 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 			LOGGER.info(
 					"cerrarActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			AdmUsuarios usuario = usuarios.get(0);
+			if (usuarios != null && usuarios.size() > 0) {
 
-			usuario.setIdinstitucion(idInstitucion);
+				AdmUsuarios usuario = usuarios.get(0);
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
+				usuario.setIdinstitucion(idInstitucion);
 
-			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
 
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
-			LOGGER.info(
-					"cerrarActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener las actas");
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-			// Obtenemos el acta que vamos a cerrar
-			ScsActacomision acta = obtenerActa(actasItem, idInstitucion);
+				LOGGER.info(
+						"cerrarActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener las actas");
 
-			if (acta.getFecharesolucion() == null) {
+				// Obtenemos el acta que vamos a cerrar
+				ScsActacomision acta = obtenerActa(actasItem, idInstitucion);
 
-				if (actasItem.getFecharesolucion() == null) {
-					actasItem.setFecharesolucion(new Date());
-				}
+				if (acta.getFecharesolucion() == null) {
 
-				List<ScsEjgActa> listaEjgActa = obtenerEjgActa(acta);
+					if (actasItem.getFecharesolucion() == null) {
+						actasItem.setFecharesolucion(new Date());
+					}
 
-				LOGGER.info("Lista de ejgasociados conseguida");
+					List<ScsEjgActa> listaEjgActa = obtenerEjgActa(acta);
 
-				if (!listaEjgActa.isEmpty()) {
+					LOGGER.info("Lista de ejgasociados conseguida");
 
-					LOGGER.info("*****************lista de ejg asociados al acta no es nula************** "
-							+ listaEjgActa.size());
+					if (!listaEjgActa.isEmpty()) {
 
-					for (ScsEjgActa scsEjgActa : listaEjgActa) {
+						LOGGER.info("*****************lista de ejg asociados al acta no es nula************** "
+								+ listaEjgActa.size());
 
-						List<ScsEjg> ejgItemLista = obtenerListaEjg(scsEjgActa);
+						for (ScsEjgActa scsEjgActa : listaEjgActa) {
 
-						if (!ejgItemLista.isEmpty()) {
+							List<ScsEjg> ejgItemLista = obtenerListaEjg(scsEjgActa);
 
-							LOGGER.info("*****************tamaño de la lista de ejg asociados al acta**************"
-									+ ejgItemLista.size());
+							if (!ejgItemLista.isEmpty()) {
 
-							for (ScsEjg ejgItem : ejgItemLista) {
+								LOGGER.info("*****************tamaño de la lista de ejg asociados al acta**************"
+										+ ejgItemLista.size());
 
-								LOGGER.info("DATOS DEL EJG NADA MAS EMPEZAR EL FOR =  " + ejgItem.getIdinstitucion()
-										+ " ANIO EJG = " + ejgItem.getAnio() + " idtipoeEJG = " + ejgItem.getIdtipoejg()
-										+ " NUMERO = " + ejgItem.getNumero());
+								for (ScsEjg ejgItem : ejgItemLista) {
 
-								if (ejgItem.getIdfundamentojuridico() == null) {
-
-									// Buscamos el estado del ejg remitido comision y le añadimos a la observacion
-									// esta informacion
-									LOGGER.info("*****************si el idfundamentojuridico es nulo**************");
-
-									List<ScsEstadoejg> listaEstadosEjg = obtenerEstadosEjg(ejgItem,
-											ejgItem.getIdinstitucion());
-
-									if (!listaEstadosEjg.isEmpty()) {
-										LOGGER.info("*****************tamaño de la lista de estados ejg ************** "
-												+ listaEstadosEjg.size());
-
-										for (ScsEstadoejg estado : listaEstadosEjg) {
-
-											if (estado.getIdestadoejg() == 9) {
-												LOGGER.info("*****************el estado es 9 ************** ");
-												estado.setObservaciones(estado.getObservaciones()
-														+ "Expediente sin Resolución. Se retira del acta "
-														+ ejgItem.getAnio() + "/" + ejgItem.getNumejg());
-												response = scsEstadoejgMapper.updateByPrimaryKey(estado);
-												if (response == 0)
-													throw (new Exception(
-															"Error al eliminar el dictamen asociado al EJG"));
-											}
-										}
-									}
-									LOGGER.info(
-											"*****************datos que se van a borrar de la tabla ejgacta ACTA **************"
-													+ acta.getIdacta() + " " + acta.getAnioacta() + " "
-													+ acta.getIdinstitucion());
-									LOGGER.info(
-											"*****************datos que se van a borrar de la tabla ejgacta EJG ************** =  "
-													+ ejgItem.getIdinstitucion() + " ANIO EJG = " + ejgItem.getAnio()
-													+ " idtipoeEJG = " + ejgItem.getIdtipoejg() + " NUMERO = "
-													+ ejgItem.getNumero());
-
-									response = borrarActa(acta, ejgItem);
-
-									LOGGER.info("RESPONSE " + response);
-
-									LOGGER.info("borro la relacion ejgacta");
-
-								} else {
-
-									LOGGER.info("el fundamento juridico no es nulo");
-
-									response = actualizarFecharesolucioncajg(ejgItem.getIdinstitucion(), usuario,
-											ejgItem);
-
-									if (response == 0)
-										throw (new Exception(
-												"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
-														+ " asociada a un EJG"));
-
-									ejgItem.setFecharesolucioncajg(actasItem.getFecharesolucion());
-
-									response = scsEjgMapper.updateByPrimaryKey(ejgItem);
-
-									if (response == 0) {
-										throw (new Exception(
-												"No se ha podido actualizar el objeto ejg con la nueva observacion y la nueva fecha resolucion"));
-									}
-
-									LOGGER.info("VALORES PARA BUSCAR EL ESTADO DEL EJG =  " + ejgItem.getIdinstitucion()
+									LOGGER.info("DATOS DEL EJG NADA MAS EMPEZAR EL FOR =  " + ejgItem.getIdinstitucion()
 											+ " ANIO EJG = " + ejgItem.getAnio() + " idtipoeEJG = "
 											+ ejgItem.getIdtipoejg() + " NUMERO = " + ejgItem.getNumero());
 
-									List<ScsEstadoejg> listaEstadosEjg = obtenerEstadosEjg(ejgItem,
-											ejgItem.getIdinstitucion());
+									if (ejgItem.getIdfundamentojuridico() == null) {
 
-									LOGGER.info("CUANTOS ESTADOS TIENE ESTE EJG? " + listaEstadosEjg.size());
+										// Buscamos el estado del ejg remitido comision y le añadimos a la observacion
+										// esta informacion
+										LOGGER.info(
+												"*****************si el idfundamentojuridico es nulo**************");
 
-									for (ScsEstadoejg ScsEstadoejg : listaEstadosEjg) {
-										LOGGER.info("ESTOS SON LOS DATOS DEL ESTADO EJG ");
+										List<ScsEstadoejg> listaEstadosEjg = obtenerEstadosEjg(ejgItem,
+												ejgItem.getIdinstitucion());
 
-										LOGGER.info("VALORES DENTRO DEL FOR PARA VER LOS DATOS DEL ESTADO EJG =  "
-												+ ScsEstadoejg.getIdinstitucion() + " ANIO EJG = "
-												+ ScsEstadoejg.getAnio() + " idtipoeEJG = "
-												+ ScsEstadoejg.getIdtipoejg() + " NUMERO = " + ScsEstadoejg.getNumero()
-												+ " IDESTADOPOREJG = " + ScsEstadoejg.getIdestadoporejg());
-									}
+										if (!listaEstadosEjg.isEmpty()) {
+											LOGGER.info(
+													"*****************tamaño de la lista de estados ejg ************** "
+															+ listaEstadosEjg.size());
 
-									if (!listaEstadosEjg.isEmpty()) {
+											for (ScsEstadoejg estado : listaEstadosEjg) {
 
-										LOGGER.info("CREAMOS EL ESTADO ");
+												if (estado.getIdestadoejg() == 9) {
+													LOGGER.info("*****************el estado es 9 ************** ");
+													estado.setObservaciones(estado.getObservaciones()
+															+ "Expediente sin Resolución. Se retira del acta "
+															+ ejgItem.getAnio() + "/" + ejgItem.getNumejg());
+													response = scsEstadoejgMapper.updateByPrimaryKey(estado);
+													if (response == 0)
+														throw (new Exception(
+																"Error al eliminar el dictamen asociado al EJG"));
+												}
+											}
+										}
+										LOGGER.info(
+												"*****************datos que se van a borrar de la tabla ejgacta ACTA **************"
+														+ acta.getIdacta() + " " + acta.getAnioacta() + " "
+														+ acta.getIdinstitucion());
+										LOGGER.info(
+												"*****************datos que se van a borrar de la tabla ejgacta EJG ************** =  "
+														+ ejgItem.getIdinstitucion() + " ANIO EJG = "
+														+ ejgItem.getAnio() + " idtipoeEJG = " + ejgItem.getIdtipoejg()
+														+ " NUMERO = " + ejgItem.getNumero());
 
-										response = crearEstado(actasItem, ejgItem, listaEstadosEjg);
+										response = borrarActa(acta, ejgItem);
+
+										LOGGER.info("RESPONSE " + response);
+
+										LOGGER.info("borro la relacion ejgacta");
+
+									} else {
+
+										LOGGER.info("el fundamento juridico no es nulo");
+
+										response = actualizarFecharesolucioncajg(ejgItem.getIdinstitucion(), usuario,
+												ejgItem);
+
+										if (response == 0)
+											throw (new Exception(
+													"Error en el triggerEjgUpdatesResol al actualizar la fecha de resolucion del acta asociada"
+															+ " asociada a un EJG"));
+
+										ejgItem.setFecharesolucioncajg(actasItem.getFecharesolucion());
+
+										response = scsEjgMapper.updateByPrimaryKey(ejgItem);
 
 										if (response == 0) {
-											throw (new SigaExceptions("No se ha podido actualizar el estado"));
+											throw (new Exception(
+													"No se ha podido actualizar el objeto ejg con la nueva observacion y la nueva fecha resolucion"));
 										}
 
-										LOGGER.info("updateando el estado ejg");
+										LOGGER.info(
+												"VALORES PARA BUSCAR EL ESTADO DEL EJG =  " + ejgItem.getIdinstitucion()
+														+ " ANIO EJG = " + ejgItem.getAnio() + " idtipoeEJG = "
+														+ ejgItem.getIdtipoejg() + " NUMERO = " + ejgItem.getNumero());
 
-									}
+										List<ScsEstadoejg> listaEstadosEjg = obtenerEstadosEjg(ejgItem,
+												ejgItem.getIdinstitucion());
 
-									LOGGER.info("Datos ejg anio ->" + ejgItem.getAnio() + " idinstitucion -> "
-											+ ejgItem.getIdinstitucion() + " idtipoejg ->" + ejgItem.getIdtipoejg()
-											+ " numeroejg->" + ejgItem.getNumejg());
+										LOGGER.info("CUANTOS ESTADOS TIENE ESTE EJG? " + listaEstadosEjg.size());
 
-									LOGGER.info("Datos acta anio ->" + acta.getAnioacta() + " idinstitucion -> "
-											+ acta.getIdinstitucion() + " idtipoejg ->" + acta.getIdacta());
+										for (ScsEstadoejg ScsEstadoejg : listaEstadosEjg) {
+											LOGGER.info("ESTOS SON LOS DATOS DEL ESTADO EJG ");
 
-									response = borrarActa(acta, ejgItem);
+											LOGGER.info("VALORES DENTRO DEL FOR PARA VER LOS DATOS DEL ESTADO EJG =  "
+													+ ScsEstadoejg.getIdinstitucion() + " ANIO EJG = "
+													+ ScsEstadoejg.getAnio() + " idtipoeEJG = "
+													+ ScsEstadoejg.getIdtipoejg() + " NUMERO = "
+													+ ScsEstadoejg.getNumero() + " IDESTADOPOREJG = "
+													+ ScsEstadoejg.getIdestadoporejg());
+										}
 
-									if (response == 0) {
-										throw (new Exception("No se ha podido borrar el acta"));
+										if (!listaEstadosEjg.isEmpty()) {
+
+											LOGGER.info("CREAMOS EL ESTADO ");
+
+											response = crearEstado(actasItem, ejgItem, listaEstadosEjg);
+
+											if (response == 0) {
+												throw (new SigaExceptions("No se ha podido actualizar el estado"));
+											}
+
+											LOGGER.info("updateando el estado ejg");
+
+										}
+
+										LOGGER.info("Datos ejg anio ->" + ejgItem.getAnio() + " idinstitucion -> "
+												+ ejgItem.getIdinstitucion() + " idtipoejg ->" + ejgItem.getIdtipoejg()
+												+ " numeroejg->" + ejgItem.getNumejg());
+
+										LOGGER.info("Datos acta anio ->" + acta.getAnioacta() + " idinstitucion -> "
+												+ acta.getIdinstitucion() + " idtipoejg ->" + acta.getIdacta());
+
+										response = borrarActa(acta, ejgItem);
+
+										if (response == 0) {
+											throw (new Exception("No se ha podido borrar el acta"));
+										}
+
 									}
 
 								}
 
 							}
-
 						}
 					}
-				}
-				// Ponemos fecha de hoy para el cierre
-				acta.setFecharesolucion(actasItem.getFecharesolucion());
-				scsActacomisionMapper.updateByPrimaryKey(acta);
-				updateResponseDTO.setStatus(SigaConstants.OK);
 
+					// Ponemos fecha de hoy para el cierre
+					acta.setFecharesolucion(actasItem.getFecharesolucion());
+					scsActacomisionMapper.updateByPrimaryKey(acta);
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
 			} else {
 				error.setCode(500);
 				error.setDescription("El acta ya esta cerrada");
@@ -1282,34 +1319,35 @@ public class BusquedaActaServiceImpl implements IBusquedaActa {
 
 			LOGGER.info(
 					"comboSufijoActa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if (usuarios != null && usuarios.size() > 0) {
 
-			AdmUsuarios usuario = usuarios.get(0);
+				AdmUsuarios usuario = usuarios.get(0);
 
-			usuario.setIdinstitucion(idInstitucion);
+				usuario.setIdinstitucion(idInstitucion);
 
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
 
-			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 
-			LOGGER.info(
-					"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el combo de sufijos para actas");
+				LOGGER.info(
+						"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el combo de sufijos para actas");
 
-			// Obtenemos el combo de sufijos para el acta
+				// Obtenemos el combo de sufijos para el acta
 
-			acta = obtenerActa(actasItem, idInstitucion);
+				acta = obtenerActa(actasItem, idInstitucion);
 
-			List<ScsEjgActa> listaEjgActaRelacionado = obtenerEjgActa(acta);
+				List<ScsEjgActa> listaEjgActaRelacionado = obtenerEjgActa(acta);
 
-			if (!listaEjgActaRelacionado.isEmpty()) {
-				acta.setUsumodificacion(listaEjgActaRelacionado.size());
+				if (!listaEjgActaRelacionado.isEmpty()) {
+					acta.setUsumodificacion(listaEjgActaRelacionado.size());
+				}
+
+				LOGGER.info(
+						"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener el combo de sufijos para actas");
 			}
-
-			LOGGER.info(
-					"comboSufijoActa() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener el combo de sufijos para actas");
-
 		} else {
 
 			error.setCode(500);

@@ -84,11 +84,9 @@ public class ScsActaSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 	public String obtenerIdActa(ActasItem actasItem, Short idInstitucion) {
 
 		SQL sql = new SQL();
-		sql.SELECT("*");
+		sql.SELECT("MAX(IDACTA)");
 		sql.FROM("(SELECT IDACTA FROM SCS_ACTACOMISION WHERE ANIOACTA = " + actasItem.getAnioacta()
-				+ " AND IDINSTITUCION = " + idInstitucion + " ORDER BY IDACTA desc)");
-
-		sql.WHERE("ROWNUM <=  1");
+				+ " AND IDINSTITUCION = " + idInstitucion + ")");
 
 		LOGGER.info("*******************obtenerIdActa********************" + sql.toString());
 		return sql.toString();
