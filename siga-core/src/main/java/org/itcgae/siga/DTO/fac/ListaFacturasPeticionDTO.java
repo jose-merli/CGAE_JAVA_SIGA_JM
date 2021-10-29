@@ -56,7 +56,7 @@ public class ListaFacturasPeticionDTO {
 	
 	@Override
 	public String toString() {
-		return "ListaProductosDTO [listaFacturasPeticionItems=" + listaFacturasPeticionItems + ", error=" + error + "]";
+		return "ListaFacturasDTO [listaFacturasPeticionItems=" + listaFacturasPeticionItems + ", error=" + error + "]";
 	}
 	
 }

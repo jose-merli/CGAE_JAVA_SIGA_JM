@@ -10,6 +10,9 @@ import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionDTO;
+import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionItem;
 
 public interface IGestionFichaCompraSuscripcionService {
 	
@@ -38,5 +41,9 @@ public interface IGestionFichaCompraSuscripcionService {
 
 	public String getPermisoModificarImporteProducto(HttpServletRequest request);
 
-	ListaFacturasPeticionDTO getFacturasPeticion(HttpServletRequest request, String nSolicitud);
+	public ListaFacturasPeticionDTO getFacturasPeticion(HttpServletRequest request, String nSolicitud);
+
+	public ListaDescuentosPeticionDTO getDescuentosPeticion(HttpServletRequest request, String nSolicitud);
+
+	public InsertResponseDTO saveAnticipoPeticion(HttpServletRequest request, ListaDescuentosPeticionItem anticipoLista) throws SigaExceptions;
 }

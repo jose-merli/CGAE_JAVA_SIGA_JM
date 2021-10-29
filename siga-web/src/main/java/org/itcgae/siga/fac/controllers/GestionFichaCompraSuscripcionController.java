@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.ListaCodigosPorColegioDTO;
+import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionDTO;
+import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionItem;
 import org.itcgae.siga.DTO.fac.ListaFacturasPeticionDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
@@ -104,5 +106,19 @@ public class GestionFichaCompraSuscripcionController {
 		ListaFacturasPeticionDTO response = gestionFichaCompraSuscripcionService.getFacturasPeticion(request, idPeticion);
 		if(response.getError() == null) return new ResponseEntity<ListaFacturasPeticionDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<ListaFacturasPeticionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping(value = "/pys/getDescuentosPeticion")
+	ResponseEntity<ListaDescuentosPeticionDTO> getDescuentosPeticion(HttpServletRequest request, String idPeticion) throws Exception {
+		ListaDescuentosPeticionDTO response = gestionFichaCompraSuscripcionService.getDescuentosPeticion(request, idPeticion);
+		if(response.getError() == null) return new ResponseEntity<ListaDescuentosPeticionDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<ListaDescuentosPeticionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/pys/saveAnticipoPeticion")
+	ResponseEntity<InsertResponseDTO> saveAnticipoPeticion(HttpServletRequest request, @RequestBody ListaDescuentosPeticionItem anticipoPeticion) throws Exception {
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.saveAnticipoPeticion(request, anticipoPeticion);
+		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

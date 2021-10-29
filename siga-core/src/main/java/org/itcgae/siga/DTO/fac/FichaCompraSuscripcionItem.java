@@ -22,7 +22,7 @@ public class FichaCompraSuscripcionItem {
 	private Date fechaSolicitadaAnulacion;
 	private Date fechaAnulada;
 	
-	//TARJETA FORMA DE PAGO
+	//TARJETA PRODUCTOS
 	private String idFormasPagoComunes;
 	private String idFormaPagoSeleccionada;
 	private String totalNeto;
@@ -30,11 +30,14 @@ public class FichaCompraSuscripcionItem {
 	private String impTotal;
 	private String pendPago;
     private String cuentaBancSelecc;
+    private List<ListaProductosCompraItem> productos;
 	
 	private String idEstadoPeticion;
 
-    private List<ListaProductosCompraItem> productos;
-	
+
+    //TRARJETA FACTURACION
+    private List<ListaFacturasPeticionItem> facturas;
+    
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}
@@ -166,6 +169,12 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setFechaAnulada(Date fechaAnulada) {
 		this.fechaAnulada = fechaAnulada;
+	}
+	public List<ListaFacturasPeticionItem> getFacturas() {
+		return facturas;
+	}
+	public void setFacturas(List<ListaFacturasPeticionItem> facturas) {
+		this.facturas = facturas;
 	}
 
 }
