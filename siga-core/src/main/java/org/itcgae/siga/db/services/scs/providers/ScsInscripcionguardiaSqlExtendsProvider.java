@@ -1497,6 +1497,7 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		sql.WHERE(
 		"scs_guardiasturno.fechabaja IS NULL",
 		"scs_turno.fechabaja IS NULL",
+		"scs_inscripcionguardia.fechasuscripcion IS NOT NULL",
 		"scs_inscripcionguardia.idpersona = " + idpersona,
 		"scs_inscripcionguardia.idinstitucion = " + idInstitucion,
 		"scs_guardiasturno.IDGUARDIA = " + guardia,
