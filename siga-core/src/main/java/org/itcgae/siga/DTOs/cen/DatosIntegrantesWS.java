@@ -25,6 +25,10 @@ public class DatosIntegrantesWS {
 	private Date fechaBajaCargo;
 	private String fechaCargo;
 	private String sociedad;
+	private String idPersona;
+	private String idInstitucionCliente;
+	private String codigoColegioCliente;
+	private String descripcionColegioCliente;
 	
 	public String getIdSociedad() {
 		return idSociedad;
@@ -153,6 +157,30 @@ public class DatosIntegrantesWS {
 	public void setSociedad(String sociedad) {
 		this.sociedad = sociedad;
 	}
+	public String getIdPersona() {
+		return idPersona;
+	}
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+	public String getIdInstitucionCliente() {
+		return idInstitucionCliente;
+	}
+	public void setIdInstitucionCliente(String idInstitucionCliente) {
+		this.idInstitucionCliente = idInstitucionCliente;
+	}
+	public String getCodigoColegioCliente() {
+		return codigoColegioCliente;
+	}
+	public void setCodigoColegioCliente(String codigoColegioCliente) {
+		this.codigoColegioCliente = codigoColegioCliente;
+	}
+	public String getDescripcionColegioCliente() {
+		return descripcionColegioCliente;
+	}
+	public void setDescripcionColegioCliente(String descripcionColegioCliente) {
+		this.descripcionColegioCliente = descripcionColegioCliente;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -178,6 +206,10 @@ public class DatosIntegrantesWS {
 		result = prime * result + ((sociedad == null) ? 0 : sociedad.hashCode());
 		result = prime * result + ((socio == null) ? 0 : socio.hashCode());
 		result = prime * result + ((tipoIdentificacion == null) ? 0 : tipoIdentificacion.hashCode());
+		result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
+		result = prime * result + ((idInstitucionCliente == null) ? 0 : idInstitucionCliente.hashCode());
+		result = prime * result + ((codigoColegioCliente == null) ? 0 : codigoColegioCliente.hashCode());
+		result = prime * result + ((descripcionColegioCliente == null) ? 0 : descripcionColegioCliente.hashCode());
 		return result;
 	}
 	@Override
@@ -294,6 +326,26 @@ public class DatosIntegrantesWS {
 				return false;
 		} else if (!tipoIdentificacion.equals(other.tipoIdentificacion))
 			return false;
+		if (idPersona == null) {
+			if (other.idPersona != null)
+				return false;
+		} else if (!idPersona.equals(other.idPersona))
+			return false;
+		if (idInstitucionCliente == null) {
+			if (other.idInstitucionCliente != null)
+				return false;
+		} else if (!idInstitucionCliente.equals(other.idInstitucionCliente))
+			return false;
+		if (codigoColegioCliente == null) {
+			if (other.codigoColegioCliente != null)
+				return false;
+		} else if (!codigoColegioCliente.equals(other.codigoColegioCliente))
+			return false;
+		if (descripcionColegioCliente == null) {
+			if (other.descripcionColegioCliente != null)
+				return false;
+		} else if (!descripcionColegioCliente.equals(other.descripcionColegioCliente))
+			return false;
 		return true;
 	}
 	@Override
@@ -305,9 +357,9 @@ public class DatosIntegrantesWS {
 				+ ", profesional=" + profesional + ", profesion=" + profesion + ", codigocolegio=" + codigocolegio
 				+ ", descripcionColegio=" + descripcionColegio + ", numColegiado=" + numColegiado + ", socio=" + socio
 				+ ", cargo=" + cargo + ", descripcionCargo=" + descripcionCargo + ", fechaBajaCargo=" + fechaBajaCargo
-				+ ", fechaCargo=" + fechaCargo + ", sociedad=" + sociedad + "]";
+				+ ", fechaCargo=" + fechaCargo + ", sociedad=" + sociedad + ", idPersona=" + idPersona
+				+ ", idInstitucionCliente=" + idInstitucionCliente + ", codigoColegioCliente=" + codigoColegioCliente
+				+ ", descripcionColegioCliente=" + descripcionColegioCliente + "]";
 	}
-	
-	
 	
 }
