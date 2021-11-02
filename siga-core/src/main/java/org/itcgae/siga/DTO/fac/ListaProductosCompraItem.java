@@ -12,6 +12,7 @@ public class ListaProductosCompraItem {
 	private String noFacturable;
 	private String idtipoiva;
 	private String valorIva;
+	private String solicitarBaja;
 	
 	private int idproducto;
 	private int idtipoproducto;
@@ -109,5 +110,11 @@ public class ListaProductosCompraItem {
 	}
 	public void setValorIva(String valorIva) {
 		this.valorIva = valorIva;
+	}
+	public String getSolicitarBaja() {
+		return solicitarBaja;
+	}
+	public void setSolicitarBaja(String solicitarBaja) {
+		this.solicitarBaja = solicitarBaja;
 	}
 }

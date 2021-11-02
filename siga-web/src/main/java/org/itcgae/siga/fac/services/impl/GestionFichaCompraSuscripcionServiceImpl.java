@@ -1787,6 +1787,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						
 						else {
 							
+							//REVISAR ANULACIÓN DE FACTURAS (SE DEBE IMPLEMENTAR)
+							
 							PysCompraExample compraExample = new PysCompraExample();
 	
 							compraExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud))
