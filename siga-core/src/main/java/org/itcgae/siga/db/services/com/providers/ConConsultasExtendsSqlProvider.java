@@ -4,6 +4,7 @@ package org.itcgae.siga.db.services.com.providers;
 import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 
 public class ConConsultasExtendsSqlProvider {
@@ -74,12 +75,12 @@ public class ConConsultasExtendsSqlProvider {
 		
 		if(filtros.getGenerica() != null && !filtros.getGenerica().trim().equals("")){
 			if(filtros.getGenerica().equals("N")){
-				sql.WHERE("((CONSULTA.GENERAL = 'N' OR CONSULTA.GENERAL = 'n' OR CONSULTA.GENERAL = '0') AND CONSULTA.IDINSTITUCION = '" + idInstitucion +"')");
+				sql.WHERE("( (UPPER(CONSULTA.GENERAL) = 'N' OR CONSULTA.GENERAL = '0') AND (CONSULTA.IDINSTITUCION = " + idInstitucion + ") )");
 			}else if(filtros.getGenerica().equals("S")){
-				sql.WHERE("((CONSULTA.GENERAL = 'S' OR CONSULTA.GENERAL = 's' OR  CONSULTA.GENERAL = '1') AND CONSULTA.IDINSTITUCION = '2000')");
+				sql.WHERE("( (UPPER(CONSULTA.GENERAL) = 'S' OR CONSULTA.GENERAL = '1') AND (CONSULTA.IDINSTITUCION = " + idInstitucion + ") )");
 			}
 		}else {
-			sql.WHERE("((CONSULTA.IDINSTITUCION = '2000' AND (UPPER(CONSULTA.GENERAL) = 'S'  OR  CONSULTA.GENERAL = '1')) OR (CONSULTA.IDINSTITUCION = '" + idInstitucion +"' AND (UPPER(CONSULTA.GENERAL) = 'N'  OR  CONSULTA.GENERAL = '0')))");
+			sql.WHERE("( ( (upper(CONSULTA.GENERAL) = 'S' OR  CONSULTA.GENERAL = '1') AND (CONSULTA.IDINSTITUCION = 2000 OR CONSULTA.IDINSTITUCION = "+ idInstitucion + ") ) OR (UPPER(CONSULTA.GENERAL) = 'N' OR CONSULTA.GENERAL = '0') AND (CONSULTA.IDINSTITUCION = " + idInstitucion + ")  )");
 		}
 		
 		sql.ORDER_BY("CONSULTA.DESCRIPCION");
@@ -219,28 +220,72 @@ public class ConConsultasExtendsSqlProvider {
 		return sql.toString();
 	}
 	
-public String obtenerDatosConsulta(String idLenguaje, Short idInstitucion, String idConsulta){
-		
+	public String obtenerDatosConsulta(String idLenguaje, Short idInstitucion, String idConsulta){
+			
+			SQL sql = new SQL();
+			sql.SELECT(" criterio_con.IDCONSULTA");
+			sql.SELECT(" criterio_con.ORDEN");
+			sql.SELECT(" criterio_con.OPERADOR conector");
+			sql.SELECT(" criterio_con.ABRIRPAR");
+			sql.SELECT(" campo_con.IDCAMPO");
+			sql.SELECT(" campo_con.NOMBREENCONSULTA");
+			sql.SELECT(" f_siga_getrecurso(operacion_con.DESCRIPCION, " + idLenguaje + ") operador");
+			sql.SELECT("  operacion_con.SIMBOLO");
+			sql.SELECT(" criterio_con.VALOR");
+			sql.SELECT(" criterio_con.CERRARPAR");
+	
+			sql.FROM(" CON_CRITERIOCONSULTA criterio_con");
+			sql.FROM(" CON_CAMPOCONSULTA campo_con");
+			sql.FROM(" CON_OPERACIONCONSULTA operacion_con");
+			
+			sql.WHERE(" criterio_con.idinstitucion = " + idInstitucion);
+			sql.WHERE(" criterio_con.idconsulta = " + idConsulta);
+			sql.WHERE(" campo_con.idcampo (+) = criterio_con.idcampo");
+			sql.WHERE(" operacion_con.idoperacion (+) = criterio_con.idoperacion");
+			sql.ORDER_BY(" orden");
+			
+			return sql.toString();
+		}
+	
+	public String obtenerConsulta(Short idInstitucion, String idConsulta){
 		SQL sql = new SQL();
-		sql.SELECT(" criterio_con.ORDEN");
-		sql.SELECT(" criterio_con.OPERADOR conector");
-		sql.SELECT(" criterio_con.ABRIRPAR");
-		sql.SELECT(" campo_con.NOMBREENCONSULTA");
-		sql.SELECT(" f_siga_getrecurso(operacion_con.DESCRIPCION, " + idLenguaje + ") operador");
-		sql.SELECT(" criterio_con.VALOR");
-		sql.SELECT(" criterio_con.CERRARPAR");
-		sql.SELECT("cc.IDCLASECOMUNICACION");
-
-		sql.FROM(" CON_CRITERIOCONSULTA criterio_con");
-		sql.FROM(" CON_CAMPOCONSULTA campo_con");
-		sql.FROM(" CON_OPERACIONCONSULTA operacion_con");
 		
-		sql.WHERE(" criterio_con.idinstitucion = " + idInstitucion);
-		sql.WHERE(" criterio_con.idconsulta = " + idConsulta);
-		sql.WHERE(" campo_con.idcampo (+) = criterio_con.idcampo");
-		sql.WHERE(" operacion_con.idoperacion (+) = criterio_con.idoperacion");
+		sql.SELECT(" SENTENCIA");
+		
+		sql.FROM(" CON_CONSULTA");
+		
+		sql.WHERE(" idconsulta = " + idConsulta);
+		sql.WHERE(" idinstitucion = " + idInstitucion);
 		
 		return sql.toString();
+	}
+	
+	public String obtenerConfigColumnasQueryBuilder(){
+		SQL sql = new SQL();
+		
+		sql.SELECT(" distinct CASE tipocampo WHEN 'D' THEN 'date' WHEN 'A' THEN 'string' WHEN 'N' THEN 'number' END AS tipocampo");
+		sql.SELECT(" idcampo");
+		sql.SELECT(" nombreenconsulta");
+		sql.SELECT(" selectayuda");
+		
+		sql.FROM(" CON_CAMPOCONSULTA");
+		
+		sql.WHERE(" visibilidad = 'P'");
+		
+		return sql.toString();
+	}
+	
+	public String obtenerCombosQueryBuilder(ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem, String idioma, Short idInstitucion){
+	
+		if(configColumnasQueryBuilderItem.getSelectayuda().contains("@IDIOMA@")) {
+			configColumnasQueryBuilderItem.setSelectayuda(configColumnasQueryBuilderItem.getSelectayuda().replace("@IDIOMA@", idioma));
+		}
+		
+		if(configColumnasQueryBuilderItem.getSelectayuda().contains("@IDINSTITUCION@")) {
+			configColumnasQueryBuilderItem.setSelectayuda(configColumnasQueryBuilderItem.getSelectayuda().replace("@IDINSTITUCION@", idInstitucion.toString()));
+		}
+	
+		return configColumnasQueryBuilderItem.getSelectayuda();
 	}
 
 }

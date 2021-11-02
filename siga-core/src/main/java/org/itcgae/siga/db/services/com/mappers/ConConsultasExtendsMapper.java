@@ -12,12 +12,15 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.services.com.providers.ConClaseComunicacionesExtendsSqlProvider;
 import org.itcgae.siga.db.services.com.providers.ConConsultasExtendsSqlProvider;
 import org.itcgae.siga.db.services.fac.providers.PySTiposServiciosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -53,7 +56,7 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 	@Results({
 		@Result(column = "IDMAX", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})
-	NewIdDTO selectMaxIDConsulta(short idInstitucion);
+	NewIdDTO selectMaxIDConsulta();
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasPlantilla")
 	@Results({
@@ -128,15 +131,36 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerDatosConsulta")
 	@Results({
+		@Result(column = "IDCONSULTA", property = "idconsulta", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "ORDEN", property = "orden", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "CONECTOR", property = "conector", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ABRIRPAR", property = "abrirparentesis", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCAMPO", property = "idcampo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREENCONSULTA", property = "campo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OPERADOR", property = "operador", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SIMBOLO", property = "simbolo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CERRARPAR", property = "cerrarparentesis", jdbcType = JdbcType.VARCHAR)
 		
 		}) 
 	List<ConstructorConsultasItem> obtenerDatosConsulta(String idioma, Short idInstitucion, String idConsulta);
 	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerConsulta")
+	String obtenerConsulta(Short idInstitucion, String idConsulta);
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerConfigColumnasQueryBuilder")
+	@Results({
+		@Result(column = "TIPOCAMPO", property = "tipocampo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCAMPO", property = "idcampo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREENCONSULTA", property = "nombreenconsulta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SELECTAYUDA", property = "selectayuda", jdbcType = JdbcType.VARCHAR)
+		
+		}) 
+	List<ConfigColumnasQueryBuilderItem> obtenerConfigColumnasQueryBuilder();
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "obtenerCombosQueryBuilder")
+	@Results({@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> obtenerCombosQueryBuilder(ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem, String idioma, Short idInstitucion);
 }	

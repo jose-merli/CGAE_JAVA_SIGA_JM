@@ -9,7 +9,17 @@ import org.itcgae.siga.DTOs.gen.Error;
 public class ConstructorConsultasDTO {
 	
 	private List <ConstructorConsultasItem> constructorConsultasItem = new ArrayList <ConstructorConsultasItem>();
+	private String consulta;
+	
 	private Error error = null;
+	
+	public String getConsulta() {
+		return consulta;
+	}
+	public void setConsulta(String consulta) {
+		this.consulta = consulta;
+	}
+
 	
 	public List<ConstructorConsultasItem> getConstructorConsultasItem() {
 		return constructorConsultasItem;
@@ -26,7 +36,7 @@ public class ConstructorConsultasDTO {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(constructorConsultasItem, error);
+		return Objects.hash(constructorConsultasItem, consulta, error);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -38,15 +48,13 @@ public class ConstructorConsultasDTO {
 			return false;
 		ConstructorConsultasDTO other = (ConstructorConsultasDTO) obj;
 		return Objects.equals(constructorConsultasItem, other.constructorConsultasItem)
-				&& Objects.equals(error, other.error);
+				&& Objects.equals(consulta, other.consulta) && Objects.equals(error, other.error);
 	}
 	
 	@Override
 	public String toString() {
-		return "ConstructorConsultasDTO [constructorConsultasItem=" + constructorConsultasItem + ", error=" + error
-				+ ", getConstructorConsultasItem()=" + getConstructorConsultasItem() + ", getError()=" + getError()
-				+ ", hashCode()=" + hashCode() + ", getClass()=" + getClass() + ", toString()=" + super.toString()
-				+ "]";
+		return "ConstructorConsultasDTO [constructorConsultasItem=" + constructorConsultasItem + ", consulta="
+				+ consulta + ", error=" + error + "]";
 	}	
 
 }
