@@ -151,7 +151,7 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 //		
 //		sql.FROM(" con_consulta");
 //		sql.WHERE(" idobjetivo = 3");
-//		sql.WHERE(" idclase = 1");
+//		sql.WHERE(" idclasecomunicacion = 1");
 //		sql.WHERE(" idinstitucion = '" + idInstitucion + "'");
 //		sql.WHERE(" fechabaja is null");
 //		
@@ -175,7 +175,7 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 //		select idconsulta, descripcion from con_consulta
 //		where idinstitucion = 2005
 //		and idobjetivo = 3
-//		and idclase = 1
+//		and idclasecomunicacion = 1
 //		and fechabaja is null
 //		union
 //		select idconsulta, descripcion from con_consulta
@@ -192,7 +192,7 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		
 		sql.FROM(" con_consulta");
 		sql.WHERE(" idobjetivo = 3");
-		sql.WHERE(" idclase = 1");
+		sql.WHERE(" idclasecomunicacion = 1");
 		sql.WHERE(" idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE(" fechabaja is null");
 		
@@ -212,7 +212,7 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		
 		sql.FROM(" con_consulta");
 		sql.WHERE(" idobjetivo = 3");
-		sql.WHERE(" idclase = 1");
+		sql.WHERE(" idclasecomunicacion = 1");
 		sql.WHERE(" idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE(" idconsulta = " + idConsulta);
 

@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderDTO;
+import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
@@ -16,10 +18,12 @@ import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.com.QueryBuilderDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IConsultasService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -213,14 +217,15 @@ public class ConsultasController {
 	}
 	
 	@PostMapping(value = "/pys/constructorConsultas")
-	ResponseEntity<ConstructorConsultasDTO> constructorConsultas(HttpServletRequest request, @RequestBody ConstructorConsultasDTO constructorConsultasDTO) {
-		ConstructorConsultasDTO response = _consultasService.constructorConsultas(request, constructorConsultasDTO);
+	ResponseEntity<QueryBuilderDTO> constructorConsultas(HttpServletRequest request, @RequestBody QueryBuilderDTO queryBuilderDTO) throws Exception {
+		QueryBuilderDTO response = _consultasService.constructorConsultas(request, queryBuilderDTO);
 		if (response.getError() == null)
-			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<QueryBuilderDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<QueryBuilderDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	//SQL
 	@GetMapping(value = "/pys/obtenerDatosConsulta")
 	ResponseEntity<ConstructorConsultasDTO> obtenerDatosConsulta(HttpServletRequest request, @RequestParam String idConsulta) { 
 		ConstructorConsultasDTO response = _consultasService.obtenerDatosConsulta(request, idConsulta);
@@ -229,5 +234,32 @@ public class ConsultasController {
 		else
 			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	//JSON
+	@GetMapping(value = "/pys/obtenerConsultaJSON")
+	ResponseEntity<ConstructorConsultasDTO> obtenerConsultaJSON(HttpServletRequest request, @RequestParam String idConsulta) { 
+		ConstructorConsultasDTO response = _consultasService.obtenerConsultaJSON(request, idConsulta);
+		if (response.getError() == null)
+			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConstructorConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping(value = "/pys/obtenerConfigColumnasQueryBuilder")
+	ResponseEntity<ConfigColumnasQueryBuilderDTO> obtenerConfigColumnasQueryBuilder(HttpServletRequest request) { 
+		ConfigColumnasQueryBuilderDTO response = _consultasService.obtenerConfigColumnasQueryBuilder(request);
+		if (response.getError() == null)
+			return new ResponseEntity<ConfigColumnasQueryBuilderDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConfigColumnasQueryBuilderDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
+	@PostMapping(value = "/pys/obtenerCombosQueryBuilder")
+	ResponseEntity<ComboDTO> obtenerCombosQueryBuilder(HttpServletRequest request, @RequestBody ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem) { 
+		ComboDTO response = _consultasService.obtenerCombosQueryBuilder(request, configColumnasQueryBuilderItem);
+		if (response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }
