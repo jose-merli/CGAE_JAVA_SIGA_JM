@@ -6,6 +6,7 @@ import java.util.Date;
 public class ListaDescuentosPeticionItem {
 
 	private String idPeticion;
+	private Short idAnticipo;
 	private String tipo; //1 (anticipo) , 2 (monedero)
 	private String desTipo;
 	private String descripcion;
@@ -40,5 +41,11 @@ public class ListaDescuentosPeticionItem {
 	}
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+	public Short getIdAnticipo() {
+		return idAnticipo;
+	}
+	public void setIdAnticipo(Short idAnticipo) {
+		this.idAnticipo = idAnticipo;
 	}
 }

@@ -1,5 +1,7 @@
 package org.itcgae.siga.fac.controllers;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
@@ -120,5 +122,12 @@ public class GestionFichaCompraSuscripcionController {
 		InsertResponseDTO response = gestionFichaCompraSuscripcionService.saveAnticipoPeticion(request, anticipoPeticion);
 		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(value = "/pys/deleteAnticipoPeticion")
+	ResponseEntity<DeleteResponseDTO> deleteAnticipoPeticion(HttpServletRequest request, @RequestBody List<ListaDescuentosPeticionItem> anticiposListaPeticion) throws Exception {
+		DeleteResponseDTO response = gestionFichaCompraSuscripcionService.deleteAnticipoPeticion(request, anticiposListaPeticion);
+		if(response.getStatus()=="200") return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

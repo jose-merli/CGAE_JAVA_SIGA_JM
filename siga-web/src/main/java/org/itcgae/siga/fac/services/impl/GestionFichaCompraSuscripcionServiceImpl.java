@@ -20,6 +20,7 @@ import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -42,6 +43,7 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.PysAnticipoletrado;
 import org.itcgae.siga.db.entities.PysAnticipoletradoExample;
+import org.itcgae.siga.db.entities.PysAnticipoletradoKey;
 import org.itcgae.siga.db.entities.PysCompra;
 import org.itcgae.siga.db.entities.PysCompraExample;
 import org.itcgae.siga.db.entities.PysLineaanticipo;
@@ -1393,6 +1395,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								for (PysAnticipoletrado anticipo : anticiposPeticion) {
 									ListaDescuentosPeticionItem descuentoPeticion = new ListaDescuentosPeticionItem();
 	
+									descuentoPeticion.setIdAnticipo(anticipo.getIdanticipo());
 									descuentoPeticion.setIdPeticion(comprasPeticion.get(0).getIdpeticion().toString());
 									descuentoPeticion.setImporte(anticipo.getImporteinicial());
 									descuentoPeticion.setTipo("2"); //En el front se procesará y representará "Monedero"
@@ -1424,6 +1427,157 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 	}
 
 
+	@Override
+	@Transactional
+	public DeleteResponseDTO deleteAnticipoPeticion(HttpServletRequest request, List<ListaDescuentosPeticionItem> anticiposLista)
+			throws SigaExceptions {
+
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info(
+				"deleteAnticipoPeticion() -> Entrada al servicio para eliminar anticipos de a una solicitud");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"deleteAnticipoPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"deleteAnticipoPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				
+				for(ListaDescuentosPeticionItem anticipoLista : anticiposLista) {
+				
+					PysPeticioncomprasuscripcionKey peticionKey = new PysPeticioncomprasuscripcionKey();
+	
+					peticionKey.setIdinstitucion(idInstitucion);
+					peticionKey.setIdpeticion(Long.valueOf(anticipoLista.getIdPeticion()));
+	
+					PysPeticioncomprasuscripcion peticion = pysPeticioncomprasuscripcionMapper
+							.selectByPrimaryKey(peticionKey);
+	
+					
+					PysAnticipoletradoKey anticipoKey = new PysAnticipoletradoKey();
+					
+					anticipoKey.setIdanticipo(anticipoLista.getIdAnticipo());
+					anticipoKey.setIdinstitucion(idInstitucion);
+					anticipoKey.setIdpersona(peticion.getIdpersona());
+	
+					LOGGER.info(
+							"deleteAnticipoPeticion() / pysAnticipoLetradoMapper.insert() -> Entrada a pysAnticipoLetradoMapper para insertar el nuevo anticipo de una solicitud");
+	
+					// Se elimina un anticipo
+					response = pysAnticipoLetradoMapper.deleteByPrimaryKey(anticipoKey);
+					if (response == 0) {
+						throw new SigaExceptions("Error al eliminar un anticipo de una solicitud");
+					}
+	
+					LOGGER.info(
+							"deleteAnticipoPeticion() / pysAnticipoLetradoMapper.insert() -> Salida de pysAnticipoLetradoMapper para insertar el nuevo anticipo de una solicitud");
+	
+					LOGGER.info(
+							"deleteAnticipoPeticion() / pysCompraMapper.selectByExample() -> Entrada a pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
+	
+					PysCompraExample compraExample = new PysCompraExample();
+	
+					compraExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(anticipoLista.getIdPeticion()))
+							.andIdinstitucionEqualTo(idInstitucion);
+	
+					// Se comprueba si la peticion es de compra o de suscripcion
+					List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(compraExample);
+	
+					LOGGER.info(
+							"deleteAnticipoPeticion() / pysCompraMapper.selectByExample() -> Salida de pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
+	
+					// Si la peticion tiene alguna compra asociada se extraen las lineas de compra
+					if (!comprasPeticion.isEmpty()) {		
+						
+						PysLineaanticipoExample lineaAnticipoExample = new PysLineaanticipoExample();
+						
+						lineaAnticipoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdanticipoEqualTo(anticipoLista.getIdAnticipo());
+					
+						
+						LOGGER.info(
+								"deleteAnticipoPeticion() / pysLineaAnticipoMapper.deleteByExample() -> Entrada a pysLineaAnticipoMapper para insertar una nueva linea de anticipo de una solicitud");
+		
+						response = pysLineaAnticipoMapper.deleteByExample(lineaAnticipoExample);
+		
+						LOGGER.info(
+								"deleteAnticipoPeticion() / pysLineaAnticipoMapper.deleteByExample() -> Salida de pysLineaAnticipoMapper para insertar una nueva linea de anticipo de una solicitud");
+		
+						if (response == 0) {
+							throw new SigaExceptions("Error al eliminar una linea de anticipo de una solicitud");
+						}
+					}else {
+						PysSuscripcionExample suscripcionExample = new PysSuscripcionExample();
+
+						suscripcionExample.createCriteria().andIdpeticionEqualTo(peticion.getIdpeticion())
+								.andIdinstitucionEqualTo(idInstitucion);
+
+						LOGGER.info(
+								"deleteAnticipoPeticion() / pysSuscripcionMapper.selectByExample() -> Entrada a pysSuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
+
+						List<PysSuscripcion> suscripcionesPeticion = pysSuscripcionMapper
+								.selectByExample(suscripcionExample);
+
+						LOGGER.info(
+								"deleteAnticipoPeticion() / pysSuscripcionMapper.selectByExample() -> Entrada a pysSuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
+
+						// Si la peticion tiene alguna suscripcion asociada se extraen las facturas de
+						// las suscripciones
+						if (!suscripcionesPeticion.isEmpty()) {
+							
+							PysServicioanticipoExample servicioAnticipoExample = new PysServicioanticipoExample();
+							
+							servicioAnticipoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdanticipoEqualTo(anticipoLista.getIdAnticipo())
+							.andIdservicioEqualTo(suscripcionesPeticion.get(0).getIdservicio()).andIdserviciosinstitucionEqualTo(suscripcionesPeticion.get(0).getIdserviciosinstitucion())
+							.andIdtiposerviciosEqualTo(suscripcionesPeticion.get(0).getIdtiposervicios());
+						
+							
+							LOGGER.info(
+									"deleteAnticipoPeticion() / pysServicioanticipoMapper.deleteByExample() -> Entrada a pysServicioanticipoMapper para eliminar una linea de anticipo de una solicitud");
+			
+							response = pysServicioanticipoMapper.deleteByExample(servicioAnticipoExample);
+			
+							LOGGER.info(
+									"deleteAnticipoPeticion() / pysServicioanticipoMapper.deleteByExample() -> Salida de pysServicioanticipoMapper para eliminar una linea de anticipo de una solicitud");
+			
+							if (response == 0) {
+								throw new SigaExceptions("Error al eliminar anticipos de a una solicitud");
+							}
+						}
+					}
+				}
+
+				deleteResponseDTO.setStatus("200");
+			}
+
+			deleteResponseDTO.setError(error);
+			LOGGER.info(
+					"deleteAnticipoPeticion() -> Salida del servicio para eliminar anticipos de a una solicitud");
+
+			
+		}
+		
+		return deleteResponseDTO;
+	}
+	
+	
 	@Override
 	@Transactional
 	public InsertResponseDTO saveAnticipoPeticion(HttpServletRequest request, ListaDescuentosPeticionItem anticipoLista)
