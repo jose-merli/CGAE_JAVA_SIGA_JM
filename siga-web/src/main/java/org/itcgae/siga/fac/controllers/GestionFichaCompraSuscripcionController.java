@@ -130,4 +130,11 @@ public class GestionFichaCompraSuscripcionController {
 		if(response.getStatus()=="200") return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@PostMapping(value = "/pys/anularPeticion")
+	ResponseEntity<UpdateResponseDTO> anularPeticion(HttpServletRequest request, @RequestBody String nSolicitud) throws Exception {
+		UpdateResponseDTO response = gestionFichaCompraSuscripcionService.anularPeticion(request, nSolicitud);
+		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }

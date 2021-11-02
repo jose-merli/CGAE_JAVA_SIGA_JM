@@ -50,4 +50,6 @@ public interface IGestionFichaCompraSuscripcionService {
 
 	public DeleteResponseDTO deleteAnticipoPeticion(HttpServletRequest request,
 			List<ListaDescuentosPeticionItem> anticiposLista) throws SigaExceptions;
+
+	public UpdateResponseDTO anularPeticion(HttpServletRequest request, String nSolicitud) throws Exception;
 }

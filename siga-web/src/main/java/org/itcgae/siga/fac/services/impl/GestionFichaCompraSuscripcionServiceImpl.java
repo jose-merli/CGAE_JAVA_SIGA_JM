@@ -1714,4 +1714,161 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		return insertResponseDTO;
 	}
 	
+	@Override
+	@Transactional
+	public UpdateResponseDTO anularPeticion(HttpServletRequest request, String nSolicitud) throws Exception {
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.info("anularPeticion() -> Entrada al servicio para anular una petición");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		//Este String sirve para saber si el usuario conectado es una colegiado o no.
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"anularPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"anularPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+						
+						//Si es letrado, se considera que no es personal del colegio y que
+						//por lo tanto no puede anular la petición directamente sino solicitarla
+						if(!letrado.equals("N")) {
+							PysPeticioncomprasuscripcionKey solicitudKey = new PysPeticioncomprasuscripcionKey();
+
+							solicitudKey.setIdinstitucion(idInstitucion);
+							solicitudKey.setIdpeticion(Long.valueOf(nSolicitud));
+
+							PysPeticioncomprasuscripcion solicitudAlta = pysPeticioncomprasuscripcionMapper
+									.selectByPrimaryKey(solicitudKey);
+							
+							
+							PysPeticioncomprasuscripcion solicitudBaja = new PysPeticioncomprasuscripcion();
+
+							solicitudBaja.setFecha(new Date());
+							solicitudBaja.setFechamodificacion(new Date());
+							solicitudBaja.setIdinstitucion(idInstitucion);
+							solicitudBaja.setIdpersona(solicitudAlta.getIdpersona());
+							solicitudBaja.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcionExtendsMapper.selectMaxIdPeticion(idInstitucion).getNewId())+1);
+							solicitudBaja.setIdpeticionalta((Long.valueOf(nSolicitud)));
+							solicitudBaja.setUsumodificacion(usuarios.get(0).getIdusuario());
+							solicitudBaja.setTipopeticion("B");
+							solicitudBaja.setIdestadopeticion((short) 20);
+							Long fechaActual = new Date().getTime();
+							solicitudBaja.setNumOperacion(
+									"1" + idInstitucion.toString() + solicitudAlta.getIdpersona() + fechaActual.toString());
+							
+							LOGGER.info(
+									"anularPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Entrada a pysPeticioncomprasuscripcionMapper para solicitar la anulacion una petición");
+					
+
+							response = pysPeticioncomprasuscripcionMapper.insert(solicitudBaja);
+							
+							LOGGER.info(
+									"anularPeticion() / pysPeticioncomprasuscripcionMapper.insert() -> Salida de pysPeticioncomprasuscripcionMapper para solicitar la anulacion una petición");
+		
+							if (response == 0)
+								throw new Exception("Error al insertar la petición de anulación de la petición en la BBDD.");
+						}
+						
+						else {
+							
+							PysCompraExample compraExample = new PysCompraExample();
+	
+							compraExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud))
+									.andIdinstitucionEqualTo(idInstitucion);
+							
+							LOGGER.info(
+									"anularPeticion() / pysCompraMapper.selectByExample() -> Entrada a pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
+	
+	
+							// Se comprueba si la peticion es de compra o de suscripcion
+							List<PysCompra> comprasPeticion = pysCompraMapper.selectByExample(compraExample);
+	
+							LOGGER.info(
+									"anularPeticion() / pysCompraMapper.selectByExample() -> Salida de pysCompraMapper para recuperar las posibles compras asociadas a la peticion");
+	
+							// Si la peticion tiene alguna compra asociada 
+							if (!comprasPeticion.isEmpty()) {
+		
+								for (PysCompra compra : comprasPeticion) {
+			
+									
+									compra.setFechabaja(new Date());
+									LOGGER.info(
+											"anularPeticion() / pysCompraMapper.updateByPrimaryKey() -> Entrada a pysCompraMapper para introducir la fecha de anulacion de la compra asociada a una peticion");
+									
+									response = pysCompraMapper.updateByPrimaryKey(compra);
+									
+									LOGGER.info(
+											"anularPeticion() / pysCompraMapper.updateByPrimaryKey() -> Salida de pysCompraMapper para introducir la fecha de anulacion de la compra asociada a una peticion");
+			
+									if (response == 0)
+										throw new Exception("Error al anular un registro de compra en la BBDD.");
+								}
+							} else {
+								PysSuscripcionExample suscripcionExample = new PysSuscripcionExample();
+
+								suscripcionExample.createCriteria().andIdpeticionEqualTo(Long.valueOf(nSolicitud))
+										.andIdinstitucionEqualTo(idInstitucion);
+
+								LOGGER.info(
+										"anularPeticion() / pysSuscripcionMapper.selectByExample() -> Entrada a pysSuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
+
+								List<PysSuscripcion> suscripcionesPeticion = pysSuscripcionMapper
+										.selectByExample(suscripcionExample);
+
+								LOGGER.info(
+										"anularPeticion() / pysSuscripcionMapper.selectByExample() -> Entrada a pysSuscripcionMapper para recuperar las posibles facturaciones asociadas a la peticion de suscripcion");
+
+								// Si la peticion tiene alguna suscripcion asociada 
+								if (!suscripcionesPeticion.isEmpty()) {
+									
+									for(PysSuscripcion suscripcion : suscripcionesPeticion) {
+										
+										suscripcion.setFechabaja(new Date());
+										suscripcion.setFechabajafacturacion(new Date());
+								
+									
+										LOGGER.info(
+												"anularPeticion() / pysSuscripcionMapper.updateByPrimaryKey() -> Entrada a pysSuscripcionMapper para eliminar una linea de anticipo de una solicitud");
+						
+										response = pysSuscripcionMapper.updateByPrimaryKey(suscripcion);
+						
+										LOGGER.info(
+												"anularPeticion() / pysSuscripcionMapper.updateByPrimaryKey() -> Salida de pysSuscripcionMapper para eliminar una linea de anticipo de una solicitud");
+						
+										if (response == 0) {
+											throw new SigaExceptions("Error al anular una de las suscripciones asociadas a una solicitud");
+										}
+									}
+								}
+							}
+						}
+					}
+				
+				updateResponseDTO.setStatus("200");
+			}
+
+		updateResponseDTO.setError(error);
+		LOGGER.info("anularPeticion() -> Salida del servicio para anular una petición");
+
+		return updateResponseDTO;
+	}
+	
+	
 }
