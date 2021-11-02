@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.scs.IncompatibilidadesDatosEntradaItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsIncompatibilidadguardiasSqlProvider;
 
 public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatibilidadguardiasSqlProvider{
@@ -152,14 +153,17 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		
 		listado_guardias_idGuardia.SELECT("SCS_GUARDIASTURNO.IDGUARDIA");
 		listado_guardias_idGuardia.FROM("SCS_GUARDIASTURNO");
-		if (incompatibilidades.getNombreGuardia() != null && !incompatibilidades.getNombreGuardia().isEmpty()) {
+		/*if (incompatibilidades.getNombreGuardia() != null && !incompatibilidades.getNombreGuardia().isEmpty()) {
 			listado_guardias_idGuardia.WHERE("scs_guardiasturno.nombre = " + "'" + incompatibilidades.getNombreGuardia().toString() +  "'" );
-		}
+		}*/
 		if (idInstitucion != null && !idInstitucion.isEmpty()) {
 			listado_guardias_idGuardia.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = " + idInstitucion );
 		}
 		if (incompatibilidades.getIdTurno() != null && !incompatibilidades.getIdTurno().isEmpty()) {
 			listado_guardias_idGuardia.WHERE("SCS_GUARDIASTURNO.IDTURNO IN (" + incompatibilidades.getIdTurno() + " ) " );
+		}
+		if (!UtilidadesString.esCadenaVacia(incompatibilidades.getIdGuardia())) {
+			listado_guardias_idGuardia.WHERE("SCS_GUARDIASTURNO.IDGUARDIA IN (" + incompatibilidades.getIdGuardia() + " ) " );
 		}
 		
 		
@@ -232,14 +236,18 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		
 		sqlSCSGuardiasTurnoIdGuardia.SELECT("SCS_GUARDIASTURNO.IDGUARDIA");
 		sqlSCSGuardiasTurnoIdGuardia.FROM("SCS_GUARDIASTURNO");
-		if (incompatibilidades.getNombreGuardia() != null && !incompatibilidades.getNombreGuardia().isEmpty()) {
+		/*if (incompatibilidades.getNombreGuardia() != null && !incompatibilidades.getNombreGuardia().isEmpty()) {
 		sqlSCSGuardiasTurnoIdGuardia.WHERE("scs_guardiasturno.nombre = " + "'" + incompatibilidades.getNombreGuardia().toString() + "'" );
-		}
+		}*/
+
 		if (idInstitucion != null && !idInstitucion.isEmpty()) {
 		sqlSCSGuardiasTurnoIdGuardia.WHERE("SCS_GUARDIASTURNO.IDINSTITUCION = " + idInstitucion );
 		}
 		if (incompatibilidades.getIdTurno() != null && !incompatibilidades.getIdTurno().isEmpty()) {
 		sqlSCSGuardiasTurnoIdGuardia.WHERE("SCS_GUARDIASTURNO.IDTURNO IN (" + incompatibilidades.getIdTurno() + " ) " );
+		}
+		if (incompatibilidades.getIdGuardia() != null && !incompatibilidades.getIdGuardia().isEmpty()) {
+			sqlSCSGuardiasTurnoIdGuardia.WHERE("SCS_GUARDIASTURNO.IDGUARDIA IN (" + incompatibilidades.getIdGuardia() + " ) " );
 		}
 		
 		sqlMotivos.SELECT("MOTIVOS");
