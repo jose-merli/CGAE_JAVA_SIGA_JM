@@ -543,14 +543,14 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		SQL sql = new SQL();
 		
 		// Select
-		sql.SELECT("p.idpersona");
-		sql.SELECT("p.nombre");
-		sql.SELECT("p.apellidos1");
-		sql.SELECT("p.apellidos2");
-		sql.SELECT("p.nifcif");
-		sql.SELECT("d.movil");
-		sql.SELECT("d.correoelectronico");
-		sql.SELECT("d.domicilio");
+		sql.SELECT_DISTINCT("p.idpersona");
+		sql.SELECT_DISTINCT("p.nombre");
+		sql.SELECT_DISTINCT("p.apellidos1");
+		sql.SELECT_DISTINCT("p.apellidos2");
+		sql.SELECT_DISTINCT("p.nifcif");
+		sql.SELECT_DISTINCT("d.movil");
+		sql.SELECT_DISTINCT("d.correoelectronico");
+		sql.SELECT_DISTINCT("d.domicilio");
 		
 		// From
 		sql.FROM("cen_persona p");

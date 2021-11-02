@@ -30,8 +30,17 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 				+ "		WHERE idformapago=fP.idformapago "
 				+ "	) formapago");
 		sql.SELECT("sf.generarpdf");
+		sql.SELECT("sf.idmodelofactura");
+		sql.SELECT("sf.idmodelorectificativa");
 		sql.SELECT("sf.enviofacturas");
+		sql.SELECT("sf.idplatillamail");
 		sql.SELECT("sf.traspasofacturas");
+		sql.SELECT("sf.traspaso_plantilla");
+		sql.SELECT("sf.traspaso_codauditoria_def");
+		sql.SELECT("sf.confdeudor");
+		sql.SELECT("sf.ctaclientes");
+		sql.SELECT("sf.confingresos");
+		sql.SELECT("sf.ctaingresos");
 		sql.SELECT("sf.idseriefacturacionprevia");
 		sql.SELECT("(CASE WHEN sf.tiposerie = 'G' then 1 else 0 end) serieGenerica");
 		

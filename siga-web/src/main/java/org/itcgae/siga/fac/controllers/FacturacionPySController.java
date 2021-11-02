@@ -128,5 +128,23 @@ public class FacturacionPySController {
 		ComboDTO response = facturacionService.getFormasPagosSerie(idSerieFacturacion, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
-	
+
+	@GetMapping(value = "/comboModelosComunicacion")
+	ResponseEntity<ComboDTO> comboModelosComunicacion(HttpServletRequest request) {
+		ComboDTO response = facturacionService.comboModelosComunicacion(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/getContadoresSerie")
+	ResponseEntity<ContadorSeriesDTO> getContadoresSerie(HttpServletRequest request) {
+		ContadorSeriesDTO response = facturacionService.getContadoresSerie(request);
+		return new ResponseEntity<ContadorSeriesDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/getContadoresRectificativasSerie")
+	ResponseEntity<ContadorSeriesDTO> getContadoresRectificativasSerie(HttpServletRequest request) {
+		ContadorSeriesDTO response = facturacionService.getContadoresRectificativasSerie(request);
+		return new ResponseEntity<ContadorSeriesDTO>(response, HttpStatus.OK);
+	}
+
 }

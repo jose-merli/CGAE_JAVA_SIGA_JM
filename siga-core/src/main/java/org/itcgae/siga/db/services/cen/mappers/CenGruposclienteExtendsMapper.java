@@ -68,6 +68,7 @@ public interface CenGruposclienteExtendsMapper extends CenGruposclienteMapper{
 	@SelectProvider(type = CenGruposclienteSqlExtendsProvider.class, method = "comboEtiquetas")
 	@Results({ 
 		@Result(column = "ID", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)}) 
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
 	List<ComboItem> comboEtiquetas(String idioma, Short idInstitucion);
 }

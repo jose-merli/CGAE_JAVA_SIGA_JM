@@ -22,9 +22,22 @@ public class SerieFacturacionItem {
 
 	private String idFormaPago;
 	private String formaPago;
+
 	private Boolean generarPDF;
+	private String idModeloFactura;
+	private String idModeloRectificativa;
+
 	private Boolean envioFacturas;
+	private String idPlatillaMail;
+
 	private Boolean traspasoFacturas;
+	private String traspasoPlatilla;
+	private String traspasoCodAuditoriaDef;
+
+	private String confDeudor;
+	private String ctaClientes;
+	private String confIngresos;
+	private String ctaIngresos;
 
 	private List<String> idTiposProductos;
 	private List<ComboItem> tiposProductos;
@@ -40,6 +53,78 @@ public class SerieFacturacionItem {
 
 	private String idSerieFacturacionPrevia;
 	private Boolean serieGenerica;
+
+	public String getIdModeloRectificativa() {
+		return idModeloRectificativa;
+	}
+
+	public void setIdModeloRectificativa(String idModeloRectificativa) {
+		this.idModeloRectificativa = idModeloRectificativa;
+	}
+
+	public String getIdPlatillaMail() {
+		return idPlatillaMail;
+	}
+
+	public void setIdPlatillaMail(String idPlatillaMail) {
+		this.idPlatillaMail = idPlatillaMail;
+	}
+
+	public String getTraspasoPlatilla() {
+		return traspasoPlatilla;
+	}
+
+	public void setTraspasoPlatilla(String traspasoPlatilla) {
+		this.traspasoPlatilla = traspasoPlatilla;
+	}
+
+	public String getIdModeloFactura() {
+		return idModeloFactura;
+	}
+
+	public void setIdModeloFactura(String idModeloFactura) {
+		this.idModeloFactura = idModeloFactura;
+	}
+
+	public String getTraspasoCodAuditoriaDef() {
+		return traspasoCodAuditoriaDef;
+	}
+
+	public void setTraspasoCodAuditoriaDef(String traspasoCodAuditoriaDef) {
+		this.traspasoCodAuditoriaDef = traspasoCodAuditoriaDef;
+	}
+
+	public String getConfDeudor() {
+		return confDeudor;
+	}
+
+	public void setConfDeudor(String confDeudor) {
+		this.confDeudor = confDeudor;
+	}
+
+	public String getCtaClientes() {
+		return ctaClientes;
+	}
+
+	public void setCtaClientes(String ctaClientes) {
+		this.ctaClientes = ctaClientes;
+	}
+
+	public String getConfIngresos() {
+		return confIngresos;
+	}
+
+	public void setConfIngresos(String confIngresos) {
+		this.confIngresos = confIngresos;
+	}
+
+	public String getCtaIngresos() {
+		return ctaIngresos;
+	}
+
+	public void setCtaIngresos(String ctaIngresos) {
+		this.ctaIngresos = ctaIngresos;
+	}
 
 	public String getIdSerieFacturacion() {
 		return idSerieFacturacion;
@@ -275,8 +360,17 @@ public class SerieFacturacionItem {
 				Objects.equals(idFormaPago, that.idFormaPago) &&
 				Objects.equals(formaPago, that.formaPago) &&
 				Objects.equals(generarPDF, that.generarPDF) &&
+				Objects.equals(idModeloFactura, that.idModeloFactura) &&
+				Objects.equals(idModeloRectificativa, that.idModeloRectificativa) &&
 				Objects.equals(envioFacturas, that.envioFacturas) &&
+				Objects.equals(idPlatillaMail, that.idPlatillaMail) &&
 				Objects.equals(traspasoFacturas, that.traspasoFacturas) &&
+				Objects.equals(traspasoPlatilla, that.traspasoPlatilla) &&
+				Objects.equals(traspasoCodAuditoriaDef, that.traspasoCodAuditoriaDef) &&
+				Objects.equals(confDeudor, that.confDeudor) &&
+				Objects.equals(ctaClientes, that.ctaClientes) &&
+				Objects.equals(confIngresos, that.confIngresos) &&
+				Objects.equals(ctaIngresos, that.ctaIngresos) &&
 				Objects.equals(idTiposProductos, that.idTiposProductos) &&
 				Objects.equals(tiposProductos, that.tiposProductos) &&
 				Objects.equals(idTiposServicios, that.idTiposServicios) &&
@@ -289,11 +383,6 @@ public class SerieFacturacionItem {
 				Objects.equals(idContadorFacturasRectificativas, that.idContadorFacturasRectificativas) &&
 				Objects.equals(idSerieFacturacionPrevia, that.idSerieFacturacionPrevia) &&
 				Objects.equals(serieGenerica, that.serieGenerica);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(idSerieFacturacion, observaciones, fechaBaja, abreviatura, descripcion, tiposIncluidos, idCuentaBancaria, cuentaBancaria, idSufijo, sufijo, idFormaPago, formaPago, generarPDF, envioFacturas, traspasoFacturas, idTiposProductos, tiposProductos, idTiposServicios, tiposServicios, idEtiquetas, etiquetas, idConsultasDestinatarios, consultasDestinatarios, idContadorFacturas, idContadorFacturasRectificativas, idSerieFacturacionPrevia, serieGenerica);
 	}
 
 	@Override
@@ -312,8 +401,17 @@ public class SerieFacturacionItem {
 				", idFormaPago='" + idFormaPago + '\'' +
 				", formaPago='" + formaPago + '\'' +
 				", generarPDF=" + generarPDF +
+				", idModeloFactura='" + idModeloFactura + '\'' +
+				", idModeloRectificativa='" + idModeloRectificativa + '\'' +
 				", envioFacturas=" + envioFacturas +
+				", idPlatillaMail='" + idPlatillaMail + '\'' +
 				", traspasoFacturas=" + traspasoFacturas +
+				", traspasoPlatilla='" + traspasoPlatilla + '\'' +
+				", traspasoCodAuditoriaDef='" + traspasoCodAuditoriaDef + '\'' +
+				", confDeudor='" + confDeudor + '\'' +
+				", ctaClientes='" + ctaClientes + '\'' +
+				", confIngresos='" + confIngresos + '\'' +
+				", ctaIngresos='" + ctaIngresos + '\'' +
 				", idTiposProductos=" + idTiposProductos +
 				", tiposProductos=" + tiposProductos +
 				", idTiposServicios=" + idTiposServicios +
@@ -327,6 +425,11 @@ public class SerieFacturacionItem {
 				", idSerieFacturacionPrevia='" + idSerieFacturacionPrevia + '\'' +
 				", serieGenerica=" + serieGenerica +
 				'}';
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idSerieFacturacion, observaciones, fechaBaja, abreviatura, descripcion, tiposIncluidos, idCuentaBancaria, cuentaBancaria, idSufijo, sufijo, idFormaPago, formaPago, generarPDF, idModeloFactura, idModeloRectificativa, envioFacturas, idPlatillaMail, traspasoFacturas, traspasoPlatilla, traspasoCodAuditoriaDef, confDeudor, ctaClientes, confIngresos, ctaIngresos, idTiposProductos, tiposProductos, idTiposServicios, tiposServicios, idEtiquetas, etiquetas, idConsultasDestinatarios, consultasDestinatarios, idContadorFacturas, idContadorFacturasRectificativas, idSerieFacturacionPrevia, serieGenerica);
 	}
 
 }
