@@ -747,9 +747,16 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 							guardia.setIdinstitucion(idInstitucion);
 							guardia.setFechamodificacion(new Date());
 							guardia.setUsumodificacion(usuario.getIdusuario());
+							
+							//SI LAS GUARDIAS SON OBLIGATORIAS, NO PUEDE HACERSE.
+							int obligatoriedad = scsTurnosExtendsMapper.getObligatoriedadByTurno(idInstitucion, cargaMasivaDatosITItem.getIdTurno());
+							if ( obligatoriedad != 0) {
+							//DECODE(SCS_TURNO.GUARDIAS, 0, 'Obligatorias', DECODE(SCS_TURNO.GUARDIAS, 2, 'A elegir', 'Todas o ninguna')
 								
 							//Se comprueba si se ha introducido una guardia especifica. Si no es asi, se realiza con todos las guardias del turno.
 							if(cargaMasivaDatosITItem.getIdGuardia().equals(null) || cargaMasivaDatosITItem.getIdGuardia().equals("")) {
+								
+								
 								int i=0;
 								while(i < listGu.size() && result!=0) {
 									GuardiasItem gu = listGu.get(i);
@@ -765,7 +772,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 
 									registrosErroneos++;
 								}
-								//Se no se ha completado la insercion de todas las inscripciones, se eliminan las realizadas.
+								//Si no se ha completado la insercion de todas las inscripciones, se eliminan las realizadas.
 								if(i<listGu.size() && i!=0) {
 									
 									ScsInscripcionguardiaKey key = new ScsInscripcionguardiaKey();
@@ -780,7 +787,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 										scsInscripcionguardiaMapper.deleteByPrimaryKey(key);
 									}
 								}
+							
 							}
+//					
 							else {
 
 								guardia.setIdguardia(Integer.parseInt(cargaMasivaDatosITItem.getIdGuardia()));
@@ -795,6 +804,13 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									registrosErroneos++;
 								}
 							}
+						}else {
+							errores += "La guardia es obligatoria para el turno, no se puede realizar. <br/>";
+							error.setDescription(errores);
+							deleteResponseDTO.setError(error);
+
+							registrosErroneos++;
+						}
 						}
 						//En el caso que se haya introducido una inscripcion de baja
 						else {
@@ -1199,15 +1215,15 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								key2.setFechasolicitud(cargaMasivaDatosITItem.getFechaEfectiva());
 								key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 								
-								ScsInscripcionturno instur = new ScsInscripcionturno();
+								List<ScsInscripcionturno> insturList = new ArrayList<ScsInscripcionturno>();
 								
-								instur = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2, new SimpleDateFormat("dd/MM/yyyy").format(cargaMasivaDatosITItem.getFechaEfectiva()));
+								insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2, new SimpleDateFormat("dd/MM/yyyy").format(cargaMasivaDatosITItem.getFechaEfectiva()));
 								
 								
 								//Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se inscriben las guardias.
-								if(instur != null) {
+								if(insturList.get(0) != null) {
 									//5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del turno correspondiente.
-									if(cargaMasivaDatosITItem.getFechaEfectiva().compareTo(instur.getFechavalidacion())<0) 
+									if(cargaMasivaDatosITItem.getFechaEfectiva().compareTo(insturList.get(0).getFechavalidacion())<0) 
 										errorLinea.append("La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
 									
 									//6. El grupo y el orden sólo aplicarán para guardias por grupos, en otro caso, no se tendrán en cuenta
@@ -1266,14 +1282,14 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									key2.setFechasolicitud(cargaMasivaDatosITItem.getFechaEfectiva());
 									key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
 									
-									ScsInscripcionturno instur = new ScsInscripcionturno();
+									List<ScsInscripcionturno> insturList = new ArrayList<ScsInscripcionturno>();
 									
-									instur = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2, new SimpleDateFormat("dd/MM/yyyy").format(cargaMasivaDatosITItem.getFechaEfectiva()));
+									insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2, new SimpleDateFormat("dd/MM/yyyy").format(cargaMasivaDatosITItem.getFechaEfectiva()));
 									
 									//Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se inscriben las guardias.
-									if(instur != null) {
+									if(insturList.get(0) != null) {
 										//5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del turno correspondiente.
-										if(cargaMasivaDatosITItem.getFechaEfectiva().compareTo(instur.getFechavalidacion())<0) 
+										if(cargaMasivaDatosITItem.getFechaEfectiva().compareTo(insturList.get(0).getFechavalidacion())<0) 
 											errorLinea.append("La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
 										
 										//6. El grupo y el orden sólo aplicarán para guardias por grupos, en otro caso, no se tendrán en cuenta
@@ -2612,23 +2628,23 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			
 			//Consulto la maxima fecha inicio para el periodo en la cabecera de guardias:
 
-			fechaMAX =  scsGuardiasturnoExtendsMapper.maxFechaInicioPeriodoCabGuardia( idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoPrimerDia);
-			String OLD_FORMAT = "yyyy-MM-dd HH:mm:ss.S";
-			String NEW_FORMAT = "dd/MM/yyyy";
-			if (fechaMAX!= null) {
-			fechaMAX = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaMAX);
-			} else {
-				fechaMAX = fechaPeriodoUltimoDia;
-			}
+//			fechaMAX =  scsGuardiasturnoExtendsMapper.maxFechaInicioPeriodoCabGuardia( idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoPrimerDia);
+//			String OLD_FORMAT = "yyyy-MM-dd HH:mm:ss.S";
+//			String NEW_FORMAT = "dd/MM/yyyy";
+//			if (fechaMAX!= null) {
+//			fechaMAX = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaMAX);
+//			} else {
+//				fechaMAX = fechaPeriodoUltimoDia;
+//			}
 			//Consulto la minima fecha inicio para el periodo en la cabecera de guardias:
-
-			fechaMIN = scsGuardiasturnoExtendsMapper.minFechaInicioPeriodoCabGuardia(idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoUltimoDia);
-			if (fechaMIN!= null) {
-			fechaMIN = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaMIN);
-			}else {
-				fechaMIN = fechaPeriodoPrimerDia;
-			}
-			total = scsGuardiasturnoExtendsMapper.diasSeparacionEntreGuardias( idpersona, idinstitucion,  idturno,  idguardia,  fechaMAX,  fechaMIN,  fechaPeriodoPrimerDia,  fechaPeriodoUltimoDia);
+//
+//			fechaMIN = scsGuardiasturnoExtendsMapper.minFechaInicioPeriodoCabGuardia(idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoUltimoDia);
+//			if (fechaMIN!= null) {
+//			fechaMIN = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaMIN);
+//			}else {
+//				fechaMIN = fechaPeriodoPrimerDia;
+//			}
+			total = scsGuardiasturnoExtendsMapper.diasSeparacionEntreGuardias( idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoPrimerDia,  fechaPeriodoUltimoDia);
 
 		} catch (Exception e){
 			throw new Exception(e +": Excepcion en ScsGuardiasColegiadoAdm.validacionIncompatibilidad(). Consulta SQL:"+consulta);
