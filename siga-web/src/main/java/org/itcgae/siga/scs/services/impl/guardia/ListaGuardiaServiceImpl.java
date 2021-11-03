@@ -138,15 +138,16 @@ public class ListaGuardiaServiceImpl implements ListaGuardiaService {
 						}
 					} else {
 						scsConjuntoguardias = new ScsConjuntoguardias();
-						String newIDLista = this.scsConjuntoguardiasExtendsMapper.getNextIdLista(idInstitucion);
-						scsConjuntoguardias.setIdconjuntoguardia(Short.valueOf(newIDLista));
+						//Se comenta el seteo del ID, a partir de ahora se usara la secuencia de SCS_CONJUNTOGUARDIAS
+						/*String newIDLista = this.scsConjuntoguardiasExtendsMapper.getNextIdLista(idInstitucion);
+						scsConjuntoguardias.setIdconjuntoguardia(Short.valueOf(newIDLista));*/
 						scsConjuntoguardias.setIdinstitucion(idInstitucion);
 						scsConjuntoguardias.setDescripcion(lista.getNombre());
 						scsConjuntoguardias.setLugar(lista.getLugar());
 						if (!UtilidadesString.esCadenaVacia(lista.getIdTipo())) {
 							scsConjuntoguardias.setTipo(Short.valueOf(lista.getIdTipo()));
 						} else {
-							scsConjuntoguardias.setTipo((Short)null);
+							scsConjuntoguardias.setTipo(null);
 						}
 
 						scsConjuntoguardias.setObservaciones(lista.getObservaciones());

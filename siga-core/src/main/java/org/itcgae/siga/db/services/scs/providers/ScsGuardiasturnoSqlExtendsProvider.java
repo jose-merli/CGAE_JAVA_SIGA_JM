@@ -1551,8 +1551,8 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 	public String generateCalendarioProgramado(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion, String today, String usuModif) {
 		
 		SQL sub2 = new SQL();
-		sub2.SELECT_DISTINCT("MAX(IDPROGCALENDARIO)");
-		sub2.FROM("SCS_PROG_CALENDARIOS");
+		sub2.SELECT_DISTINCT("SEQ_SCSPROGCALENDARIOS.NEXTVAL");
+		sub2.FROM("DUAL");
 		
 		SQL sub3 = new SQL();
 		sub3.SELECT_DISTINCT("MAX(FECHAMODIFICACION)");
@@ -1573,7 +1573,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 //		}
 		sql.INSERT_INTO("SCS_PROG_CALENDARIOS");
 //		if (calendarioItem.getIdCalendarioProgramado() != null) {
-			sql.VALUES("IDPROGCALENDARIO", "( " + sub2.toString() + " ) + 1");
+			sql.VALUES("IDPROGCALENDARIO", "( " + sub2.toString() + " )");
 //		}
 		if (calendarioItem.getIdCalG() != null) {
 			sql.VALUES("IDCONJUNTOGUARDIA", calendarioItem.getIdCalG());

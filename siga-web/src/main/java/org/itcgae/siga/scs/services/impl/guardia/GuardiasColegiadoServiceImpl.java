@@ -390,14 +390,14 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-				
+				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-					Long fechaHoy = new Date().getTime();
+					String fechaHoy = formatter.format(new Date());
 
 					String institucion = idInstitucion.toString();
 					String idTurno = datos[0].toString();
 					String idGuardia = datos[1].toString();
-					String fechadesde = datos[2].toString();
+					Long fechadesde = Long.parseLong(datos[2]);
 					String idPersona = datos[3].toString();
 					String newLetrado = datos[4].toString();
 					String fechaSustitucion = datos[5].toString();
@@ -410,150 +410,112 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 						if (saltoOcompensacion.equalsIgnoreCase("N")) {
 							LOGGER.info("sustituirGuardiaColeg() / obtener permuta guardia solicitante");
 
-						
-							ScsPermutaguardiasExample permutaGuardiaSolicitante = new ScsPermutaguardiasExample();
-							permutaGuardiaSolicitante.createCriteria()
-							.andIdinstitucionEqualTo(idInstitucion)
-							.andIdpersonaSolicitanteEqualTo(Long.parseLong(idPersona))
-							.andIdguardiaSolicitanteEqualTo(Integer.parseInt(idGuardia))
-							.andIdturnoSolicitanteEqualTo(Integer.parseInt(idTurno))
-							.andFechainicioSolicitanteEqualTo(new Date(Long.parseLong(fechadesde)))
-							.andIdcalendarioguardiasSolicitanEqualTo(Integer.parseInt(calendarioGuardias));
-				
+							//obtiene la guardia del colegiado
+							ScsCabeceraguardiasKey guardia = new ScsCabeceraguardiasKey();
+							guardia.setIdinstitucion(idInstitucion);
+							guardia.setIdguardia(Integer.parseInt(idGuardia));
+							guardia.setIdturno(Integer.parseInt(idTurno));
+							guardia.setIdpersona(Long.parseLong(idPersona));
+							guardia.setFechainicio(new Date(fechadesde));
+							ScsCabeceraguardias cabGuardia = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(guardia);
 							
-							List<ScsPermutaguardias> listPerGuarSol = scsPermutaguardiasExtendsMapper.selectByExample(permutaGuardiaSolicitante);
-							if(!listPerGuarSol.isEmpty()) {
-								for(ScsPermutaguardias item:listPerGuarSol) {
+							//obtiene la permuta asociada a ese colegiado en una fecha concreta
+							ScsPermutaCabeceraExample permCab =new ScsPermutaCabeceraExample();
+							permCab.createCriteria()
+							.andIdinstitucionEqualTo(idInstitucion)
+							.andIdguardiaEqualTo(cabGuardia.getIdguardia())
+							.andIdturnoEqualTo(cabGuardia.getIdturno())
+							.andIdpersonaEqualTo(cabGuardia.getIdpersona())
+							.andFechaEqualTo(cabGuardia.getFechainicio());
+							List<ScsPermutaCabecera> permutaCabecera = scsPermutaCabeceraExtendsMapper.selectByExample(permCab);
+							
+							if(!permutaCabecera.isEmpty()) {
+								ScsPermutaguardiasExample permutaGuardiaSolicitante = new ScsPermutaguardiasExample();
+								permutaGuardiaSolicitante.createCriteria()
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdPerCabSolicitanteEqualTo(permutaCabecera.get(0).getIdPermutaCabecera());
+								List<ScsPermutaguardias> permutaGS = scsPermutaguardiasExtendsMapper.selectByExample(permutaGuardiaSolicitante);
+								if(!permutaGS.isEmpty()) {
 									
-									ScsPermutaCabeceraKey keypermutaCabSol = new ScsPermutaCabeceraKey();
-									keypermutaCabSol.setIdinstitucion(idInstitucion);
-									keypermutaCabSol.setIdPermutaCabecera(item.getIdPerCabSolicitante());
-									
-									ScsPermutaCabecera permutaCabsol = scsPermutaCabeceraExtendsMapper.selectByPrimaryKey(keypermutaCabSol);
-									
-									ScsCabeceraguardiasKey keycabeceraGuardiaSol = new ScsCabeceraguardiasKey();
-									keycabeceraGuardiaSol.setIdinstitucion(idInstitucion);
-									keycabeceraGuardiaSol.setIdguardia(permutaCabsol.getIdguardia());
-									keycabeceraGuardiaSol.setIdturno(permutaCabsol.getIdturno());
-									keycabeceraGuardiaSol.setIdpersona(permutaCabsol.getIdpersona());
-									keycabeceraGuardiaSol.setFechainicio(permutaCabsol.getFecha());
-									
-									ScsCabeceraguardias cabeceraGuardia = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(keycabeceraGuardiaSol);
-									
-									int delPerGuar = scsPermutaguardiasExtendsMapper.deleteByPrimaryKey(item);
-									
-									if(delPerGuar !=0) {
-										int delPerCab = scsPermutaCabeceraExtendsMapper.deleteByPrimaryKey(keypermutaCabSol);
-										if(delPerCab != 0) {
-											int delcabGuar = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(keycabeceraGuardiaSol);
-											
-											//una vez eliminadas las pemutas se inserta los registros con el colegiado cambiado
-											if(delcabGuar != 0) {
-												cabeceraGuardia.setIdpersona(Long.parseLong(newLetrado));
-												cabeceraGuardia.setComensustitucion(comensustitucion);
-												cabeceraGuardia.setSustituto("1");
-												cabeceraGuardia.setLetradosustituido(Long.parseLong(idPersona));
-												cabeceraGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
-												cabeceraGuardia.setFechamodificacion(new Date());
-												cabeceraGuardia.setUsumodificacion(usuario.getIdusuario());
-												int insertcabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabeceraGuardia);
-												if(insertcabGuar != 0) {
-													permutaCabsol.setIdpersona(Long.parseLong(newLetrado));
-													int insertPerCabSol = scsPermutaCabeceraExtendsMapper.insertSelective(permutaCabsol);
-													if(insertPerCabSol != 0) {
-														item.setIdpersonaSolicitante(Long.parseLong(newLetrado));
-														respCabGuar = scsPermutaguardiasExtendsMapper.insertSelective(item);
+										int delPG = scsPermutaguardiasExtendsMapper.deleteByPrimaryKey(permutaGS.get(0));
+										if(delPG != 0) {
+											int delPC = scsPermutaCabeceraExtendsMapper.deleteByPrimaryKey(permutaCabecera.get(0));
+											if(delPC != 0) {
+												int delGC = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(cabGuardia);
+												if(delGC != 0) {
+													cabGuardia.setIdpersona(Long.parseLong(newLetrado));
+													cabGuardia.setComensustitucion(comensustitucion);
+													cabGuardia.setSustituto("1");
+													cabGuardia.setLetradosustituido(Long.parseLong(idPersona));
+													cabGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
+													cabGuardia.setFechamodificacion(new Date());
+													cabGuardia.setUsumodificacion(usuario.getIdusuario());
+													int insertcabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabGuardia);
+													if(insertcabGuar != 0) {
+														permutaCabecera.get(0).setIdpersona(Long.parseLong(newLetrado));
+														int insertPerCabSol = scsPermutaCabeceraExtendsMapper.insertSelective(permutaCabecera.get(0));
+														if(insertPerCabSol != 0) {
+															permutaGS.get(0).setIdpersonaSolicitante(Long.parseLong(newLetrado));
+															respCabGuar = scsPermutaguardiasExtendsMapper.insertSelective(permutaGS.get(0));
+														}
 													}
 												}
 											}
 										}
-									}
 									
-							}
-							}
-							
-							ScsPermutaguardiasExample permutaGuardiaConfirmador = new ScsPermutaguardiasExample();
-							permutaGuardiaConfirmador.createCriteria()
-							.andIdinstitucionEqualTo(idInstitucion)
-							.andIdpersonaConfirmadorEqualTo(Long.parseLong(idPersona))
-							.andIdguardiaConfirmadorEqualTo(Integer.parseInt(idGuardia))
-							.andIdturnoConfirmadorEqualTo(Integer.parseInt(idTurno))
-							.andFechainicioConfirmadorEqualTo(new Date(Long.parseLong(fechadesde)))
-							.andIdcalendarioguardiasConfirmadEqualTo(Integer.parseInt(calendarioGuardias));
-				
-							
-							List<ScsPermutaguardias> listPerGuarConf = scsPermutaguardiasExtendsMapper.selectByExample(permutaGuardiaConfirmador);
-							if(!listPerGuarConf.isEmpty()) {
-								for(ScsPermutaguardias item:listPerGuarConf) {
-									
-									ScsPermutaCabeceraKey keypermutaCabConf = new ScsPermutaCabeceraKey();
-									keypermutaCabConf.setIdinstitucion(idInstitucion);
-									keypermutaCabConf.setIdPermutaCabecera(item.getIdPerCabSolicitante());
-									
-									ScsPermutaCabecera permutaCabsol = scsPermutaCabeceraExtendsMapper.selectByPrimaryKey(keypermutaCabConf);
-									
-									ScsCabeceraguardiasKey keycabeceraGuardiaConf = new ScsCabeceraguardiasKey();
-									keycabeceraGuardiaConf.setIdinstitucion(idInstitucion);
-									keycabeceraGuardiaConf.setIdguardia(permutaCabsol.getIdguardia());
-									keycabeceraGuardiaConf.setIdturno(permutaCabsol.getIdturno());
-									keycabeceraGuardiaConf.setIdpersona(permutaCabsol.getIdpersona());
-									keycabeceraGuardiaConf.setFechainicio(permutaCabsol.getFecha());
-									
-									ScsCabeceraguardias cabeceraGuardia = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(keycabeceraGuardiaConf);
-									
-									int delPerGuar = scsPermutaguardiasExtendsMapper.deleteByPrimaryKey(item);
-									
-									if(delPerGuar !=0) {
-										int delPerCab = scsPermutaCabeceraExtendsMapper.deleteByPrimaryKey(keypermutaCabConf);
-										if(delPerCab != 0) {
-											int delcabGuar = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(keycabeceraGuardiaConf);
-											
-											//una vez eliminadas las pemutas se inserta los registros con el colegiado cambiado
-											if(delcabGuar != 0) {
-												cabeceraGuardia.setIdpersona(Long.parseLong(newLetrado));
-												cabeceraGuardia.setComensustitucion(comensustitucion);
-												cabeceraGuardia.setSustituto("1");
-												cabeceraGuardia.setLetradosustituido(Long.parseLong(idPersona));
-												cabeceraGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
-												cabeceraGuardia.setFechamodificacion(new Date());
-												cabeceraGuardia.setUsumodificacion(usuario.getIdusuario());
-												int insertcabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabeceraGuardia);
+								}
+								ScsPermutaguardiasExample permutaGuardiaConfirmador = new ScsPermutaguardiasExample();
+								permutaGuardiaConfirmador.createCriteria()
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdPerCabConfirmadorEqualTo(permutaCabecera.get(0).getIdPermutaCabecera());
+								
+								List<ScsPermutaguardias> permutaGC = scsPermutaguardiasExtendsMapper.selectByExample(permutaGuardiaConfirmador);
+								if(!permutaGC.isEmpty()) {
+									int delPG = scsPermutaguardiasExtendsMapper.deleteByPrimaryKey(permutaGC.get(0));
+									if(delPG != 0) {
+										int delPC = scsPermutaCabeceraExtendsMapper.deleteByPrimaryKey(permutaCabecera.get(0));
+										if(delPC != 0) {
+											int delGC = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(cabGuardia);
+											if(delGC != 0) {
+												cabGuardia.setIdpersona(Long.parseLong(newLetrado));
+												cabGuardia.setComensustitucion(comensustitucion);
+												cabGuardia.setSustituto("1");
+												cabGuardia.setLetradosustituido(Long.parseLong(idPersona));
+												cabGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
+												cabGuardia.setFechamodificacion(new Date());
+												cabGuardia.setUsumodificacion(usuario.getIdusuario());
+												int insertcabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabGuardia);
 												if(insertcabGuar != 0) {
-													permutaCabsol.setIdpersona(Long.parseLong(newLetrado));
-													int insertPerCabConf = scsPermutaCabeceraExtendsMapper.insertSelective(permutaCabsol);
+													permutaCabecera.get(0).setIdpersona(Long.parseLong(newLetrado));
+													int insertPerCabConf = scsPermutaCabeceraExtendsMapper.insertSelective(permutaCabecera.get(0));
 													if(insertPerCabConf != 0) {
-														item.setIdpersonaConfirmador(Long.parseLong(newLetrado));
-														respCabGuar = scsPermutaguardiasExtendsMapper.insertSelective(item);
+														permutaGC.get(0).setIdpersonaConfirmador(Long.parseLong(newLetrado));
+														respCabGuar = scsPermutaguardiasExtendsMapper.insertSelective(permutaGC.get(0));
 													}
 												}
 											}
 										}
 									}
 								}
-							}
-							if(listPerGuarSol.isEmpty() && listPerGuarConf.isEmpty()) {
-								ScsCabeceraguardiasKey cabGuardia = new ScsCabeceraguardiasKey();
-								cabGuardia .setIdinstitucion(idInstitucion);
-								cabGuardia .setIdguardia(Integer.parseInt(idGuardia));
-								cabGuardia .setIdturno(Integer.parseInt(idTurno));
-								cabGuardia .setIdpersona(Long.parseLong(idPersona));
-								cabGuardia .setFechainicio(new Date(Long.parseLong(fechadesde)));
-								
-								ScsCabeceraguardias cabeceraGuardia = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(cabGuardia);
-								
-								int delcabGuar = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(cabGuardia);
-								if(delcabGuar != 0) {
-									cabeceraGuardia.setIdpersona(Long.parseLong(newLetrado));
-									cabeceraGuardia.setComensustitucion(comensustitucion);
-									cabeceraGuardia.setSustituto("1");
-									cabeceraGuardia.setLetradosustituido(Long.parseLong(idPersona));
-									cabeceraGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
-									cabeceraGuardia.setFechamodificacion(new Date());
-									cabeceraGuardia.setUsumodificacion(usuario.getIdusuario());
-									respCabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabeceraGuardia);
+							}else {
+								int cabeGua = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(cabGuardia);
+								if(cabeGua != 0) {
+									cabGuardia.setIdpersona(Long.parseLong(newLetrado));
+									cabGuardia.setComensustitucion(comensustitucion);
+									cabGuardia.setSustituto("1");
+									cabGuardia.setLetradosustituido(Long.parseLong(idPersona));
+									cabGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
+									cabGuardia.setFechamodificacion(new Date());
+									cabGuardia.setUsumodificacion(usuario.getIdusuario());
+									respCabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabGuardia);
 								}
-							
 							}
+							
+							
+							
+							
+							
+							
 							if (respCabGuar == 0) {
 								error.setCode(400);
 								updateResponseDTO.setStatus(SigaConstants.KO);
@@ -568,150 +530,105 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 						} else {
 							LOGGER.info("sustituirGuardiaColeg() / obtener permuta guardia solicitante");
 
+							//obtiene la guardia del colegiado
+							ScsCabeceraguardiasKey guardia = new ScsCabeceraguardiasKey();
+							guardia.setIdinstitucion(idInstitucion);
+							guardia.setIdguardia(Integer.parseInt(idGuardia));
+							guardia.setIdturno(Integer.parseInt(idTurno));
+							guardia.setIdpersona(Long.parseLong(idPersona));
+							guardia.setFechainicio(new Date(fechadesde));
+							ScsCabeceraguardias cabGuardia = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(guardia);
 							
-							ScsPermutaguardiasExample permutaGuardiaSolicitante = new ScsPermutaguardiasExample();
-							permutaGuardiaSolicitante.createCriteria()
+							//obtiene la permuta asociada a ese colegiado en una fecha concreta
+							ScsPermutaCabeceraExample permCab =new ScsPermutaCabeceraExample();
+							permCab.createCriteria()
 							.andIdinstitucionEqualTo(idInstitucion)
-							.andIdpersonaSolicitanteEqualTo(Long.parseLong(idPersona))
-							.andIdguardiaSolicitanteEqualTo(Integer.parseInt(idGuardia))
-							.andIdturnoSolicitanteEqualTo(Integer.parseInt(idTurno))
-							.andFechainicioSolicitanteEqualTo(new Date(Long.parseLong(fechadesde)))
-							.andIdcalendarioguardiasSolicitanEqualTo(Integer.parseInt(calendarioGuardias));
-				
+							.andIdguardiaEqualTo(cabGuardia.getIdguardia())
+							.andIdturnoEqualTo(cabGuardia.getIdturno())
+							.andIdpersonaEqualTo(cabGuardia.getIdpersona())
+							.andFechaEqualTo(cabGuardia.getFechainicio());
+							List<ScsPermutaCabecera> permutaCabecera = scsPermutaCabeceraExtendsMapper.selectByExample(permCab);
 							
-							List<ScsPermutaguardias> listPerGuarSol = scsPermutaguardiasExtendsMapper.selectByExample(permutaGuardiaSolicitante);
-							if(!listPerGuarSol.isEmpty()) {
-								for(ScsPermutaguardias item:listPerGuarSol) {
+							if(!permutaCabecera.isEmpty()) {
+								ScsPermutaguardiasExample permutaGuardiaSolicitante = new ScsPermutaguardiasExample();
+								permutaGuardiaSolicitante.createCriteria()
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdPerCabSolicitanteEqualTo(permutaCabecera.get(0).getIdPermutaCabecera());
+								List<ScsPermutaguardias> permutaGS = scsPermutaguardiasExtendsMapper.selectByExample(permutaGuardiaSolicitante);
+								if(!permutaGS.isEmpty()) {
 									
-									ScsPermutaCabeceraKey keypermutaCabSol = new ScsPermutaCabeceraKey();
-									keypermutaCabSol.setIdinstitucion(idInstitucion);
-									keypermutaCabSol.setIdPermutaCabecera(item.getIdPerCabSolicitante());
-									
-									ScsPermutaCabecera permutaCabsol = scsPermutaCabeceraExtendsMapper.selectByPrimaryKey(keypermutaCabSol);
-									
-									ScsCabeceraguardiasKey keycabeceraGuardiaSol = new ScsCabeceraguardiasKey();
-									keycabeceraGuardiaSol.setIdinstitucion(idInstitucion);
-									keycabeceraGuardiaSol.setIdguardia(permutaCabsol.getIdguardia());
-									keycabeceraGuardiaSol.setIdturno(permutaCabsol.getIdturno());
-									keycabeceraGuardiaSol.setIdpersona(permutaCabsol.getIdpersona());
-									keycabeceraGuardiaSol.setFechainicio(permutaCabsol.getFecha());
-									
-									ScsCabeceraguardias cabeceraGuardia = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(keycabeceraGuardiaSol);
-									
-									int delPerGuar = scsPermutaguardiasExtendsMapper.deleteByPrimaryKey(item);
-									
-									if(delPerGuar !=0) {
-										int delPerCab = scsPermutaCabeceraExtendsMapper.deleteByPrimaryKey(keypermutaCabSol);
-										if(delPerCab != 0) {
-											int delcabGuar = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(keycabeceraGuardiaSol);
-											
-											//una vez eliminadas las pemutas se inserta los registros con el colegiado cambiado
-											if(delcabGuar != 0) {
-												cabeceraGuardia.setIdpersona(Long.parseLong(newLetrado));
-												cabeceraGuardia.setComensustitucion(comensustitucion);
-												cabeceraGuardia.setSustituto("1");
-												cabeceraGuardia.setLetradosustituido(Long.parseLong(idPersona));
-												cabeceraGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
-												cabeceraGuardia.setFechamodificacion(new Date());
-												cabeceraGuardia.setUsumodificacion(usuario.getIdusuario());
-												int insertcabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabeceraGuardia);
-												if(insertcabGuar != 0) {
-													permutaCabsol.setIdpersona(Long.parseLong(newLetrado));
-													int insertPerCabSol = scsPermutaCabeceraExtendsMapper.insertSelective(permutaCabsol);
-													if(insertPerCabSol != 0) {
-														item.setIdpersonaSolicitante(Long.parseLong(newLetrado));
-														respCabGuar = scsPermutaguardiasExtendsMapper.insertSelective(item);
+										int delPG = scsPermutaguardiasExtendsMapper.deleteByPrimaryKey(permutaGS.get(0));
+										if(delPG != 0) {
+											int delPC = scsPermutaCabeceraExtendsMapper.deleteByPrimaryKey(permutaCabecera.get(0));
+											if(delPC != 0) {
+												int delGC = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(cabGuardia);
+												if(delGC != 0) {
+													cabGuardia.setIdpersona(Long.parseLong(newLetrado));
+													cabGuardia.setComensustitucion(comensustitucion);
+													cabGuardia.setSustituto("1");
+													cabGuardia.setLetradosustituido(Long.parseLong(idPersona));
+													cabGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
+													cabGuardia.setFechamodificacion(new Date());
+													cabGuardia.setUsumodificacion(usuario.getIdusuario());
+													int insertcabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabGuardia);
+													if(insertcabGuar != 0) {
+														permutaCabecera.get(0).setIdpersona(Long.parseLong(newLetrado));
+														int insertPerCabSol = scsPermutaCabeceraExtendsMapper.insertSelective(permutaCabecera.get(0));
+														if(insertPerCabSol != 0) {
+															permutaGS.get(0).setIdpersonaSolicitante(Long.parseLong(newLetrado));
+															respCabGuar = scsPermutaguardiasExtendsMapper.insertSelective(permutaGS.get(0));
+														}
 													}
 												}
 											}
 										}
-									}
 									
-							}
-							}
-							
-							ScsPermutaguardiasExample permutaGuardiaConfirmador = new ScsPermutaguardiasExample();
-							permutaGuardiaConfirmador.createCriteria()
-							.andIdinstitucionEqualTo(idInstitucion)
-							.andIdpersonaConfirmadorEqualTo(Long.parseLong(idPersona))
-							.andIdguardiaConfirmadorEqualTo(Integer.parseInt(idGuardia))
-							.andIdturnoConfirmadorEqualTo(Integer.parseInt(idTurno))
-							.andFechainicioConfirmadorEqualTo(new Date(Long.parseLong(fechadesde)))
-							.andIdcalendarioguardiasConfirmadEqualTo(Integer.parseInt(calendarioGuardias));
-				
-							
-							List<ScsPermutaguardias> listPerGuarConf = scsPermutaguardiasExtendsMapper.selectByExample(permutaGuardiaConfirmador);
-							if(!listPerGuarConf.isEmpty()) {
-								for(ScsPermutaguardias item:listPerGuarConf) {
-									
-									ScsPermutaCabeceraKey keypermutaCabConf = new ScsPermutaCabeceraKey();
-									keypermutaCabConf.setIdinstitucion(idInstitucion);
-									keypermutaCabConf.setIdPermutaCabecera(item.getIdPerCabSolicitante());
-									
-									ScsPermutaCabecera permutaCabsol = scsPermutaCabeceraExtendsMapper.selectByPrimaryKey(keypermutaCabConf);
-									
-									ScsCabeceraguardiasKey keycabeceraGuardiaConf = new ScsCabeceraguardiasKey();
-									keycabeceraGuardiaConf.setIdinstitucion(idInstitucion);
-									keycabeceraGuardiaConf.setIdguardia(permutaCabsol.getIdguardia());
-									keycabeceraGuardiaConf.setIdturno(permutaCabsol.getIdturno());
-									keycabeceraGuardiaConf.setIdpersona(permutaCabsol.getIdpersona());
-									keycabeceraGuardiaConf.setFechainicio(permutaCabsol.getFecha());
-									
-									ScsCabeceraguardias cabeceraGuardia = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(keycabeceraGuardiaConf);
-									
-									int delPerGuar = scsPermutaguardiasExtendsMapper.deleteByPrimaryKey(item);
-									
-									if(delPerGuar !=0) {
-										int delPerCab = scsPermutaCabeceraExtendsMapper.deleteByPrimaryKey(keypermutaCabConf);
-										if(delPerCab != 0) {
-											int delcabGuar = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(keycabeceraGuardiaConf);
-											
-											//una vez eliminadas las pemutas se inserta los registros con el colegiado cambiado
-											if(delcabGuar != 0) {
-												cabeceraGuardia.setIdpersona(Long.parseLong(newLetrado));
-												cabeceraGuardia.setComensustitucion(comensustitucion);
-												cabeceraGuardia.setSustituto("1");
-												cabeceraGuardia.setLetradosustituido(Long.parseLong(idPersona));
-												cabeceraGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
-												cabeceraGuardia.setFechamodificacion(new Date());
-												cabeceraGuardia.setUsumodificacion(usuario.getIdusuario());
-												int insertcabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabeceraGuardia);
+								}
+								ScsPermutaguardiasExample permutaGuardiaConfirmador = new ScsPermutaguardiasExample();
+								permutaGuardiaConfirmador.createCriteria()
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdPerCabConfirmadorEqualTo(permutaCabecera.get(0).getIdPermutaCabecera());
+								
+								List<ScsPermutaguardias> permutaGC = scsPermutaguardiasExtendsMapper.selectByExample(permutaGuardiaConfirmador);
+								if(!permutaGC.isEmpty()) {
+									int delPG = scsPermutaguardiasExtendsMapper.deleteByPrimaryKey(permutaGC.get(0));
+									if(delPG != 0) {
+										int delPC = scsPermutaCabeceraExtendsMapper.deleteByPrimaryKey(permutaCabecera.get(0));
+										if(delPC != 0) {
+											int delGC = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(cabGuardia);
+											if(delGC != 0) {
+												cabGuardia.setIdpersona(Long.parseLong(newLetrado));
+												cabGuardia.setComensustitucion(comensustitucion);
+												cabGuardia.setSustituto("1");
+												cabGuardia.setLetradosustituido(Long.parseLong(idPersona));
+												cabGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
+												cabGuardia.setFechamodificacion(new Date());
+												cabGuardia.setUsumodificacion(usuario.getIdusuario());
+												int insertcabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabGuardia);
 												if(insertcabGuar != 0) {
-													permutaCabsol.setIdpersona(Long.parseLong(newLetrado));
-													int insertPerCabConf = scsPermutaCabeceraExtendsMapper.insertSelective(permutaCabsol);
+													permutaCabecera.get(0).setIdpersona(Long.parseLong(newLetrado));
+													int insertPerCabConf = scsPermutaCabeceraExtendsMapper.insertSelective(permutaCabecera.get(0));
 													if(insertPerCabConf != 0) {
-														item.setIdpersonaConfirmador(Long.parseLong(newLetrado));
-														respCabGuar = scsPermutaguardiasExtendsMapper.insertSelective(item);
+														permutaGC.get(0).setIdpersonaConfirmador(Long.parseLong(newLetrado));
+														respCabGuar = scsPermutaguardiasExtendsMapper.insertSelective(permutaGC.get(0));
 													}
 												}
 											}
 										}
 									}
 								}
-							}
-							
-							if(listPerGuarSol.isEmpty() && listPerGuarConf.isEmpty()) {
-								ScsCabeceraguardiasKey cabGuardia = new ScsCabeceraguardiasKey();
-								cabGuardia .setIdinstitucion(idInstitucion);
-								cabGuardia .setIdguardia(Integer.parseInt(idGuardia));
-								cabGuardia .setIdturno(Integer.parseInt(idTurno));
-								cabGuardia .setIdpersona(Long.parseLong(idPersona));
-								cabGuardia .setFechainicio(new Date(Long.parseLong(fechadesde)));
-								
-								ScsCabeceraguardias cabeceraGuardia = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(cabGuardia);
-								
-								int delcabGuar = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(cabGuardia);
-								if(delcabGuar != 0) {
-									cabeceraGuardia.setIdpersona(Long.parseLong(newLetrado));
-									cabeceraGuardia.setComensustitucion(comensustitucion);
-									cabeceraGuardia.setSustituto("1");
-									cabeceraGuardia.setLetradosustituido(Long.parseLong(idPersona));
-									cabeceraGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
-									cabeceraGuardia.setFechamodificacion(new Date());
-									cabeceraGuardia.setUsumodificacion(usuario.getIdusuario());
-									respCabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabeceraGuardia);
+							}else {
+								int cabeGua = scsCabeceraguardiasExtendsMapper.deleteByPrimaryKey(cabGuardia);
+								if(cabeGua != 0) {
+									cabGuardia.setIdpersona(Long.parseLong(newLetrado));
+									cabGuardia.setComensustitucion(comensustitucion);
+									cabGuardia.setSustituto("1");
+									cabGuardia.setLetradosustituido(Long.parseLong(idPersona));
+									cabGuardia.setFechasustitucion(new Date(Long.parseLong(fechaSustitucion)));
+									cabGuardia.setFechamodificacion(new Date());
+									cabGuardia.setUsumodificacion(usuario.getIdusuario());
+									respCabGuar = scsCabeceraguardiasExtendsMapper.insertSelective(cabGuardia);
 								}
-							
 							}
 							
 							if (respCabGuar != 0) {
@@ -722,7 +639,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 									scgi.setIdPersona(idPersona);
 									scgi.setIdGuardia(idGuardia);
 									scgi.setIdTurno(idTurno);
-									scgi.setFecha(fechaHoy.toString());
+									scgi.setFecha(fechaHoy);
 									scgi.setSaltoCompensacion(saltoOcompensacion);
 									scgi.setMotivo("Sustitución");
 
@@ -746,7 +663,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 									scgi.setIdPersona(idPersona);
 									scgi.setIdGuardia(idGuardia);
 									scgi.setIdTurno(idTurno);
-									scgi.setFecha(fechaHoy.toString());
+									scgi.setFecha(fechaHoy);
 									scgi.setSaltoCompensacion(saltoOcompensacion);
 									scgi.setMotivo("Sustitución");
 
@@ -772,7 +689,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 									scgi.setIdPersona(idPersona);
 									scgi.setIdGuardia(idGuardia);
 									scgi.setIdTurno(idTurno);
-									scgi.setFecha(fechaHoy.toString());
+									scgi.setFecha(fechaHoy);
 									scgi.setSaltoCompensacion(salto);
 									scgi.setMotivo("Sustitución");
 
@@ -787,7 +704,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 										scgi.setIdPersona(idPersona);
 										scgi.setIdGuardia(idGuardia);
 										scgi.setIdTurno(idTurno);
-										scgi.setFecha(fechaHoy.toString());
+										scgi.setFecha(fechaHoy);
 										scgi.setSaltoCompensacion(comp);
 										scgi.setMotivo("Sustitución");
 

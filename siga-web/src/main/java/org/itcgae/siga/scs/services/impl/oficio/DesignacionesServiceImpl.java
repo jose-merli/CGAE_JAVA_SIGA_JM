@@ -55,6 +55,8 @@ import org.itcgae.siga.DTOs.scs.BajasTemporalesItem;
 import org.itcgae.siga.DTOs.scs.CenPersonaItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaDTO;
+import org.itcgae.siga.DTOs.scs.DocumentoActDesignaItem;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaDTO;
 import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
@@ -116,6 +118,8 @@ import org.itcgae.siga.db.entities.ScsDesignaprocurador;
 import org.itcgae.siga.db.entities.ScsDesignaprocuradorExample;
 import org.itcgae.siga.db.entities.ScsDesignasletrado;
 import org.itcgae.siga.db.entities.ScsDesignasletradoExample;
+import org.itcgae.siga.db.entities.ScsDocumentacionasi;
+import org.itcgae.siga.db.entities.ScsDocumentacionasiKey;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesigna;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesignaExample;
 import org.itcgae.siga.db.entities.ScsDocumentaciondesignaKey;
@@ -145,13 +149,17 @@ import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsAcreditacionMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
+import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
+import org.itcgae.siga.db.mappers.ScsContrariosasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsContrariosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
+import org.itcgae.siga.db.mappers.ScsDelitosasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosdesignaMapper;
 import org.itcgae.siga.db.mappers.ScsDelitosejgMapper;
 import org.itcgae.siga.db.mappers.ScsDesignaprocuradorMapper;
 import org.itcgae.siga.db.mappers.ScsDesignasletradoMapper;
+import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
@@ -160,11 +168,13 @@ import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.mappers.ScsSaltoscompensacionesMapper;
+import org.itcgae.siga.db.mappers.ScsSojMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignasLetradoExtendsMapper;
@@ -206,6 +216,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private ScsDesignacionesExtendsMapper scsDesignacionesExtendsMapper;
 
 	@Autowired
+	private ScsSojMapper scsSojMapper;
+
+	@Autowired
 	private ScsEstadoejgMapper scsEstadoejgMapper;
 
 	@Autowired
@@ -228,6 +241,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private ScsContrariosdesignaMapper scsContrariosdesignaMapper;
+
+	@Autowired
+	private ScsContrariosasistenciaMapper scsContrariosasistenciaMapper;
 
 	@Autowired
 	private ScsPersonajgExtendsMapper scsPersonajgExtendsMapper;
@@ -278,6 +294,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private ScsContrariosejgMapper scsContrariosejgMapper;
 
 	@Autowired
+	private ScsDocumentacionasiMapper scsDocumentacionasiMapper;
+
+	@Autowired
 	private GenFicheroMapper genFicheroMapper;
 
 	@Autowired
@@ -285,6 +304,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 	@Autowired
 	private ScsEjgMapper scsEjgMapper;
+
+	@Autowired
+	private ScsDelitosasistenciaMapper scsDelitosasistenciaMapper;
 
 	@Autowired
 	private ScsProcedimientosMapper scsProcedimientosMapper;
@@ -317,8 +339,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private ScsDelitosdesignaMapper scsDelitosdesignaMapper;
 
 	@Autowired
+	private ScsAsistenciaMapper scsAsistenciaMapper;
+
+	@Autowired
 	private ScsAsistenciaExtendsMapper scsAsistenciaExtendsMapper;
 
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+	
 	@Autowired
 	private ScsEjgExtendsMapper scsEjgExtendsMapper;
 
@@ -748,6 +776,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		// DesignaItem result = new DesignaItem();
 		Error error = new Error();
 		List<DesignaItem> designas = null;
+		List<DesignaItem> designasNuevas = null;
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
 
@@ -2995,7 +3024,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 										direccionCensoColegiado = direccion;
 									}
 								}
-tarjetaDatosDireccionesService
+//								UpdateResponseDTO response = tarjetaDatosDireccionesService.updateDirection(datosDirecciones, request);
+								InsertResponseDTO responseDireccion = tarjetaDatosDireccionesService
 										.createDirection(direccionCensoColegiado, request);
 							}
 						}
@@ -4754,7 +4784,7 @@ tarjetaDatosDireccionesService
 					}
 
 					if (letradoSaliente.getFechadesigna().equals(letradoEntrante.getFechadesigna()) || designa.getArt27().equals("Si")) {
-						designaLetradoVieja.getIdpersona();
+						Long idPersonaDesignaVieja = designaLetradoVieja.getIdpersona();
 //						designaLetradoNueva = designaLetradoVieja;
 						designaLetradoNueva.setIdpersona(designaLetradoNueva.getIdpersona());
 						response = scsDesignasletradoMapper.deleteByPrimaryKey(designaLetradoVieja);
@@ -5135,6 +5165,8 @@ tarjetaDatosDireccionesService
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		int responseDesig = 0;
+		int responseAct = 0;
+
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		Date fecha = null;
 
@@ -5250,7 +5282,7 @@ tarjetaDatosDireccionesService
 									record.setIdturno(Integer.parseInt(actuacion.getIdTurno()));
 									record.setAnio(Short.parseShort(actuacion.getAnio()));
 
-									scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
+									responseAct = scsActuaciondesignaMapper.updateByPrimaryKeySelective(record);
 
 								}
 							}
@@ -5710,7 +5742,275 @@ tarjetaDatosDireccionesService
 		return directorioFichero.toString();
 	}
 
+	@Override
+	public InsertResponseDTO subirDocumentoActDesigna(MultipartHttpServletRequest request) {
 
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.subirDocumentoActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.subirDocumentoActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				Iterator<String> itr = request.getFileNames();
+
+				while (itr.hasNext()) {
+
+					MultipartFile file = request.getFile(itr.next());
+					String nombreFichero = file.getOriginalFilename().split(";")[0];
+					String json = file.getOriginalFilename().split(";")[1].replaceAll("%22", "\"");
+					DocumentoActDesignaItem documentoActDesignaItem = objectMapper.readValue(json,
+							DocumentoActDesignaItem.class);
+					String extension = FilenameUtils.getExtension(nombreFichero);
+
+					Long idFile = uploadFileActDesigna(file.getBytes(), usuarios.get(0).getIdusuario(), idInstitucion,
+							nombreFichero, extension);
+
+					MaxIdDto nuevoId = scsDesignacionesExtendsMapper.getNewIdDocumentacionAsi(idInstitucion);
+
+					ScsDocumentacionasi scsDocumentacionasi = new ScsDocumentacionasi();
+
+					scsDocumentacionasi.setAnio(Short.valueOf(documentoActDesignaItem.getAnio()));
+					scsDocumentacionasi.setNumero(Long.valueOf(documentoActDesignaItem.getNumero()));
+					scsDocumentacionasi.setIdactuacion(Long.valueOf(documentoActDesignaItem.getIdActuacion()));
+					if (!UtilidadesString.esCadenaVacia(documentoActDesignaItem.getObservaciones())) {
+						scsDocumentacionasi.setObservaciones(documentoActDesignaItem.getObservaciones());
+					}
+					scsDocumentacionasi.setNombrefichero(nombreFichero);
+					scsDocumentacionasi.setIddocumentacionasi(Integer.valueOf(nuevoId.getIdMax().toString()));
+					scsDocumentacionasi.setIdtipodocumento(Short.valueOf("2"));
+					scsDocumentacionasi.setIdfichero(idFile);
+					scsDocumentacionasi.setIdinstitucion(idInstitucion);
+					scsDocumentacionasi.setUsumodificacion(usuarios.get(0).getIdusuario());
+					scsDocumentacionasi.setFechamodificacion(new Date());
+					scsDocumentacionasi.setFechaentrada(new Date());
+
+					int response = scsDocumentacionasiMapper.insertSelective(scsDocumentacionasi);
+
+					if (response == 1) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.subirDocumentoActDesigna() -> Se ha producido un error al subir un fichero perteneciente a la actuación");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						insertResponseDTO.setError(error);
+					}
+
+				}
+
+				String documentos = request.getParameter("documentosActualizar");
+				List<DocumentoActDesignaItem> listaDocumentos = objectMapper.readValue(documentos,
+						new TypeReference<List<DocumentoActDesignaItem>>() {
+						});
+
+				if (listaDocumentos != null && !listaDocumentos.isEmpty()) {
+
+					for (DocumentoActDesignaItem doc : listaDocumentos) {
+
+						ScsDocumentacionasi scsDocumentacionasi = new ScsDocumentacionasi();
+
+						if (!UtilidadesString.esCadenaVacia(doc.getObservaciones())) {
+							scsDocumentacionasi.setObservaciones(doc.getObservaciones());
+						}
+						scsDocumentacionasi.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsDocumentacionasi.setFechamodificacion(new Date());
+						scsDocumentacionasi.setIddocumentacionasi(Integer.valueOf(doc.getIdDocumentacionasi()));
+						scsDocumentacionasi.setIdinstitucion(idInstitucion);
+
+						int response2 = scsDocumentacionasiMapper.updateByPrimaryKeySelective(scsDocumentacionasi);
+
+						if (response2 == 1) {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+
+						if (response2 == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.error(
+									"DesignacionesServiceImpl.subirDocumentoActDesigna() -> Se ha producido un error al actualizar la información relacionada al documento de la actuación");
+							error.setCode(500);
+							error.setDescription("general.mensaje.error.bbdd");
+							insertResponseDTO.setError(error);
+						}
+
+					}
+
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.subirDocumentoActDesigna2() -> Se ha producido un error al subir un fichero perteneciente a la actuación",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			insertResponseDTO.setError(error);
+		}
+
+		return insertResponseDTO;
+	}
+
+	@Override
+	public DocumentoActDesignaDTO getDocumentosPorActDesigna(DocumentoActDesignaItem documentoActDesignaItem,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DocumentoActDesignaDTO documentoActDesignaDTO = new DocumentoActDesignaDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDocumentosPorActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDocumentosPorActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				List<DocumentoActDesignaItem> listaDocumentoActDesignaItem = scsDesignacionesExtendsMapper
+						.getDocumentosPorActDesigna(documentoActDesignaItem, idInstitucion);
+
+				documentoActDesignaDTO.setListaDocumentoActDesignaItem(listaDocumentoActDesignaItem);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.getDocumentosPorActDesigna() -> Se ha producido un error en la búsqueda de documentos asociados a la actuacion",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			documentoActDesignaDTO.setError(error);
+		}
+
+		return documentoActDesignaDTO;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> descargarDocumentosActDesigna(
+			List<DocumentoActDesignaItem> listaDocumentoActDesignaItem, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ResponseEntity<InputStreamResource> res = null;
+		InputStream fileStream = null;
+		HttpHeaders headers = new HttpHeaders();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDocumentosPorActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.getDocumentosPorActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty() && !listaDocumentoActDesignaItem.isEmpty()) {
+
+				if (listaDocumentoActDesignaItem.size() == 1) {
+
+					String path = getDirectorioFichero(idInstitucion);
+					path += File.separator + idInstitucion + "_" + listaDocumentoActDesignaItem.get(0).getIdFichero()
+							+ listaDocumentoActDesignaItem.get(0).getExtension().toLowerCase();
+
+					File file = new File(path);
+					fileStream = new FileInputStream(file);
+
+					String tipoMime = getMimeType(listaDocumentoActDesignaItem.get(0).getExtension());
+
+					headers.setContentType(MediaType.parseMediaType(tipoMime));
+					headers.set("Content-Disposition",
+							"attachment; filename=\"" + listaDocumentoActDesignaItem.get(0).getNombreFichero() + "\"");
+					headers.setContentLength(file.length());
+
+				} else {
+					fileStream = getZipFileDocumentosActDesigna(listaDocumentoActDesignaItem, idInstitucion);
+
+					headers.setContentType(MediaType.parseMediaType("application/zip"));
+					headers.set("Content-Disposition", "attachment; filename=\"documentos.zip\"");
+				}
+
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+						HttpStatus.OK);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.descargarDocumentosActDesigna() -> Se ha producido un error al descargar un archivo asociado a la actuacion",
+					e);
+		}
+
+		return res;
+	}
+
+	private InputStream getZipFileDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
+			Short idInstitucion) {
+
+		ByteArrayOutputStream byteArrayOutputStream = null;
+
+		try {
+
+			byteArrayOutputStream = new ByteArrayOutputStream();
+			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+			for (DocumentoActDesignaItem doc : listaDocumentoActDesignaItem) {
+
+				zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
+				String path = getDirectorioFichero(idInstitucion);
+				path += File.separator + idInstitucion + "_" + doc.getIdFichero() + doc.getExtension().toLowerCase();
+				File file = new File(path);
+				FileInputStream fileInputStream = new FileInputStream(file);
+				IOUtils.copy(fileInputStream, zipOutputStream);
+				fileInputStream.close();
+			}
+
+			zipOutputStream.closeEntry();
+
+			if (zipOutputStream != null) {
+				zipOutputStream.finish();
+				zipOutputStream.flush();
+				IOUtils.closeQuietly(zipOutputStream);
+			}
+
+			IOUtils.closeQuietly(bufferedOutputStream);
+			IOUtils.closeQuietly(byteArrayOutputStream);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+	}
 
 	private InputStream getZipFileDocumentosDesigna(List<DocumentoDesignaItem> listaDocumentoDesignaItem,
 			Short idInstitucion) {
@@ -5787,6 +6087,98 @@ tarjetaDatosDireccionesService
 		return mime;
 	}
 
+	@Override
+	public DeleteResponseDTO eliminarDocumentosActDesigna(List<DocumentoActDesignaItem> listaDocumentoActDesignaItem,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+
+		try {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			LOGGER.info(
+					"DesignacionesServiceImpl.eliminarDocumentosActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.eliminarDocumentosActDesigna() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+
+				for (DocumentoActDesignaItem doc : listaDocumentoActDesignaItem) {
+
+					String path = getDirectorioFichero(idInstitucion);
+					path += File.separator + idInstitucion + "_" + doc.getIdFichero()
+							+ doc.getExtension().toLowerCase();
+
+					File file = new File(path);
+
+					if (file.exists()) {
+						file.delete();
+					}
+
+					ScsDocumentacionasiKey scsDocumentacionasiKey = new ScsDocumentacionasiKey();
+
+					scsDocumentacionasiKey.setIddocumentacionasi(Integer.valueOf(doc.getIdDocumentacionasi()));
+					scsDocumentacionasiKey.setIdinstitucion(idInstitucion);
+
+					int response = scsDocumentacionasiMapper.deleteByPrimaryKey(scsDocumentacionasiKey);
+
+					if (response == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.eliminarDocumentosActDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la actuacion");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						deleteResponseDTO.setError(error);
+					}
+
+					GenFicheroKey genFicheroKey = new GenFicheroKey();
+
+					genFicheroKey.setIdfichero(Long.valueOf(doc.getIdFichero()));
+					genFicheroKey.setIdinstitucion(idInstitucion);
+
+					int response2 = genFicheroMapper.deleteByPrimaryKey(genFicheroKey);
+
+					if (response2 == 1) {
+						deleteResponseDTO.setStatus(SigaConstants.OK);
+					}
+
+					if (response2 == 0) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.error(
+								"DesignacionesServiceImpl.eliminarDocumentosActDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la actuacion");
+						error.setCode(500);
+						error.setDescription("general.mensaje.error.bbdd");
+						deleteResponseDTO.setError(error);
+					}
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(
+					"DesignacionesServiceImpl.eliminarDocumentosActDesigna() -> Se ha producido un error en la eliminación de documentos asociados a la actuacion",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+			error.setMessage(e.getMessage());
+			deleteResponseDTO.setError(error);
+		}
+
+		return deleteResponseDTO;
+	}
 
 	@Override
 	public DocumentoDesignaDTO getDocumentosPorDesigna(DocumentoDesignaItem documentoDesignaItem,
@@ -7194,7 +7586,9 @@ tarjetaDatosDireccionesService
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		new Error();
+		Error error = new Error();
+		int response = 0;
+		
 		ScsEjg ejg = new ScsEjg();
 
 		if (idInstitucion != null) {
