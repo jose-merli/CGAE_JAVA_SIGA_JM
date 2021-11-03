@@ -163,4 +163,8 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> obtenerCombosQueryBuilder(ConfigColumnasQueryBuilderItem configColumnasQueryBuilderItem, String idioma, Short idInstitucion);
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "getIdOperacion")
+	int getIdOperacion(String idCampo, String simbolo);
+	
 }	

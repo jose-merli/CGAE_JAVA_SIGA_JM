@@ -44,6 +44,7 @@ import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.com.Criterio;
 import org.itcgae.siga.DTOs.com.KeyItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
@@ -2629,6 +2630,9 @@ public class ConsultasServiceImpl implements IConsultasService {
 		}
 		
 	}
+	
+	public static int contador = 1;
+    public static List criterioLst = new ArrayList();
 
 	@Override
 	@Transactional
@@ -2640,6 +2644,13 @@ public class ConsultasServiceImpl implements IConsultasService {
 		
 		int statusDeleteConCriterioConsulta = 0;
 		int statusInsertConCriterioConsulta = 0;
+		
+		List<Integer> listIndicesLikes = new ArrayList<Integer>();
+		if(queryBuilderDTO.getConsulta().contains("LIKE")) {
+			listIndicesLikes = this.findWord(queryBuilderDTO.getConsulta(), "LIKE");
+			
+			queryBuilderDTO.setConsulta(this.eliminarParentesisOperadorLike(queryBuilderDTO.getConsulta(), listIndicesLikes));
+		}
 		
 		LOGGER.info(
 				"constructorConsultas() / ConCriterioConsultaMapper.deleteByPrimaryKey() -> Entrada a ConCriterioConsultaMapper para eliminar los registros ya existentes antes de insertar los nuevos");
@@ -2657,6 +2668,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 				conCriterioConsultaEliminar.setIdconsulta((long) rule.getIdconsulta());
 				
 				statusDeleteConCriterioConsulta = conCriterioConsultaMapper.deleteByPrimaryKey(conCriterioConsultaEliminar);
+				conCriterioConsultaMapper.selectByExample(null);
 				
 				if(statusDeleteConCriterioConsulta == 0) {
 					throw new Exception("Ha fallado la eliminacion del registro en con_criterioconsulta con PK --> idconsulta: " + rule.getIdconsulta() + ", orden: " + rule.getOrden() + ", idinstitucion: " + idInstitucion);
@@ -2697,81 +2709,186 @@ public class ConsultasServiceImpl implements IConsultasService {
 					conCriterioConsultaInsertar.setIdinstitucion(idInstitucion);
 					conCriterioConsultaInsertar.setIdconsulta(Long.valueOf(queryBuilderDTO.getIdconsulta()));
 					
-					queryBuilderDTO.getConsulta().replace("(", "( ");
-					queryBuilderDTO.getConsulta().replace(")", " )");
-					
-					String[] criteriosLista = queryBuilderDTO.getConsulta().split(" ");
-					boolean ruleFormada = false;
-					short numRulesFormadas = 0;
-					
-					
-					for(int i = 0; i < criteriosLista.length; i++) {
-						if(criteriosLista[i].equals("(")){
-							//ABRIRPAR
-							conCriterioConsultaInsertar.setAbrirpar("1");
-						}else if (criteriosLista[i + 1].equals("=") || criteriosLista[i + 1].equals("!=") || criteriosLista[i + 1].equals(">") || criteriosLista[i + 1].equals("<") || criteriosLista[i + 1].equals(">=") || criteriosLista[i + 1].equals("<=") || criteriosLista[i + 1].toUpperCase().equals("LIKE") || criteriosLista[i + 1].toUpperCase().equals("IS NULL")){ 
-							//Si la siguiente cadena es un operador significa que ahora mismo nos encontramos en el CAMPO.
-							conCriterioConsultaInsertar.setIdcampo(Long.valueOf(criteriosLista[i]));
-						}else if (criteriosLista[i].equals("=") || criteriosLista[i].equals("!=") || criteriosLista[i].equals(">") || criteriosLista[i].equals("<") || criteriosLista[i].equals(">=") || criteriosLista[i].equals("<=") || criteriosLista[i].toUpperCase().equals("LIKE") || criteriosLista[i].toUpperCase().equals("IS NULL")) {
-							//OPERADOR
-							conCriterioConsultaInsertar.setIdoperacion(null);//INVESTIGAR BD
-						}else if(criteriosLista[i - 1].equals("=") || criteriosLista[i - 1].equals("!=") || criteriosLista[i - 1].equals(">") || criteriosLista[i - 1].equals("<") || criteriosLista[i - 1].equals(">=") || criteriosLista[i - 1].equals("<=") || criteriosLista[i - 1].toUpperCase().equals("LIKE") || criteriosLista[i - 1].toUpperCase().equals("IS NULL")) {
-							//VALOR
-							conCriterioConsultaInsertar.setValor(criteriosLista[i]);
-							//CERRARPAR
-							if(criteriosLista[i + 1].equals(")")) {
-								conCriterioConsultaInsertar.setCerrarpar("1");
-								if(criteriosLista[i+2].equals("AND") || criteriosLista[i+2].equals("OR")) {
-									conCriterioConsultaInsertar.setOperador(criteriosLista[i+2]);
-									numRulesFormadas++;
-									ruleFormada = true;
-									conCriterioConsultaInsertar.setOrden(numRulesFormadas);
-								}
-							}						
-						}else if((criteriosLista[i].equals("AND") || criteriosLista[i].equals("OR")) && !ruleFormada) {
-							if(criteriosLista[i].equals("AND")) {
-								conCriterioConsultaInsertar.setOperador("AND");
-							}else if (criteriosLista[i].equals("OR")) {
-								conCriterioConsultaInsertar.setOperador("OR");
-							}
-							numRulesFormadas++;
-							ruleFormada = true;
-							conCriterioConsultaInsertar.setOrden(numRulesFormadas);				
-						}
+		            String delimitador = null;
+		                      
+		            extraeCriterio(queryBuilderDTO.getConsulta(), delimitador);
+		            
+		            //Recorro la lista y voy insertando en con_criterioconsulta
+		            for(int i = 0; i < criterioLst.size(); i++) {
+		            	Criterio criterio = (Criterio) criterioLst.get(i);
+		            	
+		            	if(criterio.isAbrirParentesis()) {
+		            		conCriterioConsultaInsertar.setAbrirpar("1");
+		            	}else {
+		            		conCriterioConsultaInsertar.setAbrirpar("0");
+		            	}
+		            	
+		            	if(criterio.getOperador() != null) {
+		            		conCriterioConsultaInsertar.setOperador(criterio.getOperador());
+		            	}
+		            	
+		            	String[] filtroSplit = criterio.getFiltro().split(" ");
+		            		            	
+		            	conCriterioConsultaInsertar.setIdcampo(Long.valueOf(filtroSplit[0]));
+		            		
+		            	LOGGER.info(
+								"constructorConsultas() / ConConsultaExtendsMapper.getIdOperacion() -> Entrada al servicio para obtener el idOperacion necesario para la insercion en con_criterioconsulta");
+		            	
+		            	if(!filtroSplit[1].equals("IS")) {
+		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(filtroSplit[0], filtroSplit[1]);
+		            		conCriterioConsultaInsertar.setIdoperacion((long) idoperacion);
+		            	}else{
+		            		String simbolo = filtroSplit[1] + " " + filtroSplit[2];
+		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(filtroSplit[0], simbolo.toLowerCase());
+		            		conCriterioConsultaInsertar.setIdoperacion((long) idoperacion);
+		            	}
+		            	          	
+		            	LOGGER.info(
+								"constructorConsultas() / ConConsultaExtendsMapper.getIdOperacion() -> Salida del servicio para obtener el idOperacion necesario para la insercion en con_criterioconsulta");
+		            		
+		            	if(!filtroSplit[1].equals("IS")) {
+		            		conCriterioConsultaInsertar.setValor(filtroSplit[2]);
+		            	}else {
+		            		conCriterioConsultaInsertar.setValor(null);
+		            	}
+		                        	
+		            	if(criterio.isCerrarParentesis()) {
+		            		conCriterioConsultaInsertar.setCerrarpar("1");
+		            	}else {
+		            		conCriterioConsultaInsertar.setCerrarpar("0");
+		            	}
+		            	
+		            	conCriterioConsultaInsertar.setOrden((short) criterio.getOrden());
+		            	
+		            	conCriterioConsultaInsertar.setFechamodificacion(new Date());
+						conCriterioConsultaInsertar.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
-						if(ruleFormada) {
+						statusInsertConCriterioConsulta = conCriterioConsultaMapper.insertSelective(conCriterioConsultaInsertar);
+						
+						if(statusInsertConCriterioConsulta == 0) {
+							criterioLst.clear();
+				            contador = 1;
+							throw new Exception("No se ha podido realizar la insercion parcial de la consulta en la tabla con_criterioconsulta, fallo en la rule num:" + criterio.orden);
+							
+						}else if(statusInsertConCriterioConsulta == 1) {
 							LOGGER.info(
-									"constructorConsultas() / ConCriterioConsultaMapper.insertSelective() -> Entrada a ConCriterioConsultaMapper para guardar la consulta sql enviada desde el constructor de consultas");
-							
-							conCriterioConsultaInsertar.setFechamodificacion(new Date());
-							conCriterioConsultaInsertar.setUsumodificacion(usuarios.get(0).getIdusuario());
-							
-							statusInsertConCriterioConsulta = conCriterioConsultaMapper.insertSelective(conCriterioConsultaInsertar);
-							
-							if(statusInsertConCriterioConsulta == 0) {
-								throw new Exception("No se ha podido realizar la insercion parcial de la consulta en la tabla con_criterioconsulta, fallo en la rule num:" + numRulesFormadas);						
-							}else if(statusInsertConCriterioConsulta == 1) {
-								ruleFormada = false;
-								LOGGER.info(
-										"constructorConsultas() / ConCriterioConsultaMapper.insertSelective() -> Se ha podido realizar la insercion parcial de la consulta en la tabla con_criterioconsulta, numero de inserciones: " + numRulesFormadas);
-							}
-							
-							
-							LOGGER.info(
-									"constructorConsultas() / ConCriterioConsultaMapper.insertSelective() -> Salida de ConCriterioConsultaMapper para guardar la consulta sql enviada desde el constructor de consultas");
+									"constructorConsultas() / ConCriterioConsultaMapper.insertSelective() -> Se ha podido realizar la insercion parcial de la consulta en la tabla con_criterioconsulta, numero de inserciones: " + criterio.orden);
+						}
+		            }
+		            
+		            criterioLst.clear();
+		            contador = 1;
+					
+					LOGGER.info(
+								"constructorConsultas() / ConCriterioConsultaMapper.insertSelective() -> Salida de ConCriterioConsultaMapper para guardar la consulta sql enviada desde el constructor de consultas");
 											
 						}
 					}
+			
+			
+			LOGGER.info("constructorConsultas() -> Salida del servicio para crear una nueva consulta desde el constructor de consultas");
+
+			
+			return queryBuilderDTO;
 				
-				}
-			}
-
-	
-		LOGGER.info("constructorConsultas() -> Salida del servicio para crear una nueva consulta desde el constructor de consultas");
-
-		
-		return queryBuilderDTO;
 	}
+			
+    public void extraeCriterio(String consulta, String delimitador) {
+        if (delimitador!=null) {
+                      consulta = consulta.replaceFirst(delimitador, "");
+        }
+        int posicionAnd = consulta.indexOf("AND");
+        int posicionOr = consulta.indexOf("OR");
+        int posicionProxima = 0;
+        String proximoDelimitador = null;
+        //buscamos el fin del criterio, si es AND, si es OR o si no hay nada más
+        if (posicionAnd!=-1 && posicionOr!=-1) {
+                      if (posicionAnd < posicionOr) {
+                                     proximoDelimitador = "AND";
+                                     posicionProxima = posicionAnd;
+                      }else {
+                                     proximoDelimitador = "OR";
+                                     posicionProxima = posicionOr;
+                      }
+        }else if (posicionAnd!=-1 && posicionOr==-1) {
+                      proximoDelimitador = "AND";
+                      posicionProxima = posicionAnd;
+        }else if (posicionAnd==-1 && posicionOr!=-1) {
+                      proximoDelimitador = "OR";
+                      posicionProxima = posicionOr;
+        }
+
+        if (proximoDelimitador!=null) {
+                      
+                      String subcadena = consulta.substring(0, posicionProxima);
+                      System.out.println("la subcadena a almacenar es:"+subcadena+"*");
+                      
+                      creaObjetoCriterio(subcadena, delimitador);
+                      
+                      String cadenaActual = consulta.substring( posicionProxima);
+                      extraeCriterio(cadenaActual, proximoDelimitador);
+                      
+        }else {
+                      System.out.println("la subcadena es la ultima:"+consulta+"*");
+                      
+                      creaObjetoCriterio(consulta, delimitador);
+        }
+    }
+    
+    private static void creaObjetoCriterio (String cadena, String delimitador) {
+        
+        Criterio cri = new Criterio();
+        cri.setOperador(delimitador);
+        cri.setAbrirParentesis(cadena.contains("("));
+        cri.setCerrarParentesis(cadena.contains(")"));
+        cri.setFiltro(cadena.replace("(", "").replace(")", ""));
+        
+        if(cri.getFiltro().charAt(0) == ' '){
+            cri.setFiltro(cri.getFiltro().substring(1));
+        }
+        
+        cri.setOrden(contador);
+        
+        criterioLst.add(cri);
+        
+        System.out.println(cri.toString());
+        
+        contador++;
+    }
+
+    
+    public List<Integer> findWord(String textString, String word) {
+        List<Integer> indexes = new ArrayList<Integer>();
+        String lowerCaseTextString = textString.toLowerCase();
+        String lowerCaseWord = word.toLowerCase();
+
+        int index = 0;
+        while(index != -1){
+            index = lowerCaseTextString.indexOf(lowerCaseWord, index);
+            if (index != -1) {
+                indexes.add(index);
+                index++;
+            }
+        }
+        return indexes;
+    }
+    
+    public String eliminarParentesisOperadorLike(String consulta, List<Integer> listIndicesLike){
+    	StringBuilder stringBuilder = new StringBuilder(consulta);
+    	
+    	for(int i = 0; i < listIndicesLike.size(); i++) {
+    		//Encontrar indice parentesis ( post LIKE
+    		int posicionPrimerParentesis = stringBuilder.indexOf("(", listIndicesLike.get(i));    		
+    		    	
+    		stringBuilder.deleteCharAt(posicionPrimerParentesis);
+    		//Encontrar indice parentesis ) post LIKE
+    		int posicionSegundoParentesis = stringBuilder.indexOf(")", listIndicesLike.get(i));
+    		stringBuilder.deleteCharAt(posicionSegundoParentesis);
+    	}
+  
+    	return stringBuilder.toString();	
+    }
+
 	
 	//SQL
 	@Override
@@ -2935,10 +3052,17 @@ public class ConsultasServiceImpl implements IConsultasService {
 						
 						if(constructorConsultasItem.getAbrirparentesis().equals("1")) {
 							contadorSubRules++;
-							//listaConstructorConsultasRuleDTO.add(new ConstructorConsultasRuleDTO())
+							listaConstructorConsultasRuleDTO.add(new ConstructorConsultasRuleDTO());
 							//constructorConsultasRuleDTO.setRules2(new ConstructorConsultasRuleDTO())
 						}
 					}
+//					
+//					1		1	3000	TIPO COLEGIADO	igual a	'20'	
+//					2	Y		226	RESIDENTE	igual a	'1'	
+//					3	Y		3003	GRUPO CLIENTE	igual a	'18#2005'	1
+//					4	O	1	3000	TIPO COLEGIADO	igual a	'20'	
+//					5	Y		226	RESIDENTE	igual a	'1'	
+//					6	Y		3003	GRUPO CLIENTE	igual a	'0#2005'	1
 					
 					LOGGER.info(
 							"obtenerConsultaJSON() / ConConsultasExtendsMapper.obtenerConsultaJSON() -> Salida de ConConsultasExtendsMapper para precargar la consulta ya existente en el constructor de consultas mediante un JSON");
