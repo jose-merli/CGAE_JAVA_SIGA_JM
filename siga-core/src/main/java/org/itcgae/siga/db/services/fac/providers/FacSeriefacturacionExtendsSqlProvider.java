@@ -33,7 +33,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		sql.SELECT("sf.idmodelofactura");
 		sql.SELECT("sf.idmodelorectificativa");
 		sql.SELECT("sf.enviofacturas");
-		sql.SELECT("sf.idplatillamail");
+		sql.SELECT("sf.idtipoplantillamail");
 		sql.SELECT("sf.traspasofacturas");
 		sql.SELECT("sf.traspaso_plantilla");
 		sql.SELECT("sf.traspaso_codauditoria_def");

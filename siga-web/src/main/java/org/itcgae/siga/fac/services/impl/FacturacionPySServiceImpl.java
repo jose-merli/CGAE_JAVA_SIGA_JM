@@ -947,7 +947,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					if (serieFacturacion.getSerieGenerica()) {
 						serieToUpdate.setTiposerie("G");
 					} else {
-						serieToUpdate.setTiposerie(null);
+						serieToUpdate.setTiposerie("");
 					}
 
 					// 2. Actualizar contadores (se prioriza el idContadorFacturasRectificativas sobre el idContadorFacturas)
@@ -961,8 +961,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 					// 3. Actualizar generación de ficheros
 					serieToUpdate.setGenerarpdf(serieFacturacion.getGenerarPDF() ? "1" : "0");
-					serieToUpdate.setIdmodelofactura(Long.parseLong(serieFacturacion.getIdModeloFactura()));
-					serieToUpdate.setIdmodelorectificativa(Long.parseLong(serieFacturacion.getIdModeloRectificativa()));
+					if (serieFacturacion.getIdModeloFactura() != null && !serieFacturacion.getIdModeloFactura().trim().isEmpty()) {
+						serieToUpdate.setIdmodelofactura(Long.parseLong(serieFacturacion.getIdModeloFactura()));
+					} else {
+						serieToUpdate.setIdmodelofactura(null);
+					}
+
+					if (serieFacturacion.getIdModeloRectificativa() != null && !serieFacturacion.getIdModeloRectificativa().trim().isEmpty()) {
+						serieToUpdate.setIdmodelorectificativa(Long.parseLong(serieFacturacion.getIdModeloRectificativa()));
+					} else {
+						serieToUpdate.setIdmodelorectificativa(null);
+					}
+
 
 					// 4. Envío de facturas
 					serieToUpdate.setEnviofacturas(serieFacturacion.getEnvioFacturas() ? "1" : "0");
@@ -1020,17 +1030,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 					// 8. Actualizar tipos de productos
 
-					/*
-					for (String idTipoProducto : serieFacturacion.getIdTiposProductos()) {
-						FacTiposproduincluenfactu item = new FacTiposproduincluenfactu();
-						item.setUsumodificacion(idUsuario);
-						item.setFechamodificacion(new Date());
-						item.setIdinstitucion(idInstitucion);
-						item.setIdseriefacturacion(idSerieFacturacion);
-						item.setIdtipoproducto(Short.parseShort(idTipoProducto));
-						// item.setIdproducto(""); Por acabar
-					}
-					*/
 
 					// 9. Actualizar tipos de servicios
 
@@ -1105,7 +1104,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO guardarEtiquetasSerieFacturacion(String idSerieFacturacion, List<ComboItem> etiquetasSeleccionadas, List<ComboItem> etiquetasNoSeleccionadas, HttpServletRequest request) {
+	public UpdateResponseDTO guardarEtiquetasSerieFacturacion(TarjetaPickListSerieDTO etiquetas, HttpServletRequest request) {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		int response = 0;
 		Error error = new Error();
@@ -1134,32 +1133,34 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 				//Logica
                 FacTipocliincluidoenseriefac etiqueta = null;
-                Long idSerie = Long.parseLong(idSerieFacturacion);
+                Long idSerie = Long.parseLong(etiquetas.getIdSerieFacturacion());
 
 
                 // Borra las formas de pago anteriores
                 //facFormapagoserieExtendsMapper.deleteByExample(formapagoExample);
 
-                for (ComboItem item : etiquetasNoSeleccionadas) {
+                for (ComboItem item : etiquetas.getNoSeleccionados()) {
                     Short idGrupo = Short.parseShort(item.getValue());
 
                     FacTipocliincluidoenseriefacExample etiquetaExample = new FacTipocliincluidoenseriefacExample();
                     etiquetaExample.createCriteria()
                             .andIdinstitucionEqualTo(idInstitucion)
                             .andIdseriefacturacionEqualTo(idSerie)
-                            .andIdgrupoEqualTo(idGrupo);
+                            .andIdgrupoEqualTo(idGrupo)
+							.andIdinstitucionGrupoEqualTo(idInstitucion);
 
                     facTipocliincluidoenseriefacExtendsMapper.deleteByExample(etiquetaExample);
                 }
 
-                for (ComboItem item : etiquetasSeleccionadas) {
+                for (ComboItem item : etiquetas.getSeleccionados()) {
                     Short idGrupo = Short.parseShort(item.getValue());
 
                     FacTipocliincluidoenseriefacExample etiquetaExample = new FacTipocliincluidoenseriefacExample();
                     etiquetaExample.createCriteria()
                             .andIdinstitucionEqualTo(idInstitucion)
                             .andIdseriefacturacionEqualTo(idSerie)
-                            .andIdgrupoEqualTo(idGrupo);
+                            .andIdgrupoEqualTo(idGrupo)
+							.andIdinstitucionGrupoEqualTo(idInstitucion);
 
                     long size = facTipocliincluidoenseriefacExtendsMapper.countByExample(etiquetaExample);
 
@@ -1170,7 +1171,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
                         etiqueta.setIdinstitucion(idInstitucion);
                         etiqueta.setIdseriefacturacion(idSerie);
                         etiqueta.setIdgrupo(idGrupo);
-                        etiqueta.setIdgrupo(null); // Por acabar
+                        etiqueta.setIdinstitucionGrupo(idInstitucion);
 
                         facTipocliincluidoenseriefacExtendsMapper.insert(etiqueta);
                     }
@@ -1409,7 +1410,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO guardarFormasPagosSerie(String idSerieFacturacion, List<ComboItem> formasPagosSeleccionadas, List<ComboItem> formasPagosNoSeleccionadas, HttpServletRequest request) {
+	public UpdateResponseDTO guardarFormasPagosSerie(TarjetaPickListSerieDTO formasPagos, HttpServletRequest request) {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		int response = 0;
 		Error error = new Error();
@@ -1436,17 +1437,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			if (usuarios != null && !usuarios.isEmpty()) {
 				Integer idUsuario = usuarios.get(0).getIdusuario();
 				LOGGER.info(
-						"guardarFormasPagosSerie() / facFormapagoserieExtendsMapper.insertSelective() -> Entrada a facSeriefacturacionExtendsMapper para guardar las formas de pago");
+						"guardarFormasPagosSerie() / facFormapagoserieExtendsMapper.insertSelective() -> Entrada a facFormapagoserieExtendsMapper para guardar las formas de pago");
 
 				//Logica
                 FacFormapagoserie formapagoserie = null;
-                Long idSerie = Long.parseLong(idSerieFacturacion);
+                Long idSerie = Long.parseLong(formasPagos.getIdSerieFacturacion());
 
-
-                // Borra las formas de pago anteriores
-                //facFormapagoserieExtendsMapper.deleteByExample(formapagoExample);
-
-                for (ComboItem item : formasPagosNoSeleccionadas) {
+                for (ComboItem item : formasPagos.getNoSeleccionados()) {
                     Short idFormaPago = Short.parseShort(item.getValue());
 
                     FacFormapagoserieExample formapagoExample = new FacFormapagoserieExample();
@@ -1458,7 +1455,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
                     facFormapagoserieExtendsMapper.deleteByExample(formapagoExample);
                 }
 
-                for (ComboItem item : formasPagosSeleccionadas) {
+                for (ComboItem item : formasPagos.getSeleccionados()) {
                     Short idFormaPago = Short.parseShort(item.getValue());
 
                     FacFormapagoserieExample formapagoExample = new FacFormapagoserieExample();

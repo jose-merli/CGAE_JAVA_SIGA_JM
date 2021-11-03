@@ -27,12 +27,12 @@ public interface IFacturacionPySService {
     public ComboDTO comboPlanificacion(String idSerieFacturacion, HttpServletRequest request);
     public UpdateResponseDTO guardarSerieFacturacion(SerieFacturacionItem serieFacturacion, HttpServletRequest request);
 	public ComboDTO getEtiquetasSerie(String idSerieFacturacion, HttpServletRequest request);
-	public UpdateResponseDTO guardarEtiquetasSerieFacturacion(String idSerieFacturacion, List<ComboItem> etiquetasSeleccionadas, List<ComboItem> etiquetasNoSeleccionadas, HttpServletRequest request);
+	public UpdateResponseDTO guardarEtiquetasSerieFacturacion(TarjetaPickListSerieDTO etiquetas, HttpServletRequest request);
 	public DestinatariosSeriesDTO getDestinatariosSeries(String idSerieFacturacion, HttpServletRequest request);
 	public ComboDTO comboPlantillasEnvio(HttpServletRequest request);
 	public ComboDTO getFormasPagosDisponiblesSeries(HttpServletRequest request);
 	public ComboDTO getFormasPagosSerie(String idSerieFacturacion, HttpServletRequest request);
-	public UpdateResponseDTO guardarFormasPagosSerie(String idSerieFacturacion, List<ComboItem> formasPagosSeleccionadas, List<ComboItem> formasPagosNoSeleccionadas, HttpServletRequest request);
+	public UpdateResponseDTO guardarFormasPagosSerie(TarjetaPickListSerieDTO formasPagos, HttpServletRequest request);
 	public ComboDTO comboModelosComunicacion(HttpServletRequest request);
 	public ContadorSeriesDTO getContadoresSerie(HttpServletRequest request);
 	public ContadorSeriesDTO getContadoresRectificativasSerie(HttpServletRequest request);

@@ -6,6 +6,7 @@ import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -145,6 +146,18 @@ public class FacturacionPySController {
 	ResponseEntity<ContadorSeriesDTO> getContadoresRectificativasSerie(HttpServletRequest request) {
 		ContadorSeriesDTO response = facturacionService.getContadoresRectificativasSerie(request);
 		return new ResponseEntity<ContadorSeriesDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/guardarEtiquetasSerieFacturacion")
+	ResponseEntity<UpdateResponseDTO> guardarEtiquetasSerieFacturacion(@RequestBody TarjetaPickListSerieDTO etiquetas, HttpServletRequest request) {
+		UpdateResponseDTO response = facturacionService.guardarEtiquetasSerieFacturacion(etiquetas, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/guardarFormasPagosSerie")
+	ResponseEntity<UpdateResponseDTO> guardarFormasPagosSerie(@RequestBody TarjetaPickListSerieDTO formasPagos, HttpServletRequest request) {
+		UpdateResponseDTO response = facturacionService.guardarFormasPagosSerie(formasPagos, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
 }

@@ -34,7 +34,7 @@ public interface FacSeriefacturacionExtendsMapper extends FacSeriefacturacionMap
 		@Result(column = "idmodelofactura", property = "idModeloFactura", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idmodelorectificativa", property = "idModeloRectificativa", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "enviofacturas", property = "envioFacturas", jdbcType = JdbcType.BOOLEAN),
-		@Result(column = "idplatillamail", property = "idPlatillaMail", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idtipoplantillamail", property = "idPlatillaMail", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "traspasofacturas", property = "traspasoFacturas", jdbcType = JdbcType.BOOLEAN),
 		@Result(column = "traspaso_plantilla", property = "traspasoPlatilla", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "traspaso_codauditoria_def", property = "traspasoCodAuditoriaDef", jdbcType = JdbcType.VARCHAR),
