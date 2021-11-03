@@ -288,4 +288,18 @@ public class ConConsultasExtendsSqlProvider {
 		return configColumnasQueryBuilderItem.getSelectayuda();
 	}
 
+	public String getIdOperacion(String idCampo, String simbolo){
+		SQL sql = new SQL();
+		
+		sql.SELECT(" con_opeconsulta.IDOPERACION");
+		
+		sql.FROM(" CON_OPERACIONCONSULTA con_opeconsulta");
+		sql.FROM(" CON_CAMPOCONSULTA con_campocon");
+		
+		sql.WHERE(" con_campocon.tipocampo = con_opeconsulta.tipooperador");
+		sql.WHERE(" con_campocon.IDCAMPO = " + idCampo);
+		sql.WHERE(" con_opeconsulta.simbolo = '" + simbolo + "'");
+		
+		return sql.toString();
+	}
 }

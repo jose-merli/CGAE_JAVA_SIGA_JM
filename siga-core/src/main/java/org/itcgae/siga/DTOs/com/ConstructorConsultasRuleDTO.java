@@ -7,9 +7,7 @@ import java.util.Objects;
 public class ConstructorConsultasRuleDTO {
 	String condition;
 	List <ConstructorConsultasRuleItem> rules = new ArrayList<ConstructorConsultasRuleItem>();
-	List<ConstructorConsultasRuleDTO> rules2 = new ArrayList<ConstructorConsultasRuleDTO>();
-	
-	
+	//List<ConstructorConsultasRuleDTO> rules2 = new ArrayList<ConstructorConsultasRuleDTO>();
 	
 	public String getCondition() {
 		return condition;
@@ -23,16 +21,10 @@ public class ConstructorConsultasRuleDTO {
 	public void setRules(List<ConstructorConsultasRuleItem> rules) {
 		this.rules = rules;
 	}
-	public List<ConstructorConsultasRuleDTO> getRules2() {
-		return rules2;
-	}
-	public void setRules2(List<ConstructorConsultasRuleDTO> rules2) {
-		this.rules2 = rules2;
-	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(condition, rules, rules2);
+		return Objects.hash(condition, rules);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -43,13 +35,14 @@ public class ConstructorConsultasRuleDTO {
 		if (getClass() != obj.getClass())
 			return false;
 		ConstructorConsultasRuleDTO other = (ConstructorConsultasRuleDTO) obj;
-		return Objects.equals(condition, other.condition) && Objects.equals(rules, other.rules)
-				&& Objects.equals(rules2, other.rules2);
+		return Objects.equals(condition, other.condition) && Objects.equals(rules, other.rules);
 	}
 	
 	@Override
 	public String toString() {
-		return "ConstructorConsultasRuleDTO [condition=" + condition + ", rules=" + rules + ", rules2=" + rules2 + "]";
+		return "ConstructorConsultasRuleDTO [condition=" + condition + ", rules=" + rules + "]";
 	}
 	
+	
+
 }
