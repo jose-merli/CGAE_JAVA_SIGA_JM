@@ -29,6 +29,7 @@ public class FichaCompraSuscripcionItem {
 	private String totalIVA;
 	private String impTotal;
 	private String pendPago;
+	private String impPagado;
     private String cuentaBancSelecc;
     private List<ListaProductosCompraItem> productos;
 	
@@ -175,6 +176,12 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setFacturas(List<ListaFacturasPeticionItem> facturas) {
 		this.facturas = facturas;
+	}
+	public String getImpPagado() {
+		return impPagado;
+	}
+	public void setImpPagado(String impPagado) {
+		this.impPagado = impPagado;
 	}
 
 }

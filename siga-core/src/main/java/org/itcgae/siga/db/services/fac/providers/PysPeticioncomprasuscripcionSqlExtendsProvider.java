@@ -405,6 +405,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("PRodSol.idproductoinstitucion");
 		sql.SELECT_DISTINCT("PRodSol.idpeticion");
 		sql.SELECT_DISTINCT("ProdSol.NOFACTURABLE");
+		sql.SELECT_DISTINCT("Prin.solicitarBaja"); //Este atributo hace referencia a la propiedad/check "Solictar baja por internet"
+		
 		
 		
 		sql.FROM(" pys_productosinstitucion prin, pys_tipoiva tiva");
