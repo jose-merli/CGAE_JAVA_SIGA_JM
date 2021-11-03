@@ -950,7 +950,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 						serieToUpdate.setTiposerie("");
 					}
 
-					// 2. Actualizar contadores (se prioriza el idContadorFacturasRectificativas sobre el idContadorFacturas)
+					// 2. Actualizar contadores
 					if (serieFacturacion.getIdContadorFacturasRectificativas() != null && !serieFacturacion.getIdContadorFacturasRectificativas().trim().isEmpty()) {
 						serieToUpdate.setIdcontador(serieFacturacion.getIdContadorFacturasRectificativas());
 					} else if (serieFacturacion.getIdContadorFacturas() != null && !serieFacturacion.getIdContadorFacturas().trim().isEmpty()) {
@@ -977,7 +977,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					// 4. Envío de facturas
 					serieToUpdate.setEnviofacturas(serieFacturacion.getEnvioFacturas() ? "1" : "0");
 
-					if (serieFacturacion.getIdPlatillaMail() != null && serieFacturacion.getIdPlatillaMail().isEmpty()) {
+					if (serieFacturacion.getIdPlatillaMail() != null && !serieFacturacion.getIdPlatillaMail().trim().isEmpty()) {
                         serieToUpdate.setIdtipoplantillamail(Integer.parseInt(serieFacturacion.getIdPlatillaMail()));
                     } else {
 					    serieToUpdate.setIdtipoplantillamail(null);
@@ -1704,6 +1704,63 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return contadorSeriesDTO;
 	}
 
+	/*
+	@Override
+	@Transactional
+	public UpdateResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request) {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		int response = 0;
+		Error error = new Error();
 
+		LOGGER.info("guardarFormasPagosSerie() -> Entrada al servicio para guardar las formas de pago");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"FacturacionPySServiceImpl.guardarFormasPagosSerie() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"guardarFormasPagosSerie() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				Integer idUsuario = usuarios.get(0).getIdusuario();
+				LOGGER.info(
+						"guardarFormasPagosSerie() / facFormapagoserieExtendsMapper.insertSelective() -> Entrada a facFormapagoserieExtendsMapper para guardar las formas de pago");
+
+				//Logica
+
+				AdmContador nuevoContador = new AdmContador();
+				nuevoContador.setNombre(contador.getNombre());
+				nuevoContador.setPrefijo(contador.getPrefijo());
+				nuevoContador.setContador(Long.parseLong(contador.getContador()));
+				nuevoContador.setSufijo(contador.getSufijo());
+
+
+				nuevoContador.setIdinstitucion(idInstitucion);
+				nuevoContador.setUsucreacion(idUsuario);
+				nuevoContador.setFechacreacion(new Date());
+				nuevoContador.setUsumodificacion(idUsuario);
+				nuevoContador.setFechamodificacion(new Date());
+
+				admContadorMapper.insertSelective(nuevoContador);
+			}
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("guardarFormasPagosSerie() -> Salida del servicio para guardar las formas de pago");
+
+		return updateResponseDTO;
+	}
+	*/
 
 }

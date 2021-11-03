@@ -43,6 +43,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		sql.SELECT("sf.ctaingresos");
 		sql.SELECT("sf.idseriefacturacionprevia");
 		sql.SELECT("(CASE WHEN sf.tiposerie = 'G' then 1 else 0 end) serieGenerica");
+		sql.SELECT("sf.idcontador");
 		
 		// From
 		sql.FROM("fac_seriefacturacion sf");
