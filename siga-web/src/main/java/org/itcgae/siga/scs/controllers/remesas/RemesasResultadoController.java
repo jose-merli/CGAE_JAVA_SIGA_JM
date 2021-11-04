@@ -1,6 +1,8 @@
 package org.itcgae.siga.scs.controllers.remesas;
 
-import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -65,15 +67,27 @@ public class RemesasResultadoController {
 													MultipartHttpServletRequest  request){
 		LOGGER.info("----ENTRA METODO GUARDAR RESULTADO-----");
 		RemesasResolucionItem remesasResolucionItem = new RemesasResolucionItem();
+		
 		if(idRemesa != 0) {
 			remesasResolucionItem.setIdRemesa(idRemesa);
 		}
 		remesasResolucionItem.setObservaciones(observaciones);
 		remesasResolucionItem.setNombreFichero(nombreFichero);
-		remesasResolucionItem.setFechaCarga(Date.valueOf(fechaCarga));
-		remesasResolucionItem.setFechaResolucion(Date.valueOf(fechaResolucion));
-
+	
+		try {
+			Date dateB = new SimpleDateFormat("dd/mm/yyyy")
+					.parse(fechaCarga);
+			Date dateC = new SimpleDateFormat("dd/mm/yyyy")
+					.parse(fechaResolucion);
+			remesasResolucionItem.setFechaCarga(dateB);
+			remesasResolucionItem.setFechaResolucion(dateC);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		UpdateResponseDTO response = remesasResultados.guardarRemesaResultado(remesasResolucionItem,  request);
+		
+		LOGGER.info("----SALIDA METODO GUARDAR RESULTADO-----");
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else

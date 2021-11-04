@@ -1129,7 +1129,13 @@ public class SigaConstants {
 	public static final String ACREDITACION_TIPO_FIN = "2";
 	public static final String ACREDITACION_TIPO_COMPLETA = "3";
 	
+	//Remesa Resultados
 	public static final String CONTADOR_REMESAS_RESULTADOS= "REMESARESULTEJG";
 	public static final String MAX_NUM_LINEAS_FICHERO = "MAX_NUM_LINEAS_FICH";
+	
+	//Contadores
+	public static final String C_PPN_IDTIPOPRODUCTO = "PPN_IDTIPOPRODUCTO";
+    public static final String C_PPN_IDPRODUCTO = "PPN_IDPRODUCTO";
+    public static final String C_PPN_IDPRODUCTOINSTITUCION = "PPN_IDPRODUCTOINSTITUCION";
 
 }
