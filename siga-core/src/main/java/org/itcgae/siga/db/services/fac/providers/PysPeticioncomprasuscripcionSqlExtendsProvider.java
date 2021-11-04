@@ -183,6 +183,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.INNER_JOIN("pys_serviciossolicitados servSol on servSol.idinstitucion = pet.idinstitucion and servSol.idpeticion = pet.idpeticion");
 		}
 		
+		//REVISAR
 		sql.WHERE("rownum = 1");
 
 		return sql.toString();
@@ -339,6 +340,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.INNER_JOIN("pys_serviciossolicitados servSol on servSol.idinstitucion = pet.idinstitucion and servSol.idpeticion = pet.idpeticion");
 		}
 		
+		//REVISAR
 		sql.WHERE("rownum = 1");
 
 		return sql.toString();
@@ -649,13 +651,17 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			}
 		}
 
-		if (filtro.getIdTipoServicio() != null)
+		if (filtro.getIdTipoServicio() != null) {
 			sql.WHERE("servSol.idServiciosInstitucion = " + filtro.getIdTipoServicio());
+		}
 
-		if (filtro.getIdCategoria() != null)
+		if (filtro.getIdCategoria() != null) {
 			sql.WHERE("servSol.idTipoServicios = " + filtro.getIdCategoria());
+		}
 
-		if(filtro.getIdEstadoFactura() != null)sql.WHERE("fact.estado = "+filtro.getIdEstadoFactura());
+		if(filtro.getIdEstadoFactura() != null) {
+			sql.WHERE("fact.estado = "+filtro.getIdEstadoFactura());
+		}
 //		private String importe; // valor aplicado durante la compra (importe total)
 
 		return sql.toString();

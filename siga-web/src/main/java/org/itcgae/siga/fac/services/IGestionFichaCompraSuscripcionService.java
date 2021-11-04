@@ -8,6 +8,7 @@ import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ListaFacturasPeticionDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -52,4 +53,6 @@ public interface IGestionFichaCompraSuscripcionService {
 			List<ListaDescuentosPeticionItem> anticiposLista) throws SigaExceptions;
 
 	public UpdateResponseDTO anularPeticion(HttpServletRequest request, String nSolicitud) throws Exception;
+
+	ListaServiciosSuscripcionDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud);
 }

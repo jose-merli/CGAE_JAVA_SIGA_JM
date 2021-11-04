@@ -107,6 +107,10 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 				+ " ELSE TO_CHAR(COUNT(foserv.idformapago) )\r\n"
 				+ " END\r\n"
 				+ " forma_pago");
+		sql.SELECT("servin.noFacturable");
+		sql.SELECT("LISTAGG(fo.idformapago, ',') WITHIN GROUP (ORDER BY fo.idformapago) as idformaspago");
+		sql.SELECT("LISTAGG(fo.internet, ',') WITHIN GROUP (ORDER BY fo.idformapago) as formaspagoInternet");
+		sql.SELECT("servin.SOLICITARBAJA");
 		
 		sql.FROM("   (\r\n"
 				+ "	        SELECT\r\n"

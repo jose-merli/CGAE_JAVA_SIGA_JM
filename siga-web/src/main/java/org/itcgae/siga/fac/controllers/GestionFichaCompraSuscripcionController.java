@@ -12,6 +12,7 @@ import org.itcgae.siga.DTO.fac.ListaDescuentosPeticionItem;
 import org.itcgae.siga.DTO.fac.ListaFacturasPeticionDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
+import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionDTO;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -136,5 +137,12 @@ public class GestionFichaCompraSuscripcionController {
 		UpdateResponseDTO response = gestionFichaCompraSuscripcionService.anularPeticion(request, nSolicitud);
 		if(response.getStatus()=="200") return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping(value = "/pys/getListaServiciosSuscripcion")
+	ResponseEntity<ListaServiciosSuscripcionDTO> getListaServiciosSuscripcion(HttpServletRequest request, String idPeticion) throws Exception {
+		ListaServiciosSuscripcionDTO response = gestionFichaCompraSuscripcionService.getListaServiciosSuscripcion(request, idPeticion);
+		if(response.getError().getCode()==200) return new ResponseEntity<ListaServiciosSuscripcionDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<ListaServiciosSuscripcionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

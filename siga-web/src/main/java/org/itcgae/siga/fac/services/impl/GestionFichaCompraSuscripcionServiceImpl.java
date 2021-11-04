@@ -21,6 +21,8 @@ import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionDTO;
+import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -230,19 +232,39 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 						fichaCompleta.setIdInstitucion(idInstitucion.toString());
 						fichaCompleta.setProductos(ficha.getProductos());
+						fichaCompleta.setServicios(ficha.getServicios());
 						if(fichaCompleta.getIdFormasPagoComunes() != null)fichaCompleta.setIdFormaPagoSeleccionada(fichaCompleta.getIdFormasPagoComunes().split(",")[0]);
 					}
 					//Para obtener toda la informacion de una compra/suscripcion ya creada
 					else { 
-						List<ListaProductosCompraItem> productos = null;
 						
-						//Si se viene de otra pantalla a consultar la ficha de compra
-						if(ficha.getProductos().size()==0) {
-							productos = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, ficha.getnSolicitud());
-							ficha.setProductos(productos);
+						List<ListaProductosCompraItem> productos = null;
+						List<ListaServiciosSuscripcionItem> servicios = null;
+						
+						
+						//Si es una ficha de compra
+						if(ficha.getProductos() != null) {
+							
+							//Si se viene de otra pantalla a consultar la ficha de compra
+							if(ficha.getProductos().size()==0) {
+								productos = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, ficha.getnSolicitud());
+								ficha.setProductos(productos);
+							}
+							else if(ficha.getProductos().size()>0){
+								productos = ficha.getProductos();
+							}
 						}
-						else if(ficha.getProductos().size()>0){
-							productos = ficha.getProductos();
+						//Si es una ficha de suscripcion
+						else {
+							
+							//Si se viene de otra pantalla a consultar la ficha de compra
+							if(ficha.getServicios().size()==0) {
+								servicios = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, ficha.getnSolicitud());
+								ficha.setServicios(servicios);
+							}
+							else if(ficha.getProductos().size()>0){
+								servicios = ficha.getServicios();
+							}
 						}
 						LOGGER.info(
 								"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion() -> Entrada a PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la compra/suscripcion");
@@ -255,7 +277,12 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					
 
 						fichaCompleta.setIdInstitucion(idInstitucion.toString());
-						if(productos != null)fichaCompleta.setProductos(productos);
+						if(productos != null) {
+							fichaCompleta.setProductos(productos);
+						}
+						if(servicios != null) {
+							fichaCompleta.setServicios(servicios);
+						}
 					}
 				}
 
@@ -1874,12 +1901,13 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		return updateResponseDTO;
 	}
 
-	public ListaServiciosDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud) {
+	@Override
+	public ListaServiciosSuscripcionDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud) {
 		
-			ListaServiciosDTO listaServiciosSuscripcion = new ListaServiciosDTO();
+			ListaServiciosSuscripcionDTO listaServiciosSuscripcion = new ListaServiciosSuscripcionDTO();
 			Error error = new Error();
 	
-			LOGGER.debug("getListaServiciosSuscripcion() -> Entrada al servicio para obtener la informacion de los productos de una peticion");
+			LOGGER.debug("getListaServiciosSuscripcion() -> Entrada al servicio para obtener la informacion de los servicios de una peticion");
 	
 			// Conseguimos información del usuario logeado
 			String token = request.getHeader("Authorization");
@@ -1904,21 +1932,22 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				if (usuarios != null && !usuarios.isEmpty()) {
 					
 					LOGGER.info(
-							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServicios() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
+							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServicios() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los servicios de una peticion");
 	
-					List<ListaServiciosItem> serviciosSuscripcion = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, nSolicitud);
+					List<ListaServiciosSuscripcionItem> serviciosSuscripcion = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, nSolicitud);
 	
-					listaServiciosSuscripcion.setListaServiciosItems(serviciosSuscripcion);
+					LOGGER.info(
+							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los servicios de una peticion");
+				
+					listaServiciosSuscripcion.setListaServiciosSuscripcionItems(serviciosSuscripcion);
 					
 					error.setCode(200);
 					
 					listaServiciosSuscripcion.setError(error);
 					
-					LOGGER.info(
-							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
 				}
 			}
-			LOGGER.debug("getListaServiciosSuscripcion() -> Salida del servicio para obtener la informacion de los productos de una peticion");
+			LOGGER.debug("getListaServiciosSuscripcion() -> Salida del servicio para obtener la informacion de los servicios de una peticion");
 	
 			return listaServiciosSuscripcion;
 		}

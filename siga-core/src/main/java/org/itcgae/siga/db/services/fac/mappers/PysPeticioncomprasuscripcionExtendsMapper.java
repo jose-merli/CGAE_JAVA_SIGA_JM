@@ -15,6 +15,7 @@ import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ListaSuscripcionesItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
@@ -173,5 +174,5 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 		@Result(column = "solicitarBaja", property = "solicitarBaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR)
 		}) 
-	List<ListaServiciosItem> getListaServiciosSuscripcion(Short idInstitucion, String nSolicitud);
+	List<ListaServiciosSuscripcionItem> getListaServiciosSuscripcion(Short idInstitucion, String nSolicitud);
 }
