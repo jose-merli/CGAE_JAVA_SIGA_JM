@@ -95,6 +95,9 @@ public interface GuardiasService {
 
 	public List<DatosCalendarioProgramadoItem> getCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
 			HttpServletRequest request);
+	
+	public DatosCalendarioProgramadoItem getLastCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
+			HttpServletRequest request);
 
 	public DeleteResponseDTO deleteCalendariosProgramados(DeleteCalendariosProgDatosEntradaItem deleteCalBody,
 			HttpServletRequest request);

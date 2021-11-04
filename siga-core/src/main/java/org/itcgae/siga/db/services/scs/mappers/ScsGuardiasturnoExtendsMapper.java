@@ -222,6 +222,29 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	
 	List<DatosCalendarioProgramadoItem> getCalendariosProgramadosSigaClassique(CalendariosProgDatosEntradaItem obj, String idIns);
 	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getLastCalendariosProgramadosSigaClassique")
+	@Results({ @Result(column = "institucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "turno", property = "turno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "guardia", property = "guardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idTurno", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idGuardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechaDesde", property = "fechaDesde", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechaHasta", property = "fechaHasta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "generado", property = "generado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "fechaProgramacion", property = "fechaProgramacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "listaGuardias", property = "listaGuardias", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idCalG", property = "idCalG", jdbcType = JdbcType.INTEGER),
+			@Result(column = "numGuardias", property = "numGuardias", jdbcType = JdbcType.INTEGER),
+			@Result(column = "idCalendarioProgramado", property = "idCalendarioProgramado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "facturado", property = "facturado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "asistenciasAsociadas", property = "asistenciasAsociadas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR)})
+	
+	List<DatosCalendarioProgramadoItem> getLastCalendariosProgramadosSigaClassique(CalendariosProgDatosEntradaItem obj, String idIns);
+	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getFechasProgramacionFromIdConjuntoGuardia")
 	@Results({ 
 			@Result(column = "fechaDesde", property = "fechaDesde", jdbcType = JdbcType.VARCHAR),
@@ -1021,7 +1044,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "diasSeparacionEntreGuardias")
 			@Results({
 				@Result(column = "TOTAL", property="TOTAL", jdbcType = JdbcType.VARCHAR)})
-			String diasSeparacionEntreGuardias(String idpersona,String idinstitucion, String idturno, String idguardia, String fechaMAX, String fechaMIN, String fechaPeriodoPrimerDia, String fechaPeriodoUltimoDia);
+			String diasSeparacionEntreGuardias(String idpersona,String idinstitucion, String idturno, String idguardia, Boolean esPermuta, String fechaPeriodoPrimerDiaOriginal, String fechaPeriodoPrimerDia, String fechaPeriodoUltimoDia);
 			
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "maxFechaInicioPeriodoCabGuardia")
 			@Results({
@@ -1046,7 +1069,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "marcarSaltoCompensacion")
 			@Results({})
-			String marcarSaltoCompensacion(Integer usuario, String idturno, ScsSaltoscompensaciones saltoCompensacion,String s_idpersona, String s_idinstitucion, String s_idturno, String s_idguardia,String s_saltocompensacion);
+			String marcarSaltoCompensacion(Integer usuario, String idturno, ScsSaltoscompensaciones saltoCompensacion,String s_idpersona, String s_idinstitucion, String s_idturno, String s_idguardia,String s_saltocompensacion, String fechaCumplimiento);
 		
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getGrupoData")
 			@Results({ @Result(column = "idgrupoguardiacolegiado", property = "idgrupoguardiacolegiado", jdbcType = JdbcType.VARCHAR),

@@ -10,6 +10,7 @@ public class DatosCalendarioProgramadoItem {
 	private String observaciones;
 	private String fechaDesde;
 	private String fechaHasta;
+	private String fechaModificacion;
 	private String fechaProgramacion;
 	private String estado;
 	private String generado;
