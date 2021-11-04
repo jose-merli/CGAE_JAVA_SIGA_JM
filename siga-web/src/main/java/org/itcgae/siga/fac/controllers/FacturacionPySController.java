@@ -97,7 +97,10 @@ public class FacturacionPySController {
 	@PostMapping(value = "/guardarSerieFacturacion")
 	ResponseEntity<UpdateResponseDTO> guardarSerieFacturacion(@RequestBody SerieFacturacionItem serieFacturacion, HttpServletRequest request) {
 		UpdateResponseDTO response = facturacionService.guardarSerieFacturacion(serieFacturacion, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@GetMapping(value = "/getEtiquetasSerie")

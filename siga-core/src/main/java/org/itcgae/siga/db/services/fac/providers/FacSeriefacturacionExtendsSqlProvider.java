@@ -58,10 +58,10 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		sql.WHERE("sf.idinstitucion = '" + idInstitucion + "'");
 		
 		// Where opcionales
-		if (serieFacturacionItem.getAbreviatura() != null && serieFacturacionItem.getAbreviatura() != "")
-			sql.WHERE("upper(sf.nombreabreviado) LIKE upper('%" + serieFacturacionItem.getAbreviatura() + "%')");
-		if (serieFacturacionItem.getDescripcion() != null && serieFacturacionItem.getDescripcion() != "")
-			sql.WHERE("upper(sf.descripcion) LIKE upper('%" + serieFacturacionItem.getDescripcion() + "%')");
+		if (serieFacturacionItem.getAbreviatura() != null && serieFacturacionItem.getAbreviatura().trim() != "")
+			sql.WHERE("upper(sf.nombreabreviado) LIKE upper('%" + serieFacturacionItem.getAbreviatura().trim() + "%')");
+		if (serieFacturacionItem.getDescripcion() != null && serieFacturacionItem.getDescripcion().trim() != "")
+			sql.WHERE("upper(sf.descripcion) LIKE upper('%" + serieFacturacionItem.getDescripcion().trim() + "%')");
 		if (serieFacturacionItem.getIdCuentaBancaria() != null && serieFacturacionItem.getIdCuentaBancaria() != "")
 			sql.WHERE("bi.bancos_codigo = '" + serieFacturacionItem.getIdCuentaBancaria() + "'");
 		

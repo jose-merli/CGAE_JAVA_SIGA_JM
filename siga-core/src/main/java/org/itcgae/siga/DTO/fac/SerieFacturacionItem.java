@@ -28,10 +28,10 @@ public class SerieFacturacionItem {
 	private String idModeloRectificativa;
 
 	private Boolean envioFacturas;
-	private String idPlatillaMail;
+	private String idPlantillaMail;
 
 	private Boolean traspasoFacturas;
-	private String traspasoPlatilla;
+	private String traspasoPlantilla;
 	private String traspasoCodAuditoriaDef;
 
 	private String confDeudor;
@@ -62,20 +62,20 @@ public class SerieFacturacionItem {
 		this.idModeloRectificativa = idModeloRectificativa;
 	}
 
-	public String getIdPlatillaMail() {
-		return idPlatillaMail;
+	public String getIdPlantillaMail() {
+		return idPlantillaMail;
 	}
 
-	public void setIdPlatillaMail(String idPlatillaMail) {
-		this.idPlatillaMail = idPlatillaMail;
+	public void setIdPlantillaMail(String idPlantillaMail) {
+		this.idPlantillaMail = idPlantillaMail;
 	}
 
-	public String getTraspasoPlatilla() {
-		return traspasoPlatilla;
+	public String getTraspasoPlantilla() {
+		return traspasoPlantilla;
 	}
 
-	public void setTraspasoPlatilla(String traspasoPlatilla) {
-		this.traspasoPlatilla = traspasoPlatilla;
+	public void setTraspasoPlantilla(String traspasoPlantilla) {
+		this.traspasoPlantilla = traspasoPlantilla;
 	}
 
 	public String getIdModeloFactura() {
@@ -363,9 +363,9 @@ public class SerieFacturacionItem {
 				Objects.equals(idModeloFactura, that.idModeloFactura) &&
 				Objects.equals(idModeloRectificativa, that.idModeloRectificativa) &&
 				Objects.equals(envioFacturas, that.envioFacturas) &&
-				Objects.equals(idPlatillaMail, that.idPlatillaMail) &&
+				Objects.equals(idPlantillaMail, that.idPlantillaMail) &&
 				Objects.equals(traspasoFacturas, that.traspasoFacturas) &&
-				Objects.equals(traspasoPlatilla, that.traspasoPlatilla) &&
+				Objects.equals(traspasoPlantilla, that.traspasoPlantilla) &&
 				Objects.equals(traspasoCodAuditoriaDef, that.traspasoCodAuditoriaDef) &&
 				Objects.equals(confDeudor, that.confDeudor) &&
 				Objects.equals(ctaClientes, that.ctaClientes) &&
@@ -383,6 +383,11 @@ public class SerieFacturacionItem {
 				Objects.equals(idContadorFacturasRectificativas, that.idContadorFacturasRectificativas) &&
 				Objects.equals(idSerieFacturacionPrevia, that.idSerieFacturacionPrevia) &&
 				Objects.equals(serieGenerica, that.serieGenerica);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idSerieFacturacion, observaciones, fechaBaja, abreviatura, descripcion, tiposIncluidos, idCuentaBancaria, cuentaBancaria, idSufijo, sufijo, idFormaPago, formaPago, generarPDF, idModeloFactura, idModeloRectificativa, envioFacturas, idPlantillaMail, traspasoFacturas, traspasoPlantilla, traspasoCodAuditoriaDef, confDeudor, ctaClientes, confIngresos, ctaIngresos, idTiposProductos, tiposProductos, idTiposServicios, tiposServicios, idEtiquetas, etiquetas, idConsultasDestinatarios, consultasDestinatarios, idContadorFacturas, idContadorFacturasRectificativas, idSerieFacturacionPrevia, serieGenerica);
 	}
 
 	@Override
@@ -404,9 +409,9 @@ public class SerieFacturacionItem {
 				", idModeloFactura='" + idModeloFactura + '\'' +
 				", idModeloRectificativa='" + idModeloRectificativa + '\'' +
 				", envioFacturas=" + envioFacturas +
-				", idPlatillaMail='" + idPlatillaMail + '\'' +
+				", idPlantillaMail='" + idPlantillaMail + '\'' +
 				", traspasoFacturas=" + traspasoFacturas +
-				", traspasoPlatilla='" + traspasoPlatilla + '\'' +
+				", traspasoPlantilla='" + traspasoPlantilla + '\'' +
 				", traspasoCodAuditoriaDef='" + traspasoCodAuditoriaDef + '\'' +
 				", confDeudor='" + confDeudor + '\'' +
 				", ctaClientes='" + ctaClientes + '\'' +
@@ -426,10 +431,4 @@ public class SerieFacturacionItem {
 				", serieGenerica=" + serieGenerica +
 				'}';
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(idSerieFacturacion, observaciones, fechaBaja, abreviatura, descripcion, tiposIncluidos, idCuentaBancaria, cuentaBancaria, idSufijo, sufijo, idFormaPago, formaPago, generarPDF, idModeloFactura, idModeloRectificativa, envioFacturas, idPlatillaMail, traspasoFacturas, traspasoPlatilla, traspasoCodAuditoriaDef, confDeudor, ctaClientes, confIngresos, ctaIngresos, idTiposProductos, tiposProductos, idTiposServicios, tiposServicios, idEtiquetas, etiquetas, idConsultasDestinatarios, consultasDestinatarios, idContadorFacturas, idContadorFacturasRectificativas, idSerieFacturacionPrevia, serieGenerica);
-	}
-
 }

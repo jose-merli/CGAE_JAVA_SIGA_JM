@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -926,28 +927,57 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					// 1. Actualizar datos generales
 					if (serieFacturacion.getAbreviatura() != null
 							&& !serieFacturacion.getAbreviatura().trim().isEmpty()
-							&& serieFacturacion.getAbreviatura().length() <= 20)
-						serieToUpdate.setNombreabreviado(serieFacturacion.getAbreviatura());
+							&& serieFacturacion.getAbreviatura().trim().length() <= 20) {
+						serieToUpdate.setNombreabreviado(serieFacturacion.getAbreviatura().trim());
+
+						// 1.1. Abreviatura única
+						FacSeriefacturacionExample uniqueExample = new FacSeriefacturacionExample();
+						uniqueExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdseriefacturacionNotEqualTo(idSerieFacturacion).andNombreabreviadoEqualTo(serieFacturacion.getAbreviatura().trim());
+						long found = facSeriefacturacionExtendsMapper.countByExample(uniqueExample);
+
+						if (found > 0) {
+							error.setCode(400);
+							error.setDescription("facturacion.seriesFactura.abreviatura.unica");
+							updateResponseDTO.setStatus(SigaConstants.KO);
+						}
+
+					}
 
 					if (serieFacturacion.getDescripcion() != null
 							&& !serieFacturacion.getDescripcion().trim().isEmpty()
-							&& serieFacturacion.getDescripcion().length() <= 100)
+							&& serieFacturacion.getDescripcion().trim().length() <= 100) {
 						serieToUpdate.setDescripcion(serieFacturacion.getDescripcion());
 
-					if (serieFacturacion.getIdSerieFacturacionPrevia() != null && !serieFacturacion.getIdSerieFacturacionPrevia().trim().isEmpty())
-						serieToUpdate.setIdseriefacturacionprevia(Long.parseLong(serieFacturacion.getIdSerieFacturacionPrevia()));
-					else
-						serieToUpdate.setIdseriefacturacionprevia(null);
+						// 1.2. Descripción única
+						FacSeriefacturacionExample uniqueExample = new FacSeriefacturacionExample();
+						uniqueExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdseriefacturacionNotEqualTo(idSerieFacturacion).andDescripcionEqualTo(serieFacturacion.getDescripcion().trim());
+						long found = facSeriefacturacionExtendsMapper.countByExample(uniqueExample);
 
-					if (serieFacturacion.getObservaciones() == null
-							|| (serieFacturacion.getObservaciones() != null
-								&& serieFacturacion.getObservaciones().length() <= 4000))
-					serieToUpdate.setObservaciones(serieFacturacion.getObservaciones());
+						if (found > 0) {
+							error.setCode(400);
+							error.setDescription("facturacion.seriesFactura.descripcion.unica");
+							updateResponseDTO.setStatus(SigaConstants.KO);
+						}
+					}
+
+
+					if (serieFacturacion.getIdSerieFacturacionPrevia() != null && !serieFacturacion.getIdSerieFacturacionPrevia().trim().isEmpty()) {
+						serieToUpdate.setIdseriefacturacionprevia(Long.parseLong(serieFacturacion.getIdSerieFacturacionPrevia()));
+					} else {
+						serieToUpdate.setIdseriefacturacionprevia(null);
+					}
+
+					if (serieFacturacion.getObservaciones() != null && !serieFacturacion.getObservaciones().trim().isEmpty()
+								&& serieFacturacion.getObservaciones().trim().length() <= 4000) {
+						serieToUpdate.setObservaciones(serieFacturacion.getObservaciones().trim());
+					} else {
+						serieToUpdate.setObservaciones(null);
+					}
 
 					if (serieFacturacion.getSerieGenerica()) {
 						serieToUpdate.setTiposerie("G");
 					} else {
-						serieToUpdate.setTiposerie("");
+						serieToUpdate.setTiposerie(null);
 					}
 
 					// 2. Actualizar contadores
@@ -977,30 +1007,43 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					// 4. Envío de facturas
 					serieToUpdate.setEnviofacturas(serieFacturacion.getEnvioFacturas() ? "1" : "0");
 
-					if (serieFacturacion.getIdPlatillaMail() != null && !serieFacturacion.getIdPlatillaMail().trim().isEmpty()) {
-                        serieToUpdate.setIdtipoplantillamail(Integer.parseInt(serieFacturacion.getIdPlatillaMail()));
+					if (serieFacturacion.getIdPlantillaMail() != null && !serieFacturacion.getIdPlantillaMail().trim().isEmpty()) {
+                        serieToUpdate.setIdtipoplantillamail(Integer.parseInt(serieFacturacion.getIdPlantillaMail()));
                     } else {
 					    serieToUpdate.setIdtipoplantillamail(null);
                     }
 
 					// 5. Actualizar traspaso de facturas
 					serieToUpdate.setTraspasofacturas(serieFacturacion.getTraspasoFacturas() ? "1" : "0");
-					serieToUpdate.setTraspasoPlantilla(serieFacturacion.getTraspasoPlatilla());
-					serieToUpdate.setTraspasoCodauditoriaDef(serieFacturacion.getTraspasoCodAuditoriaDef());
+
+					if (serieFacturacion.getTraspasoPlantilla() != null && !serieFacturacion.getTraspasoPlantilla().trim().isEmpty()
+							&& serieFacturacion.getTraspasoPlantilla().trim().length() <= 10) {
+						serieToUpdate.setTraspasoPlantilla(serieFacturacion.getTraspasoPlantilla().trim());
+					} else {
+						serieToUpdate.setTraspasoPlantilla(null);
+					}
+
+					if (serieFacturacion.getTraspasoCodAuditoriaDef() != null && !serieFacturacion.getTraspasoCodAuditoriaDef().trim().isEmpty()
+							&& serieFacturacion.getTraspasoCodAuditoriaDef().trim().length() <= 10) {
+						serieToUpdate.setTraspasoCodauditoriaDef(serieFacturacion.getTraspasoCodAuditoriaDef().trim());
+					} else {
+						serieToUpdate.setTraspasoCodauditoriaDef(null);
+					}
+
 
 					// 6. Actualizar exportación contabilidad
                     if (serieFacturacion.getConfDeudor() != null && !serieFacturacion.getConfDeudor().trim().isEmpty())
-					    serieToUpdate.setConfdeudor(serieFacturacion.getConfDeudor());
+					    serieToUpdate.setConfdeudor(serieFacturacion.getConfDeudor().trim());
                     else
                         serieToUpdate.setConfdeudor(null);
 
                     if (serieFacturacion.getConfIngresos() != null && !serieFacturacion.getConfIngresos().trim().isEmpty())
-                        serieToUpdate.setConfingresos(serieFacturacion.getConfIngresos());
+                        serieToUpdate.setConfingresos(serieFacturacion.getConfIngresos().trim());
                     else
                         serieFacturacion.setConfIngresos(null);
 
-                    serieToUpdate.setCtaclientes(serieFacturacion.getCtaClientes());
-					serieToUpdate.setCtaingresos(serieFacturacion.getCtaIngresos());
+                    serieToUpdate.setCtaclientes(serieFacturacion.getCtaClientes().trim());
+					serieToUpdate.setCtaingresos(serieFacturacion.getCtaIngresos().trim());
 
 					// 7. Actualizar FAC_SERIEFACTURACION_BANCO
 					FacSeriefacturacionBancoExample bancoExample = new FacSeriefacturacionBancoExample();
@@ -1008,7 +1051,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					List<FacSeriefacturacionBanco> serieBancoItems = facSeriefacturacionBancoMapper.selectByExample(bancoExample);
 					boolean isNewBanco = serieBancoItems == null && serieBancoItems.isEmpty();
 
-					response = facSeriefacturacionExtendsMapper.updateByPrimaryKeySelective(serieToUpdate);
+					if (error.getCode() == null) {
+						response = facSeriefacturacionExtendsMapper.updateByPrimaryKey(serieToUpdate);
+					}
 
 					FacSeriefacturacionBanco serieBancoToUpdate = new FacSeriefacturacionBanco();
 					if (isNewBanco) {
@@ -1021,11 +1066,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					serieBancoToUpdate.setFechamodificacion(new Date());
 					serieBancoToUpdate.setBancosCodigo(serieFacturacion.getIdCuentaBancaria());
 					serieBancoToUpdate.setIdsufijo(Short.parseShort(serieFacturacion.getIdSufijo()));
-				
-					if (!isNewBanco) {
-						response = facSeriefacturacionBancoMapper.updateByExample(serieBancoToUpdate, bancoExample);
-					} else {
-						response = facSeriefacturacionBancoMapper.insert(serieBancoToUpdate);
+
+					if (error.getCode() == null) {
+						if (!isNewBanco) {
+							response = facSeriefacturacionBancoMapper.updateByExample(serieBancoToUpdate, bancoExample);
+						} else {
+							response = facSeriefacturacionBancoMapper.insert(serieBancoToUpdate);
+						}
 					}
 
 					// 8. Actualizar tipos de productos
@@ -1033,9 +1080,13 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 					// 9. Actualizar tipos de servicios
 
-					
 				}
 
+				if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
 			}
 		}
 
