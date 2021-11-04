@@ -42,7 +42,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 		ListaSuscripcionesDTO listaSuscripciones = new ListaSuscripcionesDTO();
 		Error error = new Error();
 
-		LOGGER.info(
+		LOGGER.debug(
 				"getListaSuscripciones() -> Entrada al servicio para recuperar la lista de suscripciones de servicios");
 
 		// Conseguimos información del usuario logeado
@@ -106,7 +106,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 			error.setCode(500);
 		}
 
-		LOGGER.info(
+		LOGGER.debug(
 				"getListaSuscripciones() -> Salida del servicio para obtener las peticiones de suscripcion que cumplan las condiciones");
 
 		listaSuscripciones.setError(error);

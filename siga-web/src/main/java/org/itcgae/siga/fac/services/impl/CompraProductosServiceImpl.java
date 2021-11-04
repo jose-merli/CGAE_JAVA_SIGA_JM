@@ -44,7 +44,7 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 		ComboDTO comboDTO = new ComboDTO();
 		Error error = new Error();
 
-		LOGGER.info("comboEstadoFactura() -> Entrada al servicio para recuperar el combo de estados de factura");
+		LOGGER.debug("comboEstadoFactura() -> Entrada al servicio para recuperar el combo de estados de factura");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -90,7 +90,7 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 
 		comboDTO.setError(error);
 
-		LOGGER.info("comboEstadoFactura() -> Salida del servicio para recuperar el combo de estados de factura");
+		LOGGER.debug("comboEstadoFactura() -> Salida del servicio para recuperar el combo de estados de factura");
 
 		return comboDTO;
 	}
@@ -100,7 +100,7 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 		ListaCompraProductosDTO listaCompraProductos = new ListaCompraProductosDTO();
 		Error error = new Error();
 
-		LOGGER.info(
+		LOGGER.debug(
 				"getListaCompraProductos() -> Entrada al servicio para recuperar la lista de compras de productos");
 
 		// Conseguimos información del usuario logeado
@@ -165,7 +165,7 @@ public class CompraProductosServiceImpl implements ICompraProductosService{
 			error.setCode(500);
 		}
 
-		LOGGER.info(
+		LOGGER.debug(
 				"getListaCompraProductos() -> Salida del servicio para obtener las peticiones de compra que cumplan las condiciones");
 
 		listaCompraProductos.setError(error);
