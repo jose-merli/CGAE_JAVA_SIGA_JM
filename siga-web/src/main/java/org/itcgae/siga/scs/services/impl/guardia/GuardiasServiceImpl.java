@@ -6832,7 +6832,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 				
 				
 				inscripciones = scsInscripcionguardiaExtendsMapper.getListadoInscripciones(inscripcionesBody, idInstitucion.toString());
-
+				
+				for(BusquedaInscripcionItem inscrip:inscripciones) {
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+					Date fechaSolicitud;
+					try {
+						fechaSolicitud = sdf.parse(inscrip.getFechaSol());
+						inscrip.setFechasolicitud(fechaSolicitud);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
 				
 				LOGGER.info("getInscripciones() -> Salida ya con los datos recogidos");
 			}

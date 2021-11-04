@@ -174,7 +174,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "FECHADENEGACION", property = "fechadenegacion", jdbcType = JdbcType.DATE),
 		@Result(column = "OBSERVACIONESDENEGACION", property = "observacionesdenegacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBSERVACIONESVALBAJA", property = "observacionesvalbaja", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHASUSCRIPCION", property = "fechasolicitud", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHASUSCRIPCION", property = "fechaSol", jdbcType = JdbcType.VARCHAR),
 	})
 	List<BusquedaInscripcionItem> getListadoInscripciones(InscripcionDatosEntradaDTO inscripciones, String idInstitucion);
 	
@@ -196,15 +196,14 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "OBSERVACIONESVALBAJA", property = "observacionesvalbaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHASUSCRIPCION", property = "fechasolicitud", jdbcType = JdbcType.DATE),
 	})
-	BusquedaInscripcionMod getObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripciones, String idInstitucion, String fECHABAJA,
-			String fECHADENEGACION, String fECHASOLICITUD, String fECHASOLICITUDBAJA, String fECHAVALIDACION, String fECHAVALORALTA, String fECHAVALORBAJA);
+	BusquedaInscripcionMod getObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripciones, String idInstitucion, String fECHASOLICITUD);
 	
 	
 	@DeleteProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "DeleteFKGrupoColegiado")
 	int getDeleteFKGrupoColegiado(BusquedaInscripcionMod inscripcion, String fECHASOLICITUD);
 	
 	@DeleteProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "DeleteObjetoFrontValidarInscripcion")
-	int getDeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripcion, String fECHABAJA, String fECHADENEGACION, String fECHASOLICITUD, String fECHASOLICITUDBAJA, String fECHAVALIDACION, String fECHAVALORALTA, String fECHAVALORBAJA);
+	int getDeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripcion, String fECHASOLICITUD);
 	
 	@InsertProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "InsertObjetoValidarInscripcion")	
 	@Results({
@@ -248,12 +247,12 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "getSaltoCompensacionesActivo")
 	@Results({ 
 	})
-	List<SaltoCompGuardiaItem> getBuscarSaltoCompensancion(String idInstitucion, String idturno, String idguardia, String idpersona);
+	List<SaltoCompGuardiaItem> getBuscarSaltoCompensancion(String idInstitucion, String idturno, String idguardia, String idpersona,String saltocompensacion);
 
 
 
 	@DeleteProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "eliminarSaltoCompensacion")
-	int getEliminarSaltoCompensancion(String idinstitucion, String idturno, String idguardia, String idpersona);
+	int getEliminarSaltoCompensancion(String idinstitucion, String idturno, String idguardia, String idpersona, String saltooCompensacion);
 
 
 
