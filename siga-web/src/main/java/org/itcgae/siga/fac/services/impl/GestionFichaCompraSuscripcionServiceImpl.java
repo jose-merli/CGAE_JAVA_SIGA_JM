@@ -19,6 +19,8 @@ import org.itcgae.siga.DTO.fac.ListaProductosCompraDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
+import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -1871,6 +1873,54 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 		return updateResponseDTO;
 	}
+
+	public ListaServiciosDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud) {
+		
+			ListaServiciosDTO listaServiciosSuscripcion = new ListaServiciosDTO();
+			Error error = new Error();
 	
+			LOGGER.info("getListaServiciosSuscripcion() -> Entrada al servicio para obtener la informacion de los productos de una peticion");
 	
-}
+			// Conseguimos información del usuario logeado
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+	
+			// Se comentan el try y el catch para que la anotación @Transactional funcione
+			// correctamente
+	//		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+	
+				LOGGER.info(
+						"getListaServiciosSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+	
+				LOGGER.info(
+						"getListaServiciosSuscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+	
+				if (usuarios != null && !usuarios.isEmpty()) {
+					
+					LOGGER.info(
+							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServicios() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
+	
+					List<ListaServiciosItem> serviciosSuscripcion = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, nSolicitud);
+	
+					listaServiciosSuscripcion.setListaServiciosItems(serviciosSuscripcion);
+					
+					error.setCode(200);
+					
+					listaServiciosSuscripcion.setError(error);
+					
+					LOGGER.info(
+							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
+				}
+			}
+			LOGGER.info("getListaServiciosSuscripcion() -> Salida del servicio para obtener la informacion de los productos de una peticion");
+	
+			return listaServiciosSuscripcion;
+		}
+	}
+	

@@ -97,6 +97,7 @@ public class PySTiposProductosSqlExtendsProvider extends PysProductosSqlProvider
 		sql.SELECT(" concat(F_siga_formatonumero(ROUND((PRIN.VALOR*TIVA.VALOR/100)+PRIN.VALOR, 2),2), ' €') AS PRECIO_IVA");
 		sql.SELECT(" PRIN.IDCONTADOR");
 		sql.SELECT(" PRIN.NOFACTURABLE");
+		sql.SELECT(" PRIN.SOLICITARBAJA");
 		
 		sql.FROM(" pys_productosinstitucion prin, pys_formapagoproducto fopa1, pys_formapago fo, pys_tipoiva tiva, pys_tiposproductos tproducto, pys_productos produc");
 		if(filtroProductoItem.getFormaPago() != null && filtroProductoItem.getFormaPago() != "") {

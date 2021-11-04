@@ -9,6 +9,7 @@ import java.util.Locale;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
+import org.itcgae.siga.DTO.fac.FiltrosSuscripcionesItem;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionSqlProvider;
@@ -286,7 +287,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("per.nifcif as nIdentificacion");
 		sql.SELECT_DISTINCT("col.NCOLEGIADO \r\n");
 		sql.SELECT_DISTINCT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as apellidosnombre \r\n");
-		sql.SELECT_DISTINCT("CASE WHEN COUNT(*) OVER (ORDER BY prodIns.descripcion) >1 THEN FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) || '...'\r\n"
+		//REVISAR COUNT que siempre devuelve 200
+		sql.SELECT_DISTINCT("CASE WHEN COUNT(1) OVER (ORDER BY prodIns.descripcion) >1 THEN FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) || '...'\r\n"
 				+ "ELSE FIRST_VALUE(prodIns.descripcion) OVER (ORDER BY prodSol.FECHARECEPCIONSOLICITUD) END as concepto \r\n");
 		sql.SELECT_DISTINCT("prodSol.idformapago as idformapago \r\n");
 		sql.SELECT_DISTINCT("CASE WHEN prodSol.noFacturable = '1' THEN 'No facturable'\r\n"
@@ -347,6 +349,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		if(filtro.getnSolicitud() != null && filtro.getnSolicitud().trim() != "")sql.WHERE("pet.idpeticion like '%"+filtro.getnSolicitud()+"%'");
 		
 		if(filtro.getDescProd() != null && filtro.getDescProd().trim() != "")sql.WHERE("convert(UPPER(prodIns.descripcion) , 'US7ASCII' ) like convert(UPPER('%"+filtro.getDescProd()+"%') , 'US7ASCII' )");
+		
 		
 		if(filtro.getFechaSolicitudDesde() != null) {
 			DateFormat dateFormatFront = new SimpleDateFormat(
@@ -421,6 +424,194 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		
 		sql.ORDER_BY(" PRIN.DESCRIPCION");
 		
+		return sql.toString();
+	}
+
+	public String getListaSuscripciones(FiltrosSuscripcionesItem filtro, Short idInstitucion, String idioma)
+			throws ParseException {
+
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("pet.fecha as fechaSolicitud");
+		sql.SELECT_DISTINCT("pet.idPeticion as nSolicitud");
+		sql.SELECT_DISTINCT("per.nifcif as nIdentificacion");
+		sql.SELECT_DISTINCT("col.NCOLEGIADO \r\n");
+		sql.SELECT_DISTINCT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre as apellidosnombre \r\n");
+		//REVISAR COUNT que siempre devuelve 200
+//		sql.SELECT_DISTINCT(
+//				"CASE WHEN COUNT(1) OVER (ORDER BY servIns.descripcion) >1 THEN FIRST_VALUE(servIns.descripcion) OVER (ORDER BY suscripcion.fechasuscripcion) || '...'\r\n"
+//						+ "ELSE FIRST_VALUE(servIns.descripcion) OVER (ORDER BY suscripcion.fechasuscripcion) || '[ ' || precioServ.descripcion || ' ]'  END as concepto \r\n");
+//		sql.SELECT_DISTINCT("servIns.descripcion || '[ ' || precioServ.descripcion || ' ]' as concepto");
+		sql.SELECT_DISTINCT("CASE WHEN suscripcion.fechabaja is not null or petBaja.fecha is null THEN servIns.descripcion || '[ ' || precioServ.descripcion || ' ]' "
+				+ "ELSE servIns.descripcion END as concepto");
+		sql.SELECT_DISTINCT("servSol.idformapago as idformapago \r\n");
+		sql.SELECT_DISTINCT("CASE WHEN servIns.noFacturable = '1' THEN 'No facturable'\r\n"
+				+ "ELSE f_siga_getrecurso(formPago.descripcion, " + idioma + ") END as desFormaPago");
+//		sql.SELECT_DISTINCT("(servSol.VALOR*servSol.cantidad)*(1+TIVA.VALOR/100) AS impTotal \r\n");
+
+		sql.SELECT_DISTINCT(
+				"CASE WHEN suscripcion.fechasuscripcion is null THEN petBaja.fecha \r\n" + "ELSE null END as fechaDenegada \r\n");
+		sql.SELECT_DISTINCT("CASE WHEN suscripcion.fechasuscripcion is not null THEN petBaja.fecha \r\n"
+				+ "ELSE null END as fechaSolicitadaAnulacion \r\n");
+		sql.SELECT_DISTINCT("suscripcion.fechasuscripcion as fechaEfectiva");
+		sql.SELECT_DISTINCT("suscripcion.fechaBaja as fechaAnulada");
+		sql.SELECT_DISTINCT("f_siga_getrecurso_etiqueta(estfact.DESCRIPCION,'" + idioma + "') AS estadoFactura");
+		sql.SELECT_DISTINCT("precioServ.valor || '(' || f_siga_getrecurso(periodicidad.descripcion, "+idioma+") || ')' as PrecioPerio");
+		sql.SELECT_DISTINCT("suscripcion.fechasuscripcion as fechasuscripcion");
+		sql.SELECT_DISTINCT("suscripcion.fechabaja as fechabaja");
+
+		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION pet"); 
+
+		sql.INNER_JOIN(
+				"PYS_serviciosSolicitados servSol on servSol.idinstitucion=pet.idInstitucion and servSol.idpeticion=pet.idPeticion");
+		sql.LEFT_OUTER_JOIN("pys_formapago formPago on formPago.idformapago = servSol.idformapago");
+		sql.LEFT_OUTER_JOIN(
+				"pys_suscripcion suscripcion on suscripcion.idinstitucion = pet.idinstitucion and suscripcion.idpeticion = pet.idpeticion");
+		sql.INNER_JOIN("cen_persona per on per.idpersona = pet.idpersona");
+		sql.LEFT_OUTER_JOIN(
+				"cen_colegiado col on col.idpersona = pet.idpersona and col.idinstitucion = pet.idinstitucion");
+		sql.INNER_JOIN(
+				"pys_serviciosinstitucion servIns on servIns.idinstitucion = servSol.idinstitucion and servIns.idservicio = servSol.idservicio \r\n"
+						+ "and servIns.idTipoServicios = servSol.idTipoServicios and servIns.idServiciosInstitucion = servSol.idServiciosInstitucion");
+		sql.INNER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = servIns.idtipoiva");
+		//POR AHORA SE TIENEN EN CUENTA UNICAMENTE LOS PRECIOS DE SERVICIOS POR DEFECTO
+		sql.LEFT_OUTER_JOIN("pys_preciosservicios precioServ on precioServ.idinstitucion = servSol.idinstitucion and precioServ.idservicio = servSol.idservicio \r\n"
+				+ "and precioServ.idTipoServicios = servSol.idTipoServicios and precioServ.idServiciosInstitucion = servSol.idServiciosInstitucion "
+				+ "and precioServ.idperiodicidad = servSol.idperiodicidad and precioServ.porDefecto = '1'");
+		sql.LEFT_OUTER_JOIN("pys_periodicidad periodicidad on precioServ.idperiodicidad = periodicidad.idperiodicidad");
+		sql.LEFT_OUTER_JOIN(
+				"pys_peticioncomprasuscripcion petBaja on petBaja.idinstitucion = pet.idinstitucion and petBaja.idpeticionalta = pet.idpeticion");
+		sql.LEFT_OUTER_JOIN("fac_facturacionSuscripcion factSus on factSus.idservicio = suscripcion.idservicio \r\n"
+				+ "and factSus.idTipoServicios = suscripcion.idTipoServicios and factSus.idServiciosInstitucion = suscripcion.idServiciosInstitucion "
+				+ "and factSus.idinstitucion = suscripcion.idinstitucion and factSus.idsuscripcion = suscripcion.idpeticion");
+		sql.LEFT_OUTER_JOIN("fac_facturacionSuscripcion factSusBis ON (factSusBis.idservicio = suscripcion.idservicio \r\n"
+				+ "and factSusBis.idTipoServicios = suscripcion.idTipoServicios and factSusBis.idServiciosInstitucion = suscripcion.idServiciosInstitucion \r\n"
+				+ "and factSusBis.idinstitucion = suscripcion.idinstitucion and factSusBis.idsuscripcion = suscripcion.idpeticion AND \r\n"
+			   + "(factSus.idfactura < factSusBis.idfactura))");
+		sql.LEFT_OUTER_JOIN("fac_factura fact on fact.idfactura = factSus.idfactura \r\n"
+				+ "and fact.idinstitucion = suscripcion.idinstitucion");
+		
+		sql.LEFT_OUTER_JOIN("fac_estadoFactura estFact on estFact.idestado = fact.estado");
+
+		sql.WHERE("pet.idinstitucion = " + idInstitucion.toString());
+		sql.WHERE("rownum <= 200");
+		sql.WHERE("factSusBis.idfactura is null");
+
+		if (filtro.getIdEstadoSolicitud() != null) {
+			switch (filtro.getIdEstadoSolicitud()) {
+			case "1": //Pendiente
+				sql.WHERE("CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha\r\n"
+						+ "				ELSE null END is null and suscripcion.fechaSuscripcion is null");
+				break;
+			case "2"://Denegada
+				sql.WHERE("CASE WHEN suscripcion.fechaSuscripcion is null THEN petBaja.fecha \r\n"
+						+ "				ELSE null END is not null");
+				break;
+			case "3"://Aceptada
+				sql.WHERE(
+						"suscripcion.fechaSuscripcion is not null and CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
+								+ "				ELSE null END is null");
+				break;
+			case "4"://Anulacion solicitada
+				sql.WHERE("CASE WHEN suscripcion.fechaSuscripcion is not null THEN petBaja.fecha \r\n"
+						+ "				ELSE null END is not null and suscripcion.fechaBaja is null");
+				break;
+			case "5"://Anulada
+				sql.WHERE("suscripcion.fechaBaja is not null");
+				break;
+			}
+		}
+
+		if (filtro.getIdpersona() != null)
+			sql.WHERE("pet.idpersona = " + filtro.getIdpersona());
+
+		if (filtro.getnSolicitud() != null && filtro.getnSolicitud().trim() != "")
+			sql.WHERE("pet.idpeticion like '%" + filtro.getnSolicitud() + "%'");
+
+		if (filtro.getDescServ() != null && filtro.getDescServ().trim() != "")
+			sql.WHERE("convert(UPPER(servIns.descripcion) , 'US7ASCII' ) like convert(UPPER('%" + filtro.getDescServ()
+					+ "%') , 'US7ASCII' )");
+
+		if(filtro.getaFechaDe() != null) {
+			DateFormat dateFormatFront = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
+			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
+			String strDate = dateFormatSql
+					.format(dateFormatFront.parse(filtro.getaFechaDe().toString()).getTime());
+			//Deben estar en estado "Aceptada" o "Pendiente de anulacion" en esa fecha
+			sql.WHERE(
+					"(suscripcion.fechaSuscripcion is not null and "
+					+ "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and"
+					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
+		}
+		else{
+			if (filtro.getFechaSolicitudDesde() != null) {
+				DateFormat dateFormatFront = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
+				DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
+				String strDate = dateFormatSql
+						.format(dateFormatFront.parse(filtro.getFechaSolicitudDesde().toString()).getTime());
+				sql.WHERE("pet.fecha >= to_date('" + strDate + "','dd/MM/YY')");
+			}
+	
+			if (filtro.getFechaSolicitudHasta() != null) {
+				DateFormat dateFormatFront = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
+				DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
+				String strDate = dateFormatSql
+						.format(dateFormatFront.parse(filtro.getFechaSolicitudHasta().toString()).getTime());
+				sql.WHERE("pet.fecha <= to_date('" + strDate + "','dd/MM/YY')");
+			}
+		}
+
+		if (filtro.getIdTipoServicio() != null)
+			sql.WHERE("servSol.idServiciosInstitucion = " + filtro.getIdTipoServicio());
+
+		if (filtro.getIdCategoria() != null)
+			sql.WHERE("servSol.idTipoServicios = " + filtro.getIdCategoria());
+
+		if(filtro.getIdEstadoFactura() != null)sql.WHERE("fact.estado = "+filtro.getIdEstadoFactura());
+//		private String importe; // valor aplicado durante la compra (importe total)
+
+		return sql.toString();
+	}
+
+	public String getListaServiciosSuscripcion(Short idInstitucion, String idPeticion) {
+
+		SQL sql = new SQL();
+
+
+		sql.SELECT_DISTINCT(" case when servSol.orden is null then rownum \r\n" + "else servSol.orden end as orden");
+		sql.SELECT_DISTINCT(" servIns.descripcion");
+		sql.SELECT_DISTINCT(" servSol.cantidad");
+		sql.SELECT_DISTINCT(" precioServ.valor");
+		sql.SELECT_DISTINCT(" servIns.idtipoiva as idtipoiva");
+		sql.SELECT_DISTINCT("TIVA.descripcion as IVA");
+		sql.SELECT_DISTINCT("TIVA.valor as valorIva");
+//		sql.SELECT_DISTINCT("F_siga_formatonumero(ROUND(prin.VALOR*TIVA.VALOR/100)+prin.VALOR, 2) AS total \r\n");
+		sql.SELECT_DISTINCT("servSol.idservicio");
+		sql.SELECT_DISTINCT("servSol.idtiposervicios");
+		sql.SELECT_DISTINCT("servSol.idserviciosinstitucion");
+		sql.SELECT_DISTINCT("servSol.idpeticion");
+		sql.SELECT_DISTINCT("servIns.NOFACTURABLE");
+		sql.SELECT_DISTINCT("servIns.solicitarBaja"); // Este atributo hace referencia a la propiedad/check "Solictar
+														// baja por internet"
+		sql.SELECT_DISTINCT("servIns.Automatico");
+
+		sql.FROM(" pys_serviciosinstitucion servIns, pys_tipoiva tiva");
+		sql.FROM("pys_serviciossolicitados servSol");
+		sql.FROM("pys_preciosServicios precioServ");
+
+		sql.WHERE(" servIns.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE(" tiva.idtipoiva (+) = servIns.idtipoiva");
+		sql.WHERE(" servSol.idinstitucion(+) = servIns.idinstitucion");
+		sql.WHERE("servSol.idpeticion = " + idPeticion);
+		sql.WHERE("servSol.idservicio(+) = servIns.idservicio and servSol.idtiposervicios(+) = servIns.idtiposervicios "
+				+ "and servSol.idserviciosinstitucion(+) = servIns.idserviciosinstitucion");
+		sql.WHERE("precioserv.idservicio (+) = servIns.idservicio");
+		sql.WHERE("precioserv.idtiposervicios (+) = servIns.idtiposervicios");
+		sql.WHERE("precioserv.idserviciosinstitucion (+) = servIns.idserviciosinstitucion");
+		sql.WHERE("precioserv.idinstitucion (+) = servIns.idinstitucion");
+
+		sql.ORDER_BY(" servIns.DESCRIPCION");
+
 		return sql.toString();
 	}
 

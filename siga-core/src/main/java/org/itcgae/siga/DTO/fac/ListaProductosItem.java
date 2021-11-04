@@ -24,6 +24,7 @@ public class ListaProductosItem {
 	private Date fechaBajaIva;
 	private String idFormasPago;
 	private String formasPagoInternet;
+	private String solicitarBaja;
 	
 	public int getIdproducto() {
 		return idproducto;
@@ -223,6 +224,12 @@ public class ListaProductosItem {
 	}
 	public void setFormasPagoInternet(String formasPagoInternet) {
 		this.formasPagoInternet = formasPagoInternet;
+	}
+	public String getSolicitarBaja() {
+		return solicitarBaja;
+	}
+	public void setSolicitarBaja(String solicitarBaja) {
+		this.solicitarBaja = solicitarBaja;
 	}
 	
 }

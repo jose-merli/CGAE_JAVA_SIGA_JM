@@ -32,6 +32,10 @@ public class FichaCompraSuscripcionItem {
 	private String impPagado;
     private String cuentaBancSelecc;
     private List<ListaProductosCompraItem> productos;
+    
+    //TARJETA SERVICIOS
+    //REVISAR
+    private List<ListaProductosCompraItem> servicios;
 	
 	private String idEstadoPeticion;
 
