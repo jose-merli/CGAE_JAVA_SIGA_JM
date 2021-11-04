@@ -22,6 +22,7 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -152,7 +153,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	@Override
 	public ComboDTO comboEstado(HttpServletRequest request) {
 		// TODO Auto-generated method stub
-		// Conseguimos información del usuario logeado
+		// Conseguimos debugrmación del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -162,22 +163,22 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"comboEstado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"comboEstado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+			LOGGER.debug("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
 
-			LOGGER.info(
-					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"comboEstado() / ScsRemesasExtendsMapper.comboEstado() -> Entrada a ScsRemesasExtendsMapper para obtener los combo");
 
 			comboItems = scsRemesasExtendsMapper.comboEstado(usuarios.get(0).getIdlenguaje());
 
-			LOGGER.info(
+			LOGGER.debug(
 					"comboEstado() / ScsRemesasExtendsMapper.comboEstado() -> Salida a ScsRemesasExtendsMapper para obtener los combo");
 
 			if (comboItems != null) {
@@ -185,14 +186,14 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			}
 
 		}
-		LOGGER.info("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
+		LOGGER.debug("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
 		return comboDTO;
 	}
 
 	@Override
 	public RemesaBusquedaDTO buscarRemesas(RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request) {
 		// TODO Auto-generated method stub
-		// Conseguimos información del usuario logeado
+		// Conseguimos debugrmación del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -202,18 +203,18 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"buscarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"buscarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"buscarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"buscarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"buscarRemesas() / ScsRemesasExtendsMapper.buscarRemesas() -> Entrada a ScsRemesasExtendsMapper para obtener las remesas");
 
-			LOGGER.info("Id remesa -> " + remesasBusquedaItem.getIdRemesa() + " | idLenguaje -> "
+			LOGGER.debug("Id remesa -> " + remesasBusquedaItem.getIdRemesa() + " | idLenguaje -> "
 					+ usuarios.get(0).getIdlenguaje() + " | fecha generacion -> "
 					+ remesasBusquedaItem.getFechaGeneracionDesde());
 
@@ -247,7 +248,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				remesasItems.get(i).setnRegistro(nRegistro);
 			}
 
-			LOGGER.info(
+			LOGGER.debug(
 					"buscarRemesas() / ScsRemesasExtendsMapper.buscarRemesas() -> Salida a ScsRemesasExtendsMapper para obtener las remesas");
 
 			if (remesasItems != null) {
@@ -255,7 +256,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			}
 
 		}
-		LOGGER.info("getLabel() -> Salida del servicio para obtener las remesas");
+		LOGGER.debug("getLabel() -> Salida del servicio para obtener las remesas");
 		return remesaBusquedaDTO;
 	}
 
@@ -274,26 +275,26 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			LOGGER.info(
-					"borrarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"borrarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"borrarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"borrarRemesas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"borrarRemesas() / ScsRemesasExtendsMapper.borrarRemesas() -> Entrada a ScsRemesasExtendsMapper para eliminar las remesas");
 
 			try {
 
 				if (remesasBusquedaItem != null && remesasBusquedaItem.size() > 0) {
 
-					LOGGER.info("remesaBusquedaItem -> " + remesasBusquedaItem.get(0).getIdRemesa());
+					LOGGER.debug("remesaBusquedaItem -> " + remesasBusquedaItem.get(0).getIdRemesa());
 
 					for (RemesasBusquedaItem remesas : remesasBusquedaItem) {
 
-						LOGGER.info("Entra al foreach de la remesas");
+						LOGGER.debug("Entra al foreach de la remesas");
 
 						CajgRemesaKey remesaKey = new CajgRemesaKey();
 
@@ -310,7 +311,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 							if (Integer.parseInt(remesaEstado.get(0).getIdRemesa()) == remesas.getIdRemesa()) {
 
-								LOGGER.info("Se comprueba que la remesa con id -> " + remesas.getIdRemesa()
+								LOGGER.debug("Se comprueba que la remesa con id -> " + remesas.getIdRemesa()
 										+ " está inciada");
 
 								// Buscamos si la remesa tiene EJG asociados
@@ -319,7 +320,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 										.andIdinstitucionremesaEqualTo(idInstitucion);
 								List<CajgEjgremesa> ejgRemesas = cajgEjgremesaExtendsMapper.selectByExample(example);
 
-								LOGGER.info("Obtenemos los EJG asociados a la remesa");
+								LOGGER.debug("Obtenemos los EJG asociados a la remesa");
 
 								// Comprobamos si está vacia la lista con los EJG asociados
 								if (!ejgRemesas.isEmpty()) {
@@ -346,7 +347,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 											// Hacemos el update de la columna FechaBaja del EJG
 											for (ScsEstadoejg scsEstadoejg : estadoEjg) {
 
-												LOGGER.info("Actualizamos el EJG con año/numero: "
+												LOGGER.debug("Actualizamos el EJG con año/numero: "
 														+ scsEstadoejg.getAnio() + "/" + scsEstadoejg.getNumero()
 														+ " para ponerle FECHABAJA");
 
@@ -364,7 +365,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 										}
 
-										LOGGER.info("Borramos la relación entre el EJG y la remesa");
+										LOGGER.debug("Borramos la relación entre el EJG y la remesa");
 
 										// Borramos la relación entre el ejg y la remesa
 
@@ -377,7 +378,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 								}
 
-								LOGGER.info("Borramos la relacion entre la remesa y el estado de la misma");
+								LOGGER.debug("Borramos la relacion entre la remesa y el estado de la misma");
 
 								// Borramos la relacion de la remesa y su estado
 								CajgRemesaestadosExample remesaEstadoKey = new CajgRemesaestadosExample();
@@ -388,7 +389,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 							}
 
-							LOGGER.info("Borramos la remesa con id: " + remesas.getIdRemesa());
+							LOGGER.debug("Borramos la remesa con id: " + remesas.getIdRemesa());
 
 							// Borramos la remesa
 							CajgRemesaExample remesaExample = new CajgRemesaExample();
@@ -410,7 +411,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				error.setCode(400);
 				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 				deleteResponseDTO.setStatus(SigaConstants.KO);
-				LOGGER.info("Se ha producido un error en BBDD contacte con su administrador");
+				LOGGER.debug("Se ha producido un error en BBDD contacte con su administrador");
 				throw e;
 			}
 
@@ -432,22 +433,22 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				error.setDescription("No se ha(n) borrado la(s) remesa(s) con Nº de Registro: " + nRegistro
 						+ ", porque no estan en estado 'Iniciado'");
 				deleteResponseDTO.setStatus(SigaConstants.OK);
-				LOGGER.info("No se ha(n) borrado la(s) remesa(s) con Nº de Registro: " + nRegistro
+				LOGGER.debug("No se ha(n) borrado la(s) remesa(s) con Nº de Registro: " + nRegistro
 						+ ", porque no estan en estado 'Iniciado'");
 			} else if (error.getCode() == null) {
 				error.setCode(200);
 				error.setDescription("Se han borrado las remesas correctamente");
 				deleteResponseDTO.setStatus(SigaConstants.OK);
-				LOGGER.info("Se han borrado las remesas correctamente");
+				LOGGER.debug("Se han borrado las remesas correctamente");
 			}
 
 			deleteResponseDTO.setError(error);
 
-			LOGGER.info(
+			LOGGER.debug(
 					"borrarRemesas() / ScsRemesasExtendsMapper.borrarRemesas() -> Salida a ScsRemesasExtendsMapper para eliminar las remesas");
 
 		}
-		LOGGER.info("getLabel() -> Salida del servicio para eliminar las remesas");
+		LOGGER.debug("getLabel() -> Salida del servicio para eliminar las remesas");
 
 		return deleteResponseDTO;
 	}
@@ -455,7 +456,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	@Override
 	public EstadoRemesaDTO listadoEstadoRemesa(RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request) {
 		// TODO Auto-generated method stub
-		// Conseguimos información del usuario logeado
+		// Conseguimos debugrmación del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -465,22 +466,22 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"listadoEstadoRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"listadoEstadoRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+			LOGGER.debug("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
 
-			LOGGER.info(
-					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"listadoEstadoRemesa() / ScsRemesasExtendsMapper.listadoEstadoRemesa() -> Entrada a ScsRemesasExtendsMapper para obtener los estados de la remesa");
 
 			estadoRemesaItem = scsRemesasExtendsMapper.listadoEstadoRemesa(remesasBusquedaItem, idInstitucion, usuarios.get(0).getIdlenguaje());
 
-			LOGGER.info(
+			LOGGER.debug(
 					"listadoEstadoRemesa() / ScsRemesasExtendsMapper.listadoEstadoRemesa() -> Salida a ScsRemesasExtendsMapper para obtener los estados de la remesa");
 
 			if (estadoRemesaItem != null) {
@@ -488,7 +489,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			}
 
 		}
-		LOGGER.info("getLabel() -> Salida del servicio para obtener los estado de la remesa");
+		LOGGER.debug("getLabel() -> Salida del servicio para obtener los estado de la remesa");
 		return estadoRemesaDTO;
 	}
 
@@ -503,17 +504,17 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"getUltimoRegitroRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"getUltimoRegitroRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+			LOGGER.debug("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
 
-			LOGGER.info(
-					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"getUltimoRegitroRemesa() / admContadorExtendsMapper.getUltimoRegitroRemesa() -> Entrada a AdmContadorExtendsMapper para obtener el ultimo registro de las remesas");
 			AdmContadorKey key = new AdmContadorKey();
 
@@ -522,11 +523,11 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 			contador = admContadorExtendsMapper.selectByPrimaryKey(key);
 
-			LOGGER.info(
+			LOGGER.debug(
 					"getUltimoRegitroRemesa() / admContadorExtendsMapper.getUltimoRegitroRemesa() -> Salida a AdmContadorExtendsMapper para obtener el ultimo registro de las remesas");
 
 		}
-		LOGGER.info("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
+		LOGGER.debug("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
 		return contador;
 	}
 
@@ -547,18 +548,18 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"guardarRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"guardarRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"guardarRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"guardarRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			if (remesasItem.getIdRemesa() == 0) {
 				try {
 
-					LOGGER.info(
+					LOGGER.debug(
 							"guardarRemesa() / cajgRemesaExtendsMapper.insert() -> Entrada a CajgRemesaExtendsMapper para insertar una remesa");
 
 					CajgRemesa remesa = new CajgRemesa();
@@ -575,22 +576,22 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 					response = cajgRemesaExtendsMapper.insert(remesa);
 
-					LOGGER.info(
+					LOGGER.debug(
 							"guardarRemesa() / cajgRemesaExtendsMapper.insert() -> Salida de CajgRemesaExtendsMapper para insertar una remesa");
 
 					if (response == 1) {
 
-						LOGGER.info(
+						LOGGER.debug(
 								"guardarRemesa() / admContadorExtendsMapper.selectByPrimaryKey() -> Entrada de AdmContadorExtendsMapper para obtener el contador de REMESA");
 
 						AdmContador contador = getUltimoRegitroRemesa(request);
 
-						LOGGER.info(
+						LOGGER.debug(
 								"guardarRemesa() / admContadorExtendsMapper.selectByPrimaryKey() -> Salida de AdmContadorExtendsMapper para obtener el contador de REMESA");
 
 						if (contador != null) {
 
-							LOGGER.info(
+							LOGGER.debug(
 									"guardarRemesa() / admContadorExtendsMapper.updateByPrimaryKeySelective() -> Entrada de AdmContadorExtendsMapper para incrementar en 1 el contador de REMESA");
 
 							response = 0;
@@ -599,11 +600,11 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 							response = admContadorExtendsMapper.updateByPrimaryKeySelective(contador);
 
-							LOGGER.info(
+							LOGGER.debug(
 									"guardarRemesa() / admContadorExtendsMapper.updateByPrimaryKeySelective() -> Salida de AdmContadorExtendsMapper para incrementar en 1 el contador de REMESA");
 
 							if (response == 1) {
-								LOGGER.info(
+								LOGGER.debug(
 										"guardarRemesa() / cajgRemesaEstadosMapper.insert() -> Entrada de CajgRemesaEstadosMapper para insertar un estado de una remesas");
 
 								CajgRemesaestados remesaEstado = new CajgRemesaestados();
@@ -616,7 +617,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 								response = cajgRemesaEstadosMapper.insert(remesaEstado);
 
-								LOGGER.info(
+								LOGGER.debug(
 										"guardarRemesa() / cajgRemesaEstadosMapper.insert() -> Salida de CajgRemesaEstadosMapper para insertar un estado de una remesas");
 							}
 						}
@@ -650,7 +651,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			} else {
 				try {
 
-					LOGGER.info(
+					LOGGER.debug(
 							"guardarRemesa() / cajgRemesaExtendsMapper.selectByPrimaryKey(example) -> Entrada a CajgRemesaExtendsMapper para buscar la remesa a actualizar");
 
 					CajgRemesaKey remesa = new CajgRemesaKey();
@@ -660,19 +661,19 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 					CajgRemesa remesaBD = cajgRemesaExtendsMapper.selectByPrimaryKey(remesa);
 
-					LOGGER.info(
+					LOGGER.debug(
 							"guardarRemesa() / cajgRemesaExtendsMapper.selectByPrimaryKey(example) -> Salida de CajgRemesaExtendsMapper para buscar la remesa a actualizar");
 
 					if (remesaBD != null) {
 
-						LOGGER.info(
+						LOGGER.debug(
 								"guardarRemesa() / cajgRemesaExtendsMapper.updateByPrimaryKeySelective(example) -> Entrada a CajgRemesaExtendsMapper para actulizar la remesa");
 
 						remesaBD.setDescripcion(remesasItem.getDescripcion());
 
 						response = cajgRemesaExtendsMapper.updateByPrimaryKeySelective(remesaBD);
 
-						LOGGER.info(
+						LOGGER.debug(
 								"guardarRemesa() / cajgRemesaExtendsMapper.updateByPrimaryKeySelective(example) -> Salida de CajgRemesaExtendsMapper para actulizar la remesa");
 
 					}
@@ -700,7 +701,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("guardarRemesa() -> Salida del servicio para insertar/actualizar remesa");
+		LOGGER.debug("guardarRemesa() -> Salida del servicio para insertar/actualizar remesa");
 
 		return updateResponseDTO;
 	}
@@ -708,7 +709,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	@Override
 	public EJGRemesaDTO getEJGRemesa(RemesasItem remesasItem, HttpServletRequest request) {
 		// TODO Auto-generated method stub
-		// Conseguimos información del usuario logeado
+		// Conseguimos debugrmación del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -718,18 +719,18 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"getEJGRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"getEJGRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getEJGRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"getEJGRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"getEJGRemesa() / ScsRemesasExtendsMapper.getEJGRemesa() -> Entrada a ScsRemesasExtendsMapper para obtener los ejg asociados a la remesa");
 
-			LOGGER.info("Id remesa -> " + remesasItem.getIdRemesa());
+			LOGGER.debug("Id remesa -> " + remesasItem.getIdRemesa());
 
 			ejgRemesaItems = scsRemesasExtendsMapper.getEJGRemesa(remesasItem, idInstitucion);
 
@@ -741,7 +742,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				ejgRemesaItems.get(i).setIncidencias(incidencias);
 			}
 
-			LOGGER.info(
+			LOGGER.debug(
 					"getEJGRemesa() / ScsRemesasExtendsMapper.getEJGRemesa() -> Salida a ScsRemesasExtendsMapper para obtener los ejg asociados a la remesa");
 
 			if (ejgRemesaItems != null) {
@@ -749,7 +750,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			}
 		}
 
-		LOGGER.info("getLabel() -> Salida del servicio para obtener los ejg asociados a la remesa");
+		LOGGER.debug("getLabel() -> Salida del servicio para obtener los ejg asociados a la remesa");
 
 		return ejgRemesaDTO;
 	}
@@ -767,26 +768,26 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			LOGGER.info(
-					"borrarExpedientesRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"borrarExpedientesRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"borrarExpedientesRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"borrarExpedientesRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"borrarExpedientesRemesa() / ScsRemesasExtendsMapper.borrarExpedientesRemesa() -> Entrada a ScsRemesasExtendsMapper para eliminar los expedientes de la remesa");
 
 			try {
 
 				if (ejgRemesaItem != null && ejgRemesaItem.size() > 0) {
 
-					LOGGER.info("remesaBusquedaItem -> " + ejgRemesaItem.get(0).getIdentificadorEJG());
+					LOGGER.debug("remesaBusquedaItem -> " + ejgRemesaItem.get(0).getIdentificadorEJG());
 
 					for (EJGRemesaItem ejg : ejgRemesaItem) {
 
-						LOGGER.info("Entra al foreach de los EJG's");
+						LOGGER.debug("Entra al foreach de los EJG's");
 
 						// Buscamos los registros de los EJG asociados a la remesa con ciertas
 						// condiciones
@@ -806,7 +807,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 							// Hacemos el update de la columna FechaBaja del EJG
 							for (ScsEstadoejg scsEstadoejg : estadoEjg) {
 
-								LOGGER.info("Actualizamos el EJG con año/numero: " + scsEstadoejg.getAnio() + "/"
+								LOGGER.debug("Actualizamos el EJG con año/numero: " + scsEstadoejg.getAnio() + "/"
 										+ scsEstadoejg.getNumero() + " para ponerle FECHABAJA");
 
 								cambiarFechaBaja.setAnio(scsEstadoejg.getAnio());
@@ -822,7 +823,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 						}
 
-						LOGGER.info("Borramos la relación entre el EJG y la remesa");
+						LOGGER.debug("Borramos la relación entre el EJG y la remesa");
 
 						// Borramos la relación entre el ejg y la remesa
 
@@ -839,7 +840,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				error.setCode(400);
 				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 				deleteResponseDTO.setStatus(SigaConstants.KO);
-				LOGGER.info("Se ha producido un error en BBDD contacte con su administrador");
+				LOGGER.debug("Se ha producido un error en BBDD contacte con su administrador");
 				throw e;
 			}
 
@@ -847,16 +848,16 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				error.setCode(200);
 				error.setDescription("Se han borrado los expedientes correctamente");
 				deleteResponseDTO.setStatus(SigaConstants.OK);
-				LOGGER.info("Se han borrado los expedientes correctamente");
+				LOGGER.debug("Se han borrado los expedientes correctamente");
 			}
 
 			deleteResponseDTO.setError(error);
 
-			LOGGER.info(
+			LOGGER.debug(
 					"borrarExpedientesRemesa() / ScsRemesasExtendsMapper.borrarExpedientesRemesa() -> Salida a ScsRemesasExtendsMapper para eliminar los expedientes de la remesa");
 
 		}
-		LOGGER.info("getLabel() -> Salida del servicio para eliminar los expedientes");
+		LOGGER.debug("getLabel() -> Salida del servicio para eliminar los expedientes");
 
 		return deleteResponseDTO;
 	}
@@ -871,17 +872,17 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"getTipoPCAJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"getTipoPCAJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+			LOGGER.debug("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
 
-			LOGGER.info(
-					"getTipoPCAJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"getTipoPCAJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"getTipoPCAJG() / genParametrosMapper.selectByPrimaryKey() -> Entrada a GenParametrosMapper para obtener el tipo de PCAJG de la institucion logeada");
 			GenParametrosKey key = new GenParametrosKey();
 
@@ -891,15 +892,15 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 			parametro = genParametrosMapper.selectByPrimaryKey(key);
 
-			LOGGER.info(
+			LOGGER.debug(
 					"getTipoPCAJG() / genParametrosMapper.selectByPrimaryKey() -> Entrada a GenParametrosMapper para obtener el tipo de PCAJG de la institucion logeada"
 							+ parametro.getValor());
 
-			LOGGER.info(
+			LOGGER.debug(
 					"getTipoPCAJG() / genParametrosMapper.selectByPrimaryKey() -> Salida a GenParametrosMapper para obtener el tipo de PCAJG de la institucion logeada");
 
 		}
-		LOGGER.info("getLabel() -> Salida del servicio para obtener el tipo de PCAJG de la institucion logeada");
+		LOGGER.debug("getLabel() -> Salida del servicio para obtener el tipo de PCAJG de la institucion logeada");
 		return parametro;
 	}
 
@@ -916,17 +917,17 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"validaOperacion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"validaOperacion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+			LOGGER.debug("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
 
-			LOGGER.info(
-					"validaOperacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"validaOperacion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"validaOperacion() / ScsRemesasExtendsMapper.checkAcciones() -> Entrada a ScsRemesasExtendsMapper para obtener las acciones posibles para la institucion");
 
 			parametro = getTipoPCAJG(request);
@@ -934,7 +935,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			checkAccionesRemesasItems = scsRemesasExtendsMapper.getAcciones(remesasItem, idInstitucion,
 					usuarios.get(0).getIdlenguaje(), parametro.getValor());
 
-			LOGGER.info(
+			LOGGER.debug(
 					"validaOperacion() / ScsRemesasExtendsMapper.checkAcciones() -> Salida a ScsRemesasExtendsMapper para obtener las acciones posibles para la institucion");
 
 			if (checkAccionesRemesasItems != null) {
@@ -942,7 +943,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			}
 
 		}
-		LOGGER.info("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
+		LOGGER.debug("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
 		return checkAccionesRemesasDTO;
 	}
 
@@ -960,17 +961,17 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"ejecutaOperacionRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"ejecutaOperacionRemesa() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
+			LOGGER.debug("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
 
-			LOGGER.info(
-					"ejecutaOperacionRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"ejecutaOperacionRemesa() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"ejecutaOperacionRemesa() / ScsRemesasExtendsMapper.ejecutaOperacionRemesa() -> Entrada a ScsRemesasExtendsMapper para obtener las acciones posibles para la institucion");
 			
 			parametro = getTipoPCAJG(request);
@@ -996,11 +997,11 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				}
 			}
 
-			LOGGER.info(
+			LOGGER.debug(
 					"ejecutaOperacionRemesa() / ScsRemesasExtendsMapper.checkAcciones() -> Salida a ScsRemesasExtendsMapper para obtener las acciones posibles para la institucion");
 
 		}
-		LOGGER.info("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
+		LOGGER.debug("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
 		return insertResponseDTO;
 	}
 
@@ -1029,7 +1030,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	private InsertResponseDTO validaEnviaExpedientes(Short idinstitucion, Long idremesa , int accion, String tipoPCAJG, String mensajeValidando, HttpServletRequest request) {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
-		LOGGER.info("Insertando un nuevo registro para la validación o envío de datos de una remesa de envío.");
+		LOGGER.debug("Insertando un nuevo registro para la validación o envío de datos de una remesa de envío.");
 
 		try {
 			
@@ -1078,7 +1079,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 		try {
 			if (cajgRemesa == null || cajgRemesa.getIdinstitucion() == null || cajgRemesa.getIdremesa() == null) {
-				LOGGER.info("Se ha recibido un cajgremesa no válido");
+				LOGGER.debug("Se ha recibido un cajgremesa no válido");
 				throw new IllegalArgumentException("Se debe indicar el idinstitución e idremesa");
 			}
 			
@@ -1097,7 +1098,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 				CajgRespuestaEjgremesaExample cajgRespuestaEjgremesaExample = new CajgRespuestaEjgremesaExample();
 				cajgRespuestaEjgremesaExample.createCriteria().andIdejgremesaIn(listIdejgremesa);
 				borrados = cajgRespuestaEjgremesaMapper.deleteByExample(cajgRespuestaEjgremesaExample);
-				LOGGER.info(String.format("Se han eliminado %s registros de la tabla CajgRespuestaEjgremesa asociados a la remesa %s y la institución %s", borrados, 
+				LOGGER.debug(String.format("Se han eliminado %s registros de la tabla CajgRespuestaEjgremesa asociados a la remesa %s y la institución %s", borrados, 
 						cajgRemesa.getIdremesa(), cajgRemesa.getIdinstitucion()));
 			}
 		}catch(Exception e) {
@@ -1160,39 +1161,6 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		
 		return insertResponseDTO;
 	}
-	
-	public int getMaxIdRespuesta(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		RemesasItem idRespuesta = new RemesasItem();
-
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"getMaxIdRespuesta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info("Lenguaje del usuario: " + usuarios.get(0).getIdlenguaje());
-
-			LOGGER.info(
-					"comboPonenteComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			LOGGER.info(
-					"getMaxIdRespuesta() / scsRemesasExtendsMapper.getMaxIdRespuesta() -> Entrada a scsRemesasExtendsMapper para obtener el ultimo registro de idRespuesta");
-
-			idRespuesta = scsRemesasExtendsMapper.getMaxIdRespuesta();
-
-			LOGGER.info(
-					"getMaxIdRespuesta() / scsRemesasExtendsMapper.getMaxIdRespuesta() -> Salida a scsRemesasExtendsMapper para obtener el ultimo registro de idRespuesta");
-
-		}
-		LOGGER.info("getLabel() -> Salida del servicio para obtener los tipos de estado de las remesas");
-		return idRespuesta.getIdRemesa();
-	}
 
 	@Transactional
 	public int insertaRespuestaEJGRemesa(Long idejgremesa, String codigoError, String descripcionErrorTraducido, HttpServletRequest request) {
@@ -1211,7 +1179,6 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		cajgRespuestaEjgremesa.setFechamodificacion(new Date());
 		cajgRespuestaEjgremesa.setUsumodificacion(SigaConstants.USUMODIFICACION_0);
 		cajgRespuestaEjgremesa.setIdtiporespuesta(Long.valueOf(1));
-		cajgRespuestaEjgremesa.setIdrespuesta(BigDecimal.valueOf(getMaxIdRespuesta(request)));
 
 		return cajgRespuestaEjgremesaMapper.insert(cajgRespuestaEjgremesa);
 	}
@@ -1253,7 +1220,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		List<EcomColaParametros> listaEcomColaParametros = ecomColaParametrosMapper.selectByExample(ecomColaParametrosExample);
 		
 		if (listaEcomColaParametros != null && listaEcomColaParametros.size() > 0) {
-			LOGGER.info("Posibles candidatos para ver si la remesa ha sido ejecutada o se está ejecutando");
+			LOGGER.debug("Posibles candidatos para ver si la remesa ha sido ejecutada o se está ejecutando");
 			List<Long> ids = new ArrayList<Long>();
 			for (EcomColaParametros ecomColaParametros : listaEcomColaParametros) {
 				ids.add(ecomColaParametros.getIdecomcola());
@@ -1280,7 +1247,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 			}
 		}
 		
-		LOGGER.info("¿La remesa del colegio " + idinstitucion + " con idRemesa " + idremesa + " está en ejecución? = '" + ejecutandose + "'");
+		LOGGER.debug("¿La remesa del colegio " + idinstitucion + " con idRemesa " + idremesa + " está en ejecución? = '" + ejecutandose + "'");
 		
 		return ejecutandose;		
 	}
@@ -1386,7 +1353,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 	
 	private ByteArrayInputStream crearExcel(List<CajgRespuestaEjgremesa> respuestaEjgRemesa, List<CajgEjgremesa> listaCajgEjgremesas, int idRemesa) {
 		List<String> cabeceraExcel = Arrays.asList("IDENTIFICADOR DEL EJG", "DESCRIPCION");
-		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
+		try (Workbook workbook = new HSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
 			Sheet sheet = workbook.createSheet("ErrorRemesa"+idRemesa);
 
 		    // Header

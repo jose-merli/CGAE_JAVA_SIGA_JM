@@ -13,13 +13,14 @@ import org.itcgae.siga.DTOs.scs.EstadoRemesaItem;
 import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem2;
+import org.itcgae.siga.db.mappers.CajgRemesaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsRemesasExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface ScsRemesasExtendsMapper{
+public interface ScsRemesasExtendsMapper {
 
 	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "comboEstado")
 	@Results({ 
@@ -96,9 +97,4 @@ public interface ScsRemesasExtendsMapper{
 	})
 	List<CheckAccionesRemesas> getAcciones(RemesasItem remesasItem, Short idInstitucion, String idlenguaje, String tipoPCAJG);
 	
-	@SelectProvider(type = ScsRemesasExtendsProvider.class, method = "getMaxIdRespuesta")
-	@Results({
-		@Result(column = "IDRESPUESTA", property = "idRemesa", jdbcType = JdbcType.NUMERIC)
-	})
-	RemesasItem getMaxIdRespuesta();
 }

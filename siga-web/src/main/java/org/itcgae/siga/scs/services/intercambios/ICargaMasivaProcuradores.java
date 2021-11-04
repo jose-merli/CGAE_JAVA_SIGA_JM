@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorBusquedaItem;
 import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorItem;
+import org.itcgae.siga.exception.BusinessException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public interface ICargaMasivaProcuradores {
 
 	public CargaMasivaProcuradorDTO listado(CargaMasivaProcuradorBusquedaItem cargaMasivaItem, HttpServletRequest request);
 
-	public DeleteResponseDTO uploadFilePD(MultipartHttpServletRequest request);
+	public DeleteResponseDTO cargarFichero(MultipartHttpServletRequest request) throws BusinessException, IOException, Exception;
 
 	public InputStreamResource descargarFicheros(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem, HttpServletRequest request);
 	

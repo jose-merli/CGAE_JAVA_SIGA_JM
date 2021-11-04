@@ -49,25 +49,25 @@ public class RemesasController {
 	
 	@RequestMapping(value = "/buscarRemesas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<RemesaBusquedaDTO> buscarRemesas(@RequestBody RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request) {
-		LOGGER.info("Entra en el método buscarRemesas");
+		LOGGER.debug("Entra en el método buscarRemesas");
 		RemesaBusquedaDTO response = busquedaRemesas.buscarRemesas(remesasBusquedaItem, request);
-		LOGGER.info("Termina el método buscarRemesas");
+		LOGGER.debug("Termina el método buscarRemesas");
 		return new ResponseEntity<RemesaBusquedaDTO>(response, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/borrarRemesas", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> borrarRemesas(@RequestBody List<RemesasBusquedaItem> remesasBusquedaItem, HttpServletRequest request) {
-		LOGGER.info("Entra en el método borrarRemesas");
+		LOGGER.debug("Entra en el método borrarRemesas");
 		DeleteResponseDTO response = busquedaRemesas.borrarRemesas(remesasBusquedaItem, request);
-		LOGGER.info("Termina el método borrarRemesas");
+		LOGGER.debug("Termina el método borrarRemesas");
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/listadoEstadosRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EstadoRemesaDTO> listadoEstadosRemesa(@RequestBody RemesasBusquedaItem remesasBusquedaItem, HttpServletRequest request) {
-		LOGGER.info("Entra en el método listadoEstadosRemesa");
+		LOGGER.debug("Entra en el método listadoEstadosRemesa");
 		EstadoRemesaDTO response = busquedaRemesas.listadoEstadoRemesa(remesasBusquedaItem, request);
-		LOGGER.info("Termina el método listadoEstadosRemesa");
+		LOGGER.debug("Termina el método listadoEstadosRemesa");
 		return new ResponseEntity<EstadoRemesaDTO>(response, HttpStatus.OK);
 	}
 	
@@ -88,41 +88,41 @@ public class RemesasController {
 	
 	@RequestMapping(value = "/getEJGRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EJGRemesaDTO> getEJGRemesa(@RequestBody RemesasItem remesasItem, HttpServletRequest request) {
-		LOGGER.info("Entra en el método buscarRemesas");
+		LOGGER.debug("Entra en el método buscarRemesas");
 		EJGRemesaDTO response = busquedaRemesas.getEJGRemesa(remesasItem, request);
-		LOGGER.info("Termina el método buscarRemesas");
+		LOGGER.debug("Termina el método buscarRemesas");
 		return new ResponseEntity<EJGRemesaDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/borrarExpedientesRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DeleteResponseDTO> borrarExpedientesRemesa(@RequestBody List<EJGRemesaItem> remesasBusquedaItem, HttpServletRequest request) {
-		LOGGER.info("Entra en el método borrarExpedientesRemesa");
+		LOGGER.debug("Entra en el método borrarExpedientesRemesa");
 		DeleteResponseDTO response = busquedaRemesas.borrarExpedientesRemesa(remesasBusquedaItem, request);
-		LOGGER.info("Termina el método borrarExpedientesRemesa");
+		LOGGER.debug("Termina el método borrarExpedientesRemesa");
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/getAcciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<CheckAccionesRemesasDTO> getAcciones(@RequestBody RemesasItem remesasItem, HttpServletRequest request) {
-		LOGGER.info("Entra en el método checkAcciones");
+		LOGGER.debug("Entra en el método checkAcciones");
 		CheckAccionesRemesasDTO response = busquedaRemesas.getAcciones(remesasItem, request);
-		LOGGER.info("Termina el método checkAcciones");
+		LOGGER.debug("Termina el método checkAcciones");
 		return new ResponseEntity<CheckAccionesRemesasDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/ejecutaOperacionRemesa", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> ejecutaOperacionRemesa(@RequestBody RemesaAccionItem remesaAccionItem, HttpServletRequest request) {
-		LOGGER.info("Entra en el método ejecutaOperacionRemesa");
+		LOGGER.debug("Entra en el método ejecutaOperacionRemesa");
 		InsertResponseDTO response = busquedaRemesas.ejecutaOperacionRemesa(remesaAccionItem, request);
-		LOGGER.info("Termina el método ejecutaOperacionRemesa");
+		LOGGER.debug("Termina el método ejecutaOperacionRemesa");
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/descargarLogErrores", method = RequestMethod.POST, produces = "application/vnd.ms-excel")
 	ResponseEntity<InputStreamResource> descargarLogErrores(@RequestBody RemesaAccionItem remesaAccionItem, HttpServletRequest request) {
-		LOGGER.info("Entra en el método descargarLogErrores");
+		LOGGER.debug("Entra en el método descargarLogErrores");
 		InputStreamResource response = busquedaRemesas.descargarLogErrores(remesaAccionItem, request);
-		LOGGER.info("Termina el método descargarLogErrores");
+		LOGGER.debug("Termina el método descargarLogErrores");
 		HttpHeaders header = new HttpHeaders();
 		header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ErrorRemesa" + remesaAccionItem.getIdRemesa()+ ".xls");
 		header.setAccessControlExposeHeaders(cabecera);

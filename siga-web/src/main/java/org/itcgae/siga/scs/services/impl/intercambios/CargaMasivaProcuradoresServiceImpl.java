@@ -5,14 +5,19 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -36,6 +42,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.DTOs.scs.CargaMasivaDatosITItem;
 import org.itcgae.siga.DTOs.scs.CargaMasivaDatosPDItem;
 import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorBusquedaItem;
 import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorDTO;
@@ -43,20 +50,37 @@ import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorItem;
 import org.itcgae.siga.DTOs.scs.InscripcionesItem;
 import org.itcgae.siga.DTOs.scs.RemesasResultadoItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
+import org.itcgae.siga.cen.services.IFicherosService;
+import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCargamasiva;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenHistorico;
+import org.itcgae.siga.db.entities.GenFichero;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosKey;
 import org.itcgae.siga.db.entities.GenRecursosExample;
+import org.itcgae.siga.db.entities.ScsDatosprocuradores;
+import org.itcgae.siga.db.entities.ScsDesigna;
+import org.itcgae.siga.db.entities.ScsDesignaExample;
+import org.itcgae.siga.db.entities.ScsDesignaKey;
+import org.itcgae.siga.db.entities.ScsDesignaprocurador;
+import org.itcgae.siga.db.entities.ScsDesignaprocuradorExample;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgExample;
+import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
+import org.itcgae.siga.db.entities.ScsEjgdesigna;
+import org.itcgae.siga.db.entities.ScsEjgdesignaExample;
+import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.entities.ScsInscripcionguardia;
@@ -65,12 +89,27 @@ import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
 import org.itcgae.siga.db.entities.ScsInscripcionturno;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoKey;
+import org.itcgae.siga.db.entities.ScsProcurador;
+import org.itcgae.siga.db.entities.ScsProcuradorKey;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
+import org.itcgae.siga.db.mappers.ScsDatosprocuradoresMapper;
+import org.itcgae.siga.db.mappers.ScsDesignaMapper;
+import org.itcgae.siga.db.mappers.ScsDesignaprocuradorMapper;
+import org.itcgae.siga.db.mappers.ScsProcuradorMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenCargaMasivaExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
+import org.itcgae.siga.db.mappers.ScsEjgMapper;
+import org.itcgae.siga.db.mappers.ScsEjgdesignaMapper;
+import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsIntercambiosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.impl.ejg.BusquedaRemesasServiceImpl;
+import org.itcgae.siga.scs.services.impl.oficio.GestionCargasMasivasOficioServiceImpl;
 import org.itcgae.siga.scs.services.intercambios.ICargaMasivaProcuradores;
+import org.itcgae.siga.scs.services.oficio.IGestionCargasMasivasOficio;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -79,13 +118,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcuradores {
 
-	private Logger LOGGER = Logger.getLogger(BusquedaRemesasServiceImpl.class);
+	private Logger LOGGER = Logger.getLogger(CargaMasivaProcuradoresServiceImpl.class);
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -95,7 +135,37 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
-
+	
+	@Autowired
+	private ScsProcuradorMapper scsProcuradorMapper;
+	
+	@Autowired
+	private ScsDesignaMapper scsDesignaMapper;
+	
+	@Autowired
+	private ScsEjgMapper scsEjgMapper;
+	
+	@Autowired
+	private ScsEstadoejgMapper scsEstadoEjgMapper;
+	
+	@Autowired
+	private ScsEjgdesignaMapper scsEjgdesignaMapper;
+	
+	@Autowired
+	private ScsDesignaprocuradorMapper scsDesignaprocuradorMapper;
+	
+	@Autowired
+	private CenCargaMasivaExtendsMapper cenCargaMasivaExtendsMapper;
+	
+	@Autowired
+	private ScsDatosprocuradoresMapper scsDatosprocuradoresMapper;
+	
+	@Autowired
+	private GenRecursosMapper genRecursosMapper;
+	
+	@Autowired
+	private CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
+	
 	@Override
 	public InputStreamResource descargarModelo(HttpServletRequest request)
 			throws IOException, EncryptedDocumentException, InvalidFormatException {
@@ -106,9 +176,9 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 	}
 
 	private ByteArrayInputStream crearExcel() {
-		List<String> cabeceraExcel = Arrays.asList("CODIGODESIGNAABOGADO", "NUMEJG", "NUMCOLPROCURADOR",
-				"NUMDESIGNAPROCURADOR", "FECHADESIGPROCURADOR", "OBSERVACIONES");
-		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
+		List<String> cabeceraExcel = Arrays.asList(SigaConstants.PD_CODIGODESIGNAABOGADO, SigaConstants.PD_NUMEJG, SigaConstants.PD_NUMCOLPROCURADOR,
+				SigaConstants.PD_NUMDESIGNAPROCURADOR, SigaConstants.PD_FECHADESIGPROCURADOR, SigaConstants.PD_OBSERVACIONES);
+		try (Workbook workbook = new HSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
 			Sheet sheet = workbook.createSheet("Modelo Carga Masiva Procuradores");
 
 			// Header
@@ -156,21 +226,21 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"listado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"listado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"listado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"listado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
-			LOGGER.info(
+			LOGGER.debug(
 					"listado() / ScsRemesasExtendsMapper.buscarRemesas() -> Entrada a ScsIntercambiosExtendsMapper para obtener las Cargas Maivas de Procuradores");
 
 			List<CargaMasivaProcuradorItem> cargaMasivaProcurador = scsIntercambiosExtendsMapper
 					.listadoCargaMasivaProcuradores(cargaMasivaItem, idInstitucion);
 
-			LOGGER.info(
+			LOGGER.debug(
 					"listado() / ScsRemesasExtendsMapper.buscarRemesas() -> Salida a ScsRemesasExtendsMapper para obtener las Cargas Maivas de Procuradores");
 
 			if (cargaMasivaProcurador != null) {
@@ -178,709 +248,695 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 			}
 
 		}
-		LOGGER.info("getLabel() -> Salida del servicio para obtener las Cargas Maivas de Procuradores");
+		LOGGER.debug("getLabel() -> Salida del servicio para obtener las Cargas Maivas de Procuradores");
 		return cargaMasivaProcuradorDTO;
 	}
 
 	@Override
-	public DeleteResponseDTO uploadFilePD(MultipartHttpServletRequest request) {
-//		// TODO Auto-generated method stub
-//		LOGGER.info("uploadFilePD() -> Entrada al servicio para subir un archivo");
-//		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-//		Error error = new Error();
-//		String errores = "";
-//		int registrosErroneos = 0;
-//		Vector<Hashtable<String, Object>> datosLog = new Vector<Hashtable<String, Object>>();
-//
-//		// Coger archivo del request
-//		LOGGER.debug("uploadFilePD() -> Coger archivo del request");
-//		Iterator<String> itr = request.getFileNames();
-//		MultipartFile file = request.getFile(itr.next());
-//		String nombreFichero = file.getOriginalFilename();
-//
-//		// Extraer la información del excel
-//		LOGGER.debug("uploadFilePD() -> Extraer los datos del archivo");
-//		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
-//
-//		CenCargamasiva cenCargamasivacv = new CenCargamasiva();
-//
-//		// Conseguimos información del usuario logeado
-//		String token = request.getHeader("Authorization");
-//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-//		if (null != idInstitucion) {
-//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-//			LOGGER.info(
-//					"uploadFilePD() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-//			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-//			LOGGER.info(
-//					"uploadFilePD() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//			if (null != usuarios && usuarios.size() > 0) {
-//
-//				AdmUsuarios usuario = usuarios.get(0);
-//
-//				List<CargaMasivaDatosPDItem> cargaMasivaDatosPDItems = parseExcelFilePD(datos, usuario);
-//
-//				for (CargaMasivaDatosPDItem cargaMasivaDatosPDItem : cargaMasivaDatosPDItems) {
-//
-//					int result = -1;
-//
-//					// Si no se ha detectado errores leyendo el excel introducido
-//					if (cargaMasivaDatosPDItem.getErrores() == null) {
-//						int z = 1;						
-//
-//						TurnosItem t = new TurnosItem();
-//						t.setIdturno(cargaMasivaDatosPDItem.getIdTurno());
-//						List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t,	idInstitucion.toString(), usuario.getIdlenguaje());
-//
-//						//Se comprueba si el turno tiene turnos o no
-//						if (!listGu.isEmpty()) {
-//							
-//							//Se compruaba si hay inscripciones guardias ya insertadas con los valores introducidos
-//							ScsInscripcionguardia guardia = new ScsInscripcionguardia();
-//
-//							guardia.setFechasuscripcion(cargaMasivaDatosPDItem.getFechaEfectiva());
-//							guardia.setFechavalidacion(cargaMasivaDatosPDItem.getFechaEfectiva());
-//							guardia.setIdturno(Integer.parseInt(cargaMasivaDatosPDItem.getIdTurno()));
-//							guardia.setIdpersona(Long.parseLong(cargaMasivaDatosPDItem.getIdPersona()));
-//							guardia.setIdinstitucion(idInstitucion);
-//							guardia.setFechamodificacion(new Date());
-//							guardia.setUsumodificacion(usuario.getIdusuario());
-//
-//							// Se comprueba si se ha introducido una guardia especifica. Si no es asi, se
-//							// realiza con todos las guardias del turno.
-//							if (cargaMasivaDatosPDItem.getIdGuardia() == null
-//									|| cargaMasivaDatosPDItem.getIdGuardia().equals("")) {
-//								int i = 0;
-//								while (i < listGu.size() && result != 0) {
-//									GuardiasItem gu = listGu.get(i);
-//									guardia.setIdguardia(Integer.parseInt(gu.getIdGuardia()));
-//
-//									result = scsInscripcionguardiaMapper.insert(guardia);
-//									i++;
-//								}
-//								if (result == 0) {
-//									errores += "Error insertando la peticion de la linea " + z + ". <br/>";
-//									error.setDescription(errores);
-//									deleteResponseDTO.setError(error);
-//
-//									throw new Exception("Error insertando la peticion de la linea " + z);
-//								}
-//							} else {
-//
-//								guardia.setIdguardia(Integer.parseInt(cargaMasivaDatosPDItem.getIdGuardia()));
-//
-//								result = scsInscripcionguardiaMapper.insert(guardia);
-//
-//								if (result == 0) {
-//									errores += "Error insertando la peticion de la linea " + z + ". <br/>";
-//									error.setDescription(errores);
-//									deleteResponseDTO.setError(error);
-//
-//									registrosErroneos++;
-//
-////									throw new Exception("Error insertando la peticion de la linea "+z);
-//
-//								}
-//							}
-//
-//						}
-//
-//						// Se busca si ya existe una incripcion a dicho turno para esa persona.
-//						ScsInscripcionturnoExample exampleInscripcion = new ScsInscripcionturnoExample();
-//
-//						exampleInscripcion.setOrderByClause("FECHASOLICITUD DESC");
-//						exampleInscripcion.createCriteria()
-//								.andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosPDItem.getIdTurno()))
-//								.andIdinstitucionEqualTo(idInstitucion)
-//								.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosPDItem.getIdPersona()));
-//
-//						List<ScsInscripcionturno> inscripcionesTurno = scsInscripcionturnoMapper.selectByExample(exampleInscripcion);
-//
-//						if (!inscripcionesTurno.isEmpty()) {
-//
-//							ScsInscripcionturno inscripcionturno = inscripcionesTurno.get(0);
-//
-//							inscripcionturno.setFechavalidacion(cargaMasivaDatosPDItem.getFechaEfectiva());
-//							inscripcionturno.setFechabaja(null);
-//							inscripcionturno.setFechasolicitudbaja(null);
-//							inscripcionturno.setFechamodificacion(new Date());
-//							inscripcionturno.setUsumodificacion(usuario.getIdusuario());
-//
-//							scsInscripcionturnoMapper.updateByPrimaryKey(inscripcionturno);
-//						} else {
-//
-//							ScsInscripcionturno inscripcionturno = new ScsInscripcionturno();
-//
-//							inscripcionturno.setFechasolicitud(cargaMasivaDatosPDItem.getFechaEfectiva());
-//							inscripcionturno.setFechavalidacion(cargaMasivaDatosPDItem.getFechaEfectiva());
-//							inscripcionturno.setFechabaja(null);
-//							inscripcionturno.setFechasolicitudbaja(null);
-//							inscripcionturno.setIdturno(Integer.parseInt(cargaMasivaDatosPDItem.getIdTurno()));
-//							inscripcionturno.setIdpersona(Long.parseLong(cargaMasivaDatosPDItem.getIdPersona()));
-//							inscripcionturno.setIdinstitucion(idInstitucion);
-//							inscripcionturno.setFechamodificacion(new Date());
-//							inscripcionturno.setUsumodificacion(usuario.getIdusuario());
-//
-//							scsInscripcionturnoMapper.insert(inscripcionturno);
-//						}
-//
-//						// Se introduce el documento en el hisotrico tanto para bajas temporales como
-//						// para inscripciones.
-//						insertaCenHistoricoIT(cargaMasivaDatosPDItem, usuario);
-//
-//					} else {
-//						errores += cargaMasivaDatosPDItem.getErrores();
-//						error.setDescription(errores);
-//						deleteResponseDTO.setError(error);
-//
-//						registrosErroneos++;
-//					}
-//
-//					Hashtable<String, Object> e = new Hashtable<String, Object>();
-//					e = convertItemtoHashIT(cargaMasivaDatosPDItem);
-//					// Guardar log
-//					datosLog.add(e);
-//				}
-//
-//				if (cargaMasivaDatosPDItems.isEmpty()) {
-//					error.setMessage("No existen registros en el fichero.");
-//					deleteResponseDTO.setStatus(SigaConstants.OK);
-//				} else {
-//					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGIT, datosLog);
-//
-//					cenCargamasivacv.setTipocarga("IT");
-//					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
-//					cenCargamasivacv.setNombrefichero(nombreFichero);
-//					cenCargamasivacv.setNumregistros(cargaMasivaDatosPDItems.size());
-//					cenCargamasivacv.setNumregistroserroneos(registrosErroneos);
-//					cenCargamasivacv.setFechamodificacion(new Date());
-//					cenCargamasivacv.setFechacarga(new Date());
-//					cenCargamasivacv.setUsumodificacion(usuario.getIdusuario());
-//
-//					Long idFile = uploadFileLog(file.getBytes(), cenCargamasivacv, false);
-//					Long idLogFile = uploadFileLog(bytesLog, cenCargamasivacv, true);
-//
-//					cenCargamasivacv.setIdfichero(idFile);
-//					cenCargamasivacv.setIdficherolog(idLogFile);
-//
-//					int result = cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
-//
-//					if (result == 0) {
-//						throw new Exception("Error subiendo el fichero al repositorio");
-//					}
-//
-//					LOGGER.info("uploadFilePD() -> Salida al servicio para subir un archivo");
-//					deleteResponseDTO.setStatus(SigaConstants.OK);
-//					error.setDescription(errores);
-//					int correctos = cenCargamasivacv.getNumregistros() - registrosErroneos;
-//					error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
-//							+ "<br/> Registros Erroneos: " + cenCargamasivacv.getNumregistroserroneos());
-//					error.setCode(SigaConstants.CODE_200);
-//				}
-//			}
-//		}
-//
-//		deleteResponseDTO.setError(error);
-//
-//		return deleteResponseDTO;
-		return null;
+	@Transactional
+	public DeleteResponseDTO cargarFichero(MultipartHttpServletRequest request) throws Exception {
+		// TODO Auto-generated method stub
+		LOGGER.debug("cargarFichero() -> Entrada al servicio para subir un archivo");
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		Error error = new Error();
+		String errores = "";
+		int registrosErroneos = 0;
+		Vector<Hashtable<String, Object>> datosLog = new Vector<Hashtable<String, Object>>();
+		Vector<Hashtable<String, Object>> datos = new Vector<Hashtable<String, Object>>();
+
+		// Coger archivo del request
+		LOGGER.debug("cargarFichero() -> Coger archivo del request");
+		Iterator<String> itr = request.getFileNames();
+		MultipartFile file = request.getFile(itr.next());
+		String nombreFichero = file.getOriginalFilename();
+
+		// Extraer la debugrmación del excel
+		LOGGER.debug("cargarFichero() -> Extraer los datos del archivo");
+		try {
+			datos = ExcelHelper.parseExcelFile(file.getBytes());
+		} catch (BusinessException | IOException e1) {
+			// TODO Auto-generated catch block
+			LOGGER.error(e1.getStackTrace());
+			throw e1;
+		}
+
+		CenCargamasiva cenCargamasivacv = new CenCargamasiva();
+		ScsDesignaprocurador scsDesignaprocurador = new ScsDesignaprocurador();
+
+		// Conseguimos debugrmación del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.debug(
+					"cargarFichero() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.debug(
+					"cargarFichero() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				LOGGER.debug("cargarFichero() -> Extraer los datos del archivo y los convertimos en clases");
+				List<CargaMasivaDatosPDItem> cargaMasivaDatosPDItems = parseExcelFilePD(datos, usuario);
+
+				LOGGER.debug("cargarFichero() / Se obtienen los ficheros cargados en una lista de clases");
+				
+				if(cargaMasivaDatosPDItems.size() != 0 && !cargaMasivaDatosPDItems.isEmpty()) {
+					
+					for (CargaMasivaDatosPDItem cargaMasivaDatosPDItem : cargaMasivaDatosPDItems) {
+
+						LOGGER.debug("cargarFichero() / Se van leyendo los ficheros cargados en la lista");
+						
+						LOGGER.debug("cargarFichero() / Si no se ha detectado errores leyendo el excel introducido");
+						if (cargaMasivaDatosPDItem.getErrores() == null) {
+							
+							LOGGER.debug("cargarFichero() / Insertamos linea en scs_procuradorDesigna, si no existe la designacion,"
+									+ " si no continuamos para asignar los procuradores a los EJG");
+							if(!cargaMasivaDatosPDItem.isExisteDesigna()){
+								scsDesignaprocurador = new ScsDesignaprocurador();
+								scsDesignaprocurador.setIdinstitucion(cargaMasivaDatosPDItem.getIdInstitucion());
+								scsDesignaprocurador.setIdturno(cargaMasivaDatosPDItem.getDesigaAbogadoIdTurno());
+								scsDesignaprocurador.setAnio(cargaMasivaDatosPDItem.getDesigaAbogadoAnio());
+								scsDesignaprocurador.setNumero(cargaMasivaDatosPDItem.getDesigaAbogadoNumero());
+
+								scsDesignaprocurador.setIdprocurador(cargaMasivaDatosPDItem.getIdPersona());
+								scsDesignaprocurador.setIdinstitucionProc(cargaMasivaDatosPDItem.getIdInstitucion());
+								scsDesignaprocurador.setNumerodesignacion(String.valueOf(cargaMasivaDatosPDItem.getNumDesignaProcurador()));
+								scsDesignaprocurador.setFechadesigna(cargaMasivaDatosPDItem.getFechaDesignaProcurador());
+								scsDesignaprocurador.setObservaciones(cargaMasivaDatosPDItem.getObservaciones());
+								scsDesignaprocurador.setFechamodificacion(new Date());
+								scsDesignaprocurador.setUsumodificacion(usuario.getUsumodificacion());
+
+								scsDesignaprocuradorMapper.insert(scsDesignaprocurador);
+							}
+
+							LOGGER.debug("cargarFichero() / Insertamos el procurador en el ejg ");
+							if(cargaMasivaDatosPDItem.getNumEJG()!=null){
+								ScsEjgWithBLOBs ejg = new ScsEjgWithBLOBs();
+								ejg.setIdinstitucion(cargaMasivaDatosPDItem.getIdInstitucion());
+								ejg.setIdtipoejg((short) cargaMasivaDatosPDItem.getEjgIdTipo());
+								ejg.setAnio((short) cargaMasivaDatosPDItem.getEjgAnio());
+								ejg.setNumero(cargaMasivaDatosPDItem.getEjgNumero());
+
+								ejg.setIdprocurador(cargaMasivaDatosPDItem.getIdPersona());
+								ejg.setIdinstitucionProc(cargaMasivaDatosPDItem.getIdInstitucion());
+								ejg.setNumerodesignaproc(String.valueOf(cargaMasivaDatosPDItem.getNumDesignaProcurador()));
+								ejg.setFechaDesProc(cargaMasivaDatosPDItem.getFechaDesignaProcurador());
+
+
+								scsEjgMapper.updateByPrimaryKeySelective(ejg);
+								
+								ScsEstadoejg aux = scsIntercambiosExtendsMapper.getMaxIdEstadoPorEJG(ejg.getAnio().toString(), idInstitucion, ejg.getNumero().toString(), ejg.getIdtipoejg().toString());
+
+								ScsEstadoejg scsEstadoejg = new ScsEstadoejg();
+								scsEstadoejg.setIdinstitucion(ejg.getIdinstitucion());
+								scsEstadoejg.setIdtipoejg(ejg.getIdtipoejg());
+								scsEstadoejg.setAnio(ejg.getAnio());
+								scsEstadoejg.setNumero(ejg.getNumero());
+								scsEstadoejg.setAutomatico("1");
+								scsEstadoejg.setIdestadoejg(new Short("9")); //REMITIDO A COMISIÓN
+								scsEstadoejg.setFechainicio(new Date());
+								scsEstadoejg.setFechamodificacion(new Date());
+								scsEstadoejg.setUsumodificacion(usuario.getUsumodificacion());
+								scsEstadoejg.setIdestadoporejg(aux.getIdestadoporejg()+1);
+
+								scsEstadoEjgMapper.insert(scsEstadoejg);
+							}
+							
+							LOGGER.debug("cargarFichero() / Insertamos linea en scs_Datosprocuradores");
+							ScsDatosprocuradores cenDatoscv = new ScsDatosprocuradores();
+							cenDatoscv.setIdinstitucion(cargaMasivaDatosPDItem.getIdInstitucion());
+							cenDatoscv.setCodigodesignaabogado(cargaMasivaDatosPDItem.getDesignaAbogadoCodigo());
+							cenDatoscv.setFechadesigprocurador(cargaMasivaDatosPDItem.getFechaDesignaProcurador());
+							cenDatoscv.setNumcolprocurador(String.valueOf(cargaMasivaDatosPDItem.getNumColProcurador()));
+							cenDatoscv.setNumdesignaprocurador(String.valueOf(cargaMasivaDatosPDItem.getNumDesignaProcurador()));
+							cenDatoscv.setNumejg(cargaMasivaDatosPDItem.getNumEJG());
+							cenDatoscv.setObservaciones(cargaMasivaDatosPDItem.getObservaciones());
+							cenDatoscv.setFechamodificacion(new Date());
+							cenDatoscv.setUsumodificacion(SigaConstants.USUMODIFICACION_0);
+							scsDatosprocuradoresMapper.insert(cenDatoscv);
+							
+							// Se introduce el documento en el historico
+							LOGGER.debug("cargarFichero() -> Se introduce el documento en el historico");
+							insertaCenHistoricoIT(cargaMasivaDatosPDItem, usuario);
+
+						} else {
+							errores += cargaMasivaDatosPDItem.getErrores();
+							error.setDescription(errores);
+							deleteResponseDTO.setError(error);
+
+							registrosErroneos++;
+						}
+
+						LOGGER.debug("cargarFichero() / Se llama al método convertItemtoHastIT()");
+						Hashtable<String, Object> e = new Hashtable<String, Object>();
+						e = convertItemtoHashIT(cargaMasivaDatosPDItem);
+						// Guardar log
+						datosLog.add(e);
+					}
+					
+					LOGGER.debug("cargarFichero() / Subimos el fichero");
+					
+					int result = 0;
+					try {
+						byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSMODEL_PD, datosLog);
+
+						cenCargamasivacv.setTipocarga("PD");
+						cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
+						cenCargamasivacv.setNombrefichero(nombreFichero);
+						cenCargamasivacv.setNumregistros(cargaMasivaDatosPDItems.size());
+						cenCargamasivacv.setNumregistroserroneos(registrosErroneos);
+						cenCargamasivacv.setFechamodificacion(new Date());
+						cenCargamasivacv.setFechacarga(new Date());
+						cenCargamasivacv.setUsumodificacion(usuario.getIdusuario());
+
+						Long idFile = uploadFileLog(file.getBytes(), cenCargamasivacv, false);
+						Long idLogFile = uploadFileLog(bytesLog, cenCargamasivacv, true);
+
+						cenCargamasivacv.setIdfichero(idFile);
+						cenCargamasivacv.setIdficherolog(idLogFile);
+
+						result = cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
+					}catch(IOException e) {
+						LOGGER.error(e.getStackTrace());
+						throw e;
+					}
+					
+					if (result == 0) {
+						throw new Exception("Error subiendo el fichero al repositorio");
+					}
+
+					deleteResponseDTO.setStatus(SigaConstants.OK);
+					error.setDescription(errores);
+					int correctos = cenCargamasivacv.getNumregistros() - registrosErroneos;
+					error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
+							+ "<br/> Registros Erroneos: " + cenCargamasivacv.getNumregistroserroneos());
+					error.setCode(SigaConstants.CODE_200);
+					
+				}else {
+					error.setMessage("No existen registros en el fichero.");
+					deleteResponseDTO.setStatus(SigaConstants.OK);
+				}
+			}
+		}
+
+		deleteResponseDTO.setError(error);
+
+		LOGGER.debug("cargarFichero() -> Salida del servicio para cargarFichero");
+		
+		return deleteResponseDTO;
+	}
+	
+	@Transactional
+	private void insertaCenHistoricoIT(CargaMasivaDatosPDItem cargaMasivaDatosPDItem, AdmUsuarios usuario) 
+			throws BusinessException{
+		
+		LOGGER.debug("Insertando en CEN_HISTORICO para el colegio " + usuario.getIdinstitucion() + ", idPersona "
+				+ cargaMasivaDatosPDItem.getIdPersona());
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+		CenHistorico cenHistorico = new CenHistorico();
+		cenHistorico.setIdinstitucion(usuario.getIdinstitucion());
+		cenHistorico.setIdpersona(cargaMasivaDatosPDItem.getIdPersona());
+		cenHistorico.setFechaentrada(Calendar.getInstance().getTime());
+		cenHistorico.setFechaefectiva(Calendar.getInstance().getTime());
+		cenHistorico.setMotivo(null);
+		cenHistorico.setIdtipocambio(SigaConstants.HISTORICOCAMBIOCV.DATOSCV.getId());
+		cenHistorico.setFechamodificacion(Calendar.getInstance().getTime());
+		cenHistorico.setUsumodificacion(usuario.getIdusuario());
+
+		NewIdDTO newIdDTO = cenHistoricoExtendsMapper.selectMaxIDHistoricoByPerson(
+				String.valueOf(cargaMasivaDatosPDItem.getIdPersona()), String.valueOf(usuario.getIdinstitucion()));
+		if (newIdDTO == null) {
+			cenHistorico.setIdhistorico((short) 1);
+		} else {
+			int newIdCv = Integer.parseInt(newIdDTO.getNewId()) + 1;
+			cenHistorico.setIdhistorico((short) newIdCv);
+		}
+
+		StringBuffer descripcion = new StringBuffer();
+
+		GenRecursosExample genRecursosExample = new GenRecursosExample();
+		genRecursosExample.createCriteria().andIdrecursoEqualTo("historico.literal.registroNuevo")
+				.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+		List<GenRecursos> genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
+
+		descripcion = descripcion.append(genRecursos.get(0).getDescripcion());
+
+		descripcion.append("\n");
+		descripcion.append("- CodigoDesignaAbogado: ");
+		descripcion.append(cargaMasivaDatosPDItem.getCodigoDesignaAbogado() != null
+				? cargaMasivaDatosPDItem.getCodigoDesignaAbogado()
+				: "");
+
+		descripcion.append("\n");
+		descripcion.append("- NumEJG: ");
+		descripcion.append(cargaMasivaDatosPDItem.getNumEJG() != null ? cargaMasivaDatosPDItem.getNumEJG() : "");
+		
+		descripcion.append("\n");
+		descripcion.append("- NumColProcurador: ");
+		descripcion.append(
+				cargaMasivaDatosPDItem.getNumColProcurador() != null ? cargaMasivaDatosPDItem.getNumColProcurador()
+						: "");
+		
+		descripcion.append("\n");
+		descripcion.append("- NumDesignaProcurador: ");
+		descripcion.append(
+				cargaMasivaDatosPDItem.getNumDesignaProcurador() != null ? cargaMasivaDatosPDItem.getNumDesignaProcurador()
+						: "");
+		
+		descripcion.append("\n");
+		descripcion.append("- FechaDesignaProcurador: ");
+		descripcion.append(
+				cargaMasivaDatosPDItem.getFechaDesignaProcurador() != null ? simpleDateFormat.format(cargaMasivaDatosPDItem.getFechaDesignaProcurador())
+						: "");
+		
+		descripcion.append("\n");
+		descripcion.append("- Observaciones: ");
+		descripcion.append(
+				cargaMasivaDatosPDItem.getObservaciones() != null ? cargaMasivaDatosPDItem.getObservaciones()
+						: "");
+
+		cenHistorico.setDescripcion(descripcion.toString());
+
+		if (cenHistoricoExtendsMapper.insert(cenHistorico) != 1) {
+			throw new BusinessException("No se ha insertado correctamente el registro en cenHistorico para el colegio "
+					+ usuario.getIdinstitucion() + ", idPersona " + cargaMasivaDatosPDItem.getIdPersona()
+					+ " e idTipoCambio " + SigaConstants.HISTORICOCAMBIOCV.DATOSCV.getId());
+		}
+
 	}
 
-//	private void insertaCenHistoricoIT(CargaMasivaDatosPDItem cargaMasivaDatosPDItem, AdmUsuarios usuario) {
-//		// TODO Auto-generated method stub
-//		LOGGER.debug("Insertando en CEN_HISTORICO para el colegio " + usuario.getIdinstitucion() + ", idPersona "
-//				+ cargaMasivaDatosPDItem.getIdPersona());
-//
-//		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-//
-//		CenHistorico cenHistorico = new CenHistorico();
-//		cenHistorico.setIdinstitucion(usuario.getIdinstitucion());
-//		cenHistorico.setIdpersona(Long.parseLong(cargaMasivaDatosPDItem.getIdPersona()));
-//		cenHistorico.setFechaentrada(Calendar.getInstance().getTime());
-//		cenHistorico.setFechaefectiva(Calendar.getInstance().getTime());
-//		cenHistorico.setMotivo(null);
-//		cenHistorico.setIdtipocambio(SigaConstants.HISTORICOCAMBIOCV.DATOSCV.getId());
-//		cenHistorico.setFechamodificacion(Calendar.getInstance().getTime());
-//		cenHistorico.setUsumodificacion(usuario.getIdusuario());
-//
-//		NewIdDTO newIdDTO = cenHistoricoExtendsMapper.selectMaxIDHistoricoByPerson(
-//				String.valueOf(cargaMasivaDatosPDItem.getIdPersona()), String.valueOf(usuario.getIdinstitucion()));
-//		if (newIdDTO == null) {
-//			cenHistorico.setIdhistorico((short) 1);
-//		} else {
-//			int newIdCv = Integer.parseInt(newIdDTO.getNewId()) + 1;
-//			cenHistorico.setIdhistorico((short) newIdCv);
-//		}
-//
-//		StringBuffer descripcion = new StringBuffer();
-//
-//		GenRecursosExample genRecursosExample = new GenRecursosExample();
-//		genRecursosExample.createCriteria().andIdrecursoEqualTo("historico.literal.registroNuevo")
-//				.andIdlenguajeEqualTo(usuario.getIdlenguaje());
-//		List<GenRecursos> genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
-//
-//		descripcion = descripcion.append(genRecursos.get(0).getDescripcion());
-//
-//		descripcion.append("\n");
-//		descripcion.append("- FechaEfectiva: ");
-//		descripcion.append(cargaMasivaDatosPDItem.getFechaEfectiva() != null
-//				? simpleDateFormat.format(cargaMasivaDatosPDItem.getFechaEfectiva())
-//				: "");
-//
-//		descripcion.append("\n");
-//		descripcion.append("- Turno: ");
-//		descripcion.append(cargaMasivaDatosPDItem.getNombreTurno() != null ? cargaMasivaDatosPDItem.getNombreTurno() : "");
-//		
-//		descripcion.append("\n");
-//		descripcion.append("- Idinstitucion: ");
-//		descripcion.append(
-//				cargaMasivaDatosPDItem.getIdInstitucion() != null ? cargaMasivaDatosPDItem.getIdInstitucion()
-//						: "");
-//		
-//		descripcion.append("\n");
-//		descripcion.append("- Guardia: ");
-//		descripcion.append(
-//				cargaMasivaDatosPDItem.getNombreGuardia() != null ? cargaMasivaDatosPDItem.getNombreGuardia()
-//						: "");
-//		
-//		descripcion.append("\n");
-//		descripcion.append("- Tipo: ");
-//		descripcion.append(
-//				cargaMasivaDatosPDItem.getTipo() != null ? cargaMasivaDatosPDItem.getTipo()
-//						: "");
-//
-//		cenHistorico.setDescripcion(descripcion.toString());
-//
-//		if (cenHistoricoMapper.insert(cenHistorico) != 1) {
-//			throw new BusinessException("No se ha insertado correctamente el registro en cenHistorico para el colegio "
-//					+ usuario.getIdinstitucion() + ", idPersona " + cargaMasivaDatosPDItem.getIdPersona()
-//					+ " e idTipoCambio " + SigaConstants.HISTORICOCAMBIOCV.DATOSCV.getId());
-//		}
-//	}
-//
-//	private Hashtable<String, Object> convertItemtoHashIT(CargaMasivaDatosPDItem cargaMasivaDatosPDItem) {
-//		// TODO Auto-generated method stub
-//		Date dateLog = new Date();
-//		DateFormat df2 = new SimpleDateFormat("dd/MM/yyyy");
-//
-//		LOGGER.info(dateLog + ":inicio.CargaMasivaProcuradoresServiceImpl.convertItemtoHashIT");
-//		Hashtable<String, Object> e = new Hashtable<String, Object>();
-//				
-//		if (cargaMasivaDatosPDItem.getnColegiado() != null) {
-//			e.put(SigaConstants.IT_NCOLEGIADO, cargaMasivaDatosPDItem.getnColegiado());
-//		}
-//		if (cargaMasivaDatosPDItem.getIdTurno() != null) {
-//			e.put(SigaConstants.IT_TURNO, cargaMasivaDatosPDItem.getIdTurno());
-//		}
-//		if (cargaMasivaDatosPDItem.getIdGuardia() != null) {
-//			e.put(SigaConstants.IT_GUARDIA, cargaMasivaDatosPDItem.getIdGuardia());
-//		}
-//		if (cargaMasivaDatosPDItem.getTipo() != null) {
-//			e.put(SigaConstants.IT_TIPO, cargaMasivaDatosPDItem.getTipo());
-//		}
-//		if (cargaMasivaDatosPDItem.getFechaEfectiva() != null) {
-//			String fechaEfectiva = df2.format(cargaMasivaDatosPDItem.getFechaEfectiva());
-//			e.put(SigaConstants.IT_FECHAEFECTIVA, fechaEfectiva);
-//		}
-//
-//		if (cargaMasivaDatosPDItem.getErrores() != null) {
-//			e.put(SigaConstants.ERRORES, cargaMasivaDatosPDItem.getErrores());
-//		}
-//		
-//		LOGGER.info(dateLog + ":fin.CargaMasivaProcuradoresServiceImpl.convertItemtoHashIT");
-//		return e;
-//	}
-//
-//	private Long uploadFileLog(byte[] bytes, CenCargamasiva cenCargamasiva, boolean isLog) {
-//		// TODO Auto-generated method stub
-//		Date dateLog = new Date();
-//		LOGGER.info(dateLog + ":inicio.CargaMasivaProcuradoresServiceImpl.uploadFileLog");
-//		FicheroVo ficheroVo = new FicheroVo();
-//
-//		String directorioFichero = getDirectorioFichero(cenCargamasiva.getIdinstitucion());
-//		ficheroVo.setDirectorio(directorioFichero);
-//		String nombreFicheroString = cenCargamasiva.getNombrefichero();
-//		ficheroVo.setNombre(nombreFicheroString); 
-//		ficheroVo.setDescripcion("Carga Masiva " + ficheroVo.getNombre());
-//
-//		ficheroVo.setIdinstitucion(cenCargamasiva.getIdinstitucion());
-//		ficheroVo.setFichero(bytes);
-//		ficheroVo.setExtension("xls");
-//
-//		ficheroVo.setUsumodificacion(Integer.valueOf(cenCargamasiva.getUsumodificacion()));
-//		ficheroVo.setFechamodificacion(new Date());
-//		ficherosServiceImpl.insert(ficheroVo);
-//
-//		if (isLog) {
-//			ficheroVo.setDescripcion("log_" + ficheroVo.getDescripcion());
-//			ficheroVo.setNombre("log_" + ficheroVo.getNombre());
-//		}
-//
-//		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
-//		LOGGER.info(dateLog + ":fin.CargaMasivaProcuradoresServiceImpl.uploadFileLog");
-//		return ficheroVo.getIdfichero();;
-//	}
-//	
-//	private String getDirectorioFichero(Short idInstitucion) {
-//		Date dateLog = new Date();
-//		LOGGER.info(dateLog + ":inicio.CargaMasivaProcuradoresServiceImpl.getDirectorioFichero");
-//
-//		// Extraer propiedad
-//		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
-//		genPropertiesExampleP.createCriteria().andParametroEqualTo("cen.cargaExcel.ficheros.path");
-//		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
-//		String pathCV = genPropertiesPath.get(0).getValor(); 
-//		
-//		StringBuffer directorioFichero = new StringBuffer(pathCV);
-//		directorioFichero.append(idInstitucion);
-//		directorioFichero.append(File.separator);
-//
-//		// Extraer propiedad
-//		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
-//		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaCV");
-//		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
-//		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
-//
-//		LOGGER.info(dateLog + ":fin.CargaMasivaProcuradoresServiceImpl.getDirectorioFichero");
-//		return directorioFichero.toString();
-//	}
+	private Hashtable<String, Object> convertItemtoHashIT(CargaMasivaDatosPDItem cargaMasivaDatosPDItem) {
+		// TODO Auto-generated method stub
+		Date dateLog = new Date();
+		DateFormat df2 = new SimpleDateFormat("dd/MM/yyyy");
 
-//	private List<CargaMasivaDatosPDItem> parseExcelFilePD(Vector<Hashtable<String, Object>> datos,
-//			AdmUsuarios usuario) {
-//		// TODO Auto-generated method stub
-//		Date dateLog = new Date();
-//		LOGGER.info(dateLog + ":inicio.CargaMasivaProcuradoresServiceImpl.parseExcelFilePD");
-//
-//		List<CargaMasivaDatosPDItem> masivaDatosPDVos = new ArrayList<CargaMasivaDatosPDItem>();
-//		CargaMasivaDatosPDItem cargaMasivaDatosPDItem = null;
-//
-////		Hashtable<String, SubtiposCVItem> tipoCvHashtable = new Hashtable<String, SubtiposCVItem>();
-////		Hashtable<String, SubtiposCVItem> subtipo1CvHashtable = new Hashtable<String, SubtiposCVItem>();
-////		Hashtable<String, SubtiposCVItem> subtipo2CvHashtable = new Hashtable<String, SubtiposCVItem>();
-////		Hashtable<Long, String> personaHashtable = new Hashtable<Long, String>();
-//
-////		SubtiposCVItem tipoCVVo = null;
-////		SubtiposCVItem subtipoCV1Vo = null;
-////		SubtiposCVItem subtipoCV2Vo = null;
-//
-//
-//		Short idInstitucion = usuario.getIdinstitucion();
-//		String idLenguaje = usuario.getIdlenguaje();
-//
-//		GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
-//		genRecursosCatalogosKey.setIdlenguaje(idLenguaje);
-//
-//		List<Short> idInstituciones = new ArrayList<Short>();
-//		idInstituciones.add(idInstitucion);
-//
-//		// Comprueba si la institucion que esta logeada es la 2000 si es diferente la
-//		// añade a la lista de instituciones
-//		if (idInstitucion != SigaConstants.IDINSTITUCION_2000) {
-//			idInstituciones.add(SigaConstants.IDINSTITUCION_2000);
-//		}
-//
-//		StringBuffer errorLinea = null;
-//		int numLinea = 1;
-//		for (Hashtable<String, Object> hashtable : datos) {
-//			cargaMasivaDatosPDItem = new CargaMasivaDatosPDItem();
-//
-//			cargaMasivaDatosPDItem.setIdInstitucion(idInstitucion);
-//			errorLinea = new StringBuffer();
-////			SigaConstants.IT_TURNO, "Campo de texto. Obligatorio");
-////			SigaConstants.IT_GUARDIA, "Campo de texto");
-////			SigaConstants.IT_NCOLEGIADO, "Campo numérico. Obligatorio");
-//		
-//			// Turno
-//			if (hashtable.get(SigaConstants.IT_TURNO) != null
-//					&& !hashtable.get(SigaConstants.IT_TURNO).toString().equals("")) {
-//				cargaMasivaDatosPDItem
-//						.setNombreTurno((String) hashtable.get(SigaConstants.IT_TURNO));
-//				try {
-//					TurnosItem turnosItem = new TurnosItem();
-//					turnosItem.setAbreviatura(cargaMasivaDatosPDItem.getNombreTurno());
-//					List<TurnosItem> listaTur = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion);
-//		
-//					cargaMasivaDatosPDItem.setIdTurno(listaTur.get(0).getIdturno().toString());
-//				}
-//				catch (Exception e) {
-//					errorLinea.append("No se ha encontrado un turno con la introducida");
-//					cargaMasivaDatosPDItem.setNombreTurno("Error");
-//				}
-//			}
-//			else{
-//				errorLinea.append("Es obligatorio introducir el turno.");
-//				cargaMasivaDatosPDItem.setNombreTurno("Error");
-//			} 
-//			
-//			// Obtener guardia
-//			if (hashtable.get(SigaConstants.IT_GUARDIA) != null
-//					&& !hashtable.get(SigaConstants.IT_GUARDIA).toString().equals("")) {
-//				cargaMasivaDatosPDItem.setNombreGuardia((String) hashtable.get(SigaConstants.IT_GUARDIA));
-//				try {
-//					ScsGuardiasturnoExample guardiaExample = new ScsGuardiasturnoExample();
-//					guardiaExample.createCriteria().andNombreEqualTo(cargaMasivaDatosPDItem.getNombreGuardia()).
-//						andIdinstitucionEqualTo(idInstitucion);
-//					List<ScsGuardiasturno> listaGuar = scsGuardiasTurnoExtendsMapper.selectByExample(guardiaExample);
-//		
-//					if(listaGuar.get(0).getIdturno().toString().equals(cargaMasivaDatosPDItem.getIdTurno())) {
-//						errorLinea.append("No se ha encontrado una guardia con el nombre introducido en el turno asociado");
-//						cargaMasivaDatosPDItem.setNombreGuardia("Error");
-//					}
-//					else cargaMasivaDatosPDItem.setIdGuardia(listaGuar.get(0).getIdguardia().toString());
-//				}
-//				catch (Exception e) {
-//					errorLinea.append("No se ha encontrado una guardia con el nombre introducido");
-//					cargaMasivaDatosPDItem.setNombreGuardia("Error");
-//				}
-//			}
-//			
-//			// Obtener ncolegiado y extraemos id persona
-//			if (hashtable.get(SigaConstants.IT_NCOLEGIADO) != null
-//					&& !hashtable.get(SigaConstants.IT_NCOLEGIADO).toString().equals("")) {
-//				cargaMasivaDatosPDItem.setnColegiado((String) hashtable.get(SigaConstants.IT_NCOLEGIADO));
-//				
-//				try {
-//					CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
-//					cenColegiadoExample.createCriteria().andNcolegiadoEqualTo(cargaMasivaDatosPDItem.getnColegiado()).andIdinstitucionEqualTo(idInstitucion);
-//					List<CenColegiado> cenColegiado = cenColegiadoMapper.selectByExample(cenColegiadoExample);
-//		
-//					cargaMasivaDatosPDItem.setIdPersona(cenColegiado.get(0).getIdpersona().toString());
-//		
-//				} catch (Exception e) {
-//					errorLinea.append("No se ha encontrado una persona con el número de colegiado introducido en su institucion. ");
-//					cargaMasivaDatosPDItem.setnColegiado("Error");
-//				}
-//			}
-//			else {
-//				errorLinea.append("Es obligatorio introducir número de colegiado.");
-//				cargaMasivaDatosPDItem.setnColegiado("Error");
-//			}
-////			SigaConstants.IT_FECHAEFECTIVA, "Obligatorio");
-////			SigaConstants.IT_TIPO, "puede tener los valores ‘ALTA’ o ‘BAJA’. Obligatorio");
-////			SigaConstants.IT_GRUPO, "Número de grupo para las guardias por grupo");
-////			SigaConstants.IT_ORDEN, "Dentro del grupo para las guardias por grupo. Obligatorio si se rellena el Grupo");
-//	
-//			
-//			// Comprobamos tipo 
-//			if (hashtable.get(SigaConstants.IT_TIPO) != null
-//					&& !hashtable.get(SigaConstants.IT_TIPO).toString().equals("")) {
-//				
-//				if(hashtable.get(SigaConstants.IT_TIPO).toString().equals("ALTA") ||
-//						hashtable.get(SigaConstants.IT_TIPO).toString().equals("BAJA")) {
-//					cargaMasivaDatosPDItem.setTipo((String) hashtable.get(SigaConstants.IT_TIPO));
-//				}
-//				else{
-//					errorLinea.append("El valor de tipo solo puede ser \"ALTA\" o \"BAJA\".");
-//					cargaMasivaDatosPDItem.setTipo("Error");
-//				}
-//				
-//			}
-//			else {
-//				errorLinea.append("Es obligatorio introducir el tipo de petición a realizar.");
-//				cargaMasivaDatosPDItem.setTipo("Error");
-//			}
-//			
-//			//Comprobamos fecha efectiva
-//			if (hashtable.get(SigaConstants.IT_FECHAEFECTIVA) != null
-//					&& !hashtable.get(SigaConstants.IT_FECHAEFECTIVA).toString().equals("")) {
-//				try {
-//					cargaMasivaDatosPDItem.setFechaEfectiva(new SimpleDateFormat("dd-MM-yyyy").parse((String) hashtable.get(SigaConstants.IT_FECHAEFECTIVA)));
-//				} catch (Exception e) {
-//					errorLinea.append("La fecha introducida no tiene un formato valido.");
-//					cargaMasivaDatosPDItem.setFechaEfectiva(null);
-//				}
-//				
-//			}
-//			else {
-//				errorLinea.append("Es obligatorio introducir la fecha efectiva. ");
-//				cargaMasivaDatosPDItem.setFechaEfectiva(null);
-//			}
-//			
-////			El grupo y el orden sólo aplicarán para guardias por grupos, en otro caso, no se tendrán en cuenta.
-////			• Orden no se puede repetir dentro del mismo grupo, tanto los existentes como los del fichero.
-//
-//
-//			//Comporbamos grupo y orden juntos al ser dependientes
-////			if (hashtable.get(SigaConstants.IT_GRUPO) != null
-////					&& !hashtable.get(SigaConstants.IT_GRUPO).toString().equals("")) {
-////
-////				cargaMasivaDatosPDItem.setGrupo((String) hashtable.get(SigaConstants.IT_GRUPO));
-////				//Comprobamos longitud de entrada
-////				if(cargaMasivaDatosPDItem.getGrupo().length()<=5) {
-////					errorLinea.append("En valor en la columna \"GRUPO\" debe tener menos de seis cifras.");
-////					cargaMasivaDatosPDItem.setGrupo("Error");
-////				}
-////				else {
-////					if(cargaMasivaDatosPDItem.getIdGuardia().equals("") || cargaMasivaDatosPDItem.getIdGuardia().equals(null)) {
-////						TurnosItem t = new TurnosItem();
-////						t.setIdturno(cargaMasivaDatosPDItem.getIdTurno());
-////						List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t, idInstitucion.toString(), usuario.getIdlenguaje());
-////						for(GuardiasItem gu : listGu) {
-////						//Comprobamos que todas las guardias de un turno estan en un grupo. Se cambian los valores pero no se añade un error para que no impida su posible insercion
-////							List<cargaMasivaDatosPDItem> group = scsInscripcionguardiaExtendsMapper.searchGrupoGuardia(idInstitucion, gu.getIdGuardia());
-////							if(group.isEmpty()) {
-////								cargaMasivaDatosPDItem.setOrden("Error");
-////								cargaMasivaDatosPDItem.setGrupo("Error");
-////							}
-////						}
-////					}
-////					else {
-////						CheckGrupoOrden(cargaMasivaDatosPDItem, errorLinea, idInstitucion, hashtable, datos);
-////					}
-////				}
-////			}
-//			
-//			//Comprobamos según su tipo (ALTA o BAJA) y unicamente si no tiene otros errrores
-//			if(errorLinea.toString().isEmpty() && hashtable.get(SigaConstants.IT_TIPO).toString().equals("ALTA")) {
-//				TurnosItem t = new TurnosItem();
-//				t.setIdturno(cargaMasivaDatosPDItem.getIdTurno());
-//				List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t, idInstitucion.toString(), usuario.getIdlenguaje());
-//				
-//				//Comprobamos el tipo de guardias asociadas al turno. En caso de ser obligatorias (valor 0), no se realizarian las inscripciones.  2- A elegir; 1-Todas o ninguna;
-//				if(!listGu.isEmpty()) {
-//					if(!listGu.get(0).getObligatoriedad().equals("0")) {
-//					
-//						ScsInscripcionturnoKey key2 = new ScsInscripcionturnoKey();
-//						key2.setIdinstitucion(idInstitucion);
-//						key2.setIdpersona(Long.parseLong(cargaMasivaDatosPDItem.getIdPersona()));
-//						key2.setFechasolicitud(cargaMasivaDatosPDItem.getFechaEfectiva());
-//						key2.setIdturno(Integer.parseInt(cargaMasivaDatosPDItem.getIdTurno()));
-//						
-//						ScsInscripcionturno instur = new ScsInscripcionturno();
-//						
-//						instur = scsInscripcionturnoMapper.selectByPrimaryKey(key2);
-//						
-//						//Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se inscriben las guardias.
-////						if(instur != null) {
-//							
-//							ScsInscripcionguardiaKey key1= new ScsInscripcionguardiaKey();
-//							
-//							key1.setFechasuscripcion(cargaMasivaDatosPDItem.getFechaEfectiva());
-//							key1.setIdturno(Integer.parseInt(cargaMasivaDatosPDItem.getIdTurno()));
-//							key1.setIdpersona(Long.parseLong(cargaMasivaDatosPDItem.getIdPersona()));
-//							key1.setIdinstitucion(idInstitucion);
-//							
-//							//Si la tabla especifica alguna guardia, se comprueba solo una guardia 
-//							if(cargaMasivaDatosPDItem.getIdGuardia()!=null && cargaMasivaDatosPDItem.getIdGuardia()!="") {
-//								
-//								key1.setIdguardia(Integer.parseInt(cargaMasivaDatosPDItem.getIdGuardia()));
-//								
-//								//Se comprueba si la inscripción en la guardia ya existe de alta para la fecha efectiva indicada
-//								if(scsInscripcionguardiaMapper.selectByPrimaryKey(key1)==null) {
-//								
-//									//Se comprueba que la fecha efectiva es mayor o igual a la fecha efectiva de la inscripcion al turno correspondiente .
-//									if(instur != null && cargaMasivaDatosPDItem.getFechaEfectiva().compareTo(instur.getFechavalidacion())<0) errorLinea.append("La fecha efectiva introducida es anterior a la fecha efectiva de la inscripcion al turno asociado.");
-//								}
-//								else errorLinea.append("Ya existe una inscripcion a dicha guardia con las mismas caracteristicas.");
-//							}
-//							//Si no se introduce una guardia en especifico, se comprueban todas las guardias de dicho turno
-//							else {
-//								for(GuardiasItem gu : listGu) {
-//									
-//									key1.setIdguardia(Integer.parseInt(gu.getIdGuardia()));
-//										
-//									//Se comprueba si la inscripción en la guardia ya existe de alta para la fecha efectiva indicada
-//									if(scsInscripcionguardiaMapper.selectByPrimaryKey(key1)!=null) errorLinea.append("Ya existe una inscripcion a la guardia "+gu.getNombre()+" con las mismas caracteristicas.");
-//								}
-//							}
-//							//Se comprueba que la fecha efectiva es mayor o igual a la fecha efectiva del turno correspondiente.
-//							if(instur != null && cargaMasivaDatosPDItem.getFechaEfectiva().compareTo(instur.getFechavalidacion())<0) errorLinea.append("La fecha efectiva introducida es anterior a la fecha efectiva de la inscripcion al turno asociado.");
-//						
-////						}
-////						else errorLinea.append("El colegiado no esta inscrito en el turno indicado.");
-//					}
-//					else errorLinea.append("Las guardias en el turno son obligatorias por lo que no se puede realizar la fila.");
-//				}
-////				else errorLinea.append("No se ha encontrado guardias asociadas al turno indicado.");
-//			}
-//			else if(errorLinea.toString().isEmpty() && hashtable.get(SigaConstants.IT_TIPO).toString().equals("BAJA")) {
-//				
-//				TurnosItem t = new TurnosItem();
-//				t.setIdturno(cargaMasivaDatosPDItem.getIdTurno());
-//				List<GuardiasItem> listGu = scsGuardiasTurnoExtendsMapper.searchGuardias(t, idInstitucion.toString(), usuario.getIdlenguaje());
-//				
-//				//Comprobamos el tipo de guardias asociadas al turno. En caso de ser obligatorias (0) o Todas o ninguna (1), no se realizarian las inscripciones.  2- A elegir; 1-Todas o ninguna;
-//				if(!listGu.isEmpty()) {
-//					if(!listGu.get(0).getObligatoriedad().equals("0")) {
-//						if(!listGu.get(0).getObligatoriedad().equals("1")) {
-//					
-//							
-//							
-//							//Comprobamos si se introdujo una guardia o no.
-//							if(cargaMasivaDatosPDItem.getIdGuardia() == null) {
-//								
-//									ScsInscripcionguardiaExample example1= new ScsInscripcionguardiaExample();
-//									
-//									example1.setOrderByClause("FECHASOLICITUD DESC");
-//									example1.createCriteria().andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosPDItem.getIdTurno()))
-//									.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosPDItem.getIdPersona()))
-//									.andIdinstitucionEqualTo(idInstitucion);
-//									
-//									List<ScsInscripcionguardia> insGur = scsInscripcionguardiaMapper.selectByExample(example1);
-//									
-//									if(listGu.get(0).getIdTurno().toString().equals(cargaMasivaDatosPDItem.getIdTurno())) {
-//										errorLinea.append("No se ha encontrado una guardia con el nombre introducido en el turno asociado");
-//										cargaMasivaDatosPDItem.setNombreGuardia("Error");
-//									}
-//									
-//									//Se comprueba si la inscripción en la guardia no existe
-//									if(insGur.size()!=listGu.size()) errorLinea.append("El colegiado no esta inscrito en todas las guardias del turno.");
-//									//Se comprueba si ya esta de baja
-//									else {
-//										for(ScsInscripcionguardia guardia: insGur) {
-//											if(guardia.getFechabaja() != null)errorLinea.append("El colegiado ya dió de baja la inscripcion en alguna guardia del turno.");
-//										}
-//									}
-//								
-//							}
-//							else {
-//								
-//								ScsInscripcionguardiaExample example1= new ScsInscripcionguardiaExample();
-//								
-//								example1.setOrderByClause("FECHASOLICITUD DESC");
-//								example1.createCriteria().andIdturnoEqualTo(Integer.parseInt(cargaMasivaDatosPDItem.getIdTurno()))
-//								.andIdpersonaEqualTo(Long.parseLong(cargaMasivaDatosPDItem.getIdPersona()))
-//								.andIdinstitucionEqualTo(idInstitucion).andIdguardiaEqualTo(Integer.valueOf(cargaMasivaDatosPDItem.getIdGuardia()));
-//								
-//								List<ScsInscripcionguardia> insGur = scsInscripcionguardiaMapper.selectByExample(example1);
-//								
-//								if(listGu.get(0).getIdTurno().toString().equals(cargaMasivaDatosPDItem.getIdTurno())) {
-//									errorLinea.append("No se ha encontrado una guardia con el nombre introducido en el turno asociado");
-//									cargaMasivaDatosPDItem.setNombreGuardia("Error");
-//								}
-//								
-//								//Se comprueba si la inscripción en la guardia no existe
-//								if(insGur.size()==0) errorLinea.append("El colegiado no esta inscrito en la guardia introducida.");
-//								//Se comprueba si ya esta de baja
-//								else {
-//									for(ScsInscripcionguardia guardia: insGur) {
-//										if(guardia.getFechabaja() != null)errorLinea.append("El colegiado ya dió de baja la inscripcion en esa guardia del turno.");
-//									}
-//								}
-//							}
-//						}
-//						else errorLinea.append("Las guardias en el turno son \"Todas o ninguna\" por lo que no se puede realizar la fila.");
-//					}
-//					else errorLinea.append("Las guardias en el turno son \"Obligatorias\" por lo que no se puede realizar la fila.");
-//				}
-////				else errorLinea.append("No se ha encontrado guardias asociadas al turno indicado.");
-//			}
-//
-//			if (!errorLinea.toString().isEmpty()) {
-//				cargaMasivaDatosPDItem
-//						.setErrores("Errores en la línea " + numLinea + " : " + errorLinea.toString() + "<br/>");
-//			}
-//
-//			masivaDatosPDVos.add(cargaMasivaDatosPDItem);
-//			numLinea++;
-//		}
-//
-//		LOGGER.info(dateLog + ":fin.CargaMasivaProcuradoresServiceImpl.parseExcelFilePD");
-//		return masivaDatosPDVos;
-//	}
+		LOGGER.debug(dateLog + " --> Inicio CargaMasivaProcuradoresServiceImpl convertItemtoHashIT");
+		Hashtable<String, Object> e = new Hashtable<String, Object>();
+				
+		if (cargaMasivaDatosPDItem.getCodigoDesignaAbogado() != null) {
+			e.put(SigaConstants.PD_CODIGODESIGNAABOGADO, cargaMasivaDatosPDItem.getCodigoDesignaAbogado());
+		}
+		if (cargaMasivaDatosPDItem.getFechaDesignaProcurador() != null) {
+			String fechaDesignaProcurador = df2.format(cargaMasivaDatosPDItem.getFechaDesignaProcurador());
+			e.put(SigaConstants.PD_FECHADESIGPROCURADOR, fechaDesignaProcurador);
+		}
+		if (cargaMasivaDatosPDItem.getNombreProcurador() != null) {
+			e.put(SigaConstants.PD_NUMCOLPROCURADOR, cargaMasivaDatosPDItem.getNombreProcurador());
+		}
+		if (cargaMasivaDatosPDItem.getNumDesignaProcurador() != null) {
+			e.put(SigaConstants.PD_NUMDESIGNAPROCURADOR, cargaMasivaDatosPDItem.getNumDesignaProcurador());
+		}
+		if (cargaMasivaDatosPDItem.getNumEJG() != null) {
+			e.put(SigaConstants.PD_NUMEJG, cargaMasivaDatosPDItem.getNumEJG());
+		}
+		if (cargaMasivaDatosPDItem.getObservaciones() != null) {
+			e.put(SigaConstants.PD_OBSERVACIONES, cargaMasivaDatosPDItem.getObservaciones());
+		}
+
+		if (cargaMasivaDatosPDItem.getErrores() != null) {
+			e.put(SigaConstants.ERRORES, cargaMasivaDatosPDItem.getErrores());
+		}
+		
+		LOGGER.debug(dateLog + " --> Fin CargaMasivaProcuradoresServiceImpl convertItemtoHashIT");
+		return e;
+	}
+
+	@Transactional
+	private Long uploadFileLog(byte[] bytes, CenCargamasiva cenCargamasiva, boolean isLog) throws IOException {
+		// TODO Auto-generated method stub
+		Date dateLog = new Date();
+		LOGGER.debug(dateLog + " --> Inicio CargaMasivaProcuradoresServiceImpl uploadFileLog");
+		IFicherosService ficherosService = new FicherosServiceImpl();
+		FicheroVo ficheroVo = new FicheroVo();
+
+		String directorioFichero = getDirectorioFichero(cenCargamasiva.getIdinstitucion());
+		ficheroVo.setDirectorio(directorioFichero);
+		String nombreFicheroString = cenCargamasiva.getNombrefichero();
+		ficheroVo.setNombre(nombreFicheroString); 
+		ficheroVo.setDescripcion("Carga Masiva " + ficheroVo.getNombre());
+
+		ficheroVo.setIdinstitucion(cenCargamasiva.getIdinstitucion());
+		ficheroVo.setFichero(bytes);
+		ficheroVo.setExtension("xls");
+
+		ficheroVo.setUsumodificacion(Integer.valueOf(cenCargamasiva.getUsumodificacion()));
+		ficheroVo.setFechamodificacion(new Date());
+		
+		ficherosService.insert(ficheroVo);
+
+		if (isLog) {
+			ficheroVo.setDescripcion("log_" + ficheroVo.getDescripcion());
+			ficheroVo.setNombre("log_" + ficheroVo.getNombre());
+		}
+
+		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
+		
+		try {
+			guardarFicheroEnDisco(bytes, cenCargamasiva);
+		} catch (IOException e) {
+			LOGGER.debug("Error al crear y escribir el fichero: " + e.getStackTrace());
+			throw e;
+		}
+		
+		LOGGER.debug(dateLog + " --> Fin CargaMasivaProcuradoresServiceImpl uploadFileLog");
+		return ficheroVo.getIdfichero();
+	}
+	
+	private String getDirectorioFichero(Short idInstitucion) {
+		Date dateLog = new Date();
+		LOGGER.debug(dateLog + " --> Inicio CargaMasivaProcuradoresServiceImpl getDirectorioFichero");
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("cen.cargaExcel.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String pathCV = genPropertiesPath.get(0).getValor(); 
+		
+		StringBuffer directorioFichero = new StringBuffer(pathCV);
+		directorioFichero.append(idInstitucion);
+		directorioFichero.append(File.separator);
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
+		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaCV");
+		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+
+		LOGGER.debug(dateLog + " --> Fin CargaMasivaProcuradoresServiceImpl getDirectorioFichero");
+		return directorioFichero.toString();
+	}
+
+	private List<CargaMasivaDatosPDItem> parseExcelFilePD(Vector<Hashtable<String, Object>> datos, AdmUsuarios usuario) {
+		// TODO Auto-generated method stub
+		Date dateLog = new Date();
+		LOGGER.debug(dateLog + " --> Inicio CargaMasivaProcuradoresServiceImpl parseExcelFilePD");
+
+		List<CargaMasivaDatosPDItem> masivaDatosPDVos = new ArrayList<CargaMasivaDatosPDItem>();
+		CargaMasivaDatosPDItem cargaMasivaDatosPDItem = null;
+		
+		HashMap<String, ScsProcurador> procuradorHashtable = new HashMap<String, ScsProcurador>();
+		ScsProcurador scsProcurador = null;
+
+		Short idInstitucion = usuario.getIdinstitucion();
+		String idLenguaje = usuario.getIdlenguaje();
+
+		GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
+		genRecursosCatalogosKey.setIdlenguaje(idLenguaje);
+
+		StringBuffer errorLinea = null;
+		int numLinea = 1;
+		for (Hashtable<String, Object> hashtable : datos) {
+			cargaMasivaDatosPDItem = new CargaMasivaDatosPDItem();
+
+			cargaMasivaDatosPDItem.setIdInstitucion(idInstitucion);
+			errorLinea = new StringBuffer();
+		
+			LOGGER.debug("parseExcelFilePD() / Obtenemos los datos de la columna OBSERVACIONES");
+			if (hashtable.get(SigaConstants.PD_OBSERVACIONES) != null && !hashtable.get(SigaConstants.PD_OBSERVACIONES).toString().equals("") &&
+				!hashtable.get(SigaConstants.PD_OBSERVACIONES).toString().equals("aaaaaaaaaaaaa") && !hashtable.get(SigaConstants.PD_OBSERVACIONES).toString().equals("Opcional")) {
+				cargaMasivaDatosPDItem.setObservaciones(hashtable.get(SigaConstants.PD_OBSERVACIONES).toString());
+			}
+			
+			LOGGER.debug("parseExcelFilePD() / Obtenemos los datos de la columna NUMDESIGNAPROCURADOR");
+			if(hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR)!=null && !hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString().equals("") &&
+				!hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString().equals("Opcional")){
+				cargaMasivaDatosPDItem.setNumDesignaProcurador(hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString());	
+			}
+			
+			LOGGER.debug("parseExcelFilePD() / Obtenemos los datos de la columna FECHADESIGPROCURADOR");
+			if(hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR)!=null && !hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString().equals("") &&
+				!hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString().equals("dd/mm/yyyy") && !hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString().equals("Requerido")){
+				try {
+					cargaMasivaDatosPDItem.setFechaDesignaProcurador(new SimpleDateFormat("dd-MM-yyyy").parse(hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString()));
+				} catch (ParseException e1) {
+					errorLinea.append("Fecha de designacion de procurador mal introducida. Debe ser dd/mm/yyyy.");
+				}
+			}else{
+				errorLinea.append("Es obligatorio introducir la fecha de designacion del procurador. ");
+				cargaMasivaDatosPDItem.setFechaDesignaProcurador(null);
+			}
+			
+			LOGGER.debug("parseExcelFilePD() / Obtenemos los datos de la columna NUMCOLPROCURADOR");
+			if(hashtable.get(SigaConstants.PD_NUMCOLPROCURADOR)!=null && !hashtable.get(SigaConstants.PD_NUMCOLPROCURADOR).toString().equals("") &&
+			   !hashtable.get(SigaConstants.PD_NUMCOLPROCURADOR).toString().equals("nnnnn") && !hashtable.get(SigaConstants.PD_NUMCOLPROCURADOR).toString().equals("Requerido")){
+				cargaMasivaDatosPDItem.setNumColProcurador(hashtable.get(SigaConstants.PD_NUMCOLPROCURADOR).toString());
+
+				
+				// PREGUNTAR ESTO!!!!!!
+				
+				if(!procuradorHashtable.containsKey(cargaMasivaDatosPDItem.getNumColProcurador())){
+					try {
+						ScsProcuradorKey procuradorKey = new ScsProcuradorKey();
+						
+						procuradorKey.setIdinstitucion(cargaMasivaDatosPDItem.getIdInstitucion());
+						procuradorKey.setIdprocurador(Long.valueOf(cargaMasivaDatosPDItem.getNumColProcurador()));
+						scsProcurador  = scsProcuradorMapper.selectByPrimaryKey(procuradorKey);
+					} catch (BusinessException e) {
+						scsProcurador = null;
+					}
+				}else{
+					scsProcurador = procuradorHashtable.get(cargaMasivaDatosPDItem.getNumColProcurador());	
+				}
+				
+				// PREGUNTAR LO ANTERIOR!!!!!
+				
+				
+				StringBuffer nombre = null;
+				if(scsProcurador!=null){
+					nombre = new StringBuffer();
+					nombre.append(scsProcurador.getNombre());
+					nombre.append(" ");
+					nombre.append(scsProcurador.getApellidos1());
+					if(scsProcurador.getApellidos2()!=null){
+						nombre.append(" ");
+						nombre.append(scsProcurador.getApellidos2());
+					}
+					cargaMasivaDatosPDItem.setNombreProcurador(nombre.toString());
+					cargaMasivaDatosPDItem.setIdPersona(scsProcurador.getIdprocurador());
+				}else{
+					cargaMasivaDatosPDItem.setNombreProcurador("Procurador no encontrado");
+					errorLinea.append("Procurador no encontrado. ");
+
+				}
+				procuradorHashtable.put(String.valueOf(cargaMasivaDatosPDItem.getNumColProcurador()), scsProcurador);
+			}else{
+				errorLinea.append("Es obligatorio introducir número de procurador. ");
+				cargaMasivaDatosPDItem.setNumColProcurador("Error");
+
+			}
+			
+			
+			// PREGUNTAR ESTO!!!!!!
+			
+			LOGGER.debug("parseExcelFilePD() / Obtenemos los datos de la columna CODIGODESIGNAABOGADO");
+			if(hashtable.get(SigaConstants.PD_CODIGODESIGNAABOGADO)!=null && !hashtable.get(SigaConstants.PD_CODIGODESIGNAABOGADO).toString().equals("") &&
+			   !hashtable.get(SigaConstants.PD_CODIGODESIGNAABOGADO).toString().equals("nnnn/nnnnn") && !hashtable.get(SigaConstants.PD_CODIGODESIGNAABOGADO).toString().equals("Requerido")){
+
+				String codigoDesignaAbogado = hashtable.get(SigaConstants.PD_CODIGODESIGNAABOGADO).toString();
+				cargaMasivaDatosPDItem.setDesignaAbogadoCodigo(codigoDesignaAbogado);
+				try {
+					String [] designa =  codigoDesignaAbogado.split("/");
+					Short anio = Short.valueOf(designa[0]);	
+					String codigo = designa[1];
+
+					ScsDesignaExample designaExample = new ScsDesignaExample();
+					designaExample.createCriteria().andAnioEqualTo(anio).andIdinstitucionEqualTo(idInstitucion).andCodigoEqualTo(codigo);
+					
+					List<ScsDesigna> designaciones =  scsDesignaMapper.selectByExample(designaExample);
+					
+					if(designaciones==null){
+						throw new BusinessException("No existe la designa seleccionada");
+					}else if (designaciones.size()>1){
+						throw new BusinessException("El codigo de designa no es unico para ese año");
+					}
+					cargaMasivaDatosPDItem.setDesigaAbogadoAnio(designaciones.get(0).getAnio());
+					cargaMasivaDatosPDItem.setDesigaAbogadoIdTurno(designaciones.get(0).getIdturno());
+					cargaMasivaDatosPDItem.setDesigaAbogadoNumero(designaciones.get(0).getNumero());
+
+				}  catch (BusinessException e) {
+					errorLinea.append("No se ha encontrado la Designacion. ");
+				}catch (Exception e) {
+					errorLinea.append("Codigo de designacion mal introducido. Debe ser año/codigo(nnnn/aaaaaa). ");
+				}  
+
+			}else{
+				errorLinea.append("Es obligatorio introducir número de designacion. ");
+				cargaMasivaDatosPDItem.setDesignaAbogadoCodigo("Error");
+			}
+			
+			// PREGUNTAR LO ANTERIOR!!!!!
+			
+			LOGGER.debug("parseExcelFilePD() / Obtenemos los datos de la columna NUMEJG");
+			if(hashtable.get(SigaConstants.PD_NUMEJG)!=null && !hashtable.get(SigaConstants.PD_NUMEJG).toString().equals("") &&
+				!hashtable.get(SigaConstants.PD_NUMEJG).toString().equals("nnnn/nnnnn") && !hashtable.get(SigaConstants.PD_NUMEJG).toString().equals("Opcional")){
+
+
+				String numEJg = hashtable.get(SigaConstants.PD_NUMEJG).toString();
+				cargaMasivaDatosPDItem.setNumEJG(numEJg);
+
+				try {
+					String [] ejgString =  numEJg.split("/");
+					Short anio = Short.valueOf(ejgString[0]);	
+					String numEJG = ejgString[1];
+					
+					ScsEjgExample ejgExample = new ScsEjgExample();
+					
+					ejgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(anio).andNumejgEqualTo(numEJG);
+
+					List<ScsEjg> ejgs =  scsEjgMapper.selectByExample(ejgExample);
+					
+					ScsEjg ejg = ejgs.get(0);
+
+					if(cargaMasivaDatosPDItem.getDesigaAbogadoAnio()!=null){
+						ScsEjgdesignaExample scsEjgdesignaExample = new ScsEjgdesignaExample();
+						scsEjgdesignaExample.createCriteria().andAnioejgEqualTo(ejg.getAnio()).andNumeroejgEqualTo(Long.valueOf(ejg.getNumero()))
+						.andIdinstitucionEqualTo(Short.valueOf(ejg.getIdinstitucion())).andIdtipoejgEqualTo(ejg.getIdtipoejg())
+						.andAniodesignaEqualTo(cargaMasivaDatosPDItem.getDesigaAbogadoAnio()).andIdturnoEqualTo(cargaMasivaDatosPDItem.getDesigaAbogadoIdTurno())
+						.andNumerodesignaEqualTo(cargaMasivaDatosPDItem.getDesigaAbogadoNumero());
+						List<ScsEjgdesigna> scsEjgdesignas = scsEjgdesignaMapper.selectByExample(scsEjgdesignaExample);
+						//Si esta relacionado con nuestra designa
+						if(scsEjgdesignas!=null && scsEjgdesignas.size()>0){
+							cargaMasivaDatosPDItem.setEjgAnio(ejg.getAnio());
+							cargaMasivaDatosPDItem.setEjgIdTipo(ejg.getIdtipoejg());
+							cargaMasivaDatosPDItem.setEjgNumero(ejg.getNumero());
+						}else{
+							errorLinea.append("Expediente no relacionado con la designación.");
+						}
+					}
+				}    catch (BusinessException e) {
+					errorLinea.append("No se ha encontrado el EJG. ");
+					throw e;
+				}catch (Exception e) {
+					errorLinea.append("Codigo de EJG mal introducido. Debe ser año/codigo(nnnn/nnnnn). ");
+					throw e;
+				}
+			}	
+
+			if (!errorLinea.toString().isEmpty()) {
+				cargaMasivaDatosPDItem.setErrores("Errores en la línea " + numLinea + " : " + errorLinea.toString() + "<br/>");
+			}
+
+			masivaDatosPDVos.add(cargaMasivaDatosPDItem);
+			numLinea++;
+		}
+		
+		// MCL: Se comprueba si la designacion ya existe en base de datos
+		for (CargaMasivaDatosPDItem cargaMasivaDatos : masivaDatosPDVos) {
+			if(cargaMasivaDatos.getIdInstitucion()!=null && !cargaMasivaDatos.getIdInstitucion().toString().equals("")
+					&& cargaMasivaDatos.getDesigaAbogadoIdTurno()!=0
+					&& cargaMasivaDatos.getDesigaAbogadoAnio()!=null && !cargaMasivaDatos.getDesigaAbogadoAnio().toString().equals("")
+					&& cargaMasivaDatos.getDesigaAbogadoNumero()!=null && !cargaMasivaDatos.getDesigaAbogadoNumero().toString().equals("")
+					&& cargaMasivaDatos.getIdPersona()!=null && !cargaMasivaDatos.getIdPersona().toString().equals("")
+					&& cargaMasivaDatos.getFechaDesignaProcurador()!=null && !cargaMasivaDatos.getFechaDesignaProcurador().toString().equals("")){
+
+				ScsDesignaprocuradorExample scsDesignaprocuradorExample = new ScsDesignaprocuradorExample();
+				scsDesignaprocuradorExample.createCriteria().andIdinstitucionEqualTo(cargaMasivaDatos.getIdInstitucion())
+				.andIdturnoEqualTo(cargaMasivaDatos.getDesigaAbogadoIdTurno())
+				.andAnioEqualTo(cargaMasivaDatos.getDesigaAbogadoAnio()).andNumeroEqualTo(cargaMasivaDatos.getDesigaAbogadoNumero())
+				.andIdprocuradorEqualTo(cargaMasivaDatos.getIdPersona()).andIdinstitucionProcEqualTo(cargaMasivaDatos.getIdInstitucion())
+				.andFechadesignaEqualTo(cargaMasivaDatos.getFechaDesignaProcurador());
+
+				List<ScsDesignaprocurador> listaDesigna = scsDesignaprocuradorMapper.selectByExample(scsDesignaprocuradorExample);
+
+				// MCL: En caso de existir se marca para continuar con el proceso y asignar el procurador al expediente EJG
+				if(listaDesigna!=null && listaDesigna.size()>0){
+					cargaMasivaDatos.setExisteDesigna(true);
+				}
+
+				// MCL: Se comprueba si el expediente ya esta asignado al procurador y a la designacion
+				if(cargaMasivaDatos.getEjgNumero() != null && cargaMasivaDatos.getEjgIdTipo() != 0 && cargaMasivaDatos.getNumDesignaProcurador() != null){
+					ScsEjgExample scsEjgExample = new ScsEjgExample();
+					scsEjgExample.createCriteria().andIdinstitucionEqualTo(cargaMasivaDatos.getIdInstitucion()).andIdtipoejgEqualTo((short) cargaMasivaDatos.getEjgIdTipo())
+					.andAnioEqualTo((short) cargaMasivaDatos.getEjgAnio()).andNumeroEqualTo(cargaMasivaDatos.getEjgNumero())
+					.andIdprocuradorEqualTo(cargaMasivaDatos.getIdPersona()).andIdinstitucionProcEqualTo(cargaMasivaDatos.getIdInstitucion())
+					.andFechaDesProcEqualTo(cargaMasivaDatos.getFechaDesignaProcurador()).andNumerodesignaprocEqualTo(String.valueOf(cargaMasivaDatosPDItem.getNumDesignaProcurador()));
+
+					List<ScsEjg> listaEjg = scsEjgMapper.selectByExample(scsEjgExample);
+
+					// MCL: En caso de estar designado se muestra el mensaje de error
+					if(listaEjg!=null && listaEjg.size()>0){
+						String error = "El expediente ya se encuentra asignado a dicho procurador y a la designación";
+						// MCL: Si tiene errores previos, se le concatena
+						if(cargaMasivaDatos.getErrores()!=null && !cargaMasivaDatos.getErrores().equals("")){
+							cargaMasivaDatos.setErrores(cargaMasivaDatos.getErrores() + error);
+						}else{
+							cargaMasivaDatos.setErrores(error);
+						}
+					} 
+				}
+			}
+		}
+
+		LOGGER.debug(dateLog + " --> Fin CargaMasivaProcuradoresServiceImpl parseExcelFilePD");
+		return masivaDatosPDVos;
+	}
+	
+	public void guardarFicheroEnDisco(byte[] bytes, CenCargamasiva cenCargamasiva) throws IOException {
+		
+		StringBuffer directorio = new StringBuffer(getDirectorioFicheroSigaClassique(cenCargamasiva.getIdinstitucion()));
+		
+		directorio.append(File.separator);
+		directorio.append(cenCargamasiva.getNombrefichero());		
+		File file = new File(directorio.toString());
+		
+		OutputStream output = null;
+		
+		try {
+			
+			if(!file.exists()) {
+				file.createNewFile();
+			}
+			
+			output = new FileOutputStream(file);
+			output.write(bytes);
+			output.flush();
+		} catch (IOException e) {
+			LOGGER.debug("Error al crear y escribir el fichero: " + e.getStackTrace());
+			throw e;
+		}finally {
+			if(output!=null) {
+				try {
+					output.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+				
+			output = null;
+		}
+	}
+		
+	
+	private String getDirectorioFicheroSigaClassique(Short idInstitucion) {
+		Date dateLog = new Date();
+		LOGGER.debug(dateLog + " --> Inicio CargaMasivaProcuradoresServiceImpl getDirectorioFicheroSigaClassique");
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String pathCV = genPropertiesPath.get(0).getValor(); 
+		
+		StringBuffer directorioFichero = new StringBuffer(pathCV);
+		directorioFichero.append(idInstitucion);
+		directorioFichero.append(File.separator);
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
+		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaCV");
+		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+
+		LOGGER.debug(dateLog + " --> Fin CargaMasivaProcuradoresServiceImpl getDirectorioFicheroSigaClassique");
+		return directorioFichero.toString();
+	}
 
 	@Override
 	public InputStreamResource descargarFicheros(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem, HttpServletRequest request) {
@@ -894,13 +950,13 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-			LOGGER.info(
-					"descargarFicheros() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"descargarFicheros() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"descargarFicheros() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.debug(
+					"descargarFicheros() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty() && !cargaMasivaProcuradorItem.isEmpty()) {
 				fileStream = getZipFileRemesasResultados(cargaMasivaProcuradorItem, idInstitucion);				
@@ -986,7 +1042,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		path += File.separator + idInstitucion + File.separator + "cargaMasivaProcuradores";
 		path += File.separator + idCargaMasiva;
 
-		LOGGER.info("getDirectorioFicheroRemesa() -> Path del directorio de ficheros CargaMasivaProcuradores  = " + path);
+		LOGGER.debug("getDirectorioFicheroRemesa() -> Path del directorio de ficheros CargaMasivaProcuradores  = " + path);
 
 		return path;
 	}

@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorBusquedaItem;
 import org.itcgae.siga.DTOs.scs.CargaMasivaProcuradorItem;
+import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.services.scs.providers.ScsIntercambiosExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -30,5 +31,11 @@ public interface ScsIntercambiosExtendsMapper {
 		@Result(column = "NUMREGISTROSERRONEOS", property = "numRegistrosErroneos", jdbcType = JdbcType.NUMERIC)
 	})
 	List<CargaMasivaProcuradorItem> listadoCargaMasivaProcuradores(CargaMasivaProcuradorBusquedaItem cargaMasivaItem, Short idInstitucion);
+	
+	@SelectProvider(type = ScsIntercambiosExtendsProvider.class, method = "getMaxIdEstadoPorEJG")
+	@Results({
+		@Result(column = "IDESTADOPOREJG", property = "idestadoporejg", jdbcType = JdbcType.NUMERIC)
+	})
+	ScsEstadoejg getMaxIdEstadoPorEJG(String anio, Short idInstitucion, String numero, String idTipoEJG);
 
 }

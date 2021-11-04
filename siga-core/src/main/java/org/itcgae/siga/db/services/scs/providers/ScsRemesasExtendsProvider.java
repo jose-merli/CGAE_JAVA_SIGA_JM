@@ -439,16 +439,5 @@ public class ScsRemesasExtendsProvider {
 
 		return sql.toString();
 	}
-	
-	public String getMaxIdRespuesta(Short idInstitucion) {
-		SQL sql = new SQL();
-
-		sql.SELECT("MAX(idrespuesta)+1 as IDRESPUESTA");
-		sql.FROM("cajg_respuesta_ejgremesa");
-
-		LOGGER.info(sql.toString());
-
-		return sql.toString();
-	}
 
 }

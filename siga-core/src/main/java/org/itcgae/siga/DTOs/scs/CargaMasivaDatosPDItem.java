@@ -6,13 +6,105 @@ public class CargaMasivaDatosPDItem {
 
 	private String codigoDesignaAbogado;
 	private String numEJG;
-	private int numColProcurador;
-	private int numDesignaProcurador;
+	private Long idPersona;
+	private String numColProcurador;
+	private String numDesignaProcurador;
+	private String nombreProcurador;
 	private Date fechaDesignaProcurador;
 	private String Observaciones;
 	private Short idInstitucion;
 	private String errores;
 	
+	private boolean existeDesigna;
+	private int desigaAbogadoIdTurno;
+	private Short desigaAbogadoAnio;
+	private Long desigaAbogadoNumero;
+	private String designaAbogadoCodigo;
+	
+	private int ejgIdTipo;
+	private int ejgAnio;
+	private Long ejgNumero;
+			
+	public boolean isExisteDesigna() {
+		return existeDesigna;
+	}
+
+	public void setExisteDesigna(boolean existeDesigna) {
+		this.existeDesigna = existeDesigna;
+	}
+
+	public int getEjgIdTipo() {
+		return ejgIdTipo;
+	}
+
+	public void setEjgIdTipo(int ejgIdTipo) {
+		this.ejgIdTipo = ejgIdTipo;
+	}
+
+	public int getEjgAnio() {
+		return ejgAnio;
+	}
+
+	public void setEjgAnio(int ejgAnio) {
+		this.ejgAnio = ejgAnio;
+	}
+
+	public Long getEjgNumero() {
+		return ejgNumero;
+	}
+
+	public void setEjgNumero(Long ejgNumero) {
+		this.ejgNumero = ejgNumero;
+	}
+
+	public int getDesigaAbogadoIdTurno() {
+		return desigaAbogadoIdTurno;
+	}
+
+	public void setDesigaAbogadoIdTurno(int desigaAbogadoIdTurno) {
+		this.desigaAbogadoIdTurno = desigaAbogadoIdTurno;
+	}
+
+	public Short getDesigaAbogadoAnio() {
+		return desigaAbogadoAnio;
+	}
+
+	public void setDesigaAbogadoAnio(Short desigaAbogadoAnio) {
+		this.desigaAbogadoAnio = desigaAbogadoAnio;
+	}
+
+	public Long getDesigaAbogadoNumero() {
+		return desigaAbogadoNumero;
+	}
+
+	public void setDesigaAbogadoNumero(Long desigaAbogadoNumero) {
+		this.desigaAbogadoNumero = desigaAbogadoNumero;
+	}
+
+	public String getDesignaAbogadoCodigo() {
+		return designaAbogadoCodigo;
+	}
+
+	public void setDesignaAbogadoCodigo(String designaAbogadoCodigo) {
+		this.designaAbogadoCodigo = designaAbogadoCodigo;
+	}
+
+	public Long getIdPersona() {
+		return idPersona;
+	}
+
+	public void setIdPersona(Long idPersona) {
+		this.idPersona = idPersona;
+	}
+
+	public String getNombreProcurador() {
+		return nombreProcurador;
+	}
+
+	public void setNombreProcurador(String nombreProcurador) {
+		this.nombreProcurador = nombreProcurador;
+	}
+
 	public String getCodigoDesignaAbogado() {
 		return codigoDesignaAbogado;
 	}
@@ -29,19 +121,19 @@ public class CargaMasivaDatosPDItem {
 		this.numEJG = numEJG;
 	}
 	
-	public int getNumColProcurador() {
+	public String getNumColProcurador() {
 		return numColProcurador;
 	}
 	
-	public void setNumColProcurador(int numColProcurador) {
+	public void setNumColProcurador(String numColProcurador) {
 		this.numColProcurador = numColProcurador;
 	}
 	
-	public int getNumDesignaProcurador() {
+	public String getNumDesignaProcurador() {
 		return numDesignaProcurador;
 	}
 	
-	public void setNumDesignaProcurador(int numDesignaProcurador) {
+	public void setNumDesignaProcurador(String numDesignaProcurador) {
 		this.numDesignaProcurador = numDesignaProcurador;
 	}
 	
