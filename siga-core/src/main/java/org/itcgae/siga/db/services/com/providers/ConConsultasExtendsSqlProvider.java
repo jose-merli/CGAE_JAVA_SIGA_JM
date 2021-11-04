@@ -227,24 +227,30 @@ public class ConConsultasExtendsSqlProvider {
 			sql.SELECT(" criterio_con.ORDEN");
 			sql.SELECT(" criterio_con.OPERADOR conector");
 			sql.SELECT(" criterio_con.ABRIRPAR");
-			sql.SELECT(" campo_con.IDCAMPO");
+			sql.SELECT(" campo_con.IDCAMPO");		
+			sql.SELECT(" campo_con.IDTABLA");
+			sql.SELECT(" tablaconsulta_con.DESCRIPCION");
+			sql.SELECT(" campo_con.NOMBREREAL");	
 			sql.SELECT(" campo_con.NOMBREENCONSULTA");
 			sql.SELECT(" f_siga_getrecurso(operacion_con.DESCRIPCION, " + idLenguaje + ") operador");
-			sql.SELECT("  operacion_con.SIMBOLO");
+			sql.SELECT(" operacion_con.SIMBOLO");
 			sql.SELECT(" criterio_con.VALOR");
 			sql.SELECT(" criterio_con.CERRARPAR");
 	
 			sql.FROM(" CON_CRITERIOCONSULTA criterio_con");
 			sql.FROM(" CON_CAMPOCONSULTA campo_con");
+			sql.FROM(" CON_TABLACONSULTA tablaconsulta_con");
 			sql.FROM(" CON_OPERACIONCONSULTA operacion_con");
 			
 			sql.WHERE(" criterio_con.idinstitucion = " + idInstitucion);
 			sql.WHERE(" criterio_con.idconsulta = " + idConsulta);
 			sql.WHERE(" campo_con.idcampo (+) = criterio_con.idcampo");
+			sql.WHERE(" campo_con.idtabla = tablaconsulta_con.idtabla");
 			sql.WHERE(" operacion_con.idoperacion (+) = criterio_con.idoperacion");
 			sql.ORDER_BY(" orden");
 			
 			return sql.toString();
+	
 		}
 	
 	public String obtenerConsulta(Short idInstitucion, String idConsulta){
