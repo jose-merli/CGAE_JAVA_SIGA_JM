@@ -198,12 +198,12 @@ public class GuardiaController {
 		return new ResponseEntity<IncompatibilidadesDTO>(response, HttpStatus.OK);
 	}
 	@PostMapping(value = "/eliminarIncompatibilidades", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> deleteIncompatibilidades(@RequestBody DeleteIncompatibilidadesDatosEntradaItem deleteIncompatibilidadesBody, HttpServletRequest request){
+	ResponseEntity<DeleteResponseDTO> deleteIncompatibilidades(@RequestBody List<DeleteIncompatibilidadesDatosEntradaItem> deleteIncompatibilidadesBody, HttpServletRequest request){
 		DeleteResponseDTO response= guardiasService.deleteIncompatibilidades(deleteIncompatibilidadesBody, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	@PostMapping(value = "/guardarIncompatibilidades", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> saveIncompatibilidades(@RequestBody SaveIncompatibilidadesDatosEntradaItem incompatibilidadesBody, HttpServletRequest request){
+	ResponseEntity<DeleteResponseDTO> saveIncompatibilidades(@RequestBody List<SaveIncompatibilidadesDatosEntradaItem> incompatibilidadesBody, HttpServletRequest request){
 		DeleteResponseDTO response= guardiasService.saveIncompatibilidades(incompatibilidadesBody, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}

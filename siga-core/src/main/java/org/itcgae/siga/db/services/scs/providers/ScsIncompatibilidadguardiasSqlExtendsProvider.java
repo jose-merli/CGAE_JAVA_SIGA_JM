@@ -141,7 +141,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 	
 	
 	
-	public String listadoIncompatibilidades(IncompatibilidadesDatosEntradaItem incompatibilidades, String idInstitucion, String idGuardia) {
+	public String listadoIncompatibilidades(IncompatibilidadesDatosEntradaItem incompatibilidades, String idInstitucion, String idGuardia, Integer tamMax) {
 	
 		SQL listado_guardias = new SQL();
 		SQL listado_guardias_idGuardia = new SQL();
@@ -150,6 +150,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		SQL sqlNombreg2 = new SQL();
 		SQL sqlSCSGuardiasTurnoIdGuardia = new SQL();
 		SQL sqlMotivos = new SQL();
+		SQL SQL_PADRE = new SQL();
 		
 		listado_guardias_idGuardia.SELECT("SCS_GUARDIASTURNO.IDGUARDIA");
 		listado_guardias_idGuardia.FROM("SCS_GUARDIASTURNO");
@@ -270,9 +271,9 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 			"NVL((SELECT DIASSEPARACIONGUARDIAS FROM SCS_INCOMPATIBILIDADGUARDIAS WHERE IDINSTITUCION = g1.IDINSTITUCION AND ((IDTURNO = g1.IDTURNO AND IDGUARDIA = g1.IDGUARDIA AND IDTURNO_INCOMPATIBLE = g2.IDTURNO AND IDGUARDIA_INCOMPATIBLE = g2.IDGUARDIA) OR (IDTURNO = g2.IDTURNO AND IDGUARDIA = g2.IDGUARDIA AND IDTURNO_INCOMPATIBLE = g1.IDTURNO AND IDGUARDIA_INCOMPATIBLE = g1.IDGUARDIA)) AND rownum = 1), '') AS DIASSEPARACIONGUARDIAS");
 
 			sql.FROM( "( " + listado_guardias + " ) G1 ");
-			sql.FROM(  "( " + listado_guardias + " ) G2 "  );
+			sql.FROM(  "( SCS_GUARDIASTURNO ) G2 "  );
 			sql.WHERE("g1.IDINSTITUCION = g2.IDINSTITUCION");
-			sql.WHERE("  (g1.IDTURNO <> g2.IDTURNO OR g1.IDGUARDIA <> g2.IDGUARDIA)" ); //FALLA!!
+			sql.WHERE("  (g1.IDTURNO <> g2.IDTURNO OR g1.IDGUARDIA <> g2.IDGUARDIA)" );
 			if (idInstitucion != null && !idInstitucion.isEmpty()) {
 				sql.WHERE("g1.IDINSTITUCION = " + idInstitucion );
 			}
@@ -281,10 +282,20 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 			}
 			sql.WHERE("g1.IDGUARDIA IN (" +sqlSCSGuardiasTurnoIdGuardia + ")" );
 				
-			sql.ORDER_BY(" turno, guardia, motivos, diasseparacionguardias");
+			sql.ORDER_BY(" turno, guardia, turno_incompatible, guardia_incompatible");
 
-			
-			return sql.toString();
+
+			SQL_PADRE.SELECT(" *");
+			SQL_PADRE.FROM("( " + sql.toString() + " )");
+			SQL_PADRE.WHERE("EXISTE IS NOT NULL");
+			if(tamMax != null && tamMax > 0) {
+				tamMax += 1;
+				SQL_PADRE.WHERE(" ROWNUM <= " + tamMax);
+			}
+
+
+			return SQL_PADRE.toString();
+
 
 	}
 	
@@ -415,9 +426,15 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		//Campos obligatorios : Turno, Guardia, Guardias Incompatibles (al menos seleccionar una guardia) y Días de separación.
 		//Si ya existía la incompatibilidad, se actualizará (este update actualiza ambas incompatibilidades al la vez)
 		sql.UPDATE("SCS_INCOMPATIBILIDADGUARDIAS");
-		sql.SET("MOTIVOS = '" + motivos + "'," +
-			" DIASSEPARACIONGUARDIAS = " + diasSeparacionGuardia + "," + 
-			" FECHAMODIFICACION = '"+ fechaModificacion + "'");
+		if(!UtilidadesString.esCadenaVacia(motivos)) {
+			sql.SET("MOTIVOS = '" + motivos + "'," +
+					" DIASSEPARACIONGUARDIAS = " + diasSeparacionGuardia + "," +
+					" FECHAMODIFICACION = '" + fechaModificacion + "'");
+		}else{
+			sql.SET("MOTIVOS = null," +
+					" DIASSEPARACIONGUARDIAS = " + diasSeparacionGuardia + "," +
+					" FECHAMODIFICACION = '" + fechaModificacion + "'");
+		}
 		sql.WHERE(
 			"IDINSTITUCION =" + idInstitucion +
 			" AND ((IDTURNO IN ( " + idTurno + " )" +
@@ -517,7 +534,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		if (idPartidaPresupuestaria != null && !idPartidaPresupuestaria.isEmpty()) {
 			sql.WHERE("SCS_GUARDIASTURNO.IDPARTIDAPRESUPUESTARIA IN ( " + idPartidaPresupuestaria + ")"  );
 		}
-		sql.ORDER_BY("SCS_GUARDIASTURNO.FECHAMODIFICACION DESC");
+		sql.ORDER_BY("SCS_GUARDIASTURNO.NOMBRE");
 		return sql.toString();
 	}
 	
@@ -544,7 +561,7 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 			sql.WHERE("SCS_GUARDIASTURNO.IDPARTIDAPRESUPUESTARIA IN ( " + idPartidaPresupuestaria + ")"  );
 		}
 		
-		sql.ORDER_BY("SCS_GUARDIASTURNO.FECHAMODIFICACION DESC");
+		sql.ORDER_BY("SCS_GUARDIASTURNO.NOMBRE");
 		return sql.toString();
 	}
 	
