@@ -800,5 +800,18 @@ public String busquedaColaOficio2(TurnosItem turnosItem,String strDate,String bu
 
 		return sql.toString();
 	}
+	
+	
+	public String getObligatoriedadByTurno(Short idInstitucion, String idTurno) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("T.GUARDIAS");
+		sql.FROM("SCS_TURNO T");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+//DECODE(SCS_TURNO.GUARDIAS, 0, 'Obligatorias', DECODE(SCS_TURNO.GUARDIAS, 2, 'A elegir', 'Todas o ninguna')
+		return sql.toString();
+	}
 
 }

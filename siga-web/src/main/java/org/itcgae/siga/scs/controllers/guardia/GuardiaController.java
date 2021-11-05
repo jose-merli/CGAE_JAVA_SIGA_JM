@@ -198,12 +198,12 @@ public class GuardiaController {
 		return new ResponseEntity<IncompatibilidadesDTO>(response, HttpStatus.OK);
 	}
 	@PostMapping(value = "/eliminarIncompatibilidades", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> deleteIncompatibilidades(@RequestBody DeleteIncompatibilidadesDatosEntradaItem deleteIncompatibilidadesBody, HttpServletRequest request){
+	ResponseEntity<DeleteResponseDTO> deleteIncompatibilidades(@RequestBody List<DeleteIncompatibilidadesDatosEntradaItem> deleteIncompatibilidadesBody, HttpServletRequest request){
 		DeleteResponseDTO response= guardiasService.deleteIncompatibilidades(deleteIncompatibilidadesBody, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	@PostMapping(value = "/guardarIncompatibilidades", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> saveIncompatibilidades(@RequestBody SaveIncompatibilidadesDatosEntradaItem incompatibilidadesBody, HttpServletRequest request){
+	ResponseEntity<DeleteResponseDTO> saveIncompatibilidades(@RequestBody List<SaveIncompatibilidadesDatosEntradaItem> incompatibilidadesBody, HttpServletRequest request){
 		DeleteResponseDTO response= guardiasService.saveIncompatibilidades(incompatibilidadesBody, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
@@ -221,6 +221,11 @@ public class GuardiaController {
 	}
 	
 	
+	@PostMapping(value = "/buscarLastCalendarioProgramado", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DatosCalendarioProgramadoItem> getLastCalendarioProgramado(@RequestBody CalendariosProgDatosEntradaItem calendarioProgBody, HttpServletRequest request) {
+		DatosCalendarioProgramadoItem response = guardiasService.getLastCalendarioProgramado(calendarioProgBody, request);
+		return new ResponseEntity<DatosCalendarioProgramadoItem>(response, HttpStatus.OK);
+	}
 	@PostMapping(value = "/buscarCalendariosProgramados", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<List<DatosCalendarioProgramadoItem>> getCalendarioProgramado(@RequestBody CalendariosProgDatosEntradaItem calendarioProgBody, HttpServletRequest request) {
 		List<DatosCalendarioProgramadoItem> response = guardiasService.getCalendarioProgramado(calendarioProgBody, request);
@@ -311,8 +316,10 @@ public class GuardiaController {
 		
 		if (response.getStatus() == "OK") {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		} else {
+		} else if (response.getStatus() == "ERRORASOCIADAS"){
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.CONFLICT);
+		}else {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 			}
 	

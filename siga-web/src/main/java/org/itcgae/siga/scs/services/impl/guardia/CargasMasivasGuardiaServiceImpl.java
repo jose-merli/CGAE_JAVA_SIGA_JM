@@ -1,30 +1,5 @@
 package org.itcgae.siga.scs.services.impl.guardia;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.TreeSet;
-import java.util.Vector;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.DVConstraint;
@@ -38,79 +13,25 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
-import org.itcgae.siga.DTOs.adm.FileDataDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.DTOs.scs.BusquedaInscripcionMod;
-import org.itcgae.siga.DTOs.scs.CalendarioAutomatico;
-import org.itcgae.siga.DTOs.scs.CalendarioEfectivo;
-import org.itcgae.siga.DTOs.scs.CargaMasivaDatosGuardiatem;
-import org.itcgae.siga.DTOs.scs.CargaMasivaDatosITItem;
-import org.itcgae.siga.DTOs.scs.DatosCalendarioProgramadoItem;
-import org.itcgae.siga.DTOs.scs.GuardiaCalendarioItem;
-import org.itcgae.siga.DTOs.scs.PeriodoEfectivoItem;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
-import org.itcgae.siga.cen.services.impl.BusquedaColegiadosServiceImpl;
+import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenBajastemporales;
-import org.itcgae.siga.db.entities.CenCargamasiva;
-import org.itcgae.siga.db.entities.CenColegiado;
-import org.itcgae.siga.db.entities.CenColegiadoExample;
-import org.itcgae.siga.db.entities.CenHistorico;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
-import org.itcgae.siga.db.entities.GenRecursos;
-import org.itcgae.siga.db.entities.GenRecursosCatalogosKey;
-import org.itcgae.siga.db.entities.GenRecursosExample;
-import org.itcgae.siga.db.entities.ScsGrupoguardia;
-import org.itcgae.siga.db.entities.ScsGrupoguardiacolegiado;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample;
-import org.itcgae.siga.db.entities.ScsGuardiascolegiadoKey;
-import org.itcgae.siga.db.entities.ScsGuardiasturno;
-import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
-import org.itcgae.siga.db.entities.ScsGuardiasturnoKey;
-import org.itcgae.siga.db.entities.ScsInscripcionguardia;
-import org.itcgae.siga.db.entities.ScsInscripcionguardiaKey;
-import org.itcgae.siga.db.entities.ScsInscripcionturno;
-import org.itcgae.siga.db.entities.ScsInscripcionturnoKey;
-import org.itcgae.siga.db.mappers.CenColegiadoMapper;
-import org.itcgae.siga.db.mappers.CenHistoricoMapper;
-import org.itcgae.siga.db.mappers.CenPersonaMapper;
-import org.itcgae.siga.db.mappers.GenFicheroMapper;
-import org.itcgae.siga.db.mappers.GenPropertiesMapper;
-import org.itcgae.siga.db.mappers.GenRecursosMapper;
-import org.itcgae.siga.db.mappers.ScsGrupoguardiaMapper;
-import org.itcgae.siga.db.mappers.ScsGrupoguardiacolegiadoMapper;
-import org.itcgae.siga.db.mappers.ScsGrupoguardiacolegiadoSqlProvider;
-import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoMapper;
-import org.itcgae.siga.db.mappers.ScsGuardiascolegiadoSqlProvider;
-import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
-import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
-import org.itcgae.siga.db.mappers.ScsInscripcionturnoMapper;
-import org.itcgae.siga.db.mappers.ScsTurnoMapper;
+import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargaMasivaExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsBajasTemporalesExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsGrupoguardiacolegiadoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionesTurnoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsInscripcionguardiaExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.*;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.guardia.CargasMasivasGuardiaService;
 import org.itcgae.siga.scs.services.impl.maestros.FichaPartidasJudicialesServiceImpl;
-import org.itcgae.siga.scs.services.oficio.IGestionInscripcionesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -123,11 +44,21 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
 
 @Service
 public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaService{
 
-	private Logger LOGGER = Logger.getLogger(FichaPartidasJudicialesServiceImpl.class);
+	private final Logger LOGGER = Logger.getLogger(CargasMasivasGuardiaServiceImpl.class);
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -1198,16 +1129,15 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 								key2.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
 								key2.setFechasolicitud(cargaMasivaDatosITItem.getFechaEfectiva());
 								key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
-								
-								ScsInscripcionturno instur = new ScsInscripcionturno();
-								
-								instur = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2, new SimpleDateFormat("dd/MM/yyyy").format(cargaMasivaDatosITItem.getFechaEfectiva()));
+
+								List<ScsInscripcionturno> insturList = new ArrayList<ScsInscripcionturno>();
+								insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2, new SimpleDateFormat("dd/MM/yyyy").format(cargaMasivaDatosITItem.getFechaEfectiva()));
 								
 								
 								//Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se inscriben las guardias.
-								if(instur != null) {
+								if(insturList.get(0) != null) {
 									//5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del turno correspondiente.
-									if(cargaMasivaDatosITItem.getFechaEfectiva().compareTo(instur.getFechavalidacion())<0) 
+									if(cargaMasivaDatosITItem.getFechaEfectiva().compareTo(insturList.get(0).getFechavalidacion())<0)
 										errorLinea.append("La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
 									
 									//6. El grupo y el orden sólo aplicarán para guardias por grupos, en otro caso, no se tendrán en cuenta
@@ -1265,15 +1195,13 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									key2.setIdpersona(Long.parseLong(cargaMasivaDatosITItem.getIdPersona()));
 									key2.setFechasolicitud(cargaMasivaDatosITItem.getFechaEfectiva());
 									key2.setIdturno(Integer.parseInt(cargaMasivaDatosITItem.getIdTurno()));
-									
-									ScsInscripcionturno instur = new ScsInscripcionturno();
-									
-									instur = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2, new SimpleDateFormat("dd/MM/yyyy").format(cargaMasivaDatosITItem.getFechaEfectiva()));
-									
-									//Comprobamos si ya exite inscripcion a dicho turno. Si no existe, no se inscriben las guardias.
-									if(instur != null) {
+
+
+									List<ScsInscripcionturno> insturList = new ArrayList<ScsInscripcionturno>();
+									insturList = scsInscripcionturnoMapper.selectByPrimaryKeyDate(key2, new SimpleDateFormat("dd/MM/yyyy").format(cargaMasivaDatosITItem.getFechaEfectiva()));
+									if(insturList.get(0) != null) {
 										//5. La fecha efectiva tiene que ser mayor o igual a la fecha efectiva del turno correspondiente.
-										if(cargaMasivaDatosITItem.getFechaEfectiva().compareTo(instur.getFechavalidacion())<0) 
+										if(cargaMasivaDatosITItem.getFechaEfectiva().compareTo(insturList.get(0).getFechavalidacion())<0)
 											errorLinea.append("La fecha efectiva introducida es anterior a la fecha efectiva del turno asociado.");
 										
 										//6. El grupo y el orden sólo aplicarán para guardias por grupos, en otro caso, no se tendrán en cuenta
@@ -1978,7 +1906,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									calendarioItem.setObservaciones(observaciones);
 									//generamos programacion por cada guardia
 									//ScsProgCalendariosSqlProvider.insertSelective(ScsProgCalendarios record)
-									int  res = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
+									String nextIdCalendarioProgramado = getNuevoIdCalProg();
+									calendarioItem.setIdCalendarioProgramado(nextIdCalendarioProgramado);
+									int  res = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(nextIdCalendarioProgramado, calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
 
 										String idProgramacion = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
 										//generamos un calendario por cada guardia asociada a esa programacion	
@@ -2612,24 +2542,23 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			
 			//Consulto la maxima fecha inicio para el periodo en la cabecera de guardias:
 
-			fechaMAX =  scsGuardiasturnoExtendsMapper.maxFechaInicioPeriodoCabGuardia( idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoPrimerDia);
+			/*fechaMAX =  scsGuardiasturnoExtendsMapper.maxFechaInicioPeriodoCabGuardia( idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoPrimerDia);
 			String OLD_FORMAT = "yyyy-MM-dd HH:mm:ss.S";
 			String NEW_FORMAT = "dd/MM/yyyy";
 			if (fechaMAX!= null) {
 			fechaMAX = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaMAX);
 			} else {
 				fechaMAX = fechaPeriodoUltimoDia;
-			}
+			}*/
 			//Consulto la minima fecha inicio para el periodo en la cabecera de guardias:
 
-			fechaMIN = scsGuardiasturnoExtendsMapper.minFechaInicioPeriodoCabGuardia(idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoUltimoDia);
+			/*fechaMIN = scsGuardiasturnoExtendsMapper.minFechaInicioPeriodoCabGuardia(idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoUltimoDia);
 			if (fechaMIN!= null) {
 			fechaMIN = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaMIN);
 			}else {
 				fechaMIN = fechaPeriodoPrimerDia;
-			}
-			total = scsGuardiasturnoExtendsMapper.diasSeparacionEntreGuardias( idpersona, idinstitucion,  idturno,  idguardia,  fechaMAX,  fechaMIN,  fechaPeriodoPrimerDia,  fechaPeriodoUltimoDia);
-
+			}*/
+			total = scsGuardiasturnoExtendsMapper.diasSeparacionEntreGuardias( idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoPrimerDia,  fechaPeriodoUltimoDia);
 		} catch (Exception e){
 			throw new Exception(e +": Excepcion en ScsGuardiasColegiadoAdm.validacionIncompatibilidad(). Consulta SQL:"+consulta);
 		}
@@ -2903,4 +2832,17 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		LOGGER.info(dateLog + ":fin.CargaMasivaDatosCVImpl.getDirectorioFicheroSigaClassique");
 		return directorioFichero.toString();
 	}
+	
+	public String getNuevoIdCalProg() throws Exception
+	{
+		String nuevoId = "";
+
+		try {
+			nuevoId = scsGuardiasturnoExtendsMapper.nextIdCalprog();
+		} catch (Exception e) {
+			throw new Exception(e + ": Error al obtener nuevo id calendarios programados");
+		}
+
+		return nuevoId;
+	} // getNuevoIdSaltoCompensacionGrupo()
 }

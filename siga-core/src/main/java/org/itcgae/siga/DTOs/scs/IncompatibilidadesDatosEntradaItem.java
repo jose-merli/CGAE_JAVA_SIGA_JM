@@ -14,7 +14,16 @@ public class IncompatibilidadesDatosEntradaItem {
 	private String idPartidaPresupuestaria;
 	private String idTipoTurno;
 	private String idTipoGuardia;
-	
+	private String idGuardia;
+
+	public String getIdGuardia() {
+		return idGuardia;
+	}
+
+	public void setIdGuardia(String idGuardia) {
+		this.idGuardia = idGuardia;
+	}
+
 	public String getIdTurno() {
 		return idTurno;
 	}

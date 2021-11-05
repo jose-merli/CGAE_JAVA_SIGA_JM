@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
+import org.itcgae.siga.db.mappers.ScsTurnoSqlProvider;
 import org.itcgae.siga.DTOs.scs.InscripcionTurnoItem;
 import org.itcgae.siga.DTOs.scs.ActuacionDesignaItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -69,6 +70,9 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper {
 			@Result(column = "nombrepartidosjudiciales", property = "nombrepartidosjudiciales", jdbcType = JdbcType.VARCHAR),})
 	List<TurnosItem> busquedaTurnos(TurnosItem turnosItem, Short idInstitucion);
 
+	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "getObligatoriedadByTurno")
+	int getObligatoriedadByTurno(Short idInstitucion, String idTurno);
+	
 	@SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "busquedaFichaTurnos")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
 			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR, id = true),

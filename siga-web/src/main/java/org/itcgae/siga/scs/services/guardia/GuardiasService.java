@@ -83,9 +83,9 @@ public interface GuardiasService {
 			HttpServletRequest request);
 
 	public DeleteResponseDTO deleteIncompatibilidades(
-			DeleteIncompatibilidadesDatosEntradaItem deleteIncompatibilidadesBody, HttpServletRequest request);
+			List<DeleteIncompatibilidadesDatosEntradaItem> deleteIncompatibilidadesBody, HttpServletRequest request);
 
-	public DeleteResponseDTO saveIncompatibilidades(SaveIncompatibilidadesDatosEntradaItem incompatibilidadesBody,
+	public DeleteResponseDTO saveIncompatibilidades(List<SaveIncompatibilidadesDatosEntradaItem> incompatibilidadesBody,
 			HttpServletRequest request);
 
 	public ComboIncompatibilidadesResponse getCombo(ComboIncompatibilidadesDatosEntradaItem comboIncompatibilidadesDatosEntradaItem, HttpServletRequest request);
@@ -94,6 +94,9 @@ public interface GuardiasService {
 			HttpServletRequest request);
 
 	public List<DatosCalendarioProgramadoItem> getCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
+			HttpServletRequest request);
+	
+	public DatosCalendarioProgramadoItem getLastCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
 			HttpServletRequest request);
 
 	public DeleteResponseDTO deleteCalendariosProgramados(DeleteCalendariosProgDatosEntradaItem deleteCalBody,

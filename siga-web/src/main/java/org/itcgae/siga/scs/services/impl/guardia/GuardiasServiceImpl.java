@@ -843,7 +843,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 							guardia.setIdordenacioncolas(ordenacion.getIdordenacioncolas());
 
 						} else {
+							guardia.setDiasseparacionguardias(Short.parseShort(guardiasItem.getDiasSeparacionGuardias()));
 							guardia.setIdordenacioncolas(colas.get(0).getIdordenacioncolas());
+							guardia.setRequeridavalidacion(Boolean.toString(guardiasItem.isRequeridaValidacion()));
 							scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
 
 						}
@@ -865,6 +867,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					guardia.setFechamodificacion(new Date());
 					guardia.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
+					guardia.setDiasseparacionguardias(Short.parseShort(guardiasItem.getDiasSeparacionGuardias()));
+					guardia.setRequeridavalidacion(Boolean.toString(guardiasItem.isRequeridaValidacion()));
 					response = scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
 
 					if(response > 0){
@@ -1907,7 +1911,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<IncompatibilidadesItem> incompatibilidades = new ArrayList<IncompatibilidadesItem>();
 		IncompatibilidadesDTO inc = new IncompatibilidadesDTO();
-		String idGuardia = ""; 
+		String idGuardia = "";
+		Integer tamMaximo;
+		List<GenParametros> tamMax = new ArrayList<>();
+		Error error = new Error();
 		
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1921,13 +1928,40 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("getIncompatibilidades() -> Entrada para obtener las incompatibilidades");
 
-				incompatibilidades = scsIncompatibilidadguardiasExtendsMapper.getListadoIncompatibilidades(incompBody, idInstitucion.toString(), idGuardia);
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
 
-				
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+						.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				LOGGER.info(
+						"getIncompatibilidades() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+				LOGGER.info(
+						"getIncompatibilidades() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				if (tamMax != null) {
+					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+				} else {
+					tamMaximo = null;
+				}
+
+				incompatibilidades = scsIncompatibilidadguardiasExtendsMapper.getListadoIncompatibilidades(incompBody, idInstitucion.toString(), idGuardia, tamMaximo);
+
+				if (tamMaximo != null && incompatibilidades != null && !incompatibilidades.isEmpty() && incompatibilidades.size() > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo
+							+ " resultados, pero se muestran sólo los " + tamMaximo
+							+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					inc.setError(error);
+					incompatibilidades.remove(incompatibilidades.size() - 1);
+				}
 				LOGGER.info("getIncompatibilidades() -> Salida ya con los datos recogidos");
 			}
 		}
-		
 		inc.setIncompatibilidadesItem(incompatibilidades);
 		return inc;
 	}
@@ -1951,34 +1985,41 @@ public class GuardiasServiceImpl implements GuardiasService {
 		response.setValues(comboGuardiasIncValues);
 		return response;
 	}
-	
+
+	@Transactional
 	@Override
-	public DeleteResponseDTO deleteIncompatibilidades(DeleteIncompatibilidadesDatosEntradaItem deleteIncompatibilidadesBody, HttpServletRequest request) {
+	public DeleteResponseDTO deleteIncompatibilidades(List<DeleteIncompatibilidadesDatosEntradaItem> deleteIncompatibilidadesBody, HttpServletRequest request) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		int response = 1;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String idGuardia = ""; // DUDA
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (usuarios != null && usuarios.size() > 0 && deleteIncompatibilidadesBody.getIdTurno() != null && !deleteIncompatibilidadesBody.getIdTurno().isEmpty() && deleteIncompatibilidadesBody.getIdInstitucion() != null && 
-					!deleteIncompatibilidadesBody.getIdInstitucion().isEmpty() && deleteIncompatibilidadesBody.getIdGuardia() != null && !deleteIncompatibilidadesBody.getIdGuardia().isEmpty() && 
-					deleteIncompatibilidadesBody.getIdTurnoIncompatible() != null && !deleteIncompatibilidadesBody.getIdTurnoIncompatible().isEmpty() && deleteIncompatibilidadesBody.getIdGuardiaIncompatible() != null && ! deleteIncompatibilidadesBody.getIdGuardiaIncompatible().isEmpty()) {
+			if (usuarios != null && usuarios.size() > 0 ) {
 				LOGGER.info("deleteIncompatibilidades() -> Entrada para borrar las incompatibilidades");
-				//Doble borrado
-				scsIncompatibilidadguardiasExtendsMapper.deleteIncompatibilidades(deleteIncompatibilidadesBody.getIdTurno(), deleteIncompatibilidadesBody.getIdInstitucion(), deleteIncompatibilidadesBody.getIdGuardia(), deleteIncompatibilidadesBody.getIdTurnoIncompatible(), deleteIncompatibilidadesBody.getIdGuardiaIncompatible());
+				for (int i = 0; i < deleteIncompatibilidadesBody.size(); i++) {
+					DeleteIncompatibilidadesDatosEntradaItem incompatibilidad = deleteIncompatibilidadesBody.get(i);
+					if(!UtilidadesString.esCadenaVacia(incompatibilidad.getIdTurno())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdInstitucion())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdGuardia())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdTurnoIncompatible())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdGuardiaIncompatible())){
+						//Doble borrado
+						scsIncompatibilidadguardiasExtendsMapper.deleteIncompatibilidades(incompatibilidad.getIdTurno(), incompatibilidad.getIdInstitucion(), incompatibilidad.getIdGuardia(), incompatibilidad.getIdTurnoIncompatible(), incompatibilidad.getIdGuardiaIncompatible());
+					}
+				}
 				LOGGER.info("deleteIncompatibilidades() -> Salida ya con los datos recogidos");
 			}else {
 				response = 0;
@@ -1998,15 +2039,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return deleteResponseDTO;
 	}
 	
-	
+	@Transactional
 	@Override
-	public DeleteResponseDTO saveIncompatibilidades(SaveIncompatibilidadesDatosEntradaItem incompatibilidadesBody,
+	public DeleteResponseDTO saveIncompatibilidades(List<SaveIncompatibilidadesDatosEntradaItem> incompatibilidadesBody,
 			HttpServletRequest request) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-		int response = 1;
+		int response = 0;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		String idInstitucion = incompatibilidadesBody.getIdInstitucion();
+		String idInstitucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		String idGuardia = ""; 
 		String idTurno = ""; 
 		String idTurnoIncompatible = "";
@@ -2023,60 +2064,61 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			//if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
-				idTurno = incompatibilidadesBody.getIdTurno();
-				if ( idTurno == null || idTurno.isEmpty() && incompatibilidadesBody.getNombreTurno() != null) {
-					idTurno = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoFromNombreTurno(incompatibilidadesBody.getNombreTurno());
-				}
-				
-				idGuardia = incompatibilidadesBody.getIdGuardia();
-				if ( idGuardia == null || idGuardia.isEmpty() && incompatibilidadesBody.getNombreGuardia() != null) {
-					idGuardia = scsIncompatibilidadguardiasExtendsMapper.getIdGuardiaFromNombreGuardia(incompatibilidadesBody.getNombreGuardia());
-				}
-				
-				idGuardiaIncompatible = incompatibilidadesBody.getIdGuardiaIncompatible();
-				if ( idGuardiaIncompatible == null || idGuardiaIncompatible.isEmpty()) {
-					incompatibilidadesBody.getNombreGuardiaIncompatible().forEach(gi -> {
-						String idGuardiaIncompatibleAux = scsIncompatibilidadguardiasExtendsMapper.getIdGuardiaIncompatibleFromNombreGuardia(gi);
-						idGuardiaIncompatibleList.add(idGuardiaIncompatibleAux);
-					});
-					idGuardiaIncompatible = idGuardiaIncompatibleList.get(0);
-					
-				}
-				
-				idTurnoIncompatible = incompatibilidadesBody.getIdTurnoIncompatible();
-				if ( idTurnoIncompatible == null || idTurnoIncompatible.isEmpty()) {
-					if(incompatibilidadesBody.getNombreTurnoIncompatible() != null && !incompatibilidadesBody.getNombreTurnoIncompatible().isEmpty()) {
-						idTurnoIncompatible = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoIncompatibleFromNombreTurno(incompatibilidadesBody.getNombreTurnoIncompatible());
-					}else {
-						idTurnoIncompatible = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoIncByIdGuardiaInc(idGuardiaIncompatible);
-					}
-				}
-				
-				String pattern = "dd/MM/YY";
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-				String fechaModificacion = simpleDateFormat.format(new Date());	
-				if(idTurno != null && !idTurno.isEmpty() &&  incompatibilidadesBody.getIdInstitucion() != null && ! incompatibilidadesBody.getIdInstitucion().isEmpty() && idGuardia != null && !idGuardia.isEmpty() && idTurnoIncompatible != null && !idTurnoIncompatible.isEmpty() && idGuardiaIncompatible != null && !idGuardiaIncompatible.isEmpty()) {
-					int existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(idTurno, incompatibilidadesBody.getIdInstitucion(), idGuardia, idTurnoIncompatible, idGuardiaIncompatible);
-					if (existe == 2) {
-						//existe en ambas direcciones - la actualizamos
-						scsIncompatibilidadguardiasExtendsMapper.updateIfExists(incompatibilidadesBody.getIdTurno(), incompatibilidadesBody.getIdInstitucion(), incompatibilidadesBody.getIdGuardia(), incompatibilidadesBody.getIdTurnoIncompatible(), incompatibilidadesBody.getIdGuardiaIncompatible(), incompatibilidadesBody.getMotivos(), incompatibilidadesBody.getDiasSeparacionGuardias(), fechaModificacion);
-						
-					}
-					if (existe == 0) {
-						//no existe - llamamos dos veces para guardar en ambas direcciones
-						scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidadesBody.getIdInstitucion()), Integer.parseInt(idGuardia), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardiaIncompatible), usuarios.get(0).getIdusuario(), incompatibilidadesBody.getMotivos(), Integer.parseInt(incompatibilidadesBody.getDiasSeparacionGuardias()), fechaModificacion);
-						scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidadesBody.getIdInstitucion()), Integer.parseInt(idGuardiaIncompatible), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(), incompatibilidadesBody.getMotivos(), Integer.parseInt(incompatibilidadesBody.getDiasSeparacionGuardias()), fechaModificacion);
+			if (usuarios != null && usuarios.size() > 0 && !incompatibilidadesBody.isEmpty()) {
+                LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
+                for (int i = 0; i < incompatibilidadesBody.size(); i++) {
+                    SaveIncompatibilidadesDatosEntradaItem incompatibilidad = incompatibilidadesBody.get(i);
+                    idInstitucion = incompatibilidad.getIdInstitucion();
+                    idTurno = incompatibilidad.getIdTurno();
+                    if ( idTurno == null || idTurno.isEmpty() && incompatibilidad.getNombreTurno() != null) {
+                        idTurno = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoFromNombreTurno(incompatibilidad.getNombreTurno());
+                    }
 
-					}
-				}else {
-					response = 0;
-				}
-				
-				
+                    idGuardia = incompatibilidad.getIdGuardia();
+                    if ( idGuardia == null || idGuardia.isEmpty() && incompatibilidad.getNombreGuardia() != null) {
+                        idGuardia = scsIncompatibilidadguardiasExtendsMapper.getIdGuardiaFromNombreGuardia(incompatibilidad.getNombreGuardia());
+                    }
+
+                    idGuardiaIncompatible = incompatibilidad.getIdGuardiaIncompatible();
+                    if ( idGuardiaIncompatible == null || idGuardiaIncompatible.isEmpty()) {
+                        incompatibilidad.getNombreGuardiaIncompatible().forEach(gi -> {
+                            String idGuardiaIncompatibleAux = scsIncompatibilidadguardiasExtendsMapper.getIdGuardiaIncompatibleFromNombreGuardia(gi);
+                            idGuardiaIncompatibleList.add(idGuardiaIncompatibleAux);
+                        });
+                        idGuardiaIncompatible = idGuardiaIncompatibleList.get(0);
+
+                    }
+
+                    idTurnoIncompatible = incompatibilidad.getIdTurnoIncompatible();
+                    if ( idTurnoIncompatible == null || idTurnoIncompatible.isEmpty()) {
+                        if(incompatibilidad.getNombreTurnoIncompatible() != null && !incompatibilidad.getNombreTurnoIncompatible().isEmpty()) {
+                            idTurnoIncompatible = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoIncompatibleFromNombreTurno(incompatibilidad.getNombreTurnoIncompatible());
+                        }else {
+                            idTurnoIncompatible = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoIncByIdGuardiaInc(idGuardiaIncompatible);
+                        }
+                    }
+
+                    String pattern = "dd/MM/YY";
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                    String fechaModificacion = simpleDateFormat.format(new Date());
+                    if(idTurno != null && !idTurno.isEmpty() &&  incompatibilidad.getIdInstitucion() != null && ! incompatibilidad.getIdInstitucion().isEmpty() && idGuardia != null && !idGuardia.isEmpty() && idTurnoIncompatible != null && !idTurnoIncompatible.isEmpty() && idGuardiaIncompatible != null && !idGuardiaIncompatible.isEmpty()) {
+                        int existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(idTurno, incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncompatible, idGuardiaIncompatible);
+                        if (existe == 2) {
+                            //existe en ambas direcciones - la actualizamos
+                            scsIncompatibilidadguardiasExtendsMapper.updateIfExists(idTurno, incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncompatible, idGuardiaIncompatible, incompatibilidad.getMotivos(), incompatibilidad.getDiasSeparacionGuardias(), fechaModificacion);
+                        }
+                        if (existe == 0) {
+                            //no existe - llamamos dos veces para guardar en ambas direcciones
+                            scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidad.getIdInstitucion()), Integer.parseInt(idGuardia), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardiaIncompatible), usuarios.get(0).getIdusuario(), incompatibilidad.getMotivos(), Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
+                            scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidad.getIdInstitucion()), Integer.parseInt(idGuardiaIncompatible), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(), incompatibilidad.getMotivos(), Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
+
+                        }
+                    }else {
+                        response = 0;
+                    }
+                }
 				LOGGER.info("saveIncompatibilidades() -> Salida ya con los datos recogidos");
-			//}
+			}
 		}
 		
 		// comprobacion actualización
@@ -2270,7 +2312,73 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 	
 	
-	
+	@Override
+	public DatosCalendarioProgramadoItem getLastCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
+			HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<DatosCalendarioProgramadoItem> datos = new ArrayList<DatosCalendarioProgramadoItem>();
+		List<DatosCalendarioProgramadoItem> datosFull = new ArrayList<DatosCalendarioProgramadoItem>();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getLastCalendarioProgramado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getLastCalendarioProgramado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("getLastCalendarioProgramado() -> Entrada para obtener los datos del calendario");
+
+				//datos = scsGuardiasturnoExtendsMapper.getCalendarioProgramado(calendarioProgBody, idInstitucion.toString());
+				String OLD_FORMAT = "yyyy'-'MM'-'dd'T'HH':'mm':'ss";
+				String OLD_FORMAT1 = "yyyy-MM-dd HH:mm:ss";
+				String NEW_FORMAT = "dd/MM/yyyy";
+				String NEW_FORMAT1 = "dd/MM/yyyy HH:mm:ss";
+				//2017-02-06 00:00:00.0
+				if (calendarioProgBody.getFechaCalendarioDesde() != null) {
+                    String fecha = null;
+				    if(!calendarioProgBody.getFechaCalendarioDesde().contains("T")){
+                        fecha = changeDateFormat(OLD_FORMAT1, NEW_FORMAT, calendarioProgBody.getFechaCalendarioDesde());
+                    }else{
+                        fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT, calendarioProgBody.getFechaCalendarioDesde());
+                    }
+
+					calendarioProgBody.setFechaCalendarioDesde(fecha);
+				}
+				if (calendarioProgBody.getFechaCalendarioHasta()!= null) {
+                    String fecha = null;
+                    if(!calendarioProgBody.getFechaCalendarioHasta().contains("T")){
+                        fecha = changeDateFormat(OLD_FORMAT1, NEW_FORMAT, calendarioProgBody.getFechaCalendarioHasta());
+                    }else{
+                        fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT, calendarioProgBody.getFechaCalendarioHasta());
+                    }
+					calendarioProgBody.setFechaCalendarioHasta(fecha);
+				}
+				if (calendarioProgBody.getFechaProgramadaDesde()!= null) {
+					String fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT1, calendarioProgBody.getFechaProgramadaDesde());
+					calendarioProgBody.setFechaProgramadaDesde(fecha);
+				}
+				if (calendarioProgBody.getFechaProgramadaHasta()!= null) {
+					String fecha = changeDateFormat(OLD_FORMAT, NEW_FORMAT1, calendarioProgBody.getFechaProgramadaHasta());
+					calendarioProgBody.setFechaProgramadaHasta(fecha);
+				}
+				datos = scsGuardiasturnoExtendsMapper.getLastCalendariosProgramadosSigaClassique(calendarioProgBody, idInstitucion.toString());
+
+
+				LOGGER.info("getLastCalendarioProgramado() -> Salida ya con los datos recogidos");
+			}
+		}
+
+		return datos.get(0);
+	}
 	@Override
 	public List<RangoFechasItem> getFechasProgramacionGuardia(String idGuardia,
 			HttpServletRequest request) {
@@ -2343,7 +2451,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (usuarios != null && usuarios.size() > 0 && deleteCalBody.getIdTurno() != null && !deleteCalBody.getIdTurno().isEmpty() && deleteCalBody.getIdInstitucion() != null && 
 					!deleteCalBody.getIdInstitucion().isEmpty() && deleteCalBody.getIdGuardia() != null && !deleteCalBody.getIdGuardia().isEmpty() && 
 							deleteCalBody.getIdCalendarioProgramado() != null && !deleteCalBody.getIdCalendarioProgramado().isEmpty()) {
-				LOGGER.info("deleteIncompatibilidades() -> Entrada para borrar las incompatibilidades");
+				LOGGER.info("deleteCalendariosProgramados() -> Entrada para borrar las incompatibilidades");
 				//Doble borrado
 				scsIncompatibilidadguardiasExtendsMapper.deleteCalendarioProgramado1(deleteCalBody.getIdTurno(), deleteCalBody.getIdInstitucion(), deleteCalBody.getIdGuardia(), deleteCalBody.getIdCalendarioProgramado());
 				scsIncompatibilidadguardiasExtendsMapper.deleteCalendarioProgramado2(deleteCalBody.getIdTurno(), deleteCalBody.getIdInstitucion(), deleteCalBody.getIdGuardia(), deleteCalBody.getIdCalendarioProgramado());
@@ -3126,7 +3234,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							error.setCode(204);
 							error.setDescription("No existen guardias asociadas a esta programación");
 							error.setMessage("No existen guardias asociadas a esta programación");
-							insertResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setStatus("ERRORASOCIADAS");
 						}
 					}
 					if ( !errorGuardiaAsociadas) {
@@ -3135,7 +3243,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 					//idConjunto: 
 						calendarioItem.setIdCalG(idConjuntoGuardia);
 					}
-					int response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
+					String nextIdCalendarioProgramado = getNuevoIdCalProg();
+					calendarioItem.setIdCalendarioProgramado(nextIdCalendarioProgramado);
+					int response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(nextIdCalendarioProgramado, calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
 					 List<ScsConfConjuntoGuardias> confList = scsConfConjuntoGuardiasMapper.selectConfById(calendarioItem.getIdCalG(), today,  usuario.getIdusuario().toString());
 					 confList.forEach(conf -> {
 						 ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
@@ -3144,8 +3254,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 							historico.setIdconjuntoguardia(new Long(calendarioItem.getIdCalG()));
 							historico.setIdguardia(conf.getIdguardia());
 							historico.setIdinstitucion(idInstitucion);
-							String idCalendarioProgramado = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
-							historico.setIdprogcalendario(new Long(idCalendarioProgramado));
+							//String idCalendarioProgramado = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
+							historico.setIdprogcalendario(new Long(nextIdCalendarioProgramado));
 							historico.setIdturno(conf.getIdturno());
 							//OBTENER ORDEN DE SCS_CONF_CONJUNTO_GUARDIAS
 							if (conf.getOrden() != null) {
@@ -3183,7 +3293,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return insertResponseDTO;
 		}
 	
+
 	@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario: 0 * 0/1 * * *}")
+
 	@Override
 	public InsertResponseDTO generarCalendarioAsync () {
 		LOGGER.info("generarCalendarioAsync() -> Entrada al servicio para búsqueda de las guardias");
@@ -4837,12 +4949,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 	saltoCompensacion.setSaltoocompensacion(saltoOCompensacion);
 	
 	//saltoCompensacion.setIdCalendarioGuardiasCreacion(this.idCalendarioGuardias);
-	saltoCompensacion.setFechacumplimiento(new Date((String) diasGuardia.get(0)));
+
+	saltoCompensacion.setFechacumplimiento(new Date(diasGuardia.get(0).toString()));
 	//saltoCompensacion.setFechaCumplimiento(GstDate.getApplicationFormatDate("", (String) diasGuardia.get(0)) );
 	if(idGuardia1!=null)
 	saltoCompensacion.setIdcalendarioguardias(idCalendarioGuardias1);
 	saltoCompensacion.setMotivos(motivo);
-	marcarSaltoCompensacion(saltoCompensacion);
+	marcarSaltoCompensacion(saltoCompensacion, diasGuardia.get(0).toString());
 	}
 	
 	/**
@@ -4852,7 +4965,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	 * @param saltoCompensacion
 	 * @throws ClsExceptions
 	 */
-	public void marcarSaltoCompensacion(ScsSaltoscompensaciones saltoCompensacion) throws Exception
+	public void marcarSaltoCompensacion(ScsSaltoscompensaciones saltoCompensacion, String fechaCumplimiento) throws Exception
 	{
 		try {
 			String s_idinstitucion = saltoCompensacion.getIdinstitucion().toString();
@@ -4878,7 +4991,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 //			String NEW_FORMAT = "dd/MM/YY";
 //
 //			saltoCompensacion.setFechacumplimiento(changeDateFormat(OLD_FORMAT, NEW_FORMAT, saltoCompensacion.getFechacumplimiento().toString()));
-			scsGuardiasturnoExtendsMapper.marcarSaltoCompensacion(usuModificacion1, idTurno1.toString(), saltoCompensacion,s_idpersona, s_idinstitucion, s_idturno, s_idguardia, s_saltocompensacion);
+			scsGuardiasturnoExtendsMapper.marcarSaltoCompensacion(usuModificacion1, idTurno1.toString(), saltoCompensacion,s_idpersona, s_idinstitucion, s_idturno, s_idguardia, s_saltocompensacion, fechaCumplimiento);
 
 
 		} catch (Exception e) {
@@ -5048,6 +5161,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 	 * @return String con el nuevo identificador.
 	 * @throws ClsExceptions
 	 */	
+	public String getNuevoIdCalProg() throws Exception
+	{
+		String nuevoId = "";
+
+		try {
+			nuevoId = scsGuardiasturnoExtendsMapper.nextIdCalprog();
+		} catch (Exception e) {
+			throw new Exception(e + ": Error al obtener nuevo id calendarios programados");
+		}
+
+		return nuevoId;
+	} // getNuevoIdSaltoCompensacionGrupo()
+	
 	public String getNuevoIdSaltoCompensacionGrupo() throws Exception
 	{
 		String nuevoId = "";
@@ -5060,8 +5186,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		return nuevoId;
 	} // getNuevoIdSaltoCompensacionGrupo()
-	
-	
 	private boolean isIncompatible(LetradoInscripcionItem letradoGuardia, ArrayList diasGuardia)
 			throws Exception
 	{
@@ -5160,8 +5284,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 		boolean salida = false;
 
 		try {
-			if (validacionSeparacionGuardias(miHash) != null) {
-			numeroSepacionesIncorrectas = Integer.parseInt(validacionSeparacionGuardias(miHash));
+			String vsg = validacionSeparacionGuardias(miHash);
+			if (vsg != null) {
+			numeroSepacionesIncorrectas = Integer.parseInt(vsg);
 				if (numeroSepacionesIncorrectas == 0) 
 					salida = true;
 				else
@@ -5217,15 +5342,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 			
 			//Consulto la maxima fecha inicio para el periodo en la cabecera de guardias:
 
-			fechaMAX =  scsGuardiasturnoExtendsMapper.maxFechaInicioPeriodoCabGuardia( idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoPrimerDia);
-			String OLD_FORMAT = "yyyy-MM-dd HH:mm:ss.S";
-			String NEW_FORMAT = "dd/MM/yyyy";
-			fechaMAX = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaMAX);
+//			fechaMAX =  scsGuardiasturnoExtendsMapper.maxFechaInicioPeriodoCabGuardia( idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoPrimerDia);
+//			String OLD_FORMAT = "yyyy-MM-dd HH:mm:ss.S";
+//			String NEW_FORMAT = "dd/MM/yyyy";
+//			fechaMAX = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaMAX);
 			//Consulto la minima fecha inicio para el periodo en la cabecera de guardias:
 
-			fechaMIN = scsGuardiasturnoExtendsMapper.minFechaInicioPeriodoCabGuardia(idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoUltimoDia);
-			fechaMIN = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaMIN);
-			total = scsGuardiasturnoExtendsMapper.diasSeparacionEntreGuardias( idpersona, idinstitucion,  idturno,  idguardia,  fechaMAX,  fechaMIN,  fechaPeriodoPrimerDia,  fechaPeriodoUltimoDia);
+//			fechaMIN = scsGuardiasturnoExtendsMapper.minFechaInicioPeriodoCabGuardia(idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoUltimoDia);
+//			fechaMIN = changeDateFormat(OLD_FORMAT, NEW_FORMAT, fechaMIN);
+			total = scsGuardiasturnoExtendsMapper.diasSeparacionEntreGuardias( idpersona, idinstitucion,  idturno,  idguardia,  esPermuta,  fechaPeriodoPrimerDiaOriginal,  fechaPeriodoPrimerDia,  fechaPeriodoUltimoDia);
 
 		} catch (Exception e){
 			throw new Exception(e +": Excepcion en ScsGuardiasColegiadoAdm.validacionIncompatibilidad(). Consulta SQL:"+consulta);
@@ -5849,34 +5974,39 @@ public class GuardiasServiceImpl implements GuardiasService {
 				hmPersonasConSaltos = new HashMap<Long, ArrayList<LetradoInscripcionItem>>();
 				List<String> idPersona2List =getQuerySaltosCompensacionesActivos("S", idInstitucion, idTurno, idGuardia);
 				
-				idPersona2List.forEach(idPersona2 -> {
+//				idPersona2List.forEach(idPersona2 -> {
 
-					ArrayList<LetradoInscripcionItem> alLetradosSaltados;
-					LetradoInscripcionItem letradoSeleccionado = null;
-					Long idPersona;
-					if (idPersona2 != null) {
-						idPersona = new Long( idPersona2);
-					
+
+
+						String idPersonasSeparatedByComma = idPersona2List.stream().collect(Collectors.joining(","));
+
+						List<CenPersonaItem> personas = getPersonaPorId(idPersonasSeparatedByComma);
+						if (personas.size() != 0) {
+						personas.forEach(persona -> {
+							ArrayList<LetradoInscripcionItem> alLetradosSaltados;
+							LetradoInscripcionItem letradoSeleccionado = null;
+
 					try {
-						letradoSeleccionado = new LetradoInscripcionItem(getPersonaPorId(idPersona.toString()), idInstitucion,
+						letradoSeleccionado = new LetradoInscripcionItem(persona, idInstitucion,
 									idTurno, idGuardia, "S");
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 		
-						if (hmPersonasConSaltos.containsKey(idPersona))
-							alLetradosSaltados = hmPersonasConSaltos.get(idPersona);
+						if (hmPersonasConSaltos.containsKey(persona.getIdpersona()))
+							alLetradosSaltados = hmPersonasConSaltos.get(persona.getIdpersona());
 						else
 							alLetradosSaltados = new ArrayList<LetradoInscripcionItem>();
 		
 						alLetradosSaltados.add(letradoSeleccionado);
-						hmPersonasConSaltos.put(idPersona, alLetradosSaltados);
-					}
-				});
+						hmPersonasConSaltos.put(persona.getIdpersona(), alLetradosSaltados);
+						});
+		}
+//				});
 		
 		} catch (Exception e) {
-			throw new Exception(e + "Error al comporbar si hay salto en BD.");
+			throw new Exception(e + "Error al comprobar si hay salto en BD.");
 		}
 
 		return hmPersonasConSaltos;
@@ -5913,7 +6043,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	 * @version 1	 
 	 * @param nifcif de la persona a buscar 
 	 */	
-	public CenPersonaItem getPersonaPorId (String idPersona) throws Exception{
+	public List<CenPersonaItem> getPersonaPorId (String idPersona) throws Exception{
 
 		
 		try {
@@ -5923,11 +6053,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 			codigos.put(new Integer(1),idPersona);
 			List<CenPersonaItem> personas =  scsGuardiasturnoExtendsMapper.getPersonaById(idPersona);
 			
-			if ((personas != null) && personas.size() == 1) {
-				perBean = (CenPersonaItem)personas.get(0);
-			}
-			
-			return perBean;
+//			if ((personas != null) && personas.size() == 1) {
+//				perBean = (CenPersonaItem)personas.get(0);
+//			}
+//
+//			return perBean;
+			return personas;
 		}
 		catch (Exception e) {
 			throw new Exception (e + ": Error al recuperar los datos");
@@ -5958,43 +6089,47 @@ public class GuardiasServiceImpl implements GuardiasService {
 				alLetradosCompensados = new ArrayList<LetradoInscripcionItem>();
 				idPersonaList = getQuerySaltosCompensacionesActivos("C", idInstitucion, idTurno,
 							idGuardia);
-				idPersonaList.forEach(idPersona -> {
-
-					LetradoInscripcionItem letradoSeleccionado;
-					if (idPersona != null) {
+//				idPersonaList.forEach(idPersona -> {
+					if (idPersonaList.size() != 0) {
+						String idPersonasSeparatedByComma = idPersonaList.stream().collect(Collectors.joining(","));
 						if( idGuardia!=null ){
-							InscripcionGuardiaItem inscripcionGuardia = null; 
+							List<InscripcionGuardiaItem> inscripcionGuardiaList = new ArrayList<InscripcionGuardiaItem>();
 							try {
-								inscripcionGuardia = getInscripcionGuardiaActiva(idInstitucion.toString(), idTurno.toString(),
-										idGuardia.toString(), idPersona, fecha);
+								inscripcionGuardiaList = getInscripcionGuardiaActiva(idInstitucion.toString(), idTurno.toString(),
+										idGuardia.toString(), idPersonasSeparatedByComma, fecha);
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 //							if(inscripcionGuardia == null)
-//								continue;s
-							letradoSeleccionado = new LetradoInscripcionItem();
-							letradoSeleccionado.setInscripcionGuardia(inscripcionGuardia);
-							letradoSeleccionado.setSaltoocompensacion("C");
-							alLetradosCompensados.add(letradoSeleccionado);
+//								continue;
+							inscripcionGuardiaList.forEach(inscripcionGuardia -> {
+
+								LetradoInscripcionItem letradoSeleccionado = new LetradoInscripcionItem();
+								letradoSeleccionado.setInscripcionGuardia(inscripcionGuardia);
+								letradoSeleccionado.setSaltoocompensacion("C");
+								alLetradosCompensados.add(letradoSeleccionado);
+							});
+
 						}else{
-							InscripcionTurnoItem inscripcionTurno = null;
+							List<InscripcionTurnoItem> inscripcionTurnoList = new ArrayList<InscripcionTurnoItem>();
 							try {
-								inscripcionTurno = getInscripcionTurnoActiva(idInstitucion.toString(), idTurno.toString(), idPersona, fecha);
+								inscripcionTurnoList = getInscripcionTurnoActiva(idInstitucion.toString(), idTurno.toString(), idPersonasSeparatedByComma, fecha);
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 //							if(inscripcionTurno == null)
 //								continue;
-							letradoSeleccionado = new LetradoInscripcionItem(inscripcionTurno);
+							inscripcionTurnoList.forEach(inscripcionTurno -> {
+							LetradoInscripcionItem letradoSeleccionado = new LetradoInscripcionItem();
 							letradoSeleccionado.setSaltoocompensacion("C");
 							letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
 							alLetradosCompensados.add(letradoSeleccionado);
-							
+							});
 						}
 					}
-				});
+//				});
 	
 			
 		} catch (Exception e) {
@@ -6008,7 +6143,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	/**
 	 * Obtiene las inscripcion activa de la persona en la guardia en la fecha dada
 	 */
-	public InscripcionTurnoItem getInscripcionTurnoActiva(String idinstitucion, String idturno, String idpersona, String fecha) throws Exception {
+	public List<InscripcionTurnoItem> getInscripcionTurnoActiva(String idinstitucion, String idturno, String idpersona, String fecha) throws Exception {
 		try {
 			if (idinstitucion == null || idinstitucion.equals(""))		return null;
 			if (idturno == null || idturno.equals(""))					return null;
@@ -6020,9 +6155,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			List<InscripcionTurnoItem> datos = null;
 			datos =  scsGuardiasturnoExtendsMapper.getInscripcionesTurnoActiva(idpersona,idinstitucion, idturno, fecha);
-				for (int i = 0; i < datos.size(); i++) {
-	
-					InscripcionTurnoItem inscripcionBean = datos.get(i);
+//				for (int i = 0; i < datos.size(); i++) {
+//
+//					InscripcionTurnoItem inscripcionBean = datos.get(i);
 //					CenPersonaItem personaBean = new CenPersonaItem(inscripcionBean.getIdpersona(), 
 //							inscripcionBean.getNombre(), 
 //							inscripcionBean.getApellidos1(),
@@ -6031,10 +6166,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 //					//DUDA
 //					
 //					inscripcionBean.setPersona(personaBean);
-					datos.add(inscripcionBean);
-				}
-	
-			return datos.get(0);
+//					datos.add(inscripcionBean);
+//				}
+//
+//			return datos.get(0);
+			return datos;
 			
 		} catch (Exception e) {
 			throw new Exception (e + ": Error al ejecutar getInscripcionActiva()");
@@ -6045,7 +6181,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 	/**
 	 * Obtiene las inscripcion activa de la persona en la guardia en la fecha dada
 	 */
-	public InscripcionGuardiaItem getInscripcionGuardiaActiva(String idinstitucion, String idturno, String idguardia, String idpersona, String fecha) throws Exception {
+	public List<InscripcionGuardiaItem> getInscripcionGuardiaActiva(String idinstitucion, String idturno, String idguardia, String idpersona, String fecha) throws Exception {
 		try {
 			if (idinstitucion == null || idinstitucion.equals(""))		return null;
 			if (idturno == null || idturno.equals(""))					return null;
@@ -6058,8 +6194,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 			
 			List<InscripcionGuardiaItem> datos = null;
 			datos = scsGuardiasturnoExtendsMapper.getInscripcionesGuardiaActiva(idpersona, idinstitucion, idguardia, fecha, idturno);
-			
-			return datos.get(0);
+//			if (datos.size() != 0) {
+//				return datos.get(0);
+//			}else {
+//				return null;
+//			}
+			return datos;
 			
 		} catch (Exception e) {
 			throw new Exception (e + ": Error al ejecutar getInscripcionActiva()");
@@ -6736,7 +6876,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 				
 				
 				inscripciones = scsInscripcionguardiaExtendsMapper.getListadoInscripciones(inscripcionesBody, idInstitucion.toString());
-
+				
+				for(BusquedaInscripcionItem inscrip:inscripciones) {
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+					Date fechaSolicitud;
+					try {
+						fechaSolicitud = sdf.parse(inscrip.getFechaSol());
+						inscrip.setFechasolicitud(fechaSolicitud);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
 				
 				LOGGER.info("getInscripciones() -> Salida ya con los datos recogidos");
 			}

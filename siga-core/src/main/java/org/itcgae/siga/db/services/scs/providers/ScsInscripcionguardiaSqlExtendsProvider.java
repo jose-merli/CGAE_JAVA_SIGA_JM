@@ -392,10 +392,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 	        }
 		
 		sql.SELECT("(CASE"
-				+ "            WHEN ins.fechadenegacion IS NOT NULL"
-				+ "                 AND ins.fechabaja IS NOT NULL"
-				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
-				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '4'"
+				+ "            WHEN ins.fechadenegacion IS NOT NULL THEN '4'"
 				+ "            WHEN ins.fechadenegacion IS NULL"
 				+ "                 AND ins.fechabaja IS NOT NULL"
 				+ "                 AND ins.fechasolicitudbaja IS NOT NULL"
@@ -408,11 +405,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "                 AND ins.fechabaja IS NULL"
 				+ "                 AND ins.fechasolicitudbaja IS NULL"
 				+ "                 AND ins.fechavalidacion IS NOT NULL THEN '1'"
-				+ "            WHEN ins.fechadenegacion IS NULL"
-				+ "                 AND ins.fechabaja IS NULL"
-				+ "                 AND ins.fechasolicitudbaja IS NULL"
-				+ "					AND ins.fechasuscripcion IS NOT NULL"
-				+ "                 AND ins.fechavalidacion IS NULL THEN '0'"
+				+ "            ELSE '0'"
 				+ "        END"
 				+ "    ) estado");
 		
@@ -435,7 +428,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		sql.SELECT("ins.idinstitucion");
 		sql.SELECT("ins.idpersona");
 		sql.SELECT("ins.idturno");
-		sql.SELECT("ins.fechasuscripcion");
+		sql.SELECT("to_char(ins.FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS') AS fechasuscripcion");
 		sql.SELECT("ins.observacionessuscripcion");
 		sql.SELECT("ins.fechavalidacion");
 		sql.SELECT("ins.observacionesvalidacion");
@@ -599,17 +592,16 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		}
 		
 		if(inscripciones.getFechasolicitud() != null) {
-			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/RRRR')= TO_DATE('"+FECHASOLICITUD+"','DD,MM/RRRR')");
+			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
 		}
 		
 		return sql.toString();
 	}
 	
-	public String ObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripciones, String idInstitucion,String FECHABAJA,String FECHADENEGACION, String FECHASOLICITUD,
-			String FECHASOLICITUDBAJA,String FECHAVALIDACION,String FECHAVALORALTA,String FECHAVALORBAJA) {
+	public String ObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripciones, String idInstitucion, String FECHASOLICITUD) {
 		
 		SQL sql = new SQL();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		//SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/YYYY HH24:MI:SS");
 		
 		sql.SELECT("*");
 		sql.FROM("scs_inscripcionguardia");
@@ -631,50 +623,13 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		}
 		
 		if(inscripciones.getFechasolicitud() != null) {
-			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/RRRR')= TO_DATE('"+FECHASOLICITUD+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getFechabaja() != null) {
-			sql.WHERE("TO_CHAR(FECHABAJA,'DD/MM/RRRR')= TO_DATE('"+FECHABAJA+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getObservacionessolicitud() != null) {
-			sql.WHERE("OBSERVACIONESSUSCRIPCION ='"+inscripciones.getObservacionessolicitud()+"'");
-		}
-		
-		if(inscripciones.getObservacionesbaja() != null) {
-			sql.WHERE("OBSERVACIONESBAJA ='"+inscripciones.getObservacionesbaja()+"'");
-		}
-		
-		if(inscripciones.getFechasolicitudbaja() != null) {
-			sql.WHERE("TO_CHAR(FECHASOLICITUDBAJA,'DD/MM/RRRR')= TO_DATE('"+FECHASOLICITUDBAJA+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getFechavalidacion() != null) {
-			sql.WHERE("TO_CHAR(FECHAVALIDACION,'DD/MM/RRRR')= TO_DATE('"+FECHAVALIDACION+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getObservacionesvalidacion() != null) {
-			sql.WHERE("OBSERVACIONESVALIDACION ='"+inscripciones.getObservacionesvalidacion()+"'");
-		}
-		
-		if(inscripciones.getFechadenegacion() != null) {
-			sql.WHERE("TO_CHAR(FECHADENEGACION,'DD/MM/RRRR')= TO_DATE('"+FECHADENEGACION+"','DD,MM/RRRR')");
-		}
-		
-		if(inscripciones.getObservacionesdenegacion() != null) {
-			sql.WHERE("OBSERVACIONESDENEGACION ='"+inscripciones.getFechadenegacion()+"'");
-		}
-		
-		if(inscripciones.getObservacionesvalbaja() != null) {
-			sql.WHERE("OBSERVACIONESVALBAJA ='"+inscripciones.getObservacionesvalbaja()+"'");
+			sql.WHERE("to_char(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
 		}
 		
 		return sql.toString();
 	}
 	
-public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripciones,String FECHABAJA,String FECHADENEGACION, String FECHASOLICITUD,
-		String FECHASOLICITUDBAJA,String FECHAVALIDACION,String FECHAVALORALTA,String FECHAVALORBAJA) {
+public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscripciones, String FECHASOLICITUD) {
 		
 		SQL sql = new SQL();
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -701,7 +656,7 @@ public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscrip
 		}
 		
 		if(inscripciones.getFechasolicitud() != null) {
-			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/RRRR')= TO_DATE('"+FECHASOLICITUD+"','DD,MM/RRRR')");
+			sql.WHERE("to_char(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
 		}
 		
 //		if(inscripciones.getFechabaja() != null) {
@@ -772,7 +727,7 @@ public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscrip
 		}
 		
 		if(inscripciones.getFechasolicitud() != null) {
-			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/RRRR')= TO_DATE('"+FECHASOLICITUD+"','DD,MM/RRRR')");
+			sql.WHERE("TO_CHAR(FECHASUSCRIPCION,'DD/MM/YYYY HH:MI:SS')= '"+FECHASOLICITUD+"'");
 		}
 		
 	return sql.toString();
@@ -823,7 +778,7 @@ public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscrip
 		return sql.toString();
 	}
 	
-	public String eliminarSaltoCompensacion(String idinstitucion, String idturno,String idguardia, String idpersona) {
+	public String eliminarSaltoCompensacion(String idinstitucion, String idturno,String idguardia, String idpersona,String saltooCompensacion) {
 			
 			SQL sql = new SQL();
 							
@@ -843,6 +798,10 @@ public String DeleteObjetoFrontValidarInscripcion(BusquedaInscripcionMod inscrip
 			
 			if(idguardia != null && !idguardia.isEmpty()) {
 				sql.WHERE("IDGUARDIA ="+ idguardia);
+			}
+			
+			if(saltooCompensacion != null && !saltooCompensacion.isEmpty()) {
+				sql.WHERE("SALTOOCOMPENSACION ="+ saltooCompensacion);
 			}
 			
 			
@@ -1109,10 +1068,10 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		}
 	
 		if(FECHASOLICITUDNUEVA != null) {
-			sql.VALUES("FECHASUSCRIPCION","TO_DATE('"+FECHASOLICITUDNUEVA+"','DD,MM/RRRR')");
+			sql.VALUES("FECHASUSCRIPCION","TO_DATE('"+FECHASOLICITUDNUEVA+"','DD/MM/YYYY HH:MI:SS')");
 		}else {
 			if(FECHASOLICITUD != null) {
-				sql.VALUES("FECHASUSCRIPCION", "TO_DATE('"+FECHASOLICITUD+"','DD,MM/RRRR')");
+				sql.VALUES("FECHASUSCRIPCION", "TO_DATE('"+FECHASOLICITUD+"','DD/MM/YYYY HH:MI:SS')");
 			}
 		}
 		
@@ -1263,10 +1222,10 @@ public String buscarGuardiasAsocTurnos(String idinstitucion, String idturno,Stri
 		}
 		
 		if(fECHASOLICITUDNUEVA != null) {
-			sql.VALUES("FECHASUSCRIPCION","TO_DATE('"+fECHASOLICITUDNUEVA+"','DD,MM/RRRR')");
+			sql.VALUES("FECHASUSCRIPCION","TO_DATE('"+fECHASOLICITUDNUEVA+"','DD/MM/YYYY HH:MI:SS')");
 		}else {
 			if(FECHASOLICITUD != null) {
-				sql.VALUES("FECHASUSCRIPCION","TO_DATE('"+FECHASOLICITUD+"','DD,MM/RRRR')");
+				sql.VALUES("FECHASUSCRIPCION","TO_DATE('"+FECHASOLICITUD+"','DD/MM/YYYY HH:MI:SS')");
 			}
 		}
 		
