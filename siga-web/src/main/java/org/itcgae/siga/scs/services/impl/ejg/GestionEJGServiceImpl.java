@@ -1426,7 +1426,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
                 // Determinamos el origen de apertura ya que, aunque no sea una clave primaria,
                 // no se permita que tenga valor null.
-                record.setOrigenapertura("M");
+                if(datos.getCreadoDesde()!=null) {
+                	record.setOrigenapertura(datos.getCreadoDesde());
+                }else {
+                	record.setOrigenapertura("M");
+                }
 
                 // Sucede lo mismo
                 record.setTipoletrado("M");
