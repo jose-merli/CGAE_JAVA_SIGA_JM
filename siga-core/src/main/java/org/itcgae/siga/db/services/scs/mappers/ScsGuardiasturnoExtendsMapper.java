@@ -512,7 +512,7 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 
 	 @InsertProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="generateCalendarioProgramado")
 	 @Results({})
-	 int generateCalendarioProgramado(DatosCalendarioProgramadoItem calendarioItem, String idInstitucion, String today, String usuModif);
+	 int generateCalendarioProgramado(String idCalculado, DatosCalendarioProgramadoItem calendarioItem, String idInstitucion, String today, String usuModif);
 	 
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="insertarHistorico")
@@ -1035,6 +1035,11 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "guardarSaltosCompensacionesGrupo")
 			@Results({})
 			String guardarSaltosCompensacionesGrupo(SaltoCompGuardiaGrupoItem saltoItem, String idInstitucion, Integer usuario);
+			
+			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "nextIdSaltoOComp")
+			@Results({
+				@Result(column = "ID", property="ID", jdbcType = JdbcType.VARCHAR)})
+			String nextIdCalprog();
 			
 			@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "nextIdSaltoOComp")
 			@Results({

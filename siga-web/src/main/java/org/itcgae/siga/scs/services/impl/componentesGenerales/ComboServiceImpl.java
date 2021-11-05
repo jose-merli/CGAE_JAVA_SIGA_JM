@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.services.impl.componentesGenerales;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -497,8 +498,18 @@ public class ComboServiceImpl implements ComboService {
 				LOGGER.info(
 						"getJurisdicciones() -> Entrada para obtener la información de las distintas jurisdicciones");
 
-				comboJuris.setCombooItems(
-						scsJurisdiccionExtendsMapper.getComboJurisdiccion(usuarios.get(0).getIdlenguaje()));
+				List<ComboItem> items = scsJurisdiccionExtendsMapper.getComboJurisdiccion(usuarios.get(0).getIdlenguaje());
+				List<String> valuesList = new ArrayList<String>();
+				items.forEach(it -> {
+					valuesList.add(it.getValue());
+				});
+				ComboItem todos = new ComboItem();
+				todos.setLabel("");
+				String valueAll = valuesList.stream().collect(Collectors.joining(","));
+				todos.setValue(valueAll);
+				
+				items.add(todos);
+				comboJuris.setCombooItems(items);
 
 				LOGGER.info("getJurisdicciones() -> Salida ya con los datos recogidos");
 

@@ -3203,7 +3203,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							error.setCode(204);
 							error.setDescription("No existen guardias asociadas a esta programación");
 							error.setMessage("No existen guardias asociadas a esta programación");
-							insertResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setStatus("ERRORASOCIADAS");
 						}
 					}
 					if ( !errorGuardiaAsociadas) {
@@ -3212,7 +3212,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 					//idConjunto: 
 						calendarioItem.setIdCalG(idConjuntoGuardia);
 					}
-					int response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
+					String nextIdCalendarioProgramado = getNuevoIdCalProg();
+					calendarioItem.setIdCalendarioProgramado(nextIdCalendarioProgramado);
+					int response = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(nextIdCalendarioProgramado, calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
 					 List<ScsConfConjuntoGuardias> confList = scsConfConjuntoGuardiasMapper.selectConfById(calendarioItem.getIdCalG(), today,  usuario.getIdusuario().toString());
 					 confList.forEach(conf -> {
 						 ScsHcoConfProgCalendarios historico = new ScsHcoConfProgCalendarios();
@@ -3221,8 +3223,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 							historico.setIdconjuntoguardia(new Long(calendarioItem.getIdCalG()));
 							historico.setIdguardia(conf.getIdguardia());
 							historico.setIdinstitucion(idInstitucion);
-							String idCalendarioProgramado = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
-							historico.setIdprogcalendario(new Long(idCalendarioProgramado));
+							//String idCalendarioProgramado = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
+							historico.setIdprogcalendario(new Long(nextIdCalendarioProgramado));
 							historico.setIdturno(conf.getIdturno());
 							//OBTENER ORDEN DE SCS_CONF_CONJUNTO_GUARDIAS
 							if (conf.getOrden() != null) {
@@ -5128,6 +5130,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 	 * @return String con el nuevo identificador.
 	 * @throws ClsExceptions
 	 */	
+	public String getNuevoIdCalProg() throws Exception
+	{
+		String nuevoId = "";
+
+		try {
+			nuevoId = scsGuardiasturnoExtendsMapper.nextIdCalprog();
+		} catch (Exception e) {
+			throw new Exception(e + ": Error al obtener nuevo id calendarios programados");
+		}
+
+		return nuevoId;
+	} // getNuevoIdSaltoCompensacionGrupo()
+	
 	public String getNuevoIdSaltoCompensacionGrupo() throws Exception
 	{
 		String nuevoId = "";
@@ -5140,8 +5155,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		return nuevoId;
 	} // getNuevoIdSaltoCompensacionGrupo()
-	
-	
 	private boolean isIncompatible(LetradoInscripcionItem letradoGuardia, ArrayList diasGuardia)
 			throws Exception
 	{

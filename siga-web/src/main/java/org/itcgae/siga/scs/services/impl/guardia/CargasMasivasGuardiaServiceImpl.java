@@ -1994,7 +1994,9 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 									calendarioItem.setObservaciones(observaciones);
 									//generamos programacion por cada guardia
 									//ScsProgCalendariosSqlProvider.insertSelective(ScsProgCalendarios record)
-									int  res = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
+									String nextIdCalendarioProgramado = getNuevoIdCalProg();
+									calendarioItem.setIdCalendarioProgramado(nextIdCalendarioProgramado);
+									int  res = scsGuardiasturnoExtendsMapper.generateCalendarioProgramado(nextIdCalendarioProgramado, calendarioItem,  idInstitucion.toString(), today, usuario.getIdusuario().toString());
 
 										String idProgramacion = scsGuardiasturnoExtendsMapper.getLastProgramacion(idInstitucion.toString());
 										//generamos un calendario por cada guardia asociada a esa programacion	
@@ -2919,4 +2921,17 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		LOGGER.info(dateLog + ":fin.CargaMasivaDatosCVImpl.getDirectorioFicheroSigaClassique");
 		return directorioFichero.toString();
 	}
+	
+	public String getNuevoIdCalProg() throws Exception
+	{
+		String nuevoId = "";
+
+		try {
+			nuevoId = scsGuardiasturnoExtendsMapper.nextIdCalprog();
+		} catch (Exception e) {
+			throw new Exception(e + ": Error al obtener nuevo id calendarios programados");
+		}
+
+		return nuevoId;
+	} // getNuevoIdSaltoCompensacionGrupo()
 }

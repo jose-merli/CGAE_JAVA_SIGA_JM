@@ -316,8 +316,10 @@ public class GuardiaController {
 		
 		if (response.getStatus() == "OK") {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		} else {
+		} else if (response.getStatus() == "ERRORASOCIADAS"){
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.CONFLICT);
+		}else {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 			}
 	
