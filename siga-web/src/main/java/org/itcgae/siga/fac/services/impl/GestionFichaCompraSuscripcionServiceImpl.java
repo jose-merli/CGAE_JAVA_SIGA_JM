@@ -21,6 +21,8 @@ import org.itcgae.siga.DTO.fac.ListaProductosDTO;
 import org.itcgae.siga.DTO.fac.ListaProductosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionDTO;
+import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ProductoDetalleDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -173,7 +175,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		FichaCompraSuscripcionItem fichaCompleta = null;
 		Error error = new Error();
 
-		LOGGER.info(
+		LOGGER.debug(
 				"getFichaCompraSuscripcion() -> Entrada al servicio para recuperar los detalles de la compra/suscripcion");
 
 		// Conseguimos información del usuario logeado
@@ -230,19 +232,39 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 						fichaCompleta.setIdInstitucion(idInstitucion.toString());
 						fichaCompleta.setProductos(ficha.getProductos());
+						fichaCompleta.setServicios(ficha.getServicios());
 						if(fichaCompleta.getIdFormasPagoComunes() != null)fichaCompleta.setIdFormaPagoSeleccionada(fichaCompleta.getIdFormasPagoComunes().split(",")[0]);
 					}
 					//Para obtener toda la informacion de una compra/suscripcion ya creada
 					else { 
-						List<ListaProductosCompraItem> productos = null;
 						
-						//Si se viene de otra pantalla a consultar la ficha de compra
-						if(ficha.getProductos().size()==0) {
-							productos = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, ficha.getnSolicitud());
-							ficha.setProductos(productos);
+						List<ListaProductosCompraItem> productos = null;
+						List<ListaServiciosSuscripcionItem> servicios = null;
+						
+						
+						//Si es una ficha de compra
+						if(ficha.getProductos() != null) {
+							
+							//Si se viene de otra pantalla a consultar la ficha de compra
+							if(ficha.getProductos().size()==0) {
+								productos = pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra(idInstitucion, ficha.getnSolicitud());
+								ficha.setProductos(productos);
+							}
+							else if(ficha.getProductos().size()>0){
+								productos = ficha.getProductos();
+							}
 						}
-						else if(ficha.getProductos().size()>0){
-							productos = ficha.getProductos();
+						//Si es una ficha de suscripcion
+						else {
+							
+							//Si se viene de otra pantalla a consultar la ficha de compra
+							if(ficha.getServicios().size()==0) {
+								servicios = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, ficha.getnSolicitud());
+								ficha.setServicios(servicios);
+							}
+							else if(ficha.getProductos().size()>0){
+								servicios = ficha.getServicios();
+							}
 						}
 						LOGGER.info(
 								"getFichaCompraSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getFichaCompraSuscripcion() -> Entrada a PysPeticioncomprasuscripcionExtendsMapper para obtener los detalles de la compra/suscripcion");
@@ -255,7 +277,12 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					
 
 						fichaCompleta.setIdInstitucion(idInstitucion.toString());
-						if(productos != null)fichaCompleta.setProductos(productos);
+						if(productos != null) {
+							fichaCompleta.setProductos(productos);
+						}
+						if(servicios != null) {
+							fichaCompleta.setServicios(servicios);
+						}
 					}
 				}
 
@@ -266,7 +293,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					e);
 		}
 
-		LOGGER.info(
+		LOGGER.debug(
 				"getFichaCompraSuscripcion() -> Salida del servicio para obtener los detalles de la compra/suscripcion");
 
 		return fichaCompleta;
@@ -281,7 +308,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("solicitarCompra() -> Entrada al servicio para crear una solicitud de compra");
+		LOGGER.debug("solicitarCompra() -> Entrada al servicio para crear una solicitud de compra");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -366,7 +393,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("solicitarCompra() -> Salida del servicio para crear una solicitud de compra");
+		LOGGER.debug("solicitarCompra() -> Salida del servicio para crear una solicitud de compra");
 		
 		return insertResponseDTO;
 	}
@@ -390,7 +417,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("solicitarSuscripcion() -> Entrada al servicio para crear una solicitud de suscripción");
+		LOGGER.debug("solicitarSuscripcion() -> Entrada al servicio para crear una solicitud de suscripción");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -461,7 +488,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 //		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("solicitarSuscripcion() -> Salida del servicio para crear una solicitud de suscripción");
+		LOGGER.debug("solicitarSuscripcion() -> Salida del servicio para crear una solicitud de suscripción");
 
 		return insertResponseDTO;
 	}
@@ -474,7 +501,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("aprobarSuscripcion() -> Entrada al servicio para crear una solicitud de suscripción");
+		LOGGER.debug("aprobarSuscripcion() -> Entrada al servicio para crear una solicitud de suscripción");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -544,7 +571,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		updateResponseDTO.setError(error);
-		LOGGER.info("aprobarSuscripcion() -> Salida del servicio para aprobar una solicitud de suscripción");
+		LOGGER.debug("aprobarSuscripcion() -> Salida del servicio para aprobar una solicitud de suscripción");
 
 		return updateResponseDTO;
 	}
@@ -557,7 +584,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("aprobarCompra() -> Entrada al servicio para crear una solicitud de suscripción");
+		LOGGER.debug("aprobarCompra() -> Entrada al servicio para crear una solicitud de suscripción");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -677,7 +704,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 //		}
 
 		updateResponseDTO.setError(error);
-		LOGGER.info("aprobarCompra() -> Salida del servicio para aprobar una solicitud de compra");
+		LOGGER.debug("aprobarCompra() -> Salida del servicio para aprobar una solicitud de compra");
 
 		return updateResponseDTO;
 	}
@@ -691,7 +718,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("denegarPeticion() -> Entrada al servicio para crear la denegación de la petición");
+		LOGGER.debug("denegarPeticion() -> Entrada al servicio para crear la denegación de la petición");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -756,7 +783,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("denegarPeticion() -> Salida del servicio para crear una solicitud de suscripción");
+		LOGGER.debug("denegarPeticion() -> Salida del servicio para crear una solicitud de suscripción");
 
 		return insertResponseDTO;
 	}
@@ -770,7 +797,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("denegarPeticionMultiple() -> Entrada al servicio para crear la denegación de una o varias peticiones");
+		LOGGER.debug("denegarPeticionMultiple() -> Entrada al servicio para crear la denegación de una o varias peticiones");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -822,7 +849,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("denegarPeticionMultiple() -> Salida del servicio para crear la denegación de una petición");
+		LOGGER.debug("denegarPeticionMultiple() -> Salida del servicio para crear la denegación de una o varias peticiones");
 
 		return insertResponseDTO;
 	}
@@ -836,7 +863,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("aprobarCompraMultiple() -> Entrada al servicio para aprobar una o varias peticiones de compra");
+		LOGGER.debug("aprobarCompraMultiple() -> Entrada al servicio para aprobar una o varias peticiones de compra");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -891,7 +918,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("aprobarCompraMultiple() -> Salida del servicio para aprobar una o varias peticiones de compra");
+		LOGGER.debug("aprobarCompraMultiple() -> Salida del servicio para aprobar una o varias peticiones de compra");
 
 		return insertResponseDTO;
 	}
@@ -905,7 +932,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("updateProductosPeticion() -> Entrada al servicio para actualizar los productos solicitados asociados con una solicitud");
+		LOGGER.debug("updateProductosPeticion() -> Entrada al servicio para actualizar los productos solicitados asociados con una solicitud");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1013,7 +1040,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 
 		insertResponseDTO.setError(error);
-		LOGGER.info("updateProductosPeticion() -> Salida del servicio para actualizar los productos solicitados asociados con una solicitud");
+		LOGGER.debug("updateProductosPeticion() -> Salida del servicio para actualizar los productos solicitados asociados con una solicitud");
 
 		return insertResponseDTO;
 	}
@@ -1024,7 +1051,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		ListaProductosCompraDTO listaProductosCompra = new ListaProductosCompraDTO();
 		Error error = new Error();
 
-		LOGGER.info("getListaProductosCompra() -> Entrada al servicio para obtener la informacion de los productos de una peticion");
+		LOGGER.debug("getListaProductosCompra() -> Entrada al servicio para obtener la informacion de los productos de una peticion");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1063,7 +1090,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						"getListaProductosCompra() / pysPeticioncomprasuscripcionExtendsMapper.getListaProductosCompra() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
 			}
 		}
-		LOGGER.info("getListaProductosCompra() -> Salida del servicio para obtener la informacion de los productos de una peticion");
+		LOGGER.debug("getListaProductosCompra() -> Salida del servicio para obtener la informacion de los productos de una peticion");
 
 		return listaProductosCompra;
 	}
@@ -1093,7 +1120,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("getFacturasPeticion() -> Entrada al servicio para obtener las facturas de una petición");
+		LOGGER.debug("getFacturasPeticion() -> Entrada al servicio para obtener las facturas de una petición");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1239,7 +1266,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			listaFacturasDTO.setError(error);
 		}
 
-		LOGGER.info("getFacturasPeticion() -> Salida del servicio para obtener las facturas de una petición");
+		LOGGER.debug("getFacturasPeticion() -> Salida del servicio para obtener las facturas de una petición");
 
 		return listaFacturasDTO;
 	}
@@ -1251,7 +1278,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("getDescuentosPeticion() -> Entrada al servicio para obterner los descuentos y anticipos de una petición");
+		LOGGER.debug("getDescuentosPeticion() -> Entrada al servicio para obterner los descuentos y anticipos de una petición");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1423,7 +1450,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			listaDescuentosDTO.setError(error);
 		}
 
-		LOGGER.info("getDescuentosPeticion() -> Salida del servicio para obtener los descuentos y anticipos de una petición");
+		LOGGER.debug("getDescuentosPeticion() -> Salida del servicio para obtener los descuentos y anticipos de una petición");
 
 		return listaDescuentosDTO;
 	}
@@ -1438,7 +1465,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info(
+		LOGGER.debug(
 				"deleteAnticipoPeticion() -> Entrada al servicio para eliminar anticipos de a una solicitud");
 
 		// Conseguimos información del usuario logeado
@@ -1570,7 +1597,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			}
 
 			deleteResponseDTO.setError(error);
-			LOGGER.info(
+			LOGGER.debug(
 					"deleteAnticipoPeticion() -> Salida del servicio para eliminar anticipos de a una solicitud");
 
 			
@@ -1589,7 +1616,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info(
+		LOGGER.debug(
 				"saveAnticipo() -> Entrada al servicio para asociar un nuevo anticipo a una solicitud");
 
 		// Conseguimos información del usuario logeado
@@ -1707,7 +1734,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			}
 
 			insertResponseDTO.setError(error);
-			LOGGER.info(
+			LOGGER.debug(
 					"saveAnticipo() -> Salida del servicio para asociar un nuevo anticipo a una solicitud");
 
 			
@@ -1724,7 +1751,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		Error error = new Error();
 		int response = 0;
 
-		LOGGER.info("anularPeticion() -> Entrada al servicio para anular una petición");
+		LOGGER.debug("anularPeticion() -> Entrada al servicio para anular una petición");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1869,17 +1896,18 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 			}
 
 		updateResponseDTO.setError(error);
-		LOGGER.info("anularPeticion() -> Salida del servicio para anular una petición");
+		LOGGER.debug("anularPeticion() -> Salida del servicio para anular una petición");
 
 		return updateResponseDTO;
 	}
 
-	public ListaServiciosDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud) {
+	@Override
+	public ListaServiciosSuscripcionDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud) {
 		
-			ListaServiciosDTO listaServiciosSuscripcion = new ListaServiciosDTO();
+			ListaServiciosSuscripcionDTO listaServiciosSuscripcion = new ListaServiciosSuscripcionDTO();
 			Error error = new Error();
 	
-			LOGGER.info("getListaServiciosSuscripcion() -> Entrada al servicio para obtener la informacion de los productos de una peticion");
+			LOGGER.debug("getListaServiciosSuscripcion() -> Entrada al servicio para obtener la informacion de los servicios de una peticion");
 	
 			// Conseguimos información del usuario logeado
 			String token = request.getHeader("Authorization");
@@ -1904,21 +1932,22 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				if (usuarios != null && !usuarios.isEmpty()) {
 					
 					LOGGER.info(
-							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServicios() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
+							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServicios() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los servicios de una peticion");
 	
-					List<ListaServiciosItem> serviciosSuscripcion = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, nSolicitud);
+					List<ListaServiciosSuscripcionItem> serviciosSuscripcion = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, nSolicitud);
 	
-					listaServiciosSuscripcion.setListaServiciosItems(serviciosSuscripcion);
+					LOGGER.info(
+							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los servicios de una peticion");
+				
+					listaServiciosSuscripcion.setListaServiciosSuscripcionItems(serviciosSuscripcion);
 					
 					error.setCode(200);
 					
 					listaServiciosSuscripcion.setError(error);
 					
-					LOGGER.info(
-							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los productos de una peticion");
 				}
 			}
-			LOGGER.info("getListaServiciosSuscripcion() -> Salida del servicio para obtener la informacion de los productos de una peticion");
+			LOGGER.debug("getListaServiciosSuscripcion() -> Salida del servicio para obtener la informacion de los servicios de una peticion");
 	
 			return listaServiciosSuscripcion;
 		}

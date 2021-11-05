@@ -35,7 +35,7 @@ public class FichaCompraSuscripcionItem {
     
     //TARJETA SERVICIOS
     //REVISAR
-    private List<ListaProductosCompraItem> servicios;
+    private List<ListaServiciosSuscripcionItem> servicios;
 	
 	private String idEstadoPeticion;
 
@@ -186,6 +186,12 @@ public class FichaCompraSuscripcionItem {
 	}
 	public void setImpPagado(String impPagado) {
 		this.impPagado = impPagado;
+	}
+	public List<ListaServiciosSuscripcionItem> getServicios() {
+		return servicios;
+	}
+	public void setServicios(List<ListaServiciosSuscripcionItem> servicios) {
+		this.servicios = servicios;
 	}
 
 }
