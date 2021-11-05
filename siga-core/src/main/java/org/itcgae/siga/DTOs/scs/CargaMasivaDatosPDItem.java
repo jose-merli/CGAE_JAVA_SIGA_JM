@@ -7,6 +7,7 @@ public class CargaMasivaDatosPDItem {
 	private String codigoDesignaAbogado;
 	private String numEJG;
 	private Long idPersona;
+	private Long idProcurador;
 	private String numColProcurador;
 	private String numDesignaProcurador;
 	private String nombreProcurador;
@@ -24,7 +25,15 @@ public class CargaMasivaDatosPDItem {
 	private int ejgIdTipo;
 	private int ejgAnio;
 	private Long ejgNumero;
-			
+		
+	public Long getIdProcurador() {
+		return idProcurador;
+	}
+
+	public void setIdProcurador(Long idProcurador) {
+		this.idProcurador = idProcurador;
+	}
+
 	public boolean isExisteDesigna() {
 		return existeDesigna;
 	}

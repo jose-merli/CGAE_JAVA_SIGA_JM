@@ -91,6 +91,7 @@ import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoKey;
 import org.itcgae.siga.db.entities.ScsProcurador;
 import org.itcgae.siga.db.entities.ScsProcuradorKey;
+import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.mappers.ScsDatosprocuradoresMapper;
@@ -165,6 +166,12 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 	
 	@Autowired
 	private CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
+	
+	@Autowired
+	private FicherosServiceImpl ficherosServiceImpl;
+	
+	@Autowired
+	private CenColegiadoMapper cenColegiadoMapper;
 	
 	@Override
 	public InputStreamResource descargarModelo(HttpServletRequest request)
@@ -323,7 +330,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 								scsDesignaprocurador.setAnio(cargaMasivaDatosPDItem.getDesigaAbogadoAnio());
 								scsDesignaprocurador.setNumero(cargaMasivaDatosPDItem.getDesigaAbogadoNumero());
 
-								scsDesignaprocurador.setIdprocurador(cargaMasivaDatosPDItem.getIdPersona());
+								scsDesignaprocurador.setIdprocurador(cargaMasivaDatosPDItem.getIdProcurador());
 								scsDesignaprocurador.setIdinstitucionProc(cargaMasivaDatosPDItem.getIdInstitucion());
 								scsDesignaprocurador.setNumerodesignacion(String.valueOf(cargaMasivaDatosPDItem.getNumDesignaProcurador()));
 								scsDesignaprocurador.setFechadesigna(cargaMasivaDatosPDItem.getFechaDesignaProcurador());
@@ -342,7 +349,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 								ejg.setAnio((short) cargaMasivaDatosPDItem.getEjgAnio());
 								ejg.setNumero(cargaMasivaDatosPDItem.getEjgNumero());
 
-								ejg.setIdprocurador(cargaMasivaDatosPDItem.getIdPersona());
+								ejg.setIdprocurador(cargaMasivaDatosPDItem.getIdProcurador());
 								ejg.setIdinstitucionProc(cargaMasivaDatosPDItem.getIdInstitucion());
 								ejg.setNumerodesignaproc(String.valueOf(cargaMasivaDatosPDItem.getNumDesignaProcurador()));
 								ejg.setFechaDesProc(cargaMasivaDatosPDItem.getFechaDesignaProcurador());
@@ -419,6 +426,14 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 
 						cenCargamasivacv.setIdfichero(idFile);
 						cenCargamasivacv.setIdficherolog(idLogFile);
+						
+						try {
+							guardarFicheroEnDisco(file.getBytes(), cenCargamasivacv, false);
+							guardarFicheroEnDisco(bytesLog, cenCargamasivacv, true);
+						} catch (IOException e) {
+							LOGGER.debug("Error al crear y escribir el fichero: " + e.getStackTrace());
+							throw e;
+						}
 
 						result = cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
 					}catch(IOException e) {
@@ -573,7 +588,6 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		// TODO Auto-generated method stub
 		Date dateLog = new Date();
 		LOGGER.debug(dateLog + " --> Inicio CargaMasivaProcuradoresServiceImpl uploadFileLog");
-		IFicherosService ficherosService = new FicherosServiceImpl();
 		FicheroVo ficheroVo = new FicheroVo();
 
 		String directorioFichero = getDirectorioFichero(cenCargamasiva.getIdinstitucion());
@@ -589,7 +603,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		ficheroVo.setUsumodificacion(Integer.valueOf(cenCargamasiva.getUsumodificacion()));
 		ficheroVo.setFechamodificacion(new Date());
 		
-		ficherosService.insert(ficheroVo);
+		ficherosServiceImpl.insert(ficheroVo);
 
 		if (isLog) {
 			ficheroVo.setDescripcion("log_" + ficheroVo.getDescripcion());
@@ -597,13 +611,6 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		}
 
 		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
-		
-		try {
-			guardarFicheroEnDisco(bytes, cenCargamasiva);
-		} catch (IOException e) {
-			LOGGER.debug("Error al crear y escribir el fichero: " + e.getStackTrace());
-			throw e;
-		}
 		
 		LOGGER.debug(dateLog + " --> Fin CargaMasivaProcuradoresServiceImpl uploadFileLog");
 		return ficheroVo.getIdfichero();
@@ -719,7 +726,13 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 						nombre.append(scsProcurador.getApellidos2());
 					}
 					cargaMasivaDatosPDItem.setNombreProcurador(nombre.toString());
-					cargaMasivaDatosPDItem.setIdPersona(scsProcurador.getIdprocurador());
+					cargaMasivaDatosPDItem.setIdProcurador(scsProcurador.getIdprocurador());
+					
+					CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+					cenColegiadoExample.createCriteria().andNcolegiadoEqualTo(scsProcurador.getNcolegiado()).andIdinstitucionEqualTo(scsProcurador.getIdinstitucion());
+					List<CenColegiado> cenColegiado = cenColegiadoMapper.selectByExample(cenColegiadoExample);
+
+					cargaMasivaDatosPDItem.setIdPersona(Long.valueOf(cenColegiado.get(0).getIdpersona().toString()));
 				}else{
 					cargaMasivaDatosPDItem.setNombreProcurador("Procurador no encontrado");
 					errorLinea.append("Procurador no encontrado. ");
@@ -833,14 +846,14 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 					&& cargaMasivaDatos.getDesigaAbogadoIdTurno()!=0
 					&& cargaMasivaDatos.getDesigaAbogadoAnio()!=null && !cargaMasivaDatos.getDesigaAbogadoAnio().toString().equals("")
 					&& cargaMasivaDatos.getDesigaAbogadoNumero()!=null && !cargaMasivaDatos.getDesigaAbogadoNumero().toString().equals("")
-					&& cargaMasivaDatos.getIdPersona()!=null && !cargaMasivaDatos.getIdPersona().toString().equals("")
+					&& cargaMasivaDatos.getIdProcurador()!=null && !cargaMasivaDatos.getIdProcurador().toString().equals("")
 					&& cargaMasivaDatos.getFechaDesignaProcurador()!=null && !cargaMasivaDatos.getFechaDesignaProcurador().toString().equals("")){
 
 				ScsDesignaprocuradorExample scsDesignaprocuradorExample = new ScsDesignaprocuradorExample();
 				scsDesignaprocuradorExample.createCriteria().andIdinstitucionEqualTo(cargaMasivaDatos.getIdInstitucion())
 				.andIdturnoEqualTo(cargaMasivaDatos.getDesigaAbogadoIdTurno())
 				.andAnioEqualTo(cargaMasivaDatos.getDesigaAbogadoAnio()).andNumeroEqualTo(cargaMasivaDatos.getDesigaAbogadoNumero())
-				.andIdprocuradorEqualTo(cargaMasivaDatos.getIdPersona()).andIdinstitucionProcEqualTo(cargaMasivaDatos.getIdInstitucion())
+				.andIdprocuradorEqualTo(cargaMasivaDatos.getIdProcurador()).andIdinstitucionProcEqualTo(cargaMasivaDatos.getIdInstitucion())
 				.andFechadesignaEqualTo(cargaMasivaDatos.getFechaDesignaProcurador());
 
 				List<ScsDesignaprocurador> listaDesigna = scsDesignaprocuradorMapper.selectByExample(scsDesignaprocuradorExample);
@@ -855,7 +868,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 					ScsEjgExample scsEjgExample = new ScsEjgExample();
 					scsEjgExample.createCriteria().andIdinstitucionEqualTo(cargaMasivaDatos.getIdInstitucion()).andIdtipoejgEqualTo((short) cargaMasivaDatos.getEjgIdTipo())
 					.andAnioEqualTo((short) cargaMasivaDatos.getEjgAnio()).andNumeroEqualTo(cargaMasivaDatos.getEjgNumero())
-					.andIdprocuradorEqualTo(cargaMasivaDatos.getIdPersona()).andIdinstitucionProcEqualTo(cargaMasivaDatos.getIdInstitucion())
+					.andIdprocuradorEqualTo(cargaMasivaDatos.getIdProcurador()).andIdinstitucionProcEqualTo(cargaMasivaDatos.getIdInstitucion())
 					.andFechaDesProcEqualTo(cargaMasivaDatos.getFechaDesignaProcurador()).andNumerodesignaprocEqualTo(String.valueOf(cargaMasivaDatosPDItem.getNumDesignaProcurador()));
 
 					List<ScsEjg> listaEjg = scsEjgMapper.selectByExample(scsEjgExample);
@@ -878,13 +891,18 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		return masivaDatosPDVos;
 	}
 	
-	public void guardarFicheroEnDisco(byte[] bytes, CenCargamasiva cenCargamasiva) throws IOException {
+	public void guardarFicheroEnDisco(byte[] bytes, CenCargamasiva cenCargamasiva, boolean isLog) throws IOException {
 		
-		StringBuffer directorio = new StringBuffer(getDirectorioFicheroSigaClassique(cenCargamasiva.getIdinstitucion()));
+		File directorio = new File(getDirectorioFicheroSigaClassique(cenCargamasiva.getIdinstitucion()) + File.separator + cenCargamasiva.getIdcargamasiva());
 		
-		directorio.append(File.separator);
-		directorio.append(cenCargamasiva.getNombrefichero());		
-		File file = new File(directorio.toString());
+		if(!directorio.exists()) 
+			directorio.mkdirs();
+		
+		StringBuffer pathDirectorio = new StringBuffer(getDirectorioFicheroSigaClassique(cenCargamasiva.getIdinstitucion()));
+		
+		pathDirectorio.append(File.separator);
+		pathDirectorio.append(isLog ? "log_" + cenCargamasiva.getIdfichero() + "_" + cenCargamasiva.getNombrefichero() : cenCargamasiva.getIdfichero() + "_" +  cenCargamasiva.getNombrefichero());
+		File file = new File(pathDirectorio.toString());
 		
 		OutputStream output = null;
 		
@@ -996,8 +1014,8 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 						nextEntry = doc.getNombreFichero();
 					}
 
-					String path = getDirectorioFicheroRemesa(idInstitucion, doc.getIdCargaMasiva());
-					path += File.separator + doc.getNombreFichero();
+					String path = getDirectorioFicheroRemesa(idInstitucion, doc.getIdFichero());
+					path += "_" + doc.getNombreFichero();
 					File file = new File(path);
 					if (file.exists() && !file.isDirectory()) {
 						zipOutputStream.putNextEntry(new ZipEntry(nextEntry));
@@ -1027,19 +1045,18 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 	}
 
-	private String getDirectorioFicheroRemesa(Short idInstitucion, int idCargaMasiva) {
+	private String getDirectorioFicheroRemesa(Short idInstitucion, Long idCargaMasiva) {
 		// TODO Auto-generated method stub
 		// Extraemos el path para los ficheros
 		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
-		genPropertiesExampleP.createCriteria().andParametroEqualTo("cajg.directorioFisicoCAJG");
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("cen.cargaExcel.ficheros.path");
 		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
 		String path = genPropertiesPath.get(0).getValor();
 
 		GenPropertiesExample genPropertiesExamplePG = new GenPropertiesExample();
-		genPropertiesExamplePG.createCriteria().andParametroEqualTo("cajg.directorioCAJGJava");
+		genPropertiesExamplePG.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaCV");
 		List<GenProperties> genPropertiesPathP = genPropertiesMapper.selectByExample(genPropertiesExamplePG);
 		path += genPropertiesPathP.get(0).getValor();
-		path += File.separator + idInstitucion + File.separator + "cargaMasivaProcuradores";
 		path += File.separator + idCargaMasiva;
 
 		LOGGER.debug("getDirectorioFicheroRemesa() -> Path del directorio de ficheros CargaMasivaProcuradores  = " + path);
