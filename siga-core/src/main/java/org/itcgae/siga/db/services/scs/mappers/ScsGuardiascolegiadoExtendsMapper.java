@@ -39,6 +39,13 @@ public interface ScsGuardiascolegiadoExtendsMapper extends ScsGuardiascolegiadoM
         @Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR),
     })
     List<ComboItem> getTurnosByColegiadoFecha(String idPersona, Short idInstitucion, String guardiaDia);
+
+    @SelectProvider(type = ScsGuardiascolegiadoSqlExtendsProvider.class, method = "getGuardiasByTurnoColegiadoFecha")
+    @Results({
+            @Result(column = "idGuardia", property = "value", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "nombre", property = "label", jdbcType = JdbcType.VARCHAR),
+    })
+    List<ComboItem> getGuardiasByTurnoColegiadoFecha(String idPersona, Short idInstitucion, String guardiaDia, String idTurno);
     
     @SelectProvider(type = ScsGuardiascolegiadoSqlExtendsProvider.class, method = "getColegiadosGuardiaDia")
     @Results({ 

@@ -20,7 +20,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public interface AsistenciaService {
 	
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona);
-	
+
+	public ComboDTO getGuardiasByTurnoColegiadoFecha(HttpServletRequest request, String guardiaDia, String idTurno, String idPersona);
+
 	public ComboDTO getTiposAsistenciaColegio (HttpServletRequest request, String idTurno, String idGuardia);
 	
 	public ComboDTO getColegiadosGuardiaDia (HttpServletRequest request, String idTurno, String idGuardia, String guardiaDia);

@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.TarjetaAsistenciaResponseItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasSqlProvider;
@@ -35,16 +36,57 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
         		+ "            AND gc.idturno = turno.idturno\r\n"
         		+ "    )          AS nombre");
         sql.FROM("scs_calendarioguardias  gc");
-        sql.INNER_JOIN("SCS_TURNO turno ON gc.idinstitucion = turno.idinstitucion AND gc.idturno = turno.idturno");
+        sql.INNER_JOIN("SCS_TURNO turno ON gc.idinstitucion = turno.idinstitucion AND gc.idturno = turno.idturno",
+                "SCS_CABECERAGUARDIAS CG on GC.IDINSTITUCION = CG.IDINSTITUCION " +
+                        "AND GC.IDTURNO = CG.IDTURNO " +
+                        "AND GC.IDGUARDIA = CG.IDGUARDIA " +
+                        "AND GC.IDCALENDARIOGUARDIAS = CG.IDCALENDARIOGUARDIAS");
         sql.WHERE("turno.idinstitucion = " + idInstitucion);
         sql.WHERE("nvl(turno.idtipoturno, 2) = 2");
-        sql.WHERE("TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(gc.fechainicio) AND trunc(gc.fechafin)");
+        sql.WHERE("TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(cg.fechainicio) AND trunc(cg.fecha_fin)");
         if(idPersona != null
         		&& !"".equals(idPersona)) {
-        	sql.WHERE("gc.IDPERSONA_ULTIMOANTERIOR = " + idPersona);
+        	sql.WHERE("CG.IDPERSONA = " + idPersona);
         }
         sql.ORDER_BY("nombre");
         return sql.toString();
+    }
+
+    public String getGuardiasByTurnoColegiadoFecha(String idPersona, Short idInstitucion, String guardiaDia, String idTurno){
+        SQL SQL = new SQL();
+
+        if(!UtilidadesString.esCadenaVacia(idPersona)) {
+            SQL.SELECT_DISTINCT("GUA.IDGUARDIA",
+                    "GUA.NOMBRE");
+            SQL.FROM("SCS_GUARDIASTURNO GUA");
+            SQL.INNER_JOIN("SCS_CALENDARIOGUARDIAS GC ON GC.IDINSTITUCION = GUA.IDINSTITUCION " +
+                            "AND GC.IDTURNO = GUA.IDTURNO " +
+                            "AND GC.IDGUARDIA = GUA.IDGUARDIA ",
+                    "SCS_CABECERAGUARDIAS CG ON GC.IDINSTITUCION = CG.IDINSTITUCION " +
+                            "AND GC.IDTURNO = CG.IDTURNO " +
+                            "AND GC.IDGUARDIA = CG.IDGUARDIA " +
+                            "AND GC.IDCALENDARIOGUARDIAS = CG.IDCALENDARIOGUARDIAS");
+            SQL.WHERE("GUA.IDTURNO = '" + idTurno + "'",
+                    "GUA.IDINSTITUCION = '" + idInstitucion + "'",
+                    "CG.IDPERSONA = '"+idPersona+"'",
+                    "TO_DATE('"+ guardiaDia +"', 'dd/MM/yyyy') BETWEEN trunc(cg.fechainicio) AND trunc(cg.fecha_fin)");
+            SQL.ORDER_BY("GUA.NOMBRE");
+        }else{
+            SQL.SELECT("NOMBRE");
+            SQL.SELECT("IDGUARDIA");
+
+            SQL.FROM("SCS_GUARDIASTURNO");
+            if (idTurno != null &&  !idTurno.isEmpty()) {
+                SQL.WHERE("IDTURNO IN (" + idTurno + ")");
+            }
+            if (idInstitucion != null) {
+                SQL.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+            }
+            SQL.WHERE("FECHABAJA IS NULL");
+            SQL.ORDER_BY("nombre");
+        }
+
+        return SQL.toString();
     }
     
     public String getColegiadosGuardiaDia(String idTurno, String idGuardia, Short idInstitucion, String guardiaDia) {

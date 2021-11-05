@@ -7,7 +7,7 @@ public class FiltroAsistenciaItem implements Comparable<FiltroAsistenciaItem> {
 	private String idTurno;
 	private String idTipoAsistenciaColegiado;
 	private String idLetradoGuardia;
-	private boolean isSustituto;
+	private String isSustituto;
 	private String idTipoAsistencia;
 	private String numColegiado;
 	private String idComisaria;
@@ -28,8 +28,16 @@ public class FiltroAsistenciaItem implements Comparable<FiltroAsistenciaItem> {
 	private String apellidos;
 	private String nombre;
 	private String nig;
+	private String idLetradoManual;
 
-	
+	public String getIdLetradoManual() {
+		return idLetradoManual;
+	}
+
+	public void setIdLetradoManual(String idLetradoManual) {
+		this.idLetradoManual = idLetradoManual;
+	}
+
 	public String getDiaGuardia() {
 		return diaGuardia;
 	}
@@ -60,12 +68,15 @@ public class FiltroAsistenciaItem implements Comparable<FiltroAsistenciaItem> {
 	public void setIdLetradoGuardia(String idLetradoGuardia) {
 		this.idLetradoGuardia = idLetradoGuardia;
 	}
-	public boolean isSustituto() {
+
+	public String getIsSustituto() {
 		return isSustituto;
 	}
-	public void setSustituto(boolean isSustituto) {
+
+	public void setIsSustituto(String isSustituto) {
 		this.isSustituto = isSustituto;
 	}
+
 	public String getIdTipoAsistencia() {
 		return idTipoAsistencia;
 	}
@@ -240,7 +251,7 @@ public class FiltroAsistenciaItem implements Comparable<FiltroAsistenciaItem> {
 		result = prime * result + ((idLetradoGuardia == null) ? 0 : idLetradoGuardia.hashCode());
 		result = prime * result + ((idTipoAsistenciaColegiado == null) ? 0 : idTipoAsistenciaColegiado.hashCode());
 		result = prime * result + ((idTurno == null) ? 0 : idTurno.hashCode());
-		result = prime * result + (isSustituto ? 1231 : 1237);
+		result = prime * result + ((isSustituto == null) ? 0 : isSustituto.hashCode());
 		return result;
 	}
 	@Override

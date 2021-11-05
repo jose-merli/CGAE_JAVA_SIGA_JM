@@ -43,6 +43,20 @@ public class AsistenciaController {
 		}
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+
+	@GetMapping(value = "/guardiasByTurnoColegiadoFecha")
+	public ResponseEntity<ComboDTO> getGuardiasByTurnoColegiadoFecha(HttpServletRequest request,
+															  @RequestParam String guardiaDia,
+															  @RequestParam String idTurno,
+															  @RequestParam(required = false) String idPersona) {
+		ComboDTO response = null;
+		try {
+			response = asistenciaService.getGuardiasByTurnoColegiadoFecha(request, guardiaDia, idTurno, idPersona);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 	
 	@GetMapping(value="/getTiposAsistencia")
 	public ResponseEntity<ComboDTO> getTiposAsistencia(HttpServletRequest request, 
