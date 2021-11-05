@@ -35,7 +35,7 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "comboCuentasBancarias")
 	@Results({ 
 		@Result(column = "BANCOS_CODIGO", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IBAN", property = "label", jdbcType = JdbcType.VARCHAR)}) 
+		@Result(column = "CUENTA", property = "label", jdbcType = JdbcType.VARCHAR)}) 
 	List<ComboItem> comboCuentasBancarias(Short idInstitucion);
 	
 }
