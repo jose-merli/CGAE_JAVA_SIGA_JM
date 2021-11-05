@@ -193,19 +193,19 @@ public class ScsIncompatibilidadguardiasSqlExtendsProvider extends ScsIncompatib
 		}
 		/*listado_guardias.WHERE("SCS_GUARDIASTURNO.IDGUARDIA IN (" + listado_guardias_idGuardia + ")" );*/
 		if (incompatibilidades.getIdArea() != null && !incompatibilidades.getIdArea().isEmpty()) {
-			listado_guardias.WHERE("SCS_AREA.IDAREA = " + incompatibilidades.getIdArea() );
+			listado_guardias.WHERE("SCS_AREA.IDAREA IN (" + incompatibilidades.getIdArea() + ")");
 		}
-		if (incompatibilidades.getIdArea() != null && !incompatibilidades.getIdArea().isEmpty()) {
-			listado_guardias.WHERE("SCS_AREA.IDAREA = " + incompatibilidades.getIdArea() );
-		}
+//		if (incompatibilidades.getIdArea() != null && !incompatibilidades.getIdArea().isEmpty()) {
+//			listado_guardias.WHERE("SCS_AREA.IDAREA = " + incompatibilidades.getIdArea() );
+//		}
 		if (incompatibilidades.getIdMateria() != null && !incompatibilidades.getIdMateria().isEmpty()) {
-			listado_guardias.WHERE("SCS_MATERIA.IDMATERIA = " + incompatibilidades.getIdMateria() );
+			listado_guardias.WHERE("SCS_MATERIA.IDMATERIA IN ("+ incompatibilidades.getIdMateria() + ")");
 		}
 		if (incompatibilidades.getIdZona() != null && !incompatibilidades.getIdZona().isEmpty()) {
-			listado_guardias.WHERE("SCS_ZONA.IDZONA = " + incompatibilidades.getIdZona() );
+			listado_guardias.WHERE("SCS_ZONA.IDZONA IN (" + incompatibilidades.getIdZona() + ")");
 		}
 		if (incompatibilidades.getIdSubZona() != null && !incompatibilidades.getIdSubZona().isEmpty()) {
-			listado_guardias.WHERE("SCS_SUBZONA.IDSUBZONA = " + incompatibilidades.getIdSubZona() );
+			listado_guardias.WHERE("SCS_SUBZONA.IDSUBZONA IN ( "+ incompatibilidades.getIdSubZona()+ ")" );
 		}
 		if (incompatibilidades.getIdJurisdiccion() != null && !incompatibilidades.getIdJurisdiccion().isEmpty()) {
 			listado_guardias.WHERE("SCS_TURNO.IDJURISDICCION IN ( " + incompatibilidades.getIdJurisdiccion() + ")" );

@@ -62,9 +62,9 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
         sql.INNER_JOIN("cen_persona per on per.idpersona = gc.idpersona");
         sql.WHERE("gc.idinstitucion = "+idInstitucion);
         sql.AND();
-        sql.WHERE("gc.idguardia = '"+idGuardia+"'");
+        sql.WHERE("gc.idguardia IN ("+idGuardia+")");
         sql.AND();
-        sql.WHERE("gc.idturno = '"+idTurno+"'");
+        sql.WHERE("gc.idturno IN ("+idTurno+")");
         sql.AND();
         sql.WHERE("TO_DATE('"+guardiaDia+"', 'DD/MM/YYYY') BETWEEN trunc(gc.fechainicio) AND trunc(gc.fechafin)");
         sql.ORDER_BY("posicion,nombre");

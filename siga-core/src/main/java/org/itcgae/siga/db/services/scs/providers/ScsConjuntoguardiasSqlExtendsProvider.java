@@ -27,9 +27,9 @@ public class ScsConjuntoguardiasSqlExtendsProvider extends ScsConjuntoguardiasSq
 
             if (!UtilidadesString.esCadenaVacia(filtro.getIdGrupoZona())) {
             SQL.INNER_JOIN("scs_conf_conjunto_guardias ccg on cg.idconjuntoguardia = ccg.idconjuntoguardia and cg.idinstitucion = ccg.idinstitucion", "scs_guardiasturno g on g.idguardia = ccg.idguardia and g.idinstitucion = ccg.idinstitucion", "scs_turno t on t.idturno = g.idturno and t.idinstitucion = g.idinstitucion");
-            SQL.WHERE("t.idzona='" + filtro.getIdGrupoZona() + "'");
+            SQL.WHERE("t.idzona IN (" + filtro.getIdGrupoZona() + ")");
             if (!UtilidadesString.esCadenaVacia(filtro.getIdZona())) {
-                SQL.WHERE("t.idsubzona='" + filtro.getIdZona() + "'");
+                SQL.WHERE("t.idsubzona IN (" + filtro.getIdZona() + ")");
             }
         }
 
