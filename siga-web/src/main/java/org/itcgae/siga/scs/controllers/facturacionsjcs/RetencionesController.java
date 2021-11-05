@@ -1,7 +1,9 @@
 package org.itcgae.siga.scs.controllers.facturacionsjcs;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.scs.*;
+import org.itcgae.siga.db.entities.FcsRetencionesJudiciales;
 import org.itcgae.siga.scs.services.facturacionsjcs.IRetencionesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,10 +29,22 @@ public class RetencionesController {
         return new ResponseEntity<RetencionesDTO>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/searchRetencion")
+    public ResponseEntity<RetencionDTO> searchRetencion(@RequestBody RetencionesRequestDTO retencionesRequestDTO, HttpServletRequest request) {
+        RetencionDTO response = iRetencionesService.searchRetencion(retencionesRequestDTO, request);
+        return new ResponseEntity<RetencionDTO>(response, HttpStatus.OK);
+    }
+
     @PostMapping("/deleteRetenciones")
     public ResponseEntity<DeleteResponseDTO> deleteRetenciones(@RequestBody List<RetencionesItem> retencionesItemList, HttpServletRequest request) {
         DeleteResponseDTO response = iRetencionesService.deleteRetenciones(retencionesItemList, request);
         return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/saveOrUpdateRetencion")
+    public ResponseEntity<InsertResponseDTO> saveOrUpdateRetencion(@RequestBody FcsRetencionesJudiciales retencion, HttpServletRequest request) {
+        InsertResponseDTO response = iRetencionesService.saveOrUpdateRetencion(retencion, request);
+        return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
     }
 
     @PostMapping("/searchRetencionesAplicadas")

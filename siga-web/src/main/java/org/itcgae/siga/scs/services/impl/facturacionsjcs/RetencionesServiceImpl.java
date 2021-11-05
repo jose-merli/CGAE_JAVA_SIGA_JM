@@ -2,6 +2,7 @@ package org.itcgae.siga.scs.services.impl.facturacionsjcs;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -114,6 +115,60 @@ public class RetencionesServiceImpl implements IRetencionesService {
         return retencionesDTO;
     }
 
+    @Override
+    public RetencionDTO searchRetencion(RetencionesRequestDTO retencionesRequestDTO, HttpServletRequest request) {
+
+        LOGGER.info("RetencionesServiceImpl.searchRetencion() -> Entrada al servicio de busqueda de retencion");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        RetencionDTO retencionDTO = new RetencionDTO();
+
+        try {
+
+            if (null != idInstitucion) {
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info(
+                        "RetencionesServiceImpl.searchRetencion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "RetencionesServiceImpl.searchRetencion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    LOGGER.info("RetencionesServiceImpl.searchRetencion() ->  fcsRetencionesJudicialesExtendsMapper.selectByPrimaryKey() -> Inicio de consulta para buscar la retencion");
+                    FcsRetencionesJudicialesKey fcsRetencionesJudicialesKey = new FcsRetencionesJudicialesKey();
+                    fcsRetencionesJudicialesKey.setIdretencion(Long.valueOf(retencionesRequestDTO.getIdRetenciones()));
+                    fcsRetencionesJudicialesKey.setIdinstitucion(idInstitucion);
+                    FcsRetencionesJudiciales fcsRetencionesJudiciales = fcsRetencionesJudicialesExtendsMapper.selectByPrimaryKey(fcsRetencionesJudicialesKey);
+                    retencionDTO.setRetencion(fcsRetencionesJudiciales);
+                    LOGGER.info("RetencionesServiceImpl.searchRetencion() ->  fcsRetencionesJudicialesExtendsMapper.selectByPrimaryKey() -> Fin de consulta para buscar la retencion");
+
+                } else {
+                    LOGGER.warn("RetencionesServiceImpl.searchRetencion() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                            + dni + " e idInstitucion = " + idInstitucion);
+                }
+            } else {
+                LOGGER.warn("RetencionesServiceImpl.searchRetencion() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("RetencionesServiceImpl.searchRetencion() -> Se ha producido un error en la busqueda de la retencion", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+        }
+
+        retencionDTO.setError(error);
+
+        LOGGER.info("RetencionesServiceImpl.searchRetencion() -> Salida del servicio de busqueda de retencion");
+
+        return retencionDTO;
+    }
+
     public DeleteResponseDTO deleteRetenciones(List<RetencionesItem> retencionesItemList, HttpServletRequest request) {
 
         LOGGER.info("RetencionesServiceImpl.deleteRetenciones() -> Entrada al servicio de eliminacion de retenciones");
@@ -175,6 +230,86 @@ public class RetencionesServiceImpl implements IRetencionesService {
         LOGGER.info("RetencionesServiceImpl.deleteRetenciones() -> Salida del servicio de eliminacion de retenciones");
 
         return deleteResponseDTO;
+    }
+
+    @Override
+    public InsertResponseDTO saveOrUpdateRetencion(FcsRetencionesJudiciales retencion, HttpServletRequest request) {
+
+        LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> Entrada al servicio para guardar o actualizar una retencion");
+
+        String token = request.getHeader("Authorization");
+        String dni = UserTokenUtils.getDniFromJWTToken(token);
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        Error error = new Error();
+        InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+        int response = 0;
+
+        try {
+
+            if (null != idInstitucion) {
+
+                AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+                exampleUsuarios.createCriteria().andNifEqualTo(dni)
+                        .andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+                LOGGER.info(
+                        "RetencionesServiceImpl.saveOrUpdateRetencion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+                List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+                LOGGER.info(
+                        "RetencionesServiceImpl.saveOrUpdateRetencion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+                if (null != usuarios && !usuarios.isEmpty()) {
+
+                    retencion.setFechamodificacion(new Date());
+                    retencion.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+                    if (retencion.getIdretencion() == null) {
+                        LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> fcsRetencionesJudicialesExtendsMapper.getNewId() -> Inicio consulta para obtener nuevo id de retencion");
+                        Long newId = Long.valueOf(fcsRetencionesJudicialesExtendsMapper.getNewId(idInstitucion).getIdMax());
+                        retencion.setIdretencion(newId);
+                        insertResponseDTO.setId(newId.toString());
+                        retencion.setIdinstitucion(idInstitucion);
+                        retencion.setFechaalta(new Date());
+                        LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> fcsRetencionesJudicialesExtendsMapper.getNewId() -> Fin consulta para obtener nuevo id de retencion");
+
+                        LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> fcsRetencionesJudicialesExtendsMapper.insertSelective() -> Inicio inserccion de la retencion");
+                        response = fcsRetencionesJudicialesExtendsMapper.insertSelective(retencion);
+                        LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> fcsRetencionesJudicialesExtendsMapper.insertSelective() -> Fin inserccion de la retencion");
+                    } else {
+                        LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> fcsRetencionesJudicialesExtendsMapper.updateByPrimaryKeySelective() -> Inicio actualizacion de la retencion");
+                        response = fcsRetencionesJudicialesExtendsMapper.updateByPrimaryKeySelective(retencion);
+                        LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> fcsRetencionesJudicialesExtendsMapper.updateByPrimaryKeySelective() -> Fin actualizacion de la retencion");
+                    }
+
+                    if (response == 1) {
+                        insertResponseDTO.setStatus(SigaConstants.OK);
+                    } else {
+                        LOGGER.error("RetencionesServiceImpl.saveOrUpdateRetencion() -> Se ha producido un error al intentar guardar o actualizar la retencion");
+                        error.setCode(500);
+                        error.setDescription("general.message.error.realiza.accion");
+                        insertResponseDTO.setStatus(SigaConstants.KO);
+                    }
+
+                } else {
+                    LOGGER.warn("RetencionesServiceImpl.saveOrUpdateRetencion() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+                            + dni + " e idInstitucion = " + idInstitucion);
+                }
+
+            } else {
+                LOGGER.warn("RetencionesServiceImpl.saveOrUpdateRetencion() -> idInstitucion del token nula");
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("RetencionesServiceImpl.saveOrUpdateRetencion() -> Se ha producido un error al intentar guardar o actualizar la retencion", e);
+            error.setCode(500);
+            error.setDescription("general.mensaje.error.bbdd");
+            insertResponseDTO.setStatus(SigaConstants.KO);
+        }
+
+        insertResponseDTO.setError(error);
+
+        LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> Salida del servicio para guardar o actualizar una retencion");
+
+        return insertResponseDTO;
     }
 
     @Override

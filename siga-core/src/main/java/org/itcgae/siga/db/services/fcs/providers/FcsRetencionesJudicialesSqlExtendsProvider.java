@@ -21,7 +21,7 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         subQuery.WHERE("COL.IDINSTITUCION = RETENCIONES.IDINSTITUCION");
 
         SQL subQuery2 = new SQL();
-        subQuery2.SELECT("(PER.NOMBRE || ' ' || PER.APELLIDOS1 || ' ' || PER.APELLIDOS2)");
+        subQuery2.SELECT("(PER.APELLIDOS2 || ' ' || PER.APELLIDOS1 || ', ' || PER.NOMBRE)");
         subQuery2.FROM("CEN_PERSONA PER");
         subQuery2.WHERE("PER.IDPERSONA = RETENCIONES.IDPERSONA");
 
@@ -237,6 +237,9 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         if (!UtilidadesString.esCadenaVacia(retencionesRequestDTO.getIdPersona())) {
             sql.WHERE("COB.IDPERSONA = " + retencionesRequestDTO.getIdPersona());
         }
+        if (!UtilidadesString.esCadenaVacia(retencionesRequestDTO.getIdRetenciones())) {
+            sql.WHERE("RET.IDRETENCION = " + retencionesRequestDTO.getIdRetenciones());
+        }
         if (null != retencionesRequestDTO.getFechaInicio()) {
             String fecha = simpleDateFormat.format(retencionesRequestDTO.getFechaInicio());
             sql.WHERE("RET.FECHAINICIO >= TO_DATE('" + fecha + "', 'YYYY/MM/DD HH24:MI:SS')");
@@ -385,6 +388,16 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         queryPrincipal.ORDER_BY("COB.IDCOBRO");
 
         return queryPrincipal.toString();
+    }
+
+    public String getNewId(Short idInstitucion) {
+
+        SQL sql = new SQL();
+        sql.SELECT("(NVL(MAX(IDRETENCION), 0) + 1) IDRETENCION");
+        sql.FROM("FCS_RETENCIONES_JUDICIALES");
+        sql.WHERE("IDINSTITUCION = " + idInstitucion);
+
+        return sql.toString();
     }
 
 }
