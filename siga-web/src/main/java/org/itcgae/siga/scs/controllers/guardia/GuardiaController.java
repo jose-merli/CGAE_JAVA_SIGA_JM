@@ -293,7 +293,12 @@ public class GuardiaController {
 	ResponseEntity<InsertResponseDTO> insertGuardiaToCalendar(
 			@RequestBody List<GuardiaCalendarioItem> guardiaCalendarioItemList, String idCalendar, HttpServletRequest request) {
 		InsertResponseDTO response = guardiasService.insertGuardiaToCalendar( request, idCalendar, guardiaCalendarioItemList);
+		if (response.getStatus() == "OK") {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+			
 			}
 	
 	

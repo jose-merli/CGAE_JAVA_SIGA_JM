@@ -3016,6 +3016,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							"insertGuardiaToCalendar() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
 					String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(idCalendar, idInstitucion.toString());
 					itemList.forEach(item -> {
+						try {
 						String response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(idConjuntoGuardia, idInstitucion.toString(), today, item);
 						String response2 = scsGuardiasturnoExtendsMapper.setGuardiaInCalendario(idCalendar, idConjuntoGuardia, idInstitucion.toString(), today, item);
 						if ((response == null || response2 == null)  && error.getDescription() == null)
@@ -3025,6 +3026,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 						} else if (error.getCode() == null) {
 							error.setCode(200);
 							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+						}catch(Exception e) {
+							error.setCode(500);
+							error.setDescription("general.mensaje.error.bbdd");
+							error.setMessage(e.getMessage());
+							insertResponseDTO.setError(error);
 						}
 
 					});
