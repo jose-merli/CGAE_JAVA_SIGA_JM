@@ -1643,7 +1643,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 * @param idInstitucion
 	 * @param usuario
 	 */
-	
+	@Transactional
 	private void procesarDelitosAsistenciaExpress (TarjetaAsistenciaResponseItem tarjetaAsistenciaItem, String anioParam, String numeroParam, Short idInstitucion, AdmUsuarios usuario){
 
 		String anio = "";
@@ -2414,6 +2414,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 		return updateResponseDTO;
 	}
+	@Transactional
 	private void procesarDelitos(TarjetaDefensaJuridicaItem tarjetaDefensaJuridicaItem, Short idInstitucion , String anioNumero){
 
 		ScsDelitosasistenciaExample scsDelitosasistenciaExample = new ScsDelitosasistenciaExample();
@@ -2622,6 +2623,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return relacionesDTO;
 	}
 
+	@Transactional
 	@Override
 	public UpdateResponseDTO asociarDesigna(HttpServletRequest request, String anioNumero, DesignaItem designaItem, String copiarDatos) {
 		String token = request.getHeader("Authorization");
@@ -2772,6 +2774,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return updateResponseDTO;
 	}
 
+	@Transactional
 	@Override
 	public UpdateResponseDTO asociarEjg(HttpServletRequest request, String anioNumero, EjgItem ejg, String copiarDatos) {
 		String token = request.getHeader("Authorization");

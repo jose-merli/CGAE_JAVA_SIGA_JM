@@ -1910,9 +1910,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<IncompatibilidadesItem> incompatibilidades = new ArrayList<IncompatibilidadesItem>();
-		List<IncompatibilidadesItem> incompatibilidadesExistentes = new ArrayList<IncompatibilidadesItem>();
 		IncompatibilidadesDTO inc = new IncompatibilidadesDTO();
-		String idGuardia = ""; 
+		String idGuardia = "";
+		Integer tamMaximo;
+		List<GenParametros> tamMax = new ArrayList<>();
+		Error error = new Error();
 		
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1926,20 +1928,41 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("getIncompatibilidades() -> Entrada para obtener las incompatibilidades");
 
-				incompatibilidades = scsIncompatibilidadguardiasExtendsMapper.getListadoIncompatibilidades(incompBody, idInstitucion.toString(), idGuardia);
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
 
-				incompatibilidades.forEach(incomp -> {
-					if (incomp.getExiste() != null) {
-						if (incomp.getExiste().equals("1")) {
-							incompatibilidadesExistentes.add(incomp);
-						}
-					}
-				});
+				genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+						.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				LOGGER.info(
+						"getIncompatibilidades() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+				LOGGER.info(
+						"getIncompatibilidades() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+				if (tamMax != null) {
+					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+				} else {
+					tamMaximo = null;
+				}
+
+				incompatibilidades = scsIncompatibilidadguardiasExtendsMapper.getListadoIncompatibilidades(incompBody, idInstitucion.toString(), idGuardia, tamMaximo);
+
+				if (tamMaximo != null && incompatibilidades != null && !incompatibilidades.isEmpty() && incompatibilidades.size() > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo
+							+ " resultados, pero se muestran sólo los " + tamMaximo
+							+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					inc.setError(error);
+					incompatibilidades.remove(incompatibilidades.size() - 1);
+				}
 				LOGGER.info("getIncompatibilidades() -> Salida ya con los datos recogidos");
 			}
 		}
-		
-		inc.setIncompatibilidadesItem(incompatibilidadesExistentes);
+		inc.setIncompatibilidadesItem(incompatibilidades);
 		return inc;
 	}
 	
@@ -1962,34 +1985,41 @@ public class GuardiasServiceImpl implements GuardiasService {
 		response.setValues(comboGuardiasIncValues);
 		return response;
 	}
-	
+
+	@Transactional
 	@Override
-	public DeleteResponseDTO deleteIncompatibilidades(DeleteIncompatibilidadesDatosEntradaItem deleteIncompatibilidadesBody, HttpServletRequest request) {
+	public DeleteResponseDTO deleteIncompatibilidades(List<DeleteIncompatibilidadesDatosEntradaItem> deleteIncompatibilidadesBody, HttpServletRequest request) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		int response = 1;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String idGuardia = ""; // DUDA
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"tarjetaIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteIncompatibilidades() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (usuarios != null && usuarios.size() > 0 && deleteIncompatibilidadesBody.getIdTurno() != null && !deleteIncompatibilidadesBody.getIdTurno().isEmpty() && deleteIncompatibilidadesBody.getIdInstitucion() != null && 
-					!deleteIncompatibilidadesBody.getIdInstitucion().isEmpty() && deleteIncompatibilidadesBody.getIdGuardia() != null && !deleteIncompatibilidadesBody.getIdGuardia().isEmpty() && 
-					deleteIncompatibilidadesBody.getIdTurnoIncompatible() != null && !deleteIncompatibilidadesBody.getIdTurnoIncompatible().isEmpty() && deleteIncompatibilidadesBody.getIdGuardiaIncompatible() != null && ! deleteIncompatibilidadesBody.getIdGuardiaIncompatible().isEmpty()) {
+			if (usuarios != null && usuarios.size() > 0 ) {
 				LOGGER.info("deleteIncompatibilidades() -> Entrada para borrar las incompatibilidades");
-				//Doble borrado
-				scsIncompatibilidadguardiasExtendsMapper.deleteIncompatibilidades(deleteIncompatibilidadesBody.getIdTurno(), deleteIncompatibilidadesBody.getIdInstitucion(), deleteIncompatibilidadesBody.getIdGuardia(), deleteIncompatibilidadesBody.getIdTurnoIncompatible(), deleteIncompatibilidadesBody.getIdGuardiaIncompatible());
+				for (int i = 0; i < deleteIncompatibilidadesBody.size(); i++) {
+					DeleteIncompatibilidadesDatosEntradaItem incompatibilidad = deleteIncompatibilidadesBody.get(i);
+					if(!UtilidadesString.esCadenaVacia(incompatibilidad.getIdTurno())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdInstitucion())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdGuardia())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdTurnoIncompatible())
+							&& !UtilidadesString.esCadenaVacia(incompatibilidad.getIdGuardiaIncompatible())){
+						//Doble borrado
+						scsIncompatibilidadguardiasExtendsMapper.deleteIncompatibilidades(incompatibilidad.getIdTurno(), incompatibilidad.getIdInstitucion(), incompatibilidad.getIdGuardia(), incompatibilidad.getIdTurnoIncompatible(), incompatibilidad.getIdGuardiaIncompatible());
+					}
+				}
 				LOGGER.info("deleteIncompatibilidades() -> Salida ya con los datos recogidos");
 			}else {
 				response = 0;
@@ -2009,15 +2039,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return deleteResponseDTO;
 	}
 	
-	
+	@Transactional
 	@Override
-	public DeleteResponseDTO saveIncompatibilidades(SaveIncompatibilidadesDatosEntradaItem incompatibilidadesBody,
+	public DeleteResponseDTO saveIncompatibilidades(List<SaveIncompatibilidadesDatosEntradaItem> incompatibilidadesBody,
 			HttpServletRequest request) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-		int response = 1;
+		int response = 0;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		String idInstitucion = incompatibilidadesBody.getIdInstitucion();
+		String idInstitucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		String idGuardia = ""; 
 		String idTurno = ""; 
 		String idTurnoIncompatible = "";
@@ -2034,60 +2064,61 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			//if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
-				idTurno = incompatibilidadesBody.getIdTurno();
-				if ( idTurno == null || idTurno.isEmpty() && incompatibilidadesBody.getNombreTurno() != null) {
-					idTurno = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoFromNombreTurno(incompatibilidadesBody.getNombreTurno());
-				}
-				
-				idGuardia = incompatibilidadesBody.getIdGuardia();
-				if ( idGuardia == null || idGuardia.isEmpty() && incompatibilidadesBody.getNombreGuardia() != null) {
-					idGuardia = scsIncompatibilidadguardiasExtendsMapper.getIdGuardiaFromNombreGuardia(incompatibilidadesBody.getNombreGuardia());
-				}
-				
-				idGuardiaIncompatible = incompatibilidadesBody.getIdGuardiaIncompatible();
-				if ( idGuardiaIncompatible == null || idGuardiaIncompatible.isEmpty()) {
-					incompatibilidadesBody.getNombreGuardiaIncompatible().forEach(gi -> {
-						String idGuardiaIncompatibleAux = scsIncompatibilidadguardiasExtendsMapper.getIdGuardiaIncompatibleFromNombreGuardia(gi);
-						idGuardiaIncompatibleList.add(idGuardiaIncompatibleAux);
-					});
-					idGuardiaIncompatible = idGuardiaIncompatibleList.get(0);
-					
-				}
-				
-				idTurnoIncompatible = incompatibilidadesBody.getIdTurnoIncompatible();
-				if ( idTurnoIncompatible == null || idTurnoIncompatible.isEmpty()) {
-					if(incompatibilidadesBody.getNombreTurnoIncompatible() != null && !incompatibilidadesBody.getNombreTurnoIncompatible().isEmpty()) {
-						idTurnoIncompatible = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoIncompatibleFromNombreTurno(incompatibilidadesBody.getNombreTurnoIncompatible());
-					}else {
-						idTurnoIncompatible = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoIncByIdGuardiaInc(idGuardiaIncompatible);
-					}
-				}
-				
-				String pattern = "dd/MM/YY";
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-				String fechaModificacion = simpleDateFormat.format(new Date());	
-				if(idTurno != null && !idTurno.isEmpty() &&  incompatibilidadesBody.getIdInstitucion() != null && ! incompatibilidadesBody.getIdInstitucion().isEmpty() && idGuardia != null && !idGuardia.isEmpty() && idTurnoIncompatible != null && !idTurnoIncompatible.isEmpty() && idGuardiaIncompatible != null && !idGuardiaIncompatible.isEmpty()) {
-					int existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(idTurno, incompatibilidadesBody.getIdInstitucion(), idGuardia, idTurnoIncompatible, idGuardiaIncompatible);
-					if (existe == 2) {
-						//existe en ambas direcciones - la actualizamos
-						scsIncompatibilidadguardiasExtendsMapper.updateIfExists(incompatibilidadesBody.getIdTurno(), incompatibilidadesBody.getIdInstitucion(), incompatibilidadesBody.getIdGuardia(), incompatibilidadesBody.getIdTurnoIncompatible(), incompatibilidadesBody.getIdGuardiaIncompatible(), incompatibilidadesBody.getMotivos(), incompatibilidadesBody.getDiasSeparacionGuardias(), fechaModificacion);
-						
-					}
-					if (existe == 0) {
-						//no existe - llamamos dos veces para guardar en ambas direcciones
-						scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidadesBody.getIdInstitucion()), Integer.parseInt(idGuardia), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardiaIncompatible), usuarios.get(0).getIdusuario(), incompatibilidadesBody.getMotivos(), Integer.parseInt(incompatibilidadesBody.getDiasSeparacionGuardias()), fechaModificacion);
-						scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidadesBody.getIdInstitucion()), Integer.parseInt(idGuardiaIncompatible), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(), incompatibilidadesBody.getMotivos(), Integer.parseInt(incompatibilidadesBody.getDiasSeparacionGuardias()), fechaModificacion);
+			if (usuarios != null && usuarios.size() > 0 && !incompatibilidadesBody.isEmpty()) {
+                LOGGER.info("tarjetaIncompatibilidades() -> Entrada para obtener las incompatibilidades");
+                for (int i = 0; i < incompatibilidadesBody.size(); i++) {
+                    SaveIncompatibilidadesDatosEntradaItem incompatibilidad = incompatibilidadesBody.get(i);
+                    idInstitucion = incompatibilidad.getIdInstitucion();
+                    idTurno = incompatibilidad.getIdTurno();
+                    if ( idTurno == null || idTurno.isEmpty() && incompatibilidad.getNombreTurno() != null) {
+                        idTurno = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoFromNombreTurno(incompatibilidad.getNombreTurno());
+                    }
 
-					}
-				}else {
-					response = 0;
-				}
-				
-				
+                    idGuardia = incompatibilidad.getIdGuardia();
+                    if ( idGuardia == null || idGuardia.isEmpty() && incompatibilidad.getNombreGuardia() != null) {
+                        idGuardia = scsIncompatibilidadguardiasExtendsMapper.getIdGuardiaFromNombreGuardia(incompatibilidad.getNombreGuardia());
+                    }
+
+                    idGuardiaIncompatible = incompatibilidad.getIdGuardiaIncompatible();
+                    if ( idGuardiaIncompatible == null || idGuardiaIncompatible.isEmpty()) {
+                        incompatibilidad.getNombreGuardiaIncompatible().forEach(gi -> {
+                            String idGuardiaIncompatibleAux = scsIncompatibilidadguardiasExtendsMapper.getIdGuardiaIncompatibleFromNombreGuardia(gi);
+                            idGuardiaIncompatibleList.add(idGuardiaIncompatibleAux);
+                        });
+                        idGuardiaIncompatible = idGuardiaIncompatibleList.get(0);
+
+                    }
+
+                    idTurnoIncompatible = incompatibilidad.getIdTurnoIncompatible();
+                    if ( idTurnoIncompatible == null || idTurnoIncompatible.isEmpty()) {
+                        if(incompatibilidad.getNombreTurnoIncompatible() != null && !incompatibilidad.getNombreTurnoIncompatible().isEmpty()) {
+                            idTurnoIncompatible = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoIncompatibleFromNombreTurno(incompatibilidad.getNombreTurnoIncompatible());
+                        }else {
+                            idTurnoIncompatible = scsIncompatibilidadguardiasExtendsMapper.getIdTurnoIncByIdGuardiaInc(idGuardiaIncompatible);
+                        }
+                    }
+
+                    String pattern = "dd/MM/YY";
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                    String fechaModificacion = simpleDateFormat.format(new Date());
+                    if(idTurno != null && !idTurno.isEmpty() &&  incompatibilidad.getIdInstitucion() != null && ! incompatibilidad.getIdInstitucion().isEmpty() && idGuardia != null && !idGuardia.isEmpty() && idTurnoIncompatible != null && !idTurnoIncompatible.isEmpty() && idGuardiaIncompatible != null && !idGuardiaIncompatible.isEmpty()) {
+                        int existe = scsIncompatibilidadguardiasExtendsMapper.checkIncompatibilidadesExists(idTurno, incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncompatible, idGuardiaIncompatible);
+                        if (existe == 2) {
+                            //existe en ambas direcciones - la actualizamos
+                            scsIncompatibilidadguardiasExtendsMapper.updateIfExists(idTurno, incompatibilidad.getIdInstitucion(), idGuardia, idTurnoIncompatible, idGuardiaIncompatible, incompatibilidad.getMotivos(), incompatibilidad.getDiasSeparacionGuardias(), fechaModificacion);
+                        }
+                        if (existe == 0) {
+                            //no existe - llamamos dos veces para guardar en ambas direcciones
+                            scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidad.getIdInstitucion()), Integer.parseInt(idGuardia), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardiaIncompatible), usuarios.get(0).getIdusuario(), incompatibilidad.getMotivos(), Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
+                            scsIncompatibilidadguardiasExtendsMapper.saveListadoIncompatibilidades(Integer.parseInt(idTurno), Integer.parseInt(incompatibilidad.getIdInstitucion()), Integer.parseInt(idGuardiaIncompatible), Integer.parseInt(idTurnoIncompatible), Integer.parseInt(idGuardia), usuarios.get(0).getIdusuario(), incompatibilidad.getMotivos(), Integer.parseInt(incompatibilidad.getDiasSeparacionGuardias()), fechaModificacion);
+
+                        }
+                    }else {
+                        response = 0;
+                    }
+                }
 				LOGGER.info("saveIncompatibilidades() -> Salida ya con los datos recogidos");
-			//}
+			}
 		}
 		
 		// comprobacion actualización
@@ -2340,8 +2371,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 					calendarioProgBody.setFechaProgramadaHasta(fecha);
 				}
 				datos = scsGuardiasturnoExtendsMapper.getLastCalendariosProgramadosSigaClassique(calendarioProgBody, idInstitucion.toString());
-				
-				
+
+
 				LOGGER.info("getLastCalendarioProgramado() -> Salida ya con los datos recogidos");
 			}
 		}
@@ -5945,8 +5976,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 				
 //				idPersona2List.forEach(idPersona2 -> {
 
-					
-				
+
+
 						String idPersonasSeparatedByComma = idPersona2List.stream().collect(Collectors.joining(","));
 
 						List<CenPersonaItem> personas = getPersonaPorId(idPersonasSeparatedByComma);
@@ -5954,7 +5985,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						personas.forEach(persona -> {
 							ArrayList<LetradoInscripcionItem> alLetradosSaltados;
 							LetradoInscripcionItem letradoSeleccionado = null;
-						
+
 					try {
 						letradoSeleccionado = new LetradoInscripcionItem(persona, idInstitucion,
 									idTurno, idGuardia, "S");
@@ -6025,7 +6056,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 //			if ((personas != null) && personas.size() == 1) {
 //				perBean = (CenPersonaItem)personas.get(0);
 //			}
-//			
+//
 //			return perBean;
 			return personas;
 		}
@@ -6073,13 +6104,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 //							if(inscripcionGuardia == null)
 //								continue;
 							inscripcionGuardiaList.forEach(inscripcionGuardia -> {
-								
+
 								LetradoInscripcionItem letradoSeleccionado = new LetradoInscripcionItem();
 								letradoSeleccionado.setInscripcionGuardia(inscripcionGuardia);
 								letradoSeleccionado.setSaltoocompensacion("C");
 								alLetradosCompensados.add(letradoSeleccionado);
 							});
-				
+
 						}else{
 							List<InscripcionTurnoItem> inscripcionTurnoList = new ArrayList<InscripcionTurnoItem>();
 							try {
@@ -6125,7 +6156,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			List<InscripcionTurnoItem> datos = null;
 			datos =  scsGuardiasturnoExtendsMapper.getInscripcionesTurnoActiva(idpersona,idinstitucion, idturno, fecha);
 //				for (int i = 0; i < datos.size(); i++) {
-//	
+//
 //					InscripcionTurnoItem inscripcionBean = datos.get(i);
 //					CenPersonaItem personaBean = new CenPersonaItem(inscripcionBean.getIdpersona(), 
 //							inscripcionBean.getNombre(), 
@@ -6137,7 +6168,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 //					inscripcionBean.setPersona(personaBean);
 //					datos.add(inscripcionBean);
 //				}
-//	
+//
 //			return datos.get(0);
 			return datos;
 			
@@ -6845,7 +6876,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 				
 				
 				inscripciones = scsInscripcionguardiaExtendsMapper.getListadoInscripciones(inscripcionesBody, idInstitucion.toString());
-
+				
+				for(BusquedaInscripcionItem inscrip:inscripciones) {
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+					Date fechaSolicitud;
+					try {
+						fechaSolicitud = sdf.parse(inscrip.getFechaSol());
+						inscrip.setFechasolicitud(fechaSolicitud);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
 				
 				LOGGER.info("getInscripciones() -> Salida ya con los datos recogidos");
 			}

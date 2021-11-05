@@ -37,6 +37,7 @@ public class BusquedaInscripcionItem {
 	private String infoURL;
 	private String errorDetail;
 	private String descripcion_obligatoriedad;
+	private String fechaSol;
 	
 	
 	
@@ -238,6 +239,12 @@ public class BusquedaInscripcionItem {
 	}
 	public void setErrorDetail(String errorDetail) {
 		this.errorDetail = errorDetail;
+	}
+	public String getFechaSol() {
+		return fechaSol;
+	}
+	public void setFechaSol(String fechaSol) {
+		this.fechaSol = fechaSol;
 	}
 	
 	

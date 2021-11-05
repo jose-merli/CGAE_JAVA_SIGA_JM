@@ -132,6 +132,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 				LOGGER.info("validarInscripciones() -> Entrada para validar las inscripciones");
 
 				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+				SimpleDateFormat sdfFechaSus = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 				String FECHABAJA = null, FECHADENEGACION = null, FECHASOLICITUD = null, FECHASOLICITUDBAJA = null,
 						FECHAVALIDACION = null, FECHAVALORALTA = null, FECHAVALORBAJA = null;
 				String FECHADENEGACIONNUEVA = null, FECHASOLICITUDNUEVA = null, FECHASOLICITUDBAJANUEVA = null,
@@ -148,7 +149,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 					}
 
 					if (inscripcion.getFechasolicitud() != null) {
-						FECHASOLICITUD = formatter.format(inscripcion.getFechasolicitud());
+						FECHASOLICITUD = sdfFechaSus.format(inscripcion.getFechasolicitud());
 					}
 
 					if (inscripcion.getFechasolicitudbaja() != null) {
@@ -172,7 +173,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 					}
 
 					if (inscripcion.getFechasolicitudNUEVA() != null) {
-						FECHASOLICITUDNUEVA = formatter.format(inscripcion.getFechasolicitudNUEVA());
+						FECHASOLICITUDNUEVA = sdfFechaSus.format(inscripcion.getFechasolicitudNUEVA());
 					}
 
 					if (inscripcion.getFechasolicitudbajaNUEVA() != null) {
@@ -184,8 +185,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 					}
 
 					objeto = inscripcionGuardiaExtensdsMapper.getObjetoFrontValidarInscripcion(inscripcion,
-							idInstitucion.toString(), FECHABAJA, FECHADENEGACION, FECHASOLICITUD, FECHASOLICITUDBAJA,
-							FECHAVALIDACION, FECHAVALORALTA, FECHAVALORBAJA);
+							idInstitucion.toString(), FECHASOLICITUD);
 
 					objetoFK = inscripcionGuardiaExtensdsMapper.getObjetoFKGrupoColegiado(inscripcion,
 							idInstitucion.toString(), FECHASOLICITUD);
@@ -205,9 +205,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 							if (deleteFK != 0) {
 
-								int delete = inscripcionGuardiaExtensdsMapper.getDeleteObjetoFrontValidarInscripcion(objeto,
-										FECHABAJA, FECHADENEGACION, FECHASOLICITUD, FECHASOLICITUDBAJA, FECHAVALIDACION,
-										FECHAVALORALTA, FECHAVALORBAJA);
+								int delete = inscripcionGuardiaExtensdsMapper.getDeleteObjetoFrontValidarInscripcion(objeto, FECHASOLICITUD);
 								int usuario = usuarios.get(0).getIdusuario();
 								if (delete != 0) {
 									int insert = inscripcionGuardiaExtensdsMapper.getInsertObjetoValidarInscripcion(
@@ -227,9 +225,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 						} else {
 
-							int delete = inscripcionGuardiaExtensdsMapper.getDeleteObjetoFrontValidarInscripcion(objeto,
-									FECHABAJA, FECHADENEGACION, FECHASOLICITUD, FECHASOLICITUDBAJA, FECHAVALIDACION,
-									FECHAVALORALTA, FECHAVALORBAJA);
+							int delete = inscripcionGuardiaExtensdsMapper.getDeleteObjetoFrontValidarInscripcion(objeto, FECHASOLICITUD);
 							if (delete != 0) {
 								int usuario = usuarios.get(0).getIdusuario();
 
@@ -342,15 +338,17 @@ public class InscripcionServiceImpl implements InscripcionService {
 							idInstitucion.toString(), FECHABAJA, FECHADENEGACIONNUEVA, FECHASOLICITUDNUEVA,
 							FECHASOLICITUDBAJANUEVA, FECHAVALIDACIONNUEVA, FECHAVALORALTA, FECHAVALORBAJA, usuario);
 
-					if (inscripciones == 0)
+					if (inscripciones != 0) {
 						contadorKO++;
+					}
+						
 				}
 
 				LOGGER.info("solicitarBajaInscripcion() -> Salida ya con los datos modificados");
 			}
 		}
 
-		if (contadorKO == 0)
+		if (contadorKO != 0)
 			upd.setStatus(SigaConstants.OK);
 		else
 			upd.setStatus(SigaConstants.KO);
@@ -452,7 +450,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 					inscripciones = inscripcionGuardiaExtensdsMapper.getCFechaInscripciones(a, idInstitucion.toString(),
 							FECHABAJA, FECHAVALIDACIONNUEVA, usuario);
 
-					if (inscripciones == 0)
+					if (inscripciones != 0)
 						contadorKO++;
 				}
 
@@ -460,7 +458,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 			}
 		}
 
-		if (contadorKO == 0)
+		if (contadorKO != 0)
 			upd.setStatus(SigaConstants.OK);
 		else
 			upd.setStatus(SigaConstants.KO);
@@ -505,14 +503,21 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 					int usuario = usuarios.get(0).getIdusuario();
 
-					saltosList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(idInstitucion.toString(),
-							idturno, idguardia, idpersona);
 
-//					compensacionesList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(
-//							idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
-//
-//					if (saltosList.size() != 0)
-//						contadorKO++;
+					// buscar primero los saltos y si hay que los borre, que primero busque para que
+					// no de error de eliminación si no hay
+					saltosList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(idInstitucion.toString(),
+							idturno, idguardia, idpersona,saltos);
+
+					
+					// lo mismo para las compensaciones
+					compensacionesList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(
+							idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
+					
+
+					if (saltosList.size() != 0 || compensacionesList.size() != 0) {
+						contadorKO++;
+					}
 				}
 
 				LOGGER.info(
@@ -522,7 +527,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 		boolean existe;
 
-		if (saltosList.isEmpty()) {
+		if (contadorKO == 0) {
 			existe = false;
 		}else {
 			existe = true;
@@ -707,7 +712,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 
 		boolean existe;
 
-		if (contadorKO == 1)
+		if (contadorKO != 0)
 			existe = true;
 		else
 			existe = false;
@@ -756,22 +761,22 @@ public class InscripcionServiceImpl implements InscripcionService {
 					// buscar primero los saltos y si hay que los borre, que primero busque para que
 					// no de error de eliminación si no hay
 					saltosList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(idInstitucion.toString(),
-							idturno, idguardia, idpersona);
+							idturno, idguardia, idpersona,saltos);
 
 					if (saltosList.size() > 0) {
 						// query de eliminar saltos
 						
 						saltosN = inscripcionGuardiaExtensdsMapper.getEliminarSaltoCompensancion(
-								idInstitucion.toString(), idturno, idguardia, idpersona);
+								idInstitucion.toString(), idturno, idguardia, idpersona,saltos);
 					}
-//					// lo mismo para las compensaciones
-//					compensacionesList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(
-//							idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
-//					if (compensacionesList.size() > 0) {
-//						// query de eliminar compensaciones
-//						compensacionesN = inscripcionGuardiaExtensdsMapper.getEliminarSaltoCompensancion(
-//								idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
-//					}
+					// lo mismo para las compensaciones
+					compensacionesList = inscripcionGuardiaExtensdsMapper.getBuscarSaltoCompensancion(
+							idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
+					if (compensacionesList.size() > 0) {
+						// query de eliminar compensaciones
+						compensacionesN = inscripcionGuardiaExtensdsMapper.getEliminarSaltoCompensancion(
+								idInstitucion.toString(), idturno, idguardia, idpersona, compensaciones);
+					}
 
 					if (saltosN != 0 || compensacionesN != 0) {
 						contadorKO++;
@@ -1213,7 +1218,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 			}
 		}
 
-		if (contadorKO == 1)
+		if (contadorKO != 0)
 			upd.setStatus(SigaConstants.OK);
 		else
 			upd.setStatus(SigaConstants.KO);

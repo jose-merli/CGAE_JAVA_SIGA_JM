@@ -3162,13 +3162,13 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 			where.append("=");
 			where.append(s_idpersona);
 		}
-//		if (s_saltocompensacion.charAt(0) != ' ') {
-//			where.append("   AND ");
-//			where.append("SALTOOCOMPENSACION");
-//			where.append("= '");
-//			where.append(s_saltocompensacion.charAt(0));
-//			where.append("'");
-//		}
+		if (s_saltocompensacion.charAt(0) != ' ') {
+			where.append("   AND ");
+			where.append("SALTOOCOMPENSACION");
+			where.append("= '");
+			where.append(s_saltocompensacion.charAt(0));
+			where.append("'");
+		}
 			where.append("   AND ");
 			where.append("FECHACUMPLIMIENTO");
 			where.append(" IS NULL ");
