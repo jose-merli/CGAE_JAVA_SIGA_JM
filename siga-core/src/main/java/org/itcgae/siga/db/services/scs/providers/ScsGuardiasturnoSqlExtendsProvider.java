@@ -158,19 +158,19 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		// FILTRO POR AREA
 		if (guardiaItem.getArea() != null && guardiaItem.getArea() != "")
-			sql.WHERE("SCS_AREA.IDAREA = '" + guardiaItem.getArea() + "'");
+			sql.WHERE("SCS_AREA.IDAREA IN (" + guardiaItem.getArea() + ")");
 
 		// FILTRO POR AREA | MATERIA
 		if (guardiaItem.getMateria() != null && guardiaItem.getMateria() != "")
-			sql.WHERE("SCS_MATERIA.IDMATERIA ='" + guardiaItem.getMateria() + "'");
+			sql.WHERE("SCS_MATERIA.IDMATERIA IN (" + guardiaItem.getMateria() + ")");
 
 		// FILTRO POR GRUPOZONA
 		if (guardiaItem.getGrupoZona() != null && guardiaItem.getGrupoZona() != "")
-			sql.WHERE("SCS_ZONA.IDZONA = '" + guardiaItem.getGrupoZona() + "'");
+			sql.WHERE("SCS_ZONA.IDZONA IN (" + guardiaItem.getGrupoZona() + ")");
 
 		// FILTRO POR GRUPOZONA | ZONA
 		if (guardiaItem.getZona() != null && guardiaItem.getZona() != "")
-			sql.WHERE("SCS_SUBZONA.IDSUBZONA = '" + guardiaItem.getZona() + "'");
+			sql.WHERE("SCS_SUBZONA.IDSUBZONA IN (" + guardiaItem.getZona() + ")");
 
 		// FILTRO POR JURISDICCION
 		if (guardiaItem.getJurisdiccion() != null && guardiaItem.getJurisdiccion() != "")
