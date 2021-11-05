@@ -1211,7 +1211,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql2.WHERE("HPC.IDTURNO IN ( " + calendarioItem.getIdTurno() + " )");
 		}
 		if (calendarioItem.getIdGuardia() != null && calendarioItem.getIdGuardia() != "") {
-		sql2.WHERE("HPC.IDGUARDIA = " + calendarioItem.getIdGuardia());
+		sql2.WHERE("HPC.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+" ) ");
 		//sql2.ORDER_BY("HPC.ORDEN");
 		}
 		
@@ -1293,10 +1293,10 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("PC.IDINSTITUCION = " + idInstitucion);
 		}
 		if (calendarioItem.getIdConjuntoGuardia() != null && calendarioItem.getIdConjuntoGuardia() != "") {
-		sql.WHERE("PC.IDCONJUNTOGUARDIA =  " +  calendarioItem.getIdConjuntoGuardia());
+		sql.WHERE("PC.IDCONJUNTOGUARDIA IN  (" +  calendarioItem.getIdConjuntoGuardia()+")");
 		}
 		if (calendarioItem.getEstado() != null && calendarioItem.getEstado() != "") {
-		sql.WHERE("PC.ESTADO = " + calendarioItem.getEstado());
+		sql.WHERE("PC.ESTADO IN (" + calendarioItem.getEstado()+")");
 		}
 //		else {
 //		sql.WHERE("PC.ESTADO  IN (1 , 5)");
@@ -1320,7 +1320,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.WHERE("CG.IDTURNO IN ( " + calendarioItem.getIdTurno() + " )");
 		}
 		if (calendarioItem.getIdGuardia() != null && calendarioItem.getIdGuardia() != "") {
-		sql.WHERE("CG.IDGUARDIA = " + calendarioItem.getIdGuardia());
+		sql.WHERE("CG.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+")");
 		}
 		if (idInstitucion != null && idInstitucion != "") {
 		sql.WHERE("CG.IDINSTITUCION = " + idInstitucion);

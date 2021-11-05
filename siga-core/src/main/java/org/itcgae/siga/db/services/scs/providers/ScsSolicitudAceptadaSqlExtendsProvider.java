@@ -1,5 +1,8 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.PreAsistenciaItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -43,7 +46,7 @@ public class ScsSolicitudAceptadaSqlExtendsProvider extends ScsSolicitudAceptada
 			sql2.WHERE("LL.NUMAVISOCV = '"+preAsistencia.getnAvisoCentralita()+"'");
 		}
 		if(!UtilidadesString.esCadenaVacia(preAsistencia.getEstado())) {
-			sql2.WHERE("SA.ESTADO = '"+preAsistencia.getEstado()+"'");
+			sql2.WHERE("SA.ESTADO IN ("+preAsistencia.getEstado()+")");
 		}
 		if(!UtilidadesString.esCadenaVacia(preAsistencia.getFechaLlamadaDsd())) {
 			sql2.WHERE("SA.FECHALLAMADA >= TO_DATE('"+preAsistencia.getFechaLlamadaDsd()+"','DD/MM/YYYY HH24:MI')");
@@ -51,20 +54,40 @@ public class ScsSolicitudAceptadaSqlExtendsProvider extends ScsSolicitudAceptada
 		if(!UtilidadesString.esCadenaVacia(preAsistencia.getFechaLlamadaHasta())) {
 			sql2.WHERE("SA.FECHALLAMADA <= TO_DATE('"+preAsistencia.getFechaLlamadaHasta()+"','DD/MM/YYYY HH24:MI')");
 		}
-		if(!UtilidadesString.esCadenaVacia(preAsistencia.getIdGuardia())
+		if(UtilidadesString.esCadenaVacia(preAsistencia.getIdGuardia())
 				&& !UtilidadesString.esCadenaVacia(preAsistencia.getIdTurno())) {
-			sql2.WHERE("SA.IDGUARDIA  IN (select G.IDGUARDIA FROM SCS_GUARDIASTURNO G WHERE  G.IDINSTITUCION = '"+idInstitucion+"' AND G.IDTURNO ='"+preAsistencia.getIdTurno()+"')");
+			sql2.WHERE("SA.IDGUARDIA  IN (select G.IDGUARDIA FROM SCS_GUARDIASTURNO G WHERE  G.IDINSTITUCION = '"+idInstitucion+"' AND G.IDTURNO IN( "+preAsistencia.getIdTurno()+"))");
 		}
 		if(!UtilidadesString.esCadenaVacia(preAsistencia.getIdGuardia())) {
-			sql2.WHERE("SA.IDGUARDIA = '"+preAsistencia.getIdGuardia()+"'");
+			sql2.WHERE("SA.IDGUARDIA IN ("+preAsistencia.getIdGuardia()+")");
 		}
 		if(!UtilidadesString.esCadenaVacia(preAsistencia.getIdTipoCentroDetencion())) {
 			if("10".equals(preAsistencia.getIdTipoCentroDetencion())) {
-				sql2.WHERE("SA.IDCENTRODETENCION = '"+preAsistencia.getIdComisaria()+"'");
+				String[] arrayComisariaString =  preAsistencia.getIdComisaria().split(",");
+				List<String> listaComisariasString = Arrays.asList(arrayComisariaString);
+				String str ="";
+				for(int i=0; i< listaComisariasString.size() ; i++) {
+					if(i == 0) {
+						str += "'"+listaComisariasString.get(i) +"' ";
+					}else {
+						str += ",'" + listaComisariasString.get(i) +"'";
+					}
+				}
+				sql2.WHERE("SA.IDCENTRODETENCION IN ("+str+")");
 			}else if("20".equals(preAsistencia.getIdTipoCentroDetencion())) {
-				sql2.WHERE("SA.IDCENTRODETENCION = '"+preAsistencia.getIdJuzgado()+"'");
+				String[] arrayJuzgadoString =  preAsistencia.getIdJuzgado().split(",");
+				List<String> listaJuzgadoString = Arrays.asList(arrayJuzgadoString);
+				String str = "";
+				for(int i=0; i< listaJuzgadoString.size() ; i++) {
+					if(i == 0) {
+						str += "'"+listaJuzgadoString.get(i) +"' ";
+					}else {
+						str += ",'" + listaJuzgadoString.get(i) +"'";
+					}
+				}
+				sql2.WHERE("SA.IDCENTRODETENCION IN ("+str+")");
 			}
-			sql2.WHERE("SA.IDTIPOCENTRODETENCION = '"+preAsistencia.getIdTipoCentroDetencion()+"'");
+			sql2.WHERE("SA.IDTIPOCENTRODETENCION IN ("+preAsistencia.getIdTipoCentroDetencion()+")");
 		}
 		if(!UtilidadesString.esCadenaVacia(preAsistencia.getNumeroColegiado())){
 			sql2.WHERE("SA.NUMEROCOLEGIADO = '"+preAsistencia.getNumeroColegiado()+"'");
