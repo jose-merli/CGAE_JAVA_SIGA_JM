@@ -110,11 +110,11 @@ public class ScsCabeceraguardiasSqlExtendsProvider extends ScsCabeceraguardiasSq
 			
 			
 			if(guardiaItem.getIdTurno() != null && guardiaItem.getIdTurno() != "") {
-				sql.WHERE("guard.idturno = " + guardiaItem.getIdTurno());
+				sql.WHERE("guard.idturno IN (" + guardiaItem.getIdTurno()+")");
 			}
 			
 			if(guardiaItem.getIdGuardia() != null && guardiaItem.getIdGuardia() != "") {
-				sql.WHERE("guard.idguardia = " + guardiaItem.getIdGuardia());
+				sql.WHERE("guard.idguardia IN ( " + guardiaItem.getIdGuardia() +")");
 			}
 			
 			if(guardiaItem.getNumColegiado() != null && guardiaItem.getNumColegiado() != "") {

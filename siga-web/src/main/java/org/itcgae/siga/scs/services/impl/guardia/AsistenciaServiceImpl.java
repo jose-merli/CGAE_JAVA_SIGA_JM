@@ -275,10 +275,15 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				if (usuarios != null && usuarios.size() > 0) {
 					
 					ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
-					
+					String[] arrayGuardiasString =  idGuardia.split(",");
+					List<String> listaGuardiasString = Arrays.asList(arrayGuardiasString);
+					List<Integer> listaGuardiasInteger= listaGuardiasString.stream().map(s -> Integer.parseInt(s)).collect(Collectors.toList());
+					String [] arrayTurnosString = idTurno.split(",");
+					List<String> listaTurnosString = Arrays.asList(arrayTurnosString);
+					List<Integer> listaTurnosInteger= listaTurnosString.stream().map(s -> Integer.parseInt(s)).collect(Collectors.toList());
 					example.createCriteria()
-							.andIdguardiaEqualTo(Integer.valueOf(idGuardia))
-							.andIdturnoEqualTo(Integer.valueOf(idTurno))
+							.andIdguardiaIn(listaGuardiasInteger)
+							.andIdturnoIn(listaTurnosInteger)
 							.andIdinstitucionEqualTo(idInstitucion);
 
 					List<ScsGuardiasturno> guardiasList = scsGuardiasturnoExtendsMapper.selectByExample(example);
