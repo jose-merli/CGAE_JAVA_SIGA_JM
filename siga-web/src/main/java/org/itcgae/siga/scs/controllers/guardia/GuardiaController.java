@@ -296,9 +296,9 @@ public class GuardiaController {
 			}
 	@PostMapping(value = "/addGuardiaCalendario", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> insertGuardiaToCalendar(
-			@RequestBody List<GuardiaCalendarioItem> guardiaCalendarioItemList, String idCalendar, HttpServletRequest request) {
-		InsertResponseDTO response = guardiasService.insertGuardiaToCalendar( request, idCalendar, guardiaCalendarioItemList);
-		if (response.getStatus() == "OK") {
+			@RequestBody List<GuardiaCalendarioItem> guardiaCalendarioItemList, Boolean update,String idCalendar, HttpServletRequest request) {
+		InsertResponseDTO response = guardiasService.insertGuardiaToCalendar( update, request, idCalendar, guardiaCalendarioItemList);
+		if (response.getStatus() == "OK" || response.getStatus() == "") {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		}else {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);

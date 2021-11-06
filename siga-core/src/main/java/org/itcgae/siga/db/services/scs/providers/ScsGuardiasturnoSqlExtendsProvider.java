@@ -274,7 +274,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		sql.SELECT("IDGUARDIA");
 
 		sql.FROM("SCS_GUARDIASTURNO");
-		if (idTurno != null &&  !idTurno.isEmpty() && idTurno != "undefined") {
+		if (!idTurno.equals("null") && idTurno != null &&  !idTurno.isEmpty() && !idTurno.equals("undefined")) {
 			sql.WHERE("IDTURNO IN (" + idTurno + ")");
 		}
 		if (idInstitucion != null &&  !idInstitucion.isEmpty()) {
@@ -925,6 +925,30 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		return sql2.toString();
 	}
 	
+	
+	public String updateGuardiaInCalendario(String idCalendar, String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item) {
+		SQL sql2 = new SQL();
+		sql2.UPDATE("SCS_HCO_CONF_PROG_CALENDARIOS H");
+		if (item.getOrden() != null) {
+			sql2.SET("ORDEN = "+ item.getOrden());
+		}
+		if (idCalendar != null) {
+			sql2.WHERE("IDPROGCALENDARIO = "+ idCalendar);
+		}
+		if (idConjuntoGuardia != null) {
+			sql2.WHERE("IDCONJUNTOGUARDIA = "+ idConjuntoGuardia);
+		}
+		if (idInstitucion != null) {
+			sql2.WHERE("IDINSTITUCION = "+ idInstitucion);
+		}
+		if (item.getTurno() != null) {
+			sql2.WHERE("IDTURNO = "+ item.getTurno());
+		}
+		if (item.getGuardia()!= null) {
+			sql2.WHERE("IDGUARDIA = "+ item.getGuardia());
+		}
+		return sql2.toString();
+	}
 	public String deleteGuardiaFromCalendario(String idCalendar, String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item) {
 		SQL subquery = new SQL();
 		if (idConjuntoGuardia != null) {

@@ -461,6 +461,9 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 @Results({})
 	 String setGuardiaInCalendario(String idCalendar, String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item);
 	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="updateGuardiaInCalendario")
+	 @Results({})
+	 String updateGuardiaInCalendario(String idCalendar, String idConjuntoGuardia, String idInstitucion, String today, GuardiaCalendarioItem item);
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="deleteguardiaFromConjuntoGuardias")
 	 @Results({})

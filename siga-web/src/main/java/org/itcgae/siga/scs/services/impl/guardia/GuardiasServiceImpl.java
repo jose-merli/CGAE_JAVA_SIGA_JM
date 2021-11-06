@@ -3008,7 +3008,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 	
 	@Override
-	public InsertResponseDTO insertGuardiaToCalendar (HttpServletRequest request, String idCalendar, List<GuardiaCalendarioItem> itemList) {
+	public InsertResponseDTO insertGuardiaToCalendar (Boolean update, HttpServletRequest request, String idCalendar, List<GuardiaCalendarioItem> itemList) {
 		LOGGER.info("comboGuardias() -> Entrada al servicio para búsqueda de las guardias");
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -3027,7 +3027,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 					LOGGER.info(
 							"insertGuardiaToCalendar() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
 					String idConjuntoGuardia = scsGuardiasturnoExtendsMapper.getConjuntoFromCalendarId(idCalendar, idInstitucion.toString());
+					
+					
 					itemList.forEach(item -> {
+						if (!update) {
 						try {
 						String response = scsGuardiasturnoExtendsMapper.setguardiaInConjuntoGuardias(idConjuntoGuardia, idInstitucion.toString(), today, item);
 						String response2 = scsGuardiasturnoExtendsMapper.setGuardiaInCalendario(idCalendar, idConjuntoGuardia, idInstitucion.toString(), today, item);
@@ -3045,9 +3048,20 @@ public class GuardiasServiceImpl implements GuardiasService {
 							error.setMessage(e.getMessage());
 							insertResponseDTO.setError(error);
 						}
-
+						}else {
+							try {
+								scsGuardiasturnoExtendsMapper.updateGuardiaInCalendario(idCalendar, idConjuntoGuardia, idInstitucion.toString(), today, item);
+							}catch(Exception e) {
+								error.setCode(500);
+								error.setDescription("general.mensaje.error.bbdd");
+								error.setMessage(e.getMessage());
+								insertResponseDTO.setError(error);
+							}
+						}
+						
 					});
 					
+				
 						LOGGER.info("insertGuardiaToCalendar() -> Entrada para obtener los datos del calendario");
 					}
 			}

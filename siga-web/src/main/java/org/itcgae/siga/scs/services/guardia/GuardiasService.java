@@ -123,7 +123,7 @@ public interface GuardiasService {
 
 	public InsertResponseDTO insertGuardiaToConjunto(HttpServletRequest request, String idConjuntoGuardia, List<GuardiaCalendarioItem> item);
 
-	public InsertResponseDTO insertGuardiaToCalendar(HttpServletRequest request, String idCalendar,
+	public InsertResponseDTO insertGuardiaToCalendar(Boolean update,HttpServletRequest request, String idCalendar,
 			List<GuardiaCalendarioItem> itemList);
 
 	public InsertResponseDTO deleteGuardiaFromCalendar(HttpServletRequest request, String idCalendar,
