@@ -2,7 +2,6 @@ package org.itcgae.siga.scs.services.impl.guardia;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jdk.nashorn.internal.objects.NativeArray;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -20,6 +19,7 @@ import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.*;
@@ -152,6 +152,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	@Autowired
 	private ScsTipoactuacionExtendsMapper scsTipoactuacionExtendsMapper;
 
+	@Autowired
+	private GuardiasColegiadoServiceImpl guardiasColegiadoServiceImpl;
+
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
 		String token = request.getHeader("Authorization");
@@ -165,12 +168,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 	
 				LOGGER.info(
-						"getGuardiasByColegiadoFecha() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"getTurnosByColegiadoFecha() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 	
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 	
 				LOGGER.info(
-						"getGuardiasByColegiadoFecha() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+						"getTurnosByColegiadoFecha() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 	
 				if (usuarios != null && usuarios.size() > 0) {
 					
@@ -195,7 +198,50 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				}
 			}
 		}catch(Exception e) {
-			LOGGER.error("getGuardiasByColegiadoFecha() / ERROR: "+ e.getMessage(), e);
+			LOGGER.error("getTurnosByColegiadoFecha() / ERROR: "+ e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al traer las guardias del colegiado para la fecha" + guardiaDia + ": " + e);
+			error.description("Error al traer las guardias del colegiado para la fecha" + guardiaDia + ": " + e);
+			comboDTO.setError(error);
+		}
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO getGuardiasByTurnoColegiadoFecha(HttpServletRequest request, String guardiaDia, String idTurno, String idPersona) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"getGuardiasByTurnoColegiadoFecha() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"getGuardiasByTurnoColegiadoFecha() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && usuarios.size() > 0) {
+
+					//Si la fecha trae hora la recortamos
+					if(guardiaDia.length() > 10) {
+
+						guardiaDia = guardiaDia.substring(0, 11);
+
+					}
+					List<ComboItem> combosItems = scsGuardiascolegiadoExtendsMapper.getGuardiasByTurnoColegiadoFecha(idPersona, idInstitucion, guardiaDia,idTurno);
+					comboDTO.setCombooItems(combosItems);
+
+				}
+			}
+		}catch(Exception e) {
+			LOGGER.error("getTurnosByColegiadoFecha() / ERROR: "+ e.getMessage(), e);
 			error.setCode(500);
 			error.setMessage("Error al traer las guardias del colegiado para la fecha" + guardiaDia + ": " + e);
 			error.description("Error al traer las guardias del colegiado para la fecha" + guardiaDia + ": " + e);
@@ -556,7 +602,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					if(asistencias != null
 							&& !asistencias.isEmpty()) {
 						
-						procesarSustitucionGuardia(asistencias.get(0).getFiltro(), idInstitucion);
+						procesarSustitucionGuardia(asistencias.get(0).getFiltro(), idInstitucion, request);
 						
 						asistencias.forEach((TarjetaAsistenciaResponseItem asistencia) -> {
 							
@@ -968,17 +1014,38 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 * @param filtro
 	 * @throws Exception 
 	 */
-	private void procesarSustitucionGuardia(FiltroAsistenciaItem filtro, Short idInstitucion) throws Exception {
-		
-			
-		if(filtro.isSustituto()) {
-			//Sustituimos el que está de guardia por el de la asistencia
-			LOGGER.info("procesarSustitucionGuardia() / Pendiente de implementar, se sustituye letrado de guardia");
-			
-		}else {
-				
-			LOGGER.info("procesarSustitucionGuardia() / Pendiente de implementar, se añade el letrado de la asistencia como refuerzo en la guardia");
-			
+	@Transactional
+	private void procesarSustitucionGuardia(FiltroAsistenciaItem filtro, Short idInstitucion, HttpServletRequest request) throws SigaExceptions {
+
+		try {
+			if ("S".equals(filtro.getIsSustituto()) && !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
+				String[] datos = new String[9];
+				datos[0] = filtro.getIdTurno();
+				datos[1] = filtro.getIdGuardia();
+				datos[2] = String.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime()); //Fecha desde la que se sustituye
+				datos[3] = filtro.getIdLetradoGuardia(); //Letrado al que vamos a sustituir
+				datos[4] = filtro.getIdLetradoManual(); //Letrado que sustituye
+				datos[5] = String.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime()); //Fecha de sustitucion
+				datos[6] = ""; //Comentario
+				datos[7] = "N"; //Salto o compensacion
+				datos[8]= "";
+				//Sustituimos el que está de guardia por el de la asistencia
+				LOGGER.info("procesarSustitucionGuardia() / Pendiente de implementar, se sustituye letrado de guardia");
+				UpdateResponseDTO updateResponseDTO = guardiasColegiadoServiceImpl.sustituirGuardiaColeg(datos, request);
+			} else {
+
+				LOGGER.info("procesarSustitucionGuardia() / Pendiente de implementar, se añade el letrado de la asistencia como refuerzo en la guardia");
+				TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = new TarjetaAsistenciaResponseItem();
+				tarjetaAsistenciaResponseItem.setIdTurno(filtro.getIdTurno());
+				tarjetaAsistenciaResponseItem.setIdGuardia(filtro.getIdGuardia());
+				tarjetaAsistenciaResponseItem.setFechaAsistencia(filtro.getDiaGuardia() + " 00:00");
+				tarjetaAsistenciaResponseItem.setIdLetradoGuardia(filtro.getIdLetradoGuardia());
+				procesaGuardiasColegiado(tarjetaAsistenciaResponseItem, idInstitucion);
+
+			}
+
+		}catch(Exception e){
+			throw new SigaExceptions(e, "Error al añadir como refuerzo o sustituir el letrado de guardia : " + e);
 		}
 	}
 
@@ -1691,7 +1758,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 *
 	 * @param tarjetaAsistenciaResponseItem
 	 */
-	private void procesaGuardiasColegiado(TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem, Short idInstitucion){
+	private void procesaGuardiasColegiado(TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem, Short idInstitucion) throws SigaExceptions {
 
 		try {
 
@@ -1834,6 +1901,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 		} catch (Exception e) {
 			LOGGER.error("procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, " + e, e);
+			throw new SigaExceptions(e, "procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, " + e);
 		}
 
 	}
