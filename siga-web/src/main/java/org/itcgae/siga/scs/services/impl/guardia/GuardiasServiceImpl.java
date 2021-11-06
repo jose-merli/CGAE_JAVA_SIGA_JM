@@ -3051,6 +3051,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}else {
 							try {
 								scsGuardiasturnoExtendsMapper.updateGuardiaInCalendario(idCalendar, idConjuntoGuardia, idInstitucion.toString(), today, item);
+								error.setCode(200);
+								insertResponseDTO.setStatus(SigaConstants.OK);
 							}catch(Exception e) {
 								error.setCode(500);
 								error.setDescription("general.mensaje.error.bbdd");
