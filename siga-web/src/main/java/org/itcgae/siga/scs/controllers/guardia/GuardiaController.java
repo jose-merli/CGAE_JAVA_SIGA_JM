@@ -93,7 +93,12 @@ public class GuardiaController {
 	ResponseEntity<UpdateResponseDTO> updateGuardias(@RequestBody GuardiasItem guardiaItem,
 			HttpServletRequest request) {
 		UpdateResponseDTO response = guardiasService.updateGuardia(guardiaItem, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if (response.getStatus() == "OK") {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@PostMapping(value = "/busquedaGuardia/detalleGuardia", produces = MediaType.APPLICATION_JSON_VALUE)

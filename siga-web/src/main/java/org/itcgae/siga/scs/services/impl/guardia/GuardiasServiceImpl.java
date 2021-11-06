@@ -843,7 +843,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 							guardia.setIdordenacioncolas(ordenacion.getIdordenacioncolas());
 
 						} else {
-							guardia.setDiasseparacionguardias(Short.parseShort(guardiasItem.getDiasSeparacionGuardias()));
+							Short dS = null;
+							if (guardiasItem.getDiasSeparacionGuardias() != null) {
+								dS = Short.parseShort(guardiasItem.getDiasSeparacionGuardias());
+							}
+							guardia.setDiasseparacionguardias(dS);
 							guardia.setIdordenacioncolas(colas.get(0).getIdordenacioncolas());
 							guardia.setRequeridavalidacion(Boolean.toString(guardiasItem.isRequeridaValidacion()));
 							scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
@@ -854,6 +858,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						LOGGER.info(
 								"updateGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a updatear Configuracion de calendario de guardias");
+						if (!UtilidadesString.esCadenaVacia(guardiasItem.getDiasGuardia()))
 						guardia.setDiasguardia(Short.valueOf(guardiasItem.getDiasGuardia()));
 						guardia.setTipodiasguardia(guardiasItem.getTipoDiasGuardia());
 						if (!UtilidadesString.esCadenaVacia(guardiasItem.getDiasPeriodo()))
@@ -867,6 +872,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					guardia.setFechamodificacion(new Date());
 					guardia.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
+					if (!UtilidadesString.esCadenaVacia(guardiasItem.getDiasSeparacionGuardias()))
 					guardia.setDiasseparacionguardias(Short.parseShort(guardiasItem.getDiasSeparacionGuardias()));
 					guardia.setRequeridavalidacion(Boolean.toString(guardiasItem.isRequeridaValidacion()));
 					response = scsGuardiasturnoExtendsMapper.updateByPrimaryKeySelective(guardia);
@@ -1716,7 +1722,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 								grupoColegiado.setFechasuscripcion(inscripcionFechSus.getFechasuscripcion());
 
-								scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
+								response = scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
 
 							} else {
 
@@ -1736,7 +1742,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 								grupoColegiado.setIdgrupoguardia(grupoPerteneciente.get(0).getIdgrupoguardia());
 
-								scsGrupoguardiacolegiadoExtendsMapper.updateByExampleSelective(grupoColegiado,
+								response = scsGrupoguardiacolegiadoExtendsMapper.updateByExampleSelective(grupoColegiado,
 										scsGrupoguardiacolegiadoExample);
 							}
 						}
@@ -1753,10 +1759,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 						for (int i = 0; i < inscripcionesGrupoNuevo.size(); i++) {
 							if (inscripcionesGrupoNuevo.get(i).getNumeroGrupo() == null
 									|| inscripcionesGrupoNuevo.get(i).getNumeroGrupo().equals("")) {
-
+							Long idGGC = null;
+							if (inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado() != null) {
+								idGGC = Long.valueOf(inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado());
+							}
 								ScsGrupoguardiacolegiadoExample grupoGuardiaColegiadoExample = new ScsGrupoguardiacolegiadoExample();
-								grupoGuardiaColegiadoExample.createCriteria().andIdgrupoguardiacolegiadoEqualTo(
-										Long.valueOf(inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado()));
+								grupoGuardiaColegiadoExample.createCriteria().andIdgrupoguardiacolegiadoEqualTo(idGGC);
 								scsGrupoguardiacolegiadoExtendsMapper.deleteByExample(grupoGuardiaColegiadoExample);
 
 							} else {
@@ -1774,7 +1782,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 								grupo.setNumerogrupo(Integer.valueOf(inscripcionesGrupoNuevo.get(i).getNumeroGrupo()));
 								grupo.setIdinstitucion(idInstitucion);
 
-								scsGrupoguardiaExtendsMapper.insert(grupo);
+								response = scsGrupoguardiaExtendsMapper.insert(grupo);
 
 								grupoColegiado = new ScsGrupoguardiacolegiado();
 								// Aqui se crea un nuevo grupo colegiado en caso de que el recibido no tenga
@@ -1784,7 +1792,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 									grupoColegiado.setFechacreacion(new Date());
 									grupoColegiado.setUsucreacion(usuarios.get(0).getIdusuario().intValue());
 									grupoColegiado.setUsumodificacion(usuarios.get(0).getIdusuario().intValue());
-									grupoColegiado.setOrden(Integer.valueOf(inscripcionesGrupoNuevo.get(i).getOrden()));
+									Integer orden = null;
+									if (inscripcionesGrupoNuevo.get(i).getOrden() != null) {
+										orden = Integer.valueOf(inscripcionesGrupoNuevo.get(i).getOrden());
+									}
+									grupoColegiado.setOrden(orden);
 									grupoColegiado.setIdgrupoguardia(grupoPerteneciente.get(0).getIdgrupoguardia());
 									grupoColegiado.setIdinstitucion(idInstitucion);
 									grupoColegiado.setIdguardia(Integer.valueOf(guardiasItem.getIdGuardia()));
@@ -1806,7 +1818,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 									grupoColegiado.setFechasuscripcion(inscripcionFechSus.getFechasuscripcion());
 
-									scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
+									response = scsGrupoguardiacolegiadoExtendsMapper.insert(grupoColegiado);
 
 								} else {
 									// Aqui cambiamos los datos necesarios del grupo guardia y lo actualizamos.
@@ -1826,7 +1838,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 									grupoColegiado.setIdgrupoguardia((long) idGrupo);
 									grupoColegiado.setOrden(Integer.valueOf(inscripcionesGrupoNuevo.get(i).getOrden()));
 
-									scsGrupoguardiacolegiadoExtendsMapper.updateByExampleSelective(grupoColegiado,
+									response = scsGrupoguardiacolegiadoExtendsMapper.updateByExampleSelective(grupoColegiado,
 											scsGrupoguardiacolegiadoExample);
 								}
 							}
