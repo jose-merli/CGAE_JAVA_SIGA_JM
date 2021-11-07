@@ -596,7 +596,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
         sql.SELECT("ejg.dictamen as observacionesDictamen");
         // REGTEL
         sql.SELECT("ejg.identificadords");
-        sql.SELECT("(SELECT NCOLEGIADO FROM CEN_COLEGIADO WHERE PER.IDPERSONA = CEN_COLEGIADO.IDPERSONA) AS NCOLEGIADO");
+        sql.SELECT("(SELECT NCOLEGIADO FROM CEN_COLEGIADO WHERE PER.IDPERSONA = CEN_COLEGIADO.IDPERSONA and ejg.idinstitucion = CEN_COLEGIADO.idinstitucion) AS NCOLEGIADO");
         // from
         sql.FROM("scs_ejg ejg");
         // joins
