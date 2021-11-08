@@ -20,7 +20,6 @@ public class CargaMasivaDatosPDItem {
 	private int desigaAbogadoIdTurno;
 	private Short desigaAbogadoAnio;
 	private Long desigaAbogadoNumero;
-	private String designaAbogadoCodigo;
 	
 	private int ejgIdTipo;
 	private int ejgAnio;
@@ -88,14 +87,6 @@ public class CargaMasivaDatosPDItem {
 
 	public void setDesigaAbogadoNumero(Long desigaAbogadoNumero) {
 		this.desigaAbogadoNumero = desigaAbogadoNumero;
-	}
-
-	public String getDesignaAbogadoCodigo() {
-		return designaAbogadoCodigo;
-	}
-
-	public void setDesignaAbogadoCodigo(String designaAbogadoCodigo) {
-		this.designaAbogadoCodigo = designaAbogadoCodigo;
 	}
 
 	public Long getIdPersona() {

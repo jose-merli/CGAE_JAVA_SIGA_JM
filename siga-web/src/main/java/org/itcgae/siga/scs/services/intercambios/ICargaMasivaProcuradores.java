@@ -29,6 +29,6 @@ public interface ICargaMasivaProcuradores {
 
 	public DeleteResponseDTO cargarFichero(MultipartHttpServletRequest request) throws BusinessException, IOException, Exception;
 
-	public InputStreamResource descargarFicheros(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem, HttpServletRequest request);
+	public ResponseEntity<InputStreamResource> descargarFicheros(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem, HttpServletRequest request);
 	
 }

@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -377,7 +378,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 							LOGGER.debug("cargarFichero() / Insertamos linea en scs_Datosprocuradores");
 							ScsDatosprocuradores cenDatoscv = new ScsDatosprocuradores();
 							cenDatoscv.setIdinstitucion(cargaMasivaDatosPDItem.getIdInstitucion());
-							cenDatoscv.setCodigodesignaabogado(cargaMasivaDatosPDItem.getDesignaAbogadoCodigo());
+							cenDatoscv.setCodigodesignaabogado(cargaMasivaDatosPDItem.getCodigoDesignaAbogado());
 							cenDatoscv.setFechadesigprocurador(cargaMasivaDatosPDItem.getFechaDesignaProcurador());
 							cenDatoscv.setNumcolprocurador(String.valueOf(cargaMasivaDatosPDItem.getNumColProcurador()));
 							cenDatoscv.setNumdesignaprocurador(String.valueOf(cargaMasivaDatosPDItem.getNumDesignaProcurador()));
@@ -410,7 +411,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 					
 					int result = 0;
 					try {
-						byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSMODEL_PD, datosLog);
+						byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOG_PD, datosLog);
 
 						cenCargamasivacv.setTipocarga("PD");
 						cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
@@ -555,29 +556,26 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		LOGGER.debug(dateLog + " --> Inicio CargaMasivaProcuradoresServiceImpl convertItemtoHashIT");
 		Hashtable<String, Object> e = new Hashtable<String, Object>();
 				
-		if (cargaMasivaDatosPDItem.getCodigoDesignaAbogado() != null) {
-			e.put(SigaConstants.PD_CODIGODESIGNAABOGADO, cargaMasivaDatosPDItem.getCodigoDesignaAbogado());
-		}
-		if (cargaMasivaDatosPDItem.getFechaDesignaProcurador() != null) {
-			String fechaDesignaProcurador = df2.format(cargaMasivaDatosPDItem.getFechaDesignaProcurador());
-			e.put(SigaConstants.PD_FECHADESIGPROCURADOR, fechaDesignaProcurador);
-		}
-		if (cargaMasivaDatosPDItem.getNombreProcurador() != null) {
-			e.put(SigaConstants.PD_NUMCOLPROCURADOR, cargaMasivaDatosPDItem.getNombreProcurador());
-		}
-		if (cargaMasivaDatosPDItem.getNumDesignaProcurador() != null) {
-			e.put(SigaConstants.PD_NUMDESIGNAPROCURADOR, cargaMasivaDatosPDItem.getNumDesignaProcurador());
-		}
-		if (cargaMasivaDatosPDItem.getNumEJG() != null) {
-			e.put(SigaConstants.PD_NUMEJG, cargaMasivaDatosPDItem.getNumEJG());
-		}
-		if (cargaMasivaDatosPDItem.getObservaciones() != null) {
-			e.put(SigaConstants.PD_OBSERVACIONES, cargaMasivaDatosPDItem.getObservaciones());
-		}
+		e.put(SigaConstants.PD_CODIGODESIGNAABOGADO, cargaMasivaDatosPDItem.getCodigoDesignaAbogado() != null ? cargaMasivaDatosPDItem.getCodigoDesignaAbogado() : "");
 
-		if (cargaMasivaDatosPDItem.getErrores() != null) {
-			e.put(SigaConstants.ERRORES, cargaMasivaDatosPDItem.getErrores());
+		String fechaDesignaProcurador = "";
+		
+		if (cargaMasivaDatosPDItem.getFechaDesignaProcurador() != null) {
+			fechaDesignaProcurador = df2.format(cargaMasivaDatosPDItem.getFechaDesignaProcurador());
 		}
+		
+		e.put(SigaConstants.PD_FECHADESIGPROCURADOR, cargaMasivaDatosPDItem.getFechaDesignaProcurador() != null ? fechaDesignaProcurador : "");
+
+		e.put(SigaConstants.PD_NUMCOLPROCURADOR, cargaMasivaDatosPDItem.getNumColProcurador() != null ? cargaMasivaDatosPDItem.getNumColProcurador() : "");
+		
+		e.put(SigaConstants.PD_NUMDESIGNAPROCURADOR, cargaMasivaDatosPDItem.getNumDesignaProcurador() != null ? cargaMasivaDatosPDItem.getNumDesignaProcurador() : "");
+		
+		e.put(SigaConstants.PD_NUMEJG, cargaMasivaDatosPDItem.getNumEJG() != null ? cargaMasivaDatosPDItem.getNumEJG() : "");
+		
+		e.put(SigaConstants.PD_OBSERVACIONES, cargaMasivaDatosPDItem.getObservaciones() != null ? cargaMasivaDatosPDItem.getObservaciones() : "");
+		
+		e.put(SigaConstants.ERRORES, cargaMasivaDatosPDItem.getErrores() != null ? cargaMasivaDatosPDItem.getErrores() : "");
+		
 		
 		LOGGER.debug(dateLog + " --> Fin CargaMasivaProcuradoresServiceImpl convertItemtoHashIT");
 		return e;
@@ -674,7 +672,11 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 			LOGGER.debug("parseExcelFilePD() / Obtenemos los datos de la columna NUMDESIGNAPROCURADOR");
 			if(hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR)!=null && !hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString().equals("") &&
 				!hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString().equals("nnnnn") &&	!hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString().equals("Opcional")){
-				cargaMasivaDatosPDItem.setNumDesignaProcurador(hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString());	
+				cargaMasivaDatosPDItem.setNumDesignaProcurador(hashtable.get(SigaConstants.PD_NUMDESIGNAPROCURADOR).toString());
+				
+				if(cargaMasivaDatosPDItem.getNumDesignaProcurador().length() != 5) {
+					errorLinea.append("Numero de designa del procurador mal introducida. Debe ser nnnnn. ");
+				}
 			}
 			
 			LOGGER.debug("parseExcelFilePD() / Obtenemos los datos de la columna FECHADESIGPROCURADOR");
@@ -683,11 +685,10 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 				try {
 					cargaMasivaDatosPDItem.setFechaDesignaProcurador(new SimpleDateFormat("dd-MM-yyyy").parse(hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString()));
 				} catch (ParseException e1) {
-					errorLinea.append("Fecha de designacion de procurador mal introducida. Debe ser dd/mm/yyyy.");
+					errorLinea.append("Fecha de designacion de procurador mal introducida. Debe ser dd/mm/yyyy. ");
 				}
 			}else{
 				errorLinea.append("Es obligatorio introducir la fecha de designacion del procurador. ");
-				cargaMasivaDatosPDItem.setFechaDesignaProcurador(null);
 			}
 			
 			LOGGER.debug("parseExcelFilePD() / Obtenemos los datos de la columna NUMCOLPROCURADOR");
@@ -741,7 +742,6 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 				procuradorHashtable.put(String.valueOf(cargaMasivaDatosPDItem.getNumColProcurador()), scsProcurador);
 			}else{
 				errorLinea.append("Es obligatorio introducir número de procurador. ");
-				cargaMasivaDatosPDItem.setNumColProcurador("Error");
 
 			}
 			
@@ -753,7 +753,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 			   !hashtable.get(SigaConstants.PD_CODIGODESIGNAABOGADO).toString().equals("nnnn/nnnnn") && !hashtable.get(SigaConstants.PD_CODIGODESIGNAABOGADO).toString().equals("Requerido")){
 
 				String codigoDesignaAbogado = hashtable.get(SigaConstants.PD_CODIGODESIGNAABOGADO).toString();
-				cargaMasivaDatosPDItem.setDesignaAbogadoCodigo(codigoDesignaAbogado);
+				cargaMasivaDatosPDItem.setCodigoDesignaAbogado(codigoDesignaAbogado);
 				try {
 					String [] designa =  codigoDesignaAbogado.split("/");
 					Short anio = Short.valueOf(designa[0]);	
@@ -781,7 +781,6 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 
 			}else{
 				errorLinea.append("Es obligatorio introducir número de designacion. ");
-				cargaMasivaDatosPDItem.setDesignaAbogadoCodigo("Error");
 			}
 			
 			// PREGUNTAR LO ANTERIOR!!!!!
@@ -823,12 +822,10 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 							errorLinea.append("Expediente no relacionado con la designación.");
 						}
 					}
-				}    catch (BusinessException e) {
+				}catch (BusinessException e) {
 					errorLinea.append("No se ha encontrado el EJG. ");
-					throw e;
 				}catch (Exception e) {
 					errorLinea.append("Codigo de EJG mal introducido. Debe ser año/codigo(nnnn/nnnnn). ");
-					throw e;
 				}
 			}	
 
@@ -901,7 +898,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		StringBuffer pathDirectorio = new StringBuffer(getDirectorioFicheroSigaClassique(cenCargamasiva.getIdinstitucion()));
 		
 		pathDirectorio.append(File.separator);
-		pathDirectorio.append(isLog ? "log_" + cenCargamasiva.getIdfichero() + "_" + cenCargamasiva.getNombrefichero() : cenCargamasiva.getIdfichero() + "_" +  cenCargamasiva.getNombrefichero());
+		pathDirectorio.append(isLog ? "log_" + cenCargamasiva.getIdficherolog() + "_" + cenCargamasiva.getNombrefichero() : cenCargamasiva.getIdfichero() + "_" +  cenCargamasiva.getNombrefichero());
 		File file = new File(pathDirectorio.toString());
 		
 		OutputStream output = null;
@@ -957,12 +954,15 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 	}
 
 	@Override
-	public InputStreamResource descargarFicheros(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem, HttpServletRequest request) {
+	public ResponseEntity<InputStreamResource> descargarFicheros(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem, HttpServletRequest request) {
 		// TODO Auto-generated method stub
+		LOGGER.info("descargarFicheros() -> Entrada al servicio para generar la plantilla de errores");
+
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InputStream fileStream = null;
+		ResponseEntity<InputStreamResource> res = null;
 
 		try {
 
@@ -975,55 +975,111 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 
 			LOGGER.debug(
 					"descargarFicheros() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener debugrmación del usuario logeado");
-
-			if (usuarios != null && !usuarios.isEmpty() && !cargaMasivaProcuradorItem.isEmpty()) {
-				fileStream = getZipFileRemesasResultados(cargaMasivaProcuradorItem, idInstitucion);				
+			
+			if(cargaMasivaProcuradorItem.size() == 1) {
+				res = soloUnArchivo(cargaMasivaProcuradorItem, idInstitucion);
+			}else {
+				res = getZipFile(cargaMasivaProcuradorItem, idInstitucion);
 			}
+			
+			LOGGER.info("descargarFicheros() -> Salida del servicio para generar la plantilla de errores");
 
 		} catch (Exception e) {
 			LOGGER.error(
 					"descargarFicheros() -> Se ha producido un error al descargar archivos asociados a la carga masiva de procuradores",
 					e);
 		}
-
-		return new InputStreamResource(fileStream);
+		
+		return res;
 	}
 
-	private InputStream getZipFileRemesasResultados(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem,
+	private ResponseEntity<InputStreamResource> soloUnArchivo(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem,
+			Short idInstitucion) {
+		
+		// Extraer el path
+		//String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
+		String path = getDirectorioFichero(idInstitucion);
+		path += File.separator + "log_" + cargaMasivaProcuradorItem.get(0).getIdFicheroLog() + "_" + cargaMasivaProcuradorItem.get(0).getNombreFichero();
+		File file = new File(path);
+		
+		InputStream fileStream;
+		ResponseEntity<InputStreamResource> res = null;
+		try {
+			fileStream = new FileInputStream(file);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + cargaMasivaProcuradorItem.get(0).getNombreFichero());
+			headers.setContentLength(file.length());
+			headers.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
+		} catch (FileNotFoundException e) {
+			LOGGER.warn("descargarFicheros() -> No encuentra el fichero original en la ruta SigaNovo");
+
+			//Si no encuentra el fichero buscamos en la ruta de siga classique
+			String pathClassique = getDirectorioFicheroSigaClassique(idInstitucion);
+			pathClassique += File.separator +"log_" + cargaMasivaProcuradorItem.get(0).getIdFicheroLog() + "_" + cargaMasivaProcuradorItem.get(0).getNombreFichero();
+			
+			File fileClassique = new File(pathClassique);
+
+			try {
+				fileStream = new FileInputStream(fileClassique);
+				HttpHeaders headersClassique = new HttpHeaders();
+				headersClassique.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+				headersClassique.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + cargaMasivaProcuradorItem.get(0).getNombreFichero());
+				headersClassique.setContentLength(fileClassique.length());
+				headersClassique.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headersClassique, HttpStatus.OK);
+			
+			} catch (FileNotFoundException eClassique) {
+				LOGGER.warn("descargarFicheros() -> No encuentra el fichero original en la ruta SigaClassique");
+			}
+		}
+		return res;
+	}
+
+	private ResponseEntity<InputStreamResource> getZipFile(List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem,
 			Short idInstitucion) {
 		// TODO Auto-generated method stub
+		
+		HttpHeaders headersClassique = new HttpHeaders();
+		headersClassique.setContentType(MediaType.parseMediaType("application/zip"));
+
+		headersClassique.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=CargaMasivaProcuradores.zip");
+		headersClassique.setAccessControlExposeHeaders(Arrays.asList(HttpHeaders.CONTENT_DISPOSITION));
+		
 		ByteArrayOutputStream byteArrayOutputStream = null;
+		ResponseEntity<InputStreamResource> res = null;
 
+		byteArrayOutputStream = new ByteArrayOutputStream();
+		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+		ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+				
 		try {
-
-			byteArrayOutputStream = new ByteArrayOutputStream();
-			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-
 			for (CargaMasivaProcuradorItem doc : cargaMasivaProcuradorItem) {
-				if (doc.getNombreFichero() != null) {
-					String nextEntry;
-					if (doc.getNombreFichero().contains(".")) {
-						nextEntry = doc.getNombreFichero().substring(0, doc.getNombreFichero().lastIndexOf("."));
-						nextEntry += "-" + doc.getIdCargaMasiva();
-						String extension = doc.getNombreFichero()
-								.substring(doc.getNombreFichero().lastIndexOf("."), doc.getNombreFichero().length())
-								.toLowerCase();
-						nextEntry += extension;
-					} else {
-						nextEntry = doc.getNombreFichero();
-					}
-
-					String path = getDirectorioFicheroRemesa(idInstitucion, doc.getIdFichero());
-					path += "_" + doc.getNombreFichero();
+				try {
+					String path = getDirectorioFichero(idInstitucion);
+					path += File.separator + "log_" + doc.getIdFicheroLog() + "_" + doc.getNombreFichero();
 					File file = new File(path);
-					if (file.exists() && !file.isDirectory()) {
-						zipOutputStream.putNextEntry(new ZipEntry(nextEntry));
-						FileInputStream fileInputStream = new FileInputStream(file);
+					FileInputStream fileInputStream = new FileInputStream(file);
+					zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
+					IOUtils.copy(fileInputStream, zipOutputStream);
+					fileInputStream.close();
+				}catch(FileNotFoundException e) {
+					//Si no encuentra el fichero buscamos en la ruta de siga classique
+					String pathClassique = getDirectorioFicheroSigaClassique(idInstitucion);
+					pathClassique += File.separator +"log_" + doc.getIdFicheroLog() + "_" + doc.getNombreFichero();
+					
+					try {
+						File fileClassique = new File(pathClassique);
+						zipOutputStream.putNextEntry(new ZipEntry(doc.getNombreFichero()));
+						FileInputStream fileInputStream = new FileInputStream(fileClassique);
 						IOUtils.copy(fileInputStream, zipOutputStream);
 						fileInputStream.close();
+					}catch(FileNotFoundException eClassique) {
+						LOGGER.warn("descargarFicheros() -> No encuentra el fichero original en la ruta SigaClassique");
+						res = new ResponseEntity<InputStreamResource>(new InputStreamResource(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())), headersClassique, HttpStatus.NO_CONTENT);
 					}
-					zipOutputStream.closeEntry();
 				}
 			}
 
@@ -1041,27 +1097,11 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		res = new ResponseEntity<InputStreamResource>(new InputStreamResource(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())), headersClassique, HttpStatus.OK);
 
-		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+		return res;
+		
+		
 	}
-
-	private String getDirectorioFicheroRemesa(Short idInstitucion, Long idCargaMasiva) {
-		// TODO Auto-generated method stub
-		// Extraemos el path para los ficheros
-		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
-		genPropertiesExampleP.createCriteria().andParametroEqualTo("cen.cargaExcel.ficheros.path");
-		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
-		String path = genPropertiesPath.get(0).getValor();
-
-		GenPropertiesExample genPropertiesExamplePG = new GenPropertiesExample();
-		genPropertiesExamplePG.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaCV");
-		List<GenProperties> genPropertiesPathP = genPropertiesMapper.selectByExample(genPropertiesExamplePG);
-		path += genPropertiesPathP.get(0).getValor();
-		path += File.separator + idCargaMasiva;
-
-		LOGGER.debug("getDirectorioFicheroRemesa() -> Path del directorio de ficheros CargaMasivaProcuradores  = " + path);
-
-		return path;
-	}
-
 }

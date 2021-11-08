@@ -71,11 +71,7 @@ public class CargaMasivaProcuradoresController {
 	
 	@RequestMapping(value = "/descargarFicheros", method = RequestMethod.POST, produces = "application/zip")
 	ResponseEntity<InputStreamResource> descargarFicheros(@RequestBody List<CargaMasivaProcuradorItem> cargaMasivaProcuradorItem, HttpServletRequest request) {
-		InputStreamResource response = iCargaMasivaProcuradores.descargarFicheros(cargaMasivaProcuradorItem, request);		
-		HttpHeaders header = new HttpHeaders();
-		header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=CargaMasivaProcuradores.zip");
-		header.setAccessControlExposeHeaders(cabecera);
-		return new ResponseEntity<InputStreamResource>(response, header, HttpStatus.OK);
+		return iCargaMasivaProcuradores.descargarFicheros(cargaMasivaProcuradorItem, request);		
 	}
 
 }
