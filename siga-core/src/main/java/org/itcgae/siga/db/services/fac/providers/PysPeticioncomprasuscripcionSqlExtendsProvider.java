@@ -147,23 +147,23 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 			// OBTENEMOS LAS FORMAS DE PAGO COMUNES
 			String fromPagosComunes = "(";
-			String innerJoinServicios = "pys_serviciosinstitucion prin on prin.idinstitucion = pet.idinstitucion  and (";
+			String innerJoinServicios = "pys_serviciosinstitucion servIns on servIns.idinstitucion = pet.idinstitucion  and (";
 			for (ListaServiciosSuscripcionItem servicio : peticion.getServicios()) {
 				fromPagosComunes += "select pago.idformapago\r\n"
 						+ "				from pys_serviciosinstitucion serv\r\n"
-						+ "				inner join pys_formapagoservicio pago on pago.idinstitucion = prod.idinstitucion and prod.idservicio = pago.idservicio \r\n"
-						+ "				and pago.idtiposervicio = prod.idtiposervicio AND prod.IDservicioINSTITUCION = pago.IDservicioINSTITUCION\r\n"
-						+ "				where prod.idinstitucion = " + peticion.getIdInstitucion();
+						+ "				inner join pys_formapagoservicios pago on pago.idinstitucion = serv.idinstitucion and serv.idservicio = pago.idservicio \r\n"
+						+ "				and pago.idtiposervicios = serv.idtiposervicios AND serv.IDserviciosINSTITUCION = pago.IDserviciosINSTITUCION\r\n"
+						+ "				where serv.idinstitucion = " + peticion.getIdInstitucion();
 						//Se filtran los metodos de pago sean por internet o no según si el usuario es un colegiado o no 
 						if(esColegiado)fromPagosComunes += " and pago.internet = 'A'";
 						else fromPagosComunes += " and pago.internet = 'S'";
-						fromPagosComunes += " and (serv.idservicio = " + servicio.getIdServicio() + " and prod.idtiposervicio="
-						+ servicio.getIdTipoServicio() + " and prod.idservicioinstitucion="
+						fromPagosComunes += " and (serv.idservicio = " + servicio.getIdServicio() + " and serv.idtiposervicios="
+						+ servicio.getIdTipoServicio() + " and serv.idserviciosinstitucion="
 						+ servicio.getIdServicioInstitucion() + ") \r\n";
 				fromPagosComunes += "intersect\r\n";
 				
-				innerJoinServicios += "(servIns.idservicio = "+servicio.getIdServicio()+" and prin.idtiposervicio="+servicio.getIdTipoServicio()+
-						" and servIns.idservicioinstitucion="+servicio.getIdServicioInstitucion()+") OR";
+				innerJoinServicios += "(servIns.idservicio = "+servicio.getIdServicio()+" and servIns.idtiposervicios="+servicio.getIdTipoServicio()+
+						" and servIns.idserviciosinstitucion="+servicio.getIdServicioInstitucion()+") OR";
 				
 			}
 			//Se elimina el ultimo OR
@@ -175,9 +175,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.SELECT("(" + sqlPagos.toString() + ") AS idformaspagocomunes");
 			
 			//Obtenemos el id de la forma de pago utilizada.
-			sql.SELECT("FIRST_VALUE(servSol.idformapago) OVER (ORDER BY servSol.FECHARECEPCIONSOLICITUD) as idFormaPagoSeleccionada");
+			sql.SELECT("FIRST_VALUE(servSol.idformapago) OVER (ORDER BY servSol.FECHAMODIFICACION) as idFormaPagoSeleccionada");
 			//Obtenemos la cuenta bancaria
-			sql.SELECT("FIRST_VALUE(servSol.idcuenta) OVER (ORDER BY servSol.FECHARECEPCIONSOLICITUD) as idCuentaBancSeleccionada");
+			sql.SELECT("FIRST_VALUE(servSol.idcuenta) OVER (ORDER BY servSol.FECHAMODIFICACION) as idCuentaBancSeleccionada");
 			
 				
 			sql.INNER_JOIN("pys_serviciossolicitados servSol on servSol.idinstitucion = pet.idinstitucion and servSol.idpeticion = pet.idpeticion");
@@ -688,23 +688,28 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("servIns.solicitarBaja"); // Este atributo hace referencia a la propiedad/check "Solictar
 														// baja por internet"
 		sql.SELECT_DISTINCT("servIns.Automatico");
+		sql.SELECT_DISTINCT("precioServ.IDPRECIOSSERVICIOS as idPrecio");
 		sql.SELECT_DISTINCT("precioServ.valor as precio");
-		sql.SELECT_DISTINCT("f_siga_getrecurso(periodicidad.descripcion, "+idioma+") as periodo");
+		sql.SELECT_DISTINCT("periodicidad.IDPERIODICIDAD as idPeriodicidad");
+		sql.SELECT_DISTINCT("periodicidad.periodosMes as periodicidadValor");
+		sql.SELECT_DISTINCT("periodicidad.descripcion as periodicidadDesc");
 
 		sql.FROM(" pys_serviciosinstitucion servIns, pys_tipoiva tiva");
 		sql.FROM("pys_serviciossolicitados servSol");
 		sql.FROM("pys_preciosServicios precioServ");
+		sql.FROM("pys_periodicidad periodicidad");
 		
+		//REVISAR: NO QUEDA CLARO QUE HAY QUE COMPROBAR PARA QUE TENGA EN CONSIDERACION LA FECHA
 		if(aFechaDe != null) {
 			DateFormat dateFormatFront = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
 			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
 			String strDate = dateFormatSql
 					.format(dateFormatFront.parse(aFechaDe.toString()).getTime());
 			//Deben estar en estado "Aceptada" o "Pendiente de anulacion" en esa fecha
-			sql.WHERE(
-					"(suscripcion.fechaSuscripcion is not null and "
-					+ "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and"
-					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
+//			sql.WHERE(
+//					"(suscripcion.fechaSuscripcion is not null and "
+//					+ "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and"
+//					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
 		}
 
 		sql.WHERE(" servIns.IDINSTITUCION = '" + idInstitucion + "'");
@@ -717,6 +722,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.WHERE("precioserv.idtiposervicios (+) = servIns.idtiposervicios");
 		sql.WHERE("precioserv.idserviciosinstitucion (+) = servIns.idserviciosinstitucion");
 		sql.WHERE("precioserv.idinstitucion (+) = servIns.idinstitucion");
+		sql.WHERE("periodicidad.idperiodicidad (+) = precioServ.idperiodicidad");
 
 		sql.ORDER_BY(" servIns.DESCRIPCION");
 

@@ -157,11 +157,10 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getListaServiciosSuscripcion")
 	@Results({
-		@Result(column = "IDSERVICIO", property = "idservicio", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "IDTIPOSERVICIO", property = "idtiposervicio", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "IDSERVICIOINSTITUCION", property = "idservicioinstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDSERVICIO", property = "idServicio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOSERVICIO", property = "idTipoServicio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDSERVICIOINSTITUCION", property = "idServicioInstitucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "VALOR", property = "precioUnitario", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "orden", property = "orden", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "cantidad", property = "cantidad", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "total", property = "total", jdbcType = JdbcType.VARCHAR),
@@ -172,9 +171,12 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 		@Result(column = "idtipoiva", property = "idtipoiva", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "valorIva", property = "valorIva", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "solicitarBaja", property = "solicitarBaja", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "precio", property = "precio", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "periodo", property = "periodo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idPrecio", property = "idPrecioServicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "precio", property = "precioServicioValor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idPeriodicidad", property = "idPeriodicidad", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "periodicidadValor", property = "periodicidadValor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "periodicidadDesc", property = "periodicidadDesc", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR)
 		}) 
-	List<ListaServiciosSuscripcionItem> getListaServiciosSuscripcion(Short idInstitucion, String nSolicitud, String idioma);
+	List<ListaServiciosSuscripcionItem> getListaServiciosSuscripcion(Short idInstitucion, String nSolicitud, String idioma, Date aFechaDe);
 }

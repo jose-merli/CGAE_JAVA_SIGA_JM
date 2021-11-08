@@ -259,7 +259,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							
 							//Si se viene de otra pantalla a consultar la ficha de compra
 							if(ficha.getServicios().size()==0) {
-								servicios = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, ficha.getnSolicitud(), usuarios.get(0).getIdlenguaje());
+								servicios = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, ficha.getnSolicitud(), usuarios.get(0).getIdlenguaje(), null);
 								ficha.setServicios(servicios);
 							}
 							else if(ficha.getProductos().size()>0){
@@ -1934,7 +1934,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					LOGGER.info(
 							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServicios() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los servicios de una peticion");
 	
-					List<ListaServiciosSuscripcionItem> serviciosSuscripcion = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, nSolicitud, usuarios.get(0).getIdlenguaje());
+					List<ListaServiciosSuscripcionItem> serviciosSuscripcion = pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion(idInstitucion, nSolicitud, usuarios.get(0).getIdlenguaje(), aFechaDe);
 	
 					LOGGER.info(
 							"getListaServiciosSuscripcion() / pysPeticioncomprasuscripcionExtendsMapper.getListaServiciosSuscripcion() -> Salida de pysPeticioncomprasuscripcionExtendsMapper para obtener la informacion de los servicios de una peticion");

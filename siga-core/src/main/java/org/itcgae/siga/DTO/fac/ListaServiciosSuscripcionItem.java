@@ -10,12 +10,14 @@ public class ListaServiciosSuscripcionItem {
 	private String precioServicioValor;
 	private String idPeriodicidad;
 	private String periodicidadValor;
+	private String periodicidadDesc;
 	private String iva;
 	private String total;
 	private String noFacturable;
 	private String idtipoiva;
 	private String valorIva;
 	private String solicitarBaja;
+	private String automatico;
 	
 	private int idServicio;
 	private int idTipoServicio;
@@ -137,6 +139,18 @@ public class ListaServiciosSuscripcionItem {
 	}
 	public void setPeriodicidadValor(String periodicidadValor) {
 		this.periodicidadValor = periodicidadValor;
+	}
+	public String getPeriodicidadDesc() {
+		return periodicidadDesc;
+	}
+	public void setPeriodicidadDesc(String periodicidadDesc) {
+		this.periodicidadDesc = periodicidadDesc;
+	}
+	public String getAutomatico() {
+		return automatico;
+	}
+	public void setAutomatico(String automatico) {
+		this.automatico = automatico;
 	}
 
 }
