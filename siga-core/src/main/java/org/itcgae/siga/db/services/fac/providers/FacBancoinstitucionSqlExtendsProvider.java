@@ -99,7 +99,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 		SQL query = new SQL();
 		
 		query.SELECT("bi.bancos_codigo");
-		query.SELECT("bi.iban");
+		query.SELECT("comisiondescripcion || ' (...' || SUBSTR(IBAN, -4) || ')' CUENTA");
 		query.FROM("FAC_BANCOINSTITUCION bi");
 		query.WHERE("bi.idinstitucion=" + idInstitucion);
 		query.ORDER_BY("bi.bancos_codigo");
