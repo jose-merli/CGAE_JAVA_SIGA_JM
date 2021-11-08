@@ -9,6 +9,8 @@ import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
+import org.itcgae.siga.DTO.fac.FicherosAdeudosDTO;
+import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
@@ -42,6 +44,6 @@ public interface IFacturacionPySService {
 	public ComboDTO comboModelosComunicacion(HttpServletRequest request);
 	public ContadorSeriesDTO getContadoresSerie(HttpServletRequest request);
 	public ContadorSeriesDTO getContadoresRectificativasSerie(HttpServletRequest request);
-
+	public FicherosAdeudosDTO getFicherosAdeudos(FicherosAdeudosItem item, HttpServletRequest request);
 }
  

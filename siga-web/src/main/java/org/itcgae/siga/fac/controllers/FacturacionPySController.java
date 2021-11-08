@@ -6,7 +6,6 @@ import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -169,4 +168,9 @@ public class FacturacionPySController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
+	@PostMapping(value = "/getFicherosAdeudos")
+	ResponseEntity<FicherosAdeudosDTO> getFicherosAdeudos(@RequestBody FicherosAdeudosItem item,  HttpServletRequest request) {
+		FicherosAdeudosDTO response = facturacionService.getFicherosAdeudos(item, request);
+		return new ResponseEntity<FicherosAdeudosDTO>(response, HttpStatus.OK);
+	}
 }
