@@ -113,19 +113,17 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		return sql.toString();
 	}
 
-	public String getUsoSufijo(int idInstitucion, String codigoBanco) {
+	public String getNextIdSerieFacturacion(Short idInstitucion) {
 		SQL sql = new SQL();
 
-		sql.SELECT("COUNT(1)");
-		sql.FROM("( " + getConsultaUsoSufijo(idInstitucion, codigoBanco));
-
-		Logger LOGGER = Logger.getLogger(FacSeriefacturacionExtendsSqlProvider.class);
-		LOGGER.info(sql.toString());
+		sql.SELECT("(NVL(MAX(sf.idseriefacturacion),0) + 1) as idseriefacturacion");
+		sql.FROM("fac_seriefacturacion sf");
+		sql.WHERE("sf.idinstitucion = " + idInstitucion);
 
 		return sql.toString();
 	}
 
-	private String getConsultaUsoSufijo(int idInstitucion, String codigoBanco) {
+	public String getConsultaUsoSufijo(int idInstitucion, String codigoBanco) {
 
 		String principal;
 		SQL pagos = new SQL();
@@ -186,7 +184,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 							"AND sf.idseriefacturacion = sfb.idseriefacturacion)");
 		series.LEFT_OUTER_JOIN("fac_sufijo s ON (sfb.idinstitucion = s.idinstitucion " +
 								"AND sfb.idsufijo = s.idsufijo)");
-		series.WHERE("sf.idinstitucion = " + idInstitucion + " AND sfb.bancos_codigo = " + codigoBanco + ")");
+		series.WHERE("sf.idinstitucion = " + idInstitucion + " AND sfb.bancos_codigo = " + codigoBanco);
 
 		principal = pagos + " UNION " + series;
 

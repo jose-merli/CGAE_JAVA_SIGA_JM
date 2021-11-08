@@ -7,8 +7,11 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
+import org.itcgae.siga.DTO.fac.UsosSufijosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionMapper;
+import org.itcgae.siga.db.services.cen.providers.CenSolimodidireccionesSqlExtendsProvider;
 import org.itcgae.siga.db.services.fac.providers.FacSeriefacturacionExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -48,7 +51,20 @@ public interface FacSeriefacturacionExtendsMapper extends FacSeriefacturacionMap
 	})
 	List<SerieFacturacionItem> getSeriesFacturacion(SerieFacturacionItem serieFacturacionItem, Short idInstitucion, String idioma);
 
-	@SelectProvider(type = FacSeriefacturacionExtendsSqlProvider.class, method = "getUsoSufijo")
-	int getUsoSufijo(int idInstitucion, String codigoBanco);
+	@SelectProvider(type = FacSeriefacturacionExtendsSqlProvider.class, method = "getNextIdSerieFacturacion")
+	@Results({ @Result(column = "idseriefacturacion", property = "newId", jdbcType = JdbcType.VARCHAR) })
+	NewIdDTO getNextIdSerieFacturacion(Short idInstitucion);
+
+	@SelectProvider(type = FacSeriefacturacionExtendsSqlProvider.class, method = "getConsultaUsoSufijo")
+	@Results({
+		@Result(column = "idseriefacturacion", property = "idSerieFacturacion", jdbcType = JdbcType.INTEGER),
+		@Result(column = "tipo", property = "tipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "cod_banco", property = "codBanco", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "abreviatura", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "sufijo", property = "sufijo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "num_pendientes", property = "numPendientes", jdbcType = JdbcType.VARCHAR),
+	})
+	List<UsosSufijosItem> getUsosSufijos(int idInstitucion, String codigoBanco);
 
 }

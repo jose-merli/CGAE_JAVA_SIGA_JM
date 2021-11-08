@@ -45,5 +45,7 @@ public interface IFacturacionPySService {
 	public ContadorSeriesDTO getContadoresSerie(HttpServletRequest request);
 	public ContadorSeriesDTO getContadoresRectificativasSerie(HttpServletRequest request);
 	public FicherosAdeudosDTO getFicherosAdeudos(FicherosAdeudosItem item, HttpServletRequest request);
+    public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request);
+    public ComboDTO comboTiposIVA(HttpServletRequest request);
 }
  
