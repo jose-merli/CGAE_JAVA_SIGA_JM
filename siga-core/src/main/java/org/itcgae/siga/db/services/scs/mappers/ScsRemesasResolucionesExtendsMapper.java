@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.scs.LogRemesaResolucionItem;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
 import org.itcgae.siga.db.entities.CajgRemesaresolucionfichero;
@@ -28,7 +29,8 @@ public interface ScsRemesasResolucionesExtendsMapper {
 		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHACARGA", property = "fechaCarga", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHARESOLUCION", property = "fechaResolucion", jdbcType = JdbcType.DATE),
-		@Result(column = "IDREMESA", property = "idRemesa", jdbcType = JdbcType.NUMERIC)
+		@Result(column = "IDREMESA", property = "idRemesa", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "LOGGENERADO", property ="log", jdbcType = JdbcType.NUMERIC)
 	})
 	List<RemesasResolucionItem> buscarRemesasResoluciones(RemesasResolucionItem remesasResolucionItem, int idInstitucion);
 	
@@ -50,4 +52,18 @@ public interface ScsRemesasResolucionesExtendsMapper {
 	})
 	List<EcomOperacionTipoaccion> ecomOperacionTipoAccion(String tipoCAJG);
 
+	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class, method = "idTipoRemesa")
+	@Results({
+		@Result(column = "IDTIPOREMESA", property = "idtiporemesa", jdbcType = JdbcType.INTEGER)
+	})
+	String idTipoRemesa (String idInstitucion);
+	
+	@SelectProvider(type = ScsRemesasResolucionesExtendsProvider.class, method = "logRemesaResoluciones")
+	@Results({
+		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PARAMETROSERROR", property = "parametrosError", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUEROLINEA", property = "numeroLinea", jdbcType = JdbcType.VARCHAR),
+	})
+	List<LogRemesaResolucionItem> logRemesaResoluciones(String idInstitucion, String idRemesaResolucion) ;
 }

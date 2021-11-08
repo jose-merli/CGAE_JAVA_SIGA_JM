@@ -24,6 +24,7 @@ public class ScsRemesasResolucionesExtendsProvider {
 		sql.SELECT("RES.FECHACARGA");
 		sql.SELECT("RES.FECHARESOLUCION");
 		sql.SELECT("RES.IDREMESA");
+		sql.SELECT("RES.LOGGENERADO AS LOGGENERADO");
 		
 		sql.FROM("CAJG_REMESARESOLUCION RES");
 		
@@ -103,4 +104,28 @@ public class ScsRemesasResolucionesExtendsProvider {
 		LOGGER.info(sql.toString());
 		return sql.toString();
 	}
+	public String idTipoRemesa(String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("IDTIPOREMESA");
+		sql.FROM("CAJG_TIPOREMESA");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		LOGGER.info(sql.toString());
+		return sql.toString();
+	}
+	
+	public String logRemesaResoluciones(String idInstitucion, String idRemesaResolucion) {
+		SQL sql = new SQL();
+		sql.SELECT("E.CODIGO AS codigo");
+		sql.SELECT("E.DESCRIPCION AS descripcion");
+		sql.SELECT("R.PARAMETROSERROR AS prametrosError");
+		sql.SELECT("R.NUMEROLINEA AS numeroLinea");
+		sql.FROM("CAJG_REMESARESOLUCIONFICHERO R","CAJG_ERRORESREMESARESOL E");
+		sql.WHERE("R.IDERRORESREMESARESOL = E.IDERRORESREMESARESOL");
+		sql.WHERE("R.IDINSTITUCION = E.IDINSTITUCION");
+		sql.WHERE("R.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("R.IDREMESARESOLUCION = " + idRemesaResolucion);
+		sql.ORDER_BY("R.NUMEROLINEA");
+		return sql.toString();
+	}
+	
 }

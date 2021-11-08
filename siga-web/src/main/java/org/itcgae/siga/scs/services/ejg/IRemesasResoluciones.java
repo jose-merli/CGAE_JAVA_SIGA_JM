@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.scs.EcomOperacionTipoaccionDTO;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesaResolucionDTO;
@@ -11,6 +12,7 @@ import org.itcgae.siga.DTOs.scs.RemesasBusquedaItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IRemesasResoluciones {
 	
@@ -22,5 +24,8 @@ public interface IRemesasResoluciones {
 	EcomOperacionTipoaccionDTO obtenerOperacionTipoAccion(HttpServletRequest request);
 
 	EcomOperacionTipoaccionDTO obtenerResoluciones(HttpServletRequest request);
+
+	UpdateResponseDTO guardarRemesaResolucion(RemesasResolucionItem remesasResolucionItem,
+			MultipartHttpServletRequest request);
 
 }

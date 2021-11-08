@@ -9,11 +9,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
+import java.text.MessageFormat;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -35,6 +38,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.LogRemesaResolucionItem;
 import org.itcgae.siga.DTOs.scs.RemesaResultadoDTO;
 import org.itcgae.siga.DTOs.scs.RemesasItem;
 import org.itcgae.siga.DTOs.scs.RemesasResolucionItem;
@@ -100,9 +104,6 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
     
     @Autowired
     private GestorContadores gestorContadores;
-    
-	@Autowired
-	private AdmContadorExtendsMapper admContadorExtendsMapper;
 	
 	@Autowired
 	private ScsRemesasResolucionesExtendsMapper remesasResolucionesExtendsMapper;
@@ -120,7 +121,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 	private CajgProcedimientoremesaresolMapper cajgProcedimientoremesaresolMapper;
 	
 	@Autowired
-	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	private ScsRemesasResolucionesExtendsMapper scsRemesasResolucionesExtendsMapper;
 	
 	@Override
 	public RemesaResultadoDTO buscarRemesasResultado(RemesasResultadoItem remesasResultadoItem, HttpServletRequest request) {
@@ -251,8 +252,6 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
         genPropertiesExamplePG.createCriteria().andParametroEqualTo("cajg.directorioCAJGJava");
         List<GenProperties> genPropertiesPathP = genPropertiesMapper.selectByExample(genPropertiesExamplePG);
         path += genPropertiesPathP.get(0).getValor();
-      //Para local
-        path = "C:\\Users\\kvargasnunez\\Desktop\\Server";
         path += File.separator + idInstitucion + File.separator + "remesaResoluciones";		
         path += File.separator + idRemesaResolucion;
         
@@ -282,6 +281,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 		int response = 0;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		boolean produceLog = false;
 		
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		if (idInstitucion != null) {
@@ -347,7 +347,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 					remesaResolucion.setNombrefichero((conFichero) ? fileName : "");
 					remesaResolucion.setFechamodificacion(new Date());
 					remesaResolucion.setUsumodificacion(usuarios.get(0).getIdusuario());
-					remesaResolucion.setLoggenerado(new Short("0"));
+					remesaResolucion.setLoggenerado(new Short("1"));
 					remesaResolucion.setIdtiporemesa(new Short("3"));
 					
 					response = cajgRemesaresolucionMapper.insert(remesaResolucion);
@@ -386,7 +386,12 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 							
 							LOGGER.info(
 									"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida de la llamada al PL");
+							produceLog = generaLog(path,fileName , idInstitucion, remesaResolucionID);
 							
+							if(!produceLog) {
+								remesaResolucion.setLoggenerado(new Short("0"));
+								 cajgRemesaresolucionMapper.updateByPrimaryKeySelective(remesaResolucion);
+							}
 							
 						}	
 					}
@@ -469,6 +474,12 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 						//3 Llamamos al PL
 						response = 	invocarProcedimiento(procedimientos.get(0).getConsulta(), idInstitucion, remesasResolucionItem, procedimientos.get(0).getDelimitador(), fileName,usuarios.get(0).getIdusuario() );
 						
+						produceLog = generaLog(path,fileName , idInstitucion, remesaResolucionID);
+						
+						if(!produceLog) {
+							cajgRemesaresolucion.setLoggenerado(new Short("0"));
+							 cajgRemesaresolucionMapper.updateByPrimaryKey(cajgRemesaresolucion);
+						}
 						LOGGER.info(
 								"guardarRemesaResultado() / cajgRemesaResolucionExtendsMapper.insert() -> Salida de la llamada al PL");
 						
@@ -510,48 +521,41 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
     	return updateResponseDTO;
     }
 
-	
-	private Boolean comprobacionFichero(File file) {
+	private boolean generaLog(String path,String nombreFichero, Short idInstitucion,
+			RemesasResolucionItem remesaResolucionID) throws IOException {
 		
-		GenParametrosExample genParametro = new GenParametrosExample();
-		genParametro.createCriteria().andParametroEqualTo(SigaConstants.MAX_NUM_LINEAS_FICHERO);
-		 List<GenParametros> parametros = genParametrosExtendsMapper.selectByExample(genParametro);
-
-		FileInputStream fis;
-		int MAX = Integer.parseInt(parametros.get(0).getValor());
-
-		try {
-			int numLineas = 0;
-			fis = new FileInputStream(file.getPath());
-			// Creates an InputStreamReader
-			InputStreamReader isr = new InputStreamReader(fis);
-			BufferedReader br = new BufferedReader(isr);
-			String linea="";
-				while(br.ready()) {  
-				    linea = br.readLine();  
-				    if(linea!=null){
-				    	numLineas++;		    		
-					}
-				}
-			br.close();
-			isr.close();
-			fis.close();
+		
+		List<LogRemesaResolucionItem> resultadoLogresultadoLog = scsRemesasResolucionesExtendsMapper.logRemesaResoluciones(String.valueOf(idInstitucion), String.valueOf(remesaResolucionID));
+		MessageFormat messageFormat;
+		String [] params;
+		if(!resultadoLogresultadoLog.isEmpty()) {
+			File logFile = getLogFile(path, nombreFichero);
+			FileWriter fileWriter = new FileWriter(logFile);
+			BufferedWriter bw = new BufferedWriter(fileWriter);
 			
-			if(numLineas > MAX) {
-				file.delete();
-				return false;
-			}
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		return true;
+			  for (LogRemesaResolucionItem log : resultadoLogresultadoLog) {
+				  params = log.getParametrosError().split(",");
+				  messageFormat = new MessageFormat(log.getDescripcion());
+				  
+	            	bw.write("[Línea:" + log.getNumeroLinea() + "] " +
+	            			"[" +log.getCodigo() + "] " + messageFormat.format(params));
+	            	bw.newLine();
+	            }
+			 bw.flush();
+			 bw.close();
+			return true;
+		}
+		return false;
 	}
 	
+	private File getLogFile(String path, String nombreFichero) {
+		String pathLog = path +"log";
+		File logDirectory = new File(pathLog);
+		logDirectory.mkdirs();
+		pathLog += File.separator + nombreFichero + "_errores.txt";
+		File logFile = new File(pathLog);
+		return logFile;
+	}
 	
 	private void insertRemesaResolucionFichero(Short idInstitucion, RemesasResolucionItem remesaResolucionID, MultipartFile  fileIn,String path ) {
 
@@ -570,7 +574,7 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 		try {
 			File fileServer = new File(path, fileIn.getOriginalFilename());
 			fis = new FileInputStream(fileServer.getPath());
-			InputStreamReader isr = new InputStreamReader(fis);
+			InputStreamReader isr = new InputStreamReader(fis, "ISO-8859-15");
 			BufferedReader br = new BufferedReader(isr);
 			String linea="";
 			int numLinea = 0;
@@ -713,19 +717,18 @@ public class RemesasResultadoServiceImpl implements IRemesasResultados{
 
 		} catch (FileNotFoundException e) {
 			LOGGER.error("uploadFile() -> Error al buscar fichero en el directorio indicado", e);
+			return false;
 		} catch (IOException ioe) {
 			LOGGER.error("uploadFile() -> Error al guardar fichero en el directorio indicado", ioe);
+			return false;
 		} finally {
 			// close the stream
 			LOGGER.debug("uploadFile() -> Cierre del stream del fichero");
 			stream.close();
 		}
 		
-		if(comprobacionFichero(serverFile)) {
-			return true;	
-		}	
-		return false;
-
+		return true ;	
+		
 	}
 	
 }

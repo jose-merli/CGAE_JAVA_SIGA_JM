@@ -16,6 +16,7 @@ public class RemesasResolucionItem {
 	private Date fechaResolucionDesde;
 	private Date fechaResolucionHasta;
 	private int idRemesa;
+	private int log;
 	
 	
 	//RESULTADO
@@ -82,6 +83,11 @@ public class RemesasResolucionItem {
 	public Date getFechaCarga() {
 		return fechaCarga;
 	}
+	
+	@JsonProperty("log")
+	public int getLog() {
+		return log;
+	}
 
 	//SETTERS
 	public void setIdRemesaResolucion(int idRemesaResolucion) {
@@ -132,7 +138,9 @@ public class RemesasResolucionItem {
 		this.fechaCarga = fechaCarga;
 	}
 
-
+	public void setLog(int log) {
+		this.log = log;
+	}
 	
 	
 	

@@ -1,10 +1,14 @@
 package org.itcgae.siga.scs.controllers.remesas;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.scs.EcomOperacionTipoaccionDTO;
 import org.itcgae.siga.DTOs.scs.RemesaBusquedaDTO;
 import org.itcgae.siga.DTOs.scs.RemesaResolucionDTO;
@@ -20,7 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/remesasResoluciones")
@@ -61,6 +67,38 @@ public class RemesasResolucionesController {
 		EcomOperacionTipoaccionDTO response = remesasResoluciones.obtenerResoluciones(request);
 		LOGGER.info("Termina el método obtenerResoluciones");
 		return new ResponseEntity<EcomOperacionTipoaccionDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/guardarRemesaResolucion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<UpdateResponseDTO> guardarRemesa(@RequestParam int idRemesa,
+													@RequestParam("observaciones") String observaciones,
+													@RequestParam("nombreFichero") String nombreFichero,
+													@RequestParam("fechaResolucion") String fechaResolucion,
+													MultipartHttpServletRequest  request){
+		LOGGER.info("----ENTRA METODO GUARDAR RESOLUCION-----");
+		RemesasResolucionItem remesasResolucionItem = new RemesasResolucionItem();
+		
+		if(idRemesa != 0) {
+			remesasResolucionItem.setIdRemesa(idRemesa);
+		}
+		remesasResolucionItem.setObservaciones(observaciones);
+		remesasResolucionItem.setNombreFichero(nombreFichero);
+	
+		try {
+			Date dateC = new SimpleDateFormat("dd/mm/yyyy")
+					.parse(fechaResolucion);
+			remesasResolucionItem.setFechaResolucion(dateC);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		UpdateResponseDTO response = remesasResoluciones.guardarRemesaResolucion(remesasResolucionItem,  request);
+		
+		LOGGER.info("----SALIDA METODO GUARDAR RESOLUCION-----");
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	
