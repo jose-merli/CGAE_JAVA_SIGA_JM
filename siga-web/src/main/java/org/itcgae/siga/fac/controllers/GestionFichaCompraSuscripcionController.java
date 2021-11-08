@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -140,8 +141,8 @@ public class GestionFichaCompraSuscripcionController {
 	}
 	
 	@GetMapping(value = "/pys/getListaServiciosSuscripcion")
-	ResponseEntity<ListaServiciosSuscripcionDTO> getListaServiciosSuscripcion(HttpServletRequest request, String idPeticion) throws Exception {
-		ListaServiciosSuscripcionDTO response = gestionFichaCompraSuscripcionService.getListaServiciosSuscripcion(request, idPeticion);
+	ResponseEntity<ListaServiciosSuscripcionDTO> getListaServiciosSuscripcion(HttpServletRequest request, String idPeticion, Date aFechaDe) throws Exception {
+		ListaServiciosSuscripcionDTO response = gestionFichaCompraSuscripcionService.getListaServiciosSuscripcion(request, idPeticion, aFechaDe);
 		if(response.getError().getCode()==200) return new ResponseEntity<ListaServiciosSuscripcionDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<ListaServiciosSuscripcionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}

@@ -6,7 +6,10 @@ public class ListaServiciosSuscripcionItem {
 	private String descripcion;
 	private String observaciones;
 	private String cantidad;
-	private String precioUnitario;
+	private String idPrecioServicio;
+	private String precioServicioValor;
+	private String idPeriodicidad;
+	private String periodicidadValor;
 	private String iva;
 	private String total;
 	private String noFacturable;
@@ -44,12 +47,6 @@ public class ListaServiciosSuscripcionItem {
 	}
 	public void setCantidad(String cantidad) {
 		this.cantidad = cantidad;
-	}
-	public String getPrecioUnitario() {
-		return precioUnitario;
-	}
-	public void setPrecioUnitario(String precioUnitario) {
-		this.precioUnitario = precioUnitario;
 	}
 	public String getIva() {
 		return iva;
@@ -116,6 +113,30 @@ public class ListaServiciosSuscripcionItem {
 	}
 	public void setIdServicioInstitucion(int idServicioInstitucion) {
 		this.idServicioInstitucion = idServicioInstitucion;
+	}
+	public String getIdPrecioServicio() {
+		return idPrecioServicio;
+	}
+	public void setIdPrecioServicio(String idPrecioServicio) {
+		this.idPrecioServicio = idPrecioServicio;
+	}
+	public String getPrecioServicioValor() {
+		return precioServicioValor;
+	}
+	public void setPrecioServicioValor(String precioServicioValor) {
+		this.precioServicioValor = precioServicioValor;
+	}
+	public String getIdPeriodicidad() {
+		return idPeriodicidad;
+	}
+	public void setIdPeriodicidad(String idPeriodicidad) {
+		this.idPeriodicidad = idPeriodicidad;
+	}
+	public String getPeriodicidadValor() {
+		return periodicidadValor;
+	}
+	public void setPeriodicidadValor(String periodicidadValor) {
+		this.periodicidadValor = periodicidadValor;
 	}
 
 }

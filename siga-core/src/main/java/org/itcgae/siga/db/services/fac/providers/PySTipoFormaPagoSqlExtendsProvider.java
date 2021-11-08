@@ -46,4 +46,8 @@ public class PySTipoFormaPagoSqlExtendsProvider {
 		
 		return sql.toString();
 	}
+	
+	public String comboPreciosServicio(String idioma) {
+		return "";
+	}
 }

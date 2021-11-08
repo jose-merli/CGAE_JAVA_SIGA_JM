@@ -104,7 +104,7 @@ public class PysServiciosSqlExtendsProvider extends PysServiciosSqlProvider {
 		return sql.toString();
 	}
 	
-	public String searchTiposServiciosByIdCategoria(String idioma, Short idInstitucion, String idCategoria) {
+	public String searchTiposServiciosByIdCategoria(String idioma, Short idInstitucion, String idCategoria) { //En realidad busca los servicios con ese idcategoria
 		SQL sql = new SQL();
 		
 		sql.SELECT("IDSERVICIO AS ID");

@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.services;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,5 +55,5 @@ public interface IGestionFichaCompraSuscripcionService {
 
 	public UpdateResponseDTO anularPeticion(HttpServletRequest request, String nSolicitud) throws Exception;
 
-	ListaServiciosSuscripcionDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud);
+	ListaServiciosSuscripcionDTO getListaServiciosSuscripcion(HttpServletRequest request, String nSolicitud, Date aFechaDe);
 }

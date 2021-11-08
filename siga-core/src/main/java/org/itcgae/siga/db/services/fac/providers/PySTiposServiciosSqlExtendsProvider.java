@@ -299,6 +299,10 @@ public class PySTiposServiciosSqlExtendsProvider extends PysServiciosSqlProvider
 		sql.GROUP_BY(" servin.automatico");
 		sql.GROUP_BY(" tiva.descripcion");
 		sql.GROUP_BY(" servis.descripcion");
+		sql.GROUP_BY("servin.noFacturable");
+		sql.GROUP_BY("idformaspago");
+		sql.GROUP_BY("formaspagoInternet");
+		sql.GROUP_BY("servin.SOLICITARBAJA");
 			
 		sql.ORDER_BY(" servin.DESCRIPCION");
 		

@@ -93,7 +93,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 						}
 						
 						LOGGER.info(
-								"getListaSuscripciones() / pysPeticioncomprasuscripcionExtendsMapper.getListaCompras() -> Salida de PysPeticioncomprasuscripcionExtendsMapper para obtener las peticiones de compra que cumplan las condiciones");
+								"getListaSuscripciones() / pysPeticioncomprasuscripcionExtendsMapper.getListaSuscripciones() -> Salida de PysPeticioncomprasuscripcionExtendsMapper para obtener las peticiones de compra que cumplan las condiciones");
 					
 						error.setCode(200);
 				}

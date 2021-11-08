@@ -564,10 +564,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				"pys_serviciosinstitucion servIns on servIns.idinstitucion = servSol.idinstitucion and servIns.idservicio = servSol.idservicio \r\n"
 						+ "and servIns.idTipoServicios = servSol.idTipoServicios and servIns.idServiciosInstitucion = servSol.idServiciosInstitucion");
 		sql.INNER_JOIN("pys_tipoiva tiva on tiva.idtipoiva = servIns.idtipoiva");
-		//POR AHORA SE TIENEN EN CUENTA UNICAMENTE LOS PRECIOS DE SERVICIOS POR DEFECTO
 		sql.LEFT_OUTER_JOIN("pys_preciosservicios precioServ on precioServ.idinstitucion = servSol.idinstitucion and precioServ.idservicio = servSol.idservicio \r\n"
 				+ "and precioServ.idTipoServicios = servSol.idTipoServicios and precioServ.idServiciosInstitucion = servSol.idServiciosInstitucion "
-				+ "and precioServ.idperiodicidad = servSol.idperiodicidad and precioServ.porDefecto = '1'");
+				+ "and precioServ.idperiodicidad = servSol.idperiodicidad and precioServ.idPreciosServicios = servSol.idPreciosServicios");
 		sql.LEFT_OUTER_JOIN("pys_periodicidad periodicidad on precioServ.idperiodicidad = periodicidad.idperiodicidad");
 		sql.LEFT_OUTER_JOIN(
 				"pys_peticioncomprasuscripcion petBaja on petBaja.idinstitucion = pet.idinstitucion and petBaja.idpeticionalta = pet.idpeticion");
@@ -663,11 +662,12 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.WHERE("fact.estado = "+filtro.getIdEstadoFactura());
 		}
 //		private String importe; // valor aplicado durante la compra (importe total)
+		sql.WHERE("rownum <= 200");
 
 		return sql.toString();
 	}
 
-	public String getListaServiciosSuscripcion(Short idInstitucion, String idPeticion) {
+	public String getListaServiciosSuscripcion(Short idInstitucion, String idPeticion, String idioma, Date aFechaDe) throws ParseException {
 
 		SQL sql = new SQL();
 
@@ -688,10 +688,24 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT_DISTINCT("servIns.solicitarBaja"); // Este atributo hace referencia a la propiedad/check "Solictar
 														// baja por internet"
 		sql.SELECT_DISTINCT("servIns.Automatico");
+		sql.SELECT_DISTINCT("precioServ.valor as precio");
+		sql.SELECT_DISTINCT("f_siga_getrecurso(periodicidad.descripcion, "+idioma+") as periodo");
 
 		sql.FROM(" pys_serviciosinstitucion servIns, pys_tipoiva tiva");
 		sql.FROM("pys_serviciossolicitados servSol");
 		sql.FROM("pys_preciosServicios precioServ");
+		
+		if(aFechaDe != null) {
+			DateFormat dateFormatFront = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", new Locale("en"));
+			DateFormat dateFormatSql = new SimpleDateFormat("dd/MM/YY");
+			String strDate = dateFormatSql
+					.format(dateFormatFront.parse(aFechaDe.toString()).getTime());
+			//Deben estar en estado "Aceptada" o "Pendiente de anulacion" en esa fecha
+			sql.WHERE(
+					"(suscripcion.fechaSuscripcion is not null and "
+					+ "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and"
+					+ "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
+		}
 
 		sql.WHERE(" servIns.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE(" tiva.idtipoiva (+) = servIns.idtipoiva");
