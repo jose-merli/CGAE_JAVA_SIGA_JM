@@ -40,6 +40,12 @@ public class FacturacionPySController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@GetMapping(value = "/comboSeriesFacturacion")
+	ResponseEntity<ComboDTO> comboSeriesFacturacion(HttpServletRequest request) {
+		ComboDTO response = facturacionService.comboSeriesFacturacion(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@GetMapping(value = "/comboEtiquetas")
 	ResponseEntity<ComboDTO> comboEtiquetas(HttpServletRequest request) {
 		ComboDTO response = facturacionService.comboEtiquetas(request);

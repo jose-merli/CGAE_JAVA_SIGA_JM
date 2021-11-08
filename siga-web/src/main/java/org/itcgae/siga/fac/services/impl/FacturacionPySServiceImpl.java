@@ -2,6 +2,7 @@ package org.itcgae.siga.fac.services.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -9,28 +10,67 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.fac.*;
+import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
+import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
+import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
+import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
+import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
+import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
+import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
+import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
+import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
-import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.*;
-import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmContador;
+import org.itcgae.siga.db.entities.AdmContadorExample;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
+import org.itcgae.siga.db.entities.FacFacturaExample;
+import org.itcgae.siga.db.entities.FacFormapagoserie;
+import org.itcgae.siga.db.entities.FacFormapagoserieExample;
+import org.itcgae.siga.db.entities.FacSeriefacturacion;
+import org.itcgae.siga.db.entities.FacSeriefacturacionBanco;
+import org.itcgae.siga.db.entities.FacSeriefacturacionBancoExample;
+import org.itcgae.siga.db.entities.FacSeriefacturacionExample;
+import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
+import org.itcgae.siga.db.entities.FacSufijo;
+import org.itcgae.siga.db.entities.FacSufijoExample;
+import org.itcgae.siga.db.entities.FacTipocliincluidoenseriefac;
+import org.itcgae.siga.db.entities.FacTipocliincluidoenseriefacExample;
+import org.itcgae.siga.db.entities.ModModelocomunicacion;
+import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
+import org.itcgae.siga.db.mappers.AdmContadorMapper;
+import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
+import org.itcgae.siga.db.mappers.FacFacturaMapper;
+import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
+import org.itcgae.siga.db.mappers.FacSufijoMapper;
+import org.itcgae.siga.db.mappers.FacTiposproduincluenfactuMapper;
+import org.itcgae.siga.db.mappers.FacTiposservinclsenfactMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
-import org.itcgae.siga.db.services.fac.mappers.*;
+import org.itcgae.siga.db.services.fac.mappers.FacBancoinstitucionExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacFacturacionsuscripcionExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacFormapagoserieExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.PysCompraExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
+import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.gen.Error;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -97,7 +137,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
     @Autowired
     private FacTiposservinclsenfactMapper facTiposservinclsenfactMapper;
-
+    
+	@Autowired
+	private CgaeAuthenticationProvider authenticationProvider;
+	
     @Override
     public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias, HttpServletRequest request) {
 
@@ -1753,6 +1796,49 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		LOGGER.info("getContadoresRectificativasSerie() -> Salida del servicio para obtener los datos de los contadores rectificativas");
 
 		return contadorSeriesDTO;
+	}
+
+	@Override
+	public ComboDTO comboSeriesFacturacion(HttpServletRequest request) {
+		
+		ComboDTO comboDTO = new ComboDTO();
+		
+		List<ComboItem> comboItems;
+		Error error = new Error();
+		String dni, idInstitucion;
+		
+		LOGGER.info("FacturacionPySServiceImpl.comboSeriesFacturacion() -> Entrada al servicio para recuperar el combo de series de facturacion");
+
+		// Conseguimos información del usuario logeado
+		try {
+			
+			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+		
+			dni = authentication.get("dni");
+			idInstitucion = authentication.get("idInstitucion");
+					
+			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
+				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info("FacturacionPySServiceImpl.comboSeriesFacturacion() -> obteniendo datos para el el combo de series de facturación");
+					
+					//comboDTO.setCombooItems(facBancoinstitucionExtendsMapper.comboCuentasBancarias(idInstitucion));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.comboCuentasBancarias() -> Se ha producido un error al obtener el combo de cuentas bancarias",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboCuentasBancarias() -> Salida del servicio para obtener el combo de cuentas bancarias");
+		
+		return comboDTO;
 	}
 
 	/*
