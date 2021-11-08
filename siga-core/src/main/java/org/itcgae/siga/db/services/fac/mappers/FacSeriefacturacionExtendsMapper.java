@@ -58,6 +58,7 @@ public interface FacSeriefacturacionExtendsMapper extends FacSeriefacturacionMap
 	@SelectProvider(type = FacSeriefacturacionExtendsSqlProvider.class, method = "getConsultaUsoSufijo")
 	@Results({
 		@Result(column = "idseriefacturacion", property = "idSerieFacturacion", jdbcType = JdbcType.INTEGER),
+		@Result(column = "tipo", property = "tipo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "cod_banco", property = "codBanco", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "abreviatura", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),

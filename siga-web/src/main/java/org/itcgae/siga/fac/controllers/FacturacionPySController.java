@@ -170,8 +170,8 @@ public class FacturacionPySController {
 	}
 
 	@GetMapping(value = "/getUsosSufijos")
-	ResponseEntity<UsosSufijosDTO> getUsosSufijos(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
-		UsosSufijosDTO response = facturacionService.getUsosSufijos(idSerieFacturacion, request);
+	ResponseEntity<UsosSufijosDTO> getUsosSufijos(@RequestParam String codBanco, HttpServletRequest request) {
+		UsosSufijosDTO response = facturacionService.getUsosSufijos(codBanco, request);
 		return new ResponseEntity<UsosSufijosDTO>(response, HttpStatus.OK);
 	}
 
