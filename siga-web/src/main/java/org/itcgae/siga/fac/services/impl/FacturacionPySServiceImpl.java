@@ -98,6 +98,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
     @Autowired
     private FacTiposservinclsenfactMapper facTiposservinclsenfactMapper;
 
+    @Autowired
+    private PySTipoIvaExtendsMapper pySTipoIvaExtendsMapper;
+
     @Override
     public DeleteResponseDTO borrarCuentasBancarias(List<CuentasBancariasItem> cuentasBancarias, HttpServletRequest request) {
 
@@ -1794,6 +1797,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				nuevoContador.setPrefijo(contador.getPrefijo());
 				nuevoContador.setContador(Long.parseLong(contador.getContador()));
 				nuevoContador.setSufijo(contador.getSufijo());
+				nuevoContador.setIdtabla("FAC_FACTURA");
 
 
 				nuevoContador.setIdinstitucion(idInstitucion);
@@ -1813,5 +1817,171 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return updateResponseDTO;
 	}
 	*/
+	/*
+	@Override
+	@Transactional
+	public UpdateResponseDTO guardarContadorRectificativaSerie(ContadorSeriesItem contador, HttpServletRequest request) {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		int response = 0;
+		Error error = new Error();
+
+		LOGGER.info("guardarFormasPagosSerie() -> Entrada al servicio para guardar las formas de pago");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"FacturacionPySServiceImpl.guardarFormasPagosSerie() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"guardarFormasPagosSerie() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				Integer idUsuario = usuarios.get(0).getIdusuario();
+				LOGGER.info(
+						"guardarFormasPagosSerie() / facFormapagoserieExtendsMapper.insertSelective() -> Entrada a facFormapagoserieExtendsMapper para guardar las formas de pago");
+
+				//Logica
+
+				AdmContador nuevoContador = new AdmContador();
+				nuevoContador.setNombre(contador.getNombre());
+				nuevoContador.setPrefijo(contador.getPrefijo());
+				nuevoContador.setContador(Long.parseLong(contador.getContador()));
+				nuevoContador.setSufijo(contador.getSufijo());
+				nuevoContador.setIdtabla("FAC_ABONO");
+
+
+				nuevoContador.setIdinstitucion(idInstitucion);
+				nuevoContador.setUsucreacion(idUsuario);
+				nuevoContador.setFechacreacion(new Date());
+				nuevoContador.setUsumodificacion(idUsuario);
+				nuevoContador.setFechamodificacion(new Date());
+
+				admContadorMapper.insertSelective(nuevoContador);
+			}
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("guardarFormasPagosSerie() -> Salida del servicio para guardar las formas de pago");
+
+		return updateResponseDTO;
+	}
+	*/
+
+	@Override
+	public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request) {
+		UsosSufijosDTO usosSufijosDTO = new UsosSufijosDTO();
+
+		List<UsosSufijosItem> usosSufijosItems;
+		Error error = new Error();
+
+		LOGGER.info("getUsosSufijos() -> Entrada al servicio para recuperar usos y sufijos");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"FacturacionPySServiceImpl.getUsosSufijos() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"comboSufijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"comboSufijos() / facSeriefacturacionExtendsMapper.getUsosSufijos() -> Entrada a facSeriefacturacionExtendsMapper para obtener los usos y sufijos");
+
+					//Logica
+					usosSufijosItems = facSeriefacturacionExtendsMapper.getUsosSufijos(idInstitucion, codBanco);
+					usosSufijosDTO.setUsosSufijosItems(usosSufijosItems);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.getUsosSufijos() -> Se ha producido un error al obtener los usos y sufijos",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		usosSufijosDTO.setError(error);
+
+		LOGGER.info("getUsosSufijos() -> Salida del servicio para obtener los usos y sufijos");
+
+		return usosSufijosDTO;
+	}
+
+	@Override
+	public ComboDTO comboTiposIVA(HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+
+		List<ComboItem> comboItems;
+		Error error = new Error();
+
+		LOGGER.info("comboTiposIVA() -> Entrada al servicio para recuperar el combo de tipos de IVA");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+				LOGGER.info(
+						"FacturacionPySServiceImpl.comboTiposIVA() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"comboTiposIVA() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					LOGGER.info(
+							"comboTiposIVA() / pySTipoIvaExtendsMapper.comboTiposIVA() -> Entrada a pySTipoIvaExtendsMapper para obtener el combo de tipos de IVA");
+
+					String idioma = usuarios.get(0).getIdlenguaje();
+
+					//Logica
+					comboItems = pySTipoIvaExtendsMapper.comboTiposIVA(idioma);
+
+					comboDTO.setCombooItems(comboItems);
+
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.comboTiposIVA() -> Se ha producido un error al obtener el combo de tipos de IVA",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		comboDTO.setError(error);
+
+		LOGGER.info("comboTiposIVA() -> Salida del servicio para obtener el combo de tipos de IVA");
+
+		return comboDTO;
+	}
+
 
 }

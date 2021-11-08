@@ -163,4 +163,17 @@ public class FacturacionPySController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 
+	@GetMapping(value = "/getUsosSufijos")
+	ResponseEntity<UsosSufijosDTO> getUsosSufijos(@RequestParam String idSerieFacturacion, HttpServletRequest request) {
+		UsosSufijosDTO response = facturacionService.getUsosSufijos(idSerieFacturacion, request);
+		return new ResponseEntity<UsosSufijosDTO>(response, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/comboTiposIVA")
+	ResponseEntity<ComboDTO> comboTiposIVA(HttpServletRequest request) {
+		ComboDTO response = facturacionService.comboTiposIVA(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+
+
 }

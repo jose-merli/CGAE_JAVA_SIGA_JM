@@ -30,5 +30,12 @@ public interface PySTipoIvaExtendsMapper extends PysTipoivaMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		}) 
 	List<ComboItem> comboIvaNoDerogados(String idioma);
-	
+
+	@SelectProvider(type = PySTipoIvaSqlExtendsProvider.class, method = "comboIva")
+	@Results({
+			@Result(column = "idtipoiva", property = "value", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "descripcion", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> comboTiposIVA(String idioma);
+
 }

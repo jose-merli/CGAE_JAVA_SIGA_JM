@@ -113,6 +113,16 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		return sql.toString();
 	}
 
+	public String getNextIdSerieFacturacion(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("(NVL(MAX(sf.idseriefacturacion),0) + 1) as idseriefacturacion");
+		sql.FROM("fac_seriefacturacion sf");
+		sql.WHERE("sf.idinstitucion = " + idInstitucion);
+
+		return sql.toString();
+	}
+
 	public String getUsoSufijo(int idInstitucion, String codigoBanco) {
 		SQL sql = new SQL();
 
@@ -125,7 +135,7 @@ public class FacSeriefacturacionExtendsSqlProvider extends FacSeriefacturacionSq
 		return sql.toString();
 	}
 
-	private String getConsultaUsoSufijo(int idInstitucion, String codigoBanco) {
+	public String getConsultaUsoSufijo(int idInstitucion, String codigoBanco) {
 
 		String principal;
 		SQL pagos = new SQL();
