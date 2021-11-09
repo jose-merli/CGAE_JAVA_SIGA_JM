@@ -1152,4 +1152,8 @@ public class SigaConstants {
 	public static final String ACREDITACION_TIPO_FIN = "2";
 	public static final String ACREDITACION_TIPO_COMPLETA = "3";
 
+	//Expedientes
+	public static final String RECURSO_MENU_EXP_EXEA = "menu.expedientesexea";
+	public static final String PARAM_MENU_EXEA_ACTIVO = "EXPEDIENTES_EXEA_ACTIVOS";
+
 }

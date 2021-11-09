@@ -49,37 +49,7 @@ import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
 import org.itcgae.siga.commons.utils.TokenGenerationException;
-import org.itcgae.siga.db.entities.AdmConfig;
-import org.itcgae.siga.db.entities.AdmConfigExample;
-import org.itcgae.siga.db.entities.AdmGestorinterfaz;
-import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
-import org.itcgae.siga.db.entities.AdmPerfil;
-import org.itcgae.siga.db.entities.AdmPerfilExample;
-import org.itcgae.siga.db.entities.AdmPerfilKey;
-import org.itcgae.siga.db.entities.AdmPerfilRol;
-import org.itcgae.siga.db.entities.AdmPerfilRolExample;
-import org.itcgae.siga.db.entities.AdmRol;
-import org.itcgae.siga.db.entities.AdmRolExample;
-import org.itcgae.siga.db.entities.AdmTiposacceso;
-import org.itcgae.siga.db.entities.AdmTiposaccesoKey;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenClienteKey;
-import org.itcgae.siga.db.entities.CenColegiado;
-import org.itcgae.siga.db.entities.CenColegiadoKey;
-import org.itcgae.siga.db.entities.CenInstitucion;
-import org.itcgae.siga.db.entities.CenInstitucionExample;
-import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
-import org.itcgae.siga.db.entities.GenMenu;
-import org.itcgae.siga.db.entities.GenMenuExample;
-import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.AdmGestorinterfazMapper;
 import org.itcgae.siga.db.mappers.AdmPerfilMapper;
@@ -302,6 +272,30 @@ public class MenuServiceImpl implements IMenuService {
 
 			}
 
+			//Miramos si trae la opcion de menu Expedientes EXEA, si es así pero el colegio no tiene configurada esta opcion de menu por parametro, la quitamos
+			if(items != null && !items.isEmpty()
+				&&  items.stream().anyMatch(menuItem -> SigaConstants.RECURSO_MENU_EXP_EXEA.equals(menuItem.getLabel()))){
+
+				List<Short> instituciones = new ArrayList<Short>();
+				instituciones.add(idInstitucion);
+				instituciones.add(SigaConstants.IDINSTITUCION_0_SHORT);
+				GenParametrosExample genParametrosExample = new GenParametrosExample();
+				genParametrosExample.createCriteria()
+						.andFechaBajaIsNull()
+						.andIdinstitucionIn(instituciones)
+						.andModuloEqualTo("EXP")
+						.andParametroEqualTo(SigaConstants.PARAM_MENU_EXEA_ACTIVO);
+				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+				List<GenParametros> genParametros = genParametrosMapper.selectByExample(genParametrosExample);
+
+				if(genParametros != null && !genParametros.isEmpty()){
+					String expedientesEXEAActivo = genParametros.get(0).getValor();
+					//Si vale N, tendremos que eliminar la opcion Expedientes EXEA del menu
+					if("N".equals(expedientesEXEAActivo)){
+						items = items.stream().filter(menuItem -> !SigaConstants.RECURSO_MENU_EXP_EXEA.equals(menuItem.getLabel())).collect(Collectors.toList());
+					}
+				}
+			}
 			response.setMenuItems(items);
 		}
 
@@ -910,7 +904,6 @@ public class MenuServiceImpl implements IMenuService {
 	
 	private String getInstitucionRequest(HttpServletRequest request) {
 		String idInstitucion = null;
-		
 		try {
 			String roles = (String) request.getHeader("CAS-roles");
 			String defaultRole = null;
@@ -922,9 +915,9 @@ public class MenuServiceImpl implements IMenuService {
 			}else {
 				roleAttributes = roles.split(" ");
 			}
-				
+
 			idInstitucion = roleAttributes[0];
-			
+
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage(),e);
 		}
