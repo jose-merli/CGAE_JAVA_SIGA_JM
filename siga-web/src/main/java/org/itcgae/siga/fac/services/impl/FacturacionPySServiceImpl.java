@@ -1093,6 +1093,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					// Logica
 					AdmContador nuevoContador = new AdmContador();
 					nuevoContador.setNombre(contador.getNombre());
+					nuevoContador.setDescripcion(contador.getNombre());
 					nuevoContador.setPrefijo(contador.getPrefijo());
 					nuevoContador.setContador(Long.parseLong(contador.getContador()));
 					nuevoContador.setSufijo(contador.getSufijo());
@@ -1109,6 +1110,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					nuevoContador.setFechacreacion(new Date());
 					nuevoContador.setUsumodificacion(idUsuario);
 					nuevoContador.setFechamodificacion(new Date());
+					nuevoContador.setModificablecontador("1");
 
 					admContadorMapper.insertSelective(nuevoContador);
 
@@ -1128,69 +1130,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 		return createResponseDTO;
 	}
-	/*
-	 * @Override
-	 * 
-	 * @Transactional public UpdateResponseDTO
-	 * guardarContadorRectificativaSerie(ContadorSeriesItem contador,
-	 * HttpServletRequest request) { UpdateResponseDTO updateResponseDTO = new
-	 * UpdateResponseDTO(); int response = 0; Error error = new Error();
-	 * 
-	 * LOGGER.
-	 * info("guardarFormasPagosSerie() -> Entrada al servicio para guardar las formas de pago"
-	 * );
-	 * 
-	 * // Conseguimos información del usuario logeado String token =
-	 * request.getHeader("Authorization"); String dni =
-	 * UserTokenUtils.getDniFromJWTToken(token); Short idInstitucion =
-	 * UserTokenUtils.getInstitucionFromJWTToken(token);
-	 * 
-	 * if (idInstitucion != null) { AdmUsuariosExample exampleUsuarios = new
-	 * AdmUsuariosExample();
-	 * exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(
-	 * idInstitucion);
-	 * 
-	 * LOGGER.info(
-	 * "FacturacionPySServiceImpl.guardarFormasPagosSerie() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado"
-	 * );
-	 * 
-	 * List<AdmUsuarios> usuarios =
-	 * admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	 * 
-	 * LOGGER.info(
-	 * "guardarFormasPagosSerie() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado"
-	 * );
-	 * 
-	 * if (usuarios != null && !usuarios.isEmpty()) { Integer idUsuario =
-	 * usuarios.get(0).getIdusuario(); LOGGER.info(
-	 * "guardarFormasPagosSerie() / facFormapagoserieExtendsMapper.insertSelective() -> Entrada a facFormapagoserieExtendsMapper para guardar las formas de pago"
-	 * );
-	 * 
-	 * //Logica
-	 * 
-	 * AdmContador nuevoContador = new AdmContador();
-	 * nuevoContador.setNombre(contador.getNombre());
-	 * nuevoContador.setPrefijo(contador.getPrefijo());
-	 * nuevoContador.setContador(Long.parseLong(contador.getContador()));
-	 * nuevoContador.setSufijo(contador.getSufijo());
-	 * nuevoContador.setIdtabla("FAC_ABONO");
-	 * 
-	 * 
-	 * nuevoContador.setIdinstitucion(idInstitucion);
-	 * nuevoContador.setUsucreacion(idUsuario); nuevoContador.setFechacreacion(new
-	 * Date()); nuevoContador.setUsumodificacion(idUsuario);
-	 * nuevoContador.setFechamodificacion(new Date());
-	 * 
-	 * admContadorMapper.insertSelective(nuevoContador); } }
-	 * 
-	 * updateResponseDTO.setError(error);
-	 * 
-	 * LOGGER.
-	 * info("guardarFormasPagosSerie() -> Salida del servicio para guardar las formas de pago"
-	 * );
-	 * 
-	 * return updateResponseDTO; }
-	 */
 
 	@Override
 	public UsosSufijosDTO getUsosSufijos(String codBanco, HttpServletRequest request) {
