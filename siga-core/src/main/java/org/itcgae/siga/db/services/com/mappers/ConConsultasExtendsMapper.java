@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderItem;
 import org.itcgae.siga.DTOs.com.ConstructorConsultasItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
@@ -51,7 +52,13 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 			@Result(column = "NOMBREMODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR) })
 	List<ConsultaItem> selectConsultasSearch(Short idInstitucion, String idLenguaje, List<String> perfiles, ConsultasSearch filtros);
-
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectServiciosByConsulta")
+	@Results({ @Result(column = "IDSERVICIOSINSTITUCION", property = "idserviciosinstitucion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDSERVICIO", property = "idservicio", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDTIPOSERVICIOS", property = "idtiposervicios", jdbcType = JdbcType.NUMERIC)})
+	List<ServicioDetalleDTO> selectServiciosByConsulta(Short idInstitucion, String idConsulta);
+	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectMaxIdConsulta")
 	@Results({
 		@Result(column = "IDMAX", property = "newId", jdbcType = JdbcType.VARCHAR)
@@ -137,7 +144,7 @@ public interface ConConsultasExtendsMapper extends ConConsultaMapper{
 		@Result(column = "ABRIRPAR", property = "abrirparentesis", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCAMPO", property = "idcampo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTABLA", property = "idtabla", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripciontabla", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREREAL", property = "nombrereal", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREENCONSULTA", property = "campo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OPERADOR", property = "operador", jdbcType = JdbcType.VARCHAR),
