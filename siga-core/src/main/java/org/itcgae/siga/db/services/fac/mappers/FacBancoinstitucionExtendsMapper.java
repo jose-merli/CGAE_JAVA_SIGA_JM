@@ -18,17 +18,29 @@ import org.springframework.stereotype.Service;
 public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMapper {
 	
 	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "getCuentasBancarias")
-	@Results({ 
-		@Result(column = "COD_BANCO", property = "codBanco", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "COD_SUCURSAL", property = "codSucursal", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
-		@Result(column = "IBAN", property = "IBAN", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "SJCS", property = "sjcs", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "COMISIONDESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "COMISIONIMPORTE", property = "comisionImporte", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NUM_USOS", property = "numUsos", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NUM_FICHEROS", property = "numFicheros", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR)}) 
+	@Results({
+		@Result(column = "bancos_codigo", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "cod_banco", property = "codBanco", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "cod_sucursal", property = "codSucursal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechabaja", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "iban", property = "IBAN", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
+//		@Result(column = "descripcion", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "asientocontable", property = "asientoContable", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "cuentacontabletarjeta", property = "cuentaContableTarjeta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "bic", property = "BIC", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "num_usos", property = "numUsos", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "num_ficheros", property = "numFicheros", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "comisionimporte", property = "comisionImporte", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "comisiondescripcion", property = "comisionDescripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idtipoiva", property = "idTipoIVA", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "configficherossecuencia", property = "configFicherosSecuencia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "configficherosesquema", property = "configFicherosEsquema", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "configlugaresquemasecuencia", property = "configLugaresQueMasSecuencia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "configconceptoampliado", property = "configConceptoAmpliado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idsufijosjcs", property = "idSufijoSjcs", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "concepto", property = "concepto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "sjcs", property = "sjcs", jdbcType = JdbcType.VARCHAR)})
 	List<CuentasBancariasItem> getCuentasBancarias(Short idInstitucion);
 	
 	

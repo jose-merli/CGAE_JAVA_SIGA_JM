@@ -1,184 +1,272 @@
 package org.itcgae.siga.DTO.fac;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class CuentasBancariasItem {
-	private short id;
-	private String nombre;
-	private String bancoCodigo;
+
+	private String bancosCodigo;
 	private String codBanco;
 	private String codSucursal;
 	private Date fechaBaja;
-	private String IBAN;
-	private String descripcion;
-	private String sjcs;
-	private String comisionImporte;
-	private String numUsos;
-	private String  numFicheros;
 
-	public short getId() {
-		return id;
+	private String IBAN;
+	private String nombre;
+	private String descripcion;
+	private String asientoContable;
+	private String cuentaContableTarjeta;
+	private String BIC;
+	private String numUsos;
+	private String numFicheros;
+
+	private String comisionImporte;
+	private String comisionDescripcion;
+	private String idTipoIVA;
+
+	private String configFicherosSecuencia;
+	private String configFicherosEsquema;
+	private String configLugaresQueMasSecuencia;
+	private String configConceptoAmpliado;
+
+	private String sjcs;
+	private String idSufijoSjcs;
+	private String concepto;
+
+	public String getBancosCodigo() {
+		return bancosCodigo;
 	}
-	public void setId(short id) {
-		this.id = id;
+
+	public void setBancosCodigo(String bancosCodigo) {
+		this.bancosCodigo = bancosCodigo;
 	}
-	public String getNombre() {
-		return nombre;
-	}
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-	public String getBancoCodigo() {
-		return bancoCodigo;
-	}
-	public void setBancoCodigo(String bancoCodigo) {
-		this.bancoCodigo = bancoCodigo;
-	}
+
 	public String getCodBanco() {
 		return codBanco;
 	}
+
 	public void setCodBanco(String codBanco) {
 		this.codBanco = codBanco;
 	}
+
 	public String getCodSucursal() {
 		return codSucursal;
 	}
+
 	public void setCodSucursal(String codSucursal) {
 		this.codSucursal = codSucursal;
 	}
+
 	public Date getFechaBaja() {
 		return fechaBaja;
 	}
+
 	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
+
 	public String getIBAN() {
 		return IBAN;
 	}
-	public void setIBAN(String iBAN) {
-		IBAN = iBAN;
+
+	public void setIBAN(String IBAN) {
+		this.IBAN = IBAN;
 	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
 	public String getDescripcion() {
 		return descripcion;
 	}
+
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
-	public String getSjcs() {
-		return sjcs;
+
+	public String getAsientoContable() {
+		return asientoContable;
 	}
-	public void setSjcs(String sjcs) {
-		this.sjcs = sjcs;
+
+	public void setAsientoContable(String asientoContable) {
+		this.asientoContable = asientoContable;
 	}
-	public String getComisionImporte() {
-		return comisionImporte;
+
+	public String getCuentaContableTarjeta() {
+		return cuentaContableTarjeta;
 	}
-	public void setComisionImporte(String comisionImporte) {
-		this.comisionImporte = comisionImporte;
+
+	public void setCuentaContableTarjeta(String cuentaContableTarjeta) {
+		this.cuentaContableTarjeta = cuentaContableTarjeta;
 	}
+
+	public String getBIC() {
+		return BIC;
+	}
+
+	public void setBIC(String BIC) {
+		this.BIC = BIC;
+	}
+
 	public String getNumUsos() {
 		return numUsos;
 	}
+
 	public void setNumUsos(String numUsos) {
 		this.numUsos = numUsos;
 	}
+
 	public String getNumFicheros() {
 		return numFicheros;
 	}
+
 	public void setNumFicheros(String numFicheros) {
 		this.numFicheros = numFicheros;
 	}
+
+	public String getComisionImporte() {
+		return comisionImporte;
+	}
+
+	public void setComisionImporte(String comisionImporte) {
+		this.comisionImporte = comisionImporte;
+	}
+
+	public String getComisionDescripcion() {
+		return comisionDescripcion;
+	}
+
+	public void setComisionDescripcion(String comisionDescripcion) {
+		this.comisionDescripcion = comisionDescripcion;
+	}
+
+	public String getIdTipoIVA() {
+		return idTipoIVA;
+	}
+
+	public void setIdTipoIVA(String idTipoIVA) {
+		this.idTipoIVA = idTipoIVA;
+	}
+
+	public String getConfigFicherosSecuencia() {
+		return configFicherosSecuencia;
+	}
+
+	public void setConfigFicherosSecuencia(String configFicherosSecuencia) {
+		this.configFicherosSecuencia = configFicherosSecuencia;
+	}
+
+	public String getIdSufijoSjcs() {
+		return idSufijoSjcs;
+	}
+
+	public void setIdSufijoSjcs(String idSufijoSjcs) {
+		this.idSufijoSjcs = idSufijoSjcs;
+	}
+
+	public String getConfigFicherosEsquema() {
+		return configFicherosEsquema;
+	}
+
+	public void setConfigFicherosEsquema(String configFicherosEsquema) {
+		this.configFicherosEsquema = configFicherosEsquema;
+	}
+
+	public String getConfigLugaresQueMasSecuencia() {
+		return configLugaresQueMasSecuencia;
+	}
+
+	public void setConfigLugaresQueMasSecuencia(String configLugaresQueMasSecuencia) {
+		this.configLugaresQueMasSecuencia = configLugaresQueMasSecuencia;
+	}
+
+	public String getConfigConceptoAmpliado() {
+		return configConceptoAmpliado;
+	}
+
+	public void setConfigConceptoAmpliado(String configConceptoAmpliado) {
+		this.configConceptoAmpliado = configConceptoAmpliado;
+	}
+
+	public String getSjcs() {
+		return sjcs;
+	}
+
+	public void setSjcs(String sjcs) {
+		this.sjcs = sjcs;
+	}
+
+	public String getConcepto() {
+		return concepto;
+	}
+
+	public void setConcepto(String concepto) {
+		this.concepto = concepto;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		CuentasBancariasItem that = (CuentasBancariasItem) o;
+		return Objects.equals(bancosCodigo, that.bancosCodigo) &&
+				Objects.equals(codBanco, that.codBanco) &&
+				Objects.equals(codSucursal, that.codSucursal) &&
+				Objects.equals(fechaBaja, that.fechaBaja) &&
+				Objects.equals(IBAN, that.IBAN) &&
+				Objects.equals(nombre, that.nombre) &&
+				Objects.equals(descripcion, that.descripcion) &&
+				Objects.equals(asientoContable, that.asientoContable) &&
+				Objects.equals(cuentaContableTarjeta, that.cuentaContableTarjeta) &&
+				Objects.equals(BIC, that.BIC) &&
+				Objects.equals(numUsos, that.numUsos) &&
+				Objects.equals(numFicheros, that.numFicheros) &&
+				Objects.equals(comisionImporte, that.comisionImporte) &&
+				Objects.equals(comisionDescripcion, that.comisionDescripcion) &&
+				Objects.equals(idTipoIVA, that.idTipoIVA) &&
+				Objects.equals(configFicherosSecuencia, that.configFicherosSecuencia) &&
+				Objects.equals(configFicherosEsquema, that.configFicherosEsquema) &&
+				Objects.equals(configLugaresQueMasSecuencia, that.configLugaresQueMasSecuencia) &&
+				Objects.equals(configConceptoAmpliado, that.configConceptoAmpliado) &&
+				Objects.equals(sjcs, that.sjcs) &&
+				Objects.equals(idSufijoSjcs, that.idSufijoSjcs) &&
+				Objects.equals(concepto, that.concepto);
+	}
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((IBAN == null) ? 0 : IBAN.hashCode());
-		result = prime * result + ((bancoCodigo == null) ? 0 : bancoCodigo.hashCode());
-		result = prime * result + ((codBanco == null) ? 0 : codBanco.hashCode());
-		result = prime * result + ((codSucursal == null) ? 0 : codSucursal.hashCode());
-		result = prime * result + ((comisionImporte == null) ? 0 : comisionImporte.hashCode());
-		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
-		result = prime * result + ((fechaBaja == null) ? 0 : fechaBaja.hashCode());
-		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
-		result = prime * result + ((numFicheros == null) ? 0 : numFicheros.hashCode());
-		result = prime * result + ((numUsos == null) ? 0 : numUsos.hashCode());
-		result = prime * result + ((sjcs == null) ? 0 : sjcs.hashCode());
-		return result;
+		return Objects.hash(bancosCodigo, codBanco, codSucursal, fechaBaja, IBAN, nombre, descripcion, asientoContable, cuentaContableTarjeta, BIC, numUsos, numFicheros, comisionImporte, comisionDescripcion, idTipoIVA, configFicherosSecuencia, configFicherosEsquema, configLugaresQueMasSecuencia, configConceptoAmpliado, sjcs, idSufijoSjcs, concepto);
 	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		CuentasBancariasItem other = (CuentasBancariasItem) obj;
-		if (IBAN == null) {
-			if (other.IBAN != null)
-				return false;
-		} else if (!IBAN.equals(other.IBAN))
-			return false;
-		if (bancoCodigo == null) {
-			if (other.bancoCodigo != null)
-				return false;
-		} else if (!bancoCodigo.equals(other.bancoCodigo))
-			return false;
-		if (codBanco == null) {
-			if (other.codBanco != null)
-				return false;
-		} else if (!codBanco.equals(other.codBanco))
-			return false;
-		if (codSucursal == null) {
-			if (other.codSucursal != null)
-				return false;
-		} else if (!codSucursal.equals(other.codSucursal))
-			return false;
-		if (comisionImporte == null) {
-			if (other.comisionImporte != null)
-				return false;
-		} else if (!comisionImporte.equals(other.comisionImporte))
-			return false;
-		if (descripcion == null) {
-			if (other.descripcion != null)
-				return false;
-		} else if (!descripcion.equals(other.descripcion))
-			return false;
-		if (fechaBaja == null) {
-			if (other.fechaBaja != null)
-				return false;
-		} else if (!fechaBaja.equals(other.fechaBaja))
-			return false;
-		if (nombre == null) {
-			if (other.nombre != null)
-				return false;
-		} else if (!nombre.equals(other.nombre))
-			return false;
-		if (numFicheros == null) {
-			if (other.numFicheros != null)
-				return false;
-		} else if (!numFicheros.equals(other.numFicheros))
-			return false;
-		if (numUsos == null) {
-			if (other.numUsos != null)
-				return false;
-		} else if (!numUsos.equals(other.numUsos))
-			return false;
-		if (sjcs == null) {
-			if (other.sjcs != null)
-				return false;
-		} else if (!sjcs.equals(other.sjcs))
-			return false;
-		return true;
-	}
+
 	@Override
 	public String toString() {
-		return "CuentasBancariasItem [nombre=" + nombre + ", bancoCodigo=" + bancoCodigo + ", codBanco=" + codBanco
-				+ ", codSucursal=" + codSucursal + ", fechaBaja=" + fechaBaja + ", IBAN=" + IBAN + ", descripcion="
-				+ descripcion + ", sjcs=" + sjcs + ", comisionImporte=" + comisionImporte + ", numUsos=" + numUsos
-				+ ", numFicheros=" + numFicheros + "]";
+		return "CuentasBancariasItem{" +
+				"bancosCodigo='" + bancosCodigo + '\'' +
+				", codBanco='" + codBanco + '\'' +
+				", codSucursal='" + codSucursal + '\'' +
+				", fechaBaja=" + fechaBaja +
+				", IBAN='" + IBAN + '\'' +
+				", nombre='" + nombre + '\'' +
+				", descripcion='" + descripcion + '\'' +
+				", asientoContable='" + asientoContable + '\'' +
+				", cuentaContableTarjeta='" + cuentaContableTarjeta + '\'' +
+				", BIC='" + BIC + '\'' +
+				", numUsos='" + numUsos + '\'' +
+				", numFicheros='" + numFicheros + '\'' +
+				", comisionImporte='" + comisionImporte + '\'' +
+				", comisionDescripcion='" + comisionDescripcion + '\'' +
+				", idTipoIVA='" + idTipoIVA + '\'' +
+				", configFicherosSecuencia='" + configFicherosSecuencia + '\'' +
+				", configFicherosEsquema='" + configFicherosEsquema + '\'' +
+				", configLugaresQueMasSecuencia='" + configLugaresQueMasSecuencia + '\'' +
+				", configConceptoAmpliado='" + configConceptoAmpliado + '\'' +
+				", sjcs='" + sjcs + '\'' +
+				", idSufijoSjcs='" + idSufijoSjcs + '\'' +
+				", concepto='" + concepto + '\'' +
+				'}';
 	}
-	
-
-	 
 }

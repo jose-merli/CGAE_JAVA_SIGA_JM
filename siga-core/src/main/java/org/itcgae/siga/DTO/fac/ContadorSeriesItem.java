@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class ContadorSeriesItem {
 
+    private String idSerieFacturacion;
     private String idContador;
     private String nombre;
     private String prefijo;
@@ -50,12 +51,21 @@ public class ContadorSeriesItem {
         this.contador = contador;
     }
 
+    public String getIdSerieFacturacion() {
+        return idSerieFacturacion;
+    }
+
+    public void setIdSerieFacturacion(String idSerieFacturacion) {
+        this.idSerieFacturacion = idSerieFacturacion;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ContadorSeriesItem that = (ContadorSeriesItem) o;
-        return Objects.equals(idContador, that.idContador) &&
+        return Objects.equals(idSerieFacturacion, that.idSerieFacturacion) &&
+                Objects.equals(idContador, that.idContador) &&
                 Objects.equals(nombre, that.nombre) &&
                 Objects.equals(prefijo, that.prefijo) &&
                 Objects.equals(sufijo, that.sufijo) &&
@@ -64,18 +74,18 @@ public class ContadorSeriesItem {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idContador, nombre, prefijo, sufijo, contador);
+        return Objects.hash(idSerieFacturacion, idContador, nombre, prefijo, sufijo, contador);
     }
 
     @Override
     public String toString() {
         return "ContadorSeriesItem{" +
-                "idContador='" + idContador + '\'' +
+                "idSerieFacturacion='" + idSerieFacturacion + '\'' +
+                ", idContador='" + idContador + '\'' +
                 ", nombre='" + nombre + '\'' +
                 ", prefijo='" + prefijo + '\'' +
                 ", sufijo='" + sufijo + '\'' +
                 ", contador='" + contador + '\'' +
                 '}';
     }
-
 }
