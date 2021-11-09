@@ -74,7 +74,7 @@ public class FacturacionPySGeneralController {
 	}
 
 	@GetMapping(value = "/comboPlantillasEnvio")
-	ResponseEntity<ComboDTO> getDestinatariosSeries(HttpServletRequest request) {
+	ResponseEntity<ComboDTO> comboPlantillasEnvio(HttpServletRequest request) {
 		ComboDTO response = facturacionGeneralService.comboPlantillasEnvio(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}

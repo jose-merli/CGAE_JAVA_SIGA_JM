@@ -8,6 +8,7 @@ public class UsosSufijosItem {
     private String idSerieFacturacion;
     private String abreviatura;
     private String descripcion;
+    private String idSufijo;
     private String sufijo;
     private String numPendientes;
 
@@ -59,6 +60,14 @@ public class UsosSufijosItem {
         this.numPendientes = numPendientes;
     }
 
+    public String getIdSufijo() {
+        return idSufijo;
+    }
+
+    public void setIdSufijo(String idSufijo) {
+        this.idSufijo = idSufijo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -68,13 +77,14 @@ public class UsosSufijosItem {
                 Objects.equals(idSerieFacturacion, that.idSerieFacturacion) &&
                 Objects.equals(abreviatura, that.abreviatura) &&
                 Objects.equals(descripcion, that.descripcion) &&
+                Objects.equals(idSufijo, that.idSufijo) &&
                 Objects.equals(sufijo, that.sufijo) &&
                 Objects.equals(numPendientes, that.numPendientes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tipo, idSerieFacturacion, abreviatura, descripcion, sufijo, numPendientes);
+        return Objects.hash(tipo, idSerieFacturacion, abreviatura, descripcion, idSufijo, sufijo, numPendientes);
     }
 
     @Override
@@ -84,6 +94,7 @@ public class UsosSufijosItem {
                 ", idSerieFacturacion='" + idSerieFacturacion + '\'' +
                 ", abreviatura='" + abreviatura + '\'' +
                 ", descripcion='" + descripcion + '\'' +
+                ", idSufijo='" + idSufijo + '\'' +
                 ", sufijo='" + sufijo + '\'' +
                 ", numPendientes='" + numPendientes + '\'' +
                 '}';

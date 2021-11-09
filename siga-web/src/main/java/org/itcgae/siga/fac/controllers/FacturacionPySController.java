@@ -55,7 +55,7 @@ public class FacturacionPySController {
 	}
 
 	@PostMapping(value = "/eliminaSerieFacturacion")
-	ResponseEntity<DeleteResponseDTO> getSeriesFacturacion(
+	ResponseEntity<DeleteResponseDTO> eliminaSerieFacturacion(
 			@RequestBody List<SerieFacturacionItem> serieFacturacionItems, HttpServletRequest request) {
 		DeleteResponseDTO response = facturacionService.eliminaSerieFacturacion(serieFacturacionItems, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);

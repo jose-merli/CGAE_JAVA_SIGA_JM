@@ -23,29 +23,14 @@ import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
 import org.itcgae.siga.DTO.fac.UsosSufijosDTO;
 import org.itcgae.siga.DTO.fac.UsosSufijosItem;
+import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.AdmContador;
-import org.itcgae.siga.db.entities.AdmContadorExample;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenCuentasbancarias;
-import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
-import org.itcgae.siga.db.entities.FacFacturaExample;
-import org.itcgae.siga.db.entities.FacFormapagoserie;
-import org.itcgae.siga.db.entities.FacFormapagoserieExample;
-import org.itcgae.siga.db.entities.FacSeriefacturacion;
-import org.itcgae.siga.db.entities.FacSeriefacturacionBanco;
-import org.itcgae.siga.db.entities.FacSeriefacturacionBancoExample;
-import org.itcgae.siga.db.entities.FacSeriefacturacionExample;
-import org.itcgae.siga.db.entities.FacSeriefacturacionKey;
-import org.itcgae.siga.db.entities.FacTipocliincluidoenseriefac;
-import org.itcgae.siga.db.entities.FacTipocliincluidoenseriefacExample;
+import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
-import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.mappers.FacSeriefacturacionBancoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -78,9 +63,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	@Autowired
 	private FacFacturaMapper facFacturaMapper;
-
-	@Autowired
-	private CenCuentasbancariasMapper cenCuentasbancarias;
 
 	@Autowired
 	private AdmContadorMapper admContadorMapper;
@@ -139,19 +121,20 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					// Logica
 					for (CuentasBancariasItem cuenta : cuentasBancarias) {
 
-						CenCuentasbancariasExample cuentasbancariasExample = new CenCuentasbancariasExample();
-						cuentasbancariasExample.createCriteria().andIdcuentaEqualTo(cuenta.getId())
-								.andIdinstitucionEqualTo(Short.parseShort(idInstitucion));
+						FacBancoinstitucionKey cuentasbancariasKey = new FacBancoinstitucionKey();
+						cuentasbancariasKey.setIdinstitucion(Short.parseShort(idInstitucion));
+						cuentasbancariasKey.setBancosCodigo(cuenta.getBancosCodigo());
 
 						LOGGER.info("\n\nTratamiento de la cuenta con IBAN: " + cuenta.getIBAN() + "\n\n");
 
 						if (Integer.parseInt(cuenta.getNumUsos()) < 1) {
-							this.cenCuentasbancarias.deleteByExample(cuentasbancariasExample);
+							this.facBancoinstitucionExtendsMapper.deleteByPrimaryKey(cuentasbancariasKey);
 						} else {
-							CenCuentasbancarias cuentaCambio = this.cenCuentasbancarias
-									.selectByExample(cuentasbancariasExample).get(0);
-							cuentaCambio.setFechabaja(new Date());
-							this.cenCuentasbancarias.updateByExample(cuentaCambio, cuentasbancariasExample);
+							FacBancoinstitucion cuentaCambio = this.facBancoinstitucionExtendsMapper.selectByPrimaryKey(cuentasbancariasKey);
+							if (cuentaCambio != null) {
+								cuentaCambio.setFechabaja(new Date());
+								this.facBancoinstitucionExtendsMapper.updateByPrimaryKey(cuentaCambio);
+							}
 						}
 
 					}
@@ -1079,6 +1062,71 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				"FacturacionPySServiceImpl.getFicherosAdeudos() -> Salida del servicio  para obtener los ficheros de adeudos");
 
 		return ficherosAdeudosDTO;
+	}
+
+	// @Override
+	@Transactional
+	public CreateResponseDTO guardarContadorSerie(ContadorSeriesItem contador, HttpServletRequest request) {
+		CreateResponseDTO createResponseDTO = new CreateResponseDTO();
+
+		Error error = new Error();
+		String dni, idInstitucion;
+
+		LOGGER.info("guardarContadorSerie() -> Entrada al servicio para crear un nuevo contador");
+
+		try {
+			// Conseguimos información del usuario logeado
+			HashMap<String, String> authentication = authenticationProvider.checkAuthentication(request);
+
+			dni = authentication.get("dni");
+			idInstitucion = authentication.get("idInstitucion");
+
+			if (!dni.isEmpty() && !idInstitucion.isEmpty()) {
+				List<AdmUsuarios> usuarios = authenticationProvider.getUsuarios(dni, idInstitucion);
+
+				if (usuarios != null && !usuarios.isEmpty()) {
+					Integer idUsuario = usuarios.get(0).getIdusuario();
+					String idSerieFacturacion = contador.getIdSerieFacturacion();
+					LOGGER.info(
+							"guardarContadorSerie() / admContadorMapper.insertSelective() -> Entrada a admContadorMapper para crear un nuevo contador");
+
+					// Logica
+					AdmContador nuevoContador = new AdmContador();
+					nuevoContador.setNombre(contador.getNombre());
+					nuevoContador.setPrefijo(contador.getPrefijo());
+					nuevoContador.setContador(Long.parseLong(contador.getContador()));
+					nuevoContador.setSufijo(contador.getSufijo());
+					nuevoContador.setIdtabla("FAC_FACTURA");
+
+					nuevoContador.setIdcontador("FAC_" + idSerieFacturacion + "_" + "1");
+
+					nuevoContador.setIdcamposufijo("NUMEROFACTURA");
+					nuevoContador.setIdcampoprefijo("NUMEROFACTURA");
+					nuevoContador.setIdcampocontador("NUMEROFACTURA");
+
+					nuevoContador.setIdinstitucion(Short.parseShort(idInstitucion));
+					nuevoContador.setUsucreacion(idUsuario);
+					nuevoContador.setFechacreacion(new Date());
+					nuevoContador.setUsumodificacion(idUsuario);
+					nuevoContador.setFechamodificacion(new Date());
+
+					admContadorMapper.insertSelective(nuevoContador);
+
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(
+					"FacturacionPySServiceImpl.guardarContadorSerie() -> Se ha producido un error al crear un nuevo contador",
+					e);
+			error.setCode(500);
+			error.setDescription("general.mensaje.error.bbdd");
+		}
+
+		createResponseDTO.setError(error);
+
+		LOGGER.info("guardarContadorSerie() -> Salida del servicio para crear un nuevo contador");
+
+		return createResponseDTO;
 	}
 	/*
 	 * @Override
