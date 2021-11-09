@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTO.fac;
 
+import java.util.Date;
+
 public class ListaServiciosSuscripcionItem {
 	
 	private String orden;
@@ -8,6 +10,7 @@ public class ListaServiciosSuscripcionItem {
 	private String cantidad;
 	private String idPrecioServicio;
 	private String precioServicioValor;
+	private String precioServicioDesc;
 	private String idPeriodicidad;
 	private String periodicidadValor;
 	private String periodicidadDesc;
@@ -18,10 +21,12 @@ public class ListaServiciosSuscripcionItem {
 	private String valorIva;
 	private String solicitarBaja;
 	private String automatico;
+	private Date fechaAlta;
+	private Date fechaBaja;
 	
 	private int idServicio;
-	private int idTipoServicio;
-	private int idServicioInstitucion;
+	private int idTipoServicios;
+	private int idServiciosInstitucion;
 	
 	private String idPeticion;
 	private String idPersona;
@@ -104,18 +109,6 @@ public class ListaServiciosSuscripcionItem {
 	public void setIdServicio(int idServicio) {
 		this.idServicio = idServicio;
 	}
-	public int getIdTipoServicio() {
-		return idTipoServicio;
-	}
-	public void setIdTipoServicio(int idTipoServicio) {
-		this.idTipoServicio = idTipoServicio;
-	}
-	public int getIdServicioInstitucion() {
-		return idServicioInstitucion;
-	}
-	public void setIdServicioInstitucion(int idServicioInstitucion) {
-		this.idServicioInstitucion = idServicioInstitucion;
-	}
 	public String getIdPrecioServicio() {
 		return idPrecioServicio;
 	}
@@ -151,6 +144,36 @@ public class ListaServiciosSuscripcionItem {
 	}
 	public void setAutomatico(String automatico) {
 		this.automatico = automatico;
+	}
+	public int getIdTipoServicios() {
+		return idTipoServicios;
+	}
+	public void setIdTipoServicios(int idTipoServicios) {
+		this.idTipoServicios = idTipoServicios;
+	}
+	public int getIdServiciosInstitucion() {
+		return idServiciosInstitucion;
+	}
+	public void setIdServiciosInstitucion(int idServiciosInstitucion) {
+		this.idServiciosInstitucion = idServiciosInstitucion;
+	}
+	public Date getFechaAlta() {
+		return fechaAlta;
+	}
+	public void setFechaAlta(Date fechaAlta) {
+		this.fechaAlta = fechaAlta;
+	}
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+	public String getPrecioServicioDesc() {
+		return precioServicioDesc;
+	}
+	public void setPrecioServicioDesc(String precioServicioDesc) {
+		this.precioServicioDesc = precioServicioDesc;
 	}
 
 }

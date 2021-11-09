@@ -150,7 +150,8 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			@Result(column = "precioPerio", property = "precioPerio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fechaSuscripcion", property = "fechaSuscripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fechaBaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "estadoFactura", property = "idEstadoFactura", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "estadoFactura", property = "idEstadoFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "precioServicioDesc", property = "precioServicioDesc", jdbcType = JdbcType.VARCHAR)
 			
 		})
 	List<ListaSuscripcionesItem> getListaSuscripciones(FiltrosSuscripcionesItem filtro, Short idInstitucion, String idioma);
@@ -158,14 +159,13 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getListaServiciosSuscripcion")
 	@Results({
 		@Result(column = "IDSERVICIO", property = "idServicio", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "IDTIPOSERVICIO", property = "idTipoServicio", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "IDSERVICIOINSTITUCION", property = "idServicioInstitucion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOSERVICIOs", property = "idTipoServicios", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDSERVICIOSINSTITUCION", property = "idServiciosInstitucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "orden", property = "orden", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "cantidad", property = "cantidad", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "total", property = "total", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IVA", property = "iva", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "obervaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idPeticion", property = "idPeticion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOFACTURABLE", property = "noFacturable", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipoiva", property = "idtipoiva", jdbcType = JdbcType.VARCHAR),

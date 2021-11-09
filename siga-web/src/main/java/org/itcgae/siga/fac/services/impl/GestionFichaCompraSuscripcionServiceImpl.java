@@ -1953,5 +1953,155 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 		}
 	
 	
+	@Override
+	@Transactional
+	public InsertResponseDTO updateServiciosPeticion(HttpServletRequest request, FichaCompraSuscripcionItem peticion)
+			throws Exception {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		LOGGER.debug("updateServiciosPeticion() -> Entrada al servicio para actualizar los servicios solicitados asociados con una solicitud");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Se comentan el try y el catch para que la anotación @Transactional funcione
+		// correctamente
+//		try {
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+
+			LOGGER.info(
+					"updateServiciosPeticion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateServiciosPeticion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && !usuarios.isEmpty()) {
+				LOGGER.info(
+						"updateServiciosPeticion() / pysServiciossolicitadosMapper.deleteByExample() -> Entrada a pysServiciossolicitadosMapper para eliminar los servicios solicitados asociados con una solicitud");
+
+				PysServiciossolicitadosExample prodExample = new PysServiciossolicitadosExample();
+				
+				prodExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(Long.valueOf(peticion.getnSolicitud()));
+				//para comprobar que hay servicios a eliminar
+				List<PysServiciossolicitados> serviciosViejos = pysServiciossolicitadosMapper.selectByExample(prodExample);
+				response = pysServiciossolicitadosMapper.deleteByExample(prodExample);
+				//La segunda condicion es para evitar que se lance una excepcion al intentar eliminar un conjunto vacio
+				if(response == 0 && !serviciosViejos.isEmpty()) {
+					throw new Exception("Eror al eliminar los servicios solicitados de la petición");
+				}
+				
+				LOGGER.info(
+						"updateServiciosPeticion() / pysServiciossolicitadosMapper.deleteByExaple() -> Salida de pysServiciossolicitadosMapper para eliminar los servicios solicitados asociados con una solicitud");
+
+				
+				
+				PysServiciossolicitados servicioSolicitado = new PysServiciossolicitados();
+
+				servicioSolicitado.setIdinstitucion(idInstitucion);
+				servicioSolicitado.setIdpersona(Long.valueOf(peticion.getIdPersona()));
+				servicioSolicitado.setIdpeticion(Long.valueOf(peticion.getnSolicitud()));
+				//Si se ha seleccionado como forma de pago "No facturable"
+//				if(peticion.getIdFormaPagoSeleccionada().equals("-1")) {
+//					//De forma temporal se utilizara el id 80 que se refiere a pago por domiciliacion bancaria 
+//					//que no tendra cuenta bancaria seleccionada.
+//					servicioSolicitado.setIdformapago((short) 80);
+//					servicioSolicitado.setNofacturable("1");
+//				}
+//				else{
+					servicioSolicitado.setIdformapago(Short.valueOf(peticion.getIdFormaPagoSeleccionada()));
+//					servicioSolicitado.setNofacturable("0");
+//				}
+				//En el caso que la forma de pago sea domiciliación bancaria
+				if(peticion.getIdFormaPagoSeleccionada().equals("80")) {
+					servicioSolicitado.setIdcuenta(Short.valueOf(peticion.getCuentaBancSelecc()));
+				}
+				else {
+					servicioSolicitado.setIdcuenta(null);
+				}
+				
+				servicioSolicitado.setFechamodificacion(new Date());
+				servicioSolicitado.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+				for (ListaServiciosSuscripcionItem servicio : peticion.getServicios()) {
+					
+					servicioSolicitado.setIdservicio((long) servicio.getIdServicio());
+					servicioSolicitado.setIdtiposervicios((short) servicio.getIdTipoServicios());
+					servicioSolicitado.setIdserviciosinstitucion((long) servicio.getIdServiciosInstitucion());
+					servicioSolicitado.setIdpreciosservicios(Short.valueOf(servicio.getIdPrecioServicio()));
+					servicioSolicitado.setIdperiodicidad(Short.valueOf(servicio.getIdPeriodicidad()));
+					
+					//REVISAR: 
+					servicioSolicitado.setAceptado("A");
+					
+					servicioSolicitado.setOrden(Short.valueOf(servicio.getOrden()));
+					servicioSolicitado.setCantidad(1);
+					
+					LOGGER.info(
+							"updateServiciosPeticion() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para insertar los servicios solicitados asociados con una solicitud");
+					
+					response = pysServiciossolicitadosMapper.insert(servicioSolicitado);
+					if (response == 0)
+						throw new Exception("Error al insertar un servicio solicitado en la BBDD.");
+				}
+				LOGGER.info(
+						"updateServiciosPeticion() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para insertar los servicios solicitados asociados con una solicitud");
+			
+				
+				
+				if(peticion.getFechaAceptada() != null) {
+					LOGGER.info(
+							"updateServiciosPeticion() / pysSuscripcionMapper.updateByPrimaryKey() -> Entrada a pysSuscripcionesMapper para actualizar las suscripciones asociadas con una solicitud");
+
+					PysSuscripcionExample suscExample = new PysSuscripcionExample();
+					
+					suscExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpeticionEqualTo(Long.valueOf(peticion.getnSolicitud()));
+					//para comprobar que hay suscripciones
+					List<PysSuscripcion> listSuscPeticion = pysSuscripcionMapper.selectByExample(suscExample);
+
+					//Se comprueba si se han cambiado la fecha de alta o de baja en el front. Se comprueba solo el primera ya que supuestamente solo se manejara un servicio por suscripcion.
+					if(!listSuscPeticion.isEmpty()) {
+						for(PysSuscripcion susc : listSuscPeticion) {
+							if(!peticion.getFechaAceptada().equals(peticion.getServicios().get(0).getFechaAlta())){
+								susc.setFechasuscripcion(peticion.getServicios().get(0).getFechaAlta());
+							}
+							if(!susc.getFechabajafacturacion().equals(peticion.getServicios().get(0).getFechaBaja())){
+								susc.setFechabajafacturacion(peticion.getServicios().get(0).getFechaAlta());
+							}
+							if(!peticion.getFechaAceptada().equals(peticion.getServicios().get(0).getFechaAlta()) ||
+									!susc.getFechabajafacturacion().equals(peticion.getServicios().get(0).getFechaBaja())) {
+								pysSuscripcionMapper.updateByPrimaryKey(susc);
+								if(response == 0) {
+									throw new Exception("Eror al actualizar las suscripciones solicitadas de la petición");
+								}
+							}
+						}
+					}
+					
+					LOGGER.info(
+							"updateServiciosPeticion() / pysSuscripcionMapper.updateByPrimaryKey() -> Salida de pysSuscripcionesMapper para eliminar las suscripciones asociadas con una solicitud");
+
+				}
+
+				}
+
+			insertResponseDTO.setStatus("200");
+		}
+
+		insertResponseDTO.setError(error);
+		LOGGER.debug("updateServiciosPeticion() -> Salida del servicio para actualizar los servicios solicitados asociados con una solicitud");
+
+		return insertResponseDTO;
+	}
+	
+	
 	}
 	

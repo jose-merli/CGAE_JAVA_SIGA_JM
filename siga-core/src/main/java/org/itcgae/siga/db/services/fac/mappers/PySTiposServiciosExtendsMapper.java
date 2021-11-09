@@ -63,7 +63,9 @@ public interface PySTiposServiciosExtendsMapper extends PysServiciosMapper{
 		@Result(column = "FORMA_PAGO", property = "formapago", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "noFacturable", property = "noFacturable", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "formasPagoInternet", property = "formasPagoInternet", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "solicitarBaja", property = "solicitarBaja", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "solicitarBaja", property = "solicitarBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaBajaIva", property = "fechaBajaIva", jdbcType = JdbcType.DATE),
+		@Result(column = "valorIva", property = "valorIva", jdbcType = JdbcType.VARCHAR)
 		
 		}) 
 	List<ListaServiciosItem> searchListadoServiciosBuscador(String idioma, Short idInstitucion, FiltroServicioItem filtroServicioItem);	
