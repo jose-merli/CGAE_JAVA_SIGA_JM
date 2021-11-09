@@ -22,7 +22,7 @@ public interface FacDisquetecargosExtendsMapper extends FacDisquetecargosMapper 
 		@Result(column = "IDDISQUETECARGOS", property = "idDisqueteCargos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "BANCOS_CODIGO", property = "bancosCodigo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "COMISIONDESCRIPCION", property = "comisionDescripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CUENTA_ENTIDAD", property = "cuentaEntidad", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IBAN", property = "iban", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHACREACION", property = "fechaCreacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDSERIEFACTURACION", property = "idseriefacturacion", jdbcType = JdbcType.VARCHAR),
