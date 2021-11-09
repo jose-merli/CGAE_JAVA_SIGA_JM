@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -31,6 +32,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTO.fac.FiltroServicioItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosDTO;
 import org.itcgae.siga.DTO.fac.ListaServiciosItem;
+import org.itcgae.siga.DTO.fac.ServicioDetalleDTO;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConfigColumnasQueryBuilderDTO;
@@ -2647,6 +2649,12 @@ public class ConsultasServiceImpl implements IConsultasService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
+		Error error = new Error();
+		
+		String consulta = "";
+		criterioLst.clear();
+        contador = 1;
+		
 		int statusDeleteConCriterioConsulta = 0;
 		int statusInsertConCriterioConsulta = 0;
 		
@@ -2706,8 +2714,8 @@ public class ConsultasServiceImpl implements IConsultasService {
 				if (usuarios != null && !usuarios.isEmpty()) {
 
 					String idioma = usuarios.get(0).getIdlenguaje();
-					
-					
+						
+				if(queryBuilderDTO.getConsulta() != null && !queryBuilderDTO.getConsulta().equals("")) {
 					//Inserto en con_criterioconsulta los campos recibidos del constructor de consultas
 					ConCriterioconsulta conCriterioConsultaInsertar = new ConCriterioconsulta();
 					
@@ -2741,11 +2749,27 @@ public class ConsultasServiceImpl implements IConsultasService {
 		            	
 		            	if(!filtroSplit[1].equals("IS")) {
 		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(filtroSplit[0], filtroSplit[1].toLowerCase());
-		            		conCriterioConsultaInsertar.setIdoperacion((long) idoperacion);
+		            		if(idoperacion != 0) {
+		            			conCriterioConsultaInsertar.setIdoperacion((long) idoperacion);
+		            		}else {
+		            			error.setCode(HttpStatus.SC_BAD_GATEWAY);
+		            			error.setMessage("El operador: " + filtroSplit[1] + " no puede ser usado en ese campo");
+		            			queryBuilderDTO.setError(error);
+		            			
+		            			throw new Exception("El operador: " + filtroSplit[1] + " no puede ser usado en ese campo");
+		            		}
 		            	}else{
 		            		String simbolo = filtroSplit[1] + " " + filtroSplit[2];
 		            		int idoperacion = _conConsultasExtendsMapper.getIdOperacion(filtroSplit[0], simbolo.toLowerCase());
+		            		if(idoperacion != 0) {
 		            		conCriterioConsultaInsertar.setIdoperacion((long) idoperacion);
+		            		}else {
+		            			error.setCode(HttpStatus.SC_BAD_GATEWAY);
+		            			error.setMessage("El operador: " + simbolo + " no puede ser usado en ese campo");
+		            			queryBuilderDTO.setError(error);
+		            			
+		            			throw new Exception("El operador: " + simbolo + " no puede ser usado en ese campo");
+		            		}
 		            	}
 		            	          	
 		            	LOGGER.info(
@@ -2781,13 +2805,12 @@ public class ConsultasServiceImpl implements IConsultasService {
 						}
 		            }
 		            
-		            criterioLst.clear();
-		            contador = 1;
+				}
 		            
 		            int statusUpdateConConsulta = 0;
 		            int statusDeleteConConsulta = 0;
 		            boolean queryPorDefecto = false;
-		            String consulta = "";
+		            
 		            
 		            //Si hay criterios formamos la query basandonos en ellos
 		            if(!queryBuilderDTO.getConsulta().equals("")) {
@@ -2815,59 +2838,47 @@ public class ConsultasServiceImpl implements IConsultasService {
 		            
 		            conConsulta.setSentencia(consulta);            
 		            
-		         // Inserto en CON_CONSULTA, si hace falta
-					if (!queryPorDefecto) {
-						statusUpdateConConsulta = _conConsultaMapper.updateByPrimaryKeySelective(conConsulta);
+		         // Actualizo en CON_CONSULTA
+					statusUpdateConConsulta = _conConsultaMapper.updateByPrimaryKeySelective(conConsulta);
 						
-						if(statusUpdateConConsulta == 0) {			
-							throw new Exception("No se ha podido realizar la actualizacion de la consulta en la tabla con_consulta");
+					if(statusUpdateConConsulta == 0) {			
+						throw new Exception("No se ha podido realizar la actualizacion de la consulta en la tabla con_consulta");
 							
-						}else if(statusUpdateConConsulta == 1) {
-							LOGGER.info(
-									"constructorConsultas() / ConConsultaMapper.updateByPrimaryKeySelective() -> Se ha podido realizar la actualizacion de la consulta en la tabla con_consulta");
-						}
-					} else {//ESTA PARTE DEL ELIMINAR NO TENGO CLARO EL PORQUE
-						//Si el criterio es el por defecto borro la sentencia en CON_CONSULTA
-						ConConsultaKey conConsultaKey = new ConConsultaKey();
-						
-						conConsultaKey.setIdinstitucion(idInstitucion);
-						conConsultaKey.setIdconsulta(Long.valueOf(queryBuilderDTO.getIdconsulta()));
-						
-						statusDeleteConConsulta = _conConsultaMapper.deleteByPrimaryKey(conConsultaKey);
-						
-						if(statusDeleteConConsulta == 0) {			
-							throw new Exception("No se ha podido realizar la eliminacion de la consulta en la tabla con_consulta");
-							
-						}else if(statusDeleteConConsulta == 1) {
-							LOGGER.info(
-									"constructorConsultas() / ConConsultaMapper.deleteByPrimaryKey) -> Se ha podido realizar la eliminacion de la consulta en la tabla con_consulta");
-						}
-						
-					}
-		           
-		            //Actualizo PYS_SERVICIOSINSTITUCION (HABRIA QUE RECORRER PYS_SERVICIOSINSTITUCION EN BUSCA DE TODOS LOS SERVICIOS QUE TENGAN ASIGNADA ESTA CONSULTA???)
-					int statusUpdatePysServiciosInstitucion = 0;
-					PysServiciosinstitucion pysServiciosInstitucion = new PysServiciosinstitucion();
-					
-					pysServiciosInstitucion.setIdinstitucion(idInstitucion);
-					pysServiciosInstitucion.setIdserviciosinstitucion(null);
-					pysServiciosInstitucion.setIdservicio(null);
-					pysServiciosInstitucion.setIdtiposervicios(null);
-					
-					pysServiciosInstitucion.setCriterios(consulta);
-					
-					statusUpdatePysServiciosInstitucion = _pysServiciosInstitucionMapper.updateByPrimaryKeySelective(pysServiciosInstitucion);
-					
-					if(statusUpdatePysServiciosInstitucion == 0) {			
-						throw new Exception("No se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_serviciosinstitucion");
-						
-					}else if(statusUpdatePysServiciosInstitucion == 1) {
+					}else if(statusUpdateConConsulta == 1) {
 						LOGGER.info(
-								"constructorConsultas() / ConConsultaMapper.deleteByPrimaryKey) -> Se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_serviciosinstitucion");
-					}		
+								"constructorConsultas() / ConConsultaMapper.updateByPrimaryKeySelective() -> Se ha podido realizar la actualizacion de la consulta en la tabla con_consulta");
+					}
+					
 				}
-			}
-			
+		           
+		            //Actualizo PYS_SERVICIOSINSTITUCION (HABRIA QUE RECORRER PYS_SERVICIOSINSTITUCION EN BUSCA DE TODOS LOS SERVICIOS DE ESTA INSTITUCION QUE TENGAN ASIGNADA ESTA CONSULTA)
+					List<ServicioDetalleDTO> listaServicios = new ArrayList<ServicioDetalleDTO>();
+					
+					listaServicios = _conConsultasExtendsMapper.selectServiciosByConsulta(idInstitucion, queryBuilderDTO.getIdconsulta());
+				
+					for (ServicioDetalleDTO servicioDetalleDTO : listaServicios) {
+						int statusUpdatePysServiciosInstitucion = 0;
+						PysServiciosinstitucion pysServiciosInstitucion = new PysServiciosinstitucion();
+						
+						pysServiciosInstitucion.setIdinstitucion(idInstitucion);
+						pysServiciosInstitucion.setIdserviciosinstitucion((long) servicioDetalleDTO.getIdserviciosinstitucion());
+						pysServiciosInstitucion.setIdservicio((long) servicioDetalleDTO.getIdservicio());
+						pysServiciosInstitucion.setIdtiposervicios((short) servicioDetalleDTO.getIdtiposervicios());
+						
+						pysServiciosInstitucion.setCriterios(consulta);
+						
+						statusUpdatePysServiciosInstitucion = _pysServiciosInstitucionMapper.updateByPrimaryKeySelective(pysServiciosInstitucion);
+						
+						if(statusUpdatePysServiciosInstitucion == 0) {			
+							throw new Exception("No se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_serviciosinstitucion");
+							
+						}else if(statusUpdatePysServiciosInstitucion == 1) {
+							LOGGER.info(
+									"constructorConsultas() / _pysServiciosInstitucionMapper.updateByPrimaryKeySelective) -> Se ha podido realizar la actualizacion del criterio (consulta) en la tabla pys_serviciosinstitucion");
+						}		
+					}
+					
+				}		
 			
 			LOGGER.info("constructorConsultas() -> Salida del servicio para crear una nueva consulta desde el constructor de consultas");
 
@@ -2893,16 +2904,16 @@ public class ConsultasServiceImpl implements IConsultasService {
 		}
 		
 		// variable resultado
-	  	String consulta=" SELECT ";
+	  	String consulta="SELECT ";
 	  	try{
 //	  		//campos de consulta
 	  		consulta += " " + getCamposSalida(nombreTablas);
 //	  		
 //	  		//tablas a consultar
-	  		consulta += " FROM " + getFrom(nombreTablas);
+	  		consulta += " FROM" + getFrom(nombreTablas);
 //	  		
 //	  		//where fijo
-	  		consulta += " WHERE " + getWhereFijo(nombreTablas);
+	  		consulta += " WHERE" + getWhereFijo(nombreTablas);
 //	  		
 //	  		//where variable
 	  		if (constructorDeConsultasList != null && constructorDeConsultasList.size() > 0)
@@ -2927,7 +2938,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 		  	boolean hayPrimero = false;
 		  	
 		  	// COMPROBAMOS LA TABLA CEN_CLIENTE
-		  	resultado += (nombreTablas.contains("CEN_CLIENTE")? "CEN_CLIENTE.IDINSTITUCION, CEN_CLIENTE.IDPERSONA." :"");
+		  	resultado += (nombreTablas.contains("CEN_CLIENTE")? "CEN_CLIENTE.IDINSTITUCION, CEN_CLIENTE.IDPERSONA" :"");
 		  	// comprobamos si ya se han insertado los primeros campos
 		  	if(!resultado.equals("")) hayPrimero=true; 
 		  	
@@ -2963,7 +2974,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 		  	boolean hayPrimero = false;
 
 		  	// COMPROBAMOS LA TABLA CEN_CLIENTE
-		  	resultado += (nombreTablas.contains("CEN_CLIENTE")?" CEN_CLIENTE ":"");
+		  	resultado += (nombreTablas.contains("CEN_CLIENTE")?" CEN_CLIENTE":"");
 		  	// comprobamos si ya se ha insertado la primera tabla
 		  	if(!resultado.equals("")) hayPrimero=true; 
 		  	
@@ -3004,31 +3015,31 @@ public class ConsultasServiceImpl implements IConsultasService {
 		  	
 		  	// COMPROBAMOS LA TABLA CEN_CLIENTE
 		  	if (nombreTablas.contains("CEN_CLIENTE")){
-		  		resultado += " CEN_CLIENTE.IDINSTITUCION" + "=" + "@IDINSTITUCION@ ";
-		  		resultado += " AND CEN_CLIENTE.IDPERSONA" + "=" + "@IDPERSONA@ ";
+		  		resultado += " CEN_CLIENTE.IDINSTITUCION" + " = " + "@IDINSTITUCION@ ";
+		  		resultado += " AND CEN_CLIENTE.IDPERSONA" + " = " + "@IDPERSONA@ ";
 		  	}
 		  	// comprobamos si ya se han insertado los primeros campos
 		  	if(!resultado.equals("")) hayPrimero=true; 
 		  	
 		  	// COMPROBAMOS LA TABLA CEN_COLEGIADO
 		  	if(nombreTablas.contains("CEN_COLEGIADO")&&(!hayPrimero)){
-		  		resultado += (hayPrimero?" AND ":" ") + "CEN_COLEGIADO.IDINSTITUCION" + "=" + "@IDINSTITUCION@ ";
-		  		resultado += " AND CEN_COLEGIADO.IDPERSONA" + "=" + "@IDPERSONA@ ";
+		  		resultado += (hayPrimero?" AND ":" ") + "CEN_COLEGIADO.IDINSTITUCION" + " = " + "@IDINSTITUCION@ ";
+		  		resultado += " AND CEN_COLEGIADO.IDPERSONA" + " = " + "@IDPERSONA@ ";
 		  	}
 		  	if(!resultado.equals("")) hayPrimero=true; 
 
 		  	// COMPROBAMOS LA TABLA CEN_GRUPOSCLIENTE_CLIENTE
 		  	if(nombreTablas.contains("CEN_GRUPOSCLIENTE_CLIENTE")&&(!hayPrimero)){
-		  		resultado += (hayPrimero?" AND ":" ") + "CEN_GRUPOSCLIENTE_CLIENTE.IDINSTITUCION" + "=" + "@IDINSTITUCION@ ";
-		  		resultado += " AND CEN_GRUPOSCLIENTE_CLIENTE.IDPERSONA" + "=" + "@IDPERSONA@ ";
+		  		resultado += (hayPrimero?" AND ":" ") + "CEN_GRUPOSCLIENTE_CLIENTE.IDINSTITUCION" + " = " + "@IDINSTITUCION@ ";
+		  		resultado += " AND CEN_GRUPOSCLIENTE_CLIENTE.IDPERSONA" + " = " + "@IDPERSONA@ ";
 		  	}
 		  	if(!resultado.equals("")) hayPrimero=true; 
 		  	
 		  	// SI NO SE HAN INCLUIDO NINGUNA DE LAS DOS TABLAS, 
 		  	// POR DEFECTO, INCLUIMOS LA DE CEN_CLIENTE
 		  	if (!hayPrimero) {
-		  		resultado += " CEN_CLIENTE.IDINSTITUCION" + "=" + "@IDINSTITUCION@ ";
-		  		resultado += " AND CEN_CLIENTE.IDPERSONA" + "=" + "@IDPERSONA@ ";
+		  		resultado += " CEN_CLIENTE.IDINSTITUCION" + " = " + "@IDINSTITUCION@ ";
+		  		resultado += " AND CEN_CLIENTE.IDPERSONA" + " = " + "@IDPERSONA@ ";
 		  	}
 
 	  	}catch(Exception e){
@@ -3098,10 +3109,11 @@ public class ConsultasServiceImpl implements IConsultasService {
 			  		String operacion = registroConCriterioConsulta.getSimbolo();
 			  		if (operacion.trim().equalsIgnoreCase("is null")) {
 			  		    String valor = registroConCriterioConsulta.getValor();
-			  		    if (valor.trim().equalsIgnoreCase("1")||valor.trim().equalsIgnoreCase("'1'"))
-			  		      resultado += operacion;
-			  		    if (valor.trim().equalsIgnoreCase("0")||valor.trim().equalsIgnoreCase("'0'"))
-			  		      resultado += " is not null ";
+			  		    resultado += operacion;
+//			  		    if (valor.trim().equalsIgnoreCase("1")||valor.trim().equalsIgnoreCase("'1'"))
+//			  		      resultado += operacion;
+//			  		    if (valor.trim().equalsIgnoreCase("0")||valor.trim().equalsIgnoreCase("'0'"))
+//			  		      resultado += " is not null ";
 			  		}
 			  		else {
 			  		    resultado += operacion + " " + registroConCriterioConsulta.getValor() + " ";
@@ -3144,7 +3156,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 		  	if (!nombreTablas.contains("CEN_CLIENTE")){//  hacemos join de las tablas cen_colegiado y cen_persona 
 		  		                                                // siempre que no exista join entre cen_cliente y cen_colegiado
 			  	if(nombreTablas.contains("CEN_COLEGIADO") && nombreTablas.contains("CEN_PERSONA")){
-			  		resultado += (hayPrimero?" AND ":" ")+"CEN_COLEGIADO.IDPERSONAC(+) = CEN_PERSONA.IDPERSONA ";
+			  		resultado += (hayPrimero?" AND ":" ")+"CEN_COLEGIADO.IDPERSONA(+) = CEN_PERSONA.IDPERSONA ";
 			  	}
 			  	if(!resultado.equals("")) hayPrimero=true; 
 		  	}
@@ -3158,7 +3170,7 @@ public class ConsultasServiceImpl implements IConsultasService {
 	 public static String getQueryPorDefecto () throws Exception{
 		  	
 		  	//devuelve una consulta por defecto
-		  	String consulta = " SELECT CEN_CLIENTE.IDINSTITUCION, CEN_CLIENTE.IDPERSONA FROM CEN_CLIENTE WHERE CEN_CLIENTE.IDINSTITUCION @IDINSTITUCION@ AND CEN_CLIENTE.IDPERSONA = @IDPERSONA@";
+		  	String consulta = "SELECT CEN_CLIENTE.IDINSTITUCION, CEN_CLIENTE.IDPERSONA FROM CEN_CLIENTE WHERE CEN_CLIENTE.IDINSTITUCION = @IDINSTITUCION@ AND CEN_CLIENTE.IDPERSONA = @IDPERSONA@";
 		  	
 		  	return consulta;
 	 }
@@ -3215,8 +3227,10 @@ public class ConsultasServiceImpl implements IConsultasService {
         cri.setCerrarParentesis(cadena.contains(")"));
         cri.setFiltro(cadena.replace("(", "").replace(")", ""));
         
-        if(cri.getFiltro().charAt(0) == ' '){
-            cri.setFiltro(cri.getFiltro().substring(1));
+        if(cri.getFiltro() != null && !cri.getFiltro().equals("")) {
+	        if(cri.getFiltro().charAt(0) == ' '){
+	            cri.setFiltro(cri.getFiltro().substring(1));
+	        }
         }
         
         cri.setOrden(contador);

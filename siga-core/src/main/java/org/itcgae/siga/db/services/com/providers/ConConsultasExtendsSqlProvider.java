@@ -297,7 +297,7 @@ public class ConConsultasExtendsSqlProvider {
 	public String getIdOperacion(String idCampo, String simbolo){
 		SQL sql = new SQL();
 		
-		sql.SELECT(" con_opeconsulta.IDOPERACION");
+		sql.SELECT(" NVL(MIN(con_opeconsulta.IDOPERACION),0) idoperacion");
 		
 		sql.FROM(" CON_OPERACIONCONSULTA con_opeconsulta");
 		sql.FROM(" CON_CAMPOCONSULTA con_campocon");
@@ -308,4 +308,20 @@ public class ConConsultasExtendsSqlProvider {
 		
 		return sql.toString();
 	}
+	
+	public String selectServiciosByConsulta(Short idInstitucion, String idConsulta){
+		SQL sql = new SQL();
+		
+		sql.SELECT(" IDSERVICIOSINSTITUCION");
+		sql.SELECT(" IDSERVICIO");
+		sql.SELECT(" IDTIPOSERVICIOS");
+		
+		sql.FROM(" PYS_SERVICIOSINSTITUCION");
+		
+		sql.WHERE(" IDINSTITUCION = " + idInstitucion);
+		sql.WHERE(" IDCONSULTA = " + idConsulta);
+		
+		return sql.toString();
+	}
+	
 }
